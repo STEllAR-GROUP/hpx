@@ -227,7 +227,7 @@ hpx_option(HPX_WITH_COMPILER_WARNINGS BOOL
   ON ADVANCED)
 
 hpx_option(HPX_WITH_EXECUTABLE_PREFIX STRING
-	"Executable prefix (default none), 'hpx_' useful for system install."
+  "Executable prefix (default none), 'hpx_' useful for system install."
   "" CATEGORY "Build Targets")
 
 hpx_option(HPX_WITH_DOCUMENTATION BOOL
@@ -1727,16 +1727,14 @@ else()
 endif()
 
 
-# ################################################################################
-# # search path configuration
-# ################################################################################
-
+################################################################################
+# search path configuration
+################################################################################
 include(GNUInstallDirs)
 
 if(HPX_WITH_FULL_RPATH)
   hpx_include(SetFullRPATH)
 endif()
-###############################################################################
 
 ################################################################################
 # Git commit detection
