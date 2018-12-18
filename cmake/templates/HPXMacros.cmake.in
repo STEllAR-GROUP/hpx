@@ -5,6 +5,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@HPX_CMAKE_MODULE_PATH@")
+
+include(GNUInstallDirs)
 include(HPX_Utils)
 
 function(hpx_check_compiler_compatibility)
