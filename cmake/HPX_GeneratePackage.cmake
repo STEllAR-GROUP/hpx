@@ -126,11 +126,11 @@ endif()
 
 # Configure config for the install dir ...
 set(HPX_CONF_INCLUDE_DIRS
-  "-I${CMAKE_INSTALL_PREFIX}/include -I${CMAKE_INSTALL_PREFIX}/include/hpx/external ${_NEEDED_INCLUDE_DIRS}"
+  "-I${CMAKE_INSTALL_FULL_INCLUDEDIR} -I${CMAKE_INSTALL_FULL_INCLUDEDIR}/hpx/external ${_NEEDED_INCLUDE_DIRS}"
 )
 set(HPX_CMAKE_CONF_INCLUDE_DIRS
-  "${CMAKE_INSTALL_PREFIX}/include"
-  "${CMAKE_INSTALL_PREFIX}/include/hpx/external"
+  "${CMAKE_INSTALL_FULL_INCLUDEDIR}"
+  "${CMAKE_INSTALL_FULL_INCLUDEDIR}/hpx/external"
   "${_NEEDED_CMAKE_INCLUDE_DIRS}"
 )
 set(HPX_CONF_PREFIX ${CMAKE_INSTALL_PREFIX})
@@ -196,7 +196,7 @@ configure_file(${hpx_bazel_file}
   @ONLY)
 
 # Configure macros for the install dir ...
-set(HPX_CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/lib/cmake/${HPX_PACKAGE_NAME}")
+set(HPX_CMAKE_MODULE_PATH "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}")
 configure_file(cmake/templates/HPXMacros.cmake.in
   "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/HPXMacros.cmake"
   ESCAPE_QUOTES @ONLY)
@@ -210,7 +210,7 @@ install(
   EXPORT HPXTargets
   FILE HPXTargets.cmake
 #  NAMESPACE hpx::
-  DESTINATION ${LIB}/cmake/${HPX_PACKAGE_NAME}
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
 )
 
 install(
@@ -218,7 +218,7 @@ install(
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${HPX_PACKAGE_NAME}Config.cmake"
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/HPXMacros.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/${HPX_PACKAGE_NAME}ConfigVersion.cmake"
-    DESTINATION ${LIB}/cmake/${HPX_PACKAGE_NAME}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
   COMPONENT cmake
 )
 
@@ -228,14 +228,14 @@ install(
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx_application_debug.pc"
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx_component.pc"
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx_component_debug.pc"
-  DESTINATION ${LIB}/pkgconfig
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
   COMPONENT pkgconfig
 )
 
 install(
   FILES
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpxcxx"
-  DESTINATION bin
+  DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT compiler_wrapper
   PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
   GROUP_READ GROUP_EXECUTE
@@ -245,6 +245,6 @@ install(
 install(
   FILES
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx_bazel_defs.bzl"
-  DESTINATION ${LIB}/bazel
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/bazel
   COMPONENT bazel
 )
