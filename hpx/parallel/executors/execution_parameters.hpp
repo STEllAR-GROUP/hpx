@@ -90,6 +90,16 @@ namespace hpx { namespace parallel { namespace execution
                     std::forward<Executor>(exec), std::forward<F>(f), cores,
                     num_tasks);
             }
+
+            template <typename AnyParameters, typename Executor, typename F>
+            struct result
+            {
+                using type = decltype(call(
+                    std::declval<AnyParameters>(),
+                    std::declval<Executor>(), std::declval<F>(),
+                    std::declval<std::size_t>(), std::declval<std::size_t>()
+                ));
+            };
         };
 
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_chunk_size)
@@ -137,6 +147,16 @@ namespace hpx { namespace parallel { namespace execution
                 return call(static_cast<Parameters&>(params),
                     std::forward<Executor>(exec), cores, num_tasks);
             }
+
+            template <typename AnyParameters, typename Executor>
+            struct result
+            {
+                using type = decltype(call(
+                    std::declval<AnyParameters>(),
+                    std::declval<Executor>(),
+                    std::declval<std::size_t>(), std::declval<std::size_t>()
+                ));
+            };
         };
 
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(maximal_number_of_chunks)
@@ -199,6 +219,15 @@ namespace hpx { namespace parallel { namespace execution
                 call(static_cast<Parameters&>(params),
                     std::forward<Executor>(exec));
             }
+
+            template <typename AnyParameters, typename Executor>
+            struct result
+            {
+                using type = decltype(call(
+                    std::declval<AnyParameters>(),
+                    std::declval<Executor>()
+                ));
+            };
         };
 
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(reset_thread_distribution)
@@ -244,6 +273,15 @@ namespace hpx { namespace parallel { namespace execution
                 return call(static_cast<Parameters&>(params),
                     std::forward<Executor>(exec));
             }
+
+            template <typename AnyParameters, typename Executor>
+            struct result
+            {
+                using type = decltype(call(
+                    std::declval<AnyParameters>(),
+                    std::declval<Executor>()
+                ));
+            };
         };
 
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(count_processing_units)
@@ -286,6 +324,15 @@ namespace hpx { namespace parallel { namespace execution
                 call(static_cast<Parameters&>(params),
                     std::forward<Executor>(exec));
             }
+
+            template <typename AnyParameters, typename Executor>
+            struct result
+            {
+                using type = decltype(call(
+                    std::declval<AnyParameters>(),
+                    std::declval<Executor>()
+                ));
+            };
         };
 
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_begin_execution)
@@ -327,6 +374,15 @@ namespace hpx { namespace parallel { namespace execution
                 call(static_cast<Parameters&>(params),
                     std::forward<Executor>(exec));
             }
+
+            template <typename AnyParameters, typename Executor>
+            struct result
+            {
+                using type = decltype(call(
+                    std::declval<AnyParameters>(),
+                    std::declval<Executor>()
+                ));
+            };
         };
 
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_end_execution)

@@ -69,6 +69,17 @@ namespace hpx { namespace parallel { namespace execution
                     timed_executor<NonBlockingOneWayExecutor&>(exec, rel_time),
                     std::forward<F>(f), std::forward<Ts>(ts)...);
             }
+
+            template <typename NonBlockingOneWayExecutor, typename F,
+                typename ... Ts>
+            struct result
+            {
+                using type = decltype(call(
+                    std::declval<NonBlockingOneWayExecutor>(),
+                    std::declval<hpx::util::steady_time_point const&>(),
+                    std::declval<F>(), std::declval<Ts>()...
+                ));
+            };
         };
         /// \endcond
     }
@@ -115,6 +126,16 @@ namespace hpx { namespace parallel { namespace execution
                     timed_executor<OneWayExecutor&>(exec, rel_time),
                     std::forward<F>(f), std::forward<Ts>(ts)...);
             }
+
+            template <typename OneWayExecutor, typename F, typename ... Ts>
+            struct result
+            {
+                using type = decltype(call(
+                    std::declval<OneWayExecutor>(),
+                    std::declval<hpx::util::steady_time_point const&>(),
+                    std::declval<F>(), std::declval<Ts>()...
+                ));
+            };
         };
 
         /// \endcond
