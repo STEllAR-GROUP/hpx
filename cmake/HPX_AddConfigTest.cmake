@@ -423,6 +423,13 @@ function(hpx_check_for_cxx11_std_exception_ptr)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx11_std_forward_list)
+  add_hpx_config_test(HPX_WITH_CXX11_FORWARD_LIST
+    SOURCE cmake/tests/cxx11_std_forward_list.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_cxx11_std_initializer_list)
   add_hpx_config_test(HPX_WITH_CXX11_STD_INITIALIZER_LIST
     SOURCE cmake/tests/cxx11_std_initializer_list.cpp
