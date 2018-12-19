@@ -31,17 +31,32 @@ namespace hpx { namespace threads { namespace policies
         > thread_queue_type;
 
         //////////////////////////////////////////////////////////////////////////////////
-        ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads), queues_(num_threads), max_queue_thread_count_(1000)
+        ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads), max_queue_thread_count_(1000), queues_(num_threads), messages_per_thread(num_threads)
         {
 //            std::cout << "ffwd_scheduler constructor - make " << num_threads << " queues" << std::endl;
             HPX_ASSERT(num_threads != 0);
             for (std::size_t i = 0; i < num_threads; ++i)
                 queues_[i] = new thread_queue_type(max_queue_thread_count_);
+
+
+            for(std::size_t i = 0; i < num_threads; i++) {
+                messages_per_thread[i] = 0;
+            }
+
+            wait_or_add_new_counter = 0;
+            get_next_thread_counter = 0;
         }
 
         ~ffwd_scheduler() {
             messages.clear();
             responses.clear();
+            std::cout << "added " << wait_or_add_new_counter << " tasks to the queue" << std::endl;
+            std::cout << "got " << get_next_thread_counter << " tasks from the queue" << std::endl;
+
+            for(unsigned int i = 0; i < messages_per_thread.size(); i++) {
+                std::cout << "Found " << messages_per_thread[i] << " tasks for thread " << i << std::endl;
+            }
+
         }
 
         //////////////////////////////////////////////////////////////////////////////////
@@ -216,6 +231,7 @@ namespace hpx { namespace threads { namespace policies
             std::unique_lock<pu_mutex_type> l;
             num_thread = select_active_pu(l, num_thread);
 
+            // queue version
             HPX_ASSERT(num_thread < queue_size);
             queues_.at(num_thread)->create_thread(data, id, initial_state,
                 run_now, ec);
@@ -238,8 +254,9 @@ namespace hpx { namespace threads { namespace policies
             bool result = this_queue->get_next_thread(thrd);
 
             this_queue->increment_num_pending_accesses();
-            if (result)
+            if (result) {
                 return true;
+            }
             this_queue->increment_num_pending_misses();
 
             bool have_staged = this_queue->
@@ -291,13 +308,17 @@ namespace hpx { namespace threads { namespace policies
 
             HPX_ASSERT(num_thread < queues_.size());
             queues_[num_thread]->schedule_thread(thrd);
+            get_next_thread_counter++;
         }
 
         void schedule_thread_last(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
                                   thread_priority priority = thread_priority_normal) {
-//            std::cout << "schedule_thread_last not implemented yet" << std::endl;
+            // std::cout << "schedule_thread_last not implemented yet" << std::endl;
+
+            get_next_thread_counter++;
+
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
             if (schedulehint.mode == thread_schedule_hint_mode_thread)
@@ -349,6 +370,8 @@ namespace hpx { namespace threads { namespace policies
                 idle_loop_count, added) && result;
             if (0 != added) {
 //                std::cout << "wait_or_add_new returning " << result << std::endl;
+                  wait_or_add_new_counter += added;
+                  messages_per_thread.at(num_thread) += added;
                 return result;
             }
 
@@ -360,23 +383,26 @@ namespace hpx { namespace threads { namespace policies
             }
 
             // NUMA sensitivity not yet implemented, so we don't need it here
-            for (std::size_t i = 1; i != queues_size; ++i)
-            {
-                // FIXME: Do a better job here.
-                std::size_t const idx = (i + num_thread) % queues_size;
+//            for (std::size_t i = 1; i != queues_size; ++i)
+//            {
+//                // FIXME: Do a better job here.
+//                std::size_t const idx = (i + num_thread) % queues_size;
 
-                HPX_ASSERT(idx != num_thread);
+//                HPX_ASSERT(idx != num_thread);
 
-                result = queues_[num_thread]->wait_or_add_new(running,
-                    idle_loop_count, added, queues_[idx]) && result;
-                if (0 != added)
-                {
-                    queues_[idx]->increment_num_stolen_from_staged(added);
-                    queues_[num_thread]->increment_num_stolen_to_staged(added);
-//                    std::cout << "wait_or_add_new returning " << result << std::endl;
-                    return result;
-                }
-            }
+//                result = queues_[num_thread]->wait_or_add_new(running,
+//                    idle_loop_count, added, queues_[idx]) && result;
+//                if (0 != added)
+//                {
+//                    queues_[idx]->increment_num_stolen_from_staged(added);
+//                    queues_[num_thread]->increment_num_stolen_to_staged(added);
+////                    std::cout << "wait_or_add_new returning " << result << std::endl;
+
+//                    wait_or_add_new_counter += added;
+
+//                    return result;
+//                }
+//            }
 
             // nothing was found
 //            std::cout << "wait_or_add_new returning false" << std::endl;
@@ -412,11 +438,18 @@ namespace hpx { namespace threads { namespace policies
         }
 
     private:
+        std::size_t max_queue_thread_count_;
+
         std::list<int> messages;
         std::list<int> responses;
         std::vector<thread_queue_type*> queues_;
         std::atomic<std::size_t> curr_queue_;
-        std::size_t max_queue_thread_count_;
+        std::vector<int> messages_per_thread;
+
+        // Add in counters to see if messaging between get_next_thread (takes them) and wait_or_add_new (puts them in) is viable
+        std::atomic<int> wait_or_add_new_counter;
+        std::atomic<int> get_next_thread_counter;
+
     };
 }}}
 
