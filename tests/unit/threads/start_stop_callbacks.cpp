@@ -70,13 +70,19 @@ int hpx_main(int argc, char* argv[])
     HPX_TEST(std::size_t(std::distance(p.first, p.second)) ==
         hpx::get_num_worker_threads());
 
-    p = threads.equal_range("parcel-thread");
-    auto cfg = hpx::get_config_entry("hpx.threadpools.parcel_pool_size", "0");
+    p = threads.equal_range("timer-thread");
+    auto cfg = hpx::get_config_entry("hpx.threadpools.timer_pool_size", "0");
     HPX_TEST(std::distance(p.first, p.second) == boost::lexical_cast<int>(cfg));
 
-    p = threads.equal_range("timer-thread");
-    cfg = hpx::get_config_entry("hpx.threadpools.timer_pool_size", "0");
-    HPX_TEST(std::distance(p.first, p.second) == boost::lexical_cast<int>(cfg));
+#if defined(HPX_HAVE_NETWORKING)
+    if (hpx::is_networking_enabled())
+    {
+        p = threads.equal_range("parcel-thread");
+        cfg = hpx::get_config_entry("hpx.threadpools.parcel_pool_size", "0");
+        HPX_TEST(
+            std::distance(p.first, p.second) == boost::lexical_cast<int>(cfg));
+    }
+#endif
 
     p = threads.equal_range("io-thread");
     cfg = hpx::get_config_entry("hpx.threadpools.io_pool_size", "0");

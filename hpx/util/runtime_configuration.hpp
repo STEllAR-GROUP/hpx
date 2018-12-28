@@ -62,6 +62,9 @@ namespace hpx { namespace util
         std::uint32_t get_num_localities() const;
         void set_num_localities(std::uint32_t);
 
+        // should networking be enabled
+        bool enable_networking() const;
+
         // sequence number of first usable pu
         std::uint32_t get_first_used_core() const;
         void set_first_used_core(std::uint32_t);
