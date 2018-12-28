@@ -1552,4 +1552,20 @@ namespace hpx
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt) rt->stop_evaluating_counters();
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Return true if networking is enabled.
+    bool is_networking_enabled()
+    {
+#if defined(HPX_HAVE_NETWORKING)
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->get_config().enable_networking();
+        }
+        return true;        // be on the safe side, enable networking
+#else
+        return false;
+#endif
+    }
 }

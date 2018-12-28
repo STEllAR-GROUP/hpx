@@ -219,9 +219,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
 #if defined(HPX_HAVE_NETWORKING)
-    // compare number of parcels with number of messages generated
-    print_counters("/parcels/count/*/sent");
-    print_counters("/messages/count/*/sent");
+    if (hpx::is_networking_enabled())
+    {
+        // compare number of parcels with number of messages generated
+        print_counters("/parcels/count/*/sent");
+        print_counters("/messages/count/*/sent");
+    }
 #endif
 
     return hpx::finalize();

@@ -406,7 +406,8 @@ namespace hpx { namespace util
                 ("hpx:ignore-batch-env", "ignore batch environment variables")
                 ("hpx:expect-connecting-localities",
                   "this locality expects other localities to dynamically connect "
-                  "(implied if the number of initial localities is larger than 1)")
+                  "(default: false if the number of localities is equal to one, "
+                  "true if the number of initial localities is larger than 1)")
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
                   "run on (default: 0), valid for "
