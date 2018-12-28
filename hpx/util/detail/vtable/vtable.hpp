@@ -43,77 +43,60 @@ namespace hpx { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct vtable
     {
-        static const std::size_t function_storage_size = 3*sizeof(void*);
-
         template <typename T>
-        HPX_FORCEINLINE static T& get(void** v)
+        HPX_FORCEINLINE static T& get(void* obj)
         {
-            if (sizeof(T) <= function_storage_size)
-            {
-                return *reinterpret_cast<T*>(v);
-            } else {
-                return **reinterpret_cast<T**>(v);
-            }
+            return *static_cast<T*>(obj);
         }
 
         template <typename T>
-        HPX_FORCEINLINE static T const& get(void* const* v)
+        HPX_FORCEINLINE static T const& get(void const* obj)
         {
-            if (sizeof(T) <= function_storage_size)
-            {
-                return *reinterpret_cast<T const*>(v);
-            } else {
-                return **reinterpret_cast<T* const*>(v);
-            }
+            return *static_cast<T const*>(obj);
         }
 
         template <typename T>
-        HPX_FORCEINLINE static void default_construct(void** v)
+        HPX_FORCEINLINE static T* default_construct(
+            void* storage, std::size_t storage_size)
         {
-            if (sizeof(T) <= function_storage_size)
+            if (sizeof(T) <= storage_size)
             {
-                ::new (static_cast<void*>(v)) T; //-V206
+                return ::new (storage) T; //-V206
             } else {
-                *v = new T;
+                return new T;
             }
         }
 
         template <typename T, typename Arg>
-        HPX_FORCEINLINE static void construct(void** v, Arg&& arg)
+        HPX_FORCEINLINE static T* construct(
+            void* storage, std::size_t storage_size, Arg&& arg)
         {
-            if (sizeof(T) <= function_storage_size)
+            if (sizeof(T) <= storage_size)
             {
-                ::new (static_cast<void*>(v)) T(std::forward<Arg>(arg)); //-V206
+                return ::new (storage) T(std::forward<Arg>(arg)); //-V206
             } else {
-                *v = new T(std::forward<Arg>(arg));
+                return new T(std::forward<Arg>(arg));
             }
         }
 
-        template <typename T, typename Arg>
-        HPX_FORCEINLINE static void reconstruct(void** v, Arg&& arg)
+        template <typename T>
+        HPX_FORCEINLINE static void _destruct(void* obj)
         {
-            _delete<T>(v);
-            construct<T, Arg>(v, std::forward<Arg>(arg));
+            get<T>(obj).~T();
         }
+        void (*destruct)(void*);
 
         template <typename T>
-        HPX_FORCEINLINE static void _destruct(void** v)
+        HPX_FORCEINLINE static void _delete(void* obj, std::size_t storage_size)
         {
-            get<T>(v).~T();
-        }
-        void (*destruct)(void**);
-
-        template <typename T>
-        HPX_FORCEINLINE static void _delete(void** v)
-        {
-            if (sizeof(T) <= function_storage_size)
+            if (sizeof(T) <= storage_size)
             {
-                _destruct<T>(v);
+                _destruct<T>(obj);
             } else {
-                delete &get<T>(v);
+                delete static_cast<T*>(obj);
             }
         }
-        void (*delete_)(void**);
+        void (*delete_)(void*, std::size_t storage_size);
 
         template <typename T>
         HPX_CONSTEXPR vtable(construct_vtable<T>) noexcept
