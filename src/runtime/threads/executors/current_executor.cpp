@@ -60,9 +60,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         error_code& ec)
     {
         // create a new thread
-        thread_init_data data(util::bind(
-            util::one_shot(&current_executor::thread_function_nullary),
-            std::move(f)), desc);
+        thread_init_data data(util::one_shot(util::bind(
+            &current_executor::thread_function_nullary,
+            std::move(f))), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
@@ -80,9 +80,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new suspended thread
-        thread_init_data data(util::bind(
-            util::one_shot(&current_executor::thread_function_nullary),
-            std::move(f)), desc);
+        thread_init_data data(util::one_shot(util::bind(
+            &current_executor::thread_function_nullary,
+            std::move(f))), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
