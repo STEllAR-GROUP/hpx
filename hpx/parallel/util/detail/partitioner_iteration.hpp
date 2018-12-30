@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <cstddef>
 #include <type_traits>

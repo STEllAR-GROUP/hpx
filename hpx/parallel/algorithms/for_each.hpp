@@ -81,6 +81,43 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
+        template <typename F>
+        struct invoke_projected<F, util::projection_identity>
+        {
+            typename hpx::util::decay<F>::type& f_;
+            util::projection_identity& proj_;
+
+            template <typename T>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename std::enable_if<
+               !hpx::traits::is_value_proxy<T>::value
+            >::type
+            call(T && t)
+            {
+                T && tmp = std::forward<T>(t);
+                hpx::util::invoke(f_, tmp);
+            }
+
+            template <typename T>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename std::enable_if<
+                hpx::traits::is_value_proxy<T>::value
+            >::type
+            call(T && t)
+            {
+                auto tmp = std::forward<T>(t);
+                hpx::util::invoke_r<void>(f_, tmp);
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            void operator()(Iter curr)
+            {
+                call(*curr);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename F, typename Proj>
         struct for_each_iteration
         {
@@ -203,7 +240,7 @@ namespace hpx { namespace parallel { inline namespace v1
         for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             Proj && proj, std::true_type);
 
-        /// Segmented implementaion using for_each.
+        /// Segmented implementation using for_each.
         template <typename ExPolicy, typename FwdIter, typename Size, typename F,
             typename Proj>
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
