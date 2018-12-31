@@ -170,6 +170,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename Iter>
         struct for_each_n : public detail::algorithm<for_each_n<Iter>, Iter>
         {
@@ -383,7 +384,22 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj>
-            static InIter
+            static typename std::enable_if<
+                hpx::traits::is_random_access_iterator<InIter>::value, InIter
+            >::type
+            sequential(ExPolicy && policy, InIter first, InIter last, F && f,
+                Proj && proj)
+            {
+                return util::loop_n<typename std::decay<ExPolicy>::type>(first,
+                    static_cast<std::size_t>(std::distance(first, last)),
+                    invoke_projected<F, Proj>{f, proj});
+            }
+
+            template <typename ExPolicy, typename InIter, typename F,
+                typename Proj>
+            static typename std::enable_if<
+                !hpx::traits::is_random_access_iterator<InIter>::value, InIter
+            >::type
             sequential(ExPolicy && policy, InIter first, InIter last, F && f,
                 Proj && proj)
             {

@@ -149,18 +149,32 @@ namespace hpx { namespace parallel { namespace util
             // handle sequences of non-futures
             template <typename Iter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            static Iter call(Iter it, std::size_t count, F && f)
+            static Iter call(Iter it, std::size_t num, F && f)
             {
-                for (/**/; count != 0; (void) --count, ++it)
+                std::size_t count(num & std::size_t(-4));
+                for (std::size_t i = 0; i < count; (void) ++it, i += 4)
+                {
+                    f(it); f(++it); f(++it); f(++it);
+                }
+                for (/**/; count < num; (void) ++count, ++it)
+                {
                     f(it);
+                }
                 return it;
             }
 
             template <typename Iter, typename CancelToken, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            static Iter call(Iter it, std::size_t count, CancelToken& tok, F && f)
+            static Iter call(Iter it, std::size_t num, CancelToken& tok, F && f)
             {
-                for (/**/; count != 0; (void) --count, ++it)
+                std::size_t count(num & std::size_t(-4));
+                for (std::size_t i = 0; i < count; (void) ++it, i += 4)
+                {
+                    if (tok.was_cancelled())
+                        break;
+                    f(it); f(++it); f(++it); f(++it);
+                }
+                for (/**/; count < num; (void) ++count, ++it)
                 {
                     if (tok.was_cancelled())
                         break;

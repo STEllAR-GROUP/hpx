@@ -129,7 +129,7 @@ namespace hpx {namespace parallel { inline namespace v1
                                 }
                             });
                     },
-                    [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
+                    [=]() mutable -> FwdIter
                     {
                         difference_type search_res = tok.get_data();
                         if (search_res != count)
@@ -358,7 +358,7 @@ namespace hpx {namespace parallel { inline namespace v1
                                 }
                             });
                     },
-                    [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
+                    [=]() mutable -> FwdIter
                     {
                         difference_type search_res = tok.get_data();
                         if(search_res != s_difference_type(count))

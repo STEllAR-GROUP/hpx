@@ -142,10 +142,10 @@ namespace hpx { namespace parallel { namespace execution
                 auto wrapped = make_wrapped_func(
                     std::forward<F>(f), std::forward<Ts>(ts)...);
 
-                auto end = hpx::util::end(shape);
-                for (auto it = hpx::util::begin(shape); it != end; ++it)
+                for (auto const& elem : shape)
                 {
-                    post(wrapped, std::ref(sem), *it);
+                    parallel_policy_executor_aggregated::post(
+                        wrapped, std::ref(sem), elem);
                 }
 
                 sem.wait(static_cast<std::int64_t>(hpx::util::size(shape)));
@@ -167,12 +167,6 @@ namespace hpx { namespace parallel { namespace execution
                     std::forward<Ts>(ts)...));
 
             return result;
-        }
-
-        template <typename F, typename S, typename... Ts>
-        void bulk_sync_execute(F&& f, S const& shape, Ts&&... ts) const
-        {
-            sync_exec{}(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
         }
     };
 
@@ -220,7 +214,7 @@ namespace hpx { namespace parallel { namespace execution
         hpx::future<void>
         async_execute(F && f, Ts &&... ts) const
         {
-            return hpx::detail::async_launch_policy_dispatch<Policy>::call(
+            return hpx::detail::async_launch_policy_dispatch<hpx::launch>::call(
                 l_, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
@@ -231,7 +225,7 @@ namespace hpx { namespace parallel { namespace execution
             hpx::util::thread_description desc(f,
                 "hpx::parallel::execution::parallel_executor_aggregated::post");
 
-            detail::post_policy_dispatch<Policy>::call(
+            detail::post_policy_dispatch<hpx::launch>::call(
                 desc, l_, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
@@ -257,6 +251,7 @@ namespace hpx { namespace parallel { namespace execution
             hpx::util::tuple<Ts const&...> ts_;
         };
 
+    public:
         template <typename F, typename ... Ts>
         HPX_FORCEINLINE static
         wrapped_func<F, Ts...> make_wrapped_func(F && f, Ts &&... ts)
@@ -264,53 +259,13 @@ namespace hpx { namespace parallel { namespace execution
             return wrapped_func<F, Ts...>{std::forward<F>(f),
                 hpx::util::forward_as_tuple(std::forward<Ts>(ts)...)};
         }
-
-        struct sync_exec
-        {
-            template <typename F, typename S, typename... Ts>
-            void operator()(F&& f, S const& shape, Ts&&... ts) const
-            {
-                // Simple sequential spawning of tasks, one task for each
-                // requested iteration.
-                lcos::local::counting_semaphore sem(0);
-
-                auto wrapped = make_wrapped_func(
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
-
-                for (auto const& elem : shape)
-                {
-                    post(wrapped, std::ref(sem), std::ref(elem));
-                }
-
-                sem.wait(static_cast<std::int64_t>(hpx::util::size(shape)));
-            }
-
-            parallel_policy_executor_aggregated const& this_;
-        };
         /// \endcond
 
     public:
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
-        std::vector<hpx::future<void>>
-        bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
-        {
-            // for now, wrap single future in a vector to avoid having to change
-            // the executor and algorithm infrastructure
-            std::vector<hpx::future<void>> result;
-            result.emplace_back(
-                async_execute(sync_exec{*this}, std::forward<F>(f), shape,
-                    std::forward<Ts>(ts)...));
-
-            return result;
-        }
-
-        template <typename F, typename S, typename... Ts>
-        void bulk_sync_execute(F&& f, S const& shape, Ts&&... ts) const
-        {
-            sync_exec{*this}(
-                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
-        }
+        inline std::vector<hpx::future<void>> bulk_async_execute(
+            F&& f, S const& shape, Ts&&... ts) const;
 
     private:
         /// \cond NOINTERNAL
@@ -328,6 +283,47 @@ namespace hpx { namespace parallel { namespace execution
         hpx::launch l_;
         /// \endcond
     };
+
+    namespace detail
+    {
+        struct sync_exec
+        {
+            template <typename F, typename S, typename... Ts>
+            void operator()(F&& f, S const& shape, Ts&&... ts) const
+            {
+                // Simple sequential spawning of tasks, one task for each
+                // requested iteration.
+                lcos::local::counting_semaphore sem(0);
+
+                auto wrapped = parallel_policy_executor_aggregated<
+                    hpx::launch>::make_wrapped_func(std::forward<F>(f),
+                    std::forward<Ts>(ts)...);
+
+                for (auto const& elem : shape)
+                {
+                    this_.post(wrapped, std::ref(sem), elem);
+                }
+
+                sem.wait(static_cast<std::int64_t>(hpx::util::size(shape)));
+            }
+
+            parallel_policy_executor_aggregated<hpx::launch> this_;
+        };
+    }
+
+    template <typename F, typename S, typename... Ts>
+    std::vector<hpx::future<void>>
+    parallel_policy_executor_aggregated<hpx::launch>::bulk_async_execute(
+        F&& f, S const& shape, Ts&&... ts) const
+    {
+        // for now, wrap single future in a vector to avoid having to change
+        // the executor and algorithm infrastructure
+        std::vector<hpx::future<void>> result;
+        result.emplace_back(
+            async_execute(detail::sync_exec{*this}, std::forward<F>(f), shape,
+                std::forward<Ts>(ts)...));
+        return result;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     using parallel_executor_aggregated =

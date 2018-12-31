@@ -225,7 +225,7 @@ namespace hpx { namespace parallel { inline namespace v2
                     part_iterations<F, S, args_type>{
                         std::forward<F>(f), stride, args
                     },
-                    [=] (std::vector<hpx::future<void> > &&) mutable -> void
+                    [=] () mutable -> void
                     {
                         auto pack = typename hpx::util::detail::make_index_pack<
                             sizeof...(Ts)>::type();

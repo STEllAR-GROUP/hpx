@@ -257,8 +257,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             }
                         }
                     },
-                    [first, tok](std::vector<hpx::future<void> > &&) mutable
-                    ->  FwdIter
+                    [first, tok]() mutable -> FwdIter
                     {
                         difference_type loc = tok.get_data();
                         std::advance(first, loc);

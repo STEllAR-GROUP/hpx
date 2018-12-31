@@ -89,7 +89,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                         tok.cancel(i);
                                 });
                         },
-                        [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
+                        [=]() mutable -> FwdIter
                         {
                             difference_type adj_find_res = tok.get_data();
                             if(adj_find_res != count)
