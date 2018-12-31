@@ -703,6 +703,14 @@ namespace hpx { namespace util
                 {
                     return true;
                 }
+
+                // for any runtime mode except 'console' networking should be
+                // enabled as well
+                if (hpx::util::get_entry_as<std::string>(
+                        *sec, "runtime_mode", "") != "console")
+                {
+                    return true;
+                }
             }
         }
 #endif
