@@ -570,7 +570,6 @@ namespace hpx { namespace threads { namespace detail
         // util::itt::frame_context fctx(thread_domain);
 #endif
 
-
         std::int64_t& idle_loop_count = counters.idle_loop_count_;
         std::int64_t& busy_loop_count = counters.busy_loop_count_;
 

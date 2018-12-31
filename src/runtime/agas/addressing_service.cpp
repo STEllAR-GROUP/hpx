@@ -130,8 +130,7 @@ namespace hpx { namespace agas
     }; // }}}
 
 addressing_service::addressing_service(
-    parcelset::parcelhandler& ph
-  , util::runtime_configuration const& ini_
+    util::runtime_configuration const& ini_
   , runtime_mode runtime_type_
     )
   : gva_cache_(new gva_cache_type)
@@ -149,23 +148,27 @@ addressing_service::addressing_service(
   , mem_lva_(0)
   , state_(state_starting)
   , locality_()
+{
+    if (caching_)
+        gva_cache_->reserve(ini_.get_agas_local_cache_size());
+}
+
+void addressing_service::bootstrap(
+    parcelset::parcelhandler& ph, util::runtime_configuration const& ini)
 { // {{{
     LPROGRESS_;
 
-    if (caching_)
-        gva_cache_->reserve(ini_.get_agas_local_cache_size());
-
 #if defined(HPX_HAVE_NETWORKING)
     std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
-    create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini_);
+    create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini);
     if (service_type == service_mode_bootstrap)
     {
-        launch_bootstrap(pp, ph.endpoints(), ini_);
+        launch_bootstrap(pp, ph.endpoints(), ini);
     }
 #else
-    create_big_boot_barrier(nullptr, ph.endpoints(), ini_);
+    create_big_boot_barrier(nullptr, ph.endpoints(), ini);
     HPX_ASSERT(service_type == service_mode_bootstrap);
-    launch_bootstrap(nullptr, ph.endpoints(), ini_);
+    launch_bootstrap(nullptr, ph.endpoints(), ini);
 #endif
 } // }}}
 
@@ -267,13 +270,13 @@ void addressing_service::launch_bootstrap(
       , components::get_component_type<components::server::runtime_support>()
       , 1U, rt.get_runtime_support_lva());
 
-    register_name("/0/agas/locality#0", here);
-    if (is_console())
-        register_name("/0/locality#console", here);
-
     naming::gid_type lower, upper;
     get_id_range(HPX_INITIAL_GID_RANGE, lower, upper);
     rt.get_id_pool().set_range(lower, upper);
+
+    register_name("/0/agas/locality#0", here);
+    if (is_console())
+        register_name("/0/locality#console", here);
 } // }}}
 
 void addressing_service::launch_hosted()
