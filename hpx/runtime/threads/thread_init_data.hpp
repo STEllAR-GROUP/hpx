@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 #endif
 
 #include <cstddef>
@@ -40,7 +40,7 @@ namespace hpx { namespace threads
             parent_locality_id(0), parent_id(nullptr), parent_phase(0),
 #endif
 #ifdef HPX_HAVE_APEX
-            apex_data(nullptr),
+            timer_data(nullptr),
 #endif
             priority(thread_priority_normal),
             schedulehint(),
@@ -65,7 +65,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_APEX
         // HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
         // and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on
-            apex_data = apex_new_task(description, parent_locality_id, parent_id );
+            timer_data = util::external_timer::new_task(description, parent_locality_id, parent_id );
 #endif
             return *this;
         }
@@ -82,7 +82,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_APEX
         /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
          * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
-            apex_data(apex_new_task(description, parent_locality_id, parent_id )),
+            timer_data(util::external_timer::new_task(description, parent_locality_id, parent_id )),
 #endif
             priority(rhs.priority),
             schedulehint(rhs.schedulehint),
@@ -109,7 +109,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_APEX
         /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
          * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
-            apex_data(apex_new_task(description,parent_locality_id,parent_id)),
+            timer_data(util::external_timer::new_task(description,parent_locality_id,parent_id)),
 #endif
             priority(priority_), schedulehint(os_thread),
             stacksize(stacksize_),
@@ -132,7 +132,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_APEX
         /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
          * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
-        apex_task_wrapper apex_data;
+        std::shared_ptr<util::external_timer::task_wrapper> timer_data;
 #endif
 
         thread_priority priority;

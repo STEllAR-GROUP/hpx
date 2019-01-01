@@ -29,7 +29,7 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 #endif
 
 #include <atomic>
@@ -511,13 +511,13 @@ namespace hpx { namespace threads {
             thread_init_data& init_data, thread_state_enum newstate) = 0;
 
 #if defined(HPX_HAVE_APEX)
-        apex_task_wrapper get_apex_data() const noexcept
+        std::shared_ptr<util::external_timer::task_wrapper> get_timer_data() const noexcept
         {
-            return apex_data_;
+            return timer_data_;
         }
-        void set_apex_data(apex_task_wrapper data) noexcept
+        void set_timer_data(std::shared_ptr<util::external_timer::task_wrapper> data) noexcept
         {
-            apex_data_ = data;
+            timer_data_ = data;
         }
 #endif
 
@@ -578,7 +578,7 @@ namespace hpx { namespace threads {
 
     public:
 #if defined(HPX_HAVE_APEX)
-        apex_task_wrapper apex_data_;
+        std::shared_ptr<util::external_timer::task_wrapper> timer_data_;
 #endif
         bool is_stackless_;
     };

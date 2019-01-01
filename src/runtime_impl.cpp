@@ -31,7 +31,7 @@
 #include <hpx/runtime_impl.hpp>
 #include <hpx/state.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/yield_while.hpp>
@@ -50,10 +50,6 @@
 #include <thread>
 #include <utility>
 #include <vector>
-
-#ifdef HPX_HAVE_APEX
-#include "apex_api.hpp"
-#endif
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
@@ -410,7 +406,7 @@ namespace hpx
 
         // initialize instrumentation system
 #ifdef HPX_HAVE_APEX
-        apex::init(nullptr, hpx::get_locality_id(),
+        util::external_timer::timer.init(nullptr, hpx::get_locality_id(),
                 hpx::get_initial_num_localities());
 #endif
 
@@ -527,7 +523,7 @@ namespace hpx
 
 #if defined(HPX_HAVE_APEX)
         // not registering helper threads - for now
-        //apex::register_thread(thread_name.c_str());
+        //util::external_timer::timer.register_thread(thread_name.c_str());
 #endif
 
         // wait for termination
@@ -629,7 +625,7 @@ namespace hpx
 #endif
 //         deinit_tss();
 #ifdef HPX_HAVE_APEX
-        apex::finalize();
+        util::external_timer::timer.finalize();
 #endif
     }
 
@@ -928,7 +924,7 @@ namespace hpx
 
 #if defined(HPX_HAVE_APEX)
         if (std::strstr(name, "worker") != nullptr)
-            apex::register_thread(name);
+            util::external_timer::timer.register_thread(name);
 #endif
 
         // call thread-specific user-supplied on_start handler

@@ -16,7 +16,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 #endif
 
 #include <cstddef>
@@ -71,7 +71,7 @@ namespace hpx { namespace threads {
             parent_locality_id_ = get_locality_id();
 #endif
 #if defined(HPX_HAVE_APEX)
-        set_apex_data(init_data.apex_data);
+        set_timer_data(init_data.timer_data);
 #endif
     }
 
@@ -198,7 +198,7 @@ namespace hpx { namespace threads {
             parent_locality_id_ = get_locality_id();
 #endif
 #if defined(HPX_HAVE_APEX)
-        set_apex_data(init_data.apex_data);
+        set_timer_data(init_data.timer_data);
 #endif
         HPX_ASSERT(init_data.stacksize != 0);
     }
@@ -340,21 +340,21 @@ namespace hpx { namespace threads {
     }
 
 #if defined(HPX_HAVE_APEX)
-    apex_task_wrapper get_self_apex_data()
+    task_wrapper get_self_timer_data()
     {
         thread_data* thrd_data = get_self_id_data();
         if (HPX_LIKELY(nullptr != thrd_data))
         {
-            return thrd_data->get_apex_data();
+            return thrd_data->get_timer_data();
         }
         return nullptr;
     }
-    void set_self_apex_data(apex_task_wrapper data)
+    void set_self_timer_data(task_wrapper data)
     {
         thread_data* thrd_data = get_self_id_data();
         if (HPX_LIKELY(nullptr != thrd_data))
         {
-            thrd_data->set_apex_data(data);
+            thrd_data->set_timer_data(data);
         }
         return;
     }
