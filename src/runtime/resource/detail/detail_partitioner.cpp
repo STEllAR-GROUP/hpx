@@ -225,18 +225,6 @@ namespace hpx { namespace resource { namespace detail
             throw_runtime_error("partitioner::partitioner",
                 "Cannot instantiate more than one resource partitioner");
         }
-	
-        if(HPX_HAVE_MAX_CPU_COUNT < topo_.get_number_of_pus())
-	{
-                
-		throw_runtime_error(
-                "partitioner::partioner",
-		"HPX_HAVE_MAX_CPU_COUNT is set as " +
-                std::to_string(HPX_HAVE_MAX_CPU_COUNT) +
-                " your system has " +
-                std::to_string(topo_.get_number_of_pus()) +
-                ". Please recompile HPX and increase the maximal CPU count!");
-	}
 
 
         if(HPX_HAVE_MAX_CPU_COUNT < topo_.get_number_of_pus())
