@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/static.hpp>
 
@@ -226,20 +227,16 @@ namespace hpx { namespace resource { namespace detail
                 "Cannot instantiate more than one resource partitioner");
         }
 
-
         if(HPX_HAVE_MAX_CPU_COUNT < topo_.get_number_of_pus())
         {
-                throw_runtime_error(
-                   "partitioner::partioner",
-                   "Currently, HPX_HAVE_MAX_CPU_COUNT is set to " +
-                   std::to_string(HPX_HAVE_MAX_CPU_COUNT) +
-                   " while your system has " +
-                   std::to_string(topo_.get_number_of_pus()) +
-                   " processing units. Please reconfigure HPX with " +
-                   "-DHPX_WITH_MAX_CPU_COUNT=" +
-                   std::to_string(topo_.get_number_of_pus()) +
-                   " or higher) to increase the maximal CPU count."
-                   );
+            throw_runtime_error("partitioner::partioner",
+                hpx::util::format(
+                    "Currently, HPX_HAVE_MAX_CPU_COUNT is set to {1} "
+                    "while your system has {2} processing units. Please "
+                    "reconfigure HPX with -DHPX_WITH_MAX_CPU_COUNT={2} (or "
+                    "higher) to increase the maximal CPU count supported by "
+                    "HPX.",
+                    HPX_HAVE_MAX_CPU_COUNT, topo_.get_number_of_pus()));
         }
 
         // Create the default pool
