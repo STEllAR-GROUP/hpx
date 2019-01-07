@@ -3,8 +3,9 @@
 
 // FFWD_TODO: Remove all these comments!
 
-/* FFWD_TODO: Take scheduling_loop as "server", Threadpool thread as "clients"
-    - Ffwd_scheduler is running per node => it should act as server -> have message-list in here
+/* FFWD_TODO: Scheduling loop is done by each thread, Threadpool threads are "server" and "clients" at the same time.
+ * Client whenever they put new work/tasks into the list, Server when they take tasks from the list.
+    - Ffwd_scheduler is running per node -> have message-list in here
     - Scheduling_loop periodically calls this to get next task (get_next_thread / schedule_next) -> first look at message-list, then work of task
     - Test this with fibonacci_dataflow
 */
@@ -48,8 +49,8 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ~ffwd_scheduler() {
+            std::cout << "Messages contains: " << messages.size() << " elements at time of destruction" << std::endl;
             messages.clear();
-            responses.clear();
             std::cout << "added " << wait_or_add_new_counter << " tasks to the queue" << std::endl;
             std::cout << "got " << get_next_thread_counter << " tasks from the queue" << std::endl;
 
@@ -367,7 +368,7 @@ namespace hpx { namespace threads { namespace policies
             bool result = true;
 
             result = queues_[num_thread]->wait_or_add_new(running,
-                idle_loop_count, added) && result;
+                idle_loop_count, added) && result; // warum mit result verundet?? result ist doch immer true, was bringt das dann?
             if (0 != added) {
 //                std::cout << "wait_or_add_new returning " << result << std::endl;
                   wait_or_add_new_counter += added;
@@ -406,7 +407,7 @@ namespace hpx { namespace threads { namespace policies
 
             // nothing was found
 //            std::cout << "wait_or_add_new returning false" << std::endl;
-            return false;
+            return result;
         }
 
         void on_start_thread(std::size_t num_thread) override {
@@ -441,7 +442,6 @@ namespace hpx { namespace threads { namespace policies
         std::size_t max_queue_thread_count_;
 
         std::list<int> messages;
-        std::list<int> responses;
         std::vector<thread_queue_type*> queues_;
         std::atomic<std::size_t> curr_queue_;
         std::vector<int> messages_per_thread;
