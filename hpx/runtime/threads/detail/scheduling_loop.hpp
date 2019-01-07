@@ -825,7 +825,7 @@ namespace hpx { namespace threads { namespace detail
                 if (scheduler.SchedulingPolicy::wait_or_add_new(
                         num_thread, running, idle_loop_count))
                 {
-//                    std::cout << "scheduling loop wait_or_add_new returned with some gold" << std::endl;
+//                    std::cout << "scheduling loop wait_or_add_new returned true" << std::endl;
                     // Clean up terminated threads before trying to exit
                     bool can_exit =
                         !running &&
@@ -833,7 +833,6 @@ namespace hpx { namespace threads { namespace detail
                             num_thread, true) &&
                         scheduler.SchedulingPolicy::get_queue_length(
                             num_thread) == 0;
-
                     if (this_state.load() == state_pre_sleep)
                     {
                         if (can_exit)
@@ -846,7 +845,7 @@ namespace hpx { namespace threads { namespace detail
                         can_exit = can_exit &&
                             scheduler.SchedulingPolicy::get_thread_count(
                                 suspended, thread_priority_default,
-                                num_thread) == 0;
+                                num_thread) <= 6; // FFWD_TODO the num_threads is counted in here as well => find a way to not count them here
 
                         if (can_exit)
                         {
