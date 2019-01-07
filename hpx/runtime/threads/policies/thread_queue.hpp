@@ -43,13 +43,6 @@
 #include <vector>
 
 
-// FFWD Message list class (outsource if this is working)
-namespace hpx { namespace threads { namespace policies
-{
-
-
-}}}
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
