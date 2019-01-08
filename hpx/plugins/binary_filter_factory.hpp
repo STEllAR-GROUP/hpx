@@ -67,7 +67,7 @@ namespace hpx { namespace plugins
         {
             if (isenabled_)
                 return new BinaryFilter(compress, next_filter);
-            return 0;
+            return nullptr;
         }
 
     protected:
