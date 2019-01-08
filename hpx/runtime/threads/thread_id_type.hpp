@@ -130,7 +130,7 @@ namespace threads {
         thread_data* thrd_;
     };
 
-    HPX_CONSTEXPR_OR_CONST thread_id_type invalid_thread_id;
+    HPX_CONSTEXPR_OR_CONST inline thread_id_type invalid_thread_id;
 }
 }
 
