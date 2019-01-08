@@ -82,7 +82,7 @@ namespace hpx { namespace threads { namespace executors
 
             /// Set the new scheduler mode
             void set_scheduler_mode(
-                threads::policies::scheduler_mode mode) const
+                threads::policies::scheduler_mode mode) override
             {
                 pool_->set_scheduler_mode(mode);
             }
