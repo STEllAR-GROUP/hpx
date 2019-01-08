@@ -148,7 +148,7 @@ struct dummy_class_tracks_deletions
 unsigned dummy_class_tracks_deletions::deletions = 0;
 
 hpx::threads::thread_specific_ptr<dummy_class_tracks_deletions>
-    tss_with_null_cleanup(0);
+    tss_with_null_cleanup(nullptr);
 
 void tss_thread_with_null_cleanup(dummy_class_tracks_deletions* delete_tracker)
 {
@@ -198,7 +198,7 @@ void test_tss_cleanup_not_called_for_null_pointer()
     local_tss.reset(new Dummy);
 
     tss_cleanup_called = false;
-    local_tss.reset(0);
+    local_tss.reset(nullptr);
     HPX_TEST(tss_cleanup_called);
 
     tss_cleanup_called = false;
