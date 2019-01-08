@@ -52,7 +52,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         delete storage;
-        storage = 0;
+        storage = nullptr;
 #endif
     }
 
@@ -70,8 +70,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         if (nullptr == tss_map)
             return 0;
 
-        tss_data_node* node = tss_map->find(0);
-        if (0 == node)
+        tss_data_node* node = tss_map->find(nullptr);
+        if (nullptr == node)
             return 0;
 
         return node->get_data<std::size_t>();
@@ -100,10 +100,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return 0;
         }
 
-        tss_data_node* node = tss_map->find(0);
-        if (0 == node)
+        tss_data_node* node = tss_map->find(nullptr);
+        if (nullptr == node)
         {
-            tss_map->insert(0, new std::size_t(data)); //-V508
+            tss_map->insert(nullptr, new std::size_t(data));    //-V508
             return 0;
         }
 
@@ -197,12 +197,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         if (tss_data_node* const current_node = find_tss_data(key))
         {
-            if (func || (tss_data != 0))
+            if (func || (tss_data != nullptr))
                 current_node->reinit(func, tss_data, cleanup_existing);
             else
                 erase_tss_node(key, cleanup_existing);
         }
-        else if(func || (tss_data != 0))
+        else if (func || (tss_data != nullptr))
         {
             add_new_tss_node(key, func, tss_data);
         }

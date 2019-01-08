@@ -102,22 +102,27 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         typedef hpx::threads::thread_id_type thread_id_type;
 
         template <typename Derived>
-        context_base(Derived& derived, std::ptrdiff_t stack_size, thread_id_type id)
-          : default_context_impl(derived, stack_size),
-            m_caller(),
-            m_state(ctx_ready),
-            m_exit_state(ctx_exit_not_requested),
-            m_exit_status(ctx_not_exited),
+        context_base(
+            Derived& derived, std::ptrdiff_t stack_size, thread_id_type id)
+          : default_context_impl(derived, stack_size)
+          , m_caller()
+          , m_state(ctx_ready)
+          , m_exit_state(ctx_exit_not_requested)
+          , m_exit_status(ctx_not_exited)
+          ,
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-            m_phase(0),
+          m_phase(0)
+          ,
 #endif
-            m_thread_data(0),
+          m_thread_data(nullptr)
+          ,
 #if defined(HPX_HAVE_APEX)
-            m_apex_data(nullptr),
+          m_apex_data(nullptr)
+          ,
 #endif
-            m_type_info(),
-            m_thread_id(id),
-            continuation_recursion_count_(0)
+          m_type_info()
+          , m_thread_id(id)
+          , continuation_recursion_count_(0)
         {}
 
         void reset()
@@ -347,7 +352,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
             HPX_ASSERT(m_phase == 0);
 #endif
-            HPX_ASSERT(m_thread_data == 0);
+            HPX_ASSERT(m_thread_data == nullptr);
 #if defined(HPX_HAVE_APEX)
             m_apex_data = rebind_base_apex(id);
 #endif
