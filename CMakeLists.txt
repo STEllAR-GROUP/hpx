@@ -60,6 +60,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 ################################################################################
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
+include(GNUInstallDirs)
 include(HPX_Utils)
 
 # explicitly set certain policies
@@ -1743,8 +1744,6 @@ endif()
 ################################################################################
 # search path configuration
 ################################################################################
-include(GNUInstallDirs)
-
 if(HPX_WITH_FULL_RPATH)
   hpx_include(SetFullRPATH)
 endif()
