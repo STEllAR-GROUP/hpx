@@ -615,13 +615,14 @@ namespace hpx { namespace util
             cfgmap, rtcfg_, vm, env, using_nodelist, initial);
         num_cores_ = detail::handle_num_cores(cfgmap, vm, num_threads_, env);
 
-        bool expect_connections = false;
         bool run_agas_server = false;
         std::string hpx_host;
-        std::uint16_t initial_hpx_port = 0;
         std::uint16_t hpx_port = 0;
 
 #if defined(HPX_HAVE_NETWORKING)
+        bool expect_connections = false;
+        std::uint16_t initial_hpx_port = 0;
+
         // handling number of localities, those might have already been initialized
         // from MPI environment
         num_localities_ = detail::handle_num_localities(cfgmap, vm, env,
