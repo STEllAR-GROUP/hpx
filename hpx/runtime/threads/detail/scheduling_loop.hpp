@@ -583,9 +583,10 @@ namespace hpx { namespace threads { namespace detail
 
         // spin for some time after queues have become empty
         bool may_exit = false;
-        bool networking_is_enabled = hpx::is_networking_enabled();
 
 #if defined(HPX_HAVE_NETWORKING)
+        bool networking_is_enabled = hpx::is_networking_enabled();
+
         std::shared_ptr<bool> background_running = nullptr;
         thread_id_type background_thread;
 
