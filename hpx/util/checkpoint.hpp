@@ -153,7 +153,7 @@ namespace util {
     ///
     /// \returns Operator<< returns the ostream object.
     ///
-    std::ostream& operator<<(std::ostream& ost, checkpoint const& ckp)
+    inline std::ostream& operator<<(std::ostream& ost, checkpoint const& ckp)
     {
         // Write the size of the checkpoint to the file
         int64_t size = ckp.size();
@@ -184,7 +184,7 @@ namespace util {
     ///
     /// \returns Operator>> returns the ostream object.
     ///
-    std::istream& operator>>(std::istream& ist, checkpoint& ckp)
+    inline std::istream& operator>>(std::istream& ist, checkpoint& ckp)
     {
         // Read in the size of the next checkpoint
         int64_t length;

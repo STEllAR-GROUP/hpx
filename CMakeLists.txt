@@ -60,6 +60,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 ################################################################################
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
+include(GNUInstallDirs)
 include(HPX_Utils)
 
 # explicitly set certain policies
@@ -225,6 +226,10 @@ hpx_option(HPX_WITH_DEFAULT_TARGETS BOOL
 hpx_option(HPX_WITH_COMPILER_WARNINGS BOOL
   "Enable compiler warnings (default: ON)"
   ON ADVANCED)
+
+hpx_option(HPX_WITH_COMPILER_WARNINGS_AS_ERRORS BOOL
+  "Turn compiler warnings into errors (default: OFF)"
+  OFF ADVANCED)
 
 hpx_option(HPX_WITH_EXECUTABLE_PREFIX STRING
   "Executable prefix (default none), 'hpx_' useful for system install."
@@ -1411,6 +1416,15 @@ if(HPX_WITH_COMPILER_WARNINGS)
   endif()
 endif()
 
+# Configure compiler warnings as errors
+if(HPX_WITH_COMPILER_WARNINGS_AS_ERRORS)
+  if(MSVC)
+    hpx_add_compile_flag(-WX LANGUAGES C CXX Fortran)
+  else()
+    hpx_add_compile_flag_if_available(-Werror LANGUAGES CXX C Fortran)
+  endif()
+endif()
+
 # Diagnostics
 if(MSVC)
   # Display full paths in diagnostics
@@ -1730,8 +1744,6 @@ endif()
 ################################################################################
 # search path configuration
 ################################################################################
-include(GNUInstallDirs)
-
 if(HPX_WITH_FULL_RPATH)
   hpx_include(SetFullRPATH)
 endif()

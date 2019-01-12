@@ -853,6 +853,7 @@ namespace hpx { namespace serialization
 #define HPX_REGISTER_ACTION_1(action)                                         \
     HPX_REGISTER_ACTION_2(action, action)                                     \
 /**/
+#if defined(HPX_MSVC) || defined(HPX_MINGW)
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
@@ -863,6 +864,17 @@ namespace hpx { namespace serialization
             transfer_continuation_action< action>;                            \
     }}                                                                        \
 /**/
+#else
+#define HPX_REGISTER_ACTION_2(action, actionname)                             \
+    HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
+    HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
+    HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                        \
+    namespace hpx { namespace actions {                                       \
+        template struct transfer_action< action>;                             \
+        template struct transfer_continuation_action< action>;                \
+    }}                                                                        \
+/**/
+#endif
 
 #if defined(HPX_MSVC) || defined(HPX_MINGW)
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \

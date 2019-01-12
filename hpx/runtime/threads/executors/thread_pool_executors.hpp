@@ -70,21 +70,22 @@ namespace hpx { namespace threads { namespace executors
                 threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Return an estimate of the number of waiting tasks.
-            std::uint64_t num_pending_closures(error_code& ec) const;
+            std::uint64_t num_pending_closures(error_code& ec) const override;
 
             // Reset internal (round robin) thread distribution scheme
-            void reset_thread_distribution();
+            void reset_thread_distribution() override;
 
             /// Return the mask for processing units the given thread is allowed
             /// to run on.
-            mask_cref_type get_pu_mask(topology const& topology,
-                std::size_t num_thread) const
+            mask_cref_type get_pu_mask(topology const&,
+                std::size_t num_thread) const override
             {
                 return hpx::resource::get_partitioner().get_pu_mask(num_thread);
             }
 
             /// Set the new scheduler mode
-            void set_scheduler_mode(threads::policies::scheduler_mode mode)
+            void set_scheduler_mode(
+                threads::policies::scheduler_mode mode) override
             {
                 scheduler_.set_scheduler_mode(mode);
             }
@@ -94,7 +95,7 @@ namespace hpx { namespace threads { namespace executors
 
             // Return the requested policy element
             std::size_t get_policy_element(threads::detail::executor_parameter p,
-                error_code& ec) const;
+                error_code& ec) const override;
 
             // The function below are used by the resource manager to
             // interact with the scheduler.
