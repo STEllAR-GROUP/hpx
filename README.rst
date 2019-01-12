@@ -107,7 +107,8 @@ about the expectations for members of our community, with regard to how they
 will behave toward each other.
 
 Please find the project's gpg key, which is used to sign HPX releases
-[here](http://hkps.pool.sks-keyservers.net/pks/lookup?search=Ste%7C%7Car+group&fingerprint=on&op=index).
+`here 
+<https://pgp.mit.edu/pks/lookup?op=get&search=0xE18AE35E86BB194F)>`_.
 
 Citing
 ======
