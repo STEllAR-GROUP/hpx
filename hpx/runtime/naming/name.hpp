@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
@@ -794,31 +794,37 @@ namespace hpx { namespace naming
 
         private:
             typedef void (*deleter_type)(detail::id_type_impl*);
-            static deleter_type get_deleter(id_type_management t);
+            static deleter_type get_deleter(id_type_management t) noexcept;
 
         public:
-            id_type_impl()
-              : count_(0), type_(unknown_deleter)
+            id_type_impl() noexcept
+              : count_(1), type_(unknown_deleter)
             {}
 
-            explicit id_type_impl (std::uint64_t lsb_id, id_type_management t)
-              : gid_type(0, lsb_id), count_(0), type_(t)
+            explicit id_type_impl(
+                    std::uint64_t lsb_id, id_type_management t) noexcept
+              : gid_type(0, lsb_id)
+              , count_(1)
+              , type_(t)
             {}
 
             explicit id_type_impl (std::uint64_t msb_id, std::uint64_t lsb_id,
-                    id_type_management t)
-              : gid_type(msb_id, lsb_id), count_(0), type_(t)
+                    id_type_management t) noexcept
+              : gid_type(msb_id, lsb_id), count_(1), type_(t)
             {}
 
-            explicit id_type_impl (gid_type const& gid, id_type_management t)
-              : gid_type(gid), count_(0), type_(t)
+            explicit id_type_impl(
+                    gid_type const& gid, id_type_management t) noexcept
+              : gid_type(gid)
+              , count_(1)
+              , type_(t)
             {}
 
-            id_type_management get_management_type() const
+            id_type_management get_management_type() const noexcept
             {
                 return type_;
             }
-            void set_management_type(id_type_management type)
+            void set_management_type(id_type_management type) noexcept
             {
                 type_ = type;
             }
@@ -843,9 +849,6 @@ namespace hpx { namespace naming
             id_type_management type_;
         };
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT gid_type get_parcel_dest_gid(id_type const& id);
 }}
 
 #include <hpx/runtime/naming/id_type.hpp>

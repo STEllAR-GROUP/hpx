@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/util/internal_allocator.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -35,7 +36,7 @@ namespace hpx { namespace naming
     private:
         friend struct detail::id_type_impl;
 
-        id_type(detail::id_type_impl* p)
+        id_type(detail::id_type_impl* p) noexcept
           : gid_(p)
         {}
 
@@ -49,30 +50,33 @@ namespace hpx { namespace naming
                                     ///< credits when sent
         };
 
-        id_type() {}
+        id_type() = default;
 
         id_type(std::uint64_t lsb_id, management_type t);
         id_type(gid_type const& gid, management_type t);
         id_type(std::uint64_t msb_id, std::uint64_t lsb_id, management_type t);
 
-        id_type(id_type const & o) : gid_(o.gid_) {}
-        id_type(id_type && o)
+        id_type(id_type const& o) noexcept
+          : gid_(o.gid_)
+        {
+        }
+        id_type(id_type && o) noexcept
           : gid_(std::move(o.gid_))
         {
             o.gid_.reset();
         }
 
-        id_type & operator=(id_type const & o)
+        id_type & operator=(id_type const & o) noexcept
         {
             if (this != &o)
                 gid_ = o.gid_;
             return *this;
         }
-        id_type & operator=(id_type && o)
+        id_type & operator=(id_type && o) noexcept
         {
             if (this != &o)
             {
-                gid_ = o.gid_;
+                gid_ = std::move(o.gid_);
                 o.gid_.reset();
             }
             return *this;
@@ -88,7 +92,7 @@ namespace hpx { namespace naming
         id_type& operator++();
         id_type operator++(int);
 
-        explicit operator bool() const noexcept;
+        explicit operator bool() const;
 
         // comparison is required as well
         friend bool operator== (id_type const& lhs, id_type const& rhs);
@@ -111,21 +115,22 @@ namespace hpx { namespace naming
         // care, or better, don't use this at all.
         void make_unmanaged() const;
 
-    private:
-        friend HPX_API_EXPORT gid_type get_parcel_dest_gid(id_type const& id);
+        static void deallocate(detail::id_type_impl* p);
 
+    private:
         friend HPX_EXPORT std::ostream& operator<<(std::ostream& os,
             id_type const& id);
 
         friend class hpx::serialization::access;
 
         void save(serialization::output_archive& ar, unsigned int version) const;
-
         void load(serialization::input_archive& ar, unsigned int version);
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
         boost::intrusive_ptr<detail::id_type_impl> gid_;
+
+        static util::internal_allocator<detail::id_type_impl> alloc_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

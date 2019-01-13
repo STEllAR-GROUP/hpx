@@ -48,6 +48,10 @@ bool register_name(
   , error_code& ec
     )
 {
+    if (&ec == &throws)
+    {
+        return register_name(launch::sync, name, id.get_gid());
+    }
     return register_name(name, id).get(ec);
 }
 

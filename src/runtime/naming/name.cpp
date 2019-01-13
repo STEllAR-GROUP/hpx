@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -115,6 +115,10 @@ HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::detail::gid_serialization_data)
 
 namespace hpx { namespace naming
 {
+    ///////////////////////////////////////////////////////////////////////////
+    util::internal_allocator<detail::id_type_impl> id_type::alloc_;
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         void decrement_refcnt(detail::id_type_impl* p)
@@ -122,7 +126,8 @@ namespace hpx { namespace naming
             // do nothing if it's too late in the game
             if (!get_runtime_ptr())
             {
-                delete p;   // delete local gid representation in any case
+                // delete local gid representation in any case
+                id_type::deallocate(p);
                 return;
             }
 
@@ -136,7 +141,8 @@ namespace hpx { namespace naming
                 !naming::get_agas_client().resolve_cached(*p, addr)))
             {
                 // guard for wait_abort and other shutdown issues
-                try {
+                try
+                {
                     // decrement global reference count for the given gid,
                     std::int64_t credits = detail::get_credit_from_gid(*p);
                     HPX_ASSERT(0 != credits);
@@ -148,13 +154,15 @@ namespace hpx { namespace naming
                         agas::decref(*p, credits, ec);
                     }
                 }
-                catch (hpx::exception const& e) {
+                catch (hpx::exception const& e)
+                {
                     LTM_(error)
                         << "Unhandled exception while executing decrement_refcnt:"
                         << e.what();
                 }
             }
-            else {
+            else
+            {
                 // If the gid was not split at any point in time we can assume
                 // that the referenced object is fully local.
                 HPX_ASSERT(addr.type_ != components::component_invalid);
@@ -163,22 +171,26 @@ namespace hpx { namespace naming
                 // FIXME: The address should still be in the cache, but it could
                 // be evicted. It would be nice to have a way to pass the address
                 // directly to destroy_component.
-                try {
+                try
+                {
                     components::server::destroy_component(*p, addr);
                 }
-                catch (hpx::exception const& e) {
+                catch (hpx::exception const& e)
+                {
                     // This request might come in too late and the thread manager
                     // was already stopped. We ignore the request if that's the
                     // case.
-                    if (e.get_error() != invalid_status) {
+                    if (e.get_error() != invalid_status)
+                    {
                         throw;      // rethrow if not invalid_status
                     }
-                    else if (!threads::threadmanager_is(hpx::state_stopping)) {
+                    else if (!threads::threadmanager_is(hpx::state_stopping))
+                    {
                         throw;      // rethrow if not stopping
                     }
                 }
             }
-            delete p;   // delete local gid representation in any case
+            id_type::deallocate(p);   // delete local gid representation in any case
         }
 
         // custom deleter for managed gid_types, will be called when the last
@@ -187,26 +199,31 @@ namespace hpx { namespace naming
         {
             // a credit of zero means the component is not (globally) reference
             // counted
-            if (detail::has_credits(*p)) {
+            if (!refers_to_local_lva(*p) && detail::has_credits(*p))
+            {
                 // execute the deleter directly
                 decrement_refcnt(p);
             }
-            else {
-                delete p;   // delete local gid representation if needed
+            else
+            {
+                // delete local gid representation if needed
+                id_type::deallocate(p);
             }
         }
 
         // custom deleter for unmanaged gid_types, will be called when the last
         // copy of the corresponding naming::id_type goes out of scope
-        void gid_unmanaged_deleter (id_type_impl* p)
+        void gid_unmanaged_deleter(id_type_impl* p)
         {
-            delete p;   // delete local gid representation only
+            id_type::deallocate(p);   // delete local gid representation only
         }
 
         ///////////////////////////////////////////////////////////////////////
-        id_type_impl::deleter_type id_type_impl::get_deleter(id_type_management t)
+        id_type_impl::deleter_type id_type_impl::get_deleter(
+            id_type_management t) noexcept
         {
-            switch (t) {
+            switch (t)
+            {
             case unmanaged:
                 return &detail::gid_unmanaged_deleter;
 

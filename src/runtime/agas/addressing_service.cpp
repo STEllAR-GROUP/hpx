@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2018 Hartmut Kaiser
+//  Copyright (c) 2011-2019 Hartmut Kaiser
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
@@ -1012,8 +1012,8 @@ bool addressing_service::resolve_locally_known_addresses(
             addr.locality_ = dest;
             addr.type_ = hpx::components::component_agas_primary_namespace;
             // addr.address_ will be supplied on the target locality
-            return true;
         }
+        return true;
     }
 
     if (HPX_AGAS_SYMBOL_NS_LSB == lsb)
@@ -1030,7 +1030,6 @@ bool addressing_service::resolve_locally_known_addresses(
             addr.type_ = hpx::components::component_agas_symbol_namespace;
             // addr.address_ will be supplied on the target locality
         }
-
         return true;
     }
 
