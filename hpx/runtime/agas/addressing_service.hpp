@@ -126,8 +126,7 @@ public:
     resolved_localities_type resolved_localities_;
 
     addressing_service(
-        parcelset::parcelhandler& ph
-      , util::runtime_configuration const& ini_
+        util::runtime_configuration const& ini_
       , runtime_mode runtime_type_
         );
 
@@ -136,6 +135,9 @@ public:
         // TODO: Free the future pools?
         destroy_big_boot_barrier();
     }
+
+    void bootstrap(
+        parcelset::parcelhandler& ph, util::runtime_configuration const& ini);
 
     void initialize(parcelset::parcelhandler& ph, std::uint64_t rts_lva,
         std::uint64_t mem_lva);

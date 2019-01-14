@@ -444,7 +444,7 @@ namespace hpx { namespace parallel { namespace util
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         return detail::loop_with_cleanup_n<cat>::call_with_token(it, count,
             tok, std::forward<F>(f), std::forward<Cleanup>(cleanup));
-    };
+    }
 
     template <typename Iter, typename FwdIter, typename CancelToken,
         typename F, typename Cleanup>
@@ -455,7 +455,7 @@ namespace hpx { namespace parallel { namespace util
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         return detail::loop_with_cleanup_n<cat>::call_with_token(it, count,
             dest, tok, std::forward<F>(f), std::forward<Cleanup>(cleanup));
-    };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -511,7 +511,7 @@ namespace hpx { namespace parallel { namespace util
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         return detail::loop_idx_n<cat>::call(base_idx, it, count, tok,
             std::forward<F>(f));
-    };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail

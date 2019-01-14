@@ -484,6 +484,9 @@ namespace hpx { namespace parcelset
         mutable mutex_type mtx_;
         write_handler_type write_handler_;
 
+        /// cache whether networking has been enabled
+        bool is_networking_enabled_;
+
     private:
         static std::vector<plugins::parcelport_factory_base *> &
             get_parcelport_factories();

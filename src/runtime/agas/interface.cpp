@@ -395,11 +395,17 @@ naming::gid_type get_next_id(
     )
 {
     runtime* rt = get_runtime_ptr();
-    if (rt == nullptr || rt->get_state() == state_invalid)
+    if (rt == nullptr)
     {
         HPX_THROWS_IF(ec, invalid_status,
             "get_next_id", "the runtime system has not been started yet.");
         return naming::invalid_gid;
+    }
+
+    // during bootstrap we use the id pool
+    if (rt->get_state() == state_invalid)
+    {
+        return rt->get_id_pool().get_id(count);
     }
 
     naming::resolver_client& agas_ = naming::get_agas_client();

@@ -167,7 +167,7 @@ namespace hpx { namespace parallel { inline namespace v2
                     errors.add(f.get_exception_ptr());
             }
             if (errors.size() != 0)
-                throw errors;
+                throw std::forward<parallel::exception_list>(errors);
         }
 
         // return future representing the execution of all tasks
@@ -194,9 +194,8 @@ namespace hpx { namespace parallel { inline namespace v2
             return
                 result::get(
                     hpx::dataflow(
-                        hpx::util::bind_back(
-                            hpx::util::one_shot(&task_block::on_ready),
-                            std::move(errors)),
+                        hpx::util::one_shot(hpx::util::bind_back(
+                            &task_block::on_ready, std::move(errors))),
                         std::move(tasks)
                     ));
         }

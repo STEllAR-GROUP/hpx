@@ -18,7 +18,7 @@
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/math/common_factor.hpp>
+#include <boost/integer/common_factor.hpp>
 
 #include <chrono>
 #include <cstdint>
@@ -403,8 +403,8 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         if (suspended_tasks != 0)
         {
-            std::uint64_t gcd = boost::math::gcd(tasks_per_feeder
-                                                 , suspended_tasks_per_feeder);
+            std::uint64_t gcd = boost::integer::gcd(
+                tasks_per_feeder, suspended_tasks_per_feeder);
 
             suspend_step = suspended_tasks_per_feeder / gcd;
             // We check earlier to make sure that there are never more

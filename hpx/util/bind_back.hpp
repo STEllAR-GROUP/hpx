@@ -13,6 +13,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/one_shot.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
@@ -24,10 +25,6 @@ namespace hpx { namespace util
 {
     namespace detail
     {
-        template <typename F>
-        class one_shot_wrapper;
-
-        ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Ts, typename ...Us>
         struct invoke_bound_back_result;
 
@@ -49,17 +46,6 @@ namespace hpx { namespace util
         template <typename F, typename ...Ts, typename ...Us>
         struct invoke_bound_back_result<F const&&, util::tuple<Ts...> const&&, Us...>
           : util::invoke_result<F const, Us..., Ts const...>
-        {};
-
-        // one-shot wrapper is not const callable
-        template <typename F, typename ...Ts, typename ...Us>
-        struct invoke_bound_back_result<
-            one_shot_wrapper<F> const&, util::tuple<Ts...> const&, Us...>
-        {};
-
-        template <typename F, typename ...Ts, typename ...Us>
-        struct invoke_bound_back_result<
-            one_shot_wrapper<F> const&&, util::tuple<Ts...> const&&, Us...>
         {};
 
         template <typename F, std::size_t ...Is, typename Ts, typename ...Us>

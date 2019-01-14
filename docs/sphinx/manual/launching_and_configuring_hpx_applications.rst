@@ -96,7 +96,7 @@ first value). Duplicate sections simply merge their properties together, as if
 they occurred contiguously.
 
 In |hpx| ini files, a property value ``${FOO:default}`` will use the environmental
-variable ``FOO`` to extract the actual value if it is set and``default``otherwise.
+variable ``FOO`` to extract the actual value if it is set and ``default`` otherwise.
 No default has to be specified. Therefore ``${FOO}`` refers to the environmental
 variable ``FOO``. If ``FOO`` is not set or empty the overall expression will evaluate
 to an empty string. A property value ``$[section.key:default]`` refers to the value
@@ -284,7 +284,7 @@ The ``hpx`` configuration section
    * * ``hpx.stacks.large_size``
      * This is initialized to the large stack size to be used by |hpx|-threads.
        Set by default to the value of the compile time preprocessor constant
-       ``HPX_LARGE_STACK_SIZE`` (defaults to``0x200000``). This setting is used
+       ``HPX_LARGE_STACK_SIZE`` (defaults to ``0x200000``). This setting is used
        by default for the thread running ``hpx_main`` only.
    * * ``hpx.stacks.huge_size``
      * This is initialized to the huge stack size to be used by |hpx|-threads.
@@ -695,8 +695,8 @@ The ``hpx.agas`` configuration section
    * * ``hpx.agas.service_mode``
      * This property specifies what type of :term:`AGAS` service is running on
        this :term:`locality`. Currently, two modes exist. The :term:`locality`
-       that acts as the :term:`AGAS` server runs in``bootstrap``mode. All other
-       localities are in``hosted``mode.
+       that acts as the :term:`AGAS` server runs in ``bootstrap`` mode. All other
+       localities are in ``hosted`` mode.
    * * ``hpx.agas.dedicated_server``
      * This property specifies whether the :term:`AGAS` server is exclusively
        running :term:`AGAS` services and not hosting any application components.
@@ -709,15 +709,15 @@ The ``hpx.agas`` configuration section
        ``HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS`` (``4096``).
    * * ``hpx.agas.use_caching``
      * This property specifies whether a software address translation cache is
-       used. It is a boolean value. Defaults to``1``
+       used. It is a boolean value. Defaults to ``1``.
    * * ``hpx.agas.use_range_caching``
      * This property specifies whether range-based caching is used by the
        software address translation cache. This property is ignored if
-       `hpx.agas.use_caching` is false. It is a boolean value. Defaults to ``1``
+       `hpx.agas.use_caching` is false. It is a boolean value. Defaults to ``1``.
    * * ``hpx.agas.local_cache_size``
      * This property defines the size of the software address translation cache
        for :term:`AGAS` services. This property is ignored
-       if``hpx.agas.use_caching``is false. Note that if
+       if ``hpx.agas.use_caching`` is false. Note that if
        ``hpx.agas.use_range_caching`` is true, this size will refer to the
        maximum number of ranges stored in the cache, not the number of entries
        spanned by the cache. The default depends on the compile time
@@ -888,8 +888,8 @@ The merge operation itself conforms to the rules as described in the section
 
    Any changes made to the configuration database caused by one of the steps
    will influence the loading process for all subsequent steps. For instance, if
-   one of the ini files loaded changes the property``hpx.ini_path`` this will
-   influence the directories searched in step 9 as described above.]
+   one of the ini files loaded changes the property ``hpx.ini_path`` this will
+   influence the directories searched in step 9 as described above.
 
 .. important::
 
@@ -1210,10 +1210,10 @@ general logging category are shown here (the syntax is described in the section
     destination = ${HPX_LOGDESTINATION:console}
     format = ${HPX_LOGFORMAT:(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) P%parentloc%/%hpxparent%.%hpxparentphase% %time%($hh:$mm.$ss.$mili) [%idx%]|\\n}
 
-The logging level is taken from the environment variable``HPX_LOGLEVEL``and
+The logging level is taken from the environment variable ``HPX_LOGLEVEL`` and
 defaults to zero, e.g. no logging. The default logging destination is read from
-the environment variable``HPX_LOGDESTINATION`` On any of the localities it
-defaults to``console``which redirects all generated logging output to the
+the environment variable ``HPX_LOGDESTINATION`` On any of the localities it
+defaults to ``console`` which redirects all generated logging output to the
 console instance of an application. The following table lists the possible
 destinations for any logging output. It is possible to specify more than one
 destination separated by whitespace.
@@ -1740,7 +1740,7 @@ ignore the option. For instance, the following PBS script passes the option
 
 .. caution::
 
-   If the first application specific argument (inside``$APP_OPTIONS`` is a
+   If the first application specific argument (inside ``$APP_OPTIONS`` is a
    non-option (i.e. does not start with a ``-`` or a ``--``, then it must be
    placed before the option :option:`--hpx:nodes`, which, in this case,
    should be the last option on the command line.

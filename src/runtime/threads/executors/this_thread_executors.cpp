@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -144,9 +144,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
 
         // create a new thread
-        thread_init_data data(util::bind(
-            util::one_shot(&this_thread_executor::thread_function_nullary),
-            this, std::move(f)), desc);
+        thread_init_data data(util::one_shot(util::bind(
+            &this_thread_executor::thread_function_nullary,
+            this, std::move(f))), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         // update statistics
@@ -183,9 +183,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         scheduler_.get_state(0).compare_exchange_strong(expected, state_starting);
 
         // create a new suspended thread
-        thread_init_data data(util::bind(
-            util::one_shot(&this_thread_executor::thread_function_nullary),
-            this, std::move(f)), desc);
+        thread_init_data data(util::one_shot(util::bind(
+            &this_thread_executor::thread_function_nullary,
+            this, std::move(f))), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
@@ -345,12 +345,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
             // FIXME: turn these values into performance counters
             std::int64_t executed_threads = 0, executed_thread_phases = 0;
-            std::uint64_t overall_times = 0, thread_times = 0;
+            std::int64_t overall_times = 0, thread_times = 0;
             std::int64_t idle_loop_count = 0, busy_loop_count = 0;
-            std::uint8_t task_active = 0;
+            bool task_active = false;
 
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
-            std::uint64_t bg_work = 0;
+            std::int64_t bg_work = 0;
             threads::detail::scheduling_counters counters(
                 executed_threads, executed_thread_phases,
                 overall_times, thread_times, idle_loop_count, busy_loop_count,

@@ -33,6 +33,7 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <forward_list>
 #include <stack>
 #include <string>
 #include <utility>
@@ -718,8 +719,7 @@ namespace hpx { namespace threads
         bool ran_exit_funcs_;
 
         // Singly linked list (heap-allocated)
-        // FIXME: replace with forward_list eventually.
-        std::deque<util::function_nonser<void()> > exit_funcs_;
+        std::forward_list<util::function_nonser<void()> > exit_funcs_;
 
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;

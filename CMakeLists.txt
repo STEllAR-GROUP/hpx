@@ -60,6 +60,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 ################################################################################
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
+include(GNUInstallDirs)
 include(HPX_Utils)
 
 # explicitly set certain policies
@@ -225,6 +226,14 @@ hpx_option(HPX_WITH_DEFAULT_TARGETS BOOL
 hpx_option(HPX_WITH_COMPILER_WARNINGS BOOL
   "Enable compiler warnings (default: ON)"
   ON ADVANCED)
+
+hpx_option(HPX_WITH_COMPILER_WARNINGS_AS_ERRORS BOOL
+  "Turn compiler warnings into errors (default: OFF)"
+  OFF ADVANCED)
+
+hpx_option(HPX_WITH_EXECUTABLE_PREFIX STRING
+  "Executable prefix (default none), 'hpx_' useful for system install."
+  "" CATEGORY "Build Targets")
 
 hpx_option(HPX_WITH_DOCUMENTATION BOOL
   "Build the HPX documentation (default OFF)."
@@ -1059,6 +1068,12 @@ if((MSVC14 AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
 endif()
 
 ################################################################################
+# Some special handling of the compilation is need on build infrastructure for
+# generating packages for target architecture, see issue #3575
+
+hpx_option(HPX_WITH_BUILD_BINARY_PACKAGE BOOL
+  "Build HPX on the build infrastructure on any LINUX distribution (default: OFF)."
+  OFF ADVANCED)
 
 ################################################################################
 # Add necessary compiler flags. Flags added here include flags to disable/enable
@@ -1405,6 +1420,15 @@ if(HPX_WITH_COMPILER_WARNINGS)
   endif()
 endif()
 
+# Configure compiler warnings as errors
+if(HPX_WITH_COMPILER_WARNINGS_AS_ERRORS)
+  if(MSVC)
+    hpx_add_compile_flag(-WX LANGUAGES C CXX Fortran)
+  else()
+    hpx_add_compile_flag_if_available(-Werror LANGUAGES CXX C Fortran)
+  endif()
+endif()
+
 # Diagnostics
 if(MSVC)
   # Display full paths in diagnostics
@@ -1482,17 +1506,25 @@ else()
     hpx_add_compile_flag_if_available(-wd2536)
   endif()
 
+
   # rdtsc is an x86 instruction that reads the value of a CPU time stamp
   # counter. rdtscp is an extension to rdtsc. The difference is that rdtscp is
   # a serializing instruction.
   hpx_cpuid("rdtsc" HPX_WITH_RDTSC
     DEFINITIONS HPX_HAVE_RDTSC)
 
+ # One can not assume if RDTSCP is available on the hardware
+ # of the build infrastructure, that it will be available on
+ # all potential target hardware, see Issue  #3575
+ if(NOT ${HPX_WITH_BUILD_BINARY_PACKAGE})
+
   # XeonPhi's do not support RDTSCP
   if(NOT ("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI"))
     hpx_cpuid("rdtscp" HPX_WITH_RDTSCP
       DEFINITIONS HPX_HAVE_RDTSCP)
   endif()
+
+ endif()
 
   if(NOT HPX_WITH_RDTSC AND NOT HPX_WITH_RDTSCP)
     hpx_warn("Neither rdtsc nor rdtscp is available; some performance counters may report incorrect results")
@@ -1713,18 +1745,12 @@ else()
 endif()
 
 
-# ################################################################################
-# # search path configuration
-# ################################################################################
-
-if (NOT DEFINED LIB)
-  set(LIB "lib")
-endif(NOT DEFINED LIB)
-
+################################################################################
+# search path configuration
+################################################################################
 if(HPX_WITH_FULL_RPATH)
   hpx_include(SetFullRPATH)
 endif()
-###############################################################################
 
 ################################################################################
 # Git commit detection
@@ -1853,7 +1879,7 @@ configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
 ################################################################################
 install(
   FILES "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
-  DESTINATION bin
+  DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT core
   PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
   GROUP_READ GROUP_EXECUTE
@@ -1861,7 +1887,7 @@ install(
 
 install( # install all hpx header files
   DIRECTORY hpx/
-  DESTINATION include/hpx
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"
   PATTERN ".git" EXCLUDE
@@ -1872,7 +1898,7 @@ install( # install all hpx header files
 # cmake options
 install(
   DIRECTORY "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/"
-  DESTINATION include/hpx
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"
   PATTERN ".git" EXCLUDE
@@ -1881,14 +1907,14 @@ install(
 
 install( # Install all HPX cmake utility files
   DIRECTORY cmake/
-  DESTINATION ${LIB}/cmake/${HPX_PACKAGE_NAME}
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
   COMPONENT core
   PATTERN ".cmake.in" EXCLUDE
   PATTERN ".git" EXCLUDE)
 
 install( # Install HPX Python scripts
   DIRECTORY python/scripts/
-  DESTINATION bin
+  DESTINATION ${CMAKE_INSTALL_BINDIR}
   FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                    GROUP_READ GROUP_EXECUTE
                    WORLD_READ WORLD_EXECUTE
@@ -1913,13 +1939,13 @@ install( # Install HPX Python scripts
 #         COMMAND "${CMAKE_COMMAND}" -E create_symlink "${script_name}" "${script_name_we}"
 #   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 #
-#       install(FILES "${CMAKE_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "bin")
+#       install(FILES "${CMAKE_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "${CMAKE_INSTALL_BINDIR}")
 #     endforeach()
 #   endif()
 #
 #   install( # Install HPX Python module (TODO: this is a temporary hack)
 #     DIRECTORY python/hpx
-#     DESTINATION share/hpx-${HPX_VERSION}/python
+#     DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx-${HPX_VERSION}/python
 #     COMPONENT core
 #     FILES_MATCHING PATTERN "*.py"
 #     PATTERN ".git" EXCLUDE)
@@ -1930,13 +1956,13 @@ install( # Install HPX Python scripts
 #     "hpx-${HPX_VERSION}" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
 #   # create a symlink in share pointing to the latest HPX installation
 #   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
-#   install(DIRECTORY "${CMAKE_BINARY_DIR}/python/hpx" DESTINATION "share")
+#   install(DIRECTORY "${CMAKE_BINARY_DIR}/python/hpx" DESTINATION "${CMAKE_INSTALL_DATADIR}")
 
 if("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
   # FIXME: push changes upstream
   install(
     DIRECTORY external/asio/boost
-    DESTINATION include/hpx/external
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx/external
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
     PATTERN ".git" EXCLUDE)
@@ -1944,19 +1970,19 @@ endif()
 
 install(
   FILES "${PROJECT_SOURCE_DIR}/LICENSE_1_0.txt"
-  DESTINATION share/hpx
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx
   COMPONENT license)
 
 if(HPX_WITH_DOCUMENTATION)
   # Install HPX documentation files
   install(
     FILES "${PROJECT_SOURCE_DIR}/docs/index.html"
-    DESTINATION share/hpx/
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/
     COMPONENT docs)
 
   install(
     DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx/docs/html/"
-    DESTINATION share/hpx/docs/html
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/html
     COMPONENT docs
     PATTERN ".git" EXCLUDE)
 endif()

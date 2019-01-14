@@ -615,13 +615,14 @@ namespace hpx { namespace util
             cfgmap, rtcfg_, vm, env, using_nodelist, initial);
         num_cores_ = detail::handle_num_cores(cfgmap, vm, num_threads_, env);
 
-        bool expect_connections = false;
         bool run_agas_server = false;
         std::string hpx_host;
-        std::uint16_t initial_hpx_port = 0;
         std::uint16_t hpx_port = 0;
 
 #if defined(HPX_HAVE_NETWORKING)
+        bool expect_connections = false;
+        std::uint16_t initial_hpx_port = 0;
+
         // handling number of localities, those might have already been initialized
         // from MPI environment
         num_localities_ = detail::handle_num_localities(cfgmap, vm, env,
@@ -640,7 +641,7 @@ namespace hpx { namespace util
         //  - num_localities > 1
         expect_connections =
             cfgmap.get_value<int>("hpx.expect_connecting_localities",
-                num_localities_ > 1 ? 0 : 1) ? true : false;
+                num_localities_ > 1 ? 1 : 0) != 0;
 
         if (vm.count("hpx:expect-connecting-localities"))
             expect_connections = true;
@@ -788,6 +789,8 @@ namespace hpx { namespace util
         {
             hpx_host = hpx::util::resolve_public_ip_address();
         }
+
+        ini_config += "hpx.node!=" + std::to_string(node);
 #endif
 
         // handle setting related to schedulers

@@ -45,10 +45,10 @@ namespace hpx { namespace threads
         {
             {
                 hpx::util::unlock_guard<mutex_type::scoped_lock> ul(l);
-                if(!exit_funcs_.back().empty())
-                    exit_funcs_.back()();
+                if(!exit_funcs_.front().empty())
+                    exit_funcs_.front()();
             }
-            exit_funcs_.pop_back();
+            exit_funcs_.pop_front();
         }
         ran_exit_funcs_ = true;
     }
@@ -63,7 +63,7 @@ namespace hpx { namespace threads
             return false;
         }
 
-        exit_funcs_.push_back(f);
+        exit_funcs_.push_front(f);
 
         return true;
     }

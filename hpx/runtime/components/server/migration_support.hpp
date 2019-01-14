@@ -192,13 +192,13 @@ namespace hpx { namespace components
             // Make sure we pin the component at construction of the bound object
             // which will also unpin it once the thread runs to completion (the
             // bound object goes out of scope).
-            return util::bind(
-                util::one_shot(&migration_support::thread_function),
+            return util::one_shot(util::bind(
+                &migration_support::thread_function,
                 get_lva<this_component_type>::call(lva),
                 util::placeholders::_1,
                 traits::component_decorate_function<base_type>::call(
                     lva, std::forward<F>(f)),
-                components::pinned_ptr::create<this_component_type>(lva));
+                components::pinned_ptr::create<this_component_type>(lva)));
         }
 
         // Return whether the given object was migrated, if it was not

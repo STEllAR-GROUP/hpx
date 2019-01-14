@@ -298,15 +298,15 @@ namespace hpx { namespace actions
                 target.get_management_type() == naming::id_type::unmanaged)
             {
                 return traits::action_decorate_function<Derived>::call(lva,
-                    util::bind(util::one_shot(
-                        typename Derived::thread_function()),
-                        lva, comptype, std::forward<Ts>(vs)...));
+                    util::one_shot(util::bind(
+                        typename Derived::thread_function(),
+                        lva, comptype, std::forward<Ts>(vs)...)));
             }
 
             return traits::action_decorate_function<Derived>::call(lva,
-                util::bind(util::one_shot(
-                    typename Derived::thread_function(target)),
-                    lva, comptype, std::forward<Ts>(vs)...));
+                util::one_shot(util::bind(
+                    typename Derived::thread_function(target),
+                    lva, comptype, std::forward<Ts>(vs)...)));
         }
 
         // This static construct_thread_function allows to construct
@@ -853,6 +853,7 @@ namespace hpx { namespace serialization
 #define HPX_REGISTER_ACTION_1(action)                                         \
     HPX_REGISTER_ACTION_2(action, action)                                     \
 /**/
+#if defined(HPX_MSVC) || defined(HPX_MINGW)
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
@@ -863,6 +864,17 @@ namespace hpx { namespace serialization
             transfer_continuation_action< action>;                            \
     }}                                                                        \
 /**/
+#else
+#define HPX_REGISTER_ACTION_2(action, actionname)                             \
+    HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
+    HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
+    HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                        \
+    namespace hpx { namespace actions {                                       \
+        template struct transfer_action< action>;                             \
+        template struct transfer_continuation_action< action>;                \
+    }}                                                                        \
+/**/
+#endif
 
 #if defined(HPX_MSVC) || defined(HPX_MINGW)
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \

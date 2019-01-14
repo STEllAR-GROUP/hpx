@@ -16,10 +16,13 @@
 #include <hpx/util/plugin/dll.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 
+#include <boost/filesystem.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -61,6 +64,9 @@ namespace hpx { namespace util
         // initial number of localities
         std::uint32_t get_num_localities() const;
         void set_num_localities(std::uint32_t);
+
+        // should networking be enabled
+        bool enable_networking() const;
 
         // sequence number of first usable pu
         std::uint32_t get_first_used_core() const;
@@ -146,6 +152,21 @@ namespace hpx { namespace util
             std::vector<std::string> const& cmdline_ini_defs);
 
         void reconfigure();
+
+        void load_component_paths(
+            std::vector<std::shared_ptr<plugins::plugin_registry_base>>&
+                plugin_registries,
+            std::string const& component_base_paths,
+            std::string const& component_path_suffixes,
+            std::set<std::string>& component_paths,
+            std::map<std::string, boost::filesystem::path>& basenames);
+
+        void load_component_path(
+            std::vector<std::shared_ptr<plugins::plugin_registry_base>>&
+                plugin_registries,
+            std::string const& path,
+            std::set<std::string>& component_paths,
+            std::map<std::string, boost::filesystem::path>& basenames);
 
     public:
         runtime_mode mode_;

@@ -166,6 +166,7 @@ namespace hpx { namespace util
             return get_section(l, sec_name);
         }
 
+        section_map& get_sections() { return sections_; }
         section_map const& get_sections() const { return sections_; }
 
         void add_entry(std::string const& key, entry_type const& val)

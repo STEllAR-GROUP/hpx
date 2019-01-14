@@ -374,7 +374,7 @@ namespace hpx { namespace threads { namespace policies
         // get/set scheduler mode
         scheduler_mode get_scheduler_mode() const
         {
-            return mode_.load(std::memory_order_acquire);
+            return mode_.load(std::memory_order_relaxed);
         }
 
         void set_scheduler_mode(scheduler_mode mode)

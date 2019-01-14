@@ -50,7 +50,7 @@ if(HPX_WITH_NETWORKING)
                      launch_process_test_server_component)
     set(launch_process_PARAMETERS
       --launch=$<TARGET_FILE:launched_process_test>
-)
+      --hpx:expect-connecting-localities)
 endif()
 
 set(action_invoke_no_more_than_PARAMETERS
