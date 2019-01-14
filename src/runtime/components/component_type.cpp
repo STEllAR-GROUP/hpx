@@ -1,19 +1,19 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/throw_exception.hpp>
-
-#include <hpx/lcos/local/spinlock.hpp>
-
-#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/reinitializable_static.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -81,6 +81,30 @@ namespace hpx { namespace components
 
                 return it->second;
             }
+
+            static bool enumerate_instance_counts(
+                util::unique_function_nonser<bool(component_type)> const& f)
+            {
+                std::vector<component_type> types;
+
+                {
+                    std::lock_guard<mutex_type> l(mtx());
+                    types.reserve(data().size());
+
+                    for (auto const& e : data())
+                    {
+                        types.push_back(e.first);
+                    }
+                }
+
+                for (component_type t : types)
+                {
+                    if (!f(t))
+                        return false;
+                }
+
+                return true;
+            }
         };
     }
 
@@ -97,6 +121,12 @@ namespace hpx { namespace components
     component_deleter_type& deleter(component_type type)
     {
         return detail::component_database::get_entry(type).deleter_;
+    }
+
+    bool enumerate_instance_counts(
+        util::unique_function_nonser<bool(component_type)> const& f)
+    {
+        return detail::component_database::enumerate_instance_counts(f);
     }
 
     namespace detail

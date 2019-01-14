@@ -114,6 +114,10 @@ inline std::uint32_t get_num_localities(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+HPX_API_EXPORT std::string get_component_type_name(
+    components::component_type type, error_code& ec = throws);
+
+///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT lcos::future<std::vector<std::uint32_t> > get_num_threads();
 
 HPX_API_EXPORT std::vector<std::uint32_t> get_num_threads(

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c)      2017 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -14,11 +14,12 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/util/detail/pp/strip_parens.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <cstdint>
 #include <string>
@@ -86,11 +87,15 @@ namespace hpx { namespace components
         factory_check    = 2
     };
 
+    // access data related to component instance counts
     HPX_EXPORT bool& enabled(component_type type);
     HPX_EXPORT util::atomic_count& instance_count(component_type type);
     typedef void(*component_deleter_type)(
         hpx::naming::gid_type const&, hpx::naming::address const&);
     HPX_EXPORT component_deleter_type& deleter(component_type type);
+
+    HPX_EXPORT bool enumerate_instance_counts(
+        util::unique_function_nonser<bool(component_type)> const& f);
 
     /// \brief Return the string representation for a given component type id
     HPX_EXPORT std::string const get_component_type_name(component_type type);
