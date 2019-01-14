@@ -137,8 +137,8 @@ namespace hpx { namespace naming
             // resolved, which means we don't know anything about the component
             // type.
             naming::address addr;
-            if ((gid_was_split(*p) ||
-                !naming::get_agas_client().resolve_cached(*p, addr)))
+            if (gid_was_split(*p) ||
+                !naming::get_agas_client().resolve_cached(*p, addr))
             {
                 // guard for wait_abort and other shutdown issues
                 try
@@ -199,7 +199,7 @@ namespace hpx { namespace naming
         {
             // a credit of zero means the component is not (globally) reference
             // counted
-            if (!refers_to_local_lva(*p) && detail::has_credits(*p))
+            if (detail::has_credits(*p))
             {
                 // execute the deleter directly
                 decrement_refcnt(p);

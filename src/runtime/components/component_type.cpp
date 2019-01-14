@@ -20,6 +20,7 @@
 #include <map>
 #include <mutex>
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
