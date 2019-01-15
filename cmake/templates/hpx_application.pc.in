@@ -7,8 +7,8 @@
 
 prefix=@HPX_CONF_PREFIX@
 exec_prefix=${prefix}
-libdir=${exec_prefix}/@HPX_CONF_LIBDIR@
-includedir=${exec_prefix}/@HPX_CONF_INCLUDEDIR@
+libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${exec_prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 
 Name: hpx_application
 Description: High Performance ParalleX (application configuration)$<$<CONFIG:Debug>: - debug build>
