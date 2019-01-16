@@ -883,6 +883,16 @@ if(HPX_WITH_ATTACH_DEBUGGER_ON_TEST_FAILURE)
   hpx_add_config_define(HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE)
 endif()
 
+hpx_option(HPX_WITH_TESTS_DEBUG_LOG BOOL
+  "Turn on debug logs (--hpx:debug-hpx-log) for tests (default: OFF)"
+  OFF
+  CATEGORY "Debugging" ADVANCED)
+
+hpx_option(HPX_WITH_TESTS_DEBUG_LOG_DESTINATION STRING
+  "Destination for test debug logs (default: cout)"
+  "cout"
+  CATEGORY "Debugging" ADVANCED)
+
 # If APEX is defined, the action timers need thread debug info.
 if(HPX_WITH_APEX)
     hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
