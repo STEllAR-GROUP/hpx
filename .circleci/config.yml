@@ -18,9 +18,17 @@ convert_xml: &convert_xml
           /hpx/conv.xsl Testing/`head -n 1 < Testing/TAG`/Test.xml \
           > ${CIRCLE_JOB}/Test.xml
 
+move_core_dump: &move_core_dump
+    name: Moving core dumps
+    when: on_fail
+    command: |
+        mkdir -p ${CIRCLE_JOB}
+        # Ignore errors if there are no core dumps
+        cp core.* ${CIRCLE_JOB} || true
+
 move_debug_log: &move_debug_log
     name: Moving debug logs
-    when: always
+    when: on_fail
     command: |
         mkdir -p ${CIRCLE_JOB}
         cp debug-log.txt ${CIRCLE_JOB} || true
@@ -203,9 +211,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.examples
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -226,9 +237,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.actions
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -249,9 +263,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.agas
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -272,9 +289,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.build
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -295,9 +315,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.component
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -318,9 +341,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.computeapi
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -341,9 +367,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.diagnostics
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -364,9 +393,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.lcos
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -387,9 +419,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.algorithms
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -410,9 +445,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.block
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -433,9 +471,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.container_algorithms
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -456,9 +497,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.datapar_algorithms
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -479,9 +523,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.executors
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -504,9 +551,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.segmented_algorithms
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -527,9 +577,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.parcelset
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -550,9 +603,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.performance_counter
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -573,9 +629,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.resource
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -596,9 +655,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.serialization
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -619,9 +681,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.threads
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -642,9 +707,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.traits
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -665,9 +733,12 @@ jobs:
           name: Running Unit Tests
           when: always
           command: |
+              ulimit -c unlimited
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.util
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
@@ -691,6 +762,8 @@ jobs:
               ctest -T test --no-compress-output --output-on-failure -R tests.regressions
       - run:
           <<: *convert_xml
+      - run:
+          <<: *move_core_dump
       - run:
           <<: *move_debug_log
       - store_test_results:
