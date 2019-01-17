@@ -375,7 +375,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'HPX'
-copyright = u'2008-2018, The Ste||ar Group'
+copyright = u'2008-2019, The Ste||ar Group'
 author = u'The Ste||ar Group'
 
 # The version info for the project you're documenting, acts as replacement for
