@@ -43,8 +43,12 @@ namespace hpx { namespace util { namespace debug
     class cxxabi_demangle_helper
     {
     public:
-        cxxabi_demangle_helper() :
-            demangled_ {abi::__cxa_demangle(typeid(T).name(), 0, 0, 0), std::free} {}
+        cxxabi_demangle_helper()
+          : demangled_{abi::__cxa_demangle(
+                           typeid(T).name(), nullptr, nullptr, nullptr),
+                std::free}
+        {
+        }
 
         char const* type_id() const
         {
