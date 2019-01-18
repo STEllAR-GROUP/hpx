@@ -139,7 +139,7 @@ are completed to avoid confusion.
    ``contact@stellar-group.org`` key by adding the ``-s`` flag to ``git tag``.
    Make sure you change git to sign with the ``contact@stellar-group.org`` key,
    rather than your own key if you use one. You also need to change the name and
-   email used for commits. Change them to ``Ste||ar Group`` and
+   email used for commits. Change them to ``STE||AR Group`` and
    ``contact@stellar-group.org``, respectively. Finally, the
    ``contact@stellar-group.org`` email address needs to be added to your GitHub
    account for the tag to show up as verified.
