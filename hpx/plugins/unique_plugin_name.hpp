@@ -7,7 +7,7 @@
 #if !defined(HPX_UNIQUE_PLUGIN_NAME_MAR_24_2013_245PM)
 #define HPX_UNIQUE_PLUGIN_NAME_MAR_24_2013_245PM
 
-#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/pp/stringize.hpp>
 
 namespace hpx { namespace plugins
 {

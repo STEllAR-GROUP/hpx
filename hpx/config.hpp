@@ -38,8 +38,8 @@
 #error HPX cannot be compiled with a Boost version earlier than 1.58.0
 #endif
 
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/pp/cat.hpp>
+#include <hpx/pp/stringize.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 // On Windows, make sure winsock.h is not included even if windows.h is

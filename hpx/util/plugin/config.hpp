@@ -7,7 +7,7 @@
 #define HPX_UTIL_PLUGIN_CONFIG_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/pp/stringize.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_NO_EXPORT_API)

@@ -10,10 +10,10 @@
 
 #include <hpx/runtime/components/component_factory.hpp>
 
-#include <hpx/util/detail/pp/strip_parens.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/expand.hpp>
-#include <hpx/util/detail/pp/nargs.hpp>
+#include <hpx/pp/cat.hpp>
+#include <hpx/pp/expand.hpp>
+#include <hpx/pp/nargs.hpp>
+#include <hpx/pp/strip_parens.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This macro is used create and to register a minimal component factory with

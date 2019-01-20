@@ -14,15 +14,15 @@
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/pp/cat.hpp>
+#include <hpx/pp/expand.hpp>
+#include <hpx/pp/nargs.hpp>
+#include <hpx/pp/stringize.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/expand.hpp>
-#include <hpx/util/detail/pp/nargs.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
 
 #include <exception>
 #include <memory>

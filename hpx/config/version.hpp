@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/export_definitions.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/pp/cat.hpp>
 
 #include <boost/version.hpp>
 

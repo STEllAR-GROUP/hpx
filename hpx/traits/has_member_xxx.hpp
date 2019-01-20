@@ -7,7 +7,7 @@
 #ifndef HPX_TRAITS_HAS_MEMBER_XXX_HPP
 #define HPX_TRAITS_HAS_MEMBER_XXX_HPP
 
-#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/pp/cat.hpp>
 
 #include <type_traits>
 

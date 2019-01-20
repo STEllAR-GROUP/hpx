@@ -13,6 +13,10 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/sync_fwd.hpp>
+#include <hpx/pp/cat.hpp>
+#include <hpx/pp/expand.hpp>
+#include <hpx/pp/nargs.hpp>
+#include <hpx/pp/stringize.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -37,10 +41,6 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/expand.hpp>
-#include <hpx/util/detail/pp/nargs.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
