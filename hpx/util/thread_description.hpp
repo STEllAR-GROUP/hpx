@@ -74,6 +74,7 @@ namespace hpx { namespace util
         }
 #endif
 
+        /* The priority of description is name, altname, address */
         template <typename F, typename =
             typename std::enable_if<
                 !std::is_same<F, thread_description>::value &&
@@ -84,6 +85,7 @@ namespace hpx { namespace util
           : type_(data_type_description)
         {
             char const* name = traits::get_function_annotation<F>::call(f);
+            // If a name exists, use it, not the altname.
             if (name != nullptr)
             {
                 altname = name;
