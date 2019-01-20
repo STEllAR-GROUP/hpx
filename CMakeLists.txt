@@ -1775,6 +1775,17 @@ endfunction()
 include_directories("${CMAKE_BINARY_DIR}")
 
 ################################################################################
+# Add custom targets for tests
+################################################################################
+add_custom_target(tests)
+add_custom_target(tests.unit)
+add_custom_target(tests.regressions)
+add_custom_target(tests.performance)
+add_custom_target(tests.headers)
+add_dependencies(tests
+  tests.unit tests.regressions tests.performance tests.headers)
+
+################################################################################
 # Add libraries
 ################################################################################
 add_subdirectory(libs)
@@ -1828,8 +1839,6 @@ if(HPX_WITH_TESTS)
   if(NOT PYTHONINTERP_FOUND)
     hpx_warn("A python interpreter could not be found. The test suite can not be run automatically.")
   endif()
-
-  add_hpx_pseudo_target(tests)
 
   enable_testing()
   include(CTest)

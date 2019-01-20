@@ -9,7 +9,7 @@
 
 #include <hpx/util/always_void.hpp>
 
-#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/pp/cat.hpp>
 
 #include <type_traits>
 

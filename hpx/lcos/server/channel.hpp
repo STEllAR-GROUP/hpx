@@ -9,16 +9,16 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/local/channel.hpp>
+#include <hpx/pp/cat.hpp>
+#include <hpx/pp/expand.hpp>
+#include <hpx/pp/nargs.hpp>
+#include <hpx/pp/stringize.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/expand.hpp>
-#include <hpx/util/detail/pp/nargs.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
 
 #include <cstddef>
 #include <exception>

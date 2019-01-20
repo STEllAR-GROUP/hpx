@@ -7,9 +7,9 @@
 #ifndef HPX_TRAITS_POLYMORPHIC_TRAITS_HPP
 #define HPX_TRAITS_POLYMORPHIC_TRAITS_HPP
 
+#include <hpx/pp/strip_parens.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/has_xxx.hpp>
-#include <hpx/util/detail/pp/strip_parens.hpp>
 
 #include <type_traits>
 

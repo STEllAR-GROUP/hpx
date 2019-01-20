@@ -10,9 +10,9 @@
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/plugin_registry.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/nargs.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/pp/cat.hpp>
+#include <hpx/pp/nargs.hpp>
+#include <hpx/pp/stringize.hpp>
 
 #include <cstddef>
 

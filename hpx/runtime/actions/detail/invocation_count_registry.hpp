@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/pp/cat.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
 
