@@ -7,8 +7,11 @@
 #ifndef HPX_SERIALIZATION_ACCESS_HPP
 #define HPX_SERIALIZATION_ACCESS_HPP
 
+#include <hpx/config/automatic_struct_serialization.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/brace_initializable_fwd.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
+#include <hpx/traits/brace_initializable_traits.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <string>
@@ -53,7 +56,37 @@ namespace hpx { namespace serialization
         public:
             static constexpr bool value = decltype(test<T>(0))::value;
         };
+#if defined(HPX_SUPPORT_AUTOMATIC_STRUCT_SERIALIZATION)
+        template <class T>
+        class has_serialize_adl
+        {
+            template <class T1> static std::false_type test(...);
+            template <class T1, class = decltype(serialize(
+                std::declval<output_archive &>(),
+                std::declval<typename std::remove_const<T1>::type &>(),
+                0u))>
+            static std::true_type test(int);
 
+        public:
+            static constexpr bool value = decltype(test<T>(0))::value;
+        };
+
+        template <class T>
+        class has_struct_serialization
+        {
+        public:
+            template <class T1> static std::false_type test(...);
+
+            template <class T1, class = decltype(serialize_struct(
+                std::declval<hpx::serialization::output_archive &>(),
+                std::declval<typename std::remove_const<T1>::type &>(),
+                hpx::traits::arity<T1>()))>
+            static std::true_type test(int);
+
+        public:
+            static constexpr bool value = decltype(test<T>(0))::value;
+        };
+#endif
         template <class T>
         class serialize_dispatcher
         {
@@ -76,15 +109,43 @@ namespace hpx { namespace serialization
 
             struct non_intrusive
             {
-                // this additional indirection level is needed to
-                // force ADL on the second phase of template lookup.
-                // call of serialize function directly from base_object
-                // finds only serialize-member function and doesn't
-                // perform ADL
+                template<class T1> struct dependent_false : std::false_type {};
+
+
                 template <class Archive>
                 static void call(Archive& ar, T& t, unsigned)
                 {
+#if defined(HPX_SUPPORT_AUTOMATIC_STRUCT_SERIALIZATION)
+                    if constexpr (has_serialize_adl<T>::value)
+                    {
+                        // this additional indirection level is needed to
+                        // force ADL on the second phase of template lookup.
+                        // call of serialize function directly from base_object
+                        // finds only serialize-member function and doesn't
+                        // perform ADL
+                        detail::serialize_force_adl(ar, t, 0);
+                    }
+                    else if constexpr (has_struct_serialization<T>::value)
+                    {
+                        // This is automatic serialization for types
+                        // which are simple (brace-initializable) structs,
+                        // what that means every struct's field
+                        // has to be serializable and public.
+                        serialize_struct(ar, t, 0);
+                    }
+                    else
+                    {
+                        static_assert(dependent_false<T>::value,
+                                      "No serialization method found");
+                    }
+#else
+                    // this additional indirection level is needed to
+                    // force ADL on the second phase of template lookup.
+                    // call of serialize function directly from base_object
+                    // finds only serialize-member function and doesn't
+                    // perform ADL
                     detail::serialize_force_adl(ar, t, 0);
+#endif
                 }
             };
 

@@ -201,5 +201,11 @@ function(hpx_perform_cxx_feature_tests)
 
     hpx_check_for_cxx17_hardware_destructive_interference_size(
       DEFINITIONS HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE)
+
+    hpx_check_for_cxx17_structured_bindings(
+      DEFINITIONS HPX_WITH_CXX17_STRUCTURED_BINDINGS)
+
+    hpx_check_for_cxx17_if_constexpr(
+      DEFINITIONS HPX_WITH_CXX17_IF_CONSTEXPR)
   endif()
 endfunction()

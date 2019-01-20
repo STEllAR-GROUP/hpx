@@ -6,6 +6,7 @@
 set(tests
     serialization_array
     serialization_valarray
+    serialization_brace_initializable
     serialization_builtins
     serialization_complex
     serialization_custom_constructor
@@ -66,7 +67,6 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
 
   if(HPX_WITH_FAIL_COMPILE_TESTS)
     set(fail_compile_tests
-        fail_compile_non_serializable_class
        )
     foreach(fail_compile_test ${fail_compile_tests})
       set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
