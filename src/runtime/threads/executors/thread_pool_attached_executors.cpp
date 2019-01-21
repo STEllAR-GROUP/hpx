@@ -16,8 +16,8 @@
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
 #  include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 #endif
+#include <hpx/assert.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>

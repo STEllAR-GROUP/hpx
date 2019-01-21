@@ -40,9 +40,9 @@ if(HPX_WITH_EXAMPLES_OPENMP)
      )
 
   set(openmp_homogeneous_timed_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies} hpx.config)
+      DEPENDENCIES ${boost_library_dependencies} hpx.config hpx.assert)
   set(openmp_parallel_region_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies} hpx.config)
+      DEPENDENCIES ${boost_library_dependencies} hpx.config hpx.assert)
 endif()
 
 if(HPX_WITH_EXAMPLES_QTHREADS)
@@ -59,7 +59,7 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
                   ${QTHREADS_LIBRARIES} hpx.config)
   set(qthreads_heterogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                  ${QTHREADS_LIBRARIES} hpx.config)
+                  ${QTHREADS_LIBRARIES} hpx.config hpx.assert)
 endif()
 
 if(HPX_WITH_EXAMPLES_TBB)
@@ -82,13 +82,13 @@ set(skynet_FLAGS DEPENDENCIES iostreams_component)
 set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component)
 
 set(delay_baseline_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies} hpx.config)
+    DEPENDENCIES ${boost_library_dependencies} hpx.config hpx.assert)
 
 set(delay_baseline_threaded_FLAGS
-    DEPENDENCIES ${boost_library_dependencies} hpx.config)
+    DEPENDENCIES ${boost_library_dependencies} hpx.config hpx.assert)
 
 set(print_heterogeneous_payloads_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies} hpx.config)
+    DEPENDENCIES ${boost_library_dependencies} hpx.config hpx.assert)
 
 set(benchmarks ${benchmarks}
     hpx_tls_overhead
@@ -159,6 +159,8 @@ foreach(benchmark ${benchmarks})
       ${benchmark}.cpp)
 
   source_group("Source Files" FILES ${sources})
+
+  message(${benchmark} ${${benchmark}_FLAGS})
 
   # add example executable
   add_hpx_executable(${benchmark}_test

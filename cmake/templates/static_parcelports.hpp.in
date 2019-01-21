@@ -8,7 +8,7 @@
 #if !defined(HPX_PARCELSET_STATIC_PARCELPORTS_HPP)
 #define HPX_PARCELSET_STATIC_PARCELPORTS_HPP
 
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
 
 #include <vector>
 

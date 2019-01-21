@@ -1076,8 +1076,6 @@ hpx_option(HPX_WITH_BUILD_BINARY_PACKAGE BOOL
 # optimization flags is not handled here and is left to the responsibility of
 # the user to avoid conflicts in the resulting binaries
 
-hpx_add_target_compile_definition(_DEBUG PUBLIC CONFIGURATIONS Debug)
-hpx_add_target_compile_definition(DEBUG PUBLIC CONFIGURATIONS Debug)
 hpx_add_target_compile_definition(HPX_DISABLE_ASSERTS PUBLIC
   CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
 hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS PUBLIC
@@ -1780,6 +1778,11 @@ add_custom_target(tests.examples)
 add_dependencies(tests
   tests.unit tests.regressions tests.performance tests.headers tests.examples)
 
+if (HPX_WITH_TESTS)
+  enable_testing()
+  include(CTest)
+endif()
+
 ################################################################################
 # Add libraries
 ################################################################################
@@ -1843,9 +1846,6 @@ if(HPX_WITH_TESTS)
   if(NOT PYTHONINTERP_FOUND)
     hpx_warn("A python interpreter could not be found. The test suite can not be run automatically.")
   endif()
-
-  enable_testing()
-  include(CTest)
 
   include_directories(tests)
   add_subdirectory(tests)

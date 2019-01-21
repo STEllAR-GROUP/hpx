@@ -10,10 +10,10 @@
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/parallel/datapar/loop.hpp>
 #endif
+#include <hpx/assert.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>

@@ -8,9 +8,9 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 // util
+#include <hpx/assert.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/deferred_call.hpp>

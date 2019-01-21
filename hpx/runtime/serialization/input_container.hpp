@@ -8,12 +8,12 @@
 #define HPX_SERIALIZATION_INPUT_CONTAINER_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/runtime/serialization/container.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/serialization_access_data.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef> // for size_t
 #include <cstdint>

@@ -16,7 +16,7 @@
 #undef BOOST_POOL_INSTRUMENT
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
 //
 #include <plugins/parcelport/verbs/rdma/verbs_memory_region.hpp>
 

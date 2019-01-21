@@ -12,7 +12,7 @@
 
 #if defined(HPX_HAVE_CUDA)
 
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/util/iterator_adaptor.hpp>
 
 #include <hpx/compute/cuda/target.hpp>

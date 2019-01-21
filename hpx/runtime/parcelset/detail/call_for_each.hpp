@@ -7,8 +7,8 @@
 #ifndef HPX_RUNTIME_PARCELSET_DETAIL_CALL_FOR_EACH_HPP
 #define HPX_RUNTIME_PARCELSET_DETAIL_CALL_FOR_EACH_HPP
 
+#include <hpx/assert.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <utility>

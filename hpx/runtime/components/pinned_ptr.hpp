@@ -7,11 +7,11 @@
 #define HPX_COMPONENTS_PINNED_PTR_JAN_22_2016_1027AM
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/component_pin_support.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <memory>
 #include <type_traits>

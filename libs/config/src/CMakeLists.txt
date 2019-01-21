@@ -54,6 +54,11 @@ target_include_directories(hpx.config PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)
 
+target_compile_definitions(hpx.config PUBLIC
+  $<$<CONFIG:Debug>:DEBUG>
+  $<$<CONFIG:Debug>:_DEBUG>
+)
+
 include(HPX_AddSourceGroup)
 add_hpx_source_group(NAME hpx ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../include/hpx
   CLASS "Header Files" TARGETS ${headers})

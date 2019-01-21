@@ -4,8 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <utility>

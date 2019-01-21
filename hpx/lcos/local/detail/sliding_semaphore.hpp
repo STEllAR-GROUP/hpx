@@ -7,9 +7,9 @@
 #define HPX_LCOS_DETAIL_SLIDING_SEMAPHORE_AUG_25_2016_1026AM
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 
 #include <algorithm>

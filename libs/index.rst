@@ -9,5 +9,6 @@
    :maxdepth: 2
 
    /libs/_example/docs/index.rst
+   /libs/assert/docs/index.rst
    /libs/config/docs/index.rst
    /libs/pp/docs/index.rst

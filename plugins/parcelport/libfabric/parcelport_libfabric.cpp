@@ -25,7 +25,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 //
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/util/debug/thread_stacktrace.hpp>
 //
 #include <boost/asio/ip/host_name.hpp>

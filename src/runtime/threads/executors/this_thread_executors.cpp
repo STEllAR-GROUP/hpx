@@ -14,14 +14,14 @@
 #  include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 #endif
 
-#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
-#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
+#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
@@ -437,6 +437,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         hpx::state expected = state_initialized;
         bool result = state.compare_exchange_strong(expected, state_starting);
         HPX_ASSERT(result);
+        HPX_UNUSED(result);
     }
 
     // Remove the given processing unit from the scheduler.
@@ -451,6 +452,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         std::atomic<hpx::state>& state = scheduler_.get_state(0);
         hpx::state oldstate = state.exchange(state_stopped);
         HPX_ASSERT(oldstate == state_suspended || oldstate == state_stopped);
+        HPX_UNUSED(oldstate);
 
         thread_num_ = std::size_t(-1);
         parent_thread_num_ = std::size_t(-1);

@@ -24,13 +24,13 @@
 #include <vector>
 #include <utility>
 
+#include <hpx/assert.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime/serialization/map.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/map.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>

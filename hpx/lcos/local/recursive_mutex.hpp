@@ -11,8 +11,8 @@
 #define HPX_LCOS_RECURSIVE_MUTEX_AUG_03_2009_0459PM
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <atomic>
 #include <cstddef>

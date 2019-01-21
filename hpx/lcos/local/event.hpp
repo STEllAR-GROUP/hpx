@@ -8,9 +8,9 @@
 #define HPX_LCOS_LOCAL_EVENT_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <atomic>
 #include <mutex>

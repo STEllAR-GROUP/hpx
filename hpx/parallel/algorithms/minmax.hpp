@@ -11,10 +11,10 @@
 #define HPX_PARALLEL_DETAIL_MINMAX_AUG_20_2014_1005AM
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_pair.hpp>
 

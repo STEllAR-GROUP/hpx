@@ -17,7 +17,7 @@
 #ifndef JT28092007_named_writer_HPP_DEFINED
 #define JT28092007_named_writer_HPP_DEFINED
 
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/util/logging/format.hpp>
 #include <cstddef>
 #include <string>

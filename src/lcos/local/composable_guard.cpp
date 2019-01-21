@@ -5,7 +5,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/function.hpp>
 

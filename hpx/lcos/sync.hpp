@@ -7,8 +7,9 @@
 #define HPX_LCOS_SYNC_JUL_21_2018_0933PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/sync_fwd.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/lcos/detail/sync_implementations.hpp>
+#include <hpx/lcos/sync_fwd.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/is_valid_action.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <type_traits>

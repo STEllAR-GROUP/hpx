@@ -9,9 +9,9 @@
 #define HPX_PARALLEL_ALGORITHM_FOR_LOOP_REDUCTION_MAR_05_2016_0837PM
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>

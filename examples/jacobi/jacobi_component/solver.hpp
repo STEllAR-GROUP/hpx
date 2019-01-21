@@ -10,8 +10,8 @@
 #include "server/solver.hpp"
 #include "grid.hpp"
 
+#include <hpx/assert.hpp>
 #include <hpx/include/naming.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <utility>

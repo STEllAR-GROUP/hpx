@@ -7,11 +7,11 @@
 #define HPX_LCOS_LOCAL_CONDITIONAL_TRIGGER_SEP_09_2012_1256PM
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
 
 #include <utility>

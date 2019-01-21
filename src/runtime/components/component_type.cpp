@@ -11,8 +11,8 @@
 
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <hpx/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <cstddef>

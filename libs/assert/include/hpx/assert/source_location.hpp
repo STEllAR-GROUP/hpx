@@ -1,0 +1,23 @@
+//  Copyright (c) 2019 Thomas Heller
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef HPX_ASSERT_SOURCE_LOCATION_HPP
+#define HPX_ASSERT_SOURCE_LOCATION_HPP
+
+#include <iosfwd>
+
+namespace hpx { namespace assertion {
+    /// This contains the location information where \a HPX_ASSERT has been
+    /// called
+    struct source_location
+    {
+        const char* file_name;
+        unsigned line_number;
+        const char* function_name;
+    };
+    std::ostream& operator<<(std::ostream& os, source_location const& loc);
+}}
+
+#endif

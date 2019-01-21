@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
+#include <hpx/assert.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 
 #include <cstddef>
@@ -79,10 +79,8 @@ namespace hpx { namespace threads { namespace policies
         {
             typedef typename base_type::thread_queue_type thread_queue_type;
 
-            std::size_t queues_size = this->queues_.size();
-
             {
-                HPX_ASSERT(num_thread < queues_size);
+                HPX_ASSERT(num_thread < this->queues_.size());
 
                 thread_queue_type* q = this->queues_[num_thread];
                 bool result = q->get_next_thread(thrd);
@@ -103,8 +101,7 @@ namespace hpx { namespace threads { namespace policies
         bool wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count) override
         {
-            std::size_t queues_size = this->queues_.size();
-            HPX_ASSERT(num_thread < queues_size);
+            HPX_ASSERT(num_thread < this->queues_.size());
 
             std::size_t added = 0;
             bool result = true;
@@ -126,7 +123,7 @@ namespace hpx { namespace threads { namespace policies
                 bool suspended_only = true;
 
                 for (std::size_t i = 0;
-                     suspended_only && i != queues_size; ++i)
+                     suspended_only && i != this->queues_.size(); ++i)
                 {
                     suspended_only = this->queues_[i]->dump_suspended_threads(
                         i, idle_loop_count, running);

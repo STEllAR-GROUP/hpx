@@ -17,6 +17,7 @@
 /// classes are asynchronous API which return the futures.
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/lcos/reduce.hpp>
 #include <hpx/pp/cat.hpp>
 #include <hpx/pp/expand.hpp>
@@ -31,7 +32,6 @@
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <iostream>

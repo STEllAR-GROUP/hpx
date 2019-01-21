@@ -8,9 +8,9 @@
 #ifndef HPX_PARCELSET_POLICIES_LIBFABRIC_HEADER_HPP
 #define HPX_PARCELSET_POLICIES_LIBFABRIC_HEADER_HPP
 
-#include <plugins/parcelport/parcelport_logging.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
-#include <hpx/util/assert.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 //
 #include <array>
 #include <cstdint>

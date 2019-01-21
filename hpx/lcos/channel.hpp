@@ -8,13 +8,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
-#include <hpx/lcos/server/channel.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/server/channel.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <type_traits>

@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/assert.hpp>
 #include <hpx/runtime/agas/detail/bootstrap_component_namespace.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstdint>
 #include <string>

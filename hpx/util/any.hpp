@@ -15,11 +15,11 @@
 #define HPX_UTIL_ANY_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <boost/detail/sp_typeinfo.hpp>

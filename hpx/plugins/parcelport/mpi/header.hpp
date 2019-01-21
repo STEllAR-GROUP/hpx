@@ -11,10 +11,10 @@
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
+#include <hpx/assert.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <array>
 #include <cstddef>

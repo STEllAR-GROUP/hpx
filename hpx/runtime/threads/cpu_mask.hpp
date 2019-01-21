@@ -11,7 +11,7 @@
 #define HPX_RUNTIME_THREADS_CPU_MASK_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
 
 #include <climits>
 #include <cstddef>

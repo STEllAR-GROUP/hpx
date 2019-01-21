@@ -9,7 +9,7 @@
 #define HPX_BABB0428_2085_4DCF_851A_8819D186835E
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
 
 // Needed to get potentially get _GLIBCXX_HAVE_TLS
 #include <cstdlib>

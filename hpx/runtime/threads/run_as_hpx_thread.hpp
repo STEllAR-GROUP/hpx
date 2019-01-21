@@ -7,9 +7,9 @@
 #define HPX_THREADS_RUN_AS_HPX_THREAD_MAR_12_2016_0202PM
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/optional.hpp>
 #include <hpx/util/result_of.hpp>

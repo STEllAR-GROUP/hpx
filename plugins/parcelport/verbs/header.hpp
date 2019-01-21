@@ -8,8 +8,8 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_HEADER_HPP
 #define HPX_PARCELSET_POLICIES_VERBS_HEADER_HPP
 
+#include <hpx/assert.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
-#include <hpx/util/assert.hpp>
 //
 #include <array>
 #include <cstdint>

@@ -7,7 +7,7 @@
 #define HPX_TAGGED_THREAD_STATE_MAR_12_2010_0125PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -8,12 +8,12 @@
 #ifndef HPX_HPX_INIT_IMPL_HPP
 #define HPX_HPX_INIT_IMPL_HPP
 
+#include <hpx/assert.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/function.hpp>

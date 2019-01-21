@@ -7,8 +7,8 @@
 #if !defined(HPX_SIMPLE_CENTRAL_TUPLESPACE_MAR_31_2013_0555PM)
 #define HPX_SIMPLE_CENTRAL_TUPLESPACE_MAR_31_2013_0555PM
 
+#include <hpx/assert.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <string>
 

@@ -9,7 +9,7 @@
 #define HPX_UTIL_COORDINATE_NOV_03_2014_0227PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
 
 #include <algorithm>
 #include <cstddef>

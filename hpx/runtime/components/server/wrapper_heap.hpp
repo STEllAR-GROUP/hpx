@@ -8,10 +8,10 @@
 #define HPX_UTIL_WRAPPER_HEAP_JUN_12_2008_0904AM
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/wrapper_heap_base.hpp>

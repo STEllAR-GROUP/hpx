@@ -6,8 +6,8 @@
 #if !defined(HPX_EXAMPLE_CANCELABLE_ACTION_APR_19_1052AM)
 #define HPX_EXAMPLE_CANCELABLE_ACTION_APR_19_1052AM
 
+#include <hpx/assert.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/util/assert.hpp>
 
 #include "stubs/cancelable_action.hpp"
 

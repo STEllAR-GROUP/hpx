@@ -17,7 +17,7 @@
 #ifndef JT28092007_format_HPP_DEFINED
 #define JT28092007_format_HPP_DEFINED
 
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
 #include <hpx/util/logging/format/array.hpp>

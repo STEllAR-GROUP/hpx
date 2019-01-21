@@ -7,8 +7,8 @@
 #if !defined(HPX_TEMPLATE_ACCUMULATOR_MAR_31_2016_1052AM)
 #define HPX_TEMPLATE_ACCUMULATOR_MAR_31_2016_1052AM
 
+#include <hpx/assert.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/util/assert.hpp>
 
 #include "server/template_accumulator.hpp"
 

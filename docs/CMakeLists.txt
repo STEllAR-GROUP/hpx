@@ -5,6 +5,8 @@
 
 # Add all files here which should be passed to doxygen
 set(doxygen_dependencies
+    "${PROJECT_SOURCE_DIR}/libs/assert/include/hpx/assert.hpp"
+    "${PROJECT_SOURCE_DIR}/libs/assert/include/hpx/assert/source_location.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_init.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_start.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_finalize.hpp"

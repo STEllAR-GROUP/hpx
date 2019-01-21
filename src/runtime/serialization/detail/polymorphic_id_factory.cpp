@@ -6,8 +6,8 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstdint>
 #include <map>

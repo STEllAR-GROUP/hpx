@@ -6,16 +6,16 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 
+#include <hpx/assert.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/steady_clock.hpp>

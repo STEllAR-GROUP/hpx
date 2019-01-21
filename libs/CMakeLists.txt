@@ -13,6 +13,17 @@ include(HPX_CreateSymbolicLink)
 execute_process(COMMAND "${CMAKE_COMMAND}" -E remove_directory ${CMAKE_BINARY_DIR}/include/hpx)
 execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory ${CMAKE_BINARY_DIR}/include/hpx)
 
+add_subdirectory(assert)
+file(GLOB PP_INCLUDE_LIST
+  LIST_DIRECTORIES true CONFIGURE_DEPENDS
+  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/assert/include/hpx/
+  ${CMAKE_CURRENT_SOURCE_DIR}/assert/include/hpx/*)
+foreach(include ${PP_INCLUDE_LIST})
+  create_symbolic_link(
+    ${CMAKE_CURRENT_SOURCE_DIR}/assert/include/hpx/${include}
+    ${CMAKE_BINARY_DIR}/include/hpx/${include})
+endforeach()
+
 add_subdirectory(config)
 file(GLOB PP_INCLUDE_LIST
   LIST_DIRECTORIES true CONFIGURE_DEPENDS

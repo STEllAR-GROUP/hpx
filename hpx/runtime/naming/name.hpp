@@ -9,6 +9,7 @@
 #define HPX_RUNTIME_NAMING_NAME_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/itt_notify.hpp>

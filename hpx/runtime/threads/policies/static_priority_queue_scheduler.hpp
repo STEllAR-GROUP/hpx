@@ -11,11 +11,11 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+#include <hpx/assert.hpp>
 #include <hpx/compat/mutex.hpp>
-#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
+#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -3,9 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/throw_exception.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/throw_exception.hpp>
 
 #include <cstdint>
 #include <string>

@@ -8,9 +8,9 @@
 #if !defined(HPX_LCOS_LATCH_APR_18_2015_0925PM)
 #define HPX_LCOS_LATCH_APR_18_2015_0925PM
 
+#include <hpx/assert.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <mutex>

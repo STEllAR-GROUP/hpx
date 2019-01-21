@@ -6,17 +6,17 @@
 
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
+#include <hpx/assert.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/state.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/state.hpp>
+#include <hpx/throw_exception.hpp>
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif

@@ -7,8 +7,8 @@
 #if !defined(HPX_ECFE19F9_A826_4AE1_AC7C_33DC5714CF0B)
 #define HPX_ECFE19F9_A826_4AE1_AC7C_33DC5714CF0B
 
+#include <hpx/assert.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/util/assert.hpp>
 
 #include "server/accumulator.hpp"
 

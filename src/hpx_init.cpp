@@ -9,6 +9,7 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/apply.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/hpx_user_main_config.hpp>
@@ -24,10 +25,10 @@
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/util/apex.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/debugging.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/logging.hpp>
@@ -310,6 +311,29 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        HPX_NORETURN void assertion_handler(
+            hpx::assertion::source_location const& loc, const char* expr,
+            std::string const& msg)
+        {
+            if (get_config_entry("hpx.attach_debugger", "") == "exception")
+            {
+                util::attach_debugger();
+            }
+            std::ostringstream strm;
+            strm << "Assertion '" << expr << "' failed";
+            if (!msg.empty())
+            {
+                strm << " (" << msg << ")";
+            }
+
+            hpx::exception e(hpx::assertion_failure, strm.str());
+            std::cerr << hpx::diagnostic_information(
+                             hpx::detail::get_exception(e, loc.function_name,
+                                 loc.file_name, loc.line_number))
+                      << std::endl;
+            std::abort();
+        }
+
         ///////////////////////////////////////////////////////////////////////
         struct dump_config
         {
@@ -573,6 +597,7 @@ namespace hpx
             startup_function_type startup, shutdown_function_type shutdown,
             hpx::runtime_mode mode, bool blocking)
         {
+            hpx::assertion::set_assertion_handler(&detail::assertion_handler);
 #if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
             set_error_handlers();
 #endif

@@ -8,6 +8,7 @@
 #define HPX_PARTITIONED_VECTOR_COMPONENT_IMPL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/pp/cat.hpp>
 #include <hpx/pp/expand.hpp>
 #include <hpx/pp/nargs.hpp>
@@ -18,7 +19,6 @@
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
 

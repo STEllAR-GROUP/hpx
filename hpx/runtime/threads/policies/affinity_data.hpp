@@ -7,8 +7,8 @@
 #define HPX_RUNTIME_THREADS_POLICIES_AFFINITY_DATA_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <atomic>
 #include <cstddef>

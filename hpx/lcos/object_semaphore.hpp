@@ -8,10 +8,10 @@
 #define HPX_1FB4A979_B6B6_4845_BD95_3CEC605011A2
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstdint>
 

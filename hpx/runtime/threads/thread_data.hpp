@@ -17,7 +17,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/throw_exception.hpp>
 
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/function.hpp>

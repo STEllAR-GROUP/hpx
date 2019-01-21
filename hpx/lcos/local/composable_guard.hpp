@@ -81,11 +81,11 @@
 #define HPX_LCOS_LOCAL_COMPOSABLE_GUARD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util_fwd.hpp>
-#include <hpx/lcos/local/packaged_task.hpp>
 
 #include <atomic>
 #include <cstddef>

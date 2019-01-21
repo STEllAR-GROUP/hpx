@@ -15,7 +15,7 @@
 
 #include <hpx/config.hpp>
 //#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/util/iterator_adaptor.hpp>
 
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>

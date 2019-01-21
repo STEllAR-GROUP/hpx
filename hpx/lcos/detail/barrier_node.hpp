@@ -7,6 +7,7 @@
 #define HPX_LCOS_DETAIL_BARRIER_NODE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/barrier.hpp>
@@ -15,7 +16,6 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 
 #include <cstddef>

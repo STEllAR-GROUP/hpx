@@ -5,26 +5,26 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/error.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/exception_info.hpp>
-#include <hpx/state.hpp>
-#include <hpx/version.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/state.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/version.hpp>
 
 #if defined(HPX_WINDOWS)
 #  include <process.h>
@@ -456,59 +456,6 @@ namespace hpx { namespace detail
             std::string const&, std::string const&, long);
 
     ///////////////////////////////////////////////////////////////////////////
-    void assertion_failed(char const* expr, char const* function,
-        char const* file, long line)
-    {
-        assertion_failed_msg(expr, expr, function, file, line);
-    }
-
-    void assertion_failed_msg(char const* msg, char const* expr,
-        char const* function, char const* file, long line)
-    {
-        if (!expect_exception_flag.load(std::memory_order_relaxed) &&
-            get_config_entry("hpx.attach_debugger", "") == "exception")
-        {
-            util::attach_debugger();
-        }
-
-        bool threw = false;
-
-        std::string str("assertion '" + std::string(msg) + "' failed");
-        if (expr != msg)
-            str += " (" + std::string(expr) + ")";
-
-        try {
-            boost::filesystem::path p(hpx::util::create_path(file));
-            hpx::detail::throw_exception(
-                hpx::exception(hpx::assertion_failure, str),
-                function, p.string(), line);
-        }
-        catch (...) {
-            threw = true;
-
-            // If the runtime pointer is available, we can safely get the prefix
-            // of this locality. If it's not available, then just terminate.
-            runtime* rt = get_runtime_ptr();
-            if (nullptr != rt)  {
-                rt->report_error(std::current_exception());
-            }
-            else {
-                std::cerr << "Runtime is not available, reporting error locally. "
-                    << hpx::diagnostic_information(std::current_exception())
-                    << std::flush;
-            }
-        }
-
-        // If the exception wasn't thrown, then print out the assertion message,
-        // so that the program doesn't abort without any diagnostics.
-        if (!threw) {
-            std::cerr << "Runtime is not available, reporting error locally\n"
-                         "{what}: " << str << std::endl;
-        }
-        std::abort();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // report an early or late exception and abort
     void report_exception_and_continue(std::exception_ptr const& e)
     {
@@ -562,17 +509,19 @@ namespace hpx
         std::ostringstream strm;
         strm << "\n";
 
+        // add full build information
+        strm << full_build_string();
+
+        std::string const* env = xi.get<hpx::detail::throw_env>();
+        if (env && !env->empty())
+            strm << "{env}: " << *env;
+
         std::string const* back_trace =
             xi.get<hpx::detail::throw_stacktrace>();
         if (back_trace && !back_trace->empty()) {
             // FIXME: add indentation to stack frame information
             strm << "{stack-trace}: " << *back_trace << "\n";
         }
-
-        std::string const* env =
-            xi.get<hpx::detail::throw_env>();
-        if (env && !env->empty())
-            strm << "{env}: " << *env;
 
         std::uint32_t const* locality =
             xi.get<hpx::detail::throw_locality>();
@@ -588,21 +537,6 @@ namespace hpx
             xi.get<hpx::detail::throw_pid>();
         if (pid_ && -1 != *pid_)
             strm << "{process-id}: " << *pid_ << "\n";
-
-        std::string const* function =
-            xi.get<hpx::detail::throw_function>();
-        if (function)
-            strm << "{function}: " << *function << "\n";
-
-        std::string const* file =
-            xi.get<hpx::detail::throw_file>();
-        if (file)
-            strm << "{file}: " << *file << "\n";
-
-        long const* line =
-            xi.get<hpx::detail::throw_line>();
-        if (line)
-            strm << "{line}: " << *line << "\n";
 
         bool thread_info = false;
         char const* const thread_prefix = "{os-thread}: ";
@@ -643,8 +577,17 @@ namespace hpx
         if (auxinfo)
             strm << "{auxinfo}: " << *auxinfo << "\n";
 
-        // add full build information
-        strm << full_build_string();
+        std::string const* file = xi.get<hpx::detail::throw_file>();
+        if (file)
+            strm << "{file}: " << *file << "\n";
+
+        long const* line = xi.get<hpx::detail::throw_line>();
+        if (line)
+            strm << "{line}: " << *line << "\n";
+
+        std::string const* function = xi.get<hpx::detail::throw_function>();
+        if (function)
+            strm << "{function}: " << *function << "\n";
 
         // Try a cast to std::exception - this should handle boost.system
         // error codes in addition to the standard library exceptions.
@@ -841,18 +784,6 @@ namespace hpx
         if (state_info && !state_info->empty())
             return *state_info;
         return std::string();
-    }
-
-    void assertion_failed(char const* expr, char const* function,
-        char const* file, long line)
-    {
-        hpx::detail::assertion_failed(expr, function, file, line);
-    }
-
-    void assertion_failed_msg(char const* msg, char const* expr,
-        char const* function, char const* file, long line)
-    {
-        hpx::detail::assertion_failed_msg(msg, expr, function, file, line);
     }
 }
 

@@ -9,8 +9,8 @@
 #define HPX_F646702C_6556_48FA_BF9D_3E7959983122
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/pp/stringize.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <boost/current_function.hpp>
 #include <boost/io/ios_state.hpp>

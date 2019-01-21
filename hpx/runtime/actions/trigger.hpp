@@ -7,11 +7,11 @@
 #ifndef HPX_ACTIONS_TRIGGER_HPP
 #define HPX_ACTIONS_TRIGGER_HPP
 
+#include <hpx/assert.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>

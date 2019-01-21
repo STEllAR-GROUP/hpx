@@ -7,16 +7,16 @@
 #include <hpx/lcos/detail/future_data.hpp>
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/lcos/local/futures_factory.hpp>
+#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/lcos/local/futures_factory.hpp>
-#include <hpx/runtime/threads/thread.hpp>
-#include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/components/client_base.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
