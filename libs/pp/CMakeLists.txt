@@ -38,6 +38,11 @@ install(TARGETS hpx.pp EXPORT HPXTargets
 )
 hpx_export_targets(hpx.pp)
 
+install(
+  DIRECTORY include/hpx
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx
+  COMPONENT pp)
+
 add_subdirectory(tests)
 
 message(STATUS "pp: Configuring done")

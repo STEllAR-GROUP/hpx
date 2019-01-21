@@ -10,7 +10,6 @@
 #ifndef HPX_CONFIG_VERSION_HPP
 #define HPX_CONFIG_VERSION_HPP
 
-#include <hpx/config.hpp>
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/pp/cat.hpp>
 

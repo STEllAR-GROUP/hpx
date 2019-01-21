@@ -13,25 +13,25 @@ set(benchmarks
     htts2_hpx
    )
 
-set(htts2_payload_precision_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies})
+set(htts2_payload_precision_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} hpx.config)
 
 if(HPX_WITH_EXAMPLES_OPENMP)
   set(benchmarks ${benchmarks} htts2_omp)
-  set(htts2_omp_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies})
+  set(htts2_omp_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} hpx.config)
 endif()
 
 if(HPX_WITH_EXAMPLES_QTHREADS)
   include_directories(${QTHREADS_INCLUDE_DIR})
 
   set(benchmarks ${benchmarks} htts2_qthreads)
-  set(htts2_qthreads_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARY})
+  set(htts2_qthreads_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARY} hpx.config)
 endif()
 
 if(HPX_WITH_EXAMPLES_TBB)
   include_directories(${TBB_INCLUDE_DIR})
 
   set(benchmarks ${benchmarks} htts2_tbb)
-  set(htts2_tbb_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${TBB_LIBRARY})
+  set(htts2_tbb_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${TBB_LIBRARY} hpx.config)
 endif()
 
 foreach(benchmark ${benchmarks})
@@ -59,8 +59,16 @@ foreach(benchmark ${benchmarks})
                               ${benchmark})
 endforeach()
 
+target_include_directories(htts2_payload_precision PRIVATE ${HPX_SOURCE_DIR})
 if(HPX_WITH_EXAMPLES_OPENMP)
   set_target_properties(htts2_omp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
   set_target_properties(htts2_omp PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
+  target_include_directories(htts2_omp PRIVATE ${HPX_SOURCE_DIR})
+endif()
+if(HPX_WITH_EXAMPLES_OPENMP)
+  target_include_directories(htts2_tbb PRIVATE ${HPX_SOURCE_DIR})
+endif()
+if(HPX_WITH_EXAMPLES_QTHREADS)
+  target_include_directories(htts2_qthreads PRIVATE ${HPX_SOURCE_DIR})
 endif()
 

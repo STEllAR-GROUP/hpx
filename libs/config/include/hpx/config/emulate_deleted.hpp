@@ -6,8 +6,6 @@
 #if !defined(HPX_CONFIG_EMULATE_DELETED_JAN_06_2013_0919PM)
 #define HPX_CONFIG_EMULATE_DELETED_JAN_06_2013_0919PM
 
-#include <hpx/config.hpp>
-
 #define HPX_NON_COPYABLE(cls)                                                 \
     cls(cls const&) = delete;                                                 \
     cls(cls&&) = delete;                                                      \

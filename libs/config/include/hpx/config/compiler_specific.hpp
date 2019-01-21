@@ -6,8 +6,6 @@
 #if !defined(HPX_COMPILER_SPECIFIC_201204261048)
 #define HPX_COMPILER_SPECIFIC_201204261048
 
-#include <hpx/config/defines.hpp>
-
 #if defined(__GNUC__)
 
 // macros to facilitate handling of compiler-specific issues
@@ -77,25 +75,23 @@
 #endif
 
 // Detecting CUDA compilation mode
-#if defined(HPX_HAVE_CUDA)
 // Detecting NVCC
-# if defined(__NVCC__) || defined(__CUDACC__)
-#  if defined(__CUDA_ARCH__)
+#if defined(__NVCC__) || defined(__CUDACC__)
+# if defined(__CUDA_ARCH__)
 // nvcc compiling CUDA code, device mode.
-#   define HPX_COMPUTE_DEVICE_CODE
-#  else
+#  define HPX_COMPUTE_DEVICE_CODE
+# else
 // nvcc compiling CUDA code, host mode.
-#   define HPX_COMPUTE_HOST_CODE
-#  endif
+#  define HPX_COMPUTE_HOST_CODE
+# endif
 // Detecting NVCC
-# elif defined(__clang__) && defined(__CUDA__)
-#  if defined(__CUDA_ARCH__)
+#elif defined(__clang__) && defined(__CUDA__)
+# if defined(__CUDA_ARCH__)
 // clang compiling CUDA code, device mode.
-#    define HPX_COMPUTE_DEVICE_CODE
-#  else
+#   define HPX_COMPUTE_DEVICE_CODE
+# else
 // clang compiling CUDA code, host mode.
-#    define HPX_COMPUTE_HOST_CODE
-#  endif
+#   define HPX_COMPUTE_HOST_CODE
 # endif
 #endif
 

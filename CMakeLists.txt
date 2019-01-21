@@ -999,7 +999,6 @@ endif()
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################
-include_directories("${PROJECT_SOURCE_DIR}")
 link_directories(${CMAKE_BINARY_DIR}/lib)
 
 ################################################################################
@@ -1770,11 +1769,6 @@ function(generate_config_defines_header TARGET_DIRECTORY)
 endfunction()
 
 ################################################################################
-# Set basic search paths for the generated HPX headers
-################################################################################
-include_directories("${CMAKE_BINARY_DIR}")
-
-################################################################################
 # Add custom targets for tests
 ################################################################################
 add_custom_target(tests)
@@ -1782,12 +1776,22 @@ add_custom_target(tests.unit)
 add_custom_target(tests.regressions)
 add_custom_target(tests.performance)
 add_custom_target(tests.headers)
+add_custom_target(tests.examples)
 add_dependencies(tests
-  tests.unit tests.regressions tests.performance tests.headers)
+  tests.unit tests.regressions tests.performance tests.headers tests.examples)
 
 ################################################################################
 # Add libraries
 ################################################################################
+if(NOT HPX_WITH_STATIC_LINKING)
+  if(MSVC)
+    # The MSVC linker can't handle a static library as large as we get when
+    # statically linking the main HPX library
+    set(hpx_libs_link_mode SHARED)
+  else()
+    set(hpx_libs_link_mode ${hpx_library_link_mode})
+  endif()
+endif()
 add_subdirectory(libs)
 
 ################################################################################

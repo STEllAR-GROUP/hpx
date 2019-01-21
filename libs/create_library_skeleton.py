@@ -132,11 +132,11 @@ if lib_name != '--recreate' and not os.path.exists(lib_name):
     f.write('add_subdirectory(unit)\n')
     f.write('\n')
     f.write(f'add_custom_target(tests.regressions.{lib_name})\n')
-    f.write(f'add_dependencies(tests.regressions tests.tests.regressions.{lib_name})\n')
+    f.write(f'add_dependencies(tests.regressions tests.regressions.{lib_name})\n')
     f.write('add_subdirectory(regressions)\n')
     f.write('\n')
     f.write(f'add_custom_target(tests.performance.{lib_name})\n')
-    f.write(f'add_dependencies(tests.performance tests.tests.performance.{lib_name})\n')
+    f.write(f'add_dependencies(tests.performance tests.performance.{lib_name})\n')
     f.write('add_subdirectory(performance)\n')
     f.write('\n')
 

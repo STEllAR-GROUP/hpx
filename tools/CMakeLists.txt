@@ -9,7 +9,6 @@ set(subdirs inspect)
 
 if((NOT MSVC) OR HPX_WITH_VCPKG)
   set(tools ${tools} cpu_features)
-  set(cpu_features NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY})
 endif()
 
 foreach(tool ${tools})
@@ -17,7 +16,7 @@ foreach(tool ${tools})
     SOURCES ${tool}.cpp ${${tool}}
     FOLDER "Tools/${tool}")
   add_hpx_pseudo_dependencies(tools ${tool})
-  target_link_libraries(${tool} ${HPX_TLL_PUBLIC} ${Boost_LIBRARIES})
+  target_link_libraries(${tool} ${HPX_TLL_PUBLIC} ${Boost_LIBRARIES} hpx.config)
 endforeach()
 
 foreach(subdir ${subdirs})

@@ -282,6 +282,8 @@ else()
     FOLDER "Core")
 endif()
 
+target_include_directories(hpx PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/hpx>)
 target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${HPX_LIBRARIES})
 if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
   target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
@@ -297,7 +299,7 @@ foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
   endif()
 endforeach()
 
-target_link_libraries(hpx ${HPX_TLL_PUBLIC} hpx.pp)
+target_link_libraries(hpx ${HPX_TLL_PUBLIC} hpx.pp hpx.config)
 
 set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
@@ -340,7 +342,8 @@ if(NOT HPX_WITH_STATIC_LINKING)
         ${hpx_init_SOURCES} ${hpx_init_HEADERS})
     endif()
   endif()
-  target_link_libraries(hpx_init ${HPX_TLL_PUBLIC} hpx.pp)
+  target_include_directories(hpx_init PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
+  target_link_libraries(hpx_init ${HPX_TLL_PUBLIC} hpx.pp hpx.config)
 
   set_property(TARGET hpx_init APPEND
     PROPERTY COMPILE_DEFINITIONS
@@ -380,7 +383,8 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
       "HPX_APPLICATION_EXPORTS"
       "HPX_ENABLE_ASSERT_HANDLER")
 
-    target_link_libraries(hpx_wrap ${HPX_TLL_PUBLIC} hpx.pp)
+    target_include_directories(hpx_wrap PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
+    target_link_libraries(hpx_wrap ${HPX_TLL_PUBLIC} hpx.pp hpx.config)
 
     set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
     set(hpx_targets ${hpx_targets} hpx_wrap)

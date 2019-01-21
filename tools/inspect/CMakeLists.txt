@@ -15,7 +15,7 @@ if(NOT Boost_REGEX_FOUND)
 endif()
 
 if((NOT MSVC) OR HPX_WITH_VCPKG)
-  target_link_libraries(inspect ${HPX_TLL_PUBLIC} ${Boost_LIBRARIES})
+  target_link_libraries(inspect ${HPX_TLL_PUBLIC} ${Boost_LIBRARIES} hpx.config)
 endif()
 
 # add dependencies to pseudo-target
