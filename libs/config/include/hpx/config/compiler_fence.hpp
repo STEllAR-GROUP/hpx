@@ -9,6 +9,17 @@
 
 #include <hpx/config/compiler_specific.hpp>
 
+#if defined(DOXYGEN)
+
+/// Generates assembly that serves as a fence to the compiler/CPU to disable optimization.
+/// Usually implemented in the form of a memory barrier
+#define HPX_COMPILER_FENCE
+
+/// Generates assembly the executes a "pause" instruction. Useful in spinning loops.
+#define HPX_SMT_PAUSE
+
+#else
+
 #if defined(__INTEL_COMPILER)
 
 #define HPX_COMPILER_FENCE __memory_barrier()
@@ -42,6 +53,7 @@ extern "C" void _mm_pause();
 
 #define HPX_COMPILER_FENCE
 
+#endif
 #endif
 
 #endif

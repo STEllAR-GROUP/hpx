@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/config/version.hpp>
 #include <hpx/config/config_strings.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
@@ -297,9 +298,5 @@ namespace hpx
 
         return strm.str();
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    char const HPX_CHECK_VERSION[] = HPX_PP_STRINGIZE(HPX_CHECK_VERSION);
-    char const HPX_CHECK_BOOST_VERSION[] = HPX_PP_STRINGIZE(HPX_CHECK_BOOST_VERSION);
 }
 

@@ -8,6 +8,10 @@
 
 #include <hpx/config/compiler_specific.hpp>
 
+#if defined(DOXYGEN)
+/// Marks a function to be forced to be inlined
+#define HPX_FORCEINLINE
+#else
 #if !defined(HPX_FORCEINLINE)
 #   if defined(__NVCC__) || defined(__CUDACC__)
 #       define HPX_FORCEINLINE inline
@@ -18,6 +22,7 @@
 #   else
 #       define HPX_FORCEINLINE inline
 #   endif
+#endif
 #endif
 
 

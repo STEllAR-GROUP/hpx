@@ -263,6 +263,8 @@
 #  define HPX_HAVE_THREAD_BACKTRACE_DEPTH 5
 #endif
 
+/// \cond NOINTERNAL
+
 ///////////////////////////////////////////////////////////////////////////////
 // This defines the maximum number of connect retries to the AGAS service
 // allowing for some leeway during startup of the localities
@@ -445,5 +447,7 @@
 #define HPX_AGAS_SYMBOL_NS_LSB                       0x0000000000000003ULL
 #define HPX_AGAS_LOCALITY_NS_MSB                     0x0000000100000001ULL
 #define HPX_AGAS_LOCALITY_NS_LSB                     0x0000000000000004ULL
+
+/// \endcond
 
 #endif

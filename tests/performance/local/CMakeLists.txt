@@ -44,9 +44,9 @@ if(HPX_WITH_EXAMPLES_OPENMP)
      )
 
   set(openmp_homogeneous_timed_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies} hpx.pp)
+      DEPENDENCIES ${boost_library_dependencies} hpx.config)
   set(openmp_parallel_region_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies} hpx.pp)
+      DEPENDENCIES ${boost_library_dependencies} hpx.config)
 endif()
 
 if(HPX_WITH_EXAMPLES_QTHREADS)
@@ -60,11 +60,10 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
 
   set(qthreads_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                  ${QTHREADS_LIBRARIES} hpx.pp)
-
+                  ${QTHREADS_LIBRARIES} hpx.config)
   set(qthreads_heterogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                  ${QTHREADS_LIBRARIES} hpx.pp)
+                  ${QTHREADS_LIBRARIES} hpx.config)
 endif()
 
 if(HPX_WITH_EXAMPLES_TBB)
@@ -77,7 +76,7 @@ if(HPX_WITH_EXAMPLES_TBB)
 
   set(tbb_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   ${TBB_LIBRARIES} hpx.pp)
+                   ${TBB_LIBRARIES} hpx.config)
 endif()
 
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
@@ -87,13 +86,13 @@ set(skynet_FLAGS DEPENDENCIES iostreams_component)
 set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component)
 
 set(delay_baseline_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies} hpx.pp)
+    DEPENDENCIES ${boost_library_dependencies} hpx.config)
 
 set(delay_baseline_threaded_FLAGS
-    DEPENDENCIES ${boost_library_dependencies} hpx.pp)
+    DEPENDENCIES ${boost_library_dependencies} hpx.config)
 
 set(print_heterogeneous_payloads_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies} hpx.pp)
+    DEPENDENCIES ${boost_library_dependencies} hpx.config)
 
 set(benchmarks ${benchmarks}
     hpx_tls_overhead
@@ -199,15 +198,36 @@ foreach(benchmark ${benchmarks})
 
 endforeach()
 
+target_include_directories(delay_baseline_test
+    PRIVATE ${HPX_SOURCE_DIR})
+target_include_directories(delay_baseline_threaded_test
+    PRIVATE ${HPX_SOURCE_DIR})
+target_include_directories(print_heterogeneous_payloads_test
+    PRIVATE ${HPX_SOURCE_DIR})
+
 if(HPX_WITH_EXAMPLES_OPENMP)
   set_target_properties(openmp_homogeneous_timed_task_spawn_test
     PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
   set_target_properties(openmp_homogeneous_timed_task_spawn_test
     PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
+  target_include_directories(openmp_homogeneous_timed_task_spawn_test
+    PRIVATE ${HPX_SOURCE_DIR})
   set_target_properties(openmp_parallel_region_test
     PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
   set_target_properties(openmp_parallel_region_test
     PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
+  target_include_directories(openmp_parallel_region_test
+    PRIVATE ${HPX_SOURCE_DIR})
+endif()
+if(HPX_WITH_EXAMPLES_TBB)
+  target_include_directories(tbb_homogeneous_timed_task_spawn
+    PRIVATE ${HPX_SOURCE_DIR})
+endif()
+if(HPX_WITH_EXAMPLES_QTHREADS)
+  target_include_directories(qthreads_homogeneous_timed_task_spawn
+    PRIVATE ${HPX_SOURCE_DIR})
+  target_include_directories(qthreads_heterogeneous_timed_task_spawn
+    PRIVATE ${HPX_SOURCE_DIR})
 endif()
 
 add_hpx_pseudo_target(tests.performance.local.htts_v2)

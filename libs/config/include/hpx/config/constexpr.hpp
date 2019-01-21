@@ -23,7 +23,9 @@
 #else
 #   define HPX_CXX14_CONSTEXPR
 #endif
+#endif
 
+/// This macro evaluates to `static HPX_CONSTEXPR_OR_CONST`
 #define HPX_STATIC_CONSTEXPR static HPX_CONSTEXPR_OR_CONST
 
 #endif

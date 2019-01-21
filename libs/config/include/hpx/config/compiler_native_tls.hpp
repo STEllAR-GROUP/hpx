@@ -8,6 +8,16 @@
 
 #include <hpx/config/defines.hpp>
 
+#if defined(DOXYGEN)
+
+/// This macro is replaced with the compiler specific keyword/attribute to mark a
+/// variabel as thread local.
+/// For more details see
+/// `https://en.cppreference.com/w/cpp/keyword/thread_local`_.
+#define HPX_NATIVE_TLS
+
+#else
+
 // don't #include ciso646 for MSVC as it contains '#define and &&' and similar
 #if !defined(_MSC_VER)
 #include <ciso646>
@@ -33,6 +43,8 @@
 #  else
 #    error "Native thread local storage is not supported for this platform, please undefine HPX_HAVE_NATIVE_TLS"
 #  endif
+#endif
+
 #endif
 
 #endif

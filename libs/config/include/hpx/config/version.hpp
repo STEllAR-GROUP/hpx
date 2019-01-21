@@ -10,36 +10,38 @@
 #ifndef HPX_CONFIG_VERSION_HPP
 #define HPX_CONFIG_VERSION_HPP
 
-#include <hpx/config.hpp>
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/pp/cat.hpp>
 
 #include <boost/version.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-//  The version of HPX
-//
-//  HPX_VERSION_FULL & 0x0000FF is the sub-minor version
-//  HPX_VERSION_FULL & 0x00FF00 is the minor version
-//  HPX_VERSION_FULL & 0xFF0000 is the major version
-//
-//  HPX_VERSION_DATE   YYYYMMDD is the date of the release
-//                               (estimated release date for master branch)
-//
-#define HPX_VERSION_MAJOR        @HPX_VERSION_MAJOR@u
-#define HPX_VERSION_MINOR        @HPX_VERSION_MINOR@u
-#define HPX_VERSION_SUBMINOR     @HPX_VERSION_SUBMINOR@u
+///  The version of HPX
+///
+///  HPX_VERSION_FULL & 0x0000FF is the sub-minor version
+///  HPX_VERSION_FULL & 0x00FF00 is the minor version
+///  HPX_VERSION_FULL & 0xFF0000 is the major version
+///
+#define HPX_VERSION_FULL         0x010300
 
-#define HPX_VERSION_FULL                                                       \
-    ((HPX_VERSION_MAJOR << 16) | (HPX_VERSION_MINOR << 8) | HPX_VERSION_SUBMINOR)
+/// Evaluates to the major version of HPX
+#define HPX_VERSION_MAJOR        1
+/// Evaluates to the minor version of HPX
+#define HPX_VERSION_MINOR        3
+/// Evaluates to the subminor version of HPX
+#define HPX_VERSION_SUBMINOR     0
 
-#define HPX_VERSION_DATE         @HPX_VERSION_DATE@
+///  HPX_VERSION_DATE   YYYYMMDD is the date of the release
+///                               (estimated release date for master branch)
+///
+#define HPX_VERSION_DATE         20181112
 
+/// \cond NOINTERNAL
 #if !defined(HPX_AGAS_VERSION)
     #define HPX_AGAS_VERSION 0x30
 #endif
 
-#define HPX_VERSION_TAG          "@HPX_VERSION_TAG@"
+#define HPX_VERSION_TAG          "-trunk"
 
 #if !defined(HPX_HAVE_GIT_COMMIT)
     #define HPX_HAVE_GIT_COMMIT  "unknown"
@@ -88,5 +90,7 @@ namespace hpx
         }
     }
 #endif
+
+/// \endcond
 
 #endif
