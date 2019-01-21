@@ -6,4 +6,5 @@
 #include <hpx/pp/nargs.hpp>
 
 #pragma message(                                                               \
-    "The header hpx/util/detail/nargs.hpp is deprecated, please include hpx/pp/nargs.hpp instead")
+    "The header hpx/util/detail/nargs.hpp is deprecated,                       \
+    please include hpx/pp/nargs.hpp instead")

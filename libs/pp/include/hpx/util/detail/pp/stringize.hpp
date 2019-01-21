@@ -6,4 +6,5 @@
 #include <hpx/pp/stringize.hpp>
 
 #pragma message(                                                               \
-    "The header hpx/util/detail/stringize.hpp is deprecated, please include hpx/pp/stringize.hpp instead")
+    "The header hpx/util/detail/stringize.hpp is deprecated,                   \
+    please include hpx/pp/stringize.hpp instead")

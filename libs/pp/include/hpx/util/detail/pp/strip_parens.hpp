@@ -6,4 +6,5 @@
 #include <hpx/pp/strip_parens.hpp>
 
 #pragma message(                                                               \
-    "The header hpx/util/detail/strip_parens.hpp is deprecated, please include hpx/pp/strip_parens.hpp instead")
+    "The header hpx/util/detail/strip_parens.hpp is deprecated,                \
+    please include hpx/pp/strip_parens.hpp instead")

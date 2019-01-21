@@ -12,6 +12,7 @@
 #include <hpx/assert/current_function.hpp>
 #include <hpx/assert/evaluate_assert.hpp>
 #include <hpx/assert/source_location.hpp>
+#include <hpx/pp/stringize.hpp>
 
 #include <string>
 #include <type_traits>

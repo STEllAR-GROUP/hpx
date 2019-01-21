@@ -10,6 +10,7 @@
 // util
 #include <hpx/assert.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/pp/stringize.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>

@@ -6,4 +6,5 @@
 #include <hpx/pp/config.hpp>
 
 #pragma message(                                                               \
-    "The header hpx/util/detail/config.hpp is deprecated, please include hpx/pp/config.hpp instead")
+    "The header hpx/util/detail/config.hpp is deprecated,                      \
+    please include hpx/pp/config.hpp instead")

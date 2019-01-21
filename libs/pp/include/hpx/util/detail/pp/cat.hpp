@@ -6,4 +6,5 @@
 #include <hpx/pp/cat.hpp>
 
 #pragma message(                                                               \
-    "The header hpx/util/detail/cat.hpp is deprecated, please include hpx/pp/cat.hpp instead")
+    "The header hpx/util/detail/cat.hpp is deprecated,                         \
+    please include hpx/pp/cat.hpp instead")

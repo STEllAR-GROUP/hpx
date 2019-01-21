@@ -7,6 +7,7 @@
 #include <hpx/assert/source_location.hpp>
 
 #include <iostream>
+#include <string>
 
 namespace hpx { namespace assertion {
     namespace {

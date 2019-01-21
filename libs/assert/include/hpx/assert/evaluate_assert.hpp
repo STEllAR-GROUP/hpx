@@ -9,7 +9,9 @@
 #include <hpx/config.hpp>
 #if defined(HPX_DEBUG)
 #include <hpx/assert/source_location.hpp>
+#include <hpx/pp/stringize.hpp>
 
+#include <string>
 #include <utility>
 
 namespace hpx { namespace assertion { namespace detail {
