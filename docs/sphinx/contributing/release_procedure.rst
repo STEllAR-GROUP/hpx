@@ -171,8 +171,8 @@ are completed to avoid confusion.
       http://stellar.cct.lsu.edu/files/hpx_#.#.#.tar.bz2
       http://stellar.cct.lsu.edu/files/hpx_#.#.#.7z
 
-#. Update the websites (`stellar-group.org`_ and `stellar.cct.lsu.edu`_) with
-   the following:
+#. Update the websites (`stellar-group.org <https://stellar-group.org>`_ and
+   `stellar.cct.lsu.edu <https://stellar.cct.lsu.edu>`_) with the following:
 
    * Download links on the download page
    * Documentation links on the docs page (link to generated documentation on
