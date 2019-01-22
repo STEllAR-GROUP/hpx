@@ -11,7 +11,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/threads.hpp>
 
-#include <mutex>
+#include <atomic>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace examples { namespace server
@@ -29,20 +29,23 @@ namespace examples { namespace server
       : public hpx::components::component_base<cancelable_action>
     {
     private:
-        typedef hpx::lcos::local::spinlock mutex_type;
-
         struct reset_id
         {
             reset_id(cancelable_action& this_)
               : outer_(this_)
             {
-                std::lock_guard<mutex_type> l(outer_.mtx_);
-                outer_.id_ = hpx::this_thread::get_id();
+                {
+                    hpx::thread::id old_value =
+                        outer_.id_.exchange(hpx::this_thread::get_id());
+                    HPX_ASSERT(old_value == hpx::thread::id());
+                }
             }
             ~reset_id()
             {
-                std::lock_guard<mutex_type> l(outer_.mtx_);
-                outer_.id_ = hpx::thread::id();    // invalidate thread id
+                hpx::thread::id old_value =
+                    outer_.id_.exchange(hpx::thread::id());
+                HPX_ASSERT(old_value != hpx::thread::id());
+                HPX_ASSERT(outer_.id_ == hpx::thread::id());
             }
 
             cancelable_action& outer_;
@@ -67,19 +70,18 @@ namespace examples { namespace server
         // Cancel the lengthy action above
         void cancel_it()
         {
-            std::lock_guard<mutex_type> l(mtx_);
-            if (id_ != hpx::thread::id()) {
-                hpx::thread::interrupt(id_);
-                id_ = hpx::thread::id();        // invalidate thread id
-            }
+            // Make sure id_ has been set
+            hpx::util::yield_while(
+                [this]() { return id_ == hpx::thread::id(); });
+            HPX_ASSERT(id_ != hpx::thread::id());
+            hpx::thread::interrupt(id_);
         }
 
         HPX_DEFINE_COMPONENT_ACTION(cancelable_action, do_it, do_it_action);
         HPX_DEFINE_COMPONENT_ACTION(cancelable_action, cancel_it, cancel_it_action);
 
     private:
-        mutable mutex_type mtx_;
-        hpx::thread::id id_;
+        std::atomic<hpx::thread::id> id_;
     };
 }}
 
