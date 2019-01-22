@@ -126,6 +126,10 @@ are completed to avoid confusion.
 #. Checkout the release branch, and replace the ``-rcN`` tag in
    ``hpx/config/version.hpp`` with an empty string.
 
+#. Update any occurrences of the latest stable release to refer to the version
+   about to be released. For example, ``quickstart.rst`` contains instructions
+   to check out the latest stable tag. Make sure that refers to the new version.
+
 #. Add a new entry to the RPM changelog (``cmake/packaging/rpm/Changelog.txt``)
    with the new version number and a link to the corresponding changelog.
 
