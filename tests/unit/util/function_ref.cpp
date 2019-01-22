@@ -449,6 +449,41 @@ static void
     }
 }
 
+static void
+    test_ptr_ref()
+{
+    typedef hpx::util::function_ref<void ()> func_void_type;
+    typedef hpx::util::function_ref<int ()> func_int_type;
+
+    // Invocation of a function
+    void (*void_ptr)() = &write_five;
+    func_void_type v1 = void_ptr;
+    global_int = 0;
+    void_ptr = &write_three;
+    v1();
+    HPX_TEST(global_int == 5);
+
+    // Invocation and assignment
+    void_ptr = &write_five;
+    v1 = void_ptr;
+    global_int = 0;
+    void_ptr = &write_three;
+    v1();
+    HPX_TEST(global_int == 5);
+
+    // Invocation of a function
+    int (*int_ptr)() = &generate_five;
+    func_int_type v2 = int_ptr;
+    int_ptr = &generate_three;
+    HPX_TEST(v2() == 5);
+
+    // Invocation and assignment
+    int_ptr = &generate_five;
+    v2 = int_ptr;
+    int_ptr = &generate_three;
+    HPX_TEST(v2() == 5);
+}
+
 struct big_aggregating_structure {
     // int disable_small_objects_optimizations[32];
 
@@ -515,6 +550,7 @@ int main(int, char* [])
     test_one_arg();
     test_two_args();
     test_ref();
+    test_ptr_ref();
     test_copy_semantics();
 
     return hpx::util::report_errors();

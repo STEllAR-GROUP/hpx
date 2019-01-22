@@ -67,14 +67,23 @@ namespace hpx { namespace util
             return *this;
         }
 
-        template <typename F>
+        template <typename F, typename T = typename std::remove_reference<F>::type,
+            typename Enable = typename std::enable_if<
+                !std::is_pointer<T>::value
+            >::type>
         void assign(F&& f)
         {
-            typedef typename std::remove_reference<F>::type target_type;
-
             HPX_ASSERT(!detail::is_empty_function(f));
-            vptr = get_vtable<target_type>();
+            vptr = get_vtable<T>();
             object = reinterpret_cast<void*>(std::addressof(f));
+        }
+
+        template <typename T>
+        void assign(T* f_ptr) noexcept
+        {
+            HPX_ASSERT(f_ptr != nullptr);
+            vptr = get_vtable<T>();
+            object = reinterpret_cast<void*>(f_ptr);
         }
 
         void swap(function_ref& f) noexcept
