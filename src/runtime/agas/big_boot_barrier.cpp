@@ -237,7 +237,7 @@ namespace hpx { namespace agas
         HPX_ASSERT(pp);
         naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
         parcelset::parcel p(
-            parcelset::detail::create_parcel::call(std::false_type(),
+            parcelset::detail::create_parcel::call(
                 naming::get_gid_from_locality_id(target_locality_id),
                 std::move(addr), act, std::forward<Args>(args)...));
 #if defined(HPX_HAVE_PARCEL_PROFILING)

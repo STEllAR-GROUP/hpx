@@ -398,7 +398,7 @@ namespace hpx
             HPX_ASSERT(id.get_management_type() == naming::id_type::unmanaged);
             naming::gid_type gid = id.get_gid();
             parcelset::parcel p =
-                parcelset::detail::create_parcel::call(std::false_type(),
+                parcelset::detail::create_parcel::call(
                     std::move(gid), complement_addr<action_type_>(addr),
                     action_type_(), priority
                 );
