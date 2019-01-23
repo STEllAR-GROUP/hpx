@@ -1319,6 +1319,33 @@ How to install |hpx| on Arch distributions
 The rest of the installation steps are same as provided with Fedora
 or Unix variants.
 
+How to install |hpx| on Debian-based distributions
+--------------------------------------------------
+
+* Install all packages for a minimal installation:
+
+  .. code-block:: bash
+
+     sudo apt install cmake libboost-all-dev hwloc libgoogle-perftools-dev
+
+* For building the documentation you will need to further install the following:
+
+  .. code-block:: bash
+
+     sudo apt install doxygen python-pip
+
+     pip install --user sphinx sphinx_rtd_theme breathe
+
+  or the following if you prefer to get Python packages from the Debian
+  repositories:
+
+  .. code-block:: bash
+
+     sudo apt install doxygen python-sphinx python-sphinx-rtd-theme python-breathe
+
+The rest of the installation steps are same as provided with Fedora
+or Unix variants.
+
 .. include:: ../../generated/cmake_toolchains.rst
 
 .. include:: ../../generated/cmake_variables.rst
