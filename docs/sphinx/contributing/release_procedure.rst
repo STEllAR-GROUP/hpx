@@ -126,6 +126,10 @@ are completed to avoid confusion.
 #. Checkout the release branch, and replace the ``-rcN`` tag in
    ``hpx/config/version.hpp`` with an empty string.
 
+#. Update any occurrences of the latest stable release to refer to the version
+   about to be released. For example, ``quickstart.rst`` contains instructions
+   to check out the latest stable tag. Make sure that refers to the new version.
+
 #. Add a new entry to the RPM changelog (``cmake/packaging/rpm/Changelog.txt``)
    with the new version number and a link to the corresponding changelog.
 
@@ -171,8 +175,8 @@ are completed to avoid confusion.
       http://stellar.cct.lsu.edu/files/hpx_#.#.#.tar.bz2
       http://stellar.cct.lsu.edu/files/hpx_#.#.#.7z
 
-#. Update the websites (`stellar-group.org`_ and `stellar.cct.lsu.edu`_) with
-   the following:
+#. Update the websites (`stellar-group.org <https://stellar-group.org>`_ and
+   `stellar.cct.lsu.edu <https://stellar.cct.lsu.edu>`_) with the following:
 
    * Download links on the download page
    * Documentation links on the docs page (link to generated documentation on
