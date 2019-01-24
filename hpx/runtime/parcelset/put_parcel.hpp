@@ -21,7 +21,6 @@
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind_back.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <cstddef>
@@ -97,6 +96,23 @@ namespace hpx { namespace parcelset
         };
 
         template <typename PutParcel>
+        struct put_parcel_cont
+        {
+            typename std::decay<PutParcel>::type pp;
+            naming::id_type dest;
+            naming::address addr;
+            std::unique_ptr<actions::base_action> action;
+
+            void operator()(hpx::future<naming::gid_type> f)
+            {
+                pp(detail::create_parcel::call_with_action(
+                    f.get(), std::move(addr),
+                    std::move(action)
+                ));
+            }
+        };
+
+        template <typename PutParcel>
         void put_parcel_impl(PutParcel&& pp,
             naming::id_type dest, naming::address&& addr,
             std::unique_ptr<actions::base_action>&& action)
@@ -137,23 +153,11 @@ namespace hpx { namespace parcelset
                 {
                     split_gid.then(
                         hpx::launch::sync,
-                        hpx::util::one_shot(hpx::util::bind_back(
-                            [dest]
-                            (hpx::future<naming::gid_type> f,
-                             typename std::decay<PutParcel>::type&& pp_,
-                             naming::address&& addr_,
-                             std::unique_ptr<actions::base_action>&& action_)
-                            {
-                                HPX_UNUSED(dest);
-                                pp_(detail::create_parcel::call_with_action(
-                                    f.get(), std::move(addr_),
-                                    std::move(action_)
-                                ));
-                            },
-                            std::forward<PutParcel>(pp), std::move(addr),
+                        put_parcel_cont<PutParcel>{
+                            std::forward<PutParcel>(pp),
+                            std::move(dest), std::move(addr),
                             std::move(action)
-                        ))
-                    );
+                        });
                 }
             }
         }
