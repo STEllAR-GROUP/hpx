@@ -44,4 +44,6 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   COMPONENT pp)
 
+add_subdirectory(tests)
+
 message(STATUS "pp: Configuring done")
