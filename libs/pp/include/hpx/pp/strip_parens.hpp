@@ -42,7 +42,7 @@
  * evaluates to \c X itself without error.
  *
  * The original implementation of this macro is from Steven Watanbe as shown
- * in http://article.gmane.org/gmane.comp.lib.boost.user/61011
+ * in http://boost.2283326.n4.nabble.com/preprocessor-removing-parentheses-td2591973.html#a2591976
  *
  * \param X Symbol to strip parens from
  *
