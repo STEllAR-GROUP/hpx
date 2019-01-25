@@ -41,6 +41,9 @@ function(add_hpx_test category name)
     set(args ${args} "${arg}")
   endforeach()
   set(args "-v" "--" ${args})
+  if(${HPX_WITH_TESTS_DEBUG_LOG})
+    set(args ${args} "--hpx:debug-hpx-log=${HPX_WITH_TESTS_DEBUG_LOG_DESTINATION}")
+  endif()
 
   set(cmd "${PYTHON_EXECUTABLE}"
           "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
