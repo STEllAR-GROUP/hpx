@@ -11,6 +11,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/predef/other/endian.h>
 
 #include <algorithm>
 #include <cstddef>
@@ -51,7 +52,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         reinterpret_cast<std::uint64_t>(&test_function));
 
     // compose archive flags
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
     std::string endian_out =
         hpx::get_config_entry("hpx.parcel.endian_out", "big");
 #else

@@ -44,7 +44,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
-#include <boost/detail/endian.hpp>
+#include <boost/predef/other/endian.h>
 
 #include <algorithm>
 #include <cstddef>
@@ -1582,7 +1582,7 @@ namespace hpx { namespace parcelset
                 HPX_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
             "max_outbound_message_size = ${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:"
                 HPX_PP_STRINGIZE(HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}",
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
             "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}",
 #else
             "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}",
