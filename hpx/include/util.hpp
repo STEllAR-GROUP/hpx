@@ -22,6 +22,7 @@
 #include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/function_ref.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -31,6 +32,7 @@
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/util/unwrap.hpp>
 #include <hpx/util/zip_iterator.hpp>
 

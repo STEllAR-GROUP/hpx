@@ -34,8 +34,8 @@ namespace hpx { namespace util { namespace detail
     HPX_CONSTEXPR inline VTable const* get_vtable() noexcept
     {
         static_assert(
-            std::is_same<T, typename std::decay<T>::type>::value,
-            "T shall have no cv-ref-qualifiers");
+            !std::is_reference<T>::value,
+            "T shall have no ref-qualifiers");
 
         return &vtables<VTable, T>::instance;
     }
@@ -46,13 +46,13 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         HPX_FORCEINLINE static T& get(void* obj)
         {
-            return *static_cast<T*>(obj);
+            return *reinterpret_cast<T*>(obj);
         }
 
         template <typename T>
         HPX_FORCEINLINE static T const& get(void const* obj)
         {
-            return *static_cast<T const*>(obj);
+            return *reinterpret_cast<T const*>(obj);
         }
 
         template <typename T>

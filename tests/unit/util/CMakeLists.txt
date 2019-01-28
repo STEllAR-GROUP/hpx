@@ -12,6 +12,7 @@ set(tests
     config_entry
     format
     function
+    function_ref
     pack_traversal
     pack_traversal_async
     parse_slurm_nodelist

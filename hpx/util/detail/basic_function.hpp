@@ -30,29 +30,6 @@ namespace hpx { namespace util { namespace detail
     static const std::size_t function_storage_size = 3*sizeof(void*);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F>
-    static bool is_empty_function(F const&, std::false_type) noexcept
-    {
-        return false;
-    }
-
-    template <typename F>
-    static bool is_empty_function(F const& f, std::true_type) noexcept
-    {
-        return f == nullptr;
-    }
-
-    template <typename F>
-    static bool is_empty_function(F const& f) noexcept
-    {
-        std::integral_constant<bool,
-            std::is_pointer<F>::value
-         || std::is_member_pointer<F>::value
-        > is_pointer;
-        return is_empty_function(f, is_pointer);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename VTable, typename Sig>
     class function_base;
 

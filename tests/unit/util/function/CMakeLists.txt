@@ -8,7 +8,7 @@ set(tests
     contains_test
     function_arith
     function_args
-    function_ref
+    function_ref_wrapper
     function_target
     function_test
     nothrow_swap
