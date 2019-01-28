@@ -13,6 +13,7 @@
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/array.hpp>
+#include <boost/predef/other/endian.h>
 
 #include <array>
 #include <cstddef>
@@ -68,7 +69,7 @@ namespace hpx { namespace serialization
                     typename std::remove_const<T>::type
                 >::value> use_optimized;
 
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
             bool archive_endianess_differs = ar.endian_little();
 #else
             bool archive_endianess_differs = ar.endian_big();

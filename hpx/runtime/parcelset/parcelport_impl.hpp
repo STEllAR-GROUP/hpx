@@ -29,7 +29,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
-#include <boost/detail/endian.hpp>
+#include <boost/predef/other/endian.h>
 
 #include <atomic>
 #include <chrono>
@@ -122,7 +122,7 @@ namespace hpx { namespace parcelset
                 hpx::get_config_entry("hpx.max_background_threads",
                     (std::numeric_limits<std::size_t>::max)())))
         {
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
 #else
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "little");
