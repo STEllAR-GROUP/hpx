@@ -30,23 +30,30 @@
 
 namespace hpx { namespace util
 {
-#if HPX_HAVE_ITTNOTIFY != 0
     namespace detail
     {
+#if HPX_HAVE_ITTNOTIFY != 0
         template <typename Tag, std::size_t N>
         struct itt_spinlock_init
         {
             itt_spinlock_init();
             ~itt_spinlock_init();
         };
-    }
 #endif
+        // special struct to ensure cache line alignemnt
+        struct spinlock_holder
+        {
+            // pad to 64 bytes
+            char cacheline_pad[64 - sizeof(boost::detail::spinlock)];
+            boost::detail::spinlock lock;
+        };
+    }
 
-    template <typename Tag, std::size_t N = 128>
+    template <typename Tag, std::size_t N = HPX_HAVE_SPINLOCK_POOL_NUM>
     class spinlock_pool
     {
     private:
-        static boost::detail::spinlock pool_[N];
+        static detail::spinlock_holder pool_[N];
 #if HPX_HAVE_ITTNOTIFY != 0
         static detail::itt_spinlock_init<Tag, N> init_;
 #endif
@@ -56,7 +63,7 @@ namespace hpx { namespace util
         static boost::detail::spinlock & spinlock_for( void const * pv )
         {
             std::size_t i = fibhash<N>(reinterpret_cast< std::size_t >(pv));
-            return pool_[ i ];
+            return pool_[ i ].lock;
         }
 
         class scoped_lock
@@ -97,7 +104,7 @@ namespace hpx { namespace util
     };
 
     template <typename Tag, std::size_t N>
-    boost::detail::spinlock spinlock_pool<Tag, N>::pool_[ N ];
+    detail::spinlock_holder spinlock_pool<Tag, N>::pool_[N];
 
 #if HPX_HAVE_ITTNOTIFY != 0
     namespace detail
@@ -107,9 +114,9 @@ namespace hpx { namespace util
         {
             for (int i = 0; i < N; ++i)
             {
-                HPX_ITT_SYNC_CREATE(&spinlock_pool<Tag, N>::pool_[i],
+                HPX_ITT_SYNC_CREATE(&spinlock_pool<Tag, N>::pool_[i].lock,
                     "boost::detail::spinlock", 0);
-                HPX_ITT_SYNC_RENAME(&spinlock_pool<Tag, N>::pool_[i],
+                HPX_ITT_SYNC_RENAME(&spinlock_pool<Tag, N>::pool_[i].lock,
                     "boost::detail::spinlock");
             }
         }
@@ -119,7 +126,7 @@ namespace hpx { namespace util
         {
             for (int i = 0; i < N; ++i)
             {
-                HPX_ITT_SYNC_DESTROY(&spinlock_pool<Tag, N>::pool_[i]);
+                HPX_ITT_SYNC_DESTROY(&spinlock_pool<Tag, N>::pool_[i].lock);
             }
         }
     }

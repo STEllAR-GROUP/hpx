@@ -599,6 +599,12 @@ if(HPX_WITH_SCHEDULER_LOCAL_STORAGE)
   hpx_add_config_define(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 endif()
 
+hpx_option(HPX_WITH_SPINLOCK_POOL_NUM STRING
+  "Number of elements a spinlock pool manages (default: 128)"
+  128 CATEGORY "Thread Manager" ADVANCED)
+
+hpx_add_config_define(HPX_HAVE_SPINLOCK_POOL_NUM ${HPX_WITH_SPINLOCK_POOL_NUM})
+
 # Count number of terminated threads before forcefully cleaning up all of
 # them. Note: terminated threads are cleaned up either when this number is
 # reached for a particular thread queue or if the HPX_BUSY_LOOP_COUNT_MAX is
