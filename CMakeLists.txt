@@ -72,6 +72,13 @@ if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
 endif()
 hpx_set_cmake_policy(CMP0060 NEW)
 
+# If we have a cmake version older than 3.12, we can't rely on CONFIGURE_DEPENDS
+if(${CMAKE_VERSION} VERSION_LESS "3.12")
+  set(DO_CONFIGURE_DEPENDS)
+else()
+  set(DO_CONFIGURE_DEPENDS CONFIGURE_DEPENDS)
+endif()
+
 # We save the passed compiler flag to a special variable. This is needed for our
 # build system unit tests. Some flags might influence the created symbols
 # (_GLIBCXX_DEBUG i look at you)
@@ -1785,6 +1792,50 @@ endfunction()
 include_directories("${CMAKE_BINARY_DIR}")
 
 ################################################################################
+# Add custom targets for tests
+################################################################################
+if (HPX_WITH_TESTS)
+  add_custom_target(tests)
+  if (HPX_WITH_TESTS_UNIT)
+    add_custom_target(tests.unit)
+    add_dependencies(tests tests.unit)
+  endif()
+  if (HPX_WITH_TESTS_REGRESSIONS)
+    add_custom_target(tests.regressions)
+    add_dependencies(tests tests.regressions)
+  endif()
+  if (HPX_WITH_TESTS_BENCHMARKS)
+    add_custom_target(tests.performance)
+    add_dependencies(tests tests.performance)
+  endif()
+  if (HPX_WITH_TESTS_HEADERS)
+    add_custom_target(tests.headers)
+    add_dependencies(tests tests.headers)
+  endif()
+  if (HPX_WITH_TESTS_EXAMPLES)
+    add_custom_target(tests.examples)
+    add_dependencies(tests tests.examples)
+  endif()
+
+  enable_testing()
+  include(CTest)
+endif()
+
+################################################################################
+# Add libraries
+################################################################################
+if(HPX_WITH_STATIC_LINKING)
+  if(MSVC)
+    # The MSVC linker can't handle a static library as large as we get when
+    # statically linking the main HPX library
+    set(hpx_libs_link_mode SHARED)
+  else()
+    set(hpx_libs_link_mode ${hpx_library_link_mode})
+  endif()
+endif()
+add_subdirectory(libs)
+
+################################################################################
 # Configure compression and other plugins
 ################################################################################
 set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
@@ -1833,11 +1884,6 @@ if(HPX_WITH_TESTS)
   if(NOT PYTHONINTERP_FOUND)
     hpx_warn("A python interpreter could not be found. The test suite can not be run automatically.")
   endif()
-
-  add_hpx_pseudo_target(tests)
-
-  enable_testing()
-  include(CTest)
 
   include_directories(tests)
   add_subdirectory(tests)
