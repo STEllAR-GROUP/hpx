@@ -7,10 +7,10 @@
 #define HPX_PARALLEL_UTIL_DETAIL_PARTITIONER_ITERATION
 
 #include <hpx/config.hpp>
-#include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
 
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,26 +23,13 @@ namespace hpx { namespace parallel { namespace util
         template <typename Result, typename F>
         struct partitioner_iteration
         {
-            typename hpx::util::decay<F>::type f_;
+            typename std::decay<F>::type f_;
 
             template <typename T>
             HPX_HOST_DEVICE HPX_FORCEINLINE
             Result operator()(T && t)
             {
-                return hpx::util::invoke_fused(f_, std::forward<T>(t));
-            }
-        };
-
-        template <typename F>
-        struct partitioner_iteration<void, F>
-        {
-            typename hpx::util::decay<F>::type f_;
-
-            template <typename T>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            void operator()(T && t)
-            {
-                hpx::util::invoke_fused(f_, std::forward<T>(t));
+                return hpx::util::invoke_fused_r<Result>(f_, std::forward<T>(t));
             }
         };
     }
@@ -63,7 +50,7 @@ namespace hpx { namespace traits
                 noexcept
         {
             return get_function_address<
-                    typename hpx::util::decay<F>::type
+                    typename std::decay<F>::type
                 >::call(f.f_);
         }
     };
@@ -77,7 +64,7 @@ namespace hpx { namespace traits
                 noexcept
         {
             return get_function_annotation<
-                    typename hpx::util::decay<F>::type
+                    typename std::decay<F>::type
                 >::call(f.f_);
         }
     };
@@ -92,7 +79,7 @@ namespace hpx { namespace traits
                 noexcept
         {
             return get_function_annotation_itt<
-                    typename hpx::util::decay<F>::type
+                    typename std::decay<F>::type
                 >::call(f.f_);
         }
     };

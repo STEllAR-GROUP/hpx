@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,8 +58,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         // requires traits::is_future<Future>
     hpx::util::iterator_range<parallel::util::detail::chunk_size_iterator<FwdIter> >
     get_bulk_iteration_shape(
+        std::false_type /*has_variable_chunk_size*/,
         ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
-        FwdIter& begin, std::size_t& count, Stride s, std::false_type)
+        FwdIter& begin, std::size_t& count, Stride s)
     {
         std::size_t const cores = execution::processing_units_count(
             policy.executor(), policy.parameters());
@@ -126,8 +128,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         // requires traits::is_future<Future>
     std::vector<hpx::util::tuple<FwdIter, std::size_t> >
     get_bulk_iteration_shape(
-        ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
-        FwdIter& first, std::size_t& count, Stride s, std::true_type)
+        std::true_type /*has_variable_chunk_size*/,
+        ExPolicy && policy, std::vector<Future>& /*workitems*/, F1 && /*f1*/,
+        FwdIter& first, std::size_t& count, Stride s)
     {
         typedef hpx::util::tuple<FwdIter, std::size_t> tuple_type;
 
@@ -206,8 +209,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         parallel::util::detail::chunk_size_idx_iterator<FwdIter>
     >
     get_bulk_iteration_shape_idx(
+        std::false_type /*has_variable_chunk_size*/,
         ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
-        FwdIter begin, std::size_t count, Stride s, std::false_type)
+        FwdIter begin, std::size_t count, Stride s)
     {
         std::size_t const cores = execution::processing_units_count(
             policy.executor(), policy.parameters());
@@ -277,8 +281,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         // requires traits::is_future<Future>
     std::vector<hpx::util::tuple<FwdIter, std::size_t, std::size_t> >
     get_bulk_iteration_shape_idx(
+        std::true_type /*has_variable_chunk_size*/,
         ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
-        FwdIter first, std::size_t count, Stride s, std::true_type)
+        FwdIter first, std::size_t count, Stride s)
     {
         typedef hpx::util::tuple<FwdIter, std::size_t, std::size_t> tuple_type;
 
