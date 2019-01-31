@@ -1184,13 +1184,13 @@ namespace hpx { namespace components { namespace server
 
         plugin_map_type::const_iterator it = plugins_.find(message_handler_type);
         if (it == plugins_.end() || !(*it).second.first) {
+            l.unlock();
             if (ec.category() != hpx::get_lightweight_hpx_category())
             {
                 // we don't know anything about this component
                 std::ostringstream strm;
                 strm << "attempt to create message handler plugin instance of "
                         "invalid/unknown type: " << message_handler_type;
-                l.unlock();
                 HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                     "runtime_support::create_message_handler",
                     strm.str());
@@ -1247,13 +1247,13 @@ namespace hpx { namespace components { namespace server
 
         plugin_map_type::const_iterator it = plugins_.find(message_handler_type);
         if (it == plugins_.end() || !(*it).second.first) {
+            l.unlock();
             if (ec.category() != hpx::get_lightweight_hpx_category())
             {
                 // we don't know anything about this component
                 std::ostringstream strm;
                 strm << "attempt to create message handler plugin instance of "
                         "invalid/unknown type: " << message_handler_type;
-                l.unlock();
                 HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                     "runtime_support::create_message_handler",
                     strm.str());
@@ -1307,6 +1307,7 @@ namespace hpx { namespace components { namespace server
 
         plugin_map_type::const_iterator it = plugins_.find(binary_filter_type);
         if (it == plugins_.end() || !(*it).second.first) {
+            l.unlock();
             // we don't know anything about this component
             std::ostringstream strm;
             strm << "attempt to create binary filter plugin instance of "
