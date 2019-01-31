@@ -16,7 +16,6 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_parameters.hpp>
-#include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>
@@ -215,42 +214,18 @@ namespace hpx { namespace parallel { namespace util
                     std::move(inititems), std::move(workitems));
             }
         };
-
-        ///////////////////////////////////////////////////////////////////////
-        // ExPolicy: execution policy
-        // Result:   intermediate result type of first step (default: void)
-        // PartTag:  select appropriate partitioner
-        template <typename ExPolicy, typename Result, typename PartTag>
-        struct foreach_partitioner;
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename Result>
-        struct foreach_partitioner<ExPolicy, Result,
-            parallel::traits::static_partitioner_tag>
-          : detail::select_partitioner<
-                typename std::decay<ExPolicy>::type,
-                foreach_static_partitioner,
-                foreach_task_static_partitioner
-            >::template apply<Result>
-        {};
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename Result>
-        struct foreach_partitioner<ExPolicy, Result,
-                parallel::traits::default_partitioner_tag>
-          : foreach_partitioner<ExPolicy, Result,
-                parallel::traits::static_partitioner_tag>
-        {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename Result = void,
-        typename PartTag = typename parallel::traits::extract_partitioner<
-            typename std::decay<ExPolicy>::type
-        >::type>
+    // ExPolicy: execution policy
+    // Result:   intermediate result type of first step (default: void)
+    template <typename ExPolicy, typename Result = void>
     struct foreach_partitioner
-      : detail::foreach_partitioner<
-            typename std::decay<ExPolicy>::type, Result, PartTag>
+      : detail::select_partitioner<
+            typename std::decay<ExPolicy>::type,
+            detail::foreach_static_partitioner,
+            detail::foreach_task_static_partitioner
+        >::template apply<Result>
     {};
 }}}
 

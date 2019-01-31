@@ -17,7 +17,6 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_parameters.hpp>
-#include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
@@ -345,51 +344,23 @@ namespace hpx { namespace parallel { namespace util
                     });
             }
         };
-
-        ///////////////////////////////////////////////////////////////////////
-        // ExPolicy:    execution policy
-        // R:           overall result type
-        // Result1:     intermediate result type of first and second step
-        // Result2:     intermediate result of the third step
-        // ScanPartTag: select appropriate policy of scan partitioner
-        // PartTag:     select appropriate partitioner
-        template <typename ExPolicy, typename R, typename Result1,
-            typename Result2, typename ScanPartTag, typename PartTag>
-        struct scan_partitioner;
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename R, typename Result1,
-            typename Result2, typename ScanPartTag>
-        struct scan_partitioner<ExPolicy, R, Result1, Result2, ScanPartTag,
-            parallel::traits::static_partitioner_tag>
-          : detail::select_partitioner<
-                typename std::decay<ExPolicy>::type,
-                scan_static_partitioner,
-                scan_task_static_partitioner
-            >::template apply<ScanPartTag, R, Result1, Result2>
-        {};
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename R, typename Result1,
-            typename Result2, typename ScanPartTag>
-        struct scan_partitioner<ExPolicy, R, Result1,
-                Result2, ScanPartTag, parallel::traits::default_partitioner_tag>
-          : scan_partitioner<ExPolicy, R, Result1,
-                Result2, ScanPartTag, parallel::traits::static_partitioner_tag>
-        {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // ExPolicy:    execution policy
+    // R:           overall result type
+    // Result1:     intermediate result type of first and second step
+    // Result2:     intermediate result of the third step
+    // ScanPartTag: select appropriate policy of scan partitioner
     template <typename ExPolicy, typename R = void, typename Result1 = R,
         typename Result2 = void,
-        typename ScanPartTag = scan_partitioner_normal_tag,
-        typename PartTag = typename parallel::traits::extract_partitioner<
-            typename std::decay<ExPolicy>::type
-        >::type>
+        typename ScanPartTag = scan_partitioner_normal_tag>
     struct scan_partitioner
-      : detail::scan_partitioner<
-            typename std::decay<ExPolicy>::type, R, Result1,
-            Result2, ScanPartTag, PartTag>
+      : detail::select_partitioner<
+            typename std::decay<ExPolicy>::type,
+            detail::scan_static_partitioner,
+            detail::scan_task_static_partitioner
+        >::template apply<ScanPartTag, R, Result1, Result2>
     {};
 }}}
 
