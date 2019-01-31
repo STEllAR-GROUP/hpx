@@ -25,13 +25,11 @@ namespace hpx { namespace parallel { namespace util
         {
             typename hpx::util::decay<F>::type f_;
 
-            template <typename T, typename...Ts>
+            template <typename T>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            Result operator()(T && t, Ts &&... ts)
+            Result operator()(T && t)
             {
-                return hpx::util::invoke_fused(f_,
-                    hpx::util::tuple_cat(std::forward<T>(t),
-                        hpx::util::forward_as_tuple(std::forward<Ts>(ts)...)));
+                return hpx::util::invoke_fused(f_, std::forward<T>(t));
             }
         };
 
@@ -40,13 +38,11 @@ namespace hpx { namespace parallel { namespace util
         {
             typename hpx::util::decay<F>::type f_;
 
-            template <typename T, typename...Ts>
+            template <typename T>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            void operator()(T && t, Ts &&... ts)
+            void operator()(T && t)
             {
-                hpx::util::invoke_fused(f_,
-                    hpx::util::tuple_cat(std::forward<T>(t),
-                        hpx::util::forward_as_tuple(std::forward<Ts>(ts)...)));
+                hpx::util::invoke_fused(f_, std::forward<T>(t));
             }
         };
     }

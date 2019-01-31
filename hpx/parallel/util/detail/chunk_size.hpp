@@ -22,7 +22,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <type_traits>
-#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -175,40 +174,40 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future, typename F, typename FwdIter, typename ...Ts>
+    template <typename Future, typename F, typename FwdIter>
         // requires traits::is_future<Future>
     void add_ready_future_idx(std::vector<Future>& workitems,
-        F && f, FwdIter first, std::size_t base_idx, std::size_t count, Ts &&...ts)
+        F && f, FwdIter first, std::size_t base_idx, std::size_t count)
     {
         workitems.push_back(
-            hpx::make_ready_future(f(first, count, base_idx, std::forward<Ts>(ts)...)));
+            hpx::make_ready_future(f(first, count, base_idx)));
     }
 
-    template <typename F, typename FwdIter, typename ...Ts>
+    template <typename F, typename FwdIter>
     void add_ready_future_idx(std::vector<hpx::future<void> >& workitems,
-        F && f, FwdIter first, std::size_t base_idx, std::size_t count, Ts &&...ts)
+        F && f, FwdIter first, std::size_t base_idx, std::size_t count)
     {
-        f(first, count, base_idx, std::forward<Ts>(ts)...);
+        f(first, count, base_idx);
         workitems.push_back(hpx::make_ready_future());
     }
 
-    template <typename F, typename FwdIter, typename ...Ts>
+    template <typename F, typename FwdIter>
     void add_ready_future_idx(std::vector<hpx::shared_future<void> >& workitems,
-        F && f, FwdIter first, std::size_t base_idx, std::size_t count, Ts &&...ts)
+        F && f, std::size_t base_idx, FwdIter first, std::size_t count)
     {
-        f(first, count, base_idx, std::forward<Ts>(ts)...);
+        f(first, count, base_idx);
         workitems.push_back(hpx::make_ready_future());
     }
 
     template <typename ExPolicy, typename Future, typename F1,
-        typename FwdIter, typename Stride, typename...Ts>
+        typename FwdIter, typename Stride>
         // requires traits::is_future<Future>
     hpx::util::iterator_range<
         parallel::util::detail::chunk_size_idx_iterator<FwdIter>
     >
     get_bulk_iteration_shape_idx(
         ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
-        FwdIter begin, std::size_t count, Stride s, std::false_type, Ts &&... ts)
+        FwdIter begin, std::size_t count, Stride s, std::false_type)
     {
         std::size_t const cores = execution::processing_units_count(
             policy.executor(), policy.parameters());
@@ -235,7 +234,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 }
 
                 add_ready_future_idx(workitems, f1, begin, base_idx,
-                    test_chunk_size, std::forward<Ts>(ts)...);
+                    test_chunk_size);
 
                 // modifies 'test_chunk_size'
                 begin = parallel::v1::detail::next(
@@ -274,12 +273,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     }
 
     template <typename ExPolicy, typename Future, typename F1,
-        typename FwdIter, typename Stride, typename...Ts>
+        typename FwdIter, typename Stride>
         // requires traits::is_future<Future>
     std::vector<hpx::util::tuple<FwdIter, std::size_t, std::size_t> >
     get_bulk_iteration_shape_idx(
         ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
-        FwdIter first, std::size_t count, Stride s, std::true_type, Ts &&... ts)
+        FwdIter first, std::size_t count, Stride s, std::true_type)
     {
         typedef hpx::util::tuple<FwdIter, std::size_t, std::size_t> tuple_type;
 
