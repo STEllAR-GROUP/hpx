@@ -17,6 +17,7 @@ set(subdirs
     resource
     serialization
     threads
+    topology
     traits
     util
    )
