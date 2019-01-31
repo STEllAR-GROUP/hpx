@@ -49,8 +49,6 @@
 #include <cstdlib>
 #include <stdexcept>
 
-#include <boost/type_traits/type_with_alignment.hpp>
-
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 #include <errno.h>
 #include <sys/mman.h>
@@ -174,7 +172,7 @@ namespace posix
 
     struct stack_aligner
     {
-        boost::type_with_alignment<stack_alignment>::type dummy;
+        alignas(stack_alignment) char dummy[stack_alignment];
     };
 
     /**

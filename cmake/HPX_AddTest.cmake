@@ -3,7 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-macro(add_hpx_test category name)
+function(add_hpx_test category name)
   set(options FAILURE_EXPECTED)
   set(one_value_args EXECUTABLE LOCALITIES THREADS_PER_LOCALITY)
   set(multi_value_args ARGS PARCELPORTS)
@@ -21,10 +21,10 @@ macro(add_hpx_test category name)
     set(${name}_EXECUTABLE ${name})
   endif()
 
-  if(TARGET ${${name}_EXECUTABLE}_test_exe)
-    set(_exe "$<TARGET_FILE:${${name}_EXECUTABLE}_test_exe>")
-  elseif(TARGET ${${name}_EXECUTABLE}_exe)
-    set(_exe "$<TARGET_FILE:${${name}_EXECUTABLE}_exe>")
+  if(TARGET ${${name}_EXECUTABLE}_test)
+    set(_exe "$<TARGET_FILE:${${name}_EXECUTABLE}_test>")
+  elseif(TARGET ${${name}_EXECUTABLE})
+    set(_exe "$<TARGET_FILE:${${name}_EXECUTABLE}>")
   else()
     set(_exe "${${name}_EXECUTABLE}")
   endif()
@@ -41,6 +41,9 @@ macro(add_hpx_test category name)
     set(args ${args} "${arg}")
   endforeach()
   set(args "-v" "--" ${args})
+  if(${HPX_WITH_TESTS_DEBUG_LOG})
+    set(args ${args} "--hpx:debug-hpx-log=${HPX_WITH_TESTS_DEBUG_LOG_DESTINATION}")
+  endif()
 
   set(cmd "${PYTHON_EXECUTABLE}"
           "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
@@ -128,18 +131,18 @@ macro(add_hpx_test category name)
         endif()
       endif()
     endif()
-endmacro()
+endfunction()
 
-macro(add_hpx_unit_test category name)
+function(add_hpx_unit_test category name)
   add_hpx_test("tests.unit.${category}" ${name} ${ARGN})
-endmacro()
+endfunction()
 
-macro(add_hpx_regression_test category name)
+function(add_hpx_regression_test category name)
   add_hpx_test("tests.regressions.${category}" ${name} ${ARGN})
-endmacro()
+endfunction()
 
-macro(add_hpx_example_test category name)
+function(add_hpx_example_test category name)
   add_hpx_test("tests.examples.${category}" ${name} ${ARGN})
-endmacro()
+endfunction()
 
 

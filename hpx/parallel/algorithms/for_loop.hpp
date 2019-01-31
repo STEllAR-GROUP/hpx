@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,6 +20,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unused.hpp>
 
@@ -50,33 +51,33 @@ namespace hpx { namespace parallel { inline namespace v2
         ///////////////////////////////////////////////////////////////////////
         template <typename ... Ts>
         HPX_HOST_DEVICE
-        HPX_FORCEINLINE void init_iteration(std::size_t part_index, Ts &&... args)
+        HPX_FORCEINLINE void init_iteration(std::size_t part_index, Ts&... args)
         {
             int const _sequencer[] =
             {
-                0, (std::forward<Ts>(args).init_iteration(part_index), 0)...
+                0, (args.init_iteration(part_index), 0)...
             };
             (void)_sequencer;
         }
 
         template <typename ... Ts>
         HPX_HOST_DEVICE
-        HPX_FORCEINLINE void next_iteration(Ts&&... args)
+        HPX_FORCEINLINE void next_iteration(std::size_t part_index, Ts&... args)
         {
             int const _sequencer[] =
             {
-                0, (std::forward<Ts>(args).next_iteration(), 0)...
+                0, (args.next_iteration(part_index), 0)...
             };
             (void)_sequencer;
         }
 
         template <typename ... Ts>
         HPX_HOST_DEVICE
-        HPX_FORCEINLINE void exit_iteration(std::size_t size, Ts &&... args)
+        HPX_FORCEINLINE void exit_iteration(std::size_t size, Ts&... args)
         {
             int const _sequencer[] =
             {
-                0, (std::forward<Ts>(args).exit_iteration(size), 0)...
+                0, (args.exit_iteration(size), 0)...
             };
             (void)_sequencer;
         }
@@ -101,13 +102,12 @@ namespace hpx { namespace parallel { inline namespace v2
             void execute(B part_begin, std::size_t part_steps,
                 std::size_t part_index, Args &&... args)
             {
-                detail::init_iteration(part_index, std::forward<Args>(args)...);
+                detail::init_iteration(part_index, args...);
 
                 while (part_steps != 0)
                 {
-                    f_(part_begin, std::forward<Args>(args).iteration_value()...);
-
-                    detail::next_iteration(std::forward<Args>(args)...);
+                    hpx::util::invoke(
+                        f_, part_begin, args.iteration_value()...);
 
                     // NVCC seems to have a bug with std::min...
                     std::size_t chunk =
@@ -117,6 +117,9 @@ namespace hpx { namespace parallel { inline namespace v2
                     part_begin = parallel::v1::detail::next(
                         part_begin, part_steps, chunk);
                     part_steps -= chunk;
+                    part_index += chunk;
+
+                    detail::next_iteration(part_index, args...);
                 }
             }
 
@@ -145,20 +148,13 @@ namespace hpx { namespace parallel { inline namespace v2
             sequential(ExPolicy policy, InIter first, Size size, S stride,
                 F && f, Args &&... args)
             {
-                int const init_sequencer[] = {
-                    0, (args.init_iteration(0), 0)...
-                };
-                (void)init_sequencer;
+                std::size_t part_index = 0;
+                detail::init_iteration(0, args...);
 
                 std::size_t count = size;
                 while (count != 0)
                 {
                     hpx::util::invoke(f, first, args.iteration_value()...);
-
-                    int const next_sequencer[] = {
-                        0, (args.next_iteration(), 0)...
-                    };
-                    (void)next_sequencer;
 
                     // NVCC seems to have a bug with std::min...
                     std::size_t chunk = (S(count) < stride) ? count : stride;
@@ -166,13 +162,13 @@ namespace hpx { namespace parallel { inline namespace v2
                     // modifies 'chunk'
                     first = parallel::v1::detail::next(first, count, chunk);
                     count -= chunk;
+                    part_index += chunk;
+
+                    detail::next_iteration(part_index, args...);
                 }
 
                 // make sure live-out variables are properly set on return
-                int const exit_sequencer[] = {
-                    0, (args.exit_iteration(size), 0)...
-                };
-                (void)exit_sequencer;
+                detail::exit_iteration(size, args...);
 
                 return hpx::util::unused_type();
             }
@@ -186,18 +182,17 @@ namespace hpx { namespace parallel { inline namespace v2
                 if (size == 0)
                     return util::detail::algorithm_result<ExPolicy>::get();
 
-                return util::partitioner<ExPolicy>::call_with_index(
-                    policy, first, size, stride,
-                    part_iterations<F, S>{
-                        std::forward<F>(f), stride
-                    },
-                    [size] (std::vector<hpx::future<void> > &&,
+                return util::partitioner<ExPolicy>::call_with_index(policy,
+                    first, size, stride,
+                    part_iterations<F, S>{std::forward<F>(f), stride},
+                    [size](std::vector<hpx::future<void>>&&,
                         typename hpx::util::decay<Ts>::type... ts) -> void
                     {
                         // make sure live-out variables are properly set on
                         // return
-                        detail::exit_iteration(size, std::move(ts)...);
-                    }, std::forward<Ts>(ts)...);
+                        detail::exit_iteration(size, ts...);
+                    },
+                    std::forward<Ts>(ts)...);
             }
         };
 

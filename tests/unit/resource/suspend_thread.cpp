@@ -81,7 +81,7 @@ int hpx_main(int argc, char* argv[])
                 }
             }
 
-            hpx::async(test_function).get();
+            hpx::async(test_function).wait();
 
             for (std::size_t thread_num_resume = 0;
                 thread_num_resume < num_threads;

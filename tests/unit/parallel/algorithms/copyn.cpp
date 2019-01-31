@@ -140,15 +140,6 @@ void test_copy_n()
     test_copy_n_async(execution::seq(execution::task), IteratorTag());
     test_copy_n_async(execution::par(execution::task), IteratorTag());
 
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_n(execution_policy(execution::seq), IteratorTag());
-    test_copy_n(execution_policy(execution::par), IteratorTag());
-    test_copy_n(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_copy_n(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_copy_n(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
-
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     // assure output iterator will run
     test_copy_n_outiter(execution::seq, IteratorTag());
@@ -157,17 +148,6 @@ void test_copy_n()
 
     test_copy_n_outiter_async(execution::seq(execution::task), IteratorTag());
     test_copy_n_outiter_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_n_outiter(execution_policy(execution::seq), IteratorTag());
-    test_copy_n_outiter(execution_policy(execution::par), IteratorTag());
-    test_copy_n_outiter(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_copy_n_outiter(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_copy_n_outiter(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 #endif
 }
 
@@ -271,16 +251,6 @@ void test_copy_n_exception()
 
     test_copy_n_exception_async(execution::seq(execution::task), IteratorTag());
     test_copy_n_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_n_exception(execution_policy(execution::seq), IteratorTag());
-    test_copy_n_exception(execution_policy(execution::par), IteratorTag());
-
-    test_copy_n_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_copy_n_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void copy_n_exception_test()
@@ -382,16 +352,6 @@ void test_copy_n_bad_alloc()
 
     test_copy_n_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_copy_n_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_n_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_copy_n_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_copy_n_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_copy_n_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void copy_n_bad_alloc_test()

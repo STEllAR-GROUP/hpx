@@ -48,24 +48,6 @@ namespace hpx { namespace lcos
         {
             signal(hpx::async, val, count).get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        lcos::future<void> signal_async(ValueType const& val,
-            std::uint64_t count = 1)
-        {
-            return signal(launch::async, val, count);
-        }
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void signal_sync(ValueType const& val, std::uint64_t count = 1)
-        {
-            signal(launch::sync, val, count);
-        }
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void signal(ValueType const& val, std::uint64_t count = 1)
-        {
-            signal(launch::sync, val, count);
-        }
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         lcos::future<ValueType> get(launch::async_policy)
@@ -78,23 +60,6 @@ namespace hpx { namespace lcos
         {
             return get(launch::async).get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        lcos::future<ValueType> get_async()
-        {
-            return get(launch::async);
-        }
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        ValueType get_sync()
-        {
-            get(launch::sync);
-        }
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        ValueType get()
-        {
-            get(launch::sync);
-        }
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         future<void> abort_pending(launch::async_policy, error ec = no_success)
@@ -107,25 +72,6 @@ namespace hpx { namespace lcos
         {
             abort_pending(launch::async).get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        future<void> abort_pending_async(error ec = no_success)
-        {
-            HPX_ASSERT(this->get_id());
-            return this->base_type::abort_pending_async(this->get_id(), ec);
-        }
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void abort_pending_sync(error ec = no_success)
-        {
-            HPX_ASSERT(this->get_id());
-            this->base_type::abort_pending_sync(this->get_id(), ec);
-        }
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void abort_pending(error ec = no_success)
-        {
-            abort_pending_sync(ec);
-        }
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         void wait(launch::async_policy)
@@ -138,23 +84,6 @@ namespace hpx { namespace lcos
         {
             wait(launch::async).get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        future<void> wait_async()
-        {
-            return wait(launch::async);
-        }
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void wait_sync()
-        {
-            wait(launch::sync);
-        }
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void wait()
-        {
-            wait(launch::sync);
-        }
-#endif
     };
 }}
 

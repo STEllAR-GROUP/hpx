@@ -73,7 +73,7 @@ namespace hpx { namespace util { namespace cache
         // object to wrap any user supplied UpdatePolicy, dereferencing the
         // pointers.
         template <typename Func, typename Iterator>
-        struct adapt : std::binary_function<Iterator, Iterator, bool>
+        struct adapt
         {
             adapt(Func f)
               : f_(f)

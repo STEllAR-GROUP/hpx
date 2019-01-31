@@ -83,15 +83,6 @@ void test_find_if_not()
 
     test_find_if_not_async(execution::seq(execution::task), IteratorTag());
     test_find_if_not_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_if_not(execution_policy(execution::seq), IteratorTag());
-    test_find_if_not(execution_policy(execution::par), IteratorTag());
-    test_find_if_not(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_find_if_not(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_if_not(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void find_if_not_test()

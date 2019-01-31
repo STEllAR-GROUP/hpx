@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011-2017 Thomas Heller
 //
@@ -28,7 +28,6 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/plugin.hpp>
-#include <hpx/util/unlock_guard.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <boost/program_options/options_description.hpp>
@@ -39,7 +38,6 @@
 #include <list>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <set>
 #include <sstream>
 #include <string>
@@ -143,10 +141,6 @@ namespace hpx { namespace components { namespace server
         naming::gid_type migrate_component_to_here(
             std::shared_ptr<Component> const& p, naming::id_type);
 
-        /// \brief Action to create new memory block
-        naming::gid_type create_memory_block(std::size_t count,
-            hpx::actions::manage_object_action_base const& act);
-
         /// \brief Gracefully shutdown this runtime system instance
         void shutdown(double timeout, naming::id_type const& respond_to);
 
@@ -196,7 +190,6 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, create_memory_block);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, load_components);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_startup_functions);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_shutdown_functions);
@@ -245,29 +238,10 @@ namespace hpx { namespace components { namespace server
 
         bool was_stopped() const { return stop_called_; }
 
-        void add_pre_startup_function(startup_function_type f)
-        {
-            std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            pre_startup_functions_.push_back(std::move(f));
-        }
-
-        void add_startup_function(startup_function_type f)
-        {
-            std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            startup_functions_.push_back(std::move(f));
-        }
-
-        void add_pre_shutdown_function(shutdown_function_type f)
-        {
-            std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            pre_shutdown_functions_.push_back(std::move(f));
-        }
-
-        void add_shutdown_function(shutdown_function_type f)
-        {
-            std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            shutdown_functions_.push_back(std::move(f));
-        }
+        void add_pre_startup_function(startup_function_type f);
+        void add_startup_function(startup_function_type f);
+        void add_pre_shutdown_function(shutdown_function_type f);
+        void add_shutdown_function(shutdown_function_type f);
 
         void remove_here_from_connection_cache();
         void remove_here_from_console_connection_cache();
@@ -587,9 +561,6 @@ HPX_ACTION_USES_MEDIUM_STACK(
 HPX_ACTION_USES_MEDIUM_STACK(
     hpx::components::server::runtime_support::dijkstra_termination_action)
 
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::server::runtime_support::create_memory_block_action,
-    create_memory_block_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::load_components_action,
     load_components_action)

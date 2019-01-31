@@ -26,7 +26,6 @@
 #include <hpx/runtime/components/server/component_database.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
-#include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
@@ -80,10 +79,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
-HPX_REGISTER_ACTION_ID(
-    hpx::components::server::runtime_support::create_memory_block_action,
-    create_memory_block_action,
-    hpx::actions::create_memory_block_action_id)
 HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::load_components_action,
     load_components_action,
@@ -276,32 +271,6 @@ namespace hpx { namespace components { namespace server
         dijkstra_color_(false), shutdown_all_invoked_(false),
         modules_(cfg.modules())
     {}
-
-    ///////////////////////////////////////////////////////////////////////////
-    // create a new instance of a memory block
-    // FIXME: error code?
-    naming::gid_type runtime_support::create_memory_block(
-        std::size_t count, hpx::actions::manage_object_action_base const& act)
-    {
-        server::memory_block* c = server::memory_block::create(count, act);
-        naming::gid_type gid = c->get_base_gid();
-        if (gid) {
-            LRT_(info) << "successfully created memory block of size " << count //-V128
-                       << ": " << gid;
-            return gid;
-        }
-
-        delete c;
-
-        std::ostringstream strm;
-        strm << "global id " << gid << " is already bound to a different "
-                "component instance";
-        HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
-            "runtime_support::create_memory_block",
-            strm.str());
-
-        return naming::invalid_gid;
-    }
 
     // function to be called during shutdown
     // Action: shut down this runtime system instance
@@ -1597,20 +1566,34 @@ namespace hpx { namespace components { namespace server
             bool pre_startup = true;
             if (startup_shutdown->get_startup_function(startup, pre_startup))
             {
-                if (pre_startup)
-                    pre_startup_functions_.push_back(std::move(startup));
-                else
-                    startup_functions_.push_back(std::move(startup));
+                if (!startup.empty())
+                {
+                    if (pre_startup)
+                    {
+                        pre_startup_functions_.push_back(std::move(startup));
+                    }
+                    else
+                    {
+                        startup_functions_.push_back(std::move(startup));
+                    }
+                }
             }
 
             shutdown_function_type shutdown;
             bool pre_shutdown = false;
             if (startup_shutdown->get_shutdown_function(shutdown, pre_shutdown))
             {
-                if (pre_shutdown)
-                    pre_shutdown_functions_.push_back(std::move(shutdown));
-                else
-                    shutdown_functions_.push_back(std::move(shutdown));
+                if (!shutdown.empty())
+                {
+                    if (pre_shutdown)
+                    {
+                        pre_shutdown_functions_.push_back(std::move(shutdown));
+                    }
+                    else
+                    {
+                        shutdown_functions_.push_back(std::move(shutdown));
+                    }
+                }
             }
         }
         catch (hpx::exception const&) {

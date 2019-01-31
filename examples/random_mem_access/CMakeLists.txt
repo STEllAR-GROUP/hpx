@@ -34,7 +34,7 @@ foreach(subdir ${subdirs})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.random_mem_access.${subdir}_dir
-                              ${subdir}_client_exe)
+                              ${subdir}_client)
 
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_example_test("random_mem_access" ${subdir}_client ${${subdir}_PARAMETERS})
@@ -42,6 +42,6 @@ foreach(subdir ${subdirs})
     add_hpx_pseudo_dependencies(tests.examples.random_mem_access
                                 tests.examples.random_mem_access.${subdir})
     add_hpx_pseudo_dependencies(tests.examples.random_mem_access.${subdir}
-                                ${subdir}_client_exe)
+                                ${subdir}_client)
   endif()
 endforeach()

@@ -12,8 +12,6 @@
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 
-#include <boost/type_traits/is_same.hpp>
-
 namespace hpx { namespace serialization
 {
     template <typename T>

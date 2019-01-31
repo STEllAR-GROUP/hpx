@@ -31,6 +31,7 @@
 #include <atomic>
 #include <cstddef>
 #include <limits>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -456,7 +457,7 @@ namespace hpx { namespace this_thread
             }
 
             threads::thread_id_type id_;
-            boost::scoped_ptr<hpx::util::backtrace> backtrace_;
+            std::unique_ptr<hpx::util::backtrace> backtrace_;
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
             std::string full_backtrace_;
 #endif

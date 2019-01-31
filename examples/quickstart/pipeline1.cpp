@@ -8,12 +8,12 @@
 
 #include <iostream>
 #include <iterator>
+#include <regex>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/regex.hpp>
 
 struct pipeline
 {
@@ -22,8 +22,8 @@ struct pipeline
         // job for first stage
         auto grep = [](std::string const& re, std::string const& item)
         {
-            boost::regex regex(re);
-            if (boost::regex_match(item, regex))
+            std::regex regex(re);
+            if (std::regex_match(item, regex))
             {
                 auto trim = [](std::string const& s)
                 {

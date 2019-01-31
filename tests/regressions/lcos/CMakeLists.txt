@@ -111,7 +111,7 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.regressions.lcos_dir.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()
 
 add_hpx_test(

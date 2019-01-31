@@ -25,7 +25,7 @@ add_hpx_pseudo_dependencies(examples examples.cancelable_action)
 
 # add dependencies to pseudo-target
 add_hpx_pseudo_dependencies(examples.cancelable_action
-    cancelable_action_client_exe)
+    cancelable_action_client)
 
 if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
   add_hpx_example_test("cancelable_action" cancelable_action_client THREADS_PER_LOCALITY 4)
@@ -33,5 +33,5 @@ if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
   add_hpx_pseudo_dependencies(tests.examples.cancelable_action
                               tests.examples.cancelable_action.cancelable_action)
   add_hpx_pseudo_dependencies(tests.examples.cancelable_action.cancelable_action
-                              cancelable_action_client_exe)
+                              cancelable_action_client)
 endif()

@@ -130,8 +130,7 @@ namespace hpx { namespace agas
     }; // }}}
 
 addressing_service::addressing_service(
-    parcelset::parcelhandler& ph
-  , util::runtime_configuration const& ini_
+    util::runtime_configuration const& ini_
   , runtime_mode runtime_type_
     )
   : gva_cache_(new gva_cache_type)
@@ -149,23 +148,27 @@ addressing_service::addressing_service(
   , mem_lva_(0)
   , state_(state_starting)
   , locality_()
+{
+    if (caching_)
+        gva_cache_->reserve(ini_.get_agas_local_cache_size());
+}
+
+void addressing_service::bootstrap(
+    parcelset::parcelhandler& ph, util::runtime_configuration const& ini)
 { // {{{
     LPROGRESS_;
 
-    if (caching_)
-        gva_cache_->reserve(ini_.get_agas_local_cache_size());
-
 #if defined(HPX_HAVE_NETWORKING)
     std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
-    create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini_);
+    create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini);
     if (service_type == service_mode_bootstrap)
     {
-        launch_bootstrap(pp, ph.endpoints(), ini_);
+        launch_bootstrap(pp, ph.endpoints(), ini);
     }
 #else
-    create_big_boot_barrier(nullptr, ph.endpoints(), ini_);
+    create_big_boot_barrier(nullptr, ph.endpoints(), ini);
     HPX_ASSERT(service_type == service_mode_bootstrap);
-    launch_bootstrap(nullptr, ph.endpoints(), ini_);
+    launch_bootstrap(nullptr, ph.endpoints(), ini);
 #endif
 } // }}}
 
@@ -267,13 +270,13 @@ void addressing_service::launch_bootstrap(
       , components::get_component_type<components::server::runtime_support>()
       , 1U, rt.get_runtime_support_lva());
 
-    register_name("/0/agas/locality#0", here);
-    if (is_console())
-        register_name("/0/locality#console", here);
-
     naming::gid_type lower, upper;
     get_id_range(HPX_INITIAL_GID_RANGE, lower, upper);
     rt.get_id_pool().set_range(lower, upper);
+
+    register_name("/0/agas/locality#0", here);
+    if (is_console())
+        register_name("/0/locality#console", here);
 } // }}}
 
 void addressing_service::launch_hosted()
@@ -804,10 +807,10 @@ hpx::future<bool> addressing_service::bind_range_async(
 
     return f.then(
         hpx::launch::sync,
-        util::bind(
-            util::one_shot(&addressing_service::bind_postproc),
+        util::one_shot(util::bind(
+            &addressing_service::bind_postproc,
             this, _1, id, g
-        ));
+        )));
 }
 
 hpx::future<naming::address> addressing_service::unbind_range_async(
@@ -927,7 +930,7 @@ bool addressing_service::is_local_lva_encoded_address(
     )
 {
     // NOTE: This should still be migration safe.
-    return naming::detail::strip_internal_bits_from_gid(msb) ==
+    return naming::detail::strip_internal_bits_and_component_type_from_gid(msb) ==
         get_local_locality().get_msb();
 }
 
@@ -954,20 +957,20 @@ bool addressing_service::resolve_locally_known_addresses(
             return true;
         }
 
+        if (naming::refers_to_local_lva(id))
+        {
+            // handle (non-migratable) components located on this locality first
+            addr.type_ = naming::detail::get_component_type_from_gid(msb);
+            addr.address_ = lsb;
+            return true;
+        }
+
         if (naming::refers_to_virtual_memory(msb))
         {
             HPX_ASSERT(mem_lva_);
 
             addr.type_ = components::component_memory;
             addr.address_ = mem_lva_;
-            return true;
-        }
-
-        if (naming::refers_to_local_lva(id))
-        {
-            // handle (non-migratable) components located on this locality first
-            addr.type_ = naming::detail::get_component_type_from_gid(msb);
-            addr.address_ = lsb;
             return true;
         }
     }
@@ -1099,7 +1102,11 @@ bool addressing_service::resolve_cached(
 
     // special cases
     if (resolve_locally_known_addresses(id, addr))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
         return true;
+    }
 
     // If caching is disabled, bail
     if (!caching_)
@@ -1285,10 +1292,10 @@ hpx::future<naming::address> addressing_service::resolve_full_async(
     using util::placeholders::_1;
     return f.then(
         hpx::launch::sync,
-        util::bind(
-            util::one_shot(&addressing_service::resolve_full_postproc),
+        util::one_shot(util::bind(
+            &addressing_service::resolve_full_postproc,
             this, _1, gid
-        ));
+        )));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1549,10 +1556,10 @@ lcos::future<std::int64_t> addressing_service::incref_async(
     using util::placeholders::_1;
     return f.then(
         hpx::launch::sync,
-        util::bind(
-            util::one_shot(&addressing_service::synchronize_with_async_incref),
+        util::one_shot(util::bind(
+            &addressing_service::synchronize_with_async_incref,
             this, _1, keep_alive, pending_decrefs
-        ));
+        )));
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1671,10 +1678,10 @@ lcos::future<bool> addressing_service::register_name_async(
     {
         return f.then(
             hpx::launch::sync,
-            util::bind_back(
-                util::one_shot(&correct_credit_on_failure),
+            util::one_shot(util::bind_back(
+                &correct_credit_on_failure,
                 id, std::int64_t(HPX_GLOBALCREDIT_INITIAL), new_credit
-            ));
+            )));
     }
 
     return f;
@@ -1753,9 +1760,9 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
     using util::placeholders::_1;
     return f.then(
         hpx::launch::sync,
-        util::bind(
-            util::one_shot(&detail::on_register_event), _1, std::move(result_f)
-        ));
+        util::one_shot(util::bind(
+            &detail::on_register_event, _1, std::move(result_f)
+        )));
 }
 
 // Return all matching entries in the symbol namespace

@@ -72,15 +72,6 @@ set(tests
     when_some_std_array
    )
 
-if(HPX_WITH_EXECUTOR_COMPATIBILITY)
-  set(tests ${tests}
-      apply_local_executor_v1
-      async_local_executor_v1
-      future_then_executor_v1
-      local_dataflow_executor_v1
-     )
-endif()
-
 if(HPX_WITH_AWAIT)
   set(tests ${tests} await)
   set(await_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -143,11 +134,6 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   set(folder_name "Tests/Unit/LCOs")
-  string(FIND ${test} "_v1" _is_v1_test)
-
-  if(NOT (_is_v1_test EQUAL -1))
-    set(folder_name "Tests/Unit/LCOs/V1")
-  endif()
 
   # add example executable
   add_hpx_executable(${test}_test
@@ -168,7 +154,7 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.unit.lcos.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()
 
 if(HPX_WITH_COMPILE_ONLY_TESTS)

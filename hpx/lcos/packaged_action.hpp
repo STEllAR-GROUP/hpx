@@ -20,11 +20,13 @@
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind_front.hpp>
+#include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/protect.hpp>
 
 #include <boost/asio/error.hpp>
 
 #include <exception>
+#include <memory>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -234,10 +236,16 @@ namespace lcos {
         // use this instance its member function \a apply needs to be directly
         // called.
         packaged_action()
+          : base_type(std::allocator_arg, hpx::util::internal_allocator<>{})
         {
         }
 
-        ///////////////////////////////////////////////////////////////////////
+        template <typename Allocator>
+        packaged_action(std::allocator_arg_t, Allocator const& alloc)
+          : base_type(std::allocator_arg, alloc)
+        {
+        }
+
         template <typename... Ts>
         void apply(naming::id_type const& id, Ts&&... vs)
         {
@@ -360,6 +368,14 @@ namespace lcos {
         /// use this instance its member function \a apply needs to be directly
         /// called.
         packaged_action()
+          : packaged_action<Action, Result, false>(
+              std::allocator_arg, hpx::util::internal_allocator<>{})
+        {
+        }
+
+        template <typename Allocator>
+        packaged_action(std::allocator_arg_t, Allocator const& alloc)
+          : packaged_action<Action, Result, false>(std::allocator_arg, alloc)
         {
         }
 

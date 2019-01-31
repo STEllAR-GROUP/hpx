@@ -15,9 +15,6 @@
 //  contention, all operations have a constant complexity, except for the dtor.
 ////////////////////////////////////////////////////////////////////////////////
 
-// hpxinspect:nodeprecatedinclude:boost/atomic.hpp
-// hpxinspect:nodeprecatedname:boost::atomic
-
 #if !defined(HPX_F985C12D_03E7_4E25_8CB1_018A56A265E0)
 #define HPX_F985C12D_03E7_4E25_8CB1_018A56A265E0
 
@@ -26,9 +23,9 @@
 #include <hpx/util/lockfree/detail/tagged_ptr_pair.hpp>
 #include <hpx/util/lockfree/freelist.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/lockfree/detail/tagged_ptr.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <iostream>
 #include <type_traits>
@@ -49,7 +46,7 @@ template <typename T>
 struct deque_node //-V690
 {
     typedef detail::tagged_ptr<deque_node> pointer;
-    typedef boost::atomic<pointer> atomic_pointer;
+    typedef std::atomic<pointer> atomic_pointer;
 
     typedef typename pointer::tag_t tag_t;
 
@@ -79,7 +76,7 @@ struct deque_anchor //-V690
     typedef typename node::tag_t tag_t;
 
     typedef tagged_ptr_pair<node, node> pair;
-    typedef boost::atomic<pair> atomic_pair;
+    typedef std::atomic<pair> atomic_pair;
 
   private:
     atomic_pair pair_;

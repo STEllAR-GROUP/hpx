@@ -23,33 +23,11 @@
 #include <cstring>
 #include <string>
 #include <type_traits>
-#include <typeinfo>
 #include <utility>
 
 namespace hpx { namespace util { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename F>
-    static bool is_empty_function(F const&, std::false_type) noexcept
-    {
-        return false;
-    }
-
-    template <typename F>
-    static bool is_empty_function(F const& f, std::true_type) noexcept
-    {
-        return f == nullptr;
-    }
-
-    template <typename F>
-    static bool is_empty_function(F const& f) noexcept
-    {
-        std::integral_constant<bool,
-            std::is_pointer<F>::value
-         || std::is_member_pointer<F>::value
-        > is_pointer;
-        return is_empty_function(f, is_pointer);
-    }
+    static const std::size_t function_storage_size = 3*sizeof(void*);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename VTable, typename Sig>
@@ -58,35 +36,28 @@ namespace hpx { namespace util { namespace detail
     template <typename VTable, typename R, typename ...Ts>
     class function_base<VTable, R(Ts...)>
     {
-        // make sure the empty table instance is initialized in time, even
-        // during early startup
-        static VTable const* get_empty_table()
-        {
-            static VTable const empty_table =
-                detail::construct_vtable<detail::empty_function<R(Ts...)> >();
-            return &empty_table;
-        }
-
     public:
         function_base() noexcept
-          : vptr(get_empty_table())
-        {
-            std::memset(object, 0, vtable::function_storage_size);
-            vtable::default_construct<empty_function<R(Ts...)> >(object);
-        }
+          : vptr(detail::get_empty_function_vtable<VTable>())
+          , object(nullptr)
+        {}
 
         function_base(function_base&& other) noexcept
           : vptr(other.vptr)
+          , object(other.object)
         {
-            // move-construct
-            std::memcpy(object, other.object, vtable::function_storage_size);
-            other.vptr = get_empty_table();
-            vtable::default_construct<empty_function<R(Ts...)> >(other.object);
+            if (object == &other.storage)
+            {
+                std::memcpy(storage, other.storage, function_storage_size);
+                object = &storage;
+            }
+            other.vptr = detail::get_empty_function_vtable<VTable>();
+            other.object = nullptr;
         }
 
         ~function_base()
         {
-            vptr->delete_(object);
+            reset();
         }
 
         function_base& operator=(function_base&& other) noexcept
@@ -114,13 +85,16 @@ namespace hpx { namespace util { namespace detail
                 VTable const* f_vptr = get_vtable<target_type>();
                 if (vptr == f_vptr)
                 {
-                    vtable::reconstruct<target_type>(object, std::forward<F>(f));
+                    // reuse object storage
+                    vtable::_destruct<target_type>(object);
+                    object = vtable::construct<target_type>(
+                        object, -1, std::forward<F>(f));
                 } else {
                     reset();
-                    vtable::_delete<empty_function<R(Ts...)> >(object);
 
                     vptr = f_vptr;
-                    vtable::construct<target_type>(object, std::forward<F>(f));
+                    object = vtable::construct<target_type>(
+                        storage, function_storage_size, std::forward<F>(f));
                 }
             } else {
                 reset();
@@ -129,34 +103,34 @@ namespace hpx { namespace util { namespace detail
 
         void reset() noexcept
         {
-            if (!vptr->empty)
+            if (object != nullptr)
             {
-                vptr->delete_(object);
+                vptr->delete_(object, function_storage_size);
 
-                vptr = get_empty_table();
-                vtable::default_construct<empty_function<R(Ts...)> >(object);
+                vptr = detail::get_empty_function_vtable<VTable>();
+                object = nullptr;
             }
         }
 
         void swap(function_base& f) noexcept
         {
             std::swap(vptr, f.vptr);
-            std::swap(object, f.object); // swap
+            std::swap(object, f.object);
+            std::swap(storage, f.storage);
+            if (object == &f.storage)
+                object = &storage;
+            if (f.object == &storage)
+                f.object = &f.storage;
         }
 
         bool empty() const noexcept
         {
-            return vptr->empty;
+            return object == nullptr;
         }
 
         explicit operator bool() const noexcept
         {
             return !empty();
-        }
-
-        std::type_info const& target_type() const noexcept
-        {
-            return empty() ? typeid(void) : vptr->get_type();
         }
 
         template <typename T>
@@ -233,7 +207,8 @@ namespace hpx { namespace util { namespace detail
 
     protected:
         VTable const *vptr;
-        mutable void* object[(vtable::function_storage_size / sizeof(void*))];
+        void* object;
+        mutable unsigned char storage[function_storage_size];
     };
 
     template <typename Sig, typename VTable>
@@ -288,7 +263,8 @@ namespace hpx { namespace util { namespace detail
                 ar >> name;
 
                 this->vptr = detail::get_vtable<vtable>(name);
-                this->vptr->load_object(this->object, ar, version);
+                this->object = this->vptr->load_object(
+                    this->storage, function_storage_size, ar, version);
             }
         }
 

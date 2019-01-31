@@ -712,6 +712,7 @@ namespace policies {
 
             // low priority task
             if (!result) {
+#ifdef JB_LP_STEALING
                 for (std::size_t d=domain_num; d<domain_num+num_domains_; ++d) {
                     std::size_t dom = d % num_domains_;
                     // set the preferred queue for this domain, if applicable
@@ -723,6 +724,10 @@ namespace policies {
                     result = lp_queues_[dom].get_next_thread(q_index, thrd);
                     if (result) break;
                 }
+#else
+                // no cross domain stealing for LP queues
+                result = lp_queues_[domain_num].get_next_thread(0, thrd);
+#endif
             }
             if (result)
             {
@@ -1109,6 +1114,7 @@ namespace policies {
 
             // low priority task
             if (!result) {
+#ifdef JB_LP_STEALING
                 for (std::size_t d=domain_num; d<domain_num+num_domains_; ++d) {
                     std::size_t dom = d % num_domains_;
                     // set the preferred queue for this domain, if applicable
@@ -1121,6 +1127,12 @@ namespace policies {
                         idle_loop_count, added);
                     if (0 != added) return result;
                 }
+#else
+                // no cross domain stealing for LP queues
+                result = lp_queues_[domain_num].wait_or_add_new(0, running,
+                    idle_loop_count, added);
+                if (0 != added) return result;
+#endif
             }
 
             return result;

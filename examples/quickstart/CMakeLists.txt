@@ -25,6 +25,7 @@ set(example_programs
     fibonacci_one
     fibonacci_futures
     fibonacci_futures_distributed
+    fibonacci_local
     file_serialization
     fractals
     fractals_struct
@@ -35,13 +36,11 @@ set(example_programs
     latch_local
     latch_remote
     local_channel
-    non_atomic_rma
     partitioned_vector_spmd_foreach
     pingpong
     pipeline1
     print_to_console
     potpourri
-    quicksort
     receive_buffer
     safe_object
     shared_mutex
@@ -80,7 +79,7 @@ set(event_synchronization_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(fractals_FLAGS COMPONENT_DEPENDENCIES iostreams)
 if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
-  set(hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams DEPENDENCIES compress_snappy_lib)
+  set(hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams DEPENDENCIES compress_snappy)
 else()
   set(hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
@@ -159,7 +158,7 @@ foreach(example_program ${example_programs})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.quickstart.${example_program}
-                              ${example_program}_exe)
+                              ${example_program})
 
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND
       NOT ("${example_program}" IN_LIST disabled_tests))
@@ -168,6 +167,6 @@ foreach(example_program ${example_programs})
     add_hpx_pseudo_dependencies(tests.examples.quickstart
                                 tests.examples.quickstart.${example_program})
     add_hpx_pseudo_dependencies(tests.examples.quickstart.${example_program}
-                                ${example_program}_exe)
+                                ${example_program})
   endif()
 endforeach()

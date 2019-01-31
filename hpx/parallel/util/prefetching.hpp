@@ -40,19 +40,14 @@ namespace hpx { namespace parallel { namespace util
                 typename std::iterator_traits<Itr>::value_type
             >
         {
-        private:
-            typedef std::iterator<
-                std::random_access_iterator_tag,
-                typename std::iterator_traits<Itr>::value_type
-            > base_type;
-
         public:
             typedef Itr base_iterator;
 
-            typedef typename base_type::value_type value_type;
-            typedef typename base_type::difference_type difference_type;
-            typedef typename base_type::pointer pointer;
-            typedef typename base_type::reference reference;
+            typedef std::random_access_iterator_tag iterator_category;
+            typedef typename std::iterator_traits<Itr>::value_type value_type;
+            typedef std::ptrdiff_t difference_type;
+            typedef value_type* pointer;
+            typedef value_type& reference;
 
         private:
             typedef hpx::util::tuple<std::reference_wrapper<Ts>...> ranges_type;

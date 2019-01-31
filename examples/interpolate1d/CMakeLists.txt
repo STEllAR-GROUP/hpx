@@ -41,7 +41,7 @@ if(HPX_WITH_EXAMPLES_HDF5)
 
     # add dependencies to pseudo-target
     add_hpx_pseudo_dependencies(examples.interpolate1d.${subdir}_
-                                ${subdir}_client_exe)
+                                ${subdir}_client)
 
     if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
       add_hpx_example_test("interpolate1d" ${subdir} ${${subdir}_PARAMETERS})
@@ -49,7 +49,7 @@ if(HPX_WITH_EXAMPLES_HDF5)
       add_hpx_pseudo_dependencies(tests.examples.interpolate1d
                                   tests.examples.interpolate1d.${subdir})
       add_hpx_pseudo_dependencies(tests.examples.interpolate1d.${subdir}
-                                  ${subdir}_client_exe)
+                                  ${subdir}_client)
     endif()
   endforeach()
 
@@ -68,6 +68,6 @@ if(HPX_WITH_EXAMPLES_HDF5)
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.interpolate1d.create_1d_testdata
-                              create_1d_testdata_exe)
+                              create_1d_testdata)
 
 endif()

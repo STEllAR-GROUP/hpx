@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/static.hpp>
 
@@ -224,6 +225,18 @@ namespace hpx { namespace resource { namespace detail
         {
             throw_runtime_error("partitioner::partitioner",
                 "Cannot instantiate more than one resource partitioner");
+        }
+
+        if(HPX_HAVE_MAX_CPU_COUNT < topo_.get_number_of_pus())
+        {
+            throw_runtime_error("partitioner::partioner",
+                hpx::util::format(
+                    "Currently, HPX_HAVE_MAX_CPU_COUNT is set to {1} "
+                    "while your system has {2} processing units. Please "
+                    "reconfigure HPX with -DHPX_WITH_MAX_CPU_COUNT={2} (or "
+                    "higher) to increase the maximal CPU count supported by "
+                    "HPX.",
+                    HPX_HAVE_MAX_CPU_COUNT, topo_.get_number_of_pus()));
         }
 
         // Create the default pool
@@ -516,7 +529,7 @@ namespace hpx { namespace resource { namespace detail
         {
             if (initial_thread_pools_[i].assigned_pus_.empty())
             {
-                return false;
+                return true;
             }
             for (auto assigned_pus : initial_thread_pools_[i].assigned_pus_)
             {

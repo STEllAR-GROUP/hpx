@@ -44,7 +44,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
-#include <boost/detail/endian.hpp>
+#include <boost/predef/other/endian.h>
 
 #include <algorithm>
 #include <cstddef>
@@ -111,11 +111,13 @@ namespace hpx { namespace parcelset
                                    "hpx.parcel.message_handlers", "0") != 0)
       , count_routed_(0)
       , write_handler_(&default_write_handler)
+      , is_networking_enabled_(hpx::is_networking_enabled())
     {
         LPROGRESS_;
 
 #if defined(HPX_HAVE_NETWORKING)
-        if (cfg.get_entry("hpx.parcel.enable", "1") != "0")
+        if (is_networking_enabled_ &&
+            cfg.get_entry("hpx.parcel.enable", "1") != "0")
         {
             for (plugins::parcelport_factory_base* factory :
                     get_parcelport_factories())
@@ -204,13 +206,13 @@ namespace hpx { namespace parcelset
     void parcelhandler::attach_parcelport(std::shared_ptr<parcelport> const& pp)
     {
 #if defined(HPX_HAVE_NETWORKING)
-
-        if(!pp) return;
+        if (!hpx::is_networking_enabled() || !pp)
+            return;
 
         // add the new parcelport to the list of parcel-ports we care about
         int priority = pp->priority();
         std::string cfgkey(std::string("hpx.parcel.") + pp->type() + ".enable");
-        if(get_config_entry(cfgkey, "0") != "1")
+        if (get_config_entry(cfgkey, "0") != "1")
         {
             priority = -priority;
         }
@@ -253,7 +255,7 @@ namespace hpx { namespace parcelset
 
 #if defined(HPX_HAVE_NETWORKING)
         // flush all parcel buffers
-        if(0 == num_thread)
+        if (is_networking_enabled_ && 0 == num_thread)
         {
             std::unique_lock<mutex_type> l(handlers_mtx_, std::try_to_lock);
 
@@ -437,6 +439,7 @@ namespace hpx { namespace parcelset
     void parcelhandler::put_parcel(parcel p, write_handler_type f)
     {
 #if defined(HPX_HAVE_NETWORKING)
+        HPX_ASSERT(is_networking_enabled_);
         HPX_ASSERT(resolver_);
 
         naming::gid_type const& gid = p.destination();
@@ -530,6 +533,7 @@ namespace hpx { namespace parcelset
         std::vector<write_handler_type> handlers)
     {
 #if defined(HPX_HAVE_NETWORKING)
+        HPX_ASSERT(is_networking_enabled_);
         HPX_ASSERT(resolver_);
 
         if (parcels.size() != handlers.size())
@@ -734,6 +738,9 @@ namespace hpx { namespace parcelset
         locality const& loc, error_code& ec)
     {
 #if defined(HPX_HAVE_NETWORKING)
+        if (!is_networking_enabled_)
+            return nullptr;
+
         std::unique_lock<mutex_type> l(handlers_mtx_);
         handler_key_type key(loc, action);
         message_handler_map::iterator it = handlers_.find(key);
@@ -1101,6 +1108,9 @@ namespace hpx { namespace parcelset
     void parcelhandler::register_counter_types(std::string const& pp_type)
     {
 #if defined(HPX_HAVE_NETWORKING)
+        if (!is_networking_enabled_)
+            return;
+
         using util::placeholders::_1;
         using util::placeholders::_2;
 
@@ -1421,10 +1431,13 @@ namespace hpx { namespace parcelset
     void parcelhandler::register_connection_cache_counter_types(
         std::string const& pp_type)
     {
+#if defined(HPX_HAVE_NETWORKING)
+        if (!is_networking_enabled_)
+            return;
+
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
 
-#if defined(HPX_HAVE_NETWORKING)
         util::function_nonser<std::int64_t(bool)> cache_insertions(
             util::bind_front(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_insertions));
@@ -1569,7 +1582,7 @@ namespace hpx { namespace parcelset
                 HPX_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
             "max_outbound_message_size = ${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:"
                 HPX_PP_STRINGIZE(HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}",
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
             "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}",
 #else
             "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}",
@@ -1577,7 +1590,6 @@ namespace hpx { namespace parcelset
             "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}",
             "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
                 "$[hpx.parcel.array_optimization]}",
-            "enable_security = ${HPX_PARCEL_ENABLE_SECURITY:0}",
             "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}",
 #if defined(HPX_HAVE_PARCEL_COALESCING)
             "message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:1}"

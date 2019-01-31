@@ -264,6 +264,14 @@ namespace hpx
         char const* binary_filter_type, bool compress,
         serialization::binary_filter* next_filter = nullptr,
         error_code& ec = throws);
+
+    /// Return true if networking is enabled.
+    ///
+    /// \note Networking is enabled if `-DHPX_WITH_NETWORKING=On` was used at
+    ///       configuration time and more than one locality is used or the
+    ///       command line option `--hpx:expect-connecting-localities` was
+    ///       specified
+    HPX_API_EXPORT bool is_networking_enabled();
 }
 
 #endif

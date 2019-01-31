@@ -14,5 +14,5 @@ foreach(app ${pipeline})
                               examples.pipeline.${app})
 
   add_hpx_pseudo_dependencies(examples.pipeline.${app}
-                              ${app}_exe)
+                              ${app})
 endforeach()

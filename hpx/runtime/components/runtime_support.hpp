@@ -78,22 +78,6 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename Config>
-        naming::id_type create_memory_block(std::size_t count,
-            hpx::actions::manage_object_action<T, Config> const& act)
-        {
-            return this->base_type::create_memory_block(gid_, count, act);
-        }
-
-        /// Asynchronously create a new memory block using the runtime_support
-        template <typename T, typename Config>
-        lcos::future<naming::id_type>
-        create_memory_block_async(std::size_t count,
-            hpx::actions::manage_object_action<T, Config> const& act)
-        {
-            return this->base_type::create_memory_block_async(gid_, count, act);
-        }
-
         lcos::future<int> load_components_async()
         {
             return this->base_type::load_components_async(gid_);

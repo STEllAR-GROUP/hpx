@@ -10,7 +10,7 @@ if(NOT HPX_WITH_TESTS_EXTERNAL_BUILD)
 endif()
 
 # Try building an external cmake based project ...
-macro(create_cmake_test name hpx_dir)
+function(create_cmake_test name hpx_dir)
   set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/${name}")
   add_custom_target(${name}.make_build_dir
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${build_dir}" VERBATIM
@@ -66,9 +66,9 @@ macro(create_cmake_test name hpx_dir)
 #    "build" ${name}
 #    EXECUTABLE "${build_dir}/test"
 #  )
-endmacro()
+endfunction()
 
-macro(create_pkgconfig_test name hpx_dir)
+function(create_pkgconfig_test name hpx_dir)
   set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/${name}")
   add_custom_target(${name}.make_build_dir
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${build_dir}" VERBATIM
@@ -94,7 +94,7 @@ macro(create_pkgconfig_test name hpx_dir)
 #    "build" ${name}
 #    EXECUTABLE "${build_dir}/test"
 #  )
-endmacro()
+endfunction()
 
 create_cmake_test(
   cmake_build_dir_test
@@ -102,7 +102,7 @@ create_cmake_test(
 
 create_cmake_test(
   cmake_install_dir_test
-  "${CMAKE_INSTALL_PREFIX}/lib/cmake/${HPX_PACKAGE_NAME}"
+  "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}"
 )
 
 find_package(PkgConfig)
@@ -113,7 +113,7 @@ if(PKGCONFIG_FOUND AND NOT MSVC)
 
   create_pkgconfig_test(
     pkgconfig_install_dir_test
-    "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+    "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig")
 endif()
 
 set(tests

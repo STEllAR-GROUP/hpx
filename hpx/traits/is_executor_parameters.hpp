@@ -12,7 +12,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/traits/v1/is_executor_parameters.hpp>     // backwards compatibility
 
 #include <functional>
 #include <type_traits>

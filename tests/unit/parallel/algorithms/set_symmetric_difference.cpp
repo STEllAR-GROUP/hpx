@@ -86,22 +86,6 @@ void test_set_symmetric_difference1()
         IteratorTag());
     test_set_symmetric_difference1_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_symmetric_difference1(execution_policy(execution::seq),
-        IteratorTag());
-    test_set_symmetric_difference1(execution_policy(execution::par),
-        IteratorTag());
-    test_set_symmetric_difference1(execution_policy(execution::par_unseq),
-        IteratorTag());
-
-    test_set_symmetric_difference1(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_symmetric_difference1(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_symmetric_difference_test1()
@@ -191,22 +175,6 @@ void test_set_symmetric_difference2()
         IteratorTag());
     test_set_symmetric_difference2_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_symmetric_difference2(execution_policy(execution::seq),
-        IteratorTag());
-    test_set_symmetric_difference2(execution_policy(execution::par),
-        IteratorTag());
-    test_set_symmetric_difference2(execution_policy(execution::par_unseq),
-        IteratorTag());
-
-    test_set_symmetric_difference2(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_symmetric_difference2(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_symmetric_difference_test2()
@@ -324,20 +292,6 @@ void test_set_symmetric_difference_exception()
         execution::seq(execution::task), IteratorTag());
     test_set_symmetric_difference_exception_async(
         execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_symmetric_difference_exception(execution_policy(execution::seq),
-        IteratorTag());
-    test_set_symmetric_difference_exception(execution_policy(execution::par),
-        IteratorTag());
-
-    test_set_symmetric_difference_exception(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_symmetric_difference_exception(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_symmetric_difference_exception_test()
@@ -453,20 +407,6 @@ void test_set_symmetric_difference_bad_alloc()
         execution::seq(execution::task), IteratorTag());
     test_set_symmetric_difference_bad_alloc_async(
         execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_symmetric_difference_bad_alloc(execution_policy(execution::seq),
-        IteratorTag());
-    test_set_symmetric_difference_bad_alloc(execution_policy(execution::par),
-        IteratorTag());
-
-    test_set_symmetric_difference_bad_alloc(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_symmetric_difference_bad_alloc(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_symmetric_difference_bad_alloc_test()

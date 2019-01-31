@@ -163,6 +163,7 @@ int hpx_main(int argc, char* argv[])
 #endif
 
 #if defined(HPX_HAVE_NETWORKING)
+    if (hpx::is_networking_enabled())
     {
         execution::service_executor exec(service_executor_type::parcel_thread_pool);
         test_service_executor(exec);

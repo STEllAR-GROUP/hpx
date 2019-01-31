@@ -444,7 +444,7 @@ namespace hpx { namespace parallel { namespace util
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         return detail::loop_with_cleanup_n<cat>::call_with_token(it, count,
             tok, std::forward<F>(f), std::forward<Cleanup>(cleanup));
-    };
+    }
 
     template <typename Iter, typename FwdIter, typename CancelToken,
         typename F, typename Cleanup>
@@ -455,7 +455,7 @@ namespace hpx { namespace parallel { namespace util
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         return detail::loop_with_cleanup_n<cat>::call_with_token(it, count,
             dest, tok, std::forward<F>(f), std::forward<Cleanup>(cleanup));
-    };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -511,7 +511,7 @@ namespace hpx { namespace parallel { namespace util
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         return detail::loop_idx_n<cat>::call(base_idx, it, count, tok,
             std::forward<F>(f));
-    };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -552,6 +552,23 @@ namespace hpx { namespace parallel { namespace util
         {
             val = hpx::util::invoke(r, val, *first);
             ++first;
+        }
+        return val;
+    }
+
+    template <typename T, typename Iter1, typename Iter2, typename Reduce,
+        typename Conv>
+    HPX_FORCEINLINE T
+    accumulate(Iter1 first1, Iter1 last1, Iter2 first2, Reduce && r, Conv && conv)
+    {
+        T val = hpx::util::invoke(conv, *first1, *first2);
+        ++first1;
+        ++first2;
+        while(last1 != first1)
+        {
+            val = hpx::util::invoke(r, val, hpx::util::invoke(conv, *first1, *first2));
+            ++first1;
+            ++first2;
         }
         return val;
     }

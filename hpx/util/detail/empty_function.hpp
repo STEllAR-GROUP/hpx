@@ -8,42 +8,65 @@
 #ifndef HPX_UTIL_DETAIL_EMPTY_FUNCTION_HPP
 #define HPX_UTIL_DETAIL_EMPTY_FUNCTION_HPP
 
-#include <hpx/throw_exception.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/detail/function_registration.hpp>
+#include <hpx/util/detail/vtable/vtable.hpp>
+
+#include <type_traits>
 
 namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig>
-    struct empty_function; // must be trivial and empty
-
-    template <typename R, typename ...Ts>
-    struct empty_function<R(Ts...)>
+    template <typename F>
+    static bool is_empty_function(std::false_type, F const&) noexcept
     {
-        R operator()(Ts...) const
-        {
-            hpx::throw_exception(bad_function_call,
-                "empty function object should not be used",
-                "empty_function::operator()");
-        }
-    };
+        return false;
+    }
+
+    template <typename F>
+    static bool is_empty_function(std::true_type, F const& f) noexcept
+    {
+        return f == nullptr;
+    }
+
+    template <typename F>
+    static bool is_empty_function(F const& f) noexcept
+    {
+        using is_pointer = std::integral_constant<bool,
+            std::is_pointer<F>::value
+         || std::is_member_pointer<F>::value
+        >;
+        return is_empty_function(is_pointer{}, f);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct empty_function {}; // must be trivial and empty
+
+    HPX_NORETURN HPX_EXPORT void throw_bad_function_call();
 
     // Pseudo registration for empty functions.
     // We don't want to serialize empty functions.
-    template <typename VTable, typename Sig>
+    template <typename VTable>
     struct get_function_name_impl<
         VTable
-      , hpx::util::detail::empty_function<Sig>
+      , hpx::util::detail::empty_function
     >
     {
-        static char const* call()
+        HPX_NORETURN static char const* call()
         {
-            hpx::throw_exception(bad_function_call,
-                "empty function object should not be used",
-                "get_function_name<empty_function>");
-            return "";
+            throw_bad_function_call();
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // make sure the empty table instance is initialized in time, even
+    // during early startup
+    template <typename VTable>
+    VTable const* get_empty_function_vtable()
+    {
+        static VTable const empty_vtable = construct_vtable<empty_function>();
+        return &empty_vtable;
+    }
 }}}
 
 #endif

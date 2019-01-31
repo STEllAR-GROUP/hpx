@@ -157,15 +157,6 @@ void test_move()
     test_move_async(execution::seq(execution::task), IteratorTag());
     test_move_async(execution::par(execution::task), IteratorTag());
 
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_move(execution_policy(execution::seq), IteratorTag());
-    test_move(execution_policy(execution::par), IteratorTag());
-    test_move(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_move(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_move(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
-
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     // assure output iterator will work
     test_move_outiter(execution::seq, IteratorTag());
@@ -174,15 +165,6 @@ void test_move()
 
     test_move_outiter_async(execution::seq(execution::task), IteratorTag());
     test_move_outiter_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_move_outiter(execution_policy(execution::seq), IteratorTag());
-    test_move_outiter(execution_policy(execution::par), IteratorTag());
-    test_move_outiter(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_move_outiter(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_move_outiter(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 #endif
 }
 
@@ -285,14 +267,6 @@ void test_move_exception()
 
     test_move_exception_async(execution::seq(execution::task), IteratorTag());
     test_move_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_move_exception(execution_policy(execution::seq), IteratorTag());
-    test_move_exception(execution_policy(execution::par), IteratorTag());
-
-    test_move_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_move_exception(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void move_exception_test()
@@ -392,14 +366,6 @@ void test_move_bad_alloc()
 
     test_move_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_move_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_move_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_move_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_move_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_move_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void move_bad_alloc_test()

@@ -14,6 +14,7 @@
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/basic_function.hpp>
+#include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/function_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
@@ -53,14 +54,11 @@ namespace hpx { namespace util
         function(function const& other)
           : base_type()
         {
-            detail::vtable::_delete<
-                detail::empty_function<R(Ts...)>
-            >(this->object);
-
             this->vptr = other.vptr;
-            if (!this->vptr->empty)
+            if (other.object != nullptr)
             {
-                this->vptr->copy(this->object, other.object);
+                this->object = this->vptr->copy(
+                    this->storage, detail::function_storage_size, other.object);
             }
         }
 
@@ -84,17 +82,25 @@ namespace hpx { namespace util
 
         function& operator=(function const& other)
         {
-            if (this != &other)
+            if (this->vptr == other.vptr)
             {
+                if (this != &other)
+                {
+                    // reuse object storage
+                    this->vptr->destruct(this->object);
+                    this->object = this->vptr->copy(
+                        this->object, -1, other.object);
+                }
+            } else {
                 reset();
-                detail::vtable::_delete<
-                    detail::empty_function<R(Ts...)>
-                >(this->object);
 
                 this->vptr = other.vptr;
-                if (!this->vptr->empty)
+                if (other.object != nullptr)
                 {
-                    this->vptr->copy(this->object, other.object);
+                    this->object = this->vptr->copy(
+                        this->storage, detail::function_storage_size, other.object);
+                } else {
+                    this->object = nullptr;
                 }
             }
             return *this;
@@ -124,7 +130,6 @@ namespace hpx { namespace util
         using base_type::assign;
         using base_type::reset;
         using base_type::empty;
-        using base_type::target_type;
         using base_type::target;
     };
 

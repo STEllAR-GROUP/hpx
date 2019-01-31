@@ -560,13 +560,13 @@ void register_worker(registration_header const& header)
         // delay the final response until the runtime system is up and running
         util::unique_function_nonser<void()>* thunk =
             new util::unique_function_nonser<void()>(
-                util::bind(
-                    util::one_shot(&big_boot_barrier::apply_notification)
+                util::one_shot(util::bind(
+                    &big_boot_barrier::apply_notification
                   , std::ref(get_big_boot_barrier())
                   , 0
                   , naming::get_locality_id_from_gid(prefix)
                   , dest
-                  , std::move(hdr)));
+                  , std::move(hdr))));
         get_big_boot_barrier().add_thunk(thunk);
     }
 }

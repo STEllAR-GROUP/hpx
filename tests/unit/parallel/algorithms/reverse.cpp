@@ -88,17 +88,6 @@ void test_reverse()
 
     test_reverse_async(execution::seq(execution::task), IteratorTag());
     test_reverse_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_reverse(execution_policy(execution::seq), IteratorTag());
-    test_reverse(execution_policy(execution::par), IteratorTag());
-    test_reverse(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_reverse(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_reverse(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void reverse_test()
@@ -195,16 +184,6 @@ void test_reverse_exception()
         IteratorTag());
     test_reverse_exception_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_reverse_exception(execution_policy(execution::seq), IteratorTag());
-    test_reverse_exception(execution_policy(execution::par), IteratorTag());
-
-    test_reverse_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_reverse_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void reverse_exception_test()
@@ -299,16 +278,6 @@ void test_reverse_bad_alloc()
         IteratorTag());
     test_reverse_bad_alloc_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_reverse_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_reverse_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_reverse_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_reverse_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void reverse_bad_alloc_test()

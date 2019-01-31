@@ -124,7 +124,9 @@ namespace hpx { namespace applier
 
     applier::applier(parcelset::parcelhandler &ph, threads::threadmanager& tm)
       : parcel_handler_(ph), thread_manager_(tm)
-    {}
+    {
+        init_tss();
+    }
 
     void applier::initialize(std::uint64_t rts, std::uint64_t mem)
     {

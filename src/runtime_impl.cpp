@@ -163,17 +163,15 @@ namespace hpx
                 util::placeholders::_1, util::placeholders::_2, true),
             util::bind(&runtime_impl::deinit_tss, This(), "parcel-thread",
                 util::placeholders::_1))
-      , agas_client_(parcel_handler_, ini_, rtcfg.mode_)
+      , agas_client_(ini_, rtcfg.mode_)
       , applier_(parcel_handler_, *thread_manager_)
     {
         LPROGRESS_;
 
-        components::server::get_error_dispatcher().register_error_sink(
-            &runtime_impl::default_errorsink, default_error_sink_);
+        agas_client_.bootstrap(parcel_handler_, ini_);
 
-        // in AGAS v2, the runtime pointer (accessible through get_runtime
-        // and get_runtime_ptr) is already initialized at this point.
-        applier_.init_tss();
+        components::server::get_error_dispatcher().
+            set_error_sink(&runtime_impl::default_errorsink);
 
         // now create all threadmanager pools
         thread_manager_->create_pools();

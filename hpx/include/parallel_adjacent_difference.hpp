@@ -7,5 +7,6 @@
 #define HPX_PARALLEL_ADJACENT_DIFFERENCE_JUL_15_2015_0808PM
 
 #include <hpx/parallel/algorithms/adjacent_difference.hpp>
+#include <hpx/parallel/segmented_algorithms/adjacent_difference.hpp>
 
 #endif

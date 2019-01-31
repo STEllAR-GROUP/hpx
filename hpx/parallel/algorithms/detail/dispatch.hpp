@@ -22,9 +22,6 @@
 
 #include <string>
 #include <type_traits>
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-#include <typeinfo>
-#endif
 #include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail
@@ -383,67 +380,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             return Derived::parallel(std::forward<ExPolicy>(policy),
                 std::forward<Args>(args)...);
         }
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-        ///////////////////////////////////////////////////////////////////////////
-        template <typename... Args>
-        local_result_type
-        call(parallel::execution_policy policy, std::false_type,
-            Args&&... args) const
-        {
-            // this implementation is not nice, however we don't have variadic
-            // virtual functions accepting template arguments and supporting
-            // perfect forwarding
-            std::type_info const& t = policy.type();
-
-            if (t == typeid(execution::sequenced_policy))
-            {
-                return call(
-                    *policy.get<execution::sequenced_policy>(),
-                    std::true_type(), std::forward<Args>(args)...);
-            }
-
-            if (t == typeid(execution::sequenced_task_policy))
-            {
-                return call(execution::seq, std::true_type(),
-                    std::forward<Args>(args)...);
-            }
-
-            if (t == typeid(execution::parallel_policy))
-            {
-                return call(
-                    *policy.get<execution::parallel_policy>(),
-                    std::false_type(), std::forward<Args>(args)...);
-            }
-
-            if (t == typeid(execution::parallel_task_policy))
-            {
-                execution::parallel_task_policy const& t =
-                    *policy.get<execution::parallel_task_policy>();
-
-                return call(execution::par.with(t.parameters()),
-                    std::false_type(), std::forward<Args>(args)...);
-            }
-
-            if (t == typeid(execution::parallel_unsequenced_policy))
-            {
-                return call(
-                    *policy.get<execution::parallel_unsequenced_policy>(),
-                    std::false_type(), std::forward<Args>(args)...);
-            }
-
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                std::string("hpx::parallel::") + name_,
-                "The given execution policy is not supported");
-        }
-
-        template <typename... Args>
-        local_result_type
-        call(parallel::execution_policy, std::true_type, Args&&... args) const
-        {
-            return call(execution::seq, std::true_type(), std::forward<Args>(args)...);
-        }
-#endif
 
     private:
         char const* const name_;

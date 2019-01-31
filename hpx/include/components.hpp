@@ -18,7 +18,6 @@
 
 #include <hpx/runtime/components/component_type.hpp>
 
-#include <hpx/runtime/components/memory_block.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 
 #include <hpx/runtime/components/server/memory.hpp>

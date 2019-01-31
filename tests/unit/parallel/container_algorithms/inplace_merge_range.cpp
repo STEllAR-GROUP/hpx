@@ -172,17 +172,6 @@ void test_inplace_merge()
 
     test_inplace_merge_async(execution::seq(execution::task), DataType());
     test_inplace_merge_async(execution::par(execution::task), DataType());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_inplace_merge(execution_policy(execution::seq), DataType());
-    test_inplace_merge(execution_policy(execution::par), DataType());
-    test_inplace_merge(execution_policy(execution::par_unseq), DataType());
-
-    test_inplace_merge(execution_policy(execution::seq(execution::task)),
-        DataType());
-    test_inplace_merge(execution_policy(execution::par(execution::task)),
-        DataType());
-#endif
 }
 
 void test_inplace_merge()

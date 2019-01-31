@@ -17,7 +17,7 @@ if(HPX_WITH_COMPRESSION_ZLIB)
   endif()
 endif()
 
-macro(add_zlib_module)
+function(add_zlib_module)
   hpx_debug("add_zlib_module" "ZLIB_FOUND: ${ZLIB_FOUND}")
   if(HPX_WITH_COMPRESSION_ZLIB)
     if(NOT MSVC)
@@ -34,7 +34,7 @@ macro(add_zlib_module)
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${ZLIB_LIBRARIES})
 
-    add_hpx_pseudo_dependencies(plugins.binary_filter.zlib compress_zlib_lib)
+    add_hpx_pseudo_dependencies(plugins.binary_filter.zlib compress_zlib)
     add_hpx_pseudo_dependencies(core plugins.binary_filter.zlib)
   endif()
-endmacro()
+endfunction()

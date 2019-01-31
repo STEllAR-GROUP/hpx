@@ -21,11 +21,11 @@
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <boost/io/ios_state.hpp>
-#include <boost/scoped_ptr.hpp>
 
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -477,7 +477,7 @@ namespace hpx { namespace threads
                 // Strict binding not supported or failed, try weak binding.
                 if (hwloc_set_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
                 {
-                    boost::scoped_ptr<char> buffer(new char [1024]);
+                    std::unique_ptr<char[]> buffer(new char [1024]);
 
                     hwloc_bitmap_snprintf(buffer.get(), 1024, cpuset);
                     hwloc_bitmap_free(cpuset);
@@ -555,6 +555,36 @@ namespace hpx { namespace threads
         hwloc_bitmap_free(nodeset);
         return empty_mask;
     } // }}}
+
+    std::size_t topology::init_numa_node_number(std::size_t num_thread)
+    {
+#if HWLOC_API_VERSION >= 0x00020000
+        if (std::size_t(-1) == num_thread)
+            return std::size_t(-1);
+
+        std::size_t num_pu = (num_thread + pu_offset) % num_of_pus_;
+
+        hwloc_obj_t obj;
+        {
+            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU,
+                static_cast<unsigned>(num_pu));
+            HPX_ASSERT(num_pu == detail::get_index(obj));
+        }
+
+        hwloc_obj_t tmp = nullptr;
+        while ((tmp = hwloc_get_next_obj_by_type(topo, HWLOC_OBJ_NUMANODE, tmp))
+                != nullptr) {
+            if (hwloc_bitmap_intersects(tmp->cpuset, obj->cpuset)) {
+                /* tmp matches, use it */
+                return tmp->logical_index;
+            }
+        }
+        return 0;
+#else
+        return init_node_number(num_thread, HWLOC_OBJ_NODE);
+#endif
+    }
 
     std::size_t topology::init_node_number(
         std::size_t num_thread, hwloc_obj_type_t type
@@ -678,7 +708,7 @@ namespace hpx { namespace threads
 
     std::size_t topology::get_number_of_numa_nodes() const
     {
-        int nobjs =  hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NODE);
+        int nobjs =  hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NUMANODE);
         if(0 > nobjs)
         {
             HPX_THROW_EXCEPTION(kernel_error
@@ -1317,7 +1347,7 @@ namespace hpx { namespace threads
 
     int topology::get_numa_domain(const void *addr) const
     {
-#if HWLOC_API_VERSION >= 0x00010b00
+#if HWLOC_API_VERSION >= 0x00010b06
         hpx_hwloc_bitmap_wrapper *nodeset = topology::bitmap_storage_.get();
         if (nullptr == nodeset)
         {

@@ -27,7 +27,7 @@ if(HPX_WITH_EXAMPLES_HDF5)
     FOLDER "Examples/ShenEOS")
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.sheneos sheneos_client_exe)
+  add_hpx_pseudo_dependencies(examples.sheneos sheneos_client)
 
   add_hpx_executable(sheneos_test
     SOURCES sheneos_test.cpp
@@ -35,7 +35,7 @@ if(HPX_WITH_EXAMPLES_HDF5)
     FOLDER "Examples/ShenEOS")
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.sheneos sheneos_test_exe)
+  add_hpx_pseudo_dependencies(examples.sheneos sheneos_test)
 
   # TODO: Fix example. Not added to unit tests until fixed.
 
@@ -56,13 +56,13 @@ if(HPX_WITH_EXAMPLES_HDF5)
         DEPENDENCIES sheneos_component ${HDF5_FORTRAN_LIBRARY} ${HDF5_LIBRARY}
         FOLDER "Examples/ShenEOS")
 
-      set_target_properties(sheneos_compare_exe
+      set_target_properties(sheneos_compare
           PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")
-      set_target_properties(sheneos_compare_exe
+      set_target_properties(sheneos_compare
           PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
 
       # add dependencies to pseudo-target
-      add_hpx_pseudo_dependencies(examples.sheneos sheneos_compare_exe)
+      add_hpx_pseudo_dependencies(examples.sheneos sheneos_compare)
     endif()
   endif()
 endif()

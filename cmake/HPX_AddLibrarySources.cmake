@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-macro(add_hpx_library_sources name globtype)
+function(add_hpx_library_sources name globtype)
   set(options APPEND)
   set(one_value_args)
   set(multi_value_args EXCLUDE GLOBS)
@@ -34,10 +34,10 @@ macro(add_hpx_library_sources name globtype)
         CACHE INTERNAL "Sources for lib${name}." FORCE)
     endif()
   endforeach()
-endmacro()
+endfunction()
 
 ###############################################################################
-macro(add_hpx_library_sources_noglob name)
+function(add_hpx_library_sources_noglob name)
   set(options APPEND)
   set(one_value_args)
   set(multi_value_args EXCLUDE SOURCES)
@@ -70,5 +70,5 @@ macro(add_hpx_library_sources_noglob name)
         CACHE INTERNAL "Sources for lib${name}." FORCE)
     endif()
   endforeach()
-endmacro()
+endfunction()
 

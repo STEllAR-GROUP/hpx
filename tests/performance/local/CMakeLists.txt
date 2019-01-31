@@ -182,18 +182,18 @@ foreach(benchmark ${benchmarks})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.performance.local.${benchmark}
-                              ${benchmark}_test_exe)
+                              ${benchmark}_test)
 
 endforeach()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
-  set_target_properties(openmp_homogeneous_timed_task_spawn_test_exe
+  set_target_properties(openmp_homogeneous_timed_task_spawn_test
     PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(openmp_homogeneous_timed_task_spawn_test_exe
+  set_target_properties(openmp_homogeneous_timed_task_spawn_test
     PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(openmp_parallel_region_test_exe
+  set_target_properties(openmp_parallel_region_test
     PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(openmp_parallel_region_test_exe
+  set_target_properties(openmp_parallel_region_test
     PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()
 

@@ -16,8 +16,7 @@ function(hpx_setup_target target)
   set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INSTALL_FLAGS)
   cmake_parse_arguments(target "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-  hpx_is_target(is_target ${target})
-  if(NOT is_target)
+  if(NOT TARGET ${target})
     hpx_error("${target} does not represent a target")
   endif()
 
@@ -217,6 +216,10 @@ function(hpx_setup_target target)
   endif()
 
   target_link_libraries(${target} ${HPX_TLL_PUBLIC} ${hpx_libs} ${target_DEPENDENCIES})
+
+  if(TARGET hpx_internal_flags)
+    target_link_libraries(${target} PRIVATE hpx_internal_flags)
+  endif()
 
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)
 

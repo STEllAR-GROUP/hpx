@@ -75,7 +75,6 @@ namespace hpx
 
         class runtime_support;
         class memory;
-        class memory_block;
 
         class pinned_ptr;
 
@@ -83,14 +82,12 @@ namespace hpx
         {
             struct runtime_support;
             struct memory;
-            struct memory_block;
         }
 
         namespace server
         {
             class HPX_API_EXPORT runtime_support;
             class HPX_API_EXPORT memory;
-            class HPX_API_EXPORT memory_block;
         }
 
         HPX_EXPORT void console_logging(logging_destination dest,

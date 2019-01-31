@@ -12,6 +12,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/threads.hpp>
@@ -35,6 +36,7 @@ using hpx::naming::id_type;
 
 using hpx::future;
 using hpx::async;
+using hpx::apply;
 using hpx::lcos::wait_each;
 
 using hpx::util::high_resolution_timer;
@@ -170,7 +172,7 @@ void measure_function_futures_thread_count(std::uint64_t count, bool csv)
     high_resolution_timer walltime;
 
     for (std::uint64_t i = 0; i < count; ++i)
-        async(&null_function);
+        apply(&null_function);
 
     // Yield until there is only this and background threads left.
     auto this_pool = hpx::this_thread::get_pool();

@@ -55,12 +55,12 @@ namespace hpx { namespace components
         static threads::thread_function_type
         decorate_action(naming::address::address_type lva, F && f)
         {
-            return util::bind(
-                util::one_shot(&locking_hook::thread_function),
+            return util::one_shot(util::bind(
+                &locking_hook::thread_function,
                 get_lva<this_component_type>::call(lva),
                 util::placeholders::_1,
                 traits::component_decorate_function<base_type>::call(
-                    lva, std::forward<F>(f)));
+                    lva, std::forward<F>(f))));
         }
 
     protected:

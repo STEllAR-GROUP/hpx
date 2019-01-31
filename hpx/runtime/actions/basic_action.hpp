@@ -298,15 +298,15 @@ namespace hpx { namespace actions
                 target.get_management_type() == naming::id_type::unmanaged)
             {
                 return traits::action_decorate_function<Derived>::call(lva,
-                    util::bind(util::one_shot(
-                        typename Derived::thread_function()),
-                        lva, comptype, std::forward<Ts>(vs)...));
+                    util::one_shot(util::bind(
+                        typename Derived::thread_function(),
+                        lva, comptype, std::forward<Ts>(vs)...)));
             }
 
             return traits::action_decorate_function<Derived>::call(lva,
-                util::bind(util::one_shot(
-                    typename Derived::thread_function(target)),
-                    lva, comptype, std::forward<Ts>(vs)...));
+                util::one_shot(util::bind(
+                    typename Derived::thread_function(target),
+                    lva, comptype, std::forward<Ts>(vs)...)));
         }
 
         // This static construct_thread_function allows to construct
@@ -622,7 +622,6 @@ namespace hpx { namespace actions
         console_error_sink_action_id,
         console_logging_action_id,
         console_print_action_id,
-        create_memory_block_action_id,
         create_performance_counter_action_id,
         dijkstra_termination_action_id,
         free_component_action_id,
@@ -648,11 +647,6 @@ namespace hpx { namespace actions
         locality_namespace_get_num_threads_action_id,
         locality_namespace_get_num_overall_threads_action_id,
         locality_namespace_statistics_counter_action_id,
-        memory_block_checkin_action_id,
-        memory_block_checkout_action_id,
-        memory_block_clone_action_id,
-        memory_block_get_action_id,
-        memory_block_get_config_action_id,
         output_stream_write_async_action_id,
         output_stream_write_sync_action_id,
         performance_counter_get_counter_info_action_id,
@@ -692,8 +686,6 @@ namespace hpx { namespace actions
         terminate_action_id,
         terminate_all_action_id,
         update_agas_cache_action_id,
-        register_worker_security_action_id,
-        notify_worker_security_action_id,
 
         base_lco_with_value_gid_get,
         base_lco_with_value_gid_set,
@@ -861,6 +853,7 @@ namespace hpx { namespace serialization
 #define HPX_REGISTER_ACTION_1(action)                                         \
     HPX_REGISTER_ACTION_2(action, action)                                     \
 /**/
+#if defined(HPX_MSVC) || defined(HPX_MINGW)
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
@@ -871,6 +864,17 @@ namespace hpx { namespace serialization
             transfer_continuation_action< action>;                            \
     }}                                                                        \
 /**/
+#else
+#define HPX_REGISTER_ACTION_2(action, actionname)                             \
+    HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
+    HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
+    HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                        \
+    namespace hpx { namespace actions {                                       \
+        template struct transfer_action< action>;                             \
+        template struct transfer_continuation_action< action>;                \
+    }}                                                                        \
+/**/
+#endif
 
 #if defined(HPX_MSVC) || defined(HPX_MINGW)
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \

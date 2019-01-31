@@ -28,7 +28,6 @@
 #define LPCS_(lvl)  LHPX_(lvl, " [PCS] ")   /* performance counters */
 #define LAS_(lvl)   LHPX_(lvl, "  [AS] ")   /* addressing service */
 #define LBT_(lvl)   LHPX_(lvl, "  [BT] ")   /* bootstrap */
-#define LSEC_(lvl)  LHPX_(lvl, " [SEC] ")   /* security */
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -275,7 +274,6 @@ namespace hpx { namespace util { namespace detail
     #define LPCS_(lvl)            if(true) {} else hpx::util::detail::dummy_log
     #define LAS_(lvl)             if(true) {} else hpx::util::detail::dummy_log
     #define LBT_(lvl)             if(true) {} else hpx::util::detail::dummy_log
-    #define LSEC_(lvl)            if(true) {} else hpx::util::detail::dummy_log
 
     #define LFATAL_               if(true) {} else hpx::util::detail::dummy_log
 

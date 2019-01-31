@@ -150,7 +150,7 @@ template <class Container>
 void test_when_each_n_from_list_iterators()
 {
     unsigned count = 10;
-    unsigned const n = 5;
+    unsigned n = 5;
 
     unsigned call_count = 0;
     unsigned call_with_index_count = 0;

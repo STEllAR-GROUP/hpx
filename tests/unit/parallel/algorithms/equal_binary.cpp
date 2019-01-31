@@ -122,17 +122,6 @@ void test_equal_binary1()
 
     test_equal_binary1_async(execution::seq(execution::task), IteratorTag());
     test_equal_binary1_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_equal_binary1(execution_policy(execution::seq), IteratorTag());
-    test_equal_binary1(execution_policy(execution::par), IteratorTag());
-    test_equal_binary1(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_equal_binary1(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_equal_binary1(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void equal_binary_test1()
@@ -245,17 +234,6 @@ void test_equal_binary2()
 
     test_equal_binary2_async(execution::seq(execution::task), IteratorTag());
     test_equal_binary2_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_equal_binary2(execution_policy(execution::seq), IteratorTag());
-    test_equal_binary2(execution_policy(execution::par), IteratorTag());
-    test_equal_binary2(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_equal_binary2(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_equal_binary2(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void equal_binary_test2()
@@ -362,16 +340,6 @@ void test_equal_binary_exception()
         IteratorTag());
     test_equal_binary_exception_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_equal_binary_exception(execution_policy(execution::seq), IteratorTag());
-    test_equal_binary_exception(execution_policy(execution::par), IteratorTag());
-
-    test_equal_binary_exception(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_equal_binary_exception(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void equal_binary_exception_test()
@@ -476,16 +444,6 @@ void test_equal_binary_bad_alloc()
         IteratorTag());
     test_equal_binary_bad_alloc_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_equal_binary_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_equal_binary_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_equal_binary_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_equal_binary_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void equal_binary_bad_alloc_test()

@@ -89,9 +89,8 @@ namespace hpx { namespace threads
                 F, Future, Ts...
             >::type result_type;
 
-        auto func = hpx::util::bind_back(
-            hpx::util::one_shot(std::forward<F>(f)),
-            std::forward<Ts>(ts)...);
+        auto func = hpx::util::one_shot(hpx::util::bind_back(
+            std::forward<F>(f), std::forward<Ts>(ts)...));
 
         typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
             hpx::lcos::detail::make_continuation_exec<result_type>(
@@ -113,7 +112,32 @@ namespace hpx { namespace threads
     {
         exec.add(
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
-            "hpx::parallel::execution::post");
+            "hpx::parallel::execution::post",
+            threads::pending,
+            true,
+            exec.get_stacksize(),
+            threads::thread_schedule_hint(),
+            throws);
+    }
+    ///////////////////////////////////////////////////////////////////////////
+    // post()
+    template <typename Executor, typename F, typename Hint, typename ... Ts>
+    HPX_FORCEINLINE
+    typename std::enable_if<
+        hpx::traits::is_threads_executor<Executor>::value &&
+        std::is_same<typename hpx::util::decay<Hint>::type,
+            hpx::threads::thread_schedule_hint>::value
+    >::type
+    post(Executor && exec, F && f, Hint && hint, Ts &&... ts)
+    {
+        exec.add(
+            util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
+            "hpx::parallel::execution::post",
+            threads::pending,
+            true,
+            exec.get_stacksize(),
+            std::forward<Hint>(hint),
+            throws);
     }
 
     ///////////////////////////////////////////////////////////////////////////

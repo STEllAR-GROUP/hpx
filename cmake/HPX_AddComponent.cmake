@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-macro(add_hpx_component name)
+function(add_hpx_component name)
   # retrieve arguments
   set(options EXCLUDE_FROM_ALL AUTOGLOB STATIC PLUGIN)
   set(one_value_args INI FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX LANGUAGE)
@@ -102,10 +102,10 @@ macro(add_hpx_component name)
     set(exclude_from_all EXCLUDE_FROM_ALL)
   else()
     if(${name}_PLUGIN AND NOT HPX_WITH_STATIC_LINKING)
-      set(install_destination ${LIB}/hpx)
+      set(install_destination ${CMAKE_INSTALL_LIBDIR}/hpx)
       set(${name}_OUTPUT_SUFFIX hpx)
     else()
-      set(install_destination ${LIB})
+      set(install_destination ${CMAKE_INSTALL_LIBDIR})
     endif()
     if(${name}_INSTALL_SUFFIX)
       set(install_destination ${${name}_INSTALL_SUFFIX})
@@ -186,5 +186,5 @@ macro(add_hpx_component name)
     ${_target_flags}
     ${install_optional}
   )
-endmacro()
+endfunction()
 

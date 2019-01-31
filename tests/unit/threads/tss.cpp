@@ -10,6 +10,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <chrono>
 #include <mutex>
 #include <vector>
 #include <utility>
@@ -101,6 +102,12 @@ void test_tss_with_custom_cleanup()
     hpx::thread t(&tss_thread_with_custom_cleanup);
     t.join();
 
+    // make sure the custom cleanup can run first (this is necessary as the TSS
+    // cleanup runs after the exit callbacks of a thread, which in this case
+    // might cause the t.join() above to return before the TSS was actually
+    // cleaned up.
+    hpx::this_thread::sleep_for(std::chrono::microseconds(100));
+
     HPX_TEST(tss_cleanup_called);
 }
 
@@ -141,7 +148,7 @@ struct dummy_class_tracks_deletions
 unsigned dummy_class_tracks_deletions::deletions = 0;
 
 hpx::threads::thread_specific_ptr<dummy_class_tracks_deletions>
-    tss_with_null_cleanup(0);
+    tss_with_null_cleanup(nullptr);
 
 void tss_thread_with_null_cleanup(dummy_class_tracks_deletions* delete_tracker)
 {
@@ -191,7 +198,7 @@ void test_tss_cleanup_not_called_for_null_pointer()
     local_tss.reset(new Dummy);
 
     tss_cleanup_called = false;
-    local_tss.reset(0);
+    local_tss.reset(nullptr);
     HPX_TEST(tss_cleanup_called);
 
     tss_cleanup_called = false;
