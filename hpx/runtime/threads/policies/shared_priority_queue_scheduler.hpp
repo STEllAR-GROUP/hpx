@@ -30,6 +30,7 @@
 #include <string>
 #include <numeric>
 #include <type_traits>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -1208,6 +1209,26 @@ namespace hpx { namespace threads { namespace policies {
 
                 HPX_ASSERT(num_domains_ <= HPX_HAVE_MAX_NUMA_DOMAIN_COUNT);
 
+                // if we have zero cores on a numa domain, then reindex the domains to be
+                // sequential otherwise it messes up counting as a simple indexing operation
+                {
+                    std::vector<std::size_t> d_inx(d_lookup_.begin(), d_lookup_.end());
+                    // reduce list of all used domains to simple unique sort list
+                    std::sort(d_inx.begin(), d_inx.end(), std::less<std::size_t>());
+                    auto last = std::unique(d_inx.begin(), d_inx.end());
+                    d_inx.erase(last, d_inx.end());
+                    num_domains_ = d_inx.size();
+                    // turn list into a map
+                    std::map<std::size_t, std::size_t> domain_map;
+                    std::size_t index = 0;
+                    for (auto d : d_inx) domain_map.emplace(d, index++);
+                    // replace old domain number with new one
+                    for (std::size_t d=0; d<d_lookup_.size(); ++d) {
+                        d_lookup_[d] = domain_map[d_lookup_[d]];
+                    }
+                }
+
+                // count cores per domain and assign queues accordingly
                 for (std::size_t local_id=0; local_id!=num_workers_; ++local_id)
                 {
                     q_lookup_[local_id] = q_counts_[d_lookup_[local_id]]++;
