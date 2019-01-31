@@ -530,6 +530,22 @@ namespace detail
         {
             // set the received result, reset error status
             try {
+                // store the value
+                set_value(std::forward<T>(result));
+            }
+            catch (...) {
+                // store the error instead
+                return set_exception(std::current_exception());
+            }
+        }
+
+        // helper functions for setting data (if successful) or the error (if
+        // non-successful)
+        template <typename T>
+        void set_remote_data(T && result)
+        {
+            // set the received result, reset error status
+            try {
                 typedef typename util::decay<T>::type naked_type;
 
                 typedef traits::get_remote_result<

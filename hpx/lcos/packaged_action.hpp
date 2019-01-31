@@ -403,7 +403,7 @@ namespace lcos {
                         auto && result = action_type::execute_function(
                             addr.address_, addr.type_, std::forward<Ts>(vs)...);
                         this->shared_state_->mark_as_started();
-                        this->shared_state_->set_data(std::move(result));
+                        this->shared_state_->set_remote_data(std::move(result));
                         return;
                     }
                 }
@@ -413,7 +413,7 @@ namespace lcos {
                     auto && result = action_type::execute_function(
                         addr.address_, addr.type_, std::forward<Ts>(vs)...);
                     this->shared_state_->mark_as_started();
-                    this->shared_state_->set_data(std::move(result));
+                    this->shared_state_->set_remote_data(std::move(result));
                     return;
                 }
             }
@@ -446,7 +446,7 @@ namespace lcos {
                         auto && result = action_type::execute_function(
                             addr.address_, addr.type_, std::forward<Ts>(vs)...);
                         this->shared_state_->mark_as_started();
-                        this->shared_state_->set_data(std::move(result));
+                        this->shared_state_->set_remote_data(std::move(result));
                         return;
                     }
                 }
@@ -456,7 +456,7 @@ namespace lcos {
                     auto && result = action_type::execute_function(
                         addr.address_, addr.type_, std::forward<Ts>(vs)...);
                     this->shared_state_->mark_as_started();
-                    this->shared_state_->set_data(std::move(result));
+                    this->shared_state_->set_remote_data(std::move(result));
                     return;
                 }
             }
@@ -490,7 +490,7 @@ namespace lcos {
                         auto && result = action_type::execute_function(
                             addr.address_, addr.type_, std::forward<Ts>(vs)...);
                         this->shared_state_->mark_as_started();
-                        this->shared_state_->set_data(std::move(result));
+                        this->shared_state_->set_remote_data(std::move(result));
 
                         // invoke callback
                         cb(boost::system::error_code(), parcelset::parcel());
@@ -503,7 +503,7 @@ namespace lcos {
                     auto && result = action_type::execute_function(
                         addr.address_, addr.type_, std::forward<Ts>(vs)...);
                     this->shared_state_->mark_as_started();
-                    this->shared_state_->set_data(std::move(result));
+                    this->shared_state_->set_remote_data(std::move(result));
 
                     // invoke callback
                     cb(boost::system::error_code(), parcelset::parcel());
@@ -539,7 +539,7 @@ namespace lcos {
                         auto && result = action_type::execute_function(
                             addr.address_, addr.type_, std::forward<Ts>(vs)...);
                         this->shared_state_->mark_as_started();
-                        this->shared_state_->set_data(std::move(result));
+                        this->shared_state_->set_remote_data(std::move(result));
 
                         // invoke callback
                         cb(boost::system::error_code(), parcelset::parcel());
@@ -552,7 +552,7 @@ namespace lcos {
                     auto && result = action_type::execute_function(
                         addr.address_, addr.type_, std::forward<Ts>(vs)...);
                     this->shared_state_->mark_as_started();
-                    this->shared_state_->set_data(std::move(result));
+                    this->shared_state_->set_remote_data(std::move(result));
 
                     // invoke callback
                     cb(boost::system::error_code(), parcelset::parcel());
