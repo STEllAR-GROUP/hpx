@@ -1238,20 +1238,23 @@ namespace hpx { namespace threads { namespace policies {
                 for (std::size_t i = 0; i < num_domains_; ++i)
                 {
                     std::size_t queues = (std::max)(
-                        q_counts_[i] / cores_per_queue_.high_priority,
+                        static_cast<std::size_t>(0.5 + q_counts_[i] /
+                            static_cast<double>(cores_per_queue_.high_priority)),
                         std::size_t(1));
                     hp_queues_[i].init(
                         q_counts_[i], queues, thread_queue_init_);
 
                     queues = (std::max)(
-                        q_counts_[i] / cores_per_queue_.normal_priority,
+                        static_cast<std::size_t>(0.5 + q_counts_[i] /
+                            static_cast<double>(cores_per_queue_.normal_priority)),
                         std::size_t(1));
                     np_queues_[i].init(
                         q_counts_[i], queues, thread_queue_init_);
 
-                    queues =
-                        (std::max)(q_counts_[i] / cores_per_queue_.low_priority,
-                            std::size_t(1));
+                    queues = (std::max)(
+                        static_cast<std::size_t>(0.5 + q_counts_[i] /
+                            static_cast<double>(cores_per_queue_.low_priority)),
+                        std::size_t(1));
                     lp_queues_[i].init(
                         q_counts_[i], queues, thread_queue_init_);
                 }
