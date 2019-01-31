@@ -29,6 +29,7 @@
             -DHPX_WITH_THREAD_LOCAL_STORAGE=On
             -DCMAKE_EXPORT_COMPILE_COMMANDS=On
             -DHPX_WITH_DOCUMENTATION=On
+            -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=On
             ${CMAKE_EXTRA_FLAGS}
     except:
         - gh-pages
