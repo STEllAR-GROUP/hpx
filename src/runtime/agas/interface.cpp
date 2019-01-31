@@ -50,7 +50,8 @@ bool register_name(
 {
     if (&ec == &throws)
     {
-        return register_name(launch::sync, name, id.get_gid());
+        naming::resolver_client& agas_ = naming::get_agas_client();
+        return agas_.register_name(name, id);
     }
     return register_name(name, id).get(ec);
 }

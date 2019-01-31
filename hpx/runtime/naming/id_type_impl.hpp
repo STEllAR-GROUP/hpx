@@ -19,45 +19,29 @@
 namespace hpx { namespace naming
 {
     ///////////////////////////////////////////////////////////////////////////
-    inline void id_type::deallocate(detail::id_type_impl* p)
-    {
-        using detail::id_type_impl;
-        p->~id_type_impl();
-        alloc_.deallocate(p, 1);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // the local gid is actually just a wrapper around the real thing
     inline id_type::id_type(std::uint64_t lsb_id, management_type t)
-      : gid_(nullptr)
+      : gid_(new detail::id_type_impl(detail::id_type_impl::init_no_addref{}, 0,
+                 lsb_id, static_cast<detail::id_type_management>(t)),
+            false)
     {
-        detail::id_type_impl* p = alloc_.allocate(1);
-        new (p) detail::id_type_impl(
-            0, lsb_id, static_cast<detail::id_type_management>(t));
-        gid_.reset(p, false);
     }
 
     inline id_type::id_type(gid_type const& gid, management_type t)
-      : gid_(nullptr)
+      : gid_(new detail::id_type_impl(detail::id_type_impl::init_no_addref{},
+                 gid, static_cast<detail::id_type_management>(t)),
+            false)
     {
-        detail::id_type_impl* p = alloc_.allocate(1);
-        new (p) detail::id_type_impl(
-            gid, static_cast<detail::id_type_management>(t));
-        gid_.reset(p, false);
-
         if (t == unmanaged)
             detail::strip_internal_bits_except_dont_cache_from_gid(*gid_);
     }
 
-    inline id_type::id_type(std::uint64_t msb_id, std::uint64_t lsb_id,
-            management_type t)
-      : gid_(nullptr)
+    inline id_type::id_type(
+            std::uint64_t msb_id, std::uint64_t lsb_id, management_type t)
+      : gid_(new detail::id_type_impl(detail::id_type_impl::init_no_addref{},
+                 msb_id, lsb_id, static_cast<detail::id_type_management>(t)),
+            false)
     {
-        detail::id_type_impl* p = alloc_.allocate(1);
-        new (p) detail::id_type_impl(
-            msb_id, lsb_id, static_cast<detail::id_type_management>(t));
-        gid_.reset(p, false);
-
         if (t == unmanaged)
             detail::strip_internal_bits_except_dont_cache_from_gid(*gid_);
     }

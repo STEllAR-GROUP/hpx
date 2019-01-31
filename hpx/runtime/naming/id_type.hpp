@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/util/internal_allocator.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -36,10 +35,6 @@ namespace hpx { namespace naming
     private:
         friend struct detail::id_type_impl;
 
-        id_type(detail::id_type_impl* p) noexcept
-          : gid_(p)
-        {}
-
     public:
         enum management_type
         {
@@ -63,22 +58,16 @@ namespace hpx { namespace naming
         id_type(id_type && o) noexcept
           : gid_(std::move(o.gid_))
         {
-            o.gid_.reset();
         }
 
         id_type & operator=(id_type const & o) noexcept
         {
-            if (this != &o)
-                gid_ = o.gid_;
+            gid_ = o.gid_;
             return *this;
         }
         id_type & operator=(id_type && o) noexcept
         {
-            if (this != &o)
-            {
-                gid_ = std::move(o.gid_);
-                o.gid_.reset();
-            }
+            gid_ = std::move(o.gid_);
             return *this;
         }
 
@@ -115,8 +104,6 @@ namespace hpx { namespace naming
         // care, or better, don't use this at all.
         void make_unmanaged() const;
 
-        static void deallocate(detail::id_type_impl* p);
-
     private:
         friend HPX_EXPORT std::ostream& operator<<(std::ostream& os,
             id_type const& id);
@@ -129,8 +116,6 @@ namespace hpx { namespace naming
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
         boost::intrusive_ptr<detail::id_type_impl> gid_;
-
-        static util::internal_allocator<detail::id_type_impl> alloc_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

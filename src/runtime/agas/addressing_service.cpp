@@ -1634,21 +1634,6 @@ void addressing_service::decref(
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-bool addressing_service::register_name(
-    std::string const& name
-  , naming::gid_type const& id
-  , error_code& ec
-    )
-{ // {{{
-    try {
-        return symbol_ns_.bind(name, naming::detail::get_stripped_gid(id));
-    }
-    catch (hpx::exception const& e) {
-        HPX_RETHROWS_IF(ec, e, "addressing_service::register_name");
-        return false;
-    }
-} // }}}
-
 static bool correct_credit_on_failure(future<bool> f, naming::id_type id,
     std::int64_t mutable_gid_credit, std::int64_t new_gid_credit)
 {
@@ -1661,10 +1646,45 @@ static bool correct_credit_on_failure(future<bool> f, naming::id_type id,
     return true;
 }
 
+bool addressing_service::register_name(
+    std::string const& name, naming::gid_type const& id, error_code& ec)
+{ // {{{
+    try
+    {
+        return symbol_ns_.bind(name, naming::detail::get_stripped_gid(id));
+    }
+    catch (hpx::exception const& e)
+    {
+        HPX_RETHROWS_IF(ec, e, "addressing_service::register_name");
+    }
+    return false;
+} // }}}
+
+bool addressing_service::register_name(
+    std::string const& name, naming::id_type const& id, error_code& ec)
+{
+    // We need to modify the reference count.
+    naming::gid_type& mutable_gid = const_cast<naming::id_type&>(id).get_gid();
+    naming::gid_type new_gid = naming::detail::split_gid_if_needed(mutable_gid).get();
+    std::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
+
+    try
+    {
+        return symbol_ns_.bind(name, new_gid);
+    }
+    catch (hpx::exception const& e)
+    {
+        if (new_credit != 0)
+        {
+            naming::detail::add_credit_to_gid(mutable_gid, new_credit);
+        }
+        HPX_RETHROWS_IF(ec, e, "addressing_service::register_name");
+    }
+    return false;
+}
+
 lcos::future<bool> addressing_service::register_name_async(
-    std::string const& name
-  , naming::id_type const& id
-    )
+    std::string const& name, naming::id_type const& id)
 { // {{{
     // We need to modify the reference count.
     naming::gid_type& mutable_gid = const_cast<naming::id_type&>(id).get_gid();

@@ -116,7 +116,7 @@ HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::detail::gid_serialization_data)
 namespace hpx { namespace naming
 {
     ///////////////////////////////////////////////////////////////////////////
-    util::internal_allocator<detail::id_type_impl> id_type::alloc_;
+    util::internal_allocator<detail::id_type_impl> detail::id_type_impl::alloc_;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -127,7 +127,7 @@ namespace hpx { namespace naming
             if (!get_runtime_ptr())
             {
                 // delete local gid representation in any case
-                id_type::deallocate(p);
+                delete p;
                 return;
             }
 
@@ -190,7 +190,7 @@ namespace hpx { namespace naming
                     }
                 }
             }
-            id_type::deallocate(p);   // delete local gid representation in any case
+            delete p;   // delete local gid representation in any case
         }
 
         // custom deleter for managed gid_types, will be called when the last
@@ -207,7 +207,7 @@ namespace hpx { namespace naming
             else
             {
                 // delete local gid representation if needed
-                id_type::deallocate(p);
+                delete p;
             }
         }
 
@@ -215,7 +215,7 @@ namespace hpx { namespace naming
         // copy of the corresponding naming::id_type goes out of scope
         void gid_unmanaged_deleter(id_type_impl* p)
         {
-            id_type::deallocate(p);   // delete local gid representation only
+            delete p;   // delete local gid representation only
         }
 
         ///////////////////////////////////////////////////////////////////////
