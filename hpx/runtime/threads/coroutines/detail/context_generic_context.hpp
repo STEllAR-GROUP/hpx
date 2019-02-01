@@ -256,7 +256,8 @@ namespace hpx { namespace threads { namespace coroutines
             {
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
                 return stack_size_ -
-                    (reinterpret_cast<std::size_t>(stack_pointer_) - get_stack_ptr());
+                    (get_stack_ptr() -
+                        reinterpret_cast<std::size_t>(stack_pointer_));
 #else
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
 #endif
