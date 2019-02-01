@@ -286,46 +286,49 @@ namespace hpx
     std::atomic<int> runtime::instance_number_counter_(-1);
 
     ///////////////////////////////////////////////////////////////////////////
-    util::thread_specific_ptr<runtime*, runtime::tls_tag> runtime::runtime_;
-    util::thread_specific_ptr<std::string, runtime::tls_tag> runtime::thread_name_;
-    util::thread_specific_ptr<std::uint64_t, runtime::tls_tag> runtime::uptime_;
+
+    namespace {
+        std::uint64_t& runtime_uptime()
+        {
+            static HPX_NATIVE_TLS std::uint64_t uptime;
+            return uptime;
+        }
+    }
+
+    namespace detail
+    {
+        std::string& runtime_thread_name()
+        {
+            static HPX_NATIVE_TLS std::string thread_name_;
+            return thread_name_;
+        }
+    }
 
     void runtime::init_tss()
     {
         // initialize our TSS
-        if (nullptr == runtime::runtime_.get())
+        runtime*& runtime_ = get_runtime_ptr();
+        if (nullptr == runtime_)
         {
             HPX_ASSERT(nullptr == threads::thread_self::get_self());
 
-            runtime::runtime_.reset(new runtime* (this));
-            runtime::uptime_.reset(new std::uint64_t);
-            *runtime::uptime_.get() = util::high_resolution_clock::now();
-
-            threads::thread_self::init_self(); // done in resource_partitioner
+            runtime_ = this;
+            runtime_uptime() = util::high_resolution_clock::now();
         }
     }
 
     void runtime::deinit_tss()
     {
         // reset our TSS
-        threads::thread_self::reset_self();
-        runtime::uptime_.reset();
-        runtime::runtime_.reset();
-        util::reset_held_lock_data();
-
+        runtime_uptime() = 0;
+        get_runtime_ptr() = nullptr;
         threads::reset_continuation_recursion_count();
-    }
-
-    std::string runtime::get_thread_name()
-    {
-        std::string const* str = runtime::thread_name_.get();
-        return str ? *str : "<unknown>";
     }
 
     std::uint64_t runtime::get_system_uptime()
     {
         std::int64_t diff =
-            util::high_resolution_clock::now() - *runtime::uptime_.get();
+            util::high_resolution_clock::now() - runtime_uptime();
         return diff < 0LL ? 0ULL : static_cast<std::uint64_t>(diff);
     }
 
@@ -845,19 +848,26 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     runtime& get_runtime()
     {
-        HPX_ASSERT(nullptr != runtime::runtime_.get());   // should have been initialized
-        return **runtime::runtime_;
+        HPX_ASSERT(get_runtime_ptr() != nullptr);
+        return *get_runtime_ptr();
     }
 
-    runtime* get_runtime_ptr()
+    runtime*& get_runtime_ptr()
     {
-        runtime** rt = runtime::runtime_.get();
-        return rt ? *rt : nullptr;
+        static HPX_NATIVE_TLS runtime* runtime_;
+        return runtime_;
     }
 
     naming::gid_type const & get_locality()
     {
         return get_runtime().get_agas_client().get_local_locality();
+    }
+
+    std::string get_thread_name()
+    {
+        std::string& thread_name = detail::runtime_thread_name();
+        if (thread_name.empty()) return "<unkown>";
+        return thread_name;
     }
 
     /// Register the current kernel thread with HPX, this should be done once
@@ -1234,16 +1244,7 @@ namespace hpx
 
     std::size_t get_worker_thread_num(error_code& ec)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-        {
-            HPX_THROWS_IF(
-                ec, invalid_status,
-                "hpx::get_worker_thread_num",
-                "the runtime system has not been initialized yet");
-            return std::size_t(-1);
-        }
-        return rt->get_thread_manager().get_worker_thread_num();
+        return threads::detail::get_thread_num_tss();
     }
 
     std::size_t get_num_worker_threads()
@@ -1276,8 +1277,7 @@ namespace hpx
         }
 
         bool numa_sensitive = false;
-        if (std::size_t(-1) !=
-            rt->get_thread_manager().get_worker_thread_num(&numa_sensitive))
+        if (std::size_t(-1) != get_worker_thread_num())
             return numa_sensitive;
         return false;
     }
@@ -1414,11 +1414,6 @@ namespace hpx
     std::uint32_t get_locality_id(error_code& ec)
     {
         return agas::get_locality_id(ec);
-    }
-
-    std::string get_thread_name()
-    {
-        return runtime::get_thread_name();
     }
 
     std::uint64_t get_system_uptime()

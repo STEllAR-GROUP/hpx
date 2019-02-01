@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compat/mutex.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -15,7 +16,6 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
-#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
@@ -591,8 +591,7 @@ namespace policies {
             case thread_schedule_hint_mode::thread_schedule_hint_mode_none:
             {
                 // Create thread on this worker thread if possible
-                std::size_t global_thread_num =
-                    threads::detail::thread_num_tss_.get_worker_thread_num();
+                std::size_t global_thread_num = hpx::get_worker_thread_num();
                 thread_num = this->global_to_local_thread_index(global_thread_num);
                 if (thread_num>=num_workers_) {
                     // This is a task being injected from a thread on another pool.
@@ -620,8 +619,7 @@ namespace policies {
                 domain_num = data.schedulehint.hint % num_domains_;
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
-                std::size_t global_thread_num =
-                    threads::detail::thread_num_tss_.get_worker_thread_num();
+                std::size_t global_thread_num = hpx::get_worker_thread_num();
                 thread_num = this->global_to_local_thread_index(global_thread_num);
                 if (d_lookup_[thread_num] == domain_num) {
                     q_index = q_lookup_[thread_num];
@@ -756,8 +754,7 @@ namespace policies {
             case thread_schedule_hint_mode::thread_schedule_hint_mode_none:
             {
                 // Create thread on this worker thread if possible
-                std::size_t global_thread_num =
-                    threads::detail::thread_num_tss_.get_worker_thread_num();
+                std::size_t global_thread_num = hpx::get_worker_thread_num();
                 thread_num = this->global_to_local_thread_index(global_thread_num);
                 if (thread_num>=num_workers_) {
                     // This is a task being injected from a thread on another pool.
@@ -786,8 +783,7 @@ namespace policies {
                 domain_num = schedulehint.hint % num_domains_;
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
-                std::size_t global_thread_num =
-                    threads::detail::thread_num_tss_.get_worker_thread_num();
+                std::size_t global_thread_num = hpx::get_worker_thread_num();
                 thread_num = this->global_to_local_thread_index(global_thread_num);
                 if (d_lookup_[thread_num] == domain_num) {
                     q_index = q_lookup_[thread_num];
@@ -846,8 +842,7 @@ namespace policies {
             case thread_schedule_hint_mode::thread_schedule_hint_mode_none:
             {
                 // Create thread on this worker thread if possible
-                std::size_t global_thread_num =
-                    threads::detail::thread_num_tss_.get_worker_thread_num();
+                std::size_t global_thread_num = hpx::get_worker_thread_num();
                 thread_num = this->global_to_local_thread_index(global_thread_num);
                 if (thread_num>=num_workers_) {
                     // This is a task being injected from a thread on another pool.
@@ -876,8 +871,7 @@ namespace policies {
                 domain_num = schedulehint.hint % num_domains_;
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
-                std::size_t global_thread_num =
-                    threads::detail::thread_num_tss_.get_worker_thread_num();
+                std::size_t global_thread_num = hpx::get_worker_thread_num();
                 thread_num = this->global_to_local_thread_index(global_thread_num);
                 if (d_lookup_[thread_num] == domain_num) {
                     q_index = q_lookup_[thread_num];

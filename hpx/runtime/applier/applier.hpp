@@ -162,14 +162,6 @@ namespace hpx { namespace applier
             return memory_id_;
         }
 
-    public:
-        // the TSS holds a pointer to the applier associated with a given
-        // OS thread
-        struct tls_tag {};
-        static hpx::util::thread_specific_ptr<applier*, tls_tag> applier_;
-        void init_tss();
-        void deinit_tss();
-
     private:
         parcelset::parcelhandler& parcel_handler_;
         threads::threadmanager& thread_manager_;

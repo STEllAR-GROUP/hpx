@@ -61,6 +61,11 @@ namespace hpx
     std::list<shutdown_function_type> global_pre_shutdown_functions;
     std::list<shutdown_function_type> global_shutdown_functions;
 
+    namespace detail
+    {
+        extern std::string& runtime_thread_name();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     void register_pre_startup_function(startup_function_type f)
     {
@@ -770,40 +775,36 @@ namespace hpx
         // initialize our TSS
         this->runtime::init_tss();
 
-        // initialize applier TSS
-        applier_.init_tss();
-
         // set the thread's name, if it's not already set
-        if (nullptr == runtime::thread_name_.get())
-        {
-            std::string* fullname = new std::string(locality);
-            if (!locality.empty())
-                *fullname += "/";
-            *fullname += context;
-            if (postfix && *postfix)
-                *fullname += postfix;
-            *fullname += "#" + std::to_string(num);
-            runtime::thread_name_.reset(fullname);
+        HPX_ASSERT(detail::runtime_thread_name().empty());
 
-            char const* name = runtime::thread_name_.get()->c_str();
+        std::string fullname = std::string(locality);
+        if (!locality.empty())
+            fullname += "/";
+        fullname += context;
+        if (postfix && *postfix)
+            fullname += postfix;
+        fullname += "#" + std::to_string(num);
+        detail::runtime_thread_name() = std::move(fullname);
 
-            // initialize thread mapping for external libraries (i.e. PAPI)
-            thread_support_->register_thread(name, ec);
+        char const* name = detail::runtime_thread_name().c_str();
 
-            // initialize coroutines context switcher
-            hpx::threads::coroutines::thread_startup(name);
+        // initialize thread mapping for external libraries (i.e. PAPI)
+        thread_support_->register_thread(name, ec);
 
-            // register this thread with any possibly active Intel tool
-            HPX_ITT_THREAD_SET_NAME(name);
+        // initialize coroutines context switcher
+        hpx::threads::coroutines::thread_startup(name);
 
-            // set thread name as shown in Visual Studio
-            util::set_thread_name(name);
+        // register this thread with any possibly active Intel tool
+        HPX_ITT_THREAD_SET_NAME(name);
+
+        // set thread name as shown in Visual Studio
+        util::set_thread_name(name);
 
 #if defined(HPX_HAVE_APEX)
-            if (std::strstr(name, "worker") != nullptr)
-                apex::register_thread(name);
+        if (std::strstr(name, "worker") != nullptr)
+            apex::register_thread(name);
 #endif
-        }
 
         // call thread-specific user-supplied on_error handler
         if (on_start_func_)
@@ -837,7 +838,7 @@ namespace hpx
 //                         , hpx::util::format(
 //                             "failed to set thread affinity mask ("
 //                             HPX_CPU_MASK_PREFIX "{:x}) for service thread: {}",
-//                             used_processing_units, runtime::thread_name_.get()));
+//                             used_processing_units, detail::runtime_thread_name()));
 //                 }
             }
 #endif
@@ -855,9 +856,6 @@ namespace hpx
         // initialize coroutines context switcher
         hpx::threads::coroutines::thread_shutdown();
 
-        // reset applier TSS
-        applier_.deinit_tss();
-
         // reset our TSS
         this->runtime::deinit_tss();
 
@@ -865,7 +863,7 @@ namespace hpx
         thread_support_->unregister_thread();
 
         // reset thread local storage
-        runtime::thread_name_.reset();
+        detail::runtime_thread_name().clear();
     }
 
     naming::gid_type
@@ -926,7 +924,7 @@ namespace hpx
     bool runtime_impl::register_thread(
         char const* name, std::size_t num, bool service_thread, error_code& ec)
     {
-        if (nullptr != runtime::thread_name_.get())
+        if (nullptr != get_runtime_ptr())
             return false;       // already registered
 
         // prefix thread name with locality number, if needed
@@ -944,10 +942,10 @@ namespace hpx
     /// Unregister an external OS-thread with HPX
     bool runtime_impl::unregister_thread()
     {
-        if (nullptr == runtime::thread_name_.get())
+        if (nullptr != get_runtime_ptr())
             return false;       // never registered
 
-        deinit_tss(get_thread_name().c_str(), hpx::get_worker_thread_num());
+        deinit_tss(detail::runtime_thread_name().c_str(), hpx::get_worker_thread_num());
         return true;
     }
 
