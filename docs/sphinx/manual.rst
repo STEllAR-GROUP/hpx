@@ -16,6 +16,7 @@ information on how to build and use |hpx| in different scenarios.
 .. toctree::
    :maxdepth: 2
 
+   manual/getting_hpx
    manual/building_hpx
    manual/creating_hpx_projects
    manual/starting_the_hpx_runtime

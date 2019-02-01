@@ -16,6 +16,8 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/predef/other/endian.h>
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -167,7 +169,7 @@ void test_normal_serialization(T& arg)
 
     // compose archive flags
     unsigned out_archive_flags = hpx::serialization::disable_data_chunking;
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
     out_archive_flags |= hpx::serialization::endian_little;
@@ -198,7 +200,7 @@ void test_normal_serialization(T1& arg1, T2& arg2)
 
     // compose archive flags
     unsigned out_archive_flags = hpx::serialization::disable_data_chunking;
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
     out_archive_flags |= hpx::serialization::endian_little;
@@ -230,7 +232,7 @@ void test_normal_serialization(double d, T1& arg1, std::string const& s,
 
     // compose archive flags
     unsigned out_archive_flags = hpx::serialization::disable_data_chunking;
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
     out_archive_flags |= hpx::serialization::endian_little;
@@ -263,7 +265,7 @@ void test_zero_copy_serialization(T& arg)
 
     // compose archive flags
     unsigned out_archive_flags = 0U;
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
     out_archive_flags |= hpx::serialization::endian_little;
@@ -294,7 +296,7 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
 
     // compose archive flags
     unsigned out_archive_flags = 0U;
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
     out_archive_flags |= hpx::serialization::endian_little;
@@ -326,7 +328,7 @@ void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
 
     // compose archive flags
     unsigned out_archive_flags = 0U;
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
     out_archive_flags |= hpx::serialization::endian_little;

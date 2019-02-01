@@ -24,7 +24,6 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -121,13 +120,6 @@ namespace hpx
             return state_.load() == state_stopped;
         }
 
-        // the TSS holds a pointer to the runtime associated with a given
-        // OS thread
-        struct tls_tag {};
-        static util::thread_specific_ptr<runtime*, tls_tag> runtime_;
-        static util::thread_specific_ptr<std::string, tls_tag> thread_name_;
-        static util::thread_specific_ptr<std::uint64_t, tls_tag> uptime_;
-
         /// \brief access configuration information
         util::runtime_configuration& get_config()
         {
@@ -142,9 +134,6 @@ namespace hpx
         {
             return static_cast<std::size_t>(instance_number_);
         }
-
-        /// \brief Return the name of the calling thread.
-        static std::string get_thread_name();
 
         /// \brief Return the system uptime measure on the thread executing this call
         static std::uint64_t get_system_uptime();

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,10 +14,11 @@
 #  include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 #endif
 
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
-#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
@@ -345,12 +346,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
             // FIXME: turn these values into performance counters
             std::int64_t executed_threads = 0, executed_thread_phases = 0;
-            std::uint64_t overall_times = 0, thread_times = 0;
+            std::int64_t overall_times = 0, thread_times = 0;
             std::int64_t idle_loop_count = 0, busy_loop_count = 0;
-            std::uint8_t task_active = 0;
+            bool task_active = false;
 
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
-            std::uint64_t bg_work = 0;
+            std::int64_t bg_work = 0;
             threads::detail::scheduling_counters counters(
                 executed_threads, executed_thread_phases,
                 overall_times, thread_times, idle_loop_count, busy_loop_count,
@@ -431,7 +432,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         HPX_ASSERT(std::size_t(-1) == orig_thread_num_);
 
         thread_num_ = thread_num;
-        orig_thread_num_ = threads::detail::thread_num_tss_.get_worker_thread_num();
+        orig_thread_num_ = hpx::get_worker_thread_num();
 
         std::atomic<hpx::state>& state = scheduler_.get_state(0);
         hpx::state expected = state_initialized;

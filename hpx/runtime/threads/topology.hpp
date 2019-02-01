@@ -18,7 +18,6 @@
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/resource/partitioner_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/static.hpp>
@@ -41,12 +40,30 @@ namespace hpx { namespace threads
         HPX_NON_COPYABLE(hpx_hwloc_bitmap_wrapper);
 
         // take ownership of the hwloc allocated bitmap
-        hpx_hwloc_bitmap_wrapper(void *bmp) {
-            bmp_ = reinterpret_cast<hwloc_bitmap_t >(bmp);
+        hpx_hwloc_bitmap_wrapper()
+          : bmp_(nullptr)
+        {
+        }
+
+        hpx_hwloc_bitmap_wrapper(void* bmp)
+          : bmp_(reinterpret_cast<hwloc_bitmap_t>(bmp))
+        {
         }
         // frees the hwloc allocated bitmap
-        ~hpx_hwloc_bitmap_wrapper() {
+        ~hpx_hwloc_bitmap_wrapper()
+        {
             hwloc_bitmap_free(bmp_);
+        }
+
+        void reset(hwloc_bitmap_t bmp)
+        {
+            if (bmp_) hwloc_bitmap_free(bmp_);
+            bmp_ = bmp;
+        }
+
+        explicit operator bool() const
+        {
+            return bmp_ != nullptr;
         }
 
         hwloc_bitmap_t get_bmp() const {
@@ -388,10 +405,6 @@ namespace hpx { namespace threads
         std::vector<mask_type> numa_node_affinity_masks_;
         std::vector<mask_type> core_affinity_masks_;
         std::vector<mask_type> thread_affinity_masks_;
-
-        struct tls_tag {};
-        static util::thread_specific_ptr<hpx_hwloc_bitmap_wrapper, tls_tag>
-            bitmap_storage_;
     };
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -18,6 +18,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/cstdint.hpp>
+#include <boost/predef/other/endian.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -228,7 +229,7 @@ namespace hpx { namespace serialization
             char* cptr = reinterpret_cast<char *>(&l); //-V206
             load_binary(cptr, static_cast<std::size_t>(size));
 
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
             if (endian_little())
                 reverse_bytes(size, cptr);
 #else

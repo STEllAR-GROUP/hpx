@@ -1378,19 +1378,13 @@ namespace hpx { namespace lcos
                 std::forward<Policy>(policy), std::forward<F>(f), ec);
         }
 
-        template <typename F>
-        typename hpx::traits::future_then_result<shared_future, F>::type
-        then(threads::executor& sched, F && f, error_code& ec = throws) const
-        {
-            return base_type::then(shared_future(*this),
-                sched, std::forward<F>(f), ec);
-        }
-
         template <typename Executor, typename F>
         typename util::lazy_enable_if<
             hpx::traits::is_one_way_executor<
                 typename std::decay<Executor>::type>::value ||
             hpx::traits::is_two_way_executor<
+                typename std::decay<Executor>::type>::value ||
+            hpx::traits::is_threads_executor<
                 typename std::decay<Executor>::type>::value
           , hpx::traits::future_then_executor_result<Executor, shared_future, F>
         >::type

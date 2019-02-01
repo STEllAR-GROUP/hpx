@@ -194,10 +194,16 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
     public:
-        static HPX_EXPORT void set_self(coroutine_self* self);
-        static HPX_EXPORT coroutine_self* get_self();
-        static HPX_EXPORT void init_self();
-        static HPX_EXPORT void reset_self();
+        static HPX_EXPORT coroutine_self*& local_self();
+
+        static void set_self(coroutine_self* self)
+        {
+            local_self() = self;
+        }
+        static coroutine_self* get_self()
+        {
+            return local_self();
+        }
 
 #if defined(HPX_HAVE_APEX)
         apex_task_wrapper get_apex_data(void) const

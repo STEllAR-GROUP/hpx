@@ -1250,6 +1250,12 @@ crucial for getting decent performance on the Xeon Phi.
 How to install |hpx| on Fedora distributions
 --------------------------------------------
 
+.. important::
+
+   There are official |hpx| packages for Fedora. Unless you want to customize
+   your build you may want to start off with the official packages. Instructions
+   can be found on the |stellar_hpx_download|_ page.
+
 .. note::
 
    This section of the manual is based off of our collaborators Patrick Diehl's
@@ -1302,7 +1308,13 @@ How to install |hpx| on Fedora distributions
 How to install |hpx| on Arch distributions
 ------------------------------------------
 
-* Install all packages for minimal installation:
+.. important::
+
+   There are |hpx| packages for Arch in the AUR. Unless you want to customize
+   your build you may want to start off with those. Instructions can be found on
+   the |stellar_hpx_download|_ page.
+
+* Install all packages for a minimal installation:
 
   .. code-block:: bash
 
@@ -1315,6 +1327,33 @@ How to install |hpx| on Arch distributions
      sudo pacman -S doxygen python-pip
 
      pip install --user sphinx sphinx_rtd_theme breathe
+
+The rest of the installation steps are same as provided with Fedora
+or Unix variants.
+
+How to install |hpx| on Debian-based distributions
+--------------------------------------------------
+
+* Install all packages for a minimal installation:
+
+  .. code-block:: bash
+
+     sudo apt install cmake libboost-all-dev hwloc libgoogle-perftools-dev
+
+* For building the documentation you will need to further install the following:
+
+  .. code-block:: bash
+
+     sudo apt install doxygen python-pip
+
+     pip install --user sphinx sphinx_rtd_theme breathe
+
+  or the following if you prefer to get Python packages from the Debian
+  repositories:
+
+  .. code-block:: bash
+
+     sudo apt install doxygen python-sphinx python-sphinx-rtd-theme python-breathe
 
 The rest of the installation steps are same as provided with Fedora
 or Unix variants.

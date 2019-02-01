@@ -111,7 +111,7 @@ function(write_config_defines_file)
   if (NOT OPTION_TEMPLATE)
     string(TOUPPER ${OPTION_NAMESPACE} NAMESPACE_UPPER)
     set(PREAMBLE
-      "//  Copyright (c) Ste||ar Group\n"
+      "//  Copyright (c) STE||AR Group\n"
       "//\n"
       "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
       "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"

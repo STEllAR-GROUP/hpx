@@ -245,14 +245,6 @@ namespace hpx { namespace threads
             }
         }
 
-        // Return the (global) sequence number of the current thread
-        std::size_t get_worker_thread_num(bool* /*numa_sensitive*/ = nullptr)
-        {
-            if (get_self_ptr() == nullptr)
-                return std::size_t(-1);
-            return detail::thread_num_tss_.get_worker_thread_num();
-        }
-
     public:
         /// The function register_counter_types() is called during startup to
         /// allow the registration of all performance counter types for this
@@ -300,12 +292,12 @@ namespace hpx { namespace threads
 
         void init_tss(std::size_t num)
         {
-            detail::thread_num_tss_.init_tss(num);
+            detail::set_thread_num_tss(num);
         }
 
         void deinit_tss()
         {
-            detail::thread_num_tss_.deinit_tss();
+            detail::set_thread_num_tss(std::size_t(-1));
         }
 
     public:

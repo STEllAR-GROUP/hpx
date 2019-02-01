@@ -12,8 +12,33 @@
 #include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
+#include <type_traits>
+
 namespace hpx { namespace util { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F>
+    static bool is_empty_function(std::false_type, F const&) noexcept
+    {
+        return false;
+    }
+
+    template <typename F>
+    static bool is_empty_function(std::true_type, F const& f) noexcept
+    {
+        return f == nullptr;
+    }
+
+    template <typename F>
+    static bool is_empty_function(F const& f) noexcept
+    {
+        using is_pointer = std::integral_constant<bool,
+            std::is_pointer<F>::value
+         || std::is_member_pointer<F>::value
+        >;
+        return is_empty_function(is_pointer{}, f);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     struct empty_function {}; // must be trivial and empty
 

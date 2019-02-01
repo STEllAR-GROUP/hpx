@@ -22,7 +22,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/integer/cover_operators.hpp>
 
-#include <boost/detail/endian.hpp>
+#include <boost/predef/other/endian.h>
 
 #include <climits>
 #include <cstddef>
@@ -179,7 +179,7 @@ namespace hpx { namespace util
       public:
         typedef T value_type;
         endian() {}
-#     ifdef BOOST_BIG_ENDIAN
+#     if BOOST_ENDIAN_BIG_BYTE
         endian(T i) { detail::store_big_endian<T, n_bits/8>(bytes, i); }
         operator T() const
           { return detail::load_big_endian<T, n_bits/8>(bytes); }
@@ -204,7 +204,7 @@ namespace hpx { namespace util
       public:
         typedef T value_type;
         endian() {}
-    #ifdef BOOST_BIG_ENDIAN
+    #if BOOST_ENDIAN_BIG_BYTE
         endian(T i) : integer(i) { }
         operator T() const { return integer; }
     #else
@@ -225,7 +225,7 @@ namespace hpx { namespace util
       public:
         typedef T value_type;
         endian() {}
-    #ifdef BOOST_LITTLE_ENDIAN
+    #if BOOST_ENDIAN_LITTLE_BYTE
         endian(T i) : integer(i) { }
         operator T() const { return integer; }
     #else

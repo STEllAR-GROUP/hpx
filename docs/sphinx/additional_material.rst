@@ -15,4 +15,4 @@ Additional material
   * `Recorded lectures <https://www.youtube.com/playlist?list=PL1tk5lGm7zvSXfS-sqOOmIJ0lFNjKze18>`_
   * `Slides <https://github.com/STEllAR-GROUP/tutorials/tree/master/cscs2016>`_
 * `Tutorials repository <https://github.com/STEllAR-GROUP/tutorials>`_
-* `Ste||ar group blog posts <http://stellar-group.org/blog/>`_
+* `STE||AR Group blog posts <http://stellar-group.org/blog/>`_

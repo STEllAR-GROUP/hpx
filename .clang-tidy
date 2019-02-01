@@ -1,0 +1,13 @@
+# Copyright (c) 2019 Thomas Heller
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+Checks: '-*,modernize-use-nullptr,misc-use-after-move,misc-virtual-near-miss,misc-multiple-statement-macro,misc-move-constructor-init,misc-move-forwarding-reference,misc-assert-side-effect,misc-dangling-handle,misc-non-copyable-objects,misc-forwarding-reference-overload,misc-unused-raii'
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*hpx.*'
+CheckOptions:
+  - key: misc-assert-side-effect.CheckFunctionCalls
+    value: 1
+  - key: misc-assert-side-effect.AssertMacros
+    value: 'HPX_ASSERT'

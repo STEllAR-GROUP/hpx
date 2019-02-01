@@ -21,8 +21,8 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/detail/endian.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/predef/other/endian.h>
 #include <boost/spirit/include/qi_alternative.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
@@ -1005,14 +1005,14 @@ namespace hpx { namespace util
         if (has_section("hpx.parcel")) {
             util::section const* sec = get_section("hpx.parcel");
             if (nullptr != sec) {
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
                 return sec->get_entry("endian_out", "big");
 #else
                 return sec->get_entry("endian_out", "little");
 #endif
             }
         }
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
         return "big";
 #else
         return "little";

@@ -23,7 +23,6 @@
 #include <hpx/runtime/threads/topology.hpp> //! FIXME remove
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <cstddef>
