@@ -1,0 +1,77 @@
+#  Copyright (c) 2018 Thomas Heller
+#
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+.debug-ubsan-x86: &debug-ubsan-x86
+    variables:
+        CMAKE_BUILD_TYPE: "Debug"
+        CMAKE_EXTRA_FLAGS: "-DCMAKE_CXX_FLAGS=-fsanitize=\"undefined -fno-omit-frame-pointer\" -DHPX_WITH_SANITIZERS=On"
+        TARGET_IMAGE_NAME: stellargroup/hpx:dev
+    tags:
+        - linux
+        - x86
+        - clang-7.0.1
+        - boost-1.65.1
+
+cmake Debug UBSAN x86:
+    <<: *debug-ubsan-x86
+    extends: .cmake
+
+core Debug UBSAN x86:
+    <<: *debug-ubsan-x86
+    extends: .core
+    dependencies:
+        - checkout
+        - cmake Debug UBSAN x86
+
+examples Debug UBSAN x86:
+    <<: *debug-ubsan-x86
+    variables:
+        TESTS: "examples"
+        UBSAN_OPTIONS: "print_stacktrace=1,halt_on_error=1"
+    extends: .test
+    dependencies:
+        - checkout
+        - core Debug UBSAN x86
+        - get conv.xsl
+        - get junit2html
+    artifacts:
+        paths:
+            - build
+
+tests.unit Debug UBSAN x86:
+    <<: *debug-ubsan-x86
+    variables:
+        TESTS: "tests.unit"
+        UBSAN_OPTIONS: "print_stacktrace=1,halt_on_error=1"
+    extends: .test
+    dependencies:
+        - checkout
+        - core Debug UBSAN x86
+        - get conv.xsl
+        - get junit2html
+
+tests.regressions Debug UBSAN x86:
+    <<: *debug-ubsan-x86
+    variables:
+        TESTS: "tests.regressions"
+        UBSAN_OPTIONS: "print_stacktrace=1,halt_on_error=1"
+    extends: .test
+    dependencies:
+        - checkout
+        - core Debug UBSAN x86
+        - get conv.xsl
+        - get junit2html
+
+tests.performance Debug UBSAN x86:
+    <<: *debug-ubsan-x86
+    variables:
+        TESTS: "tests.performance"
+        UBSAN_OPTIONS: "print_stacktrace=1,halt_on_error=1"
+    extends: .test
+    dependencies:
+        - checkout
+        - core Debug UBSAN x86
+        - get conv.xsl
+        - get junit2html

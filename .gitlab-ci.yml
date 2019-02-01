@@ -37,5 +37,7 @@ include:
     - .gitlab-ci/test.yml
     - .gitlab-ci/docker.yml
     - .gitlab-ci/linux/x86/clang-7.0.1/boost-1.65.1/debug.yml
+    - .gitlab-ci/linux/x86/clang-7.0.1/boost-1.65.1/debug-asan.yml
+    - .gitlab-ci/linux/x86/clang-7.0.1/boost-1.65.1/debug-ubsan.yml
     - .gitlab-ci/linux/x86/clang-7.0.1/boost-1.65.1/release.yml
     - .gitlab-ci/docs.yml

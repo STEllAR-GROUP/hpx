@@ -16,12 +16,12 @@
         - mkdir -p build
         - cd build
         - cmake --version
-        - cmake ../source -G "Ninja"
+        - eval cmake ../source -G "Ninja"
             -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
             -DHPX_WITH_MALLOC=system
             -DHPX_WITH_GIT_COMMIT=${CI_COMMIT_SHA}
-            -DHPX_WITH_GIT_BRANCH="${CI_COMMIT_REF_NAME}"
-            -DHPX_WITH_GIT_TAG="${CI_COMMIT_TAG}"
+            -DHPX_WITH_GIT_BRANCH=${CI_COMMIT_REF_NAME}
+            -DHPX_WITH_GIT_TAG=${CI_COMMIT_TAG}
             -DHPX_WITH_TOOLS=On
             -DCMAKE_CXX_FLAGS="-fcolor-diagnostics"
             -DHPX_WITH_TESTS_HEADERS=On

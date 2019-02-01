@@ -1,0 +1,78 @@
+#  Copyright (c) 2018 Thomas Heller
+#
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+.debug-asan-x86: &debug-asan-x86
+    variables:
+        CMAKE_BUILD_TYPE: "Debug"
+        CMAKE_EXTRA_FLAGS: "-DCMAKE_CXX_FLAGS=\"-fsanitize=address -fno-omit-frame-pointer\" -DHPX_WITH_SANITIZERS=On"
+        TARGET_IMAGE_NAME: stellargroup/hpx:dev
+    tags:
+        - linux
+        - x86
+        - clang-7.0.1
+        - boost-1.65.1
+
+cmake Debug ASAN x86:
+    <<: *debug-asan-x86
+    extends: .cmake
+
+core Debug ASAN x86:
+    <<: *debug-asan-x86
+    extends: .core
+    dependencies:
+        - checkout
+        - cmake Debug ASAN x86
+
+examples Debug ASAN x86:
+    <<: *debug-asan-x86
+    variables:
+        TESTS: "examples"
+        ASAN_OPTIONS: "detect_leaks=0"
+    extends: .test
+    dependencies:
+        - checkout
+        - core Debug ASAN x86
+        - get conv.xsl
+        - get junit2html
+    artifacts:
+        paths:
+            - build
+
+tests.unit Debug ASAN x86:
+    <<: *debug-asan-x86
+    variables:
+        TESTS: "tests.unit"
+        ASAN_OPTIONS: "detect_leaks=0"
+    extends: .test
+    dependencies:
+        - checkout
+        - core Debug ASAN x86
+        - get conv.xsl
+        - get junit2html
+
+tests.regressions Debug ASAN x86:
+    <<: *debug-asan-x86
+    variables:
+        TESTS: "tests.regressions"
+        ASAN_OPTIONS: "detect_leaks=0"
+    extends: .test
+    dependencies:
+        - checkout
+        - core Debug ASAN x86
+        - get conv.xsl
+        - get junit2html
+
+tests.performance Debug ASAN x86:
+    <<: *debug-asan-x86
+    variables:
+        TESTS: "tests.performance"
+        ASAN_OPTIONS: "detect_leaks=0"
+    extends: .test
+    dependencies:
+        - checkout
+        - core Debug ASAN x86
+        - get conv.xsl
+        - get junit2html
+
