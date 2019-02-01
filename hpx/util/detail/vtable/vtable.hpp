@@ -9,6 +9,7 @@
 #define HPX_UTIL_DETAIL_VTABLE_VTABLE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -46,12 +47,14 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         HPX_FORCEINLINE static T& get(void* obj)
         {
+            HPX_ASSERT(obj);
             return *reinterpret_cast<T*>(obj);
         }
 
         template <typename T>
         HPX_FORCEINLINE static T const& get(void const* obj)
         {
+            HPX_ASSERT(obj);
             return *reinterpret_cast<T const*>(obj);
         }
 
@@ -82,6 +85,8 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         HPX_FORCEINLINE static void _destruct(void* obj)
         {
+            if (obj == nullptr)
+                return;
             get<T>(obj).~T();
         }
         void (*destruct)(void*);

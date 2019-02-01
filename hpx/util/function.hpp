@@ -13,6 +13,7 @@
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
@@ -84,8 +85,9 @@ namespace hpx { namespace util
         {
             if (this->vptr == other.vptr)
             {
-                if (this != &other)
+                if (this != &other && this->object)
                 {
+                    HPX_ASSERT(other.object != nullptr);
                     // reuse object storage
                     this->vptr->destruct(this->object);
                     this->object = this->vptr->copy(
