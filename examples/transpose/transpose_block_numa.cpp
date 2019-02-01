@@ -583,8 +583,8 @@ int main(int argc, char* argv[])
         "hpx.run_hpx_main!=1",
         "hpx.numa_sensitive=2",  // no-cross NUMA stealing
         // block all cores of requested number of NUMA-domains
-        hpx::util::format("hpx.cores={}", numa_nodes * num_cores),
-        hpx::util::format("hpx.os_threads={}", numa_nodes * pus.second)
+//        hpx::util::format("hpx.cores={}", numa_nodes * num_cores),
+//        hpx::util::format("hpx.os_threads={}", numa_nodes * pus.second)
     };
 
     std::string node_name("numanode");
@@ -605,8 +605,9 @@ int main(int argc, char* argv[])
             pus.second-1                             // core:0-%d
         );
     }
-    cfg.push_back(bind_desc);
+//    cfg.push_back(bind_desc);
 
+//    return hpx::init();
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
 
