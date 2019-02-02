@@ -73,7 +73,7 @@ namespace lcos {
             void set_value(RemoteResult&& result)
             {
                 HPX_ASSERT(shared_state_);
-                shared_state_->set_data(std::move(result));
+                shared_state_->set_remote_data(std::move(result));
             }
 
             void set_exception(std::exception_ptr const& e)

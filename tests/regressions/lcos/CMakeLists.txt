@@ -124,6 +124,7 @@ add_hpx_test(
 # compile only tests
 if(HPX_WITH_COMPILE_ONLY_TESTS)
   set(compile_tests
+      dataflow_future_ref_3639
       future_range_ambiguity_2032
       wait_all_std_array_2035
      )
