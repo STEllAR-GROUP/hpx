@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/compat/condition_variable.hpp>
 #include <hpx/compat/mutex.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
@@ -342,6 +343,7 @@ namespace hpx { namespace components { namespace server
         bool stop_called_;
         bool stop_done_;
         bool terminated_;
+        compat::thread::id main_thread_id_;
         bool dijkstra_color_;   // false: white, true: black
         std::atomic<bool> shutdown_all_invoked_;
 
