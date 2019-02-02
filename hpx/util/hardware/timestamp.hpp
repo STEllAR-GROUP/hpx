@@ -35,6 +35,8 @@
     #include <hpx/util/hardware/timestamp/linux_generic.hpp>
 #elif defined(__powerpc__)
     #include <hpx/util/hardware/timestamp/linux_generic.hpp>
+#elif defined(__s390x__)
+    #include <hpx/util/hardware/timestamp/linux_generic.hpp>
 #elif defined(__bgq__)
     #include <hpx/util/hardware/timestamp/bgq.hpp>
 #else
