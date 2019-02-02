@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,6 +20,7 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
@@ -171,7 +172,12 @@ namespace hpx { namespace threads { namespace policies
         int const max_terminated_threads;
 
         // this is the type of a map holding all threads (except depleted ones)
-        typedef std::unordered_set<thread_id_type> thread_map_type;
+        using thread_map_type =
+            std::unordered_set<thread_id_type, std::hash<thread_id_type>,
+                std::equal_to<>, util::internal_allocator<thread_id_type>>;
+
+        using thread_heap_type =
+            std::list<thread_id_type, util::internal_allocator<thread_id_type>>;
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         typedef
@@ -206,7 +212,7 @@ namespace hpx { namespace threads { namespace policies
 
             std::ptrdiff_t stacksize = data.stacksize;
 
-            std::list<thread_id_type>* heap = nullptr;
+            thread_heap_type* heap = nullptr;
 
             if (stacksize == get_stack_size(thread_stacksize_small))
             {
@@ -265,12 +271,15 @@ namespace hpx { namespace threads { namespace policies
             {
                 hpx::util::unlock_guard<Lock> ull(lk);
 
-
                 // Allocate a new thread object.
-                thrd = thread_id_type(
-                    new threads::thread_data(data, this, state));
+                threads::thread_data* p = thread_alloc_.allocate(1);
+                new (p) threads::thread_data(data, this, state);
+                thrd = thread_id_type(p);
             }
         }
+
+        static util::internal_allocator<threads::thread_data> thread_alloc_;
+        static util::internal_allocator<task_description> task_description_alloc_;
 
         ///////////////////////////////////////////////////////////////////////
         // add new threads if there is some amount of work available
@@ -293,8 +302,6 @@ namespace hpx { namespace threads { namespace policies
                     ++addfrom->new_tasks_wait_count_;
                 }
 #endif
-
-
                 // measure thread creation time
                 util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
 
@@ -305,7 +312,8 @@ namespace hpx { namespace threads { namespace policies
 
                 create_thread_object(thrd, data, state, lk);
 
-                delete task;
+                task->~task_description();
+                task_description_alloc_.deallocate(task, 1);
 
                 // add the new entry to the map of all threads
                 std::pair<thread_map_type::iterator, bool> p =
@@ -462,7 +470,7 @@ namespace hpx { namespace threads { namespace policies
                     bool deleted = thread_map_.erase(tid) != 0;
                     HPX_ASSERT(deleted);
                     if (deleted) {
-                        delete todelete;
+                        deallocate(todelete);
                         --thread_map_count_;
                         HPX_ASSERT(thread_map_count_ >= 0);
                     }
@@ -573,19 +581,26 @@ namespace hpx { namespace threads { namespace policies
             add_new_logger_("thread_queue::add_new")
         {}
 
+        static void deallocate(threads::thread_data* p)
+        {
+            using threads::thread_data;
+            p->~thread_data();
+            thread_alloc_.deallocate(p, 1);
+        }
+
         ~thread_queue()
         {
             for(auto t: thread_heap_small_)
-                delete t.get();
+                deallocate(t.get());
 
             for(auto t: thread_heap_medium_)
-                delete t.get();
+                deallocate(t.get());
 
             for(auto t: thread_heap_large_)
-                delete t.get();
+                deallocate(t.get());
 
             for(auto t: thread_heap_huge_)
-                delete t.get();
+                deallocate(t.get());
         }
 
         void set_max_count(std::size_t max_count = max_thread_count)
@@ -767,15 +782,14 @@ namespace hpx { namespace threads { namespace policies
             // later thread creation
             ++new_tasks_count_;
 
+            task_description* td = task_description_alloc_.allocate(1);
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            new_tasks_.push(new task_description(
-                std::move(data), initial_state,
-                util::high_resolution_clock::now()
-            ));
+            new (td) task_description(std::move(data), initial_state,
+                util::high_resolution_clock::now());
 #else
-            new_tasks_.push(new task_description( //-V106
-                std::move(data), initial_state));
+            new (td) task_description(std::move(data), initial_state); //-V106
 #endif
+            new_tasks_.push(td);
             if (&ec != &throws)
                 ec = make_success_code();
         }
@@ -809,8 +823,6 @@ namespace hpx { namespace threads { namespace policies
             task_description* task;
             while (src->new_tasks_.pop(task))
             {
-
-
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
                 if (maintain_queue_wait_times) {
                     std::int64_t now = util::high_resolution_clock::now();
@@ -1097,46 +1109,35 @@ namespace hpx { namespace threads { namespace policies
         void on_error(std::size_t num_thread, std::exception_ptr const& e) {}
 
     private:
-        mutable mutex_type mtx_;                    ///< mutex protecting the members
+        mutable mutex_type mtx_;            // mutex protecting the members
 
-        thread_map_type thread_map_;
-        ///< mapping of thread id's to HPX-threads
-        std::atomic<std::int64_t> thread_map_count_;
-        ///< overall count of work items
+        thread_map_type thread_map_;        // mapping of thread id's to HPX-threads
+        std::atomic<std::int64_t> thread_map_count_; // overall count of work items
 
-        work_items_type work_items_;
-        ///< list of active work items
-        std::atomic<std::int64_t> work_items_count_;
-        ///< count of active work items
+        work_items_type work_items_;        // list of active work items
+        std::atomic<std::int64_t> work_items_count_; // count of active work items
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        std::atomic<std::int64_t> work_items_wait_;
-        ///< overall wait time of work items
-        std::atomic<std::int64_t> work_items_wait_count_;
-        ///< overall number of work items in queue
+        std::atomic<std::int64_t> work_items_wait_; // overall wait time of work items
+        std::atomic<std::int64_t> work_items_wait_count_; // overall number of
+                                                          // work items in queue
 #endif
-        terminated_items_type terminated_items_;     ///< list of terminated threads
-        std::atomic<std::int64_t> terminated_items_count_;
-        ///< count of terminated items
+        terminated_items_type terminated_items_;    // list of terminated threads
+        std::atomic<std::int64_t> terminated_items_count_; // count of terminated items
 
-        std::size_t max_count_;
-        ///< maximum number of existing HPX-threads
-        task_items_type new_tasks_;
-        ///< list of new tasks to run
+        std::size_t max_count_;     // maximum number of existing HPX-threads
+        task_items_type new_tasks_; // list of new tasks to run
 
-        std::atomic<std::int64_t> new_tasks_count_;
-        ///< count of new tasks to run
+        std::atomic<std::int64_t> new_tasks_count_; // count of new tasks to run
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        std::atomic<std::int64_t> new_tasks_wait_;
-        ///< overall wait time of new tasks
-        std::atomic<std::int64_t> new_tasks_wait_count_;
-        ///< overall number tasks waited
+        std::atomic<std::int64_t> new_tasks_wait_;  // overall wait time of new tasks
+        std::atomic<std::int64_t> new_tasks_wait_count_; // overall number tasks waited
 #endif
 
-        std::list<thread_id_type> thread_heap_small_;
-        std::list<thread_id_type> thread_heap_medium_;
-        std::list<thread_id_type> thread_heap_large_;
-        std::list<thread_id_type> thread_heap_huge_;
+        thread_heap_type thread_heap_small_;
+        thread_heap_type thread_heap_medium_;
+        thread_heap_type thread_heap_large_;
+        thread_heap_type thread_heap_huge_;
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         std::uint64_t add_new_time_;
@@ -1150,18 +1151,31 @@ namespace hpx { namespace threads { namespace policies
         // # of times our associated worker-thread looked for work in work_items
         std::atomic<std::int64_t> pending_accesses_;
 
+        // count of work_items stolen from this queue
         std::atomic<std::int64_t> stolen_from_pending_;
-        ///< count of work_items stolen from this queue
+        // count of new_tasks stolen from this queue
         std::atomic<std::int64_t> stolen_from_staged_;
-        ///< count of new_tasks stolen from this queue
+        // count of work_items stolen to this queue from other queues
         std::atomic<std::int64_t> stolen_to_pending_;
-        ///< count of work_items stolen to this queue from other queues
+        // count of new_tasks stolen to this queue from other queues
         std::atomic<std::int64_t> stolen_to_staged_;
-        ///< count of new_tasks stolen to this queue from other queues
 #endif
 
         util::block_profiler<add_new_tag> add_new_logger_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Mutex, typename PendingQueuing, typename StagedQueuing,
+        typename TerminatedQueuing>
+    util::internal_allocator<threads::thread_data> thread_queue<Mutex,
+        PendingQueuing, StagedQueuing, TerminatedQueuing>::thread_alloc_;
+
+    template <typename Mutex, typename PendingQueuing, typename StagedQueuing,
+        typename TerminatedQueuing>
+    util::internal_allocator<typename thread_queue<Mutex, PendingQueuing,
+            StagedQueuing, TerminatedQueuing>::task_description>
+        thread_queue<Mutex, PendingQueuing, StagedQueuing,
+            TerminatedQueuing>::task_description_alloc_;
 }}}
 
 #endif

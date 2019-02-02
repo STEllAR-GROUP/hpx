@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/internal_allocator.hpp>
 
 #include <cstdint>
 
@@ -20,22 +21,26 @@ namespace hpx { namespace naming
     ///////////////////////////////////////////////////////////////////////////
     // the local gid is actually just a wrapper around the real thing
     inline id_type::id_type(std::uint64_t lsb_id, management_type t)
-        : gid_(new detail::id_type_impl(0, lsb_id,
-            static_cast<detail::id_type_management>(t)))
-    {}
+      : gid_(new detail::id_type_impl(detail::id_type_impl::init_no_addref{}, 0,
+                 lsb_id, static_cast<detail::id_type_management>(t)),
+            false)
+    {
+    }
 
     inline id_type::id_type(gid_type const& gid, management_type t)
-        : gid_(new detail::id_type_impl(gid,
-            static_cast<detail::id_type_management>(t)))
+      : gid_(new detail::id_type_impl(detail::id_type_impl::init_no_addref{},
+                 gid, static_cast<detail::id_type_management>(t)),
+            false)
     {
         if (t == unmanaged)
             detail::strip_internal_bits_except_dont_cache_from_gid(*gid_);
     }
 
-    inline id_type::id_type(std::uint64_t msb_id, std::uint64_t lsb_id,
-            management_type t)
-        : gid_(new detail::id_type_impl(msb_id, lsb_id,
-            static_cast<detail::id_type_management>(t)))
+    inline id_type::id_type(
+            std::uint64_t msb_id, std::uint64_t lsb_id, management_type t)
+      : gid_(new detail::id_type_impl(detail::id_type_impl::init_no_addref{},
+                 msb_id, lsb_id, static_cast<detail::id_type_management>(t)),
+            false)
     {
         if (t == unmanaged)
             detail::strip_internal_bits_except_dont_cache_from_gid(*gid_);
@@ -61,7 +66,7 @@ namespace hpx { namespace naming
         return id_type((*gid_)++, unmanaged);
     }
 
-    inline id_type::operator bool() const noexcept
+    inline id_type::operator bool() const
     {
         return gid_ && *gid_;
     }

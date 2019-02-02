@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -526,10 +526,15 @@ namespace hpx { namespace lcos { namespace detail
 //         typename future_unwrap_result<future<R>>::result_type>::type
 //     unwrap(future<R> && future, error_code& ec = throws);
 
+    template <typename Allocator, typename Future>
+    typename traits::detail::shared_state_ptr<
+        typename future_unwrap_result<Future>::result_type>::type
+    unwrap_alloc(Allocator const& a, Future&& future, error_code& ec = throws);
+
     template <typename Future>
     typename hpx::traits::detail::shared_state_ptr<
         typename future_unwrap_result<Future>::result_type>::type
-    unwrap(Future && future, error_code& ec = throws);
+    unwrap(Future&& future, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>

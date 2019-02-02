@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2017 Hartmut Kaiser
+//  Copyright (c) 2012-2019 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -684,7 +684,7 @@ std::vector<std::int64_t> primary_namespace::decrement_credit(
         // Decrement.
         if (credits < 0)
         {
-            std::list<free_entry> free_list;
+            free_entry_list_type free_list;
             decrement_sweep(free_list, lower, upper, -credits, hpx::throws);
 
             free_components_sync(free_list, lower, upper, hpx::throws);
@@ -887,7 +887,7 @@ void primary_namespace::increment(
 void primary_namespace::resolve_free_list(
     std::unique_lock<mutex_type>& l
   , std::list<refcnt_table_type::iterator> const& free_list
-  , std::list<free_entry>& free_entry_list
+  , free_entry_list_type& free_entry_list
   , naming::gid_type const& lower
   , naming::gid_type const& upper
   , error_code& ec
@@ -978,7 +978,7 @@ void primary_namespace::resolve_free_list(
 
 ///////////////////////////////////////////////////////////////////////////////
 void primary_namespace::decrement_sweep(
-    std::list<free_entry>& free_entry_list
+    free_entry_list_type& free_entry_list
   , naming::gid_type const& lower
   , naming::gid_type const& upper
   , std::int64_t credits
@@ -1102,7 +1102,7 @@ void primary_namespace::decrement_sweep(
 
 ///////////////////////////////////////////////////////////////////////////////
 void primary_namespace::free_components_sync(
-    std::list<free_entry>& free_list
+    free_entry_list_type& free_list
   , naming::gid_type const& lower
   , naming::gid_type const& upper
   , error_code& ec

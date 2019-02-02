@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2016 Hartmut Kaiser
+//  Copyright (c) 2012-2019 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,6 +21,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
+#include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <atomic>
@@ -337,17 +338,21 @@ struct HPX_EXPORT primary_namespace
         naming::gid_type locality_;
     };
 
+    using free_entry_allocator_type = util::internal_allocator<free_entry>;
+    using free_entry_list_type =
+        std::list<free_entry, free_entry_allocator_type>;
+
     void resolve_free_list(
         std::unique_lock<mutex_type>& l
       , std::list<refcnt_table_type::iterator> const& free_list
-      , std::list<free_entry>& free_entry_list
+      , free_entry_list_type& free_entry_list
       , naming::gid_type const& lower
       , naming::gid_type const& upper
       , error_code& ec
         );
 
     void decrement_sweep(
-        std::list<free_entry>& free_list
+        free_entry_list_type& free_list
       , naming::gid_type const& lower
       , naming::gid_type const& upper
       , std::int64_t credits
@@ -355,7 +360,7 @@ struct HPX_EXPORT primary_namespace
         );
 
     void free_components_sync(
-        std::list<free_entry>& free_list
+        free_entry_list_type& free_list
       , naming::gid_type const& lower
       , naming::gid_type const& upper
       , error_code& ec

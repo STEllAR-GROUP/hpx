@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2017 Hartmut Kaiser
+//  Copyright (c) 1998-2019 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,7 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
+#include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/wrapper_heap_base.hpp>
 
@@ -31,12 +32,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail
 {
-#if HPX_DEBUG_WRAPPER_HEAP != 0
-#  define HPX_WRAPPER_HEAP_INITIALIZED_MEMORY 1
-#else
-#  define HPX_WRAPPER_HEAP_INITIALIZED_MEMORY 0
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     namespace one_size_heap_allocators
     {
@@ -50,11 +45,11 @@ namespace hpx { namespace components { namespace detail
         {
             static void* alloc(std::size_t size)
             {
-                return ::malloc(size);
+                return alloc_.allocate(size);
             }
-            static void free(void* p)
+            static void free(void* p, std::size_t count)
             {
-                ::free(p);
+                alloc_.deallocate(static_cast<char*>(p), count);
             }
             static void* realloc(std::size_t &, void *)
             {
@@ -63,6 +58,8 @@ namespace hpx { namespace components { namespace detail
                 // return nullptr
                 return nullptr;
             }
+
+            HPX_EXPORT static util::internal_allocator<char> alloc_;
         };
     }
 
@@ -172,7 +169,5 @@ namespace hpx { namespace components { namespace detail
 }}} // namespace hpx::components::detail
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#undef HPX_WRAPPER_HEAP_INITIALIZED_MEMORY
 
 #endif

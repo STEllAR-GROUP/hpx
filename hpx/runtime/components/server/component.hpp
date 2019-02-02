@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2015-2017 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/internal_allocator.hpp>
 
 #include <cstddef>
 #include <new>
@@ -17,7 +18,8 @@
 
 namespace hpx { namespace components {
 
-    namespace detail {
+    namespace detail
+    {
         ///////////////////////////////////////////////////////////////////////
         template <typename Component>
         struct simple_heap
@@ -25,14 +27,19 @@ namespace hpx { namespace components {
             void* alloc(std::size_t count)
             {
                 HPX_ASSERT(1 == count);
-                return ::operator new(sizeof(Component));
+                return alloc_.allocate(count);
             }
             void free(void* p, std::size_t count)
             {
                 HPX_ASSERT(1 == count);
-                ::operator delete(p);
+                alloc_.deallocate(static_cast<Component*>(p), count);
             }
+
+            static util::internal_allocator<Component> alloc_;
         };
+
+        template <typename Component>
+        util::internal_allocator<Component> simple_heap<Component>::alloc_;
     }
 
     ///////////////////////////////////////////////////////////////////////////

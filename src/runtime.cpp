@@ -1032,8 +1032,10 @@ namespace hpx
             return naming::invalid_id;
         }
 
-        return naming::id_type(hpx::applier::get_applier().get_raw_locality(ec),
+        static naming::id_type here(
+            hpx::applier::get_applier().get_raw_locality(ec),
             naming::id_type::unmanaged);
+        return here;
     }
 
     naming::id_type find_root_locality(error_code& ec)

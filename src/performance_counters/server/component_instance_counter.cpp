@@ -1,16 +1,18 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/function.hpp>
 
 #include <cstdint>
+#include <sstream>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,10 +46,23 @@ namespace hpx { namespace performance_counters { namespace detail
                 }
 
                 if (paths.parameters_.empty()) {
+                    std::stringstream strm;
+                    strm << "invalid instance counter parameter: must specify "
+                            "a component type\n"
+                            "known component types:\n";
+
+                    components::enumerate_instance_counts(
+                        [&strm](components::component_type type) -> bool
+                        {
+                            strm << "  "
+                                 << agas::get_component_type_name(type)
+                                 << "\n";
+                            return true;
+                        });
+
                     HPX_THROWS_IF(ec, bad_parameter,
-                        "component_instance_counter_creator",
-                        "invalid instance counter parameter: must specify "
-                        "a component type");
+                        "component_instance_counter_creator", strm.str());
+
                     return naming::invalid_gid;
                 }
 

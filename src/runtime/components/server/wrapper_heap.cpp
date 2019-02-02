@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2017 Hartmut Kaiser
+//  Copyright (c) 1998-2019 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,6 +31,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail
 {
+    namespace one_size_heap_allocators
+    {
+        util::internal_allocator<char> fixed_mallocator::alloc_;
+    }
+
 #if HPX_DEBUG_WRAPPER_HEAP != 0
 #define HPX_WRAPPER_HEAP_INITIALIZED_MEMORY 1
 
@@ -383,7 +388,9 @@ namespace hpx { namespace components { namespace detail
                     << " with " << size() << " allocated object(s)!";
             }
 
-            allocator_type::free(pool_);
+            std::size_t const total_num_bytes =
+                parameters_.capacity * parameters_.element_size;
+            allocator_type::free(pool_, total_num_bytes);
             pool_ = first_free_ = nullptr;
             free_size_ = 0;
         }
