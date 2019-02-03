@@ -155,7 +155,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
 
         std::mt19937 gen(seed);
-        std::uniform_int_distribution<> dist;
+        std::uniform_int_distribution<> dist(0, 1000);
 
         // fill the vector with random numbers
         partitioned_vector_view<int> view(v);
