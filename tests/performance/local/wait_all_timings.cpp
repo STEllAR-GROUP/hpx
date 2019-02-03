@@ -123,10 +123,10 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::string const chunks_str = hpx::util::format("{}", num_chunks);
     std::string const delay_str = hpx::util::format("{}", delay);
 
-    hpx::util::format_to(hpx::cout,
-        "{:10},{:10},{:10},{:10},{:10.12},{:10.12}\n",
-        tasks_str, std::string("1"), delay_str,
-        elapsed_seq, elapsed_seq / num_tasks) << hpx::endl;
+    hpx::util::format_to(hpx::cout, "{:10},{:10},{:10},{:10},{:10.12}\n",
+        tasks_str, std::string("1"), delay_str, elapsed_seq,
+        elapsed_seq / num_tasks)
+        << hpx::endl;
     hpx::util::print_cdash_timing("WaitAll", elapsed_seq / num_tasks);
 
     if (num_chunks != 1)
