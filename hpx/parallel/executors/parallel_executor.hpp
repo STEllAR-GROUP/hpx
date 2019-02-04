@@ -173,32 +173,29 @@ namespace hpx { namespace parallel { namespace execution
                 chunk_size = (std::max)(chunk_size, num_tasks);
 
 
-                while (size != 0)
+                while (size > chunk_size)
                 {
-                    std::size_t curr_chunk_size = (std::min)(chunk_size, size);
-
                     async_execute(
                         [&, base, curr_chunk_size, num_tasks, it] {
-                            return spawn(results, l, base, curr_chunk_size, 
+                            return spawn(results, l, base, chunk_size, 
                                 num_tasks, func, it, ts...);
                         });
 
-
-                    base += curr_chunk_size;
-                    it = hpx::parallel::v1::detail::next(it, curr_chunk_size);
-                    size -= curr_chunk_size;
+                    base += chunk_size;
+                    it = hpx::parallel::v1::detail::next(it, chunk_size);
+                    size -= chunk_size;
                 }
-            } else {
-                // spawn all tasks sequentially
-                HPX_ASSERT(base + size <= results.size());
-
-                for (std::size_t i = 0; i != size; ++i, ++it)
-                {
-                    results[base + i] = async_execute(func, *it, ts...);
-                }
-
-                l.count_down(size);
             }
+
+            // spawn remaining tasks sequentially
+            HPX_ASSERT(base + size <= results.size());
+
+            for (std::size_t i = 0; i != size; ++i, ++it)
+            {
+                results[base + i] = async_execute(func, *it, ts...);
+            }
+
+            l.count_down(size);
         }
         /// \endcond
 
