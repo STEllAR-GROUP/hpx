@@ -402,10 +402,12 @@ void test_executor_task_block(Executor& exec)
     define_task_block_test1(exec);
     define_task_block_test2(exec);
     define_task_block_test3(exec);
+#if !__has_feature(address_sanitizer)
     define_task_block_test4(exec);
 
     define_task_block_exceptions_test1(exec);
     define_task_block_exceptions_test2(exec);
+#endif
 }
 
 int hpx_main()
@@ -419,8 +421,10 @@ int hpx_main()
         hpx::parallel::execution::parallel_executor exec;
         test_executor_task_block(exec);
 
+#if !__has_feature(address_sanitizer)
         define_task_block_exceptions_test3(exec);
         define_task_block_exceptions_test4(exec);
+#endif
     }
 
     return hpx::finalize();

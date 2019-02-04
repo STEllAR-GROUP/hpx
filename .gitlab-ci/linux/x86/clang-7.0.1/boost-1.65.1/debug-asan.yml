@@ -36,9 +36,6 @@ examples Debug ASAN x86:
         - core Debug ASAN x86
         - get conv.xsl
         - get junit2html
-    artifacts:
-        paths:
-            - build
 
 tests.unit Debug ASAN x86:
     <<: *debug-asan-x86

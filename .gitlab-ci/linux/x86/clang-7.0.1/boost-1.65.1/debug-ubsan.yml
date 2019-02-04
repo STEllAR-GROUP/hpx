@@ -36,9 +36,6 @@ examples Debug UBSAN x86:
         - core Debug UBSAN x86
         - get conv.xsl
         - get junit2html
-    artifacts:
-        paths:
-            - build
 
 tests.unit Debug UBSAN x86:
     <<: *debug-ubsan-x86
