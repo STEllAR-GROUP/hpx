@@ -26,7 +26,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
     template <typename InIterB, typename InIterE, typename T>
     inline T accumulate(InIterB first, InIterE last, T value)
     {
-        return accumulate(first, last, value, std::plus<>());
+        return accumulate(first, last, value, std::plus<T>());
     }
 }}}}
 
