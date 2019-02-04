@@ -7,6 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -120,12 +121,9 @@ namespace hpx { namespace applier
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::util::thread_specific_ptr<applier*, applier::tls_tag> applier::applier_;
-
     applier::applier(parcelset::parcelhandler &ph, threads::threadmanager& tm)
       : parcel_handler_(ph), thread_manager_(tm)
     {
-        init_tss();
     }
 
     void applier::initialize(std::uint64_t rts, std::uint64_t mem)
@@ -217,35 +215,14 @@ namespace hpx { namespace applier
         return true;
     }
 
-    void applier::init_tss()
-    {
-        if (nullptr == applier::applier_.get())
-            applier::applier_.reset(new applier* (this));
-    }
-
-    void applier::deinit_tss()
-    {
-        applier::applier_.reset();
-    }
-
     applier& get_applier()
     {
-        // should have been initialized
-        HPX_ASSERT(nullptr != applier::applier_.get());
-        return **applier::applier_;
+        return hpx::get_runtime().get_applier();
     }
 
     applier* get_applier_ptr()
     {
-        applier** appl = applier::applier_.get();
-        return appl ? *appl : nullptr;
-    }
-
-    // The function \a get_locality_id returns the id of this locality
-    std::uint32_t get_locality_id(error_code& ec) //-V659
-    {
-        applier** appl = applier::applier_.get();
-        return appl ? (*appl)->get_locality_id(ec) : naming::invalid_locality_id;
+        return &hpx::get_runtime().get_applier();
     }
 }}
 

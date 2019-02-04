@@ -21,7 +21,7 @@ namespace hpx
     /// The function \a get_runtime returns a reference to the (thread
     /// specific) runtime instance.
     HPX_API_EXPORT runtime& get_runtime();
-    HPX_API_EXPORT runtime* get_runtime_ptr();
+    HPX_API_EXPORT runtime*& get_runtime_ptr();
 }
 
 #endif

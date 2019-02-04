@@ -12,7 +12,6 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/runtime/threads/topology.hpp>
@@ -21,7 +20,6 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -86,12 +84,6 @@ namespace hpx { namespace threads
         }
 
         return active_os_thread_count;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    std::size_t thread_pool_base::get_worker_thread_num() const
-    {
-        return detail::thread_num_tss_.get_worker_thread_num();
     }
 
     ///////////////////////////////////////////////////////////////////////////

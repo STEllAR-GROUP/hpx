@@ -74,7 +74,7 @@ and under what circumstances it affects you.
 
 Some but not all tasks require you to have built HPX. Even if that is not
 required, your feedback can be helpful to us - so - please try. The master
-build instructions are [here](http://stellar-group.github.io/hpx/docs/html/hpx/tutorial/getting_started.html)
+build instructions are [here](https://stellar-group.github.io/hpx/docs/sphinx/branches/master/html/quickstart.html)
 with more stuff under development.
 
 ### Hacking help

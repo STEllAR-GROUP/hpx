@@ -266,10 +266,14 @@ namespace hpx { namespace components
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    runtime_support::runtime_support(hpx::util::runtime_configuration & cfg)
-      : stop_called_(false), stop_done_(false), terminated_(false),
-        dijkstra_color_(false), shutdown_all_invoked_(false),
-        modules_(cfg.modules())
+    runtime_support::runtime_support(hpx::util::runtime_configuration& cfg)
+      : stop_called_(false)
+      , stop_done_(false)
+      , terminated_(false)
+      , main_thread_id_(compat::this_thread::get_id())
+      , dijkstra_color_(false)
+      , shutdown_all_invoked_(false)
+      , modules_(cfg.modules())
     {}
 
     // function to be called during shutdown
@@ -898,7 +902,13 @@ namespace hpx { namespace components { namespace server
 
             stop_done_ = true;
             wait_condition_.notify_all();
-            stop_condition_.wait(l);        // wait for termination
+
+            // The main thread notifies stop_condition_, so don't wait if we're
+            // on the main thread.
+            if (compat::this_thread::get_id() != main_thread_id_)
+            {
+                stop_condition_.wait(l);        // wait for termination
+            }
         }
     }
 
@@ -909,7 +919,13 @@ namespace hpx { namespace components { namespace server
             stop_called_ = true;
             stop_done_ = true;
             wait_condition_.notify_all();
-            stop_condition_.wait(l);        // wait for termination
+
+            // The main thread notifies stop_condition_, so don't wait if we're
+            // on the main thread.
+            if (compat::this_thread::get_id() != main_thread_id_)
+            {
+                stop_condition_.wait(l);        // wait for termination
+            }
         }
     }
 
@@ -1184,13 +1200,13 @@ namespace hpx { namespace components { namespace server
 
         plugin_map_type::const_iterator it = plugins_.find(message_handler_type);
         if (it == plugins_.end() || !(*it).second.first) {
+            l.unlock();
             if (ec.category() != hpx::get_lightweight_hpx_category())
             {
                 // we don't know anything about this component
                 std::ostringstream strm;
                 strm << "attempt to create message handler plugin instance of "
                         "invalid/unknown type: " << message_handler_type;
-                l.unlock();
                 HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                     "runtime_support::create_message_handler",
                     strm.str());
@@ -1247,13 +1263,13 @@ namespace hpx { namespace components { namespace server
 
         plugin_map_type::const_iterator it = plugins_.find(message_handler_type);
         if (it == plugins_.end() || !(*it).second.first) {
+            l.unlock();
             if (ec.category() != hpx::get_lightweight_hpx_category())
             {
                 // we don't know anything about this component
                 std::ostringstream strm;
                 strm << "attempt to create message handler plugin instance of "
                         "invalid/unknown type: " << message_handler_type;
-                l.unlock();
                 HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                     "runtime_support::create_message_handler",
                     strm.str());
@@ -1307,6 +1323,7 @@ namespace hpx { namespace components { namespace server
 
         plugin_map_type::const_iterator it = plugins_.find(binary_filter_type);
         if (it == plugins_.end() || !(*it).second.first) {
+            l.unlock();
             // we don't know anything about this component
             std::ostringstream strm;
             strm << "attempt to create binary filter plugin instance of "

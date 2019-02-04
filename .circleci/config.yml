@@ -108,6 +108,7 @@ jobs:
                 -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
                 -DHPX_WITH_TESTS_DEBUG_LOG=On \
                 -DHPX_WITH_TESTS_DEBUG_LOG_DESTINATION=/hpx/build/debug-log.txt \
+                -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=On \
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
                 -DHPX_WITH_DOCUMENTATION=On
       - persist_to_workspace:

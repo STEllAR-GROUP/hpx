@@ -1310,22 +1310,27 @@ namespace hpx { namespace threads
         return true;
     }
 
-    util::thread_specific_ptr<hpx_hwloc_bitmap_wrapper, topology::tls_tag>
-        topology::bitmap_storage_;
+    namespace {
+        hpx_hwloc_bitmap_wrapper& bitmap_storage()
+        {
+            HPX_NATIVE_TLS hpx_hwloc_bitmap_wrapper bitmap_storage_(nullptr);
+
+            return bitmap_storage_;
+        }
+    }
+
 
     threads::mask_type topology::get_area_membind_nodeset(
         const void *addr, std::size_t len) const
     {
-        hpx_hwloc_bitmap_wrapper *nodeset = topology::bitmap_storage_.get();
-        if (nullptr == nodeset)
+        hpx_hwloc_bitmap_wrapper& nodeset = bitmap_storage();
+        if (!nodeset)
         {
-            hwloc_bitmap_t nodeset_ = hwloc_bitmap_alloc();
-            topology::bitmap_storage_.reset(new hpx_hwloc_bitmap_wrapper(nodeset_));
-            nodeset = topology::bitmap_storage_.get();
+            nodeset.reset(hwloc_bitmap_alloc());
         }
         //
         hwloc_membind_policy_t policy;
-        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset->get_bmp());
+        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset.get_bmp());
 
         if (
 #if HWLOC_API_VERSION >= 0x00010b06
@@ -1348,15 +1353,13 @@ namespace hpx { namespace threads
     int topology::get_numa_domain(const void *addr) const
     {
 #if HWLOC_API_VERSION >= 0x00010b06
-        hpx_hwloc_bitmap_wrapper *nodeset = topology::bitmap_storage_.get();
-        if (nullptr == nodeset)
+        hpx_hwloc_bitmap_wrapper& nodeset = bitmap_storage();
+        if (!nodeset)
         {
-            hwloc_bitmap_t nodeset_ = hwloc_bitmap_alloc();
-            topology::bitmap_storage_.reset(new hpx_hwloc_bitmap_wrapper(nodeset_));
-            nodeset = topology::bitmap_storage_.get();
+            nodeset.reset(hwloc_bitmap_alloc());
         }
         //
-        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset->get_bmp());
+        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset.get_bmp());
 
         int ret = hwloc_get_area_memlocation(topo, addr, 1,  ns,
             HWLOC_MEMBIND_BYNODESET);
