@@ -45,7 +45,24 @@ tests.unit Debug UBSAN x86:
     variables:
         TESTS: "tests.unit"
         UBSAN_OPTIONS: "print_stacktrace=1,halt_on_error=1"
-    extends: .test
+    image: stellargroup/build_env:ubuntu
+    stage: test
+    script:
+      - cd build
+      - ninja -j8 ${TESTS}
+      - ctest -T test --no-compress-output --output-on-failure -R ${TESTS}
+    after_script:
+      - xsltproc conv.xsl build/Testing/`head -n 1 < build/Testing/TAG`/Test.xml > ${TESTS}.xml
+      - ./junit2html/junit2html ./${TESTS}.xml ./${TESTS}.html
+    artifacts:
+        when: always
+        reports:
+            junit: ${TESTS}.xml
+        paths:
+            - ${TESTS}.xml
+            - ${TESTS}.html
+    except:
+        - gh-pages
     dependencies:
         - checkout
         - core Debug UBSAN x86
