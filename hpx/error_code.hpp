@@ -215,6 +215,12 @@ namespace hpx
             exception_ = std::exception_ptr();
         }
 
+        /// Copy constructor for error_code
+        ///
+        /// \note This function maintains the error category of the left hand
+        ///       side if the right hand side is a success code.
+        HPX_EXPORT error_code(error_code const& rhs);
+
         /// Assignment operator for error_code
         ///
         /// \note This function maintains the error category of the left hand
