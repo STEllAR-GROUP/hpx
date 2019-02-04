@@ -354,7 +354,7 @@ namespace hpx { namespace lcos
             }
 
         private:
-            Tuple const& t_;
+            Tuple t_;
         };
     }
 
