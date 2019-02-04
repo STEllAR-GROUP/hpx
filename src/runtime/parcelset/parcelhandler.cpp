@@ -86,15 +86,13 @@ namespace hpx { namespace parcelset
     // This function is synchronous.
     void parcelhandler::sync_put_parcel(parcel p) //-V669
     {
-        lcos::local::promise<void> promise;
-        future<void> sent_future = promise.get_future();
-        put_parcel(
-            std::move(p)
-          , [&promise](boost::system::error_code const&, parcel const&)
-            {
-                promise.set_value();
-            }
-        );  // schedule parcel send
+        auto promise = std::make_shared<hpx::lcos::local::promise<void>>();
+        future<void> sent_future = promise->get_future();
+        put_parcel(std::move(p),
+            [HPX_CAPTURE_MOVE(promise)](
+                boost::system::error_code const&, parcel const&) {
+                promise->set_value();
+            });            // schedule parcel send
         sent_future.get(); // wait for the parcel to be sent
     }
 
