@@ -56,6 +56,8 @@ int main()
     }
 
     // Same test with lambdas
+    // action lambdas inhibit undefined behavior...
+#if defined(HPX_HAVE_SANITIZERS)
     {
         auto nt =
             hpx::actions::lambda_to_action(
@@ -95,6 +97,7 @@ int main()
             HPX_TEST_EQ(loc, id);
         }
     }
+#endif
 
     return 0;
 }

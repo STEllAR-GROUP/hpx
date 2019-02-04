@@ -38,9 +38,12 @@ int hpx_main(int argc, char* argv[])
     }
 
     // Same test with lambdas
+    // action lambdas inhibit undefined behavior...
+#if defined(HPX_HAVE_SANITIZERS)
     {
         hpx::async(std::move(mynamespace::t), hpx::find_here());
     }
+#endif
 
     // End the program
     return hpx::finalize();

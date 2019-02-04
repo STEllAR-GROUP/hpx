@@ -38,6 +38,8 @@ int hpx_main(int argc, char* argv[])
     }
 
     // Same test with lambdas
+    // action lambdas inhibit undefined behavior...
+#if defined(HPX_HAVE_SANITIZERS)
     {
         auto t2 =
             hpx::actions::lambda_to_action(
@@ -59,6 +61,7 @@ int hpx_main(int argc, char* argv[])
 
         HPX_TEST_EQ(result, std::string("84"));
     }
+#endif
 
     return hpx::finalize();
 }
