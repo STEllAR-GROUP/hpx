@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2018 Hartmut Kaiser
+# Copyright (c) 2007-2019 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
@@ -1446,6 +1446,12 @@ endif()
 if(MSVC)
   # Display full paths in diagnostics
   hpx_add_compile_flag(-FC LANGUAGES C CXX)
+  if(CMAKE_CL_64)
+    set(__target_arch "x86_64")
+  else()
+    set(__target_arch "x84")
+  endif()
+  hpx_info("Architecture detected: ${__target_arch}")
 else()
   # Show the flags that toggle each warning
   hpx_add_compile_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX C Fortran)
@@ -1519,28 +1525,51 @@ else()
     hpx_add_compile_flag_if_available(-wd2536)
   endif()
 
+  set(__has_timestamp_support OFF)
+  include(TargetArch)
 
-  # rdtsc is an x86 instruction that reads the value of a CPU time stamp
-  # counter. rdtscp is an extension to rdtsc. The difference is that rdtscp is
-  # a serializing instruction.
-  hpx_cpuid("rdtsc" HPX_WITH_RDTSC
-    DEFINITIONS HPX_HAVE_RDTSC)
+  target_architecture(__target_arch)
+  if("${__target_arch}" STREQUAL "i386" OR
+     "${__target_arch}" STREQUAL "ix86" OR
+     "${__target_arch}" STREQUAL "x86_64" OR
+     "${__target_arch}" STREQUAL "ia64")
 
- # One can not assume if RDTSCP is available on the hardware
- # of the build infrastructure, that it will be available on
- # all potential target hardware, see Issue  #3575
- if(NOT ${HPX_WITH_BUILD_BINARY_PACKAGE})
+      # rdtsc is an x86 instruction that reads the value of a CPU time stamp
+      # counter. rdtscp is an extension to rdtsc. The difference is that rdtscp is
+      # a serializing instruction.
+      hpx_cpuid("rdtsc" HPX_WITH_RDTSC DEFINITIONS HPX_HAVE_RDTSC)
 
-  # XeonPhi's do not support RDTSCP
-  if(NOT ("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI"))
-    hpx_cpuid("rdtscp" HPX_WITH_RDTSCP
-      DEFINITIONS HPX_HAVE_RDTSCP)
+      # One can not assume if RDTSCP is available on the hardware
+      # of the build infrastructure, that it will be available on
+      # all potential target hardware, see Issue  #3575
+      if(NOT ${HPX_WITH_BUILD_BINARY_PACKAGE})
+
+        # XeonPhi's do not support RDTSCP
+        if(NOT ("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI"))
+          hpx_cpuid("rdtscp" HPX_WITH_RDTSCP DEFINITIONS HPX_HAVE_RDTSCP)
+        endif()
+
+      endif()
+      if(HPX_WITH_RDTSC OR HPX_WITH_RDTSCP)
+        set(__has_timestamp_support ON)
+      endif()
+  elseif("${__target_arch}" STREQUAL "arm" OR
+         "${__target_arch}" STREQUAL "armv5" OR
+         "${__target_arch}" STREQUAL "armv6" OR
+         "${__target_arch}" STREQUAL "armv7")
+    set(__has_timestamp_support ON)
+  elseif("${__target_arch}" STREQUAL "ppc" OR
+         "${__target_arch}" STREQUAL "ppc64")
+    set(__has_timestamp_support ON)
+  elseif("${__target_arch}" STREQUAL "bgq")
+    set(__has_timestamp_support ON)
+  elseif("${__target_arch}" STREQUAL "s390x")
+    set(__has_timestamp_support ON)
   endif()
 
- endif()
-
-  if(NOT HPX_WITH_RDTSC AND NOT HPX_WITH_RDTSCP)
-    hpx_warn("Neither rdtsc nor rdtscp is available; some performance counters may report incorrect results")
+  hpx_info("Architecture detected: ${__target_arch}")
+  if(NOT __has_timestamp_support)
+    hpx_warn("No timestamp support is available; some performance counters may report incorrect results")
   endif()
 endif()
 
