@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
@@ -20,6 +20,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/detail/yield_k.hpp>
+#include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 
@@ -794,31 +795,45 @@ namespace hpx { namespace naming
 
         private:
             typedef void (*deleter_type)(detail::id_type_impl*);
-            static deleter_type get_deleter(id_type_management t);
+            static deleter_type get_deleter(id_type_management t) noexcept;
 
         public:
-            id_type_impl()
+            // This is a tag type used to convey the information that the caller is
+            // _not_ going to addref the future_data instance
+            struct init_no_addref {};
+
+            // called by serialization, needs to start off with a reference
+            // count of zero
+            id_type_impl() noexcept
               : count_(0), type_(unknown_deleter)
             {}
 
-            explicit id_type_impl (std::uint64_t lsb_id, id_type_management t)
-              : gid_type(0, lsb_id), count_(0), type_(t)
+            explicit id_type_impl(init_no_addref,
+                    std::uint64_t lsb_id, id_type_management t) noexcept
+              : gid_type(0, lsb_id)
+              , count_(1)
+              , type_(t)
             {}
 
-            explicit id_type_impl (std::uint64_t msb_id, std::uint64_t lsb_id,
-                    id_type_management t)
-              : gid_type(msb_id, lsb_id), count_(0), type_(t)
+            explicit id_type_impl(init_no_addref, std::uint64_t msb_id,
+                    std::uint64_t lsb_id, id_type_management t) noexcept
+              : gid_type(msb_id, lsb_id)
+              , count_(1)
+              , type_(t)
             {}
 
-            explicit id_type_impl (gid_type const& gid, id_type_management t)
-              : gid_type(gid), count_(0), type_(t)
+            explicit id_type_impl(init_no_addref, gid_type const& gid,
+                    id_type_management t) noexcept
+              : gid_type(gid)
+              , count_(1)
+              , type_(t)
             {}
 
-            id_type_management get_management_type() const
+            id_type_management get_management_type() const noexcept
             {
                 return type_;
             }
-            void set_management_type(id_type_management type)
+            void set_management_type(id_type_management type) noexcept
             {
                 type_ = type;
             }
@@ -829,6 +844,31 @@ namespace hpx { namespace naming
             void load(serialization::input_archive& ar, unsigned);
 
             HPX_SERIALIZATION_SPLIT_MEMBER()
+
+            // custom allocator support
+            static void* operator new(std::size_t size)
+            {
+                if (size != sizeof(id_type_impl))
+                {
+                    return ::operator new (size);
+                }
+                return alloc_.allocate(1);
+            }
+
+            static void operator delete(void *p, std::size_t size)
+            {
+                if (p == nullptr)
+                {
+                    return;
+                }
+
+                if (size != sizeof(id_type_impl))
+                {
+                    return ::operator delete (p);
+                }
+
+                return alloc_.deallocate(static_cast<id_type_impl*>(p), 1);
+            }
 
         private:
             // credit management (called during serialization), this function
@@ -841,11 +881,10 @@ namespace hpx { namespace naming
 
             util::atomic_count count_;
             id_type_management type_;
+
+            static util::internal_allocator<id_type_impl> alloc_;
         };
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT gid_type get_parcel_dest_gid(id_type const& id);
 }}
 
 #include <hpx/runtime/naming/id_type.hpp>

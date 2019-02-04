@@ -1231,12 +1231,9 @@ public:
 
     bool register_name(
         std::string const& name
-      , naming::id_type const& id
-      , error_code& ec = throws
-        )
-    {
-        return register_name_async(name, id).get(ec);
-    }
+        , naming::id_type const& id
+        , error_code& ec = throws
+    );
 
     /// \brief Unregister a global name (release any existing association)
     ///

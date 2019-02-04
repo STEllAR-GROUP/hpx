@@ -152,10 +152,8 @@ namespace hpx { namespace lcos { namespace detail
             try {
                 Func func = std::move(func_);
 
-                result_type res =
-                    util::invoke_fused(std::move(func), std::move(futures));
-
-                this->set_data(std::move(res));
+                this->set_data(
+                    util::invoke_fused(std::move(func), std::move(futures)));
             }
             catch(...) {
                 this->set_exception(std::current_exception());

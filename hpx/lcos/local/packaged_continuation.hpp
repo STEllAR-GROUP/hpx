@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,6 +20,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
@@ -790,21 +791,97 @@ namespace hpx { namespace lcos { namespace detail
         }
     };
 
+    template <typename Allocator, typename ContResult>
+    class unwrap_continuation_allocator
+      : public unwrap_continuation<ContResult>
+    {
+        using base_type = unwrap_continuation<ContResult>;
+
+        using other_allocator = typename std::allocator_traits<
+            Allocator>::template rebind_alloc<unwrap_continuation_allocator>;
+
+    public:
+        using init_no_addref = typename base_type::init_no_addref;
+
+        unwrap_continuation_allocator(other_allocator const& alloc)
+          : alloc_(alloc)
+        {}
+
+        unwrap_continuation_allocator(
+                init_no_addref no_addref, other_allocator const& alloc)
+          : base_type(no_addref)
+          , alloc_(alloc)
+        {}
+
+    private:
+        void destroy() override
+        {
+            typedef std::allocator_traits<other_allocator> traits;
+
+            other_allocator alloc(alloc_);
+            traits::destroy(alloc, this);
+            traits::deallocate(alloc, this, 1);
+        }
+
+        other_allocator alloc_;
+    };
+}}}
+
+namespace hpx { namespace traits { namespace detail
+{
+    template <typename ContResult, typename Allocator>
+    struct shared_state_allocator<
+        lcos::detail::unwrap_continuation<ContResult>, Allocator>
+    {
+        using type =
+            lcos::detail::unwrap_continuation_allocator<Allocator, ContResult>;
+    };
+}}}
+
+namespace hpx { namespace lcos { namespace detail
+{
+    template <typename Allocator, typename Future>
+    inline typename traits::detail::shared_state_ptr<
+        typename future_unwrap_result<Future>::result_type>::type
+    unwrap_impl_alloc(Allocator const& a, Future && future, error_code& /*ec*/)
+    {
+        using base_allocator = Allocator;
+        using result_type = typename future_unwrap_result<Future>::result_type;
+
+        using shared_state = typename traits::detail::shared_state_allocator<
+                detail::unwrap_continuation<result_type>, base_allocator
+            >::type;
+
+        using other_allocator = typename std::allocator_traits<
+            base_allocator>::template rebind_alloc<shared_state>;
+        using traits = std::allocator_traits<other_allocator>;
+
+        using init_no_addref = typename shared_state::init_no_addref;
+
+        using unique_ptr = std::unique_ptr<shared_state,
+            util::allocator_deleter<other_allocator>>;
+
+        other_allocator alloc(a);
+        unique_ptr p(traits::allocate(alloc, 1),
+            util::allocator_deleter<other_allocator>{alloc});
+
+        traits::construct(alloc, p.get(), init_no_addref{}, alloc);
+
+        // create a continuation
+        typename hpx::traits::detail::shared_state_ptr<result_type>::type
+            result(p.release(), false);
+        static_cast<shared_state*>(result.get())
+            ->attach(std::forward<Future>(future));
+        return result;
+    }
+
     template <typename Future>
     inline typename traits::detail::shared_state_ptr<
         typename future_unwrap_result<Future>::result_type>::type
-    unwrap_impl(Future && future, error_code& /*ec*/)
+    unwrap_impl(Future && future, error_code& ec)
     {
-        typedef typename future_unwrap_result<Future>::result_type result_type;
-
-        typedef detail::unwrap_continuation<result_type> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
-
-        // create a continuation
-        typename traits::detail::shared_state_ptr<result_type>::type p(
-            new shared_state(init_no_addref{}), false);
-        static_cast<shared_state*>(p.get())->attach(std::forward<Future>(future));
-        return p;
+        return unwrap_impl_alloc(
+            util::internal_allocator<>{}, std::move(future), ec);
     }
 
 //     template <typename R>
@@ -829,6 +906,14 @@ namespace hpx { namespace lcos { namespace detail
 //
 //         return unwrap_impl(std::move(fut), ec);
 //     }
+
+    template <typename Allocator, typename Future>
+    inline typename traits::detail::shared_state_ptr<
+        typename future_unwrap_result<Future>::result_type>::type
+    unwrap_alloc(Allocator const& a, Future && future, error_code& ec)
+    {
+        return unwrap_impl_alloc(a, std::forward<Future>(future), ec);
+    }
 
     template <typename Future>
     inline typename traits::detail::shared_state_ptr<

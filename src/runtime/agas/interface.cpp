@@ -48,6 +48,11 @@ bool register_name(
   , error_code& ec
     )
 {
+    if (&ec == &throws)
+    {
+        naming::resolver_client& agas_ = naming::get_agas_client();
+        return agas_.register_name(name, id);
+    }
     return register_name(name, id).get(ec);
 }
 
@@ -162,6 +167,13 @@ std::uint32_t get_num_overall_threads(
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_overall_threads(ec);
+}
+
+std::string get_component_type_name(
+    components::component_type type, error_code& ec)
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.get_component_type_name(type, ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

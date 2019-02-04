@@ -21,6 +21,7 @@
       <Item Name="[is_locked]">(id_msb_ &amp; 0x20000000ull) ? true : false</Item>
       <Item Name="[dont_cache]">(id_msb_ &amp; 0x00800000ull) ? true : false</Item>
       <Item Name="[migratable]">(id_msb_ &amp; 0x00400000ull) ? true : false</Item>
+      <Item Name="[local]">(id_msb_ &amp; 0x00000001ull) ? false : true</Item>
       <Item Condition="((id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) != 0" Name="[locality_id]">(unsigned int)((id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) - 1</Item>
       <Item Condition="(id_msb_ &amp; 1ull) == 0" Name="[comptype]">(hpx::components::component_enum_type)((id_msb_ &gt;&gt; 1ull) &amp; 0xfffffull)</Item>
     </Expand>
@@ -40,6 +41,7 @@
       <Item Condition="gid_.px != 0" Name="[is_locked]">(gid_.px->id_msb_ &amp; 0x20000000ull) ? true : false</Item>
       <Item Condition="gid_.px != 0" Name="[dont_cache]">(gid_.px->id_msb_ &amp; 0x00800000ull) ? true : false</Item>
       <Item Condition="gid_.px != 0" Name="[migratable]">(gid_.px->id_msb_ &amp; 0x00400000ull) ? true : false</Item>
+      <Item Condition="gid_.px != 0" Name="[local]">(gid_.px->id_msb_ &amp; 0x00000001ull) ? false : true</Item>
       <Item Condition="gid_.px != 0 &amp;&amp; ((gid_.px->id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) != 0" Name="[locality_id]">(unsigned int)((gid_.px->id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) - 1</Item>
       <Item Condition="gid_.px != 0 &amp;&amp; (gid_.px->id_msb_ &amp; 1ull) == 0" Name="[comptype]">(hpx::components::component_enum_type)((gid_.px->id_msb_ &gt;&gt; 1ull) &amp; 0xfffffull)</Item>
       <Item Condition="gid_.px != 0" Name="[count]">gid_.px->count_.value_</Item>
