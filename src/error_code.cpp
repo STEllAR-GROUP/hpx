@@ -176,6 +176,18 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    error_code::error_code(error_code const& rhs)
+      : boost::system::error_code(rhs.value() == success ?
+                make_success_code(
+                    (category() == get_lightweight_hpx_category()) ?
+                        hpx::lightweight :
+                        hpx::plain) :
+                rhs)
+      , exception_(rhs.exception_)
+    {
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     error_code& error_code::operator=(error_code const& rhs)
     {
         if (this != &rhs) {
