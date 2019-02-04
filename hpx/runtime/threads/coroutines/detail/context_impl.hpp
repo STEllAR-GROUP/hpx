@@ -100,8 +100,8 @@
      make copyable.
 */
 
-#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)                              \
- && defined(HPX_HAVE_FIBER_BASED_COROUTINES)
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES) &&                            \
+    defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #   error HPX_HAVE_GENERIC_CONTEXT_COROUTINES and HPX_HAVE_FIBER_BASED_COROUTINES cannot be defined at the same time.
 #endif
 
@@ -113,8 +113,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     typedef generic_context::context_impl default_context_impl;
 }}}}
 
-#elif (defined(__linux) || defined(linux) || defined(__linux__)) \
-       && !defined(__bgq__) && !defined(__powerpc__)
+#elif (defined(__linux) || defined(linux) || defined(__linux__)) &&            \
+    !defined(__bgq__) && !defined(__powerpc__) && !defined(__s390x_)
 
 #include <hpx/runtime/threads/coroutines/detail/context_linux_x86.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail
@@ -122,7 +122,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     typedef lx::context_impl default_context_impl;
 }}}}
 
-#elif defined(_POSIX_VERSION) || defined(__bgq__) || defined(__powerpc__)
+#elif defined(_POSIX_VERSION) || defined(__bgq__) || defined(__powerpc__) ||   \
+    defined(__s390x_)
 
 #include <hpx/runtime/threads/coroutines/detail/context_posix.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail
