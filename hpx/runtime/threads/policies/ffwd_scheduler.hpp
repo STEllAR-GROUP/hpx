@@ -25,19 +25,13 @@ namespace hpx { namespace threads { namespace policies
         > thread_queue_type;
 
         //////////////////////////////////////////////////////////////////////////////////
-        ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads), thread_count(num_threads), max_queue_thread_count_(1000), queues_(num_threads)
+        ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads), thread_count(num_threads), max_queue_thread_count_(1000)
         {
-            HPX_ASSERT(num_threads != 0);
-            for (std::size_t i = 0; i < num_threads; ++i)
-                queues_[i] = new thread_queue_type(max_queue_thread_count_);
-
-//            messages = new thread_queue_type(max_queue_thread_count_);
-
-//            std::cout << " --constructor-- " << std::endl;
+            // everything necessary is done in initializer list
         }
 
         ~ffwd_scheduler() {
-
+            // messages are empty, all threads have been terminated
         }
 
         //////////////////////////////////////////////////////////////////////////////////
@@ -95,17 +89,16 @@ namespace hpx { namespace threads { namespace policies
         std::int64_t get_queue_length(
             std::size_t num_thread = std::size_t(-1)) const {
             // Return queue length of one specific queue.
-//            std::int64_t count = 0;
-//            if (std::size_t(-1) != num_thread) {
-//                HPX_ASSERT(num_thread < queues_.size());
 
-//                return messages.get_queue_length();
-//            }
 
+            // FFWD_TODO: looks like this doesn't count the thread_count background threads, right?
 //            for (std::size_t i = 0; i != queues_.size(); ++i)
 //                count += queues_[i]->get_queue_length();
 
 //            return count;
+//            if(std::size_t(-1) != num_thread) { // Return queue length of one specific queue
+//                return messages.get_queue_length();
+//            }
             return messages.get_queue_length();
         }
 
@@ -201,7 +194,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread =
                 data.schedulehint.mode == thread_schedule_hint_mode_thread ?
                 data.schedulehint.hint : std::size_t(-1);
-            std::size_t queue_size = queues_.size();
+            std::size_t queue_size = thread_count;
 
             if (std::size_t(-1) == num_thread)
             {
@@ -296,7 +289,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             // this should no longer be necessary, as we only have that one big queue, question is what does select_active pu do with the num_thread?
-            std::size_t queue_size = queues_.size();
+            std::size_t queue_size = thread_count;
 
             if (std::size_t(-1) == num_thread)
             {
@@ -339,7 +332,7 @@ namespace hpx { namespace threads { namespace policies
                 allow_fallback = false;
             }
 
-            std::size_t queue_size = queues_.size();
+            std::size_t queue_size = thread_count;
 
             if (std::size_t(-1) == num_thread)
             {
@@ -440,7 +433,7 @@ namespace hpx { namespace threads { namespace policies
         std::size_t max_queue_thread_count_;
 
         thread_queue_type messages;
-        std::vector<thread_queue_type*> queues_;
+//        std::vector<thread_queue_type*> queues_;
         std::atomic<std::size_t> curr_queue_;
 
         // Add in counters to see if messaging between get_next_thread (takes them) and wait_or_add_new (puts them in) is viable

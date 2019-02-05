@@ -848,8 +848,8 @@ namespace hpx { namespace threads { namespace detail
                         can_exit = can_exit &&
                             scheduler.SchedulingPolicy::get_thread_count(
                                 suspended, thread_priority_default,
-                                num_thread) <= (uint)( num_thread+1); // FFWD_TODO the num_threads is counted in here as well => find a way to not count them here
-//                        std::cout << scheduler.SchedulingPolicy::get_thread_count(suspended, thread_priority_default, num_thread) << std::endl;
+                                num_thread) == 0;
+
                         if (can_exit)
                         {
                             if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
