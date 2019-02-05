@@ -99,7 +99,7 @@ double run_remove_if_benchmark_std(int test_count,
             org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
-        std::remove_if(first, last, pred);
+        (void)std::remove_if(first, last, pred);
         time += hpx::util::high_resolution_clock::now() - elapsed;
     }
 
