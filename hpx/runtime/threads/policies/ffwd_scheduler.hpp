@@ -25,35 +25,18 @@ namespace hpx { namespace threads { namespace policies
         > thread_queue_type;
 
         //////////////////////////////////////////////////////////////////////////////////
-        ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads), thread_count(num_threads), max_queue_thread_count_(1000), queues_(num_threads), messages_per_thread(num_threads)
+        ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads), thread_count(num_threads), max_queue_thread_count_(1000), queues_(num_threads)
         {
             HPX_ASSERT(num_threads != 0);
             for (std::size_t i = 0; i < num_threads; ++i)
                 queues_[i] = new thread_queue_type(max_queue_thread_count_);
 
-
-//            for(std::size_t i = 0; i < num_threads; i++) {
-//                messages_per_thread[i] = 0;
-//            }
 //            messages = new thread_queue_type(max_queue_thread_count_);
-
-            wait_or_add_new_counter = 0;
-            get_next_thread_counter = 0;
 
 //            std::cout << " --constructor-- " << std::endl;
         }
 
         ~ffwd_scheduler() {
-//            std::cout << "Messages contains: " << messages.size() << " elements at time of destruction" << std::endl;
-//            messages.clear();
-//            std::cout << "added " << wait_or_add_new_counter << " tasks to the queue" << std::endl;
-//            std::cout << "got " << get_next_thread_counter << " tasks from the queue" << std::endl;
-
-////            std::cout << " --destructor-- " << std::endl;
-
-//            for(unsigned int i = 0; i < messages_per_thread.size(); i++) {
-//                std::cout << "Found " << messages_per_thread[i] << " tasks for thread " << i << std::endl;
-//            }
 
         }
 
@@ -384,18 +367,12 @@ namespace hpx { namespace threads { namespace policies
         bool wait_or_add_new(std::size_t num_thread, bool running,
                              std::int64_t& idle_loop_count) {
 //            std::cout << "wait_or_add_new.." << std::endl;
-
-            std::size_t queues_size = queues_.size();
-            HPX_ASSERT(num_thread < queues_.size());
-
             std::size_t added = 0;
             bool result = true;
 
             result = messages.wait_or_add_new(running,
                 idle_loop_count, added) && result; // FFWD_TODO: Warum mit result verundet?? result ist doch immer true, was bringt das dann?
             if (0 != added) {
-                  wait_or_add_new_counter += added;
-                  messages_per_thread.at(num_thread) += added;
                 return result;
             }
 
@@ -465,7 +442,6 @@ namespace hpx { namespace threads { namespace policies
         thread_queue_type messages;
         std::vector<thread_queue_type*> queues_;
         std::atomic<std::size_t> curr_queue_;
-        std::vector<int> messages_per_thread;
 
         // Add in counters to see if messaging between get_next_thread (takes them) and wait_or_add_new (puts them in) is viable
         std::atomic<int> wait_or_add_new_counter;
