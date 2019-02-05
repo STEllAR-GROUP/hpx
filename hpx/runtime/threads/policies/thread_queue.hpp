@@ -721,7 +721,6 @@ namespace hpx { namespace threads { namespace policies
         {
             // thread has not been created yet
             if (id) *id = invalid_thread_id;
-
             if (run_now)
             {
                 threads::thread_id_type thrd;

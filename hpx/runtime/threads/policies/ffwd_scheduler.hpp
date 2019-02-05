@@ -116,7 +116,7 @@ namespace hpx { namespace threads { namespace policies
         bool cleanup_terminated(bool delete_all) {
 
             bool empty = true;
-            messages.cleanup_terminated(delete_all) && empty; // FFWD_TODO: Warum hier mit empty verundet?
+            messages.cleanup_terminated(delete_all);
             return empty;
         }
 
@@ -127,25 +127,28 @@ namespace hpx { namespace threads { namespace policies
 
         void create_thread(thread_init_data& data, thread_id_type* id,
                                    thread_state_enum initial_state, bool run_now, error_code& ec) {
-            std::size_t num_thread =
-                data.schedulehint.mode == thread_schedule_hint_mode_thread ?
-                data.schedulehint.hint : std::size_t(-1);
-            std::size_t queue_size = thread_count;
+//            {
+//                // Entire block was used in earlier implementations to select which thread queue was used
+//                // Is it still necessary?
+//                std::size_t num_thread =
+//                    data.schedulehint.mode == thread_schedule_hint_mode_thread ?
+//                    data.schedulehint.hint : std::size_t(-1);
+//                std::size_t queue_size = thread_count;
 
-            if (std::size_t(-1) == num_thread)
-            {
-                num_thread = curr_queue_++ % queue_size;
-            }
-            else if (num_thread >= queue_size)
-            {
-                num_thread %= queue_size;
-            }
+//                if (std::size_t(-1) == num_thread)
+//                {
+//                    num_thread = curr_queue_++ % queue_size;
+//                }
+//                else if (num_thread >= queue_size)
+//                {
+//                    num_thread %= queue_size;
+//                }
 
-            // FFWD_TODO: keep this lock? What does it do?
-            std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread);
+//                std::unique_lock<pu_mutex_type> l;
+//                num_thread = select_active_pu(l, num_thread);
+//            }
 
-            messages.create_thread(data, id, initial_state, run_now, ec); // FFWD_TODO: Locking?
+            messages.create_thread(data, id, initial_state, run_now, ec);
         }
 
         bool get_next_thread(std::size_t num_thread, bool running,
@@ -178,34 +181,35 @@ namespace hpx { namespace threads { namespace policies
         void schedule_thread(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
-                             thread_priority priority = thread_priority_normal){
+            thread_priority priority = thread_priority_normal){
+//            {
+//                // Entire block was used in earlier implementations to select which thread queue was used
+//                // Is it still necessary?
+//                // NOTE: This scheduler ignores NUMA hints.
+//                std::size_t num_thread = std::size_t(-1);
+//                if (schedulehint.mode == thread_schedule_hint_mode_thread)
+//                {
+//                    num_thread = schedulehint.hint;
+//                }
+//                else
+//                {
+//                    allow_fallback = false;
+//                }
 
-            // NOTE: This scheduler ignores NUMA hints.
-            std::size_t num_thread = std::size_t(-1);
-            if (schedulehint.mode == thread_schedule_hint_mode_thread)
-            {
-                num_thread = schedulehint.hint;
-            }
-            else
-            {
-                allow_fallback = false;
-            }
+//                std::size_t queue_size = thread_count;
 
-            // FFWD_TODO: this should no longer be necessary, as we only have that one big queue, question is what does select_active pu do with the num_thread?
-            std::size_t queue_size = thread_count;
+//                if (std::size_t(-1) == num_thread)
+//                {
+//                    num_thread = curr_queue_++ % queue_size;
+//                }
+//                else if (num_thread >= queue_size)
+//                {
+//                    num_thread %= queue_size;
+//                }
 
-            if (std::size_t(-1) == num_thread)
-            {
-                num_thread = curr_queue_++ % queue_size;
-            }
-            else if (num_thread >= queue_size)
-            {
-                num_thread %= queue_size;
-            }
-
-            // FFWD_TODO: Leave locking? Again: What does it do?
-            std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread, allow_fallback);
+//                std::unique_lock<pu_mutex_type> l;
+//                num_thread = select_active_pu(l, num_thread, allow_fallback);
+//            }
 
             HPX_ASSERT(thrd->get_scheduler_base() == this);
             messages.schedule_thread(thrd);
@@ -258,7 +262,7 @@ namespace hpx { namespace threads { namespace policies
             bool result = true;
 
             result = messages.wait_or_add_new(running,
-                idle_loop_count, added) && result; // FFWD_TODO: Warum mit result verundet?? result ist doch immer true, was bringt das dann?
+                idle_loop_count, added);
             if (0 != added) {
                 return result;
             }
