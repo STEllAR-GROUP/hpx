@@ -111,7 +111,11 @@ namespace hpx { namespace naming
         static std::uint64_t const special_bits_mask =
             locality_id_mask | internal_bits_mask | component_type_mask;
 
-        explicit gid_type (std::uint64_t lsb_id = 0)
+        gid_type ()
+          : id_msb_(0), id_lsb_(0)
+        {}
+
+        explicit gid_type (std::uint64_t lsb_id)
           : id_msb_(0), id_lsb_(lsb_id)
         {}
 
