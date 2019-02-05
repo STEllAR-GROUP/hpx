@@ -3,27 +3,11 @@
 
 // FFWD_TODO: Remove all these comments!
 
-/* FFWD_TODO: Scheduling loop is done by each thread, Threadpool threads are "server" and "clients" at the same time.
- * Client whenever they put new work/tasks into the list, Server when they take tasks from the list.
-    - Ffwd_scheduler is running per node -> have message-list in here
-    - Scheduling_loop periodically calls this to get next task (get_next_thread / schedule_next) -> first look at message-list, then work of task
-    - Test this with fibonacci_dataflow
-*/
-
-/// First experiments for ffwd scheduler -> FFWD_TODO: implement scheduler_base
 #include "scheduler_base.hpp"
 #include "thread_queue.hpp"
 
 #if !defined(HPX_THREADMANAGER_SCHEDULING_FFWD_SCHEDULER)
 #define HPX_THREADMANAGER_SCHEDULING_FFWD_SCHEDULER
-
-// FFWD Message list class (outsource if this is working)
-namespace hpx { namespace threads { namespace policies
-{
-
-
-
-}}}
 
 
 namespace hpx { namespace threads { namespace policies
@@ -43,7 +27,6 @@ namespace hpx { namespace threads { namespace policies
         //////////////////////////////////////////////////////////////////////////////////
         ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads), thread_count(num_threads), max_queue_thread_count_(1000), queues_(num_threads), messages_per_thread(num_threads)
         {
-//            std::cout << "ffwd_scheduler constructor - make " << num_threads << " queues" << std::endl;
             HPX_ASSERT(num_threads != 0);
             for (std::size_t i = 0; i < num_threads; ++i)
                 queues_[i] = new thread_queue_type(max_queue_thread_count_);
@@ -218,11 +201,6 @@ namespace hpx { namespace threads { namespace policies
         bool cleanup_terminated(bool delete_all) {
 //            std::cout << "cleanup_terminated not implemented yet" << std::endl;
 
-//            bool empty = true;
-//            for (std::size_t i = 0; i != queues_.size(); ++i)
-//                empty = queues_[i]->cleanup_terminated(delete_all) && empty;
-
-//            return empty;
             bool empty = true;
             messages.cleanup_terminated(delete_all) && empty; // FFWD_TODO: Warum hier mit empty verundet?
             return empty;
@@ -230,7 +208,6 @@ namespace hpx { namespace threads { namespace policies
 
         bool cleanup_terminated(std::size_t num_thread, bool delete_all) {
 //            std::cout << "cleanup_terminated not implemented yet" << std::endl;
-//            return queues_[num_thread]->cleanup_terminated(delete_all);
             return messages.cleanup_terminated(delete_all);
 
         }
@@ -256,10 +233,6 @@ namespace hpx { namespace threads { namespace policies
             std::unique_lock<pu_mutex_type> l;
             num_thread = select_active_pu(l, num_thread);
 
-//            // queue version
-//            HPX_ASSERT(num_thread < queue_size);
-//            queues_.at(num_thread)->create_thread(data, id, initial_state,
-//                run_now, ec);
             messages.create_thread(data, id, initial_state, run_now, ec); // FFWD_TODO: Locking?
         }
 
@@ -399,8 +372,6 @@ namespace hpx { namespace threads { namespace policies
 
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 
-//            HPX_ASSERT(num_thread < queues_.size());
-//            queues_[num_thread]->schedule_thread(thrd, true);
             messages.schedule_thread(thrd, true);
         }
 
@@ -461,16 +432,13 @@ namespace hpx { namespace threads { namespace policies
         }
 
         void on_start_thread(std::size_t num_thread) override {
-//            queues_[num_thread]->on_start_thread(num_thread);
             messages.on_start_thread(num_thread);
         }
         void on_stop_thread(std::size_t num_thread) override {
-//            queues_[num_thread]->on_stop_thread(num_thread);
             messages.on_stop_thread(num_thread);
         }
         void on_error(std::size_t num_thread,
             std::exception_ptr const& e) override {
-//            queues_[num_thread]->on_error(num_thread, e);
             messages.on_error(num_thread, e);
         }
 
@@ -484,7 +452,6 @@ namespace hpx { namespace threads { namespace policies
         void start_periodic_maintenance(
             std::atomic<hpx::state>& /*global_state*/)
         {
-//            std::cout << "start_periodic_maintenance not implemented yet, is empty in other schedulers - leave empty?" << std::endl;
         }
 
         void reset_thread_distribution() {
