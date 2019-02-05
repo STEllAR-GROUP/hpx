@@ -172,9 +172,9 @@ namespace hpx { namespace threads { namespace policies
         int const max_terminated_threads;
 
         // this is the type of a map holding all threads (except depleted ones)
-        using thread_map_type =
-            std::unordered_set<thread_id_type, std::hash<thread_id_type>,
-                std::equal_to<>, util::internal_allocator<thread_id_type>>;
+        using thread_map_type = std::unordered_set<thread_id_type,
+            std::hash<thread_id_type>, std::equal_to<thread_id_type>,
+            util::internal_allocator<thread_id_type>>;
 
         using thread_heap_type =
             std::list<thread_id_type, util::internal_allocator<thread_id_type>>;
