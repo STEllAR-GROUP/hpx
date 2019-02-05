@@ -605,7 +605,7 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
         thread_data* next_thrd = nullptr;
-        while (true) { // FFWD_TODO: Add debug output to see what is called when
+        while (true) {
             thread_data* thrd = next_thrd;
             // Get the next HPX thread from the queue
             bool running = this_state.load(
@@ -614,7 +614,6 @@ namespace hpx { namespace threads { namespace detail
                            scheduler.SchedulingPolicy::get_next_thread(
                         num_thread, running, idle_loop_count, thrd)))
             {
-//                std::cout << "scheduling_loop - get_next_thread worked" << std::endl;
                 tfunc_time_wrapper tfunc_time_collector(idle_rate);
                 HPX_ASSERT(thrd->get_scheduler_base() == &scheduler);
 
@@ -823,12 +822,10 @@ namespace hpx { namespace threads { namespace detail
             else
             {
                 ++idle_loop_count;
-//                std::cout << "scheduling_loop - get_next_thread returned false" << std::endl;
 
                 if (scheduler.SchedulingPolicy::wait_or_add_new(
                         num_thread, running, idle_loop_count))
                 {
-//                    std::cout << "scheduling loop wait_or_add_new returned true" << std::endl;
                     // Clean up terminated threads before trying to exit
                     bool can_exit =
                         !running &&

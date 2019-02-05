@@ -88,17 +88,7 @@ namespace hpx { namespace threads { namespace policies
 
         std::int64_t get_queue_length(
             std::size_t num_thread = std::size_t(-1)) const {
-            // Return queue length of one specific queue.
 
-
-            // FFWD_TODO: looks like this doesn't count the thread_count background threads, right?
-//            for (std::size_t i = 0; i != queues_.size(); ++i)
-//                count += queues_[i]->get_queue_length();
-
-//            return count;
-//            if(std::size_t(-1) != num_thread) { // Return queue length of one specific queue
-//                return messages.get_queue_length();
-//            }
             return messages.get_queue_length();
         }
 
@@ -107,58 +97,7 @@ namespace hpx { namespace threads { namespace policies
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const {
-//            // Return thread count of one specific queue.
-//            std::int64_t count = 0;
-//            if (std::size_t(-1) != num_thread)
-//            {
-//                HPX_ASSERT(num_thread < queues_.size());
 
-//                switch (priority) {
-//                case thread_priority_default:
-//                case thread_priority_low:
-//                case thread_priority_normal:
-//                case thread_priority_boost:
-//                case thread_priority_high:
-//                case thread_priority_high_recursive:
-//                    return queues_[num_thread]->get_thread_count(state);
-
-//                default:
-//                case thread_priority_unknown:
-//                    {
-//                        HPX_THROW_EXCEPTION(bad_parameter,
-//                            "local_queue_scheduler::get_thread_count",
-//                            "unknown thread priority value (thread_priority_unknown)");
-//                        return 0;
-//                    }
-//                }
-//                return 0;
-
-//            }
-
-//            // Return the cumulative count for all queues.
-//            switch (priority) {
-//            case thread_priority_default:
-//            case thread_priority_low:
-//            case thread_priority_normal:
-//            case thread_priority_boost:
-//            case thread_priority_high:
-//            case thread_priority_high_recursive:
-//                {
-//                    for (std::size_t i = 0; i != queues_.size(); ++i)
-//                        count += queues_[i]->get_thread_count(state);
-//                    break;
-//                }
-
-//            default:
-//            case thread_priority_unknown:
-//                {
-//                    HPX_THROW_EXCEPTION(bad_parameter,
-//                        "local_queue_scheduler::get_thread_count",
-//                        "unknown thread priority value (thread_priority_unknown)");
-//                    return 0;
-//                }
-//            }
-//            return count;
             return messages.get_thread_count();
         }
 
@@ -175,7 +114,6 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool cleanup_terminated(bool delete_all) {
-//            std::cout << "cleanup_terminated not implemented yet" << std::endl;
 
             bool empty = true;
             messages.cleanup_terminated(delete_all) && empty; // FFWD_TODO: Warum hier mit empty verundet?
@@ -183,14 +121,12 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool cleanup_terminated(std::size_t num_thread, bool delete_all) {
-//            std::cout << "cleanup_terminated not implemented yet" << std::endl;
             return messages.cleanup_terminated(delete_all);
 
         }
 
         void create_thread(thread_init_data& data, thread_id_type* id,
                                    thread_state_enum initial_state, bool run_now, error_code& ec) {
-//            std::cout << "ffwd create_thread" << std::endl;
             std::size_t num_thread =
                 data.schedulehint.mode == thread_schedule_hint_mode_thread ?
                 data.schedulehint.hint : std::size_t(-1);
@@ -214,39 +150,6 @@ namespace hpx { namespace threads { namespace policies
 
         bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd){
-
-//            if(messages.get_queue_length() != 0) {
-////                std::cout << "get_next_thread - message" << std::endl;
-//            } else {
-////                std::cout << "get_next_thread - no message" << std::endl;
-//            }
-
-//            std::size_t queues_size = queues_.size();
-//            HPX_ASSERT(num_thread < queues_size);
-//            thread_queue_type* this_queue = queues_[num_thread];
-
-//            // we only have our local queue right now
-//            bool result = this_queue->get_next_thread(thrd);
-
-//            this_queue->increment_num_pending_accesses();
-//            if (result) {
-//                return true;
-//            }
-//            this_queue->increment_num_pending_misses();
-
-//            bool have_staged = this_queue->
-//                get_staged_queue_length(std::memory_order_relaxed) != 0;
-
-//            // Give up, we should have work to convert.
-//            if (have_staged)
-//                return false;
-
-//            if (!running)
-//            {
-//                return false;
-//            }
-
-//            return false;
 
             // we only have our local queue right now
             bool result = messages.get_next_thread(thrd);
@@ -276,7 +179,7 @@ namespace hpx { namespace threads { namespace policies
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
                              thread_priority priority = thread_priority_normal){
-//            std::cout << "schedule_thread not implemented yet" << std::endl;
+
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
             if (schedulehint.mode == thread_schedule_hint_mode_thread)
@@ -288,7 +191,7 @@ namespace hpx { namespace threads { namespace policies
                 allow_fallback = false;
             }
 
-            // this should no longer be necessary, as we only have that one big queue, question is what does select_active pu do with the num_thread?
+            // FFWD_TODO: this should no longer be necessary, as we only have that one big queue, question is what does select_active pu do with the num_thread?
             std::size_t queue_size = thread_count;
 
             if (std::size_t(-1) == num_thread)
@@ -305,11 +208,6 @@ namespace hpx { namespace threads { namespace policies
             num_thread = select_active_pu(l, num_thread, allow_fallback);
 
             HPX_ASSERT(thrd->get_scheduler_base() == this);
-
-//            HPX_ASSERT(num_thread < queues_.size());
-//            queues_[num_thread]->schedule_thread(thrd);
-//            get_next_thread_counter++;
-
             messages.schedule_thread(thrd);
         }
 
@@ -317,9 +215,6 @@ namespace hpx { namespace threads { namespace policies
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
                                   thread_priority priority = thread_priority_normal) {
-            // std::cout << "schedule_thread_last not implemented yet" << std::endl;
-
-            get_next_thread_counter++;
 
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
@@ -359,7 +254,6 @@ namespace hpx { namespace threads { namespace policies
 
         bool wait_or_add_new(std::size_t num_thread, bool running,
                              std::int64_t& idle_loop_count) {
-//            std::cout << "wait_or_add_new.." << std::endl;
             std::size_t added = 0;
             bool result = true;
 
@@ -374,28 +268,6 @@ namespace hpx { namespace threads { namespace policies
             {
                 return true;
             }
-
-            // NUMA sensitivity not yet implemented, so we don't need it here
-//            for (std::size_t i = 1; i != queues_size; ++i)
-//            {
-//                // FIXME: Do a better job here.
-//                std::size_t const idx = (i + num_thread) % queues_size;
-
-//                HPX_ASSERT(idx != num_thread);
-
-//                result = queues_[num_thread]->wait_or_add_new(running,
-//                    idle_loop_count, added, queues_[idx]) && result;
-//                if (0 != added)
-//                {
-//                    queues_[idx]->increment_num_stolen_from_staged(added);
-//                    queues_[num_thread]->increment_num_stolen_to_staged(added);
-////                    std::cout << "wait_or_add_new returning " << result << std::endl;
-
-//                    wait_or_add_new_counter += added;
-
-//                    return result;
-//                }
-//            }
 
             // nothing was found
             return false;
@@ -433,12 +305,7 @@ namespace hpx { namespace threads { namespace policies
         std::size_t max_queue_thread_count_;
 
         thread_queue_type messages;
-//        std::vector<thread_queue_type*> queues_;
         std::atomic<std::size_t> curr_queue_;
-
-        // Add in counters to see if messaging between get_next_thread (takes them) and wait_or_add_new (puts them in) is viable
-        std::atomic<int> wait_or_add_new_counter;
-        std::atomic<int> get_next_thread_counter;
 
     };
 }}}
