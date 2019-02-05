@@ -36,7 +36,7 @@ struct A
 struct B
 {
     const int a;
-    double b;
+    short b;
 
 public:
     B() = delete;
