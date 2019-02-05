@@ -42,6 +42,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 #ifdef __APPLE__
@@ -251,21 +252,22 @@ namespace hpx { namespace detail
         // create a std::exception_ptr object encapsulating the Exception to
         // be thrown and annotate it with all the local information we have
         try {
-            throw_with_info(e, hpx::exception_info().set(
-               hpx::detail::throw_stacktrace(back_trace),
-               hpx::detail::throw_locality(node),
-               hpx::detail::throw_hostname(hostname),
-               hpx::detail::throw_pid(pid),
-               hpx::detail::throw_shepherd(shepherd),
-               hpx::detail::throw_thread_id(thread_id),
-               hpx::detail::throw_thread_name(thread_name),
-               hpx::detail::throw_function(func),
-               hpx::detail::throw_file(file),
-               hpx::detail::throw_line(line),
-               hpx::detail::throw_env(env),
-               hpx::detail::throw_config(config),
-               hpx::detail::throw_state(state_name),
-               hpx::detail::throw_auxinfo(auxinfo)));
+            throw_with_info(e,
+                std::move(hpx::exception_info().set(
+                    hpx::detail::throw_stacktrace(back_trace),
+                    hpx::detail::throw_locality(node),
+                    hpx::detail::throw_hostname(hostname),
+                    hpx::detail::throw_pid(pid),
+                    hpx::detail::throw_shepherd(shepherd),
+                    hpx::detail::throw_thread_id(thread_id),
+                    hpx::detail::throw_thread_name(thread_name),
+                    hpx::detail::throw_function(func),
+                    hpx::detail::throw_file(file),
+                    hpx::detail::throw_line(line),
+                    hpx::detail::throw_env(env),
+                    hpx::detail::throw_config(config),
+                    hpx::detail::throw_state(state_name),
+                    hpx::detail::throw_auxinfo(auxinfo))));
         }
         catch (...) {
             return std::current_exception();
@@ -284,10 +286,11 @@ namespace hpx { namespace detail
         // create a std::exception_ptr object encapsulating the Exception to
         // be thrown and annotate it with all the local information we have
         try {
-            throw_with_info(e, hpx::exception_info().set(
-               hpx::detail::throw_function(func),
-               hpx::detail::throw_file(file),
-               hpx::detail::throw_line(line)));
+            throw_with_info(e,
+                std::move(
+                    hpx::exception_info().set(hpx::detail::throw_function(func),
+                        hpx::detail::throw_file(file),
+                        hpx::detail::throw_line(line))));
         }
         catch (...) {
             return std::current_exception();
