@@ -428,6 +428,10 @@ namespace detail
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
 
+            // handle all threads waiting for the future to become ready
+            auto on_completed = std::move(on_completed_);
+            on_completed_.clear();
+
             // The value has been set, changing the state to 'value' at this
             // point signals to all other threads that this future is ready.
             state expected = empty;
@@ -442,10 +446,6 @@ namespace detail
                     "data has already been set for this future");
                 return;
             }
-
-            // handle all threads waiting for the future to become ready
-            auto on_completed = std::move(on_completed_);
-            on_completed_.clear();
 
             // Note: we use notify_one repeatedly instead of notify_all as we
             //       know: a) that most of the time we have at most one thread
@@ -484,6 +484,10 @@ namespace detail
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
 
+            // handle all threads waiting for the future to become ready
+            auto on_completed = std::move(on_completed_);
+            on_completed_.clear();
+
             // The value has been set, changing the state to 'exception' at this
             // point signals to all other threads that this future is ready.
             state expected = empty;
@@ -498,10 +502,6 @@ namespace detail
                     "data has already been set for this future");
                 return;
             }
-
-            // handle all threads waiting for the future to become ready
-            auto on_completed = std::move(on_completed_);
-            on_completed_.clear();
 
             // Note: we use notify_one repeatedly instead of notify_all as we
             //       know: a) that most of the time we have at most one thread
