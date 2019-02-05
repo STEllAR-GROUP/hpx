@@ -12,13 +12,6 @@
 #include <hpx/config.hpp>
 #include <hpx/error.hpp>
 
-/// \cond NOINTERNAL
-namespace boost
-{
-    class exception_ptr;
-}
-/// \endcond
-
 namespace hpx
 {
     /// \cond NOINTERNAL
