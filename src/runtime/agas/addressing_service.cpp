@@ -2890,7 +2890,7 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == std::size_t(~0U))
+        if (sequence_nr == ~0U)
         {
             sequence_nr =
                 std::size_t(naming::get_locality_id_from_id(find_here()));
@@ -2910,7 +2910,7 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == std::size_t(~0U))
+        if (sequence_nr == ~0U)
         {
             sequence_nr =
                 std::size_t(naming::get_locality_id_from_id(find_here()));
@@ -2944,7 +2944,7 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == std::size_t(~0U))
+        if (sequence_nr == ~0U)
         {
             sequence_nr =
                 std::size_t(naming::get_locality_id_from_id(find_here()));
