@@ -133,7 +133,7 @@ namespace hpx { namespace util
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
             "component_paths = ${HPX_COMPONENT_PATHS}",
-            "component_base_paths = $[hpx.location]"
+            "component_base_paths = $[hpx.location]" // NOLINT
                 HPX_INI_PATH_DELIMITER "$[system.executable_prefix]",
             "component_path_suffixes = /lib/hpx" HPX_INI_PATH_DELIMITER
                                       "/bin/hpx",
