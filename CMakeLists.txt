@@ -48,6 +48,9 @@ project(HPX CXX C)
 set(HPX_VERSION_MAJOR 1)
 set(HPX_VERSION_MINOR 3)
 set(HPX_VERSION_SUBMINOR 0)
+set(HPX_VERSION_DATE 20181112)
+set(HPX_VERSION_TAG "-trunk")
+
 set(HPX_VERSION "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}")
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
 set(HPX_SOVERSION ${HPX_VERSION_MAJOR})
@@ -1804,7 +1807,7 @@ hpx_include(SetOutputPaths)
 ##############################################################################
 
 ################################################################################
-# Provide a macro for generating config headers
+# Provide a function for generating config headers
 ################################################################################
 function(generate_config_defines_header TARGET_DIRECTORY)
   # Generate a defines.hpp to be used in the build directory ...
@@ -1939,7 +1942,7 @@ endif()
 add_plugin_modules()
 
 ################################################################################
-# Configure the header to include all compile definitions
+# Generate config headers and helpers
 ################################################################################
 generate_config_defines_header(${CMAKE_BINARY_DIR})
 
@@ -1949,6 +1952,17 @@ write_config_defines_file(
   TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
   NAMESPACE default
   FILENAME "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
+
+# Configure version.hpp for build tree and install directory
+configure_file(
+    "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
+    "${CMAKE_BINARY_DIR}/hpx/config/version.hpp"
+    @ONLY)
+
+configure_file(
+    "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
+    "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/version.hpp"
+    @ONLY)
 
 # Configure hpxrun.py
 configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
