@@ -32,6 +32,7 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`3663` - Fixing race between setting and getting the value inside future_data
 * :hpx-pr:`3648` - Adding timestamp option for S390x platform
 * :hpx-pr:`3647` - Blind attempt to fix warnings issued by gcc V9
 * :hpx-pr:`3591` - Fix compilation error on arm7 architecture. Compiles and runs on Fedora 29 on Pi 3.
