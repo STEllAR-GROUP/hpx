@@ -270,7 +270,9 @@ int main(int argc, char* argv[])
                       << std::endl;
 
             high_priority_sched::init_parameter_type scheduler_init(
-                init.num_threads_, {4, 4, 64}, init.affinity_data_,
+                init.num_threads_,
+                {4, 4, 64},
+                init.affinity_data_,
                 thread_queue_init, "shared-priority-scheduler");
             std::unique_ptr<high_priority_sched> scheduler(
                 new high_priority_sched(scheduler_init));
@@ -302,7 +304,8 @@ int main(int argc, char* argv[])
                           << std::endl;
 
                 high_priority_sched::init_parameter_type scheduler_init(
-                    init.num_threads_, {4, 4, 64}, init.affinity_data_,
+                    init.num_threads_, {4, 4, 64},
+                    init.affinity_data_,
                     thread_queue_init, "shared-priority-scheduler");
                 std::unique_ptr<high_priority_sched> scheduler(
                     new high_priority_sched(scheduler_init));

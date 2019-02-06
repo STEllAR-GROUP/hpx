@@ -656,7 +656,7 @@ namespace hpx { namespace threads {
                     shared_priority_queue_scheduler<>
                         local_sched_type;
                 local_sched_type::init_parameter_type init(
-                    thread_pool_init.num_threads_, {4, 4, 64},    // -V112
+                    thread_pool_init.num_threads_, {1, 1, 64},
                     thread_pool_init.affinity_data_, thread_queue_init,
                     "core-shared_priority_queue_scheduler");
 

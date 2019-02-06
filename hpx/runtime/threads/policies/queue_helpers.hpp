@@ -41,6 +41,13 @@ namespace hpx { namespace threads { namespace policies {
         std::size_t low_priority;
     };
 
+    // apply the modulo operator only when needed
+    // (i.e. when the input is greater than the ceiling)
+    // NB: the numbers must be positive
+    HPX_FORCEINLINE int fast_mod(const unsigned int input, const unsigned int ceil) {
+        return input >= ceil ? input % ceil : input;
+    }
+
     // ----------------------------------------------------------------
     // Helper class to hold a set of queues.
     // ----------------------------------------------------------------
@@ -50,11 +57,10 @@ namespace hpx { namespace threads { namespace policies {
         void init(std::size_t cores, std::size_t queues,
             thread_queue_init_parameters thread_queue_init)
         {
-            num_cores = cores;
+            num_cores  = cores;
             num_queues = queues;
-            scale = num_cores == 1 ? 0 :
-                                     static_cast<double>(num_queues - 1) /
-                    static_cast<double>(num_cores - 1);
+            scale      = num_cores==1 || queues==0 ? 0
+                         : static_cast<double>(num_queues-1)/(num_cores-1);
             //
             queues_.resize(num_queues);
             for (std::size_t i = 0; i < num_queues; ++i)
@@ -78,34 +84,35 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        inline bool get_next_thread(std::size_t id, threads::thread_data*& thrd)
+        inline bool get_next_thread(std::size_t qidx,
+            threads::thread_data*& thrd, bool steal)
         {
-            // loop over all queues and take one task,
+            // loop over queues and take one task,
             // starting with the requested queue
-            // then stealing from any other one in the container
-            for (std::size_t i = 0; i < num_queues; ++i)
-            {
-                std::size_t q = (id + i) % num_queues;
-                if (queues_[q]->get_next_thread(thrd))
-                    return true;
+            for (std::size_t i=0; i<num_queues; ++i) {
+                std::size_t q = fast_mod((qidx + i), num_queues);
+                // we we got a thread, return it
+                if (queues_[q]->get_next_thread(thrd)) return true;
+                // if we're not stealing, then do not check other queues
+                if (!steal) break;
             }
             return false;
         }
 
         // ----------------------------------------------------------------
-        inline bool wait_or_add_new(
-            std::size_t id, bool running, std::size_t& added)
+        inline bool wait_or_add_new(std::size_t id, bool running,
+           std::size_t& added, bool steal)
         {
             // loop over all queues and take one task,
             // starting with the requested queue
             // then stealing from any other one in the container
             bool result = true;
-            for (std::size_t i = 0; i < num_queues; ++i)
-            {
-                std::size_t q = (id + i) % num_queues;
-                result = queues_[q]->wait_or_add_new(running, added) && result;
-                if (0 != added)
-                    return result;
+            for (std::size_t i=0; i<num_queues; ++i) {
+                std::size_t q = fast_mod((id + i), num_queues);
+                result = queues_[q]->wait_or_add_new(running,
+                    added) && result;
+                if (0 != added) return result;
+                if (!steal) break;
             }
             return result;
         }
@@ -130,8 +137,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        bool enumerate_threads(
-            util::function_nonser<bool(thread_id_type)> const& f,
+        inline bool enumerate_threads(util::function_nonser<bool(thread_id_type)> const& f,
             thread_state_enum state = unknown) const
         {
             bool result = true;
@@ -141,8 +147,22 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        inline std::size_t size() const
+        inline void abort_all_suspended_threads()
         {
+            for (auto &q : queues_) q->abort_all_suspended_threads();
+        }
+
+        // ------------------------------------------------------------
+        inline bool cleanup_terminated(bool delete_all)
+        {
+            bool empty = true;
+            for (auto &q : queues_)
+                 empty = empty && q->cleanup_terminated(delete_all);
+            return empty;
+        }
+
+        // ----------------------------------------------------------------
+        inline std::size_t size() const {
             return num_queues;
         }
 
