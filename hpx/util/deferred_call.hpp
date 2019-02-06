@@ -71,45 +71,65 @@ namespace hpx { namespace util
         {};
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename F, typename Ts, typename Is>
+        struct deferred_impl;
+
+        template <typename F, typename ...Ts, std::size_t ...Is>
+        struct deferred_impl<F, util::tuple<Ts...>, pack_c<std::size_t, Is...>>
+        {
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename util::invoke_result<F, Ts...>::type
+            operator()()
+            {
+                using invoke_impl = typename detail::dispatch_invoke<F>::type;
+                return invoke_impl{std::move(_f)}(
+                    util::get<Is>(std::move(_args))...);
+            }
+
+            F _f;
+            util::tuple<Ts...> _args;
+        };
+
         template <typename F, typename ...Ts>
         class deferred;
 
         template <typename F, typename ...Ts>
         class deferred
+          : private deferred_impl<
+                F, util::tuple<typename util::decay_unwrap<Ts>::type...>,
+                typename detail::make_index_pack<sizeof...(Ts)>::type
+            >
         {
+            using base_type = deferred_impl<
+                F, util::tuple<typename util::decay_unwrap<Ts>::type...>,
+                typename detail::make_index_pack<sizeof...(Ts)>::type
+            >;
+
         public:
-            deferred() {} // needed for serialization
+            deferred() : base_type{} {} // needed for serialization
 
             template <typename F_, typename ...Ts_, typename =
                 typename std::enable_if<
                     !std::is_same<typename std::decay<F_>::type, deferred>::value
                 >::type>
             explicit HPX_HOST_DEVICE deferred(F_&& f, Ts_&&... vs)
-              : _f(std::forward<F_>(f))
-              , _args(std::forward<Ts_>(vs)...)
+              : base_type{
+                    std::forward<F_>(f),
+                    util::forward_as_tuple(std::forward<Ts_>(vs)...)}
             {}
 
 #if !defined(__NVCC__) && !defined(__CUDACC__)
             deferred(deferred&&) = default;
 #else
             HPX_HOST_DEVICE deferred(deferred&& other)
-              : _f(std::move(other._f))
-              , _args(std::move(other._args))
+              : base_type{std::move(other)}
             {}
 #endif
 
             deferred(deferred const&) = delete;
             deferred& operator=(deferred const&) = delete;
 
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename invoke_deferred_result<F, Ts...>::type
-            operator()()
-            {
-                using index_pack =
-                    typename make_index_pack<sizeof...(Ts)>::type;
-                return detail::invoke_fused_impl(index_pack{},
-                    std::move(_f), std::move(_args));
-            }
+            using base_type::operator();
 
             template <typename Archive>
             void serialize(Archive& ar, unsigned int const /*version*/)
@@ -120,17 +140,13 @@ namespace hpx { namespace util
 
             std::size_t get_function_address() const
             {
-                return traits::get_function_address<
-                        typename util::decay_unwrap<F>::type
-                    >::call(_f);
+                return traits::get_function_address<F>::call(_f);
             }
 
             char const* get_function_annotation() const
             {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-                return traits::get_function_annotation<
-                        typename util::decay_unwrap<F>::type
-                    >::call(_f);
+                return traits::get_function_annotation<F>::call(_f);
 #else
                 return nullptr;
 #endif
@@ -140,9 +156,7 @@ namespace hpx { namespace util
             util::itt::string_handle get_function_annotation_itt() const
             {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-                return traits::get_function_annotation_itt<
-                        typename util::decay_unwrap<F>::type
-                    >::call(_f);
+                return traits::get_function_annotation_itt<F>::call(_f);
 #else
                 static util::itt::string_handle sh("deferred");
                 return sh;
@@ -151,8 +165,8 @@ namespace hpx { namespace util
 #endif
 
         private:
-            typename util::decay_unwrap<F>::type _f;
-            util::tuple<typename util::decay_unwrap<Ts>::type...> _args;
+            using base_type::_f;
+            using base_type::_args;
         };
     }
 
