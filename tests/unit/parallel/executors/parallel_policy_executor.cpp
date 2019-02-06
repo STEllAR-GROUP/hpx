@@ -60,16 +60,18 @@ hpx::thread::id test_f(hpx::future<void> f, int passed_through)
 }
 
 template <typename Policy>
-void test_then()
+void test_then(bool sync)
 {
     typedef hpx::parallel::execution::parallel_policy_executor<Policy> executor;
 
     hpx::future<void> f = hpx::make_ready_future();
 
     executor exec;
-    HPX_TEST(
-        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() !=
-        hpx::this_thread::get_id());
+    bool result =
+        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() ==
+        hpx::this_thread::get_id();
+
+    HPX_TEST(sync == result);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -132,7 +134,18 @@ void test_bulk_async(bool sync)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
+void bulk_test_f_s(int value, hpx::shared_future<void> f, hpx::thread::id tid,
+    int passed_through) //-V813
+{
+    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+
+    f.get();                    // propagate exceptions
+
+    HPX_TEST(tid == hpx::this_thread::get_id());
+    HPX_TEST_EQ(passed_through, 42);
+}
+
+void bulk_test_f_a(int value, hpx::shared_future<void> f, hpx::thread::id tid,
     int passed_through) //-V813
 {
     HPX_ASSERT(f.is_ready());   // make sure, future is ready
@@ -144,7 +157,7 @@ void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
 }
 
 template <typename Policy>
-void test_bulk_then()
+void test_bulk_then(bool sync)
 {
     typedef hpx::parallel::execution::parallel_policy_executor<Policy> executor;
 
@@ -160,11 +173,12 @@ void test_bulk_then()
     hpx::shared_future<void> f = hpx::make_ready_future();
 
     executor exec;
-    hpx::parallel::execution::bulk_then_execute(
-        exec, hpx::util::bind(&bulk_test_f, _1, _2, tid, _3), v, f, 42
+    hpx::parallel::execution::bulk_then_execute(exec,
+        hpx::util::bind(sync ? &bulk_test_f_s : &bulk_test_f_a, _1, _2, tid, _3),
+        v, f, 42
     ).get();
     hpx::parallel::execution::bulk_then_execute(
-        exec, &bulk_test_f, v, f, tid, 42
+        exec, sync ? &bulk_test_f_s : &bulk_test_f_a, v, f, tid, 42
     ).get();
 }
 
@@ -198,15 +212,15 @@ void static_check_executor()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Policy>
-void policy_test(bool sync = false)
+void policy_test(bool sync = false, bool then_sync = false)
 {
     test_sync<Policy>(sync);
     test_async<Policy>(sync);
-    test_then<Policy>();
+    test_then<Policy>(then_sync);
 
     test_bulk_sync<Policy>(sync);
     test_bulk_async<Policy>(sync);
-    test_bulk_then<Policy>();
+    test_bulk_then<Policy>(then_sync);
 }
 
 int hpx_main(int argc, char* argv[])
@@ -216,9 +230,9 @@ int hpx_main(int argc, char* argv[])
     policy_test<hpx::launch>();
 
     policy_test<hpx::launch::async_policy>();
-    policy_test<hpx::launch::sync_policy>(true);
+    policy_test<hpx::launch::sync_policy>(true, true);
     policy_test<hpx::launch::fork_policy>();
-    policy_test<hpx::launch::deferred_policy>(true);
+    policy_test<hpx::launch::deferred_policy>(true, false);
 
     return hpx::finalize();
 }

@@ -34,6 +34,39 @@ namespace hpx { namespace parallel { namespace execution { namespace detail
     };
 
     template <>
+    struct post_policy_dispatch<launch>
+    {
+        template <typename F, typename... Ts>
+        static void call(hpx::util::thread_description const& desc,
+            launch const& policy, F && f, Ts &&... ts)
+        {
+            if (policy == launch::sync)
+            {
+                hpx::util::deferred_call(
+                    std::forward<F>(f), std::forward<Ts>(ts)...)();
+                return;
+            }
+
+            threads::register_thread_nullary(
+                hpx::util::deferred_call(
+                    std::forward<F>(f), std::forward<Ts>(ts)...),
+                desc, threads::pending, false, policy.priority());
+        }
+    };
+
+    template <>
+    struct post_policy_dispatch<launch::sync_policy>
+    {
+        template <typename F, typename... Ts>
+        static void call(hpx::util::thread_description const& desc,
+            launch::sync_policy const& policy, F && f, Ts &&... ts)
+        {
+            hpx::util::deferred_call(
+                std::forward<F>(f), std::forward<Ts>(ts)...)();
+        }
+    };
+
+    template <>
     struct post_policy_dispatch<launch::fork_policy>
     {
         template <typename F, typename... Ts>

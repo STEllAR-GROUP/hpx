@@ -22,6 +22,8 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/deferred_call.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/util/range.hpp>
 
 #include <algorithm>
@@ -80,13 +82,13 @@ namespace hpx { namespace parallel { namespace execution
         HPX_CONSTEXPR explicit parallel_policy_executor(
                 Policy l = detail::get_default_policy<Policy>::call(),
                 std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
-          : l_(l), num_spread_(spread), num_tasks_(tasks)
+          : policy_(l), num_spread_(spread), num_tasks_(tasks)
         {}
 
         /// \cond NOINTERNAL
         bool operator==(parallel_policy_executor const& rhs) const noexcept
         {
-            return l_ == rhs.l_ &&
+            return policy_ == rhs.policy_ &&
                 num_spread_ == rhs.num_spread_ &&
                 num_tasks_ == rhs.num_tasks_;
         }
@@ -112,18 +114,18 @@ namespace hpx { namespace parallel { namespace execution
         async_execute(F && f, Ts &&... ts) const
         {
             return hpx::detail::async_launch_policy_dispatch<Policy>::call(
-                l_, std::forward<F>(f), std::forward<Ts>(ts)...);
+                policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename ... Ts>
-        void post(F && f, Ts &&... ts)
+        void post(F && f, Ts &&... ts) const
         {
             hpx::util::thread_description desc(f,
                 "hpx::parallel::execution::parallel_executor::post");
 
             detail::post_policy_dispatch<Policy>::call(
-                desc, l_, std::forward<F>(f), std::forward<Ts>(ts)...);
+                desc, policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         // BulkTwoWayExecutor interface
@@ -175,8 +177,7 @@ namespace hpx { namespace parallel { namespace execution
 
                 while (size > chunk_size)
                 {
-                    async_execute(
-                        [&, base, curr_chunk_size, num_tasks, it] {
+                    post([&, base, chunk_size, num_tasks, it] {
                             return spawn(results, l, base, chunk_size, 
                                 num_tasks, func, it, ts...);
                         });
@@ -206,13 +207,13 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int version)
         {
-            ar & l_ & num_spread_ & num_tasks_;
+            ar & policy_ & num_spread_ & num_tasks_;
         }
         /// \endcond
 
     private:
         /// \cond NOINTERNAL
-        Policy l_;
+        Policy policy_;
         std::size_t num_spread_;
         std::size_t num_tasks_;
         /// \endcond
