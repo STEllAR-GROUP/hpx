@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 #
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
