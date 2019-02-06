@@ -10,17 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_bind_expression.hpp>
-#include <hpx/traits/is_placeholder.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/one_shot.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/tuple.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -89,7 +81,9 @@ namespace hpx { namespace util
             operator()(Ts&&... vs)
             {
                 check_call();
-                return util::invoke(std::move(_f), std::forward<Ts>(vs)...);
+
+                using invoke_impl = typename detail::dispatch_invoke<F>::type;
+                return invoke_impl{std::move(_f)}(std::forward<Ts>(vs)...);
             }
 
             template <typename Archive>
