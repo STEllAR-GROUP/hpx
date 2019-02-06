@@ -105,7 +105,10 @@ namespace hpx { namespace util
             typename invoke_deferred_result<F, Ts...>::type
             operator()()
             {
-                return util::invoke_fused(std::move(_f), std::move(_args));
+                using index_pack =
+                    typename make_index_pack<sizeof...(Ts)>::type;
+                return detail::invoke_fused_impl(index_pack{},
+                    std::move(_f), std::move(_args));
             }
 
             template <typename Archive>
