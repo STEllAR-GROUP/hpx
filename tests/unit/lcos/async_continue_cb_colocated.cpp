@@ -11,6 +11,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <atomic>
+#include <chrono>
 #include <cstdint>
 #include <utility>
 #include <vector>
@@ -79,18 +80,20 @@ int test_async_continue_cb_colocated(test_client const& target)
         hpx::future<int> f1 = hpx::async_continue_cb(
             inc, make_continuation(), hpx::colocated(target), &cb, 42);
         HPX_TEST_EQ(f1.get(), 43);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
         hpx::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
-        callback_called.store(0);
         hpx::future<int> f2 = hpx::async_continue_cb(
             inc_f, make_continuation(), hpx::colocated(target), &cb, f);
 
         p.set_value(42);
         HPX_TEST_EQ(f2.get(), 43);
-        HPX_TEST_EQ(callback_called.load(), 1);
+
+        // The callback should have been called 2 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST_EQ(callback_called.load(), 2);
     }
 
     {
@@ -103,13 +106,16 @@ int test_async_continue_cb_colocated(test_client const& target)
         hpx::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
-        callback_called.store(0);
         hpx::future<int> f2 = hpx::async_continue_cb(
             inc_f, make_continuation(), hpx::colocated(target), &cb, f);
 
         p.set_value(42);
         HPX_TEST_EQ(f2.get(), 43);
-        HPX_TEST_EQ(callback_called.load(), 1);
+
+        // The callback should have been called 2 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST_EQ(callback_called.load(), 2);
     }
 
     // test chaining locally
@@ -118,28 +124,26 @@ int test_async_continue_cb_colocated(test_client const& target)
         hpx::future<int> f = hpx::async_continue_cb(
             inc, make_continuation(mult), hpx::colocated(target), &cb, 42);
         HPX_TEST_EQ(f.get(), 86);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, make_continuation()),
             hpx::colocated(target), &cb, 42);
         HPX_TEST_EQ(f.get(), 86);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, make_continuation(inc)),
             hpx::colocated(target), &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, make_continuation(inc, make_continuation())),
             hpx::colocated(target), &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
-        HPX_TEST_EQ(callback_called.load(), 1);
+
+        // The callback should have been called 4 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST_EQ(callback_called.load(), 4);
     }
 
     // test chaining
@@ -203,6 +207,10 @@ int test_async_continue_cb_colocated(test_client const& target)
             make_continuation(mult, make_continuation()),
             hpx::colocated(target), &cb, 42);
         HPX_TEST_EQ(f.get(), 86);
+
+        // The callback should have been called once. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
         HPX_TEST_EQ(callback_called.load(), 1);
     }
 
