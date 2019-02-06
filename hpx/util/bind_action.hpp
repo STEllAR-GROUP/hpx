@@ -31,94 +31,76 @@ namespace hpx { namespace util
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename Ts, typename Us>
-        struct bind_action_apply_impl
+        template <
+            typename Action,
+            std::size_t ...Is, typename ...Ts, typename Us>
+        HPX_FORCEINLINE
+        bool bind_action_apply_impl(
+            detail::pack_c<std::size_t, Is...>,
+            util::tuple<Ts...> const& bound, Us&& unbound)
         {
-            typedef bool type;
-
-            template <std::size_t ...Is>
-            static HPX_FORCEINLINE
-            type call(
-                detail::pack_c<std::size_t, Is...>
-              , Ts&& bound, Us&& unbound
-            )
-            {
-                return hpx::apply<Action>(
-                    bind_eval(
-                        util::get<Is>(std::forward<Ts>(bound)),
-                        std::forward<Us>(unbound))...);
-            }
-        };
+            return hpx::apply<Action>(
+                detail::bind_eval(
+                    util::get<Is>(bound),
+                    std::forward<Us>(unbound))...);
+        }
 
         template <typename Action, typename Ts, typename Us>
         HPX_FORCEINLINE
         bool
-        bind_action_apply(Ts&& bound, Us&& unbound)
+        bind_action_apply(Ts const& bound, Us&& unbound)
         {
-            return bind_action_apply_impl<Action, Ts, Us>::call(
-                typename detail::make_index_pack<
+            using index_pack = typename detail::make_index_pack<
                     util::tuple_size<typename std::decay<Ts>::type>::value
-                >::type(),
+                >::type;
+            return detail::bind_action_apply_impl<Action>(index_pack{},
                 bound, std::forward<Us>(unbound));
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename Ts, typename Us>
-        struct bind_action_apply_cont_impl
+        template <
+            typename Action,
+            std::size_t ...Is, typename ...Ts, typename Us>
+        HPX_FORCEINLINE
+        bool bind_action_apply_cont_impl(
+            detail::pack_c<std::size_t, Is...>,
+            naming::id_type const& cont,
+            util::tuple<Ts...> const& bound, Us&& unbound)
         {
-            typedef bool type;
-
-            template <std::size_t ...Is>
-            static HPX_FORCEINLINE
-            type call(
-                detail::pack_c<std::size_t, Is...>
-              , naming::id_type const& cont
-              , Ts&& bound, Us&& unbound
-            )
-            {
-                return hpx::apply_c<Action>(cont,
-                    bind_eval(
-                        util::get<Is>(std::forward<Ts>(bound)),
-                        std::forward<Us>(unbound))...);
-            }
-        };
+            return hpx::apply_c<Action>(cont,
+                detail::bind_eval(
+                    util::get<Is>(bound),
+                    std::forward<Us>(unbound))...);
+        }
 
         template <typename Action, typename Ts, typename Us>
         HPX_FORCEINLINE
         bool
         bind_action_apply_cont(naming::id_type const& cont,
-            Ts&& bound, Us&& unbound
-        )
+            Ts const& bound, Us&& unbound)
         {
-            return bind_action_apply_cont_impl<
-                    Action, Ts, Us
-                >::call(
-                    typename detail::make_index_pack<
-                        util::tuple_size<typename std::decay<Ts>::type>::value
-                    >::type(), cont,
-                    bound, std::forward<Us>(unbound));
+            using index_pack = typename detail::make_index_pack<
+                    util::tuple_size<typename std::decay<Ts>::type>::value
+                >::type;
+            return detail::bind_action_apply_cont_impl<Action>(index_pack{},
+                cont, bound, std::forward<Us>(unbound));
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename Ts, typename Us>
-        struct bind_action_apply_cont_impl2
+        template <
+            typename Action,
+            std::size_t ...Is, typename Continuation, typename ...Ts, typename Us>
+        HPX_FORCEINLINE
+        bool bind_action_apply_cont_impl2(
+            detail::pack_c<std::size_t, Is...>,
+            Continuation && cont,
+            util::tuple<Ts...> const& bound, Us&& unbound)
         {
-            typedef bool type;
-
-            template <typename Continuation, std::size_t ...Is>
-            static HPX_FORCEINLINE
-            type call(
-                detail::pack_c<std::size_t, Is...>
-              , Continuation && cont
-              , Ts&& bound, Us&& unbound
-            )
-            {
-                return hpx::apply<Action>(std::forward<Continuation>(cont),
-                    bind_eval(
-                        util::get<Is>(std::forward<Ts>(bound)),
-                        std::forward<Us>(unbound))...);
-            }
-        };
+            return hpx::apply<Action>(std::forward<Continuation>(cont),
+                detail::bind_eval(
+                    util::get<Is>(bound),
+                    std::forward<Us>(unbound))...);
+        }
 
         template <typename Action, typename Continuation, typename Ts,
             typename Us>
@@ -127,50 +109,43 @@ namespace hpx { namespace util
             traits::is_continuation<Continuation>::value, bool
         >::type
         bind_action_apply_cont2(Continuation && cont,
-            Ts&& bound, Us&& unbound)
+            Ts const& bound, Us&& unbound)
         {
-            return bind_action_apply_cont_impl2<
-                    Action, Ts, Us
-                >::call(
-                    typename detail::make_index_pack<
-                        util::tuple_size<typename std::decay<Ts>::type>::value
-                    >::type(), std::forward<Continuation>(cont),
-                    bound, std::forward<Us>(unbound));
+            using index_pack = typename detail::make_index_pack<
+                    util::tuple_size<typename std::decay<Ts>::type>::value
+                >::type;
+            return detail::bind_action_apply_cont_impl2<Action>(index_pack{},
+                std::forward<Continuation>(cont), bound, std::forward<Us>(unbound));
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename Ts, typename Us>
-        struct bind_action_async_impl
+        template <
+            typename Action,
+            std::size_t ...Is, typename ...Ts, typename Us>
+        HPX_FORCEINLINE
+        lcos::future<typename traits::promise_local_result<
+            typename hpx::traits::extract_action<Action>::remote_result_type
+        >::type> bind_action_async_impl(
+            detail::pack_c<std::size_t, Is...>,
+            util::tuple<Ts...> const& bound, Us&& unbound)
         {
-            typedef lcos::future<typename traits::promise_local_result<
-                typename hpx::traits::extract_action<Action>::remote_result_type
-            >::type> type;
-
-            template <std::size_t ...Is>
-            static HPX_FORCEINLINE
-            type call(
-                detail::pack_c<std::size_t, Is...>
-              , Ts&& bound, Us&& unbound
-            )
-            {
-                return hpx::async<Action>(
-                    bind_eval(
-                        util::get<Is>(std::forward<Ts>(bound)),
-                        std::forward<Us>(unbound))...);
-            }
-        };
+            return hpx::async<Action>(
+                detail::bind_eval(
+                    util::get<Is>(bound),
+                    std::forward<Us>(unbound))...);
+        }
 
         template <typename Action, typename Ts, typename Us>
         HPX_FORCEINLINE
         lcos::future<typename traits::promise_local_result<
             typename hpx::traits::extract_action<Action>::remote_result_type
         >::type>
-        bind_action_async(Ts&& bound, Us&& unbound)
+        bind_action_async(Ts const& bound, Us&& unbound)
         {
-            return bind_action_async_impl<Action, Ts, Us>::call(
-                typename detail::make_index_pack<
+            using index_pack = typename detail::make_index_pack<
                     util::tuple_size<typename std::decay<Ts>::type>::value
-                >::type(),
+                >::type;
+            return detail::bind_action_async_impl<Action>(index_pack{},
                 bound, std::forward<Us>(unbound));
         }
 
@@ -182,10 +157,10 @@ namespace hpx { namespace util
         >::type
         bind_action_invoke(Ts&& bound, Us&& unbound)
         {
-            return bind_action_async_impl<Action, Ts, Us>::call(
-                typename detail::make_index_pack<
+            using index_pack = typename detail::make_index_pack<
                     util::tuple_size<typename std::decay<Ts>::type>::value
-                >::type(),
+                >::type;
+            return detail::bind_action_async_impl<Action>(index_pack{},
                 bound, std::forward<Us>(unbound)).get();
         }
 
@@ -240,8 +215,8 @@ namespace hpx { namespace util
             >::type
             apply_c(Continuation && cont, Us&&... us) const
             {
-                return detail::bind_action_apply_cont2<Action>
-                        (std::forward<Continuation>(cont),
+                return detail::bind_action_apply_cont2<Action>(
+                    std::forward<Continuation>(cont),
                     _bound_args, util::forward_as_tuple(std::forward<Us>(us)...));
             }
 

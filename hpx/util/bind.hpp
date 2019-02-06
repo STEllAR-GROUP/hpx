@@ -171,13 +171,14 @@ namespace hpx { namespace util
         {};
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Ts, typename Us, std::size_t ...Is>
+        template <std::size_t ...Is, typename F, typename Ts, typename Us>
         HPX_CONSTEXPR HPX_HOST_DEVICE
         typename invoke_bound_result<F&&, Ts&&, Us>::type
-        bound_impl(F&& f, Ts&& bound, Us&& unbound,
-            pack_c<std::size_t, Is...>)
+        bound_impl(pack_c<std::size_t, Is...>,
+            F&& f, Ts&& bound, Us&& unbound)
         {
-            return util::invoke(std::forward<F>(f),
+            using invoke_impl = typename detail::dispatch_invoke<F>::type;
+            return invoke_impl{std::forward<F>(f)}(
                 detail::bind_eval(
                     util::get<Is>(std::forward<Ts>(bound)),
                     std::forward<Us>(unbound))...);
@@ -223,9 +224,10 @@ namespace hpx { namespace util
                 util::tuple<Us&&...>
             >::type operator()(Us&&... vs) &
             {
-                return detail::bound_impl(_f, _args,
-                    util::forward_as_tuple(std::forward<Us>(vs)...),
-                    typename detail::make_index_pack<sizeof...(Ts)>::type());
+                using index_pack =
+                    typename detail::make_index_pack<sizeof...(Ts)>::type;
+                return detail::bound_impl(index_pack{},
+                    _f, _args, util::forward_as_tuple(std::forward<Us>(vs)...));
             }
 
             template <typename ...Us>
@@ -236,9 +238,10 @@ namespace hpx { namespace util
                 util::tuple<Us&&...>
             >::type operator()(Us&&... vs) const&
             {
-                return detail::bound_impl(_f, _args,
-                    util::forward_as_tuple(std::forward<Us>(vs)...),
-                    typename detail::make_index_pack<sizeof...(Ts)>::type());
+                using index_pack =
+                    typename detail::make_index_pack<sizeof...(Ts)>::type;
+                return detail::bound_impl(index_pack{},
+                    _f, _args, util::forward_as_tuple(std::forward<Us>(vs)...));
             }
 
             template <typename ...Us>
@@ -249,9 +252,11 @@ namespace hpx { namespace util
                 util::tuple<Us&&...>
             >::type operator()(Us&&... vs) &&
             {
-                return detail::bound_impl(std::move(_f), std::move(_args),
-                    util::forward_as_tuple(std::forward<Us>(vs)...),
-                    typename detail::make_index_pack<sizeof...(Ts)>::type());
+                using index_pack =
+                    typename detail::make_index_pack<sizeof...(Ts)>::type;
+                return detail::bound_impl(index_pack{},
+                    std::move(_f), std::move(_args),
+                    util::forward_as_tuple(std::forward<Us>(vs)...));
             }
 
             template <typename ...Us>
@@ -262,9 +267,11 @@ namespace hpx { namespace util
                 util::tuple<Us&&...>
             >::type operator()(Us&&... vs) const&&
             {
-                return detail::bound_impl(std::move(_f), std::move(_args),
-                    util::forward_as_tuple(std::forward<Us>(vs)...),
-                    typename detail::make_index_pack<sizeof...(Ts)>::type());
+                using index_pack =
+                    typename detail::make_index_pack<sizeof...(Ts)>::type;
+                return detail::bound_impl(index_pack{},
+                    std::move(_f), std::move(_args),
+                    util::forward_as_tuple(std::forward<Us>(vs)...));
             }
 
             template <typename Archive>
