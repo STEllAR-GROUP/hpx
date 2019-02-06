@@ -40,7 +40,7 @@ namespace hpx { namespace util
             util::tuple<Ts...> const& bound, Us&& unbound)
         {
             return hpx::apply<Action>(
-                detail::bind_eval(
+                detail::bind_eval<Ts const&>::call(
                     util::get<Is>(bound),
                     std::forward<Us>(unbound))...);
         }
@@ -68,7 +68,7 @@ namespace hpx { namespace util
             util::tuple<Ts...> const& bound, Us&& unbound)
         {
             return hpx::apply_c<Action>(cont,
-                detail::bind_eval(
+                detail::bind_eval<Ts const&>::call(
                     util::get<Is>(bound),
                     std::forward<Us>(unbound))...);
         }
@@ -97,7 +97,7 @@ namespace hpx { namespace util
             util::tuple<Ts...> const& bound, Us&& unbound)
         {
             return hpx::apply<Action>(std::forward<Continuation>(cont),
-                detail::bind_eval(
+                detail::bind_eval<Ts const&>::call(
                     util::get<Is>(bound),
                     std::forward<Us>(unbound))...);
         }
@@ -130,7 +130,7 @@ namespace hpx { namespace util
             util::tuple<Ts...> const& bound, Us&& unbound)
         {
             return hpx::async<Action>(
-                detail::bind_eval(
+                detail::bind_eval<Ts const&>::call(
                     util::get<Is>(bound),
                     std::forward<Us>(unbound))...);
         }
