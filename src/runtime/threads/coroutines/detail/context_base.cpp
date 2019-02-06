@@ -19,11 +19,11 @@
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
+    template class context_base<coroutine_impl>;
+
     // initialize static allocation counter
     template <typename CoroutineImpl>
     allocation_counters context_base<CoroutineImpl>::m_allocation_counters;
-
-    template struct context_base<coroutine_impl>;
 
 #if defined(HPX_HAVE_APEX)
     // adding this here, because the thread_id_type and thread_data types
