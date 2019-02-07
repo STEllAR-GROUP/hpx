@@ -217,7 +217,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             HPX_ASSERT(running());
 
             m_state = ctx_ready;
+#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+            start_yield_fiber(&asan_fake_stack, m_caller);
+#endif
             do_yield();
+
+#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+            finish_switch_fiber(asan_fake_stack, m_caller);
+#endif
 
             HPX_ASSERT(running());
         }
@@ -371,6 +378,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             m_type_info = std::move(info);
             m_state = ctx_exited;
             m_exit_status = status;
+#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+            start_yield_fiber(&asan_fake_stack, m_caller);
+#endif
             do_yield();
         }
 
@@ -390,7 +400,16 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             ++m_phase;
 #endif
             m_state = ctx_running;
+
+#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+            start_switch_fiber(&asan_fake_stack);
+#endif
+
             swap_context(m_caller, *this, detail::invoke_hint());
+
+#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+            finish_switch_fiber(asan_fake_stack, m_caller);
+#endif
         }
 
         typedef typename default_context_impl<CoroutineImpl>::context_impl_base ctx_type;

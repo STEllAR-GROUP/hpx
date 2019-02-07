@@ -81,6 +81,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         // loop as long this coroutine has been rebound
         do
         {
+#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+            finish_switch_fiber(nullptr, m_caller);
+#endif
             std::exception_ptr tinfo;
             try
             {

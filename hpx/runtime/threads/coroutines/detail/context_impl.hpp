@@ -117,6 +117,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #elif (defined(__linux) || defined(linux) || defined(__linux__)) &&            \
     !defined(__bgq__) && !defined(__powerpc__) && !defined(__s390x_)
 
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
+#define HPX_CONTEXT_HAVE_ADDRESS_SANITIZER
+#endif
+
 #include <hpx/runtime/threads/coroutines/detail/context_linux_x86.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {

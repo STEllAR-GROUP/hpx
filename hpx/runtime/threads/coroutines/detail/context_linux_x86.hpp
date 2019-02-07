@@ -55,6 +55,10 @@
 #include <valgrind/valgrind.h>
 #endif
 
+#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+#include <sanitizer/asan_interface.h>
+#endif
+
 /*
  * Defining HPX_COROUTINE_NO_SEPARATE_CALL_SITES will disable separate
  * invoke, and yield swap_context functions. Separate calls sites
@@ -95,7 +99,12 @@ namespace hpx { namespace threads { namespace coroutines
         class x86_linux_context_impl_base : detail::context_impl_base
         {
         public:
-            x86_linux_context_impl_base() {}
+            x86_linux_context_impl_base()
+              : asan_fake_stack(nullptr)
+              , asan_stack_bottom(nullptr)
+              , asan_stack_size(0)
+            {
+            }
 
             void prefetch() const
             {
@@ -130,8 +139,35 @@ namespace hpx { namespace threads { namespace coroutines
             friend void swap_context(x86_linux_context_impl_base& from,
                 x86_linux_context_impl_base const& to, yield_hint);
 
+#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+            void start_switch_fiber(void** fake_stack)
+            {
+                __sanitizer_start_switch_fiber(
+                    fake_stack, asan_stack_bottom, asan_stack_size);
+            }
+            void start_yield_fiber(
+                void** fake_stack, x86_linux_context_impl_base& caller)
+            {
+                __sanitizer_start_switch_fiber(fake_stack,
+                    caller.asan_stack_bottom, caller.asan_stack_size);
+            }
+            void finish_switch_fiber(
+                void* fake_stack, x86_linux_context_impl_base& caller)
+            {
+                __sanitizer_finish_switch_fiber(fake_stack,
+                    &caller.asan_stack_bottom, &caller.asan_stack_size);
+            }
+#endif
+
         protected:
             void ** m_sp;
+
+#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+        public:
+            void* asan_fake_stack;
+            const void* asan_stack_bottom;
+            std::size_t asan_stack_size;
+#endif
         };
 
         template <typename CoroutineImpl>
@@ -198,6 +234,10 @@ namespace hpx { namespace threads { namespace coroutines
                         VALGRIND_STACK_REGISTER(m_stack, eos));
                 }
 #endif
+#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+                asan_stack_size = m_stack_size;
+                asan_stack_bottom = const_cast<const void*>(m_stack);
+#endif
 
                 set_sigsegv_handler();
             }
@@ -214,7 +254,8 @@ namespace hpx { namespace threads { namespace coroutines
                 }
             }
 
-#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION) &&                               \
+    !defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
 
 // heuristic value 1 kilobyte
 #define COROUTINE_STACKOVERFLOW_ADDR_EPSILON 1000UL
@@ -295,6 +336,11 @@ namespace hpx { namespace threads { namespace coroutines
                     fun * funp = trampoline<CoroutineImpl>;
                     m_sp[cb_idx] = this;
                     m_sp[funp_idx] = reinterpret_cast<void*>(funp);
+#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+                    asan_stack_size = m_stack_size;
+                    asan_stack_bottom = const_cast<const void*>(m_stack);
+#endif
+                }
             }
 
             std::ptrdiff_t get_available_stack_space()
@@ -346,7 +392,8 @@ namespace hpx { namespace threads { namespace coroutines
         private:
             void set_sigsegv_handler()
             {
-#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION) &&                               \
+    !defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
                 // concept inspired by the following links:
                 //
                 // https://rethinkdb.com/blog/handling-stack-overflow-on-custom-stacks/
@@ -414,7 +461,8 @@ namespace hpx { namespace threads { namespace coroutines
             std::ptrdiff_t m_stack_size;
             void* m_stack;
 
-#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION) &&                               \
+    !defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
             struct sigaction action;
             stack_t segv_stack;
 #endif

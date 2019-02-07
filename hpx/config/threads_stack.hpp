@@ -37,7 +37,7 @@
 #if !defined(HPX_SMALL_STACK_SIZE)
 #  if defined(__has_feature)
 #    if __has_feature(address_sanitizer)
-#      define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
+#      define HPX_SMALL_STACK_SIZE  0x40000       // 256kByte
 #    endif
 #  endif
 #endif
