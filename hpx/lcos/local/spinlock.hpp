@@ -15,7 +15,6 @@
 #include <hpx/config.hpp>
 
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
