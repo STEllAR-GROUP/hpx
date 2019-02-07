@@ -19,6 +19,7 @@
 #endif
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/fibhash.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
@@ -40,13 +41,21 @@ namespace hpx { namespace util
             ~itt_spinlock_init();
         };
 #endif
-        // special struct to ensure cache line alignemnt
+#if defined(HPX_HAVE_CXX11_ALIGNAS)
+        struct alignas(threads::get_cache_line_size()) spinlock_holder
+        {
+            boost::detail::spinlock lock;
+        };
+#else
+        // special struct to ensure cache line alignment
         struct spinlock_holder
         {
             // pad to 64 bytes
-            char cacheline_pad[64 - sizeof(boost::detail::spinlock)];
+            char cacheline_pad[threads::get_cache_line_size() -
+                sizeof(boost::detail::spinlock)];
             boost::detail::spinlock lock;
         };
+#endif
     }
 
     template <typename Tag, std::size_t N = HPX_HAVE_SPINLOCK_POOL_NUM>
