@@ -47,10 +47,10 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    static bool run_on_completed_on_new_thread(
-        util::unique_function_nonser<bool()> && f, error_code& ec)
+    template <typename Callback>
+    static void run_on_completed_on_new_thread(Callback&& f)
     {
-        lcos::local::futures_factory<bool()> p(std::move(f));
+        lcos::local::futures_factory<void()> p(std::forward<Callback>(f));
 
         bool is_hpx_thread = nullptr != hpx::threads::get_self_ptr();
         hpx::launch policy = launch::fork;
@@ -61,25 +61,17 @@ namespace hpx { namespace lcos { namespace detail
         threads::thread_id_type tid = p.apply(
             policy, threads::thread_priority_boost,
             threads::thread_stacksize_current,
-            threads::thread_schedule_hint(),
-            ec);
-        if (ec) return false;
+            threads::thread_schedule_hint());
 
         // wait for the task to run
         if (is_hpx_thread)
         {
             // make sure this thread is executed last
             hpx::this_thread::yield_to(thread::id(std::move(tid)));
-            return p.get_future().get(ec);
+            return p.get_future().get();
         }
-        else
-        {
-            // If we are not on a HPX thread, we need to return immediately, to
-            // allow the newly spawned thread to execute. This might swallow
-            // possible exceptions bubbling up from the completion handler (which
-            // shouldn't happen anyway...
-            return true;
-        }
+        // If we are not on a HPX thread, we need to return immediately, to
+        // allow the newly spawned thread to execute.
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -146,37 +138,27 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     // deferred execution of a given continuation
-    bool future_data_base<traits::detail::future_data_void>::
-        run_on_completed(completed_callback_type && on_completed,
-        std::exception_ptr& ptr)
+    void future_data_base<traits::detail::future_data_void>::run_on_completed(
+        completed_callback_type&& on_completed) noexcept
     {
         try {
             hpx::util::annotate_function annotate(on_completed);
             on_completed();
         }
         catch (...) {
-            ptr = std::current_exception();
-            return false;
+            // If the completion handler throws an exception, there's nothing
+            // we can do, report the exception and terminate.
+            hpx::detail::report_exception_and_terminate(std::current_exception());
         }
-        return true;
     }
 
-    bool future_data_base<traits::detail::future_data_void>::
-        run_on_completed(completed_callback_vector_type && on_completed,
-        std::exception_ptr& ptr)
+    void future_data_base<traits::detail::future_data_void>::run_on_completed(
+        completed_callback_vector_type&& on_completed) noexcept
     {
-        try {
-            for (auto& func: on_completed)
-            {
-                hpx::util::annotate_function annotate(func);
-                func();
-            }
+        for (auto&& func: on_completed)
+        {
+            run_on_completed(std::move(func));
         }
-        catch (...) {
-            ptr = std::current_exception();
-            return false;
-        }
-        return true;
     }
 
     // make sure continuation invocation does not recurse deeper than
@@ -199,37 +181,25 @@ namespace hpx { namespace lcos { namespace detail
         if (!recurse_asynchronously)
         {
             // directly execute continuation on this thread
-            std::exception_ptr ptr;
-            if (!run_on_completed(std::forward<Callback>(on_completed), ptr))
-            {
-                error_code ec(lightweight);
-                set_exception(hpx::detail::access_exception(ec));
-            }
+            run_on_completed(std::forward<Callback>(on_completed));
         }
         else
         {
             // re-spawn continuation on a new thread
-            boost::intrusive_ptr<future_data_base> this_(this);
+            void (*p)(Callback &&) = &future_data_base::run_on_completed;
 
-            bool (future_data_base::*p)(Callback&&, std::exception_ptr&) =
-                &future_data_base::run_on_completed;
-
-            error_code ec(lightweight);
-            std::exception_ptr ptr;
-            if (!run_on_completed_on_new_thread(
-                    util::deferred_call(p, std::move(this_),
-                        std::forward<Callback>(on_completed), std::ref(ptr)),
-                    ec))
+            try
             {
-                // thread creation went wrong
-                if (ec) {
-                    set_exception(hpx::detail::access_exception(ec));
-                    return;
-                }
-
-                // re-throw exception in this context
-                HPX_ASSERT(ptr);        // exception should have been set
-                std::rethrow_exception(ptr);
+                run_on_completed_on_new_thread(
+                    util::deferred_call(
+                        p, std::forward<Callback>(on_completed)));
+            }
+            catch(...)
+            {
+                // If an exception while creating the new task or inside the
+                // completion handler is thrown, there is nothing we can do...
+                // ... but terminate and report the error
+                hpx::detail::report_exception_and_terminate(std::current_exception());
             }
         }
     }

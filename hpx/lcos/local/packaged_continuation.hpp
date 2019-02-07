@@ -881,7 +881,7 @@ namespace hpx { namespace lcos { namespace detail
     unwrap_impl(Future && future, error_code& ec)
     {
         return unwrap_impl_alloc(
-            util::internal_allocator<>{}, std::move(future), ec);
+            util::internal_allocator<>{}, std::forward<Future>(future), ec);
     }
 
 //     template <typename R>

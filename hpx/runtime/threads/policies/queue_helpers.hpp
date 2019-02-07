@@ -15,6 +15,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/unused.hpp>
 
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <vector>
@@ -66,7 +67,7 @@ namespace hpx { namespace threads { namespace policies
         // ----------------------------------------------------------------
         inline std::size_t get_queue_index(std::size_t id) const
         {
-            return static_cast<std::size_t>(0.5 + id*scale);;
+            return std::lround(id*scale);
         }
 
         // ----------------------------------------------------------------

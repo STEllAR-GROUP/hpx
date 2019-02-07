@@ -10,6 +10,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <atomic>
+#include <chrono>
 #include <cstdint>
 #include <vector>
 
@@ -63,13 +64,15 @@ void test_remote_async_cb(hpx::id_type const& target)
         callback_called.store(0);
         hpx::future<std::int32_t> f1 = hpx::async_cb(inc, target, &cb, 42);
         HPX_TEST_EQ(f1.get(), 43);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         hpx::future<std::int32_t> f2 =
             hpx::async_cb(hpx::launch::all, inc, target, &cb, 42);
         HPX_TEST_EQ(f2.get(), 43);
-        HPX_TEST_EQ(callback_called.load(), 1);
+
+        // The callback should have been called 2 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST_EQ(callback_called.load(), 2);
     }
 
     {
@@ -86,6 +89,10 @@ void test_remote_async_cb(hpx::id_type const& target)
         p.set_value(42);
         HPX_TEST_EQ(f1.get(), 43);
         HPX_TEST_EQ(f2.get(), 43);
+
+        // The callback should have been called 2 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
         HPX_TEST_EQ(callback_called.load(), 2);
     }
 
@@ -94,13 +101,15 @@ void test_remote_async_cb(hpx::id_type const& target)
         hpx::future<std::int32_t> f1 =
             hpx::async_cb<increment_action>(target, &cb, 42);
         HPX_TEST_EQ(f1.get(), 43);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         hpx::future<std::int32_t> f2 =
             hpx::async_cb<increment_action>(hpx::launch::all, target, &cb, 42);
         HPX_TEST_EQ(f2.get(), 43);
-        HPX_TEST_EQ(callback_called.load(), 1);
+
+        // The callback should have been called 2 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST_EQ(callback_called.load(), 2);
     }
 
     {
@@ -113,13 +122,15 @@ void test_remote_async_cb(hpx::id_type const& target)
         callback_called.store(0);
         hpx::future<std::int32_t> f1 = hpx::async_cb(call, dec, &cb, 42);
         HPX_TEST_EQ(f1.get(), 41);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         hpx::future<std::int32_t> f2 =
             hpx::async_cb(hpx::launch::all, call, dec, &cb, 42);
         HPX_TEST_EQ(f2.get(), 41);
-        HPX_TEST_EQ(callback_called.load(), 1);
+
+        // The callback should have been called 2 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST_EQ(callback_called.load(), 2);
     }
 
     {
@@ -131,13 +142,15 @@ void test_remote_async_cb(hpx::id_type const& target)
         hpx::future<std::int32_t> f1 =
             hpx::async_cb<call_action>(dec, &cb, 42);
         HPX_TEST_EQ(f1.get(), 41);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         hpx::future<std::int32_t> f2 =
             hpx::async_cb<call_action>(hpx::launch::all, dec, &cb, 42);
         HPX_TEST_EQ(f2.get(), 41);
-        HPX_TEST_EQ(callback_called.load(), 1);
+
+        // The callback should have been called 2 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST_EQ(callback_called.load(), 2);
     }
 
     {
@@ -152,6 +165,10 @@ void test_remote_async_cb(hpx::id_type const& target)
 
         HPX_TEST_EQ(f1.get(), 44);
         HPX_TEST_EQ(f2.get(), 44);
+
+        // The callback should have been called 2 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
         HPX_TEST_EQ(callback_called.load(), 2);
     }
 }

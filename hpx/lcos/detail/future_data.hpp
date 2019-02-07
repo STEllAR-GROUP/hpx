@@ -264,15 +264,15 @@ namespace detail
         // continuation support
 
         // deferred execution of a given continuation
-        bool run_on_completed(completed_callback_type&& on_completed,
-            std::exception_ptr& ptr);
-        bool run_on_completed(completed_callback_vector_type&& on_completed,
-            std::exception_ptr& ptr);
+        static void run_on_completed(
+            completed_callback_type&& on_completed) noexcept;
+        static void run_on_completed(
+            completed_callback_vector_type&& on_completed) noexcept;
 
         // make sure continuation invocation does not recurse deeper than
         // allowed
         template <typename Callback>
-        void handle_on_completed(Callback&& on_completed);
+        static void handle_on_completed(Callback&& on_completed);
 
         /// Set the callback which needs to be invoked when the future becomes
         /// ready. If the future is ready the function will be invoked

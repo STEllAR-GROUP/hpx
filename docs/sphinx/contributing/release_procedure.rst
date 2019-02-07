@@ -79,7 +79,7 @@ are completed to avoid confusion.
 #. Protect the release branch again to disable deleting and force pushes.
 
 #. Checkout the release branch, and replace the ``-trunk`` tag in
-   ``hpx/config/version.hpp`` with ``-rc1``.
+   ``CMakeLists.txt`` with ``-rc1``.
 
 #. Remove the examples and benchmarks that will not go into the release from the
    release branch.
@@ -124,7 +124,7 @@ are completed to avoid confusion.
    * Repeat by tagging a new release candidate as many times as needed.
 
 #. Checkout the release branch, and replace the ``-rcN`` tag in
-   ``hpx/config/version.hpp`` with an empty string.
+   ``CMakeLists.txt`` with an empty string.
 
 #. Update any occurrences of the latest stable release to refer to the version
    about to be released. For example, ``quickstart.rst`` contains instructions
@@ -135,7 +135,7 @@ are completed to avoid confusion.
 
 #. Add the release date to the caption of the current "What's New" section in
    the docs, and change the value of ``HPX_VERSION_DATE`` in
-   ``hpx/config/version.hpp``.
+   ``CMakeLists.txt``.
 
 #. Tag the release from the release branch, where tag name is the version to be
    released and description is "HPX V$VERSION: The C++ Standards Library for
@@ -190,7 +190,6 @@ are completed to avoid confusion.
    example by the next version number). Bump the HPX version to the next
    release target. The following files contain version info:
 
-   * ``hpx/config/version.hpp``
    * ``CMakeLists.txt``
    * Grep for old version number
 

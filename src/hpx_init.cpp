@@ -559,7 +559,7 @@ namespace hpx
             start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_, std::move(startup),
                 std::move(shutdown));
 
-            rt.release();          // pointer to runtime is stored in TLS
+            (void)rt.release();          // pointer to runtime is stored in TLS
             return 0;
         }
 
