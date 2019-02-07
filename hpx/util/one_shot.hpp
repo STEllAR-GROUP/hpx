@@ -83,7 +83,7 @@ namespace hpx { namespace util
                 check_call();
 
                 using invoke_impl = typename detail::dispatch_invoke<F>::type;
-                return invoke_impl{std::move(_f)}(std::forward<Ts>(vs)...);
+                return invoke_impl(std::move(_f))(std::forward<Ts>(vs)...);
             }
 
             template <typename Archive>

@@ -31,7 +31,7 @@ namespace hpx { namespace util { namespace detail
         HPX_FORCEINLINE static R _invoke(void* f, Ts&&... vs)
         {
             using invoke_impl = typename detail::dispatch_invoke<T&>::type;
-            return util::void_guard<R>(), invoke_impl{vtable::get<T>(f)}(
+            return util::void_guard<R>(), invoke_impl(vtable::get<T>(f))(
                     std::forward<Ts>(vs)...);
         }
         R (*invoke)(void*, Ts&&...);

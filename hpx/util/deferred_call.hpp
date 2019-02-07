@@ -82,7 +82,7 @@ namespace hpx { namespace util
             operator()()
             {
                 using invoke_impl = typename detail::dispatch_invoke<F>::type;
-                return invoke_impl{std::move(_f)}(
+                return invoke_impl(std::move(_f))(
                     util::get<Is>(std::move(_args))...);
             }
 
@@ -106,7 +106,7 @@ namespace hpx { namespace util
             >;
 
         public:
-            deferred() : base_type{} {} // needed for serialization
+            deferred() {} // needed for serialization
 
             template <typename F_, typename ...Ts_, typename =
                 typename std::enable_if<

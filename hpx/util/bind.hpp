@@ -135,7 +135,7 @@ namespace hpx { namespace util
             >::type operator()(Us&&... vs) &
             {
                 using invoke_impl = typename detail::dispatch_invoke<F&>::type;
-                return invoke_impl{_f}(detail::bind_eval<Ts&>::call(
+                return invoke_impl(_f)(detail::bind_eval<Ts&>::call(
                     util::get<Is>(_args),
                     util::forward_as_tuple(std::forward<Us>(vs)...))...);
             }
@@ -149,7 +149,7 @@ namespace hpx { namespace util
             >::type operator()(Us&&... vs) const&
             {
                 using invoke_impl = typename detail::dispatch_invoke<F const&>::type;
-                return invoke_impl{_f}(detail::bind_eval<Ts const&>::call(
+                return invoke_impl(_f)(detail::bind_eval<Ts const&>::call(
                     util::get<Is>(_args),
                     util::forward_as_tuple(std::forward<Us>(vs)...))...);
             }
@@ -163,7 +163,7 @@ namespace hpx { namespace util
             >::type operator()(Us&&... vs) &&
             {
                 using invoke_impl = typename detail::dispatch_invoke<F>::type;
-                return invoke_impl{std::move(_f)}(detail::bind_eval<Ts>::call(
+                return invoke_impl(std::move(_f))(detail::bind_eval<Ts>::call(
                     util::get<Is>(std::move(_args)),
                     util::forward_as_tuple(std::forward<Us>(vs)...))...);
             }
@@ -177,7 +177,7 @@ namespace hpx { namespace util
             >::type operator()(Us&&... vs) const&&
             {
                 using invoke_impl = typename detail::dispatch_invoke<F const>::type;
-                return invoke_impl{std::move(_f)}(detail::bind_eval<Ts const>::call(
+                return invoke_impl(std::move(_f))(detail::bind_eval<Ts const>::call(
                     util::get<Is>(std::move(_args)),
                     util::forward_as_tuple(std::forward<Us>(vs)...))...);
             }
@@ -199,7 +199,7 @@ namespace hpx { namespace util
             >;
 
         public:
-            bound() : base_type{} {} // needed for serialization
+            bound() {} // needed for serialization
 
             template <typename F_, typename ...Ts_, typename =
                 typename std::enable_if<

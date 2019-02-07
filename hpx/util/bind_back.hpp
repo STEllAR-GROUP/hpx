@@ -49,7 +49,7 @@ namespace hpx { namespace util
             >::type operator()(Us&&... vs) &
             {
                 using invoke_impl = typename detail::dispatch_invoke<F&>::type;
-                return invoke_impl{_f}(
+                return invoke_impl(_f)(
                     std::forward<Us>(vs)..., util::get<Is>(_args)...);
             }
 
@@ -62,7 +62,7 @@ namespace hpx { namespace util
             >::type operator()(Us&&... vs) const&
             {
                 using invoke_impl = typename detail::dispatch_invoke<F const&>::type;
-                return invoke_impl{_f}(
+                return invoke_impl(_f)(
                     std::forward<Us>(vs)..., util::get<Is>(_args)...);
             }
 
@@ -75,7 +75,7 @@ namespace hpx { namespace util
             >::type operator()(Us&&... vs) &&
             {
                 using invoke_impl = typename detail::dispatch_invoke<F>::type;
-                return invoke_impl{std::move(_f)}(
+                return invoke_impl(std::move(_f))(
                     std::forward<Us>(vs)..., util::get<Is>(std::move(_args))...);
             }
 
@@ -88,7 +88,7 @@ namespace hpx { namespace util
             >::type operator()(Us&&... vs) const&&
             {
                 using invoke_impl = typename detail::dispatch_invoke<F const>::type;
-                return invoke_impl{std::move(_f)}(
+                return invoke_impl(std::move(_f))(
                     std::forward<Us>(vs)..., util::get<Is>(std::move(_args))...);
             }
 
@@ -109,7 +109,7 @@ namespace hpx { namespace util
             >;
 
         public:
-            bound_back() : base_type{} {} // needed for serialization
+            bound_back() {} // needed for serialization
 
             template <typename F_, typename ...Ts_, typename =
                 typename std::enable_if<

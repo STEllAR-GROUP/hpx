@@ -28,6 +28,11 @@ namespace hpx { namespace util
         {
             T C::*f;
 
+            HPX_CONSTEXPR HPX_HOST_DEVICE
+            invoke_mem_obj(T C::*mem_obj) noexcept
+              : f(mem_obj)
+            {}
+
             // t0.*f
             template <typename T0>
             HPX_CONSTEXPR HPX_HOST_DEVICE
@@ -57,6 +62,11 @@ namespace hpx { namespace util
         struct invoke_mem_fun
         {
             T C::*f;
+
+            HPX_CONSTEXPR HPX_HOST_DEVICE
+            invoke_mem_fun(T C::*mem_fun) noexcept
+              : f(mem_fun)
+            {}
 
             // (t0.*f)(t1, ..., tN)
             template <typename T0, typename ...Ts>
@@ -130,7 +140,7 @@ namespace hpx { namespace util
     invoke(F&& f, Ts&&... vs)
     {
         using invoke_impl = typename detail::dispatch_invoke<F>::type;
-        return invoke_impl{std::forward<F>(f)}(std::forward<Ts>(vs)...);
+        return invoke_impl(std::forward<F>(f))(std::forward<Ts>(vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -143,7 +153,7 @@ namespace hpx { namespace util
     R invoke_r(F&& f, Ts&&... vs)
     {
         using invoke_impl = typename detail::dispatch_invoke<F>::type;
-        return util::void_guard<R>(), invoke_impl{std::forward<F>(f)}(
+        return util::void_guard<R>(), invoke_impl(std::forward<F>(f))(
                 std::forward<Ts>(vs)...);
     }
 
