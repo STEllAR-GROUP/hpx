@@ -844,6 +844,9 @@ endif()
 hpx_option(HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support."
   OFF CATEGORY "Debugging")
 
+hpx_option(HPX_WITH_SANITIZERS BOOL "Configure with sanitizer instrumentation support."
+  OFF CATEGORY "Debugging")
+
 hpx_option(HPX_WITH_VERIFY_LOCKS BOOL
   "Enable lock verification code (default: OFF, implicitly enabled in debug builds)"
   OFF
@@ -1752,6 +1755,10 @@ if(HPX_WITH_VALGRIND)
   endif()
   include_directories(${VALGRIND_INCLUDE_DIR})
   hpx_add_config_define(HPX_HAVE_VALGRIND)
+endif()
+
+if(HPX_WITH_SANITIZERS)
+  hpx_add_config_define(HPX_HAVE_SANITIZERS)
 endif()
 
 if(HPX_WITH_VIM_YCM)
