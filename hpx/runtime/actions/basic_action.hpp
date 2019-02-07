@@ -18,6 +18,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
+#include <hpx/runtime/actions/preassigned_action_id.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -33,26 +34,26 @@
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/is_future.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif
 
+#include <boost/utility/string_ref.hpp>
+
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
-#include <memory>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -65,46 +66,76 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        template <typename Action, typename F, typename ...Ts>
-        struct continuation_thread_function
+        template <typename Action>
+        struct action_invoke
+        {
+            naming::address::address_type lva;
+            naming::address::component_type comptype;
+
+            template <typename ...Ts>
+            HPX_FORCEINLINE
+            typename Action::internal_result_type
+            operator()(Ts&&... vs) const
+            {
+                return Action::invoke(lva, comptype, std::forward<Ts>(vs)...);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        /// The \a thread_function will be registered as the thread
+        /// function of a thread. It encapsulates the execution of the
+        /// original function (given by \a func).
+        template <typename Action>
+        class thread_function
         {
         public:
-            typedef typename Action::continuation_type continuation_type;
-
-            explicit continuation_thread_function(
-                    continuation_type&& cont,
-                    naming::address::address_type lva,
-                    F&& f, Ts&&... vs)
-              : cont_(std::move(cont))
-              , lva_(lva)
-              , f_(std::forward<F>(f), std::forward<Ts>(vs)...)
-            {}
-
-            explicit continuation_thread_function(
+            template <typename ...Ts>
+            explicit thread_function(
                     naming::id_type target,
-                    continuation_type&& cont,
                     naming::address::address_type lva,
-                    F&& f, Ts&&... vs)
+                    naming::address::component_type comptype,
+                    Ts&&... vs)
               : target_(std::move(target))
-              , cont_(std::move(cont))
               , lva_(lva)
-              , f_(std::forward<F>(f), std::forward<Ts>(vs)...)
+              , comptype_(comptype)
+              , args_(std::forward<Ts>(vs)...)
             {}
 
-            continuation_thread_function(continuation_thread_function && other)
-              : cont_(std::move(other.cont_))
-              , lva_(std::move(other.lva_))
-              , f_(std::move(other.f_))
-            {}
-
-            HPX_FORCEINLINE threads::thread_result_type
+            threads::thread_result_type
             operator()(threads::thread_state_ex_enum)
             {
-                LTM_(debug)
-                    << "Executing " << Action::get_action_name(lva_)
-                    << " with continuation(" << cont_.get_id() << ")";
+                try
+                {
+                    LTM_(debug) << "Executing "
+                        << Action::get_action_name(lva_) << ".";
 
-                actions::trigger(std::move(cont_), f_);
+                    // invoke the action, ignoring the return value
+                    util::invoke_fused(
+                        action_invoke<Action>{lva_, comptype_},
+                        std::move(args_));
+                } catch (hpx::thread_interrupted const&) { //-V565
+                                                         /* swallow this exception */
+                } catch (std::exception const& e) {
+                    LTM_(error)
+                        << "Unhandled exception while executing "
+                        << Action::get_action_name(lva_) << ": " << e.what();
+
+                    // report this error to the console in any case
+                    hpx::report_error(std::current_exception());
+                } catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing "
+                        << Action::get_action_name(lva_);
+
+                    // report this error to the console in any case
+                    hpx::report_error(std::current_exception());
+                }
+
+                // Verify that there are no more registered locks for this
+                // OS-thread. This will throw if there are still any locks
+                // held.
+                util::force_error_on_lock();
+
                 return threads::thread_result_type(threads::terminated,
                     threads::invalid_thread_id);
             }
@@ -112,11 +143,53 @@ namespace hpx { namespace actions
         private:
             // This holds the target alive, if necessary.
             naming::id_type target_;
-            continuation_type cont_;
             naming::address::address_type lva_;
-            util::detail::deferred<
-                typename std::decay<F>::type,
-                typename std::decay<Ts>::type...> f_;
+            naming::address::component_type comptype_;
+            typename Action::arguments_type args_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Action>
+        class continuation_thread_function
+        {
+        public:
+            template <typename ...Ts>
+            explicit continuation_thread_function(
+                    naming::id_type target,
+                    typename Action::continuation_type&& cont,
+                    naming::address::address_type lva,
+                    naming::address::component_type comptype,
+                    Ts&&... vs)
+              : target_(std::move(target))
+              , cont_(std::move(cont))
+              , lva_(lva)
+              , comptype_(comptype)
+              , args_(std::forward<Ts>(vs)...)
+            {}
+
+            threads::thread_result_type
+            operator()(threads::thread_state_ex_enum)
+            {
+                LTM_(debug)
+                    << "Executing " << Action::get_action_name(lva_)
+                    << " with continuation(" << cont_.get_id() << ")";
+
+                actions::trigger(std::move(cont_),
+                    util::functional::invoke_fused{},
+                    action_invoke<Action>{lva_, comptype_},
+                    std::move(args_));
+
+                return threads::thread_result_type(threads::terminated,
+                    threads::invalid_thread_id);
+            }
+
+        private:
+            // This holds the target alive, if necessary.
+            naming::id_type target_;
+            typename Action::continuation_type cont_;
+            naming::address::address_type lva_;
+            naming::address::component_type comptype_;
+            typename Action::arguments_type args_;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -127,6 +200,15 @@ namespace hpx { namespace actions
                !std::is_const<typename std::remove_reference<T>::type>::value
             >
         {};
+
+        ///////////////////////////////////////////////////////////////////////
+        inline std::string make_action_name(
+            boost::string_ref action_name)
+        {
+            std::stringstream name;
+            name << "action(" << action_name << ")";
+            return name.str();
+        }
     }
 
     template <typename Component, typename R, typename ...Args, typename Derived>
@@ -172,6 +254,7 @@ namespace hpx { namespace actions
                 remote_result_type
             > continuation_type;
 
+        typedef R internal_result_type;
         static const std::size_t arity = sizeof...(Args);
         typedef util::tuple<typename std::decay<Args>::type...> arguments_type;
 
@@ -180,108 +263,43 @@ namespace hpx { namespace actions
         ///////////////////////////////////////////////////////////////////////
         static std::string get_action_name(naming::address::address_type /*lva*/)
         {
-            std::stringstream name;
-            name << "action(" << detail::get_action_name<Derived>() << ")";
-            return name.str();
+            return detail::make_action_name(
+                detail::get_action_name<Derived>());
         }
 
         template <typename ...Ts>
         static R invoke(naming::address::address_type /*lva*/,
             naming::address::component_type /*comptype*/, Ts&&... /*vs*/);
 
-        struct invoker
+        template <typename ...Ts>
+        static remote_result_type invoker(
+            naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs)
         {
-            typedef
-                typename std::conditional<
-                    std::is_void<R>::value, util::unused_type, R
-                >::type
-                result_type;
-
-            template <typename ...Ts>
-            HPX_FORCEINLINE result_type operator()(
-                naming::address::address_type lva,
-                naming::address::component_type comptype, Ts&&... vs) const
-            {
-                return invoke(
-                    typename std::is_void<R>::type(), lva, comptype,
-                    std::forward<Ts>(vs)...);
-            }
-
-        private:
-            template <typename ...Ts>
-            HPX_FORCEINLINE result_type invoke(std::true_type,
-                naming::address::address_type lva,
-                naming::address::component_type comptype, Ts&&... vs) const
-            {
-                Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
-                return util::unused;
-            }
-
-            template <typename ...Ts>
-            HPX_FORCEINLINE result_type invoke(std::false_type,
-                naming::address::address_type lva,
-                naming::address::component_type comptype, Ts&&... vs) const
-            {
-                return Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
-            }
-        };
+            using is_void = typename std::is_void<R>::type;
+            return invoker_impl(is_void{}, lva, comptype,
+                std::forward<Ts>(vs)...);
+        }
 
     protected:
-        /// The \a thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the
-        /// original function (given by \a func).
-        struct thread_function
+        template <typename ...Ts>
+        HPX_FORCEINLINE static remote_result_type
+        invoker_impl(std::true_type,
+            naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs)
         {
-            thread_function()
-            {}
+            Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
+            return util::unused;
+        }
 
-            thread_function(naming::id_type const& target)
-              : target_(target)
-            {}
-
-            template <typename ...Ts>
-            HPX_FORCEINLINE threads::thread_result_type
-            operator()(naming::address::address_type lva,
-                naming::address::component_type comptype, Ts&&... vs) const
-            {
-                try {
-                    LTM_(debug) << "Executing "
-                        << Derived::get_action_name(lva) << ".";
-
-                    // call the function, ignoring the return value
-                    Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
-                }
-                catch (hpx::thread_interrupted const&) { //-V565
-                    /* swallow this exception */
-                }
-                catch (std::exception const& e) {
-                    LTM_(error)
-                        << "Unhandled exception while executing "
-                        << Derived::get_action_name(lva) << ": " << e.what();
-
-                    // report this error to the console in any case
-                    hpx::report_error(std::current_exception());
-                }
-                catch (...) {
-                    LTM_(error)
-                        << "Unhandled exception while executing "
-                        << Derived::get_action_name(lva);
-
-                    // report this error to the console in any case
-                    hpx::report_error(std::current_exception());
-                }
-
-                // Verify that there are no more registered locks for this
-                // OS-thread. This will throw if there are still any locks
-                // held.
-                util::force_error_on_lock();
-                return threads::thread_result_type(threads::terminated,
-                    threads::invalid_thread_id);
-            }
-
-            // This holds the target alive, if necessary.
-            naming::id_type target_;
-        };
+        template <typename ...Ts>
+        HPX_FORCEINLINE static remote_result_type
+        invoker_impl(std::false_type,
+            naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs)
+        {
+            return Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
+        }
 
     public:
         // This static construct_thread_function allows to construct
@@ -290,23 +308,18 @@ namespace hpx { namespace actions
         // case no continuation has been supplied.
         template <typename ...Ts>
         static threads::thread_function_type
-        construct_thread_function(naming::id_type const& target,
+        construct_thread_function(naming::id_type target,
             naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs)
         {
             if (target &&
                 target.get_management_type() == naming::id_type::unmanaged)
-            {
-                return traits::action_decorate_function<Derived>::call(lva,
-                    util::one_shot(util::bind(
-                        typename Derived::thread_function(),
-                        lva, comptype, std::forward<Ts>(vs)...)));
-            }
+                target = {};
 
+            using thread_function = detail::thread_function<Derived>;
             return traits::action_decorate_function<Derived>::call(lva,
-                util::one_shot(util::bind(
-                    typename Derived::thread_function(target),
-                    lva, comptype, std::forward<Ts>(vs)...)));
+                thread_function(target, lva, comptype,
+                    std::forward<Ts>(vs)...));
         }
 
         // This static construct_thread_function allows to construct
@@ -315,32 +328,24 @@ namespace hpx { namespace actions
         // case a continuation has been supplied
         template <typename ...Ts>
         static threads::thread_function_type
-        construct_thread_function(naming::id_type const& target,
-            continuation_type&& cont, naming::address::address_type lva,
+        construct_thread_function(naming::id_type target,
+            continuation_type&& cont,
+            naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs)
         {
-            typedef detail::continuation_thread_function<
-                Derived, invoker, naming::address::address_type&,
-                naming::address::component_type&, Ts&&...
-            > thread_function;
-
             if (target &&
                 target.get_management_type() == naming::id_type::unmanaged)
-            {
-                return traits::action_decorate_function<Derived>::call(lva,
-                    thread_function(std::move(cont), lva, invoker(),
-                        lva, comptype, std::forward<Ts>(vs)...));
-            }
+                target = {};
 
+            using thread_function = detail::continuation_thread_function<Derived>;
             return traits::action_decorate_function<Derived>::call(lva,
-                thread_function(target, std::move(cont), lva, invoker(),
-                    lva, comptype, std::forward<Ts>(vs)...));
+                thread_function(target, std::move(cont), lva, comptype,
+                    std::forward<Ts>(vs)...));
         }
 
         // direct execution
         template <typename ...Ts>
-        static HPX_FORCEINLINE
-        typename invoker::result_type
+        static HPX_FORCEINLINE remote_result_type
         execute_function(naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs)
         {
@@ -348,22 +353,19 @@ namespace hpx { namespace actions
                 << "basic_action::execute_function"
                 << Derived::get_action_name(lva);
 
-            return invoker()(lva, comptype, std::forward<Ts>(vs)...);
+            return invoker(lva, comptype, std::forward<Ts>(vs)...);
         }
 
     private:
         ///////////////////////////////////////////////////////////////////////
-        struct sync_invoke
+        template <typename IdOrPolicy, typename Policy, typename ...Ts>
+        HPX_FORCEINLINE static result_type sync_invoke(
+            Policy const& policy, IdOrPolicy const& id_or_policy,
+            error_code& ec, Ts&&... vs)
         {
-            template <typename IdOrPolicy, typename Policy, typename ...Ts>
-            HPX_FORCEINLINE static result_type call(
-                Policy const& policy, IdOrPolicy const& id_or_policy,
-                error_code& ec, Ts&&... vs)
-            {
-                return hpx::sync<basic_action>(policy, id_or_policy,
-                    std::forward<Ts>(vs)...);
-            }
-        };
+            return hpx::sync<basic_action>(policy, id_or_policy,
+                std::forward<Ts>(vs)...);
+        }
 
     public:
         ///////////////////////////////////////////////////////////////////////
@@ -372,14 +374,14 @@ namespace hpx { namespace actions
             launch policy, naming::id_type const& id,
             error_code& ec, Ts&&... vs) const
         {
-            return sync_invoke::call(policy, id, ec, std::forward<Ts>(vs)...);
+            return sync_invoke(policy, id, ec, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         HPX_FORCEINLINE result_type operator()(
             naming::id_type const& id, error_code& ec, Ts&&... vs) const
         {
-            return sync_invoke::call(
+            return sync_invoke(
                 launch::sync, id, ec, std::forward<Ts>(vs)...);
         }
 
@@ -388,7 +390,7 @@ namespace hpx { namespace actions
             launch policy, naming::id_type const& id,
             Ts&&... vs) const
         {
-            return sync_invoke::call(
+            return sync_invoke(
                 policy, id, throws, std::forward<Ts>(vs)...);
         }
 
@@ -396,7 +398,7 @@ namespace hpx { namespace actions
         HPX_FORCEINLINE result_type operator()(
             naming::id_type const& id, Ts&&... vs) const
         {
-            return sync_invoke::call(
+            return sync_invoke(
                 launch::sync, id, throws, std::forward<Ts>(vs)...);
         }
 
@@ -410,7 +412,7 @@ namespace hpx { namespace actions
         operator()(launch policy,
             DistPolicy const& dist_policy, error_code& ec, Ts&&... vs) const
         {
-            return sync_invoke::call(
+            return sync_invoke(
                 policy, dist_policy, ec, std::forward<Ts>(vs)...);
         }
 
@@ -423,7 +425,7 @@ namespace hpx { namespace actions
         operator()(DistPolicy const& dist_policy, error_code& ec,
             Ts&&... vs) const
         {
-            return sync_invoke::call(
+            return sync_invoke(
                 launch::sync, dist_policy, ec, std::forward<Ts>(vs)...);
         }
 
@@ -436,7 +438,7 @@ namespace hpx { namespace actions
         operator()(launch policy,
             DistPolicy const& dist_policy, Ts&&... vs) const
         {
-            return sync_invoke::call(
+            return sync_invoke(
                 policy, dist_policy, throws, std::forward<Ts>(vs)...);
         }
 
@@ -448,7 +450,7 @@ namespace hpx { namespace actions
         >::type
         operator()(DistPolicy const& dist_policy, Ts&&... vs) const
         {
-            return sync_invoke::call(
+            return sync_invoke(
                 launch::sync, dist_policy, throws, std::forward<Ts>(vs)...);
         }
 
@@ -596,175 +598,6 @@ namespace hpx { namespace actions
     #define HPX_MAKE_DIRECT_ACTION(func)                                      \
         hpx::actions::make_direct_action<decltype(&func), &func> /**/         \
     /**/
-
-    enum preassigned_action_id
-    {
-        register_worker_action_id = 0,
-        notify_worker_action_id,
-        allocate_action_id,
-        base_connect_action_id,
-        base_disconnect_action_id,
-        base_set_event_action_id,
-        base_set_exception_action_id,
-        broadcast_call_shutdown_functions_action_id,
-        broadcast_call_startup_functions_action_id,
-        broadcast_symbol_namespace_on_event_action_id,
-        call_shutdown_functions_action_id,
-        call_startup_functions_action_id,
-        component_namespace_bind_prefix_action_id,
-        component_namespace_bind_name_action_id,
-        component_namespace_resolve_id_action_id,
-        component_namespace_unbind_action_id,
-        component_namespace_iterate_types_action_id,
-        component_namespace_get_component_type_action_id,
-        component_namespace_get_num_localities_action_id,
-        component_namespace_statistics_counter_action_id,
-        console_error_sink_action_id,
-        console_logging_action_id,
-        console_print_action_id,
-        create_performance_counter_action_id,
-        dijkstra_termination_action_id,
-        free_component_action_id,
-        garbage_collect_action_id,
-        get_config_action_id,
-        hpx_get_locality_name_action_id,
-        hpx_lcos_server_barrier_create_component_action_id,
-        hpx_lcos_server_latch_create_component_action_id,
-        hpx_lcos_server_latch_wait_action_id,
-        list_component_type_action_id,
-        list_symbolic_name_action_id,
-        load128_action_id,
-        load16_action_id,
-        load32_action_id,
-        load64_action_id,
-        load8_action_id,
-        load_components_action_id,
-        locality_namespace_allocate_action_id,
-        locality_namespace_free_action_id,
-        locality_namespace_localities_action_id,
-        locality_namespace_resolve_locality_action_id,
-        locality_namespace_get_num_localities_action_id,
-        locality_namespace_get_num_threads_action_id,
-        locality_namespace_get_num_overall_threads_action_id,
-        locality_namespace_statistics_counter_action_id,
-        output_stream_write_async_action_id,
-        output_stream_write_sync_action_id,
-        performance_counter_get_counter_info_action_id,
-        performance_counter_get_counter_value_action_id,
-        performance_counter_get_counter_values_array_action_id,
-        performance_counter_set_counter_value_action_id,
-        performance_counter_reset_counter_value_action_id,
-        performance_counter_start_action_id,
-        performance_counter_stop_action_id,
-        primary_namespace_allocate_action_id,
-        primary_namespace_begin_migration_action_id,
-        primary_namespace_bind_gid_action_id,
-        primary_namespace_colocate_action_id,
-        primary_namespace_decrement_credit_action_id,
-        primary_namespace_end_migration_action_id,
-        primary_namespace_increment_credit_action_id,
-        primary_namespace_resolve_gid_action_id,
-        primary_namespace_route_action_id,
-        primary_namespace_unbind_gid_action_id,
-        primary_namespace_statistics_counter_action_id,
-        remove_from_connection_cache_action_id,
-        set_value_action_agas_bool_response_type_id,
-        set_value_action_agas_id_type_response_type_id,
-        shutdown_action_id,
-        shutdown_all_action_id,
-        store128_action_id,
-        store16_action_id,
-        store32_action_id,
-        store64_action_id,
-        store8_action_id,
-        symbol_namespace_bind_action_id,
-        symbol_namespace_resolve_action_id,
-        symbol_namespace_unbind_action_id,
-        symbol_namespace_iterate_action_id,
-        symbol_namespace_on_event_action_id,
-        symbol_namespace_statistics_counter_action_id,
-        terminate_action_id,
-        terminate_all_action_id,
-        update_agas_cache_action_id,
-
-        base_lco_with_value_gid_get,
-        base_lco_with_value_gid_set,
-        base_lco_with_value_vector_gid_get,
-        base_lco_with_value_vector_gid_set,
-        base_lco_with_value_id_get,
-        base_lco_with_value_id_set,
-        base_lco_with_value_vector_id_get,
-        base_lco_with_value_vector_id_set,
-        base_lco_with_value_unused_get,
-        base_lco_with_value_unused_set,
-        base_lco_with_value_float_get,
-        base_lco_with_value_float_set,
-        base_lco_with_value_double_get,
-        base_lco_with_value_double_set,
-        base_lco_with_value_int8_get,
-        base_lco_with_value_int8_set,
-        base_lco_with_value_uint8_get,
-        base_lco_with_value_uint8_set,
-        base_lco_with_value_int16_get,
-        base_lco_with_value_int16_set,
-        base_lco_with_value_uint16_get,
-        base_lco_with_value_uint16_set,
-        base_lco_with_value_int32_get,
-        base_lco_with_value_int32_set,
-        base_lco_with_value_uint32_get,
-        base_lco_with_value_uint32_set,
-        base_lco_with_value_int64_get,
-        base_lco_with_value_int64_set,
-        base_lco_with_value_uint64_get,
-        base_lco_with_value_uint64_set,
-        base_lco_with_value_uint128_get,
-        base_lco_with_value_uint128_set,
-        base_lco_with_value_bool_get,
-        base_lco_with_value_bool_set,
-        base_lco_with_value_hpx_section_get,
-        base_lco_with_value_hpx_section_set,
-        base_lco_with_value_hpx_counter_info_get,
-        base_lco_with_value_hpx_counter_info_set,
-        base_lco_with_value_hpx_counter_value_get,
-        base_lco_with_value_hpx_counter_value_set,
-        base_lco_with_value_hpx_counter_values_array_get,
-        base_lco_with_value_hpx_counter_values_array_set,
-        base_lco_with_value_hpx_memory_data_get,
-        base_lco_with_value_hpx_memory_data_set,
-        base_lco_with_value_std_string_get,
-        base_lco_with_value_std_string_set,
-        base_lco_with_value_std_bool_ptrdiff_get,
-        base_lco_with_value_std_bool_ptrdiff_set,
-        base_lco_with_value_vector_bool_get,
-        base_lco_with_value_vector_bool_set,
-        base_lco_with_value_naming_address_get,
-        base_lco_with_value_naming_address_set,
-        base_lco_with_value_gva_tuple_get,
-        base_lco_with_value_gva_tuple_set,
-        base_lco_with_value_std_pair_address_id_type_get,
-        base_lco_with_value_std_pair_address_id_type_set,
-        base_lco_with_value_std_pair_gid_type_get,
-        base_lco_with_value_std_pair_gid_type_set,
-        base_lco_with_value_id_type_get,
-        base_lco_with_value_id_type_set,
-        base_lco_with_value_vector_std_int64_get,
-        base_lco_with_value_vector_std_int64_set,
-        base_lco_with_value_vector_id_gid_get,
-        base_lco_with_value_vector_id_gid_set,
-        base_lco_with_value_vector_std_uint32_get,
-        base_lco_with_value_vector_std_uint32_set,
-        base_lco_with_value_parcelset_endpoints_get,
-        base_lco_with_value_parcelset_endpoints_set,
-        base_lco_with_value_vector_compute_host_target_get,
-        base_lco_with_value_vector_compute_host_target_set,
-        base_lco_with_value_vector_compute_cuda_target_get,
-        base_lco_with_value_vector_compute_cuda_target_set,
-
-        // typed continuations...
-        typed_continuation_hpx_agas_response,
-
-        last_action_id
-    };
 
     /// \endcond
 }}
