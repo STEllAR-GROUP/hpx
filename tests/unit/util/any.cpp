@@ -132,7 +132,7 @@ int hpx_main(variables_map& vm)
             HPX_TEST(!any1.empty());
             any any2(std::move(any1));
             HPX_TEST(!any2.empty());
-            HPX_TEST(any1.empty());
+            HPX_TEST(any1.empty()); // NOLINT
         }
 
         {
@@ -143,7 +143,7 @@ int hpx_main(variables_map& vm)
 
             any2 = std::move(any1);
             HPX_TEST(!any2.empty());
-            HPX_TEST(any1.empty());
+            HPX_TEST(any1.empty()); // NOLINT
         }
     }
     // non serializable version
@@ -219,7 +219,7 @@ int hpx_main(variables_map& vm)
             HPX_TEST(!any1.empty());
             any_nonser any2(std::move(any1));
             HPX_TEST(!any2.empty());
-            HPX_TEST(any1.empty());
+            HPX_TEST(any1.empty()); // NOLINT
         }
 
         {
@@ -230,7 +230,7 @@ int hpx_main(variables_map& vm)
 
             any2 = std::move(any1);
             HPX_TEST(!any2.empty());
-            HPX_TEST(any1.empty());
+            HPX_TEST(any1.empty()); // NOLINT
         }
     }
 

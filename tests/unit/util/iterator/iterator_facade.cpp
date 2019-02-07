@@ -104,9 +104,12 @@ struct wrapper
 {
     T m_x;
 
-    template <typename T_>
-    explicit wrapper(T_ && x)
-        : m_x(std::forward<T_>(x))
+    template <typename T_,
+        typename TD = typename std::decay<T_>::type,
+        typename Enable =
+            typename std::enable_if<!std::is_same<TD, wrapper<T>>::value>::type>
+    explicit wrapper(T_&& x)
+      : m_x(std::forward<T_>(x))
     {}
 
     template <typename U>

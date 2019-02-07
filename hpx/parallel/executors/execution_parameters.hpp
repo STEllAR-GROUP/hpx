@@ -559,9 +559,8 @@ namespace hpx { namespace parallel { namespace execution
         template <typename T>
         struct base_member_helper
         {
-            template <typename U>
-            explicit base_member_helper(U&& t)
-              : member_(std::forward<U>(t))
+            explicit base_member_helper(T t)
+              : member_(t)
             {}
 
             T member_;

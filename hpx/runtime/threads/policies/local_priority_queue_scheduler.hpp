@@ -23,6 +23,7 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <cmath>
 #include <exception>
 #include <memory>
 #include <string>
@@ -1106,8 +1107,7 @@ namespace hpx { namespace threads { namespace policies
 
             // iterate over the number of threads again to determine where to
             // steal from
-            std::ptrdiff_t radius =
-                static_cast<std::ptrdiff_t>((num_threads / 2.0) + 0.5);
+            std::ptrdiff_t radius = std::lround(num_threads / 2.0);
             victim_threads_[num_thread].reserve(num_threads);
 
             std::size_t num_pu = rp_.get_affinity_data().get_pu_num(num_thread);
