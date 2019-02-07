@@ -425,6 +425,17 @@ namespace hpx { namespace threads
         parse_affinity_options(spec, affinities, 1, 1, affinities.size(),
             num_pus, ec);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // abstract away cache-line size
+    HPX_STATIC_CONSTEXPR std::size_t get_cache_line_size()
+    {
+#if defined(HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE)
+        return std::hardware_destructive_interference_size;
+#else
+        return 64;      // assume 64 byte cache-line size
+#endif
+    }
 }}
 
 #endif /*HPX_RUNTIME_THREADS_TOPOLOGY_HPP*/

@@ -15,6 +15,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
@@ -127,7 +128,6 @@ namespace hpx { namespace lcos { namespace local
 #endif
         }
     };
-
 }}}
 
 #endif // HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
