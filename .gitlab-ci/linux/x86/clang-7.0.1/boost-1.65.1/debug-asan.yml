@@ -14,6 +14,16 @@
         - clang-7.0.1
         - boost-1.65.1
 
+asan_suppresions:
+    <<: *debug-asan-x86
+    image: stellargroup/build_env:ubuntu
+    stage: checkout
+    script:
+        - echo leak:libltd > /suppressions.txt
+    artifacts:
+        paths:
+            - /suppresions.txt
+
 cmake Debug ASAN x86:
     <<: *debug-asan-x86
     extends: .cmake
@@ -29,47 +39,51 @@ examples Debug ASAN x86:
     <<: *debug-asan-x86
     variables:
         TESTS: "examples"
-        ASAN_OPTIONS: "detect_leaks=0"
+        LSAN_OPTIONS: "suppressions=/suppressions.txt,print_suppressions=0"
     extends: .test
     dependencies:
         - checkout
         - core Debug ASAN x86
         - get conv.xsl
         - get junit2html
+        - asan_suppressions
 
 tests.unit Debug ASAN x86:
     <<: *debug-asan-x86
     variables:
         TESTS: "tests.unit"
-        ASAN_OPTIONS: "detect_leaks=0"
+        LSAN_OPTIONS: "suppressions=/suppressions.txt,print_suppressions=0"
     extends: .test
     dependencies:
         - checkout
         - core Debug ASAN x86
         - get conv.xsl
         - get junit2html
+        - asan_suppressions
 
 tests.regressions Debug ASAN x86:
     <<: *debug-asan-x86
     variables:
         TESTS: "tests.regressions"
-        ASAN_OPTIONS: "detect_leaks=0"
+        LSAN_OPTIONS: "suppressions=/suppressions.txt,print_suppressions=0"
     extends: .test
     dependencies:
         - checkout
         - core Debug ASAN x86
         - get conv.xsl
         - get junit2html
+        - asan_suppressions
 
 tests.performance Debug ASAN x86:
     <<: *debug-asan-x86
     variables:
         TESTS: "tests.performance"
-        ASAN_OPTIONS: "detect_leaks=0"
+        LSAN_OPTIONS: "suppressions=/suppressions.txt,print_suppressions=0"
     extends: .test
     dependencies:
         - checkout
         - core Debug ASAN x86
         - get conv.xsl
         - get junit2html
+        - asan_suppressions
 
