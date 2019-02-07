@@ -74,7 +74,11 @@ namespace hpx { namespace util
         void assign(F&& f)
         {
             HPX_ASSERT(!detail::is_empty_function(f));
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             vptr = get_vtable<T>();
+#else
+            vptr = get_vtable<T>()->invoke;
+#endif
             object = reinterpret_cast<void*>(std::addressof(f));
         }
 
@@ -82,7 +86,11 @@ namespace hpx { namespace util
         void assign(T* f_ptr) noexcept
         {
             HPX_ASSERT(f_ptr != nullptr);
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             vptr = get_vtable<T>();
+#else
+            vptr = get_vtable<T>()->invoke;
+#endif
             object = reinterpret_cast<void*>(f_ptr);
         }
 
@@ -94,7 +102,11 @@ namespace hpx { namespace util
 
         HPX_FORCEINLINE R operator()(Ts... vs) const
         {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             return vptr->invoke(object, std::forward<Ts>(vs)...);
+#else
+            return vptr(object, std::forward<Ts>(vs)...);
+#endif
         }
 
         std::size_t get_function_address() const
@@ -133,7 +145,11 @@ namespace hpx { namespace util
         }
 
     protected:
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
         VTable const *vptr;
+#else
+        R (*vptr)(void*, Ts&&...);
+#endif
         void* object;
     };
 }}
