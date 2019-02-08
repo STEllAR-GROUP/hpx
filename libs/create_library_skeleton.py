@@ -77,8 +77,8 @@ message(STATUS "{lib_name}: Configuring done")
 
 examples_cmakelists_template = cmake_header + f'''
 if (HPX_WITH_TESTS_EXAMPLES)
-  add_custom_target(tests.examples.{lib_name})
-  add_dependencies(tests.examples tests.examples.{lib_name})
+  add_hpx_pseudo_target(tests.examples.{lib_name})
+  add_hpx_pseudo_dependencies(tests.examples tests.examples.{lib_name})
 endif()
 
 '''
@@ -93,20 +93,20 @@ if (NOT HPX_{lib_name_upper}_WITH_TESTS)
 endif()
 
 if (HPX_WITH_TESTS_UNIT)
-  add_custom_target(tests.unit.{lib_name})
-  add_dependencies(tests.unit tests.unit.{lib_name})
+  add_hpx_pseudo_target(tests.unit.{lib_name})
+  add_hpx_pseudo_dependencies(tests.unit tests.unit.{lib_name})
   add_subdirectory(unit)
 endif()
 
 if (HPX_WITH_TESTS_REGRESSIONS)
-  add_custom_target(tests.regressions.{lib_name})
-  add_dependencies(tests.regressions tests.regressions.{lib_name})
+  add_hpx_pseudo_target(tests.regressions.{lib_name})
+  add_hpx_pseudo_dependencies(tests.regressions tests.regressions.{lib_name})
   add_subdirectory(regressions)
 endif()
 
 if (HPX_WITH_TESTS_BENCHMARKS)
-  add_custom_target(tests.performance.{lib_name})
-  add_dependencies(tests.performance tests.performance.{lib_name})
+  add_hpx_pseudo_target(tests.performance.{lib_name})
+  add_hpx_pseudo_dependencies(tests.performance tests.performance.{lib_name})
   add_subdirectory(performance)
 endif()
 
