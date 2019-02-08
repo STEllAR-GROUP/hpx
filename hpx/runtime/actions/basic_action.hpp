@@ -461,6 +461,8 @@ namespace hpx { namespace actions
             return static_cast<int>(components::get_component_type<Component>());
         }
 
+        typedef std::false_type direct_execution;
+
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
         static base_action::action_type get_action_type()
@@ -522,29 +524,13 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Signature, typename TF, TF F, typename Derived>
-    class basic_action_impl;
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename TF, TF F, typename Derived = detail::this_type>
-    struct action
-      : basic_action_impl<TF, TF, F,
-            typename detail::action_type<
-                action<TF, F, Derived>,
-                Derived
-            >::type>
-    {
-        typedef typename detail::action_type<
-            action, Derived
-        >::type derived_type;
-
-        typedef std::false_type direct_execution;
-    };
+    struct action;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename TF, TF F, typename Derived = detail::this_type>
     struct direct_action
-      : basic_action_impl<TF, TF, F,
+      : action<TF, F,
             typename detail::action_type<
                 direct_action<TF, F, Derived>,
                 Derived

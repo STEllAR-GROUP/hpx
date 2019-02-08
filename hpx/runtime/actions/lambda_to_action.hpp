@@ -43,8 +43,6 @@ namespace hpx { namespace actions
             lambda_action<F, ReturnType, Args...>>
         {
             typedef lambda_action derived_type;
-            typedef std::false_type direct_execution;
-            typedef void is_plain_action;
 
             static std::string get_action_name(naming::address::address_type /*lva*/)
             {

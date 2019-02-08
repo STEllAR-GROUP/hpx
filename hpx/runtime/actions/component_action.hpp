@@ -87,15 +87,24 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename R, typename ...Ps,
-        typename TF, TF F, typename Derived>
-    class basic_action_impl<R (Component::*)(Ps...), TF, F, Derived>
-      : public basic_action<Component, R(Ps...), Derived>
+        R (Component::*F)(Ps...), typename Derived>
+    struct action<R (Component::*)(Ps...), F, Derived>
+      : public basic_action<Component, R(Ps...),
+            typename detail::action_type<
+                action<R (Component::*)(Ps...), F, Derived>,
+                Derived
+            >::type
+        >
     {
     public:
+        typedef typename detail::action_type<
+            action, Derived
+        >::type derived_type;
+
         static std::string get_action_name(naming::address::address_type lva)
         {
             return detail::make_component_action_name(
-                detail::get_action_name<Derived>(),
+                detail::get_action_name<derived_type>(),
                 get_lva<Component>::call(lva));
         }
 
@@ -104,7 +113,7 @@ namespace hpx { namespace actions
             naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs)
         {
-            basic_action<Component, R(Ps...), Derived>::
+            basic_action<Component, R(Ps...), derived_type>::
                 increment_invocation_count();
 
             using is_future = typename traits::is_future<R>::type;
@@ -119,15 +128,24 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename R, typename ...Ps,
-        typename TF, TF F, typename Derived>
-    class basic_action_impl<R (Component::*)(Ps...) const, TF, F, Derived>
-      : public basic_action<Component const, R(Ps...), Derived>
+        R (Component::*F)(Ps...) const, typename Derived>
+    struct action<R (Component::*)(Ps...) const, F, Derived>
+      : public basic_action<Component const, R(Ps...),
+            typename detail::action_type<
+                action<R (Component::*)(Ps...) const, F, Derived>,
+                Derived
+            >::type
+        >
     {
     public:
+        typedef typename detail::action_type<
+            action, Derived
+        >::type derived_type;
+
         static std::string get_action_name(naming::address::address_type lva)
         {
             return detail::make_component_action_name(
-                detail::get_action_name<Derived>(),
+                detail::get_action_name<derived_type>(),
                 get_lva<Component>::call(lva));
         }
 
@@ -136,7 +154,7 @@ namespace hpx { namespace actions
             naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs)
         {
-            basic_action<Component const, R(Ps...), Derived>::
+            basic_action<Component const, R(Ps...), derived_type>::
                 increment_invocation_count();
 
             using is_future = typename traits::is_future<R>::type;

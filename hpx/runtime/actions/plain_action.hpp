@@ -63,15 +63,24 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename R, typename ...Ps,
-        typename TF, TF F, typename Derived>
-    class basic_action_impl<R (*)(Ps...), TF, F, Derived>
-      : public basic_action<detail::plain_function, R(Ps...), Derived>
+        R (*F)(Ps...), typename Derived>
+    struct action<R (*)(Ps...), F, Derived>
+      : public basic_action<detail::plain_function, R(Ps...),
+            typename detail::action_type<
+                action<R (*)(Ps...), F, Derived>,
+                Derived
+            >::type
+        >
     {
     public:
+        typedef typename detail::action_type<
+            action, Derived
+        >::type derived_type;
+
         static std::string get_action_name(naming::address::address_type /*lva*/)
         {
             return detail::make_plain_action_name(
-                detail::get_action_name<Derived>());
+                detail::get_action_name<derived_type>());
         }
 
         template <typename ...Ts>
@@ -79,7 +88,7 @@ namespace hpx { namespace actions
             naming::address::address_type /*lva*/,
             naming::address::component_type comptype, Ts&&... vs)
         {
-            basic_action<detail::plain_function, R(Ps...), Derived>::
+            basic_action<detail::plain_function, R(Ps...), derived_type>::
                 increment_invocation_count();
             return F(std::forward<Ts>(vs)...);
         }
