@@ -122,10 +122,11 @@ namespace hpx { namespace util
             template <typename F, typename Tuple>
             HPX_CONSTEXPR HPX_HOST_DEVICE
             typename util::detail::invoke_fused_result<F, Tuple>::type
-            operator()(F&& f, Tuple&& args) const
+            operator()(F&& f, Tuple&& t) const
             {
-                return util::invoke_fused(
-                    std::forward<F>(f), std::forward<Tuple>(args));
+                using index_pack = typename detail::fused_index_pack<Tuple>::type;
+                return detail::invoke_fused_impl(index_pack{},
+                    std::forward<F>(f), std::forward<Tuple>(t));
             }
         };
 
@@ -134,10 +135,11 @@ namespace hpx { namespace util
         {
             template <typename F, typename Tuple>
             HPX_CONSTEXPR HPX_HOST_DEVICE
-            R operator()(F&& f, Tuple&& args) const
+            R operator()(F&& f, Tuple&& t) const
             {
-                return util::invoke_fused_r<R>(
-                    std::forward<F>(f), std::forward<Tuple>(args));
+                using index_pack = typename detail::fused_index_pack<Tuple>::type;
+                return util::void_guard<R>(), detail::invoke_fused_impl(index_pack{},
+                    std::forward<F>(f), std::forward<Tuple>(t));
             }
         };
     }

@@ -173,9 +173,9 @@ namespace hpx { namespace util
             template <typename F, typename... Ts>
             HPX_CONSTEXPR HPX_HOST_DEVICE
             typename util::invoke_result<F, Ts...>::type
-            operator()(F && f, Ts &&... vs)
+            operator()(F && f, Ts &&... vs) const
             {
-                return util::invoke(std::forward<F>(f),
+                return HPX_INVOKE(std::forward<F>(f),
                     std::forward<Ts>(vs)...);
             }
         };
@@ -185,9 +185,9 @@ namespace hpx { namespace util
         {
             template <typename F, typename... Ts>
             HPX_CONSTEXPR HPX_HOST_DEVICE
-            R operator()(F && f, Ts &&... vs)
+            R operator()(F && f, Ts &&... vs) const
             {
-                return util::invoke_r<R>(std::forward<F>(f),
+                return HPX_INVOKE_R(R, std::forward<F>(f),
                     std::forward<Ts>(vs)...);
             }
         };
