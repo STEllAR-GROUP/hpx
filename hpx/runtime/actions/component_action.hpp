@@ -10,20 +10,17 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
-#include <hpx/util/detail/pp/strip_parens.hpp>
-#include <hpx/util/unused.hpp>
+
+#include <boost/utility/string_ref.hpp>
 
 #include <cstdlib>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -43,7 +40,45 @@ namespace hpx { namespace actions
             components::pinned_ptr p_;
         };
 
-        template <typename R> struct tag {};
+        ///////////////////////////////////////////////////////////////////////
+        inline std::string make_component_action_name(
+            boost::string_ref action_name, void const* lva)
+        {
+            std::stringstream name;
+            name << "component action(" << action_name << ") lva(" << lva << ")";
+            return name.str();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Component, typename R, typename F, typename ...Ts>
+        R component_invoke(std::false_type,
+            naming::address::address_type lva,
+            naming::address::component_type /*comptype*/,
+            F Component::*f, Ts&&... vs)
+        {
+            Component* component = get_lva<Component>::call(lva);
+            return (component->*f)(std::forward<Ts>(vs)...);
+        }
+
+        template <typename Component, typename R, typename F, typename ...Ts>
+        R component_invoke(std::true_type,
+            naming::address::address_type lva,
+            naming::address::component_type comptype,
+            F Component::*f, Ts&&... vs)
+        {
+            // additional pinning is required such that the object becomes
+            // unpinned only after the returned future has become ready
+            components::pinned_ptr p =
+                components::pinned_ptr::create<Component>(lva);
+
+            Component* component = get_lva<Component>::call(lva);
+            R result = (component->*f)(std::forward<Ts>(vs)...);
+
+            traits::detail::get_shared_state(result)->set_on_completed(
+                detail::keep_object_pinned{std::move(p)});
+
+            return result;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -53,60 +88,28 @@ namespace hpx { namespace actions
     template <
         typename Component, typename R, typename ...Ps,
         typename TF, TF F, typename Derived>
-    class basic_action_impl<
-            R (Component::*)(Ps...), TF, F, Derived>
+    class basic_action_impl<R (Component::*)(Ps...), TF, F, Derived>
       : public basic_action<Component, R(Ps...), Derived>
     {
     public:
         static std::string get_action_name(naming::address::address_type lva)
         {
-            std::stringstream name;
-            name << "component action("
-                 << detail::get_action_name<Derived>()
-                 << ") lva("
-                 << reinterpret_cast<void const*>(get_lva<Component>::call(lva))
-                 << ")";
-            return name.str();
-        }
-
-        template <typename R_, typename ...Ts>
-        static typename std::enable_if<!traits::is_future<R_>::value, R_>::type
-        invoke_helper(detail::tag<R_>, naming::address::address_type lva,
-            naming::address::component_type /*comptype*/, Ts&&... vs)
-        {
-            basic_action<Component, R_(Ps...), Derived>::
-                increment_invocation_count();
-            return (get_lva<Component>::call(lva)->*F)(std::forward<Ts>(vs)...);
-        }
-
-        template <typename R_, typename ...Ts>
-        static typename std::enable_if<traits::is_future<R_>::value, R_>::type
-        invoke_helper(detail::tag<R_>, naming::address::address_type lva,
-            naming::address::component_type comptype, Ts&&... vs)
-        {
-            basic_action<Component, R_(Ps...), Derived>::
-                increment_invocation_count();
-
-            // additional pinning is required such that the object becomes
-            // unpinned only after the returned future has become ready
-            components::pinned_ptr p =
-                components::pinned_ptr::create<Component>(lva);
-
-            auto result =
-                (get_lva<Component>::call(lva)->*F)(std::forward<Ts>(vs)...);
-
-            traits::detail::get_shared_state(result)->set_on_completed(
-                detail::keep_object_pinned{std::move(p)});
-
-            return result;
+            return detail::make_component_action_name(
+                detail::get_action_name<Derived>(),
+                get_lva<Component>::call(lva));
         }
 
         template <typename ...Ts>
-        static R invoke(naming::address::address_type lva,
+        static R invoke(
+            naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs)
         {
-            return invoke_helper(
-                detail::tag<R>{}, lva, comptype, std::forward<Ts>(vs)...);
+            basic_action<Component, R(Ps...), Derived>::
+                increment_invocation_count();
+
+            using is_future = typename traits::is_future<R>::type;
+            return detail::component_invoke<Component, R>(is_future{},
+                lva, comptype, F, std::forward<Ts>(vs)...);
         }
     };
 
@@ -117,61 +120,28 @@ namespace hpx { namespace actions
     template <
         typename Component, typename R, typename ...Ps,
         typename TF, TF F, typename Derived>
-    class basic_action_impl<
-            R (Component::*)(Ps...) const, TF, F, Derived>
+    class basic_action_impl<R (Component::*)(Ps...) const, TF, F, Derived>
       : public basic_action<Component const, R(Ps...), Derived>
     {
     public:
         static std::string get_action_name(naming::address::address_type lva)
         {
-            std::stringstream name;
-            name << "component action("
-                 << detail::get_action_name<Derived>()
-                 << ") lva("
-                 << reinterpret_cast<void const*>(get_lva<Component>::call(lva))
-                 << ")";
-            return name.str();
-        }
-
-        template <typename R_, typename ...Ts>
-        static typename std::enable_if<!traits::is_future<R_>::value, R_>::type
-        invoke_helper(detail::tag<R_>, naming::address::address_type lva,
-            naming::address::component_type /*comptype*/, Ts&&... vs)
-        {
-            basic_action<Component const, R_(Ps...), Derived>::
-                increment_invocation_count();
-            return (get_lva<Component const>::call(lva)->*F)(
-                std::forward<Ts>(vs)...);
-        }
-
-        template <typename R_, typename ...Ts>
-        static typename std::enable_if<traits::is_future<R_>::value, R_>::type
-        invoke_helper(detail::tag<R_>, naming::address::address_type lva,
-            naming::address::component_type comptype, Ts&&... vs)
-        {
-            basic_action<Component const, R_(Ps...), Derived>::
-                increment_invocation_count();
-
-            // additional pinning is required such that the object becomes
-            // unpinned only after the returned future has become ready
-            components::pinned_ptr p =
-                components::pinned_ptr::create<Component>(lva);
-
-            auto result = (get_lva<Component const>::call(lva)->*F)(
-                std::forward<Ts>(vs)...);
-
-            traits::detail::get_shared_state(result)->set_on_completed(
-                detail::keep_object_pinned{std::move(p)});
-
-            return result;
+            return detail::make_component_action_name(
+                detail::get_action_name<Derived>(),
+                get_lva<Component>::call(lva));
         }
 
         template <typename ...Ts>
-        static R invoke(naming::address::address_type lva,
+        static R invoke(
+            naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs)
         {
-            return invoke_helper(
-                detail::tag<R>{}, lva, comptype, std::forward<Ts>(vs)...);
+            basic_action<Component const, R(Ps...), Derived>::
+                increment_invocation_count();
+
+            using is_future = typename traits::is_future<R>::type;
+            return detail::component_invoke<Component const, R>(is_future{},
+                lva, comptype, F, std::forward<Ts>(vs)...);
         }
     };
 
