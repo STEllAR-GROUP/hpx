@@ -11,16 +11,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
-#include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detail/pp/strip_parens.hpp>
-#include <hpx/util/unused.hpp>
+
+#include <boost/utility/string_ref.hpp>
 
 #include <cstdlib>
 #include <sstream>
@@ -48,6 +46,15 @@ namespace hpx { namespace actions
                 return naming::is_locality(id);
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        inline std::string make_plain_action_name(
+            boost::string_ref action_name)
+        {
+            std::stringstream name;
+            name << "plain action(" << action_name << ")";
+            return name.str();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -61,18 +68,15 @@ namespace hpx { namespace actions
       : public basic_action<detail::plain_function, R(Ps...), Derived>
     {
     public:
-
-        typedef void is_plain_action;
-
         static std::string get_action_name(naming::address::address_type /*lva*/)
         {
-            std::stringstream name;
-            name << "plain action(" << detail::get_action_name<Derived>() << ")";
-            return name.str();
+            return detail::make_plain_action_name(
+                detail::get_action_name<Derived>());
         }
 
         template <typename ...Ts>
-        static R invoke(naming::address::address_type /*lva*/,
+        static R invoke(
+            naming::address::address_type /*lva*/,
             naming::address::component_type comptype, Ts&&... vs)
         {
             basic_action<detail::plain_function, R(Ps...), Derived>::
