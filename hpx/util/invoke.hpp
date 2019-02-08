@@ -15,6 +15,7 @@
 
 #include <boost/ref.hpp>
 
+#include <functional>
 #include <type_traits>
 #include <utility>
 
@@ -108,6 +109,13 @@ namespace hpx { namespace util
                     invoke_mem_fun<T, C>,
                     invoke_mem_obj<T, C>
                 >::type;
+        };
+
+        // flatten std::[c]ref
+        template <typename F, typename X>
+        struct dispatch_invoke<F, ::std::reference_wrapper<X> >
+        {
+            using type = X&;
         };
 
         // support boost::[c]ref, which is not callable as std::[c]ref
