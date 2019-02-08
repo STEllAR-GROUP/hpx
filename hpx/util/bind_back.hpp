@@ -48,8 +48,7 @@ namespace hpx { namespace util
                 Us&&...
             >::type operator()(Us&&... vs) &
             {
-                using invoke_impl = typename detail::dispatch_invoke<F&>::type;
-                return invoke_impl(_f)(
+                return HPX_INVOKE(_f,
                     std::forward<Us>(vs)..., util::get<Is>(_args)...);
             }
 
@@ -61,8 +60,7 @@ namespace hpx { namespace util
                 Us&&...
             >::type operator()(Us&&... vs) const&
             {
-                using invoke_impl = typename detail::dispatch_invoke<F const&>::type;
-                return invoke_impl(_f)(
+                return HPX_INVOKE(_f,
                     std::forward<Us>(vs)..., util::get<Is>(_args)...);
             }
 
@@ -74,8 +72,7 @@ namespace hpx { namespace util
                 Us&&...
             >::type operator()(Us&&... vs) &&
             {
-                using invoke_impl = typename detail::dispatch_invoke<F>::type;
-                return invoke_impl(std::move(_f))(
+                return HPX_INVOKE(std::move(_f),
                     std::forward<Us>(vs)..., util::get<Is>(std::move(_args))...);
             }
 
@@ -87,8 +84,7 @@ namespace hpx { namespace util
                 Us&&...
             >::type operator()(Us&&... vs) const&&
             {
-                using invoke_impl = typename detail::dispatch_invoke<F const>::type;
-                return invoke_impl(std::move(_f))(
+                return HPX_INVOKE(std::move(_f),
                     std::forward<Us>(vs)..., util::get<Is>(std::move(_args))...);
             }
 

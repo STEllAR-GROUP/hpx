@@ -81,8 +81,7 @@ namespace hpx { namespace util
             typename util::invoke_result<F, Ts...>::type
             operator()()
             {
-                using invoke_impl = typename detail::dispatch_invoke<F>::type;
-                return invoke_impl(std::move(_f))(
+                return HPX_INVOKE(std::move(_f),
                     util::get<Is>(std::move(_args))...);
             }
 

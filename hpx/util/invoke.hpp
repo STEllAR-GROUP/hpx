@@ -116,6 +116,17 @@ namespace hpx { namespace util
         {
             using type = X&;
         };
+
+        template <typename F>
+        using dispatch_invoke_t =
+            typename ::hpx::util::detail::dispatch_invoke<F>::type;
+
+        ///////////////////////////////////////////////////////////////////////
+#define HPX_INVOKE(F, ...)                                                     \
+        (::hpx::util::detail::dispatch_invoke_t<decltype((F))>(F)(__VA_ARGS__))
+
+#define HPX_INVOKE_R(R, F, ...)                                                \
+        (::hpx::util::void_guard<R>(), HPX_INVOKE(F, __VA_ARGS__))
     }
 
     /// Invokes the given callable object f with the content of
@@ -139,8 +150,7 @@ namespace hpx { namespace util
     typename util::invoke_result<F, Ts...>::type
     invoke(F&& f, Ts&&... vs)
     {
-        using invoke_impl = typename detail::dispatch_invoke<F>::type;
-        return invoke_impl(std::forward<F>(f))(std::forward<Ts>(vs)...);
+        return HPX_INVOKE(std::forward<F>(f), std::forward<Ts>(vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -152,9 +162,7 @@ namespace hpx { namespace util
     HPX_CONSTEXPR HPX_HOST_DEVICE
     R invoke_r(F&& f, Ts&&... vs)
     {
-        using invoke_impl = typename detail::dispatch_invoke<F>::type;
-        return util::void_guard<R>(), invoke_impl(std::forward<F>(f))(
-                std::forward<Ts>(vs)...);
+        return HPX_INVOKE_R(R, std::forward<F>(f), std::forward<Ts>(vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////

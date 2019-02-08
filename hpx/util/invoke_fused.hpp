@@ -68,8 +68,7 @@ namespace hpx { namespace util
         typename invoke_fused_result<F, Tuple>::type
         invoke_fused_impl(pack_c<std::size_t, Is...>, F&& f, Tuple&& t)
         {
-            using invoke_impl = typename detail::dispatch_invoke<F>::type;
-            return invoke_impl(std::forward<F>(f))(
+            return HPX_INVOKE(std::forward<F>(f),
                 util::get<Is>(std::forward<Tuple>(t))...);
         }
     }

@@ -134,8 +134,7 @@ namespace hpx { namespace util
                 util::tuple<Us&&...>
             >::type operator()(Us&&... vs) &
             {
-                using invoke_impl = typename detail::dispatch_invoke<F&>::type;
-                return invoke_impl(_f)(detail::bind_eval<Ts&>::call(
+                return HPX_INVOKE(_f, detail::bind_eval<Ts&>::call(
                     util::get<Is>(_args),
                     util::forward_as_tuple(std::forward<Us>(vs)...))...);
             }
@@ -148,8 +147,7 @@ namespace hpx { namespace util
                 util::tuple<Us&&...>
             >::type operator()(Us&&... vs) const&
             {
-                using invoke_impl = typename detail::dispatch_invoke<F const&>::type;
-                return invoke_impl(_f)(detail::bind_eval<Ts const&>::call(
+                return HPX_INVOKE(_f, detail::bind_eval<Ts const&>::call(
                     util::get<Is>(_args),
                     util::forward_as_tuple(std::forward<Us>(vs)...))...);
             }
@@ -162,8 +160,7 @@ namespace hpx { namespace util
                 util::tuple<Us&&...>
             >::type operator()(Us&&... vs) &&
             {
-                using invoke_impl = typename detail::dispatch_invoke<F>::type;
-                return invoke_impl(std::move(_f))(detail::bind_eval<Ts>::call(
+                return HPX_INVOKE(std::move(_f), detail::bind_eval<Ts>::call(
                     util::get<Is>(std::move(_args)),
                     util::forward_as_tuple(std::forward<Us>(vs)...))...);
             }
@@ -176,8 +173,7 @@ namespace hpx { namespace util
                 util::tuple<Us&&...>
             >::type operator()(Us&&... vs) const&&
             {
-                using invoke_impl = typename detail::dispatch_invoke<F const>::type;
-                return invoke_impl(std::move(_f))(detail::bind_eval<Ts const>::call(
+                return HPX_INVOKE(std::move(_f), detail::bind_eval<Ts const>::call(
                     util::get<Is>(std::move(_args)),
                     util::forward_as_tuple(std::forward<Us>(vs)...))...);
             }
