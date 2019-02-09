@@ -61,6 +61,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
 
     struct set_chunk_data
     {
+        set_chunk_data() { start = len = start_index = (std::size_t)(-1); }
         std::size_t start;
         std::size_t len;
         std::size_t start_index;
@@ -105,6 +106,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 std::size_t start1 = (curr_chunk - chunks.get()) * step;
                 std::size_t end1 = (std::min)(start1 + step, std::size_t(len1));
 
+                if (start1 >= end1)
+        			return;
+                
                 bool first_partition = (start1 == 0);
                 bool last_partition = (end1 == std::size_t(len1));
 
@@ -113,7 +117,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 {
                     // this chunk will be handled by the next one if all
                     // elements of this partition are equal
-                    if (!f(first1[start1], first1[end1 + 1]))
+                    if (!f(first1[start1], first1[end1]))
                         return;
 
                     // move backwards to find earliest element which is equal to
@@ -175,6 +179,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         [buffer, dest](
                             set_chunk_data* chunk, std::size_t, std::size_t)
                         {
+							if (chunk->start == (size_t)(-1) || chunk->start_index == (size_t)(-1) || chunk->len == (size_t)(-1))
+								return;
+                            
                             std::copy(buffer.get() + chunk->start,
                                 buffer.get() + chunk->start + chunk->len,
                                 dest + chunk->start_index);
