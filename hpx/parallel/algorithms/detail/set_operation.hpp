@@ -179,8 +179,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         [buffer, dest](
                             set_chunk_data* chunk, std::size_t, std::size_t)
                         {
-                            if (chunk->start == (size_t)(-1) || 
-                                chunk->start_index == (size_t)(-1) || 
+                            if (chunk->start == (size_t)(-1) ||
+                                chunk->start_index == (size_t)(-1) ||
                                 chunk->len == (size_t)(-1))
                                 return;
 
