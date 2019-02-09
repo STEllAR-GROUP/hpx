@@ -91,7 +91,7 @@ namespace hpx { namespace actions
         public:
             template <typename ...Ts>
             explicit thread_function(
-                    naming::id_type target,
+                    naming::id_type&& target,
                     naming::address::address_type lva,
                     naming::address::component_type comptype,
                     Ts&&... vs)
@@ -155,7 +155,7 @@ namespace hpx { namespace actions
         public:
             template <typename ...Ts>
             explicit continuation_thread_function(
-                    naming::id_type target,
+                    naming::id_type&& target,
                     typename Action::continuation_type&& cont,
                     naming::address::address_type lva,
                     naming::address::component_type comptype,
@@ -318,8 +318,8 @@ namespace hpx { namespace actions
 
             using thread_function = detail::thread_function<Derived>;
             return traits::action_decorate_function<Derived>::call(lva,
-                thread_function(target, lva, comptype,
-                    std::forward<Ts>(vs)...));
+                thread_function(std::move(target),
+                    lva, comptype, std::forward<Ts>(vs)...));
         }
 
         // This static construct_thread_function allows to construct
@@ -339,8 +339,8 @@ namespace hpx { namespace actions
 
             using thread_function = detail::continuation_thread_function<Derived>;
             return traits::action_decorate_function<Derived>::call(lva,
-                thread_function(target, std::move(cont), lva, comptype,
-                    std::forward<Ts>(vs)...));
+                thread_function(std::move(target), std::move(cont),
+                    lva, comptype, std::forward<Ts>(vs)...));
         }
 
         // direct execution
