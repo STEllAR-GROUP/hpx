@@ -14,6 +14,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/deferred_call.hpp>
 
+#include <cstdint>
 #include <utility>
 
 namespace hpx { namespace parallel { namespace execution { namespace detail
@@ -76,8 +77,9 @@ namespace hpx { namespace parallel { namespace execution { namespace detail
             threads::thread_id_type tid = threads::register_thread_nullary(
                 hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...),
-                desc, threads::pending_do_not_schedule, true,
-                policy.priority(), threads::thread_schedule_hint(get_worker_thread_num()),
+                desc, threads::pending_do_not_schedule, true, policy.priority(),
+                threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(get_worker_thread_num())),
                 threads::thread_stacksize_current);
 
             // make sure this thread is executed last

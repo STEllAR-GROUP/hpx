@@ -182,10 +182,11 @@ void test_bulk_then(bool sync)
     ).get();
 }
 
+template <typename Policy>
 void static_check_executor()
 {
     using namespace hpx::traits;
-    using executor =  hpx::parallel::execution::parallel_executor;
+    using executor = hpx::parallel::execution::parallel_policy_executor<Policy>;
 
     static_assert(
         !has_sync_execute_member<executor>::value,
@@ -214,6 +215,8 @@ void static_check_executor()
 template <typename Policy>
 void policy_test(bool sync = false, bool then_sync = false)
 {
+    static_check_executor<Policy>();
+
     test_sync<Policy>(sync);
     test_async<Policy>(sync);
     test_then<Policy>(then_sync);
@@ -225,8 +228,6 @@ void policy_test(bool sync = false, bool then_sync = false)
 
 int hpx_main(int argc, char* argv[])
 {
-    static_check_executor();
-
     policy_test<hpx::launch>();
 
     policy_test<hpx::launch::async_policy>();
