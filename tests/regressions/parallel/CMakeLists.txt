@@ -11,6 +11,7 @@ set(tests
     scan_non_commutative
     scan_shortlength
     search_zerolength
+    set_operations
     stable_merge_2964
     static_chunker_2282
    )
