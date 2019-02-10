@@ -61,6 +61,7 @@ namespace hpx { namespace util
                 this->object = this->vptr->copy(
                     this->storage, detail::function_storage_size, other.object);
             }
+            this->copy_serializable_vptr(other);
         }
 
         function(function&& other) noexcept
@@ -92,6 +93,7 @@ namespace hpx { namespace util
                     this->vptr->destruct(this->object);
                     this->object = this->vptr->copy(
                         this->object, -1, other.object);
+                    this->copy_serializable_vptr(other);
                 }
             } else {
                 reset();
@@ -101,6 +103,7 @@ namespace hpx { namespace util
                 {
                     this->object = this->vptr->copy(
                         this->storage, detail::function_storage_size, other.object);
+                    this->copy_serializable_vptr(other);
                 } else {
                     this->object = nullptr;
                 }

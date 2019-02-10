@@ -23,23 +23,24 @@ namespace hpx { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename VTable>
     struct serializable_function_vtable
-      : VTable, serializable_vtable
+      : serializable_vtable
     {
+        VTable const* vptr;
         char const* name;
 
         template <typename T>
         serializable_function_vtable(construct_vtable<T>) noexcept
-          : VTable(construct_vtable<T>())
-          , serializable_vtable(construct_vtable<T>())
-          , name(get_function_name<VTable, T>())
+          : serializable_vtable(construct_vtable<T>())
+          , vptr(detail::get_vtable<VTable, T>())
+          , name(detail::get_function_name<VTable, T>())
         {
             hpx::serialization::detail::polymorphic_intrusive_factory::instance().
                 register_class(name, &serializable_function_vtable::get_vtable<T>);
         }
 
         serializable_function_vtable(construct_vtable<empty_function>) noexcept
-          : VTable(construct_vtable<empty_function>())
-          , serializable_vtable(construct_vtable<empty_function>())
+          : serializable_vtable(construct_vtable<empty_function>())
+          , vptr(detail::get_empty_function_vtable<VTable>())
           , name("empty")
         {}
 
@@ -52,11 +53,13 @@ namespace hpx { namespace util { namespace detail
     };
 
     template <typename VTable>
-    VTable const* get_vtable(std::string const& name)
+    serializable_function_vtable<VTable> const*
+    get_serializable_vtable(std::string const& name)
     {
+        using serializable_vtable = serializable_function_vtable<VTable>;
         return
             hpx::serialization::detail::polymorphic_intrusive_factory::instance().
-                create<VTable const>(name);
+                create<serializable_vtable const>(name);
     }
 }}}
 

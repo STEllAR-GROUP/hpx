@@ -223,37 +223,68 @@ namespace hpx { namespace util { namespace detail
 
     template <typename VTable, typename R, typename ...Ts>
     class basic_function<VTable, R(Ts...), true>
-      : public function_base<
-            serializable_function_vtable<VTable>
-          , R(Ts...)
-        >
+      : public function_base<VTable, R(Ts...)>
     {
-        typedef serializable_function_vtable<VTable> vtable;
-        typedef function_base<vtable, R(Ts...)> base_type;
+        using serializable_vtable = serializable_function_vtable<VTable>;
+        using base_type = function_base<VTable, R(Ts...)>;
 
     public:
         typedef R result_type;
 
         basic_function() noexcept
           : base_type()
+          , serializable_vptr(nullptr)
         {}
 
         basic_function(basic_function&& other) noexcept
           : base_type(static_cast<base_type&&>(other))
+          , serializable_vptr(other.serializable_vptr)
         {}
 
         basic_function& operator=(basic_function&& other) noexcept
         {
             base_type::operator=(static_cast<base_type&&>(other));
+            serializable_vptr = other.serializable_vptr;
             return *this;
+        }
+
+        template <typename F>
+        void assign(F&& f)
+        {
+            base_type::assign(std::forward<F>(f));
+            if (!base_type::empty())
+            {
+                typedef typename std::decay<F>::type target_type;
+
+                serializable_vptr = get_serializable_vtable<target_type>();
+            }
+        }
+
+        void swap(basic_function& f) noexcept
+        {
+            base_type::swap(f);
+            std::swap(serializable_vptr, f.serializable_vptr);
         }
 
     private:
         friend class hpx::serialization::access;
 
-        void load(serialization::input_archive& ar, const unsigned version)
+        void save(serialization::output_archive& ar, unsigned const version) const
         {
-            this->reset();
+            bool const is_empty = base_type::empty();
+            ar << is_empty;
+            if (!is_empty)
+            {
+                std::string const name = serializable_vptr->name;
+                ar << name;
+
+                serializable_vptr->save_object(object, ar, version);
+            }
+        }
+
+        void load(serialization::input_archive& ar, unsigned const version)
+        {
+            base_type::reset();
 
             bool is_empty = false;
             ar >> is_empty;
@@ -261,34 +292,40 @@ namespace hpx { namespace util { namespace detail
             {
                 std::string name;
                 ar >> name;
+                serializable_vptr = detail::get_serializable_vtable<VTable>(name);
 
-                this->vptr = detail::get_vtable<vtable>(name);
-                this->object = this->vptr->load_object(
-                    this->storage, function_storage_size, ar, version);
-            }
-        }
-
-        void save(serialization::output_archive& ar, const unsigned version) const
-        {
-            bool is_empty = this->empty();
-            ar << is_empty;
-            if (!is_empty)
-            {
-                std::string function_name = this->vptr->name;
-                ar << function_name;
-
-                this->vptr->save_object(this->object, ar, version);
+                vptr = serializable_vptr->vptr;
+                object = serializable_vptr->load_object(
+                    storage, function_storage_size, ar, version);
             }
         }
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
+
+        template <typename T>
+        static serializable_vtable const* get_serializable_vtable() noexcept
+        {
+            return detail::get_vtable<serializable_vtable, T>();
+        }
+
+    protected:
+        void copy_serializable_vptr(basic_function const& other) noexcept
+        {
+            serializable_vptr = other.serializable_vptr;
+        }
+
+    protected:
+        using base_type::vptr;
+        using base_type::object;
+        using base_type::storage;
+        serializable_vtable const* serializable_vptr;
     };
 
     template <typename VTable, typename R, typename ...Ts>
     class basic_function<VTable, R(Ts...), false>
       : public function_base<VTable, R(Ts...)>
     {
-        typedef function_base<VTable, R(Ts...)> base_type;
+        using base_type = function_base<VTable, R(Ts...)>;
 
     public:
         typedef R result_type;
@@ -306,6 +343,10 @@ namespace hpx { namespace util { namespace detail
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
         }
+
+    protected:
+        void copy_serializable_vptr(basic_function const&) noexcept
+        {}
     };
 
     template <typename Sig, typename VTable, bool Serializable>
