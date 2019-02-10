@@ -42,6 +42,164 @@ namespace hpx { namespace traits
             static bool const value =
                 sizeof(test(std::declval<T>())) == sizeof(void*);
         };
+
+        template <typename T, typename U, typename = void>
+        struct addition_result
+        {};
+
+        template <typename T, typename U>
+        struct addition_result<T, U,
+            typename util::always_void<
+                decltype(std::declval<T>() + std::declval<U>())
+            >::type>
+        {
+          using type = decltype(std::declval<T>() + std::declval<U>());
+        };
+
+        template <typename T, typename = void>
+        struct dereference_result
+        {};
+
+        template <typename T>
+        struct dereference_result<T,
+            typename util::always_void< decltype(*(std::declval<T&>()))>::type>
+        {
+          using type = decltype(*(std::declval<T&>()));
+        };
+
+        template <typename T, typename U, typename = void>
+        struct inplace_addition_result
+        {};
+
+        template <typename T, typename U>
+        struct inplace_addition_result<T, U,
+            typename util::always_void<
+                decltype(std::declval<T>() += std::declval<U>())
+            >::type>
+        {
+          using type = decltype(std::declval<T>() += std::declval<U>());
+        };
+
+        template <typename T, typename U, typename = void>
+        struct inplace_subtraction_result
+        {};
+
+        template <typename T, typename U>
+        struct inplace_subtraction_result<T, U,
+            typename util::always_void<
+                decltype(std::declval<T>() -= std::declval<U>())
+            >::type>
+        {
+          using type = decltype(std::declval<T>() -= std::declval<U>());
+        };
+
+        template <typename T, typename = void>
+        struct predecrement_result
+        {};
+
+        template <typename T>
+        struct predecrement_result<T,
+            typename util::always_void<decltype(--std::declval<T&>())>::type>
+        {
+          using type = decltype(--std::declval<T&>());
+        };
+
+        template <typename T, typename = void>
+        struct postdecrement_result
+        {};
+
+        template <typename T>
+        struct postdecrement_result<T,
+            typename util::always_void<decltype(std::declval<T&>()--)>::type>
+        {
+          using type = decltype(std::declval<T&>()--);
+        };
+
+        template <typename T, typename U, typename = void>
+        struct subscript_result
+        {};
+
+        template <typename T, typename U>
+        struct subscript_result<T, U,
+            typename util::always_void<
+                decltype(std::declval<T&>()[std::declval<U>()])
+            >::type>
+        {
+          using type = decltype(std::declval<T&>()[std::declval<U>()]);
+        };
+
+        template <typename T, typename U, typename = void>
+        struct subtraction_result
+        {};
+
+        template <typename T, typename U>
+        struct subtraction_result<T, U,
+            typename util::always_void<
+                decltype(std::declval<T>() - std::declval<U>())
+            >::type>
+        {
+          using type = decltype(std::declval<T>() - std::declval<U>());
+        };
+
+        template <typename Iter, typename TraversalTag>
+        struct satisfy_traversal_concept
+          : std::false_type
+        {};
+
+        template <typename Iter>
+        struct satisfy_traversal_concept<
+            Iter, boost::bidirectional_traversal_tag>
+          : std::integral_constant<bool,
+                std::is_same<
+                    typename std::add_lvalue_reference<Iter>::type,
+                    typename detail::predecrement_result<Iter>::type
+                >::value
+                && std::is_same<Iter,
+                    typename detail::postdecrement_result<Iter>::type
+                >::value>
+        {};
+
+        template <typename Iter>
+        struct satisfy_traversal_concept<Iter, boost::random_access_traversal_tag>
+          : std::integral_constant<bool,
+                satisfy_traversal_concept<Iter,
+                    boost::bidirectional_traversal_tag
+                >::value
+                && std::is_same<
+                    typename detail::dereference_result<Iter>::type,
+                    typename detail::subscript_result<Iter,
+                        typename std::iterator_traits<Iter>::difference_type
+                    >::type
+                >::value
+                && std::is_same<
+                    Iter,
+                    typename detail::addition_result<Iter,
+                        typename std::iterator_traits<Iter>::difference_type
+                    >::type
+                >::value
+                && std::is_same<
+                    typename std::add_lvalue_reference<Iter>::type,
+                    typename detail::inplace_addition_result<Iter,
+                        typename std::iterator_traits<Iter>::difference_type
+                    >::type
+                >::value
+                && std::is_same<
+                    Iter,
+                    typename detail::subtraction_result<Iter,
+                        typename std::iterator_traits<Iter>::difference_type
+                    >::type
+                >::value
+                && std::is_same<
+                    typename std::iterator_traits<Iter>::difference_type,
+                    typename detail::subtraction_result<Iter, Iter>::type
+                >::value
+                && std::is_same<
+                    typename std::add_lvalue_reference<Iter>::type,
+                    typename detail::inplace_subtraction_result<Iter,
+                        typename std::iterator_traits<Iter>::difference_type
+                    >::type
+                >::value>
+        {};
     }
 
     template <typename Iter, typename Enable = void>
@@ -73,8 +231,11 @@ namespace hpx { namespace traits
         template <typename Iter, typename Traversal>
         struct belongs_to_iterator_traversal<Iter, Traversal,
                 typename std::enable_if<is_iterator<Iter>::value>::type>
-          : std::is_base_of<
-                Traversal, typename boost::iterator_traversal<Iter>::type>
+          : std::integral_constant<bool,
+                std::is_base_of<
+                    Traversal, typename boost::iterator_traversal<Iter>::type
+                >::value
+                || satisfy_traversal_concept<Iter, Traversal>::value>
         {};
 
         ///////////////////////////////////////////////////////////////////////
@@ -101,6 +262,35 @@ namespace hpx { namespace traits
                 typename std::enable_if<is_iterator<Iter>::value>::type>
           : std::is_same<
                 Traversal, typename boost::iterator_traversal<Iter>::type>
+        {};
+
+        template <typename Iter>
+        struct has_traversal<Iter, boost::bidirectional_traversal_tag,
+                typename std::enable_if<is_iterator<Iter>::value>::type>
+          : std::integral_constant<bool,
+                std::is_same<
+                    boost::bidirectional_traversal_tag,
+                    typename boost::iterator_traversal<Iter>::type
+                >::value
+                || (satisfy_traversal_concept<Iter,
+                        boost::bidirectional_traversal_tag
+                    >::value
+                    && !satisfy_traversal_concept<Iter,
+                        boost::random_access_traversal_tag
+                    >::value)>
+        {};
+
+        template <typename Iter>
+        struct has_traversal<Iter, boost::random_access_traversal_tag,
+                typename std::enable_if<is_iterator<Iter>::value>::type>
+          : std::integral_constant<bool,
+                std::is_same<
+                    boost::random_access_traversal_tag,
+                    typename boost::iterator_traversal<Iter>::type
+                >::value
+                || satisfy_traversal_concept<Iter,
+                       boost::random_access_traversal_tag
+                   >::value>
         {};
     }
 
