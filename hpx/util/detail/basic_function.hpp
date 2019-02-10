@@ -17,6 +17,8 @@
 #include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/vtable/serializable_function_vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
+#include <hpx/util/detail/vtable/function_vtable.hpp>
+#include <hpx/util/detail/vtable/unique_function_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
 #include <cstddef>
@@ -30,15 +32,21 @@ namespace hpx { namespace util { namespace detail
     static const std::size_t function_storage_size = 3*sizeof(void*);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename VTable, typename Sig>
+    template <typename Sig, bool Copyable>
     class function_base;
 
-    template <typename VTable, typename R, typename ...Ts>
-    class function_base<VTable, R(Ts...)>
+    template <bool Copyable, typename R, typename ...Ts>
+    class function_base<R(Ts...), Copyable>
     {
+        using vtable = typename std::conditional<
+                Copyable,
+                detail::function_vtable<R(Ts...)>,
+                detail::unique_function_vtable<R(Ts...)>
+            >::type;
+
     public:
         function_base() noexcept
-          : vptr(detail::get_empty_function_vtable<VTable>())
+          : vptr(detail::get_empty_function_vtable<vtable>())
           , object(nullptr)
         {}
 
@@ -51,7 +59,7 @@ namespace hpx { namespace util { namespace detail
                 std::memcpy(storage, other.storage, function_storage_size);
                 object = &storage;
             }
-            other.vptr = detail::get_empty_function_vtable<VTable>();
+            other.vptr = detail::get_empty_function_vtable<vtable>();
             other.object = nullptr;
         }
 
@@ -80,20 +88,20 @@ namespace hpx { namespace util { namespace detail
         {
             if (!is_empty_function(f))
             {
-                typedef typename std::decay<F>::type target_type;
+                using target_type = typename std::decay<F>::type;
 
-                VTable const* f_vptr = get_vtable<target_type>();
+                vtable const* f_vptr = get_vtable<target_type>();
                 if (vptr == f_vptr)
                 {
                     // reuse object storage
-                    vtable::_destruct<target_type>(object);
-                    object = vtable::construct<target_type>(
+                    vtable::template _destruct<target_type>(object);
+                    object = vtable::template construct<target_type>(
                         object, -1, std::forward<F>(f));
                 } else {
                     reset();
 
                     vptr = f_vptr;
-                    object = vtable::construct<target_type>(
+                    object = vtable::template construct<target_type>(
                         storage, function_storage_size, std::forward<F>(f));
                 }
             } else {
@@ -107,7 +115,7 @@ namespace hpx { namespace util { namespace detail
             {
                 vptr->delete_(object, function_storage_size);
 
-                vptr = detail::get_empty_function_vtable<VTable>();
+                vptr = detail::get_empty_function_vtable<vtable>();
                 object = nullptr;
             }
         }
@@ -136,33 +144,33 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         T* target() noexcept
         {
-            typedef typename std::remove_cv<T>::type target_type;
+            using target_type = typename std::remove_cv<T>::type;
 
             static_assert(
                 traits::is_invocable_r<R, target_type&, Ts...>::value
               , "T shall be Callable with the function signature");
 
-            VTable const* f_vptr = get_vtable<target_type>();
+            vtable const* f_vptr = get_vtable<target_type>();
             if (vptr != f_vptr || empty())
                 return nullptr;
 
-            return &vtable::get<target_type>(object);
+            return &vtable::template get<target_type>(object);
         }
 
         template <typename T>
         T const* target() const noexcept
         {
-            typedef typename std::remove_cv<T>::type target_type;
+            using target_type = typename std::remove_cv<T>::type;
 
             static_assert(
                 traits::is_invocable_r<R, target_type&, Ts...>::value
               , "T shall be Callable with the function signature");
 
-            VTable const* f_vptr = get_vtable<target_type>();
+            vtable const* f_vptr = get_vtable<target_type>();
             if (vptr != f_vptr || empty())
                 return nullptr;
 
-            return &vtable::get<target_type>(object);
+            return &vtable::template get<target_type>(object);
         }
 
         HPX_FORCEINLINE R operator()(Ts... vs) const
@@ -200,33 +208,38 @@ namespace hpx { namespace util { namespace detail
 
     private:
         template <typename T>
-        static VTable const* get_vtable() noexcept
+        static vtable const* get_vtable() noexcept
         {
-            return detail::get_vtable<VTable, T>();
+            return detail::get_vtable<vtable, T>();
         }
 
     protected:
-        VTable const *vptr;
+        vtable const *vptr;
         void* object;
         mutable unsigned char storage[function_storage_size];
     };
 
-    template <typename Sig, typename VTable>
-    static bool is_empty_function(function_base<VTable, Sig> const& f) noexcept
+    template <typename Sig, bool Copyable>
+    static bool is_empty_function(function_base<Sig, Copyable> const& f) noexcept
     {
         return f.empty();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename VTable, typename Sig, bool Serializable>
+    template <typename Sig, bool Copyable, bool Serializable>
     class basic_function;
 
-    template <typename VTable, typename R, typename ...Ts>
-    class basic_function<VTable, R(Ts...), true>
-      : public function_base<VTable, R(Ts...)>
+    template <bool Copyable, typename R, typename ...Ts>
+    class basic_function<R(Ts...), Copyable, true>
+      : public function_base<R(Ts...), Copyable>
     {
-        using serializable_vtable = serializable_function_vtable<VTable>;
-        using base_type = function_base<VTable, R(Ts...)>;
+        using vtable = typename std::conditional<
+                Copyable,
+                detail::function_vtable<R(Ts...)>,
+                detail::unique_function_vtable<R(Ts...)>
+            >::type;
+        using serializable_vtable = serializable_function_vtable<vtable>;
+        using base_type = function_base<R(Ts...), Copyable>;
 
     public:
         typedef R result_type;
@@ -254,7 +267,7 @@ namespace hpx { namespace util { namespace detail
             base_type::assign(std::forward<F>(f));
             if (!base_type::empty())
             {
-                typedef typename std::decay<F>::type target_type;
+                using target_type = typename std::decay<F>::type;
 
                 serializable_vptr = get_serializable_vtable<target_type>();
             }
@@ -292,7 +305,7 @@ namespace hpx { namespace util { namespace detail
             {
                 std::string name;
                 ar >> name;
-                serializable_vptr = detail::get_serializable_vtable<VTable>(name);
+                serializable_vptr = detail::get_serializable_vtable<vtable>(name);
 
                 vptr = serializable_vptr->vptr;
                 object = serializable_vptr->load_object(
@@ -305,7 +318,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         static serializable_vtable const* get_serializable_vtable() noexcept
         {
-            return detail::get_serializable_vtable<VTable, T>();
+            return detail::get_serializable_vtable<vtable, T>();
         }
 
     protected:
@@ -321,11 +334,11 @@ namespace hpx { namespace util { namespace detail
         serializable_vtable const* serializable_vptr;
     };
 
-    template <typename VTable, typename R, typename ...Ts>
-    class basic_function<VTable, R(Ts...), false>
-      : public function_base<VTable, R(Ts...)>
+    template <bool Copyable, typename R, typename ...Ts>
+    class basic_function<R(Ts...), Copyable, false>
+      : public function_base<R(Ts...), Copyable>
     {
-        using base_type = function_base<VTable, R(Ts...)>;
+        using base_type = function_base<R(Ts...), Copyable>;
 
     public:
         typedef R result_type;
@@ -349,9 +362,9 @@ namespace hpx { namespace util { namespace detail
         {}
     };
 
-    template <typename Sig, typename VTable, bool Serializable>
+    template <typename Sig, bool Copyable, bool Serializable>
     static bool is_empty_function(
-        basic_function<VTable, Sig, Serializable> const& f) noexcept
+        basic_function<Sig, Copyable, Serializable> const& f) noexcept
     {
         return f.empty();
     }

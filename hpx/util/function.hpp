@@ -33,16 +33,12 @@ namespace hpx { namespace util
 
     template <typename R, typename ...Ts, bool Serializable>
     class function<R(Ts...), Serializable>
-      : public detail::basic_function<
-            detail::function_vtable<R(Ts...)>
-          , R(Ts...), Serializable
-        >
+      : public detail::basic_function<R(Ts...), true, Serializable>
     {
-        typedef detail::function_vtable<R(Ts...)> vtable;
-        typedef detail::basic_function<vtable, R(Ts...), Serializable> base_type;
+        using base_type = detail::basic_function<R(Ts...), true, Serializable>;
 
     public:
-        typedef typename base_type::result_type result_type;
+        typedef R result_type;
 
         function() noexcept
           : base_type()
