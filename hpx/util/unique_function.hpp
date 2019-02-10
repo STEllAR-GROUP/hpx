@@ -38,17 +38,11 @@ namespace hpx { namespace util
     public:
         typedef R result_type;
 
-        unique_function() noexcept
-          : base_type()
+        unique_function(std::nullptr_t = nullptr) noexcept
         {}
 
-        unique_function(std::nullptr_t) noexcept
-          : base_type()
-        {}
-
-        unique_function(unique_function&& other) noexcept
-          : base_type(static_cast<base_type&&>(other))
-        {}
+        unique_function(unique_function&&) noexcept = default;
+        unique_function& operator=(unique_function&&) noexcept = default;
 
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
@@ -56,15 +50,8 @@ namespace hpx { namespace util
              && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         unique_function(F&& f)
-          : base_type()
         {
             assign(std::forward<F>(f));
-        }
-
-        unique_function& operator=(unique_function&& other) noexcept
-        {
-            base_type::operator=(static_cast<base_type&&>(other));
-            return *this;
         }
 
         template <typename F, typename FD = typename std::decay<F>::type,

@@ -14,6 +14,7 @@
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/vtable/serializable_function_vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
@@ -29,7 +30,7 @@
 
 namespace hpx { namespace util { namespace detail
 {
-    static const std::size_t function_storage_size = 3*sizeof(void*);
+    static const std::size_t function_storage_size = 3 * sizeof(void*);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Sig, bool Copyable>
@@ -50,6 +51,17 @@ namespace hpx { namespace util { namespace detail
           , object(nullptr)
         {}
 
+        function_base(function_base const& other)
+          : vptr(other.vptr)
+          , object(other.object)
+        {
+            if (other.object != nullptr)
+            {
+                object = vptr->copy(
+                    storage, detail::function_storage_size, other.object);
+            }
+        }
+
         function_base(function_base&& other) noexcept
           : vptr(other.vptr)
           , object(other.object)
@@ -66,6 +78,32 @@ namespace hpx { namespace util { namespace detail
         ~function_base()
         {
             reset();
+        }
+
+        function_base& operator=(function_base const& other)
+        {
+            if (vptr == other.vptr)
+            {
+                if (this != &other && object)
+                {
+                    HPX_ASSERT(other.object != nullptr);
+                    // reuse object storage
+                    vptr->destruct(object);
+                    object = vptr->copy(object, -1, other.object);
+                }
+            } else {
+                reset();
+
+                vptr = other.vptr;
+                if (other.object != nullptr)
+                {
+                    object = vptr->copy(
+                        storage, detail::function_storage_size, other.object);
+                } else {
+                    object = nullptr;
+                }
+            }
+            return *this;
         }
 
         function_base& operator=(function_base&& other) noexcept
@@ -86,10 +124,13 @@ namespace hpx { namespace util { namespace detail
         template <typename F>
         void assign(F&& f)
         {
+            using target_type = typename std::decay<F>::type;
+            static_assert(!Copyable ||
+                std::is_constructible<target_type, target_type const&>::value,
+                "F shall be CopyConstructible");
+
             if (!is_empty_function(f))
             {
-                using target_type = typename std::decay<F>::type;
-
                 vtable const* f_vptr = get_vtable<target_type>();
                 if (vptr == f_vptr)
                 {
@@ -242,33 +283,19 @@ namespace hpx { namespace util { namespace detail
         using base_type = function_base<R(Ts...), Copyable>;
 
     public:
-        typedef R result_type;
-
         basic_function() noexcept
           : base_type()
           , serializable_vptr(nullptr)
         {}
 
-        basic_function(basic_function&& other) noexcept
-          : base_type(static_cast<base_type&&>(other))
-          , serializable_vptr(other.serializable_vptr)
-        {}
-
-        basic_function& operator=(basic_function&& other) noexcept
-        {
-            base_type::operator=(static_cast<base_type&&>(other));
-            serializable_vptr = other.serializable_vptr;
-            return *this;
-        }
-
         template <typename F>
         void assign(F&& f)
         {
+            using target_type = typename std::decay<F>::type;
+
             base_type::assign(std::forward<F>(f));
             if (!base_type::empty())
             {
-                using target_type = typename std::decay<F>::type;
-
                 serializable_vptr = get_serializable_vtable<target_type>();
             }
         }
@@ -322,12 +349,6 @@ namespace hpx { namespace util { namespace detail
         }
 
     protected:
-        void copy_serializable_vptr(basic_function const& other) noexcept
-        {
-            serializable_vptr = other.serializable_vptr;
-        }
-
-    protected:
         using base_type::vptr;
         using base_type::object;
         using base_type::storage;
@@ -337,30 +358,7 @@ namespace hpx { namespace util { namespace detail
     template <bool Copyable, typename R, typename ...Ts>
     class basic_function<R(Ts...), Copyable, false>
       : public function_base<R(Ts...), Copyable>
-    {
-        using base_type = function_base<R(Ts...), Copyable>;
-
-    public:
-        typedef R result_type;
-
-        basic_function() noexcept
-          : base_type()
-        {}
-
-        basic_function(basic_function&& other) noexcept
-          : base_type(static_cast<base_type&&>(other))
-        {}
-
-        basic_function& operator=(basic_function&& other) noexcept
-        {
-            base_type::operator=(static_cast<base_type&&>(other));
-            return *this;
-        }
-
-    protected:
-        void copy_serializable_vptr(basic_function const&) noexcept
-        {}
-    };
+    {};
 
     template <typename Sig, bool Copyable, bool Serializable>
     static bool is_empty_function(
