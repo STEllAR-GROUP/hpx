@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2019 Austin McCartney
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -62,9 +63,37 @@ namespace hpx { namespace traits
 
         template <typename T>
         struct dereference_result<T,
-            typename util::always_void< decltype(*(std::declval<T&>()))>::type>
+            typename util::always_void<decltype(*(std::declval<T&>()))>::type>
         {
           using type = decltype(*(std::declval<T&>()));
+        };
+
+        template <typename T, typename U, typename = void>
+        struct equality_result
+        {};
+
+        template <typename T, typename U>
+        struct equality_result<T, U,
+            typename util::always_void<
+                decltype(std::declval<const T&>() == std::declval<const U&>())
+            >::type>
+        {
+          using type =
+            decltype(std::declval<const T&>() == std::declval<const U&>());
+        };
+
+        template <typename T, typename U, typename = void>
+        struct inequality_result
+        {};
+
+        template <typename T, typename U>
+        struct inequality_result<T, U,
+            typename util::always_void<
+                decltype(std::declval<const T&>() != std::declval<const U&>())
+            >::type>
+        {
+          using type =
+            decltype(std::declval<const T&>() != std::declval<const U&>());
         };
 
         template <typename T, typename U, typename = void>
@@ -105,6 +134,17 @@ namespace hpx { namespace traits
         };
 
         template <typename T, typename = void>
+        struct preincrement_result
+        {};
+
+        template <typename T>
+        struct preincrement_result<T,
+            typename util::always_void<decltype(++std::declval<T&>())>::type>
+        {
+          using type = decltype(++std::declval<T&>());
+        };
+
+        template <typename T, typename = void>
         struct postdecrement_result
         {};
 
@@ -113,6 +153,17 @@ namespace hpx { namespace traits
             typename util::always_void<decltype(std::declval<T&>()--)>::type>
         {
           using type = decltype(std::declval<T&>()--);
+        };
+
+        template <typename T, typename = void>
+        struct postincrement_result
+        {};
+
+        template <typename T>
+        struct postincrement_result<T,
+            typename util::always_void<decltype(std::declval<T&>()++)>::type>
+        {
+          using type = decltype(std::declval<T&>()++);
         };
 
         template <typename T, typename U, typename = void>
@@ -141,64 +192,122 @@ namespace hpx { namespace traits
           using type = decltype(std::declval<T>() - std::declval<U>());
         };
 
+        template <typename Iter, typename = void>
+        struct bidirectional_concept
+          : std::false_type
+        {};
+
+        template <typename Iter>
+        struct bidirectional_concept<Iter,
+            typename util::always_void<
+                typename dereference_result<Iter>::type,
+                typename equality_result<Iter, Iter>::type,
+                typename inequality_result<Iter, Iter>::type,
+                typename predecrement_result<Iter>::type,
+                typename preincrement_result<Iter>::type,
+                typename postdecrement_result<Iter>::type,
+                typename postincrement_result<Iter>::type
+            >::type>
+          : std::integral_constant<bool,
+                std::is_convertible<bool,
+                    typename equality_result<Iter, Iter>::type
+                >::value
+                && std::is_convertible<bool,
+                    typename inequality_result<Iter, Iter>::type
+                >::value
+                && std::is_same<
+                    typename std::add_lvalue_reference<Iter>::type,
+                    typename predecrement_result<Iter>::type
+                >::value
+                && std::is_same<
+                    typename std::add_lvalue_reference<Iter>::type,
+                    typename preincrement_result<Iter>::type
+                >::value
+                && std::is_same<Iter,
+                    typename postdecrement_result<Iter>::type
+                >::value
+                && std::is_same<Iter,
+                    typename postincrement_result<Iter>::type
+                >::value>
+        {};
+
+        template <typename Iter, typename = void>
+        struct random_access_concept
+          : std::false_type
+        {};
+
+        template <typename Iter>
+        struct random_access_concept<Iter,
+            typename util::always_void<
+                typename dereference_result<Iter>::type,
+                typename subscript_result<Iter,
+                    typename std::iterator_traits<Iter>::difference_type
+                >::type,
+                typename addition_result<Iter,
+                    typename std::iterator_traits<Iter>::difference_type
+                >::type,
+                typename inplace_addition_result<Iter,
+                    typename std::iterator_traits<Iter>::difference_type
+                >::type,
+                typename subtraction_result<Iter,
+                    typename std::iterator_traits<Iter>::difference_type
+                >::type,
+                typename subtraction_result<Iter, Iter>::type,
+                typename inplace_subtraction_result<Iter,
+                    typename std::iterator_traits<Iter>::difference_type
+                >::type
+              >::type>
+          : std::integral_constant<bool,
+                bidirectional_concept<Iter>::value
+                && std::is_same<
+                    typename dereference_result<Iter>::type,
+                    typename subscript_result<Iter,
+                        typename std::iterator_traits<Iter>::difference_type
+                    >::type
+                >::value
+                && std::is_same<
+                    Iter,
+                    typename addition_result<Iter,
+                        typename std::iterator_traits<Iter>::difference_type
+                    >::type
+                >::value
+                && std::is_same<
+                    typename std::add_lvalue_reference<Iter>::type,
+                    typename inplace_addition_result<Iter,
+                        typename std::iterator_traits<Iter>::difference_type
+                    >::type
+                >::value
+                && std::is_same<
+                    Iter,
+                    typename subtraction_result<Iter,
+                        typename std::iterator_traits<Iter>::difference_type
+                    >::type
+                >::value
+                && std::is_same<
+                    typename std::iterator_traits<Iter>::difference_type,
+                    typename subtraction_result<Iter, Iter>::type
+                >::value
+                && std::is_same<
+                    typename std::add_lvalue_reference<Iter>::type,
+                    typename inplace_subtraction_result<Iter,
+                        typename std::iterator_traits<Iter>::difference_type
+                    >::type
+                >::value>
+        {};
+
         template <typename Iter, typename TraversalTag>
         struct satisfy_traversal_concept
           : std::false_type
         {};
 
         template <typename Iter>
-        struct satisfy_traversal_concept<
-            Iter, boost::bidirectional_traversal_tag>
-          : std::integral_constant<bool,
-                std::is_same<
-                    typename std::add_lvalue_reference<Iter>::type,
-                    typename detail::predecrement_result<Iter>::type
-                >::value
-                && std::is_same<Iter,
-                    typename detail::postdecrement_result<Iter>::type
-                >::value>
+        struct satisfy_traversal_concept<Iter, boost::bidirectional_traversal_tag>
+          : bidirectional_concept<Iter>
         {};
 
         template <typename Iter>
         struct satisfy_traversal_concept<Iter, boost::random_access_traversal_tag>
-          : std::integral_constant<bool,
-                satisfy_traversal_concept<Iter,
-                    boost::bidirectional_traversal_tag
-                >::value
-                && std::is_same<
-                    typename detail::dereference_result<Iter>::type,
-                    typename detail::subscript_result<Iter,
-                        typename std::iterator_traits<Iter>::difference_type
-                    >::type
-                >::value
-                && std::is_same<
-                    Iter,
-                    typename detail::addition_result<Iter,
-                        typename std::iterator_traits<Iter>::difference_type
-                    >::type
-                >::value
-                && std::is_same<
-                    typename std::add_lvalue_reference<Iter>::type,
-                    typename detail::inplace_addition_result<Iter,
-                        typename std::iterator_traits<Iter>::difference_type
-                    >::type
-                >::value
-                && std::is_same<
-                    Iter,
-                    typename detail::subtraction_result<Iter,
-                        typename std::iterator_traits<Iter>::difference_type
-                    >::type
-                >::value
-                && std::is_same<
-                    typename std::iterator_traits<Iter>::difference_type,
-                    typename detail::subtraction_result<Iter, Iter>::type
-                >::value
-                && std::is_same<
-                    typename std::add_lvalue_reference<Iter>::type,
-                    typename detail::inplace_subtraction_result<Iter,
-                        typename std::iterator_traits<Iter>::difference_type
-                    >::type
-                >::value>
+          : random_access_concept<Iter>
         {};
     }
 
