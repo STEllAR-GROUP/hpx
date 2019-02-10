@@ -14,12 +14,15 @@ void set_difference_small_test(int rounds) {
     std::vector<int> a_minus_b(2);
 
     std::vector<int> perfect(2);
-    std::set_difference(set_a.begin(), set_a.end(), set_b.begin(), set_b.end(), perfect.begin());
+    std::set_difference(set_a.begin(), set_a.end(),
+                        set_b.begin(), set_b.end(), perfect.begin());
 
     while (--rounds)
     {
-        hpx::parallel::set_difference(hpx::parallel::execution::par, set_a.begin(), set_a.end(),
-            set_b.begin(), set_b.end(), a_minus_b.begin());
+        hpx::parallel::set_difference(hpx::parallel::execution::par,
+                                      set_a.begin(), set_a.end(),
+                                      set_b.begin(), set_b.end(),
+                                      a_minus_b.begin());
         HPX_TEST(perfect == a_minus_b);
     }
 }
@@ -34,12 +37,15 @@ void set_difference_medium_test(int rounds) {
     std::vector<int> a_minus_b(50);
 
     std::vector<int> perfect(50);
-    std::set_difference(set_a.begin(), set_a.end(), set_b.begin(), set_b.end(), perfect.begin());
+    std::set_difference(set_a.begin(), set_a.end(),
+                        set_b.begin(), set_b.end(), perfect.begin());
 
     while (--rounds)
     {
-        hpx::parallel::set_difference(hpx::parallel::execution::par, set_a.begin(), set_a.end(),
-            set_b.begin(), set_b.end(), a_minus_b.begin());
+        hpx::parallel::set_difference(hpx::parallel::execution::par,
+                                      set_a.begin(), set_a.end(),
+                                      set_b.begin(), set_b.end(),
+                                      a_minus_b.begin());
         HPX_TEST(perfect == a_minus_b);
     }
 }
@@ -55,12 +61,15 @@ void set_difference_large_test(int rounds) {
     std::vector<int> a_minus_b(5'000'000);
 
     std::vector<int> perfect(5'000'000);
-    std::set_difference(set_a.begin(), set_a.end(), set_b.begin(), set_b.end(), perfect.begin());
+    std::set_difference(set_a.begin(), set_a.end(),
+                        set_b.begin(), set_b.end(), perfect.begin());
 
     while (--rounds)
     {
-        hpx::parallel::set_difference(hpx::parallel::execution::par, set_a.begin(), set_a.end(),
-            set_b.begin(), set_b.end(), a_minus_b.begin());
+        hpx::parallel::set_difference(hpx::parallel::execution::par,
+                                      set_a.begin(), set_a.end(),
+                                      set_b.begin(), set_b.end(),
+                                      a_minus_b.begin());
         HPX_TEST(perfect == a_minus_b);
     }
 }
@@ -78,12 +87,15 @@ void set_intersection_small_test(int rounds) {
     std::vector<int> a_and_b(2);
 
     std::vector<int> perfect(2);
-    std::set_intersection(set_a.begin(), set_a.end(), set_b.begin(), set_b.end(), perfect.begin());
+    std::set_intersection(set_a.begin(), set_a.end(),
+                          set_b.begin(), set_b.end(), perfect.begin());
 
     while (--rounds)
     {
-        hpx::parallel::set_intersection(hpx::parallel::execution::par, set_a.begin(), set_a.end(),
-            set_b.begin(), set_b.end(), a_and_b.begin());
+        hpx::parallel::set_intersection(hpx::parallel::execution::par,
+                                        set_a.begin(), set_a.end(),
+                                        set_b.begin(), set_b.end(),
+                                        a_and_b.begin());
         HPX_TEST(perfect == a_and_b);
     }
 }
@@ -98,12 +110,15 @@ void set_intersection_medium_test(int rounds) {
     std::vector<int> a_and_b(20);
 
     std::vector<int> perfect(20);
-    std::set_intersection(set_a.begin(), set_a.end(), set_b.begin(), set_b.end(), perfect.begin());
+    std::set_intersection(set_a.begin(), set_a.end(), set_b.begin(),
+                          set_b.end(), perfect.begin());
 
     while (--rounds)
     {
-        hpx::parallel::set_intersection(hpx::parallel::execution::par, set_a.begin(), set_a.end(),
-            set_b.begin(), set_b.end(), a_and_b.begin());
+        hpx::parallel::set_intersection(hpx::parallel::execution::par,
+                                        set_a.begin(), set_a.end(),
+                                        set_b.begin(), set_b.end(),
+                                        a_and_b.begin());
         HPX_TEST(perfect == a_and_b);
     }
 }
@@ -119,12 +134,15 @@ void set_intersection_large_test(int rounds) {
     std::vector<int> a_and_b(3'000'000);
 
     std::vector<int> perfect(3'000'000);
-    std::set_intersection(set_a.begin(), set_a.end(), set_b.begin(), set_b.end(), perfect.begin());
+    std::set_intersection(set_a.begin(), set_a.end(),
+                          set_b.begin(), set_b.end(), perfect.begin());
 
     while (--rounds)
     {
-        hpx::parallel::set_intersection(hpx::parallel::execution::par, set_a.begin(), set_a.end(),
-            set_b.begin(), set_b.end(), a_and_b.begin());
+        hpx::parallel::set_intersection(hpx::parallel::execution::par,
+                                        set_a.begin(), set_a.end(),
+                                        set_b.begin(), set_b.end(),
+                                        a_and_b.begin());
         HPX_TEST(perfect == a_and_b);
     }
 }
