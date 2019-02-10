@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_TRAITS_IS_ITERATOR_MAR_05_2016_0840PM
 
 #include <hpx/config.hpp>
+#include <hpx/util/always_void.hpp>
 
 #include <boost/iterator/iterator_categories.hpp>
 
