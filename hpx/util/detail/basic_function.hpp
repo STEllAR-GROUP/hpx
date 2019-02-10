@@ -305,7 +305,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         static serializable_vtable const* get_serializable_vtable() noexcept
         {
-            return detail::get_vtable<serializable_vtable, T>();
+            return detail::get_serializable_vtable<VTable, T>();
         }
 
     protected:
