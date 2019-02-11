@@ -63,8 +63,8 @@ namespace hpx { namespace iostreams { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     void release_ostream(char const* name, naming::id_type const& id)
     {
-        LRT_(info) << "detail::release_ostream: destroying '"
-                   << name << "' stream object";
+        LRT_(info) << "detail::release_ostream: destroying '" << name
+                   << "' stream object";
 
         if (agas::is_console())
         {
