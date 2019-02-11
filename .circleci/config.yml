@@ -283,6 +283,10 @@ jobs:
       - attach_workspace:
           at: /hpx
       - run:
+          name: Installing HPX for build unit tests
+          command: |
+              ninja install
+      - run:
           name: Building Unit Tests
           command: |
               ninja -j2 -k 0 tests.unit.build
@@ -1002,6 +1006,11 @@ jobs:
           command: |
               ./bin/hello_world --hpx:bind=none
               ninja -j2 install
+          working_directory: /hpx/build
+          when: always
+      - run:
+          name: Testing installed HPX
+          command: |
               hello_world --hpx:bind=none
               ldconfig
               hpxcxx --exe=hello_world_test_build ../source/examples/quickstart/hello_world.cpp -g -lhpx_iostreamsd
@@ -1084,8 +1093,6 @@ workflows:
           <<: *core_dependency
       - tests.unit.agas:
           <<: *core_dependency
-      - tests.unit.build:
-          <<: *core_dependency
       - tests.unit.component:
           <<: *core_dependency
       - tests.unit.computeapi:
@@ -1150,6 +1157,11 @@ workflows:
           <<: *core_dependency
       - examples:
           <<: *core_dependency
+      - tests.unit.build:
+          requires:
+            - examples
+            - core
+          <<: *gh_pages_filter
       - install:
           requires:
             - inspect
