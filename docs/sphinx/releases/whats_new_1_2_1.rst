@@ -18,6 +18,8 @@ This is a bugfix release. It contains the following changes:
 * Fix compilation on ARM, s390x and 32-bit architectures.
 * Fix compilation with Boost 1.69.0.
 * Fix a critical bug in the ``future`` implementation.
+* Fix several problems in the CMake configuration which affects external
+  projects.
 
 Closed issues
 =============
@@ -36,6 +38,10 @@ Closed pull requests
 * :hpx-pr:`3663` - Fixing race between setting and getting the value inside future_data
 * :hpx-pr:`3648` - Adding timestamp option for S390x platform
 * :hpx-pr:`3647` - Blind attempt to fix warnings issued by gcc V9
+* :hpx-pr:`3611` - Include GNUInstallDirs earlier to have it available for subdirectories
+* :hpx-pr:`3595` - Use GNUInstallDirs lib path in pkgconfig config file
+* :hpx-pr:`3593` - Add include(GNUInstallDirs) to HPXMacros.cmake
 * :hpx-pr:`3591` - Fix compilation error on arm7 architecture. Compiles and runs on Fedora 29 on Pi 3.
 * :hpx-pr:`3558` - Adding constructor `exception(boost::system::error_code const&)`
+* :hpx-pr:`3555` - cmake: make install locations configurable
 * :hpx-pr:`3551` - Fix uint64_t causing compilation fail on i686
