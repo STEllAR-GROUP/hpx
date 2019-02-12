@@ -84,6 +84,19 @@ void test()
         }
     }
 
+    // unregistering names again to avoid memory leaks...
+    for (int i = 0; i < 2; ++i)
+    {
+        if (i != rank)
+            continue;
+
+        for (int j = 0; j < 2; ++j)
+        {
+            std::string name = gen_name(j, rank);
+            hpx::unregister_with_basename(name, 0).get();
+        }
+    }
+
     std::cout << "all done " << rank << "\n";
 }
 

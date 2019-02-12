@@ -17,10 +17,16 @@ set(benchmarks
     print_heterogeneous_payloads
     resume_suspend
     skynet
-    start_stop
     timed_task_spawn
     wait_all_timings
 )
+
+if(NOT HPX_WITH_SANITIZERS)
+  set(benchmarks
+      ${benchmarks}
+      start_stop
+     )
+endif()
 
 if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD)
   set(benchmarks
