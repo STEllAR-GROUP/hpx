@@ -1,5 +1,4 @@
 //  Copyright (c) 2013-2015 Agustin Berge
-//  Copyright (c) 2016 Antoine Tran Tan
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,6 +15,7 @@
 
 #include <boost/ref.hpp>
 
+#include <functional>
 #include <type_traits>
 #include <utility>
 
@@ -24,107 +24,117 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        template <typename R,typename FD>
-        struct invoke_impl
+        template <typename T, typename C>
+        struct invoke_mem_obj
         {
-            // f(t0, t1, ..., tN)
-            template <typename F, typename ...Ts>
+            T C::*f;
+
             HPX_CONSTEXPR HPX_HOST_DEVICE
-            R operator()(F&& f, Ts&&... vs) const
-            {
-                return hpx::util::void_guard<R>(),
-                    std::forward<F>(f)(std::forward<Ts>(vs)...);
-            }
-        };
+            invoke_mem_obj(T C::*mem_obj) noexcept
+              : f(mem_obj)
+            {}
 
-
-        template <typename R, typename M, typename C>
-        struct invoke_impl<R, M C::*>
-        {
             // t0.*f
-            template <typename F, typename T0>
+            template <typename T0>
             HPX_CONSTEXPR HPX_HOST_DEVICE
             typename std::enable_if<
                 std::is_base_of<C, typename std::decay<T0>::type>::value,
-                R
-            >::type
-            operator()(F f, T0& v0) const
+                util::invoke_result<T C::*, T0>
+            >::type::type
+            operator()(T0&& v0) const noexcept
             {
-                return hpx::util::void_guard<R>(), (v0.*f);
-            }
-
-            template <typename F, typename T0>
-            HPX_CONSTEXPR HPX_HOST_DEVICE
-            typename std::enable_if<
-                std::is_base_of<C, typename std::decay<T0>::type>::value
-             && !std::is_lvalue_reference<T0>::value,
-                R
-            >::type
-            operator()(F f, T0&& v0) const
-            {
-                return hpx::util::void_guard<R>(), std::move(v0.*f);
+                return std::forward<T0>(v0).*f;
             }
 
             // (*t0).*f
-            template <typename F, typename T0>
+            template <typename T0>
             HPX_CONSTEXPR HPX_HOST_DEVICE
             typename std::enable_if<
                 !std::is_base_of<C, typename std::decay<T0>::type>::value,
-                R
-            >::type
-            operator()(F f, T0&& v0) const
+                util::invoke_result<T C::*, T0>
+            >::type::type
+            operator()(T0&& v0) const noexcept(noexcept(*std::forward<T0>(v0)))
             {
-                return hpx::util::void_guard<R>(), (*this)(f, *std::forward<T0>(v0));
+                return (*std::forward<T0>(v0)).*f;
             }
         };
 
-        template <typename R, typename RR, typename C, typename ...Ps>
-        struct invoke_impl<R, RR (C::*)(Ps...)>
+        template <typename T, typename C>
+        struct invoke_mem_fun
         {
+            T C::*f;
+
+            HPX_CONSTEXPR HPX_HOST_DEVICE
+            invoke_mem_fun(T C::*mem_fun) noexcept
+              : f(mem_fun)
+            {}
+
             // (t0.*f)(t1, ..., tN)
-            template <typename F, typename T0, typename ...Ts>
+            template <typename T0, typename ...Ts>
             HPX_CONSTEXPR HPX_HOST_DEVICE
             typename std::enable_if<
                 std::is_base_of<C, typename std::decay<T0>::type>::value,
-                R
-            >::type
-            operator()(F f, T0&& v0, Ts&&... vs) const
+                util::invoke_result<T C::*, T0, Ts...>
+            >::type::type
+            operator()(T0&& v0, Ts&&... vs) const
             {
-                return hpx::util::void_guard<R>(),
-                    (std::forward<T0>(v0).*f)(std::forward<Ts>(vs)...);
+                return (std::forward<T0>(v0).*f)(std::forward<Ts>(vs)...);
             }
 
             // ((*t0).*f)(t1, ..., tN)
-            template <typename F, typename T0, typename ...Ts>
+            template <typename T0, typename ...Ts>
             HPX_CONSTEXPR HPX_HOST_DEVICE
             typename std::enable_if<
                 !std::is_base_of<C, typename std::decay<T0>::type>::value,
-                R
-            >::type
-            operator()(F f, T0&& v0, Ts&&... vs) const
+                util::invoke_result<T C::*, T0, Ts...>
+            >::type::type
+            operator()(T0&& v0, Ts&&... vs) const
             {
-                return hpx::util::void_guard<R>(),
-                    (*this)(f, *std::forward<T0>(v0), std::forward<Ts>(vs)...);
+                return ((*std::forward<T0>(v0)).*f)(std::forward<Ts>(vs)...);
             }
         };
 
-        template <typename R, typename RR, typename C, typename ...Ps>
-        struct invoke_impl<R, RR (C::*)(Ps...) const>
-          : invoke_impl<R, RR (C::*)(Ps...)>
-        {};
-
-        template <typename R,typename X>
-        struct invoke_impl<R,::boost::reference_wrapper<X>>
-          : invoke_impl<R,X&>
+        ///////////////////////////////////////////////////////////////////////
+        template <typename F, typename FD = typename std::decay<F>::type>
+        struct dispatch_invoke
         {
-            // support boost::[c]ref, which is not callable as std::[c]ref
-            template <typename F, typename ...Ts>
-            HPX_CONSTEXPR HPX_HOST_DEVICE
-            R operator()(F f, Ts&&... vs) const
-            {
-                return hpx::util::void_guard<R>(), f.get()(std::forward<Ts>(vs)...);
-            }
+            using type = F&&;
         };
+
+        template <typename F, typename T, typename C>
+        struct dispatch_invoke<F, T C::*>
+        {
+            using type = typename std::conditional<
+                    std::is_function<T>::value,
+                    invoke_mem_fun<T, C>,
+                    invoke_mem_obj<T, C>
+                >::type;
+        };
+
+        // flatten std::[c]ref
+        template <typename F, typename X>
+        struct dispatch_invoke<F, ::std::reference_wrapper<X> >
+        {
+            using type = X&;
+        };
+
+        // support boost::[c]ref, which is not callable as std::[c]ref
+        template <typename F, typename X>
+        struct dispatch_invoke<F, ::boost::reference_wrapper<X> >
+        {
+            using type = X&;
+        };
+
+        template <typename F>
+        using dispatch_invoke_t =
+            typename ::hpx::util::detail::dispatch_invoke<F>::type;
+
+        ///////////////////////////////////////////////////////////////////////
+#define HPX_INVOKE(F, ...)                                                     \
+        (::hpx::util::detail::dispatch_invoke_t<decltype((F))>(F)(__VA_ARGS__))
+
+#define HPX_INVOKE_R(R, F, ...)                                                \
+        (::hpx::util::void_guard<R>(), HPX_INVOKE(F, __VA_ARGS__))
     }
 
     /// Invokes the given callable object f with the content of
@@ -148,12 +158,10 @@ namespace hpx { namespace util
     typename util::invoke_result<F, Ts...>::type
     invoke(F&& f, Ts&&... vs)
     {
-        typedef typename util::invoke_result<F, Ts...>::type R;
-
-        return detail::invoke_impl<R,typename std::decay<F>::type>()(
-            std::forward<F>(f), std::forward<Ts>(vs)...);
+        return HPX_INVOKE(std::forward<F>(f), std::forward<Ts>(vs)...);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     /// \copydoc invoke
     ///
     /// \tparam R The result type of the function when it's called
@@ -162,12 +170,10 @@ namespace hpx { namespace util
     HPX_CONSTEXPR HPX_HOST_DEVICE
     R invoke_r(F&& f, Ts&&... vs)
     {
-        return detail::invoke_impl<R,typename std::decay<F>::type>()(
-            std::forward<F>(f), std::forward<Ts>(vs)...);
+        return HPX_INVOKE_R(R, std::forward<F>(f), std::forward<Ts>(vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \cond NOINTERNAL
     namespace functional
     {
         struct invoke
@@ -177,9 +183,7 @@ namespace hpx { namespace util
             typename util::invoke_result<F, Ts...>::type
             operator()(F && f, Ts &&... vs) const
             {
-                typedef typename util::invoke_result<F, Ts...>::type R;
-
-                return hpx::util::void_guard<R>(), util::invoke(std::forward<F>(f),
+                return HPX_INVOKE(std::forward<F>(f),
                     std::forward<Ts>(vs)...);
             }
         };
@@ -191,12 +195,11 @@ namespace hpx { namespace util
             HPX_CONSTEXPR HPX_HOST_DEVICE
             R operator()(F && f, Ts &&... vs) const
             {
-                return hpx::util::void_guard<R>(), util::invoke_r<R>(std::forward<F>(f),
+                return HPX_INVOKE_R(R, std::forward<F>(f),
                     std::forward<Ts>(vs)...);
             }
         };
     }
-    /// \endcond
 }}
 
 #endif

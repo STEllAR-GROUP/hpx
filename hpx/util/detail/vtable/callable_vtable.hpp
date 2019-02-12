@@ -14,6 +14,7 @@
 #include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/void_guard.hpp>
 
 #include <cstddef>
 #include <utility>
@@ -29,8 +30,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         HPX_FORCEINLINE static R _invoke(void* f, Ts&&... vs)
         {
-            return util::invoke_r<R>(
-                vtable::get<T>(f), std::forward<Ts>(vs)...);
+            return HPX_INVOKE_R(R, vtable::get<T>(f), std::forward<Ts>(vs)...);
         }
         R (*invoke)(void*, Ts&&...);
 
