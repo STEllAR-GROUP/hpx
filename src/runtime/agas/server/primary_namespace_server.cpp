@@ -315,7 +315,6 @@ void primary_namespace::wait_for_migration_locked(
 
             get<2>(it->second).wait(l, ec);
 
-            HPX_ASSERT(!get<0>(it->second));
             if (--get<1>(it->second) == 0)
                 migrating_objects_.erase(it);
         }
