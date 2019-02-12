@@ -195,8 +195,14 @@ namespace hpx { namespace threads { namespace detail
                 break;      // fine, just set the new state
             case pending_do_not_schedule:
             default:
-                HPX_ASSERT(false);    // should not happen
-                break;
+                {
+                    std::ostringstream strm;
+                    strm << "set_thread_state: previous state was "
+                         << get_thread_state_name(previous_state_val) << " ("
+                         << previous_state_val << ")";
+                    HPX_ASSERT_MSG(false, strm.str().c_str());    // should not happen
+                    break;
+                }
             }
 
             // If the previous state was pending we are supposed to remove the
