@@ -126,7 +126,10 @@ void interruption_point_thread(hpx::lcos::local::barrier* b,
     hpx::lcos::local::spinlock* m, bool* failed)
 {
     try {
-        std::lock_guard<hpx::lcos::local::spinlock> lk(*m);
+        std::unique_lock<hpx::lcos::local::spinlock> lk(*m);
+        hpx::util::ignore_while_checking<
+            std::unique_lock<hpx::lcos::local::spinlock>>
+            il(&lk);
         hpx::this_thread::interruption_point();
         *failed = true;
     }
