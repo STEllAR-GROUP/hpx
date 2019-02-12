@@ -9,8 +9,6 @@
 #include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/traits/action_continuation.hpp>
 
-#include <memory>
-
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -18,8 +16,8 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct action_decorate_continuation
     {
-        typedef typename traits::action_continuation<Action>::type
-            continuation_type;
+        using continuation_type =
+            typename traits::action_continuation<Action>::type;
 
         static bool call(continuation_type& /*cont*/)
         {
@@ -30,4 +28,3 @@ namespace hpx { namespace traits
 }}
 
 #endif
-

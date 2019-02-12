@@ -315,7 +315,7 @@ namespace hpx { namespace detail
             naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs) const
         {
-            return get_remote_result_type::call(typename Action::invoker()(
+            return get_remote_result_type::call(Action::invoker(
                 lva, comptype, std::forward<Ts>(vs)...));
         }
     };

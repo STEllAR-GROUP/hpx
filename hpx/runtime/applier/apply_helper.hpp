@@ -48,7 +48,7 @@ namespace hpx { namespace applier { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
-    static void call_async(threads::thread_init_data&& data,
+    void call_async(threads::thread_init_data&& data,
         naming::id_type const& target, naming::address::address_type lva,
         naming::address::component_type comptype,
         threads::thread_priority priority, Ts&&... vs)
@@ -96,7 +96,7 @@ namespace hpx { namespace applier { namespace detail
     }
 
     template <typename Action, typename Continuation, typename... Ts>
-    static void call_async(threads::thread_init_data&& data,
+    void call_async(threads::thread_init_data&& data,
         Continuation&& cont, naming::id_type const& target,
         naming::address::address_type lva,
         naming::address::component_type comptype,
@@ -138,14 +138,14 @@ namespace hpx { namespace applier { namespace detail
     }
 
     template <typename Action, typename... Ts>
-    HPX_FORCEINLINE static void call_sync(naming::address::address_type lva,
+    HPX_FORCEINLINE void call_sync(naming::address::address_type lva,
         naming::address::component_type comptype, Ts&&... vs)
     {
         Action::execute_function(lva, comptype, std::forward<Ts>(vs)...);
     }
 
     template <typename Action, typename Continuation, typename... Ts>
-    HPX_FORCEINLINE static void call_sync(Continuation&& cont,
+    HPX_FORCEINLINE void call_sync(Continuation&& cont,
         naming::address::address_type lva,
         naming::address::component_type comptype, Ts&&... vs)
     {
