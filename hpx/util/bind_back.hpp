@@ -1,5 +1,5 @@
 //  Copyright (c) 2011-2012 Thomas Heller
-//  Copyright (c) 2013-2017 Agustin Berge
+//  Copyright (c) 2013-2019 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
