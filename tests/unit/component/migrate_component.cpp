@@ -50,8 +50,9 @@ struct test_server
         auto f = hpx::make_ready_future_after(std::chrono::seconds(1));
 
         return f.then(
-            [this](hpx::future<void> && f)
+            [this](hpx::future<void> && f) -> void
             {
+                HPX_TEST(pin_count() != 0);
                 f.get();
                 HPX_TEST(pin_count() != 0);
             });
@@ -67,14 +68,15 @@ struct test_server
     {
         HPX_TEST(pin_count() != 0);
 
-        auto f =
-            hpx::make_ready_future(/*_after(std::chrono::seconds(1), */data_);
+        auto f = hpx::make_ready_future(data_);
 
         return f.then(
-            [this](hpx::future<int> && f)
+            [this](hpx::future<int> && f) -> int
             {
                 HPX_TEST(pin_count() != 0);
-                return f.get();
+                auto result = f.get();
+                HPX_TEST(pin_count() != 0);
+                return result;
             });
     }
 
@@ -117,7 +119,7 @@ private:
     int data_;
 };
 
-typedef hpx::components::simple_component<test_server> server_type;
+typedef hpx::components::component<test_server> server_type;
 HPX_REGISTER_COMPONENT(server_type, test_server);
 
 typedef test_server::call_action call_action;

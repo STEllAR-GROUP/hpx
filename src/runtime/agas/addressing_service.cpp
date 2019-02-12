@@ -2636,6 +2636,7 @@ void addressing_service::send_refcnt_requests_sync(
 hpx::future<void> addressing_service::mark_as_migrated(
     naming::gid_type const& gid_
   , util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f //-V669
+  , bool expect_to_be_marked_as_migrating
     )
 {
     if (!gid_)
@@ -2677,7 +2678,14 @@ hpx::future<void> addressing_service::mark_as_migrated(
 
         // insert the object into the map of migrated objects
         if (it == migrated_objects_table_.end())
+        {
+            HPX_ASSERT(!expect_to_be_marked_as_migrating);
             migrated_objects_table_.insert(gid);
+        }
+        else
+        {
+            HPX_ASSERT(expect_to_be_marked_as_migrating);
+        }
 
         // avoid interactions with the locking in the cache
         lock.unlock();
@@ -2710,7 +2718,7 @@ void addressing_service::unmark_as_migrated(
     migrated_objects_table_type::iterator it =
         migrated_objects_table_.find(gid);
 
-    // insert the object into the map of migrated objects
+    // remove the object from the map of migrated objects
     if (it != migrated_objects_table_.end())
     {
         migrated_objects_table_.erase(it);
@@ -2727,7 +2735,7 @@ void addressing_service::unmark_as_migrated(
     }
 }
 
-std::pair<naming::id_type, naming::address>
+hpx::future<std::pair<naming::id_type, naming::address>>
 addressing_service::begin_migration(naming::id_type const& id)
 {
     typedef std::pair<naming::id_type, naming::address> result_type;
@@ -2735,7 +2743,7 @@ addressing_service::begin_migration(naming::id_type const& id)
     if (!id)
     {
         HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::begin_migration_async",
+            "addressing_service::begin_migration",
             "invalid reference id");
     }
 
@@ -2753,7 +2761,7 @@ bool addressing_service::end_migration(
     if (!id)
     {
         HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::end_migration_async",
+            "addressing_service::end_migration",
             "invalid reference id");
     }
 
