@@ -201,15 +201,16 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 return scan_partitioner_type::call(
                     std::forward<ExPolicy>(policy),
-                    make_zip_iterator(first, flags.get()),
-                    count - 1, init,
+                    make_zip_iterator(first, flags.get()), count - 1, init,
                     // step 1 performs first part of scan algorithm
                     std::move(f1),
                     // step 2 propagates the partition results from left
                     // to right
-                    [](hpx::shared_future<std::size_t> fut1, hpx::shared_future<std::size_t> fut2) -> std::size_t
-                    {
-                        fut1.get(); fut2.get(); // propagate exceptions
+                    [](hpx::shared_future<std::size_t> fut1,
+                        hpx::shared_future<std::size_t>
+                            fut2) -> std::size_t {
+                        fut1.get();
+                        fut2.get();    // propagate exceptions
                         // There is no need to propagate the partition
                         // results. But, the scan_partitioner doesn't
                         // support 'void' as Result1. So, unavoidably
@@ -219,8 +220,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value
-                    std::move(f4)
-                );
+                    std::move(f4));
             }
         };
         /// \endcond
