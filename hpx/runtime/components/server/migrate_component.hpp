@@ -140,7 +140,7 @@ namespace hpx { namespace components { namespace server
                 agas::unmark_as_migrated(to_migrate.get_gid());
 
                 return hpx::make_exceptional_future<id_type>(
-                    HPX_GET_EXCEPTION(invalid_status,
+                    HPX_GET_EXCEPTION(migration_needs_retry,
                         "hpx::components::server::migrate_component",
                         "attempting to migrate an instance of a component "
                         "that is currently pinned"));
@@ -236,10 +236,33 @@ namespace hpx { namespace components { namespace server
         future<id_type> f = async<action_type>(id, to_migrate, addr, policy);
 
         return f.then(launch::sync,
-                [to_migrate](future<id_type> && f) -> id_type
+                [=](future<id_type> && f) -> future<id_type>
                 {
                     agas::end_migration(to_migrate);
-                    return f.get();
+                    if (f.has_exception())
+                    {
+                        try
+                        {
+                            f.get();        // rethrow exception
+                        }
+                        catch (hpx::exception const& e)
+                        {
+                            // simply retry if the migration operation detected
+                            // a (global) race between scheduled actions waiting
+                            // in AGAS and other migration operations
+                            if (e.get_error() == migration_needs_retry)
+                            {
+                                return trigger_migrate_component<Component>(
+                                    to_migrate, policy, id, addr);
+                            }
+                            throw;
+                        }
+                        catch (...)
+                        {
+                            throw;
+                        }
+                    }
+                    return std::move(f);
                 });
     }
 
