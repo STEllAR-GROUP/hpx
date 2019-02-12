@@ -51,16 +51,16 @@ void set_difference_medium_test(int rounds) {
 }
 
 void set_difference_large_test(int rounds) {
-    std::vector<int> set_a(5'000'000);
-    std::vector<int> set_b(3'000'000);
+    std::vector<int> set_a(5000000);
+    std::vector<int> set_b(3000000);
 
     std::iota(set_a.begin(), set_a.end(), 1);
-    std::fill(set_b.begin(), set_b.begin() + 1'000'000, 1);
-    std::iota(set_b.begin() + 1'000'000, set_b.end(), 2);
+    std::fill(set_b.begin(), set_b.begin() + 1000000, 1);
+    std::iota(set_b.begin() + 1000000, set_b.end(), 2);
 
-    std::vector<int> a_minus_b(5'000'000);
+    std::vector<int> a_minus_b(5000000);
 
-    std::vector<int> perfect(5'000'000);
+    std::vector<int> perfect(5000000);
     std::set_difference(set_a.begin(), set_a.end(),
                         set_b.begin(), set_b.end(), perfect.begin());
 
@@ -124,16 +124,16 @@ void set_intersection_medium_test(int rounds) {
 }
 
 void set_intersection_large_test(int rounds) {
-    std::vector<int> set_a(5'000'000);
-    std::vector<int> set_b(3'000'000);
+    std::vector<int> set_a(5000000);
+    std::vector<int> set_b(3000000);
 
     std::iota(set_a.begin(), set_a.end(), 1);
-    std::fill(set_b.begin(), set_b.begin() + 1'000'000, 1);
-    std::iota(set_b.begin() + 1'000'000, set_b.end(), 2);
+    std::fill(set_b.begin(), set_b.begin() + 1000000, 1);
+    std::iota(set_b.begin() + 1000000, set_b.end(), 2);
 
-    std::vector<int> a_and_b(3'000'000);
+    std::vector<int> a_and_b(3000000);
 
-    std::vector<int> perfect(3'000'000);
+    std::vector<int> perfect(3000000);
     std::set_intersection(set_a.begin(), set_a.end(),
                           set_b.begin(), set_b.end(), perfect.begin());
 
