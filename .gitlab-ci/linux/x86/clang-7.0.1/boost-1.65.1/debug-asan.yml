@@ -14,13 +14,17 @@
         - clang-7.0.1
         - boost-1.65.1
 
-asan_suppresions:
+asan_suppressions:
     <<: *debug-asan-x86
     image: stellargroup/build_env:ubuntu
     stage: checkout
     script:
         - echo leak:libltd > /suppressions.txt
         - echo leak:performance_counter >> /suppressions.txt
+        - echo leak:libltdl  >> /suppressions.txt
+        - echo leak:performance_counter >> /suppressions.txt
+        - echo leak:exception >> /suppressions.txt
+        - echo leak:collectable >> /suppressions.txt
     artifacts:
         paths:
             - /suppressions.txt
