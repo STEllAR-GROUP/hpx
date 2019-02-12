@@ -6,7 +6,7 @@
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/function.hpp>
 
 #include <hpx/lcos/local/composable_guard.hpp>
@@ -137,7 +137,7 @@ namespace hpx { namespace lcos { namespace local
         } else {
             std::size_t k = i + 1;
             detail::guard_task* stage = sd->stages[k];
-            stage->run = util::bind(stage_task, sd, k, n);
+            stage->run = util::bind_front(stage_task, sd, k, n);
             HPX_ASSERT(!stage->single_guard);
             run_guarded(*sd->gs.get(k), stage);
         }
@@ -157,7 +157,7 @@ namespace hpx { namespace lcos { namespace local
         guards.sort();
         stage_data* sd = new stage_data(std::move(task), guards.guards);
         int k = 0;
-        sd->stages[k]->run = util::bind(stage_task, sd, k, n);
+        sd->stages[k]->run = util::bind_front(stage_task, sd, k, n);
         sd->gs = guards;
         detail::guard_task* stage = sd->stages[k]; //-V108
         run_guarded(*sd->gs.get(k), stage); //-V106

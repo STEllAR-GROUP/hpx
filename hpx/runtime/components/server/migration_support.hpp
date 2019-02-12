@@ -16,7 +16,7 @@
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 
 #include <cstdint>
 #include <mutex>
@@ -192,10 +192,9 @@ namespace hpx { namespace components
             // Make sure we pin the component at construction of the bound object
             // which will also unpin it once the thread runs to completion (the
             // bound object goes out of scope).
-            return util::one_shot(util::bind(
+            return util::one_shot(util::bind_front(
                 &migration_support::thread_function,
                 get_lva<this_component_type>::call(lva),
-                util::placeholders::_1,
                 traits::component_decorate_function<base_type>::call(
                     lva, std::forward<F>(f)),
                 components::pinned_ptr::create<this_component_type>(lva)));
@@ -218,9 +217,9 @@ namespace hpx { namespace components
         // Execute the wrapped action. This function is bound in decorate_action
         // above. The bound object performs the pinning/unpinning.
         threads::thread_result_type thread_function(
-            threads::thread_state_ex_enum state,
             threads::thread_function_type && f,
-            components::pinned_ptr)
+            components::pinned_ptr,
+            threads::thread_state_ex_enum state)
         {
             return f(state);
         }

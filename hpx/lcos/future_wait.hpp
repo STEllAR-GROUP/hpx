@@ -14,6 +14,7 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/deferred_call.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 
@@ -165,8 +166,8 @@ namespace hpx { namespace lcos
                         traits::detail::get_shared_state(lazy_values_[i]);
 
                     current->execute_deferred();
-                    current->set_on_completed(
-                        util::bind(&wait_each::on_future_ready, this, i, id));
+                    current->set_on_completed(util::deferred_call(
+                        &wait_each::on_future_ready, this, i, id));
                 }
 
                 // If all of the requested futures are already set then our

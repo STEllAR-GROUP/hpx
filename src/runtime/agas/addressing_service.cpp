@@ -36,6 +36,7 @@
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_back.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -765,7 +766,7 @@ bool addressing_service::bind_range_local(
 } // }}}
 
 bool addressing_service::bind_postproc(
-    future<bool> f, naming::gid_type const& lower_id, gva const& g
+    naming::gid_type const& lower_id, gva const& g, future<bool> f
     )
 {
     f.get();
@@ -807,9 +808,9 @@ hpx::future<bool> addressing_service::bind_range_async(
 
     return f.then(
         hpx::launch::sync,
-        util::one_shot(util::bind(
+        util::one_shot(util::bind_front(
             &addressing_service::bind_postproc,
-            this, _1, id, g
+            this, id, g
         )));
 }
 
@@ -1228,7 +1229,7 @@ hpx::future<naming::id_type> addressing_service::get_colocation_id_async(
 
 ///////////////////////////////////////////////////////////////////////////////
 naming::address addressing_service::resolve_full_postproc(
-    future<primary_namespace::resolved_type> f, naming::gid_type const& id
+    naming::gid_type const& id, future<primary_namespace::resolved_type> f
     )
 {
     using hpx::util::get;
@@ -1291,9 +1292,9 @@ hpx::future<naming::address> addressing_service::resolve_full_async(
     using util::placeholders::_1;
     return f.then(
         hpx::launch::sync,
-        util::one_shot(util::bind(
+        util::one_shot(util::bind_front(
             &addressing_service::resolve_full_postproc,
-            this, _1, gid
+            this,  gid
         )));
 }
 
@@ -1779,8 +1780,8 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
     using util::placeholders::_1;
     return f.then(
         hpx::launch::sync,
-        util::one_shot(util::bind(
-            &detail::on_register_event, _1, std::move(result_f)
+        util::one_shot(util::bind_back(
+            &detail::on_register_event, std::move(result_f)
         )));
 }
 

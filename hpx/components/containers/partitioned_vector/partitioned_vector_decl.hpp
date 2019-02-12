@@ -21,7 +21,6 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
@@ -823,10 +822,10 @@ namespace hpx
 //         future<void> assign_async(size_type n, VALUE_TYPE const& val)
 //         {
 //             return hpx::async(launch::async,
-//                               hpx::util::bind(&vector::assign,
-//                                               this,
-//                                               n,
-//                                               val)
+//                               &vector::assign,
+//                               this,
+//                               n,
+//                               val
 //                               );
 //         }
 //

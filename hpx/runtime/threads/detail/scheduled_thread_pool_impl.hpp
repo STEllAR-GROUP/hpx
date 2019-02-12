@@ -32,6 +32,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/yield_while.hpp>
@@ -357,8 +358,9 @@ namespace hpx { namespace threads { namespace detail
         }
 
         return hpx::async(
-            hpx::util::bind(&scheduled_thread_pool::resume_internal, this, true,
-                std::ref(throws)));
+            hpx::util::bind_front(
+                &scheduled_thread_pool::resume_internal, this,
+                true, std::ref(throws)));
     }
 
     template <typename Scheduler>
@@ -440,7 +442,8 @@ namespace hpx { namespace threads { namespace detail
         }
 
         return hpx::async(
-            hpx::util::bind(&scheduled_thread_pool::suspend_internal, this,
+            hpx::util::bind_front(
+                &scheduled_thread_pool::suspend_internal, this,
                 std::ref(throws)));
     }
 
@@ -586,16 +589,16 @@ namespace hpx { namespace threads { namespace detail
 #endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
                 detail::scheduling_callbacks callbacks(
-                    util::bind(    //-V107
+                    util::bind_front(    //-V107
                         &policies::scheduler_base::idle_callback,
-                        std::ref(sched_), global_thread_num),
+                        sched_.get(), global_thread_num),
                     detail::scheduling_callbacks::callback_type());
 
                 if (mode_ & policies::do_background_work)
                 {
-                    callbacks.background_ = util::bind(    //-V107
+                    callbacks.background_ = util::bind_front(    //-V107
                         &policies::scheduler_base::background_callback,
-                        std::ref(sched_), global_thread_num);
+                        sched_.get(), global_thread_num);
                 }
 
                 sched_->Scheduler::set_scheduler_mode(mode_);
@@ -1897,7 +1900,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         return hpx::async(
-            hpx::util::bind(
+            hpx::util::bind_front(
                 &scheduled_thread_pool::suspend_processing_unit_internal, this,
                 virt_core, std::ref(throws)));
     }
@@ -1999,7 +2002,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         return hpx::async(
-            hpx::util::bind(
+            hpx::util::bind_front(
                 &scheduled_thread_pool::resume_processing_unit_internal, this,
                 virt_core, std::ref(throws)));
     }

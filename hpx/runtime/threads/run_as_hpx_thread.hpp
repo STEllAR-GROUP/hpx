@@ -75,7 +75,7 @@ namespace hpx { namespace threads
                 };
 
             // Create the HPX thread
-            hpx::threads::register_thread_nullary(std::ref(wrapper));
+            hpx::threads::register_thread_nullary(wrapper);
 
             // wait for the HPX thread to exit
             std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);
@@ -128,7 +128,7 @@ namespace hpx { namespace threads
                 };
 
             // Create an HPX thread
-            hpx::threads::register_thread_nullary(std::ref(wrapper));
+            hpx::threads::register_thread_nullary(wrapper);
 
             // wait for the HPX thread to exit
             std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);

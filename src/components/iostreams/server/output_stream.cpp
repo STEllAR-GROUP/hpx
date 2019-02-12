@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -63,8 +63,8 @@ namespace hpx { namespace iostreams { namespace server
         // Perform the IO in another OS thread.
         detail::buffer in(buf_in);
         hpx::get_thread_pool("io_pool")->get_io_service().post(
-            util::bind(&output_stream::call_write_async, this, locality_id,
-                count, std::move(in)));
+            util::bind_front(&output_stream::call_write_async, this,
+                locality_id, count, std::move(in)));
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -85,8 +85,8 @@ namespace hpx { namespace iostreams { namespace server
         // Perform the IO in another OS thread.
         detail::buffer in(buf_in);
         hpx::get_thread_pool("io_pool")->get_io_service().post(
-            util::bind(&output_stream::call_write_sync, this, locality_id,
-                count, std::ref(in), threads::get_self_id()));
+            util::bind_front(&output_stream::call_write_sync, this,
+                locality_id, count, std::ref(in), threads::get_self_id()));
 
         // Sleep until the worker thread wakes us up.
         this_thread::suspend(threads::suspended, "output_stream::write_sync");
