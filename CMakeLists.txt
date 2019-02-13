@@ -1864,7 +1864,8 @@ install( # Install all HPX cmake utility files
   DIRECTORY cmake/
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
   COMPONENT core
-  PATTERN ".cmake.in" EXCLUDE
+  PATTERN "templates" EXCLUDE
+  PATTERN "packaging" EXCLUDE
   PATTERN ".git" EXCLUDE)
 
 install( # Install HPX Python scripts
