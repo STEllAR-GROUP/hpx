@@ -26,6 +26,9 @@ namespace hpx { namespace detail
         >::type>
     async_colocated_cb(naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_ASSERT(false);
+#else
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
         naming::id_type service_target(
@@ -45,6 +48,7 @@ namespace hpx { namespace detail
                   , std::forward<Ts>(vs)...)
                 ),
             service_target, std::forward<Callback>(cb), gid.get_gid());
+#endif
     }
 
     template <
@@ -71,6 +75,9 @@ namespace hpx { namespace detail
     async_colocated_cb(Continuation && cont,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_ASSERT(false);
+#else
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
         naming::id_type service_target(
@@ -90,6 +97,7 @@ namespace hpx { namespace detail
                   , std::forward<Ts>(vs)...)
               , std::forward<Continuation>(cont)),
             service_target, std::forward<Callback>(cb), gid.get_gid());
+#endif
     }
 
     template <

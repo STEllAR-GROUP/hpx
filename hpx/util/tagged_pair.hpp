@@ -120,11 +120,16 @@ namespace hpx { namespace util
                 Tag1(typename decay<T1>::type), Tag2(typename decay<T2>::type)
             > result_type;
 
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_ASSERT(false);
+        return hpx::future<result_type>();
+#else
         return lcos::make_future<result_type>(std::move(f),
             [](std::pair<T1, T2> && p) -> result_type
             {
                 return make_tagged_pair<Tag1, Tag2>(std::move(p));
             });
+#endif
     }
 
     template <typename Tag1, typename Tag2, typename ... Ts>
@@ -141,11 +146,16 @@ namespace hpx { namespace util
                 Tag2(typename tuple_element<1, tuple<Ts...> >::type)
             > result_type;
 
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_ASSERT(false);
+        return hpx::future<result_type>();
+#else
         return lcos::make_future<result_type>(std::move(f),
             [](tuple<Ts...> && p) -> result_type
             {
                 return make_tagged_pair<Tag1, Tag2>(std::move(p));
             });
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////

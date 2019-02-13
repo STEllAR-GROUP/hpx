@@ -8,6 +8,12 @@
 
 #include <hpx/config.hpp>
 
+// #if defined(HPX_COMPUTE_DEVICE_CODE)
+//
+// #error "hpx::dataflow is not supported in device code"
+//
+// #else
+
 // Intentionally #include future.hpp outside of the guards as it may #include
 // dataflow.hpp itself
 #include <hpx/lcos/future.hpp>
@@ -575,5 +581,7 @@ namespace hpx
             alloc, std::forward<T0>(t0), std::forward<Ts>(ts)...);
     }
 }
+
+// #endif
 
 #endif /*HPX_LCOS_DATAFLOW_HPP*/

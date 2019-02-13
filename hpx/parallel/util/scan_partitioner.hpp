@@ -9,7 +9,9 @@
 #define HPX_PARALLEL_UTIL_SCAN_PARTITIONER_DEC_30_2014_0227PM
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/dataflow.hpp>
+#endif
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/assert.hpp>
@@ -66,6 +68,10 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, T && init,
                 F1 && f1, F2 && f2, F3 && f3, F4 && f4)
             {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_ASSERT(false);
+                return R();
+#else
                 // inform parameter traits
                 scoped_executor_parameters scoped_param(
                     policy.parameters(), policy.executor());
@@ -143,6 +149,7 @@ namespace hpx { namespace parallel { namespace util
                 return reduce(
                     std::move(workitems), std::move(finalitems), std::move(errors),
                     std::forward<F4>(f4));
+#endif
             }
 
             template <
@@ -154,6 +161,10 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, T && init,
                 F1 && f1, F2 && f2, F3 && f3, F4 && f4)
             {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_ASSERT(false);
+                return hpx::future<R>();
+#else
                 // inform parameter traits
                 scoped_executor_parameters scoped_param(
                     policy.parameters(), policy.executor());
@@ -266,6 +277,7 @@ namespace hpx { namespace parallel { namespace util
                 return reduce(
                     std::move(workitems), std::move(finalitems), std::move(errors),
                     std::forward<F4>(f4));
+#endif
             }
 
             template <
@@ -292,6 +304,10 @@ namespace hpx { namespace parallel { namespace util
                 std::list<std::exception_ptr>&& errors,
                 F && f)
             {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_ASSERT(false);
+                return R();
+#else
                 // wait for all tasks to finish
                 hpx::wait_all(workitems, finalitems);
 
@@ -307,6 +323,7 @@ namespace hpx { namespace parallel { namespace util
                     // rethrow either bad_alloc or exception_list
                     handle_local_exceptions::call(std::current_exception());
                 }
+#endif
             }
         };
 

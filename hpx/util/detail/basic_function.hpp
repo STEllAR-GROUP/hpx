@@ -70,9 +70,9 @@ namespace hpx { namespace util { namespace detail
         }
 
         explicit operator bool() const noexcept
-        {
+            {
             return !empty();
-        }
+            }
 
         std::size_t get_function_address() const;
         char const* get_function_annotation() const;
@@ -92,23 +92,23 @@ namespace hpx { namespace util { namespace detail
     HPX_CONSTEXPR bool is_empty_function(F* fp) noexcept
     {
         return fp == nullptr;
-    }
+        }
 
     template <typename T, typename C>
     HPX_CONSTEXPR bool is_empty_function(T C::*mp) noexcept
-    {
+        {
         return mp == nullptr;
-    }
+        }
 
     inline bool is_empty_function_impl(function_base const* f) noexcept
-    {
+        {
         return f->empty();
     }
 
     inline HPX_CONSTEXPR bool is_empty_function_impl(...) noexcept
-    {
+            {
         return false;
-    }
+            }
 
     template <typename F>
     HPX_CONSTEXPR bool is_empty_function(F const& f) noexcept
@@ -190,7 +190,7 @@ namespace hpx { namespace util { namespace detail
         void reset() noexcept
         {
             base_type::reset(get_empty_vtable());
-        }
+            }
 
         using base_type::swap;
         using base_type::empty;
@@ -275,9 +275,9 @@ namespace hpx { namespace util { namespace detail
 
             base_type::assign(std::forward<F>(f));
             if (!base_type::empty())
-            {
+        {
                 serializable_vptr = get_serializable_vtable<target_type>();
-            }
+        }
         }
 
         void swap(basic_function& f) noexcept
@@ -324,7 +324,7 @@ namespace hpx { namespace util { namespace detail
 
         template <typename T>
         static serializable_vtable const* get_serializable_vtable() noexcept
-        {
+    {
             return detail::get_serializable_vtable<vtable, T>();
         }
 

@@ -192,10 +192,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, InIter last, OutIter dest)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_helper<hpx::traits::general_pointer_tag>::call(
                 first, last, dest);
 #else
+            std::cout << "memcpy1\n";
             std::size_t count = std::distance(first, last);
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
@@ -219,13 +220,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, InIter last, OutIter dest)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_helper<hpx::traits::general_pointer_tag>::call(
                 first, last, dest);
 #else
+//             std::cout << "copy to host!\n";
             std::size_t count = std::distance(first, last);
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
+            std::cout << "memcpy2\n";
 
             cudaMemcpyAsync(&(*dest), (*first).device_ptr(),
                 bytes, cudaMemcpyDeviceToHost,
@@ -246,13 +249,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, InIter last, OutIter dest)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_helper<hpx::traits::general_pointer_tag>::call(
                 first, last, dest);
 #else
             std::size_t count = std::distance(first, last);
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
+            std::cout << "memcpy3\n";
 
             cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
                 cudaMemcpyHostToDevice,
@@ -274,13 +278,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, std::size_t count, OutIter dest)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
                 first, count, dest);
 #else
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
+            std::cout << "memcpy4\n";
             cudaMemcpyAsync((*dest).device_ptr(), (*first).device_ptr(),
                 bytes, cudaMemcpyDeviceToDevice,
                 dest.target().native_handle().get_stream());
@@ -301,13 +306,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, std::size_t count, OutIter dest)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
                 first, count, dest);
 #else
+//             std::cout << "copy to host\n";
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
+            std::cout << "memcpy5\n";
             cudaMemcpyAsync(&(*dest), (*first).device_ptr(), bytes,
                 cudaMemcpyDeviceToHost,
                 first.target().native_handle().get_stream());
@@ -328,13 +335,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, std::size_t count, OutIter dest)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
                 first, count, dest);
 #else
+//             std::cout << "copy to device\n";
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
+            std::cout << "memcpy6\n";
             cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
                 cudaMemcpyHostToDevice,
                 dest.target().native_handle().get_stream());
