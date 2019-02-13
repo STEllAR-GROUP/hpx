@@ -46,9 +46,10 @@ namespace hpx { namespace lcos { namespace local
         /// releasing all waiting threads as soon as the last \a thread
         /// entered this function.
         void wait();
+        void count_up();
 
     private:
-        std::size_t const number_of_threads_;
+        std::size_t number_of_threads_;
         std::size_t total_;
 
         mutable mutex_type mtx_;
