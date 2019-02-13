@@ -320,8 +320,10 @@ void primary_namespace::wait_for_migration_locked(
         }
         else
         {
-            HPX_ASSERT(get<1>(it->second) == 0);
-            migrating_objects_.erase(it);
+            if (get<1>(it->second) == 0)
+            {
+                migrating_objects_.erase(it);
+            }
         }
     }
 }
