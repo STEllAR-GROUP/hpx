@@ -148,8 +148,8 @@ gentle introduction to the distributed aspects of |hpx|.
    It is also possible to build e.g. all quickstart examples using ``make
    examples.quickstart``.
 
-Setting up an |hpx| project
-===========================
+Hello, World!
+=============
 
 The following ``CMakeLists.txt`` is a minimal example of what you need in order to
 build an executable using |cmake|_ and |hpx|:
@@ -159,7 +159,9 @@ build an executable using |cmake|_ and |hpx|:
    cmake_minimum_required(VERSION 3.3.2)
    project(my_hpx_project CXX)
    find_package(HPX REQUIRED)
-   add_hpx_executable(my_hpx_program SOURCES main.cpp)
+   add_hpx_executable(my_hpx_program
+       SOURCES main.cpp
+       COMPONENT_DEPENDENCIES iostreams)
 
 .. note::
 
@@ -167,36 +169,28 @@ build an executable using |cmake|_ and |hpx|:
    See the section on :ref:`using_hpx_cmake` for more details on how to use
    ``add_hpx_executable``.
 
+.. note::
+
+   ``COMPONENT_DEPENDENCIES iostreams`` is optional for a minimal project but
+   lets us use the |hpx| equivalent of ``std::cout``, i.e. the |hpx|
+   :ref:`iostreams` functionality in our application.
+
 Create a new project directory and a ``CMakeLists.txt`` with the contents above.
-Then, in your project directory run the following:
-
-.. code-block:: sh
-
-   touch main.cpp # Create an empty file for now
-   mkdir build && cd build
-   cmake -DCMAKE_PREFIX_PATH=/path/to/hpx/installation ..
-   make all
-   ./my_hpx_program
-
-Your program should now start but fail quickly because it doesn't contain a main
-function yet.
-
-Hello, World!
-=============
-
-Once you have your project set up change the line containing
-``add_hpx_executable`` in ``CMakeLists.txt`` to the following:
-
-.. code-block:: cmake
-
-   add_hpx_executable(my_hpx_program SOURCES main.cpp COMPONENT_DEPENDENCIES iostreams)
-
-and add the following to your ``main.cpp``:
+Also create a ``main.cpp`` with the contents below.
 
 .. literalinclude:: ../examples/quickstart/simplest_hello_world_1.cpp
    :language: c++
    :start-after: //[simplest_hello_world_1_getting_started
    :end-before: //]
+
+Then, in your project directory run the following:
+
+.. code-block:: sh
+
+   mkdir build && cd build
+   cmake -DCMAKE_PREFIX_PATH=/path/to/hpx/installation ..
+   make all
+   ./my_hpx_program
 
 The program looks almost like a regular C++ hello world with the exception of
 the two includes and ``hpx::cout``. When you include ``hpx_main.hpp`` some
