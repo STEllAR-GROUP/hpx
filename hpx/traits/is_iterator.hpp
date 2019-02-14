@@ -302,6 +302,11 @@ namespace hpx { namespace traits
         {};
 
         template <typename Iter>
+        struct satisfy_traversal_concept<Iter, boost::forward_traversal_tag>
+          : bidirectional_concept<Iter>
+        {};
+
+        template <typename Iter>
         struct satisfy_traversal_concept<Iter, boost::bidirectional_traversal_tag>
           : bidirectional_concept<Iter>
         {};
