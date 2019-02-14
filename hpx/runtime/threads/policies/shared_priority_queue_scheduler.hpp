@@ -12,7 +12,7 @@
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/runtime/threads/policies/thread_queue.hpp>
+#include <hpx/runtime/threads/policies/thread_queue_mc.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
@@ -63,7 +63,6 @@ namespace hpx { namespace threads { namespace policies {
     /// NUMA scheduling hints into account when creating and scheduling work.
     template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
-        typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
             default_shared_priority_queue_scheduler_terminated_queue>
     class shared_priority_queue_scheduler : public scheduler_base
@@ -83,8 +82,7 @@ namespace hpx { namespace threads { namespace policies {
     public:
         typedef std::false_type has_periodic_maintenance;
 
-        typedef thread_queue<Mutex, PendingQueuing, StagedQueuing,
-            TerminatedQueuing>
+        typedef thread_queue_mc<Mutex, PendingQueuing, TerminatedQueuing>
             thread_queue_type;
 
         shared_priority_queue_scheduler(
