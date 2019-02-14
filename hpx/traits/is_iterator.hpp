@@ -301,6 +301,21 @@ namespace hpx { namespace traits
           : std::false_type
         {};
 
+        /**
+         * The interface gaurantees of InputIterator and ForwardIterator
+         * concepts are not sufficient to robustly distinguish whether a given
+         * type models a forward iterator or an input iterator through interface
+         * inspection and concept emulation alone, given the type in question
+         * models an iterator category no stronger than forward.
+         *
+         * That said, a type which models the BidirectionalIterator concept
+         * also models a ForwardIterator concept, by definition (and the
+         * interface gaurantees on the BidirectionalIterator concept are
+         * sufficient for robust concept checking). Here we provide a
+         * specialization to capture this case, such that, bidirectional and
+         * random access iterators will be properly recognized as satisfying the
+         * ForwardIterator concept.
+         */
         template <typename Iter>
         struct satisfy_traversal_concept<Iter, boost::forward_traversal_tag>
           : bidirectional_concept<Iter>
