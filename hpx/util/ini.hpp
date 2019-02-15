@@ -72,7 +72,6 @@ namespace hpx { namespace util
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
     protected:
-        bool regex_init();
         void line_msg(std::string msg, std::string const& file,
             int lnum = 0, std::string const& line = "");
 
