@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpx-no-inspect : disable automatic code inspection for this file
+
 // ---------------------------------------------------------------------------
 // This file has been taken from https://github.com/cameron314/concurrentqueue
 // commit dea078cf5b6e742cd67a0d725e36f872feca4de4
@@ -1976,11 +1978,11 @@ private:
                             }
                         } guard = { block, index };
 
-                        element = std::move(el);
+                        element = std::move(el); // NOLINT
                     }
                     else {
-                        element = std::move(el);
-                        el.~T();
+                        element = std::move(el); // NOLINT
+                        el.~T(); // NOLINT
                         block->ConcurrentQueue::Block::template set_empty<explicit_context>(index);
                     }
 
@@ -2526,11 +2528,11 @@ private:
                             }
                         } guard = { block, index, entry, this->parent };
 
-                        element = std::move(el);
+                        element = std::move(el); // NOLINT
                     }
                     else {
-                        element = std::move(el);
-                        el.~T();
+                        element = std::move(el); // NOLINT
+                        el.~T(); // NOLINT
 
                         if (block->ConcurrentQueue::Block::template set_empty<implicit_context>(index)) {
                             {
