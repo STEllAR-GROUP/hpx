@@ -21,7 +21,6 @@
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind_back.hpp>
-#include <hpx/util/bind_front.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
@@ -62,10 +61,8 @@ namespace hpx
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
     partitioned_vector<T, Data>::get_data_helper(
-        id_type id, future<server::partitioned_vector_config_data>&& f)
+        id_type id, server::partitioned_vector_config_data data)
     {
-        server::partitioned_vector_config_data data = f.get();
-
         partitions_.clear();
         partitions_.reserve(data.partitions_.size());
 
@@ -86,8 +83,7 @@ namespace hpx
             {
                 ptrs.push_back(
                     get_ptr<partitioned_vector_partition_server>(it->partition_)
-                        .then(util::bind_front(&partitioned_vector::get_ptr_helper, l,
-                            std::ref(partitions_))));
+                        .then(get_ptr_helper{l, partitions_}));
             }
         }
         wait_all(ptrs);
@@ -98,14 +94,15 @@ namespace hpx
 
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
-    partitioned_vector<T, Data>::connect_to_helper(shared_future<id_type>&& f)
+    partitioned_vector<T, Data>::connect_to_helper(id_type id)
     {
         typedef typename components::server::distributed_metadata_base<
             server::partitioned_vector_config_data>::get_action act;
 
-        id_type id = f.get();
         return async(act(), id).then(
-            util::bind_front(&partitioned_vector::get_data_helper, this, id));
+            [=](future<server::partitioned_vector_config_data>&& f) -> void {
+                return get_data_helper(id, f.get());
+            });
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -114,7 +111,9 @@ namespace hpx
     {
         this->base_type::connect_to(symbolic_name);
         return this->base_type::share().then(
-            util::bind_front(&partitioned_vector::connect_to_helper, this));
+            [=](shared_future<id_type>&& f) -> hpx::future<void> {
+                return connect_to_helper(f.get());
+            });
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -159,7 +158,9 @@ namespace hpx
     partitioned_vector<T, Data>::partitioned_vector(future<id_type>&& f)
     {
         f.share().then(
-            util::bind_front(&partitioned_vector::connect_to_helper, this));
+            [=](shared_future<id_type>&& f) -> hpx::future<void> {
+                return connect_to_helper(f.get());
+            });
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -301,13 +302,17 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
-    partitioned_vector<T, Data>::get_ptr_helper(std::size_t loc,
-        partitions_vector_type& partitions,
-        future<std::shared_ptr<partitioned_vector_partition_server>>&& f)
+    struct partitioned_vector<T, Data>::get_ptr_helper
     {
-        partitions[loc].local_data_ = f.get();
-    }
+        std::size_t loc;
+        partitions_vector_type& partitions;
+
+        void operator()(
+            future<std::shared_ptr<partitioned_vector_partition_server>>&& f) const
+        {
+            partitions[loc].local_data_ = f.get();
+        }
+    };
 
     template <typename T, typename Data /*= std::vector<T> */>
     template <typename DistPolicy, typename Create>
@@ -348,8 +353,7 @@ namespace hpx
                 {
                     ptrs.push_back(
                         get_ptr<partitioned_vector_partition_server>(id).then(
-                            util::bind_front(&partitioned_vector::get_ptr_helper,
-                                l, std::ref(partitions_))));
+                            get_ptr_helper{l, partitions_}));
                 }
                 ++l;
 
@@ -387,9 +391,7 @@ namespace hpx
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
     partitioned_vector<T, Data>::create(DistPolicy const& policy)
     {
-        create(policy,
-            util::bind_back(
-                &partitioned_vector::create_helper1<DistPolicy>));
+        create(policy, &partitioned_vector::create_helper1<DistPolicy>);
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -397,9 +399,8 @@ namespace hpx
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
     partitioned_vector<T, Data>::create(T const& val, DistPolicy const& policy)
     {
-        create(policy,
-            util::bind_back(&partitioned_vector::create_helper2<DistPolicy>,
-                std::ref(val)));
+        create(policy, util::bind_back(
+            &partitioned_vector::create_helper2<DistPolicy>, std::ref(val)));
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -439,8 +440,7 @@ namespace hpx
                 ptrs.push_back(
                     get_ptr<partitioned_vector_partition_server>(
                         partitions[i].partition_)
-                        .then(util::bind_front(&partitioned_vector::get_ptr_helper, i,
-                            std::ref(partitions))));
+                        .then(get_ptr_helper{i, partitions}));
             }
         }
 

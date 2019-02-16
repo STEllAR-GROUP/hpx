@@ -45,7 +45,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
-#include <functional>
 #include <iosfwd>
 #include <memory>
 #include <string>
@@ -358,19 +357,18 @@ namespace hpx { namespace threads { namespace detail
         }
 
         return hpx::async(
-            hpx::util::bind_front(
-                &scheduled_thread_pool::resume_internal, this,
-                true, std::ref(throws)));
+            [this]() -> void {
+                return resume_internal(true, throws);
+            });
     }
 
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::resume_cb(
         std::function<void(void)> callback, error_code& ec)
     {
-        std::function<void(void)> resume_internal_wrapper =
-            [this, HPX_CAPTURE_MOVE(callback)]()
-            {
-                this->resume_internal(true, throws);
+        auto && resume_internal_wrapper =
+            [this, HPX_CAPTURE_MOVE(callback)]() -> void {
+                resume_internal(true, throws);
                 callback();
             };
 
@@ -442,9 +440,9 @@ namespace hpx { namespace threads { namespace detail
         }
 
         return hpx::async(
-            hpx::util::bind_front(
-                &scheduled_thread_pool::suspend_internal, this,
-                std::ref(throws)));
+            [this]() -> void {
+                return suspend_internal(throws);
+            });
     }
 
     template <typename Scheduler>
@@ -1900,9 +1898,9 @@ namespace hpx { namespace threads { namespace detail
         }
 
         return hpx::async(
-            hpx::util::bind_front(
-                &scheduled_thread_pool::suspend_processing_unit_internal, this,
-                virt_core, std::ref(throws)));
+            [this, virt_core]() -> void {
+                return suspend_processing_unit_internal(virt_core, throws);
+            });
     }
 
     template <typename Scheduler>
@@ -2002,9 +2000,9 @@ namespace hpx { namespace threads { namespace detail
         }
 
         return hpx::async(
-            hpx::util::bind_front(
-                &scheduled_thread_pool::resume_processing_unit_internal, this,
-                virt_core, std::ref(throws)));
+            [this, virt_core]() -> void {
+                return resume_processing_unit_internal(virt_core, throws);
+            });
     }
 
     template <typename Scheduler>
