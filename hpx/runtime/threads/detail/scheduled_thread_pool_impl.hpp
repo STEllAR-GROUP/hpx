@@ -32,7 +32,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/yield_while.hpp>
@@ -587,14 +587,14 @@ namespace hpx { namespace threads { namespace detail
 #endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
                 detail::scheduling_callbacks callbacks(
-                    util::bind_front(    //-V107
+                    util::deferred_call(    //-V107
                         &policies::scheduler_base::idle_callback,
                         sched_.get(), global_thread_num),
-                    detail::scheduling_callbacks::callback_type());
+                    nullptr);
 
                 if (mode_ & policies::do_background_work)
                 {
-                    callbacks.background_ = util::bind_front(    //-V107
+                    callbacks.background_ = util::deferred_call(    //-V107
                         &policies::scheduler_base::background_callback,
                         sched_.get(), global_thread_num);
                 }
