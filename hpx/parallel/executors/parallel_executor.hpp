@@ -23,6 +23,7 @@
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/range.hpp>
 
@@ -115,6 +116,31 @@ namespace hpx { namespace parallel { namespace execution
         {
             return hpx::detail::async_launch_policy_dispatch<Policy>::call(
                 policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+
+        template <typename F, typename Future, typename ... Ts>
+        HPX_FORCEINLINE
+        hpx::future<
+            typename hpx::util::detail::invoke_deferred_result<
+                F, Future, Ts...
+            >::type
+        >
+        then_execute(F && f, Future&& predecessor, Ts &&... ts)
+        {
+            using result_type =
+                typename hpx::util::detail::invoke_deferred_result<
+                    F, Future, Ts...>::type;
+
+            auto func = hpx::util::one_shot(hpx::util::bind_back(
+                std::forward<F>(f), std::forward<Ts>(ts)...));
+
+            typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
+                lcos::detail::make_continuation_alloc<result_type>(
+                    hpx::util::internal_allocator<>{},
+                    std::forward<Future>(predecessor), policy_, std::move(func));
+
+            return hpx::traits::future_access<hpx::future<result_type> >::create(
+                std::move(p));
         }
 
         // NonBlockingOneWayExecutor (adapted) interface

@@ -60,16 +60,18 @@ hpx::thread::id test_f(hpx::future<void> f, int passed_through)
 }
 
 template <typename Policy>
-void test_then()
+void test_then(bool sync)
 {
     typedef hpx::parallel::execution::parallel_policy_executor<Policy> executor;
 
     hpx::future<void> f = hpx::make_ready_future();
 
     executor exec;
-    HPX_TEST(
-        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() !=
-        hpx::this_thread::get_id());
+    bool result =
+        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() ==
+        hpx::this_thread::get_id();
+
+    HPX_TEST(sync == result);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -175,14 +177,8 @@ void static_check_executor()
     using executor = hpx::parallel::execution::parallel_policy_executor<Policy>;
 
     static_assert(
-        !has_sync_execute_member<executor>::value,
-        "!has_sync_execute_member<executor>::value");
-    static_assert(
         has_async_execute_member<executor>::value,
         "has_async_execute_member<executor>::value");
-    static_assert(
-        !has_then_execute_member<executor>::value,
-        "!has_then_execute_member<executor>::value");
     static_assert(
         !has_bulk_sync_execute_member<executor>::value,
         "!has_bulk_sync_execute_member<executor>::value");
@@ -205,7 +201,7 @@ void policy_test(bool sync = false)
 
     test_sync<Policy>(sync);
     test_async<Policy>(sync);
-    test_then<Policy>();
+    test_then<Policy>(sync);
 
     test_bulk_sync<Policy>(sync);
     test_bulk_async<Policy>(sync);
