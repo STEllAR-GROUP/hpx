@@ -27,7 +27,6 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <functional>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -175,19 +174,15 @@ namespace hpx { namespace parallel { namespace execution
                 std::vector<hpx::future<void> > tasks;
                 tasks.reserve(num_spread_);
 
-                hpx::future<void> (parallel_policy_executor::*spawn_func)(
-                        std::vector<hpx::future<Result> >&, std::size_t,
-                        std::size_t, std::size_t, F const&, Iter, Ts const&...
-                    ) const = &parallel_policy_executor::spawn;
-
                 while (size != 0)
                 {
                     std::size_t curr_chunk_size = (std::min)(chunk_size, size);
 
                     hpx::future<void> f = async_execute(
-                        spawn_func, this, std::ref(results), base,
-                        curr_chunk_size, num_tasks, std::ref(func), it,
-                        std::ref(ts)...);
+                        [&, base, curr_chunk_size, num_tasks, it] {
+                            return spawn(results, base, curr_chunk_size, num_tasks,
+                                func, it, ts...);
+                        });
                     tasks.push_back(std::move(f));
 
                     base += curr_chunk_size;

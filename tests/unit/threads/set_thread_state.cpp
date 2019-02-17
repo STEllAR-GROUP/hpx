@@ -199,8 +199,8 @@ int hpx_main(variables_map& vm)
     {
         id_type const prefix = find_here();
 
-        thread_id_type thread = register_thread_nullary
-            (hpx::util::bind(&test_dummy_thread, futures));
+        thread_id_type thread = register_thread_nullary(
+            hpx::util::deferred_call(&test_dummy_thread, futures));
 
         tree_boot(futures, grain_size, prefix,
             reinterpret_cast<std::uint64_t>(thread.get()));

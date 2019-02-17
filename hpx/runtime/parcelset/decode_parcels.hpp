@@ -18,6 +18,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>
 
@@ -211,11 +212,11 @@ namespace hpx { namespace parcelset
                         {
                             // schedule all but the first parcel on a new thread.
                             hpx::applier::register_thread_nullary(
-                                util::one_shot(util::bind(
+                                util::deferred_call(
                                     [num_thread](parcel&& p)
                                     {
                                         p.schedule_action(num_thread);
-                                    }, std::move(deferred_parcels[i]))),
+                                    }, std::move(deferred_parcels[i])),
                                 "schedule_parcel",
                                 threads::pending, true,
                                 threads::thread_priority_boost,
@@ -288,9 +289,9 @@ namespace hpx { namespace parcelset
 //         if(hpx::is_running() && parcelport.async_serialization())
 //         {
 //             hpx::applier::register_thread_nullary(
-//                 util::one_shot(util::bind(
+//                 util::deferred_call(
 //                     &decode_message<Parcelport, Buffer>,
-//                     std::ref(parcelport), std::move(buffer), 1, num_thread)),
+//                     std::ref(parcelport), std::move(buffer), 1, num_thread),
 //                 "decode_parcels",
 //                 threads::pending, true, threads::thread_priority_boost,
 //                 parcelport.get_next_num_thread());
@@ -307,9 +308,9 @@ namespace hpx { namespace parcelset
 //         if(hpx::is_running() && parcelport.async_serialization())
 //         {
 //             hpx::applier::register_thread_nullary(
-//                 util::one_shot(util::bind(
+//                 util::deferred_call(
 //                     &decode_message<Parcelport, Buffer>,
-//                     std::ref(parcelport), std::move(buffer), 0, num_thread)),
+//                     std::ref(parcelport), std::move(buffer), 0, num_thread),
 //                 "decode_parcels",
 //                 threads::pending, true, threads::thread_priority_boost,
 //                 parcelport.get_next_num_thread());

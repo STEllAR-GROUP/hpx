@@ -225,13 +225,13 @@ protected:
     void launch_hosted();
 
     naming::address resolve_full_postproc(
-        future<primary_namespace::resolved_type> f
-      , naming::gid_type const& id
+        naming::gid_type const& id
+      , future<primary_namespace::resolved_type> f
         );
     bool bind_postproc(
-        future<bool> f
-      , naming::gid_type const& id
+        naming::gid_type const& id
       , gva const& g
+      , future<bool> f
         );
 
     /// Maintain list of migrated objects

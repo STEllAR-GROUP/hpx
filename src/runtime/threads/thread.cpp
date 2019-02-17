@@ -17,6 +17,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unique_function.hpp>
@@ -195,7 +196,7 @@ namespace hpx
 
         // register callback function to be called when thread exits
         if (threads::add_thread_exit_callback(id_,
-                util::bind(&resume_thread, this_id)))
+                util::bind_front(&resume_thread, this_id)))
         {
             // wait for thread to be terminated
             util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
@@ -247,7 +248,7 @@ namespace hpx
             thread_task_base(threads::thread_id_type const& id)
             {
                 if (threads::add_thread_exit_callback(id,
-                        util::bind(&thread_task_base::thread_exit_function,
+                        util::bind_front(&thread_task_base::thread_exit_function,
                             future_base_type(this))))
                 {
                     id_ = id;

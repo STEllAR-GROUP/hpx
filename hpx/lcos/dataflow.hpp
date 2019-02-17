@@ -193,8 +193,10 @@ namespace hpx { namespace lcos { namespace detail
             // simply schedule new thread
             parallel::execution::parallel_policy_executor<launch::async_policy>
                 exec{policy};
-            parallel::execution::post(exec, &dataflow_frame::done,
-                std::move(this_), std::move(futures));
+            parallel::execution::post(exec,
+                [HPX_CAPTURE_MOVE(this_)](Futures&& futures) mutable -> void {
+                    return this_->done(std::move(futures));
+                }, std::move(futures));
         }
 
         HPX_FORCEINLINE
@@ -241,8 +243,10 @@ namespace hpx { namespace lcos { namespace detail
 
             parallel::execution::parallel_policy_executor<launch::fork_policy>
                 exec{policy};
-            parallel::execution::post(exec, &dataflow_frame::done,
-                std::move(this_), std::move(futures));
+            parallel::execution::post(exec,
+                [HPX_CAPTURE_MOVE(this_)](Futures&& futures) mutable -> void {
+                    return this_->done(std::move(futures));
+                }, std::move(futures));
         }
 
         void finalize(launch policy, Futures&& futures)
@@ -275,18 +279,11 @@ namespace hpx { namespace lcos { namespace detail
         >::type
         finalize(Executor&& exec, Futures&& futures)
         {
-            using execute_function_type =
-                typename std::conditional<
-                    is_void::value,
-                    void (dataflow_frame::*)(std::true_type, Futures&&),
-                    void (dataflow_frame::*)(std::false_type, Futures&&)
-                >::type;
-
-            execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
-
             parallel::execution::post(std::forward<Executor>(exec),
-                f, std::move(this_), is_void{}, std::move(futures));
+                [HPX_CAPTURE_MOVE(this_)](Futures&& futures) mutable -> void {
+                    return this_->execute(is_void{}, std::move(futures));
+                }, std::move(futures));
         }
 
     public:

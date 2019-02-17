@@ -8,19 +8,19 @@
 
 #if defined(HPX_HAVE_PAPI)
 
-#include <hpx/util/bind.hpp>
-#include <hpx/util/thread_mapper.hpp>
 #include <hpx/components/performance_counters/papi/server/papi.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/components/component_commandline.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/util/bind_back.hpp>
+#include <hpx/util/thread_mapper.hpp>
 
 #include <boost/program_options.hpp>
 
@@ -153,10 +153,10 @@ namespace hpx { namespace performance_counters { namespace papi
     }
 
     // discover available PAPI counters
-    bool discover_papi_counters_helper(
-        hpx::performance_counters::counter_info const& info,
+    static bool discover_papi_counters_helper(
+        hpx::performance_counters::counter_info const& info, hpx::error_code& ec,
         hpx::performance_counters::discover_counter_func const& f,
-        hpx::performance_counters::discover_counters_mode mode, hpx::error_code& ec)
+        hpx::performance_counters::discover_counters_mode mode)
     {
         hpx::performance_counters::counter_info cnt_info = info;
 
@@ -237,10 +237,8 @@ namespace hpx { namespace performance_counters { namespace papi
         hpx::performance_counters::discover_counter_func const& f,
         hpx::performance_counters::discover_counters_mode mode, hpx::error_code& ec)
     {
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
         return performance_counters::locality_thread_counter_discoverer(info,
-            hpx::util::bind(&discover_papi_counters_helper, _1, f, mode, _2),
+            hpx::util::bind_back(&discover_papi_counters_helper, f, mode),
             mode, ec);
     }
 
