@@ -1483,11 +1483,8 @@ namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object, with allocator
-    template <typename Allocator, typename T>
-    typename std::enable_if<
-       !std::is_void<T>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
-    >::type
+    template <int DeductionGuard = 0, typename Allocator, typename T>
+    future<typename hpx::util::decay_unwrap<T>::type>
     make_ready_future_alloc(Allocator const& a, T&& init)
     {
         using result_type = typename hpx::util::decay_unwrap<T>::type;
@@ -1517,11 +1514,8 @@ namespace hpx { namespace lcos
     }
 
     // extension: create a pre-initialized future object
-    template <typename T>
-    HPX_FORCEINLINE typename std::enable_if<
-       !std::is_void<T>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
-    >::type
+    template <int DeductionGuard = 0, typename T>
+    HPX_FORCEINLINE future<typename hpx::util::decay_unwrap<T>::type>
     make_ready_future(T&& init)
     {
         return make_ready_future_alloc(hpx::util::internal_allocator<>{},
@@ -1533,11 +1527,11 @@ namespace hpx { namespace lcos
     template <typename T, typename Allocator>
     typename std::enable_if<
         std::is_constructible<T>::value && !std::is_void<T>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
+        future<T>
     >::type
     make_ready_future_alloc(Allocator const& a)
     {
-        using result_type = typename hpx::util::decay_unwrap<T>::type;
+        using result_type = T;
 
         using base_allocator = Allocator;
         using shared_state = typename traits::detail::shared_state_allocator<
@@ -1568,7 +1562,7 @@ namespace hpx { namespace lcos
     template <typename T>
     HPX_FORCEINLINE typename std::enable_if<
         std::is_constructible<T>::value && !std::is_void<T>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
+        future<T>
     >::type
     make_ready_future()
     {
@@ -1580,7 +1574,7 @@ namespace hpx { namespace lcos
     template <typename T, typename Allocator, typename T1, typename ... Ts>
     typename std::enable_if<
         std::is_constructible<T, T1&&, Ts&&...>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
+        future<T>
     >::type
     make_ready_future_alloc(Allocator const& a, T1&& t1, Ts&&... ts)
     {
@@ -1614,7 +1608,7 @@ namespace hpx { namespace lcos
     template <typename T, typename T1, typename ... Ts>
     HPX_FORCEINLINE typename std::enable_if<
         std::is_constructible<T, T1&&, Ts&&...>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
+        future<T>
     >::type
     make_ready_future(T1&& t1, Ts&&... ts)
     {
@@ -1653,11 +1647,8 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
-    template <typename T>
-    typename std::enable_if<
-       !std::is_void<T>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
-    >::type
+    template <int DeductionGuard = 0, typename T>
+    future<typename hpx::util::decay_unwrap<T>::type>
     make_ready_future_at(hpx::util::steady_time_point const& abs_time,
         T&& init)
     {
@@ -1671,11 +1662,8 @@ namespace hpx { namespace lcos
             std::move(p));
     }
 
-    template <typename T>
-    typename std::enable_if<
-       !std::is_void<T>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
-    >::type
+    template <int DeductionGuard = 0, typename T>
+    future<typename hpx::util::decay_unwrap<T>::type>
     make_ready_future_after(hpx::util::steady_duration const& rel_time,
         T&& init)
     {
@@ -1740,7 +1728,9 @@ namespace hpx { namespace lcos
     }
 
     template <typename T>
-    typename std::enable_if<std::is_void<T>::value, future<void> >::type
+    typename std::enable_if<
+        std::is_void<T>::value, future<void>
+    >::type
     make_ready_future_at(hpx::util::steady_time_point const& abs_time)
     {
         return make_ready_future_at(abs_time);
@@ -1754,7 +1744,9 @@ namespace hpx { namespace lcos
     }
 
     template <typename T>
-    typename std::enable_if<std::is_void<T>::value, future<void> >::type
+    typename std::enable_if<
+        std::is_void<T>::value, future<void>
+    >::type
     make_ready_future_after(hpx::util::steady_duration const& rel_time)
     {
         return make_ready_future_at(rel_time.from_now());
