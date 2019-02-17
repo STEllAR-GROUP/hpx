@@ -44,6 +44,11 @@ HPX_REGISTER_ACTION_ID(
     hpx::actions::primary_namespace_bind_gid_action_id)
 
 HPX_REGISTER_ACTION_ID(
+    primary_namespace::begin_migration_action,
+    primary_namespace_begin_migration_action,
+    hpx::actions::primary_namespace_begin_migration_action_id)
+
+HPX_REGISTER_ACTION_ID(
     primary_namespace::end_migration_action,
     primary_namespace_end_migration_action,
     hpx::actions::primary_namespace_end_migration_action_id)
@@ -164,14 +169,19 @@ namespace hpx { namespace agas {
             naming::id_type::unmanaged);
     }
 
-    std::pair<naming::id_type, naming::address>
+    hpx::future<std::pair<naming::id_type, naming::address>>
     primary_namespace::begin_migration(naming::gid_type id)
     {
-        HPX_ASSERT(
-            naming::get_locality_from_gid(get_service_instance(id)) ==
-            hpx::get_locality());
+        naming::id_type dest = naming::id_type(get_service_instance(id),
+            naming::id_type::unmanaged);
 
-        return server_->begin_migration(id);
+        if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
+        {
+            return hpx::make_ready_future(server_->begin_migration(id));
+        }
+
+        server::primary_namespace::begin_migration_action action;
+        return hpx::async(action, std::move(dest), id);
     }
     bool primary_namespace::end_migration(naming::gid_type id)
     {

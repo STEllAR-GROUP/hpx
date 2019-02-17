@@ -1833,26 +1833,26 @@ include_directories("${CMAKE_BINARY_DIR}")
 # Add custom targets for tests
 ################################################################################
 if (HPX_WITH_TESTS)
-  add_custom_target(tests)
+  add_hpx_pseudo_target(tests)
   if (HPX_WITH_TESTS_UNIT)
-    add_custom_target(tests.unit)
-    add_dependencies(tests tests.unit)
+    add_hpx_pseudo_target(tests.unit)
+    add_hpx_pseudo_dependencies(tests tests.unit)
   endif()
   if (HPX_WITH_TESTS_REGRESSIONS)
-    add_custom_target(tests.regressions)
-    add_dependencies(tests tests.regressions)
+    add_hpx_pseudo_target(tests.regressions)
+    add_hpx_pseudo_dependencies(tests tests.regressions)
   endif()
   if (HPX_WITH_TESTS_BENCHMARKS)
-    add_custom_target(tests.performance)
-    add_dependencies(tests tests.performance)
+    add_hpx_pseudo_target(tests.performance)
+    add_hpx_pseudo_dependencies(tests tests.performance)
   endif()
   if (HPX_WITH_TESTS_HEADERS)
-    add_custom_target(tests.headers)
-    add_dependencies(tests tests.headers)
+    add_hpx_pseudo_target(tests.headers)
+    add_hpx_pseudo_dependencies(tests tests.headers)
   endif()
   if (HPX_WITH_TESTS_EXAMPLES)
-    add_custom_target(tests.examples)
-    add_dependencies(tests tests.examples)
+    add_hpx_pseudo_target(tests.examples)
+    add_hpx_pseudo_dependencies(tests tests.examples)
   endif()
 
   enable_testing()
@@ -2010,7 +2010,8 @@ install( # Install all HPX cmake utility files
   DIRECTORY cmake/
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
   COMPONENT core
-  PATTERN ".cmake.in" EXCLUDE
+  PATTERN "templates" EXCLUDE
+  PATTERN "packaging" EXCLUDE
   PATTERN ".git" EXCLUDE)
 
 install( # Install HPX Python scripts

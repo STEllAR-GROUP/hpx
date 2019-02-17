@@ -81,6 +81,8 @@ namespace hpx { namespace components { namespace server
 
             if (pin_count == ~0x0u)
             {
+                agas::unmark_as_migrated(to_migrate.get_gid());
+
                 HPX_THROW_EXCEPTION(invalid_status,
                     "hpx::components::server::migrate_to_storage_here",
                     "attempting to migrate an instance of a component which was "
@@ -90,6 +92,8 @@ namespace hpx { namespace components { namespace server
 
             if (pin_count > 1)
             {
+                agas::unmark_as_migrated(to_migrate.get_gid());
+
                 HPX_THROW_EXCEPTION(invalid_status,
                     "hpx::components::server::migrate_to_storage_here",
                     "attempting to migrate an instance of a component which is "
@@ -180,13 +184,16 @@ namespace hpx { namespace components { namespace server
             return make_ready_future(naming::invalid_id);
         }
 
-        auto r= agas::begin_migration(to_migrate);
+        auto r = agas::begin_migration(to_migrate).get();
 
         // perform actual object migration
         typedef server::migrate_to_storage_here_action<Component>
             action_type;
-        return async<action_type>(r.first, to_migrate, r.second,
-            target_storage).then(
+
+        future<id_type> f = async<action_type>(r.first, to_migrate, r.second,
+            target_storage);
+
+        return f.then(
                 [to_migrate](future<naming::id_type> && f) -> naming::id_type
                 {
                     agas::end_migration(to_migrate);

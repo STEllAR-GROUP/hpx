@@ -300,14 +300,15 @@ HPX_API_EXPORT hpx::future<hpx::id_type> on_symbol_namespace_event(
     std::string const& name, bool call_for_past_events);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT std::pair<naming::id_type, naming::address>
+HPX_API_EXPORT hpx::future<std::pair<naming::id_type, naming::address>>
     begin_migration(naming::id_type const& id);
 HPX_API_EXPORT bool end_migration(naming::id_type const& id);
 
 HPX_API_EXPORT hpx::future<void>
     mark_as_migrated(naming::gid_type const& gid,
         util::unique_function_nonser<
-            std::pair<bool, hpx::future<void> >()> && f);
+            std::pair<bool, hpx::future<void> >()> && f,
+        bool expect_to_be_marked_as_migrating);
 
 HPX_API_EXPORT std::pair<bool, components::pinned_ptr>
     was_object_migrated(naming::gid_type const& gid,

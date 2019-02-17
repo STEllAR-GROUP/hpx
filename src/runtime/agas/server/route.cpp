@@ -96,6 +96,7 @@ namespace hpx { namespace agas { namespace server
         }
 
         naming::id_type source = p.source_id();
+
         // either send the parcel on its way or execute actions locally
         if (addr.locality_ == get_locality())
         {

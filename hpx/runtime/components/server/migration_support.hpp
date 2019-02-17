@@ -86,9 +86,9 @@ namespace hpx { namespace components
             // more than once
             {
                 std::unique_lock<mutex_type> l(mtx_);
-                if (this->pin_count_ != ~0x0u && this->pin_count_ > 1)
+                if (pin_count_ != ~0x0u && pin_count_ > 1)
                 {
-                    --this->pin_count_;
+                    --pin_count_;
                     return false;
                 }
             }
@@ -123,7 +123,7 @@ namespace hpx { namespace components
                         }
                     }
                     return std::make_pair(false, make_ready_future());
-                }).get();
+                }, true).get();
 
             return was_migrated;
         }
@@ -173,7 +173,7 @@ namespace hpx { namespace components
 
                     l.unlock();
                     return std::make_pair(true, std::move(f));
-                });
+                }, false);
         }
 
         /// This hook is invoked on the newly created object after the migration

@@ -396,6 +396,11 @@ endfunction()
 
 ###############################################################################
 function(hpx_check_for_cxx11_std_atomic)
+  # Make sure HPX_HAVE_LIBATOMIC is removed from the cache if necessary
+  if(NOT HPX_WITH_CXX11_ATOMIC)
+    unset(HPX_HAVE_LIBATOMIC CACHE)
+  endif()
+
   # Sometimes linking against libatomic is required for atomic ops, if
   # the platform doesn't support lock-free atomics.
   check_library_exists(atomic __atomic_fetch_add_4 "" HPX_HAVE_LIBATOMIC)
