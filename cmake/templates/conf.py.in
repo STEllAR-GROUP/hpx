@@ -595,15 +595,25 @@ htmlhelp_basename = 'HPXdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
-latex_elements = {}
+latex_elements = {
+    'preamble': r'''
+    \usepackage{enumitem}
+    \setlistdepth{2000}
+    \nonstopmode
+    ''',
+    'maxlistdepth': '100',
+    'releasename': ' ', # NOTE: Needs the space. Empty string means default.
+}
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'HPX.tex', u'HPX Documentation',
-     u'The Ste\\textbar{}\\textbar{}ar Group', 'manual'),
+     u'The STE\\textbar{}\\textbar{}AR Group', 'manual'),
 ]
+
+latex_show_urls = 'footnote'
 
 
 # -- Options for manual page output ---------------------------------------
@@ -614,6 +624,8 @@ man_pages = [
     (master_doc, 'hpx', u'HPX Documentation',
      [author], 1)
 ]
+
+man_show_urls = True
 
 
 # -- Options for Texinfo output -------------------------------------------
