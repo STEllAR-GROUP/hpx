@@ -5,8 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// make inspect happy: hpxinspect:nodeprecatedname:boost::is_any_of
-
 #if !defined(HPX_COMPONENT_REGISTRY_MAR_10_2010_0720PM)
 #define HPX_COMPONENT_REGISTRY_MAR_10_2010_0720PM
 
@@ -19,15 +17,8 @@
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
-#include <hpx/util/find_prefix.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/runtime_configuration.hpp>
 
 #include <hpx/traits/component_config_data.hpp>
-
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/assign/std/vector.hpp>
 
 #include <string>
 #include <vector>
@@ -35,6 +26,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
+    namespace detail
+    {
+        void HPX_EXPORT get_component_info(std::vector<std::string>& fillini,
+            std::string const& filepath, bool is_static, char const* name,
+            char const* component_string, factory_state_enum state,
+            char const* more);
+
+        bool HPX_EXPORT is_component_enabled(char const* name);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// The \a component_registry provides a minimal implementation of a
     /// component's registry. If no additional functionality is required this
@@ -63,44 +64,10 @@ namespace hpx { namespace components
             std::string const& filepath, bool is_static = false)
         {
             typedef typename Component::type_holder type_holder;
-            using namespace boost::assign;
-            fillini += std::string("[hpx.components.") +
-                get_component_name<type_holder>() + "]";
-            fillini += "name = " HPX_COMPONENT_STRING;
-
-            if(!is_static)
-            {
-                if (filepath.empty()) {
-                    fillini += std::string("path = ") +
-                        util::find_prefixes("/hpx", HPX_COMPONENT_STRING);
-                }
-                else {
-                    fillini += std::string("path = ") + filepath;
-                }
-            }
-
-            switch (state) {
-            case factory_enabled:
-                fillini += "enabled = 1";
-                break;
-            case factory_disabled:
-                fillini += "enabled = 0";
-                break;
-            case factory_check:
-                fillini += "enabled = $[hpx.components.load_external]";
-                break;
-            }
-
-            if (is_static) {
-                fillini += "static = 1";
-            }
-
+            char const* name = get_component_name<type_holder>();
             char const* more = traits::component_config_data<Component>::call();
-            if (more) {
-                std::vector<std::string> data;
-                boost::split(data, more, boost::is_any_of("\n"));
-                std::copy(data.begin(), data.end(), std::back_inserter(fillini));
-            }
+            detail::get_component_info(fillini, filepath, is_static,
+                name, HPX_COMPONENT_STRING, state, more);
             return true;
         }
 
@@ -118,20 +85,8 @@ namespace hpx { namespace components
         void register_component_type()
         {
             typedef typename Component::type_holder type_holder;
-
-            char const* name = components::get_component_name<type_holder>();
-            bool enabled = true;
-            hpx::util::runtime_configuration const& config = hpx::get_config();
-            std::string enabled_entry = config.get_entry(
-                std::string("hpx.components.") + name + ".enabled", "0");
-
-            boost::algorithm::to_lower (enabled_entry);
-            if (enabled_entry == "no" || enabled_entry == "false" ||
-                enabled_entry == "0")
-            {
-                LRT_(info) << "plugin factory disabled: " << name;
-                enabled = false;     // this component has been disabled
-            }
+            char const* name = get_component_name<type_holder>();
+            bool enabled = detail::is_component_enabled(name);
 
             component_type type = components::get_component_type<type_holder>();
             typedef typename Component::base_type_holder base_type_holder;
