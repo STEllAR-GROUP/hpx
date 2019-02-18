@@ -313,7 +313,7 @@ namespace hpx { namespace lcos
                         // re-evaluate it and continue to the next argument
                         // (if any).
                         next_future_data->set_on_completed(
-                            [=]() mutable -> void {
+                            [this]() -> void {
                                 return await_next<I>(
                                     std::true_type(), std::false_type());
                             });

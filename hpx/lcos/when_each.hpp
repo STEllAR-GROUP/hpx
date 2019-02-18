@@ -310,7 +310,7 @@ namespace hpx { namespace lcos
                         // (if any).
                         boost::intrusive_ptr<when_each_frame> this_(this);
                         next_future_data->set_on_completed(
-                            [=, HPX_CAPTURE_MOVE(this_)]() mutable -> void {
+                            [HPX_CAPTURE_MOVE(this_)]() -> void {
                                 return this_->template await_next<I>(
                                     std::true_type(), std::false_type());
                             });
