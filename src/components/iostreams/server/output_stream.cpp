@@ -51,7 +51,7 @@ namespace hpx { namespace iostreams { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     void output_stream::call_write_async(std::uint32_t locality_id,
-        std::uint64_t count, detail::buffer const& in)
+        std::uint64_t count, detail::buffer const& in, hpx::id_type /*this_id*/)
     { // {{{
         // Perform the IO operation.
         pending_output_.output(locality_id, count, in, write_f, mtx_);
@@ -62,9 +62,12 @@ namespace hpx { namespace iostreams { namespace server
     { // {{{
         // Perform the IO in another OS thread.
         detail::buffer in(buf_in);
+        // we need to capture the GID of the component to keep it alive long
+        // enough.
+        hpx::id_type this_id = this->get_id();
         hpx::get_thread_pool("io_pool")->get_io_service().post(
             util::bind_front(&output_stream::call_write_async, this,
-                locality_id, count, std::move(in)));
+                locality_id, count, std::move(in), std::move(this_id)));
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
