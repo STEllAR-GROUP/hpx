@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -134,7 +134,18 @@ void test_bulk_async(bool sync)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
+void bulk_test_f_s(int value, hpx::shared_future<void> f, hpx::thread::id tid,
+    int passed_through) //-V813
+{
+    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+
+    f.get();                    // propagate exceptions
+
+    HPX_TEST(tid == hpx::this_thread::get_id());
+    HPX_TEST_EQ(passed_through, 42);
+}
+
+void bulk_test_f_a(int value, hpx::shared_future<void> f, hpx::thread::id tid,
     int passed_through) //-V813
 {
     HPX_ASSERT(f.is_ready());   // make sure, future is ready
@@ -146,7 +157,7 @@ void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
 }
 
 template <typename Policy>
-void test_bulk_then()
+void test_bulk_then(bool sync)
 {
     typedef hpx::parallel::execution::parallel_policy_executor<Policy> executor;
 
@@ -162,11 +173,11 @@ void test_bulk_then()
     hpx::shared_future<void> f = hpx::make_ready_future();
 
     executor exec;
+    hpx::parallel::execution::bulk_then_execute(exec,
+        hpx::util::bind(sync ? &bulk_test_f_s : &bulk_test_f_a, _1, _2, tid, _3),
+        v, f, 42) .get();
     hpx::parallel::execution::bulk_then_execute(
-        exec, hpx::util::bind(&bulk_test_f, _1, _2, tid, _3), v, f, 42
-    ).get();
-    hpx::parallel::execution::bulk_then_execute(
-        exec, &bulk_test_f, v, f, tid, 42
+        exec, sync ? &bulk_test_f_s : &bulk_test_f_a, v, f, tid, 42
     ).get();
 }
 
@@ -177,8 +188,14 @@ void static_check_executor()
     using executor = hpx::parallel::execution::parallel_policy_executor<Policy>;
 
     static_assert(
+        !has_sync_execute_member<executor>::value,
+        "!has_sync_execute_member<executor>::value");
+    static_assert(
         has_async_execute_member<executor>::value,
         "has_async_execute_member<executor>::value");
+    static_assert(
+        has_then_execute_member<executor>::value,
+        "has_then_execute_member<executor>::value");
     static_assert(
         !has_bulk_sync_execute_member<executor>::value,
         "!has_bulk_sync_execute_member<executor>::value");
@@ -186,8 +203,8 @@ void static_check_executor()
         has_bulk_async_execute_member<executor>::value,
         "has_bulk_async_execute_member<executor>::value");
     static_assert(
-        !has_bulk_then_execute_member<executor>::value,
-        "!has_bulk_then_execute_member<executor>::value");
+        has_bulk_then_execute_member<executor>::value,
+        "has_bulk_then_execute_member<executor>::value");
     static_assert(
         has_post_member<executor>::value,
         "check has_post_member<executor>::value");
@@ -205,7 +222,7 @@ void policy_test(bool sync = false)
 
     test_bulk_sync<Policy>(sync);
     test_bulk_async<Policy>(sync);
-    test_bulk_then<Policy>();
+    test_bulk_then<Policy>(sync);
 }
 
 int hpx_main(int argc, char* argv[])

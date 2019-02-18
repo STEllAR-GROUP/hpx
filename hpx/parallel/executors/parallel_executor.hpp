@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2019 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,6 +14,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/latch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/executors/fused_bulk_execute.hpp>
 #include <hpx/parallel/executors/post_policy_dispatch.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
@@ -22,10 +24,13 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind_back.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/one_shot.hpp>
 #include <hpx/util/range.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -56,8 +61,15 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Shape, typename ... Ts>
+        template <typename F, typename Shape, typename... Ts>
         struct bulk_function_result;
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename F, typename Shape, typename Future, typename... Ts>
+        struct bulk_then_execute_result;
+
+        template <typename F, typename Shape, typename Future, typename... Ts>
+        struct then_bulk_function_result;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -131,7 +143,7 @@ namespace hpx { namespace parallel { namespace execution
                 typename hpx::util::detail::invoke_deferred_result<
                     F, Future, Ts...>::type;
 
-            auto func = hpx::util::one_shot(hpx::util::bind_back(
+            auto && func = hpx::util::one_shot(hpx::util::bind_back(
                 std::forward<F>(f), std::forward<Ts>(ts)...));
 
             typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
@@ -191,6 +203,56 @@ namespace hpx { namespace parallel { namespace execution
 
             return results;
         }
+
+        template <typename F, typename S, typename Future, typename... Ts>
+        hpx::future<
+            typename detail::bulk_then_execute_result<F, S, Future, Ts...>::type
+        >
+        bulk_then_execute(
+            F&& f, S const& shape, Future&& predecessor, Ts&&... ts)
+        {
+            using func_result_type =
+                typename detail::then_bulk_function_result<F, S, Future,
+                    Ts...>::type;
+
+            // std::vector<future<func_result_type>>
+            using result_type = std::vector<hpx::future<func_result_type>>;
+
+            auto && func =
+                detail::make_fused_bulk_async_execute_helper<result_type>(
+                    *this, std::forward<F>(f), shape,
+                    hpx::util::make_tuple(std::forward<Ts>(ts)...));
+
+            // void or std::vector<func_result_type>
+            using vector_result_type =
+                typename detail::bulk_then_execute_result<F, S, Future,
+                    Ts...>::type;
+
+            // future<vector_result_type>
+            using result_future_type = hpx::future<vector_result_type>;
+
+            using shared_state_type =
+                typename hpx::traits::detail::shared_state_ptr<
+                    vector_result_type>::type;
+
+            using future_type = typename std::decay<Future>::type;
+
+            // vector<future<func_result_type>> -> vector<func_result_type>
+            shared_state_type p =
+                lcos::detail::make_continuation_alloc<vector_result_type>(
+                    hpx::util::internal_allocator<>{},
+                    std::forward<Future>(predecessor), policy_,
+                    [HPX_CAPTURE_MOVE(func)](future_type&& predecessor) mutable
+                    ->  vector_result_type
+                    {
+                        // use unwrap directly (instead of lazily) to avoid
+                        // having to pull in dataflow
+                        return hpx::util::unwrap(func(std::move(predecessor)));
+                    });
+
+            return hpx::traits::future_access<result_future_type>::create(
+                std::move(p));
+        }
         /// \endcond
 
     protected:
@@ -226,9 +288,9 @@ namespace hpx { namespace parallel { namespace execution
                 while (size > chunk_size)
                 {
                     post([&, base, chunk_size, num_tasks, it] {
-                            return spawn(results, l, base, chunk_size, 
-                                num_tasks, func, it, ts...);
-                        });
+                        spawn_hierarchical(results, l, base, chunk_size,
+                            num_tasks, func, it, ts...);
+                    });
 
                     base += chunk_size;
                     it = hpx::parallel::v1::detail::next(it, chunk_size);

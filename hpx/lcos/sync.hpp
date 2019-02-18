@@ -149,6 +149,34 @@ namespace hpx { namespace detail
                 >::call(launch::sync, c, std::forward<Ts>(ts)...);
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action>
+    struct sync_launch_policy_dispatch<Action,
+        typename std::enable_if<
+            traits::is_action<Action>::value
+        >::type>
+    {
+        typedef typename traits::promise_local_result<
+                typename hpx::traits::extract_action<
+                    Action
+                >::remote_result_type
+            >::type result_type;
+
+        template <typename Policy, typename ...Ts>
+        HPX_FORCEINLINE static
+        result_type
+        call(Policy && launch_policy, Action const&, Ts &&... ts)
+        {
+            static_assert(
+                traits::is_launch_policy<
+                    typename std::decay<Policy>::type
+                >::value,
+                "Policy must be a valid launch policy");
+            return sync<Action>(
+                std::forward<Policy>(launch_policy), std::forward<Ts>(ts)...);
+        }
+    };
 }}
 
 namespace hpx
