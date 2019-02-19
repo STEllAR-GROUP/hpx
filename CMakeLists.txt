@@ -302,7 +302,6 @@ hpx_option(HPX_WITH_TESTS_HEADERS BOOL "Build HPX header tests (default: OFF)" O
 hpx_option(HPX_WITH_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_EXAMPLES BOOL "Add HPX examples as tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
-hpx_option(HPX_WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 
 hpx_option(HPX_WITH_COMPILE_ONLY_TESTS BOOL
   "Create build system support for compile time only HPX tests (default ON)"
@@ -1931,11 +1930,6 @@ if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples)
   include_directories(examples)
   add_subdirectory(examples)
-endif()
-
-if(HPX_WITH_RUNTIME)
-  add_hpx_pseudo_target(runtime)
-  add_subdirectory(runtime)
 endif()
 
 if(HPX_WITH_DOCUMENTATION)
