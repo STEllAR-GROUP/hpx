@@ -1,8 +1,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// FFWD_TODO: Remove all these comments!
-
 #include "scheduler_base.hpp"
 #include "thread_queue.hpp"
 
@@ -19,22 +17,22 @@ namespace hpx { namespace threads { namespace policies
     class HPX_EXPORT ffwd_scheduler : public scheduler_base
     {
     public:
-        //////////////////////////////////////////////////////////////////////////////////
+
         typedef thread_queue<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
         > thread_queue_type;
 
-        //////////////////////////////////////////////////////////////////////////////////
-        ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads), thread_count(num_threads), max_queue_thread_count_(1000)
+        ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads),
+            thread_count(num_threads), max_queue_thread_count_(1000)
         {
-            // everything necessary is done in initializer list
+            // Everything necessary is done in initializer list
         }
 
         ~ffwd_scheduler() {
-            // messages are empty, all threads have been terminated
+            // Messages are empty, all threads have been terminated
         }
 
-        //////////////////////////////////////////////////////////////////////////////////
+
         std::string get_scheduler_name()
         {
             return "ffwd_scheduler";
@@ -42,16 +40,15 @@ namespace hpx { namespace threads { namespace policies
 
         void suspend(std::size_t num_thread)
         {
-            std::cout << "suspend called" << std::endl;
             HPX_ASSERT(num_thread < suspend_conds_.size());
 
             states_[num_thread].store(state_sleeping);
             std::unique_lock<pu_mutex_type> l(suspend_mtxs_[num_thread]);
             suspend_conds_[num_thread].wait(l);
 
-            // Only set running if still in state_sleeping. Can be set with
-            // non-blocking/locking functions to stopping or terminating, in
-            // which case the state is left untouched.
+            /* Only set running if still in state_sleeping. Can be set with
+             * non-blocking/locking functions to stopping or terminating, in
+             * which case the state is left untouched. */
             hpx::state expected = state_sleeping;
             states_[num_thread].compare_exchange_strong(expected, state_running);
 
@@ -71,6 +68,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
+        // We have no thread stealing here
         std::int64_t get_num_pending_misses(std::size_t num_thread,
             bool reset) {return 0;}
         std::int64_t get_num_pending_accesses(std::size_t num_thread,
@@ -86,9 +84,10 @@ namespace hpx { namespace threads { namespace policies
             bool reset) {return 0;}
 #endif
 
+        ///////////////////////////////////////////////////////////////////////
         std::int64_t get_queue_length(
-            std::size_t num_thread = std::size_t(-1)) const {
-
+            std::size_t num_thread = std::size_t(-1)) const
+        {
             return messages.get_queue_length();
         }
 
@@ -96,65 +95,50 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1),
-            bool reset = false) const {
-
+            bool reset = false) const
+        {
             return messages.get_thread_count();
         }
 
         // Enumerate all matching threads
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-                thread_state_enum state = unknown) const {
-            std::cout << "enumerate threads not implemented yet" << std::endl;
-            return true;
+                thread_state_enum state = unknown) const
+        {
+            return  messages.enumerate_threads(f, state);
         }
 
-        void abort_all_suspended_threads() {
-            std::cout << "abort_all_suspended_threads not implemented yet" << std::endl;
+        ///////////////////////////////////////////////////////////////////////
+        void abort_all_suspended_threads()
+        {
+            messages.abort_all_suspended_threads();
         }
 
-        bool cleanup_terminated(bool delete_all) {
-
+        ///////////////////////////////////////////////////////////////////////
+        bool cleanup_terminated(bool delete_all)
+        {
             bool empty = true;
             messages.cleanup_terminated(delete_all);
             return empty;
         }
 
-        bool cleanup_terminated(std::size_t num_thread, bool delete_all) {
+        bool cleanup_terminated(std::size_t num_thread, bool delete_all)
+        {
             return messages.cleanup_terminated(delete_all);
-
         }
 
+        ///////////////////////////////////////////////////////////////////////
         void create_thread(thread_init_data& data, thread_id_type* id,
-                                   thread_state_enum initial_state, bool run_now, error_code& ec) {
-//            {
-//                // Entire block was used in earlier implementations to select which thread queue was used
-//                // Is it still necessary?
-//                std::size_t num_thread =
-//                    data.schedulehint.mode == thread_schedule_hint_mode_thread ?
-//                    data.schedulehint.hint : std::size_t(-1);
-//                std::size_t queue_size = thread_count;
-
-//                if (std::size_t(-1) == num_thread)
-//                {
-//                    num_thread = curr_queue_++ % queue_size;
-//                }
-//                else if (num_thread >= queue_size)
-//                {
-//                    num_thread %= queue_size;
-//                }
-
-//                std::unique_lock<pu_mutex_type> l;
-//                num_thread = select_active_pu(l, num_thread);
-//            }
-
+                           thread_state_enum initial_state, bool run_now,
+                           error_code& ec)
+        {
             messages.create_thread(data, id, initial_state, run_now, ec);
         }
 
         bool get_next_thread(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count, threads::thread_data*& thrd){
-
-            // we only have our local queue right now
+            std::int64_t& idle_loop_count, threads::thread_data*& thrd)
+        {
+            // We only have our local queue
             bool result = messages.get_next_thread(thrd);
 
             messages.increment_num_pending_accesses();
@@ -178,48 +162,43 @@ namespace hpx { namespace threads { namespace policies
             return false;
         }
 
+        /// Schedule the passed thread
         void schedule_thread(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
-            thread_priority priority = thread_priority_normal){
-//            {
-//                // Entire block was used in earlier implementations to select which thread queue was used
-//                // Is it still necessary?
-//                // NOTE: This scheduler ignores NUMA hints.
-//                std::size_t num_thread = std::size_t(-1);
-//                if (schedulehint.mode == thread_schedule_hint_mode_thread)
-//                {
-//                    num_thread = schedulehint.hint;
-//                }
-//                else
-//                {
-//                    allow_fallback = false;
-//                }
+            thread_priority priority = thread_priority_normal)
+        {
+            // NOTE: This scheduler ignores NUMA hints.
+            std::size_t num_thread = std::size_t(-1);
+            if (schedulehint.mode == thread_schedule_hint_mode_thread)
+            {
+                num_thread = schedulehint.hint;
+            }
+            else
+            {
+                allow_fallback = false;
+            }
 
-//                std::size_t queue_size = thread_count;
+            std::size_t queue_size = thread_count;
 
-//                if (std::size_t(-1) == num_thread)
-//                {
-//                    num_thread = curr_queue_++ % queue_size;
-//                }
-//                else if (num_thread >= queue_size)
-//                {
-//                    num_thread %= queue_size;
-//                }
-
-//                std::unique_lock<pu_mutex_type> l;
-//                num_thread = select_active_pu(l, num_thread, allow_fallback);
-//            }
+            if (std::size_t(-1) == num_thread)
+            {
+                num_thread = curr_queue_++ % queue_size;
+            }
+            else if (num_thread >= queue_size)
+            {
+                num_thread %= queue_size;
+            }
 
             HPX_ASSERT(thrd->get_scheduler_base() == this);
             messages.schedule_thread(thrd);
         }
 
         void schedule_thread_last(threads::thread_data* thrd,
-            threads::thread_schedule_hint schedulehint,
-            bool allow_fallback = false,
-                                  thread_priority priority = thread_priority_normal) {
-
+                threads::thread_schedule_hint schedulehint,
+                bool allow_fallback = false,
+                thread_priority priority = thread_priority_normal)
+        {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
             if (schedulehint.mode == thread_schedule_hint_mode_thread)
@@ -250,14 +229,17 @@ namespace hpx { namespace threads { namespace policies
             messages.schedule_thread(thrd, true);
         }
 
+        /// Destroy the passed thread as it has been terminated
         void destroy_thread(threads::thread_data* thrd,
-                            std::int64_t& busy_count) {
+                            std::int64_t& busy_count)
+        {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
             thrd->get_queue<thread_queue_type>().destroy_thread(thrd, busy_count);
         }
 
         bool wait_or_add_new(std::size_t num_thread, bool running,
-                             std::int64_t& idle_loop_count) {
+                             std::int64_t& idle_loop_count)
+        {
             std::size_t added = 0;
             bool result = true;
 
@@ -273,18 +255,21 @@ namespace hpx { namespace threads { namespace policies
                 return true;
             }
 
-            // nothing was found
+            // Nothing was found
             return false;
         }
 
-        void on_start_thread(std::size_t num_thread) override {
+        void on_start_thread(std::size_t num_thread) override
+        {
             messages.on_start_thread(num_thread);
         }
-        void on_stop_thread(std::size_t num_thread) override {
+        void on_stop_thread(std::size_t num_thread) override
+        {
             messages.on_stop_thread(num_thread);
         }
         void on_error(std::size_t num_thread,
-            std::exception_ptr const& e) override {
+            std::exception_ptr const& e) override
+        {
             messages.on_error(num_thread, e);
         }
 
@@ -300,8 +285,9 @@ namespace hpx { namespace threads { namespace policies
         {
         }
 
-        void reset_thread_distribution() {
-            std::cout << "reset_thread_distribution not implemented yet" << std::endl;
+        void reset_thread_distribution()
+        {
+            curr_queue_.store(0);
         }
 
     private:
