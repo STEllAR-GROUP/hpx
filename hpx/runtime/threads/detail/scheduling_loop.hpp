@@ -1025,7 +1025,6 @@ namespace hpx { namespace threads { namespace detail
                 }
             }
         }
-        std::cout << "counters.executed_thread_phases_ " << counters.executed_thread_phases_ << std::endl;
     }
 }}}
 
