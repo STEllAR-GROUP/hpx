@@ -50,17 +50,6 @@ namespace hpx { namespace util
 ///////////////////////////////////////////////////////////////////////////////
 // example ini line: line # comment
 const char pattern_comment[] =  "^([^#]*)(#.*)$";
-
-// example uses ini line: [sec.ssec]
-const char pattern_section[] = "^\\[([^\\]]+)\\]$";
-
-// example uses ini line: sec.ssec.key = val
-const char pattern_qualified_entry[] =
-"^([^\\s=]+)\\.([^\\s=\\.]+)\\s*=\\s*(.*[^\\s]?)\\s*$";
-
-// example uses ini line: key = val
-const char pattern_entry[] = "^([^\\s=]+)\\s*=\\s*(.*[^\\s]?)\\s*$";
-
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace detail
@@ -84,7 +73,6 @@ namespace detail
 section::section ()
   : root_(this_())
 {
-    regex_init();
 }
 
 section::section (std::string const& filename, section* root)
@@ -96,8 +84,6 @@ section::section (std::string const& filename, section* root)
 section::section (const section & in)
   : root_(this_()), name_(in.get_name()), parent_name_(in.get_parent_name())
 {
-    regex_init();
-
     entry_map const& e = in.get_entries();
     entry_map::const_iterator end = e.end();
     for (entry_map::const_iterator i = e.begin (); i != end; ++i)
@@ -171,10 +157,6 @@ void section::read (std::string const& filename)
     if (!input.is_open())
         line_msg("Cannot open file: ", filename);
 
-    // initialize
-    if (!regex_init())
-        line_msg ("Cannot init regex for ", filename);
-
     // read file
     std::string line;
     std::vector <std::string> lines;
@@ -205,10 +187,6 @@ void section::parse (std::string const& sourcename,
     section* current = this;
 
     std::regex regex_comment (pattern_comment, std::regex_constants::icase);
-    std::regex regex_section (pattern_section, std::regex_constants::icase);
-    std::regex regex_qualified_entry (pattern_qualified_entry,
-        std::regex_constants::icase);
-    std::regex regex_entry (pattern_entry, std::regex_constants::icase);
 
     std::vector<std::string>::const_iterator end = lines.end();
     for (std::vector<std::string>::const_iterator it = lines.begin();
@@ -236,24 +214,18 @@ void section::parse (std::string const& sourcename,
                     continue;
             }
         }
-
         // no comments anymore: line is either section, key=val,
         // or garbage/empty
-        std::smatch what;
-        if (std::regex_match(line, what, regex_qualified_entry))
-        {
-            // found a entry line
-            if (4 != what.size()) //-V112
-            {
-                line_msg("Cannot parse key/value in: ", sourcename, linenum, line);
-            }
 
-            section* s = current;  // save the section we're in
-            current = this;           // start adding sections at the root
+        // Check if we have a section.
+        // Example: [sec.ssec]
+        if (line.front() == '[' && line.back() == ']')
+        {
+            current = this;    // start adding sections at the root
 
             // got the section name. It might be hierarchical, so split it up, and
             // for each elem, check if we have it.  If not, create it, and add
-            std::string sec_name (what[1]);
+            std::string sec_name(line.substr(1, line.size() - 2));
             std::string::size_type pos = 0;
             for (std::string::size_type pos1 = sec_name.find_first_of('.');
                  std::string::npos != pos1;
@@ -264,11 +236,42 @@ void section::parse (std::string const& sourcename,
             }
 
             current = current->add_section_if_new(sec_name.substr(pos));
+            continue;
+        }
+
+        // Check if we have a key=val entry...
+        std::string::size_type assign_pos = line.find('=');
+        if (assign_pos != std::string::npos)
+        {
+            std::string sec_key =
+                detail::trim_whitespace(line.substr(0, assign_pos));
+            std::string value = detail::trim_whitespace(
+                line.substr(assign_pos + 1, line.size() - assign_pos - 1));
+
+            section* s = current;    // save the section we're in
+            current = this;          // start adding sections at the root
+
+            std::string::size_type pos = 0;
+            // Check if we have a qualified key name
+            // Example: hpx.commandline.allow_unknown
+            for (std::string::size_type dot_pos = sec_key.find_first_of('.');
+                 std::string::npos != dot_pos;
+                 dot_pos = sec_key.find_first_of('.', pos = dot_pos + 1))
+            {
+                current = current->add_section_if_new(
+                    sec_key.substr(pos, dot_pos - pos));
+            }
+            // if we don't have section qualifiers, restor current...
+            if (current == this)
+            {
+                current = s;
+            }
+
+            std::string key = sec_key.substr(pos);
 
             // add key/val to this section
             std::unique_lock<mutex_type> l(current->mtx_);
 
-            std::string key(what[2]);
             if (!force_entry(key) && verify_existing && !current->has_entry(l, key))
             {
                 line_msg ("Attempt to initialize unknown entry: ", sourcename,
@@ -277,61 +280,11 @@ void section::parse (std::string const& sourcename,
 
             if (replace_existing || !current->has_entry(l, key))
             {
-                current->add_entry (l, sec_name + "." + key, key, what[3]);
+                current->add_entry(l, key, key, value);
             }
 
             // restore the old section
             current = s;
-        }
-
-        else if (std::regex_match(line, what, regex_section))
-        {
-            // found a section line
-            if (2 != what.size())
-            {
-                line_msg("Cannot parse section in: ", sourcename, linenum, line);
-            }
-
-            current = this;     // start adding sections at the root
-
-            // got the section name. It might be hierarchical, so split it up, and
-            // for each elem, check if we have it.  If not, create it, and add
-            std::string sec_name (what[1]);
-            std::string::size_type pos = 0;
-            for (std::string::size_type pos1 = sec_name.find_first_of('.');
-                 std::string::npos != pos1;
-                 pos1 = sec_name.find_first_of ('.', pos = pos1 + 1))
-            {
-                current = current->add_section_if_new(
-                    sec_name.substr(pos, pos1 - pos));
-            }
-
-            current = current->add_section_if_new(sec_name.substr(pos));
-        }
-
-        // did not match section, so might be key/val entry
-        else if ( std::regex_match (line, what, regex_entry) )
-        {
-            // found a entry line
-            if (3 != what.size())
-            {
-                line_msg("Cannot parse key/value in: ", sourcename, linenum, line);
-            }
-
-            // add key/val to current section
-            std::unique_lock<mutex_type> l(current->mtx_);
-
-            std::string key(what[1]);
-            if (!force_entry(key) && verify_existing && !current->has_entry(l, key))
-            {
-                line_msg ("Attempt to initialize unknown entry: ", sourcename,
-                    linenum, line);
-            }
-
-            if (replace_existing || !current->has_entry(l, key))
-            {
-                current->add_entry (l, key, key, what[2]);
-            }
         }
         else
         {
@@ -817,11 +770,6 @@ void section::merge(section& second)
 }
 
 /////////////////////////////////////////////////////////////////////////////////
-bool section::regex_init (void)
-{
-    return true;
-}
-
 void section::line_msg(std::string msg, std::string const& file,
     int lnum, std::string const& line)
 {
