@@ -1289,7 +1289,6 @@ hpx::future<naming::address> addressing_service::resolve_full_async(
     future<primary_namespace::resolved_type> f =
         primary_ns_.resolve_full(gid);
 
-    using util::placeholders::_1;
     return f.then(
         hpx::launch::sync,
         util::one_shot(util::bind_front(
