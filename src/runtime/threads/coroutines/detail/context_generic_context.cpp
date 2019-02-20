@@ -38,14 +38,9 @@ namespace hpx { namespace threads { namespace coroutines
             if (ctx_)
             {
                 increment_stack_recycle_count();
-#if BOOST_VERSION < 106100
-                ctx_ =
-                    boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
-#else
                 ctx_ =
                     boost::context::detail::make_fcontext(
                             stack_pointer_, stack_size_, funp_);
-#endif
             }
         }
 

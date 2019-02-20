@@ -166,7 +166,7 @@ Software and libraries
 
 In the simplest case, |hpx| depends on |boost|_ and |hwloc|_. So, before you
 read further, please make sure you have a recent version of |boost|_ installed
-on your target machine. |hpx| currently requires at least Boost V1.58.0 to work
+on your target machine. |hpx| currently requires at least Boost V1.61.0 to work
 properly. It may build and run with older versions, but we do not test |hpx|
 with those versions, so please be warned.
 
@@ -228,18 +228,13 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |boost_libraries|_
-     * 1.62.0 or newer
-     * 1.58.0
+     * 1.67.0 or newer
+     * 1.61.0
      *
    * * |hwloc|_
      * 1.11
      * 1.2 (Xeon Phi: 1.6)
      *
-
-.. note::
-
-   When compiling |hpx| using clang/libc++ on OSX platform it is advised not
-   to use Boost V1.58 or V1.60.
 
 .. note::
 
@@ -282,8 +277,8 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |boost|_
-     * 1.62.0 or newer
-     * 1.58.0
+     * 1.67.0 or newer
+     * 1.61.0
      *
    * * |hwloc|_
      * 1.11

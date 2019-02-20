@@ -192,7 +192,7 @@ namespace hpx
 
     std::string boost_version()
     {
-        // BOOST_VERSION: 105800
+        // BOOST_VERSION: 106100
         return hpx::util::format("V{}.{}.{}",
             BOOST_VERSION / 100000,
             BOOST_VERSION / 100 % 1000,
