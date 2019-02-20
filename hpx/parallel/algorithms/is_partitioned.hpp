@@ -112,14 +112,16 @@ namespace hpx { namespace parallel { inline namespace v1
                         return fst_bool;
                     };
 
+                auto f2 =
+                    [tok](std::vector<hpx::future<bool>>&& results) -> bool {
+                    if (tok.was_cancelled())
+                        return false;
+                    return sequential_is_partitioned(std::move(results));
+                };
+
                 return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy), first, count,
-                    std::move(f1),
-                    [tok](std::vector<hpx::future<bool> > && results) -> bool
-                    {
-                        if (tok.was_cancelled()) return false;
-                        return sequential_is_partitioned(std::move(results));
-                    });
+                    std::forward<ExPolicy>(policy), first, count, std::move(f1),
+                    std::move(f2));
             }
         };
         /// \endcond

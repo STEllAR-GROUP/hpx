@@ -92,23 +92,23 @@ namespace hpx { namespace parallel { inline namespace v1
                 typedef typename set_operations_buffer<FwdIter>::type buffer_type;
                 typedef typename hpx::util::decay<F>::type func_type;
 
-                return set_operation(std::forward<ExPolicy>(policy),
-                    first1, last1, first2, last2, dest, std::forward<F>(f),
-                    // calculate approximate destination index
-                    [](difference_type1 idx1, difference_type2 idx2)
-                    ->  difference_type1
-                    {
-                        return idx1 + idx2;
-                    },
-                    // perform required set operation for one chunk
-                    [](RanIter1 part_first1, RanIter1 part_last1,
-                        RanIter2 part_first2, RanIter2 part_last2,
-                        buffer_type* dest, func_type const& f)
-                    ->  buffer_type*
-                    {
-                        return std::set_union(part_first1, part_last1,
-                            part_first2, part_last2, dest, f);
-                    });
+                // calculate approximate destination index
+                auto f1 = [](difference_type1 idx1,
+                              difference_type2 idx2) -> difference_type1 {
+                    return idx1 + idx2;
+                };
+                // perform required set operation for one chunk
+                auto f2 = [](RanIter1 part_first1, RanIter1 part_last1,
+                              RanIter2 part_first2, RanIter2 part_last2,
+                              buffer_type* dest,
+                              func_type const& f) -> buffer_type* {
+                    return std::set_union(part_first1, part_last1, part_first2,
+                        part_last2, dest, f);
+                };
+
+                return set_operation(std::forward<ExPolicy>(policy), first1,
+                    last1, first2, last2, dest, std::forward<F>(f),
+                    std::move(f1), std::move(f2));
             }
         };
         /// \endcond

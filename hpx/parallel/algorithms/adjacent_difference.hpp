@@ -92,17 +92,18 @@ namespace hpx { namespace parallel { inline namespace v1
                         });
                 };
 
+                auto f2 =
+                    [dest, count](
+                        std::vector<hpx::future<void>>&&) mutable -> FwdIter2 {
+                    std::advance(dest, count);
+                    return dest;
+                };
+
                 using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, FwdIter2, void>::call(
                     std::forward<ExPolicy>(policy),
-                    make_zip_iterator(first, prev, dest), count,
-                    std::move(f1),
-                    [dest, count](std::vector<hpx::future<void> > &&)
-                        mutable -> FwdIter2
-                    {
-                        std::advance(dest, count);
-                        return dest;
-                    });
+                    make_zip_iterator(first, prev, dest), count, std::move(f1),
+                    std::move(f2));
             }
         };
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,

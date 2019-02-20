@@ -130,6 +130,15 @@ namespace hpx { namespace parallel { inline namespace v1
                         return 0u;
                     };
 
+                auto f2 = hpx::util::unwrapping(
+                    [](std::size_t, std::size_t) -> std::size_t {
+                        // There is no need to propagate the partition
+                        // results. But, the scan_partitioner doesn't
+                        // support 'void' as Result1. So, unavoidably
+                        // return non-meaning value.
+                        return 0u;
+                    });
+
                 std::shared_ptr<FwdIter> dest_ptr =
                     std::make_shared<FwdIter>(first);
                 auto f3 =
@@ -175,35 +184,26 @@ namespace hpx { namespace parallel { inline namespace v1
                         }
                     };
 
+                auto f4 =
+                    [dest_ptr, flags](
+                        std::vector<hpx::shared_future<std::size_t>>&&,
+                        std::vector<hpx::future<void>>&&) mutable -> FwdIter {
+                    HPX_UNUSED(flags);
+                    return *dest_ptr;
+                };
+
                 return scan_partitioner_type::call(
                     std::forward<ExPolicy>(policy),
-                    make_zip_iterator(first, flags.get()),
-                    count, init,
+                    make_zip_iterator(first, flags.get()), count, init,
                     // step 1 performs first part of scan algorithm
                     std::move(f1),
                     // step 2 propagates the partition results from left
                     // to right
-                    hpx::util::unwrapping(
-                        [](std::size_t, std::size_t)
-                            -> std::size_t
-                        {
-                            // There is no need to propagate the partition
-                            // results. But, the scan_partitioner doesn't
-                            // support 'void' as Result1. So, unavoidably
-                            // return non-meaning value.
-                            return 0u;
-                        }),
+                    std::move(f2),
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value
-                    [dest_ptr, flags](
-                        std::vector<hpx::shared_future<std::size_t> > &&,
-                        std::vector<hpx::future<void> > &&) mutable
-                    ->  FwdIter
-                    {
-                        HPX_UNUSED(flags);
-                        return *dest_ptr;
-                    });
+                    std::move(f4));
             }
         };
         /// \endcond
