@@ -5,7 +5,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-thread_local int dummy = 0;
+struct dummy_type
+{
+    ~dummy_type(){};
+};
+
+thread_local dummy_type dummy;
 
 int main()
 {
