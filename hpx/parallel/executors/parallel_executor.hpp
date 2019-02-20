@@ -147,7 +147,7 @@ namespace hpx { namespace parallel { namespace execution
                 std::forward<F>(f), std::forward<Ts>(ts)...));
 
             typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
-                lcos::detail::make_continuation_alloc<result_type>(
+                lcos::detail::make_continuation_alloc_nounwrap<result_type>(
                     hpx::util::internal_allocator<>{},
                     std::forward<Future>(predecessor), policy_, std::move(func));
 
