@@ -32,7 +32,8 @@ are completed to avoid confusion.
 
 #. Write release notes in ``docs/sphinx/releases/whats_new_$VERSION.rst``. Keep
    adding merged PRs and closed issues to this until just before the release is
-   made.
+   made. Add the new release notes to the table of contents in
+   ``docs/sphinx/releases.rst``.
 
 #. Build the docs, and proof-read them. Update any documentation that may have
    changed, and correct any typos. Pay special attention to:
@@ -67,7 +68,8 @@ are completed to avoid confusion.
    be deleted and recreated.
 
 #. Delete the old release branch, and create a new one by branching a stable
-   point from master.
+   point from master. If you are creating a patch release, branch from the
+   release tag for which you want to create a patch release.
 
    * ``git push origin --delete release``
    * ``git branch -D release``
@@ -87,7 +89,7 @@ are completed to avoid confusion.
 #. Remove features which have been deprecated for at least 2 releases. This
    involves removing build options which enable those features from the main
    CMakeLists.txt and also deleting all related code and tests from the main
-   source tree.
+   source tree. This step does not apply to patch releases.
 
    The general deprecation policy involves a three-step process we have to go
    through in order to introduce a breaking change
@@ -119,8 +121,8 @@ are completed to avoid confusion.
 
 #. Allow at least a week for testing of the release candidate.
 
-   * Use ``git merge`` when possible, and fall back to ``git cherry-pick``
-     when needed.
+   * Use ``git merge`` when possible, and fall back to ``git cherry-pick`` when
+     needed.
    * Repeat by tagging a new release candidate as many times as needed.
 
 #. Checkout the release branch, and replace the ``-rcN`` tag in
