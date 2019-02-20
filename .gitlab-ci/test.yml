@@ -29,7 +29,10 @@ get junit2html:
     script:
       - cd build
       - ninja ${TESTS}
-      - ctest -T test --no-compress-output --output-on-failure -R ${TESTS}
+      # since the container is run as root, we just execute the tests as the
+      # user nobody...
+      - chown -R nobody .
+      - su -s /bin/bash nobody -c "ctest -T test --no-compress-output --output-on-failure -R ${TESTS}"
     after_script:
       - xsltproc conv.xsl build/Testing/`head -n 1 < build/Testing/TAG`/Test.xml > ${TESTS}.xml
       - ./junit2html/junit2html ./${TESTS}.xml ./${TESTS}.html
