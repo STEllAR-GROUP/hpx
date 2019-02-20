@@ -16,6 +16,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/logging.hpp>
@@ -378,7 +379,7 @@ namespace hpx { namespace performance_counters
     {
         using util::placeholders::_1;
         hpx::util::function_nonser<std::int64_t(bool)> func(
-            util::bind(wrap_counter, countervalue, _1));
+            util::bind_front(wrap_counter, countervalue));
         return create_raw_counter(info, func, id, ec);
     }
 
@@ -401,7 +402,7 @@ namespace hpx { namespace performance_counters
     {
         using util::placeholders::_1;
         hpx::util::function_nonser<std::int64_t(bool)> func(
-            util::bind(&wrap_raw_counter, f, _1));
+            util::bind_front(&wrap_raw_counter, f));
         return create_raw_counter(info, func, id, ec);
     }
 
@@ -465,7 +466,7 @@ namespace hpx { namespace performance_counters
     {
         using util::placeholders::_1;
         hpx::util::function_nonser<std::vector<std::int64_t>(bool)> func(
-            util::bind(&wrap_raw_values_counter, f, _1));
+            util::bind_front(&wrap_raw_values_counter, f));
         return create_raw_counter(info, func, id, ec);
     }
 

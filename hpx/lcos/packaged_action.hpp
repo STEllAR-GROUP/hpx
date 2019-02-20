@@ -19,11 +19,10 @@
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/internal_allocator.hpp>
-#include <hpx/util/protect.hpp>
 
 #include <boost/asio/error.hpp>
+#include <boost/intrusive_ptr.hpp>
 
 #include <exception>
 #include <memory>
@@ -32,6 +31,56 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 namespace lcos {
+
+    namespace detail
+    {
+        template <typename Result>
+        struct parcel_write_handler
+        {
+            boost::intrusive_ptr<detail::promise_data<Result>> shared_state;
+
+            void operator()(
+                boost::system::error_code const& ec, parcelset::parcel const& p)
+            {
+                // any error in the parcel layer will be stored in the future object
+                if (ec)
+                {
+                    if (hpx::tolerate_node_faults()) {
+                        if (ec == boost::asio::error::connection_reset)
+                            return;
+                    }
+                    std::exception_ptr exception = HPX_GET_EXCEPTION(ec,
+                        "packaged_action::parcel_write_handler",
+                        parcelset::dump_parcel(p));
+                    shared_state->set_exception(exception);
+                }
+            }
+        };
+
+        template <typename Result, typename Callback>
+        struct parcel_write_handler_cb
+        {
+            boost::intrusive_ptr<detail::promise_data<Result>> shared_state;
+            Callback cb;
+
+            void operator()(
+                boost::system::error_code const& ec, parcelset::parcel const& p)
+            {
+                // any error in the parcel layer will be stored in the future object
+                if (ec)
+                {
+                    std::exception_ptr exception = HPX_GET_EXCEPTION(ec,
+                        "packaged_action::parcel_write_handler",
+                        parcelset::dump_parcel(p));
+                    shared_state->set_exception(exception);
+                }
+
+                // invoke user supplied callback
+                cb(ec, p);
+            }
+        };
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// A packaged_action can be used by a single \a thread to invoke a
     /// (remote) action and wait for the result. The result is expected to be
@@ -74,42 +123,6 @@ namespace lcos {
         typedef typename action_type::remote_result_type remote_result_type;
         typedef promise<Result, remote_result_type> base_type;
 
-        static void parcel_write_handler(
-            typename base_type::shared_state_ptr shared_state,
-            boost::system::error_code const& ec, parcelset::parcel const& p)
-        {
-            // any error in the parcel layer will be stored in the future object
-            if (ec)
-            {
-                if (hpx::tolerate_node_faults()) {
-                    if (ec == boost::asio::error::connection_reset)
-                        return;
-                }
-                std::exception_ptr exception = HPX_GET_EXCEPTION(ec,
-                    "packaged_action::parcel_write_handler",
-                    parcelset::dump_parcel(p));
-                shared_state->set_exception(exception);
-            }
-        }
-
-        template <typename Callback>
-        static void parcel_write_handler_cb(Callback const& cb,
-            typename base_type::shared_state_ptr shared_state,
-            boost::system::error_code const& ec, parcelset::parcel const& p)
-        {
-            // any error in the parcel layer will be stored in the future object
-            if (ec)
-            {
-                std::exception_ptr exception = HPX_GET_EXCEPTION(ec,
-                    "packaged_action::parcel_write_handler",
-                    parcelset::dump_parcel(p));
-                shared_state->set_exception(exception);
-            }
-
-            // invoke user supplied callback
-            cb(ec, p);
-        }
-
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts>
         void do_apply(naming::address&& addr, naming::id_type const& id,
@@ -119,8 +132,7 @@ namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
-            auto f = util::bind_front(&packaged_action::parcel_write_handler,
-                this->shared_state_);
+            auto&& f = detail::parcel_write_handler<Result>{this->shared_state_};
 
             naming::address addr_(this->resolve());
             naming::id_type cont_id(this->get_id(false));
@@ -153,8 +165,7 @@ namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
-            auto f = util::bind_front(&packaged_action::parcel_write_handler,
-                this->shared_state_);
+            auto&& f = detail::parcel_write_handler<Result>{this->shared_state_};
 
             naming::address addr_(this->resolve());
             naming::id_type cont_id(this->get_id(false));
@@ -177,10 +188,8 @@ namespace lcos {
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
             typedef typename util::decay<Callback>::type callback_type;
-
-            auto f = util::bind_front(
-                &packaged_action::parcel_write_handler_cb<callback_type>,
-                util::protect(std::forward<Callback>(cb)), this->shared_state_);
+            auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
+                this->shared_state_, std::forward<Callback>(cb)};
 
             naming::address addr_(this->resolve());
             naming::id_type cont_id(this->get_id(false));
@@ -214,10 +223,8 @@ namespace lcos {
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
             typedef typename util::decay<Callback>::type callback_type;
-
-            auto f = bind_front(
-                &packaged_action::parcel_write_handler_cb<callback_type>,
-                util::protect(std::forward<Callback>(cb)), this->shared_state_);
+            auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
+                this->shared_state_, std::forward<Callback>(cb)};
 
             naming::address addr_(this->resolve());
             naming::id_type cont_id(this->get_id(false));
@@ -317,17 +324,16 @@ namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
-            auto cb = util::bind_front(&packaged_action::parcel_write_handler,
-                this->shared_state_);
+            auto&& f = detail::parcel_write_handler<Result>{this->shared_state_};
 
             naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
-            auto f = hpx::functional::apply_c_p_cb<action_type>(cont_id,
+            auto fut = hpx::functional::apply_c_p_cb<action_type>(cont_id,
                 std::move(addr), id, actions::action_priority<action_type>(),
-                std::move(cb), std::forward<Ts>(vs)...);
+                std::move(f), std::forward<Ts>(vs)...);
 
-            this->shared_state_->set_task(std::move(f));
+            this->shared_state_->set_task(std::move(fut));
         }
 
         template <typename Callback, typename... Ts>
@@ -339,19 +345,17 @@ namespace lcos {
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
             typedef typename util::decay<Callback>::type callback_type;
-
-            auto cb_ = util::bind_front(
-                &packaged_action::parcel_write_handler_cb<callback_type>,
-                util::protect(std::forward<Callback>(cb)), this->shared_state_);
+            auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
+                this->shared_state_, std::forward<Callback>(cb)};
 
             naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
-            auto f = hpx::functional::apply_c_p_cb<action_type>(cont_id,
+            auto fut = hpx::functional::apply_c_p_cb<action_type>(cont_id,
                 std::move(addr), id, actions::action_priority<action_type>(),
-                std::move(cb_), std::forward<Ts>(vs)...);
+                std::move(f), std::forward<Ts>(vs)...);
 
-            this->shared_state_->set_task(std::move(f));
+            this->shared_state_->set_task(std::move(fut));
         }
     };
 

@@ -566,8 +566,29 @@ endfunction()
 function(hpx_check_for_cxx11_thread_local)
   add_hpx_config_test(HPX_WITH_CXX11_THREAD_LOCAL
     SOURCE cmake/tests/cxx11_thread_local.cpp
-    FILE ${ARGN}
-    CMAKECXXFEATURE cxx_thread_local)
+    FILE ${ARGN})
+endfunction()
+
+function(hpx_check_for_cxx11_thread_local)
+  add_hpx_config_test(HPX_WITH_CXX11_THREAD_LOCAL
+    SOURCE cmake/tests/cxx11_thread_local.cpp
+    FILE ${ARGN})
+
+  if(NOT HPX_WITH_CXX11_THREAD_LOCAL)
+    unset(HPX_HAVE_LIBSUPCPP CACHE)
+
+    # Clang version < 4 may require libsupc++
+    check_library_exists(supc++ __cxa_thread_atexit "" HPX_HAVE_LIBSUPCPP)
+    if(HPX_HAVE_LIBSUPCPP)
+      set(HPX_CXX11_THREAD_LOCAL_LIBRARIES supc++)
+
+      unset(HPX_WITH_CXX11_THREAD_LOCAL CACHE)
+      add_hpx_config_test(HPX_WITH_CXX11_THREAD_LOCAL
+        SOURCE cmake/tests/cxx11_thread_local.cpp
+        LIBRARIES ${HPX_CXX11_THREAD_LOCAL_LIBRARIES}
+        FILE ${ARGN})
+    endif()
+  endif()
 endfunction()
 
 ###############################################################################

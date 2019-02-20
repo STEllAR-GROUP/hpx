@@ -1,5 +1,5 @@
 //  Copyright (c) 2011-2012 Thomas Heller
-//  Copyright (c) 2013-2017 Agustin Berge
+//  Copyright (c) 2013-2019 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -184,6 +184,13 @@ namespace hpx { namespace util
         > result_type;
 
         return result_type(std::forward<F>(f), std::forward<Ts>(vs)...);
+    }
+
+    // nullary functions do not need to be bound again
+    template <typename F>
+    HPX_CONSTEXPR typename std::decay<F>::type
+    bind_front(F&& f) {
+        return std::forward<F>(f);
     }
 }}
 

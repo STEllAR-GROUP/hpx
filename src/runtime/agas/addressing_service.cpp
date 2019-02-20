@@ -36,6 +36,7 @@
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_back.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -765,7 +766,7 @@ bool addressing_service::bind_range_local(
 } // }}}
 
 bool addressing_service::bind_postproc(
-    future<bool> f, naming::gid_type const& lower_id, gva const& g
+    naming::gid_type const& lower_id, gva const& g, future<bool> f
     )
 {
     f.get();
@@ -807,9 +808,9 @@ hpx::future<bool> addressing_service::bind_range_async(
 
     return f.then(
         hpx::launch::sync,
-        util::one_shot(util::bind(
+        util::one_shot(util::bind_front(
             &addressing_service::bind_postproc,
-            this, _1, id, g
+            this, id, g
         )));
 }
 
@@ -1228,7 +1229,7 @@ hpx::future<naming::id_type> addressing_service::get_colocation_id_async(
 
 ///////////////////////////////////////////////////////////////////////////////
 naming::address addressing_service::resolve_full_postproc(
-    future<primary_namespace::resolved_type> f, naming::gid_type const& id
+    naming::gid_type const& id, future<primary_namespace::resolved_type> f
     )
 {
     using hpx::util::get;
@@ -1288,12 +1289,11 @@ hpx::future<naming::address> addressing_service::resolve_full_async(
     future<primary_namespace::resolved_type> f =
         primary_ns_.resolve_full(gid);
 
-    using util::placeholders::_1;
     return f.then(
         hpx::launch::sync,
-        util::one_shot(util::bind(
+        util::one_shot(util::bind_front(
             &addressing_service::resolve_full_postproc,
-            this, _1, gid
+            this,  gid
         )));
 }
 
@@ -1573,14 +1573,10 @@ void addressing_service::decref(
     if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
-        void (addressing_service::*decref_ptr)(
-            naming::gid_type const&
-          , std::int64_t
-          , error_code&
-        ) = &addressing_service::decref;
-
         threads::register_thread_nullary(
-            util::deferred_call(decref_ptr, this, raw, credit, std::ref(throws)),
+            [=]() -> void {
+                return decref(raw, credit, throws);
+            },
             "addressing_service::decref", threads::pending, true,
             threads::thread_priority_normal,
             threads::thread_schedule_hint(),
@@ -1779,8 +1775,8 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
     using util::placeholders::_1;
     return f.then(
         hpx::launch::sync,
-        util::one_shot(util::bind(
-            &detail::on_register_event, _1, std::move(result_f)
+        util::one_shot(util::bind_back(
+            &detail::on_register_event, std::move(result_f)
         )));
 }
 
@@ -1842,13 +1838,10 @@ void addressing_service::update_cache_entry(
         {
             return;
         }
-        void (addressing_service::*update_cache_entry_ptr)(
-            naming::gid_type const&
-          , gva const &
-          , error_code&
-        ) = &addressing_service::update_cache_entry;
         threads::register_thread_nullary(
-            util::deferred_call(update_cache_entry_ptr, this, id, g, std::ref(throws)),
+            [=]() -> void {
+                return update_cache_entry(id, g, throws);
+            },
             "addressing_service::update_cache_entry", threads::pending, true,
             threads::thread_priority_normal,
             threads::thread_schedule_hint(),
@@ -2636,6 +2629,7 @@ void addressing_service::send_refcnt_requests_sync(
 hpx::future<void> addressing_service::mark_as_migrated(
     naming::gid_type const& gid_
   , util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f //-V669
+  , bool expect_to_be_marked_as_migrating
     )
 {
     if (!gid_)
@@ -2677,7 +2671,14 @@ hpx::future<void> addressing_service::mark_as_migrated(
 
         // insert the object into the map of migrated objects
         if (it == migrated_objects_table_.end())
+        {
+            HPX_ASSERT(!expect_to_be_marked_as_migrating);
             migrated_objects_table_.insert(gid);
+        }
+        else
+        {
+            HPX_ASSERT(expect_to_be_marked_as_migrating);
+        }
 
         // avoid interactions with the locking in the cache
         lock.unlock();
@@ -2710,7 +2711,7 @@ void addressing_service::unmark_as_migrated(
     migrated_objects_table_type::iterator it =
         migrated_objects_table_.find(gid);
 
-    // insert the object into the map of migrated objects
+    // remove the object from the map of migrated objects
     if (it != migrated_objects_table_.end())
     {
         migrated_objects_table_.erase(it);
@@ -2727,7 +2728,7 @@ void addressing_service::unmark_as_migrated(
     }
 }
 
-std::pair<naming::id_type, naming::address>
+hpx::future<std::pair<naming::id_type, naming::address>>
 addressing_service::begin_migration(naming::id_type const& id)
 {
     typedef std::pair<naming::id_type, naming::address> result_type;
@@ -2735,7 +2736,7 @@ addressing_service::begin_migration(naming::id_type const& id)
     if (!id)
     {
         HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::begin_migration_async",
+            "addressing_service::begin_migration",
             "invalid reference id");
     }
 
@@ -2753,7 +2754,7 @@ bool addressing_service::end_migration(
     if (!id)
     {
         HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::end_migration_async",
+            "addressing_service::end_migration",
             "invalid reference id");
     }
 

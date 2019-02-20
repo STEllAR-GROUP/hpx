@@ -7,7 +7,7 @@
 #define HPX_UTIL_BLOCK_PROFILER_NOV_16_0811PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/reinitializable_static.hpp>
@@ -81,7 +81,7 @@ namespace hpx { namespace util
                 if (!registered_on_exit_)
                 {
                     registered_on_exit_ = hpx::register_on_exit(
-                        util::bind(&accumulator_stats::print_stats, This()));
+                        util::bind_front(&accumulator_stats::print_stats, This()));
                 }
                 timer_.restart();
             }
@@ -91,7 +91,7 @@ namespace hpx { namespace util
                 if (!registered_on_exit_)
                 {
                     registered_on_exit_ = hpx::register_on_exit(
-                        util::bind(&accumulator_stats::print_stats, This()));
+                        util::bind_front(&accumulator_stats::print_stats, This()));
                 }
                 return timer_.elapsed();
             }
@@ -148,7 +148,7 @@ namespace hpx { namespace util
                 if (!registered_on_exit_)
                 {
                     registered_on_exit_ = hpx::register_on_exit(
-                        util::bind(&accumulator_stats::print_stats, This()));
+                        util::bind_front(&accumulator_stats::print_stats, This()));
                 }
                 timer_.restart();
             }
@@ -158,7 +158,7 @@ namespace hpx { namespace util
                 if (!registered_on_exit_)
                 {
                     registered_on_exit_ = hpx::register_on_exit(
-                        util::bind(&accumulator_stats::print_stats, This()));
+                        util::bind_front(&accumulator_stats::print_stats, This()));
                 }
                 return timer_.elapsed();
             }

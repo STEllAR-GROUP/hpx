@@ -14,7 +14,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
@@ -388,8 +388,8 @@ namespace hpx { namespace threads { namespace detail
 
     struct scheduling_callbacks
     {
-        typedef util::function_nonser<void()> callback_type;
-        typedef util::function_nonser<bool()> background_callback_type;
+        typedef util::unique_function_nonser<void()> callback_type;
+        typedef util::unique_function_nonser<bool()> background_callback_type;
 
         explicit scheduling_callbacks(
                 callback_type && outer,

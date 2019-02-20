@@ -9,7 +9,8 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(HPX_HAVE_CXX11_CONSTEXPR) && !defined(HPX_MSVC_NVCC) && !defined(__NVCC__)
+#if defined(HPX_HAVE_CXX11_CONSTEXPR) && !defined(HPX_MSVC_NVCC) &&            \
+    !(defined(__NVCC__) && defined(__clang__))
 #   define HPX_CONSTEXPR constexpr
 #   define HPX_CONSTEXPR_OR_CONST constexpr
 #else

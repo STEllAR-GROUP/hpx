@@ -575,8 +575,11 @@ namespace hpx { namespace components
             typename hpx::traits::detail::shared_state_ptr<void>::type p =
                 lcos::detail::make_continuation<void>(
                     *this, launch::sync,
-                    util::bind_back(&client_base::register_as_helper,
-                        symbolic_name, manage_lifetime));
+                    [=](client_base const& f) -> void {
+                        return register_as_helper(
+                            f, symbolic_name, manage_lifetime);
+                    });
+
             return hpx::traits::future_access<future<void> >::
                 create(std::move(p));
         }

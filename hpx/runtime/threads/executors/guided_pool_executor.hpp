@@ -10,12 +10,13 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/util/thread_description.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/lcos/dataflow.hpp>
+#include <hpx/util/bind_back.hpp>
+#include <hpx/util/debug/demangle_helper.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/pack_traversal.hpp>
-#include <hpx/util/debug/demangle_helper.hpp>
+#include <hpx/util/thread_description.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -558,9 +559,9 @@ namespace hpx { namespace threads { namespace executors
                         F, Future, Ts...
                     >::type result_type;
 
-                auto func = hpx::util::bind(
+                auto func = hpx::util::bind_back(
                     hpx::util::one_shot(std::forward<F>(f)),
-                    hpx::util::placeholders::_1, std::forward<Ts>(ts)...);
+                    std::forward<Ts>(ts)...);
 
                 typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
                     hpx::lcos::detail::make_continuation_exec<result_type>(

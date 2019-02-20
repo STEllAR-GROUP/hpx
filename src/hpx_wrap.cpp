@@ -92,10 +92,8 @@ extern "C" int initialize_main(int argc, char** argv)
             "hpx.commandline.aliasing=0",
         };
 
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
         hpx::util::function_nonser<int(int, char**)> start_function =
-            hpx::util::bind(&hpx_start::hpx_entry, _1, _2);
+            &hpx_start::hpx_entry;
 
         // Initialize the HPX runtime system
         return hpx::init(start_function, argc, argv,

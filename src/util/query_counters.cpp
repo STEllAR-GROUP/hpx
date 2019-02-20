@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/query_counters.hpp>
@@ -48,8 +48,8 @@ namespace hpx { namespace util
         destination_(dest), format_(form),
         counter_shortnames_(shortnames), csv_header_(csv_header),
         print_counters_locally_(print_counters_locally),
-        timer_(util::bind(&query_counters::evaluate, this_()),
-            util::bind(&query_counters::terminate, this_()),
+        timer_(util::bind_front(&query_counters::evaluate, this_()),
+            util::bind_front(&query_counters::terminate, this_()),
             interval*1000, "query_counters", true)
     {
         // add counter prefix, if necessary

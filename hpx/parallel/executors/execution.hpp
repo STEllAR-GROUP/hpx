@@ -22,12 +22,10 @@
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/optional.hpp>
 #include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrap.hpp>
@@ -355,23 +353,13 @@ namespace hpx { namespace parallel { namespace execution
                             F, Ts...
                         >::type result_type;
 
-                    // older versions of gcc are not able to capture parameter
-                    // packs (gcc < 4.9)
-                    auto && args =
-                        hpx::util::forward_as_tuple(std::forward<Ts>(ts)...);
-
-                    hpx::util::optional<result_type> out;
-                    auto && wrapper =
-                        [&]() mutable
-                        {
-                            out.emplace(hpx::util::invoke_fused(
-                                std::forward<F>(f), std::move(args)));
-                        };
-
                     // use async execution, wait for result, propagate exceptions
-                    async_execute_dispatch(0, std::forward<TwoWayExecutor>(exec),
-                        std::ref(wrapper)).get();
-                    return std::move(*out);
+                    return async_execute_dispatch(0, std::forward<TwoWayExecutor>(exec),
+                        [&]() -> result_type {
+                            return hpx::util::invoke(
+                                std::forward<F>(f), std::forward<Ts>(ts)...);
+                        }
+                    ).get();
                 }
                 catch (std::bad_alloc const& ba) {
                     throw ba;

@@ -22,7 +22,7 @@
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
@@ -359,8 +359,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 #endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
             threads::detail::scheduling_callbacks callbacks(
-                threads::detail::scheduling_callbacks::callback_type(),
-                util::bind( //-V107
+                nullptr,
+                util::deferred_call( //-V107
                     &thread_pool_executor::suspend_back_into_calling_context,
                     this, virt_core));
 
@@ -433,8 +433,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         {
             ++curr_punits_;
             register_thread_nullary(
-                util::one_shot(util::bind(&thread_pool_executor::run, this,
-                    virt_core, thread_num)),
+                util::deferred_call(&thread_pool_executor::run, this,
+                    virt_core, thread_num),
                 "thread_pool_executor thread", threads::pending, true,
                 threads::thread_priority_normal,
                 threads::thread_schedule_hint(

@@ -1,4 +1,4 @@
-//  Copyright (c) 2013-2015 Agustin Berge
+//  Copyright (c) 2013-2019 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -124,8 +124,9 @@ namespace hpx { namespace util
             typename util::detail::invoke_fused_result<F, Tuple>::type
             operator()(F&& f, Tuple&& t) const
             {
-                using index_pack = typename detail::fused_index_pack<Tuple>::type;
-                return detail::invoke_fused_impl(index_pack{},
+                using index_pack =
+                    typename util::detail::fused_index_pack<Tuple>::type;
+                return util::detail::invoke_fused_impl(index_pack{},
                     std::forward<F>(f), std::forward<Tuple>(t));
             }
         };
@@ -137,9 +138,11 @@ namespace hpx { namespace util
             HPX_CONSTEXPR HPX_HOST_DEVICE
             R operator()(F&& f, Tuple&& t) const
             {
-                using index_pack = typename detail::fused_index_pack<Tuple>::type;
-                return util::void_guard<R>(), detail::invoke_fused_impl(index_pack{},
-                    std::forward<F>(f), std::forward<Tuple>(t));
+                using index_pack =
+                    typename util::detail::fused_index_pack<Tuple>::type;
+                return util::void_guard<R>(),
+                       util::detail::invoke_fused_impl(index_pack{},
+                           std::forward<F>(f), std::forward<Tuple>(t));
             }
         };
     }
