@@ -7,6 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <vector>
@@ -673,6 +674,12 @@ void is_iterator()
     HPX_TEST_MSG((is_iterator<iterator>::value),
                  "random access traversal input iterator");
   }
+  {
+    using iterator =
+      hpx::vector_iterator<int, std::vector<int>>;
+    HPX_TEST_MSG((is_iterator<iterator>::value),
+                 "hpx-specific iterator");
+  }
 }
 
 void is_output_iterator()
@@ -793,6 +800,12 @@ void is_forward_iterator()
     HPX_TEST_MSG((is_forward_iterator<iterator>::value),
                  "random access traversal input iterator");
   }
+  {
+    using iterator =
+      hpx::vector_iterator<int, std::vector<int>>;
+    HPX_TEST_MSG((is_forward_iterator<iterator>::value),
+                 "hpx-specific iterator");
+  }
 }
 
 void is_bidirectional_iterator()
@@ -881,7 +894,6 @@ void is_random_access_iterator()
 int main(int argc, char* argv[])
 {
     {
-
       addition_result();
       dereference_result();
       equality_result();
