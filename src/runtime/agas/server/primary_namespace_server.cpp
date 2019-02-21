@@ -280,13 +280,18 @@ bool primary_namespace::end_migration(naming::gid_type id)
     using hpx::util::get;
 
     migration_table_type::iterator it = migrating_objects_.find(id);
-    if (it == migrating_objects_.end() || !get<0>(it->second))
-        return false;
+    HPX_ASSERT(it != migrating_objects_.end() && get<0>(it->second));
 
     // flag this id as not being migrated anymore
     get<0>(it->second) = false;
-
-    get<2>(it->second).notify_all(std::move(l), hpx::throws);
+    if (get<1>(it->second) != 0)
+    {
+        get<2>(it->second).notify_all(std::move(l), hpx::throws);
+    }
+    else
+    {
+        migrating_objects_.erase(it);
+    }
 
     return true;
 }
@@ -302,15 +307,24 @@ void primary_namespace::wait_for_migration_locked(
     using hpx::util::get;
 
     migration_table_type::iterator it = migrating_objects_.find(id);
-    if (it != migrating_objects_.end() && get<0>(it->second))
+    if (it != migrating_objects_.end())
     {
-        ++get<1>(it->second);
+        if (get<0>(it->second))
+        {
+            ++get<1>(it->second);
 
-        get<2>(it->second).wait(l, ec);
+            get<2>(it->second).wait(l, ec);
 
-        HPX_ASSERT(hpx::util::get<0>(it->second) == false);
-        if (--get<1>(it->second) == 0)
-            migrating_objects_.erase(it);
+            if (--get<1>(it->second) == 0)
+                migrating_objects_.erase(it);
+        }
+        else
+        {
+            if (get<1>(it->second) == 0)
+            {
+                migrating_objects_.erase(it);
+            }
+        }
     }
 }
 

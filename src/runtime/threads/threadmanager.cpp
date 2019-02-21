@@ -187,7 +187,7 @@ namespace hpx { namespace threads
 
     char const* get_thread_state_name(thread_state_enum state)
     {
-        if (state < unknown || state > staged)
+        if (state < unknown || state > pending_boost)
             return "unknown";
         return strings::thread_state_names[state];
     }

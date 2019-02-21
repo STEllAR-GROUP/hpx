@@ -131,7 +131,8 @@ namespace hpx { namespace components
         template <typename Component>
         static pinned_ptr create(naming::address::address_type lva)
         {
-            return create_helper<Component>::call(lva);
+            using component_type = typename std::remove_cv<Component>::type;
+            return create_helper<component_type>::call(lva);
         }
 
     private:
