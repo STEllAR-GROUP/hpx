@@ -41,8 +41,7 @@ namespace hpx { namespace traits
 
             static char test(...);
 
-            static bool const value =
-                sizeof(test(std::declval<T>())) == sizeof(void*);
+            enum { value = sizeof(test(std::declval<T>())) == sizeof(void*) };
         };
 
         template <typename T, typename U, typename = void>
