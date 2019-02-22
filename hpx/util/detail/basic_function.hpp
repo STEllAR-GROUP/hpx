@@ -1,6 +1,6 @@
 //  Copyright (c) 2011 Thomas Heller
 //  Copyright (c) 2013 Hartmut Kaiser
-//  Copyright (c) 2014 Agustin Berge
+//  Copyright (c) 2014-2019 Agustin Berge
 //  Copyright (c) 2017 Google
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,53 +33,21 @@ namespace hpx { namespace util { namespace detail
     static const std::size_t function_storage_size = 3 * sizeof(void*);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig, bool Copyable>
-    class function_base;
-
-    template <typename F>
-    HPX_CONSTEXPR bool is_empty_function(F* fp) noexcept
+    class function_base_impl
     {
-        return fp == nullptr;
-    }
-
-    template <typename T, typename C>
-    HPX_CONSTEXPR bool is_empty_function(T C::*mp) noexcept
-    {
-        return mp == nullptr;
-    }
-
-    template <typename Sig, bool Copyable>
-    static bool is_empty_function_impl(
-        function_base<Sig, Copyable> const* f) noexcept
-    {
-        return f->empty();
-    }
-
-    static HPX_CONSTEXPR bool is_empty_function_impl(...) noexcept
-    {
-        return false;
-    }
-
-    template <typename F>
-    HPX_CONSTEXPR bool is_empty_function(F const& f) noexcept
-    {
-        return detail::is_empty_function_impl(&f);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <bool Copyable, typename R, typename ...Ts>
-    class function_base<R(Ts...), Copyable>
-    {
-        using vtable = detail::function_vtable<R(Ts...), Copyable>;
+        using vtable = function_base_vtable;
 
     public:
-        HPX_CONSTEXPR function_base() noexcept
-          : vptr(get_empty_vtable())
+        HPX_CONSTEXPR function_base_impl(
+            function_base_vtable const* empty_vptr) noexcept
+          : vptr(empty_vptr)
           , object(nullptr)
           , storage_init()
         {}
 
-        function_base(function_base const& other)
+        function_base_impl(
+            function_base_impl const& other,
+            vtable const* empty_vtable)
           : vptr(other.vptr)
           , object(other.object)
         {
@@ -91,7 +59,9 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        function_base(function_base&& other) noexcept
+        function_base_impl(
+            function_base_impl&& other,
+            vtable const* empty_vptr) noexcept
           : vptr(other.vptr)
           , object(other.object)
         {
@@ -100,16 +70,18 @@ namespace hpx { namespace util { namespace detail
                 std::memcpy(storage, other.storage, function_storage_size);
                 object = &storage;
             }
-            other.vptr = get_empty_vtable();
+            other.vptr = empty_vptr;
             other.object = nullptr;
         }
 
-        ~function_base()
+        ~function_base_impl()
         {
             destroy();
         }
 
-        function_base& operator=(function_base const& other)
+        void op_assign(
+            function_base_impl const& other,
+            vtable const* empty_vtable)
         {
             if (vptr == other.vptr)
             {
@@ -133,51 +105,16 @@ namespace hpx { namespace util { namespace detail
                     object = nullptr;
                 }
             }
-            return *this;
         }
 
-        function_base& operator=(function_base&& other) noexcept
+        void op_assign(
+            function_base_impl&& other,
+            vtable const* empty_vtable) noexcept
         {
             if (this != &other)
             {
                 swap(other);
-                other.reset();
-            }
-            return *this;
-        }
-
-        void assign(std::nullptr_t) noexcept
-        {
-            reset();
-        }
-
-        template <typename F>
-        void assign(F&& f)
-        {
-            using T = typename std::decay<F>::type;
-            static_assert(!Copyable ||
-                std::is_constructible<T, T const&>::value,
-                "F shall be CopyConstructible");
-
-            if (!detail::is_empty_function(f))
-            {
-                vtable const* f_vptr = get_vtable<T>();
-                void* buffer = nullptr;
-                if (vptr == f_vptr)
-                {
-                    HPX_ASSERT(object != nullptr);
-                    // reuse object storage
-                    buffer = object;
-                    vtable::template get<T>(object).~T();
-                } else {
-                    destroy();
-                    vptr = f_vptr;
-                    buffer = vtable::template allocate<T>(
-                        storage, function_storage_size);
-                }
-                object = ::new (buffer) T(std::forward<F>(f));
-            } else {
-                reset();
+                other.reset(empty_vtable);
             }
         }
 
@@ -191,14 +128,14 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        void reset() noexcept
+        void reset(vtable const* empty_vptr) noexcept
         {
             destroy();
-            vptr = get_empty_vtable();
+            vptr = empty_vptr;
             object = nullptr;
         }
 
-        void swap(function_base& f) noexcept
+        void swap(function_base_impl& f) noexcept
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
@@ -219,46 +156,164 @@ namespace hpx { namespace util { namespace detail
             return !empty();
         }
 
+    protected:
+        vtable const* vptr;
+        void* object;
+        union {
+            char storage_init;
+            mutable unsigned char storage[function_storage_size];
+        };
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F>
+    HPX_CONSTEXPR bool is_empty_function(F* fp) noexcept
+    {
+        return fp == nullptr;
+    }
+
+    template <typename T, typename C>
+    HPX_CONSTEXPR bool is_empty_function(T C::*mp) noexcept
+    {
+        return mp == nullptr;
+    }
+
+    inline bool is_empty_function_impl(function_base_impl const* f) noexcept
+    {
+        return f->empty();
+    }
+
+    inline HPX_CONSTEXPR bool is_empty_function_impl(...) noexcept
+    {
+        return false;
+    }
+
+    template <typename F>
+    HPX_CONSTEXPR bool is_empty_function(F const& f) noexcept
+    {
+        return detail::is_empty_function_impl(&f);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Sig, bool Copyable>
+    class function_base;
+
+    template <bool Copyable, typename R, typename ...Ts>
+    class function_base<R(Ts...), Copyable>
+      : public function_base_impl
+    {
+        using base_type = function_base_impl;
+        using vtable = detail::function_vtable<R(Ts...), Copyable>;
+
+    public:
+        HPX_CONSTEXPR function_base() noexcept
+          : base_type(get_empty_vtable())
+        {}
+
+        function_base(function_base const& other)
+          : base_type(other, get_empty_vtable())
+        {}
+
+        function_base(function_base&& other) noexcept
+          : base_type(std::move(other), get_empty_vtable())
+        {}
+
+        function_base& operator=(function_base const& other)
+        {
+            base_type::op_assign(other, get_empty_vtable());
+            return *this;
+        }
+
+        function_base& operator=(function_base&& other) noexcept
+        {
+            base_type::op_assign(std::move(other), get_empty_vtable());
+            return *this;
+        }
+
+        void assign(std::nullptr_t) noexcept
+        {
+            base_type::reset(get_empty_vtable());
+        }
+
+        template <typename F>
+        void assign(F&& f)
+        {
+            using T = typename std::decay<F>::type;
+            static_assert(!Copyable ||
+                std::is_constructible<T, T const&>::value,
+                "F shall be CopyConstructible");
+
+            if (!detail::is_empty_function(f))
+            {
+                vtable const* f_vptr =  get_vtable<T>();
+                void* buffer = nullptr;
+                if (vptr == f_vptr)
+                {
+                    HPX_ASSERT(object != nullptr);
+                    // reuse object storage
+                    buffer = object;
+                    vtable::template get<T>(object).~T();
+                } else {
+                    destroy();
+                    vptr = f_vptr;
+                    buffer = vtable::template allocate<T>(
+                        storage, function_storage_size);
+                }
+                object = ::new (buffer) T(std::forward<F>(f));
+            } else {
+                base_type::reset(get_empty_vtable());
+            }
+        }
+
+        void reset() noexcept
+        {
+            base_type::reset(get_empty_vtable());
+        }
+
+        using base_type::swap;
+        using base_type::empty;
+        using base_type::operator bool;
+
         template <typename T>
         T* target() noexcept
         {
-            using target_type = typename std::remove_cv<T>::type;
-
+            using TD = typename std::remove_cv<T>::type;
             static_assert(
-                traits::is_invocable_r<R, target_type&, Ts...>::value
+                traits::is_invocable_r<R, TD&, Ts...>::value
               , "T shall be Callable with the function signature");
 
-            vtable const* f_vptr = get_vtable<target_type>();
+            vtable const* f_vptr =  get_vtable<TD>();
             if (vptr != f_vptr || empty())
                 return nullptr;
 
-            return &vtable::template get<target_type>(object);
+            return &vtable::template get<TD>(object);
         }
 
         template <typename T>
         T const* target() const noexcept
         {
-            using target_type = typename std::remove_cv<T>::type;
-
+            using TD = typename std::remove_cv<T>::type;
             static_assert(
-                traits::is_invocable_r<R, target_type&, Ts...>::value
+                traits::is_invocable_r<R, TD&, Ts...>::value
               , "T shall be Callable with the function signature");
 
-            vtable const* f_vptr = get_vtable<target_type>();
+            vtable const* f_vptr =  get_vtable<TD>();
             if (vptr != f_vptr || empty())
                 return nullptr;
 
-            return &vtable::template get<target_type>(object);
+            return &vtable::template get<TD>(object);
         }
 
         HPX_FORCEINLINE R operator()(Ts... vs) const
         {
+            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
             return vptr->invoke(object, std::forward<Ts>(vs)...);
         }
 
         std::size_t get_function_address() const
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
             return vptr->get_function_address(object);
 #else
             return 0;
@@ -268,6 +323,7 @@ namespace hpx { namespace util { namespace detail
         char const* get_function_annotation() const
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
             return vptr->get_function_annotation(object);
 #else
             return nullptr;
@@ -277,6 +333,7 @@ namespace hpx { namespace util { namespace detail
         util::itt::string_handle get_function_annotation_itt() const
         {
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
             return vptr->get_function_annotation_itt(object);
 #else
             static util::itt::string_handle sh;
@@ -297,12 +354,9 @@ namespace hpx { namespace util { namespace detail
         }
 
     protected:
-        vtable const *vptr;
-        void* object;
-        union {
-            char storage_init;
-            mutable unsigned char storage[function_storage_size];
-        };
+        using base_type::vptr;
+        using base_type::object;
+        using base_type::storage;
     };
 
     ///////////////////////////////////////////////////////////////////////////
