@@ -46,7 +46,12 @@ namespace hpx { namespace lcos { namespace local
         /// releasing all waiting threads as soon as the last \a thread
         /// entered this function.
         void wait();
+        /// The function \a count_up will increase the number of \a threads
+        /// to be waited in \a wait function.
         void count_up();
+        /// The function \a reset will reset the number of \a threads
+        /// as given by the function parameter \a number_of_threads.
+        void reset(std::size_t number_of_threads);
 
     private:
         std::size_t number_of_threads_;
