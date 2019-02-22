@@ -39,7 +39,7 @@ namespace hpx { namespace util
     public:
         typedef R result_type;
 
-        function(std::nullptr_t = nullptr) noexcept
+        HPX_CONSTEXPR function(std::nullptr_t = nullptr) noexcept
         {}
 
         function(function const&) = default;
@@ -74,13 +74,6 @@ namespace hpx { namespace util
         using base_type::empty;
         using base_type::target;
     };
-
-    template <typename Sig, bool Serializable>
-    static bool is_empty_function(
-        function<Sig, Serializable> const& f) noexcept
-    {
-        return f.empty();
-    }
 }}
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)

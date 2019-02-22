@@ -37,6 +37,37 @@ namespace hpx { namespace util { namespace detail
     template <typename Sig, bool Copyable>
     class function_base;
 
+    template <typename F>
+    HPX_CONSTEXPR bool is_empty_function(F* fp) noexcept
+    {
+        return fp == nullptr;
+    }
+
+    template <typename T, typename C>
+    HPX_CONSTEXPR bool is_empty_function(T C::*mp) noexcept
+    {
+        return mp == nullptr;
+    }
+
+    template <typename Sig, bool Copyable>
+    static bool is_empty_function_impl(
+        function_base<Sig, Copyable> const* f) noexcept
+    {
+        return f->empty();
+    }
+
+    static HPX_CONSTEXPR bool is_empty_function_impl(...) noexcept
+    {
+        return false;
+    }
+
+    template <typename F>
+    HPX_CONSTEXPR bool is_empty_function(F const& f) noexcept
+    {
+        return detail::is_empty_function_impl(&f);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <bool Copyable, typename R, typename ...Ts>
     class function_base<R(Ts...), Copyable>
     {
@@ -47,9 +78,10 @@ namespace hpx { namespace util { namespace detail
             >::type;
 
     public:
-        function_base() noexcept
+        HPX_CONSTEXPR function_base() noexcept
           : vptr(detail::get_empty_function_vtable<vtable>())
           , object(nullptr)
+          , storage_init()
         {}
 
         function_base(function_base const& other)
@@ -132,7 +164,7 @@ namespace hpx { namespace util { namespace detail
                 std::is_constructible<T, T const&>::value,
                 "F shall be CopyConstructible");
 
-            if (!is_empty_function(f))
+            if (!detail::is_empty_function(f))
             {
                 vtable const* f_vptr = get_vtable<T>();
                 void* buffer = nullptr;
@@ -267,14 +299,11 @@ namespace hpx { namespace util { namespace detail
     protected:
         vtable const *vptr;
         void* object;
-        mutable unsigned char storage[function_storage_size];
+        union {
+            char storage_init;
+            mutable unsigned char storage[function_storage_size];
+        };
     };
-
-    template <typename Sig, bool Copyable>
-    static bool is_empty_function(function_base<Sig, Copyable> const& f) noexcept
-    {
-        return f.empty();
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Sig, bool Copyable, bool Serializable>
@@ -293,7 +322,7 @@ namespace hpx { namespace util { namespace detail
         using base_type = function_base<R(Ts...), Copyable>;
 
     public:
-        basic_function() noexcept
+        HPX_CONSTEXPR basic_function() noexcept
           : base_type()
           , serializable_vptr(nullptr)
         {}
@@ -369,13 +398,6 @@ namespace hpx { namespace util { namespace detail
     class basic_function<R(Ts...), Copyable, false>
       : public function_base<R(Ts...), Copyable>
     {};
-
-    template <typename Sig, bool Copyable, bool Serializable>
-    static bool is_empty_function(
-        basic_function<Sig, Copyable, Serializable> const& f) noexcept
-    {
-        return f.empty();
-    }
 }}}
 
 #endif

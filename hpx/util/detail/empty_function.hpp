@@ -12,33 +12,8 @@
 #include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
-#include <type_traits>
-
 namespace hpx { namespace util { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename F>
-    static bool is_empty_function(std::false_type, F const&) noexcept
-    {
-        return false;
-    }
-
-    template <typename F>
-    static bool is_empty_function(std::true_type, F const& f) noexcept
-    {
-        return f == nullptr;
-    }
-
-    template <typename F>
-    static bool is_empty_function(F const& f) noexcept
-    {
-        using is_pointer = std::integral_constant<bool,
-            std::is_pointer<F>::value
-         || std::is_member_pointer<F>::value
-        >;
-        return is_empty_function(is_pointer{}, f);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     struct empty_function {}; // must be trivial and empty
 
@@ -61,12 +36,21 @@ namespace hpx { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     // make sure the empty table instance is initialized in time, even
     // during early startup
+#if defined(HPX_HAVE_CXX11_CONSTEXPR)
     template <typename VTable>
-    VTable const* get_empty_function_vtable()
+    HPX_CONSTEXPR VTable const* get_empty_function_vtable() noexcept
     {
-        static VTable const empty_vtable = construct_vtable<empty_function>();
+        return &vtables<VTable, empty_function>::instance;
+    }
+#else
+    template <typename VTable>
+    VTable const* get_empty_function_vtable() noexcept
+    {
+        static VTable const empty_vtable =
+            detail::construct_vtable<empty_function>();
         return &empty_vtable;
     }
+#endif
 }}}
 
 #endif

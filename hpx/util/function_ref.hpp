@@ -28,6 +28,28 @@ namespace hpx { namespace util
     template <typename Sig>
     class function_ref;
 
+    namespace detail
+    {
+        template <typename F>
+        HPX_CONSTEXPR bool is_empty_function_ptr(F* fp) noexcept
+        {
+            return fp == nullptr;
+        }
+
+        template <typename T, typename C>
+        HPX_CONSTEXPR bool is_empty_function_ptr(T C::*mp) noexcept
+        {
+            return mp == nullptr;
+        }
+
+        template <typename F>
+        HPX_CONSTEXPR bool is_empty_function_ptr(F const& f) noexcept
+        {
+            return false;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename R, typename ...Ts>
     class function_ref<R(Ts...)>
     {
@@ -73,7 +95,7 @@ namespace hpx { namespace util
             >::type>
         void assign(F&& f)
         {
-            HPX_ASSERT(!detail::is_empty_function(f));
+            HPX_ASSERT(!detail::is_empty_function_ptr(f));
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             vptr = get_vtable<T>();
 #else
