@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
-#include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
@@ -72,8 +71,8 @@ namespace hpx { namespace threads { namespace coroutines
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
     {
-        prepare_main_thread() {}
-        ~prepare_main_thread() {}
+        HPX_CONSTEXPR prepare_main_thread() {}
+        HPX_CONSTEXPR ~prepare_main_thread() {}
     };
 
     namespace detail { namespace generic_context
@@ -262,11 +261,6 @@ namespace hpx { namespace threads { namespace coroutines
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
 #endif
             }
-
-            // global functions to be called for each OS-thread after it started
-            // running and before it exits
-            static void thread_startup(char const* thread_type) {}
-            static void thread_shutdown() {}
 
             // handle stack operations
             HPX_EXPORT void reset_stack();

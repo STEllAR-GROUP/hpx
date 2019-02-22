@@ -77,8 +77,8 @@ namespace hpx { namespace threads { namespace coroutines
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
     {
-        prepare_main_thread() {}
-        ~prepare_main_thread() {}
+        HPX_CONSTEXPR prepare_main_thread() {}
+        HPX_CONSTEXPR ~prepare_main_thread() {}
     };
 
     namespace detail { namespace lx
@@ -381,14 +381,6 @@ namespace hpx { namespace threads { namespace coroutines
 
             friend void swap_context(x86_linux_context_impl_base& from,
                 x86_linux_context_impl_base const& to, yield_hint);
-
-            // global functions to be called for each OS-thread after it started
-            // running and before it exits
-            static void thread_startup(char const* /*thread_type*/)
-            {}
-
-            static void thread_shutdown()
-            {}
 
         private:
 #if defined(__x86_64__)
