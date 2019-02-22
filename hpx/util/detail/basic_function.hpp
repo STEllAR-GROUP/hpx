@@ -24,6 +24,7 @@
 
 #include <cstddef>
 #include <cstring>
+#include <new>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -58,7 +59,8 @@ namespace hpx { namespace util { namespace detail
             if (other.object != nullptr)
             {
                 object = vptr->copy(
-                    storage, detail::function_storage_size, other.object);
+                    storage, detail::function_storage_size,
+                    other.object, /*destroy*/false);
             }
         }
 
@@ -77,7 +79,7 @@ namespace hpx { namespace util { namespace detail
 
         ~function_base()
         {
-            reset();
+            destroy();
         }
 
         function_base& operator=(function_base const& other)
@@ -88,17 +90,18 @@ namespace hpx { namespace util { namespace detail
                 {
                     HPX_ASSERT(other.object != nullptr);
                     // reuse object storage
-                    vptr->destruct(object);
-                    object = vptr->copy(object, -1, other.object);
+                    object = vptr->copy(
+                        object, -1,
+                        other.object, /*destroy*/true);
                 }
             } else {
-                reset();
-
+                destroy();
                 vptr = other.vptr;
                 if (other.object != nullptr)
                 {
                     object = vptr->copy(
-                        storage, detail::function_storage_size, other.object);
+                        storage, detail::function_storage_size,
+                        other.object, /*destroy*/false);
                 } else {
                     object = nullptr;
                 }
@@ -124,41 +127,48 @@ namespace hpx { namespace util { namespace detail
         template <typename F>
         void assign(F&& f)
         {
-            using target_type = typename std::decay<F>::type;
+            using T = typename std::decay<F>::type;
             static_assert(!Copyable ||
-                std::is_constructible<target_type, target_type const&>::value,
+                std::is_constructible<T, T const&>::value,
                 "F shall be CopyConstructible");
 
             if (!is_empty_function(f))
             {
-                vtable const* f_vptr = get_vtable<target_type>();
+                vtable const* f_vptr = get_vtable<T>();
+                void* buffer = nullptr;
                 if (vptr == f_vptr)
                 {
+                    HPX_ASSERT(object != nullptr);
                     // reuse object storage
-                    vtable::template _destruct<target_type>(object);
-                    object = vtable::template construct<target_type>(
-                        object, -1, std::forward<F>(f));
+                    buffer = object;
+                    vtable::template get<T>(object).~T();
                 } else {
-                    reset();
-
+                    destroy();
                     vptr = f_vptr;
-                    object = vtable::template construct<target_type>(
-                        storage, function_storage_size, std::forward<F>(f));
+                    buffer = vtable::template allocate<T>(
+                        storage, function_storage_size);
                 }
+                object = ::new (buffer) T(std::forward<F>(f));
             } else {
                 reset();
             }
         }
 
-        void reset() noexcept
+        void destroy() noexcept
         {
             if (object != nullptr)
             {
-                vptr->delete_(object, function_storage_size);
-
-                vptr = detail::get_empty_function_vtable<vtable>();
-                object = nullptr;
+                vptr->deallocate(
+                    object, function_storage_size,
+                    /*destroy*/true);
             }
+        }
+
+        void reset() noexcept
+        {
+            destroy();
+            vptr = detail::get_empty_function_vtable<vtable>();
+            object = nullptr;
         }
 
         void swap(function_base& f) noexcept

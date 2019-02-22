@@ -13,6 +13,7 @@
 #include <hpx/util/detail/vtable/vtable.hpp>
 
 #include <cstddef>
+#include <new>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -31,7 +32,8 @@ namespace hpx { namespace util { namespace detail
         static void* _load_object(void* storage, std::size_t storage_size,
             serialization::input_archive& ar, unsigned /*version*/)
         {
-            void* obj = vtable::default_construct<T>(storage, storage_size);
+            void* buffer = vtable::allocate<T>(storage, storage_size);
+            void* obj = ::new (buffer) T;
             ar >> vtable::get<T>(obj);
             return obj;
         }
