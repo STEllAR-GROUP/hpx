@@ -33,7 +33,7 @@ namespace hpx { namespace util { namespace detail
     static const std::size_t function_storage_size = 3 * sizeof(void*);
 
     ///////////////////////////////////////////////////////////////////////////
-    class function_base
+    class HPX_EXPORT function_base
     {
         using vtable = function_base_vtable;
 
@@ -47,104 +47,22 @@ namespace hpx { namespace util { namespace detail
 
         function_base(
             function_base const& other,
-            vtable const* empty_vtable)
-          : vptr(other.vptr)
-          , object(other.object)
-        {
-            if (other.object != nullptr)
-            {
-                object = vptr->copy(
-                    storage, detail::function_storage_size,
-                    other.object, /*destroy*/false);
-            }
-        }
-
+            vtable const* empty_vtable);
         function_base(
             function_base&& other,
-            vtable const* empty_vptr) noexcept
-          : vptr(other.vptr)
-          , object(other.object)
-        {
-            if (object == &other.storage)
-            {
-                std::memcpy(storage, other.storage, function_storage_size);
-                object = &storage;
-            }
-            other.vptr = empty_vptr;
-            other.object = nullptr;
-        }
-
-        ~function_base()
-        {
-            destroy();
-        }
+            vtable const* empty_vptr) noexcept;
+        ~function_base();
 
         void op_assign(
             function_base const& other,
-            vtable const* empty_vtable)
-        {
-            if (vptr == other.vptr)
-            {
-                if (this != &other && object)
-                {
-                    HPX_ASSERT(other.object != nullptr);
-                    // reuse object storage
-                    object = vptr->copy(
-                        object, -1,
-                        other.object, /*destroy*/true);
-                }
-            } else {
-                destroy();
-                vptr = other.vptr;
-                if (other.object != nullptr)
-                {
-                    object = vptr->copy(
-                        storage, detail::function_storage_size,
-                        other.object, /*destroy*/false);
-                } else {
-                    object = nullptr;
-                }
-            }
-        }
-
+            vtable const* empty_vtable);
         void op_assign(
             function_base&& other,
-            vtable const* empty_vtable) noexcept
-        {
-            if (this != &other)
-            {
-                swap(other);
-                other.reset(empty_vtable);
-            }
-        }
+            vtable const* empty_vtable) noexcept;
 
-        void destroy() noexcept
-        {
-            if (object != nullptr)
-            {
-                vptr->deallocate(
-                    object, function_storage_size,
-                    /*destroy*/true);
-            }
-        }
-
-        void reset(vtable const* empty_vptr) noexcept
-        {
-            destroy();
-            vptr = empty_vptr;
-            object = nullptr;
-        }
-
-        void swap(function_base& f) noexcept
-        {
-            std::swap(vptr, f.vptr);
-            std::swap(object, f.object);
-            std::swap(storage, f.storage);
-            if (object == &f.storage)
-                object = &storage;
-            if (f.object == &storage)
-                f.object = &f.storage;
-        }
+        void destroy() noexcept;
+        void reset(vtable const* empty_vptr) noexcept;
+        void swap(function_base& f) noexcept;
 
         bool empty() const noexcept
         {
@@ -156,32 +74,9 @@ namespace hpx { namespace util { namespace detail
             return !empty();
         }
 
-        std::size_t get_function_address() const
-        {
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            return vptr->get_function_address(object);
-#else
-            return 0;
-#endif
-        }
-
-        char const* get_function_annotation() const
-        {
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            return vptr->get_function_annotation(object);
-#else
-            return nullptr;
-#endif
-        }
-
-        util::itt::string_handle get_function_annotation_itt() const
-        {
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-            return vptr->get_function_annotation_itt(object);
-#else
-            return util::itt::string_handle{};
-#endif
-        }
+        std::size_t get_function_address() const;
+        char const* get_function_annotation() const;
+        util::itt::string_handle get_function_annotation_itt() const;
 
     protected:
         vtable const* vptr;
