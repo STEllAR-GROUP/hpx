@@ -17,25 +17,27 @@ namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////
     template <typename Sig, bool Copyable = true>
-    struct function_vtable
-      : vtable, copyable_vtable, callable_vtable<Sig>
-    {
-        template <typename T>
-        HPX_CONSTEXPR function_vtable(construct_vtable<T>) noexcept
-          : vtable(construct_vtable<T>())
-          , copyable_vtable(construct_vtable<T>())
-          , callable_vtable<Sig>(construct_vtable<T>())
-        {}
-    };
+    struct function_vtable;
 
     template <typename Sig>
-    struct function_vtable<Sig, false>
+    struct function_vtable<Sig, /*Copyable*/false>
       : vtable, callable_vtable<Sig>
     {
         template <typename T>
         HPX_CONSTEXPR function_vtable(construct_vtable<T>) noexcept
           : vtable(construct_vtable<T>())
           , callable_vtable<Sig>(construct_vtable<T>())
+        {}
+    };
+
+    template <typename Sig>
+    struct function_vtable<Sig, /*Copyable*/true>
+      : function_vtable<Sig, false>, copyable_vtable
+    {
+        template <typename T>
+        HPX_CONSTEXPR function_vtable(construct_vtable<T>) noexcept
+          : function_vtable<Sig, false>(construct_vtable<T>())
+          , copyable_vtable(construct_vtable<T>())
         {}
     };
 

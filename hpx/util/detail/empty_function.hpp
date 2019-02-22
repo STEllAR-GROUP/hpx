@@ -1,6 +1,6 @@
 //  Copyright (c) 2011 Thomas Heller
 //  Copyright (c) 2013 Hartmut Kaiser
-//  Copyright (c) 2014 Agustin Berge
+//  Copyright (c) 2014-2019 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -36,17 +36,22 @@ namespace hpx { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     // make sure the empty table instance is initialized in time, even
     // during early startup
+    template <typename Sig, bool Copyable>
+    struct function_vtable;
+
 #if defined(HPX_HAVE_CXX11_CONSTEXPR)
-    template <typename VTable>
-    HPX_CONSTEXPR VTable const* get_empty_function_vtable() noexcept
+    template <typename Sig>
+    HPX_CONSTEXPR function_vtable<Sig, true> const*
+    get_empty_function_vtable() noexcept
     {
-        return &vtables<VTable, empty_function>::instance;
+        return &vtables<function_vtable<Sig, true>, empty_function>::instance;
     }
 #else
-    template <typename VTable>
-    VTable const* get_empty_function_vtable() noexcept
+    template <typename Sig>
+    function_vtable<Sig, true> const*
+    get_empty_function_vtable() noexcept
     {
-        static VTable const empty_vtable =
+        static function_vtable<Sig, true> const empty_vtable =
             detail::construct_vtable<empty_function>();
         return &empty_vtable;
     }

@@ -74,7 +74,7 @@ namespace hpx { namespace util { namespace detail
 
     public:
         HPX_CONSTEXPR function_base() noexcept
-          : vptr(detail::get_empty_function_vtable<vtable>())
+          : vptr(get_empty_vtable())
           , object(nullptr)
           , storage_init()
         {}
@@ -100,7 +100,7 @@ namespace hpx { namespace util { namespace detail
                 std::memcpy(storage, other.storage, function_storage_size);
                 object = &storage;
             }
-            other.vptr = detail::get_empty_function_vtable<vtable>();
+            other.vptr = get_empty_vtable();
             other.object = nullptr;
         }
 
@@ -194,7 +194,7 @@ namespace hpx { namespace util { namespace detail
         void reset() noexcept
         {
             destroy();
-            vptr = detail::get_empty_function_vtable<vtable>();
+            vptr = get_empty_vtable();
             object = nullptr;
         }
 
@@ -285,6 +285,11 @@ namespace hpx { namespace util { namespace detail
         }
 
     private:
+        static HPX_CONSTEXPR vtable const* get_empty_vtable() noexcept
+        {
+            return detail::get_empty_function_vtable<R(Ts...)>();
+        }
+
         template <typename T>
         static vtable const* get_vtable() noexcept
         {
