@@ -12,6 +12,7 @@
 #include <hpx/async_launch_policy_dispatch.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/sync_launch_policy_dispatch.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
@@ -59,16 +60,9 @@ namespace hpx { namespace parallel { namespace execution
         static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         sync_execute(F && f, Ts &&... ts)
         {
-            try {
-                return hpx::util::invoke(
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
-            }
-            catch (std::bad_alloc const& ba) {
-                throw ba;
-            }
-            catch (...) {
-                throw exception_list(std::current_exception());
-            }
+            return hpx::detail::sync_launch_policy_dispatch<
+                launch::sync_policy>::call(launch::sync, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         // TwoWayExecutor interface
@@ -79,9 +73,8 @@ namespace hpx { namespace parallel { namespace execution
         async_execute(F && f, Ts &&... ts)
         {
             return hpx::detail::async_launch_policy_dispatch<
-                    launch::deferred_policy
-                >::call(launch::deferred, std::forward<F>(f),
-                    std::forward<Ts>(ts)...);
+                launch::deferred_policy>::call(launch::deferred,
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
