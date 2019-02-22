@@ -16,10 +16,9 @@
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/detail/empty_function.hpp>
+#include <hpx/util/detail/vtable/function_vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_function_vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
-#include <hpx/util/detail/vtable/function_vtable.hpp>
-#include <hpx/util/detail/vtable/unique_function_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
 #include <cstddef>
@@ -71,11 +70,7 @@ namespace hpx { namespace util { namespace detail
     template <bool Copyable, typename R, typename ...Ts>
     class function_base<R(Ts...), Copyable>
     {
-        using vtable = typename std::conditional<
-                Copyable,
-                detail::function_vtable<R(Ts...)>,
-                detail::unique_function_vtable<R(Ts...)>
-            >::type;
+        using vtable = detail::function_vtable<R(Ts...), Copyable>;
 
     public:
         HPX_CONSTEXPR function_base() noexcept
@@ -313,11 +308,7 @@ namespace hpx { namespace util { namespace detail
     class basic_function<R(Ts...), Copyable, true>
       : public function_base<R(Ts...), Copyable>
     {
-        using vtable = typename std::conditional<
-                Copyable,
-                detail::function_vtable<R(Ts...)>,
-                detail::unique_function_vtable<R(Ts...)>
-            >::type;
+        using vtable = detail::function_vtable<R(Ts...), Copyable>;
         using serializable_vtable = serializable_function_vtable<vtable>;
         using base_type = function_base<R(Ts...), Copyable>;
 

@@ -14,10 +14,7 @@
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/basic_function.hpp>
-#include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
-#include <hpx/util/detail/vtable/function_vtable.hpp>
-#include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <cstddef>
