@@ -33,20 +33,20 @@ namespace hpx { namespace util { namespace detail
     static const std::size_t function_storage_size = 3 * sizeof(void*);
 
     ///////////////////////////////////////////////////////////////////////////
-    class function_base_impl
+    class function_base
     {
         using vtable = function_base_vtable;
 
     public:
-        HPX_CONSTEXPR function_base_impl(
+        HPX_CONSTEXPR function_base(
             function_base_vtable const* empty_vptr) noexcept
           : vptr(empty_vptr)
           , object(nullptr)
           , storage_init()
         {}
 
-        function_base_impl(
-            function_base_impl const& other,
+        function_base(
+            function_base const& other,
             vtable const* empty_vtable)
           : vptr(other.vptr)
           , object(other.object)
@@ -59,8 +59,8 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        function_base_impl(
-            function_base_impl&& other,
+        function_base(
+            function_base&& other,
             vtable const* empty_vptr) noexcept
           : vptr(other.vptr)
           , object(other.object)
@@ -74,13 +74,13 @@ namespace hpx { namespace util { namespace detail
             other.object = nullptr;
         }
 
-        ~function_base_impl()
+        ~function_base()
         {
             destroy();
         }
 
         void op_assign(
-            function_base_impl const& other,
+            function_base const& other,
             vtable const* empty_vtable)
         {
             if (vptr == other.vptr)
@@ -108,7 +108,7 @@ namespace hpx { namespace util { namespace detail
         }
 
         void op_assign(
-            function_base_impl&& other,
+            function_base&& other,
             vtable const* empty_vtable) noexcept
         {
             if (this != &other)
@@ -135,7 +135,7 @@ namespace hpx { namespace util { namespace detail
             object = nullptr;
         }
 
-        void swap(function_base_impl& f) noexcept
+        void swap(function_base& f) noexcept
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
@@ -205,7 +205,7 @@ namespace hpx { namespace util { namespace detail
         return mp == nullptr;
     }
 
-    inline bool is_empty_function_impl(function_base_impl const* f) noexcept
+    inline bool is_empty_function_impl(function_base const* f) noexcept
     {
         return f->empty();
     }
@@ -222,36 +222,36 @@ namespace hpx { namespace util { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig, bool Copyable>
-    class function_base;
+    template <typename Sig, bool Copyable, bool Serializable>
+    class basic_function;
 
     template <bool Copyable, typename R, typename ...Ts>
-    class function_base<R(Ts...), Copyable>
-      : public function_base_impl
+    class basic_function<R(Ts...), Copyable, /*Serializable*/false>
+      : public function_base
     {
-        using base_type = function_base_impl;
-        using vtable = detail::function_vtable<R(Ts...), Copyable>;
+        using base_type = function_base;
+        using vtable = function_vtable<R(Ts...), Copyable>;
 
     public:
-        HPX_CONSTEXPR function_base() noexcept
+        HPX_CONSTEXPR basic_function() noexcept
           : base_type(get_empty_vtable())
         {}
 
-        function_base(function_base const& other)
+        basic_function(basic_function const& other)
           : base_type(other, get_empty_vtable())
         {}
 
-        function_base(function_base&& other) noexcept
+        basic_function(basic_function&& other) noexcept
           : base_type(std::move(other), get_empty_vtable())
         {}
 
-        function_base& operator=(function_base const& other)
+        basic_function& operator=(basic_function const& other)
         {
             base_type::op_assign(other, get_empty_vtable());
             return *this;
         }
 
-        function_base& operator=(function_base&& other) noexcept
+        basic_function& operator=(basic_function&& other) noexcept
         {
             base_type::op_assign(std::move(other), get_empty_vtable());
             return *this;
@@ -359,17 +359,13 @@ namespace hpx { namespace util { namespace detail
         using base_type::storage;
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig, bool Copyable, bool Serializable>
-    class basic_function;
-
     template <bool Copyable, typename R, typename ...Ts>
-    class basic_function<R(Ts...), Copyable, true>
-      : public function_base<R(Ts...), Copyable>
+    class basic_function<R(Ts...), Copyable, /*Serializable*/true>
+      : public basic_function<R(Ts...), Copyable, /*Serializable*/false>
     {
-        using vtable = detail::function_vtable<R(Ts...), Copyable>;
+        using vtable = function_vtable<R(Ts...), Copyable>;
         using serializable_vtable = serializable_function_vtable<vtable>;
-        using base_type = function_base<R(Ts...), Copyable>;
+        using base_type = basic_function<R(Ts...), Copyable, false>;
 
     public:
         HPX_CONSTEXPR basic_function() noexcept
@@ -443,11 +439,6 @@ namespace hpx { namespace util { namespace detail
         using base_type::storage;
         serializable_vtable const* serializable_vptr;
     };
-
-    template <bool Copyable, typename R, typename ...Ts>
-    class basic_function<R(Ts...), Copyable, false>
-      : public function_base<R(Ts...), Copyable>
-    {};
 }}}
 
 #endif
