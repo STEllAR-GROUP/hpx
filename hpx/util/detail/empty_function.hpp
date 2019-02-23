@@ -9,7 +9,6 @@
 #define HPX_UTIL_DETAIL_EMPTY_FUNCTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
 namespace hpx { namespace util { namespace detail
@@ -18,20 +17,6 @@ namespace hpx { namespace util { namespace detail
     struct empty_function {}; // must be trivial and empty
 
     HPX_NORETURN HPX_EXPORT void throw_bad_function_call();
-
-    // Pseudo registration for empty functions.
-    // We don't want to serialize empty functions.
-    template <typename VTable>
-    struct get_function_name_impl<
-        VTable
-      , hpx::util::detail::empty_function
-    >
-    {
-        HPX_NORETURN static char const* call()
-        {
-            throw_bad_function_call();
-        }
-    };
 
     ///////////////////////////////////////////////////////////////////////////
     // make sure the empty table instance is initialized in time, even

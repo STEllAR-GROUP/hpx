@@ -30,6 +30,18 @@ namespace hpx { namespace util
 
     namespace detail
     {
+        template <typename Sig>
+        struct function_ref_vtable
+          : callable_vtable<Sig>, callable_info_vtable
+        {
+            template <typename T>
+            HPX_CONSTEXPR function_ref_vtable(construct_vtable<T>) noexcept
+              : callable_vtable<Sig>(construct_vtable<T>())
+              , callable_info_vtable(construct_vtable<T>())
+            {}
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename F>
         HPX_CONSTEXPR bool is_empty_function_ptr(F* fp) noexcept
         {
@@ -53,7 +65,7 @@ namespace hpx { namespace util
     template <typename R, typename ...Ts>
     class function_ref<R(Ts...)>
     {
-        using VTable = detail::callable_vtable<R(Ts...)>;
+        using VTable = detail::function_ref_vtable<R(Ts...)>;
 
     public:
         template <typename F, typename FD = typename std::decay<F>::type,

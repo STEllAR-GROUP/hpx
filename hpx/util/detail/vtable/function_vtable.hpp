@@ -18,7 +18,7 @@
 namespace hpx { namespace util { namespace detail
 {
     struct function_base_vtable
-      : vtable, copyable_vtable
+      : vtable, copyable_vtable, callable_info_vtable
     {
         template <typename T>
         HPX_CONSTEXPR function_base_vtable(
@@ -26,6 +26,7 @@ namespace hpx { namespace util { namespace detail
             std::integral_constant<bool, true>) noexcept
           : vtable(construct_vtable<T>())
           , copyable_vtable(construct_vtable<T>())
+          , callable_info_vtable(construct_vtable<T>())
         {}
 
         template <typename T>
@@ -34,6 +35,7 @@ namespace hpx { namespace util { namespace detail
             std::integral_constant<bool, false>) noexcept
           : vtable(construct_vtable<T>())
           , copyable_vtable(nullptr)
+          , callable_info_vtable(construct_vtable<T>())
         {}
     };
 

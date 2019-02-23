@@ -156,6 +156,33 @@ namespace hpx { namespace util { namespace detail
             return !empty();
         }
 
+        std::size_t get_function_address() const
+        {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            return vptr->get_function_address(object);
+#else
+            return 0;
+#endif
+        }
+
+        char const* get_function_annotation() const
+        {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            return vptr->get_function_annotation(object);
+#else
+            return nullptr;
+#endif
+        }
+
+        util::itt::string_handle get_function_annotation_itt() const
+        {
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            return vptr->get_function_annotation_itt(object);
+#else
+            return util::itt::string_handle{};
+#endif
+        }
+
     protected:
         vtable const* vptr;
         void* object;
@@ -310,36 +337,9 @@ namespace hpx { namespace util { namespace detail
             return vptr->invoke(object, std::forward<Ts>(vs)...);
         }
 
-        std::size_t get_function_address() const
-        {
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
-            return vptr->get_function_address(object);
-#else
-            return 0;
-#endif
-        }
-
-        char const* get_function_annotation() const
-        {
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
-            return vptr->get_function_annotation(object);
-#else
-            return nullptr;
-#endif
-        }
-
-        util::itt::string_handle get_function_annotation_itt() const
-        {
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
-            return vptr->get_function_annotation_itt(object);
-#else
-            static util::itt::string_handle sh;
-            return sh;
-#endif
-        }
+        using base_type::get_function_address;
+        using base_type::get_function_annotation;
+        using base_type::get_function_annotation_itt;
 
     private:
         static HPX_CONSTEXPR vtable const* get_empty_vtable() noexcept

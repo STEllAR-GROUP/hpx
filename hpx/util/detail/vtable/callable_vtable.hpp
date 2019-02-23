@@ -22,19 +22,9 @@ namespace hpx { namespace util { namespace detail
 {
     struct empty_function;
 
-    template <typename Sig>
-    struct callable_vtable;
-
-    template <typename R, typename ...Ts>
-    struct callable_vtable<R(Ts...)>
+    ///////////////////////////////////////////////////////////////////////////
+    struct callable_info_vtable
     {
-        template <typename T>
-        HPX_FORCEINLINE static R _invoke(void* f, Ts&&... vs)
-        {
-            return HPX_INVOKE_R(R, vtable::get<T>(f), std::forward<Ts>(vs)...);
-        }
-        R (*invoke)(void*, Ts&&...);
-
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
         template <typename T>
         HPX_FORCEINLINE static std::size_t _get_function_address(void* f)
@@ -62,18 +52,47 @@ namespace hpx { namespace util { namespace detail
 #endif
 
         template <typename T>
-        HPX_CONSTEXPR callable_vtable(construct_vtable<T>) noexcept
-          : invoke(&callable_vtable::template _invoke<T>)
+        HPX_CONSTEXPR callable_info_vtable(construct_vtable<T>) noexcept
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-          , get_function_address(
-                &callable_vtable::template _get_function_address<T>)
+          : get_function_address(
+                &callable_info_vtable::template _get_function_address<T>)
           , get_function_annotation(
-                &callable_vtable::template _get_function_annotation<T>)
+                &callable_info_vtable::template _get_function_annotation<T>)
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
           , get_function_annotation_itt(
-                &callable_vtable::template _get_function_annotation_itt<T>)
+                &callable_info_vtable::template _get_function_annotation_itt<T>)
 #endif
 #endif
+        {}
+
+        HPX_CONSTEXPR callable_info_vtable(construct_vtable<empty_function>) noexcept
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+          : get_function_address(nullptr)
+          , get_function_annotation(nullptr)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+          , get_function_annotation_itt(nullptr)
+#endif
+#endif
+        {}
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Sig>
+    struct callable_vtable;
+
+    template <typename R, typename ...Ts>
+    struct callable_vtable<R(Ts...)>
+    {
+        template <typename T>
+        HPX_FORCEINLINE static R _invoke(void* f, Ts&&... vs)
+        {
+            return HPX_INVOKE_R(R, vtable::get<T>(f), std::forward<Ts>(vs)...);
+        }
+        R (*invoke)(void*, Ts&&...);
+
+        template <typename T>
+        HPX_CONSTEXPR callable_vtable(construct_vtable<T>) noexcept
+          : invoke(&callable_vtable::template _invoke<T>)
         {}
 
         HPX_NORETURN static R _empty_invoke(void*, Ts&&...)
@@ -83,16 +102,6 @@ namespace hpx { namespace util { namespace detail
 
         HPX_CONSTEXPR callable_vtable(construct_vtable<empty_function>) noexcept
           : invoke(&callable_vtable::_empty_invoke)
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-          , get_function_address(
-                &callable_vtable::template _get_function_address<empty_function>)
-          , get_function_annotation(
-                &callable_vtable::template _get_function_annotation<empty_function>)
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-          , get_function_annotation_itt(
-                &callable_vtable::template _get_function_annotation_itt<empty_function>)
-#endif
-#endif
         {}
     };
 }}}
