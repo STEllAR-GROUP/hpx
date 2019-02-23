@@ -8,8 +8,8 @@
 // #3646: Parallel algorithms should accept iterator/sentinel pairs
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/util/lightweight_test.hpp>
 #include <hpx/include/parallel_reduce.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -23,8 +23,7 @@ struct Iterator
 {
     using difference_type = std::ptrdiff_t;
     using value_type = std::int64_t;
-    // for now - just to verify reduce algorithm works with sentinels
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::input_iterator_tag;
     using pointer = std::int64_t const*;
     using reference = std::int64_t const&;
 
@@ -36,56 +35,58 @@ struct Iterator
     }
     std::int64_t operator->() const = delete;
 
-    auto& operator++()
+    Iterator& operator++()
     {
         ++(this->state);
         return *this;
     }
 
-    auto operator++(int) const
+    Iterator operator++(int)
     {
         auto copy = *this;
-        return ++copy;
+        ++(*this);
+        return copy;
     }
 
-    auto& operator--()
+    Iterator& operator--()
     {
         --(this->state);
         return *this;
     }
 
-    auto operator--(int)
+    Iterator operator--(int)
     {
         auto copy = *this;
-        return --copy;
+        --(*this);
+        return copy;
     }
 
-    auto operator[](difference_type n) const
+    std::int64_t operator[](difference_type n) const
     {
         return this->state + n;
     }
 
-    auto& operator+=(difference_type n)
+    Iterator& operator+=(difference_type n)
     {
         this->state += n;
         return *this;
     }
 
-    auto operator+(difference_type n) const
+    Iterator operator+(difference_type n) const
     {
-        auto copy = *this;
+        Iterator copy = *this;
         return copy += n;
     }
 
-    auto& operator-=(difference_type n)
+    Iterator& operator-=(difference_type n)
     {
         this->state -= n;
         return *this;
     }
 
-    auto operator-(difference_type n) const
+    Iterator operator-(difference_type n) const
     {
-        auto copy = *this;
+        Iterator copy = *this;
         return copy -= n;
     }
 
@@ -140,7 +141,7 @@ struct Iterator
 
 int main()
 {
-    auto result = hpx::parallel::reduce(hpx::parallel::execution::seq,
+    std::int64_t result = hpx::parallel::reduce(hpx::parallel::execution::seq,
         Iterator{0}, Sentinel{}, std::int64_t(0));
 
     HPX_TEST_EQ(result, std::int64_t(4950));
