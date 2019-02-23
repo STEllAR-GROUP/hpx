@@ -10,7 +10,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
@@ -116,9 +116,9 @@ namespace hpx { namespace components { namespace server
 
             return hpx::async<action_type>(
                     target_storage, std::move(data), to_migrate, addr)
-                .then(util::bind(
+                .then(util::bind_back(
                     &migrate_to_storage_here_cleanup<Component>,
-                    util::placeholders::_1, ptr, to_migrate));
+                    ptr, to_migrate));
         }
     }
 

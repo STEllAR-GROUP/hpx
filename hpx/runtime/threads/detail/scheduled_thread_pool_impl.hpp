@@ -32,6 +32,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/yield_while.hpp>
@@ -44,7 +45,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
-#include <functional>
 #include <iosfwd>
 #include <memory>
 #include <string>
@@ -357,18 +357,18 @@ namespace hpx { namespace threads { namespace detail
         }
 
         return hpx::async(
-            hpx::util::bind(&scheduled_thread_pool::resume_internal, this, true,
-                std::ref(throws)));
+            [this]() -> void {
+                return resume_internal(true, throws);
+            });
     }
 
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::resume_cb(
         std::function<void(void)> callback, error_code& ec)
     {
-        std::function<void(void)> resume_internal_wrapper =
-            [this, HPX_CAPTURE_MOVE(callback)]()
-            {
-                this->resume_internal(true, throws);
+        auto && resume_internal_wrapper =
+            [this, HPX_CAPTURE_MOVE(callback)]() -> void {
+                resume_internal(true, throws);
                 callback();
             };
 
@@ -440,8 +440,9 @@ namespace hpx { namespace threads { namespace detail
         }
 
         return hpx::async(
-            hpx::util::bind(&scheduled_thread_pool::suspend_internal, this,
-                std::ref(throws)));
+            [this]() -> void {
+                return suspend_internal(throws);
+            });
     }
 
     template <typename Scheduler>
@@ -586,16 +587,16 @@ namespace hpx { namespace threads { namespace detail
 #endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
                 detail::scheduling_callbacks callbacks(
-                    util::bind(    //-V107
+                    util::deferred_call(    //-V107
                         &policies::scheduler_base::idle_callback,
-                        std::ref(sched_), global_thread_num),
-                    detail::scheduling_callbacks::callback_type());
+                        sched_.get(), global_thread_num),
+                    nullptr);
 
                 if (mode_ & policies::do_background_work)
                 {
-                    callbacks.background_ = util::bind(    //-V107
+                    callbacks.background_ = util::deferred_call(    //-V107
                         &policies::scheduler_base::background_callback,
-                        std::ref(sched_), global_thread_num);
+                        sched_.get(), global_thread_num);
                 }
 
                 sched_->Scheduler::set_scheduler_mode(mode_);
@@ -1897,9 +1898,9 @@ namespace hpx { namespace threads { namespace detail
         }
 
         return hpx::async(
-            hpx::util::bind(
-                &scheduled_thread_pool::suspend_processing_unit_internal, this,
-                virt_core, std::ref(throws)));
+            [this, virt_core]() -> void {
+                return suspend_processing_unit_internal(virt_core, throws);
+            });
     }
 
     template <typename Scheduler>
@@ -1999,9 +2000,9 @@ namespace hpx { namespace threads { namespace detail
         }
 
         return hpx::async(
-            hpx::util::bind(
-                &scheduled_thread_pool::resume_processing_unit_internal, this,
-                virt_core, std::ref(throws)));
+            [this, virt_core]() -> void {
+                return resume_processing_unit_internal(virt_core, throws);
+            });
     }
 
     template <typename Scheduler>

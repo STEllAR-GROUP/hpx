@@ -32,7 +32,7 @@
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
@@ -560,9 +560,9 @@ void register_worker(registration_header const& header)
         // delay the final response until the runtime system is up and running
         util::unique_function_nonser<void()>* thunk =
             new util::unique_function_nonser<void()>(
-                util::one_shot(util::bind(
+                util::one_shot(util::bind_front(
                     &big_boot_barrier::apply_notification
-                  , std::ref(get_big_boot_barrier())
+                  , &get_big_boot_barrier()
                   , 0
                   , naming::get_locality_id_from_gid(prefix)
                   , dest

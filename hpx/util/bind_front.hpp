@@ -185,6 +185,13 @@ namespace hpx { namespace util
 
         return result_type(std::forward<F>(f), std::forward<Ts>(vs)...);
     }
+
+    // nullary functions do not need to be bound again
+    template <typename F>
+    HPX_CONSTEXPR typename std::decay<F>::type
+    bind_front(F&& f) {
+        return std::forward<F>(f);
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

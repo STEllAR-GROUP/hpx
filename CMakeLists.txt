@@ -302,7 +302,6 @@ hpx_option(HPX_WITH_TESTS_HEADERS BOOL "Build HPX header tests (default: OFF)" O
 hpx_option(HPX_WITH_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_EXAMPLES BOOL "Add HPX examples as tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
-hpx_option(HPX_WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 
 hpx_option(HPX_WITH_COMPILE_ONLY_TESTS BOOL
   "Create build system support for compile time only HPX tests (default ON)"
@@ -1243,6 +1242,10 @@ if(NOT WIN32)
     endif()
   endif()
 
+  if(HPX_HAVE_LIBSUPCPP)
+    hpx_libraries(supc++)
+  endif()
+
   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     hpx_libraries(dl)
   endif()
@@ -1643,7 +1646,7 @@ if(HPX_WITH_APEX)
   if(HPX_WITH_APEX_NO_UPDATE)
     set(_hpx_apex_no_update NO_UPDATE)
   endif()
-  set(_hpx_apex_tag "v2.1.0")
+  set(_hpx_apex_tag "v2.1.2")
   if(HPX_WITH_APEX_TAG)
     message("Overriding APEX git tag ${_hpx_apex_tag} with ${HPX_WITH_APEX_TAG}")
     set(_hpx_apex_tag ${HPX_WITH_APEX_TAG})
@@ -1931,11 +1934,6 @@ if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples)
   include_directories(examples)
   add_subdirectory(examples)
-endif()
-
-if(HPX_WITH_RUNTIME)
-  add_hpx_pseudo_target(runtime)
-  add_subdirectory(runtime)
 endif()
 
 if(HPX_WITH_DOCUMENTATION)

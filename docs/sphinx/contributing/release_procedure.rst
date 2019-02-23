@@ -32,7 +32,8 @@ are completed to avoid confusion.
 
 #. Write release notes in ``docs/sphinx/releases/whats_new_$VERSION.rst``. Keep
    adding merged PRs and closed issues to this until just before the release is
-   made.
+   made. Add the new release notes to the table of contents in
+   ``docs/sphinx/releases.rst``.
 
 #. Build the docs, and proof-read them. Update any documentation that may have
    changed, and correct any typos. Pay special attention to:
@@ -47,17 +48,14 @@ are completed to avoid confusion.
      *   Update collaborators
      *   Update grant information
 
-#. Change the APEX release branch to be the most current release tag available
-   in the ``git_external`` APEX section of the main ``CMakeLists.txt``. Please
-   contact the maintainers at the `APEX repository
-   <http://github.com/khuck/xpress-apex>`_ to generate a new release to
-   synchronize with the HPX release.
+#. This step does not apply to patch releases. For both APEX and hpxMP:
 
-#. Change the hpxMP release branch to be the most current release tag available
-   in the ``git_external`` hpxMP section of the main ``CMakeLists.txt``. Please
-   contact the maintainers at the `hpxMP repository
-   <https://github.com/STEllAR-GROUP/hpxMP>`_ to generate a new release to
-   synchronize with the HPX release.
+   * Change the release branch to be the most current release tag available in
+     the APEX/hpxMP ``git_external`` section in the main ``CMakeLists.txt``.
+     Please contact the maintainers of the respective packages to generate a new
+     release to synchronize with the HPX release (`APEX
+     <http://github.com/khuck/xpress-apex>`_, `hpxMP
+     <https://github.com/STEllAR-GROUP/hpxMP>`_).
 
 #. If there have been any commits to the release branch since the last release
    create a tag from the old release branch before deleting the old release
@@ -67,7 +65,8 @@ are completed to avoid confusion.
    be deleted and recreated.
 
 #. Delete the old release branch, and create a new one by branching a stable
-   point from master.
+   point from master. If you are creating a patch release, branch from the
+   release tag for which you want to create a patch release.
 
    * ``git push origin --delete release``
    * ``git branch -D release``
@@ -78,16 +77,18 @@ are completed to avoid confusion.
 
 #. Protect the release branch again to disable deleting and force pushes.
 
-#. Checkout the release branch, and replace the ``-trunk`` tag in
-   ``CMakeLists.txt`` with ``-rc1``.
+#. Check out the release branch.
+
+#. Make sure ``HPX_VERSION_MAJOR/MINOR/SUBMINOR`` in ``CMakeLists.txt`` contain
+   the correct values. Change them if needed.
 
 #. Remove the examples and benchmarks that will not go into the release from the
    release branch.
 
-#. Remove features which have been deprecated for at least 2 releases. This
-   involves removing build options which enable those features from the main
-   CMakeLists.txt and also deleting all related code and tests from the main
-   source tree.
+#. This step does not apply to patch releases. Remove features which have been
+   deprecated for at least 2 releases. This involves removing build options
+   which enable those features from the main CMakeLists.txt and also deleting
+   all related code and tests from the main source tree.
 
    The general deprecation policy involves a three-step process we have to go
    through in order to introduce a breaking change
@@ -100,31 +101,37 @@ are completed to avoid confusion.
    The main CMakeLists.txt contains a comment indicating for which version
    the breaking change was introduced first.
 
-#. Tag a release candidate from the release branch, where tag name is the
-   version to be released with a "-rcN" suffix and description is
-   "HPX V$VERSION: The C++ Standards Library for Parallelism and Concurrency".
-
-   * ``git tag -a [tag name] -m '[description]'``
-   * ``git push origin [tag name]``
-   * Create a pre-release on GitHub
-
 #. Switch Buildbot over to test the release branch
 
    * ``https://github.com/STEllAR-GROUP/hermione-buildbot/blob/rostam/master/master.cfg``
-   * Line 120
+   * ``branch`` field in ``c['change_source'] =  GitPoller``
 
-#. Notify ``hpx-users@stellar.cct.lsu.edu`` and ``stellar@cct.lsu.edu`` of the
-   availability of the release candidate. Ask users to test the candidate by
-   checking out the release candidate tag.
+#. Repeat the following steps until satisfied with the release.
 
-#. Allow at least a week for testing of the release candidate.
+   #. Change ``HPX_VERSION_TAG`` in ``CMakeLists.txt`` to ``-rcN``, where ``N``
+      is the current iteration of this step. Start with ``-rc1``.
 
-   * Use ``git merge`` when possible, and fall back to ``git cherry-pick``
-     when needed.
-   * Repeat by tagging a new release candidate as many times as needed.
+   #. Tag a release candidate from the release branch, where tag name is the
+      version to be released with a ``-rcN`` suffix and description is "HPX
+      V$VERSION: The C++ Standards Library for Parallelism and Concurrency".
 
-#. Checkout the release branch, and replace the ``-rcN`` tag in
-   ``CMakeLists.txt`` with an empty string.
+      * ``git tag -a [tag name] -m '[description]'``
+      * ``git push origin [tag name]``
+      * Create a pre-release on GitHub
+
+   #. This step is not necessary for patch releases. Notify
+      ``hpx-users@stellar.cct.lsu.edu`` and ``stellar@cct.lsu.edu`` of the
+      availability of the release candidate. Ask users to test the candidate by
+      checking out the release candidate tag.
+
+   #. Allow at least a week for testing of the release candidate.
+
+      * Use ``git merge`` when possible, and fall back to ``git cherry-pick``
+        when needed. For patch releases ``git cherry-pick`` is most likely your
+        only choice if there have been significant unrelated changes on master
+        since the previous release.
+      * Go back to the first step when enough patches have been added.
+      * If there are no more patches continue to make the final release.
 
 #. Update any occurrences of the latest stable release to refer to the version
    about to be released. For example, ``quickstart.rst`` contains instructions
@@ -132,6 +139,8 @@ are completed to avoid confusion.
 
 #. Add a new entry to the RPM changelog (``cmake/packaging/rpm/Changelog.txt``)
    with the new version number and a link to the corresponding changelog.
+
+#. Change ``HPX_VERSION_TAG`` in ``CMakeLists.txt`` to an empty string.
 
 #. Add the release date to the caption of the current "What's New" section in
    the docs, and change the value of ``HPX_VERSION_DATE`` in
@@ -151,9 +160,9 @@ are completed to avoid confusion.
    * ``git tag -s -a [tag name] -m '[description]'``
    * ``git push origin [tag name]``
 
-#. Create a release on github
+#. Create a release on GitHub
 
-   * Refer to 'What's New' section in the documentation you uploaded in the
+   * Refer to the 'What's New' section in the documentation you uploaded in the
      notes for the Github release (see previous releases for a hint).
    * A DOI number using Zenodo is automatically assigned once the release is
      created as such on github.
@@ -186,23 +195,30 @@ are completed to avoid confusion.
 
 #. Merge release branch into master.
 
-#. Create a new branch from master, and check that branch out (name it for
-   example by the next version number). Bump the HPX version to the next
-   release target. The following files contain version info:
+#. This step does not apply to patch releases. Create a new branch from master,
+   and check that branch out (name it for example by the next version number).
+   Bump the HPX version to the next release target. The following files contain
+   version info:
 
    * ``CMakeLists.txt``
    * Grep for old version number
 
-#. Create a new "What's New" section for the docs of the next anticipated
-   release. Set the date to "unreleased".
+   #. Create a new "What's New" section for the docs of the next anticipated
+      release. Set the date to "unreleased".
 
-#. Merge new branch containing next version numbers to master, resolve conflicts
-   if necessary.
+   #. Update ``$HPX_SOURCE/README.rst``
+
+      * Update version (to the about-to-be-released version)
+      * Update links to documentation
+      * Fix zenodo reference number
+
+   #. Merge new branch containing next version numbers to master, resolve conflicts
+      if necessary.
 
 #. Switch Buildbot back to test the main branch
 
    * ``https://github.com/STEllAR-GROUP/hermione-buildbot/blob/rostam/master/master.cfg``
-   * Line 120
+   * ``branch`` field in ``c['change_source'] =  GitPoller``
 
 #. Update Vcpkg (``https://github.com/Microsoft/vcpkg``) to pull from latest release.
 

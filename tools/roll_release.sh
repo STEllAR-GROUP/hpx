@@ -1,16 +1,22 @@
-#! /bin/bash
+#!/usr/bin/env bash
 #
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-VERSION_MAJOR=`grep '#define HPX_VERSION_MAJOR' hpx/config/version.hpp | awk {' print $3 '}`
-VERSION_MINOR=`grep '#define HPX_VERSION_MINOR' hpx/config/version.hpp | awk {' print $3 '}`
-VERSION_SUBMINOR=`grep '#define HPX_VERSION_SUBMINOR' hpx/config/version.hpp | awk {' print $3 '}`
+VERSION_MAJOR=`sed -n 's/set(HPX_VERSION_MAJOR \(.*\))/\1/p' CMakeLists.txt`
+VERSION_MINOR=`sed -n 's/set(HPX_VERSION_MINOR \(.*\))/\1/p' CMakeLists.txt`
+VERSION_SUBMINOR=`sed -n 's/set(HPX_VERSION_SUBMINOR \(.*\))/\1/p' CMakeLists.txt`
+VERSION_TAG=`sed -n 's/set(HPX_VERSION_TAG "\(.*\)")/\1/p' CMakeLists.txt`
 
-DOT_VERSION=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_SUBMINOR
-UNDERSCORE_VERSION=${VERSION_MAJOR}_${VERSION_MINOR}_$VERSION_SUBMINOR
+if [ ! -z "$VERSION_TAG" ]; then
+    echo "Warning: VERSION_TAG is not empty (\"$VERSION_TAG\")."
+    echo "If you intended to make a final release, remove the tag in hpx/config/version.hpp."
+fi
+
+DOT_VERSION=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_SUBMINOR$VERSION_TAG
+UNDERSCORE_VERSION=${VERSION_MAJOR}_${VERSION_MINOR}_$VERSION_SUBMINOR$VERSION_TAG
 
 DOCS_WEBSITE="https://stellar-group.github.io"
 SOURCE_WEBSITE="http://stellar.cct.lsu.edu"
@@ -67,6 +73,11 @@ rm -f packages/$SEVENZ
 rm -rf packages/7z/hpx_$DOT_VERSION
 (cd packages/7z && $SEVENZIP x ../$SEVENZ > /dev/null)
 echo "DONE"
+
+if [ ! -z "$VERSION_TAG" ]; then
+    echo "Not printing HTML for non-final release."
+    exit
+fi
 
 ZIP_MD5=`md5sum packages/$ZIP | awk {'print $1'}`
 TARGZ_MD5=`md5sum packages/$TARGZ | awk {'print $1'}`

@@ -43,28 +43,30 @@ struct bidirectional_traversal_iterator
     }
     int operator->() const = delete;
 
-    auto& operator++()
+    bidirectional_traversal_iterator& operator++()
     {
         ++(this->state);
         return *this;
     }
 
-    auto operator++(int) const
+    bidirectional_traversal_iterator operator++(int)
     {
-        auto copy = *this;
-        return ++copy;
+        bidirectional_traversal_iterator copy = *this;
+        ++(*this);
+        return copy;
     }
 
-    auto& operator--()
+    bidirectional_traversal_iterator& operator--()
     {
         --(this->state);
         return *this;
     }
 
-    auto operator--(int)
+    bidirectional_traversal_iterator operator--(int)
     {
-        auto copy = *this;
-        return --copy;
+        bidirectional_traversal_iterator copy = *this;
+        --(*this);
+        return copy;
     }
 
     bool operator==(const bidirectional_traversal_iterator& that) const
@@ -114,28 +116,30 @@ struct random_access_traversal_iterator
     }
     int operator->() const = delete;
 
-    auto& operator++()
+    random_access_traversal_iterator& operator++()
     {
         ++(this->state);
         return *this;
     }
 
-    auto operator++(int) const
+    random_access_traversal_iterator operator++(int)
     {
-        auto copy = *this;
-        return ++copy;
+        random_access_traversal_iterator copy = *this;
+        ++(*this);
+        return copy;
     }
 
-    auto& operator--()
+    random_access_traversal_iterator& operator--()
     {
         --(this->state);
         return *this;
     }
 
-    auto operator--(int)
+    random_access_traversal_iterator operator--(int)
     {
-        auto copy = *this;
-        return --copy;
+        random_access_traversal_iterator copy = *this;
+        --(*this);
+        return copy;
     }
 
     int operator[](difference_type n) const
@@ -143,27 +147,27 @@ struct random_access_traversal_iterator
         return this->state + n;
     }
 
-    auto& operator+=(difference_type n)
+    random_access_traversal_iterator& operator+=(difference_type n)
     {
         this->state += n;
         return *this;
     }
 
-    auto operator+(difference_type n) const
+    random_access_traversal_iterator operator+(difference_type n)
     {
-        auto copy = *this;
+        random_access_traversal_iterator copy = *this;
         return copy += n;
     }
 
-    auto& operator-=(difference_type n)
+    random_access_traversal_iterator& operator-=(difference_type n)
     {
         this->state -= n;
         return *this;
     }
 
-    auto operator-(difference_type n) const
+    random_access_traversal_iterator operator-(difference_type n)
     {
-        auto copy = *this;
+        random_access_traversal_iterator copy = *this;
         return copy -= n;
     }
 
@@ -219,7 +223,7 @@ void addition_result()
     {
         B operator+(const A&) const
         {
-            return {};
+            return B{};
         }
     };
 
@@ -242,7 +246,7 @@ void dereference_result()
     {
         A operator*() const
         {
-            return {};
+            return A{};
         }
     };
 
@@ -268,7 +272,7 @@ void equality_result()
     {
         B operator==(const A&) const
         {
-            return {};
+            return B{};
         }
     };
 
@@ -294,7 +298,7 @@ void inequality_result()
     {
         B operator!=(const A&) const
         {
-            return {};
+            return B{};
         }
     };
 
@@ -321,7 +325,7 @@ void inplace_addition_result()
     {
         B operator+=(const A&) const
         {
-            return {};
+            return B{};
         }
     };
 
@@ -348,7 +352,7 @@ void inplace_subtraction_result()
     {
         B operator-=(const A&) const
         {
-            return {};
+            return B{};
         }
     };
 
@@ -422,7 +426,7 @@ void postdecrement_result()
     {
         A operator--(int) const
         {
-            return {};
+            return A{};
         }
     };
 
@@ -446,7 +450,7 @@ void postincrement_result()
     {
         A operator++(int) const
         {
-            return {};
+            return A{};
         }
     };
 
@@ -473,7 +477,7 @@ void subscript_result()
     {
         B operator[](const A&) const
         {
-            return {};
+            return B{};
         }
     };
 
@@ -500,7 +504,7 @@ void subtraction_result()
     {
         B operator-(const A&) const
         {
-            return {};
+            return B{};
         }
     };
 

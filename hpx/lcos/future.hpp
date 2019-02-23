@@ -398,6 +398,12 @@ namespace hpx { namespace lcos { namespace detail
     make_continuation_alloc(Allocator const& a,
         Future const& future, Policy&& policy, F&& f);
 
+    template <typename ContResult, typename Allocator, typename Future,
+        typename Policy, typename F>
+    inline typename traits::detail::shared_state_ptr<ContResult>::type
+    make_continuation_alloc_nounwrap(Allocator const& a,
+        Future const& future, Policy&& policy, F&& f);
+
     template <typename Executor, typename Future, typename F>
     inline typename hpx::traits::future_then_executor_result<
         Executor, typename std::decay<Future>::type, F

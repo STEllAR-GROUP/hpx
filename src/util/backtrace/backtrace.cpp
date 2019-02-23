@@ -19,6 +19,7 @@
 #include <boost/config.hpp>
 
 #include <hpx/util/backtrace/backtrace.hpp>
+#include <hpx/util/bind_front.hpp>
 
 #if (defined(__linux) || defined(__APPLE__) || defined(__sun)) \
      && (!defined(__ANDROID__) || !defined(ANDROID))
@@ -408,8 +409,8 @@ namespace hpx { namespace util {
         if (nullptr == threads::get_self_ptr())
             return trace();
 
-        lcos::local::futures_factory<std::string()> p(
-            util::bind(stack_trace::get_symbols, &frames_.front(), frames_.size()));
+        lcos::local::futures_factory<std::string()> p(util::bind_front(
+            stack_trace::get_symbols, &frames_.front(), frames_.size()));
 
         error_code ec(lightweight);
         threads::thread_id_type tid = p.apply(

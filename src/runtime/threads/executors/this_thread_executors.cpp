@@ -24,6 +24,7 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
@@ -364,8 +365,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 #endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
             threads::detail::scheduling_callbacks callbacks(
-                threads::detail::scheduling_callbacks::callback_type(),
-                util::bind( //-V107
+                nullptr,
+                util::deferred_call( //-V107
                     &this_thread_executor::suspend_back_into_calling_context,
                     this));
 
