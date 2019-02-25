@@ -70,20 +70,6 @@ int hpx_main(variables_map& vm)
 
         b.wait(); // wait for all threads to enter the barrier
         HPX_TEST_EQ(pxthreads, c);
-
-        //reset the number of threads to one
-        b.reset(1);
-        // create the threads which will wait on the barrier
-        for (std::size_t i = 0; i < pxthreads; ++i)
-        {
-            //call count_up to increase number of threads waiting when create a new thread
-            b.count_up();
-            register_work(
-                    hpx::util::bind(&local_barrier_test, std::ref(b), std::ref(c)));
-        }
-
-        b.wait(); // wait for all threads to enter the barrier
-        HPX_TEST_EQ(2*pxthreads, c);
     }
 
     // initiate shutdown of the runtime system
