@@ -515,6 +515,15 @@ namespace hpx
 
         // stop the rest of the system
         parcel_handler_.stop(blocking);     // stops parcel pools as well
+#ifdef HPX_HAVE_TIMER_POOL
+        LTM_(info) << "stop: stopping timer pool";
+        timer_pool_.stop();    // stop timer pool as well
+        if (blocking)
+        {
+            timer_pool_.join();
+            timer_pool_.clear();
+        }
+#endif
 #ifdef HPX_HAVE_IO_POOL
         io_pool_.stop();                    // stops io_pool_ as well
 #endif

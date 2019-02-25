@@ -1828,16 +1828,6 @@ namespace hpx { namespace threads
             pool_iter->stop(lk, blocking);
         }
         deinit_tss();
-
-#ifdef HPX_HAVE_TIMER_POOL
-        LTM_(info) << "stop: stopping timer pool";
-        timer_pool_.stop();    // stop timer pool as well
-        if (blocking)
-        {
-            timer_pool_.join();
-            timer_pool_.clear();
-        }
-#endif
     }
 
     void threadmanager::suspend()
