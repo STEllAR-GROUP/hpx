@@ -6,14 +6,14 @@
 #ifndef HPX_SERIALIZATION_BRACE_INITIALIZABLE_FWD_HPP
 #define HPX_SERIALIZATION_BRACE_INITIALIZABLE_FWD_HPP
 
-#include <hpx/config/automatic_struct_serialization.hpp>
+#include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) && defined (HPX_HAVE_CXX17_IF_CONSTEXPR)
 namespace hpx { namespace serialization
 {
-#if defined(HPX_SUPPORT_AUTOMATIC_STRUCT_SERIALIZATION)
     template <typename Archive, typename T>
     void serialize_struct(Archive& ar, T& t, const unsigned int);
-#endif
 }}
+#endif
 
 #endif

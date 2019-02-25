@@ -7,7 +7,7 @@
 #ifndef HPX_SERIALIZATION_ACCESS_HPP
 #define HPX_SERIALIZATION_ACCESS_HPP
 
-#include <hpx/config/automatic_struct_serialization.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/brace_initializable_fwd.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
@@ -35,6 +35,42 @@ namespace hpx { namespace serialization
         }
     }
 
+#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) && defined (HPX_HAVE_CXX17_IF_CONSTEXPR)
+    // This trait must live outside of 'class access' below as otherwise MSVC
+    // will find the serialize() function in 'class access' as a dependend class
+    // (which is a MS extension)
+    template <typename T>
+    class has_serialize_adl
+    {
+        template <typename T1> static std::false_type test(...);
+
+        template <typename T1, typename = decltype(serialize(
+            std::declval<hpx::serialization::output_archive &>(),
+            std::declval<typename std::remove_const<T1>::type &>(),
+            0u))>
+        static std::true_type test(int);
+
+    public:
+        static constexpr bool value = decltype(test<T>(0))::value;
+    };
+
+    template <typename T>
+    class has_struct_serialization
+    {
+    public:
+        template <typename T1> static std::false_type test(...);
+
+        template <typename T1, typename = decltype(serialize_struct(
+            std::declval<hpx::serialization::output_archive &>(),
+            std::declval<typename std::remove_const<T1>::type &>(),
+            0u, hpx::traits::detail::arity<T1>()))>
+        static std::true_type test(int);
+
+    public:
+        static constexpr bool value = decltype(test<T>(0))::value;
+    };
+#endif
+
     class access
     {
         template <class T>
@@ -56,37 +92,7 @@ namespace hpx { namespace serialization
         public:
             static constexpr bool value = decltype(test<T>(0))::value;
         };
-#if defined(HPX_SUPPORT_AUTOMATIC_STRUCT_SERIALIZATION)
-        template <class T>
-        class has_serialize_adl
-        {
-            template <class T1> static std::false_type test(...);
-            template <class T1, class = decltype(serialize(
-                std::declval<output_archive &>(),
-                std::declval<typename std::remove_const<T1>::type &>(),
-                0u))>
-            static std::true_type test(int);
 
-        public:
-            static constexpr bool value = decltype(test<T>(0))::value;
-        };
-
-        template <class T>
-        class has_struct_serialization
-        {
-        public:
-            template <class T1> static std::false_type test(...);
-
-            template <class T1, class = decltype(serialize_struct(
-                std::declval<hpx::serialization::output_archive &>(),
-                std::declval<typename std::remove_const<T1>::type &>(),
-                hpx::traits::arity<T1>()))>
-            static std::true_type test(int);
-
-        public:
-            static constexpr bool value = decltype(test<T>(0))::value;
-        };
-#endif
         template <class T>
         class serialize_dispatcher
         {
@@ -111,11 +117,10 @@ namespace hpx { namespace serialization
             {
                 template<class T1> struct dependent_false : std::false_type {};
 
-
                 template <class Archive>
                 static void call(Archive& ar, T& t, unsigned)
                 {
-#if defined(HPX_SUPPORT_AUTOMATIC_STRUCT_SERIALIZATION)
+#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) && defined (HPX_HAVE_CXX17_IF_CONSTEXPR)
                     if constexpr (has_serialize_adl<T>::value)
                     {
                         // this additional indirection level is needed to

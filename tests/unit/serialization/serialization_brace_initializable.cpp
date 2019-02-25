@@ -3,18 +3,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/optional.hpp>
-#include <hpx/runtime/serialization/brace_initializable.hpp>
-
-#include <hpx/runtime/serialization/input_archive.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
-
+#include <hpx/include/serialization.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <vector>
-#include <tuple>
 #include <string>
+#include <tuple>
+#include <vector>
 
 struct A
 {
@@ -22,6 +16,20 @@ struct A
     double floating_number;
     int int_number;
 };
+
+static_assert(hpx::traits::is_brace_constructible<A, 3>(),
+    "hpx::traits::is_brace_constructible<A, 3>()");
+static_assert(!hpx::traits::is_brace_constructible<A, 4>(),
+    "!hpx::traits::is_brace_constructible<A, 4>()");
+static_assert(!hpx::traits::is_paren_constructible<A, 3>(),
+    "!hpx::traits::is_paren_constructible<A, 3>()");
+
+static_assert(hpx::traits::detail::arity<A>().value == 3,
+    "hpx::traits::detail::arity<A>() == size<3>{}");
+static_assert(hpx::serialization::has_struct_serialization<A>::value,
+    "has_struct_serialization<A>::value");
+static_assert(!hpx::serialization::has_serialize_adl<A>::value,
+    "!has_serialize_adl<A>::value");
 
 bool operator==(const A& a1, const A& a2)
 {
@@ -34,6 +42,20 @@ struct B
     A a;
     char sign;
 };
+
+static_assert(hpx::traits::is_brace_constructible<B, 2>(),
+    "hpx::traits::is_brace_constructible<B, 2>()");
+static_assert(!hpx::traits::is_brace_constructible<B, 3>(),
+    "!hpx::traits::is_brace_constructible<B, 3>()");
+static_assert(!hpx::traits::is_paren_constructible<B, 2>(),
+    "!hpx::traits::is_paren_constructible<B, 2>()");
+
+static_assert(hpx::traits::detail::arity<B>().value == 2,
+    "hpx::traits::detail::arity<B>() == size<2>{}");
+static_assert(hpx::serialization::has_struct_serialization<B>::value,
+    "has_struct_serialization<B>::value");
+static_assert(!hpx::serialization::has_serialize_adl<B>::value,
+    "!has_serialize_adl<B>::value");
 
 bool operator==(const B& b1, const B& b2)
 {

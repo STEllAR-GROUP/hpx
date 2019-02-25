@@ -6,7 +6,6 @@
 set(tests
     serialization_array
     serialization_valarray
-    serialization_brace_initializable
     serialization_builtins
     serialization_complex
     serialization_custom_constructor
@@ -25,6 +24,12 @@ set(tests
     serialize_with_incompatible_signature
     zero_copy_serialization
 )
+
+if(HPX_WITH_CXX17_STRUCTURED_BINDINGS AND HPX_WITH_CXX17_IF_CONSTEXPR)
+    set(tests ${tests}
+        serialization_brace_initializable
+)
+endif()
 
 add_subdirectory(polymorphic)
 
