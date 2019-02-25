@@ -228,7 +228,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     std::cout << "using seed: " << seed << std::endl;
     std::mt19937 gen(seed);
-    std::uniform_int_distribution<> dis(0, 99);
+    std::uniform_int_distribution<> dis(0, 10);
 
     auto get_next_num = [&dis, &gen](int& num){ num = dis(gen); };
 
