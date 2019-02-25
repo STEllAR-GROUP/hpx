@@ -562,10 +562,6 @@ html_extra_path = []
 # using the given strftime format.
 html_last_updated_fmt = '%b %d, %Y'
 
-# If true, SmartyPants will be used to convert quotes and dashes to
-# typographically correct entities.
-html_use_smartypants = True
-
 # If false, no module index is generated.
 html_domain_indices = True
 
