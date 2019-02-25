@@ -610,7 +610,8 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'HPX.tex', u'HPX Documentation',
-     u'The STE\\textbar{}\\textbar{}AR Group', 'manual'),
+     u'The {STE\\raisebox{.05em}{\\hspace{.1em}$|$\\hspace{0.1em}$|$\\hspace{.02em}}AR} Group',
+     'manual'),
 ]
 
 latex_show_urls = 'footnote'
