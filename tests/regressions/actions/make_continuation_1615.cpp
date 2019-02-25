@@ -39,7 +39,7 @@ int hpx_main(int argc, char* argv[])
 
     // Same test with lambdas
     // action lambdas inhibit undefined behavior...
-#if defined(HPX_HAVE_SANITIZERS)
+#if !defined(HPX_HAVE_SANITIZERS)
     {
         auto t2 =
             hpx::actions::lambda_to_action(

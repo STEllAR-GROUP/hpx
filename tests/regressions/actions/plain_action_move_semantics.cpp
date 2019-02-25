@@ -305,7 +305,7 @@ void test_void_actions()
 
     // Same tests with lambdas
     // action lambdas inhibit undefined behavior...
-#if defined(HPX_HAVE_SANITIZERS)
+#if !defined(HPX_HAVE_SANITIZERS)
     {
         // test the void actions locally only (there is no way to get the
         // overall copy count back)
@@ -573,7 +573,7 @@ void test_object_actions()
 
     // Same tests with lambdas
     // action lambdas inhibit undefined behavior...
-#if defined(HPX_HAVE_SANITIZERS)
+#if !defined(HPX_HAVE_SANITIZERS)
     {
         for (id_type const& id : localities)
         {
