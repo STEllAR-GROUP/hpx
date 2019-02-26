@@ -458,7 +458,6 @@ namespace hpx { namespace compute { namespace host {
             LOG_NUMA_MSG("Done First-Touch tasks");
         }
 
-#ifdef NUMA_BINDING_ALLOCATOR_DEBUG_PAGE_BINDING
         std::string display_binding(pointer p, numa_binding_helper_ptr helper)
         {
             std::unique_lock<std::mutex> lk(init_mutex);
@@ -527,7 +526,6 @@ namespace hpx { namespace compute { namespace host {
             }
             return display.str();
         }
-#endif
 
     protected:
         std::vector<threads::hwloc_bitmap_ptr> create_nodesets(
