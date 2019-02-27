@@ -40,6 +40,7 @@ set(tests
     local_latch
     local_barrier
     local_barrier_count_up
+    local_barrier_reset
     local_dataflow
     local_dataflow_boost_small_vector
     local_dataflow_executor
