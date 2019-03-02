@@ -270,6 +270,10 @@ namespace hpx { namespace util
             // allow for unknown options to be passed through
             "allow_unknown = ${HPX_COMMANDLINE_ALLOW_UNKNOWN:0}",
 
+            // allow for command line options to to be passed through the
+            // environment
+            "prepend_options = ${HPX_COMMANDLINE_OPTIONS}",
+
             // predefine command line aliases
             "[hpx.commandline.aliases]",
             "-a = --hpx:agas",
