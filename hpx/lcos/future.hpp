@@ -73,7 +73,8 @@ namespace hpx { namespace lcos { namespace detail
         ar >> value;
 
         boost::intrusive_ptr<shared_state> p(
-            new shared_state(init_no_addref{}, std::move(value)), false);
+            new shared_state(init_no_addref{}, in_place{}, std::move(value)),
+            false);
 
         f = hpx::traits::future_access<Future>::create(std::move(p));
     }
@@ -89,7 +90,8 @@ namespace hpx { namespace lcos { namespace detail
             serialization::detail::constructor_selector<value_type>::create(ar));
 
         boost::intrusive_ptr<shared_state> p(
-            new shared_state(init_no_addref{}, std::move(*value)), false);
+            new shared_state(init_no_addref{}, in_place{}, std::move(*value)),
+            false);
 
         f = hpx::traits::future_access<Future>::create(std::move(p));
     }
@@ -115,7 +117,8 @@ namespace hpx { namespace lcos { namespace detail
             ar >> exception;
 
             boost::intrusive_ptr<shared_state> p(
-                new shared_state(init_no_addref{}, std::move(exception)), false);
+                new shared_state(init_no_addref{}, std::move(exception)),
+                false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::invalid) {
@@ -140,7 +143,8 @@ namespace hpx { namespace lcos { namespace detail
         if (state == future_state::has_value)
         {
             boost::intrusive_ptr<shared_state> p(
-                new shared_state(init_no_addref{}, hpx::util::unused), false);
+                new shared_state(init_no_addref{}, in_place{}, hpx::util::unused),
+                false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::has_exception) {
@@ -148,7 +152,8 @@ namespace hpx { namespace lcos { namespace detail
             ar >> exception;
 
             boost::intrusive_ptr<shared_state> p(
-                new shared_state(init_no_addref{}, std::move(exception)), false);
+                new shared_state(init_no_addref{}, std::move(exception)),
+                false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::invalid) {
@@ -1488,107 +1493,13 @@ namespace hpx { namespace lcos
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    // extension: create a pre-initialized future object, with allocator
-    template <typename Allocator, typename T>
-    typename std::enable_if<
-       !std::is_void<T>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
-    >::type
-    make_ready_future_alloc(Allocator const& a, T&& init)
-    {
-        using result_type = typename hpx::util::decay_unwrap<T>::type;
-
-        using base_allocator = Allocator;
-        using shared_state = typename traits::detail::shared_state_allocator<
-                lcos::detail::future_data<result_type>, base_allocator
-            >::type;
-
-        using other_allocator = typename std::allocator_traits<base_allocator>::
-            template rebind_alloc<shared_state>;
-        using traits = std::allocator_traits<other_allocator>;
-
-        using init_no_addref = typename shared_state::init_no_addref;
-
-        using unique_ptr = std::unique_ptr<shared_state,
-            util::allocator_deleter<other_allocator>>;
-
-        other_allocator alloc(a);
-        unique_ptr p(traits::allocate(alloc, 1),
-            util::allocator_deleter<other_allocator>{alloc});
-        traits::construct(
-            alloc, p.get(), init_no_addref{}, alloc, std::forward<T>(init));
-
-        return hpx::traits::future_access<future<result_type>>::create(
-            p.release(), false);
-    }
-
-    // extension: create a pre-initialized future object
-    template <typename T>
-    HPX_FORCEINLINE typename std::enable_if<
-       !std::is_void<T>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
-    >::type
-    make_ready_future(T&& init)
-    {
-        return make_ready_future_alloc(hpx::util::internal_allocator<>{},
-            std::forward<T>(init));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // Extension (see wg21.link/P0319), with allocator
-    template <typename T, typename Allocator>
+    template <typename T, typename Allocator, typename ... Ts>
     typename std::enable_if<
-        std::is_constructible<T>::value && !std::is_void<T>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
+        std::is_constructible<T, Ts&&...>::value || std::is_void<T>::value,
+        future<T>
     >::type
-    make_ready_future_alloc(Allocator const& a)
-    {
-        using result_type = typename hpx::util::decay_unwrap<T>::type;
-
-        using base_allocator = Allocator;
-        using shared_state = typename traits::detail::shared_state_allocator<
-                lcos::detail::future_data<result_type>, base_allocator
-            >::type;
-
-        using other_allocator = typename std::allocator_traits<base_allocator>::
-            template rebind_alloc<shared_state>;
-        using traits = std::allocator_traits<other_allocator>;
-
-        using init_no_addref = typename shared_state::init_no_addref;
-        using default_construct = typename shared_state::default_construct;
-
-        using unique_ptr = std::unique_ptr<shared_state,
-            util::allocator_deleter<other_allocator>>;
-
-        other_allocator alloc(a);
-        unique_ptr p(traits::allocate(alloc, 1),
-            util::allocator_deleter<other_allocator>{alloc});
-        traits::construct(
-            alloc, p.get(), init_no_addref{}, default_construct{}, alloc);
-
-        return hpx::traits::future_access<future<result_type>>::create(
-            p.release(), false);
-    }
-
-    // Extension (see wg21.link/P0319)
-    template <typename T>
-    HPX_FORCEINLINE typename std::enable_if<
-        std::is_constructible<T>::value && !std::is_void<T>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
-    >::type
-    make_ready_future()
-    {
-        return make_ready_future_alloc<T>(hpx::util::internal_allocator<>{});
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Extension (see wg21.link/P0319), with allocator
-    template <typename T, typename Allocator, typename T1, typename ... Ts>
-    typename std::enable_if<
-        std::is_constructible<T, T1&&, Ts&&...>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
-    >::type
-    make_ready_future_alloc(Allocator const& a, T1&& t1, Ts&&... ts)
+    make_ready_future_alloc(Allocator const& a, Ts&&... ts)
     {
         using result_type = T;
 
@@ -1606,27 +1517,50 @@ namespace hpx { namespace lcos
         using unique_ptr = std::unique_ptr<shared_state,
             util::allocator_deleter<other_allocator>>;
 
+        using detail::in_place;
         other_allocator alloc(a);
         unique_ptr p(traits::allocate(alloc, 1),
             util::allocator_deleter<other_allocator>{alloc});
-        traits::construct(alloc, p.get(), init_no_addref{}, alloc,
-            std::forward<T1>(t1), std::forward<Ts>(ts)...);
+        traits::construct(alloc, p.get(), init_no_addref{}, in_place{}, alloc,
+            std::forward<Ts>(ts)...);
 
         return hpx::traits::future_access<future<result_type>>::create(
             p.release(), false);
     }
 
     // Extension (see wg21.link/P0319)
-    template <typename T, typename T1, typename ... Ts>
+    template <typename T, typename ... Ts>
     HPX_FORCEINLINE typename std::enable_if<
-        std::is_constructible<T, T1&&, Ts&&...>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
+        std::is_constructible<T, Ts&&...>::value || std::is_void<T>::value,
+        future<T>
     >::type
-    make_ready_future(T1&& t1, Ts&&... ts)
+    make_ready_future(Ts&&... ts)
     {
-        return make_ready_future_alloc<T>(hpx::util::internal_allocator<>{},
-            std::forward<T1>(t1), std::forward<Ts>(ts)...);
+        return make_ready_future_alloc<T>(
+            hpx::util::internal_allocator<>{},
+            std::forward<Ts>(ts)...);
     }
+    ///////////////////////////////////////////////////////////////////////////
+    // extension: create a pre-initialized future object, with allocator
+    template <int DeductionGuard = 0, typename Allocator, typename T>
+    future<typename hpx::util::decay_unwrap<T>::type>
+    make_ready_future_alloc(Allocator const& a, T&& init)
+    {
+        using result_type = typename hpx::util::decay_unwrap<T>::type;
+        return make_ready_future_alloc<result_type>(a, std::forward<T>(init));
+    }
+
+    // extension: create a pre-initialized future object
+    template <int DeductionGuard = 0, typename T>
+    HPX_FORCEINLINE future<typename hpx::util::decay_unwrap<T>::type>
+    make_ready_future(T&& init)
+    {
+        using result_type = typename hpx::util::decay_unwrap<T>::type;
+        return make_ready_future_alloc<result_type>(
+            hpx::util::internal_allocator<>{},
+            std::forward<T>(init));
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object which holds the
@@ -1659,11 +1593,8 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
-    template <typename T>
-    typename std::enable_if<
-       !std::is_void<T>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
-    >::type
+    template <int DeductionGuard = 0, typename T>
+    future<typename hpx::util::decay_unwrap<T>::type>
     make_ready_future_at(hpx::util::steady_time_point const& abs_time,
         T&& init)
     {
@@ -1677,11 +1608,8 @@ namespace hpx { namespace lcos
             std::move(p));
     }
 
-    template <typename T>
-    typename std::enable_if<
-       !std::is_void<T>::value,
-        future<typename hpx::util::decay_unwrap<T>::type>
-    >::type
+    template <int DeductionGuard = 0, typename T>
+    future<typename hpx::util::decay_unwrap<T>::type>
     make_ready_future_after(hpx::util::steady_duration const& rel_time,
         T&& init)
     {
@@ -1694,34 +1622,14 @@ namespace hpx { namespace lcos
     template <typename Allocator>
     inline future<void> make_ready_future_alloc(Allocator const& a)
     {
-        using base_allocator = Allocator;
-        using shared_state = typename traits::detail::shared_state_allocator<
-                lcos::detail::future_data<void>, base_allocator
-            >::type;
-
-        using other_allocator = typename std::allocator_traits<base_allocator>::
-            template rebind_alloc<shared_state>;
-        using traits = std::allocator_traits<other_allocator>;
-
-        using init_no_addref = typename shared_state::init_no_addref;
-
-        using unique_ptr = std::unique_ptr<shared_state,
-            util::allocator_deleter<other_allocator>>;
-
-        other_allocator alloc(a);
-        unique_ptr p(traits::allocate(alloc, 1),
-            util::allocator_deleter<other_allocator>{alloc});
-        traits::construct(
-            alloc, p.get(), init_no_addref{}, alloc, util::unused);
-
-        return hpx::traits::future_access<future<void>>::create(
-            p.release(), false);
+        return make_ready_future_alloc<void>(a, util::unused);
     }
 
     // extension: create a pre-initialized future object
     HPX_FORCEINLINE future<void> make_ready_future()
     {
-        return make_ready_future_alloc(hpx::util::internal_allocator<>{});
+        return make_ready_future_alloc<void>(
+            hpx::util::internal_allocator<>{}, util::unused);
     }
 
     // Extension (see wg21.link/P0319)
@@ -1746,7 +1654,9 @@ namespace hpx { namespace lcos
     }
 
     template <typename T>
-    typename std::enable_if<std::is_void<T>::value, future<void> >::type
+    typename std::enable_if<
+        std::is_void<T>::value, future<void>
+    >::type
     make_ready_future_at(hpx::util::steady_time_point const& abs_time)
     {
         return make_ready_future_at(abs_time);
@@ -1760,7 +1670,9 @@ namespace hpx { namespace lcos
     }
 
     template <typename T>
-    typename std::enable_if<std::is_void<T>::value, future<void> >::type
+    typename std::enable_if<
+        std::is_void<T>::value, future<void>
+    >::type
     make_ready_future_after(hpx::util::steady_duration const& rel_time)
     {
         return make_ready_future_at(rel_time.from_now());

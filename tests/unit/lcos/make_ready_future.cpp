@@ -7,6 +7,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -40,13 +41,27 @@ struct B
 
 void test_unary()
 {
+    B lval(42);
+
     hpx::future<B> f1 = hpx::make_ready_future(B(42));
     HPX_TEST(f1.is_ready());
     HPX_TEST_EQ(f1.get().i_, 42);
 
-    hpx::future<B> f2 = hpx::make_ready_future<B>(42);
+    hpx::future<B> f2 = hpx::make_ready_future(lval);
     HPX_TEST(f2.is_ready());
     HPX_TEST_EQ(f2.get().i_, 42);
+
+    hpx::future<B> f3 = hpx::make_ready_future<B>(42);
+    HPX_TEST(f3.is_ready());
+    HPX_TEST_EQ(f3.get().i_, 42);
+
+    hpx::future<B&> f4 = hpx::make_ready_future(std::ref(lval));
+    HPX_TEST(f4.is_ready());
+    HPX_TEST_EQ(&f4.get().i_, &lval.i_);
+
+    hpx::future<B&> f5 = hpx::make_ready_future<B&>(lval);
+    HPX_TEST(f5.is_ready());
+    HPX_TEST_EQ(&f5.get().i_, &lval.i_);
 }
 
 struct C
@@ -112,4 +127,3 @@ int main(int argc, char* argv[])
     HPX_TEST_EQ(hpx::init(argc, argv, cfg), 0);
     return hpx::util::report_errors();
 }
-

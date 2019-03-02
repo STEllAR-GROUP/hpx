@@ -62,7 +62,9 @@ namespace hpx { namespace lcos { namespace local
                 unique_pointer p (traits::allocate(alloc, 1),
                     util::allocator_deleter<other_allocator>{alloc});
 
-                traits::construct(alloc, p.get(), init_no_addref{}, alloc);
+                using lcos::detail::in_place;
+                traits::construct(alloc, p.get(), init_no_addref{}, in_place{},
+                    alloc);
                 shared_state_.reset(p.release(), false);
             }
 
