@@ -7,6 +7,7 @@ set(tests
     for_each_annotated_function
     for_loop_2281
     minimal_findend
+    reduce_3641
     scan_different_inits
     scan_non_commutative
     scan_shortlength
