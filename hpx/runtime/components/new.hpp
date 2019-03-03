@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +14,7 @@
 #include <hpx/runtime/components/default_distribution_policy.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_component.hpp>
@@ -96,7 +97,9 @@ namespace hpx
     ///          component type (<code>traits::is_component<Component>::value</code>
     ///          evaluates to true), the function will return an \a hpx::future
     ///          object instance which can be used to retrieve the global
-    ///          address of the newly created component.
+    ///          address of the newly created component. If the first argument
+    ///          is `hpx::launch::sync` the function will directly return an
+    ///          `hpx::id_type`.
     ///          * If the explicit template argument \a Component represents a
     ///          client side object (<code>traits::is_client<Component>::value</code>
     ///          evaluates to true), the function will return a new instance
@@ -256,7 +259,7 @@ namespace hpx { namespace components
         template <typename Component>
         struct new_component
         {
-            typedef hpx::future<hpx::id_type> type;
+            using type = hpx::future<hpx::id_type>;
 
             template <typename ...Ts>
             static type call(hpx::id_type const& locality, Ts&&... vs)
@@ -277,7 +280,7 @@ namespace hpx { namespace components
         template <typename Component>
         struct new_component<Component[]>
         {
-            typedef hpx::future<std::vector<hpx::id_type> > type;
+            using type = hpx::future<std::vector<hpx::id_type> >;
 
             template <typename ...Ts>
             static type call(hpx::id_type const& locality, std::size_t count,
@@ -320,12 +323,12 @@ namespace hpx { namespace components
         template <typename Component>
         struct local_new_component
         {
-            typedef typename hpx::future<hpx::id_type> type;
+            using type = hpx::future<hpx::id_type>;
 
             template <typename ...Ts>
             static type call(Ts &&... ts)
             {
-                typedef typename Component::wrapping_type component_type;
+                using component_type = typename Component::wrapping_type;
 
                 hpx::id_type id(
                     components::server::create<component_type>(
@@ -339,12 +342,12 @@ namespace hpx { namespace components
         template <typename Component>
         struct local_new_component<Component[]>
         {
-            typedef hpx::future<std::vector<hpx::id_type> > type;
+            using type = hpx::future<std::vector<hpx::id_type> >;
 
             template <typename ...Ts>
             static type call(std::size_t count, Ts&&... ts)
             {
-                typedef typename Component::wrapping_type component_type;
+                using component_type = typename Component::wrapping_type;
 
                 std::vector<hpx::id_type> result;
                 result.reserve(count);
@@ -352,13 +355,56 @@ namespace hpx { namespace components
                 for (std::size_t i = 0; i != count; ++i)
                 {
                     result.push_back(hpx::id_type(
-                        components::server::create<component_type>(
-                            std::forward<Ts>(ts)...
-                        ),
+                        components::server::create<component_type>(ts...),
                         hpx::id_type::managed));
                 }
 
                 return hpx::make_ready_future(result);
+            }
+        };
+
+        // same as above, just fully synchronous
+        template <typename Component>
+        struct local_new_component_sync
+        {
+            using type = hpx::id_type;
+
+            template <typename ...Ts>
+            static type call(Ts &&... ts)
+            {
+                using component_type = typename Component::wrapping_type;
+
+                hpx::id_type id(
+                    components::server::create<component_type>(
+                        std::forward<Ts>(ts)...
+                    ),
+                    hpx::id_type::managed);
+
+                return id;
+            }
+        };
+
+        template <typename Component>
+        struct local_new_component_sync<Component[]>
+        {
+            using type = std::vector<hpx::id_type>;
+
+            template <typename ...Ts>
+            static type call(std::size_t count, Ts&&... ts)
+            {
+                using component_type = typename Component::wrapping_type;
+
+                std::vector<hpx::id_type> result;
+                result.reserve(count);
+
+                for (std::size_t i = 0; i != count; ++i)
+                {
+                    result.push_back(hpx::id_type(
+                        components::server::create<component_type>(ts...),
+                        hpx::id_type::managed));
+                }
+
+                return result;
             }
         };
     }
@@ -449,9 +495,9 @@ namespace hpx { namespace components
         template <typename Client>
         struct local_new_client
         {
-            typedef Client type;
-            typedef typename Client::server_component_type::wrapping_type
-                component_type;
+            using type = Client;
+            using component_type =
+                typename Client::server_component_type::wrapping_type;
 
             template <typename ...Ts>
             static type call(Ts &&... ts)
@@ -524,17 +570,40 @@ namespace hpx { namespace components
     // Same as above, but just on this locality. This does not go through an
     // action, that means that the constructor arguments can be non-copyable
     // and non-movable.
-    template <typename Component, typename ...Ts>
+    template <typename Component>
     inline typename util::lazy_enable_if<
         traits::is_component_or_component_array<Component>::value,
         detail::local_new_component<Component>
     >::type
-    local_new(Ts &&... ts)
+    local_new()
+    {
+        return detail::local_new_component<Component>::call();
+    }
+
+    template <typename Component, typename T1, typename ...Ts>
+    inline typename util::lazy_enable_if<
+        traits::is_component_or_component_array<Component>::value &&
+       !std::is_same<typename std::decay<T1>::type, launch::sync_policy>::value,
+        detail::local_new_component<Component>
+    >::type
+    local_new(T1 && t1, Ts &&... ts)
     {
         return detail::local_new_component<Component>::call(
+            std::forward<T1>(t1), std::forward<Ts>(ts)...);
+    }
+
+    template <typename Component, typename ...Ts>
+    inline typename util::lazy_enable_if<
+        traits::is_component_or_component_array<Component>::value,
+        detail::local_new_component_sync<Component>
+    >::type
+    local_new(launch::sync_policy, Ts &&... ts)
+    {
+        return detail::local_new_component_sync<Component>::call(
             std::forward<Ts>(ts)...);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Client, typename ...Ts>
     inline typename util::lazy_enable_if<
         traits::is_client_or_client_array<Client>::value,

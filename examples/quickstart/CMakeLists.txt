@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2016 Hartmut Kaiser
+# Copyright (c) 2007-2019 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@ set(example_programs
     component_ctors
     component_in_executable
     component_inheritance
+    component_with_custom_heap
     component_with_executor
     composable_guard
     customize_async
@@ -72,6 +73,7 @@ set(command_line_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_in_executable_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_ctors_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_inheritance_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(component_with_custom_heap_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_with_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(customize_async_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(enumerate_threads_FLAGS COMPONENT_DEPENDENCIES iostreams)
