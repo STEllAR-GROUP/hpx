@@ -10,6 +10,8 @@
 // After creating 1000 component instances this example directly accesses those
 // in local memory without having to go through the AGAS address resolution.
 
+// make inspect happy: hpxinspect:noinclude:HPX_ASSERT
+
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
@@ -24,63 +26,73 @@
 #include <memory>
 #include <mutex>
 #include <type_traits>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Implementation of a free_list allocator, this has no bearings on the example
 // component below.
-namespace free_list_allocator
+namespace allocator
 {
     ///////////////////////////////////////////////////////////////////////////
     HPX_CONSTEXPR std::size_t BLOCK_ALIGNMENT = 8;
     HPX_CONSTEXPR std::size_t PAGE_SIZE = 16384;
 
-    template <typename T>
     struct alloc_page;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
     struct alloc_block_header
     {
         HPX_CONSTEXPR HPX_FORCEINLINE alloc_block_header(
-                alloc_page<T>* p = nullptr) noexcept
+                alloc_page* p = nullptr) noexcept
           : page(p)
         {}
 
-        HPX_FORCEINLINE alloc_page<T>* get_ptr() noexcept
-        {
-            return page;
-        }
+        ~alloc_block_header() = default;
 
-        alloc_page<T>* page;
+        alloc_block_header(alloc_block_header const&) = delete;
+        alloc_block_header(alloc_block_header&&) = delete;
+
+        alloc_block_header& operator=(alloc_block_header const&) = delete;
+        alloc_block_header& operator=(alloc_block_header&&) = delete;
+
+        alloc_page* page;
     };
 
     template <typename T>
-    struct alloc_block : alloc_block_header<T>
+    struct alloc_block : alloc_block_header
     {
         HPX_STATIC_CONSTEXPR std::size_t allocation_size =
             ((sizeof(T) + BLOCK_ALIGNMENT - 1) & ~(BLOCK_ALIGNMENT - 1)) +
-            sizeof(alloc_block_header<T>);
+            sizeof(alloc_block_header);
 
         HPX_CONSTEXPR HPX_FORCEINLINE alloc_block(
-                alloc_page<T>* page = nullptr) noexcept
-          : alloc_block_header<T>(page)
+                alloc_page* page = nullptr) noexcept
+          : alloc_block_header(page)
           , next_free(nullptr)
         {}
 
-        HPX_CONSTEXPR HPX_FORCEINLINE alloc_block<T>* operator[](
+        ~alloc_block() = default;
+
+        alloc_block(alloc_block const&) = delete;
+        alloc_block(alloc_block&&) = delete;
+
+        alloc_block& operator=(alloc_block const&) = delete;
+        alloc_block& operator=(alloc_block&&) = delete;
+
+        HPX_CONSTEXPR HPX_FORCEINLINE alloc_block* operator[](
             std::size_t i) noexcept
         {
-            return reinterpret_cast<alloc_block<T>*>(
+            return reinterpret_cast<alloc_block*>(
                 reinterpret_cast<char*>(this) + i * allocation_size);
         }
-        HPX_CONSTEXPR HPX_FORCEINLINE alloc_block<T> const* operator[](
+        HPX_CONSTEXPR HPX_FORCEINLINE alloc_block const* operator[](
             std::size_t i) const noexcept
         {
-            return reinterpret_cast<alloc_block<T> const*>(
+            return reinterpret_cast<alloc_block const*>(
                 reinterpret_cast<char const*>(this) + i * allocation_size);
         }
 
-        alloc_block<T>* next_free;
+        alloc_block* next_free;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -105,7 +117,7 @@ namespace free_list_allocator
 
         HPX_FORCEINLINE static free_list_allocator& get_allocator();
 
-        HPX_CONSTEXPR HPX_FORCEINLINE alloc_page<T> const* first_page() const
+        HPX_CONSTEXPR HPX_FORCEINLINE alloc_page const* first_page() const
         {
             return pages;
         }
@@ -115,26 +127,24 @@ namespace free_list_allocator
 
     private:
 
-        friend struct alloc_page<T>;
+        friend struct alloc_page;
 
         alloc_block<T>* chain;
-        alloc_page<T>* pages;
+        alloc_page* pages;
         mutex_type mtx;
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
     struct alloc_page
     {
-        HPX_CONSTEXPR HPX_FORCEINLINE alloc_page() noexcept
+        HPX_FORCEINLINE alloc_page(std::size_t size) noexcept
           : next(nullptr)
           , allocated_blocks(0)
+          , block_size(size)
         {}
 
-        ~alloc_page()
-        {
-            // FIXME: loop over blocks and call destructor
-        }
+        // FIXME: loop over blocks and call destructor
+        ~alloc_page() = default;
 
         alloc_page(alloc_page const&) = delete;
         alloc_page& operator=(alloc_page const&) = delete;
@@ -142,47 +152,88 @@ namespace free_list_allocator
         alloc_page(alloc_page &&) = delete;
         alloc_page& operator=(alloc_page &&) = delete;
 
+        template <typename T>
         HPX_CONSTEXPR HPX_FORCEINLINE alloc_block<T>* get_block() noexcept
         {
+            static_assert(page_size >= alloc_block<T>::allocation_size,
+                "size of objects is larger than configured page size");
+
+            // block_size must match allocation size of requested type
+            HPX_ASSERT(block_size == alloc_block<T>::allocation_size);
+
             return reinterpret_cast<alloc_block<T>*>(&data);
         }
-        HPX_CONSTEXPR HPX_FORCEINLINE alloc_block<T> const* get_block() const noexcept
+        template <typename T>
+        HPX_CONSTEXPR HPX_FORCEINLINE alloc_block<T> const* get_block() const
+            noexcept
         {
+            static_assert(page_size >= alloc_block<T>::allocation_size,
+                "size of objects is larger than configured page size");
+
+            // block_size must match allocation size of requested type
+            HPX_ASSERT(block_size == alloc_block<T>::allocation_size);
+
             return reinterpret_cast<alloc_block<T> const*>(&data);
         }
 
-        HPX_CONSTEXPR HPX_FORCEINLINE T& operator[](std::size_t i) noexcept
+        template <typename T>
+        HPX_CONSTEXPR HPX_FORCEINLINE T& get(std::size_t i) noexcept
         {
+            static_assert(page_size >= alloc_block<T>::allocation_size,
+                "size of objects is larger than configured page size");
+
+            // block_size must match allocation size of requested type
+            HPX_ASSERT(block_size == alloc_block<T>::allocation_size);
+
             return *reinterpret_cast<T*>(static_cast<void*>(
-                static_cast<alloc_block_header<T>*>((*get_block())[i]) + 1));
+                static_cast<alloc_block_header*>((*get_block<T>())[i]) + 1));
         }
-        HPX_CONSTEXPR HPX_FORCEINLINE T const& operator[](std::size_t i) const
+        template <typename T>
+        HPX_CONSTEXPR HPX_FORCEINLINE T const& get(std::size_t i) const
             noexcept
         {
+            static_assert(page_size >= alloc_block<T>::allocation_size,
+                "size of objects is larger than configured page size");
+
+            // block_size must match allocation size of requested type
+            HPX_ASSERT(block_size == alloc_block<T>::allocation_size);
+
             return *reinterpret_cast<T const*>(static_cast<void const*>(
-                static_cast<alloc_block_header<T> const*>((*get_block())[i]) + 1));
+                static_cast<alloc_block_header const*>(
+                    (*get_block<T>())[i]) + 1));
         }
 
         // for the available page size we account for the members of this
         // class below
         HPX_STATIC_CONSTEXPR std::size_t page_size =
-            PAGE_SIZE - 2 * sizeof(void*) - sizeof(std::size_t);
-
-        static_assert(page_size >= alloc_block<T>::allocation_size,
-            "size of objects is larger than configured page size");
+            PAGE_SIZE - sizeof(void*) - 2*sizeof(std::size_t);
 
         typename std::aligned_storage<page_size>::type data;
 
-        alloc_page<T>* next;
+        alloc_page* next;
         std::size_t allocated_blocks;
+        std::size_t const block_size;
     };
+
+    template <typename T>
+    HPX_CONSTEXPR HPX_FORCEINLINE T& get(
+        alloc_page* page, std::size_t i) noexcept
+    {
+        return page->template get<T>(i);
+    }
+    template <typename T>
+    HPX_CONSTEXPR HPX_FORCEINLINE T const& get(
+        alloc_page const* page, std::size_t i) noexcept
+    {
+        return page->template get<T>(i);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     HPX_FORCEINLINE free_list_allocator<T>&
         free_list_allocator<T>::get_allocator()
     {
-        static free_list_allocator<T> ctx{};
+        static free_list_allocator ctx{};
         return ctx;
     }
 
@@ -197,31 +248,30 @@ namespace free_list_allocator
         {
             chain = blk->next_free;
             ++blk->page->allocated_blocks;
-            return reinterpret_cast<alloc_block_header<T>*>(blk) + 1;
+            return reinterpret_cast<alloc_block_header*>(blk) + 1;
         }
 
-        alloc_page<T>* pg = nullptr;
+        alloc_page* pg = nullptr;
         alloc_block<T>* new_chain = nullptr;
 
         {
             hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(lk);
 
             // allocate new page
-            pg = reinterpret_cast<alloc_page<T>*>(
-                std::malloc(sizeof(alloc_page<T>)));
+            pg = reinterpret_cast<alloc_page*>(std::malloc(sizeof(alloc_page)));
             if (nullptr == pg)
             {
                 return nullptr;
             }
 
-            new (pg) alloc_page<T>();
+            new (pg) alloc_page(alloc_block<T>::allocation_size);
 
             // FIXME: move block construction into alloc_page constructor
-            blk = new_chain = (*pg->get_block())[1];
+            blk = new_chain = (*pg->template get_block<T>())[1];
             new (blk) alloc_block<T>(pg);
 
             std::size_t blocks =
-                (alloc_page<T>::page_size / alloc_block<T>::allocation_size) - 2;
+                (alloc_page::page_size / alloc_block<T>::allocation_size) - 2;
 
             do
             {
@@ -234,7 +284,7 @@ namespace free_list_allocator
 
             blk->next_free = nullptr;
 
-            blk = pg->get_block();
+            blk = pg->template get_block<T>();
             new (blk) alloc_block<T>(pg);
 
             blk->next_free = nullptr;
@@ -246,7 +296,7 @@ namespace free_list_allocator
 
         ++blk->page->allocated_blocks;
 
-        return reinterpret_cast<alloc_block_header<T>*>(blk) + 1;
+        return reinterpret_cast<alloc_block_header*>(blk) + 1;
     }
 
     template <typename T>
@@ -260,11 +310,9 @@ namespace free_list_allocator
         std::unique_lock<mutex_type> lk(mtx);
 
         auto* blk = static_cast<alloc_block<T>*>(
-            reinterpret_cast<alloc_block_header<T>*>(addr) - 1);
+            reinterpret_cast<alloc_block_header*>(addr) - 1);
 
-        alloc_page<T>* page = blk->get_ptr();
-
-        --page->allocated_blocks;
+        --blk->page->allocated_blocks;
 
         blk->next_free = chain;
         chain = blk;
@@ -306,20 +354,20 @@ struct free_list_component_heap
     // alloc and free have to be exposed from a component heap
     static void* alloc(std::size_t)
     {
-        return free_list_allocator::free_list_allocator<Component>::
+        return allocator::free_list_allocator<Component>::
             get_allocator().alloc();
     }
 
     static void free(void* p, std::size_t)
     {
-        return free_list_allocator::free_list_allocator<Component>::
+        return allocator::free_list_allocator<Component>::
             get_allocator().free(p);
     }
 
     // this is an additional function needed just for this example
-    static free_list_allocator::alloc_page<Component> const* get_first_page()
+    static allocator::alloc_page const* get_first_page()
     {
-        return free_list_allocator::free_list_allocator<Component>::
+        return allocator::free_list_allocator<Component>::
             get_allocator().first_page();
     }
 };
@@ -370,7 +418,7 @@ int main()
         auto blocks = page->allocated_blocks;
         for (std::size_t i = 0; i != blocks; ++i)
         {
-            (*page)[i].print(pagenum, i);
+            allocator::get<hello_world_server>(page, i).print(pagenum, i);
         }
     }
 
