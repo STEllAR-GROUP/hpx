@@ -3,6 +3,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+
 find_package(Git)
 
 if(NOT GIT_FOUND)
@@ -32,30 +34,63 @@ else()
 endif()
 
 # We copy the documentation files from DOCS_SOURCE
-set(DOCS_SOURCE "${HPX_BINARY_DIR}/share/hpx/docs/html")
+set(DOCS_SOURCE "${HPX_BINARY_DIR}/share/hpx/docs")
+
+# Turn the string of output formats back into a list
+string(REGEX REPLACE " " ";"
+    HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS
+    "${HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS}")
 
 # If a branch name has been set, we copy files to a corresponding directory
 message("HPX_WITH_GIT_BRANCH=\"${HPX_WITH_GIT_BRANCH}\"")
 if(HPX_WITH_GIT_BRANCH)
-    message("Updating branch directory")
+  message("Updating branch directory")
   set(DOCS_BRANCH_DEST "${CMAKE_BINARY_DIR}/gh-pages/docs/sphinx/branches/${HPX_WITH_GIT_BRANCH}")
   file(REMOVE_RECURSE "${DOCS_BRANCH_DEST}")
-  file(
-    COPY "${DOCS_SOURCE}"
-    DESTINATION "${DOCS_BRANCH_DEST}"
-    PATTERN "*.buildinfo" EXCLUDE)
+  if("html" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    file(
+        COPY "${DOCS_SOURCE}/html"
+        DESTINATION "${DOCS_BRANCH_DEST}"
+        PATTERN "*.buildinfo" EXCLUDE)
+  endif()
+  if("singlehtml" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    file(
+      COPY "${DOCS_SOURCE}/singlehtml"
+      DESTINATION "${DOCS_BRANCH_DEST}"
+      PATTERN "*.buildinfo" EXCLUDE)
+  endif()
+  if("latexpdf" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    file(
+      COPY "${DOCS_SOURCE}/latexpdf/latex/HPX.pdf"
+      DESTINATION "${DOCS_BRANCH_DEST}/pdf/"
+      PATTERN "*.buildinfo" EXCLUDE)
+  endif()
 endif()
 
 # If a tag name has been set, we copy files to a corresponding directory
 message("HPX_WITH_GIT_TAG=\"${HPX_WITH_GIT_TAG}\"")
 if(HPX_WITH_GIT_TAG)
-    message("Updating tag directory")
+  message("Updating tag directory")
   set(DOCS_TAG_DEST "${CMAKE_BINARY_DIR}/gh-pages/docs/sphinx/tags/${HPX_WITH_GIT_TAG}")
   file(REMOVE_RECURSE "${DOCS_TAG_DEST}")
-  file(
-    COPY "${DOCS_SOURCE}"
-    DESTINATION "${DOCS_TAG_DEST}"
-    PATTERN "*.buildinfo" EXCLUDE)
+  if("html" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    file(
+      COPY "${DOCS_SOURCE}/html"
+      DESTINATION "${DOCS_TAG_DEST}"
+      PATTERN "*.buildinfo" EXCLUDE)
+  endif()
+  if("singlehtml" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    file(
+      COPY "${DOCS_SOURCE}/singlehtml"
+      DESTINATION "${DOCS_TAG_DEST}"
+      PATTERN "*.buildinfo" EXCLUDE)
+  endif()
+  if("latexpdf" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    file(
+      COPY "${DOCS_SOURCE}/latexpdf/latex/HPX.pdf"
+      DESTINATION "${DOCS_TAG_DEST}/pdf/"
+      PATTERN "*.buildinfo" EXCLUDE)
+  endif()
 
   # If a tag name has been set and it is a suitable version number, we also copy
   # files to the "latest" directory. The regex only matches full version numbers
@@ -65,10 +100,24 @@ if(HPX_WITH_GIT_TAG)
     message("Updating latest directory")
     set(DOCS_LATEST_DEST "${CMAKE_BINARY_DIR}/gh-pages/docs/sphinx/latest")
     file(REMOVE_RECURSE "${DOCS_LATEST_DEST}")
-    file(
-      COPY "${DOCS_SOURCE}"
-      DESTINATION "${DOCS_LATEST_DEST}"
-      PATTERN "*.buildinfo" EXCLUDE)
+    if("html" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+      file(
+        COPY "${DOCS_SOURCE}"
+        DESTINATION "${DOCS_LATEST_DEST}/html"
+        PATTERN "*.buildinfo" EXCLUDE)
+    endif()
+    if("singlehtml" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+      file(
+        COPY "${DOCS_SOURCE}/singlehtml"
+        DESTINATION "${DOCS_LATEST_DEST}"
+        PATTERN "*.buildinfo" EXCLUDE)
+    endif()
+    if("latexpdf" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+      file(
+        COPY "${DOCS_SOURCE}/latexpdf/latex/HPX.pdf"
+        DESTINATION "${DOCS_LATEST_DEST}/pdf/"
+        PATTERN "*.buildinfo" EXCLUDE)
+    endif()
   endif()
 endif()
 

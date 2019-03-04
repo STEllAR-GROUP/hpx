@@ -91,6 +91,15 @@ jobs:
           name: Running CMake
           command: |
             cmake --version
+            if [ -z "$CIRCLE_PR_NUMBER" ] && \
+                ( [ "$CIRCLE_BRANCH" == "master" ] || \
+                  [ "$CIRCLE_BRANCH" == "release" ] || \
+                  [ "$CIRCLE_BRANCH" == "pdf-docs" ] || \
+                  [ -n "$CIRCLE_TAG" ] ); then
+                DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf"
+            else
+                DOCUMENTATION_OUTPUT_FORMATS="html"
+            fi
             cmake \
                 /hpx/source \
                 -G "Ninja" \
@@ -110,7 +119,8 @@ jobs:
                 -DHPX_WITH_TESTS_DEBUG_LOG_DESTINATION=/hpx/build/debug-log.txt \
                 -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=On \
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
-                -DHPX_WITH_DOCUMENTATION=On
+                -DHPX_WITH_DOCUMENTATION=On \
+                -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="${DOCUMENTATION_OUTPUT_FORMATS}"
       - persist_to_workspace:
           root: /hpx
           paths:
@@ -166,6 +176,7 @@ jobs:
           name: Building Sphinx Documentation
           command: |
               ninja docs
+          no_output_timeout: 45m
       - persist_to_workspace:
           root: /hpx
           paths:
@@ -285,6 +296,8 @@ jobs:
       - run:
           name: Installing HPX for build unit tests
           command: |
+              # Disable documentation just for this step
+              cmake -DHPX_WITH_DOCUMENTATION=OFF .
               ninja install
       - run:
           name: Building Unit Tests

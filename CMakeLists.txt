@@ -249,6 +249,19 @@ hpx_option(HPX_WITH_DOCUMENTATION BOOL
   "Build the HPX documentation (default OFF)."
   OFF CATEGORY "Build Targets")
 
+if(HPX_WITH_DOCUMENTATION)
+  set(valid_output_formats html singlehtml latexpdf man)
+  hpx_option(HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS STRING
+    "List of documentation output formats to generate. Valid options are ${valid_output_formats}. Multiple values can be separated with semicolons. (default html)."
+    "html" CATEGORY "Build Targets")
+
+  foreach(output_format ${HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS})
+    if(NOT ${output_format} IN_LIST valid_output_formats)
+      hpx_error("${output_format} is not a valid value for HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS. Valid output format are: ${valid_output_formats}.")
+    endif()
+  endforeach()
+endif()
+
 if(MSVC)
   hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
     "Force creating pseudo targets and pseudo dependencies (default OFF)."
@@ -2074,17 +2087,40 @@ install(
   COMPONENT license)
 
 if(HPX_WITH_DOCUMENTATION)
-  # Install HPX documentation files
   install(
     FILES "${PROJECT_SOURCE_DIR}/docs/index.html"
     DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/
     COMPONENT docs)
 
-  install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx/docs/html/"
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/html
-    COMPONENT docs
-    PATTERN ".git" EXCLUDE)
+  if("html" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    install(
+      DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx/docs/html/"
+      DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/html
+      COMPONENT docs
+      PATTERN "*.buildinfo" EXCLUDE)
+  endif()
+
+  if("singlehtml" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    install(
+      DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx/docs/singlehtml/"
+      DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/singlehtml
+      COMPONENT docs
+      PATTERN "*.buildinfo" EXCLUDE)
+  endif()
+
+  if("latexpdf" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    install(
+      FILES "${CMAKE_BINARY_DIR}/share/hpx/docs/latexpdf/latex/HPX.pdf"
+      DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/pdf/
+      COMPONENT docs)
+  endif()
+
+  if("man" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    install(
+      FILES "${CMAKE_BINARY_DIR}/share/hpx/docs/man/hpx.1"
+      DESTINATION ${CMAKE_INSTALL_MANDIR}/
+      COMPONENT docs)
+  endif()
 endif()
 
 if(HPX_WITH_VIM_YCM)
