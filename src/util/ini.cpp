@@ -334,6 +334,7 @@ bool section::has_section (std::unique_lock<mutex_type>& l,
         if (it != sections_.end())
         {
             std::string sub_sec_name = sec_name.substr(i+1);
+            hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
             return (*it).second.has_section(sub_sec_name);
         }
         return false;
@@ -352,6 +353,7 @@ section* section::get_section (std::unique_lock<mutex_type>& l,
         if (it != sections_.end())
         {
             std::string sub_sec_name = sec_name.substr(i+1);
+            hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
             return (*it).second.get_section(sub_sec_name);
         }
 
@@ -384,6 +386,7 @@ section const* section::get_section (std::unique_lock<mutex_type>& l,
         if (it != sections_.end())
         {
             std::string sub_sec_name = sec_name.substr(i+1);
+            hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
             return (*it).second.get_section(sub_sec_name);
         }
 
@@ -606,6 +609,7 @@ bool section::has_entry (std::unique_lock<mutex_type>& l, std::string const& key
         {
             section_map::const_iterator cit = sections_.find(sub_sec);
             HPX_ASSERT(cit != sections_.end());
+            hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
             return (*cit).second.has_entry(sub_key);
         }
         return false;
@@ -625,6 +629,7 @@ std::string section::get_entry (std::unique_lock<mutex_type>& l,
         {
             section_map::const_iterator cit = sections_.find(sub_sec);
             HPX_ASSERT(cit != sections_.end());
+            hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
             return (*cit).second.get_entry(sub_key);
         }
 
