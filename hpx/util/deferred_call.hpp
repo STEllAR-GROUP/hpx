@@ -109,7 +109,7 @@ namespace hpx { namespace util
 
             template <typename F_, typename ...Ts_, typename =
                 typename std::enable_if<
-                    !std::is_same<typename std::decay<F_>::type, deferred>::value
+                    std::is_constructible<F, F_>::value
                 >::type>
             explicit HPX_HOST_DEVICE deferred(F_&& f, Ts_&&... vs)
               : base_type{

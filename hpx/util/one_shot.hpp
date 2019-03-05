@@ -33,12 +33,12 @@ namespace hpx { namespace util
               : _called(false)
             {}
 
-            HPX_CONSTEXPR explicit one_shot_wrapper(F const& f)
-              : _f(f)
-              , _called(false)
-            {}
-            HPX_CONSTEXPR explicit one_shot_wrapper(F&& f)
-              : _f(std::move(f))
+            template <typename F_, typename =
+                typename std::enable_if<
+                    std::is_constructible<F, F_>::value
+                >::type>
+            HPX_CONSTEXPR explicit one_shot_wrapper(F_&& f)
+              : _f(std::forward<F_>(f))
               , _called(false)
             {}
 
@@ -60,11 +60,12 @@ namespace hpx { namespace util
             HPX_CONSTEXPR one_shot_wrapper()
             {}
 
-            HPX_CONSTEXPR explicit one_shot_wrapper(F const& f)
-              : _f(f)
-            {}
-            HPX_CONSTEXPR explicit one_shot_wrapper(F&& f)
-              : _f(std::move(f))
+            template <typename F_, typename =
+                typename std::enable_if<
+                    std::is_constructible<F, F_>::value
+                >::type>
+            HPX_CONSTEXPR explicit one_shot_wrapper(F_&& f)
+              : _f(std::forward<F_>(f))
             {}
 
             HPX_CONSTEXPR one_shot_wrapper(one_shot_wrapper&& other)

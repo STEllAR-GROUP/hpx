@@ -199,7 +199,7 @@ namespace hpx { namespace util
 
             template <typename F_, typename ...Ts_, typename =
                 typename std::enable_if<
-                    !std::is_same<typename std::decay<F_>::type, bound>::value
+                    std::is_constructible<F, F_>::value
                 >::type>
             HPX_CONSTEXPR explicit bound(F_&& f, Ts_&&... vs)
               : base_type{
