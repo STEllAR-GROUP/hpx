@@ -567,6 +567,8 @@ namespace hpx { namespace threads { namespace detail
 
                 // run the work queue
                 hpx::threads::coroutines::prepare_main_thread main_thread;
+                // avoid unused variable error
+                (void)main_thread;
 
                 // run main Scheduler loop until terminated
                 scheduling_counter_data& counter_data =

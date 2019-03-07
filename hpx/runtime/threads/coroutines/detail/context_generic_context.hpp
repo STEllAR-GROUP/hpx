@@ -72,7 +72,6 @@ namespace hpx { namespace threads { namespace coroutines
     struct prepare_main_thread
     {
         HPX_CONSTEXPR prepare_main_thread() {}
-        HPX_CONSTEXPR ~prepare_main_thread() {}
     };
 
     namespace detail { namespace generic_context
