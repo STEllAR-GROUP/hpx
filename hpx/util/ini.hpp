@@ -89,7 +89,7 @@ namespace hpx { namespace util
             std::string const& sec_name) const;
 
         ///////////////////////////////////////////////////////////////////////////
-        section* add_section_if_new(std::unique_lock<lcos::local::spinlock>& l,
+        section* add_section_if_new(std::unique_lock<mutex_type>& l,
             std::string const& sec_name);
 
         void add_entry(std::unique_lock<mutex_type>& l, std::string const& fullkey,
