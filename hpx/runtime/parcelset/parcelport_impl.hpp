@@ -196,15 +196,19 @@ namespace hpx { namespace parcelset
         {
             flush_parcels();
 
-            io_service_pool_.stop();
             if (blocking) {
                 connection_cache_.shutdown();
                 connection_handler().do_stop();
+                io_service_pool_.wait();
+                io_service_pool_.stop();
                 io_service_pool_.join();
                 connection_cache_.clear();
                 io_service_pool_.clear();
             }
-
+            else
+            {
+                io_service_pool_.stop();
+            }
         }
 
     public:
