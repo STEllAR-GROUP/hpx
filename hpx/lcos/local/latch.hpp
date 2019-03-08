@@ -29,8 +29,8 @@ namespace hpx { namespace lcos { namespace local
     /// for counter_ to be decremented to 0. When counter_ reaches 0, all such
     /// blocked threads are released.
     ///
-    /// Calls to countdown_and_wait() , count_down() , wait() , and is_ready()
-    /// behave as atomic operations.
+    /// Calls to countdown_and_wait() , count_down() , wait() , is_ready(),
+    /// count_up() , and reset() behave as atomic operations.
     ///
     /// \note   A \a local::latch is not a LCO in the sense that it has no
     ///         global id and it can't be triggered using the action (parcel)
@@ -140,6 +140,35 @@ namespace hpx { namespace lcos { namespace local
         {
             std::unique_lock<mutex_type> l(mtx_);
             cond_.abort_all(std::move(l));
+        }
+
+        /// Increments counter_ by n. Does not block.
+        ///
+        /// Requires:  n >= 0.
+        ///
+        /// \throws Nothing.
+        ///
+        void count_up(std::ptrdiff_t n)
+        {
+            HPX_ASSERT(n >= 0);
+
+            std::unique_lock<mutex_type> l(mtx_);
+
+            counter_ += n;
+        }
+
+        /// Reset counter_ to n. Does not block.
+        ///
+        /// Requires:  n >= 0.
+        ///
+        /// \throws Nothing.
+        void reset(std::ptrdiff_t n)
+        {
+            HPX_ASSERT(n >= 0);
+
+            std::unique_lock<mutex_type> l(mtx_);
+
+            counter_ = n;
         }
 
     private:
