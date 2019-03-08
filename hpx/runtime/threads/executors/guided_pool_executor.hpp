@@ -17,6 +17,7 @@
 #include <hpx/util/pack_traversal.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/traits/is_future_tuple.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -36,22 +37,13 @@
 namespace hpx { namespace threads { namespace executors
 {
     // --------------------------------------------------------------------
-    // helper structs to make future<tuple<f1, f2, f3, ...>>>
-    // detection of futures simpler
+    // helper struct for tuple of futures future<tuple<f1, f2, f3, ...>>>
     // --------------------------------------------------------------------
-    template <typename TupleOfFutures>
-    struct is_tuple_of_futures;
-
-    template <typename...Futures>
-    struct is_tuple_of_futures<util::tuple<Futures...>>
-        : util::detail::all_of<traits::is_future<Futures>...>
-    {};
-
     template <typename Future>
     struct is_future_of_tuple_of_futures
         : std::integral_constant<bool,
             traits::is_future<Future>::value &&
-            is_tuple_of_futures<
+            traits::is_future_tuple<
                 typename traits::future_traits<Future>::result_type>::value>
     {};
 
@@ -336,7 +328,7 @@ namespace hpx { namespace threads { namespace executors
                   typename ... Ts,
                   typename = enable_if_t<is_future_of_tuple_of_futures<
                     OuterFuture<util::tuple<InnerFutures...>>>::value>,
-                  typename = enable_if_t<is_tuple_of_futures<
+                  typename = enable_if_t<traits::is_future_tuple<
                     util::tuple<InnerFutures...>>::value>
                   >
         auto
@@ -401,7 +393,7 @@ namespace hpx { namespace threads { namespace executors
         template <typename F,
                   typename ... InnerFutures,
                   typename = enable_if_t<
-                      is_tuple_of_futures<util::tuple<InnerFutures...>>::value>
+                      traits::is_future_tuple<util::tuple<InnerFutures...>>::value>
                   >
         auto
         async_execute(F && f,
