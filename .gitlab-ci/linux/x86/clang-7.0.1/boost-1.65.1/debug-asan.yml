@@ -19,15 +19,15 @@ asan_suppressions:
     image: stellargroup/build_env:ubuntu
     stage: checkout
     script:
-        - echo leak:libltd > /suppressions.txt
-        - echo leak:performance_counter >> /suppressions.txt
-        - echo leak:libltdl  >> /suppressions.txt
-        - echo leak:performance_counter >> /suppressions.txt
-        - echo leak:exception >> /suppressions.txt
-        - echo leak:collectable >> /suppressions.txt
+        - echo leak:libltd > suppressions.txt
+        - echo leak:performance_counter >> suppressions.txt
+        - echo leak:libltdl  >> suppressions.txt
+        - echo leak:performance_counter >> suppressions.txt
+        - echo leak:exception >> suppressions.txt
+        - echo leak:collectable >> suppressions.txt
     artifacts:
         paths:
-            - /suppressions.txt
+            - suppressions.txt
 
 cmake Debug ASAN x86:
     <<: *debug-asan-x86
@@ -44,7 +44,7 @@ examples Debug ASAN x86:
     <<: *debug-asan-x86
     variables:
         TESTS: "examples"
-        LSAN_OPTIONS: "suppressions=/suppressions.txt,print_suppressions=0"
+        LSAN_OPTIONS: "suppressions=../../suppressions.txt,print_suppressions=0"
     extends: .test
     dependencies:
         - checkout
@@ -57,7 +57,7 @@ tests.unit Debug ASAN x86:
     <<: *debug-asan-x86
     variables:
         TESTS: "tests.unit"
-        LSAN_OPTIONS: "suppressions=/suppressions.txt,print_suppressions=0"
+        LSAN_OPTIONS: "suppressions=../../suppressions.txt,print_suppressions=0"
     extends: .test
     dependencies:
         - checkout
@@ -70,7 +70,7 @@ tests.regressions Debug ASAN x86:
     <<: *debug-asan-x86
     variables:
         TESTS: "tests.regressions"
-        LSAN_OPTIONS: "suppressions=/suppressions.txt,print_suppressions=0"
+        LSAN_OPTIONS: "suppressions=../../suppressions.txt,print_suppressions=0"
     extends: .test
     dependencies:
         - checkout
@@ -83,7 +83,7 @@ tests.performance Debug ASAN x86:
     <<: *debug-asan-x86
     variables:
         TESTS: "tests.performance"
-        LSAN_OPTIONS: "suppressions=/suppressions.txt,print_suppressions=0"
+        LSAN_OPTIONS: "suppressions=../../suppressions.txt,print_suppressions=0"
     extends: .test
     dependencies:
         - checkout
