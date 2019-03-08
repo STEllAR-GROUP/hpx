@@ -11,13 +11,14 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/internal_allocator.hpp>
+#include <hpx/traits/component_heap_type.hpp>
 
 #include <cstddef>
 #include <new>
 #include <utility>
 
-namespace hpx { namespace components {
-
+namespace hpx { namespace components
+{
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
@@ -41,7 +42,20 @@ namespace hpx { namespace components {
         template <typename Component>
         util::internal_allocator<Component> simple_heap<Component>::alloc_;
     }
+}}
 
+namespace hpx { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component, typename Enable>
+    struct component_heap_type
+    {
+        using type = hpx::components::detail::simple_heap<Component>;
+    };
+}}
+
+namespace hpx { namespace components
+{
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     class component : public Component
@@ -50,7 +64,7 @@ namespace hpx { namespace components {
         typedef Component type_holder;
         typedef component<Component> component_type;
         typedef component_type derived_type;
-        typedef detail::simple_heap<Component> heap_type;
+        typedef typename traits::component_heap_type<Component>::type heap_type;
 
         /// \brief Construct a simple_component instance holding a new wrapped
         ///        instance

@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2018 Hartmut Kaiser
+//  Copyright (c) 2018-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -128,18 +128,8 @@ namespace hpx { namespace components { namespace detail
             gid_ = naming::replace_component_type(gid_, addr.type_);
             gid_ = naming::replace_locality_id(gid_, agas::get_locality_id());
 
-            if (!applier::bind_gid_local(gid_, addr))
-            {
-                std::ostringstream strm;
-                strm << "failed to bind id " << gid_
-                        << "to locality: " << hpx::get_locality();
-
-                gid_ = naming::invalid_gid;    // invalidate GID
-
-                HPX_THROW_EXCEPTION(duplicate_component_address,
-                    "component_base<Component>::get_base_gid",
-                    strm.str());
-            }
+            // there is no need to explicitly bind this id in AGAS as the id
+            // can be directly resolved to the address it contains.
         }
 
         std::unique_lock<naming::gid_type::mutex_type> l(gid_.get_mutex());
