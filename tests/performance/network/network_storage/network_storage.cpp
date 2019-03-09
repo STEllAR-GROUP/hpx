@@ -172,6 +172,7 @@ void allocate_local_storage(uint64_t local_storage_bytes)
 //----------------------------------------------------------------------------
 void delete_local_storage()
 {
+    rma_storage.reset();
     delete[] local_storage;
 }
 

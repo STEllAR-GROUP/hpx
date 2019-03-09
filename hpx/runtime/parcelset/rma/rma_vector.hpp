@@ -219,6 +219,16 @@ namespace rma
             resize(0);
         }
 
+        void reset() {
+            print_debug("reset",0);
+            // clear size
+            resize(0);
+            // release anything we might be holding
+            m_data_ = nullptr;
+            // release allocator
+            destroy_allocator();
+        }
+
         void resize(size_type s)
         {
             print_debug("resizing", s);
@@ -354,6 +364,7 @@ namespace rma
                 return;
             }
             delete m_alloc_;
+            m_alloc_ = nullptr;
         }
 
         void deallocate_data() {
