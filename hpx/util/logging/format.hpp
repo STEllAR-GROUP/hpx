@@ -24,6 +24,7 @@
 #include <hpx/util/logging/format/op_equal.hpp>
 #include <hpx/util/logging/format_fwd.hpp>
 
+#include <algorithm>
 #include <memory>
 #include <set>
 #include <string>
@@ -126,7 +127,7 @@ and you want to define the logger classes, in a source file
 
     Classes in this namespace specify when formatters and destinations are to be called.
 
-    @sa msg_route::simple, msg_route::with_route
+    @sa msg_route::simple
 
     */
     namespace msg_route {
@@ -157,7 +158,7 @@ and you want to define the logger classes, in a source file
 Example:
 
 @code
-typedef logger< format_write<...> > logger_type;
+typedef logger< format_write > logger_type;
 HPX_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
 HPX_DEFINE_LOG(g_l, logger_type)
 #define L_ HPX_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
@@ -189,13 +190,10 @@ See manipulator.
 @param destination_base The base class for all destination classes from your application.
 See manipulator.
 
-    */
-    template<
-            class formatter_base,
-            class destination_base >
+    */\
     struct simple {
-        typedef typename formatter_base::ptr_type formatter_ptr;
-        typedef typename destination_base::ptr_type destination_ptr;
+        typedef typename formatter::base::ptr_type formatter_ptr;
+        typedef typename destination::base::ptr_type destination_ptr;
 
         typedef std::vector<formatter_ptr> f_array;
         typedef std::vector<destination_ptr> d_array;
@@ -241,285 +239,6 @@ See manipulator.
 
     private:
         write_info m_to_write;
-    };
-
-
-    /**
-    @brief. Represents a router - by default, first calls all formatters,
-    then all destinations. However you can overwrite this route
-
-    You can append a route - with append_route(),
-    or set the route with set_route().
-
-    Example:
-
-    @code
-    typedef logger< default_,
-        writer::format_write< format_base, destination_base,
-        format_and_write::simple,
-            msg_route::with_route<format_base,destination_base> > > logger_type;
-    logger_type g_l();
-
-    g_l()->writer().router().set_route()
-        .fmt( formatter::time() )
-        .fmt( formatter::append_newline() )
-        .dest( destination::dbg_window() )
-        .fmt( formatter::write_idx() )
-        .dest( destination::cout() )
-        .clear()
-        .fmt( formatter::write_idx() )
-        .fmt( formatter::append_newline() )
-        .fmt( formatter::write_to_file())
-        ;
-    @endcode
-
-    @param format_base The base class for all
-    formatter classes from your application. See manipulator.
-
-    @param destination_base The base class for all
-    destination classes from your application. See manipulator.
-
-    @remarks In the router - we don't own the objects - the array holder does that
-    */
-    template<
-            class formatter_base,
-            class destination_base,
-            // note: we're counting on these defaults in format_find_writer
-            class formatter_array =
-                hpx::util::logging::array::shared_ptr_holder<formatter_base>,
-            class destination_array =
-                hpx::util::logging::array::shared_ptr_holder<destination_base>
-    >
-    class with_route  : protected formatter_and_destination_array_holder<formatter_array,
-        destination_array> {
-        typedef typename formatter_base::ptr_type formatter_ptr;
-        typedef typename destination_base::ptr_type destination_ptr;
-
-        typedef formatter_and_destination_array_holder<formatter_array,
-            destination_array> holder_base_type;
-
-        typedef with_route<formatter_base, destination_base, formatter_array,
-            destination_array> self_type;
-
-        typedef std::vector<formatter_ptr> f_array;
-        typedef std::vector<destination_ptr> d_array;
-
-        struct write_once {
-            write_once() : do_clear_afterwards(false) {}
-            f_array formats;
-            d_array destinations;
-            // if true, will execute clear_format() after calling all of the above
-            bool do_clear_afterwards;
-        };
-        typedef std::vector<write_once> write_array;
-
-    public:
-        with_route(const formatter_array& formatters,
-            const destination_array & destinations) : holder_base_type(formatters,
-                destinations) {}
-
-        class route;
-        friend class route;
-        /**
-            represents a formatter/destination route to be added/set.
-        */
-        class route {
-            friend class with_route;
-            enum type {
-                is_fmt, is_dest, is_clear
-            };
-            struct item {
-                item() : m_fmt(0), m_dest(0), m_type(is_clear) {}
-                item& fmt(formatter_ptr f) {
-                    HPX_ASSERT(f);
-                    m_fmt = f; m_type = is_fmt; return *this;
-                }
-                item &dest(destination_ptr d) {
-                    HPX_ASSERT(d);
-                    m_dest = d; m_type = is_dest; return *this;
-                }
-                formatter_ptr m_fmt;
-                destination_ptr m_dest;
-                type m_type;
-            };
-            typedef std::vector<item> array;
-
-        protected:
-            route(self_type & self) : m_self(self) {}
-        public:
-
-            template<class formatter> route & fmt(formatter f) {
-                fmt_impl(f, std::is_base_of<hpx::util::logging::manipulator
-                    ::is_generic,formatter>() );
-                return *this;
-            }
-            template<class destination> route & dest(destination d) {
-                dest_impl(d, std::is_base_of<hpx::util::logging::manipulator
-                    ::is_generic,destination>() );
-                return *this;
-            }
-            route & clear() {
-                m_items.push_back( item() );
-                return *this;
-            }
-
-        private:
-            // not generic
-            template<class formatter> void fmt_impl(formatter f,
-                const std::false_type& ) {
-                m_items.push_back( item().fmt( m_self.formats().get_ptr(f) )) ;
-            }
-            // not generic
-            template<class destination> void dest_impl(destination d,
-                const std::false_type&) {
-                m_items.push_back( item().dest( m_self.destinations().get_ptr(d) ));
-            }
-
-            // generic
-            template<class formatter> void fmt_impl(formatter f,
-                const std::true_type& ) {
-                typedef hpx::util::logging::manipulator::detail
-                    ::generic_holder<formatter,formatter_base> holder;
-                fmt_impl( holder(f) , std::false_type() );
-            }
-            // generic
-            template<class destination> void dest_impl(destination d,
-                const std::true_type&) {
-                typedef hpx::util::logging::manipulator::detail
-                    ::generic_holder<destination,destination_base> holder;
-                dest_impl( holder(d) , std::false_type() );
-            }
-        protected:
-            self_type & m_self;
-            array m_items;
-        };
-
-        struct route_do_set;
-        friend struct route_do_set;
-        struct route_do_set : route {
-            route_do_set(self_type &self) : route(self) {}
-            ~route_do_set() {
-                route::m_self.do_set_route( *this);
-            }
-        };
-
-        struct route_do_append;
-        friend struct route_do_append;
-        struct route_do_append : route {
-            route_do_append(self_type &self) : route(self) {}
-            ~route_do_append() {
-                route::m_self.do_append_route( *this);
-            }
-        };
-
-        /**
-            sets this as the route for logging
-        */
-        route_do_set set_route() { return route_do_set(*this); }
-
-        /**
-            appends this route
-        */
-        route_do_append append_route() { return route_do_append(*this); }
-
-        void append_formatter(formatter_ptr fmt) {
-            if ( m_to_write.empty() )
-                m_to_write.push_back( write_once() );
-
-            // we need to add it at the end; if there are any destinations,
-            // we need to add it after those
-            bool can_append_to_back = m_to_write.back().destinations.empty();
-            if ( !can_append_to_back)
-                m_to_write.push_back( write_once() );
-            m_to_write.back().formats.push_back(fmt);
-        }
-        void del_formatter(formatter_ptr fmt) {
-            for ( typename write_array::const_iterator b = m_to_write.begin(),
-                e = m_to_write.end(); b != e; ++b) {
-                typename f_array::iterator del = std::remove( b->formats.begin(),
-                    b->formats.end(), fmt); //-V807
-                b->formats.erase(del, b->formats.end());
-            }
-        }
-
-        void append_destination(destination_ptr dest) {
-            if ( m_to_write.empty() )
-                m_to_write.push_back( write_once() );
-
-            if ( m_to_write.back().do_clear_afterwards)
-                // after clear, always start a new write
-                m_to_write.push_back( write_once() );
-
-            m_to_write.back().destinations.push_back(dest);
-        }
-
-        void del_destination(destination_ptr dest) {
-            for ( typename write_array::const_iterator b = m_to_write.begin(),
-                e = m_to_write.end(); b != e; ++b) {
-                typename d_array::iterator del = std::remove( b->destinations.begin(),
-                    b->destinations.end(), dest); //-V807
-                b->destinations.erase(del, b->destinations.end());
-
-                // if from a write_once - all destinations are gone,
-                // don't clear_afterwards
-                if ( b->destinations.empty() )
-                    b->do_clear_afterwards = false;
-            }
-        }
-
-        void append_clear_format() {
-            if ( m_to_write.empty() )
-                m_to_write.push_back( write_once() );
-            m_to_write.back().do_clear_afterwards = true;
-            m_to_write.push_back( write_once() );
-        }
-
-
-        template<class format_and_write>
-        void write(msg_type & msg) const {
-            format_and_write m(msg);
-
-            for ( typename write_array::const_iterator b = m_to_write.begin(),
-                e = m_to_write.end(); b != e; ++b) {
-                for ( typename f_array::const_iterator b_f = b->formats.begin(),
-                    e_f = b->formats.end(); b_f != e_f; ++b_f)
-                    m.format(*b_f);
-
-                for ( typename d_array::const_iterator
-                    b_d = b->destinations.begin(), e_d = b->destinations.end();
-                    b_d != e_d; ++b_d)
-                    m.write(*b_d);
-
-                if ( b->do_clear_afterwards)
-                    m.clear_format();
-            }
-        }
-
-    private:
-        void do_append_route(const route & r) {
-            if ( r.m_items.empty() )
-                return; // no route to add
-
-            typedef typename route::array array;
-            for ( typename array::const_iterator b = r.m_items.begin(),
-                e = r.m_items.end(); b != e; ++b) {
-                switch ( b->m_type) {
-                case route::is_fmt:       append_formatter( b->m_fmt); break;
-                case route::is_dest:      append_destination( b->m_dest); break;
-                case route::is_clear:     append_clear_format(); break;
-                }
-            }
-        }
-
-        void do_set_route(const route & r) {
-            {
-            m_to_write.clear();
-            }
-            do_append_route(r);
-        }
-
-    private:
-        write_array m_to_write;
     };
 
 

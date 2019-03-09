@@ -63,7 +63,7 @@ and then all destinations are called, in the order they were added.
 You can easily access the router() instance.
 
 @code
-typedef logger< format_write< ... > > logger_type;
+typedef logger< format_write > logger_type;
 HPX_DECLARE_LOG(g_l, logger_type)
 HPX_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
 #define L_ HPX_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
@@ -85,10 +85,6 @@ L_ << "testing " << i << i+1 << i+2;
 In the above case, @c formatter::idx() is called, then @c formatter::time(),
 then @c formatter::append_newline(). Now, the destinations are called:
 @c destination::cout(), and then @c destination::file().
-
-Most of the time this is ok, and this is what the @ref msg_route::simple "default router"
-does. However, there are other routers
-in the msg_route namespace. For instance, take a look at msg_route::with_route class.
 
 
 
@@ -141,23 +137,18 @@ if we were to keep smart pointers within the router itself.
 @bug adding a spaced generic formatter and deleting the formatter - it won't happen
 
 */
-template<
-        class formatter_base,
-        class destination_base,
-        class apply_format_and_write = default_ ,
-        class router_type = msg_route::simple<formatter_base, destination_base> ,
-        class formatter_array = array::shared_ptr_holder<formatter_base> ,
-        class destination_array = array::shared_ptr_holder<destination_base> >
 struct format_write {
+    using formatter_base = formatter::base;
+    using destination_base = destination::base;
+    using router_type = msg_route::simple;
+    using formatter_array = array::shared_ptr_holder<formatter_base>;
+    using destination_array = array::shared_ptr_holder<destination_base>;
+
     typedef typename formatter_base::ptr_type formatter_ptr;
     typedef typename destination_base::ptr_type destination_ptr;
 
-    typedef typename use_default<apply_format_and_write,
-        ::hpx::util::logging::format_and_write::simple >
-        ::type apply_format_and_write_type;
-
-    typedef formatter_base formatter_base_type;
-    typedef destination_base destination_base_type;
+    typedef ::hpx::util::logging::format_and_write::simple
+        apply_format_and_write_type;
 
 
     format_write() : m_router(m_formatters, m_destinations) {}

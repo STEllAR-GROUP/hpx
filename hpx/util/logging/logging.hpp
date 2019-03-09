@@ -20,7 +20,6 @@
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/filter.hpp>
 #include <hpx/util/logging/detail/logger.hpp>
-#include <hpx/util/logging/detail/log_keeper.hpp>
 #include <hpx/util/logging/detail/macros.hpp>
 #include <hpx/util/logging/detail/level.hpp>
 

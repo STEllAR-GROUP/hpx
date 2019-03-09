@@ -38,9 +38,8 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 
 
 namespace detail {
-    template<class destination_base> struct named_context {
-        typedef typename use_default<destination_base, base<> >
-            ::type  destination_base_type;
+    struct named_context {
+        typedef base  destination_base_type;
         typedef ::hpx::util::logging::array::shared_ptr_holder<destination_base_type >
             array;
 
@@ -111,25 +110,7 @@ namespace detail {
         // recomputes the write steps - note taht this takes place after each operation
         // for instance, the user might have first set the string and
         // later added the formatters
-        void compute_write_steps() {
-            m_info.write_steps.clear();
-
-            std::istringstream in(m_info.format_string);
-            std::string word;
-            while ( in >> word) {
-                if ( word[0] == '+')
-                    word.erase( word.begin());
-                else if ( word[0] == '-')
-                    // ignore this word
-                    continue;
-
-                if ( m_info.name_to_destination.find(word) !=
-                    m_info.name_to_destination.end())
-                    m_info.write_steps.push_back( m_info.
-                        name_to_destination.find(word)->second);
-            }
-        }
-
+        void HPX_EXPORT compute_write_steps();
     };
 
 }
@@ -190,11 +171,8 @@ In the above example, I know that the available destinations are @c out_file,
 #include <hpx/util/logging/format/destination/named.hpp>
 @endcode
 */
-template<class destination_base = default_ >
-struct named_t : is_generic, non_const_context<detail
-    ::named_context<destination_base> > {
-    typedef non_const_context< detail::named_context<destination_base>
-    > non_const_context_base;
+struct named : is_generic, non_const_context<detail::named_context > {
+    typedef non_const_context<detail::named_context > non_const_context_base;
 
     /**
         @brief constructs the named destination
@@ -203,7 +181,7 @@ struct named_t : is_generic, non_const_context<detail
         @param set [optional] named settings - see named_settings class,
         and @ref dealing_with_flags
     */
-    named_t(const std::string & format_string = std::string() ) {
+    named(const std::string & format_string = std::string() ) {
         non_const_context_base::context().format_string( format_string);
     }
     void operator()(const msg_type & msg) const { //-V659
@@ -211,12 +189,12 @@ struct named_t : is_generic, non_const_context<detail
     }
 
 
-    named_t & string(const std::string & str) {
+    named & string(const std::string & str) {
         non_const_context_base::context().format_string(str);
         return *this;
     }
 
-    template<class destination> named_t & add(const std::string & name,
+    template<class destination> named & add(const std::string & name,
         destination dest) {
         non_const_context_base::context().add(name, dest);
         return *this;
@@ -230,17 +208,11 @@ struct named_t : is_generic, non_const_context<detail
         non_const_context_base::context().configure(name, configure_str);
     }
 
-    bool operator==(const named_t & other) const {
+    bool operator==(const named & other) const {
         return &( non_const_context_base::context()) ==
             &( other.non_const_context_base::context());
     }
 };
-
-/** @brief named_t with default values. See named_t
-
-@copydoc named_t
-*/
-typedef named_t<> named;
 
 }}}}
 

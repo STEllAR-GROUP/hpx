@@ -33,8 +33,8 @@ std::(w)string and the string that holds your logged message. See convert_format
 For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
 "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
-template<class convert = do_convert_format::prepend> struct thread_id_t : is_generic,
-hpx::util::logging::op_equal::always_equal {
+template<class convert = do_convert_format::prepend> struct thread_id_t : is_generic
+{
     typedef convert convert_type;
 
     void operator()(msg_type & msg) const {
@@ -49,6 +49,8 @@ hpx::util::logging::op_equal::always_equal {
 
         convert::write( out.str(), msg );
     }
+
+    bool operator==(const thread_id_t& ) const { return true; }
 };
 
 /** @brief thread_id_t with default values. See thread_id_t

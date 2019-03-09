@@ -46,8 +46,8 @@ namespace level {
     /** the higher the level, the more critical the error */
     typedef unsigned int type;
 
-    enum {
-        disable_all = -1,
+    enum : type {
+        disable_all = (type)-1,
         enable_all = 0,
         debug = 1000,
         info = 2000,

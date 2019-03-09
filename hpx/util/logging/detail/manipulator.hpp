@@ -150,7 +150,7 @@ Now, you will define your @ref logger "logger(s)",
 to use the @ref hpx::util::logging::writer::format_write "format_write" class:
 
 @code
-HPX_DECLARE_LOG(g_l, logger_format_write< formatter_base,destination_base> > );
+HPX_DECLARE_LOG(g_l, logger_format_write );
 @endcode
 
 After this, you'll add formatter and/or destination classes to your logger(s):
@@ -211,8 +211,7 @@ To create your formatter class, you need to derive from
 
 @code
 // milliseconds since start of the program
-struct ms_since_start : formatter::class_<ms_since_start,
-formatter::implement_op_equal::no_context> {
+struct ms_since_start : formatter::class_<ms_since_start> {
     time_t m_start;
     ms_since_start : m_start( time(0) ) {}
 
@@ -235,7 +234,7 @@ To create your destination class, you need to derive from
 
 @code
 struct to_hwnd
-: destination::class_<to_hwnd, destination::implement_op_equal::has_context> {
+: destination::class_<to_hwnd> {
     HWND h;
     to_hwnd(HWND h) : h(h) {}
 
@@ -389,13 +388,12 @@ namespace manipulator {
 */
 template<
         class raw_param_type,
-        class param_type,
-        class ptr_type_ = default_ >
+        class param_type >
     struct base : hpx::util::logging::op_equal::same_type_op_equal_base {
 
-    typedef base<raw_param_type, param_type, ptr_type_> self_type;
+    typedef base<raw_param_type, param_type > self_type;
 
-    typedef typename use_default<ptr_type_, self_type*>::type ptr_type;
+    typedef self_type* ptr_type;
 
     // used as msg_type in format_and_write classes
     typedef raw_param_type raw_param;
@@ -417,39 +415,12 @@ protected:
 };
 
 
-
-
-/**
-    @brief When you implement your manipulator class,
-    how is operator== to be implemented?
-*/
-struct implement_op_equal {
-    enum type {
-        /// manipulator has no context
-        /// - that is, any two values of this type are considered equal
-        /// (operator== will automatically return true)
-        no_context,
-        /// manipulator has context - that is, you <b>have to</b> implement operator==
-        /// in your manipulator class
-        has_context
-    };
-};
-
-namespace detail {
-    template<implement_op_equal::type> struct op_equal_base {
-        bool operator==(const op_equal_base& ) const { return true; }
-    };
-
-    template<> struct op_equal_base<implement_op_equal::has_context> {};
-}
-
 /**
     @brief Use this when implementing your own formatter or destination class.
     Don't use this directly. Use formatter::class_ or destination::class_
 */
-template<class type, implement_op_equal::type op_e, class base_type> struct class_
+template<class type, class base_type> struct class_
         : base_type,
-          detail::op_equal_base<op_e>,
           hpx::util::logging::op_equal::same_type_op_equal<type> {
 
     /** @brief Override this if you want to allow configuration through scripting
@@ -459,6 +430,7 @@ template<class type, implement_op_equal::type op_e, class base_type> struct clas
     */
     virtual void configure(const std::string& ) {}
 
+    bool operator==(const class_& ) const { return true; }
 };
 
 
@@ -546,9 +518,9 @@ and do the best to convert what's in, to what they need.
 
 Example:
 @code
-template<class convert_dest = do_convert_destination > struct cout {
+struct cout {
     void operator()(const msg_type & msg) const {
-        convert_dest::write(msg, std::cout);
+        do_convert_destination::write(msg, std::cout);
     }
 };
 @endcode
@@ -562,7 +534,7 @@ and the generic %formatter/ %destination classes
 
 @code
 typedef ... formatter_base;
-logger< format_write<...> > g_l();
+logger< format_write > g_l();
 
 struct my_cool_formatter : formatter_base { ... };
 
@@ -592,7 +564,6 @@ namespace detail {
     template<class generic_type, class manipulator_base> struct generic_holder
             : class_<
                     generic_holder<generic_type,manipulator_base>,
-                    implement_op_equal::has_context,
                     manipulator_base > {
         typedef typename manipulator_base::param param;
 
@@ -644,12 +615,9 @@ See:
 */
 namespace formatter {
     namespace detail {
-        template<class arg, class ptr>
         struct format_base_finder {
-            typedef typename use_default<arg,
-                ::hpx::util::logging::optimize::cache_string_one_str >
-                ::type arg_type;
-            typedef hpx::util::logging::manipulator::base< arg_type, arg_type &, ptr>
+            typedef ::hpx::util::logging::optimize::cache_string_one_str arg_type;
+            typedef hpx::util::logging::manipulator::base< arg_type, arg_type &>
                 type;
         };
     }
@@ -660,32 +628,20 @@ namespace formatter {
     When using formatters and destinations, formatters must share a %base class,
     and destinations must share a %base class - see manipulator namespace.
     */
-    template<
-        // note: I'm counting on these defaults, in format_find_writer class
-        class arg_type = default_ ,
-        class ptr_type_ = default_ >
-    struct base : detail::format_base_finder<arg_type,ptr_type_>::type {
+    struct base : detail::format_base_finder::type {
     };
-
-    /**
-        @sa hpx::util::logging::manipulator::implement_op_equal
-    */
-    typedef hpx::util::logging::manipulator::implement_op_equal implement_op_equal;
 
     /**
         @brief Use this when implementing your own formatter class
 
         @param type Your own class name
-        @param op_e How will you @ref
-        hpx::util::logging::manipulator::implement_op_equal "implement operator=="
 
         @param base_type (optional) The formatter base class.
         Unless you've specified your own formatter class,
         you'll be happy with the default
     */
-    template<class type, implement_op_equal::type op_e, class base_type =
-          base<> > struct class_
-        : hpx::util::logging::manipulator::class_<type, op_e, base_type> {};
+    template<class type, class base_type = base > struct class_
+        : hpx::util::logging::manipulator::class_<type, base_type> {};
 
 
     using hpx::util::logging::manipulator::non_const_context;
@@ -701,8 +657,8 @@ namespace formatter {
 @brief Destination is a manipulator. It contains a place where the message,
 after being formatted, is to be written to.
 
-Some viable destinations are : @ref destination::cout_t "the console",
-@ref destination::file_t "a file", a socket, etc.
+Some viable destinations are : @ref destination::cout "the console",
+@ref destination::file "a file", a socket, etc.
 
 See:
 - @ref manipulator "The manipulator namespace"
@@ -713,12 +669,10 @@ See:
 */
 namespace destination {
     namespace detail {
-        template<class arg, class ptr >
         struct destination_base_finder {
-            typedef typename use_default<arg, std::string >
-                ::type arg_type;
+            typedef std::string arg_type;
             typedef hpx::util::logging::manipulator::base< arg_type,
-                const arg_type &, ptr> type;
+                const arg_type &> type;
         };
     }
 
@@ -728,34 +682,22 @@ namespace destination {
     When using formatters and destinations, formatters must share a %base class,
     and destinations must share a %base class - see manipulator namespace.
     */
-    template<
-        // note: I'm counting on these defaults, in format_find_writer class
-        class arg_type = default_ ,
-        class ptr_type_ = default_ >
-    struct base : detail::destination_base_finder<arg_type,ptr_type_>::type {
+    struct base : detail::destination_base_finder::type {
     };
 
     using hpx::util::logging::manipulator::non_const_context;
 
     /**
-        @sa hpx::util::logging::manipulator::implement_op_equal
-    */
-    typedef hpx::util::logging::manipulator::implement_op_equal implement_op_equal;
-
-    /**
         @brief Use this when implementing your own destination class
 
         @param type Your own class name
-        @param op_e How will you @ref
-        hpx::util::logging::manipulator::implement_op_equal "implement operator=="
 
         @param base_type (optional)
         The destination base class. Unless you've specified your own destination class,
         you'll be happy with the default
     */
-    template<class type, implement_op_equal::type op_e, class base_type =
-          base<> > struct class_
-        : hpx::util::logging::manipulator::class_<type, op_e, base_type> {};
+    template<class type, class base_type = base > struct class_
+        : hpx::util::logging::manipulator::class_<type, base_type> {};
 
     /**
         @sa hpx::util::logging::manipulator::is_generic
