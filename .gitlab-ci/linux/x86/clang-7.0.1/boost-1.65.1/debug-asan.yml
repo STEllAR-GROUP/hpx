@@ -25,6 +25,7 @@ asan_suppressions:
         - echo leak:performance_counter >> suppressions.txt
         - echo leak:exception >> suppressions.txt
         - echo leak:collectable >> suppressions.txt
+        - echo leak:mca_pmix_pmix112 >> suppressions.txt
     artifacts:
         paths:
             - suppressions.txt
