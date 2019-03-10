@@ -141,8 +141,8 @@ struct format_write {
     using formatter_base = formatter::base;
     using destination_base = destination::base;
     using router_type = msg_route::simple;
-    using formatter_array = array::shared_ptr_holder<formatter_base>;
-    using destination_array = array::shared_ptr_holder<destination_base>;
+    using formatter_array = array::ptr_holder<formatter_base>;
+    using destination_array = array::ptr_holder<destination_base>;
 
     typedef typename formatter_base::ptr_type formatter_ptr;
     typedef typename destination_base::ptr_type destination_ptr;

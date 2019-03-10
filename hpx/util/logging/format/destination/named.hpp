@@ -40,7 +40,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 namespace detail {
     struct named_context {
         typedef base  destination_base_type;
-        typedef ::hpx::util::logging::array::shared_ptr_holder<destination_base_type >
+        typedef ::hpx::util::logging::array::ptr_holder<destination_base_type >
             array;
 
         struct write_info {

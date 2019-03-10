@@ -51,7 +51,7 @@ namespace detail {
 
     struct base_named_spacer_context {
         typedef base format_base_type;
-        typedef ::hpx::util::logging::array::shared_ptr_holder<format_base_type >
+        typedef ::hpx::util::logging::array::ptr_holder<format_base_type >
             array;
 
         struct write_step {
