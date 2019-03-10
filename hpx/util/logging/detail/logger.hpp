@@ -20,9 +20,10 @@
 
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/cache_before_init.hpp>
+#include <hpx/util/logging/detail/level.hpp>
 #include <hpx/util/logging/format/named_write.hpp>
-#include <hpx/util/logging/gather/ostream_like.hpp>
 
+#include <sstream>
 #include <type_traits>
 #include <utility>
 
@@ -80,34 +81,28 @@ namespace hpx { namespace util { namespace logging {
 
     */
     struct logger {
-        typedef detail::cache_before_init cache_type;
         typedef writer::named_write write_type;
 
         struct gather_holder { //-V690
-            typedef gather::ostream_like::return_str gather_type;
+            HPX_NON_COPYABLE(gather_holder);
 
-            gather_holder(const logger & p_this)
-              : m_this(p_this), m_use(true) {}
-
-            gather_holder(const gather_holder & other)
-              : m_this(other.m_this), m_use(true) {
-                other.m_use = false;
-            }
+            gather_holder(logger const & p_this)
+              : m_this(p_this) {}
 
             ~gather_holder() {
-                // FIXME handle exiting from exceptions!!!
-                if ( m_use) {
-                    m_this.do_write(m_obj.msg());
-                }
+                m_this.do_write(m_out.str());
             }
-            gather_type & gather() { return m_obj; }
+
+            std::ostringstream & out() { return m_out; }
+
         private:
-            const logger & m_this;
-            mutable gather_type m_obj;
-            mutable bool m_use;
+            logger const& m_this;
+            std::ostringstream m_out;
         };
 
-        logger() {}
+        logger(level::type default_level = level::enable_all)
+          : m_level(default_level)
+        {}
 
         ~logger() {
             // force writing all messages from cache,
@@ -118,17 +113,15 @@ namespace hpx { namespace util { namespace logging {
         /**
             reads all data about a log message (gathers all the data about it)
         */
-        gather_holder read_msg()
-            const { return gather_holder(*this) ; }
-
-        cache_type & cache()             { return m_cache; }
-        const cache_type & cache() const { return m_cache; }
+        gather_holder gather() const { return {*this} ; }
 
         write_type & writer()                    { return m_writer; }
         const write_type & writer() const        { return m_writer; }
 
-        void turn_cache_off() {
-            m_cache.turn_cache_off( m_writer );
+        bool is_enabled(level::type level) const { return level >= m_level; }
+
+        void set_enabled(level::type level) {
+            m_level = level;
         }
 
         /** @brief Marks this logger as initialized
@@ -152,20 +145,24 @@ namespace hpx { namespace util { namespace logging {
         }
 
     public:
+        void turn_cache_off() {
+            m_cache.turn_cache_off( m_writer );
+        }
+
         // called after all data has been gathered
         void do_write(msg_type msg) const
         {
-            if ( cache().is_cache_turned_off() )
-                writer()(msg);
+            if ( m_cache.is_cache_turned_off() )
+                m_writer(msg);
             else
-                cache().add_msg(std::move(msg));
+                m_cache.add_msg(std::move(msg));
         }
 
     private:
-        cache_type m_cache;
+        mutable detail::cache_before_init m_cache;
         write_type m_writer;
+        level::type m_level;
     };
-
 }}}
 
 #endif

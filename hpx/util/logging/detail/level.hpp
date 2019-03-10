@@ -56,38 +56,6 @@ namespace level {
         fatal = 5000,
         always = 6000
     };
-
-    /**
-        @brief Filter - holds the level.
-
-        Holds the level, and tells you if a specific level is enabled.
-        It does this in a non-thread-safe way.
-
-        If you change set_enabled() while program is running,
-        it can take a bit to propagate
-        between threads. Most of the time, this should be acceptable.
-    */
-    struct holder {
-        holder(type default_level = enable_all) : m_level(default_level) {}
-        bool is_enabled(type level) const { return level >= m_level; }
-        void set_enabled(type level) {
-            m_level = level;
-        }
-    private:
-        type m_level;
-    };
-
-    /**
-        @brief Filter - holds the level
-        - and tells you at compile time if a filter is enabled or not.
-
-        Fix (compile time) holder
-    */
-    template<int fix_level = debug> struct holder_compile_time {
-        static bool is_enabled(type level) {
-            return fix_level >= level;
-        }
-    };
 } // namespace level
 
 }}}

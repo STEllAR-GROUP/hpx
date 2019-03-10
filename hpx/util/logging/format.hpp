@@ -250,6 +250,5 @@ See manipulator.
 
 #include <hpx/util/logging/format/formatter/defaults.hpp>
 #include <hpx/util/logging/format/destination/defaults.hpp>
-#include <hpx/util/logging/gather/ostream_like.hpp>
 
 #endif
