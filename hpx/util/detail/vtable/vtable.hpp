@@ -25,14 +25,15 @@ namespace hpx { namespace util { namespace detail
     template <typename VTable, typename T>
     struct vtables
     {
-        static VTable const instance;
+        static HPX_CONSTEXPR_OR_CONST VTable instance =
+            detail::construct_vtable<T>();
     };
 
     template <typename VTable, typename T>
-    VTable const vtables<VTable, T>::instance = construct_vtable<T>();
+    HPX_CONSTEXPR_OR_CONST VTable vtables<VTable, T>::instance;
 
     template <typename VTable, typename T>
-    HPX_CONSTEXPR inline VTable const* get_vtable() noexcept
+    HPX_CONSTEXPR VTable const* get_vtable() noexcept
     {
         static_assert(
             !std::is_reference<T>::value,

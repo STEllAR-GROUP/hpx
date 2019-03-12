@@ -13,6 +13,7 @@ Releases
 .. toctree::
    :maxdepth: 1
 
+   releases/whats_new_1_3_0
    releases/whats_new_1_2_1
    releases/whats_new_1_2_0
    releases/whats_new_1_1_0

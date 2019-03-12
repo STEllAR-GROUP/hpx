@@ -331,6 +331,12 @@ listed below.
      * Can be used as a highspeed communication library backend for the
        parcelport.
 
+.. note::
+
+   When using OpenMPI please note that Ubuntu (notably 18.04 LTS) and older
+   Debian ship an OpenMPI 2.x built with ``--enable-heterogeneous`` which may
+   cause communication failures at runtime and should not be used.
+
 .. list-table:: Optional software prerequisites for |hpx| on Linux systems
 
    * * Name

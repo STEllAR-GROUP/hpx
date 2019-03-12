@@ -306,6 +306,8 @@ namespace detail
         local::detail::condition_variable cond_;    // threads waiting in read
     };
 
+    struct in_place {};
+
     template <typename Result>
     struct future_data_base
       : future_data_base<traits::detail::future_data_void>
@@ -341,18 +343,8 @@ namespace detail
           : base_type(no_addref)
         {}
 
-        struct default_construct {};
-
-        future_data_base(init_no_addref no_addref, default_construct)
-          : base_type(no_addref)
-        {
-            result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
-            construct(value_ptr);
-            state_.store(value, std::memory_order_relaxed);
-        }
-
         template <typename ... Ts>
-        future_data_base(init_no_addref no_addref, Ts&&... ts)
+        future_data_base(init_no_addref no_addref, in_place, Ts&&... ts)
           : base_type(no_addref)
         {
             result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
@@ -636,8 +628,8 @@ namespace detail
         {}
 
         template <typename ... Ts>
-        future_data(init_no_addref no_addref, Ts&&... ts)
-          : future_data_base<Result>(no_addref, std::forward<Ts>(ts)...)
+        future_data(init_no_addref no_addref, in_place in_place, Ts&&... ts)
+          : future_data_base<Result>(no_addref, in_place, std::forward<Ts>(ts)...)
         {}
 
         future_data(init_no_addref no_addref, std::exception_ptr const& e)
@@ -664,9 +656,6 @@ namespace detail
                     rebind_alloc<future_data_allocator>
             other_allocator;
 
-        typedef typename future_data_base<Result>::default_construct
-            default_construct;
-
         future_data_allocator(other_allocator const& alloc)
           : future_data<Result>()
           , alloc_(alloc)
@@ -674,16 +663,8 @@ namespace detail
 
         template <typename... T>
         future_data_allocator(init_no_addref no_addref,
-                other_allocator const& alloc, T&&... ts)
-          : future_data<Result>(no_addref, std::forward<T>(ts)...)
-          , alloc_(alloc)
-        {}
-
-        template <typename... T>
-        future_data_allocator(init_no_addref no_addref,
-                default_construct defctr,
-                other_allocator const& alloc, T&&... ts)
-          : future_data<Result>(no_addref, defctr, std::forward<T>(ts)...)
+                in_place in_place, other_allocator const& alloc, T&&... ts)
+          : future_data<Result>(no_addref, in_place, std::forward<T>(ts)...)
           , alloc_(alloc)
         {}
 

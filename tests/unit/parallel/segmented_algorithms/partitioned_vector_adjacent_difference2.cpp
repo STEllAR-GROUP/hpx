@@ -7,7 +7,7 @@
 #include <hpx/include/parallel_adjacent_difference.hpp>
 #include <hpx/include/parallel_count.hpp>
 #include <hpx/include/parallel_scan.hpp>
-#include <hpx/include/partitioned_vector.hpp>
+#include <hpx/include/partitioned_vector_predef.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
 

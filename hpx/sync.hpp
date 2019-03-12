@@ -7,6 +7,7 @@
 #define HPX_SYNC_JUL_21_2018_0937PM
 
 #include <hpx/config.hpp>
+#include <hpx/sync_launch_policy_dispatch.hpp>
 #include <hpx/lcos/sync.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime_fwd.hpp>

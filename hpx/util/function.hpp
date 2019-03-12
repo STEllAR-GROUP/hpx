@@ -13,7 +13,6 @@
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_callable.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
@@ -33,39 +32,20 @@ namespace hpx { namespace util
 
     template <typename R, typename ...Ts, bool Serializable>
     class function<R(Ts...), Serializable>
-      : public detail::basic_function<
-            detail::function_vtable<R(Ts...)>
-          , R(Ts...), Serializable
-        >
+      : public detail::basic_function<R(Ts...), true, Serializable>
     {
-        typedef detail::function_vtable<R(Ts...)> vtable;
-        typedef detail::basic_function<vtable, R(Ts...), Serializable> base_type;
+        using base_type = detail::basic_function<R(Ts...), true, Serializable>;
 
     public:
-        typedef typename base_type::result_type result_type;
+        typedef R result_type;
 
-        function() noexcept
-          : base_type()
+        function(std::nullptr_t = nullptr) noexcept
         {}
 
-        function(std::nullptr_t) noexcept
-          : base_type()
-        {}
-
-        function(function const& other)
-          : base_type()
-        {
-            this->vptr = other.vptr;
-            if (other.object != nullptr)
-            {
-                this->object = this->vptr->copy(
-                    this->storage, detail::function_storage_size, other.object);
-            }
-        }
-
-        function(function&& other) noexcept
-          : base_type(static_cast<base_type&&>(other))
-        {}
+        function(function const&) = default;
+        function(function&&) noexcept = default;
+        function& operator=(function const&) = default;
+        function& operator=(function&&) noexcept = default;
 
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
@@ -73,45 +53,8 @@ namespace hpx { namespace util
              && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         function(F&& f)
-          : base_type()
         {
-            static_assert(
-                std::is_constructible<FD, FD const&>::value,
-                "F shall be CopyConstructible");
             assign(std::forward<F>(f));
-        }
-
-        function& operator=(function const& other)
-        {
-            if (this->vptr == other.vptr)
-            {
-                if (this != &other && this->object)
-                {
-                    HPX_ASSERT(other.object != nullptr);
-                    // reuse object storage
-                    this->vptr->destruct(this->object);
-                    this->object = this->vptr->copy(
-                        this->object, -1, other.object);
-                }
-            } else {
-                reset();
-
-                this->vptr = other.vptr;
-                if (other.object != nullptr)
-                {
-                    this->object = this->vptr->copy(
-                        this->storage, detail::function_storage_size, other.object);
-                } else {
-                    this->object = nullptr;
-                }
-            }
-            return *this;
-        }
-
-        function& operator=(function&& other) noexcept
-        {
-            base_type::operator=(static_cast<base_type&&>(other));
-            return *this;
         }
 
         template <typename F, typename FD = typename std::decay<F>::type,
@@ -121,9 +64,6 @@ namespace hpx { namespace util
             >::type>
         function& operator=(F&& f)
         {
-            static_assert(
-                std::is_constructible<FD, FD const&>::value,
-                "F shall be CopyConstructible");
             assign(std::forward<F>(f));
             return *this;
         }
