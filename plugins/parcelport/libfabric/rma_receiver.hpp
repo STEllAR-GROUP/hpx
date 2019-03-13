@@ -61,6 +61,9 @@ namespace libfabric
         // whether there are zero copy chunks to handle
         void read_message(region_type* region, fi_addr_t const& src_addr);
 
+        // @TODO insert docs here
+        void handle_bootstrap_message();
+
         // --------------------------------------------------------------------
         // Process a message that has no zero copy chunks
         void handle_message_no_rma();

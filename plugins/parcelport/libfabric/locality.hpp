@@ -62,36 +62,66 @@ struct locality {
     {
         std::memcpy(&data_[0], &in_data[0], array_size);
         fi_address_ = 0;
-        LOG_DEBUG_MSG("explicit constructing locality from "
-            << ipaddress(ip_address()) << ":" << decnumber(port()));
+        LOG_DEBUG_MSG("explicit constructing locality " << iplocality((*this)));
     }
 
     locality() {
         std::memset(&data_[0], 0x00, array_size);
         fi_address_ = 0;
-        LOG_DEBUG_MSG("default constructing locality from "
-            << ipaddress(ip_address()) << ":" << decnumber(port()));
+        LOG_DEBUG_MSG("default constructing locality " << iplocality((*this)));
     }
 
-    locality(const locality &other) : data_(other.data_) {
-        fi_address_ = other.fi_address_;
-        LOG_DEBUG_MSG("copy constructing locality with "
-            << ipaddress(ip_address()) << ":" << decnumber(port()));
-    }
-
-    locality(locality &&other) : data_(std::move(other.data_)),
-        fi_address_(other.fi_address_)
+    locality(const locality &other)
+        : data_(other.data_)
+        , fi_address_(other.fi_address_)
     {
-        LOG_DEBUG_MSG("move constructing locality with "
-            << ipaddress(ip_address()) << ":" << decnumber(port()));
+        LOG_DEBUG_MSG("copy constructing locality " << iplocality((*this)));
     }
+
+    locality(const locality &other, fi_addr_t addr)
+        : data_(other.data_)
+        , fi_address_(addr)
+    {
+        LOG_DEBUG_MSG("copy constructing locality + fi_addr " << iplocality((*this)));
+    }
+
+    locality(locality &&other)
+        : data_(std::move(other.data_))
+        , fi_address_(other.fi_address_)
+    {
+        LOG_DEBUG_MSG("move constructing locality " << iplocality((*this)));
+    }
+
+    // provided to support sockets mode bootstrap
+    explicit locality(const std::string &address,  const std::string &portnum)
+    {
+        LOG_DEBUG_MSG("explicit constructing locality from "
+            << address << ":" << portnum);
+        //
+        struct sockaddr_in socket_data;
+        memset (&socket_data, 0, sizeof (socket_data));
+        socket_data.sin_family      = AF_INET;
+        socket_data.sin_port        = htons(std::stol(portnum));
+        inet_pton(AF_INET, address.c_str(), &(socket_data.sin_addr));
+        //
+        std::memcpy(&data_[0], &socket_data, array_size);
+        fi_address_ = 0;
+        LOG_DEBUG_MSG("string constructing locality " << iplocality((*this)));
+    }
+
 
     locality & operator = (const locality &other) {
         data_       = other.data_;
         fi_address_ = other.fi_address_;
-        LOG_DEBUG_MSG("copy operator locality with "
-            << ipaddress(ip_address()) << ":" << decnumber(port()));
+        LOG_DEBUG_MSG("copy operator locality " << iplocality((*this)));
         return *this;
+    }
+
+    bool operator == (const locality &other) {
+        LOG_DEBUG_MSG("comparison operator locality with "
+                << iplocality((*this))
+                << iplocality(other));
+        return std::memcmp(&data_, &other.data_, array_size)==0;
     }
 
     const uint32_t & ip_address() const {
@@ -116,51 +146,53 @@ struct locality {
 #endif
     }
 
-    fi_addr_t fi_address() const {
+    inline fi_addr_t fi_address() const {
         return fi_address_;
     }
 
-    void set_fi_address(fi_addr_t fi_addr) {
+    inline void set_fi_address(fi_addr_t fi_addr) {
         fi_address_ = fi_addr;
     }
 
-    uint16_t port() const {
+    inline uint16_t port() const {
         uint16_t port = 256*reinterpret_cast<const uint8_t*>(data_.data())[2]
             + reinterpret_cast<const uint8_t*>(data_.data())[3];
         return port;
     }
 
     // some condition marking this locality as valid
-    explicit operator bool() const {
+    explicit inline operator bool() const {
+        return valid();
+    }
+
+    inline bool valid() const {
         return (ip_address() != 0);
     }
 
     void save(serialization::output_archive & ar) const {
         ar << data_;
+        ar << fi_address_;
     }
 
-    void load(serialization::input_archive & ar) {
-        ar >> data_;
-    }
+    // when loading a locality - it will have been transmitted from another node
+    // and the fi_address will not be valid, so we must look it up and put
+    // the correct value from this node's libfabric address vector.
+    // this is only called at bootstrap time, so do not worry about overheads
+    void load(serialization::input_archive & ar);
 
-    const void *fabric_data() const { return data_.data(); }
+    inline const void *fabric_data() const { return data_.data(); }
 
-    char *fabric_data_writable() { return reinterpret_cast<char*>(data_.data()); }
-
-
-    bool valid() { return true; }
+    inline char *fabric_data_writable() { return reinterpret_cast<char*>(data_.data()); }
 
 private:
+    // note that the fi_address is not compared as it is local to a node
     friend bool operator==(locality const & lhs, locality const & rhs) {
 #if defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING)
-        uint32_t a1 = lhs.ip_address();
-        uint32_t a2 = rhs.ip_address();
-        LOG_DEBUG_MSG("Testing array equality "
-            << ipaddress(a1)
-            << ipaddress(a2)
-        );
+        LOG_DEBUG_MSG("Testing locality equality "
+            << iplocality(lhs) << iplocality(rhs));
 #endif
-        return (lhs.data_ == rhs.data_);
+        return ((lhs.data_ == rhs.data_));
+//                && (lhs.fi_address_ == rhs.fi_address_));
     }
 
     friend bool operator<(locality const & lhs, locality const & rhs) {

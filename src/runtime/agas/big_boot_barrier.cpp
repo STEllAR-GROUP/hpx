@@ -39,7 +39,11 @@
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-
+#if defined(HPX_PARCELPORT_LIBFABRIC_SOCKETS) && \
+    defined(HPX_PARCELPORT_LIBFABRIC_HAVE_BOOTSTRAPPING)
+ #include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
+ #include <hpx/util/yield_while.hpp>
+#endif
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -790,6 +794,26 @@ void big_boot_barrier::wait_hosted(
         , locality_name
         , unassigned
         , suggested_prefix);
+
+#if defined(HPX_PARCELPORT_LIBFABRIC_SOCKETS) && \
+    defined(HPX_PARCELPORT_LIBFABRIC_HAVE_BOOTSTRAPPING)
+
+    parcelset::locality here_ = here();
+    std::shared_ptr<hpx::parcelset::parcelport> pp =
+            rt.get_parcel_handler().get_bootstrap_parcelport();
+    std::shared_ptr<hpx::parcelset::policies::libfabric::parcelport> lfpp =
+            std::dynamic_pointer_cast<hpx::parcelset::policies::libfabric::parcelport>(pp);
+
+    lfpp->send_bootstrap_address();
+
+    // wait until the agas node informs us that everyone has connected
+    hpx::util::yield_while(
+        [&lfpp](){
+            lfpp->background_work(0);
+            return lfpp->bootstrapping();
+        }
+    );
+#endif
 
     apply(
           static_cast<std::uint32_t>(std::random_device{}()) // random first parcel id

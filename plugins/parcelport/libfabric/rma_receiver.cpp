@@ -18,6 +18,9 @@
 #include <cstring>
 #include <utility>
 #include <vector>
+//
+#include <rdma/fabric.h>
+#include <rdma/fi_rma.h>
 
 namespace hpx {
 namespace parcelset {
@@ -75,6 +78,12 @@ namespace libfabric
 
         LOG_TRACE_MSG(
             CRC32_MEM(header_, header_->header_length(), "Header region (recv)"));
+
+        if (header_->bootstrap()) {
+            handle_bootstrap_message();
+            pp_->set_bootstrap_complete();
+            return;
+        }
 
         if (header_->chunk_ptr()==nullptr) {
             // the header does not have piggybacked chunks, we must rma-get them before
@@ -181,6 +190,37 @@ namespace libfabric
 
         // for each zerocopy chunk, schedule a read operation
         read_chunk_list();
+    }
+
+    // --------------------------------------------------------------------
+    void rma_receiver::handle_bootstrap_message()
+    {
+        LOG_DEBUG_MSG("receiver " << hexpointer(this)
+            << "handle bootstrap message");
+        HPX_ASSERT(header_);
+
+        char *piggy_back = header_->message_data();
+        HPX_ASSERT(piggy_back);
+
+        LOG_TRACE_MSG(
+            CRC32_MEM(piggy_back, header_->message_size(),
+                "(Message region recv piggybacked - no rdma)"));
+        //
+        std::size_t N = header_->message_size()/sizeof(libfabric::locality);
+        //
+        std::vector<libfabric::locality> addresses;
+        addresses.reserve(N);
+        //
+        const libfabric::locality *data =
+                reinterpret_cast<libfabric::locality*>(header_->message_data());
+        for (std::size_t i=0; i<N; ++i) {
+            addresses.push_back(data[i]);
+            LOG_DEBUG_MSG("bootstrap received " << iplocality(data[i]));
+        }
+        LOG_DEBUG_MSG("bootstrap received " << decnumber(N) << "addresses");
+        pp_->recv_bootstrap_address(addresses);
+        //
+        cleanup_receive();
     }
 
     // --------------------------------------------------------------------
@@ -536,7 +576,7 @@ namespace libfabric
         //
         memory_pool_->deallocate(header_region_);
         header_region_ = nullptr;
-        chunk_region_ = nullptr;
+        chunk_region_  = nullptr;
         header_        = nullptr;
         src_addr_      = 0 ;
         //

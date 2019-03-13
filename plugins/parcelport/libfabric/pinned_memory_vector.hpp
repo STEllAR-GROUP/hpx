@@ -56,7 +56,7 @@ namespace libfabric
         pinned_memory_vector(allocator_type* alloc) :
         m_array_(0), m_size_(0), m_cb_(0), m_alloc_(alloc), m_region_(0)
         {
-            LOG_DEBUG_MSG("pinned_memory_vector alloc "
+            LOG_TRACE_MSG("pinned_memory_vector alloc "
                 << "size " << hexuint32(m_size_)
                 << "array " << hexpointer(m_array_)
                 << "region " << hexpointer(m_region_)
@@ -81,7 +81,7 @@ namespace libfabric
             m_cb_(std::move(other.m_cb_)), m_alloc_(other.m_alloc_),
             m_region_(other.m_region_)
         {
-            LOG_DEBUG_MSG("pinned_memory_vector moved "
+            LOG_TRACE_MSG("pinned_memory_vector moved "
                 << "size " << hexuint32(m_size_)
                 << "array " << hexpointer(m_array_)
                 << "region " << hexpointer(m_region_)

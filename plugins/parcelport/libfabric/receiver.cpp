@@ -11,8 +11,9 @@
 #include <plugins/parcelport/libfabric/receiver.hpp>
 #include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
-#include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
 #include <plugins/parcelport/libfabric/sender.hpp>
+#include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
+#include <plugins/parcelport/libfabric/controller.hpp>
 //
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
@@ -81,6 +82,49 @@ namespace libfabric
             recv_deletes_ += rcv->recv_deletes_;
             delete rcv;
         }
+    }
+
+    // --------------------------------------------------------------------
+    // A new connection only contains a locality address of the sender
+    // so it can be handled directly without creating an rma_receiver
+    // just get the address and add it to the parclport address_vector
+    bool receiver::handle_new_connection(controller *controller, std::uint64_t len)
+    {
+        FUNC_START_DEBUG_MSG;
+        LOG_DEBUG_MSG("Processing new connection message of length " << decnumber(len));
+
+        // We save the received region and swap it with a newly allocated one
+        // so that we can post a recv again as soon as possible.
+        region_type* region = header_region_;
+        header_region_ = memory_pool_->allocate_region(memory_pool_->small_.chunk_size());
+        pre_post_receive();
+
+        LOG_TRACE_MSG(CRC32_MEM(region->get_address(),
+                                len, "Header region (new connection)"));
+
+        rma_receiver::header_type *header =
+                reinterpret_cast<rma_receiver::header_type*>(region->get_address());
+
+        // The message size should match the locality data size
+        HPX_ASSERT(header->message_size() == locality::array_size);
+
+        parcelset::policies::libfabric::locality source_addr;
+        std::memcpy(source_addr.fabric_data_writable(),
+                    header->message_data(),
+                    source_addr.array_size);
+        LOG_DEBUG_MSG("Received connection bootstrap locality "
+                      << iplocality(source_addr));
+
+        // free up the region we consumed
+        memory_pool_->deallocate(region);
+
+        // Add the sender's address to the address vector and update it
+        // with the fi_addr address vector table index (rank)
+        source_addr = controller->insert_address(source_addr);
+        controller->update_bootstrap_connections();
+
+        FUNC_END_DEBUG_MSG;
+        return true;
     }
 
     // --------------------------------------------------------------------

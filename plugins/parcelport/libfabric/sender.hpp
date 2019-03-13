@@ -100,14 +100,14 @@ namespace libfabric
         // The main message send routine : package the header, send it
         // with an optional extra message region if it cannot be piggybacked
         // send chunk/rma information for all zero copy serialization regions
-        void async_write_impl();
+        void async_write_impl(unsigned int flags=0);
 
         // --------------------------------------------------------------------
         // Called when a send completes
         void handle_send_completion();
 
         // --------------------------------------------------------------------
-        // Triggered when the remote end has finished RMA opreations and
+        // Triggered when the remote end has finished RMA operations and
         // we can release resources
         void handle_message_completion_ack();
 

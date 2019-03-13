@@ -33,7 +33,7 @@
 #if   defined(HPX_PARCELPORT_VERBS_HAVE_LOGGING)      || \
       defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING)
 #  define HPX_PARCELPORT_LOGGING_INCLUDE_FILES
-#  define HPX_PARCELPORT_LOGGING_HAVE_TRACE_LOG
+//#  define HPX_PARCELPORT_LOGGING_HAVE_TRACE_LOG
 #  define HPX_PARCELPORT_LOGGING_HAVE_DEBUG_LOG
 #  define HPX_PARCELPORT_LOGGING_HAVE_TIMED_LOG
 #  define HPX_PARCELPORT_LOGGING_HAVE_DEVEL_LOG
@@ -62,11 +62,13 @@
 #define decnumber(p) std::dec << p << " "
 #define dec4(p) decimal(4) << p << " "
 #define ipaddress(p)                                                           \
-    std::dec << (int) (reinterpret_cast<const uint8_t*>(&p))[0] << "."         \
-             << (int) (reinterpret_cast<const uint8_t*>(&p))[1] << "."         \
-             << (int) (reinterpret_cast<const uint8_t*>(&p))[2] << "."         \
-             << (int) (reinterpret_cast<const uint8_t*>(&p))[3] << " "
+    std::dec << int( (reinterpret_cast<const uint8_t*>(&p))[0] ) << "."         \
+             << int( (reinterpret_cast<const uint8_t*>(&p))[1] ) << "."         \
+             << int( (reinterpret_cast<const uint8_t*>(&p))[2] ) << "."         \
+             << int( (reinterpret_cast<const uint8_t*>(&p))[3] )
 #define sockaddress(p) ipaddress(((struct sockaddr_in*) (p))->sin_addr.s_addr)
+#define iplocality(p)  ipaddress(p.ip_address()) << ":" << decnumber(p.port())  \
+    << "(" << std::dec << p.fi_address() << ") "
 
 // ------------------------------------------------------------------
 // include files needed for boost::log

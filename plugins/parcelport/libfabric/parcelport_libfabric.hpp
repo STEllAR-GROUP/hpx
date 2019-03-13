@@ -55,7 +55,6 @@
 #include <plugins/parcelport/libfabric/locality.hpp>
 #include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
-#include <plugins/parcelport/libfabric/libfabric_controller.hpp>
 #include <plugins/parcelport/libfabric/sender.hpp>
 #include <plugins/parcelport/libfabric/connection_handler.hpp>
 
@@ -85,6 +84,12 @@ namespace parcelset {
 namespace policies {
 namespace libfabric
 {
+
+    class controller;
+
+    // Smart pointer for controller obje
+    typedef std::shared_ptr<controller> controller_ptr;
+
     // --------------------------------------------------------------------
     // parcelport, the implementation of the parcelport itself
     // --------------------------------------------------------------------
@@ -108,7 +113,7 @@ namespace libfabric
         // main vars used to manage the RDMA controller and interface
         // These are called from a static function, so use static
         // --------------------------------------------------------------------
-        libfabric_controller_ptr libfabric_controller_;
+        controller_ptr controller_;
 
         // our local ip address (estimated based on fabric PP address info)
         uint32_t ip_addr_;
@@ -117,6 +122,8 @@ namespace libfabric
         // we should be able to skip it
         bool bootstrap_enabled_;
         bool parcelport_enabled_;
+
+        bool bootstrap_complete;
 
         // @TODO, clean up the allocators, buffers, chunk_pool etc so that there is a
         // more consistent reuse of classes/types.
@@ -162,8 +169,11 @@ namespace libfabric
         // return a sender object back to the parcelport_impl
         // this is used by the send_immediate version of parcelport_impl
         // --------------------------------------------------------------------
-        sender* get_connection(parcelset::locality const& dest, fi_addr_t &fi_addr);
+        sender* get_connection(libfabric::locality const& dest);
+        sender* get_connection(parcelset::locality const& dest);
 
+        // --------------------------------------------------------------------
+        // put a used sender object back into the sender queue for reuse
         void reclaim_connection(sender* s);
 
         // --------------------------------------------------------------------
@@ -173,10 +183,31 @@ namespace libfabric
         std::shared_ptr<sender> create_connection(
             parcelset::locality const& dest, error_code& ec);
 
+        // --------------------------------------------------------------------
+        // parcelport destructor
         ~parcelport();
 
-        /// Should not be used any more as parcelport_impl handles this?
+        // --------------------------------------------------------------------
+        // Should not be used any more as parcelport_impl handles this?
         bool can_bootstrap() const;
+
+        // --------------------------------------------------------------------
+        // this will copy the data into the header and send it without going
+        // through the usual parcel encoding process. It is intended for
+        // bootstrap messages and should not be used during normal runtime
+        // unless special flags are used in the header to distinguish the messages
+        // from normal hpx traffic.
+        // Data sent must be small and fit into a header message.
+        void send_raw_data(const libfabric::locality &dest,
+                           void const *data, std::size_t size,
+                           unsigned int flags=0);
+
+        // --------------------------------------------------------------------
+        // bootstrap functions. @TODO document fully.
+        void send_bootstrap_address();
+        void recv_bootstrap_address(const std::vector<libfabric::locality> &addresses);
+        void set_bootstrap_complete();
+        bool bootstrapping();
 
         /// Return the name of this locality
         std::string get_locality_name() const;
@@ -185,16 +216,11 @@ namespace libfabric
 
         parcelset::locality create_locality() const;
 
-        rma::memory_region *allocate_region(std::size_t size) override {
-            return libfabric_controller_->get_memory_pool().allocate_region(size);
-        }
+        // @TODO make this inline (circular ref problem)
+        rma::memory_region *allocate_region(std::size_t size) override;
 
-        int deallocate_region(rma::memory_region *region) {
-            region_type *r = dynamic_cast<region_type*>(region);
-            HPX_ASSERT(r);
-            libfabric_controller_->get_memory_pool().deallocate(r);
-            return 0;
-        }
+        // @TODO make this inline (circular ref problem)
+        int deallocate_region(rma::memory_region *region) override;
 
         static void suspended_task_debug(const std::string &match);
 
@@ -206,8 +232,7 @@ namespace libfabric
         // --------------------------------------------------------------------
         template <typename Handler>
         bool async_write(Handler && handler,
-            sender *sender, fi_addr_t addr,
-            snd_buffer_type &buffer);
+            sender *sender, snd_buffer_type &buffer);
 
         // --------------------------------------------------------------------
         // This is called to poll for completions and handle all incoming messages
@@ -269,7 +294,8 @@ struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
     // for example check for availability of devices etc.
     static void init(int *argc, char ***argv, util::command_line_handling &cfg) {
         FUNC_START_DEBUG_MSG;
-#ifdef HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
+#ifdef HPX_PARCELPORT_LIBFABRIC_HAVE_BOOTSTRAPPING
+//#ifdef HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
         cfg.ini_config_.push_back("hpx.parcel.bootstrap!=libfabric");
 #endif
         FUNC_END_DEBUG_MSG;

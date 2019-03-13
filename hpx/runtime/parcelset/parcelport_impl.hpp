@@ -498,10 +498,9 @@ namespace hpx { namespace parcelset
             parcelport_impl &this_, locality const&dest_,
             write_handler_type *fs, parcel *ps, std::size_t num_parcels)
         {
-            std::uint64_t addr;
             error_code ec;
             // First try to get a connection ...
-            connection *sender = this_.connection_handler().get_connection(dest_, addr);
+            connection *sender = this_.connection_handler().get_connection(dest_);
 
             // If we couldn't get one ... enqueue the parcel and move on
             std::size_t encoded_parcels = 0;
@@ -547,7 +546,7 @@ namespace hpx { namespace parcelset
                             std::make_move_iterator(ps),
                             std::make_move_iterator(ps + encoded_parcels))
                     ),
-                    sender, addr,
+                    sender,
                     encoded_buffer))
                 {
                     // we don't propagate errors for now
