@@ -701,6 +701,20 @@ function(hpx_check_for_cxx17_hardware_destructive_interference_size)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx17_structured_bindings)
+  add_hpx_config_test(HPX_WITH_CXX17_STRUCTURED_BINDINGS
+    SOURCE cmake/tests/cxx17_structured_bindings.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
+function(hpx_check_for_cxx17_if_constexpr)
+  add_hpx_config_test(HPX_WITH_CXX17_IF_CONSTEXPR
+    SOURCE cmake/tests/cxx17_if_constexpr.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_mm_prefetch)
   add_hpx_config_test(HPX_WITH_MM_PREFETCH
     SOURCE cmake/tests/mm_prefetch.cpp

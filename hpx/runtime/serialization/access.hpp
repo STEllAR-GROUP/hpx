@@ -7,8 +7,11 @@
 #ifndef HPX_SERIALIZATION_ACCESS_HPP
 #define HPX_SERIALIZATION_ACCESS_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/brace_initializable_fwd.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
+#include <hpx/traits/brace_initializable_traits.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <string>
@@ -31,6 +34,42 @@ namespace hpx { namespace serialization
             serialize(ar, t, 0);
         }
     }
+
+#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) && defined (HPX_HAVE_CXX17_IF_CONSTEXPR)
+    // This trait must live outside of 'class access' below as otherwise MSVC
+    // will find the serialize() function in 'class access' as a dependend class
+    // (which is a MS extension)
+    template <typename T>
+    class has_serialize_adl
+    {
+        template <typename T1> static std::false_type test(...);
+
+        template <typename T1, typename = decltype(serialize(
+            std::declval<hpx::serialization::output_archive &>(),
+            std::declval<typename std::remove_const<T1>::type &>(),
+            0u))>
+        static std::true_type test(int);
+
+    public:
+        static constexpr bool value = decltype(test<T>(0))::value;
+    };
+
+    template <typename T>
+    class has_struct_serialization
+    {
+    public:
+        template <typename T1> static std::false_type test(...);
+
+        template <typename T1, typename = decltype(serialize_struct(
+            std::declval<hpx::serialization::output_archive &>(),
+            std::declval<typename std::remove_const<T1>::type &>(),
+            0u, hpx::traits::detail::arity<T1>()))>
+        static std::true_type test(int);
+
+    public:
+        static constexpr bool value = decltype(test<T>(0))::value;
+    };
+#endif
 
     class access
     {
@@ -76,15 +115,42 @@ namespace hpx { namespace serialization
 
             struct non_intrusive
             {
-                // this additional indirection level is needed to
-                // force ADL on the second phase of template lookup.
-                // call of serialize function directly from base_object
-                // finds only serialize-member function and doesn't
-                // perform ADL
+                template<class T1> struct dependent_false : std::false_type {};
+
                 template <class Archive>
                 static void call(Archive& ar, T& t, unsigned)
                 {
+#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) && defined (HPX_HAVE_CXX17_IF_CONSTEXPR)
+                    if constexpr (has_serialize_adl<T>::value)
+                    {
+                        // this additional indirection level is needed to
+                        // force ADL on the second phase of template lookup.
+                        // call of serialize function directly from base_object
+                        // finds only serialize-member function and doesn't
+                        // perform ADL
+                        detail::serialize_force_adl(ar, t, 0);
+                    }
+                    else if constexpr (has_struct_serialization<T>::value)
+                    {
+                        // This is automatic serialization for types
+                        // which are simple (brace-initializable) structs,
+                        // what that means every struct's field
+                        // has to be serializable and public.
+                        serialize_struct(ar, t, 0);
+                    }
+                    else
+                    {
+                        static_assert(dependent_false<T>::value,
+                                      "No serialization method found");
+                    }
+#else
+                    // this additional indirection level is needed to
+                    // force ADL on the second phase of template lookup.
+                    // call of serialize function directly from base_object
+                    // finds only serialize-member function and doesn't
+                    // perform ADL
                     detail::serialize_force_adl(ar, t, 0);
+#endif
                 }
             };
 

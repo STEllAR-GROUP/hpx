@@ -20,6 +20,7 @@
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
+#include <hpx/traits/brace_initializable_traits.hpp>
 #include <hpx/traits/component_config_data.hpp>
 #include <hpx/traits/component_heap_type.hpp>
 #include <hpx/traits/component_pin_support.hpp>
