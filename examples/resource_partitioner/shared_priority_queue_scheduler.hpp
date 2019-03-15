@@ -36,6 +36,16 @@
 #include <type_traits>
 #include <vector>
 
+#if !defined(HPX_HAVE_MAX_CPU_COUNT) && defined(HPX_HAVE_MORE_THAN_64_THREADS)
+static_assert(false,
+    "The shared_priority_scheduler does not support dynamic bitsets for CPU "
+    "masks, i.e. HPX_WITH_MAX_CPU_COUNT=\"\" and "
+    "HPX_WITH_MORE_THAN_64_THREADS=ON. Reconfigure HPX with either "
+    "HPX_WITH_MAX_CPU_COUNT=N, where N is an integer, or disable the "
+    "shared_priority_scheduler by setting HPX_WITH_THREAD_SCHEDULERS to not "
+    "include \"all\" or \"shared-priority\"");
+#else
+
 // #define SHARED_PRIORITY_SCHEDULER_DEBUG 1
 // #define SHARED_PRIORITY_SCHEDULER_MINIMAL_DEBUG 1
 
@@ -1541,6 +1551,7 @@ namespace example {
         hpx::lcos::local::spinlock init_mutex;
     };
 }}}}
+#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 

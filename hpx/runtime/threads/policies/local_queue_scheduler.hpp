@@ -110,29 +110,30 @@ namespace hpx { namespace threads { namespace policies
         typedef init_parameter init_parameter_type;
 
         local_queue_scheduler(init_parameter_type const& init,
-                bool deferred_initialization = true)
-          : scheduler_base(init.num_queues_, init.description_),
-            max_queue_thread_count_(init.max_queue_thread_count_),
-            queues_(init.num_queues_),
-            curr_queue_(0),
-            numa_sensitive_(init.numa_sensitive_),
-#ifndef HPX_NATIVE_MIC        // we know that the MIC has one NUMA domain only
-            steals_in_numa_domain_(),
-            steals_outside_numa_domain_(),
+            bool deferred_initialization = true)
+          : scheduler_base(init.num_queues_, init.description_)
+          , max_queue_thread_count_(init.max_queue_thread_count_)
+          , queues_(init.num_queues_)
+          , curr_queue_(0)
+          , numa_sensitive_(init.numa_sensitive_)
+          ,
+#ifndef HPX_NATIVE_MIC    // we know that the MIC has one NUMA domain only
+          steals_in_numa_domain_()
+          , steals_outside_numa_domain_()
 #endif
-#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || defined(HPX_HAVE_MAX_CPU_COUNT)
-            numa_domain_masks_(init.num_queues_),
-            outside_numa_domain_masks_(init.num_queues_)
-#else
-            numa_domain_masks_(init.num_queues_,
-                topology_.get_machine_affinity_mask()),
-            outside_numa_domain_masks_(init.num_queues_,
-                topology_.get_machine_affinity_mask())
-#endif
+          , numa_domain_masks_(init.num_queues_,
+              resource::get_partitioner()
+                  .get_topology()
+                  .get_machine_affinity_mask())
+          , outside_numa_domain_masks_(init.num_queues_,
+                resource::get_partitioner()
+                    .get_topology()
+                    .get_machine_affinity_mask())
         {
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
-            resize(steals_in_numa_domain_, init.num_queues_);
-            resize(steals_outside_numa_domain_, init.num_queues_);
+            resize(steals_in_numa_domain_, threads::hardware_concurrency());
+            resize(
+                steals_outside_numa_domain_, threads::hardware_concurrency());
 #endif
             if (!deferred_initialization)
             {
