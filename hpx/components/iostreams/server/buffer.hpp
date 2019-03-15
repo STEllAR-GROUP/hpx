@@ -100,8 +100,9 @@ namespace hpx { namespace iostreams { namespace detail
         void write(write_function_type const& f, Mutex& mtx)
         {
             std::unique_lock<mutex_type> l(*mtx_);
-            if (data_.get() && !data_->empty())
+            if (data_.get())
             {
+                // execute even for empty buffers as this will flush the output
                 std::shared_ptr<std::vector<char> > data(data_);
                 data_.reset();
                 l.unlock();

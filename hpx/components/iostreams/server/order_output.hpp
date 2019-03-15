@@ -36,7 +36,6 @@ namespace hpx { namespace iostreams { namespace detail
             if (count == data.first)
             {
                 // this is the next expected output line
-                if (!in.empty())
                 {
                     // output the line as requested
                     util::unlock_guard<std::unique_lock<Mutex> > ul(l);
@@ -49,7 +48,6 @@ namespace hpx { namespace iostreams { namespace detail
                 while (next != data.second.end())
                 {
                     buffer next_in = (*next).second;
-                    if (!next_in.empty())
                     {
                         // output the next line
                         util::unlock_guard<std::unique_lock<Mutex> > ul(l);
