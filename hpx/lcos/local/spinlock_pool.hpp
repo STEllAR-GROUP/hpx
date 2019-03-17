@@ -14,9 +14,9 @@
 #define HPX_LCOS_LOCAL_SPINLOCK_POOL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/fibhash.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/util/cache_aligned_data.hpp>
+#include <hpx/util/fibhash.hpp>
 
 #include <cstddef>
 
@@ -33,28 +33,13 @@ namespace hpx { namespace lcos { namespace local
             ~itt_spinlock_init();
         };
 #endif
-#if defined(HPX_HAVE_CXX11_ALIGNAS)
-        struct alignas(threads::get_cache_line_size()) spinlock_holder
-        {
-            lcos::local::spinlock lock;
-        };
-#else
-        // special struct to ensure cache line alignment
-        struct spinlock_holder
-        {
-            // pad to cache line size bytes
-            char cacheline_pad[threads::get_cache_line_size() -
-                sizeof(lcos::local::spinlock)];
-            lcos::local::spinlock lock;
-        };
-#endif
     }
 
     template <typename Tag, std::size_t N = HPX_HAVE_SPINLOCK_POOL_NUM>
     class spinlock_pool
     {
     private:
-        static detail::spinlock_holder pool_[N];
+        static util::cache_aligned_data<lcos::local::spinlock> pool_[N];
 #if HPX_HAVE_ITTNOTIFY != 0
         static detail::itt_spinlock_init<Tag> init_;
 #endif
@@ -62,7 +47,7 @@ namespace hpx { namespace lcos { namespace local
         static lcos::local::spinlock & spinlock_for(void const * pv)
         {
             std::size_t i = util::fibhash<N>(reinterpret_cast< std::size_t >(pv));
-            return pool_[ i ].lock;
+            return pool_[ i ].data_;
         }
 
         class scoped_lock
@@ -102,7 +87,8 @@ namespace hpx { namespace lcos { namespace local
     };
 
     template <typename Tag, std::size_t N>
-    detail::spinlock_holder spinlock_pool<Tag, N>::pool_[N];
+    util::cache_aligned_data<lcos::local::spinlock>
+        spinlock_pool<Tag, N>::pool_[N];
 
 #if HPX_HAVE_ITTNOTIFY != 0
     namespace detail
@@ -112,9 +98,11 @@ namespace hpx { namespace lcos { namespace local
         {
             for (int i = 0; i < 41; ++i)
             {
-                HPX_ITT_SYNC_CREATE(&lcos::local::spinlock_pool<Tag, N>::pool_[i].lock,
+                HPX_ITT_SYNC_CREATE(
+                    &lcos::local::spinlock_pool<Tag, N>::pool_[i].data_,
                     "hpx::lcos::spinlock", 0);
-                HPX_ITT_SYNC_RENAME(&lcos::local::spinlock_pool<Tag, N>::pool_[i].loc,
+                HPX_ITT_SYNC_RENAME(
+                    &lcos::local::spinlock_pool<Tag, N>::pool_[i].data_,
                     "hpx::lcos::spinlock");
             }
         }
@@ -124,7 +112,7 @@ namespace hpx { namespace lcos { namespace local
         {
             for (int i = 0; i < N; ++i)
             {
-                HPX_ITT_SYNC_DESTROY(&spinlock_pool<Tag, N>::pool_[i].lock);
+                HPX_ITT_SYNC_DESTROY(&spinlock_pool<Tag, N>::pool_[i].data_);
             }
         }
     }

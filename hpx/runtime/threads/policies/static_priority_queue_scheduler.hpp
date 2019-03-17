@@ -1,5 +1,5 @@
 //  Copyright (c)      2013 Thomas Heller
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -69,13 +69,14 @@ namespace hpx { namespace threads { namespace policies
         bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd) override
         {
-            std::size_t queues_size = this->queues_.size();
+            std::size_t queues_size = this->num_queues_;
 
             typedef typename base_type::thread_queue_type thread_queue_type;
 
-            if (num_thread < this->high_priority_queues_.size())
+            if (num_thread < queues_size)
             {
-                thread_queue_type* q = this->high_priority_queues_[num_thread];
+                thread_queue_type* q =
+                    this->high_priority_queues_[num_thread].data_;
 
                 q->increment_num_pending_accesses();
                 if (q->get_next_thread(thrd))
@@ -85,7 +86,7 @@ namespace hpx { namespace threads { namespace policies
 
             {
                 HPX_ASSERT(num_thread < queues_size);
-                thread_queue_type* q = this->queues_[num_thread];
+                thread_queue_type* q = this->queues_[num_thread].data_;
 
                 q->increment_num_pending_accesses();
                 if (q->get_next_thread(thrd))
@@ -111,20 +112,20 @@ namespace hpx { namespace threads { namespace policies
         bool wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count) override
         {
-            HPX_ASSERT(num_thread < this->queues_.size());
+            HPX_ASSERT(num_thread < this->num_queues_);
 
             std::size_t added = 0;
             bool result = true;
 
-            if (num_thread < this->high_priority_queues_.size())
+            if (num_thread < this->num_high_priority_queues_)
             {
-                result = this->high_priority_queues_[num_thread]->
+                result = this->high_priority_queues_[num_thread].data_->
                     wait_or_add_new(running, idle_loop_count, added) && result;
                 if (0 != added) return result;
             }
 
-            result = this->queues_[num_thread]->wait_or_add_new(running,
-                idle_loop_count, added) && result;
+            result = this->queues_[num_thread].data_->wait_or_add_new(
+                running, idle_loop_count, added) && result;
             if (0 != added) return result;
 
             // Check if we have been disabled
@@ -140,10 +141,10 @@ namespace hpx { namespace threads { namespace policies
                 bool suspended_only = true;
 
                 for (std::size_t i = 0;
-                     suspended_only && i != this->queues_.size(); ++i)
+                     suspended_only && i != this->num_queues_; ++i)
                 {
-                    suspended_only = this->queues_[i]->dump_suspended_threads(
-                        i, idle_loop_count, running);
+                    suspended_only = this->queues_[i].data_->
+                        dump_suspended_threads(i, idle_loop_count, running);
                 }
 
                 if (HPX_UNLIKELY(suspended_only)) {
