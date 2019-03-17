@@ -600,8 +600,8 @@ if(HPX_WITH_THREAD_CUMULATIVE_COUNTS)
 endif()
 
 hpx_option(HPX_WITH_THREAD_STEALING_COUNTS BOOL
-  "Enable keeping track of counts of thread stealing incidents in the schedulers (default: ON)"
-  ON CATEGORY "Thread Manager" ADVANCED)
+  "Enable keeping track of counts of thread stealing incidents in the schedulers (default: OFF)"
+  OFF CATEGORY "Thread Manager" ADVANCED)
 
 if(HPX_WITH_THREAD_STEALING_COUNTS)
   hpx_add_config_define(HPX_HAVE_THREAD_STEALING_COUNTS)

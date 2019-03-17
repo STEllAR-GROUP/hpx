@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2017 Hartmut Kaiser
+//  Copyright (c) 2015-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,6 +11,7 @@
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/cache_aligned_data.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -53,8 +54,9 @@ namespace hpx { namespace lcos { namespace local
         /// Postconditions: counter_ == count.
         ///
         explicit latch(std::ptrdiff_t count)
-          : counter_(count), mtx_(), cond_()
-        {}
+          : mtx_(), cond_(), counter_(count)
+        {
+        }
 
         /// Requires: No threads are blocked at the synchronization point.
         ///
@@ -68,7 +70,7 @@ namespace hpx { namespace lcos { namespace local
         ///       destructor. This may require additional coordination.
         ~latch ()
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_.data_);
             HPX_ASSERT(counter_ == 0);
         }
 
@@ -84,13 +86,13 @@ namespace hpx { namespace lcos { namespace local
         ///
         void count_down_and_wait()
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_.data_);
             HPX_ASSERT(counter_ > 0);
 
             if (--counter_ == 0)
-                cond_.notify_all(std::move(l));    // release the threads
+                cond_.data_.notify_all(std::move(l));    // release the threads
             else
-                cond_.wait(l, "hpx::local::latch::count_down_and_wait");
+                cond_.data_.wait(l, "hpx::local::latch::count_down_and_wait");
         }
 
         /// Decrements counter_ by n. Does not block.
@@ -106,11 +108,11 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ASSERT(n >= 0);
 
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_.data_);
             HPX_ASSERT(counter_ >= n);
 
             if ((counter_ -= n) == 0)
-                cond_.notify_all(std::move(l));    // release the threads
+                cond_.data_.notify_all(std::move(l));    // release the threads
         }
 
         /// Returns: counter_ == 0. Does not block.
@@ -119,7 +121,7 @@ namespace hpx { namespace lcos { namespace local
         ///
         bool is_ready() const noexcept
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_.data_);
             return counter_ == 0;
         }
 
@@ -131,15 +133,15 @@ namespace hpx { namespace lcos { namespace local
         ///
         void wait() const
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_.data_);
             if (counter_ > 0)
-                cond_.wait(l, "hpx::local::latch::wait");
+                cond_.data_.wait(l, "hpx::local::latch::wait");
         }
 
         void abort_all()
         {
-            std::unique_lock<mutex_type> l(mtx_);
-            cond_.abort_all(std::move(l));
+            std::unique_lock<mutex_type> l(mtx_.data_);
+            cond_.data_.abort_all(std::move(l));
         }
 
         /// Increments counter_ by n. Does not block.
@@ -152,7 +154,7 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ASSERT(n >= 0);
 
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_.data_);
 
             counter_ += n;
         }
@@ -166,15 +168,15 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ASSERT(n >= 0);
 
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_.data_);
 
             counter_ = n;
         }
 
     private:
+        mutable util::cache_line_data<mutex_type> mtx_;
+        mutable util::cache_aligned_data<local::detail::condition_variable> cond_;
         std::ptrdiff_t counter_;
-        mutable mutex_type mtx_;
-        mutable local::detail::condition_variable cond_;
     };
 }}}
 

@@ -19,9 +19,9 @@
 #endif
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/fibhash.hpp>
 #include <hpx/util/itt_notify.hpp>
+#include <hpx/util/cache_aligned_data.hpp>
 #include <hpx/util/register_locks.hpp>
 
 #include <boost/smart_ptr/detail/spinlock.hpp>
@@ -41,28 +41,13 @@ namespace hpx { namespace util
             ~itt_spinlock_init();
         };
 #endif
-#if defined(HPX_HAVE_CXX11_ALIGNAS)
-        struct alignas(threads::get_cache_line_size()) spinlock_holder
-        {
-            boost::detail::spinlock lock;
-        };
-#else
-        // special struct to ensure cache line alignment
-        struct spinlock_holder
-        {
-            // pad to 64 bytes
-            char cacheline_pad[threads::get_cache_line_size() -
-                sizeof(boost::detail::spinlock)];
-            boost::detail::spinlock lock;
-        };
-#endif
     }
 
     template <typename Tag, std::size_t N = HPX_HAVE_SPINLOCK_POOL_NUM>
     class spinlock_pool
     {
     private:
-        static detail::spinlock_holder pool_[N];
+        static util::cache_aligned_data<boost::detail::spinlock> pool_[N];
 #if HPX_HAVE_ITTNOTIFY != 0
         static detail::itt_spinlock_init<Tag, N> init_;
 #endif
@@ -72,7 +57,7 @@ namespace hpx { namespace util
         static boost::detail::spinlock & spinlock_for( void const * pv )
         {
             std::size_t i = fibhash<N>(reinterpret_cast< std::size_t >(pv));
-            return pool_[ i ].lock;
+            return pool_[ i ].data_;
         }
 
         class scoped_lock
@@ -113,7 +98,8 @@ namespace hpx { namespace util
     };
 
     template <typename Tag, std::size_t N>
-    detail::spinlock_holder spinlock_pool<Tag, N>::pool_[N];
+    util::cache_aligned_data<boost::detail::spinlock>
+        spinlock_pool<Tag, N>::pool_[N];
 
 #if HPX_HAVE_ITTNOTIFY != 0
     namespace detail
@@ -123,9 +109,9 @@ namespace hpx { namespace util
         {
             for (int i = 0; i < N; ++i)
             {
-                HPX_ITT_SYNC_CREATE(&spinlock_pool<Tag, N>::pool_[i].lock,
+                HPX_ITT_SYNC_CREATE(&spinlock_pool<Tag, N>::pool_[i].data_,
                     "boost::detail::spinlock", 0);
-                HPX_ITT_SYNC_RENAME(&spinlock_pool<Tag, N>::pool_[i].lock,
+                HPX_ITT_SYNC_RENAME(&spinlock_pool<Tag, N>::pool_[i].data_,
                     "boost::detail::spinlock");
             }
         }
@@ -135,7 +121,7 @@ namespace hpx { namespace util
         {
             for (int i = 0; i < N; ++i)
             {
-                HPX_ITT_SYNC_DESTROY(&spinlock_pool<Tag, N>::pool_[i].lock);
+                HPX_ITT_SYNC_DESTROY(&spinlock_pool<Tag, N>::pool_[i].data_);
             }
         }
     }
