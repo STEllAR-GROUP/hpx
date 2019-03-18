@@ -122,7 +122,8 @@ namespace hpx { namespace parallel { inline namespace v1
                                     }
                                 });
                         },
-                        [=]() mutable -> std::pair<FwdIter1, FwdIter2>
+                        [=](std::vector<hpx::future<void> > &&) mutable
+                            -> std::pair<FwdIter1, FwdIter2>
                         {
                             difference_type1 mismatched =
                                 static_cast<difference_type1>(tok.get_data());
@@ -320,7 +321,8 @@ namespace hpx { namespace parallel { inline namespace v1
                                     }
                                 });
                         },
-                        [=]() mutable -> std::pair<FwdIter1, FwdIter2>
+                        [=](std::vector<hpx::future<void> > &&) mutable
+                            -> std::pair<FwdIter1, FwdIter2>
                         {
                             difference_type mismatched =
                                 static_cast<difference_type>(tok.get_data());

@@ -278,7 +278,6 @@ namespace hpx { namespace parallel { namespace util
                 // always rethrow if 'errors' is not empty or workitems has
                 // exceptional future
                 handle_local_exceptions::call(workitems, errors);
-                handle_local_exceptions<ExPolicy>::call(workitems, errors);
 
                 try
                 {
@@ -335,7 +334,7 @@ namespace hpx { namespace parallel { namespace util
                     std::move(scoped_params),
                     std::move(workitems), std::move(errors),
                     std::forward<F2>(f2));
-                }
+            }
 
             template <
                 typename ExPolicy_,
@@ -344,8 +343,8 @@ namespace hpx { namespace parallel { namespace util
                 ExPolicy_ && policy,
                 FwdIter first, std::size_t count, Stride stride,
                 F1 && f1, F2 && f2)
-                    {
-                        // inform parameter traits
+            {
+                // inform parameter traits
                 std::shared_ptr<scoped_executor_parameters> scoped_params =
                     std::make_shared<scoped_executor_parameters>(
                         policy.parameters(), policy.executor());
@@ -353,7 +352,7 @@ namespace hpx { namespace parallel { namespace util
                 std::vector<hpx::future<Result>> workitems;
                 std::list<std::exception_ptr> errors;
                 try
-                    {
+                {
                     workitems = detail::partition_with_index<Result>(
                         std::forward<ExPolicy_>(policy),
                         first, count, stride,
@@ -369,7 +368,7 @@ namespace hpx { namespace parallel { namespace util
                     std::move(scoped_params),
                     std::move(workitems), std::move(errors),
                     std::forward<F2>(f2));
-                }
+            }
 
             template <
                 typename ExPolicy_,
@@ -380,8 +379,8 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count,
                 F1 && f1, F2 && f2,
                 std::vector<std::size_t> const& chunk_sizes, Data && data)
-                    {
-                        // inform parameter traits
+            {
+                // inform parameter traits
                 std::shared_ptr<scoped_executor_parameters> scoped_params =
                     std::make_shared<scoped_executor_parameters>(
                         policy.parameters(), policy.executor());
@@ -389,7 +388,7 @@ namespace hpx { namespace parallel { namespace util
                 std::vector<hpx::future<Result>> workitems;
                 std::list<std::exception_ptr> errors;
                 try
-            {
+                {
                     workitems = detail::partition_with_data<Result>(
                         std::forward<ExPolicy_>(policy),
                         first, count, chunk_sizes, std::forward<Data>(data),
@@ -405,7 +404,7 @@ namespace hpx { namespace parallel { namespace util
                     std::move(scoped_params),
                     std::move(workitems), std::move(errors),
                     std::forward<F2>(f2));
-                }
+            }
 
         private:
             template <typename F>
@@ -433,9 +432,9 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-        // ExPolicy: execution policy
-        // R:        overall result type
-        // Result:   intermediate result type of first step
+    // ExPolicy: execution policy
+    // R:        overall result type
+    // Result:   intermediate result type of first step
     template <typename ExPolicy, typename R = void, typename Result = R>
     struct partitioner
       : detail::select_partitioner<

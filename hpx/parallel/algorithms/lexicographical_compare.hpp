@@ -105,7 +105,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                     }
                                 });
                         },
-                        [=]() mutable -> bool
+                        [=](std::vector<hpx::future<void> > &&) mutable -> bool
                         {
                             std::size_t mismatched = tok.get_data();
 
