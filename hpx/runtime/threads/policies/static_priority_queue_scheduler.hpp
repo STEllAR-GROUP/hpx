@@ -120,12 +120,13 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread < this->num_high_priority_queues_)
             {
                 result = this->high_priority_queues_[num_thread].data_->
-                    wait_or_add_new(running, idle_loop_count, added) && result;
+                    wait_or_add_new(running, added) && result;
                 if (0 != added) return result;
             }
 
             result = this->queues_[num_thread].data_->wait_or_add_new(
-                running, idle_loop_count, added) && result;
+                         running, added) &&
+                result;
             if (0 != added) return result;
 
             // Check if we have been disabled
@@ -162,8 +163,9 @@ namespace hpx { namespace threads { namespace policies
             }
 #endif
 
-            result = this->low_priority_queue_.wait_or_add_new(running,
-                idle_loop_count, added) && result;
+            result =
+                this->low_priority_queue_.wait_or_add_new(running, added) &&
+                result;
             if (0 != added) return result;
 
             return result;
