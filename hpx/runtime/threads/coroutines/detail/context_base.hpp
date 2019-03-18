@@ -45,7 +45,6 @@
 
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp> //for swap hints
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
-#include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <hpx/runtime/threads/thread_id_type.hpp>
 #include <hpx/util/assert.hpp>
 #if defined(HPX_HAVE_APEX)

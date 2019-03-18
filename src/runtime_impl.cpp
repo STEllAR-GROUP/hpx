@@ -801,9 +801,6 @@ namespace hpx
         // initialize thread mapping for external libraries (i.e. PAPI)
         thread_support_->register_thread(name, ec);
 
-        // initialize coroutines context switcher
-        hpx::threads::coroutines::thread_startup(name);
-
         // register this thread with any possibly active Intel tool
         HPX_ITT_THREAD_SET_NAME(name);
 
@@ -861,9 +858,6 @@ namespace hpx
         {
             on_stop_func_(num, context);
         }
-
-        // initialize coroutines context switcher
-        hpx::threads::coroutines::thread_shutdown();
 
         // reset our TSS
         this->runtime::deinit_tss();

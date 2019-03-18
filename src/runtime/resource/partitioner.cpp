@@ -190,7 +190,7 @@ namespace hpx { namespace resource
 
     bool is_partitioner_valid()
     {
-        return bool(detail::get_partitioner());
+        return detail::partitioner_ref() != nullptr;
     }
 
     namespace detail

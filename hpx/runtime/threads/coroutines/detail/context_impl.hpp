@@ -145,19 +145,4 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
 #endif // HPX_HAVE_GENERIC_CONTEXT_COROUTINES
 
-namespace hpx { namespace threads { namespace coroutines
-{
-    // functions to be called for each thread after it started running
-    // and before it exits
-    inline void thread_startup(char const* thread_type)
-    {
-        detail::default_context_impl::thread_startup(thread_type);
-    }
-
-    inline void thread_shutdown()
-    {
-        detail::default_context_impl::thread_shutdown();
-    }
-}}}
-
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_IMPL_HPP*/
