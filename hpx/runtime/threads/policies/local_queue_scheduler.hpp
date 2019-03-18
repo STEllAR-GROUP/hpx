@@ -700,8 +700,8 @@ namespace hpx { namespace threads { namespace policies
             std::size_t added = 0;
             bool result = true;
 
-            result = queues_[num_thread]->wait_or_add_new(running,
-                idle_loop_count, added) && result;
+            result =
+                queues_[num_thread]->wait_or_add_new(running, added) && result;
             if (0 != added) return result;
 
             // Check if we have been disabled
@@ -738,8 +738,9 @@ namespace hpx { namespace threads { namespace policies
                             continue;
                         }
 
-                        result = queues_[num_thread]->wait_or_add_new(running,
-                            idle_loop_count, added, queues_[idx]) && result;
+                        result = queues_[num_thread]->wait_or_add_new(
+                                     running, added, queues_[idx]) &&
+                            result;
                         if (0 != added)
                         {
                             queues_[idx]->increment_num_stolen_from_staged(added);
@@ -772,7 +773,7 @@ namespace hpx { namespace threads { namespace policies
                         }
 
                         result = queues_[num_thread]->wait_or_add_new(running,
-                            idle_loop_count, added, queues_[idx]) && result;
+                            added, queues_[idx]) && result;
                         if (0 != added)
                         {
                             queues_[idx]->increment_num_stolen_from_staged(added);
@@ -794,7 +795,7 @@ namespace hpx { namespace threads { namespace policies
                     HPX_ASSERT(idx != num_thread);
 
                     result = queues_[num_thread]->wait_or_add_new(running,
-                        idle_loop_count, added, queues_[idx]) && result;
+                        added, queues_[idx]) && result;
                     if (0 != added)
                     {
                         queues_[idx]->increment_num_stolen_from_staged(added);

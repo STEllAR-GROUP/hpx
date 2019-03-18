@@ -109,8 +109,9 @@ namespace hpx { namespace threads { namespace policies
             std::size_t added = 0;
             bool result = true;
 
-            result = this->queues_[num_thread]->wait_or_add_new(running,
-                idle_loop_count, added) && result;
+            result =
+                this->queues_[num_thread]->wait_or_add_new(running, added) &&
+                result;
             if (0 != added) return result;
 
             // Check if we have been disabled

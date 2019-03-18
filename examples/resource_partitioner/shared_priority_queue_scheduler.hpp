@@ -1310,8 +1310,8 @@ namespace example {
                 // set the preferred queue for this domain, if applicable
                 std::size_t q_index = q_lookup_[thread_num];
                 // get next task, steal if from another domain
-                result = hp_queues_[dom].wait_or_add_new(q_index, running,
-                    idle_loop_count, added);
+                result =
+                    hp_queues_[dom].wait_or_add_new(q_index, running, added);
                 if (0 != added) return result;
             }
 
@@ -1322,8 +1322,8 @@ namespace example {
                     // set the preferred queue for this domain, if applicable
                     std::size_t q_index = q_lookup_[thread_num];
                     // get next task, steal if from another domain
-                    result = np_queues_[dom].wait_or_add_new(q_index, running,
-                        idle_loop_count, added);
+                    result = np_queues_[dom].wait_or_add_new(
+                        q_index, running, added);
                     if (0 != added) return result;
                 }
             }
@@ -1339,14 +1339,14 @@ namespace example {
                         lp_lookup_[(counters_[dom]++ %
                                     lp_queues_[dom].num_cores)];
 
-                    result = lp_queues_[dom].wait_or_add_new(q_index, running,
-                        idle_loop_count, added);
+                    result = lp_queues_[dom].wait_or_add_new(
+                        q_index, running, added);
                     if (0 != added) return result;
                 }
 #else
                 // no cross domain stealing for LP queues
-                result = lp_queues_[domain_num].wait_or_add_new(0, running,
-                    idle_loop_count, added);
+                result =
+                    lp_queues_[domain_num].wait_or_add_new(0, running, added);
                 if (0 != added) return result;
 #endif
             }

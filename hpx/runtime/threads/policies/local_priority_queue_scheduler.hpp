@@ -1022,14 +1022,13 @@ namespace hpx { namespace threads { namespace policies
             {
                 this_high_priority_queue =
                     high_priority_queues_[num_thread].data_;
-                result = this_high_priority_queue->wait_or_add_new(running,
-                            idle_loop_count, added)
-                        && result;
+                result =
+                    this_high_priority_queue->wait_or_add_new(running, added) &&
+                    result;
                 if (0 != added) return result;
             }
 
-            result = this_queue->wait_or_add_new(
-                running, idle_loop_count, added) && result;
+            result = this_queue->wait_or_add_new(running, added) && result;
             if (0 != added) return result;
 
             // Check if we have been disabled
@@ -1046,9 +1045,9 @@ namespace hpx { namespace threads { namespace policies
                     num_thread < num_high_priority_queues_)
                 {
                     thread_queue_type* q = high_priority_queues_[idx].data_;
-                    result = this_high_priority_queue->
-                        wait_or_add_new(true, idle_loop_count, added, q)
-                        && result;
+                    result = this_high_priority_queue->wait_or_add_new(
+                                 true, added, q) &&
+                        result;
 
                     if (0 != added)
                     {
@@ -1059,9 +1058,9 @@ namespace hpx { namespace threads { namespace policies
                     }
                 }
 
-                result = this_queue->wait_or_add_new(true, idle_loop_count,
-                             added, queues_[idx].data_)
-                    && result;
+                result = this_queue->wait_or_add_new(
+                             true, added, queues_[idx].data_) &&
+                    result;
 
                 if (0 != added)
                 {
@@ -1099,8 +1098,8 @@ namespace hpx { namespace threads { namespace policies
             }
 #endif
 
-            result = low_priority_queue_.wait_or_add_new(running,
-                idle_loop_count, added) && result;
+            result =
+                low_priority_queue_.wait_or_add_new(running, added) && result;
 
             return result;
         }
