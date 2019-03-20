@@ -20,6 +20,7 @@
 #include <memory>
 #include <cstddef>
 #include <cstring>
+#include <chrono>
 
 namespace hpx {
 namespace parcelset {
@@ -129,7 +130,7 @@ namespace libfabric
                 << "Chunk info is piggybacked");
         }
         else {
-            LOG_DEVEL_MSG("Setting up header-chunk rma data with "
+            LOG_TRACE_MSG("Setting up header-chunk rma data with "
                 << "zero-copy chunks " << decnumber(rma_regions_.size())
                 << "rma chunks " << decnumber(rma_chunks));
             auto &cb = header_->chunk_header_ptr()->chunk_rma;
@@ -170,7 +171,20 @@ namespace libfabric
 
                     if (ret == -FI_EAGAIN)
                     {
-                        LOG_ERROR_MSG("reposting fi_sendv...\n");
+                        LOG_ERROR_MSG("Reposting fi_sendv...");
+                        return true;
+                    }
+                    else if (ret == -FI_ENOENT) {
+                        if (hpx::threads::get_self_id()==hpx::threads::invalid_thread_id) {
+                            // during bootstrap, this might happen on an OS thread
+                            LOG_ERROR_MSG("No destination endpoint, retrying after 1s ...");
+                            std::this_thread::sleep_for(std::chrono::seconds(1));
+                        }
+                        else {
+                            // if a node has failed, we can recover @TODO : put something here
+                            LOG_ERROR_MSG("No destination endpoint, retrying after 1s ...");
+                            hpx::this_thread::sleep_for(std::chrono::seconds(1));
+                        }
                         return true;
                     }
                     else if (ret)
