@@ -85,7 +85,8 @@ namespace hpx { namespace traits
 
     template <typename T, std::size_t N>
     constexpr auto is_paren_constructible()
-    -> detail::is_paren_constructible<T, std::make_index_sequence<N>>
+    -> decltype(detail::is_paren_constructible(
+            static_cast<T*>(nullptr), std::make_index_sequence<N>{}))
     {
         return {};
     }
