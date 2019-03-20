@@ -184,6 +184,8 @@ namespace libfabric
             snd->postprocess_handler_ = [this](sender* s)
                 {
                     --senders_in_use_;
+                    LOG_TRACE_MSG("senders in use (-- postprocess handler) "
+                                  << decnumber(senders_in_use_));
                     senders_.push(s);
                     trigger_pending_work();
                 };
@@ -329,6 +331,8 @@ namespace libfabric
     void parcelport::reclaim_connection(sender* s)
     {
         --senders_in_use_;
+        LOG_TRACE_MSG("senders in use (-- reclaim_connection) "
+                      << decnumber(senders_in_use_));
         senders_.push(s);
     }
 
@@ -431,7 +435,6 @@ namespace libfabric
 
     // --------------------------------------------------------------------
     parcelset::locality parcelport::create_locality() const {
-        std::cout << "Create locality " << std::endl;
         FUNC_START_DEBUG_MSG;
         FUNC_END_DEBUG_MSG;
         return parcelset::locality(locality());
@@ -525,7 +528,7 @@ namespace libfabric
         bool done = false;
         do {
             LOG_TIMED_BLOCK(background, DEVEL, 5.0, {
-                LOG_DEBUG_MSG("number of senders in use "
+                LOG_DEBUG_MSG("senders in use (background) "
                     << decnumber(senders_in_use_));
             });
             // if an event comes in, we may spend time processing/handling it

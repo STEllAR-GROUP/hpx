@@ -49,7 +49,7 @@ namespace rma
 
         // placeholder for future work
         void put(T *other) {
-            LOG_DEVEL_MSG("Executing a put on rma channel");
+            LOG_TRACE_MSG("Executing a put on rma channel");
         }
 
         std::shared_ptr<rma_object<T>> getptr() {

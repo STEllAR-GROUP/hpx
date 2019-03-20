@@ -56,7 +56,7 @@ namespace rma {
         template <class U> allocator(allocator<U> const &other) noexcept
             : pool_(other.pool_)
         {
-            LOG_DEVEL_MSG("Copy constructor for allocator "
+            LOG_TRACE_MSG("Copy constructor for allocator "
                 << hexpointer(pool_));
         }
 
@@ -66,21 +66,21 @@ namespace rma {
 
         virtual void deallocate_region(memory_region *region)
         {
-            //LOG_DEVEL_MSG("STL deallocate " << hexlength(n*sizeof(value_type)));
+            //LOG_TRACE_MSG("deallocate " << hexlength(n*sizeof(value_type)));
             pool_->release_region(region);
         }
 
         template <class U, class ...A>
         void construct(U* const p, A&& ...args)
         {
-            LOG_DEVEL_MSG("STL construct ");
+            LOG_TRACE_MSG("STL construct ");
             new (p) U(std::forward<A>(args)...);
         }
 
         template <class U>
         void destroy(U* const p)
         {
-            LOG_DEVEL_MSG("STL destruct ");
+            LOG_TRACE_MSG("STL destruct ");
             p->~U();
         }
 

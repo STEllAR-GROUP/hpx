@@ -181,7 +181,7 @@ namespace libfabric
                     << " to " << hexlength(s));
 
             if (m_region_) {
-                LOG_DEBUG_MSG("Region in resize " << *m_region_);
+                LOG_TRACE_MSG("Region in resize " << *m_region_);
 
                 if (s > m_region_->get_size()) {
                     LOG_ERROR_MSG(

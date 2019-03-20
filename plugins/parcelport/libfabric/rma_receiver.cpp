@@ -322,7 +322,7 @@ namespace libfabric
                 if (c.type_ == serialization::chunk_type_rma) {
                     // rma object/vector chunks are not deleted
                     // so do not add them to the rma_regions list for cleanup
-                    LOG_DEVEL_MSG("Passing rma region to chunk structure");
+                    LOG_TRACE_MSG("Passing rma region to chunk structure");
                     c.rma_ = std::uintptr_t(get_region);
                 }
                 else {

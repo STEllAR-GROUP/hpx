@@ -312,9 +312,9 @@ namespace rma
                     region, array_, m_alloc_->get_memory_pool()),
                 [this](detail::memory_info<T> *mp)
             {
-                LOG_DEVEL_MSG("rmavector deleter callback");
+                LOG_TRACE_MSG("rmavector deleter callback");
                 if (mp->region_) {
-                    LOG_DEVEL_MSG("rmavector shared array destructor "
+                    LOG_TRACE_MSG("rmavector shared array destructor "
                           << "this "   << hexpointer(this)
                           << "region "   << hexpointer(mp->region_)
                           << "array "    << hexpointer(mp->data_));
@@ -373,7 +373,7 @@ namespace rma
 
         template <typename P>
         void print_debug(const char *msg, P p) const {
-            LOG_DEVEL_MSG("rmavector "
+            LOG_TRACE_MSG("rmavector "
                 << "this "     << hexpointer(this)
                 << msg << " "  << p << " "
                 << "region "   << hexpointer(m_data_ ? m_data_->region_ : nullptr)

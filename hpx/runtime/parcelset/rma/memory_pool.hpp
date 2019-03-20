@@ -263,10 +263,10 @@ namespace rma
         // a region instead in the first place
         memory_region *region_from_address(void const * addr)
         {
-            LOG_DEVEL_MSG("Expensive region_from_address");
+            LOG_TRACE_MSG("Expensive region_from_address");
             auto present = region_alloc_pointer_map_.is_in_map(addr);
             if (present.second) {
-                LOG_DEVEL_MSG("Found region in alloc map " << hexpointer(addr)
+                LOG_TRACE_MSG("Found region in alloc map " << hexpointer(addr)
                     << *(present.first->second));
                 return (present.first->second);
             }
