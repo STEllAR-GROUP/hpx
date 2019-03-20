@@ -1383,13 +1383,17 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag(-W3 LANGUAGES C CXX)
     # According to the ifort Windows manual, W3 isn't supported
     hpx_add_compile_flag(-W1 LANGUAGES Fortran)
-    # Boost.Lockfree triggers 'warning C4307: '+' : integral constant overflow'
-    # which is benign
-    hpx_add_compile_flag(-wd4307)
 
     # MSVC2012/2013 are overeager to report 'qualifier applied to function type
     # has no meaning; ignored'
     hpx_add_compile_flag(-wd4180)
+
+    # Boost.Lockfree triggers 'warning C4307: '+' : integral constant overflow'
+    # which is benign
+    hpx_add_compile_flag(-wd4307)
+
+    # object allocated on the heap may not be aligned
+    hpx_add_compile_flag(-wd4316)
 
     # max symbol length exceeded
     hpx_add_compile_flag(-wd4503)
