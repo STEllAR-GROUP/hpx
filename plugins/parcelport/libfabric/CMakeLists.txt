@@ -155,13 +155,13 @@ endif()
 #------------------------------------------------------------------------------
 # Throttling options
 #------------------------------------------------------------------------------
-hpx_option(HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS STRING
+hpx_option(HPX_PARCELPORT_LIBFABRIC_MAX_SENDS STRING
   "Threshold of active sends at which throttling is enabled (default: 16)"
   "16" CATEGORY "Parcelport" ADVANCED)
 
 hpx_add_config_define_namespace(
-    DEFINE    HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS
-    VALUE     ${HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS}
+    DEFINE    HPX_PARCELPORT_LIBFABRIC_MAX_SENDS
+    VALUE     ${HPX_PARCELPORT_LIBFABRIC_MAX_SENDS}
     NAMESPACE parcelport)
 
 #------------------------------------------------------------------------------
@@ -197,10 +197,6 @@ hpx_option(HPX_PARCELPORT_LIBFABRIC_MEMORY_CHUNK_SIZE STRING
   "Number of bytes a default chunk in the memory pool can hold (default: 4K)"
   "4096" CATEGORY "Parcelport" ADVANCED)
 
-hpx_option(HPX_PARCELPORT_LIBFABRIC_64K_PAGES STRING
-  "Number of 64K pages we reserve for default message buffers (default: 10)"
-  "10" CATEGORY "Parcelport" ADVANCED)
-
 hpx_option(HPX_PARCELPORT_LIBFABRIC_MEMORY_COPY_THRESHOLD STRING
   "Cutoff size over which data is never copied into existing buffers (default: 4K)"
   "4096" CATEGORY "Parcelport" ADVANCED)
@@ -214,11 +210,6 @@ hpx_add_config_define_namespace(
 hpx_add_config_define_namespace(
     DEFINE    HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE
     VALUE     ${HPX_PARCELPORT_LIBFABRIC_MEMORY_CHUNK_SIZE}
-    NAMESPACE parcelport)
-
-hpx_add_config_define_namespace(
-    DEFINE    HPX_PARCELPORT_LIBFABRIC_64K_PAGES
-    VALUE     ${HPX_PARCELPORT_LIBFABRIC_64K_PAGES}
     NAMESPACE parcelport)
 
 hpx_add_config_define_namespace(

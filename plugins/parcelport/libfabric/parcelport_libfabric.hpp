@@ -30,12 +30,6 @@
 #include <hpx/config/parcelport_defines.hpp>
 
 // --------------------------------------------------------------------
-// Controls whether we are allowed to suspend threads that are sending
-// when we have maxed out the number of sends we can handle
-#define HPX_PARCELPORT_LIBFABRIC_SUSPEND_WAKE  (HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS/2)
-
-
-// --------------------------------------------------------------------
 // Enable the use of boost small_vector for certain short lived storage
 // elements within the parcelport. This can reduce some memory allocations
 #define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR    true
@@ -140,7 +134,7 @@ namespace libfabric
 
         boost::lockfree::stack<
             sender*,
-            boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS>,
+            boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_MAX_SENDS>,
             boost::lockfree::fixed_sized<true>
         > senders_;
 
