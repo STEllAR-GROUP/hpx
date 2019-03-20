@@ -73,6 +73,9 @@ namespace libfabric
         // the owning reciever is called to handle processing of the buffer
         void pre_post_receive();
 
+        void create_rma_receiver();
+        rma_receiver* get_rma_receiver(fi_addr_t const& src_addr);
+
         // --------------------------------------------------------------------
         // The cleanup call deletes resources and sums counters from internals
         // once cleanup is done, the recevier should not be used, other than
@@ -86,9 +89,12 @@ namespace libfabric
         rma::memory_pool<region_provider> *memory_pool_;
         //
         friend class controller;
-        //
-        performance_counter<unsigned int> messages_handled_;
-        performance_counter<unsigned int> acks_received_;
+
+        // shared performance counters used by all receivers
+        static performance_counter<unsigned int> messages_handled_;
+        static performance_counter<unsigned int> acks_received_;
+        static performance_counter<unsigned int> receives_pre_posted_;
+        static performance_counter<unsigned int> active_rma_receivers_;
         // from the internal rma_receivers
         performance_counter<unsigned int> msg_plain_;
         performance_counter<unsigned int> msg_rma_;
@@ -96,16 +102,12 @@ namespace libfabric
         performance_counter<unsigned int> rma_reads_;
         performance_counter<unsigned int> recv_deletes_;
         //
-        boost::lockfree::stack<
+        typedef boost::lockfree::stack<
             rma_receiver*,
             boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS>,
             boost::lockfree::fixed_sized<true>
-        > rma_receivers_;
-
-        typedef hpx::lcos::local::spinlock mutex_type;
-        mutex_type active_receivers_mtx_;
-        hpx::lcos::local::detail::condition_variable active_receivers_cv_;
-        hpx::util::atomic_count active_receivers_;
+        > rma_stack;
+        static rma_stack rma_receivers_;
     };
 }}}}
 
