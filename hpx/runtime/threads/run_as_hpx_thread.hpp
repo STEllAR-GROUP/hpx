@@ -19,6 +19,7 @@
 #include <condition_variable>
 #include <cstdlib>
 #include <exception>
+#include <memory>
 #include <mutex>
 #include <thread>
 #include <type_traits>
@@ -34,8 +35,11 @@ namespace hpx { namespace threads
         typename util::invoke_result<F, Ts...>::type
         run_as_hpx_thread(std::false_type, F const& f, Ts &&... ts)
         {
+            // NOTE: The condition variable needs be able to live past the scope
+            // of this function. The mutex and boolean are guaranteed to live
+            // long enough because of the lock.
             hpx::lcos::local::spinlock mtx;
-            std::condition_variable_any cond;
+            auto cond = std::make_shared<std::condition_variable_any>();
             bool stopping = false;
 
             typedef typename util::invoke_result<F, Ts...>::type result_type;
@@ -48,8 +52,7 @@ namespace hpx { namespace threads
 
             // Create the HPX thread
             hpx::threads::register_thread_nullary(
-                [&]()
-                {
+                [&, cond]() {
                     try
                     {
                         // Execute the given function, forward all parameters,
@@ -68,12 +71,12 @@ namespace hpx { namespace threads
                         std::lock_guard<hpx::lcos::local::spinlock> lk(mtx);
                         stopping = true;
                     }
-                    cond.notify_all();
+                    cond->notify_all();
                 });
 
             // wait for the HPX thread to exit
             std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);
-            cond.wait(lk, [&]() -> bool { return stopping; });
+            cond->wait(lk, [&]() -> bool { return stopping; });
 
             // rethrow exceptions
             if (exception)
@@ -86,15 +89,18 @@ namespace hpx { namespace threads
         template <typename F, typename... Ts>
         void run_as_hpx_thread(std::true_type, F const& f, Ts &&... ts)
         {
+            // NOTE: The condition variable needs be able to live past the scope
+            // of this function. The mutex and boolean are guaranteed to live
+            // long enough because of the lock.
             hpx::lcos::local::spinlock mtx;
-            std::condition_variable_any cond;
+            auto cond = std::make_shared<std::condition_variable_any>();
             bool stopping = false;
 
             std::exception_ptr exception;
 
             // Create an HPX thread
             hpx::threads::register_thread_nullary(
-                [&]()
+                [&, cond]()
                 {
                     try
                     {
@@ -113,12 +119,12 @@ namespace hpx { namespace threads
                         std::lock_guard<hpx::lcos::local::spinlock> lk(mtx);
                         stopping = true;
                     }
-                    cond.notify_all();
+                    cond->notify_all();
                 });
 
             // wait for the HPX thread to exit
             std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);
-            cond.wait(lk, [&]() -> bool { return stopping; });
+            cond->wait(lk, [&]() -> bool { return stopping; });
 
             // rethrow exceptions
             if (exception)
