@@ -9,6 +9,7 @@
 #include <hpx/components/iostreams/standard_streams.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/yield_while.hpp>
+#include <hpx/lcos/barrier.hpp>
 //
 #include <boost/assert.hpp>
 
@@ -20,6 +21,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <iostream>
+#include <iomanip>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -384,9 +386,73 @@ namespace Storage {
             ));
 #endif
     }
+
+    struct simple_barrier
+    {
+        static std::atomic<uint32_t> process_count_;
+        static bool                  first_time_;
+        uint32_t                     rank_;
+        uint32_t                     nranks_;
+        hpx::id_type                 agas_;
+        //
+        simple_barrier() {}
+
+        void init() {
+            // these only need to be done once and are relatively expensive (agas)
+            if (simple_barrier::first_time_) {
+                simple_barrier::first_time_ = false;
+                hpx::id_type here = hpx::find_here();
+                rank_             = hpx::naming::get_locality_id_from_id(here);
+                agas_             = hpx::agas::get_console_locality();
+                nranks_           = hpx::get_num_localities().get();
+            }
+            // this must always be done to reset the counter
+            process_count_ = nranks_;
+            DEBUG_OUTPUT(1, "resetting barrier on rank " << rank_ << " " << process_count_);
+        }
+
+        static simple_barrier local_barrier;
+
+        static simple_barrier &get_local_barrier() {
+            return simple_barrier::local_barrier;
+        }
+    };
+
+    // instantiate the static barrier and vars
+    simple_barrier              simple_barrier::local_barrier;
+    std::atomic<unsigned int>   simple_barrier::process_count_;
+    bool                        simple_barrier::first_time_ = true;
+
+    // this function will be a remote action
+    void decrement_barrier(uint32_t rank) {
+        simple_barrier &barrier = simple_barrier::get_local_barrier();
+        DEBUG_OUTPUT(1, "Decrement barrier from rank " << rank << " " << barrier.process_count_);
+        barrier.process_count_--;
+        DEBUG_OUTPUT(1, "Decrement barrier from rank " << rank << " " << barrier.process_count_);
+    }
+
+    // this function will be a remote action
+    void reset_barrier() {
+        simple_barrier &barrier = simple_barrier::get_local_barrier();
+        barrier.process_count_ = 0;
+        DEBUG_OUTPUT(1, "Reset barrier rank " << barrier.rank_ << " " << barrier.process_count_);
+    }
+
+    // this function will be a remote action
+    static void init_barrier() {
+        simple_barrier &barrier = simple_barrier::get_local_barrier();
+        barrier.init();
+        DEBUG_OUTPUT(1, "Init barrier rank " << barrier.rank_ << " " << barrier.process_count_);
+    }
+
 } // namespace storage
 
 //----------------------------------------------------------------------------
+HPX_DEFINE_PLAIN_ACTION(Storage::decrement_barrier, DecrementBarrier_action);
+HPX_DEFINE_PLAIN_ACTION(Storage::reset_barrier, ResetBarrier_action);
+HPX_REGISTER_ACTION_DECLARATION(DecrementBarrier_action);
+HPX_REGISTER_ACTION_DECLARATION(ResetBarrier_action);
+
 // normally these are in a header
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyToStorage, CopyToStorage_action);
 HPX_REGISTER_ACTION_DECLARATION(CopyToStorage_action);
@@ -397,6 +463,45 @@ HPX_DEFINE_PLAIN_ACTION(Storage::CopyFromStorage, CopyFromStorage_action);
 // and these in a cpp
 HPX_REGISTER_ACTION(CopyToStorage_action);
 HPX_REGISTER_ACTION(CopyFromStorage_action);
+HPX_REGISTER_ACTION(DecrementBarrier_action);
+HPX_REGISTER_ACTION(ResetBarrier_action);
+
+void simple_barrier_count_down() {
+    Storage::simple_barrier &barrier = Storage::simple_barrier::get_local_barrier();
+    if (barrier.rank_==0) {
+        DEBUG_OUTPUT(1, "Decrement count " << barrier.rank_ << " " << barrier.process_count_);
+        --barrier.process_count_;
+        // wait until everyone has counted down
+        DEBUG_OUTPUT(1, "Before yield A rank " << barrier.rank_ << " " << barrier.process_count_);
+        hpx::util::yield_while( [&](){
+            bool done = (barrier.process_count_==0);
+            if (done) barrier.init();
+            return !done;
+        });
+        DEBUG_OUTPUT(1, "After yield A rank " << barrier.rank_);
+        ResetBarrier_action reset_action;
+        std::vector<hpx::id_type> remotes = hpx::find_remote_localities();
+        for (auto &&r : remotes) {
+            hpx::async(reset_action, r);
+        }
+        DEBUG_OUTPUT(1, "After actions rank " << barrier.rank_);
+    }
+    else {
+        DecrementBarrier_action barrier_action;
+        hpx::async(barrier_action, barrier.agas_, barrier.rank_);
+        // now wait until our barrier is reset to zero
+        DEBUG_OUTPUT(1, "Before yield B rank " << barrier.rank_ << " " << barrier.process_count_);
+        hpx::util::yield_while( [&](){
+            // once the condition is met, reinitialize the barrier before continuing
+            // this ensures that the barrier is always ready for the next entrance
+            // regardless of order of arrival of processes
+            bool done = (barrier.process_count_==0);
+            if (done) barrier.init();
+            return !done;
+        } );
+        DEBUG_OUTPUT(1, "After yield B rank " << barrier.rank_);
+    }
+}
 
 //----------------------------------------------------------------------------
 static std::atomic<int> in_flight;
@@ -411,10 +516,13 @@ void test_write(
 {
     CopyToStorage_action actWrite;
     //
+    Storage::simple_barrier storage_barrier();
     DEBUG_OUTPUT(1, "Entering Barrier at start of write on rank " << rank);
-    //
-    hpx::lcos::barrier::synchronize();
-    //
+//    hpx::lcos::barrier b1("b1_write");
+//    hpx::lcos::barrier b2("b2_write");
+    simple_barrier_count_down();
+//    // block at the barrier b1
+//    b1.wait(hpx::launch::async).get();
     DEBUG_OUTPUT(1, "Passed Barrier at start of write on rank " << rank);
     //
     hpx::util::high_resolution_timer timerWrite;
@@ -435,8 +543,7 @@ void test_write(
             }
         }
 
-        DEBUG_OUTPUT(1, "Starting iteration " << i << " on rank " << rank);
-
+        DEBUG_OUTPUT(2, "Starting iteration " << i << " on rank " << rank);
         in_flight = 0;
 
         //
@@ -498,7 +605,7 @@ void test_write(
                             memory_offset, options.transfer_size_B
                     ).then(
                         hpx::launch::sync,
-                        [send_rank, &in_flight](hpx::future<int> &&fut) -> int {
+                        [send_rank](hpx::future<int> &&fut) -> int {
                             int result = fut.get();
                             // decrement counter of tasks in flight
                             --FuturesWaiting[send_rank];
@@ -517,22 +624,21 @@ void test_write(
                 );
             }
         }
-        DEBUG_OUTPUT(2, "Exited transfer loop on rank " << rank);
+        hpx::util::yield_while(
+            [](){
+                return in_flight.load(std::memory_order_relaxed)>0;
+            }
+        );
+        DEBUG_OUTPUT(3, "Completed iteration " << i << " on rank " << rank);
     }
-    // wait for all tasks to complete
-    hpx::util::simple_profiler prof_wait(level1, "Final wait");
-    hpx::util::yield_while(
-        [](){
-            return in_flight.load(std::memory_order_relaxed)>0;
-        }
-    );
-    prof_wait.done();
-
     if (rank==0) std::cout << std::endl;
     DEBUG_OUTPUT(2, "Exited iterations loop on rank " << rank);
 
     hpx::util::simple_profiler prof_barrier(level1, "Final Barrier");
-    hpx::lcos::barrier::synchronize();
+    DEBUG_OUTPUT(1, "Entering Barrier at end of write on rank " << rank);
+//    b2.wait(hpx::launch::async).get();
+    simple_barrier_count_down();
+    DEBUG_OUTPUT(1, "Passed Barrier at end of write on rank " << rank);
     //
     uint64_t active_ranks = options.all2all ? nranks : 1;
     double writeMB   = static_cast<double>
@@ -591,9 +697,12 @@ void test_read(
     CopyFromStorage_action actRead;
     //
     DEBUG_OUTPUT(1, "Entering Barrier at start of read on rank " << rank);
-    //
-    hpx::lcos::barrier::synchronize();
-    //
+////    hpx::lcos::barrier::synchronize();
+//    hpx::lcos::barrier b1("b1_read");
+//    hpx::lcos::barrier b2("b2_read");
+//    b1.wait(hpx::launch::async).get();
+    simple_barrier_count_down();
+
     DEBUG_OUTPUT(1, "Passed Barrier at start of read on rank " << rank);
     //
     // this is mostly the same as the put loop, except that the received future
@@ -613,7 +722,7 @@ void test_read(
             }
         }
 
-        DEBUG_OUTPUT(1, "Starting iteration " << i << " on rank " << rank);
+        DEBUG_OUTPUT(2, "Starting iteration " << i << " on rank " << rank);
         in_flight = 0;
 
         //
@@ -695,14 +804,19 @@ void test_read(
                 );
             }
         }
-        DEBUG_OUTPUT(2, "Exited transfer loop on rank " << rank);
         hpx::util::yield_while(
             [](){
                 return in_flight.load(std::memory_order_relaxed)>0;
             }
         );
+        DEBUG_OUTPUT(3, "Completed iteration " << i << " on rank " << rank);
     }
-    hpx::lcos::barrier::synchronize();
+    if (rank==0) std::cout << std::endl;
+    DEBUG_OUTPUT(2, "Exited iterations loop on rank " << rank);
+
+    DEBUG_OUTPUT(1, "Entering Barrier at end of read on rank " << rank);
+    simple_barrier_count_down();
+    DEBUG_OUTPUT(1, "Passed Barrier at end of read on rank " << rank);
     //
     if (rank==0) std::cout << std::endl;
     //
@@ -735,6 +849,7 @@ void test_read(
 // transmit/receive time to see how well we're doing.
 int hpx_main(boost::program_options::variables_map& vm)
 {
+    hpx::util::high_resolution_timer timer_main;
     DEBUG_OUTPUT(3,"HPX main");
     //
     hpx::id_type                    here = hpx::find_here();
@@ -800,6 +915,15 @@ int hpx_main(boost::program_options::variables_map& vm)
         FuturesWaiting[i].store(0);
     }
 
+    DEBUG_OUTPUT(1, "Initialize barrier before first use on rank " << rank);
+    Storage::init_barrier();
+    DEBUG_OUTPUT(1, "Entering startup_barrier on rank " << rank);
+//    hpx::lcos::barrier start_barrier("startup_barrier");
+//    hpx::lcos::barrier end_barrier("end_barrier");
+//    start_barrier.wait(hpx::launch::async).get();
+    simple_barrier_count_down();
+    DEBUG_OUTPUT(1, "Passed startup_barrier on rank " << rank);
+
     test_options warmup = options;
     warmup.iterations = 1;
     warmup.warmup = true;
@@ -808,11 +932,24 @@ int hpx_main(boost::program_options::variables_map& vm)
     test_write(rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
     test_read (rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
     //
+    DEBUG_OUTPUT(1, "Entering end_barrier on rank " << rank);
+//    end_barrier.wait(hpx::launch::async).get();
+    simple_barrier_count_down();
+    DEBUG_OUTPUT(1, "Passed end_barrier on rank " << rank);
+
     delete_local_storage();
 
-    DEBUG_OUTPUT(3, "Calling finalize " << rank);
-    if (rank==0)
-      return hpx::finalize();
+    if (rank==0) {
+        double s = timer_main.elapsed();
+        double m = std::floor(s/60.0);
+        s = std::round((s - (m*60.0))*10.0)/10.0;
+        std::cout << "Total test time " << m << ":";
+        std::cout << std::setfill('0') << std::setw(4) << std::noshowbase << std::dec;
+        std::cout.precision(3);
+        std::cout << s << std::endl;
+        DEBUG_OUTPUT(2, "Calling finalize " << rank);
+        return hpx::finalize();
+    }
     else return 0;
 }
 
