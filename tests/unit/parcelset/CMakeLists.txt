@@ -7,12 +7,14 @@
 
 set(tests
   put_parcels
+  rdma_channel
   set_parcel_write_handler
 )
 
 set(put_parcels_PARAMETERS LOCALITIES 2)
 set(put_parcels_FLAGS DEPENDENCIES iostreams_component)
 set(set_parcel_write_handler_PARAMETERS LOCALITIES 2)
+set(rdma_test_PARAMETERS LOCALITIES 2)
 
 if(HPX_WITH_PARCEL_COALESCING)
   set(tests ${tests} put_parcels_with_coalescing)

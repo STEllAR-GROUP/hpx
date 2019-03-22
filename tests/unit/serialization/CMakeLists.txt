@@ -13,6 +13,7 @@ set(tests
     serialization_list
     serialization_map
     serialization_optional
+    serialization_rma_object
     serialization_set
     serialization_simple
     serialization_smart_ptr
