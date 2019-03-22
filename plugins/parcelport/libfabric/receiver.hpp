@@ -83,6 +83,8 @@ namespace libfabric
         void cleanup();
 
     private:
+        // libfabric requires some space for it's internal bookkeeping
+        fi_context                         context_reserved_space;
         parcelport                        *pp_;
         fid_ep                            *endpoint_;
         region_type                       *header_region_ ;

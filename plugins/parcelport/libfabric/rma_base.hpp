@@ -18,7 +18,7 @@ namespace libfabric
 
     struct rma_base
     {
-
+        //
         rma_base() {}
 
         virtual ~rma_base() {}
@@ -26,6 +26,11 @@ namespace libfabric
         //  A placeholder to allow sender or rma_received subclasses to gracefully
         // handle an error on the network
         virtual void handle_error(struct fi_cq_err_entry err) = 0;
+
+    private:
+        // libfabric requires some space for it's internal bookkeeping
+        fi_context context_reserved_space;
+
     };
 }}}}
 
