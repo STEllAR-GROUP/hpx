@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <exception>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -113,42 +114,65 @@ namespace hpx { namespace parallel { namespace execution
                 std::size_t num_tasks = (num_tasks_ == std::size_t(-1)) ?
                     global_num_tasks : num_tasks_;
 
+                std::exception_ptr e;
+                lcos::local::spinlock mtx_e;
+
                 std::size_t size = hpx::util::size(shape);
                 lcos::local::latch l(size);
                 if (hpx::detail::has_async_policy(Policy{}))
                 {
                     spawn_hierarchical(l, size, num_tasks, std::forward<F>(f),
-                        hpx::util::begin(shape), ts...);
+                        hpx::util::begin(shape), e, mtx_e, ts...);
                 }
                 else
                 {
                     spawn_sequential(l, size, std::forward<F>(f),
-                        hpx::util::begin(shape), ts...);
+                        hpx::util::begin(shape), e, mtx_e, ts...);
                 }
                 l.wait();
+
+                // rethrow any exceptions caught during processing the
+                // bulk_execute, note that we don't need to acquire the lock
+                // at this point as no other threads may access the exception
+                // concurrently
+                if (e)
+                {
+                    std::rethrow_exception(std::move(e));
+                }
             }
 
             template <typename F, typename Iter, typename... Ts>
             void spawn_sequential(lcos::local::latch& l, std::size_t size,
-                F&& f, Iter it, Ts const&... ts) const
+                F&& f, Iter it, std::exception_ptr& e,
+                lcos::local::spinlock& mtx_e, Ts const&... ts) const
             {
                 // spawn tasks sequentially
-                hpx::util::thread_description desc(f,
-                    "parallel_executor_aggregated::spawn_sequential");
-
                 for (std::size_t i = 0; i != size; ++i, ++it)
                 {
-                    detail::post_policy_dispatch<Policy>::call(
-                        desc, Policy{}, [&, it]() -> void {
+                    post([&, it]
+                    {
+                        // properly handle all exceptions thrown from 'f'
+                        try
+                        {
                             hpx::util::invoke(f, *it, ts...);
-                            l.count_down(1);
-                        });
+                        }
+                        catch (...)
+                        {
+                            // store the first caught exception only
+                            std::lock_guard<lcos::local::spinlock> l(mtx_e);
+                            if (!e)
+                                e = std::current_exception();
+                        }
+                        // count down the latch in any case
+                        l.count_down(1);
+                    });
                 }
             }
 
             template <typename F, typename Iter, typename... Ts>
             void spawn_hierarchical(lcos::local::latch& l, std::size_t size,
-                std::size_t num_tasks, F&& f, Iter it, Ts const&... ts) const
+                std::size_t num_tasks, F&& f, Iter it, std::exception_ptr& e,
+                lcos::local::spinlock& mtx_e, Ts const&... ts) const
             {
                 if (size > num_tasks)
                 {
@@ -159,9 +183,10 @@ namespace hpx { namespace parallel { namespace execution
 
                     while (size > chunk_size)
                     {
-                        post([&, chunk_size, num_tasks, it] {
-                            spawn_hierarchical(
-                                l, chunk_size, num_tasks, f, it, ts...);
+                        post([&, chunk_size, num_tasks, it]
+                        {
+                            spawn_hierarchical(l, chunk_size, num_tasks, f, it,
+                                e, mtx_e, ts...);
                         });
 
                         it = hpx::parallel::v1::detail::next(it, chunk_size);
@@ -170,7 +195,8 @@ namespace hpx { namespace parallel { namespace execution
                 }
 
                 // spawn remaining tasks sequentially
-                spawn_sequential(l, size, std::forward<F>(f), it, ts...);
+                spawn_sequential(
+                    l, size, std::forward<F>(f), it, e, mtx_e, ts...);
             }
 
             std::size_t const num_spread_;
@@ -285,24 +311,37 @@ namespace hpx { namespace parallel { namespace execution
                 std::size_t num_tasks = (num_tasks_ == std::size_t(-1)) ?
                     global_num_tasks : num_tasks_;
 
+                std::exception_ptr e;
+                lcos::local::spinlock mtx_e;
+
                 std::size_t size = hpx::util::size(shape);
                 lcos::local::latch l(size);
                 if (hpx::detail::has_async_policy(policy_))
                 {
                     spawn_hierarchical(l, size, num_tasks, std::forward<F>(f),
-                        hpx::util::begin(shape), ts...);
+                        hpx::util::begin(shape), e, mtx_e, ts...);
                 }
                 else
                 {
                     spawn_sequential(l, size, std::forward<F>(f),
-                        hpx::util::begin(shape), ts...);
+                        hpx::util::begin(shape), e, mtx_e, ts...);
                 }
                 l.wait();
+
+                // rethrow any exceptions caught during processing the
+                // bulk_execute, note that we don't need to acquire the lock
+                // at this point as no other threads may access the exception
+                // concurrently
+                if (e)
+                {
+                    std::rethrow_exception(std::move(e));
+                }
             }
 
             template <typename F, typename Iter, typename... Ts>
             void spawn_sequential(lcos::local::latch& l, std::size_t size,
-                F&& f, Iter it, Ts const&... ts) const
+                F&& f, Iter it, std::exception_ptr& e,
+                lcos::local::spinlock& mtx_e, Ts const&... ts) const
             {
                 // spawn tasks sequentially
                 hpx::util::thread_description desc(f,
@@ -311,8 +350,22 @@ namespace hpx { namespace parallel { namespace execution
                 for (std::size_t i = 0; i != size; ++i, ++it)
                 {
                     detail::post_policy_dispatch<hpx::launch>::call(
-                        desc, policy_, [&, it]() -> void {
-                            hpx::util::invoke(f, *it, ts...);
+                        desc, policy_,
+                        [&, it]() -> void
+                        {
+                            // properly handle all exceptions thrown from 'f'
+                            try
+                            {
+                                hpx::util::invoke(f, *it, ts...);
+                            }
+                            catch (...)
+                            {
+                                // store the first caught exception only
+                                std::lock_guard<lcos::local::spinlock> l(mtx_e);
+                                if (!e)
+                                    e = std::current_exception();
+                            }
+                            // count down the latch in any case
                             l.count_down(1);
                         });
                 }
@@ -320,7 +373,8 @@ namespace hpx { namespace parallel { namespace execution
 
             template <typename F, typename Iter, typename... Ts>
             void spawn_hierarchical(lcos::local::latch& l, std::size_t size,
-                std::size_t num_tasks, F&& f, Iter it, Ts const&... ts) const
+                std::size_t num_tasks, F&& f, Iter it, std::exception_ptr& e,
+                lcos::local::spinlock& mtx_e, Ts const&... ts) const
             {
                 if (size > num_tasks)
                 {
@@ -335,9 +389,11 @@ namespace hpx { namespace parallel { namespace execution
                     while (size > chunk_size)
                     {
                         detail::post_policy_dispatch<hpx::launch>::call(
-                            desc, policy_, [&, chunk_size, num_tasks, it] {
-                                spawn_hierarchical(
-                                    l, chunk_size, num_tasks, f, it, ts...);
+                            desc, policy_,
+                            [&, chunk_size, num_tasks, it]
+                            {
+                                spawn_hierarchical(l, chunk_size, num_tasks, f,
+                                    it, e, mtx_e, ts...);
                             });
 
                         it = hpx::parallel::v1::detail::next(it, chunk_size);
@@ -346,7 +402,8 @@ namespace hpx { namespace parallel { namespace execution
                 }
 
                 // spawn remaining tasks sequentially
-                spawn_sequential(l, size, std::forward<F>(f), it, ts...);
+                spawn_sequential(
+                    l, size, std::forward<F>(f), it, e, mtx_e, ts...);
             }
 
             hpx::launch const policy_;
