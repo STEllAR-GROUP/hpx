@@ -133,7 +133,8 @@ namespace hpx { namespace iostreams
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT void release_ostream(char const* name, naming::id_type const& id);
+        HPX_IOSTREAMS_EXPORT void release_ostream(
+            char const* name, naming::id_type const& id);
 
         template <typename Tag>
         void release_ostream(Tag tag, naming::id_type const& id)
