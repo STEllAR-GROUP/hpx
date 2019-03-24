@@ -57,7 +57,7 @@
 #include "fabric_error.hpp"
 
 //#define HPX_PARCELPORT_LIBFABRIC_GNI 1
-//#define HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
+//#define HPX_PARCELPORT_LIBFABRIC_HAVE_PMI 1
 //#define HPX_PARCELPORT_LIBFABRIC_HAVE_SOCKETS
 //#define HPX_PARCELPORT_LIBFABRIC_HAVE_BOOTSTRAPPING std::true_type
 
@@ -264,7 +264,7 @@ namespace libfabric
                 }
 
                 // decode the string back to raw locality data
-                LOG_DEBUG_MSG("Calling decode for " << decnumber(i)
+                LOG_TRACE_MSG("Calling decode for " << decnumber(i)
                     << " locality data on rank " << decnumber(rank));
                 locality new_locality;
                 std::copy(binary_t(encoded_data),
@@ -272,7 +272,7 @@ namespace libfabric
                           (new_locality.fabric_data_writable()));
 
                 // insert locality into address vector
-                LOG_DEBUG_MSG("Calling insert_address for " << decnumber(i)
+                LOG_TRACE_MSG("Calling insert_address for " << decnumber(i)
                     << "on rank " << decnumber(rank));
                 new_locality = insert_address(new_locality);
                 if (i == 0) {
@@ -281,6 +281,7 @@ namespace libfabric
             }
 
             PMI2_Finalize();
+            LOG_DEBUG_MSG("Completed PMI finalize on rank " << decnumber(rank));
 #endif
         }
 
@@ -451,10 +452,10 @@ namespace libfabric
             if (ret) {
                 throw fabric_error(ret, "Failed to get fabric info");
             }
-            LOG_DEBUG_MSG("Fabric info " << fi_tostr(fabric_info_, FI_TYPE_INFO));
+            LOG_TRACE_MSG("Fabric info " << fi_tostr(fabric_info_, FI_TYPE_INFO));
 
             immediate_ = (fabric_info_->rx_attr->mode & FI_RX_CQ_DATA)!=0;
-            LOG_DEBUG_MSG("Fabric supports immediate data " << immediate_);
+            LOG_TRACE_MSG("Fabric supports immediate data " << immediate_);
             LOG_EXCLUSIVE(bool context = (fabric_hints_->mode & FI_CONTEXT)!=0);
             LOG_DEBUG_MSG("Fabric requires FI_CONTEXT " << context);
 
@@ -1211,19 +1212,19 @@ namespace libfabric
         libfabric::locality insert_address(const libfabric::locality &address)
         {
             FUNC_START_DEBUG_MSG;
-            LOG_DEBUG_MSG("inserting address in vector " << iplocality(address));
+            LOG_TRACE_MSG("inserting address in vector " << iplocality(address));
             fi_addr_t fi_addr = 0xffffffff;
             int ret = fi_av_insert(av_, address.fabric_data(), 1, &fi_addr, 0, nullptr);
             if (ret < 0) {
                 fabric_error(ret, "fi_av_insert");
             }
             else if (ret == 0) {
-                LOG_DEBUG_MSG("fi_av_insert called with existing address");
+                LOG_ERROR_MSG("fi_av_insert called with existing address");
                 fabric_error(ret, "fi_av_insert did not return 1");
             }
             // address was generated correctly, now update the locality with the fi_addr
             libfabric::locality new_locality(address, fi_addr);
-            LOG_DEBUG_MSG("rank " << decnumber(fi_addr)
+            LOG_TRACE_MSG("rank " << decnumber(fi_addr)
                           << "added to address vector " << iplocality(new_locality)
                           << "fi_addr " << hexnumber(fi_addr));
             FUNC_END_DEBUG_MSG;

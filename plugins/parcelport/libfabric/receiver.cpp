@@ -44,9 +44,9 @@ namespace libfabric
         , header_region_(memory_pool.allocate_region(memory_pool.small_.chunk_size()))
         , memory_pool_(&memory_pool)
     {
-        LOG_DEBUG_MSG("created receiver: " << hexpointer(this));
-        // create an rma_receiver and push it onto the rma stack
-        create_rma_receiver();
+        LOG_TRACE_MSG("created receiver: " << hexpointer(this));
+        // create an rma_receivers per receive and push it onto the rma stack
+        create_rma_receiver(true);
         // Once constructed, we need to post the receive...
         pre_post_receive();
     }

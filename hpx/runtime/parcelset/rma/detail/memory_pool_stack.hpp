@@ -69,7 +69,7 @@ namespace detail
         // ------------------------------------------------------------------------
         bool allocate_pool()
         {
-            LOG_DEBUG_MSG(PoolType::desc() << "Allocating "
+            LOG_TRACE_MSG(PoolType::desc() << "Allocating "
                 << "ChunkSize " << hexuint32(ChunkSize)
                 << "num_chunks " << decnumber(MaxChunks)
                 << "total " << hexuint32(ChunkSize*MaxChunks));
@@ -157,7 +157,7 @@ namespace detail
             // get a block
             region_type *region = nullptr;
             if (!free_list_.pop(region)) {
-                LOG_DEBUG_MSG(PoolType::desc() << "Error in memory pool pop");
+                LOG_TRACE_MSG(PoolType::desc() << "Error in memory pool pop");
                 return nullptr;
             }
             ++in_use_;

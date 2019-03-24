@@ -62,40 +62,40 @@ struct locality {
     {
         std::memcpy(&data_[0], &in_data[0], array_size);
         fi_address_ = 0;
-        LOG_DEBUG_MSG("explicit constructing locality " << iplocality((*this)));
+        LOG_TRACE_MSG("explicit constructing locality " << iplocality((*this)));
     }
 
     locality() {
         std::memset(&data_[0], 0x00, array_size);
         fi_address_ = 0;
-        LOG_DEBUG_MSG("default constructing locality " << iplocality((*this)));
+        LOG_TRACE_MSG("default constructing locality " << iplocality((*this)));
     }
 
     locality(const locality &other)
         : data_(other.data_)
         , fi_address_(other.fi_address_)
     {
-        LOG_DEBUG_MSG("copy constructing locality " << iplocality((*this)));
+        LOG_TRACE_MSG("copy constructing locality " << iplocality((*this)));
     }
 
     locality(const locality &other, fi_addr_t addr)
         : data_(other.data_)
         , fi_address_(addr)
     {
-        LOG_DEBUG_MSG("copy constructing locality + fi_addr " << iplocality((*this)));
+        LOG_TRACE_MSG("copy constructing locality + fi_addr " << iplocality((*this)));
     }
 
     locality(locality &&other)
         : data_(std::move(other.data_))
         , fi_address_(other.fi_address_)
     {
-        LOG_DEBUG_MSG("move constructing locality " << iplocality((*this)));
+        LOG_TRACE_MSG("move constructing locality " << iplocality((*this)));
     }
 
     // provided to support sockets mode bootstrap
     explicit locality(const std::string &address,  const std::string &portnum)
     {
-        LOG_DEBUG_MSG("explicit constructing locality from "
+        LOG_TRACE_MSG("explicit constructing locality from "
             << address << ":" << portnum);
         //
         struct sockaddr_in socket_data;
@@ -106,19 +106,19 @@ struct locality {
         //
         std::memcpy(&data_[0], &socket_data, array_size);
         fi_address_ = 0;
-        LOG_DEBUG_MSG("string constructing locality " << iplocality((*this)));
+        LOG_TRACE_MSG("string constructing locality " << iplocality((*this)));
     }
 
 
     locality & operator = (const locality &other) {
         data_       = other.data_;
         fi_address_ = other.fi_address_;
-        LOG_DEBUG_MSG("copy operator locality " << iplocality((*this)));
+        LOG_TRACE_MSG("copy operator locality " << iplocality((*this)));
         return *this;
     }
 
     bool operator == (const locality &other) {
-        LOG_DEBUG_MSG("comparison operator locality with "
+        LOG_TRACE_MSG("comparison operator locality with "
                 << iplocality((*this))
                 << iplocality(other));
         return std::memcmp(&data_, &other.data_, array_size)==0;
@@ -188,7 +188,7 @@ private:
     // note that the fi_address is not compared as it is local to a node
     friend bool operator==(locality const & lhs, locality const & rhs) {
 #if defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING)
-        LOG_DEBUG_MSG("Testing locality equality "
+        LOG_TRACE_MSG("Testing locality equality "
             << iplocality(lhs) << iplocality(rhs));
 #endif
         return ((lhs.data_ == rhs.data_));

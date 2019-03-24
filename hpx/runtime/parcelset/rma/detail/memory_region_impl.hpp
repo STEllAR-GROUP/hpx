@@ -64,7 +64,7 @@ namespace detail
                     << hexpointer(buffer) << hexlength(length));
             }
             else {
-                LOG_DEBUG_MSG(
+                LOG_TRACE_MSG(
                     "OK registering region "
                     << hexpointer(buffer) << hexpointer(address_)
                     << "desc " << hexpointer(fi_mr_desc(region_))
@@ -80,7 +80,7 @@ namespace detail
             // Allocate storage for the memory region.
             void *buffer = new char[length];
             if (buffer != nullptr) {
-                LOG_DEBUG_MSG("allocated storage for memory region with malloc OK "
+                LOG_TRACE_MSG("allocated storage for memory region with malloc OK "
                     << hexnumber(length));
             }
             address_    = static_cast<char*>(buffer);
@@ -99,7 +99,7 @@ namespace detail
                     << hexpointer(buffer) << hexlength(length));
             }
             else {
-                LOG_DEBUG_MSG(
+                LOG_TRACE_MSG(
                     "OK registering region "
                     << hexpointer(buffer) << hexpointer(address_)
                     << "desc " << hexpointer(fi_mr_desc(region_))
@@ -107,7 +107,7 @@ namespace detail
                     << "length " << hexlength(size_));
             }
 
-            LOG_DEBUG_MSG("allocated/registered memory region " << hexpointer(this)
+            LOG_TRACE_MSG("allocated/registered memory region " << hexpointer(this)
                 << "with local key " << hexnumber(get_local_key())
                 << "at address " << hexpointer(get_address())
                 << "with length " << hexlength(get_size()));
@@ -143,7 +143,7 @@ namespace detail
                     return -1;
                 }
                 else {
-                    LOG_DEBUG_MSG("deregistered memory region with local key "
+                    LOG_TRACE_MSG("deregistered memory region with local key "
                         << hexpointer(get_local_key())
                         << "at address " << hexpointer(buffer)
                         << "with length " << hexlength(length));

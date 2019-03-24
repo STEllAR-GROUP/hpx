@@ -55,14 +55,14 @@ namespace detail
         static region_ptr malloc(domain_type *pd, const std::size_t bytes)
         {
             region_ptr region = std::make_shared<region_type>();
-            LOG_DEBUG_MSG("Allocating " << hexuint32(bytes) << "using chunk mallocator");
+            LOG_TRACE_MSG("Allocating " << hexuint32(bytes) << "using chunk mallocator");
             region->allocate(pd, bytes);
             return region;
         }
 
         // release a registered memory region
         static void free(region_ptr region) {
-            LOG_DEBUG_MSG("Freeing a block from chunk mallocator (ref count) "
+            LOG_TRACE_MSG("Freeing a block from chunk mallocator (ref count) "
                 << region.use_count());
             region.reset();
         }
