@@ -428,14 +428,6 @@ namespace libfabric
         {
             LOG_ERROR_MSG("Should only return agas locality when bootstrapping");
         }
-
-//        if (!controller_->agas_boostrap_ready_)
-//        {
-//            auto a = get_runtime().get_config().get_entry("hpx.agas.address", "localhost");
-//            auto p = get_runtime().get_config().get_entry("hpx.agas.port", "1790");
-//            controller_->set_agas_locality(locality(a,p));
-//        }
-
         FUNC_END_DEBUG_MSG;
         return controller_->agas_;
     }

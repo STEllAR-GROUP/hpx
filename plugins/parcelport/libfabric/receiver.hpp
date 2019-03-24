@@ -50,12 +50,6 @@ namespace libfabric
                  rma::memory_pool<region_provider>& memory_pool);
 
         // --------------------------------------------------------------------
-        // these constructors are provided because boost::lockfree::stack requires them
-        // they should not be used
-        receiver(receiver&& other);
-        receiver& operator=(receiver&& other);
-
-        // --------------------------------------------------------------------
         // destruct receive object
         ~receiver();
 

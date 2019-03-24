@@ -29,8 +29,6 @@
 # define HPX_PARCELPORT_LIBFABRIC_LOCALITY_SOCKADDR
 #endif
 
-//typedef struct fid* fi_addr_t;
-
 namespace hpx {
 namespace parcelset {
 namespace policies {

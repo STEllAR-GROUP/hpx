@@ -53,14 +53,6 @@ namespace libfabric
     }
 
     // --------------------------------------------------------------------
-    // constructor provided because boost::lockfree::stack requires it
-    // (should not be used)
-    receiver::receiver(receiver&& other) : rma_base(other.context_type())
-    {
-        std::terminate();
-    }
-
-    // --------------------------------------------------------------------
     receiver::~receiver()
     {
         if (header_region_ && memory_pool_) {
