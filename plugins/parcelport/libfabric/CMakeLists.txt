@@ -165,19 +165,6 @@ hpx_add_config_define_namespace(
     NAMESPACE parcelport)
 
 #------------------------------------------------------------------------------
-# Custom Scheduler options
-#------------------------------------------------------------------------------
-hpx_option(HPX_PARCELPORT_LIBFABRIC_USE_CUSTOM_SCHEDULER BOOL
-  "Configure the parcelport to use a custom scheduler (default: OFF - Warning, experimental, may cause serious program errors)"
-  OFF CATEGORY "Parcelport" ADVANCED)
-
-if (HPX_PARCELPORT_LIBFABRIC_USE_CUSTOM_SCHEDULER)
-  hpx_add_config_define_namespace(
-      DEFINE    HPX_PARCELPORT_LIBFABRIC_USE_CUSTOM_SCHEDULER
-      NAMESPACE parcelport)
-endif()
-
-#------------------------------------------------------------------------------
 # Lock checking
 #------------------------------------------------------------------------------
 hpx_option(HPX_PARCELPORT_LIBFABRIC_DEBUG_LOCKS BOOL
