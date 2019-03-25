@@ -100,12 +100,7 @@ namespace libfabric
         static performance_counter<unsigned int> acks_received_;
         static performance_counter<unsigned int> receives_pre_posted_;
         static performance_counter<unsigned int> active_rma_receivers_;
-        // from the internal rma_receivers
-        performance_counter<unsigned int> msg_plain_;
-        performance_counter<unsigned int> msg_rma_;
-        performance_counter<unsigned int> sent_ack_;
-        performance_counter<unsigned int> rma_reads_;
-        performance_counter<unsigned int> recv_deletes_;
+
         //
         typedef boost::lockfree::stack<
             rma_receiver*,

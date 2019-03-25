@@ -289,34 +289,39 @@ namespace libfabric
         // clean up all resources
         ~controller()
         {
-            unsigned int messages_handled = 0;
-            unsigned int acks_received    = 0;
-            unsigned int msg_plain        = 0;
-            unsigned int msg_rma          = 0;
-            unsigned int sent_ack         = 0;
-            unsigned int rma_reads        = 0;
-            unsigned int recv_deletes     = 0;
+            unsigned int messages_handled_ = 0;
+            unsigned int acks_received_    = 0;
+            unsigned int msg_plain_        = 0;
+            unsigned int msg_rma_          = 0;
+            unsigned int sent_ack_         = 0;
+            unsigned int rma_reads_        = 0;
+            unsigned int recv_deletes_     = 0;
             //
             for (auto &r : receivers_) {
                 r.cleanup();
                 // from receiver
-                messages_handled += r.messages_handled_;
-                acks_received    += r.acks_received_;
-                // from rma_receivers
-                msg_plain        += r.msg_plain_;
-                msg_rma          += r.msg_rma_;
-                sent_ack         += r.sent_ack_;
-                rma_reads        += r.rma_reads_;
-                recv_deletes     += r.recv_deletes_;
+                messages_handled_ += r.messages_handled_;
+                acks_received_    += r.acks_received_;
+            }
+
+            rma_receiver *rcv = nullptr;
+            while (receiver::rma_receivers_.pop(rcv))
+            {
+                msg_plain_    += rcv->msg_plain_;
+                msg_rma_      += rcv->msg_rma_;
+                sent_ack_     += rcv->sent_ack_;
+                rma_reads_    += rcv->rma_reads_;
+                recv_deletes_ += rcv->recv_deletes_;
+                delete rcv;
             }
 
             LOG_DEBUG_MSG(
-                   "Received messages " << decnumber(messages_handled)
-                << "Received acks "     << decnumber(acks_received)
-                << "Sent acks "     << decnumber(sent_ack)
-                << "Total reads "       << decnumber(rma_reads)
-                << "Total deletes "     << decnumber(recv_deletes)
-                << "deletes error " << decnumber(messages_handled - recv_deletes));
+                   "Received messages " << decnumber(messages_handled_)
+                << "Received acks "     << decnumber(acks_received_)
+                << "Sent acks "         << decnumber(sent_ack_)
+                << "Total reads "       << decnumber(rma_reads_)
+                << "Total deletes "     << decnumber(recv_deletes_)
+                << "deletes error "     << decnumber(messages_handled_ - recv_deletes_));
 
             // Cleaning up receivers to avoid memory leak errors.
             receivers_.clear();

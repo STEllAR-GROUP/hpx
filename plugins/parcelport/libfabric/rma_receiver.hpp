@@ -97,6 +97,8 @@ namespace libfabric
         void cleanup_receive();
 
         // --------------------------------------------------------------------
+        // called when the controller receives an error condition when
+        // handling this object as an fi_context
         void handle_error(struct fi_cq_err_entry err);
 
         // --------------------------------------------------------------------
@@ -127,14 +129,15 @@ namespace libfabric
 
         double start_time_;
 
-        //
-        friend class receiver;
-        performance_counter<unsigned int> msg_plain_;
-        performance_counter<unsigned int> msg_rma_;
-        performance_counter<unsigned int> sent_ack_;
-        performance_counter<unsigned int> rma_reads_;
-        performance_counter<unsigned int> recv_deletes_;
+        friend struct receiver;
+        friend class controller;
 
+        // counters for statistics about messages
+        static performance_counter<unsigned int> msg_plain_;
+        static performance_counter<unsigned int> msg_rma_;
+        static performance_counter<unsigned int> sent_ack_;
+        static performance_counter<unsigned int> rma_reads_;
+        static performance_counter<unsigned int> recv_deletes_;
     };
 }}}}
 

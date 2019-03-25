@@ -27,7 +27,14 @@ namespace parcelset {
 namespace policies {
 namespace libfabric
 {
-// --------------------------------------------------------------------
+
+    performance_counter<unsigned int> rma_receiver::msg_plain_;
+    performance_counter<unsigned int> rma_receiver::msg_rma_;
+    performance_counter<unsigned int> rma_receiver::sent_ack_;
+    performance_counter<unsigned int> rma_receiver::rma_reads_;
+    performance_counter<unsigned int> rma_receiver::recv_deletes_;
+
+    // --------------------------------------------------------------------
     rma_receiver::rma_receiver(
         parcelport* pp,
         fid_ep* endpoint,
@@ -132,13 +139,13 @@ namespace libfabric
 
         rcv_buffer_type buffer(std::move(wrapped_pointer), nullptr);
 
-        int zc_chunks =
+        auto zc_chunks =
             std::count_if(chunks_.begin(), chunks_.end(), [](chunktype &c) {
                 return c.type_ == serialization::chunk_type_pointer ||
                        c.type_ == serialization::chunk_type_rma;
             });
         HPX_ASSERT(zc_chunks==0);
-        int oo_chunks = chunks_.size() - zc_chunks;
+        unsigned int oo_chunks = chunks_.size() - zc_chunks;
 
         buffer.num_chunks_ = std::make_pair(zc_chunks, oo_chunks);
         buffer.data_size_  = header_->message_size();

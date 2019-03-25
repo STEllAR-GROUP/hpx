@@ -134,7 +134,8 @@ namespace libfabric
     }
 
     // --------------------------------------------------------------------
-    // when a receive completes, this callback handler is called
+    // when a receive completes, this callback handler is called if
+    // rma transfers are needed
     rma_receiver *receiver::create_rma_receiver(bool push_to_stack)
     {
         // this is the rma_receiver completion handling function
