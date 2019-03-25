@@ -33,7 +33,8 @@ namespace libfabric
         fid_ep* endpoint,
         rma::memory_pool<region_provider>* memory_pool,
         completion_handler&& handler)
-      : parcelport_(pp)
+      : rma_base(ctx_rma_receiver)
+      , parcelport_(pp)
       , endpoint_(endpoint)
       , header_region_(nullptr)
       , chunk_region_(nullptr)
@@ -44,12 +45,6 @@ namespace libfabric
       , rma_count_(0)
       , chunk_fetch_(false)
     {}
-
-    // --------------------------------------------------------------------
-    rma_receiver::~rma_receiver()
-    {
-        LOG_DEBUG_MSG("Receiving of message complete " << hexpointer(this));
-    }
 
     // --------------------------------------------------------------------
     void rma_receiver::read_message(region_type* region,

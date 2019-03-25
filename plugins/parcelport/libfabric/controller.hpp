@@ -880,7 +880,17 @@ namespace libfabric
                         << "context " << hexpointer(e.op_context));
                 }
                 rma_base *base = reinterpret_cast<rma_base*>(e.op_context);
-                base->handle_error(e);
+                switch (base->context_type()) {
+                    case ctx_sender:
+                        reinterpret_cast<sender*>(e.op_context)->handle_error(e);
+                        break;
+                    case ctx_receiver:
+                        reinterpret_cast<receiver*>(e.op_context)->handle_error(e);
+                        break;
+                    case ctx_rma_receiver:
+                        reinterpret_cast<rma_receiver*>(e.op_context)->handle_error(e);
+                        break;
+                }
             }
             else {
                 LOG_ERROR_MSG("unknown error in completion txcq read");

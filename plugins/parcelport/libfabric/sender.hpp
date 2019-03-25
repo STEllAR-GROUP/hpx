@@ -51,7 +51,8 @@ namespace libfabric
         // --------------------------------------------------------------------
         sender(parcelport* pp, fid_ep* endpoint, fid_domain* domain,
             memory_pool_type* memory_pool)
-          : parcelport_(pp)
+          : rma_base(ctx_sender)
+          , parcelport_(pp)
           , endpoint_(endpoint)
           , domain_(domain)
           , memory_pool_(memory_pool)
@@ -117,7 +118,7 @@ namespace libfabric
 
         // --------------------------------------------------------------------
         // if a send completion reports failure, we can retry the send
-        void handle_error(struct fi_cq_err_entry err) override;
+        void handle_error(struct fi_cq_err_entry err);
 
         // --------------------------------------------------------------------
         parcelport               *parcelport_;

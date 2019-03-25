@@ -39,7 +39,8 @@ namespace libfabric
     // --------------------------------------------------------------------
     receiver::receiver(parcelport* pp, fid_ep* endpoint,
         rma::memory_pool<region_provider>& memory_pool)
-        : parcelport_(pp)
+        : rma_base(ctx_receiver)
+        , parcelport_(pp)
         , endpoint_(endpoint)
         , header_region_(memory_pool.allocate_region(memory_pool.small_.chunk_size()))
         , memory_pool_(&memory_pool)
@@ -52,13 +53,9 @@ namespace libfabric
     }
 
     // --------------------------------------------------------------------
-    // these constructors are provided because boost::lockfree::stack requires them
-    // they should not be used
-    receiver::receiver(receiver&& /*other*/)
-    {
-        std::terminate();
-    }
-    receiver& receiver::operator=(receiver&& /*other*/)
+    // constructor provided because boost::lockfree::stack requires it
+    // (should not be used)
+    receiver::receiver(receiver&& other) : rma_base(other.context_type())
     {
         std::terminate();
     }

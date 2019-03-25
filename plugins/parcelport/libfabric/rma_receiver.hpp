@@ -53,8 +53,6 @@ namespace libfabric
             memory_pool_type *memory_pool,
             completion_handler&& handler);
 
-        ~rma_receiver();
-
         // --------------------------------------------------------------------
         // the main entry point when a message is received, this function
         // will despatch to either read with or without rma depending on
@@ -99,7 +97,7 @@ namespace libfabric
         void cleanup_receive();
 
         // --------------------------------------------------------------------
-        void handle_error(struct fi_cq_err_entry err) override;
+        void handle_error(struct fi_cq_err_entry err);
 
         // --------------------------------------------------------------------
         // convenience function to execute a read for each zero-copy chunk
