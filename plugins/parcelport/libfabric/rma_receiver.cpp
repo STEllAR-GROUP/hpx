@@ -11,13 +11,13 @@
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 //
 #include <hpx/util/assert.hpp>
-#include <hpx/util/yield_while.hpp>
 //
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <utility>
 #include <vector>
+#include <chrono>
 //
 #include <rdma/fabric.h>
 #include <rdma/fi_rma.h>
@@ -33,7 +33,7 @@ namespace libfabric
         fid_ep* endpoint,
         rma::memory_pool<region_provider>* memory_pool,
         completion_handler&& handler)
-      : pp_(pp)
+      : parcelport_(pp)
       , endpoint_(endpoint)
       , header_region_(nullptr)
       , chunk_region_(nullptr)
@@ -81,7 +81,7 @@ namespace libfabric
 
         if (header_->bootstrap()) {
             handle_bootstrap_message();
-            pp_->set_bootstrap_complete();
+            parcelport_->set_bootstrap_complete();
             return;
         }
 
@@ -153,7 +153,7 @@ namespace libfabric
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "calling parcel decode for complete NORMAL parcel");
         std::size_t num_thread = hpx::get_worker_thread_num();
-        decode_message_with_chunks(*pp_, std::move(buffer), 0, chunks_, num_thread);
+        decode_message_with_chunks(*parcelport_, std::move(buffer), 0, chunks_, num_thread);
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "parcel decode called for complete NORMAL (small) parcel");
 
@@ -218,7 +218,7 @@ namespace libfabric
             LOG_DEBUG_MSG("bootstrap received " << iplocality(data[i]));
         }
         LOG_DEBUG_MSG("bootstrap received " << decnumber(N) << "addresses");
-        pp_->recv_bootstrap_address(addresses);
+        parcelport_->recv_bootstrap_address(addresses);
         //
         cleanup_receive();
     }
@@ -360,36 +360,38 @@ namespace libfabric
         // count reads
         ++rma_reads_;
 
-        hpx::util::yield_while([this, get_region, remoteAddr, rkey]()
+        bool ok = false;
+        while(!ok) {
+            LOG_EXCLUSIVE(
+                // write a pattern and dump out data for debugging purposes
+                uint32_t *buffer =
+                    reinterpret_cast<uint32_t*>(get_region->get_address());
+                std::fill(buffer, buffer + get_region->get_size()/4,
+                   0xDEADC0DE);
+                LOG_TRACE_MSG(
+                    CRC32_MEM(get_region->get_address(), get_region->get_message_length(),
+                              "(RDMA GET region (pre-fi_read))"));
+            );
+
+            ssize_t ret = fi_read(endpoint_, get_region->get_address(),
+                get_region->get_message_length(), get_region->get_local_key(),
+                src_addr_, (uint64_t)(remoteAddr), rkey, this);
+
+            if (ret==0) {
+                ok = true;
+            }
+            else if (ret == -FI_EAGAIN)
             {
-                LOG_EXCLUSIVE(
-                    // write a pattern and dump out data for debugging purposes
-                    uint32_t *buffer =
-                        reinterpret_cast<uint32_t*>(get_region->get_address());
-                    std::fill(buffer, buffer + get_region->get_size()/4,
-                       0xDEADC0DE);
-                    LOG_TRACE_MSG(
-                        CRC32_MEM(get_region->get_address(), get_region->get_message_length(),
-                                  "(RDMA GET region (pre-fi_read))"));
-                    );
-
-                ssize_t ret = fi_read(endpoint_, get_region->get_address(),
-                    get_region->get_message_length(), get_region->get_local_key(),
-                    src_addr_, (uint64_t)(remoteAddr), rkey, this);
-
-                if (ret == -FI_EAGAIN)
-                {
-                    LOG_ERROR_MSG("receiver " << hexpointer(this)
-                        << "reposting fi_read...\n");
-                    return true;
-                }
-                else if (ret)
-                {
-                    throw fabric_error(ret, "fi_read");
-                }
-
-                return false;
-            }, "libfabric::receiver::async_read");
+                LOG_ERROR_MSG("receiver " << hexpointer(this)
+                    << "reposting fi_read...\n");
+                parcelport_->background_work(0);
+                std::this_thread::sleep_for(std::chrono::microseconds(1));
+            }
+            else if (ret)
+            {
+                throw fabric_error(ret, "fi_read");
+            }
+        }
     }
 
     // --------------------------------------------------------------------
@@ -521,7 +523,7 @@ namespace libfabric
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "calling parcel decode for ZEROCOPY complete parcel");
         std::size_t num_thread = hpx::get_worker_thread_num();
-        decode_message_with_chunks(*pp_, std::move(buffer), 0, chunks_, num_thread);
+        decode_message_with_chunks(*parcelport_, std::move(buffer), 0, chunks_, num_thread);
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "parcel decode called for ZEROCOPY complete parcel");
 
@@ -541,28 +543,30 @@ namespace libfabric
 
         ++sent_ack_;
 
-        hpx::util::yield_while([this]()
+        bool ok = false;
+        while(!ok) {
+            // when we received the incoming message, the tag was already set
+            // with the sender context so that we can signal it directly
+            // that we have completed RMA and the sender my now cleanup.
+            // Note : fi_inject does not trigger a completion locally, it just
+            // sends and then we can reuse buffers and move on.
+            std::uint64_t tag = this->header_->tag();
+            ssize_t ret = fi_inject(this->endpoint_, &tag,
+                sizeof(std::uint64_t), this->src_addr_);
+            if (ret==0) {
+                ok = true;
+            }
+            else if (ret == -FI_EAGAIN)
             {
-                // when we received the incoming message, the tag was already set
-                // with the sender context so that we can signal it directly
-                // that we have completed RMA and the sender my now cleanup.
-                std::uint64_t tag = this->header_->tag();
-                int ret = fi_inject(this->endpoint_, &tag,
-                    sizeof(std::uint64_t), this->src_addr_);
-
-                if (ret == -FI_EAGAIN)
-                {
-                    LOG_ERROR_MSG("receiver " << hexpointer(this)
-                        << "reposting fi_inject...\n");
-                    return true;
-                }
-                else if (ret)
-                {
-                    throw fabric_error(ret, "fi_inject ack notification error");
-                }
-
-                return false;
-            }, "libfabric::receiver::send_rdma_complete_ack");
+                LOG_ERROR_MSG("receiver " << hexpointer(this)
+                    << "reposting fi_inject...\n");
+                std::this_thread::sleep_for(std::chrono::microseconds(1));
+            }
+            else if (ret)
+            {
+                throw fabric_error(ret, "fi_inject ack notification error");
+            }
+        }
     }
 
     // --------------------------------------------------------------------

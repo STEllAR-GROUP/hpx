@@ -19,11 +19,11 @@
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 //
 #include <hpx/util/assert.hpp>
-#include <hpx/util/yield_while.hpp>
 //
 #include <utility>
 #include <cstddef>
 #include <cstdint>
+#include <chrono>
 
 namespace hpx {
 namespace parcelset {
@@ -39,7 +39,7 @@ namespace libfabric
     // --------------------------------------------------------------------
     receiver::receiver(parcelport* pp, fid_ep* endpoint,
         rma::memory_pool<region_provider>& memory_pool)
-        : pp_(pp)
+        : parcelport_(pp)
         , endpoint_(endpoint)
         , header_region_(memory_pool.allocate_region(memory_pool.small_.chunk_size()))
         , memory_pool_(&memory_pool)
@@ -138,40 +138,46 @@ namespace libfabric
 
     // --------------------------------------------------------------------
     // when a receive completes, this callback handler is called
-    void receiver::create_rma_receiver()
+    rma_receiver *receiver::create_rma_receiver(bool push_to_stack)
     {
         // this is the rma_receiver completion handling function
         // it just returns the rma_receiver back to the stack
-        auto f = [this](rma_receiver* recv)
+        auto f = [](rma_receiver* recv)
         {
             ++active_rma_receivers_;
             LOG_DEBUG_MSG("Pushing rma_receiver " << decnumber(active_rma_receivers_));
             if (!receiver::rma_receivers_.push(recv)) {
                 // if the capacity overflowed, just delete this one
-                LOG_ERROR_MSG("stack full rma_receiver " << decnumber(active_rma_receivers_));
-                std::terminate();
+                LOG_TRACE_MSG("stack full rma_receiver " << decnumber(active_rma_receivers_));
+                delete recv;
             }
         };
 
         // Put a new rma_receiver on the stack
-        rma_receiver *recv = new rma_receiver(pp_, endpoint_, memory_pool_, std::move(f));
+        rma_receiver *recv = new rma_receiver(parcelport_, endpoint_, memory_pool_, std::move(f));
         ++active_rma_receivers_;
         LOG_DEBUG_MSG("Creating new rma_receiver " << decnumber(active_rma_receivers_));
-        if (!receiver::rma_receivers_.push(recv)) {
-            // if the capacity overflowed, just delete this one
-            LOG_ERROR_MSG("stack full new rma_receiver " << decnumber(active_rma_receivers_));
-            std::terminate();
+        if (push_to_stack) {
+            if (!receiver::rma_receivers_.push(recv)) {
+                // if the capacity overflowed, just delete this one
+                LOG_TRACE_MSG("stack full new rma_receiver " << decnumber(active_rma_receivers_));
+                delete recv;
+            }
         }
+        else {
+            return recv;
+        }
+        return nullptr;
     }
 
+    // --------------------------------------------------------------------
     rma_receiver* receiver::get_rma_receiver(fi_addr_t const& src_addr)
     {
         rma_receiver *recv = nullptr;
-        hpx::util::yield_while(
-            [&recv](){
-                return !receiver::rma_receivers_.pop(recv);
-            }
-        );
+        // cannot yield here - might be called from background thread
+        if (!receiver::rma_receivers_.pop(recv)) {
+            recv = create_rma_receiver(false);
+        }
         --active_rma_receivers_;
         LOG_DEBUG_MSG("rma_receiver " << decnumber(active_rma_receivers_));
         //
@@ -201,7 +207,7 @@ namespace libfabric
         // the tag completion...
         if (len <= sizeof(std::uint64_t))
         {
-            // @TODO: fixme immediate tag retreival
+            // @TODO: fixme immediate tag retrieval
             // Get the sender that has completed rma operations and signal to it
             // that it can now cleanup - all remote get operations are done.
             sender* snd = *reinterpret_cast<sender **>(header_region_->get_address());
@@ -239,28 +245,29 @@ namespace libfabric
             << "context " << hexpointer(this)
             << "pre-posted " << decnumber(++receives_pre_posted_));
 
-        hpx::util::yield_while([this, desc]()
+        // this should never actually return true and yield
+        bool ok = false;
+        while(!ok) {
+            // post a receive using 'this' as the context, so that this
+            // receiver object can be used to handle the incoming
+            // receive/request
+            ssize_t ret = fi_recv(this->endpoint_,
+                this->header_region_->get_address(),
+                this->header_region_->get_size(), desc, 0, this);
+
+            if (ret ==0) {
+                ok = true;
+            }
+            else if (ret == -FI_EAGAIN)
             {
-                // post a receive using 'this' as the context, so that this
-                // receiver object can be used to handle the incoming
-                // receive/request
-                int ret = fi_recv(this->endpoint_,
-                    this->header_region_->get_address(),
-                    this->header_region_->get_size(), desc, 0, this);
-
-                if (ret == -FI_EAGAIN)
-                {
-                    LOG_ERROR_MSG("reposting fi_recv\n");
-                    return true;
-                }
-                else if (ret != 0)
-                {
-                    throw fabric_error(ret, "pp_post_rx");
-                }
-
-                return false;
-            }, "libfabric::receiver::post_recv");
-
+                LOG_ERROR_MSG("reposting fi_recv\n");
+                std::this_thread::sleep_for(std::chrono::microseconds(1));
+            }
+            else if (ret != 0)
+            {
+                throw fabric_error(int(ret), "pp_post_rx");
+            }
+        }
         FUNC_END_DEBUG_MSG;
     }
 }}}}

@@ -13,7 +13,6 @@
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/util/yield_while.hpp>
 //
 #include <rdma/fi_endpoint.h>
 //
@@ -164,36 +163,37 @@ namespace libfabric
                 "Message region (send piggyback)"));
 
             // send 2 regions as one message, goes into one receive
-            hpx::util::yield_while([this]()
+            bool ok = false;
+            while (!ok) {
+                ssize_t ret = fi_sendv(this->endpoint_, this->region_list_,
+                    this->desc_, 2, this->dst_addr_, this);
+
+                if (ret == 0) {
+                    ok = true;
+                }
+                else if (ret == -FI_EAGAIN) {
+                    LOG_ERROR_MSG("Reposting fi_sendv...");
+                    parcelport_->background_work(0);
+                }
+                else if (ret == -FI_ENOENT) {
+                    if (hpx::threads::get_self_id()==hpx::threads::invalid_thread_id) {
+                        // during bootstrap, this might happen on an OS thread
+                        // so use std::this_thread::sleep to really stop activity
+                        LOG_ERROR_MSG("No destination endpoint (bootstrap?), "
+                                      << "retrying after 1s ...");
+                        std::this_thread::sleep_for(std::chrono::seconds(1));
+                    }
+                    else {
+                        // if a node has failed, we can recover @TODO : put something here
+                        LOG_ERROR_MSG("No destination endpoint, retrying after 1s ...");
+                        std::terminate();
+                    }
+                }
+                else if (ret)
                 {
-                    int ret = fi_sendv(this->endpoint_, this->region_list_,
-                        this->desc_, 2, this->dst_addr_, this);
-
-                    if (ret == -FI_EAGAIN)
-                    {
-                        LOG_ERROR_MSG("Reposting fi_sendv...");
-                        return true;
-                    }
-                    else if (ret == -FI_ENOENT) {
-                        if (hpx::threads::get_self_id()==hpx::threads::invalid_thread_id) {
-                            // during bootstrap, this might happen on an OS thread
-                            LOG_ERROR_MSG("No destination endpoint, retrying after 1s ...");
-                            std::this_thread::sleep_for(std::chrono::seconds(1));
-                        }
-                        else {
-                            // if a node has failed, we can recover @TODO : put something here
-                            LOG_ERROR_MSG("No destination endpoint, retrying after 1s ...");
-                            hpx::this_thread::sleep_for(std::chrono::seconds(1));
-                        }
-                        return true;
-                    }
-                    else if (ret)
-                    {
-                        throw fabric_error(ret, "fi_sendv");
-                    }
-
-                    return false;
-                }, "sender::async_write");
+                    throw fabric_error(int(ret), "fi_sendv");
+                }
+            }
         }
         else
         {
@@ -213,28 +213,27 @@ namespace libfabric
                 message_region_->get_message_length(),
                 "Message region (send for rdma fetch)"));
 
-            // send just the header region - a single message
-            hpx::util::yield_while([this]()
+            bool ok = false;
+            while (!ok) {
+                ssize_t ret = fi_send(this->endpoint_,
+                    this->region_list_[0].iov_base,
+                    this->region_list_[0].iov_len,
+                    this->desc_[0], this->dst_addr_, this);
+
+                if (ret == 0) {
+                    ok = true;
+                }
+                else if (ret == -FI_EAGAIN)
                 {
-                    int ret = fi_send(this->endpoint_,
-                        this->region_list_[0].iov_base,
-                        this->region_list_[0].iov_len,
-                        this->desc_[0], this->dst_addr_, this);
-
-                    if (ret == -FI_EAGAIN)
-                    {
-                        LOG_ERROR_MSG("reposting fi_send...\n");
-                        return true;
-                    }
-                    else if (ret)
-                    {
-                        throw fabric_error(ret, "fi_send");
-                    }
-
-                    return false;
-                }, "sender::async_write");
+                    LOG_ERROR_MSG("reposting fi_send...\n");
+                    parcelport_->background_work(0);
+                }
+                else if (ret)
+                {
+                    throw fabric_error(int(ret), "fi_send");
+                }
+            }
         }
-
         FUNC_END_DEBUG_MSG;
     }
 
@@ -304,23 +303,24 @@ namespace libfabric
         if (header_->message_piggy_back())
         {
             // send 2 regions as one message, goes into one receive
-            hpx::util::yield_while([this]()
+            bool ok = false;
+            while (!ok) {
+                ssize_t ret = fi_sendv(this->endpoint_, this->region_list_,
+                    this->desc_, 2, this->dst_addr_, this);
+
+                if (ret == 0) {
+                    ok = true;
+                }
+                else if (ret == -FI_EAGAIN)
                 {
-                    int ret = fi_sendv(this->endpoint_, this->region_list_,
-                        this->desc_, 2, this->dst_addr_, this);
-
-                    if (ret == -FI_EAGAIN)
-                    {
-                        LOG_ERROR_MSG("reposting fi_sendv...\n");
-                        return true;
-                    }
-                    else if (ret)
-                    {
-                        throw fabric_error(ret, "fi_sendv");
-                    }
-
-                    return false;
-                }, "libfabric::sender::handle_error");
+                    LOG_ERROR_MSG("reposting fi_sendv...\n");
+                    parcelport_->background_work(0);
+                }
+                else if (ret)
+                {
+                    throw fabric_error(int(ret), "fi_sendv");
+                }
+            }
         }
         else
         {
@@ -328,25 +328,26 @@ namespace libfabric
                 message_region_->get_remote_key(), message_region_->get_address());
 
             // send just the header region - a single message
-            hpx::util::yield_while([this]()
+            bool ok = false;
+            while (!ok) {
+                ssize_t ret = fi_send(this->endpoint_,
+                    this->region_list_[0].iov_base,
+                    this->region_list_[0].iov_len,
+                    this->desc_[0], this->dst_addr_, this);
+
+                if (ret == 0) {
+                    ok = true;
+                }
+                else if (ret == -FI_EAGAIN)
                 {
-                    int ret = fi_send(this->endpoint_,
-                        this->region_list_[0].iov_base,
-                        this->region_list_[0].iov_len,
-                        this->desc_[0], this->dst_addr_, this);
-
-                    if (ret == -FI_EAGAIN)
-                    {
-                        LOG_ERROR_MSG("reposting fi_send...\n");
-                        return true;
-                    }
-                    else if (ret)
-                    {
-                        throw fabric_error(ret, "fi_sendv");
-                    }
-
-                    return false;
-                }, "libfabric::sender::handle_error");
+                    LOG_ERROR_MSG("reposting fi_send...\n");
+                    parcelport_->background_work(0);
+                }
+                else if (ret)
+                {
+                    throw fabric_error(int(ret), "fi_sendv");
+                }
+            }
         }
     }
 

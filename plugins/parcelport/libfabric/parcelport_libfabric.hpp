@@ -163,8 +163,9 @@ namespace libfabric
         // return a sender object back to the parcelport_impl
         // this is used by the send_immediate version of parcelport_impl
         // --------------------------------------------------------------------
-        sender* get_connection(libfabric::locality const& dest);
-        sender* get_connection(parcelset::locality const& dest);
+        libfabric::sender* get_connection(libfabric::locality const& dest);
+        libfabric::sender* get_connection(parcelset::locality const& dest);
+        libfabric::sender* get_sender(libfabric::locality const& dest);
 
         // --------------------------------------------------------------------
         // put a used sender object back into the sender queue for reuse
@@ -216,7 +217,7 @@ namespace libfabric
         // @TODO make this inline (circular ref problem)
         int deallocate_region(rma::memory_region *region) override;
 
-        static void suspended_task_debug(const std::string &match);
+        /*static*/ void suspended_task_debug(const std::string &match);
 
         void do_stop();
 

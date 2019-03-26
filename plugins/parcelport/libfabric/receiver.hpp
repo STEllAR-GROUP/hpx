@@ -73,7 +73,7 @@ namespace libfabric
         // the owning reciever is called to handle processing of the buffer
         void pre_post_receive();
 
-        void create_rma_receiver();
+        rma_receiver* create_rma_receiver(bool push_to_stack);
         rma_receiver* get_rma_receiver(fi_addr_t const& src_addr);
 
         // --------------------------------------------------------------------
@@ -85,7 +85,7 @@ namespace libfabric
     private:
         // libfabric requires some space for it's internal bookkeeping
         fi_context                         context_reserved_space;
-        parcelport                        *pp_;
+        parcelport                        *parcelport_;
         fid_ep                            *endpoint_;
         region_type                       *header_region_ ;
         rma::memory_pool<region_provider> *memory_pool_;

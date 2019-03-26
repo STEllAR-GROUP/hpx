@@ -113,7 +113,7 @@ namespace libfabric
             const void *remoteAddr, uint64_t rkey);
 
     private:
-        parcelport                 *pp_;
+        parcelport                 *parcelport_;
         fid_ep                     *endpoint_;
         region_type                *header_region_;
         region_type                *chunk_region_;
