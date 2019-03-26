@@ -852,7 +852,7 @@ namespace hpx { namespace threads { namespace policies
             bool result = true;
             for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
             {
-                result = result &&
+                result = result && high_priority_queues_[i] &&
                     high_priority_queues_[i]->enumerate_threads(f, state);
             }
 
