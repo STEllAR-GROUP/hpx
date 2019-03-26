@@ -39,12 +39,10 @@ namespace hpx { namespace parallel { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        template <
-            typename Result,
-            typename ExPolicy, typename FwdIter, typename F>
+        template <typename Result, typename ExPolicy, typename FwdIter,
+            typename F>
         std::vector<hpx::future<Result>> partition(
-            ExPolicy && policy,
-            FwdIter first, std::size_t count, F && f)
+            ExPolicy&& policy, FwdIter first, std::size_t count, F&& f)
         {
             // estimate a chunk size based on number of cores used
             using parameters_type =
@@ -61,8 +59,7 @@ namespace hpx { namespace parallel { namespace util
                 inititems, f, first, count, 1);
 
             std::vector<hpx::future<Result>> workitems =
-                execution::bulk_async_execute(
-                    policy.executor(),
+                execution::bulk_async_execute(policy.executor(),
                     partitioner_iteration<Result, F>{std::forward<F>(f)},
                     std::move(shape));
 
@@ -116,7 +113,7 @@ namespace hpx { namespace parallel { namespace util
         template <
             typename Result,
             typename ExPolicy, typename FwdIter, typename Data, typename F>
-            // requires is_container<Data>
+        // requires is_container<Data>
         std::vector<hpx::future<Result>> partition_with_data(
             ExPolicy && policy,
             FwdIter first, std::size_t count,
@@ -155,8 +152,7 @@ namespace hpx { namespace parallel { namespace util
             }
             HPX_ASSERT(chunk_size_it == chunk_sizes.end());
 
-            return execution::bulk_async_execute(
-                policy.executor(),
+            return execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{std::forward<F>(f)},
                 std::move(shape));
         }
@@ -174,7 +170,8 @@ namespace hpx { namespace parallel { namespace util
                 detail::scoped_executor_parameters_ref<
                     parameters_type, executor_type>;
 
-            using handle_local_exceptions = detail::handle_local_exceptions<ExPolicy>;
+            using handle_local_exceptions =
+                detail::handle_local_exceptions<ExPolicy>;
 
             template <
                 typename ExPolicy_,
@@ -269,8 +266,7 @@ namespace hpx { namespace parallel { namespace util
             template <typename F>
             static R reduce(
                 std::vector<hpx::future<Result>>&& workitems,
-                std::list<std::exception_ptr>&& errors,
-                F && f)
+                std::list<std::exception_ptr>&& errors, F && f)
             {
                 // wait for all tasks to finish
                 hpx::wait_all(workitems);
@@ -300,11 +296,11 @@ namespace hpx { namespace parallel { namespace util
                 detail::scoped_executor_parameters<
                     parameters_type, executor_type>;
 
-            using handle_local_exceptions = detail::handle_local_exceptions<ExPolicy>;
+            using handle_local_exceptions =
+                detail::handle_local_exceptions<ExPolicy>;
 
             template <
-                typename ExPolicy_,
-                typename FwdIter, typename F1, typename F2>
+                typename ExPolicy_, typename FwdIter, typename F1, typename F2>
             static hpx::future<R> call(
                 ExPolicy_ && policy,
                 FwdIter first, std::size_t count,
@@ -373,7 +369,7 @@ namespace hpx { namespace parallel { namespace util
             template <
                 typename ExPolicy_,
                 typename FwdIter, typename F1, typename F2, typename Data>
-                // requires is_container<Data>
+            // requires is_container<Data>
             static hpx::future<R> call_with_data(
                 ExPolicy_ && policy,
                 FwdIter first, std::size_t count,

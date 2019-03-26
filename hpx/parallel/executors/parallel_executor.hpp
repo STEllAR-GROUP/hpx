@@ -101,8 +101,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \cond NOINTERNAL
         bool operator==(parallel_policy_executor const& rhs) const noexcept
         {
-            return policy_ == rhs.policy_ &&
-                num_spread_ == rhs.num_spread_ &&
+            return policy_ == rhs.policy_ && num_spread_ == rhs.num_spread_ &&
                 num_tasks_ == rhs.num_tasks_;
         }
 

@@ -303,8 +303,8 @@ namespace hpx { namespace parallel { inline namespace v1
                                     }
                                 });
                         },
-                        [tok, second](std::vector<hpx::future<void> > &&) mutable
-                            -> RandIter
+                        [tok, second](std::vector<hpx::future<void> > &&)
+                            mutable -> RandIter
                         {
                             difference_type find_res =
                                 static_cast<difference_type>(tok.get_data());
