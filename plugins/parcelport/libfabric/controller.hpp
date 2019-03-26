@@ -802,9 +802,9 @@ namespace libfabric
         // This is the main polling function that checks for work completions
         // and connection manager events, if stopped is true, then completions
         // are thrown away, otherwise the completion callback is triggered
-        int poll_endpoints(bool stopped=false)
+        unsigned int poll_endpoints(bool stopped=false)
         {
-            int work = poll_for_work_completions();
+            unsigned int work = poll_for_work_completions();
 
 #ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_MSG
             work += poll_event_queue(stopped);
@@ -813,7 +813,7 @@ namespace libfabric
         }
 
         // --------------------------------------------------------------------
-        int poll_for_work_completions()
+        unsigned int poll_for_work_completions()
         {
             // @TODO, disable polling until queues are initialized to avoid this check
             // if queues are not setup, don't poll
@@ -823,7 +823,7 @@ namespace libfabric
         }
 
         // --------------------------------------------------------------------
-        int poll_send_queue()
+        unsigned int poll_send_queue()
         {
             LOG_TIMED_INIT(poll);
             LOG_TIMED_BLOCK(poll, DEVEL, 5.0, { LOG_DEBUG_MSG("poll_send_queue"); });
@@ -904,7 +904,7 @@ namespace libfabric
         }
 
         // --------------------------------------------------------------------
-        int poll_recv_queue()
+        unsigned int poll_recv_queue()
         {
             LOG_TIMED_INIT(poll);
             LOG_TIMED_BLOCK(poll, DEVEL, 5.0, { LOG_DEBUG_MSG("poll_recv_queue"); });
@@ -978,7 +978,7 @@ namespace libfabric
         }
 
         // --------------------------------------------------------------------
-        int poll_event_queue(bool stopped=false)
+        unsigned int poll_event_queue(bool stopped=false)
         {
             LOG_TIMED_INIT(poll);
             LOG_TIMED_BLOCK(poll, DEVEL, 5.0,
