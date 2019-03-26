@@ -18,6 +18,7 @@
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/cache_aligned_data.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/yield_while.hpp>
 #include <hpx/util_fwd.hpp>
@@ -80,13 +81,6 @@ namespace hpx { namespace threads { namespace policies
                 char const* description = "",
                 scheduler_mode mode = nothing_special)
           : mode_(mode)
-#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-          , wait_count_(0)
-          , max_idle_backoff_time_(
-                hpx::util::safe_lexical_cast<double>(
-                    hpx::get_config_entry("hpx.max_idle_backoff_time",
-                        HPX_IDLE_BACKOFF_TIME_MAX)))
-#endif
           , suspend_mtxs_(num_threads)
           , suspend_conds_(num_threads)
           , pu_mtxs_(num_threads)
@@ -95,6 +89,19 @@ namespace hpx { namespace threads { namespace policies
           , parent_pool_(nullptr)
           , background_thread_count_(0)
         {
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+            double max_time =
+                hpx::util::safe_lexical_cast<double>(hpx::get_config_entry(
+                    "hpx.max_idle_backoff_time", HPX_IDLE_BACKOFF_TIME_MAX));
+
+            wait_counts_.resize(num_threads);
+            for (auto && data : wait_counts_)
+            {
+                data.data_.wait_count_ = 0;
+                data.data_.max_idle_backoff_time_ = max_time;
+            }
+#endif
+
             for (std::size_t i = 0; i != num_threads; ++i)
                 states_[i].store(state_initialized);
         }
@@ -127,23 +134,27 @@ namespace hpx { namespace threads { namespace policies
 
         char const* get_description() const { return description_; }
 
-        void idle_callback(std::size_t /*num_thread*/)
+        void idle_callback(std::size_t num_thread)
         {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
             // Put this thread to sleep for some time, additionally it gets
             // woken up on new work.
 
-            // Exponential backoff with a maximum sleep time.
-            double exponent = (std::min)(double(wait_count_),
+            idle_backoff_data& data = wait_counts_[num_thread].data_;
+
+            // Exponential back-off with a maximum sleep time.
+            double exponent = (std::min)(double(data.wait_count_),
                 double(std::numeric_limits<double>::max_exponent - 1));
 
-            std::chrono::milliseconds period(std::lround(
-                (std::min)(max_idle_backoff_time_, std::pow(2.0, exponent))));
+            std::chrono::milliseconds period(std::lround((std::min)(
+                data.max_idle_backoff_time_, std::pow(2.0, exponent))));
 
-            ++wait_count_;
+            ++data.wait_count_;
 
             std::unique_lock<pu_mutex_type> l(mtx_);
             cond_.wait_for(l, period);
+#else
+            (void)num_thread;
 #endif
         }
 
@@ -164,12 +175,10 @@ namespace hpx { namespace threads { namespace policies
         void do_some_work(std::size_t num_thread)
         {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-            wait_count_.store(0, std::memory_order_release);
-
-            if (num_thread == std::size_t(-1))
-                cond_.notify_all();
-            else
-                cond_.notify_one();
+            wait_counts_[num_thread].data_.wait_count_ = 0;
+            cond_.notify_all();
+#else
+            (void)num_thread;
 #endif
         }
 
@@ -545,8 +554,12 @@ namespace hpx { namespace threads { namespace policies
         // support for suspension on idle queues
         pu_mutex_type mtx_;
         compat::condition_variable cond_;
-        std::atomic<std::uint32_t> wait_count_;
-        double max_idle_backoff_time_;
+        struct idle_backoff_data
+        {
+            std::uint32_t wait_count_;
+            double max_idle_backoff_time_;
+        };
+        std::vector<util::cache_line_data<idle_backoff_data>> wait_counts_;
 #endif
 
         // support for suspension of pus

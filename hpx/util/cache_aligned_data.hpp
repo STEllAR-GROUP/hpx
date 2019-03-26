@@ -14,7 +14,7 @@ namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     // special struct to ensure cache line alignment of a data type
-#if defined(HPX_HAVE_CXX11_ALIGNAS)
+#if defined(HPX_HAVE_CXX11_ALIGNAS) && !defined(__NVCC__)
     template <typename Data>
     struct alignas(threads::get_cache_line_size()) cache_aligned_data
     {
@@ -36,7 +36,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // special struct to data type is cache line aligned and fully occupies a
     // cache line
-#if defined(HPX_HAVE_CXX11_ALIGNAS)
+#if defined(HPX_HAVE_CXX11_ALIGNAS) && !defined(__NVCC__)
     template <typename Data>
     struct alignas(threads::get_cache_line_size()) cache_line_data
     {
