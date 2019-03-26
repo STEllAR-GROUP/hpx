@@ -301,26 +301,29 @@ typedef pointer_allocator<char> PointerAllocator;
 typedef hpx::serialization::serialize_buffer<char,
     PointerAllocator> transfer_buffer_type;
 
-typedef std::unordered_map<uint64_t, std::shared_ptr<general_buffer_type>> alive_map;
-typedef hpx::lcos::local::spinlock                                         mutex_type;
-typedef std::lock_guard<mutex_type>                                        scoped_lock;
-//
-static mutex_type keep_alive_mutex;
-static alive_map  keep_alive_buffers;
+//----------------------------------------------------------------------------
+struct buffer_deleter
+{
+    uint64_t index_;
+    std::shared_ptr<general_buffer_type> buffer_;
+    //
+//    buffer_deleter(uint64_t index, std::shared_ptr<general_buffer_type> buffer)
+//        : index_(index), buffer_(buffer) {}
+//    buffer_deleter(buffer_deleter &other)
+//        : index_(other.index_), buffer_(other.buffer_) {}
+    //
+    ~buffer_deleter() {
+        DEBUG_OUTPUT(7, "Deleting buffer index " << index_);
+        index_  = 0;
+        buffer_ = nullptr;
+    }
+};
 
 //
-void async_callback(const uint64_t index, boost::system::error_code const& /*ec*/,
+void async_callback(buffer_deleter deleter, boost::system::error_code const& /*ec*/,
     hpx::parcelset::parcel const& /*p*/)
 {
-    scoped_lock lock(keep_alive_mutex);
-    DEBUG_OUTPUT(7, "Async callback triggered for index " << index);
-    alive_map::iterator it = keep_alive_buffers.find(index);
-    if (it!=keep_alive_buffers.end()) {
-        keep_alive_buffers.erase(it);
-    }
-    else {
-        std::cout << "async_callback failed on index " << index << std::endl;
-    }
+    DEBUG_OUTPUT(7, "Async callback triggered for index " << deleter.index);
 }
 
 //----------------------------------------------------------------------------
@@ -526,6 +529,7 @@ void simple_barrier_count_down() {
 
 //----------------------------------------------------------------------------
 static std::atomic<int> in_flight;
+
 //----------------------------------------------------------------------------
 // Test speed of write/put
 void test_write(
@@ -551,6 +555,7 @@ void test_write(
     //
     // used to track callbacks to free buffers for async_cb
     uint64_t buffer_index = 0;
+    in_flight = 0;
     bool active = (rank==0) || (rank>0 && options.all2all);
     if (rank==0) std::cout << "Iteration ";
     for (std::uint64_t i = 0; active && i < options.iterations; i++) {
@@ -565,7 +570,6 @@ void test_write(
         }
 
         DEBUG_OUTPUT(2, "Starting iteration " << i << " on rank " << rank);
-        in_flight = 0;
 
         //
         // Start main message sending loop
@@ -614,14 +618,11 @@ void test_write(
                         general_buffer_type::reference);
                 using hpx::util::placeholders::_1;
                 using hpx::util::placeholders::_2;
-                {
-                    scoped_lock lock(keep_alive_mutex);
-                    DEBUG_OUTPUT(7, "Adding keep_alive_buffers " << buffer_index);
-                    keep_alive_buffers[buffer_index] = temp_buffer;
-                }
+
+                buffer_deleter keep_alive{buffer_index, temp_buffer};
                 auto temp_future =
                     hpx::async_cb(hpx::launch::fork, actWrite, locality,
-                            hpx::util::bind(&async_callback, buffer_index, _1, _2),
+                            hpx::util::bind(&async_callback, keep_alive, _1, _2),
                             *temp_buffer,
                             memory_offset, options.transfer_size_B
                     ).then(
@@ -637,21 +638,18 @@ void test_write(
 
                 // increment counter of tasks in flight
                 ++in_flight;
-                // don't let too many parcels enter the parcelport in one go
-                hpx::util::yield_while(
-                    [](){
-                        return in_flight.load(std::memory_order_relaxed)>128;
-                    }
-                );
             }
         }
-        hpx::util::yield_while(
-            [](){
-                return in_flight.load(std::memory_order_relaxed)>0;
-            }
-        );
+//        simple_barrier_count_down();
         DEBUG_OUTPUT(3, "Completed iteration " << i << " on rank " << rank);
     }
+
+    hpx::util::yield_while(
+        [](){
+            return in_flight.load(std::memory_order_relaxed)>0;
+        }
+    );
+
     if (rank==0) std::cout << std::endl;
     DEBUG_OUTPUT(2, "Exited iterations loop on rank " << rank);
 
@@ -731,6 +729,7 @@ void test_read(
     //
     hpx::util::high_resolution_timer timerRead;
     //
+    in_flight = 0;
     if (rank==0) std::cout << "Iteration ";
     bool active = (rank==0) || (rank>0 && options.all2all);
     for (std::uint64_t i = 0; active && i < options.iterations; i++) {
@@ -744,8 +743,6 @@ void test_read(
         }
 
         DEBUG_OUTPUT(2, "Starting iteration " << i << " on rank " << rank);
-        in_flight = 0;
-
         //
         // Start main message sending loop
         //
@@ -817,21 +814,18 @@ void test_read(
 
                 // increment counter of tasks in flight
                 ++in_flight;
-                // don't let too many parcels enter the parcelport in one go
-                hpx::util::yield_while(
-                    [](){
-                        return in_flight.load(std::memory_order_relaxed)>128;
-                    }
-                );
             }
         }
-        hpx::util::yield_while(
-            [](){
-                return in_flight.load(std::memory_order_relaxed)>0;
-            }
-        );
+//        simple_barrier_count_down();
         DEBUG_OUTPUT(3, "Completed iteration " << i << " on rank " << rank);
     }
+
+    hpx::util::yield_while(
+        [](){
+            return in_flight.load(std::memory_order_relaxed)>0;
+        }
+    );
+
     if (rank==0) std::cout << std::endl;
     DEBUG_OUTPUT(2, "Exited iterations loop on rank " << rank);
 
@@ -888,8 +882,8 @@ int hpx_main(boost::program_options::variables_map& vm)
       return 1;
     }
 
-    char const* msg = "hello world from OS-thread {1} on locality "
-        "{2} rank {3} hostname {4}";
+    char const* msg = "hello world from OS-thread {:02} on locality "
+        "{:04} rank {:04} hostname {}";
     hpx::util::format_to(std::cout, msg, current, hpx::get_locality_id(),
         rank, name.c_str()) << std::endl;
     //
