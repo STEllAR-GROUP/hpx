@@ -15,8 +15,6 @@
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
-#include <hpx/util/detail/vtable/unique_function_vtable.hpp>
-#include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <cstddef>
@@ -38,7 +36,7 @@ namespace hpx { namespace util
     public:
         typedef R result_type;
 
-        unique_function(std::nullptr_t = nullptr) noexcept
+        HPX_CONSTEXPR unique_function(std::nullptr_t = nullptr) noexcept
         {}
 
         unique_function(unique_function&&) noexcept = default;
@@ -71,13 +69,6 @@ namespace hpx { namespace util
         using base_type::empty;
         using base_type::target;
     };
-
-    template <typename Sig, bool Serializable>
-    static bool is_empty_function(
-        unique_function<Sig, Serializable> const& f) noexcept
-    {
-        return f.empty();
-    }
 }}
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
