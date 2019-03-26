@@ -57,8 +57,8 @@ For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_
 "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
 template<class convert = do_convert_format::prepend>
-struct idx_t : is_generic, formatter::non_const_context<std::uint64_t>,
-    hpx::util::logging::op_equal::always_equal  {
+struct idx_t : is_generic, formatter::non_const_context<std::uint64_t>
+{
     typedef formatter::non_const_context<std::uint64_t> non_const_context_base;
     typedef convert convert_type;
 
@@ -70,6 +70,8 @@ struct idx_t : is_generic, formatter::non_const_context<std::uint64_t>,
 
         convert::write( idx.str(), str );
     }
+
+    bool operator==(const idx_t& ) const { return true; }
 };
 
 
@@ -82,12 +84,14 @@ For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_
 "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
 template<class convert = do_convert_format::append> struct append_newline_t
-    : is_generic, hpx::util::logging::op_equal::always_equal {
+    : is_generic {
     typedef convert convert_type;
 
     void operator()(msg_type & str) const {
         convert::write( "\n", str );
     }
+
+    bool operator==(const append_newline_t& ) const { return true; }
 };
 
 
@@ -100,7 +104,7 @@ For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_
 "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
 template<class convert = do_convert_format::append> struct append_newline_if_needed_t
-    : is_generic, hpx::util::logging::op_equal::always_equal {
+    : is_generic {
     typedef convert convert_type;
 
     void operator()(msg_type & str) const {
@@ -112,6 +116,8 @@ template<class convert = do_convert_format::append> struct append_newline_if_nee
         if ( is_needed)
             convert::write( "\n", str );
     }
+
+    bool operator==(const append_newline_if_needed_t& ) const { return true; }
 };
 
 

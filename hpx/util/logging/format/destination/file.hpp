@@ -96,8 +96,7 @@ namespace detail {
 /**
     @brief Writes the string to a file
 */
-template <class convert_dest = do_convert_destination >
-struct file_t : is_generic, non_const_context<detail::file_info>
+struct file : is_generic, non_const_context<detail::file_info>
 {
     typedef non_const_context<detail::file_info> non_const_context_base;
     typedef util::spinlock mutex_type;
@@ -109,7 +108,7 @@ struct file_t : is_generic, non_const_context<detail::file_info>
         @param set [optional] file settings - see file_settings class,
         and @ref dealing_with_flags
     */
-    file_t(const std::string & file_name, file_settings set = file_settings() )
+    file(const std::string & file_name, file_settings set = file_settings() )
       : non_const_context_base(file_name,set)
     {}
 
@@ -119,12 +118,12 @@ struct file_t : is_generic, non_const_context<detail::file_info>
 
         if (!non_const_context_base::context().out)
             non_const_context_base::context().open();   // make sure file is opened
-        convert_dest::write(msg, *( non_const_context_base::context().out) );
+        convert::write(msg, *( non_const_context_base::context().out) );
         if ( non_const_context_base::context().settings.flush_each_time() )
             non_const_context_base::context().out->flush();
     }
 
-    bool operator==(const file_t & other) const {
+    bool operator==(const file & other) const {
         return non_const_context_base::context().name == other.context().name;
     }
 
@@ -140,14 +139,6 @@ struct file_t : is_generic, non_const_context<detail::file_info>
     static mutex_type mtx_;
 };
 
-template <typename convert_dest>
-typename file_t<convert_dest>::mutex_type file_t<convert_dest>::mtx_;
-
-/** @brief file_t with default values. See file_t
-
-@copydoc file_t
-*/
-typedef file_t<> file;
 
 }}}}
 

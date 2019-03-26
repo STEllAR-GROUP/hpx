@@ -53,28 +53,15 @@ public:
         return m_is_caching_off; // cache has been turned off
     }
 
-    void turn_cache_off(const writer::named_write & writer_) {
-        if ( m_is_caching_off )
-            return; // already turned off
+    void turn_cache_off(writer::named_write const& writer_);
 
-        m_is_caching_off = true;
-
-        // dump messages
-        message_array msgs;
-        std::swap( m_cache, msgs );
-
-        for ( auto& msg : msgs ) {
-            writer_( msg );
-        }
-    }
-
-    void add_msg(msg_type msg) const {
+    void add_msg(msg_type&& msg) {
         m_cache.push_back( std::move( msg ) );
     }
 
 private:
-    mutable message_array m_cache;
-    mutable bool m_is_caching_off;
+    message_array m_cache;
+    bool m_is_caching_off;
 };
 
 }}}}
