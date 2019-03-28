@@ -138,7 +138,8 @@ namespace libfabric
             LOG_DEBUG_MSG("Pushing rma_receiver " << decnumber(active_rma_receivers_));
             if (!receiver::rma_receivers_.push(recv)) {
                 // if the capacity overflowed, just delete this one
-                LOG_TRACE_MSG("stack full rma_receiver " << decnumber(active_rma_receivers_));
+                --active_rma_receivers_;
+                LOG_DEBUG_MSG("stack full rma_receiver " << decnumber(active_rma_receivers_));
                 delete recv;
             }
         };
@@ -150,7 +151,8 @@ namespace libfabric
         if (push_to_stack) {
             if (!receiver::rma_receivers_.push(recv)) {
                 // if the capacity overflowed, just delete this one
-                LOG_TRACE_MSG("stack full new rma_receiver " << decnumber(active_rma_receivers_));
+                --active_rma_receivers_;
+                LOG_DEBUG_MSG("stack full new rma_receiver " << decnumber(active_rma_receivers_));
                 delete recv;
             }
         }

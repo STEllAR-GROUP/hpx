@@ -829,12 +829,8 @@ namespace libfabric
             LOG_TIMED_BLOCK(poll, DEVEL, 5.0, { LOG_DEBUG_MSG("poll_send_queue"); });
 
             fi_cq_msg_entry entry;
-            int ret = 0;
-            {
-                std::unique_lock<mutex_type> l(polling_mutex_, std::try_to_lock);
-                if (l)
-                    ret = fi_cq_read(txcq_, &entry, 1);
-            }
+            int ret = fi_cq_read(txcq_, &entry, 1);
+            //
             if (ret>0) {
                 LOG_DEBUG_MSG("Completion txcq wr_id "
                     << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS)
@@ -872,16 +868,16 @@ namespace libfabric
                 // 'fabric errno' is returned
                 //
                 if(e.err == err_sz) {
-                    LOG_ERROR_MSG("txcq_ Error with len " << hexlength(e.len)
+                    LOG_ERROR_MSG("txcq Error FI_EAVAIL with len " << hexlength(e.len)
                         << "context " << hexpointer(e.op_context));
                 }
                 // flags might not be set correctly
                 if (e.flags == (FI_MSG | FI_SEND)) {
-                    LOG_ERROR_MSG("txcq Error for FI_SEND with len " << hexlength(e.len)
+                    LOG_ERROR_MSG("txcq Error FI_EAVAIL for FI_SEND with len " << hexlength(e.len)
                         << "context " << hexpointer(e.op_context));
                 }
                 if (e.flags & FI_RMA) {
-                    LOG_ERROR_MSG("txcq Error for FI_RMA with len " << hexlength(e.len)
+                    LOG_ERROR_MSG("txcq Error FI_EAVAIL for FI_RMA with len " << hexlength(e.len)
                         << "context " << hexpointer(e.op_context));
                 }
                 rma_base *base = reinterpret_cast<rma_base*>(e.op_context);
@@ -914,12 +910,8 @@ namespace libfabric
             fi_cq_msg_entry entry;
 
             // receives will use fi_cq_readfrom as we want the source address
-            int ret = 0;
-            {
-                std::unique_lock<mutex_type> l(polling_mutex_, std::try_to_lock);
-                if (l)
-                    ret = fi_cq_readfrom(rxcq_, &entry, 1, &src_addr);
-            }
+            int ret = fi_cq_readfrom(rxcq_, &entry, 1, &src_addr);
+            //
             if (ret>0) {
                 LOG_DEBUG_MSG("Completion rxcq wr_id "
                     << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS)
@@ -957,19 +949,18 @@ namespace libfabric
                 LOG_TIMED_MSG(poll, DEVEL, 10, "rxcq FI_EAGAIN");
             }
             else if (ret == -FI_EAVAIL) {
+                // read the full error status
                 struct fi_cq_err_entry e = {};
                 int err_sz = fi_cq_readerr(rxcq_, &e ,0);
-                // from the manpage 'man 3 fi_cq_readerr'
                 //
-                // On error, a negative value corresponding to
-                // 'fabric errno' is returned
-                //
-                if(e.err == err_sz) {
-                    LOG_ERROR_MSG("txcq_ Error with len " << hexlength(e.len)
-                        << "context " << hexpointer(e.op_context));
-                }
-                LOG_ERROR_MSG("rxcq Error with flags " << hexlength(e.flags)
-                    << "len " << hexlength(e.len));
+                LOG_ERROR_MSG("rxcq Error ??? "
+                              << "err "     << decnumber(-e.err)
+                              << "flags "   << hexlength(e.flags)
+                              << "len "     << hexlength(e.len)
+                              << "context " << hexpointer(e.op_context)
+                              << "error "   <<
+                fi_cq_strerror(rxcq_, e.prov_errno, e.err_data, (char*)e.buf, e.len));
+                std::terminate();
             }
             else {
                 LOG_ERROR_MSG("unknown error in completion rxcq read");
@@ -1328,7 +1319,6 @@ namespace libfabric
         // only allow one thread to handle connect/disconnect events etc
         mutex_type            initialization_mutex_;
         mutex_type            endpoint_map_mutex_;
-        mutex_type            polling_mutex_;
 
         // used to skip polling event channel too frequently
         typedef std::chrono::time_point<std::chrono::system_clock> time_type;

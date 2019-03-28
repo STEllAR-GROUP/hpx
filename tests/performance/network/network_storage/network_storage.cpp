@@ -882,11 +882,13 @@ int hpx_main(boost::program_options::variables_map& vm)
       return 1;
     }
 
-    char const* msg = "hello world from OS-thread {:02} on locality "
-        "{:04} rank {:04} hostname {}";
-    hpx::util::format_to(std::cout, msg, current, hpx::get_locality_id(),
-        rank, name.c_str()) << std::endl;
-    //
+    if (rank==0) {
+        char const* msg = "hello world from OS-thread {:02} on locality "
+            "{:04} rank {:04} hostname {}";
+        hpx::util::format_to(std::cout, msg, current, hpx::get_locality_id(),
+            rank, name.c_str()) << std::endl;
+    }
+
     // extract command line argument
     test_options options;
     options.transfer_size_B   = vm["transferKB"].as<std::uint64_t>() * 1024;

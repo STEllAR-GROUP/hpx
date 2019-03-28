@@ -107,7 +107,7 @@ namespace libfabric
         HPX_ASSERT(header_->message_size() == buffer_.data_.size());
         LOG_DEBUG_MSG("Found region allocated during encode_parcel : address "
             << hexpointer(buffer_.data_.m_array_)
-            << " region "<< *message_region_);
+            << *message_region_);
 
         // The number of completions we need before cleaning up:
         // 1 (header block send) + 1 (ack message if we have RMA chunks)
@@ -251,7 +251,7 @@ namespace libfabric
     void sender::handle_message_completion_ack()
     {
         LOG_DEBUG_MSG("Sender " << hexpointer(this)
-            << "handle handle_message_completion_ack ( "
+            << "handle_message_completion_ack ( "
             << "RMA regions " << decnumber(rma_regions_.size())
             << "completion count " << decnumber(completion_count_));
         ++acks_received_;
@@ -292,7 +292,11 @@ namespace libfabric
         buffer_.data_point_.time_ =
             util::high_resolution_clock::now() - buffer_.data_point_.time_;
         parcelport_->add_sent_data(buffer_.data_point_);
+        LOG_DEBUG_MSG("Sender " << hexpointer(this)
+            << "calling postprocess_handler");
         postprocess_handler_(this);
+        LOG_DEBUG_MSG("Sender " << hexpointer(this)
+            << "completed cleanup/postprocess_handler");
     }
 
     // --------------------------------------------------------------------

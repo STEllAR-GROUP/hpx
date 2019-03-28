@@ -202,6 +202,7 @@ namespace libfabric
                                    void const *data, std::size_t size,
                                    unsigned int flags)
     {
+        FUNC_START_DEBUG_MSG;
         LOG_DEBUG_MSG("send_raw_data (bootstrap) " << hexnumber(size));
         HPX_ASSERT(size<HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE);
 
@@ -228,11 +229,13 @@ namespace libfabric
         };
 
         sndr->async_write_impl(flags);
+        FUNC_END_DEBUG_MSG;
     }
 
     // --------------------------------------------------------------------
     void parcelport::send_bootstrap_address()
     {
+        FUNC_START_DEBUG_MSG;
         LOG_DEBUG_MSG("Sending bootstrap address to agas server : here = "
                       << ipaddress(controller_->here_.ip_address()) << ":"
                       << decnumber(controller_->here_.port()));
@@ -242,6 +245,7 @@ namespace libfabric
                       controller_->here_.fabric_data(),
                       locality::array_size,
                       libfabric::header<HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE>::bootstrap_flag);
+        FUNC_END_DEBUG_MSG;
     }
 
     // --------------------------------------------------------------------
@@ -255,6 +259,7 @@ namespace libfabric
     void parcelport::recv_bootstrap_address(
             const std::vector<libfabric::locality> &addresses)
     {
+        FUNC_START_DEBUG_MSG;
         libfabric::locality here = controller_->here_;
         // rank 0 is agas and should already be in our address vector
         for (const libfabric::locality &addr : addresses) {
@@ -272,6 +277,7 @@ namespace libfabric
                 here_ = parcelset::locality(full_addr);
             }
         }
+        FUNC_END_DEBUG_MSG;
     }
 
     // --------------------------------------------------------------------
@@ -289,7 +295,6 @@ namespace libfabric
         sender* snd = nullptr;
         if (senders_.pop(snd))
         {
-            FUNC_START_DEBUG_MSG;
             snd->dst_addr_ = dest.fi_address();
             LOG_DEBUG_MSG("get_connection : get address from "
                 << iplocality(here_.get<libfabric::locality>())
@@ -299,7 +304,6 @@ namespace libfabric
             LOG_TRACE_MSG("senders in use (++ get_connection) "
                           << decnumber(senders_in_use_));
         }
-        FUNC_END_DEBUG_MSG;
         return snd;
     }
 
@@ -309,6 +313,7 @@ namespace libfabric
     // --------------------------------------------------------------------
     libfabric::sender* parcelport::get_connection(libfabric::locality const& dest)
     {
+        FUNC_START_DEBUG_MSG;
         LOG_TIMED_INIT(background);
         LOG_TIMED_BLOCK(background, DEVEL, 60.0, {
             suspended_task_debug("");
@@ -340,10 +345,12 @@ namespace libfabric
 
     void parcelport::reclaim_connection(sender* s)
     {
-        --senders_in_use_;
-        LOG_TRACE_MSG("senders in use (-- reclaim_connection) "
+        FUNC_START_DEBUG_MSG;
+        LOG_DEBUG_MSG("senders in use (-- reclaim_connection) "
+                      << hexpointer(s)
                       << decnumber(senders_in_use_));
         senders_.push(s);
+        FUNC_END_DEBUG_MSG;
     }
 
     rma::memory_region *parcelport::allocate_region(std::size_t size) {
