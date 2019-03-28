@@ -212,6 +212,9 @@ namespace libfabric
             sndr = get_sender(dest);
         }
 
+        // reset buffer for data
+        sndr->buffer_ = sndr->get_new_buffer();
+
         // 0 zero copy chunks,
         // 1 index chunk containing our address
         sndr->buffer_.num_chunks_ = snd_buffer_type::count_chunks_type(0, 1);
