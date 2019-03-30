@@ -174,13 +174,16 @@ namespace libfabric
                     controller_->ep_active_,
                     controller_->get_domain(),
                     chunk_pool_);
+            // after a sender has been used, it's postprocess handler
+            // is called, this returns it to the free list
             snd->postprocess_handler_ = [this](sender* s)
                 {
                     --senders_in_use_;
-                    LOG_TRACE_MSG("senders in use (-- postprocess handler) "
+                    LOG_DEBUG_MSG("senders in use (-- postprocess handler) "
+                                  << hexpointer(s)
                                   << decnumber(senders_in_use_));
                     senders_.push(s);
-                    trigger_pending_work();
+//                    trigger_pending_work();
                 };
             senders_.push(snd);
         }
@@ -211,6 +214,9 @@ namespace libfabric
         sender *sndr = nullptr;
         while (!sndr) {
             sndr = get_sender(dest);
+            if (sndr) {
+                LOG_DEBUG_MSG("send_raw_data gets sender " << hexpointer(sndr));
+            }
         }
 
         // reset buffer for data
@@ -296,13 +302,15 @@ namespace libfabric
         if (senders_.pop(snd))
         {
             snd->dst_addr_ = dest.fi_address();
-            LOG_DEBUG_MSG("get_connection : get address from "
+            ++senders_in_use_;
+            LOG_DEBUG_MSG("get_sender "
+                << hexpointer(snd)
+                << " : get address from "
                 << iplocality(here_.get<libfabric::locality>())
                 << "to " << iplocality(dest)
-                << "fi_addr (rank) " << hexnumber(snd->dst_addr_));
-            ++senders_in_use_;
-            LOG_TRACE_MSG("senders in use (++ get_connection) "
-                          << decnumber(senders_in_use_));
+                << "fi_addr (rank) " << hexnumber(snd->dst_addr_)
+                << "senders in use (++ get_sender) "
+                << decnumber(senders_in_use_));
         }
         return snd;
     }
@@ -324,10 +332,11 @@ namespace libfabric
         {
             snd = get_sender(dest);
             if (snd != nullptr) {
-                FUNC_END_DEBUG_MSG;
                 // all ok, stop yielding
+                FUNC_END_DEBUG_MSG;
                 return false;
             }
+            background_work(0);
             return true;
         });
         FUNC_END_DEBUG_MSG;
@@ -343,13 +352,62 @@ namespace libfabric
         return get_connection(dest.get<libfabric::locality>());
     }
 
+    // --------------------------------------------------------------------
+    bool parcelport::can_send_immediate()
+    {
+        // there is an implicit race here because we might return
+        // true or false and it may change before the parcel is ready
+        // but it's ok because we handle either case - this is just a "hint"
+        // to optimize performance when there are free senders and we can use them
+        bool empty = senders_.empty();
+        if (empty) {
+            LOG_DEBUG_MSG("can_send_immediate false");
+        }
+        return !empty;
+    }
+
+    // --------------------------------------------------------------------
+    // if no senders are available, can_send_immediate returns false
+    // and parcels are queued up, then sent using this interface
+    // --------------------------------------------------------------------
+    std::shared_ptr<sender> parcelport::create_connection(
+        parcelset::locality const& dest, error_code& ec)
+    {
+        FUNC_START_DEBUG_MSG;
+        LOG_DEVEL_MSG("create_connection new sender");
+        std::shared_ptr<sender> new_sender = std::make_shared<sender>(
+                this,
+                controller_->ep_active_,
+                controller_->get_domain(),
+                chunk_pool_);
+        //
+        ++senders_in_use_;
+        //
+        new_sender->postprocess_handler_ = [this](sender* s)
+            {
+                --senders_in_use_;
+                LOG_DEVEL_MSG("senders in use (-- temp sender postprocess handler) "
+                              << hexpointer(s)
+                              << decnumber(senders_in_use_));
+                // do not push this one onto the sender stack
+                // since it is a temporary one.
+//                trigger_pending_work();
+            };
+        FUNC_END_DEBUG_MSG;
+        return nullptr; // return new_sender;
+    }
+
+    // --------------------------------------------------------------------
+    // return a sender connection : for unknown reasons the parcelport_impl
+    // sometimes gives back the connection/sender without using it
+    // --------------------------------------------------------------------
     void parcelport::reclaim_connection(sender* s)
     {
         FUNC_START_DEBUG_MSG;
         LOG_DEBUG_MSG("senders in use (-- reclaim_connection) "
                       << hexpointer(s)
                       << decnumber(senders_in_use_));
-        senders_.push(s);
+        s->postprocess_handler_(s);
         FUNC_END_DEBUG_MSG;
     }
 
@@ -362,18 +420,6 @@ namespace libfabric
         HPX_ASSERT(r);
         controller_->get_memory_pool().deallocate(r);
         return 0;
-    }
-
-
-    // --------------------------------------------------------------------
-    // return a sender object back to the parcelport_impl
-    // this is for compatibility with non send_immediate operation
-    // --------------------------------------------------------------------
-    std::shared_ptr<sender> parcelport::create_connection(
-        parcelset::locality const& dest, error_code& ec)
-    {
-        LOG_DEBUG_MSG("Creating new sender");
-        return std::shared_ptr<sender>();
     }
 
     // --------------------------------------------------------------------
@@ -491,13 +537,6 @@ namespace libfabric
         }
         stopped_ = true;
         // Stop receiving and sending of parcels
-    }
-
-    // --------------------------------------------------------------------
-    bool parcelport::can_send_immediate()
-    {
-        // @TODO : can use this function to deny a sender
-        return true;
     }
 
     // --------------------------------------------------------------------
