@@ -107,6 +107,18 @@ struct locality {
         LOG_TRACE_MSG("string constructing locality " << iplocality((*this)));
     }
 
+    // some condition marking this locality as valid
+    explicit inline operator bool() const {
+        LOG_TRACE_MSG("bool operator locality "
+                << iplocality((*this)));
+        return (ip_address() != 0);
+    }
+
+    inline bool valid() const {
+        LOG_TRACE_MSG("valid operator locality "
+                << iplocality((*this)));
+        return (ip_address() != 0);
+    }
 
     locality & operator = (const locality &other) {
         data_       = other.data_;
@@ -116,10 +128,19 @@ struct locality {
     }
 
     bool operator == (const locality &other) {
-        LOG_TRACE_MSG("comparison operator locality with "
+        LOG_TRACE_MSG("equality operator locality "
                 << iplocality((*this))
                 << iplocality(other));
         return std::memcmp(&data_, &other.data_, array_size)==0;
+    }
+
+    bool less_than(const locality &other) {
+        LOG_TRACE_MSG("less_than operator locality "
+                << iplocality((*this))
+                << iplocality(other));
+        if (ip_address() < other.ip_address()) return true;
+        if (ip_address() ==other.ip_address()) return port()<other.port();
+        return false;
     }
 
     const uint32_t & ip_address() const {
@@ -144,7 +165,7 @@ struct locality {
 #endif
     }
 
-    inline fi_addr_t fi_address() const {
+    inline const fi_addr_t& fi_address() const {
         return fi_address_;
     }
 
@@ -156,15 +177,6 @@ struct locality {
         uint16_t port = 256*reinterpret_cast<const uint8_t*>(data_.data())[2]
             + reinterpret_cast<const uint8_t*>(data_.data())[3];
         return port;
-    }
-
-    // some condition marking this locality as valid
-    explicit inline operator bool() const {
-        return valid();
-    }
-
-    inline bool valid() const {
-        return (ip_address() != 0);
     }
 
     void save(serialization::output_archive & ar) const {
@@ -183,20 +195,21 @@ struct locality {
     inline char *fabric_data_writable() { return reinterpret_cast<char*>(data_.data()); }
 
 private:
-    // note that the fi_address is not compared as it is local to a node
     friend bool operator==(locality const & lhs, locality const & rhs) {
-#if defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING)
-        LOG_TRACE_MSG("Testing locality equality "
+        LOG_TRACE_MSG("equality operator locality friend "
             << iplocality(lhs) << iplocality(rhs));
-#endif
-        return ((lhs.data_ == rhs.data_));
-//                && (lhs.fi_address_ == rhs.fi_address_));
+        return ((lhs.data_ == rhs.data_)
+                && (lhs.fi_address_ == rhs.fi_address_));
     }
 
     friend bool operator<(locality const & lhs, locality const & rhs) {
-        uint32_t a1 = lhs.ip_address();
-        uint32_t a2 = rhs.ip_address();
-        return a1 < a2;
+        const uint32_t &a1 = lhs.ip_address();
+        const uint32_t &a2 = rhs.ip_address();
+        const fi_addr_t &f1 = lhs.fi_address();
+        const fi_addr_t &f2 = rhs.fi_address();
+        LOG_TRACE_MSG("less_than operator locality friend "
+            << iplocality(lhs) << iplocality(rhs));
+        return (a1<a2) || (a1==a2 && f1<f2);
     }
 
     friend std::ostream & operator<<(std::ostream & os, locality const & loc) {
