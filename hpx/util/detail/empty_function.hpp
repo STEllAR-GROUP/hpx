@@ -18,6 +18,12 @@ namespace hpx { namespace util { namespace detail
 
     HPX_NORETURN HPX_EXPORT void throw_bad_function_call();
 
+    template <typename R>
+    HPX_NORETURN inline R throw_bad_function_call()
+    {
+        throw_bad_function_call();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // make sure the empty table instance is initialized in time, even
     // during early startup

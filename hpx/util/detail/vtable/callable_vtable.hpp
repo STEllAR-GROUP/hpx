@@ -95,9 +95,9 @@ namespace hpx { namespace util { namespace detail
           : invoke(&callable_vtable::template _invoke<T>)
         {}
 
-        HPX_NORETURN static R _empty_invoke(void*, Ts&&...)
+        static R _empty_invoke(void*, Ts&&...)
         {
-            throw_bad_function_call();
+            return throw_bad_function_call<R>();
         }
 
         HPX_CONSTEXPR callable_vtable(construct_vtable<empty_function>) noexcept
