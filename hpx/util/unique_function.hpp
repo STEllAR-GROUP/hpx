@@ -42,20 +42,26 @@ namespace hpx { namespace util
         unique_function(unique_function&&) noexcept = default;
         unique_function& operator=(unique_function&&) noexcept = default;
 
+        // the split SFINAE prevents MSVC from eagerly instantiating things
         template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable = typename std::enable_if<
+            typename Enable1 = typename std::enable_if<
                 !std::is_same<FD, unique_function>::value
-             && traits::is_invocable_r<R, FD&, Ts...>::value
+            >::type,
+            typename Enable2 = typename std::enable_if<
+                traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         unique_function(F&& f)
         {
             assign(std::forward<F>(f));
         }
 
+        // the split SFINAE prevents MSVC from eagerly instantiating things
         template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable = typename std::enable_if<
+            typename Enable1 = typename std::enable_if<
                 !std::is_same<FD, unique_function>::value
-             && traits::is_invocable_r<R, FD&, Ts...>::value
+            >::type,
+            typename Enable2 = typename std::enable_if<
+                traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         unique_function& operator=(F&& f)
         {
