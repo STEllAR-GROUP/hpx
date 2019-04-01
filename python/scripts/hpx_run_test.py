@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 #
 # Copyright (c) 2012 Bryce Adelstein-Lelbach
+# Copyright (c) 2019 Patrick Diehl
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,7 +23,7 @@
 import sys, os, string
 import os.path as osp
 
-from types import StringType
+#from types import StringType
 
 from optparse import OptionParser
 
@@ -37,7 +38,7 @@ if osp.exists(osp.join(sys.path[0], "../share/hpx/python/hpx")):
 
 from hpx.process import process, process_group
 
-signal_map = dict((-1 * k, v) for v, k in signal.__dict__.iteritems() \
+signal_map = dict((-1 * k, v) for v, k in signal.__dict__.items() \
                            if re.match("SIG[A-Z]*$", v))
 
 def exit_decode(exit_code):
@@ -121,12 +122,12 @@ if __name__ == '__main__':
     options.launcher += os.environ['HPX_TEST_LAUNCHER']
 
   if not (lambda x: "always" == x or "never" == x or "fail" == x)(options.log):
-    print "Error: --log=" + quote_options([options.log]) + " is invalid\n"
+    print( "Error: --log=" + quote_options([options.log]) + " is invalid\n")
     parser.print_help()
     sys.exit(1)
 
   if 0 == len(files):
-    print "Error: test specified\n"
+    print ("Error: test specified\n")
     parser.print_help()
     sys.exit(1)
 
@@ -137,25 +138,25 @@ if __name__ == '__main__':
     tests += eval(f)#eval(open(f).read())
 
   for [name, timeout, success, nodes, threads_per_node, args] in tests:
-    print "Running: " + name + " (Timeout:", timeout, "[s])",
-    sys.stdout.flush()
+    print ("Running: " + name + " (Timeout:", timeout, "[s])",
+    sys.stdout.flush())
 
     pg = process_group()
     results = [] # [ cmd, cmd_passed, exit_code, timed_out, output ]
     cmds = {}
 
-    if not osp.exists(name):
-      print "-", "Failed (test not found)"
+    if (not osp.exists(name)):
+      print ("-", "Failed (test not found)")
 
       all_passed = False
 
-      if "always" == options.log or "fail" == options.log:
+      if ("always" == options.log or "fail" == options.log):
         f = None
 
-        if not options.log_stdout:
+        if (not options.log_stdout):
           log = name + ".log"
           f = open(log, "w+")
-          print (" " * 2) + "Log:", log
+          print ((" " * 2) + "Log:", log)
         else:
           f = sys.stdout
 
@@ -169,7 +170,7 @@ if __name__ == '__main__':
     for node in range(nodes):
       cmd = []
 
-      if options.launcher:
+      if (options.launcher):
         cmd = [options.launcher]
 
       cmd += [ name
@@ -179,7 +180,7 @@ if __name__ == '__main__':
           cmd += [ '-l' + str(nodes)
                  , '-' + str(node)]
 
-      if options.args:
+      if (options.args):
         cmd += [options.args]
 
       cmd += args
@@ -198,7 +199,7 @@ if __name__ == '__main__':
                      , job.timed_out()
                      , output])
 
-      if not cmd_passed:
+      if (not cmd_passed):
         raise TestFailed()
 
     try:
@@ -217,18 +218,18 @@ if __name__ == '__main__':
     test_passed = True
 
     for result in results:
-      if not result[1]:
+      if (not result[1]):
         test_passed = False
         break
 
     all_passed = all_passed and test_passed
 
-    print "-", ("Passed" if test_passed else "Failed")
+    print ("-", ("Passed" if test_passed else "Failed"))
 
-    if "always" == options.log or ("fail" == options.log and not test_passed):
+    if ("always" == options.log or ("fail" == options.log and not test_passed)):
       f = None
 
-      if not options.log_stdout:
+      if (not options.log_stdout):
         log = name + ".log"
         f = open(log, "w+")
         print (" " * 2) + "Log:", log

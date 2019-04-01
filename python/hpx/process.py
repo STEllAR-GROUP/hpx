@@ -14,12 +14,12 @@ from sys import float_info, platform
 from threading import Thread, Lock
 from time import sleep, time
 from subprocess import Popen, STDOUT, PIPE
-from types import StringType
+#from types import StringType
 from shlex import split
 from signal import SIGKILL
 from os import kill
 from platform import system
-from Queue import Queue, Empty
+from queue import Queue, Empty
 from errno import ESRCH
 # TODO: implement for Windows
 
@@ -64,7 +64,7 @@ def kill_process_tree(parent_pid, signal=SIGKILL):
   for pid in find_process_tree(parent_pid):
     try:
       kill(int(pid), signal)
-    except OSError, err:
+    except OSError as err:
       if ESRCH != err.errno:
         raise err
       else:
@@ -96,7 +96,7 @@ class process(object):
     # other Exceptions aren't in python
     try:
       self._proc.wait()
-    except Exception, err:
+    except Exception as err:
       self._error = err
 
   def _finish(self, thread):
