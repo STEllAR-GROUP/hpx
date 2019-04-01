@@ -35,7 +35,7 @@ namespace allocator
 {
     ///////////////////////////////////////////////////////////////////////////
     HPX_CONSTEXPR std::size_t BLOCK_ALIGNMENT = 8;
-    HPX_CONSTEXPR std::size_t PAGE_SIZE = 16384;
+    HPX_CONSTEXPR std::size_t PAGE_SIZE_ = 16384;
 
     struct alloc_page;
 
@@ -204,7 +204,7 @@ namespace allocator
         // for the available page size we account for the members of this
         // class below
         HPX_STATIC_CONSTEXPR std::size_t page_size =
-            PAGE_SIZE - sizeof(void*) - 2*sizeof(std::size_t);
+            PAGE_SIZE_ - sizeof(void*) - 2*sizeof(std::size_t);
 
         typename std::aligned_storage<page_size>::type data;
 
