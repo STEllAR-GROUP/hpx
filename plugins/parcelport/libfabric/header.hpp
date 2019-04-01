@@ -107,7 +107,7 @@ namespace libfabric
             message_header.flags     |= buffer.num_chunks_.second ? normal_flag : 0;
 
             // space occupied by chunk data
-            size_t chunkbytes = chunks.size() * sizeof(chunktype);
+            size_t chunkbytes = message_header.num_chunks * sizeof(chunktype);
 
             // can we send the chunk info inside the header
             // (NB. we add +1 chunk just in case of a non piggybacked message chunk)
@@ -134,7 +134,10 @@ namespace libfabric
             }
 
             // can we send main message inside the header
-            if (buffer.data_.size() <= (data_size_ - chunkbytes)) {
+            if (buffer.data_.size() <=
+                    (data_size_ - chunkbytes -
+                     sizeof(detail::message_info) - sizeof(detail::rma_info)))
+            {
                 message_header.flags |= message_flag;
                 detail::message_info *info = message_info_ptr();
                 info->message_size = buffer.size_;
@@ -167,6 +170,7 @@ namespace libfabric
                 auto ptr = rma_info_ptr();
                 ptr->tag = reinterpret_cast<uint64_t>(tag);
             }
+
 
             LOG_DEBUG_MSG("Header : " << *this);
         }

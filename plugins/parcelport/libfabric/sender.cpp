@@ -143,8 +143,7 @@ namespace libfabric
                 << "addr "   << hexpointer(cb.data_.cpos_));
         }
 
-        if ((flags & libfabric::header<HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE>
-                ::bootstrap_flag) != 0)
+        if ((flags & header_type::bootstrap_flag) != 0)
         {
             header_->set_bootstrap_flag();
         }
@@ -165,6 +164,9 @@ namespace libfabric
             // send 2 regions as one message, goes into one receive
             bool ok = false;
             while (!ok) {
+                HPX_ASSERT(
+                    (this->region_list_[0].iov_len + this->region_list_[1].iov_len) <=
+                        HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE);
                 ssize_t ret = fi_sendv(this->endpoint_, this->region_list_,
                     this->desc_, 2, this->dst_addr_, this);
 
@@ -309,6 +311,9 @@ namespace libfabric
             // send 2 regions as one message, goes into one receive
             bool ok = false;
             while (!ok) {
+                HPX_ASSERT(
+                    (this->region_list_[0].iov_len + this->region_list_[1].iov_len) <=
+                        HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE);
                 ssize_t ret = fi_sendv(this->endpoint_, this->region_list_,
                     this->desc_, 2, this->dst_addr_, this);
 
