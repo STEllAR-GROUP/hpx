@@ -1439,6 +1439,12 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Wformat=2)
     hpx_add_compile_flag_if_available(-Wno-format-nonliteral)
 
+    # enable C++17 style alignment on allocations for pre=C++17
+    hpx_add_compile_flag_if_available(-faligned-new)
+
+    # prevent warnings about over-aligned types for pre-C++17
+    hpx_add_compile_flag_if_available(-Wno-aligned-new)
+
     # Self initialization is dangerous
     hpx_add_compile_flag_if_available(-Winit-self)
 
