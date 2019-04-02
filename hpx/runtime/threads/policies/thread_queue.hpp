@@ -447,7 +447,7 @@ namespace hpx { namespace threads { namespace policies
         ///
         /// This returns 'true' if there are no more terminated threads waiting
         /// to be deleted.
-        bool cleanup_terminated_locked(bool delete_all = false)
+        bool cleanup_terminated_locked(bool delete_all, bool recycle_threads)
         {
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
             util::tick_counter tc(cleanup_terminated_time_);
@@ -464,13 +464,23 @@ namespace hpx { namespace threads { namespace policies
                     thread_id_type tid(todelete);
                     --terminated_items_count_;
 
+                    thread_map_type::iterator it = thread_map_.find(tid);
+
                     // this thread has to be in this map
-                    HPX_ASSERT(thread_map_.find(tid) != thread_map_.end());
+                    HPX_ASSERT(it != thread_map_.end());
 
                     bool deleted = thread_map_.erase(tid) != 0;
                     HPX_ASSERT(deleted);
-                    if (deleted) {
-                        deallocate(todelete);
+                    if (deleted)
+                    {
+                        if (recycle_threads)
+                        {
+                            recycle_thread(*it);
+                        }
+                        else
+                        {
+                            deallocate(todelete);
+                        }
                         --thread_map_count_;
                         HPX_ASSERT(thread_map_count_ >= 0);
                     }
@@ -494,11 +504,21 @@ namespace hpx { namespace threads { namespace policies
                     // this thread has to be in this map
                     HPX_ASSERT(it != thread_map_.end());
 
-                    recycle_thread(*it);
-
-                    thread_map_.erase(it);
-                    --thread_map_count_;
-                    HPX_ASSERT(thread_map_count_ >= 0);
+                    bool deleted = thread_map_.erase(tid) != 0;
+                    HPX_ASSERT(deleted);
+                    if (deleted)
+                    {
+                        if (recycle_threads)
+                        {
+                            recycle_thread(*it);
+                        }
+                        else
+                        {
+                            deallocate(todelete);
+                        }
+                        --thread_map_count_;
+                        HPX_ASSERT(thread_map_count_ >= 0);
+                    }
 
                     --delete_count;
                 }
@@ -517,16 +537,16 @@ namespace hpx { namespace threads { namespace policies
                 while (true)
                 {
                     std::lock_guard<mutex_type> lk(mtx_);
-                    if (cleanup_terminated_locked(false))
+                    if (cleanup_terminated_locked(false, true))
                     {
                         return true;
                     }
                 }
-                return false;
+                HPX_ASSERT(false);
             }
 
             std::lock_guard<mutex_type> lk(mtx_);
-            return cleanup_terminated_locked(false);
+            return cleanup_terminated_locked(false, true);
         }
 
         // The maximum number of active threads this thread manager should
@@ -1062,7 +1082,7 @@ namespace hpx { namespace threads { namespace policies
                     // Before exiting each of the OS threads deletes the
                     // remaining terminated HPX threads
                     // REVIEW: Should we be doing this if we are stealing?
-                    bool canexit = cleanup_terminated_locked(true);
+                    bool canexit = cleanup_terminated_locked(true, running);
                     if (!running && canexit) {
                         // we don't have any registered work items anymore
                         //do_some_work();       // notify possibly waiting threads
@@ -1072,7 +1092,7 @@ namespace hpx { namespace threads { namespace policies
                 }
                 else
                 {
-                    cleanup_terminated_locked();
+                    cleanup_terminated_locked(false, true);
                     return false;
                 }
             }
