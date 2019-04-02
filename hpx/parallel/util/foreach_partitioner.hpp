@@ -103,6 +103,9 @@ namespace hpx { namespace parallel { namespace util
                             std::forward<ExPolicy_>(policy),
                             first, count,
                             std::forward<F1>(f1));
+
+                    scoped_params.mark_end_of_scheduling();
+
                 } catch (...) {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
@@ -174,6 +177,9 @@ namespace hpx { namespace parallel { namespace util
                             std::forward<ExPolicy_>(policy),
                             first, count,
                             std::forward<F1>(f1));
+
+                    scoped_params->mark_end_of_scheduling();
+
                 } catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<FwdIter>(
                         std::current_exception());

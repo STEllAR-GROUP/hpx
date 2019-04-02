@@ -150,7 +150,10 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool numa_sensitive() const override { return numa_sensitive_ != 0; }
-        virtual bool has_thread_stealing() const override { return true; }
+        virtual bool has_thread_stealing(std::size_t num_thread) const override
+        {
+            return true;
+        }
 
         static std::string get_scheduler_name()
         {
@@ -342,7 +345,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if none is
         /// available
         virtual bool get_next_thread(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count, threads::thread_data*& thrd) override
+            threads::thread_data*& thrd, bool /*enable_stealing*/) override
         {
             std::size_t queues_size = queues_.size();
 
@@ -692,12 +695,14 @@ namespace hpx { namespace threads { namespace policies
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count) override
+            std::int64_t& idle_loop_count, bool /*enable_stealing*/,
+            std::size_t& added) override
         {
             std::size_t queues_size = queues_.size();
             HPX_ASSERT(num_thread < queues_.size());
 
-            std::size_t added = 0;
+            added = 0;
+
             bool result = true;
 
             result =

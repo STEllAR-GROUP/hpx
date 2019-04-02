@@ -80,7 +80,7 @@ namespace hpx { namespace threads { namespace policies
         scheduler_base(std::size_t num_threads,
                 char const* description = "",
                 scheduler_mode mode = nothing_special)
-          : mode_(mode)
+          : modes_(num_threads)
           , suspend_mtxs_(num_threads)
           , suspend_conds_(num_threads)
           , pu_mtxs_(num_threads)
@@ -89,6 +89,8 @@ namespace hpx { namespace threads { namespace policies
           , parent_pool_(nullptr)
           , background_thread_count_(0)
         {
+            set_scheduler_mode(mode);
+
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
             double max_time =
                 hpx::util::safe_lexical_cast<double>(hpx::get_config_entry(
@@ -137,22 +139,30 @@ namespace hpx { namespace threads { namespace policies
         void idle_callback(std::size_t num_thread)
         {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-            // Put this thread to sleep for some time, additionally it gets
-            // woken up on new work.
+            if (modes_[num_thread].data_.load(std::memory_order_relaxed) &
+                    policies::enable_idle_backoff)
+            {
+                // Put this thread to sleep for some time, additionally it gets
+                // woken up on new work.
 
-            idle_backoff_data& data = wait_counts_[num_thread].data_;
+                idle_backoff_data& data = wait_counts_[num_thread].data_;
 
-            // Exponential back-off with a maximum sleep time.
-            double exponent = (std::min)(double(data.wait_count_),
-                double(std::numeric_limits<double>::max_exponent - 1));
+                // Exponential back-off with a maximum sleep time.
+                double exponent = (std::min)(double(data.wait_count_),
+                    double(std::numeric_limits<double>::max_exponent - 1));
 
-            std::chrono::milliseconds period(std::lround((std::min)(
-                data.max_idle_backoff_time_, std::pow(2.0, exponent))));
+                std::chrono::milliseconds period(std::lround((std::min)(
+                    data.max_idle_backoff_time_, std::pow(2.0, exponent))));
 
-            ++data.wait_count_;
+                ++data.wait_count_;
 
-            std::unique_lock<pu_mutex_type> l(mtx_);
-            cond_.wait_for(l, period);
+                std::unique_lock<pu_mutex_type> l(mtx_);
+                if (cond_.wait_for(l, period) == std::cv_status::no_timeout)
+                {
+                    // reset counter if thread was woken up
+                    data.wait_count_ = 0;
+                }
+            }
 #else
             (void)num_thread;
 #endif
@@ -172,13 +182,10 @@ namespace hpx { namespace threads { namespace policies
         /// This function gets called by the thread-manager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
         /// possibly idling OS threads
-        void do_some_work(std::size_t num_thread)
+        void do_some_work(std::size_t)
         {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-            wait_counts_[num_thread].data_.wait_count_ = 0;
             cond_.notify_all();
-#else
-            (void)num_thread;
 #endif
         }
 
@@ -219,7 +226,8 @@ namespace hpx { namespace threads { namespace policies
         std::size_t select_active_pu(std::unique_lock<pu_mutex_type>& l,
             std::size_t num_thread, bool allow_fallback = false)
         {
-            if (mode_ & threads::policies::enable_elasticity)
+            if (modes_[num_thread].data_.load(std::memory_order_relaxed) &
+                    threads::policies::enable_elasticity)
             {
                 std::size_t states_size = states_.size();
 
@@ -347,7 +355,7 @@ namespace hpx { namespace threads { namespace policies
             typedef std::atomic<hpx::state> state_type;
             for (state_type const& state : states_)
             {
-                if (state.load() < s)
+                if (state.load(std::memory_order_relaxed) < s)
                     return false;
             }
             return true;
@@ -358,7 +366,7 @@ namespace hpx { namespace threads { namespace policies
             typedef std::atomic<hpx::state> state_type;
             for (state_type const& state : states_)
             {
-                if (state.load() != s)
+                if (state.load(std::memory_order_relaxed) != s)
                     return false;
             }
             return true;
@@ -381,14 +389,54 @@ namespace hpx { namespace threads { namespace policies
         }
 
         // get/set scheduler mode
-        scheduler_mode get_scheduler_mode() const
+        virtual scheduler_mode get_scheduler_mode(std::size_t num_thread) const
         {
-            return mode_.load(std::memory_order_relaxed);
+            return modes_[num_thread].data_.load(std::memory_order_relaxed);
         }
 
         void set_scheduler_mode(scheduler_mode mode)
         {
-            mode_.store(mode);
+            // distribute the same value across all cores
+            for (auto && m : modes_)
+            {
+                m.data_.store(mode, std::memory_order_release);
+            }
+            do_some_work(std::size_t(-1));
+        }
+
+        void add_scheduler_mode(scheduler_mode mode)
+        {
+            // distribute the same value across all cores
+            mode = scheduler_mode(get_scheduler_mode(0) | mode);
+            for (auto && m : modes_)
+            {
+                m.data_.store(mode, std::memory_order_release);
+            }
+            do_some_work(std::size_t(-1));
+        }
+
+        void add_remove_scheduler_mode(
+            scheduler_mode to_add_mode, scheduler_mode to_remove_mode)
+        {
+            // distribute the same value across all cores
+            scheduler_mode mode = scheduler_mode(
+                (get_scheduler_mode(0) | to_add_mode) & ~to_remove_mode);
+            for (auto && m : modes_)
+            {
+                m.data_.store(mode, std::memory_order_release);
+            }
+            do_some_work(std::size_t(-1));
+        }
+
+        void remove_scheduler_mode(scheduler_mode mode)
+        {
+            // distribute the same value across all cores
+            mode = scheduler_mode(get_scheduler_mode(0) & ~mode);
+            for (auto && m : modes_)
+            {
+                m.data_.store(mode, std::memory_order_release);
+            }
+            do_some_work(std::size_t(-1));
         }
 
         pu_mutex_type& get_pu_mutex(std::size_t num_thread)
@@ -399,7 +447,11 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         virtual bool numa_sensitive() const { return false; }
-        virtual bool has_thread_stealing() const { return false; }
+
+        virtual bool has_thread_stealing(std::size_t num_thread) const
+        {
+            return get_scheduler_mode(num_thread) & policies::enable_stealing;
+        }
 
         inline std::size_t domain_from_local_thread_index(std::size_t n)
         {
@@ -511,7 +563,7 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, bool run_now, error_code& ec) = 0;
 
         virtual bool get_next_thread(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count, threads::thread_data*& thrd) = 0;
+            threads::thread_data*& thrd, bool enable_stealing) = 0;
 
         virtual void schedule_thread(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint,
@@ -527,7 +579,8 @@ namespace hpx { namespace threads { namespace policies
             std::int64_t& busy_count) = 0;
 
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count) = 0;
+            std::int64_t& idle_loop_count, bool enable_stealing,
+            std::size_t& added) = 0;
 
         virtual void on_start_thread(std::size_t num_thread) = 0;
         virtual void on_stop_thread(std::size_t num_thread) = 0;
@@ -548,7 +601,10 @@ namespace hpx { namespace threads { namespace policies
         virtual void reset_thread_distribution() {}
 
     protected:
-        std::atomic<scheduler_mode> mode_;
+        // the scheduler mode is simply replicated across the cores to
+        // avoid false sharing, we ignore benign data races related to this
+        // variable
+        std::vector<util::cache_line_data<std::atomic<scheduler_mode>>> modes_;
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues

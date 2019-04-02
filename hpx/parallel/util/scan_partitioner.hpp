@@ -67,7 +67,7 @@ namespace hpx { namespace parallel { namespace util
                 F1 && f1, F2 && f2, F3 && f3, F4 && f4)
             {
                 // inform parameter traits
-                scoped_executor_parameters scoped_param(
+                scoped_executor_parameters scoped_params(
                     policy.parameters(), policy.executor());
 
                 std::vector<hpx::shared_future<Result1>> workitems;
@@ -136,6 +136,9 @@ namespace hpx { namespace parallel { namespace util
                         workitems.push_back(dataflow(hpx::launch::sync,
                             f2, prev, curr));
                     }
+
+                    scoped_params.mark_end_of_scheduling();
+
                 } catch (...) {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
@@ -155,7 +158,7 @@ namespace hpx { namespace parallel { namespace util
                 F1 && f1, F2 && f2, F3 && f3, F4 && f4)
             {
                 // inform parameter traits
-                scoped_executor_parameters scoped_param(
+                scoped_executor_parameters scoped_params(
                     policy.parameters(), policy.executor());
 
                 std::vector<hpx::shared_future<Result1>> workitems;
@@ -259,6 +262,9 @@ namespace hpx { namespace parallel { namespace util
                             f3, it, size,
                             workitems[widx], workitems[widx + 1]));
                     }
+
+                    scoped_params.mark_end_of_scheduling();
+
                 } catch (...) {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);

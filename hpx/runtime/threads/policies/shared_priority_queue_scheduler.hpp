@@ -96,7 +96,10 @@ namespace policies {
         virtual ~shared_priority_queue_scheduler() {}
 
         bool numa_sensitive() const override { return true; }
-        virtual bool has_thread_stealing() const override { return true; }
+        virtual bool has_thread_stealing(std::size_t num_thread) const override
+        {
+            return true;
+        }
 
         static std::string get_scheduler_name()
         {
@@ -680,9 +683,8 @@ namespace policies {
         }
 
         /// Return the next thread to be executed, return false if none available
-        virtual bool get_next_thread(std::size_t thread_num,
-            bool running, std::int64_t& idle_loop_count,
-            threads::thread_data*& thrd) override
+        virtual bool get_next_thread(std::size_t thread_num, bool running,
+            threads::thread_data*& thrd, bool /*enable_stealing*/) override
         {
             bool result = false;
 
@@ -1076,11 +1078,13 @@ namespace policies {
         /// manager to allow for maintenance tasks to be executed in the
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        virtual bool wait_or_add_new(std::size_t thread_num,
-            bool running, std::int64_t& idle_loop_count) override
+        virtual bool wait_or_add_new(std::size_t thread_num, bool running,
+            std::int64_t& idle_loop_count, bool /*enable_stealing*/,
+            std::size_t& added) override
         {
-            std::size_t added = 0;
             bool result = true;
+
+            added = 0;
 
             if (thread_num == std::size_t(-1)) {
                 HPX_THROW_EXCEPTION(bad_parameter,
@@ -1099,46 +1103,44 @@ namespace policies {
                 std::size_t q_index = q_lookup_[thread_num];
                 // get next task, steal if from another domain
                 result =
-                    hp_queues_[dom].wait_or_add_new(q_index, running, added);
+                    hp_queues_[dom].wait_or_add_new(q_index, running, added) &&
+                    result;
                 if (0 != added) return result;
             }
 
             // try a normal priority task
-            if (!result) {
-                for (std::size_t d=0; d<num_domains_; ++d) {
-                    std::size_t dom = (domain_num+d) % num_domains_;
-                    // set the preferred queue for this domain, if applicable
-                    std::size_t q_index = q_lookup_[thread_num];
-                    // get next task, steal if from another domain
-                    result = np_queues_[dom].wait_or_add_new(
-                        q_index, running, added);
-                    if (0 != added) return result;
-                }
+            for (std::size_t d=0; d<num_domains_; ++d) {
+                std::size_t dom = (domain_num+d) % num_domains_;
+                // set the preferred queue for this domain, if applicable
+                std::size_t q_index = q_lookup_[thread_num];
+                // get next task, steal if from another domain
+                result = np_queues_[dom].wait_or_add_new(
+                                q_index, running, added) &&
+                    result;
+                if (0 != added) return result;
             }
 
             // low priority task
-            if (!result) {
 #ifdef JB_LP_STEALING
-                for (std::size_t d=domain_num; d<domain_num+num_domains_; ++d) {
-                    std::size_t dom = d % num_domains_;
-                    // set the preferred queue for this domain, if applicable
-                    std::size_t q_index = (dom==domain_num) ?
-                        q_lookup_[thread_num] :
-                        lp_lookup_[(counters_[dom]++ %
-                            lp_queues_[dom].num_cores)];
+            for (std::size_t d=domain_num; d<domain_num+num_domains_; ++d) {
+                std::size_t dom = d % num_domains_;
+                // set the preferred queue for this domain, if applicable
+                std::size_t q_index = (dom==domain_num) ?
+                    q_lookup_[thread_num] :
+                    lp_lookup_[(counters_[dom]++ %
+                        lp_queues_[dom].num_cores)];
 
-                    result = lp_queues_[dom].wait_or_add_new(
-                        q_index, running, added);
-                    if (0 != added) return result;
-                }
-#else
-                // no cross domain stealing for LP queues
-                result =
-                    lp_queues_[domain_num].wait_or_add_new(0, running, added);
+                result = lp_queues_[dom].wait_or_add_new(
+                    q_index, running, added);
                 if (0 != added) return result;
-#endif
             }
-
+#else
+            // no cross domain stealing for LP queues
+            result =
+                lp_queues_[domain_num].wait_or_add_new(0, running, added) &&
+                result;
+            if (0 != added) return result;
+#endif
             return result;
         }
 
