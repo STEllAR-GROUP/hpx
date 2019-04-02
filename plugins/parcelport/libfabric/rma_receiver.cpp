@@ -232,7 +232,7 @@ namespace libfabric
         // get the remote chunk block memory region details
         auto &cb = header_->chunk_header_ptr()->chunk_rma;
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
-            << "Fetching RMA chunk chunk data with "
+            << "Fetching RMA chunk for chunk data with "
             << "size "   << decnumber(cb.size_)
             << "rma "    << hexpointer(cb.rma_)
             << "addr "   << hexpointer(cb.data_.cpos_));
@@ -541,7 +541,7 @@ namespace libfabric
     {
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "RDMA Get tag " << hexuint64(header_->tag())
-            << " has completed : posting 8 byte ack to origin");
+            << "has completed : posting 8 byte ack to origin");
 
         ++sent_ack_;
 
@@ -582,9 +582,13 @@ namespace libfabric
         //
         memory_pool_->deallocate(header_region_);
         header_region_ = nullptr;
-        chunk_region_  = nullptr;
         header_        = nullptr;
         src_addr_      = 0 ;
+        //
+        if (chunk_region_) {
+            memory_pool_->deallocate(chunk_region_);
+            chunk_region_  = nullptr;
+        }
         //
         if (message_region_) {
             memory_pool_->deallocate(message_region_);

@@ -28,6 +28,12 @@
 #include <sstream>
 #include <string>
 
+// Define this to track which regions were not returned to the pool after use
+#ifdef RMA_POOL_DEBUG_SET
+# include <mutex>
+# include <set>
+#endif
+
 namespace hpx {
 namespace parcelset {
 namespace rma {
@@ -111,6 +117,11 @@ namespace detail
                     << "Deallocating free_list : Not all blocks were returned "
                     << " refcounts " << decnumber(in_use_));
             }
+#ifdef RMA_POOL_DEBUG_SET
+            for (auto region : region_set_) {
+                LOG_ERROR_MSG("Items remaining in set are " << *region);
+            }
+#endif
             region_type* region = nullptr;
             while (!free_list_.pop(region)) {
                 // clear our stack
@@ -125,6 +136,12 @@ namespace detail
         // ------------------------------------------------------------------------
         inline void push(region_type *region)
         {
+#ifdef RMA_POOL_DEBUG_SET
+            {
+                std::lock_guard<std::mutex> l(set_mutex_);
+                region_set_.erase(region);
+            }
+#endif
             LOG_TRACE_MSG(PoolType::desc() << "Push block " << *region
                 << "Used " << decnumber(in_use_-1)
                 << "Accesses " << decnumber(accesses_));
@@ -166,6 +183,13 @@ namespace detail
                 << *region
                 << "Used " << decnumber(in_use_)
                 << "Accesses " << decnumber(accesses_));
+
+#ifdef RMA_POOL_DEBUG_SET
+            {
+                std::lock_guard<std::mutex> l(set_mutex_);
+                region_set_.insert(region);
+            }
+#endif
             return region;
         }
 
@@ -198,6 +222,11 @@ namespace detail
         std::unordered_map<const char *, region_ptr>      block_list_;
         std::array<region_type, MaxChunks>                region_list_;
         bl::stack<region_type*, bl::capacity<MaxChunks>>  free_list_;
+
+#ifdef RMA_POOL_DEBUG_SET
+        std::mutex             set_mutex_;
+        std::set<region_type*> region_set_;
+#endif
     };
 
 }}}}

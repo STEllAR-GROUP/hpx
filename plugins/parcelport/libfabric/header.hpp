@@ -187,7 +187,7 @@ namespace libfabric
                 << "message length " << hexlength(h.message_size())
                 << "chunks " << decnumber(h.num_chunks())
                 << "zerocopy ( " << decnumber(h.num_zero_copy_chunks()) << ") "
-                << "normal ( " << decnumber(h.num_index_chunks()) << ") "
+                << "normal ( " << decnumber((h.chunk_ptr()?h.num_index_chunks():0))<<") "
                 << "piggyback " << decnumber((h.message_piggy_back()))
                 << "tag " << hexuint64(h.tag());
             return os;
