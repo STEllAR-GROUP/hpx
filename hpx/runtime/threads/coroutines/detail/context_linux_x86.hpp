@@ -82,16 +82,6 @@ namespace hpx { namespace threads { namespace coroutines
 
     namespace detail { namespace lx
     {
-        template <typename TO, typename FROM>
-        TO nasty_cast(FROM f)
-        {
-            union {
-                FROM f; TO t;
-            } u;
-            u.f = f;
-            return u.t;
-        }
-
         template<typename T>
         HPX_FORCEINLINE void trampoline(T* fun);
 
@@ -197,7 +187,8 @@ namespace hpx { namespace threads { namespace coroutines
                     - context_size;
 
                 m_sp[backup_cb_idx] = m_sp[cb_idx] = &cb;
-                m_sp[backup_funp_idx] = m_sp[funp_idx] = nasty_cast<void*>(funp);
+                m_sp[backup_funp_idx] = m_sp[funp_idx] =
+                    reinterpret_cast<void*>(funp);
 
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
                 {
