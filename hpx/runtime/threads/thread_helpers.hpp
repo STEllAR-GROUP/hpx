@@ -74,6 +74,7 @@ namespace hpx { namespace threads
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_signaled,
         thread_priority priority = thread_priority_normal,
+        bool retry_on_active = true,
         hpx::error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////
@@ -111,6 +112,7 @@ namespace hpx { namespace threads
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_timeout,
         thread_priority priority = thread_priority_normal,
+        bool retry_on_active = true,
         error_code& ec = throws);
 
     inline thread_id_type set_thread_state(thread_id_type const& id,
@@ -118,10 +120,11 @@ namespace hpx { namespace threads
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_timeout,
         thread_priority priority = thread_priority_normal,
+        bool retry_on_active = true,
         error_code& /*ec*/ = throws)
     {
-        return set_thread_state(id, abs_time, nullptr, state, stateex,
-            priority, throws);
+        return set_thread_state(id, abs_time, nullptr, state, stateex, priority,
+            retry_on_active, throws);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -156,10 +159,11 @@ namespace hpx { namespace threads
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_timeout,
         thread_priority priority = thread_priority_normal,
+        bool retry_on_active = true,
         error_code& ec = throws)
     {
         return set_thread_state(id, rel_time.from_now(), state, stateex,
-            priority, ec);
+            priority, retry_on_active, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
