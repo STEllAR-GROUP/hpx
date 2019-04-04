@@ -23,8 +23,6 @@
 import sys, os, string
 import os.path as osp
 
-#from types import StringType
-
 from optparse import OptionParser
 
 from errno import ENOENT

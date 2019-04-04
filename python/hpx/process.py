@@ -14,7 +14,6 @@ from sys import float_info, platform
 from threading import Thread, Lock
 from time import sleep, time
 from subprocess import Popen, STDOUT, PIPE
-#from types import StringType
 from shlex import split
 from signal import SIGKILL
 from os import kill
