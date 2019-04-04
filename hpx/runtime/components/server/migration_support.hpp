@@ -82,11 +82,20 @@ namespace hpx { namespace components
         }
         bool unpin()
         {
-            // no need to go through AGAS if the object is currently pinned
-            // more than once
             {
+                // no need to go through AGAS if the object is currently pinned
+                // more than once
                 std::unique_lock<mutex_type> l(mtx_);
                 if (pin_count_ != ~0x0u && pin_count_ > 1)
+                {
+                    --pin_count_;
+                    return false;
+                }
+
+                // no need to go through AGAS either if this object is not
+                // currently being migrated (unpin will be called for each
+                // action run on this object)
+                if (!was_marked_for_migration_)
                 {
                     --pin_count_;
                     return false;

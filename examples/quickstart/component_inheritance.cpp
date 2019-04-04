@@ -39,6 +39,8 @@ HPX_REGISTER_ACTION(print_action);
 // the base component 'A' defined above.
 struct B : A, hpx::components::component_base<B>
 {
+    typedef hpx::components::component_base<B>::wrapping_type wrapping_type;
+
     typedef B type_holder;
     typedef A base_type_holder;
 
@@ -57,7 +59,7 @@ struct B : A, hpx::components::component_base<B>
         hpx::cout << "B::~B\n" << hpx::flush;
     }
 
-    void print() const
+    void print() const override
     {
         hpx::cout << "B::print from locality: "
             << hpx::find_here() << ", value: " << value_ << "\n"

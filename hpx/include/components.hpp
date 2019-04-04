@@ -35,6 +35,7 @@
 #include <hpx/runtime/components/server/component_base.hpp>
 
 #include <hpx/runtime/components/server/abstract_component_base.hpp>
+#include <hpx/runtime/components/server/abstract_migration_support.hpp>
 #include <hpx/runtime/components/server/distributed_metadata_base.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
