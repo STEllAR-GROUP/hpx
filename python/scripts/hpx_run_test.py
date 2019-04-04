@@ -143,7 +143,7 @@ if __name__ == '__main__':
     results = [] # [ cmd, cmd_passed, exit_code, timed_out, output ]
     cmds = {}
 
-    if (not osp.exists(name)):
+    if not osp.exists(name):
       print ("-", "Failed (test not found)")
 
       all_passed = False
@@ -151,7 +151,7 @@ if __name__ == '__main__':
       if ("always" == options.log or "fail" == options.log):
         f = None
 
-        if (not options.log_stdout):
+        if not options.log_stdout:
           log = name + ".log"
           f = open(log, "w+")
           print ((" " * 2) + "Log:", log)
@@ -197,7 +197,7 @@ if __name__ == '__main__':
                      , job.timed_out()
                      , output])
 
-      if (not cmd_passed):
+      if not cmd_passed:
         raise TestFailed()
 
     try:
@@ -216,7 +216,7 @@ if __name__ == '__main__':
     test_passed = True
 
     for result in results:
-      if (not result[1]):
+      if not result[1]:
         test_passed = False
         break
 
@@ -224,10 +224,10 @@ if __name__ == '__main__':
 
     print ("-", ("Passed" if test_passed else "Failed"))
 
-    if ("always" == options.log or ("fail" == options.log and not test_passed)):
+    if "always" == options.log or ("fail" == options.log and not test_passed):
       f = None
 
-      if (not options.log_stdout):
+      if not options.log_stdout:
         log = name + ".log"
         f = open(log, "w+")
         print (" " * 2) + "Log:", log
