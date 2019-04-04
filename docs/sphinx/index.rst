@@ -22,7 +22,7 @@ If you can't find what you're looking for in the documentation, please:
 * contact us on `IRC <stellar_irc_>`_, the HPX channel on the `C++ Slack
   <cpplang_slack_>`_, or on our `mailing list <stellar_list_>`_; or
 * read or ask questions tagged with |hpx| on `StackOverflow
-  <hpx_stackoverflow>`_.
+  <hpx_stackoverflow_>`_.
 
 What is |hpx|?
 ==============
