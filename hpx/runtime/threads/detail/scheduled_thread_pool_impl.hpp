@@ -715,7 +715,7 @@ namespace hpx { namespace threads { namespace detail
             new_state_ex, priority,
             thread_schedule_hint(
                 static_cast<std::int16_t>(get_worker_thread_num())),
-            ec);
+            true, ec);
     }
 
     template <typename Scheduler>
@@ -728,7 +728,7 @@ namespace hpx { namespace threads { namespace detail
             newstate_ex, priority,
             thread_schedule_hint(
                 static_cast<std::int16_t>(get_worker_thread_num())),
-            nullptr, ec);
+            nullptr, true, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////

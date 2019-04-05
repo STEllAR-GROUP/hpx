@@ -356,9 +356,9 @@ namespace hpx { namespace parcelset
                     ec);
             if (ec) return;
 
-            threads::set_thread_state(id,
-                std::chrono::milliseconds(100), threads::pending,
-                threads::wait_signaled, threads::thread_priority_boost, ec);
+            threads::set_thread_state(id, std::chrono::milliseconds(100),
+                threads::pending, threads::wait_signaled,
+                threads::thread_priority_boost, true, ec);
         }
 
         /// Return the name of this locality
