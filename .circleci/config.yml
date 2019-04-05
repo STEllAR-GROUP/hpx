@@ -54,6 +54,20 @@ core_dependency: &core_dependency
       - core
     <<: *gh_pages_filter
 
+add_github_to_known_hosts: &add_github_to_known_hosts
+    run:
+        name: Add Github's key(s) to known_hosts
+        command: |
+            mkdir -p ~/.ssh
+            ssh-keyscan -H github.com >>~/.ssh/known_hosts
+configure_local_git: &configure_local_git
+    run:
+        name: Configure local Git
+        command: |
+            git config --global user.name "StellarBot"
+            git config --global user.email "stellar@cct.lsu.edu"
+
+
 version: 2
 
 jobs:
@@ -184,20 +198,14 @@ jobs:
 
   docs_push:
     <<: *defaults
-    environment:
-      # This is the public key of GitHub. If it changes it needs to be changed
-      # manually here. It can be retrieved with ssh-keyscan -H github.com.
-      GITHUB_PUBLIC_KEY: "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ=="
     steps:
       - attach_workspace:
           at: /hpx
+      - <<: *add_github_to_known_hosts
+      - <<: *configure_local_git
       - run:
           name: Pushing Sphinx Documentation
           command: |
-              mkdir -p ~/.ssh
-              echo $GITHUB_PUBLIC_KEY >> ~/.ssh/known_hosts
-              git config --global user.name "StellarBot"
-              git config --global user.email "stellar@cct.lsu.edu"
               ninja git_docs
 
   core:
@@ -1055,14 +1063,29 @@ jobs:
               docker run --volumes-from sources -w /hpx ${TARGET_IMAGE_NAME} \
                 hpxrun.py -l 2 -t 2 ./hello_world_test_build -- --hpx:bind=none
           working_directory: /hpx
+      - <<: *add_github_to_known_hosts
+      - <<: *configure_local_git
       - run:
           name: Push Docker Image
           command: |
-              if [ -z "$CIRCLE_PR_NUMBER" ] && [ "$CIRCLE_BRANCH" == "master" ]; then
+              if [[ -z "$CIRCLE_PR_NUMBER" ]] && [[ "$CIRCLE_BRANCH" == "master" ]]; then
                   docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
                   docker push ${TARGET_IMAGE_NAME}
+                  # Tag the commmit
+                  cd /hpx/source
+                  git remote set-url origin git@github.com:STEllAR-GROUP/hpx.git
+                  git tag -f stable
+                  ##########################################################
+                  # NOTE: Dependency on the Docker push is so that users who
+                  # use the Docker image would not be confused. Do not change
+                  # the order before considering every use case.
+                  ##########################################################
+                  # Remove the old tag
+                  git push origin :refs/tags/stable
+                  # Push the new stable commit tag
+                  git push origin stable
               else
-                  echo "Skipping docker push on non-master branch"
+                  echo "Not on the master branch. the image will not be pushed and the commit will not be tagged."
               fi
 
 workflows:
