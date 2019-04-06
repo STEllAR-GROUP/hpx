@@ -10,6 +10,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/threads.hpp>
+#include <hpx/include/util.hpp>
 
 #include <atomic>
 

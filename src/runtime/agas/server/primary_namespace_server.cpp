@@ -280,17 +280,18 @@ bool primary_namespace::end_migration(naming::gid_type id)
     using hpx::util::get;
 
     migration_table_type::iterator it = migrating_objects_.find(id);
-    HPX_ASSERT(it != migrating_objects_.end() && get<0>(it->second));
-
-    // flag this id as not being migrated anymore
-    get<0>(it->second) = false;
-    if (get<1>(it->second) != 0)
+    if (it != migrating_objects_.end())
     {
-        get<2>(it->second).notify_all(std::move(l), hpx::throws);
-    }
-    else
-    {
-        migrating_objects_.erase(it);
+        // flag this id as not being migrated anymore
+        get<0>(it->second) = false;
+        if (get<1>(it->second) != 0)
+        {
+            get<2>(it->second).notify_all(std::move(l), hpx::throws);
+        }
+        else
+        {
+            migrating_objects_.erase(it);
+        }
     }
 
     return true;

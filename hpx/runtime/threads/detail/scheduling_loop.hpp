@@ -10,14 +10,14 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_thread_name.hpp>
-#include <hpx/runtime/threads/detail/periodic_maintenance.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/unique_function.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
@@ -581,8 +581,6 @@ namespace hpx { namespace threads { namespace detail
 
         idle_collect_rate idle_rate(counters.tfunc_time_, counters.exec_time_);
         tfunc_time_wrapper tfunc_time_collector(idle_rate);
-
-        scheduler.SchedulingPolicy::start_periodic_maintenance(this_state);
 
         // spin for some time after queues have become empty
         bool may_exit = false;
