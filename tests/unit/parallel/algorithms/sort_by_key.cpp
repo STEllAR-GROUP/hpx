@@ -93,7 +93,7 @@ void sort_by_key_benchmark()
         hpx::parallel::sort_by_key(
             hpx::parallel::execution::par,
             keys.begin(), keys.end(), values.begin());
-        double elapsed = t.elapsed();
+        auto elapsed = static_cast<std::uint64_t>(t.elapsed_nanoseconds());
 
         // after sorting by key, the values should be equal to the original keys
         bool is_equal = std::equal(keys.begin(), keys.end(), o_values.begin());

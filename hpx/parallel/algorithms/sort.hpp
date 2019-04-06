@@ -22,6 +22,8 @@
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/executors/execution_information.hpp>
+#include <hpx/parallel/executors/execution_parameters.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -73,12 +75,12 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \remarks
         //------------------------------------------------------------------------
         template <typename ExPolicy, typename RandomIt, typename Compare>
-        hpx::future<RandomIt> sort_thread(ExPolicy& policy,
-            RandomIt first, RandomIt last, Compare comp)
+        hpx::future<RandomIt> sort_thread(ExPolicy& policy, RandomIt first,
+            RandomIt last, Compare comp, std::size_t chunk_size)
         {
             //------------------------- begin ----------------------
             std::ptrdiff_t N = last - first;
-            if (std::size_t(N) <= sort_limit_per_task)
+            if (std::size_t(N) <= chunk_size)
             {
                 return execution::async_execute(
                     policy.executor(),
@@ -143,13 +145,13 @@ namespace hpx { namespace parallel { inline namespace v1
                 execution::async_execute(
                     policy.executor(),
                         &sort_thread<ExPolicy, RandomIt, Compare>,
-                        std::ref(policy), first, c_last, comp);
+                        std::ref(policy), first, c_last, comp, chunk_size);
 
             hpx::future<RandomIt> right =
                 execution::async_execute(
                     policy.executor(),
                         &sort_thread<ExPolicy, RandomIt, Compare>,
-                        std::ref(policy), c_first, last, comp);
+                        std::ref(policy), c_first, last, comp, chunk_size);
 
             return hpx::dataflow(
                 [last](hpx::future<RandomIt> && left,
@@ -184,10 +186,36 @@ namespace hpx { namespace parallel { inline namespace v1
         parallel_sort_async(ExPolicy && policy, RandomIt first, RandomIt last,
             Compare comp)
         {
+            // number of elements to sort
+            std::size_t count = last - first;
+
+            // figure out the chunk size to use
+            std::size_t const cores = execution::processing_units_count(
+                policy.executor(), policy.parameters());
+
+            std::size_t max_chunks = execution::maximal_number_of_chunks(
+                policy.parameters(), policy.executor(), cores, count);
+            HPX_ASSERT(0 != max_chunks);
+
+            std::size_t chunk_size =
+                execution::get_chunk_size(policy.parameters(),
+                    policy.executor(), []{ return 0; }, cores, count);
+
+            // we should not consider more chunks than we have elements
+            max_chunks = (std::min)(max_chunks, count);
+
+            // we should not make chunks smaller than what's determined by the
+            // max chunk size
+            chunk_size = (std::max)(chunk_size,
+                (count + max_chunks - 1) / max_chunks);
+
+            // we should not get smaller than our sort_limit_per_task
+            chunk_size = (std::max)(chunk_size, sort_limit_per_task);
+
             std::ptrdiff_t N = last - first;
             HPX_ASSERT(N >= 0);
 
-            if (std::size_t(N) < sort_limit_per_task)
+            if (std::size_t(N) < chunk_size)
             {
                 std::sort(first, last, comp);
                 return hpx::make_ready_future(last);
@@ -199,7 +227,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return execution::async_execute(policy.executor(),
                     &sort_thread<ExPolicy, RandomIt, Compare>,
-                    std::ref(policy), first, last, comp);
+                    std::ref(policy), first, last, comp, chunk_size);
         }
 
         ///////////////////////////////////////////////////////////////////////

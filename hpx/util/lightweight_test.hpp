@@ -20,6 +20,7 @@
 #include <boost/smart_ptr/detail/spinlock.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <sstream>
 #include <iostream>
 #include <mutex>
@@ -214,6 +215,11 @@ inline void print_cdash_timing(const char *name, double time)
     temp << "<DartMeasurement name=\"" << name << "\" "
          << "type=\"numeric/double\">" << time << "</DartMeasurement>";
     std::cout << temp.str() << std::endl;
+}
+
+inline void print_cdash_timing(const char *name, std::uint64_t time)
+{
+    print_cdash_timing(name, time / 1e9);
 }
 
 }} // hpx::util
