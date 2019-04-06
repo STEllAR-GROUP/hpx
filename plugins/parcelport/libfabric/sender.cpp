@@ -89,15 +89,7 @@ namespace libfabric
         LOG_DEBUG_MSG("Placement new for header");
         header_ = new(header_memory) header_type(buffer_, this);
         header_region_->set_message_length(header_->header_length());
-
-        LOG_DEBUG_MSG("sender " << hexpointer(this)
-            << ", buffsize " << hexuint32(header_->message_size())
-            << ", header_length " << decnumber(header_->header_length())
-            << ", chunks zerocopy( " << decnumber(buffer_.num_chunks_.first) << ") "
-            << ", normal( " << decnumber(buffer_.num_chunks_.second) << ") "
-            << ", chunk_flag " << decnumber(header_->header_length())
-            << ", tag " << hexuint64(header_->tag())
-        );
+        LOG_DEBUG_MSG("header " << *header_);
 
         // Get the block of pinned memory where the message was encoded
         // during serialization
@@ -358,6 +350,18 @@ namespace libfabric
                 }
             }
         }
+    }
+
+    // --------------------------------------------------------------------
+    std::ostream & operator<<(std::ostream & os, const sender &s)
+    {
+        if (s.header_) {
+            os << "sender " << hexpointer(&s) << "header block " << *(s.header_);
+        }
+        else {
+            os << "sender " << hexpointer(&s) << "header block nullptr";
+        }
+        return os;
     }
 
 }}}}

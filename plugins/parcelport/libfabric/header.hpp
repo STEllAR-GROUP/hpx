@@ -70,11 +70,11 @@ namespace libfabric
         static constexpr unsigned int header_block_size = sizeof(detail::header_block);
         static constexpr unsigned int data_size_        = SIZE - header_block_size;
         //
-        static const unsigned int chunk_flag     = 0x01; // chunks piggybacked
-        static const unsigned int message_flag   = 0x02; // message pigybacked
-        static const unsigned int normal_flag    = 0x04; // normal chunks present
-        static const unsigned int zerocopy_flag  = 0x08; // zerocopy chunks present
-        static const unsigned int bootstrap_flag = 0x10; // Bootstrap messsage
+        static const uint32_t chunk_flag     = 0x01; // chunks piggybacked
+        static const uint32_t message_flag   = 0x02; // message pigybacked
+        static const uint32_t normal_flag    = 0x04; // normal chunks present
+        static const uint32_t zerocopy_flag  = 0x08; // zerocopy chunks present
+        static const uint32_t bootstrap_flag = 0x10; // Bootstrap messsage
 
         typedef serialization::serialization_chunk chunktype;
 
@@ -178,7 +178,12 @@ namespace libfabric
         // --------------------------------------------------------------------
         friend std::ostream & operator<<(std::ostream & os, header<SIZE> & h)
         {
-            os  << "Flags " << hexbyte(h.message_header.flags)
+            os  << "flags " << binary8(h.flags()) << "("
+                << (((h.message_header.flags & chunk_flag)!=0) ? "chunks " : "")
+                << (((h.message_header.flags & message_flag)!=0) ? "message " : "")
+                << (((h.message_header.flags & normal_flag)!=0) ? "normal " : "")
+                << (((h.message_header.flags & zerocopy_flag)!=0) ? "RMA " : "")
+                << (((h.message_header.flags & bootstrap_flag)!=0) ? "boot " : "") << ") "
                 << "chunk_data_offset " << decnumber(h.chunk_data_offset())
                 << "rma_info_offset " << decnumber(h.rma_info_offset())
                 << "message_info_offset " << decnumber(h.message_info_offset())
@@ -190,10 +195,18 @@ namespace libfabric
                 << "normal ( " << decnumber((h.chunk_ptr()?h.num_index_chunks():0))<<") "
                 << "piggyback " << decnumber((h.message_piggy_back()))
                 << "tag " << hexuint64(h.tag());
+;
             return os;
         }
 
     public:
+
+        // ------------------------------------------------------------------
+        // return a byte size representation of the flags
+        inline uint8_t flags() const {
+            return uint8_t(message_header.flags);
+        }
+
         // ------------------------------------------------------------------
         // if chunks are piggybacked, return pointer to list of chunk data
         inline char *chunk_ptr()

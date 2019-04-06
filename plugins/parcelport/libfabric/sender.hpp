@@ -56,10 +56,12 @@ namespace libfabric
           , endpoint_(endpoint)
           , domain_(domain)
           , memory_pool_(memory_pool)
+          , dst_addr_(-1)
           , buffer_(snd_data_type(memory_pool_), memory_pool_)
           , header_region_(nullptr)
           , chunk_region_(nullptr)
           , message_region_(nullptr)
+          , header_(nullptr)
           , completion_count_(0)
           , sends_posted_(0)
           , sends_deleted_(0)
@@ -119,6 +121,10 @@ namespace libfabric
         // --------------------------------------------------------------------
         // if a send completion reports failure, we can retry the send
         void handle_error(struct fi_cq_err_entry err);
+
+        // --------------------------------------------------------------------
+        // print out some info that is useful
+        friend std::ostream & operator<<(std::ostream & os, const sender &);
 
         // --------------------------------------------------------------------
         parcelport               *parcelport_;
