@@ -113,23 +113,14 @@ endif()
 
 # Boost preprocessor definitions
 hpx_add_config_cond_define(BOOST_PARAMETER_MAX_ARITY 7)
-if(MSVC)
-  hpx_option(HPX_WITH_BOOST_ALL_DYNAMIC_LINK BOOL
-    "Add BOOST_ALL_DYN_LINK to compile flags (default: OFF)"
-    OFF ADVANCED)
-  if (HPX_WITH_BOOST_ALL_DYNAMIC_LINK)
-    hpx_add_config_cond_define(BOOST_ALL_DYN_LINK)
-  endif()
-else()
+if(NOT Boost_USE_STATIC_LIBS)
+  hpx_add_config_cond_define(BOOST_ALL_DYN_LINK)
+endif()
+if(NOT MSVC)
   hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
 hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
-link_directories(${Boost_LIBRARY_DIRS})
-if((NOT MSVC) OR HPX_WITH_BOOST_ALL_DYNAMIC_LINK OR HPX_WITH_VCPKG)
-  hpx_libraries(${Boost_LIBRARIES})
-  hpx_library_dir(${Boost_LIBRARY_DIRS})
-else()
-  hpx_library_dir(${Boost_LIBRARY_DIRS})
-endif()
+add_definitions(-DBOOST_ALL_NO_LIB) # disable auto-linking
+hpx_libraries(${Boost_LIBRARIES})
