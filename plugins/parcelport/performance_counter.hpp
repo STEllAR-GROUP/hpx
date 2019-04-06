@@ -51,6 +51,8 @@ namespace parcelset
 
         inline operator T() const { return value_; }
 
+//        inline bool operator==(const T& x) { return value_ == x; }
+
         inline T operator=(const T& x) { return value_ = x; }
 
         inline T operator++() { return ++value_; }
@@ -87,7 +89,9 @@ namespace parcelset
 
         inline operator T() const { return 0; }
 
-        inline T operator=(const T&) { return 0; }
+//        inline bool operator==(const T&) { return true; }
+
+        inline T operator=(const T &) { return 0; }
 
         inline T operator++() { return 0; }
 
