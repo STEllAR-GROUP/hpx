@@ -187,12 +187,13 @@ namespace libfabric
             snd->postprocess_handler_ = [this](sender* s)
                 {
                     --senders_in_use_;
-                    LOG_DEBUG_MSG("senders in use (-- postprocess handler) "
+                    LOG_DEBUG_MSG("senders in use (-- stack sender) "
                                   << hexpointer(s)
                                   << decnumber(senders_in_use_));
                     senders_.push(s);
-//                    trigger_pending_work();
+                    trigger_pending_work();
                 };
+            // put the new sender on the free list
             senders_.push(snd);
         }
 
@@ -327,44 +328,17 @@ namespace libfabric
     // return a sender object back to the parcelport_impl
     // this is used by the send_immediate version of parcelport_impl
     // --------------------------------------------------------------------
-    libfabric::sender* parcelport::get_connection(libfabric::locality const& dest)
-    {
-        FUNC_START_DEBUG_MSG;
-        LOG_TIMED_INIT(background);
-        LOG_TIMED_BLOCK(background, DEVEL, 60.0, {
-            suspended_task_debug("");
-        });
-
-        sender* snd = nullptr;
-        hpx::util::yield_while([this, &snd, &dest]()
-        {
-            snd = get_sender(dest);
-            if (snd != nullptr) {
-                // all ok, stop yielding
-                FUNC_END_DEBUG_MSG;
-                return false;
-            }
-            background_work(0);
-            return true;
-        });
-        FUNC_END_DEBUG_MSG;
-        return snd;
-    }
-
-    // --------------------------------------------------------------------
-    // return a sender object back to the parcelport_impl
-    // this is used by the send_immediate version of parcelport_impl
-    // --------------------------------------------------------------------
     libfabric::sender* parcelport::get_connection(parcelset::locality const& dest)
     {
-        return get_connection(dest.get<libfabric::locality>());
+        return get_sender(dest.get<libfabric::locality>());
     }
 
     // --------------------------------------------------------------------
     bool parcelport::can_send_immediate()
     {
-        // there is an implicit race here because we might return
-        // true or false and it may change before the parcel is ready
+        // If there is a sender available, then we can use send_immediate API
+        // Otherwise ... there is an implicit race here because we might return
+        // true or false and it may change before the parcel is actually ready
         // but it's ok because we handle either case - this is just a "hint"
         // to optimize performance when there are free senders and we can use them
         bool empty = senders_.empty();
@@ -378,31 +352,36 @@ namespace libfabric
     // if no senders are available, can_send_immediate returns false
     // and parcels are queued up, then sent using this interface
     // --------------------------------------------------------------------
-    std::shared_ptr<sender> parcelport::create_connection(
-        parcelset::locality const& dest, error_code& ec)
+    sender *parcelport::create_connection_raw(
+        parcelset::locality const& dest)
     {
         FUNC_START_DEBUG_MSG;
-        LOG_DEVEL_MSG("create_connection new sender");
-        std::shared_ptr<sender> new_sender = std::make_shared<sender>(
+//        hpx::util::yield_while(
+//            [this](){
+//                return (senders_in_use_>(3*HPX_PARCELPORT_LIBFABRIC_MAX_SENDS/2));
+//            }
+//        );
+        sender *new_sender = new sender(
                 this,
                 controller_->ep_active_,
                 controller_->get_domain(),
                 chunk_pool_);
         //
+        new_sender->dst_addr_ = dest.get<libfabric::locality>().fi_address();
         ++senders_in_use_;
-        //
+        LOG_DEBUG_MSG("create_connection_raw new sender " << decnumber(senders_in_use_));
         new_sender->postprocess_handler_ = [this](sender* s)
             {
-                --senders_in_use_;
-                LOG_DEVEL_MSG("senders in use (-- temp sender postprocess handler) "
+            --senders_in_use_;
+                LOG_DEBUG_MSG("senders in use (-- temp sender) "
                               << hexpointer(s)
                               << decnumber(senders_in_use_));
-                // do not push this one onto the sender stack
-                // since it is a temporary one.
-//                trigger_pending_work();
+                // do not push onto the sender stack (it is a temporary sender)
+                trigger_pending_work();
+                delete s;
             };
         FUNC_END_DEBUG_MSG;
-        return nullptr; // return new_sender;
+        return new_sender;
     }
 
     // --------------------------------------------------------------------
@@ -412,10 +391,10 @@ namespace libfabric
     void parcelport::reclaim_connection(sender* s)
     {
         FUNC_START_DEBUG_MSG;
+        s->postprocess_handler_(s);
         LOG_DEBUG_MSG("senders in use (-- reclaim_connection) "
                       << hexpointer(s)
                       << decnumber(senders_in_use_));
-        s->postprocess_handler_(s);
         FUNC_END_DEBUG_MSG;
     }
 
@@ -482,7 +461,7 @@ namespace libfabric
     }
 
     // --------------------------------------------------------------------
-    // the root node has spacial handlig, this returns its Id
+    // the root node has spacial handling, this returns its Id
     parcelset::locality parcelport::
     agas_locality(util::runtime_configuration const & ini) const
     {
@@ -490,7 +469,7 @@ namespace libfabric
         // load all components as described in the configuration information
         if (!bootstrap_enabled_)
         {
-            LOG_ERROR_MSG("Should only return agas locality when bootstrapping");
+            //LOG_ERROR_MSG("Should only return agas locality when bootstrapping");
         }
         FUNC_END_DEBUG_MSG;
         return controller_->agas_;

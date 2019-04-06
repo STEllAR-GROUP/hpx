@@ -132,22 +132,25 @@ namespace libfabric
         // when terminating the parcelport, this is used to restrict access
         mutex_type  stop_mutex;
 
-        boost::lockfree::stack<
-            sender*,
-            boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_MAX_SENDS>,
-            boost::lockfree::fixed_sized<true>
-        > senders_;
+        // We must maintain a list of senders that are being used
+        using sender_list =
+            boost::lockfree::stack<
+                sender*,
+                boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_MAX_SENDS>,
+                boost::lockfree::fixed_sized<true>
+            >;
+
+        sender_list senders_;
 
         // Used to help with shutdown
         std::atomic<bool>         stopped_;
-
         memory_pool_type*         chunk_pool_;
 
         // performance_counters::parcels::gatherer& parcels_sent_;
 
         // for debugging/performance measurement
         performance_counter<unsigned int> completions_handled_;
-        performance_counter<unsigned int> senders_in_use_;
+        std::atomic<unsigned int> senders_in_use_;
 
         // --------------------------------------------------------------------
         // Constructor : mostly just initializes the superclass with 'here'
@@ -163,9 +166,8 @@ namespace libfabric
         // return a sender object back to the parcelport_impl
         // this is used by the send_immediate version of parcelport_impl
         // --------------------------------------------------------------------
-        libfabric::sender* get_connection(libfabric::locality const& dest);
-        libfabric::sender* get_connection(parcelset::locality const& dest);
         libfabric::sender* get_sender(libfabric::locality const& dest);
+        libfabric::sender* get_connection(parcelset::locality const& dest);
 
         // --------------------------------------------------------------------
         // put a used sender object back into the sender queue for reuse
@@ -175,8 +177,7 @@ namespace libfabric
         // return a sender object back to the parcelport_impl
         // this is for compatibility with non send_immediate operation
         // --------------------------------------------------------------------
-        std::shared_ptr<sender> create_connection(
-            parcelset::locality const& dest, error_code& ec);
+        sender *create_connection_raw(parcelset::locality const& dest);
 
         // --------------------------------------------------------------------
         // parcelport destructor
