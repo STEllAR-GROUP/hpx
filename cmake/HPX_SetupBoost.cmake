@@ -67,7 +67,8 @@ set(__boost_libraries
   program_options
   system)
 
-find_package(Boost 1.55 REQUIRED COMPONENTS ${__boost_libraries})
+set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
+find_package(Boost 1.55 MODULE REQUIRED COMPONENTS ${__boost_libraries})
 
 if(NOT Boost_FOUND)
   hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
@@ -85,7 +86,7 @@ endif()
 set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 
 if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
-  find_package(Boost 1.55 QUIET COMPONENTS iostreams)
+  find_package(Boost 1.55 QUIET MODULE COMPONENTS iostreams)
   if(Boost_IOSTREAMS_FOUND)
     hpx_info("  iostreams")
   else()
@@ -95,7 +96,7 @@ if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
 endif()
 
 # attempt to load Boost.Regex (if available), it's needed for inspect
-find_package(Boost 1.55 QUIET COMPONENTS regex)
+find_package(Boost 1.55 QUIET MODULE COMPONENTS regex)
 if(Boost_REGEX_FOUND)
   hpx_info("  regex")
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
