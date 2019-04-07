@@ -99,6 +99,23 @@ namespace hpx { namespace components
         return Derived(migrate<component_type>(to_migrate.get_id(), policy));
     }
 
+    /// \cond NODETAIL
+    // overload to be used for polymorphic objects
+    template <typename Component, typename Derived, typename Stub,
+        typename DistPolicy>
+#if defined(DOXYGEN)
+    Derived
+#else
+    inline typename std::enable_if<
+        traits::is_distribution_policy<DistPolicy>::value, Derived>::type
+#endif
+    migrate(client_base<Derived, Stub> const& to_migrate,
+        DistPolicy const& policy)
+    {
+        return Derived(migrate<Component>(to_migrate.get_id(), policy));
+    }
+    /// \endcond
+
     /// Migrate the component with the given id to the specified target locality
     ///
     /// The function \a migrate<Component> will migrate the component
@@ -158,6 +175,18 @@ namespace hpx { namespace components
         return Derived(migrate<component_type>(to_migrate.get_id(),
             target_locality));
     }
+
+    /// \cond NODETAIL
+    // overload to be used for polymorphic objects
+    template <typename Component, typename Derived, typename Stub>
+    inline Derived
+    migrate(client_base<Derived, Stub> const& to_migrate,
+        naming::id_type const& target_locality)
+    {
+        return Derived(migrate<Component>(to_migrate.get_id(),
+            target_locality));
+    }
+    /// \endcond
 }}
 
 #endif
