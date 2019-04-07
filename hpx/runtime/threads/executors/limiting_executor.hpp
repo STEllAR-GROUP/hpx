@@ -6,20 +6,17 @@
 #ifndef HPX_RUNTIME_THREADS_LIMITING_EXECUTOR_HPP
 #define HPX_RUNTIME_THREADS_LIMITING_EXECUTOR_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/apply.hpp>
-#include <hpx/util/thread_description.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/lcos/dataflow.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/pack_traversal.hpp>
 #include <hpx/util/yield_while.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -90,10 +87,10 @@ namespace hpx { namespace threads { namespace executors
         post(F && f, Ts &&... ts)
         {
             count_up();
+            auto&& args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
             parallel::execution::post(
                 executor_,
-                [this, f{std::move(f)},
-                    args = hpx::util::make_tuple(std::forward<Ts>(ts)...)]()
+                [this, HPX_CAPTURE_MOVE(f), HPX_CAPTURE_MOVE(args)]() mutable
                 {
                     hpx::util::invoke_fused(std::move(f), std::move(args));
                     count_down();
@@ -113,10 +110,10 @@ namespace hpx { namespace threads { namespace executors
                     F, Ts...>::type result_type;
 
             count_up();
+            auto&& args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
             lcos::local::futures_factory<result_type()> p(
                 executor_,
-                [this, f{std::move(f)},
-                    args = hpx::util::make_tuple(std::forward<Ts>(ts)...)]()
+                [this, HPX_CAPTURE_MOVE(f), HPX_CAPTURE_MOVE(args)]() mutable
                 {
                     hpx::util::invoke_fused(std::move(f), std::move(args));
                     count_down();
@@ -149,10 +146,11 @@ namespace hpx { namespace threads { namespace executors
                     F, Future, Ts...>::type result_type;
 
             count_up();
+
+            auto&& args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
             lcos::local::futures_factory<result_type()> p(
                 executor_,
-                [this, f{std::move(f)},
-                    args = hpx::util::make_tuple(std::forward<Ts>(ts)...)]()
+                [this, HPX_CAPTURE_MOVE(f), HPX_CAPTURE_MOVE(args)]() mutable
                 {
                     hpx::util::invoke_fused(std::move(f), std::move(args));
                     count_down();
