@@ -184,7 +184,11 @@ namespace hpx { namespace threads { namespace coroutines
                 }
 
                 m_stack = posix::alloc_stack(static_cast<std::size_t>(m_stack_size));
-                HPX_ASSERT(m_stack);
+                if (m_stack == nullptr)
+                {
+                    throw std::runtime_error("could not allocate memory for stack");
+                }
+
                 posix::watermark_stack(m_stack, static_cast<std::size_t>(m_stack_size));
 
                 typedef void fun(void*);

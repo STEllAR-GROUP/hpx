@@ -219,6 +219,10 @@ namespace hpx { namespace threads { namespace coroutines
                 if (stack_pointer_ != nullptr) return;
 
                 stack_pointer_ = alloc_.allocate(stack_size_);
+                if (stack_pointer_ == nullptr)
+                {
+                    throw std::runtime_error("could not allocate memory for stack");
+                }
 #if BOOST_VERSION < 106100
                 ctx_ =
                     boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
