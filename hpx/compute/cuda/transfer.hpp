@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -196,7 +197,6 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             return copy_helper<hpx::traits::general_pointer_tag>::call(
                 first, last, dest);
 #else
-            std::cout << "memcpy1\n";
             std::size_t count = std::distance(first, last);
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
@@ -224,11 +224,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             return copy_helper<hpx::traits::general_pointer_tag>::call(
                 first, last, dest);
 #else
-//             std::cout << "copy to host!\n";
             std::size_t count = std::distance(first, last);
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
-            std::cout << "memcpy2\n";
 
             cudaMemcpyAsync(&(*dest), (*first).device_ptr(),
                 bytes, cudaMemcpyDeviceToHost,
@@ -256,7 +254,6 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             std::size_t count = std::distance(first, last);
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
-            std::cout << "memcpy3\n";
 
             cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
                 cudaMemcpyHostToDevice,
@@ -285,7 +282,6 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-            std::cout << "memcpy4\n";
             cudaMemcpyAsync((*dest).device_ptr(), (*first).device_ptr(),
                 bytes, cudaMemcpyDeviceToDevice,
                 dest.target().native_handle().get_stream());
@@ -310,11 +306,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
                 first, count, dest);
 #else
-//             std::cout << "copy to host\n";
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-            std::cout << "memcpy5\n";
             cudaMemcpyAsync(&(*dest), (*first).device_ptr(), bytes,
                 cudaMemcpyDeviceToHost,
                 first.target().native_handle().get_stream());
@@ -339,11 +333,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
                 first, count, dest);
 #else
-//             std::cout << "copy to device\n";
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
-            std::cout << "memcpy6\n";
             cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
                 cudaMemcpyHostToDevice,
                 dest.target().native_handle().get_stream());

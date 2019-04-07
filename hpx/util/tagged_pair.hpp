@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/tagged.hpp>
 #include <hpx/util/tuple.hpp>

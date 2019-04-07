@@ -21,6 +21,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <type_traits>

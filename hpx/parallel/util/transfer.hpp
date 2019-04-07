@@ -102,7 +102,6 @@ namespace hpx { namespace parallel { namespace util
                 typename hpx::util::decay<OutIter>::type
             >::type
             category;
-        std::cout << typeid(category).name() << "\n";
         return detail::copy_helper<category>::call(first, last, dest);
     }
 
@@ -150,10 +149,6 @@ namespace hpx { namespace parallel { namespace util
                 typename hpx::util::decay<OutIter>::type
             >::type
             category;
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-        std::cout << typeid(category).name() << "\n";
-        std::cout << typeid(detail::copy_n_helper<category>).name() << "\n";
-#endif
         return detail::copy_n_helper<category>::call(first, count, dest);
     }
 

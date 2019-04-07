@@ -44,23 +44,23 @@ void test_transform(executor_type& exec,
     target_vector& d_A, target_vector& d_B, target_vector& d_C,
     std::vector<int> const& ref)
 {
-//     hpx::parallel::transform(
-//         hpx::parallel::execution::par.on(exec),
-//         d_A.begin(), d_A.end(), d_B.begin(), d_C.begin(),
-//         transform_test());
-//
-//     std::vector<int> h_C(d_C.size());
-//     hpx::parallel::copy(
-//         hpx::parallel::execution::par,
-//         d_C.begin(), d_C.end(), h_C.begin());
-//
-//     HPX_TEST_EQ(h_C.size(), ref.size());
-//     HPX_TEST_EQ(d_C.size(), ref.size());
-//     for(std::size_t i = 0; i != ref.size(); ++i)
-//     {
-//         HPX_TEST_EQ(h_C[i], ref[i]);
-//         HPX_TEST_EQ(d_C[i], ref[i]);
-//     }
+    hpx::parallel::transform(
+        hpx::parallel::execution::par.on(exec),
+        d_A.begin(), d_A.end(), d_B.begin(), d_C.begin(),
+        transform_test());
+
+    std::vector<int> h_C(d_C.size());
+    hpx::parallel::copy(
+        hpx::parallel::execution::par,
+        d_C.begin(), d_C.end(), h_C.begin());
+
+    HPX_TEST_EQ(h_C.size(), ref.size());
+    HPX_TEST_EQ(d_C.size(), ref.size());
+    for(std::size_t i = 0; i != ref.size(); ++i)
+    {
+        HPX_TEST_EQ(h_C[i], ref[i]);
+        HPX_TEST_EQ(d_C[i], ref[i]);
+    }
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
