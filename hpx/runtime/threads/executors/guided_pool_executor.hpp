@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2018 John Biddiscombe
+//  Copyright (c) 2017-2019 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,9 +22,12 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
-#include <iostream>
 #include <type_traits>
 #include <utility>
+
+#ifdef GUIDED_EXECUTOR_DEBUG
+#include <iostream>
+#endif
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -429,8 +432,6 @@ namespace hpx { namespace threads { namespace executors
                          decltype(unwrapped_futures_tuple)>(" | ")
 #endif
                       << "\n"
-                      /*<< "dataflow-frame: Result      : "
-                      << util::debug::print_type<Result>() */<< "\n";
 
             std::cout << "dataflow hint returning " << domain << "\n";
 #endif
@@ -569,8 +570,6 @@ namespace hpx { namespace threads { namespace executors
         guided_pool_executor<H> guided_exec_;
         pool_executor           pool_exec_;
     };
-
-
 }}}
 
 namespace hpx { namespace parallel { namespace execution
