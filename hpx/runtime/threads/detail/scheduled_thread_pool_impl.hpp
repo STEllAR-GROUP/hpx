@@ -590,7 +590,7 @@ namespace hpx { namespace threads { namespace detail
                 detail::scheduling_callbacks callbacks(
                     util::deferred_call(    //-V107
                         &policies::scheduler_base::idle_callback,
-                        sched_.get(), global_thread_num),
+                        sched_.get(), thread_num),
                     nullptr);
 
                 if (mode_ & policies::do_background_work)
@@ -1834,7 +1834,9 @@ namespace hpx { namespace threads { namespace detail
         // deadlocks when multiple HPX threads try to resume or suspend pus.
         std::unique_lock<typename Scheduler::pu_mutex_type>
             l(sched_->Scheduler::get_pu_mutex(virt_core), std::defer_lock);
-        util::yield_while([&l]()
+
+        util::yield_while(
+            [&l]()
             {
                 return !l.try_lock();
             }, "scheduled_thread_pool::suspend_processing_unit_internal",
@@ -1888,7 +1890,7 @@ namespace hpx { namespace threads { namespace detail
                     "this thread pool does not support suspending "
                     "processing units"));
         }
-        else if (!sched_->Scheduler::has_thread_stealing() &&
+        else if (!sched_->Scheduler::has_thread_stealing(virt_core) &&
             hpx::this_thread::get_pool() == this)
         {
             return hpx::make_exceptional_future<void>(
@@ -1926,7 +1928,7 @@ namespace hpx { namespace threads { namespace detail
 
         if (threads::get_self_ptr())
         {
-            if (!sched_->Scheduler::has_thread_stealing() &&
+            if (!sched_->Scheduler::has_thread_stealing(virt_core) &&
                 hpx::this_thread::get_pool() == this)
             {
                 HPX_THROW_EXCEPTION(invalid_status,

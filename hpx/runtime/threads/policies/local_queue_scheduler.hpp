@@ -150,7 +150,10 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool numa_sensitive() const override { return numa_sensitive_ != 0; }
-        virtual bool has_thread_stealing() const override { return true; }
+        virtual bool has_thread_stealing(std::size_t num_thread) const override
+        {
+            return true;
+        }
 
         static std::string get_scheduler_name()
         {
@@ -342,7 +345,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if none is
         /// available
         virtual bool get_next_thread(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count, threads::thread_data*& thrd) override
+            threads::thread_data*& thrd, bool /*enable_stealing*/) override
         {
             std::size_t queues_size = queues_.size();
 
@@ -692,16 +695,18 @@ namespace hpx { namespace threads { namespace policies
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count) override
+            std::int64_t& idle_loop_count, bool /*enable_stealing*/,
+            std::size_t& added) override
         {
             std::size_t queues_size = queues_.size();
             HPX_ASSERT(num_thread < queues_.size());
 
-            std::size_t added = 0;
+            added = 0;
+
             bool result = true;
 
-            result = queues_[num_thread]->wait_or_add_new(running,
-                idle_loop_count, added) && result;
+            result =
+                queues_[num_thread]->wait_or_add_new(running, added) && result;
             if (0 != added) return result;
 
             // Check if we have been disabled
@@ -738,8 +743,9 @@ namespace hpx { namespace threads { namespace policies
                             continue;
                         }
 
-                        result = queues_[num_thread]->wait_or_add_new(running,
-                            idle_loop_count, added, queues_[idx]) && result;
+                        result = queues_[num_thread]->wait_or_add_new(
+                                     running, added, queues_[idx]) &&
+                            result;
                         if (0 != added)
                         {
                             queues_[idx]->increment_num_stolen_from_staged(added);
@@ -772,7 +778,7 @@ namespace hpx { namespace threads { namespace policies
                         }
 
                         result = queues_[num_thread]->wait_or_add_new(running,
-                            idle_loop_count, added, queues_[idx]) && result;
+                            added, queues_[idx]) && result;
                         if (0 != added)
                         {
                             queues_[idx]->increment_num_stolen_from_staged(added);
@@ -794,7 +800,7 @@ namespace hpx { namespace threads { namespace policies
                     HPX_ASSERT(idx != num_thread);
 
                     result = queues_[num_thread]->wait_or_add_new(running,
-                        idle_loop_count, added, queues_[idx]) && result;
+                        added, queues_[idx]) && result;
                     if (0 != added)
                     {
                         queues_[idx]->increment_num_stolen_from_staged(added);

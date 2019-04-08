@@ -481,7 +481,21 @@ namespace hpx { namespace threads
     HPX_API_EXPORT void reset_thread_distribution();
 
     /// Set the new scheduler mode
-    HPX_API_EXPORT void set_scheduler_mode(threads::policies::scheduler_mode);
+    HPX_API_EXPORT void set_scheduler_mode(
+        threads::policies::scheduler_mode new_mode);
+
+    /// Add the given flags to the scheduler mode
+    HPX_API_EXPORT void add_scheduler_mode(
+        threads::policies::scheduler_mode to_add);
+
+    /// Add/remove the given flags to the scheduler mode
+    HPX_API_EXPORT void add_remove_scheduler_mode(
+        threads::policies::scheduler_mode to_add,
+        threads::policies::scheduler_mode to_remove);
+
+    /// Remove the given flags from the scheduler mode
+    HPX_API_EXPORT void remove_scheduler_mode(
+        threads::policies::scheduler_mode to_remove);
     /// \endcond
 }}
 

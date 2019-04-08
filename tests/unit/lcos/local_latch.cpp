@@ -123,7 +123,7 @@ int hpx_main()
     {
         num_threads.store(0);
 
-        hpx::lcos::local::latch l(1);
+        hpx::lcos::local::latch l(0);
         l.reset(NUM_THREADS+1);
         HPX_TEST(!l.is_ready());
 

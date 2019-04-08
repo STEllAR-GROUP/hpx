@@ -28,6 +28,7 @@ namespace hpx { namespace parallel { namespace execution
         struct reset_thread_distribution_tag {};
         struct count_processing_units_tag {};
         struct mark_begin_execution_tag {};
+        struct mark_end_of_scheduling_tag {};
         struct mark_end_execution_tag {};
         /// \endcond
     }
@@ -51,6 +52,9 @@ namespace hpx { namespace parallel { namespace execution
 
         template <typename Parameters, typename Executor, typename Enable = void>
         struct mark_begin_execution_fn_helper;
+
+        template <typename Parameters, typename Executor, typename Enable = void>
+        struct mark_end_of_scheduling_fn_helper;
 
         template <typename Parameters, typename Executor, typename Enable = void>
         struct mark_end_execution_fn_helper;
@@ -234,6 +238,38 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         ///////////////////////////////////////////////////////////////////////
+        // mark_end_of_scheduling dispatch point
+        template <typename Parameters, typename Executor>
+        HPX_FORCEINLINE auto mark_end_of_scheduling(Parameters&& params,
+                Executor&& exec)
+        ->  typename mark_end_of_scheduling_fn_helper<
+                typename hpx::util::decay_unwrap<Parameters>::type,
+                typename hpx::util::decay<Executor>::type
+            >::template result<Parameters, Executor>::type
+        {
+            return mark_end_of_scheduling_fn_helper<
+                    typename hpx::util::decay_unwrap<Parameters>::type,
+                    typename hpx::util::decay<Executor>::type
+                >::call(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec));
+        }
+
+        template <>
+        struct customization_point<mark_end_of_scheduling_tag>
+        {
+        public:
+            template <typename Parameters, typename Executor>
+            HPX_FORCEINLINE auto operator()(Parameters&& params,
+                    Executor&& exec) const
+            -> decltype(mark_end_of_scheduling(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec)))
+            {
+                return mark_end_of_scheduling(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec));
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         // mark_end_execution dispatch point
         template <typename Parameters, typename Executor>
         HPX_FORCEINLINE auto mark_end_execution(Parameters&& params,
@@ -365,6 +401,21 @@ namespace hpx { namespace parallel { namespace execution
             > const& mark_begin_execution =
                 detail::static_const<detail::customization_point<
                     detail::mark_begin_execution_tag
+                > >::value;
+
+        /// Mark the end of scheduling tasks during parallel algorithm execution
+        ///
+        /// \param params [in] The executor parameters object to use as a
+        ///              fallback if the executor does not expose
+        ///
+        /// \note This calls params.mark_begin_execution(exec) if it exists;
+        ///       otherwise it does nothing.
+        ///
+        constexpr detail::customization_point<
+                detail::mark_end_of_scheduling_tag
+            > const& mark_end_of_scheduling =
+                detail::static_const<detail::customization_point<
+                    detail::mark_end_of_scheduling_tag
                 > >::value;
 
         /// Mark the end of a parallel algorithm execution
