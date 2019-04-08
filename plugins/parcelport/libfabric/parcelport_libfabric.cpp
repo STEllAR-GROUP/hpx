@@ -110,10 +110,10 @@ namespace libfabric
                   << util::get_entry_as<std::string>(ini, "hpx.parcel.bootstrap", "")
                   << " : bootstrap " << bootstrap_enabled_);
 
-        if (hpx::util::get_entry_as<bool>(ini, "hpx.parcel.mpi.enable", "0")) {
-            LOG_DEBUG_MSG("Libfabric parcelport MPI enabled : disabling bootstrap");
-            bootstrap_enabled_ = false;
-        }
+//        if (hpx::util::get_entry_as<bool>(ini, "hpx.parcel.mpi.enable", "0")) {
+//            LOG_DEBUG_MSG("Libfabric parcelport MPI enabled : disabling bootstrap");
+//            bootstrap_enabled_ = false;
+//        }
 
         if (!parcelport_enabled_) return;
 
