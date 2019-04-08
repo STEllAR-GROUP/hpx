@@ -6,13 +6,14 @@
 #if !defined(HPX_LCOS_ASYNC_COLOCATED_CALLBACK_MAR_30_2015_1146AM)
 #define HPX_LCOS_ASYNC_COLOCATED_CALLBACK_MAR_30_2015_1146AM
 
-#include <hpx/runtime/agas/primary_namespace.hpp>
-#include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/lcos/async_continue_callback.hpp>
 #include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/lcos/detail/async_colocated_callback_fwd.hpp>
+#include <hpx/runtime/agas/primary_namespace.hpp>
+#include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/promise_local_result.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <utility>
 
@@ -26,6 +27,9 @@ namespace hpx { namespace detail
         >::type>
     async_colocated_cb(naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_ASSERT(false);
+#else
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
         naming::id_type service_target(
@@ -45,6 +49,7 @@ namespace hpx { namespace detail
                   , std::forward<Ts>(vs)...)
                 ),
             service_target, std::forward<Callback>(cb), gid.get_gid());
+#endif
     }
 
     template <
@@ -71,6 +76,9 @@ namespace hpx { namespace detail
     async_colocated_cb(Continuation && cont,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_ASSERT(false);
+#else
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
         naming::id_type service_target(
@@ -90,6 +98,7 @@ namespace hpx { namespace detail
                   , std::forward<Ts>(vs)...)
               , std::forward<Continuation>(cont)),
             service_target, std::forward<Callback>(cb), gid.get_gid());
+#endif
     }
 
     template <

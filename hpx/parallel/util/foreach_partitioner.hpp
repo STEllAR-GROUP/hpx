@@ -7,9 +7,12 @@
 #define HPX_PARALLEL_UTIL_FOREACH_PARTITIONER_OCT_03_2014_0112PM
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/dataflow.hpp>
+#endif
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -202,6 +205,10 @@ namespace hpx { namespace parallel { namespace util
                 std::list<std::exception_ptr>&& errors,
                 F && f, FwdIter last)
             {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_ASSERT(false);
+                return hpx::future<FwdIter>();
+#else
                 // wait for all tasks to finish
                 return hpx::dataflow(
                     [last, HPX_CAPTURE_MOVE(errors),
@@ -218,6 +225,7 @@ namespace hpx { namespace parallel { namespace util
                         return f(std::move(last));
                     },
                     std::move(inititems), std::move(workitems));
+#endif
             }
         };
     }

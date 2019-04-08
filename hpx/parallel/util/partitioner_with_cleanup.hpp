@@ -7,7 +7,9 @@
 #define HPX_PARALLEL_UTIL_PARTITIONER_WITH_CLEANUP_OCT_03_2014_0221PM
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/dataflow.hpp>
+#endif
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/unused.hpp>

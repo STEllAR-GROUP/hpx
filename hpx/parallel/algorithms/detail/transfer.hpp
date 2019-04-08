@@ -7,10 +7,14 @@
 #define HPX_PARALLEL_ALGORITHMS_TRANSFER
 
 #include <hpx/traits/is_iterator.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/traits/segmented_iterator_traits.hpp>
+#endif
 #include <hpx/util/tagged_pair.hpp>
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/parallel/segmented_algorithms/detail/transfer.hpp>
+#endif
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -54,6 +58,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 first, last, dest);
         }
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         // forward declare segmented version
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename FwdIter2>
@@ -62,6 +67,7 @@ namespace hpx { namespace parallel { inline namespace v1
         >::type
         transfer_(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest, std::true_type);
+#endif
 
         // Executes transfer algorithm on the elements in the range [first, last),
         // to another range beginning at \a dest.
@@ -130,12 +136,19 @@ namespace hpx { namespace parallel { inline namespace v1
                 "Requires at least forward iterator.");
 #endif
 
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            return hpx::util::make_tagged_pair<tag::in, tag::out>(
+                    transfer_<Algo>(
+                        std::forward<ExPolicy>(policy), first, last, dest,
+                        std::false_type()));
+#else
             typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
 
             return hpx::util::make_tagged_pair<tag::in, tag::out>(
                     transfer_<Algo>(
                         std::forward<ExPolicy>(policy), first, last, dest,
                         is_segmented()));
+#endif
         }
     }
 }}}

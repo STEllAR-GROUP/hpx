@@ -14,7 +14,9 @@
 #include <hpx/parallel/executors/fused_bulk_execute.hpp>
 
 #include <hpx/exception_list.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/lcos/dataflow.hpp>
+#endif
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>

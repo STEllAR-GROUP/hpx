@@ -690,6 +690,7 @@ namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     // Termination detection does not make this locality black
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <>
     struct action_does_termination_detection<
         hpx::components::server::runtime_support::dijkstra_termination_action>
@@ -699,6 +700,7 @@ namespace hpx { namespace traits
             return true;
         }
     };
+#endif
 
     // runtime_support is a (hand-rolled) component
     template <>

@@ -10,7 +10,9 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/lcos/dataflow.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/dataflow.hpp>
+#endif
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
@@ -138,6 +140,10 @@ namespace hpx { namespace compute { namespace host
         hpx::future<std::vector<bulk_locality_result> >
         bulk_create(std::size_t count, Ts &&... ts) const
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            return hpx::future<std::vector<bulk_locality_result> >();
+#else
             // collect all targets per locality
             std::map<hpx::id_type, std::vector<target_type> > m;
             for(target_type const& t : this->targets_)
@@ -187,6 +193,7 @@ namespace hpx { namespace compute { namespace host
                     return result;
                 },
                 std::move(objs));
+#endif
         }
 
     protected:
