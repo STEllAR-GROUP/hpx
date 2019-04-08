@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2018 John Biddiscombe
+//  Copyright (c) 2017-2019 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,13 +17,17 @@
 #include <hpx/util/pack_traversal.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/traits/is_future_tuple.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <string>
-#include <iostream>
 #include <type_traits>
 #include <utility>
+
+#ifdef GUIDED_EXECUTOR_DEBUG
+#include <iostream>
+#endif
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -36,22 +40,13 @@
 namespace hpx { namespace threads { namespace executors
 {
     // --------------------------------------------------------------------
-    // helper structs to make future<tuple<f1, f2, f3, ...>>>
-    // detection of futures simpler
+    // helper struct for tuple of futures future<tuple<f1, f2, f3, ...>>>
     // --------------------------------------------------------------------
-    template <typename TupleOfFutures>
-    struct is_tuple_of_futures;
-
-    template <typename...Futures>
-    struct is_tuple_of_futures<util::tuple<Futures...>>
-        : util::detail::all_of<traits::is_future<Futures>...>
-    {};
-
     template <typename Future>
     struct is_future_of_tuple_of_futures
         : std::integral_constant<bool,
             traits::is_future<Future>::value &&
-            is_tuple_of_futures<
+            traits::is_future_tuple<
                 typename traits::future_traits<Future>::result_type>::value>
     {};
 
@@ -241,10 +236,10 @@ namespace hpx { namespace threads { namespace executors
         future<typename util::detail::invoke_deferred_result<F, Ts...>::type>
         async_execute(F && f, Ts &&... ts)
         {
-#ifdef GUIDED_EXECUTOR_DEBUG
             typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
                 result_type;
 
+#ifdef GUIDED_EXECUTOR_DEBUG
             std::cout << "async_execute : Function    : "
                       << util::debug::print_type<F>() << "\n"
                       << "async_execute : Arguments   : "
@@ -283,10 +278,10 @@ namespace hpx { namespace threads { namespace executors
         ->  future<typename util::detail::invoke_deferred_result<
             F, Future, Ts...>::type>
         {
-#ifdef GUIDED_EXECUTOR_DEBUG
             typedef typename util::detail::invoke_deferred_result<
                     F, Future, Ts...>::type result_type;
 
+#ifdef GUIDED_EXECUTOR_DEBUG
             std::cout << "then_execute : Function     : "
                       << util::debug::print_type<F>() << "\n"
                       << "then_execute : Predecessor  : "
@@ -336,7 +331,7 @@ namespace hpx { namespace threads { namespace executors
                   typename ... Ts,
                   typename = enable_if_t<is_future_of_tuple_of_futures<
                     OuterFuture<util::tuple<InnerFutures...>>>::value>,
-                  typename = enable_if_t<is_tuple_of_futures<
+                  typename = enable_if_t<traits::is_future_tuple<
                     util::tuple<InnerFutures...>>::value>
                   >
         auto
@@ -399,22 +394,18 @@ namespace hpx { namespace threads { namespace executors
         // function type, result type and tuple of futures as arguments
         // --------------------------------------------------------------------
         template <typename F,
-                  typename DataFlowFrame,
-                  typename Result,
                   typename ... InnerFutures,
                   typename = enable_if_t<
-                      is_tuple_of_futures<util::tuple<InnerFutures...>>::value>
+                      traits::is_future_tuple<util::tuple<InnerFutures...>>::value>
                   >
         auto
         async_execute(F && f,
-                      DataFlowFrame && df,
-                      Result && r,
                       util::tuple<InnerFutures... > && predecessor)
         ->  future<typename util::detail::invoke_deferred_result<
-            F, DataFlowFrame, Result, util::tuple<InnerFutures... >>::type>
+            F, util::tuple<InnerFutures... >>::type>
         {
             typedef typename util::detail::invoke_deferred_result<
-                F, DataFlowFrame, Result, util::tuple<InnerFutures... >>::type
+                F, util::tuple<InnerFutures... >>::type
                     result_type;
 
             // invoke the hint function with the unwrapped tuple futures
@@ -435,10 +426,12 @@ namespace hpx { namespace threads { namespace executors
                       << "\n"
                       << "dataflow      : unwrapped   : "
                       << util::debug::print_type<
+#ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
+                         int>(" | ")
+#else
                          decltype(unwrapped_futures_tuple)>(" | ")
+#endif
                       << "\n"
-                      << "dataflow-frame: Result      : "
-                      << util::debug::print_type<Result>() << "\n";
 
             std::cout << "dataflow hint returning " << domain << "\n";
 #endif
@@ -448,8 +441,6 @@ namespace hpx { namespace threads { namespace executors
                 pool_executor_,
                 util::deferred_call(
                     std::forward<F>(f),
-                    std::forward<DataFlowFrame>(df),
-                    std::forward<Result>(r),
                     std::forward<util::tuple<InnerFutures...>>(predecessor)
                 )
             );
@@ -579,8 +570,6 @@ namespace hpx { namespace threads { namespace executors
         guided_pool_executor<H> guided_exec_;
         pool_executor           pool_exec_;
     };
-
-
 }}}
 
 namespace hpx { namespace parallel { namespace execution
