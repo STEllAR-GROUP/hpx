@@ -294,7 +294,7 @@ namespace hpx { namespace threads { namespace coroutines
                     typedef void fun(void*);
                     fun * funp = trampoline<CoroutineImpl>;
                     m_sp[cb_idx] = this;
-                    m_sp[funp_idx] = nasty_cast<void*>(funp);
+                    m_sp[funp_idx] = reinterpret_cast<void*>(funp);
             }
 
             std::ptrdiff_t get_available_stack_space()
