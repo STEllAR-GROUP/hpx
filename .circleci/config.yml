@@ -1025,18 +1025,18 @@ jobs:
       - run:
           name: Installing
           command: |
-              ./bin/hello_world --hpx:bind=none
+              ./bin/hello_world_distributed --hpx:bind=none
               ninja -j2 install
           working_directory: /hpx/build
           when: always
       - run:
           name: Testing installed HPX
           command: |
-              hello_world --hpx:bind=none
+              hello_world_distributed --hpx:bind=none
               ldconfig
-              hpxcxx --exe=hello_world_test_build ../source/examples/quickstart/hello_world.cpp -g -lhpx_iostreamsd
-              ./hello_world_test_build --hpx:bind=none
-              hpxrun.py -l 2 -t 1 ./hello_world_test_build -- --hpx:bind=none
+              hpxcxx --exe=hello_world_distributed_test_build ../source/examples/quickstart/hello_world_distributed.cpp -g -lhpx_iostreamsd
+              ./hello_world_distributed_test_build --hpx:bind=none
+              hpxrun.py -l 2 -t 1 ./hello_world_distributed_test_build -- --hpx:bind=none
           working_directory: /hpx/build
           when: always
       - run:
@@ -1052,16 +1052,16 @@ jobs:
       - run:
           name: Test Docker Image
           command: |
-              docker run ${TARGET_IMAGE_NAME} hello_world --hpx:bind=none
+              docker run ${TARGET_IMAGE_NAME} hello_world_distributed --hpx:bind=none
               docker create -v /hpx --name sources stellargroup/hpx:dev /bin/true
-              docker cp ./source/examples/quickstart/hello_world.cpp sources:/hpx
+              docker cp ./source/examples/quickstart/hello_world_distributed.cpp sources:/hpx
               docker run --volumes-from sources -w /hpx ${TARGET_IMAGE_NAME} \
-                hpxcxx --exe=hello_world_test_build                          \
-                hello_world.cpp -g -lhpx_iostreamsd
+                hpxcxx --exe=hello_world_distributed_test_build                          \
+                hello_world_distributed.cpp -g -lhpx_iostreamsd
               docker run --volumes-from sources -w /hpx ${TARGET_IMAGE_NAME} \
-                ./hello_world_test_build --hpx:bind=none
+                ./hello_world_distributed_test_build --hpx:bind=none
               docker run --volumes-from sources -w /hpx ${TARGET_IMAGE_NAME} \
-                hpxrun.py -l 2 -t 2 ./hello_world_test_build -- --hpx:bind=none
+                hpxrun.py -l 2 -t 2 ./hello_world_distributed_test_build -- --hpx:bind=none
           working_directory: /hpx
       - <<: *add_github_to_known_hosts
       - <<: *configure_local_git
