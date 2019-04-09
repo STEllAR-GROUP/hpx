@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2009 Maciej Brodowicz
 # Copyright (c) 2011 Bryce Lelbach
+# Copyright (c) 2018 Patrick Diehl
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,16 +11,16 @@ from os.path import exists, join
 
 from datetime import datetime
 
-from string import letters, digits
-
-from types import StringType
+from string import digits
 
 from optparse import OptionParser
 
-if exists(join(path[0], "../hpx")):
-  path.append(join(path[0], ".."))
-if exists(join(path[0], "../share/hpx/python/hpx")):
-  path.append(join(path[0], "../share/hpx/python"))
+import sys
+
+if exists(join(sys.path[0], "../hpx")):
+  sys.path.append(join(sys.path[0], ".."))
+if exists(join(sys.path[0], "../share/hpx/python/hpx")):
+  sys.path.append(join(sys.path[0], "../share/hpx/python"))
 
 from hpx.process import process
 
@@ -63,16 +64,16 @@ parser.add_option("--program",
 (options, cmd) = parser.parse_args()
 
 if None == options.program:
-  print "No program specified"
+  print ("No program specified")
   exit(1)
 
 (timed_out, returncode, output) = run(options.program, options.timeout)
 
 if not 0 == len(output):
-  print rstrip_last(output, '\n')
+  print (rstrip_last(output, '\n'))
 
 if timed_out:
-  print "Program timed out"
+  print ("Program timed out")
   
 exit(returncode)
 # }}}

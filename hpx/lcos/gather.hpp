@@ -191,6 +191,8 @@ namespace hpx { namespace lcos
 }}
 #else
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+
 #include <hpx/config.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
@@ -574,5 +576,6 @@ namespace hpx { namespace lcos
     HPX_REGISTER_COMPONENT(HPX_PP_CAT(gather_, name))                         \
     /**/
 
+#endif // COMPUTE_HOST_CODE
 #endif // DOXYGEN
 #endif

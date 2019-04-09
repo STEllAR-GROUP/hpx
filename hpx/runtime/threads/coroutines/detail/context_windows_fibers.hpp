@@ -180,6 +180,7 @@ namespace hpx { namespace threads { namespace coroutines
         // initial stack size (grows as needed)
         static const std::size_t stack_size = sizeof(void*) >= 8 ? 2048 : 1024;
 
+        template <typename CoroutineImpl>
         class fibers_context_impl
           : public fibers_context_impl_base
         {
@@ -195,16 +196,18 @@ namespace hpx { namespace threads { namespace coroutines
              * Create a context that on restore invokes Functor on
              *  a new stack. The stack size can be optionally specified.
              */
-            template<typename Functor>
-            explicit fibers_context_impl(Functor& cb, std::ptrdiff_t stack_size)
-              : fibers_context_impl_base(
-                    CreateFiberEx(stack_size == -1 ? default_stack_size : stack_size,
-                        stack_size == -1 ? default_stack_size : stack_size, 0,
-                        static_cast<LPFIBER_START_ROUTINE>(&trampoline<Functor>),
-                        static_cast<LPVOID>(&cb))
-                    ),
-                stacksize_(stack_size == -1 ? default_stack_size : stack_size)
+            explicit fibers_context_impl(std::ptrdiff_t stack_size)
+              : stacksize_(stack_size == -1 ? default_stack_size : stack_size)
+            {}
+
+            void init()
             {
+                if (m_ctx != nullptr) return;
+
+                m_ctx = CreateFiberEx(stack_size == -1 ? default_stack_size : stack_size,
+                        stack_size == -1 ? default_stack_size : stack_size, 0,
+                        static_cast<LPFIBER_START_ROUTINE>(&trampoline<CoroutineImpl>),
+                        static_cast<LPVOID>(this));
                 if (nullptr == m_ctx)
                 {
                     throw boost::system::system_error(
@@ -258,8 +261,6 @@ namespace hpx { namespace threads { namespace coroutines
         private:
             std::ptrdiff_t stacksize_;
         };
-
-        typedef fibers_context_impl context_impl;
     }}
 }}}
 

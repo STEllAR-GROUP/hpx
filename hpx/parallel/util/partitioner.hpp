@@ -7,7 +7,9 @@
 #define HPX_PARALLEL_UTIL_PARTITIONER_MAY_27_2014_1040PM
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/dataflow.hpp>
+#endif
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/assert.hpp>
@@ -193,6 +195,9 @@ namespace hpx { namespace parallel { namespace util
                         std::forward<ExPolicy_>(policy),
                         first, count,
                         std::forward<F1>(f1));
+
+                    scoped_params.mark_end_of_scheduling();
+
                 } catch (...) {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
@@ -222,6 +227,9 @@ namespace hpx { namespace parallel { namespace util
                         std::forward<ExPolicy_>(policy),
                         first, count, stride,
                         std::forward<F1>(f1));
+
+                    scoped_params.mark_end_of_scheduling();
+
                 } catch (...) {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
@@ -253,6 +261,9 @@ namespace hpx { namespace parallel { namespace util
                         std::forward<ExPolicy_>(policy),
                         first, count, chunk_sizes, std::forward<Data>(data),
                         std::forward<F1>(f1));
+
+                    scoped_params.mark_end_of_scheduling();
+
                 } catch (...) {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
@@ -319,6 +330,9 @@ namespace hpx { namespace parallel { namespace util
                         std::forward<ExPolicy_>(policy),
                         first, count,
                         std::forward<F1>(f1));
+
+                    scoped_params->mark_end_of_scheduling();
+
                 } catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<R>(
                         std::current_exception());
@@ -353,6 +367,9 @@ namespace hpx { namespace parallel { namespace util
                         std::forward<ExPolicy_>(policy),
                         first, count, stride,
                         std::forward<F1>(f1));
+
+                    scoped_params->mark_end_of_scheduling();
+
                 } catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<R>(
                         std::current_exception());
@@ -389,6 +406,9 @@ namespace hpx { namespace parallel { namespace util
                         std::forward<ExPolicy_>(policy),
                         first, count, chunk_sizes, std::forward<Data>(data),
                         std::forward<F1>(f1));
+
+                    scoped_params->mark_end_of_scheduling();
+
                 } catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<R>(
                         std::current_exception());
@@ -410,6 +430,10 @@ namespace hpx { namespace parallel { namespace util
                 std::list<std::exception_ptr>&& errors,
                 F && f)
             {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_ASSERT(false);
+                return hpx::future<R>();
+#else
                 // wait for all tasks to finish
                 return hpx::dataflow(
                     [HPX_CAPTURE_MOVE(errors),
@@ -423,6 +447,7 @@ namespace hpx { namespace parallel { namespace util
                         return f(std::move(r));
                     },
                     std::move(workitems));
+#endif
             }
         };
     }

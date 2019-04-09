@@ -480,9 +480,8 @@ namespace hpx { namespace threads
                     hpx::detail::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
-                typedef hpx::threads::policies::
-                    static_priority_queue_scheduler<>
-                        local_sched_type;
+                using local_sched_type =
+                    hpx::threads::policies::static_priority_queue_scheduler<>;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, numa_sensitive,
                     "core-static_priority_queue_scheduler");
@@ -497,7 +496,6 @@ namespace hpx { namespace threads
                         notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
-
 #else
                 throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=static-priority "

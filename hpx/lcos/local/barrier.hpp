@@ -46,9 +46,11 @@ namespace hpx { namespace lcos { namespace local
         /// releasing all waiting threads as soon as the last \a thread
         /// entered this function.
         void wait();
+
         /// The function \a count_up will increase the number of \a threads
         /// to be waited in \a wait function.
         void count_up();
+
         /// The function \a reset will reset the number of \a threads
         /// as given by the function parameter \a number_of_threads.
         /// the newer coming \a threads executing the function
@@ -59,7 +61,7 @@ namespace hpx { namespace lcos { namespace local
         /// The function \a reset can be executed while previous \a threads
         /// executing waiting after they have been waken up.
         /// Thus \a total_ can not be reset to \a barrier_flag which
-        /// will break the comparision condition under the function \a wait.
+        /// will break the comparison condition under the function \a wait.
         void reset(std::size_t number_of_threads);
 
     private:

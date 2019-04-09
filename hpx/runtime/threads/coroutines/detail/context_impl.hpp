@@ -110,7 +110,8 @@
 #include <hpx/runtime/threads/coroutines/detail/context_generic_context.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
-    typedef generic_context::context_impl default_context_impl;
+    template <typename CoroutineImpl>
+    using default_context_impl = generic_context::fcontext_context_impl<CoroutineImpl>;
 }}}}
 
 #elif (defined(__linux) || defined(linux) || defined(__linux__)) &&            \
@@ -119,7 +120,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #include <hpx/runtime/threads/coroutines/detail/context_linux_x86.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
-    typedef lx::context_impl default_context_impl;
+    template <typename CoroutineImpl>
+    using default_context_impl = lx::x86_linux_context_impl<CoroutineImpl>;
 }}}}
 
 #elif defined(_POSIX_VERSION) || defined(__bgq__) || defined(__powerpc__) ||   \
@@ -128,7 +130,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #include <hpx/runtime/threads/coroutines/detail/context_posix.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
-    typedef posix::context_impl default_context_impl;
+    template <typename CoroutineImpl>
+    using default_context_impl = posix::ucontext_context_impl<CoroutineImpl>;
 }}}}
 
 #elif defined(HPX_HAVE_FIBER_BASED_COROUTINES)
@@ -136,7 +139,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #include <hpx/runtime/threads/coroutines/detail/context_windows_fibers.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
-    typedef windows::context_impl default_context_impl;
+    template <typename CoroutineImpl>
+    using default_context_impl = windows::fibers_context_impl<CoroutineImpl>;
 }}}}
 
 #else

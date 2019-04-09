@@ -439,13 +439,12 @@ namespace util {
             /// Async traverse a single element which isn't a container or
             /// tuple like type. This function is SFINAEd out if the element
             /// isn't accepted by the visitor.
-            template <typename Current>
-            auto async_traverse_one_impl(container_category_tag<false, false>,
+            template <typename Current, typename = typename always_void<decltype(
+                std::declval<Frame>()->traverse(*std::declval<Current>()))>::type>
+            void async_traverse_one_impl(container_category_tag<false, false>,
                 Current&& current)
                 /// SFINAE this out if the visitor doesn't accept
                 /// the given element
-            -> typename always_void<decltype(
-                    std::declval<Frame>()->traverse(*current))>::type
             {
                 if (!frame_->traverse(*current))
                 {

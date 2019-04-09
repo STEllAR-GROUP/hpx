@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -192,7 +193,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, InIter last, OutIter dest)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_helper<hpx::traits::general_pointer_tag>::call(
                 first, last, dest);
 #else
@@ -219,7 +220,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, InIter last, OutIter dest)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_helper<hpx::traits::general_pointer_tag>::call(
                 first, last, dest);
 #else
@@ -246,7 +247,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, InIter last, OutIter dest)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_helper<hpx::traits::general_pointer_tag>::call(
                 first, last, dest);
 #else
@@ -274,7 +275,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, std::size_t count, OutIter dest)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
                 first, count, dest);
 #else
@@ -301,7 +302,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, std::size_t count, OutIter dest)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
                 first, count, dest);
 #else
@@ -328,7 +329,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static std::pair<InIter, OutIter>
         call(InIter first, std::size_t count, OutIter dest)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
                 first, count, dest);
 #else

@@ -83,15 +83,13 @@ namespace hpx { namespace threads { namespace coroutines
     namespace detail { namespace lx
     {
         template<typename T>
-        HPX_FORCEINLINE void trampoline(T* fun);
-
-        template<typename T>
-        void trampoline(T* fun)
+        HPX_FORCEINLINE void trampoline(void* fun)
         {
-            (*fun)();
+            (*static_cast<T*>(fun))();
             std::abort();
         }
 
+        template <typename CoroutineImpl>
         class x86_linux_context_impl;
 
         class x86_linux_context_impl_base : detail::context_impl_base
@@ -136,6 +134,7 @@ namespace hpx { namespace threads { namespace coroutines
             void ** m_sp;
         };
 
+        template <typename CoroutineImpl>
         class x86_linux_context_impl : public x86_linux_context_impl_base
         {
         public:
@@ -153,13 +152,18 @@ namespace hpx { namespace threads { namespace coroutines
              * Create a context that on restore invokes Functor on
              *  a new stack. The stack size can be optionally specified.
              */
-            template<typename Functor>
-            x86_linux_context_impl(Functor& cb, std::ptrdiff_t stack_size = -1)
+            explicit x86_linux_context_impl(std::ptrdiff_t stack_size = -1)
               : m_stack_size(stack_size == -1
                   ? static_cast<std::ptrdiff_t>(default_stack_size)
                   : stack_size),
                 m_stack(nullptr)
             {
+            }
+
+            void init()
+            {
+                if (m_stack != nullptr) return;
+
                 if (0 != (m_stack_size % EXEC_PAGESIZE))
                 {
                     throw std::runtime_error(
@@ -176,19 +180,22 @@ namespace hpx { namespace threads { namespace coroutines
                 }
 
                 m_stack = posix::alloc_stack(static_cast<std::size_t>(m_stack_size));
-                HPX_ASSERT(m_stack);
+                if (m_stack == nullptr)
+                {
+                    throw std::runtime_error("could not allocate memory for stack");
+                }
+
                 posix::watermark_stack(m_stack, static_cast<std::size_t>(m_stack_size));
 
-                typedef void fun(Functor*);
-                fun * funp = trampoline;
+                typedef void fun(void*);
+                fun * funp = trampoline<CoroutineImpl>;
 
                 m_sp = (static_cast<void**>(m_stack)
                     + static_cast<std::size_t>(m_stack_size) / sizeof(void*))
                     - context_size;
 
-                m_sp[backup_cb_idx] = m_sp[cb_idx] = &cb;
-                m_sp[backup_funp_idx] = m_sp[funp_idx] =
-                    reinterpret_cast<void*>(funp);
+                m_sp[cb_idx] = this;
+                m_sp[funp_idx] = reinterpret_cast<void*>(funp);
 
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
                 {
@@ -274,28 +281,26 @@ namespace hpx { namespace threads { namespace coroutines
 
             void reset_stack()
             {
-                if (m_stack)
-                {
-                    if (posix::reset_stack(
-                        m_stack, static_cast<std::size_t>(m_stack_size)))
-                        increment_stack_unbind_count();
-                }
+                HPX_ASSERT(m_stack);
+                if (posix::reset_stack(
+                    m_stack, static_cast<std::size_t>(m_stack_size)))
+                    increment_stack_unbind_count();
             }
 
             void rebind_stack()
             {
-                if (m_stack)
-                {
-                    increment_stack_recycle_count();
+                HPX_ASSERT(m_stack);
+                increment_stack_recycle_count();
 
-                    // On rebind, we initialize our stack to ensure a virgin stack
-                    m_sp = (static_cast<void**>(m_stack)
-                        + static_cast<std::size_t>(m_stack_size) / sizeof(void*))
-                        - context_size;
+                // On rebind, we initialize our stack to ensure a virgin stack
+                m_sp = (static_cast<void**>(m_stack)
+                    + static_cast<std::size_t>(m_stack_size) / sizeof(void*))
+                    - context_size;
 
-                    m_sp[cb_idx] = m_sp[backup_cb_idx];
-                    m_sp[funp_idx] = m_sp[backup_funp_idx];
-                }
+                    typedef void fun(void*);
+                    fun * funp = trampoline<CoroutineImpl>;
+                    m_sp[cb_idx] = this;
+                    m_sp[funp_idx] = nasty_cast<void*>(funp);
             }
 
             std::ptrdiff_t get_available_stack_space()
@@ -370,8 +375,6 @@ namespace hpx { namespace threads { namespace coroutines
 
 #if defined(__x86_64__)
             /** structure of context_data:
-             * 13: backup address of function to execute
-             * 12: backup address of trampoline
              * 11: additional alignment (or valgrind_id if enabled)
              * 10: parm 0 of trampoline
              * 9:  dummy return address for trampoline
@@ -389,16 +392,12 @@ namespace hpx { namespace threads { namespace coroutines
             static const std::size_t valgrind_id_idx = 11;
 #endif
 
-            static const std::size_t context_size = 14;
-            static const std::size_t backup_cb_idx = 13;
-            static const std::size_t backup_funp_idx = 12;
+            static const std::size_t context_size = 12;
             static const std::size_t cb_idx = 10;
             static const std::size_t funp_idx = 8;
 #else
             /** structure of context_data:
-             * 9: valgrind_id (if enabled)
-             * 8: backup address of function to execute
-             * 7: backup address of trampoline
+             * 7: valgrind_id (if enabled)
              * 6: parm 0 of trampoline
              * 5: dummy return address for trampoline
              * 4: return addr (here: start addr)
@@ -408,14 +407,12 @@ namespace hpx { namespace threads { namespace coroutines
              * 0: edi
              **/
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
-            static const std::size_t context_size = 10;
-            static const std::size_t valgrind_id_idx = 9;
+            static const std::size_t context_size = 8;
+            static const std::size_t valgrind_id_idx = 7;
 #else
-            static const std::size_t context_size = 9;
+            static const std::size_t context_size = 7;
 #endif
 
-            static const std::size_t backup_cb_idx = 8;
-            static const std::size_t backup_funp_idx = 7;
             static const std::size_t cb_idx = 6;
             static const std::size_t funp_idx = 4;
 #endif
@@ -428,8 +425,6 @@ namespace hpx { namespace threads { namespace coroutines
             stack_t segv_stack;
 #endif
         };
-
-        typedef x86_linux_context_impl context_impl;
 
         /**
          * Free function. Saves the current context in @p from

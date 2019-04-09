@@ -21,6 +21,7 @@ set(tests
     local_new
     migrate_component
     migrate_component_to_storage
+    migrate_polymorphic_component
     new_
     new_binpacking
     new_colocated
@@ -74,6 +75,12 @@ set(migrate_component_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 2)
 set(migrate_component_FLAGS
+    DEPENDENCIES iostreams_component)
+
+set(migrate_polymorphic_component_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 2)
+set(migrate_polymorphic_component_FLAGS
     DEPENDENCIES iostreams_component)
 
 set(inheritance_2_classes_abstract_FLAGS

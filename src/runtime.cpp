@@ -1408,6 +1408,23 @@ namespace hpx { namespace threads
         get_runtime().get_thread_manager().set_scheduler_mode(m);
     }
 
+    HPX_API_EXPORT void add_scheduler_mode(threads::policies::scheduler_mode m)
+    {
+        get_runtime().get_thread_manager().add_scheduler_mode(m);
+    }
+
+    HPX_API_EXPORT void add_remove_scheduler_mode(
+        threads::policies::scheduler_mode to_add_mode,
+        threads::policies::scheduler_mode to_remove_mode)
+    {
+        get_runtime().get_thread_manager().add_remove_scheduler_mode(
+            to_add_mode, to_remove_mode);
+    }
+
+    HPX_API_EXPORT void remove_scheduler_mode(threads::policies::scheduler_mode m)
+    {
+        get_runtime().get_thread_manager().remove_scheduler_mode(m);
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

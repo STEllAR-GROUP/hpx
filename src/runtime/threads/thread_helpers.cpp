@@ -39,24 +39,27 @@
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
-    thread_state set_thread_state(thread_id_type const& id, thread_state_enum state,
-        thread_state_ex_enum stateex, thread_priority priority, error_code& ec)
+    thread_state set_thread_state(thread_id_type const& id,
+        thread_state_enum state, thread_state_ex_enum stateex,
+        thread_priority priority, bool retry_on_active, error_code& ec)
     {
         if (&ec != &throws)
             ec = make_success_code();
 
         return detail::set_thread_state(id, state, stateex,
-            priority, thread_schedule_hint(), ec);
+            priority, thread_schedule_hint(), retry_on_active, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type set_thread_state(thread_id_type const& id,
-        util::steady_time_point const& abs_time, std::atomic<bool>* timer_started,
-        thread_state_enum state, thread_state_ex_enum stateex,
-        thread_priority priority, error_code& ec)
+        util::steady_time_point const& abs_time,
+        std::atomic<bool>* timer_started, thread_state_enum state,
+        thread_state_ex_enum stateex, thread_priority priority,
+        bool retry_on_active, error_code& ec)
     {
-        return detail::set_thread_state_timed(*id->get_scheduler_base(), abs_time, id,
-            state, stateex, priority, thread_schedule_hint(), timer_started, ec);
+        return detail::set_thread_state_timed(*id->get_scheduler_base(),
+            abs_time, id, state, stateex, priority, thread_schedule_hint(),
+            timer_started, retry_on_active, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -108,10 +111,10 @@ namespace hpx { namespace threads
 
         id->interrupt(flag);      // notify thread
 
-        // set thread state to pending, if the thread is currently active,
-        // this will be rescheduled until it calls an interruption point
+        // Set thread state to pending. If the thread is currently active we do
+        // not retry. The thread will either exit or hit an interruption_point.
         set_thread_state(id, pending, wait_abort,
-            thread_priority_normal, ec);
+            thread_priority_normal, false, ec);
     }
 
     void interruption_point(thread_id_type const& id, error_code& ec)
@@ -553,10 +556,12 @@ namespace hpx { namespace this_thread
             detail::reset_backtrace bt(id, ec);
 #endif
             std::atomic<bool> timer_started(false);
-            threads::thread_id_type timer_id = threads::set_thread_state(id,
-                abs_time, &timer_started, threads::pending, threads::wait_timeout,
-                threads::thread_priority_boost, ec);
-            if (ec) return threads::wait_unknown;
+            threads::thread_id_type timer_id =
+                threads::set_thread_state(id, abs_time, &timer_started,
+                    threads::pending, threads::wait_timeout,
+                    threads::thread_priority_boost, true, ec);
+            if (ec)
+                return threads::wait_unknown;
 
             // We might need to dispatch 'nextid' to it's correct scheduler
             // only if our current scheduler is the same, we should yield the id
@@ -583,9 +588,9 @@ namespace hpx { namespace this_thread
                 hpx::util::yield_while(
                     [&timer_started]() { return !timer_started.load(); },
                     "set_thread_state_timed");
-                threads::set_thread_state(timer_id,
-                    threads::pending, threads::wait_abort,
-                    threads::thread_priority_boost, ec1);
+                threads::set_thread_state(timer_id, threads::pending,
+                    threads::wait_abort, threads::thread_priority_boost, true,
+                    ec1);
             }
         }
 

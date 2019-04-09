@@ -122,37 +122,24 @@ void test_id_comparison()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void interruption_point_thread(hpx::lcos::local::barrier* b,
-    hpx::lcos::local::spinlock* m, bool* failed)
+void interruption_point_thread(hpx::lcos::local::spinlock* m, bool* failed)
 {
-    try {
-        std::unique_lock<hpx::lcos::local::spinlock> lk(*m);
-        hpx::util::ignore_while_checking<
-            std::unique_lock<hpx::lcos::local::spinlock>>
-            il(&lk);
-        hpx::this_thread::interruption_point();
-        *failed = true;
-    }
-    catch(...) {
-        b->wait();
-        throw;
-    }
-    b->wait();
+    std::unique_lock<hpx::lcos::local::spinlock> lk(*m);
+    hpx::util::ignore_while_checking<
+        std::unique_lock<hpx::lcos::local::spinlock>>
+        il(&lk);
+    hpx::this_thread::interruption_point();
+    *failed = true;
 }
 
 void do_test_thread_interrupts_at_interruption_point()
 {
     hpx::lcos::local::spinlock m;
-    hpx::lcos::local::barrier b(2);
     bool failed = false;
     std::unique_lock<hpx::lcos::local::spinlock> lk(m);
-    hpx::thread thrd(&interruption_point_thread, &b, &m, &failed);
+    hpx::thread thrd(&interruption_point_thread, &m, &failed);
     thrd.interrupt();
     lk.unlock();
-
-    b.wait();       // Make sure the test thread has been executed, as join is
-                    // a interruption point which might get triggered.
-
     thrd.join();
     HPX_TEST(!failed);
 }
@@ -201,8 +188,7 @@ void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
         caught = true;
     }
 
-    b.wait();       // Make sure the test thread has been executed, as join is
-                    // a interruption point which might get triggered.
+    b.wait();
 
     thrd.join();
     HPX_TEST(!failed);

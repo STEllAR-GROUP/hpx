@@ -28,141 +28,264 @@ int delay = 1000;
 int test_count = 100;
 int chunk_size = 0;
 int num_overlapping_loops = 0;
+bool disable_stealing = false;
+bool fast_idle_mode = false;
 unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
-///////////////////////////////////////////////////////////////////////////////
-void measure_sequential_foreach(std::size_t size)
+struct disable_stealing_parameter
 {
-    std::vector<std::size_t> data_representation(size);
-    std::iota(std::begin(data_representation),
-        std::end(data_representation),
-        gen());
+    template <typename Executor>
+    void mark_begin_execution(Executor &&)
+    {
+        hpx::threads::add_remove_scheduler_mode(
+            hpx::threads::policies::enable_stealing,
+            hpx::threads::policies::enable_idle_backoff);
+    }
 
-    // invoke sequential for_each
-    hpx::parallel::for_each(hpx::parallel::execution::seq,
-        std::begin(data_representation),
-        std::end(data_representation),
-        [](std::size_t)
-        {
-            worker_timed(delay);
-        });
-}
+    template <typename Executor>
+    void mark_end_of_scheduling(Executor &&)
+    {
+        hpx::threads::remove_scheduler_mode(
+            hpx::threads::policies::enable_stealing);
+    }
 
-template <typename Executor>
-void measure_parallel_foreach(std::size_t size, Executor && exec)
+    template <typename Executor>
+    void mark_end_execution(Executor &&)
+    {
+        hpx::threads::add_remove_scheduler_mode(
+            hpx::threads::policies::enable_idle_backoff,
+            hpx::threads::policies::enable_stealing);
+    }
+};
+
+namespace hpx { namespace parallel { namespace execution
 {
-    std::vector<std::size_t> data_representation(size);
-    std::iota(std::begin(data_representation),
-        std::end(data_representation),
-        gen());
-
-    // create executor parameters object
-    hpx::parallel::execution::static_chunk_size cs(chunk_size);
-
-    // invoke parallel for_each
-    hpx::parallel::for_each(hpx::parallel::execution::par.with(cs).on(exec),
-        std::begin(data_representation),
-        std::end(data_representation),
-        [](std::size_t)
-        {
-            worker_timed(delay);
-        });
-}
-
-template <typename Executor>
-hpx::future<void> measure_task_foreach(std::size_t size, Executor && exec)
-{
-    std::shared_ptr<std::vector<std::size_t> > data_representation(
-        std::make_shared<std::vector<std::size_t> >(size));
-
-    std::iota(std::begin(*data_representation),
-        std::end(*data_representation), gen());
-
-    // create executor parameters object
-    hpx::parallel::execution::static_chunk_size cs(chunk_size);
-
-    // invoke parallel for_each
-    return hpx::parallel::for_each(
-        hpx::parallel::execution::par(hpx::parallel::execution::task)
-            .with(cs).on(exec),
-        std::begin(*data_representation),
-        std::end(*data_representation),
-        [](std::size_t)
-        {
-            worker_timed(delay);
-        })
-        .then([data_representation](hpx::future<void>) {});
-}
+    template <>
+    struct is_executor_parameters<disable_stealing_parameter>
+      : std::true_type
+    {};
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
-void measure_sequential_forloop(std::size_t size)
+void measure_sequential_foreach(
+    std::vector<std::size_t> const& data_representation)
 {
-    std::vector<std::size_t> data_representation(size);
-    std::iota(std::begin(data_representation),
-        std::end(data_representation),
-        gen());
+    if (disable_stealing)
+    {
+        // disable stealing from inside the algorithm
+        disable_stealing_parameter dsp;
 
-    using iterator = typename std::vector<std::size_t>::iterator;
-
-    // invoke sequential for_loop
-    hpx::parallel::for_loop(hpx::parallel::execution::seq,
-        std::begin(data_representation),
-        std::end(data_representation),
-        [](iterator)
-        {
-            worker_timed(delay);
-        });
+        // invoke sequential for_each
+        hpx::parallel::for_each(hpx::parallel::execution::seq.with(dsp),
+            std::begin(data_representation),
+            std::end(data_representation),
+            [](std::size_t)
+            {
+                worker_timed(delay);
+            });
+    }
+    else
+    {
+        // invoke sequential for_each
+        hpx::parallel::for_each(hpx::parallel::execution::seq,
+            std::begin(data_representation),
+            std::end(data_representation),
+            [](std::size_t)
+            {
+                worker_timed(delay);
+            });
+    }
 }
 
 template <typename Executor>
-void measure_parallel_forloop(std::size_t size, Executor && exec)
+void measure_parallel_foreach(
+    std::vector<std::size_t> const& data_representation, Executor&& exec)
 {
-    std::vector<std::size_t> data_representation(size);
-    std::iota(std::begin(data_representation),
-        std::end(data_representation),
-        gen());
+    // create executor parameters object
+    hpx::parallel::execution::static_chunk_size cs(chunk_size);
 
-    using iterator = typename std::vector<std::size_t>::iterator;
+    if (disable_stealing)
+    {
+        // disable stealing from inside the algorithm
+        disable_stealing_parameter dsp;
+
+        // invoke parallel for_each
+        hpx::parallel::for_each(
+            hpx::parallel::execution::par.with(cs, dsp).on(exec),
+            std::begin(data_representation),
+            std::end(data_representation),
+            [](std::size_t)
+            {
+                worker_timed(delay);
+            });
+    }
+    else
+    {
+        // invoke parallel for_each
+        hpx::parallel::for_each(
+            hpx::parallel::execution::par.with(cs).on(exec),
+            std::begin(data_representation),
+            std::end(data_representation),
+            [](std::size_t)
+            {
+                worker_timed(delay);
+            });
+    }
+}
+
+template <typename Executor>
+hpx::future<void> measure_task_foreach(
+    std::shared_ptr<std::vector<std::size_t>> data_representation,
+    Executor&& exec)
+{
+    // create executor parameters object
+    hpx::parallel::execution::static_chunk_size cs(chunk_size);
+
+    if (disable_stealing)
+    {
+        // disable stealing from inside the algorithm
+        disable_stealing_parameter dsp;
+
+        // invoke parallel for_each
+        return hpx::parallel::for_each(
+            hpx::parallel::execution::par(hpx::parallel::execution::task)
+                .with(cs, dsp).on(exec),
+            std::begin(*data_representation),
+            std::end(*data_representation),
+            [](std::size_t)
+            {
+                worker_timed(delay);
+            })
+            .then([data_representation](hpx::future<void>) {});
+    }
+    else
+    {
+        // invoke parallel for_each
+        return hpx::parallel::for_each(
+            hpx::parallel::execution::par(hpx::parallel::execution::task)
+                .with(cs).on(exec),
+            std::begin(*data_representation),
+            std::end(*data_representation),
+            [](std::size_t)
+            {
+                worker_timed(delay);
+            })
+            .then([data_representation](hpx::future<void>) {});
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void measure_sequential_forloop(
+    std::vector<std::size_t> const& data_representation)
+{
+    using iterator = typename std::vector<std::size_t>::const_iterator;
+
+    if (disable_stealing)
+    {
+        // disable stealing from inside the algorithm
+        disable_stealing_parameter dsp;
+
+        // invoke sequential for_loop
+        hpx::parallel::for_loop(hpx::parallel::execution::seq.with(dsp),
+            std::begin(data_representation),
+            std::end(data_representation),
+            [](iterator)
+            {
+                worker_timed(delay);
+            });
+    }
+    else
+    {
+        // invoke sequential for_loop
+        hpx::parallel::for_loop(hpx::parallel::execution::seq,
+            std::begin(data_representation),
+            std::end(data_representation),
+            [](iterator)
+            {
+                worker_timed(delay);
+            });
+    }
+}
+
+template <typename Executor>
+void measure_parallel_forloop(
+    std::vector<std::size_t> const& data_representation, Executor&& exec)
+{
+    using iterator = typename std::vector<std::size_t>::const_iterator;
 
     // create executor parameters object
     hpx::parallel::execution::static_chunk_size cs(chunk_size);
 
-    // invoke parallel for_loop
-    hpx::parallel::for_loop(hpx::parallel::execution::par.with(cs).on(exec),
-        std::begin(data_representation),
-        std::end(data_representation),
-        [](iterator)
-        {
-            worker_timed(delay);
-        });
+    if (disable_stealing)
+    {
+        // disable stealing from inside the algorithm
+        disable_stealing_parameter dsp;
+
+        // invoke parallel for_loop
+        hpx::parallel::for_loop(
+            hpx::parallel::execution::par.with(cs, dsp).on(exec),
+            std::begin(data_representation),
+            std::end(data_representation),
+            [](iterator)
+            {
+                worker_timed(delay);
+            });
+    }
+    else
+    {
+        // invoke parallel for_loop
+        hpx::parallel::for_loop(hpx::parallel::execution::par.with(cs).on(exec),
+            std::begin(data_representation),
+            std::end(data_representation),
+            [](iterator)
+            {
+                worker_timed(delay);
+            });
+    }
 }
 
 template <typename Executor>
-hpx::future<void> measure_task_forloop(std::size_t size, Executor && exec)
+hpx::future<void> measure_task_forloop(
+    std::shared_ptr<std::vector<std::size_t>> data_representation,
+    Executor&& exec)
 {
-    std::shared_ptr<std::vector<std::size_t> > data_representation(
-        std::make_shared<std::vector<std::size_t> >(size));
-
-    std::iota(std::begin(*data_representation),
-        std::end(*data_representation), gen());
-
-    using iterator = typename std::vector<std::size_t>::iterator;
+    using iterator = typename std::vector<std::size_t>::const_iterator;
 
     // create executor parameters object
     hpx::parallel::execution::static_chunk_size cs(chunk_size);
 
-    // invoke parallel for_looph
-    return hpx::parallel::for_loop(
-        hpx::parallel::execution::par(hpx::parallel::execution::task)
-            .with(cs).on(exec),
-        std::begin(*data_representation),
-        std::end(*data_representation),
-        [](iterator)
-        {
-            worker_timed(delay);
-        })
-        .then([data_representation](hpx::future<void>) {});
+    if (disable_stealing)
+    {
+        // disable stealing from inside the algorithm
+        disable_stealing_parameter dsp;
+
+        // invoke parallel for_looph
+        return hpx::parallel::for_loop(
+            hpx::parallel::execution::par(hpx::parallel::execution::task)
+                .with(cs, dsp).on(exec),
+            std::begin(*data_representation),
+            std::end(*data_representation),
+            [](iterator)
+            {
+                worker_timed(delay);
+            })
+            .then([data_representation](hpx::future<void>) {});
+    }
+    else
+    {
+        // invoke parallel for_looph
+        return hpx::parallel::for_loop(
+            hpx::parallel::execution::par(hpx::parallel::execution::task)
+                .with(cs).on(exec),
+            std::begin(*data_representation),
+            std::end(*data_representation),
+            [](iterator)
+            {
+                worker_timed(delay);
+            })
+            .then([data_representation](hpx::future<void>) {});
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,11 +293,16 @@ template <typename Executor>
 std::uint64_t averageout_parallel_foreach(
     std::size_t vector_size, Executor&& exec)
 {
+    std::vector<std::size_t> data_representation(vector_size);
+    std::iota(std::begin(data_representation),
+        std::end(data_representation),
+        gen());
+
     std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
     for(auto i = 0; i < test_count; i++)
-        measure_parallel_foreach(vector_size, exec);
+        measure_parallel_foreach(data_representation, exec);
 
     return (hpx::util::high_resolution_clock::now() - start) / test_count;
 }
@@ -182,12 +310,18 @@ std::uint64_t averageout_parallel_foreach(
 template <typename Executor>
 std::uint64_t averageout_task_foreach(std::size_t vector_size, Executor && exec)
 {
+    std::shared_ptr<std::vector<std::size_t> > data_representation(
+        std::make_shared<std::vector<std::size_t> >(vector_size));
+
+    std::iota(std::begin(*data_representation),
+        std::end(*data_representation), gen());
+
     if (num_overlapping_loops <= 0)
     {
         std::uint64_t start = hpx::util::high_resolution_clock::now();
 
         for(auto i = 0; i < test_count; i++)
-            measure_task_foreach(vector_size, exec).wait();
+            measure_task_foreach(data_representation, exec).wait();
 
         return (hpx::util::high_resolution_clock::now() - start) / test_count;
     }
@@ -199,7 +333,7 @@ std::uint64_t averageout_task_foreach(std::size_t vector_size, Executor && exec)
 
     for(auto i = 0; i < test_count; i++)
     {
-        hpx::future<void> curr = measure_task_foreach(vector_size, exec);
+        hpx::future<void> curr = measure_task_foreach(data_representation, exec);
         if (i >= num_overlapping_loops)
             tests[(i-num_overlapping_loops) % tests.size()].wait();
         tests[i % tests.size()] = curr.share();
@@ -211,11 +345,16 @@ std::uint64_t averageout_task_foreach(std::size_t vector_size, Executor && exec)
 
 std::uint64_t averageout_sequential_foreach(std::size_t vector_size)
 {
+    std::vector<std::size_t> data_representation(vector_size);
+    std::iota(std::begin(data_representation),
+        std::end(data_representation),
+        gen());
+
     std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
-    for(auto i = 0; i < test_count; i++)
-        measure_sequential_foreach(vector_size);
+   for(auto i = 0; i < test_count; i++)
+        measure_sequential_foreach(data_representation);
 
     return (hpx::util::high_resolution_clock::now() - start) / test_count;
 }
@@ -225,11 +364,16 @@ template <typename Executor>
 std::uint64_t averageout_parallel_forloop(
     std::size_t vector_size, Executor&& exec)
 {
+    std::vector<std::size_t> data_representation(vector_size);
+    std::iota(std::begin(data_representation),
+        std::end(data_representation),
+        gen());
+
     std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
     for(auto i = 0; i < test_count; i++)
-        measure_parallel_forloop(vector_size, exec);
+        measure_parallel_forloop(data_representation, exec);
 
     return (hpx::util::high_resolution_clock::now() - start) / test_count;
 }
@@ -237,12 +381,18 @@ std::uint64_t averageout_parallel_forloop(
 template <typename Executor>
 std::uint64_t averageout_task_forloop(std::size_t vector_size, Executor && exec)
 {
+    std::shared_ptr<std::vector<std::size_t> > data_representation(
+        std::make_shared<std::vector<std::size_t> >(vector_size));
+
+    std::iota(std::begin(*data_representation),
+        std::end(*data_representation), gen());
+
     if (num_overlapping_loops <= 0)
     {
         std::uint64_t start = hpx::util::high_resolution_clock::now();
 
         for(auto i = 0; i < test_count; i++)
-            measure_task_forloop(vector_size, exec).wait();
+            measure_task_forloop(data_representation, exec).wait();
 
         return (hpx::util::high_resolution_clock::now() - start) / test_count;
     }
@@ -254,7 +404,8 @@ std::uint64_t averageout_task_forloop(std::size_t vector_size, Executor && exec)
 
     for(auto i = 0; i < test_count; i++)
     {
-        hpx::future<void> curr = measure_task_forloop(vector_size, exec);
+        hpx::future<void> curr =
+            measure_task_forloop(data_representation, exec);
         if (i >= num_overlapping_loops)
             tests[(i-num_overlapping_loops) % tests.size()].wait();
         tests[i % tests.size()] = curr.share();
@@ -266,11 +417,16 @@ std::uint64_t averageout_task_forloop(std::size_t vector_size, Executor && exec)
 
 std::uint64_t averageout_sequential_forloop(std::size_t vector_size)
 {
+    std::vector<std::size_t> data_representation(vector_size);
+    std::iota(std::begin(data_representation),
+        std::end(data_representation),
+        gen());
+
     std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
     for(auto i = 0; i < test_count; i++)
-        measure_sequential_forloop(vector_size);
+        measure_sequential_forloop(data_representation);
 
     return (hpx::util::high_resolution_clock::now() - start) / test_count;
 }
@@ -285,6 +441,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     test_count = vm["test_count"].as<int>();
     chunk_size = vm["chunk_size"].as<int>();
     num_overlapping_loops = vm["overlapping_loops"].as<int>();
+    disable_stealing = vm.count("disable_stealing");
+    fast_idle_mode = vm.count("fast_idle_mode");
 
     // verify that input is within domain of program
     if (test_count == 0 || test_count < 0)
@@ -297,6 +455,17 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
     else
     {
+        if (disable_stealing)
+        {
+            hpx::threads::remove_scheduler_mode(
+                hpx::threads::policies::enable_stealing);
+        }
+        if (fast_idle_mode)
+        {
+            hpx::threads::add_scheduler_mode(
+                hpx::threads::policies::fast_idle_mode);
+        }
+
         // results
         std::uint64_t par_time_foreach;
         std::uint64_t task_time_foreach;
@@ -329,6 +498,17 @@ int hpx_main(boost::program_options::variables_map& vm)
             par_time_forloop = averageout_parallel_forloop(vector_size, par);
             task_time_forloop = averageout_task_forloop(vector_size, par);
             seq_time_forloop = averageout_sequential_forloop(vector_size);
+        }
+
+        if (disable_stealing)
+        {
+            hpx::threads::add_scheduler_mode(
+                hpx::threads::policies::enable_stealing);
+        }
+        if (fast_idle_mode)
+        {
+            hpx::threads::remove_scheduler_mode(
+                hpx::threads::policies::fast_idle_mode);
         }
 
         if (csvoutput)
@@ -439,6 +619,12 @@ int main(int argc, char* argv[])
 
         ("aggregated"
         ,"use aggregated executor")
+
+        ("disable_stealing"
+        ,"disable thread stealing")
+
+        ("fast_idle_mode"
+        ,"enable fast idle mode")
         ;
 
     return hpx::init(cmdline, argc, argv, cfg);

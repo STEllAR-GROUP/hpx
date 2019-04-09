@@ -53,7 +53,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     // This type augments the context_base type with the type of the stored
     // functor.
     class coroutine_impl
-      : public context_base
+      : public context_base<coroutine_impl>
     {
     public:
         HPX_NON_COPYABLE(coroutine_impl);
@@ -69,7 +69,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         coroutine_impl(functor_type&& f, thread_id_type id,
             std::ptrdiff_t stack_size)
-          : context_base(*this, stack_size, id)
+          : context_base(stack_size, id)
           , m_result(unknown, invalid_thread_id)
           , m_arg(nullptr)
           , m_fun(std::move(f))

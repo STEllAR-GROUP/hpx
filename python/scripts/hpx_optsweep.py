@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2009 Maciej Brodowicz
 # Copyright (c) 2011 Bryce Lelbach
+# Copyright (c) 2019 Patrick Diehl
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,8 +30,8 @@ OPTSWEEP_VERSION = 0x10 # version (mostly for version tracking in pickle output)
 
 # print usage info and exit with an error code
 def usage(rc = 2):
-    print '\nUsage:', sys.argv[0], '[options] application [const_options]',
-    print '''
+    print ('\nUsage:', sys.argv[0], '[options] application [const_options]',)
+    print ('''
 Options:
  -a name,list : specify range of values, identified by "name", for a single
                 option of the application;
@@ -49,7 +50,7 @@ Options:
  -p command   : run postprocessing "command" after test sequence for each
                 configuration, applying option substitution
  -h           : prints this message
-'''
+''')
     sys.exit(rc)
 
 
@@ -94,8 +95,8 @@ def run(cmd, outfl = None, timeout = 360):
 def intopt(opta, optn):
     try:
         return int(opta)
-    except Exception, err:
-        print 'Error: invalid argument to option "'+optn+'":', opta, '('+str(err)+')'
+    except Exception as err:
+        print ('Error: invalid argument to option "'+optn+'":', opta, '('+str(err)+')')
         usage()
 
 
@@ -148,8 +149,8 @@ if __name__ == '__main__':
     # parse command line
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'a:b:d:hno:p:r:t:x:w:i:')
-    except getopt.GetoptError, err:
-        print 'Error:', str(err)
+    except getopt.GetoptError as err:
+        print ('Error:', str(err))
         usage()
 
     # option value lists, option names, # test repetitions, temporal pad
@@ -165,28 +166,28 @@ if __name__ == '__main__':
     # timeout 
     timeout = 360
     # non-quotable characters
-    nonquot = string.letters+string.digits+'-+='
+    nonquot = string.ascii_letters+string.digits+'-+='
 
     # process options
     for o, a in opts:
         if o == '-a':
             wl = a.split(',', 1)
             if len(wl) != 2:
-                print 'Error: malformed argument to "-a" option:', a
+                print ('Error: malformed argument to "-a" option:', a)
                 usage()
             try:
                 options[wl[0]] = eval(wl[1])
-            except Exception, err:
-                print 'Error: failed to evaluate "'+wl[1]+'", check syntax'
+            except Exception as err:
+                print ('Error: failed to evaluate "'+wl[1]+'", check syntax')
                 usage()
             if type(options[wl[0]]) not in (ListType, TupleType):
                 options[wl[0]] = (options[wl[1]],)
             if not len(options[wl[0]]):
-                print 'Error: empty value list for option "'+wl[0]+'"'
+                print ('Error: empty value list for option "'+wl[0]+'"')
                 usage()
             optnames.append(wl[0])
             if len(options[wl[0]]) == 1:
-                print 'Warning: single value for option "'+wl[0]+'":', options[wl[0]]
+                print ('Warning: single value for option "'+wl[0]+'":', options[wl[0]])
         elif o == '-n': stdoutf = False
         elif o == '-d': tpad = intopt(a, o)
         elif o == '-r': nrep = intopt(a, o)
@@ -196,28 +197,28 @@ if __name__ == '__main__':
         elif o == '-x':
             try:
                 excl = map(tuple, eval(a))
-            except Exception, err:
-                print 'Error: invalid exclusion list: ', str(a)
+            except Exception as err:
+                print ('Error: invalid exclusion list: ', str(a))
                 usage()
         elif o == '-b': before += [a]
         elif o == '-p': after += [a]
         elif o == '-h': usage(0)
 
     if not args:
-        print 'Error: no test application specified'
+        print ('Error: no test application specified')
         usage()
     if ofile:
         try:
             of = open(ofile, 'w')
             ofhs.append(of)
-        except Exception, err:
-            print 'Error: failed to open output file "'+ofile+'"'
+        except Exception as err:
+            print ('Error: failed to open output file "'+ofile+'"')
             sys.exit(1)
     if rfile:
         try:
             rf = open(rfile, 'w')
-        except Exception, err:
-            print 'Error: failed to open result file "'+rfile+'"'
+        except Exception as err:
+            print ('Error: failed to open result file "'+rfile+'"')
             sys.exit(1)
     if stdoutf: ofhs.append(sys.stdout)
 

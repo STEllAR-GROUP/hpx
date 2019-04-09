@@ -7,7 +7,9 @@
 #define HPX_PARALLEL_UTIL_PARTITIONER_WITH_CLEANUP_OCT_03_2014_0221PM
 
 #include <hpx/config.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/dataflow.hpp>
+#endif
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/unused.hpp>
@@ -74,6 +76,9 @@ namespace hpx { namespace parallel { namespace util
                         std::forward<ExPolicy_>(policy),
                         first, count,
                         std::forward<F1>(f1));
+
+                    scoped_params.mark_end_of_scheduling();
+
                 } catch (...) {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
@@ -142,6 +147,9 @@ namespace hpx { namespace parallel { namespace util
                         std::forward<ExPolicy_>(policy),
                         first, count,
                         std::forward<F1>(f1));
+
+                    scoped_params->mark_end_of_scheduling();
+
                 } catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<R>(
                         std::current_exception());
