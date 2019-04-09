@@ -67,7 +67,8 @@ set(__boost_libraries
   program_options
   system)
 
-find_package(Boost 1.55 REQUIRED COMPONENTS ${__boost_libraries})
+set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
+find_package(Boost 1.55 MODULE REQUIRED COMPONENTS ${__boost_libraries})
 
 if(NOT Boost_FOUND)
   hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
@@ -85,7 +86,7 @@ endif()
 set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 
 if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
-  find_package(Boost 1.55 QUIET COMPONENTS iostreams)
+  find_package(Boost 1.55 QUIET MODULE COMPONENTS iostreams)
   if(Boost_IOSTREAMS_FOUND)
     hpx_info("  iostreams")
   else()
@@ -95,7 +96,7 @@ if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
 endif()
 
 # attempt to load Boost.Regex (if available), it's needed for inspect
-find_package(Boost 1.55 QUIET COMPONENTS regex)
+find_package(Boost 1.55 QUIET MODULE COMPONENTS regex)
 if(Boost_REGEX_FOUND)
   hpx_info("  regex")
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
@@ -112,23 +113,14 @@ endif()
 
 # Boost preprocessor definitions
 hpx_add_config_cond_define(BOOST_PARAMETER_MAX_ARITY 7)
-if(MSVC)
-  hpx_option(HPX_WITH_BOOST_ALL_DYNAMIC_LINK BOOL
-    "Add BOOST_ALL_DYN_LINK to compile flags (default: OFF)"
-    OFF ADVANCED)
-  if (HPX_WITH_BOOST_ALL_DYNAMIC_LINK)
-    hpx_add_config_cond_define(BOOST_ALL_DYN_LINK)
-  endif()
-else()
+if(NOT Boost_USE_STATIC_LIBS)
+  hpx_add_config_cond_define(BOOST_ALL_DYN_LINK)
+endif()
+if(NOT MSVC)
   hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
 hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
-link_directories(${Boost_LIBRARY_DIRS})
-if((NOT MSVC) OR HPX_WITH_BOOST_ALL_DYNAMIC_LINK OR HPX_WITH_VCPKG)
-  hpx_libraries(${Boost_LIBRARIES})
-  hpx_library_dir(${Boost_LIBRARY_DIRS})
-else()
-  hpx_library_dir(${Boost_LIBRARY_DIRS})
-endif()
+add_definitions(-DBOOST_ALL_NO_LIB) # disable auto-linking
+hpx_libraries(${Boost_LIBRARIES})
