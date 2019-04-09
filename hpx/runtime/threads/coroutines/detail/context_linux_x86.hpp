@@ -142,12 +142,6 @@ namespace hpx { namespace threads { namespace coroutines
 
             typedef x86_linux_context_impl_base context_impl_base;
 
-            x86_linux_context_impl()
-                : m_stack(nullptr)
-            {
-                set_sigsegv_handler();
-            }
-
             /**
              * Create a context that on restore invokes Functor on
              *  a new stack. The stack size can be optionally specified.
