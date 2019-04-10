@@ -513,6 +513,16 @@ int hpx_main(boost::program_options::variables_map& vm)
             if(verbose)
                 std::cout << "Squared errors: " << errsq << "\n";
         }
+
+        {
+            // unregister names...
+            auto range = boost::irange(blocks_start, blocks_end);
+            for (auto b: range)
+            {
+                hpx::unregister_with_basename(A_block_basename, b);
+                hpx::unregister_with_basename(B_block_basename, b);
+            }
+        }
     }
 
     return hpx::finalize();
