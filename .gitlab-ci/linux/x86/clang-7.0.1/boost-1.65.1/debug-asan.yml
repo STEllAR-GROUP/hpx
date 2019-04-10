@@ -20,9 +20,10 @@ asan_suppresions:
     stage: checkout
     script:
         - echo leak:libltd > /suppressions.txt
+        - echo leak:performance_counter >> /suppressions.txt
     artifacts:
         paths:
-            - /suppresions.txt
+            - /suppressions.txt
 
 cmake Debug ASAN x86:
     <<: *debug-asan-x86
