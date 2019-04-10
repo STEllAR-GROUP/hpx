@@ -82,16 +82,6 @@ namespace hpx { namespace threads { namespace coroutines
 
     namespace detail { namespace lx
     {
-        template <typename TO, typename FROM>
-        TO nasty_cast(FROM f)
-        {
-            union {
-                FROM f; TO t;
-            } u;
-            u.f = f;
-            return u.t;
-        }
-
         template<typename T>
         HPX_FORCEINLINE void trampoline(void* fun)
         {
@@ -199,7 +189,7 @@ namespace hpx { namespace threads { namespace coroutines
                     - context_size;
 
                 m_sp[cb_idx] = this;
-                m_sp[funp_idx] = nasty_cast<void*>(funp);
+                m_sp[funp_idx] = reinterpret_cast<void*>(funp);
 
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
                 {
@@ -209,72 +199,9 @@ namespace hpx { namespace threads { namespace coroutines
                 }
 #endif
 
-#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
-                // concept inspired by the following links:
-                //
-                // https://rethinkdb.com/blog/handling-stack-overflow-on-custom-stacks/
-                // http://www.evanjones.ca/software/threading.html
-                //
-                segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
-                segv_stack.ss_flags = 0;
-                segv_stack.ss_size = SEGV_STACK_SIZE;
-
-                std::memset(&action, '\0', sizeof(action));
-                action.sa_flags = SA_SIGINFO|SA_ONSTACK;
-                action.sa_sigaction = &x86_linux_context_impl::sigsegv_handler;
-
-                sigaltstack(&segv_stack, nullptr);
-                sigemptyset(&action.sa_mask);
-                sigaddset(&action.sa_mask, SIGSEGV);
-                sigaction(SIGSEGV, &action, nullptr);
-#endif
-           }
-
-#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
-
-// heuristic value 1 kilobyte
-//
-#define COROUTINE_STACKOVERFLOW_ADDR_EPSILON 1000UL
-
-            static void sigsegv_handler(int /*signum*/, siginfo_t *infoptr,
-                void *ctxptr)
-            {
-                ucontext_t * uc_ctx = static_cast< ucontext_t* >(ctxptr);
-                char* sigsegv_ptr = static_cast< char* >(infoptr->si_addr);
-
-                // https://www.gnu.org/software/libc/manual/html_node/Signal-Stack.html
-                //
-                char* stk_ptr = static_cast<char*>(uc_ctx->uc_stack.ss_sp);
-
-                std::ptrdiff_t addr_delta = (sigsegv_ptr > stk_ptr)
-                    ? (sigsegv_ptr - stk_ptr)
-                    : (stk_ptr - sigsegv_ptr);
-
-                // check the stack addresses, if they're < 10 apart, terminate
-                // program should filter segmentation faults caused by
-                // coroutine stack overflows from 'genuine' stack overflows
-                //
-                if( static_cast<size_t>(addr_delta) <
-                    COROUTINE_STACKOVERFLOW_ADDR_EPSILON ) {
-
-                    std::cerr << "Stack overflow in coroutine at address "
-                        << std::internal << std::hex
-                        << std::setw(sizeof(sigsegv_ptr)*2+2)
-                        << std::setfill('0') << sigsegv_ptr
-                        << ".\n\n";
-
-                    std::cerr
-                        << "Configure the hpx runtime to allocate a larger coroutine "
-                           "stack size.\n Use the hpx.stacks.small_size, "
-                           "hpx.stacks.medium_size,\n hpx.stacks.large_size, "
-                           "or hpx.stacks.huge_size configuration\nflags to configure "
-                           "coroutine stack sizes.\n"
-                        << std::endl;
-
-                    std::terminate();
-                }
+                set_sigsegv_handler();
             }
-#endif
+
             ~x86_linux_context_impl()
             {
                 if (m_stack)
@@ -286,6 +213,59 @@ namespace hpx { namespace threads { namespace coroutines
                     posix::free_stack(m_stack, static_cast<std::size_t>(m_stack_size));
                 }
             }
+
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
+
+// heuristic value 1 kilobyte
+#define COROUTINE_STACKOVERFLOW_ADDR_EPSILON 1000UL
+
+            static void check_coroutine_stack_overflow(siginfo_t *infoptr, void *ctxptr) {
+                ucontext_t* uc_ctx = static_cast<ucontext_t*>(ctxptr);
+                char* sigsegv_ptr = static_cast<char*>(infoptr->si_addr);
+
+                // https://www.gnu.org/software/libc/manual/html_node/Signal-Stack.html
+                //
+                char* stk_ptr = static_cast<char*>(uc_ctx->uc_stack.ss_sp);
+
+                std::ptrdiff_t addr_delta = (sigsegv_ptr > stk_ptr) ?
+                    (sigsegv_ptr - stk_ptr) :
+                    (stk_ptr - sigsegv_ptr);
+
+                // check the stack addresses, if they're < 10 apart, terminate
+                // program should filter segmentation faults caused by
+                // coroutine stack overflows from 'genuine' stack overflows
+                //
+                if (static_cast<size_t>(addr_delta) <
+                    COROUTINE_STACKOVERFLOW_ADDR_EPSILON)
+                {
+                    std::cerr << "Stack overflow in coroutine at address "
+                              << std::internal << std::hex
+                              << std::setw(sizeof(sigsegv_ptr) * 2 + 2)
+                              << std::setfill('0') << sigsegv_ptr << ".\n\n";
+
+                    std::cerr
+                        << "Configure the hpx runtime to allocate a larger "
+                           "coroutine stack size.\n Use the "
+                           "hpx.stacks.small_size, hpx.stacks.medium_size,\n "
+                           "hpx.stacks.large_size, or hpx.stacks.huge_size "
+                           "configuration\nflags to configure coroutine stack "
+                           "sizes.\n"
+                        << std::endl;
+                }
+            }
+
+            static void sigsegv_handler(
+                int signum, siginfo_t* infoptr, void* ctxptr)
+            {
+                char* reason = strsignal(signum);
+                std::cerr << "{what}: " << (reason ? reason : "Unknown signal")
+                          << std::endl;
+
+                check_coroutine_stack_overflow(infoptr, ctxptr);
+
+                std::terminate();
+            }
+#endif
 
             // Return the size of the reserved stack address space.
             std::ptrdiff_t get_stacksize() const
@@ -314,7 +294,7 @@ namespace hpx { namespace threads { namespace coroutines
                     typedef void fun(void*);
                     fun * funp = trampoline<CoroutineImpl>;
                     m_sp[cb_idx] = this;
-                    m_sp[funp_idx] = nasty_cast<void*>(funp);
+                    m_sp[funp_idx] = reinterpret_cast<void*>(funp);
             }
 
             std::ptrdiff_t get_available_stack_space()
@@ -364,6 +344,29 @@ namespace hpx { namespace threads { namespace coroutines
                 x86_linux_context_impl_base const& to, yield_hint);
 
         private:
+            void set_sigsegv_handler()
+            {
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
+                // concept inspired by the following links:
+                //
+                // https://rethinkdb.com/blog/handling-stack-overflow-on-custom-stacks/
+                // http://www.evanjones.ca/software/threading.html
+                //
+                segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
+                segv_stack.ss_flags = 0;
+                segv_stack.ss_size = SEGV_STACK_SIZE;
+
+                std::memset(&action, '\0', sizeof(action));
+                action.sa_flags = SA_SIGINFO|SA_ONSTACK;
+                action.sa_sigaction = &x86_linux_context_impl::sigsegv_handler;
+
+                sigaltstack(&segv_stack, nullptr);
+                sigemptyset(&action.sa_mask);
+                sigaddset(&action.sa_mask, SIGSEGV);
+                sigaction(SIGSEGV, &action, nullptr);
+#endif
+            }
+
 #if defined(__x86_64__)
             /** structure of context_data:
              * 11: additional alignment (or valgrind_id if enabled)
