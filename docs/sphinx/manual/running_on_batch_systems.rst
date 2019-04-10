@@ -35,8 +35,8 @@ like any other regular shell script. While the description of all available PBS
 options is outside the scope of this tutorial (the interested reader may refer
 to in-depth `documentation <http://www.clusterresources.com/torquedocs21/>`_ for
 more information), below is a minimal example to illustrate the approach. As a
-test application we will use the multithreaded ``hello_world`` program,
-explained in the section :ref:`examples_hello_world`.
+test application we will use the multithreaded ``hello_world_distributed``
+program, explained in the section :ref:`examples_hello_world`.
 
 .. code-block:: bash
 
@@ -44,7 +44,7 @@ explained in the section :ref:`examples_hello_world`.
    #
    #PBS -l nodes=2:ppn=4
 
-   APP_PATH=~/packages/hpx/bin/hello_world
+   APP_PATH=~/packages/hpx/bin/hello_world_distributed
    APP_OPTIONS=
 
    pbsdsh -u $APP_PATH $APP_OPTIONS --hpx:nodes=`cat $PBS_NODEFILE`
@@ -79,18 +79,18 @@ the PBS script above would look like:
    #
    #PBS -l select=2:ncpus=4
 
-   APP_PATH=~/packages/hpx/bin/hello_world
+   APP_PATH=~/packages/hpx/bin/hello_world_distributed
    APP_OPTIONS=
 
    pbsdsh -u $APP_PATH $APP_OPTIONS --hpx:nodes=`cat $PBS_NODEFILE`
 
 ``APP_PATH`` and ``APP_OPTIONS`` are shell variables that respectively specify
-the correct path to the executable (``hello_world`` in this case) and the
-command line options. Since the ``hello_world`` application doesn't need any
-command line options, ``APP_OPTIONS`` has been left empty. Unlike in other
-execution environments, there is no need to use the :option:`--hpx:threads`
-option to indicate the required number of OS threads per node; the |hpx| library
-will derive this parameter automatically from PBS.
+the correct path to the executable (``hello_world_distributed`` in this case)
+and the command line options. Since the ``hello_world_distributed`` application
+doesn't need any command line options, ``APP_OPTIONS`` has been left empty.
+Unlike in other execution environments, there is no need to use the
+:option:`--hpx:threads` option to indicate the required number of OS threads per
+node; the |hpx| library will derive this parameter automatically from PBS.
 
 Finally, |pbsdsh| is a PBS command that starts tasks to the resources allocated
 to the current job. It is recommended to leave this line as shown and modify
@@ -129,7 +129,7 @@ Now, we invoke this script using the |pbsdsh| tool:
    #
    #PBS -l nodes=2:ppn=4
 
-   APP_PATH=~/packages/hpx/bin/hello_world
+   APP_PATH=~/packages/hpx/bin/hello_world_distributed
    APP_OPTIONS=
 
    pbsdsh -u runme.sh $APP_PATH $APP_OPTIONS --hpx:nodes=`cat $PBS_NODEFILE`

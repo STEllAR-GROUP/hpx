@@ -44,7 +44,7 @@ build_script:
 test_script:
   - cmd: |
       set PATH=%PATH%;C:\projects\vcpkg\installed\x64-windows\debug\bin
-      python build\bin\hpxrun.py -l2 -t2 build\Debug\bin\hello_world.exe -- --hpx:bind=none
+      python build\bin\hpxrun.py -l2 -t2 build\Debug\bin\hello_world_distributed.exe -- --hpx:bind=none
 
 artifacts:
   - path: hpx-master-redist-$(MSVC_GENERATOR_SHORT)-$(configuration).7z

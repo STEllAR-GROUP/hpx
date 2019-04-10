@@ -25,7 +25,7 @@ How to build |hpx| applications with pkg-config
 After you are done installing |hpx|, you should be able to build the following
 program. It prints ``Hello World!`` on the :term:`locality` you run it on.
 
-.. literalinclude:: ../../examples/quickstart/simplest_hello_world_1.cpp
+.. literalinclude:: ../../examples/quickstart/hello_world_1.cpp
    :language: c++
 
 Copy the text of this program into a file called hello_world.cpp.
@@ -358,7 +358,7 @@ If |hpx| is installed correctly, you should be able to build and run a simple
 hello world program. It prints ``Hello World!`` on the :term:`locality` you
 run it on.
 
-.. literalinclude:: ../../examples/quickstart/simplest_hello_world_1.cpp
+.. literalinclude:: ../../examples/quickstart/hello_world_1.cpp
    :language: c++
 
 Copy the content of this program into a file called hello_world.cpp.
@@ -367,7 +367,7 @@ Now in the directory where you put hello_world.cpp, create a Makefile.
 Add the following code:
 
 .. code-block:: makefile
-   
+
    CXX=(CXX)  # Add your favourite compiler here or let makefile choose default.
 
    CXXFLAGS=-O3 -std=c++17
@@ -390,7 +390,7 @@ Add the following code:
       $(CXX) $(CXXFLAGS) -c -o hello_world.o hello_world.cpp $(INCLUDE_DIRECTIVES)
 
 .. important::
-   
+
    ``LINK_FLAGS`` should be left empty if HPX_WITH_HPX_MAIN is set to OFF.
    Boost in the above example is build with ``--layout=tagged``. Actual boost
    flags may vary on your build of boost.
@@ -435,7 +435,7 @@ code:
 Now in the directory, create a Makefile. Add the following code:
 
 .. code-block:: makefile
-   
+
    CXX=(CXX)  # Add your favourite compiler here or let makefile choose default.
 
    CXXFLAGS=-O3 -std=c++17
@@ -476,7 +476,7 @@ A successfull build should result in hello_world binary. To test, type:
    ./hello_world
 
 .. note::
-   
+
    Due to high variations in CMake flags and library dependencies, it is
    recommended to build |hpx| applications and components with pkg-config
    or CMakeLists.txt. Writing Makefile may result in broken builds if
