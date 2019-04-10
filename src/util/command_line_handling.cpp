@@ -1362,8 +1362,15 @@ namespace hpx { namespace util
         // Re-run program option analysis, ini settings (such as aliases)
         // will be considered now.
 
-        parcelset::parcelhandler::init(&argc, &argv, *this);
-        for (std::shared_ptr<plugins::plugin_registry_base>& reg : plugin_registries)
+#if defined(HPX_HAVE_NETWORKING)
+        if (rtcfg_.enable_networking())
+        {
+            parcelset::parcelhandler::init(&argc, &argv, *this);
+        }
+#endif
+
+        for (std::shared_ptr<plugins::plugin_registry_base>& reg :
+            plugin_registries)
         {
             reg->init(&argc, &argv, *this);
         }
