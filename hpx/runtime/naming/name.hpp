@@ -9,8 +9,7 @@
 #define HPX_RUNTIME_NAMING_NAME_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/lcos/local/spinlock_pool.hpp>
+#include <hpx/util/spinlock_pool.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
@@ -111,7 +110,11 @@ namespace hpx { namespace naming
         static std::uint64_t const special_bits_mask =
             locality_id_mask | internal_bits_mask | component_type_mask;
 
-        explicit gid_type (std::uint64_t lsb_id = 0)
+        gid_type ()
+          : id_msb_(0), id_lsb_(0)
+        {}
+
+        explicit gid_type (std::uint64_t lsb_id)
           : id_msb_(0), id_lsb_(lsb_id)
         {}
 
@@ -372,7 +375,7 @@ namespace hpx { namespace naming
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
         // lock implementation
-        typedef lcos::local::spinlock_pool<tag> internal_mutex_type;
+        typedef util::spinlock_pool<tag> internal_mutex_type;
 
         // returns whether lock has been acquired
         bool acquire_lock()

@@ -3,15 +3,61 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/lcos/latch.hpp>
+
+#include <hpx/async.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
+#include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/server/latch.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
 #include <cstddef>
+#include <exception>
+#include <utility>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace lcos
+{
+    latch::latch(std::ptrdiff_t count)
+      : base_type(hpx::new_<lcos::server::latch>(hpx::find_here(), count))
+    {}
+
+    hpx::future<void> latch::count_down_and_wait_async()
+    {
+        lcos::server::latch::set_event_action act;
+        return hpx::async(act, get_id());
+    }
+
+    hpx::future<void> latch::count_down_async(std::ptrdiff_t n)
+    {
+        lcos::server::latch::set_value_action act;
+        return hpx::async(act, get_id(), std::move(n));
+    }
+
+    hpx::future<bool> latch::is_ready_async() const
+    {
+        lcos::server::latch::get_value_action act;
+        return hpx::async(act, get_id());
+    }
+
+    hpx::future<void> latch::wait_async() const
+    {
+        lcos::server::latch::wait_action act;
+        return hpx::async(act, get_id());
+    }
+
+    hpx::future<void> latch::set_exception_async(std::exception_ptr const& e)
+    {
+        lcos::server::latch::set_exception_action act;
+        return hpx::async(act, get_id(), e);
+    }
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 // latch
@@ -35,4 +81,3 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     bool, std::ptrdiff_t, bool_std_ptrdiff,
     hpx::actions::base_lco_with_value_std_bool_ptrdiff_get,
     hpx::actions::base_lco_with_value_std_bool_ptrdiff_set)
-

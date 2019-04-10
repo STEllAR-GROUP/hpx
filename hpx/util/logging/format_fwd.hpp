@@ -20,8 +20,6 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/util/logging/detail/util.hpp>
-
 namespace hpx { namespace util { namespace logging {
 
 namespace writer {

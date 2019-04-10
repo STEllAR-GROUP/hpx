@@ -30,11 +30,7 @@ if(HPX_WITH_THREAD_LOCAL_STORAGE)
   set(tests ${tests} tss)
 endif()
 
-if((NOT MSVC) OR HPX_WITH_VCPKG)
-  set(lockfree_fifo_FLAGS NOLIBS DEPENDENCIES ${Boost_LIBRARIES} hpx.pp)
-else()
-  set(lockfree_fifo_FLAGS NOLIBS DEPENDENCIES hpx.pp)
-endif()
+set(lockfree_fifo_FLAGS NOLIBS DEPENDENCIES ${Boost_LIBRARIES} hpx.pp)
 
 set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
 

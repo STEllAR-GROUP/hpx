@@ -74,7 +74,7 @@ namespace hpx
 
         template <typename Component, typename Deleter>
         std::shared_ptr<Component>
-        get_ptr_postproc_helper(naming::address const& addr,
+        get_ptr_postproc(naming::address const& addr,
             naming::id_type const& id)
         {
             if (get_locality() != addr.locality_)
@@ -101,14 +101,6 @@ namespace hpx
             return ptr;
         }
 
-        template <typename Component, typename Deleter>
-        std::shared_ptr<Component>
-        get_ptr_postproc(hpx::future<naming::address> f,
-            naming::id_type const& id)
-        {
-            return get_ptr_postproc_helper<Component, Deleter>(f.get(), id);
-        }
-
         ///////////////////////////////////////////////////////////////////////
         // This is similar to get_ptr<> below, except that the shared_ptr will
         // delete the local instance when it goes out of scope.
@@ -117,7 +109,7 @@ namespace hpx
         get_ptr_for_migration(naming::address const& addr,
             naming::id_type const& id)
         {
-            return get_ptr_postproc_helper<
+            return get_ptr_postproc<
                     Component, get_ptr_for_migration_deleter
                 >(addr, id);
         }
@@ -154,10 +146,12 @@ namespace hpx
     get_ptr(naming::id_type const& id)
     {
         hpx::future<naming::address> f = agas::resolve(id);
-        return f.then(hpx::launch::sync,
-            util::bind_back(
-                &detail::get_ptr_postproc<Component, detail::get_ptr_deleter>,
-                id));
+        return f.then(hpx::launch::sync, [=](
+            hpx::future<naming::address> f) -> std::shared_ptr<Component> {
+                return detail::get_ptr_postproc<
+                        Component, detail::get_ptr_deleter
+                    >(f.get(), id);
+            });
     }
 
     /// \brief Returns a future referring to the pointer to the

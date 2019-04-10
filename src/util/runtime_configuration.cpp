@@ -133,7 +133,7 @@ namespace hpx { namespace util
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
             "component_paths = ${HPX_COMPONENT_PATHS}",
-            "component_base_paths = $[hpx.location]"
+            "component_base_paths = $[hpx.location]" // NOLINT
                 HPX_INI_PATH_DELIMITER "$[system.executable_prefix]",
             "component_path_suffixes = /lib/hpx" HPX_INI_PATH_DELIMITER
                                       "/bin/hpx",
@@ -269,6 +269,10 @@ namespace hpx { namespace util
 
             // allow for unknown options to be passed through
             "allow_unknown = ${HPX_COMMANDLINE_ALLOW_UNKNOWN:0}",
+
+            // allow for command line options to to be passed through the
+            // environment
+            "prepend_options = ${HPX_COMMANDLINE_OPTIONS}",
 
             // predefine command line aliases
             "[hpx.commandline.aliases]",

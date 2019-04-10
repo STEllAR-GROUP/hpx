@@ -3,9 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if((NOT MSVC) OR HPX_WITH_VCPKG)
-  set(boost_library_dependencies ${Boost_LIBRARIES})
-endif()
+set(boost_library_dependencies ${Boost_LIBRARIES})
 
 set(benchmarks
     htts2_payload_precision
@@ -46,6 +44,15 @@ foreach(benchmark ${benchmarks})
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/HTTS v2/${benchmark}")
+
+  list(FIND ${benchmark}_FLAGS NOLIBS has_NOLIBS)
+  if (NOT has_NOLIBS EQUAL -1)
+    target_compile_definitions(${benchmark} PRIVATE
+                               HPX_FORMAT_EXPORT= #empty
+                               HPX_NO_VERSION_CHECK)
+    target_sources(${benchmark}
+                   PRIVATE ${PROJECT_SOURCE_DIR}/src/util/format.cpp)
+  endif()
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.performance.local.htts_v2.${benchmark})

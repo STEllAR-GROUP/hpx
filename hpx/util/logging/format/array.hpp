@@ -36,11 +36,11 @@ namespace hpx { namespace util { namespace logging {
         When you call get_ptr() or del(), the type you provide, must implement
         operator==(const type& , const base_type&)
     */
-    template <class base_type >
-    class shared_ptr_holder {
+    template <class base_type>
+    class ptr_holder {
     public:
         typedef base_type value_type;
-        typedef std::shared_ptr<value_type> ptr_type;
+        typedef std::unique_ptr<value_type> ptr_type;
         typedef std::vector<ptr_type> array_type;
 
         template<class derived> base_type* append(derived val) {
@@ -50,7 +50,7 @@ namespace hpx { namespace util { namespace logging {
             return copy;
         }
 
-        template<class derived> base_type * get_ptr(derived val) const {
+        template<class derived> base_type* get_ptr(derived val) const {
             for ( typename array_type::const_iterator b = m_array.begin(),
                 e = m_array.end(); b != e; ++b)
                 if ( val == (*(b->get())) )
@@ -61,11 +61,11 @@ namespace hpx { namespace util { namespace logging {
         }
 
         template<class derived> void del(derived val) {
-            base_type * p = get_ptr(val);
+            base_type* p = get_ptr(val);
             del(p);
         }
 
-        void del(base_type * p) {
+        void del(base_type* p) {
             for ( typename array_type::iterator b = m_array.begin(),
                 e = m_array.end(); b != e; ++b)
                 if ( b->get() == p) {

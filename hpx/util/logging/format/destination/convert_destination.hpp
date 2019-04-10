@@ -57,18 +57,6 @@ namespace convert {
     }
 }
 
-struct do_convert_destination {
-    template<class msg, class dest> static void write(const msg & m, dest & d) {
-        convert::write(m, d);
-    }
-
-    template<class msg, class dest> static dest do_convert(const msg & m,
-        const into<dest> &) {
-        return convert::do_convert(m, into<dest>() );
-    }
-
-};
-
 }}}}
 
 #endif

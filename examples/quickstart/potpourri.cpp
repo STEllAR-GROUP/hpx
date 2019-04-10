@@ -17,6 +17,13 @@ void final_task(hpx::future<hpx::util::tuple<hpx::future<double>, hpx::future<vo
     hpx::cout << "in final_task" << hpx::endl;
 }
 
+// Avoid ABI incompatibilities between C++11/C++17 as std::rand has exception
+// specification in libstdc++.
+int rand_wrapper()
+{
+    return std::rand();
+}
+
 int main(int, char**)
 {
     // A function can be launched asynchronously. The program will not block
@@ -49,7 +56,7 @@ int main(int, char**)
 
     // We fill the vector synchronously and sequentially.
     hpx::parallel::generate(hpx::parallel::execution::seq,
-                  std::begin(v), std::end(v), &std::rand);
+                  std::begin(v), std::end(v), &rand_wrapper);
 
     // We can launch the sort in parallel and asynchronously.
     hpx::future<void> done_sorting =

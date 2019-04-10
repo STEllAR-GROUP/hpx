@@ -15,8 +15,10 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/unused.hpp>
 
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <iomanip>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,7 +68,7 @@ namespace hpx { namespace threads { namespace policies
         // ----------------------------------------------------------------
         inline std::size_t get_queue_index(std::size_t id) const
         {
-            return static_cast<std::size_t>(0.5 + id*scale);;
+            return std::lround(id*scale);
         }
 
         // ----------------------------------------------------------------
@@ -84,7 +86,7 @@ namespace hpx { namespace threads { namespace policies
 
         // ----------------------------------------------------------------
         inline bool wait_or_add_new(std::size_t id, bool running,
-           std::int64_t& idle_loop_count, std::size_t& added)
+           std::size_t& added)
         {
             // loop over all queues and take one task,
             // starting with the requested queue
@@ -92,8 +94,7 @@ namespace hpx { namespace threads { namespace policies
             bool result = true;
             for (std::size_t i=0; i<num_queues; ++i) {
                 std::size_t q = (id + i) % num_queues;
-                result = queues_[q]->wait_or_add_new(running, idle_loop_count,
-                    added) && result;
+                result = queues_[q]->wait_or_add_new(running, added) && result;
                 if (0 != added) return result;
             }
             return result;

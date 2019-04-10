@@ -19,15 +19,14 @@ using std::vector;
 using hpx::lcos::future;
 using std::cout;
 using std::endl;
-using hpx::parallel::execution::local_queue_executor;
-
+using hpx::parallel::execution::local_priority_queue_executor;
 
 void print_ints(int i, int j)
 {
     cout << " i = " << i << ", j = " << j << endl;
 }
 
-void thread_setup(int i, local_queue_executor exec)
+void thread_setup(int i, local_priority_queue_executor exec)
 {
     vector<hpx::lcos::future<void> > tasks;
     for(int j = 0; j < 5; j++) {
@@ -39,7 +38,7 @@ int main()
 {
     vector<hpx::lcos::future<void> > threads;
     {
-        local_queue_executor exec;
+        local_priority_queue_executor exec;
         for(int i = 0; i < 8; i++)
         {
             threads.push_back(async(thread_setup, i, exec));

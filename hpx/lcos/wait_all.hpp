@@ -113,7 +113,6 @@ namespace hpx
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrap_ref.hpp>
@@ -240,9 +239,6 @@ namespace hpx { namespace lcos
                         future_type
                     >::type future_result_type;
 
-                void (wait_all_frame::*f)(Iter, Iter) =
-                    &wait_all_frame::await_range<I>;
-
                 for (/**/; next != end; ++next)
                 {
                     typename traits::detail::shared_state_ptr<
@@ -262,8 +258,12 @@ namespace hpx { namespace lcos
                             // re-evaluate it and continue to the next element
                             // in the sequence (if any).
                             next_future_data->set_on_completed(
-                                util::deferred_call(f, this,
-                                    std::move(next), std::move(end)));
+                                [this,
+                                    HPX_CAPTURE_MOVE(next), HPX_CAPTURE_MOVE(end)
+                                ]() mutable -> void {
+                                    return await_range<I>(
+                                        std::move(next), std::move(end));
+                                });
                             return;
                         }
                     }
@@ -312,11 +312,12 @@ namespace hpx { namespace lcos
                         // Attach a continuation to this future which will
                         // re-evaluate it and continue to the next argument
                         // (if any).
-                        void (wait_all_frame::*f)(std::true_type, std::false_type) =
-                            &wait_all_frame::await_next<I>;
+                        next_future_data->set_on_completed(
+                            [this]() -> void {
+                                return await_next<I>(
+                                    std::true_type(), std::false_type());
+                            });
 
-                        next_future_data->set_on_completed(util::deferred_call(
-                            f, this, std::true_type(), std::false_type()));
                         return;
                     }
                 }

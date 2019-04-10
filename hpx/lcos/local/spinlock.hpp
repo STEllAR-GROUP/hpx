@@ -127,7 +127,6 @@ namespace hpx { namespace lcos { namespace local
 #endif
         }
     };
-
 }}}
 
 #endif // HPX_B3A83B49_92E0_4150_A551_488F9F5E1113

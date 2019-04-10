@@ -13,7 +13,7 @@
 namespace hpx { namespace util
 {
     // helper function for counter evaluation
-    inline std::uint64_t get_and_reset_value(std::uint64_t& value, bool reset)
+    inline std::uint64_t get_and_reset_value(std::uint64_t& value, bool reset) noexcept
     {
         std::uint64_t result = value;
         if (reset)
@@ -21,7 +21,7 @@ namespace hpx { namespace util
         return result;
     }
 
-    inline std::int64_t get_and_reset_value(std::int64_t& value, bool reset)
+    inline std::int64_t get_and_reset_value(std::int64_t& value, bool reset) noexcept
     {
         std::int64_t result = value;
         if (reset)
@@ -30,7 +30,7 @@ namespace hpx { namespace util
     }
 
     template <typename T>
-    inline T get_and_reset_value(std::atomic<T>& value, bool reset)
+    inline T get_and_reset_value(std::atomic<T>& value, bool reset) noexcept
     {
         if (reset)
             return value.exchange(0, std::memory_order_acq_rel);
@@ -38,7 +38,7 @@ namespace hpx { namespace util
     }
 
     inline std::vector<std::int64_t> get_and_reset_value(
-        std::vector<std::int64_t>& value, bool reset)
+        std::vector<std::int64_t>& value, bool reset) noexcept
     {
         std::vector<std::int64_t> result = value;
         if (reset)

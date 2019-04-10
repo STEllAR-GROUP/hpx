@@ -220,8 +220,7 @@ if __name__ == '__main__':
       , action='store', type='string'
       , dest='runwrapper', default=default_env('HPXRUN_RUNWRAPPER', 'none')
       , help='Which runwrapper to use (Options are: none, mpi, srun) '
-             '(environment variable HPXRUN_ (environment variable '
-             'HPXRUN_RUNWRAPPER)')
+             '(environment variable HPXRUN_RUNWRAPPER)')
 
     parser.add_option('-e', '--expected'
       , action='store', type='int'

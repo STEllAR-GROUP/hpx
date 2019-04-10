@@ -104,6 +104,10 @@ namespace hpx { namespace threads { namespace detail
             // Create a task description for the new thread.
             scheduler->create_thread(data, nullptr, initial_state, false, ec);
         }
+
+        // NOTE: Don't care if the hint is a NUMA hint, just want to wake up a
+        // thread.
+        scheduler->do_some_work(data.schedulehint.hint);
     }
 }}}
 

@@ -11,7 +11,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/version.hpp>
 
 #include <memory>
@@ -65,7 +65,7 @@ namespace hpx { namespace performance_counters
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void counter_shutdown(std::shared_ptr<manage_counter> const& p)
+    static void counter_shutdown(std::shared_ptr<manage_counter> const& p)
     {
         HPX_ASSERT(p);
         p->uninstall();
@@ -80,7 +80,7 @@ namespace hpx { namespace performance_counters
         p->install(id, info, ec);
 
         // Register the shutdown function which will clean up this counter.
-        get_runtime().add_shutdown_function(util::bind(&counter_shutdown, p));
+        get_runtime().add_shutdown_function(util::bind_front(&counter_shutdown, p));
     }
 }}
 

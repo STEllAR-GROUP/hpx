@@ -45,12 +45,15 @@ endif()
 ################################################################################
 project(HPX CXX C)
 
-set(HPX_MAJOR_VERSION 1)
-set(HPX_MINOR_VERSION 3)
-set(HPX_PATCH_LEVEL   0)
-set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
+set(HPX_VERSION_MAJOR 1)
+set(HPX_VERSION_MINOR 3)
+set(HPX_VERSION_SUBMINOR 0)
+set(HPX_VERSION_DATE 20181112)
+set(HPX_VERSION_TAG "-trunk")
+
+set(HPX_VERSION "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}")
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
-set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
+set(HPX_SOVERSION ${HPX_VERSION_MAJOR})
 set(HPX_PACKAGE_NAME HPX)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -246,6 +249,19 @@ hpx_option(HPX_WITH_DOCUMENTATION BOOL
   "Build the HPX documentation (default OFF)."
   OFF CATEGORY "Build Targets")
 
+if(HPX_WITH_DOCUMENTATION)
+  set(valid_output_formats html singlehtml latexpdf man)
+  hpx_option(HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS STRING
+    "List of documentation output formats to generate. Valid options are ${valid_output_formats}. Multiple values can be separated with semicolons. (default html)."
+    "html" CATEGORY "Build Targets")
+
+  foreach(output_format ${HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS})
+    if(NOT ${output_format} IN_LIST valid_output_formats)
+      hpx_error("${output_format} is not a valid value for HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS. Valid output format are: ${valid_output_formats}.")
+    endif()
+  endforeach()
+endif()
+
 if(MSVC)
   hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
     "Force creating pseudo targets and pseudo dependencies (default OFF)."
@@ -299,7 +315,6 @@ hpx_option(HPX_WITH_TESTS_HEADERS BOOL "Build HPX header tests (default: OFF)" O
 hpx_option(HPX_WITH_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_EXAMPLES BOOL "Add HPX examples as tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
-hpx_option(HPX_WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 
 hpx_option(HPX_WITH_COMPILE_ONLY_TESTS BOOL
   "Create build system support for compile time only HPX tests (default ON)"
@@ -341,18 +356,6 @@ if(HPX_WITH_CUDA)
   set(HPX_WITH_COMPUTE On)
   hpx_add_config_define(HPX_HAVE_CUDA)
   hpx_add_config_define(HPX_HAVE_COMPUTE)
-  if(NOT HPX_WITH_CUDA_ARCH)
-    hpx_info("HPX_WITH_CUDA_ARCH has not been defined, default value is sm_20")
-    set(HPX_WITH_CUDA_ARCH sm_20)
-  endif()
-  foreach(arch ${HPX_WITH_CUDA_ARCH})
-    string(REGEX MATCHALL "sm_[0-9][0-9]" arch ${arch})
-    if(NOT arch)
-      hpx_error("Each architecture defined in HPX_WITH_CUDA_ARCH should be a list of items, each of the form sm_XX")
-    endif()
-    string(APPEND HPX_CUDA_CLANG_FLAGS " --cuda-gpu-arch=${arch}")
-  endforeach()
-  string(REGEX REPLACE ";" " " HPX_WITH_CUDA_ARCH_INFO "${HPX_WITH_CUDA_ARCH}")
   # keywords for target_link_libraries (cuda)
   set(CUDA_LINK_LIBRARIES_KEYWORD "PRIVATE")
 endif()
@@ -472,10 +475,12 @@ endif()
 
 set(HPX_MAX_CPU_COUNT_DEFAULT "64")
 hpx_option(HPX_WITH_MAX_CPU_COUNT STRING
-  "HPX applications will not use more that this number of OS-Threads (default: ${HPX_MAX_CPU_COUNT_DEFAULT})"
-  ${HPX_MAX_CPU_COUNT_DEFAULT}
+  "HPX applications will not use more that this number of OS-Threads (empty string means dynamic) (default: ${HPX_MAX_CPU_COUNT_DEFAULT})"
+  "${HPX_MAX_CPU_COUNT_DEFAULT}"
   CATEGORY "Thread Manager" ADVANCED)
-hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
+if(HPX_WITH_MAX_CPU_COUNT)
+  hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
+endif()
 
 set(HPX_MAX_NUMA_DOMAIN_COUNT_DEFAULT "4")
 hpx_option(HPX_WITH_MAX_NUMA_DOMAIN_COUNT STRING
@@ -485,7 +490,7 @@ hpx_option(HPX_WITH_MAX_NUMA_DOMAIN_COUNT STRING
 hpx_add_config_define(HPX_HAVE_MAX_NUMA_DOMAIN_COUNT ${HPX_WITH_MAX_NUMA_DOMAIN_COUNT})
 
 set(HPX_MORE_THAN_64_THREADS_DEFAULT OFF)
-if(HPX_WITH_MAX_CPU_COUNT GREATER 64)
+if((NOT HPX_WITH_MAX_CPU_COUNT) OR (HPX_WITH_MAX_CPU_COUNT GREATER 64))
   set(HPX_MORE_THAN_64_THREADS_DEFAULT ON)
 endif()
 hpx_option(HPX_WITH_MORE_THAN_64_THREADS BOOL
@@ -583,8 +588,8 @@ if(HPX_WITH_THREAD_CUMULATIVE_COUNTS)
 endif()
 
 hpx_option(HPX_WITH_THREAD_STEALING_COUNTS BOOL
-  "Enable keeping track of counts of thread stealing incidents in the schedulers (default: ON)"
-  ON CATEGORY "Thread Manager" ADVANCED)
+  "Enable keeping track of counts of thread stealing incidents in the schedulers (default: OFF)"
+  OFF CATEGORY "Thread Manager" ADVANCED)
 
 if(HPX_WITH_THREAD_STEALING_COUNTS)
   hpx_add_config_define(HPX_HAVE_THREAD_STEALING_COUNTS)
@@ -605,6 +610,12 @@ hpx_option(HPX_WITH_SCHEDULER_LOCAL_STORAGE BOOL
 if(HPX_WITH_SCHEDULER_LOCAL_STORAGE)
   hpx_add_config_define(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 endif()
+
+hpx_option(HPX_WITH_SPINLOCK_POOL_NUM STRING
+  "Number of elements a spinlock pool manages (default: 128)"
+  128 CATEGORY "Thread Manager" ADVANCED)
+
+hpx_add_config_define(HPX_HAVE_SPINLOCK_POOL_NUM ${HPX_WITH_SPINLOCK_POOL_NUM})
 
 # Count number of terminated threads before forcefully cleaning up all of
 # them. Note: terminated threads are cleaned up either when this number is
@@ -676,7 +687,7 @@ hpx_option(HPX_WITH_THREAD_SCHEDULERS STRING
   "all"
   CATEGORY "Thread Manager" ADVANCED)
 
-string(TOUPPER ${HPX_WITH_THREAD_SCHEDULERS} HPX_WITH_THREAD_SCHEDULERS_UC)
+string(TOUPPER "${HPX_WITH_THREAD_SCHEDULERS}" HPX_WITH_THREAD_SCHEDULERS_UC)
 foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "ALL")
     set(_all On)
@@ -771,8 +782,8 @@ if(HPX_WITH_NETWORKING)
 
   ## mpi parcelport settings
   hpx_option(HPX_WITH_PARCELPORT_MPI_ENV STRING
-    "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE)."
-    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE" CATEGORY "Parcelport" ADVANCED)
+    "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK)."
+    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK" CATEGORY "Parcelport" ADVANCED)
   hpx_option(HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
     "Turn on MPI multithreading support (default: ON)."
     ON CATEGORY "Parcelport" ADVANCED)
@@ -1109,7 +1120,6 @@ hpx_detect_cpp_dialect()
 # CUDA features
 ################################################################################
 if(HPX_WITH_CUDA)
-  hpx_info("HPX_WITH_CUDA_ARCH has been set with values: ${HPX_WITH_CUDA_ARCH_INFO}")
   if(NOT HPX_WITH_CUDA_CLANG)
     hpx_libraries(cudadevrt)
     if(NOT MSVC)
@@ -1130,19 +1140,13 @@ if(HPX_WITH_CUDA)
       set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O2;-Xcompiler=-MD,-Ox;-Xcompiler=-bigobj)
     endif()
     set(CUDA_SEPARABLE_COMPILATION ON)
-    foreach(arch ${HPX_WITH_CUDA_ARCH})
-      string(REPLACE "sm_" "" arch ${arch})
-      set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_${arch},code=sm_${arch})
-    endforeach()
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};${CXX_FLAG})
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-relaxed-constexpr)
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-extended-lambda)
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--default-stream per-thread)
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-lcudadevrt)
-    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-rdc=true)
   else()
     hpx_add_target_compile_option(-DBOOST_THREAD_USES_MOVE PUBLIC)
-    hpx_add_target_compile_option(--cuda-path=${CUDA_TOOLKIT_ROOT_DIR} PUBLIC)
     hpx_libraries(cudart)
     hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
     link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
@@ -1232,6 +1236,10 @@ if(NOT WIN32)
     if(HPX_HAVE_LIBATOMIC)
       hpx_libraries(atomic)
     endif()
+  endif()
+
+  if(HPX_HAVE_LIBSUPCPP)
+    hpx_libraries(supc++)
   endif()
 
   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
@@ -1356,13 +1364,17 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag(-W3 LANGUAGES C CXX)
     # According to the ifort Windows manual, W3 isn't supported
     hpx_add_compile_flag(-W1 LANGUAGES Fortran)
-    # Boost.Lockfree triggers 'warning C4307: '+' : integral constant overflow'
-    # which is benign
-    hpx_add_compile_flag(-wd4307)
 
     # MSVC2012/2013 are overeager to report 'qualifier applied to function type
     # has no meaning; ignored'
     hpx_add_compile_flag(-wd4180)
+
+    # Boost.Lockfree triggers 'warning C4307: '+' : integral constant overflow'
+    # which is benign
+    hpx_add_compile_flag(-wd4307)
+
+    # object allocated on the heap may not be aligned
+    hpx_add_compile_flag(-wd4316)
 
     # max symbol length exceeded
     hpx_add_compile_flag(-wd4503)
@@ -1407,6 +1419,12 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # Boost.Logging is built on fprintf, sadly
     hpx_add_compile_flag_if_available(-Wformat=2)
     hpx_add_compile_flag_if_available(-Wno-format-nonliteral)
+
+    # enable C++17 style alignment on allocations for pre=C++17
+    hpx_add_compile_flag_if_available(-faligned-new)
+
+    # prevent warnings about over-aligned types for pre-C++17
+    hpx_add_compile_flag_if_available(-Wno-aligned-new)
 
     # Self initialization is dangerous
     hpx_add_compile_flag_if_available(-Winit-self)
@@ -1634,7 +1652,7 @@ if(HPX_WITH_APEX)
   if(HPX_WITH_APEX_NO_UPDATE)
     set(_hpx_apex_no_update NO_UPDATE)
   endif()
-  set(_hpx_apex_tag "v2.1.0")
+  set(_hpx_apex_tag "v2.1.2")
   if(HPX_WITH_APEX_TAG)
     message("Overriding APEX git tag ${_hpx_apex_tag} with ${HPX_WITH_APEX_TAG}")
     set(_hpx_apex_tag ${HPX_WITH_APEX_TAG})
@@ -1804,7 +1822,7 @@ hpx_include(SetOutputPaths)
 ##############################################################################
 
 ################################################################################
-# Provide a macro for generating config headers
+# Provide a function for generating config headers
 ################################################################################
 function(generate_config_defines_header TARGET_DIRECTORY)
   # Generate a defines.hpp to be used in the build directory ...
@@ -1824,26 +1842,26 @@ include_directories("${CMAKE_BINARY_DIR}")
 # Add custom targets for tests
 ################################################################################
 if (HPX_WITH_TESTS)
-  add_custom_target(tests)
+  add_hpx_pseudo_target(tests)
   if (HPX_WITH_TESTS_UNIT)
-    add_custom_target(tests.unit)
-    add_dependencies(tests tests.unit)
+    add_hpx_pseudo_target(tests.unit)
+    add_hpx_pseudo_dependencies(tests tests.unit)
   endif()
   if (HPX_WITH_TESTS_REGRESSIONS)
-    add_custom_target(tests.regressions)
-    add_dependencies(tests tests.regressions)
+    add_hpx_pseudo_target(tests.regressions)
+    add_hpx_pseudo_dependencies(tests tests.regressions)
   endif()
   if (HPX_WITH_TESTS_BENCHMARKS)
-    add_custom_target(tests.performance)
-    add_dependencies(tests tests.performance)
+    add_hpx_pseudo_target(tests.performance)
+    add_hpx_pseudo_dependencies(tests tests.performance)
   endif()
   if (HPX_WITH_TESTS_HEADERS)
-    add_custom_target(tests.headers)
-    add_dependencies(tests tests.headers)
+    add_hpx_pseudo_target(tests.headers)
+    add_hpx_pseudo_dependencies(tests tests.headers)
   endif()
   if (HPX_WITH_TESTS_EXAMPLES)
-    add_custom_target(tests.examples)
-    add_dependencies(tests tests.examples)
+    add_hpx_pseudo_target(tests.examples)
+    add_hpx_pseudo_dependencies(tests tests.examples)
   endif()
 
   enable_testing()
@@ -1924,11 +1942,6 @@ if(HPX_WITH_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
-if(HPX_WITH_RUNTIME)
-  add_hpx_pseudo_target(runtime)
-  add_subdirectory(runtime)
-endif()
-
 if(HPX_WITH_DOCUMENTATION)
   add_subdirectory(docs)
 endif()
@@ -1939,7 +1952,7 @@ endif()
 add_plugin_modules()
 
 ################################################################################
-# Configure the header to include all compile definitions
+# Generate config headers and helpers
 ################################################################################
 generate_config_defines_header(${CMAKE_BINARY_DIR})
 
@@ -1949,6 +1962,17 @@ write_config_defines_file(
   TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
   NAMESPACE default
   FILENAME "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
+
+# Configure version.hpp for build tree and install directory
+configure_file(
+    "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
+    "${CMAKE_BINARY_DIR}/hpx/config/version.hpp"
+    @ONLY)
+
+configure_file(
+    "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
+    "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/version.hpp"
+    @ONLY)
 
 # Configure hpxrun.py
 configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
@@ -1990,7 +2014,8 @@ install( # Install all HPX cmake utility files
   DIRECTORY cmake/
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
   COMPONENT core
-  PATTERN ".cmake.in" EXCLUDE
+  PATTERN "templates" EXCLUDE
+  PATTERN "packaging" EXCLUDE
   PATTERN ".git" EXCLUDE)
 
 install( # Install HPX Python scripts
@@ -2055,17 +2080,40 @@ install(
   COMPONENT license)
 
 if(HPX_WITH_DOCUMENTATION)
-  # Install HPX documentation files
   install(
     FILES "${PROJECT_SOURCE_DIR}/docs/index.html"
     DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/
     COMPONENT docs)
 
-  install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx/docs/html/"
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/html
-    COMPONENT docs
-    PATTERN ".git" EXCLUDE)
+  if("html" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    install(
+      DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx/docs/html/"
+      DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/html
+      COMPONENT docs
+      PATTERN "*.buildinfo" EXCLUDE)
+  endif()
+
+  if("singlehtml" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    install(
+      DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx/docs/singlehtml/"
+      DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/singlehtml
+      COMPONENT docs
+      PATTERN "*.buildinfo" EXCLUDE)
+  endif()
+
+  if("latexpdf" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    install(
+      FILES "${CMAKE_BINARY_DIR}/share/hpx/docs/latexpdf/latex/HPX.pdf"
+      DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/pdf/
+      COMPONENT docs)
+  endif()
+
+  if("man" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    install(
+      FILES "${CMAKE_BINARY_DIR}/share/hpx/docs/man/hpx.1"
+      DESTINATION ${CMAKE_INSTALL_MANDIR}/
+      COMPONENT docs)
+  endif()
 endif()
 
 if(HPX_WITH_VIM_YCM)

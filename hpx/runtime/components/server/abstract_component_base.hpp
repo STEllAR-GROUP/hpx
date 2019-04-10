@@ -28,22 +28,22 @@ namespace hpx { namespace components
     class abstract_simple_component_base
       : private traits::detail::component_tag
     {
-    private:
-        typedef component<Component> outer_wrapping_type;
-
     public:
-        virtual ~abstract_simple_component_base() {}
+        typedef component<Component> wrapping_type;
+        typedef Component this_component_type;
+
+        virtual ~abstract_simple_component_base() = default;
 
         typedef Component base_type_holder;
 
         static component_type get_component_type()
         {
-            return hpx::components::get_component_type<outer_wrapping_type>();
+            return hpx::components::get_component_type<wrapping_type>();
         }
 
         static void set_component_type(component_type t)
         {
-            hpx::components::set_component_type<outer_wrapping_type>(t);
+            hpx::components::set_component_type<wrapping_type>(t);
         }
     };
 
@@ -62,8 +62,9 @@ namespace hpx { namespace components
     {
     public:
         typedef managed_component<Component, Wrapper> wrapping_type;
+        typedef Component this_component_type;
 
-        virtual ~abstract_managed_component_base() {}
+        virtual ~abstract_managed_component_base() = default;
 
         typedef Component base_type_holder;
 
@@ -86,22 +87,22 @@ namespace hpx { namespace components
     class abstract_fixed_component_base
       : private traits::detail::fixed_component_tag
     {
-    private:
-        typedef fixed_component<Component> outer_wrapping_type;
-
     public:
-        virtual ~abstract_fixed_component_base() {}
+        typedef fixed_component<Component> wrapping_type;
+        typedef Component this_component_type;
+
+        virtual ~abstract_fixed_component_base() = default;
 
         typedef Component base_type_holder;
 
         static component_type get_component_type()
         {
-            return hpx::components::get_component_type<outer_wrapping_type>();
+            return hpx::components::get_component_type<wrapping_type>();
         }
 
         static void set_component_type(component_type t)
         {
-            hpx::components::set_component_type<outer_wrapping_type>(t);
+            hpx::components::set_component_type<wrapping_type>(t);
         }
     };
 }}

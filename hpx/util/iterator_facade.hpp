@@ -455,8 +455,7 @@ namespace hpx { namespace util
         struct postfix_increment_result<
             Iterator, Value, Reference,
             typename std::enable_if<
-               !traits::is_forward_iterator<Iterator>::value &&
-               !traits::is_output_iterator<Iterator>::value &&
+                traits::has_category<Iterator, std::input_iterator_tag>::value &&
                 is_non_proxy_reference<Reference, Value>::value
             >::type>
         {
@@ -466,9 +465,8 @@ namespace hpx { namespace util
         template <typename Iterator, typename Value, typename Reference>
         struct postfix_increment_result<Iterator, Value, Reference,
             typename std::enable_if<
-                !traits::is_forward_iterator<Iterator>::value &&
-                !traits::is_output_iterator<Iterator>::value &&
-                !is_non_proxy_reference<Reference, Value>::value
+                traits::has_category<Iterator, std::input_iterator_tag>::value &&
+               !is_non_proxy_reference<Reference, Value>::value
             >::type>
         {
             typedef writable_postfix_increment_proxy<Iterator> type;
@@ -483,16 +481,16 @@ namespace hpx { namespace util
         typename Distance,
         typename Pointer>
     HPX_HOST_DEVICE inline
-    typename detail::postfix_increment_result<
-        Derived, T, Reference
+    typename util::detail::postfix_increment_result<
+        Derived, typename Derived::value_type, typename Derived::reference
     >::type
     operator++(iterator_facade<
             Derived, T, Category, Reference, Distance, Pointer
         >& i, int)
     {
-        typedef typename detail::postfix_increment_result<
-                Derived, T, Reference
-            >::type iterator_type;
+        typedef typename util::detail::postfix_increment_result<Derived,
+            typename Derived::value_type, typename Derived::reference>::type
+            iterator_type;
 
         iterator_type tmp(*static_cast<Derived*>(&i));
         ++i;

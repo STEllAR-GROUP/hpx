@@ -6,11 +6,8 @@
 set(tools)
 set(subdirs inspect)
 
-
-if((NOT MSVC) OR HPX_WITH_VCPKG)
-  set(tools ${tools} cpu_features)
-  set(cpu_features NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY})
-endif()
+set(tools ${tools} cpu_features)
+set(cpu_features NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY})
 
 foreach(tool ${tools})
   add_hpx_executable(${tool}

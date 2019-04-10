@@ -32,6 +32,7 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
+#include <boost/tokenizer.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -1251,6 +1252,24 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    std::vector<std::string> prepend_options(
+        std::vector<std::string>&& args, std::string&& options)
+    {
+        if (options.empty())
+        {
+            return std::move(args);
+        }
+
+        using tokenizer = boost::tokenizer<boost::escaped_list_separator<char>>;
+        boost::escaped_list_separator<char> sep('\\', ' ', '\"');
+        tokenizer tok(options, sep);
+
+        std::vector<std::string> result(tok.begin(), tok.end());
+        std::move(args.begin(), args.end(), std::back_inserter(result));
+        return result;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     int command_line_handling::call(
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv)
@@ -1273,6 +1292,14 @@ namespace hpx { namespace util
         {
             error_mode |= util::rethrow_on_error;
         }
+
+        // The cfg registry may hold command line options to prepend to the
+        // real command line.
+        std::string prepend_command_line =
+            rtcfg_.get_entry("hpx.commandline.prepend_options");
+
+        args =
+            prepend_options(std::move(args), std::move(prepend_command_line));
 
         // Initial analysis of the command line options. This is
         // preliminary as it will not take into account any aliases as

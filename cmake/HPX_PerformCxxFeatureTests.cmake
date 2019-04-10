@@ -15,6 +15,9 @@ function(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_alias_templates(
     REQUIRED "HPX needs support for C++11 alias templates")
 
+  hpx_check_for_cxx11_alignas(
+    DEFINITIONS HPX_HAVE_CXX11_ALIGNAS)
+
   hpx_check_for_cxx11_auto(
     REQUIRED "HPX needs support for C++11 auto")
 
@@ -195,5 +198,14 @@ function(hpx_perform_cxx_feature_tests)
 
     hpx_check_for_cxx17_fallthrough_attribute(
       DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
+
+    hpx_check_for_cxx17_hardware_destructive_interference_size(
+      DEFINITIONS HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE)
+
+    hpx_check_for_cxx17_structured_bindings(
+      DEFINITIONS HPX_HAVE_CXX17_STRUCTURED_BINDINGS)
+
+    hpx_check_for_cxx17_if_constexpr(
+      DEFINITIONS HPX_HAVE_CXX17_IF_CONSTEXPR)
   endif()
 endfunction()

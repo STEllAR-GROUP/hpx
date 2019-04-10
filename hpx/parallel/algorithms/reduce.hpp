@@ -13,7 +13,9 @@
 #include <hpx/util/range.hpp>
 #include <hpx/util/unwrap.hpp>
 
+#include <hpx/parallel/algorithms/detail/accumulate.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -41,21 +43,20 @@ namespace hpx { namespace parallel { inline namespace v1
               : reduce::algorithm("reduce")
             {}
 
-            template <typename ExPolicy, typename InIter, typename T_,
-                typename Reduce>
-            static T
-            sequential(ExPolicy, InIter first, InIter last, T_ && init,
-                Reduce && r)
+            template <typename ExPolicy, typename InIterB, typename InIterE,
+                typename T_, typename Reduce>
+            static T sequential(
+                ExPolicy, InIterB first, InIterE last, T_&& init, Reduce&& r)
             {
-                return std::accumulate(first, last, std::forward<T_>(init),
+                return detail::accumulate(first, last, std::forward<T_>(init),
                     std::forward<Reduce>(r));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename T_,
-                typename Reduce>
+            template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+                typename T_, typename Reduce>
             static typename util::detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
-                T_ && init, Reduce && r)
+            parallel(ExPolicy&& policy, FwdIterB first, FwdIterE last,
+                T_&& init, Reduce&& r)
             {
                 if (first == last)
                 {
@@ -64,7 +65,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
 
                 auto f1 =
-                    [r](FwdIter part_begin, std::size_t part_size) -> T
+                    [r](FwdIterB part_begin, std::size_t part_size) -> T
                     {
                         T val = *part_begin;
                         return util::accumulate_n(++part_begin, --part_size,
@@ -73,12 +74,11 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 return util::partitioner<ExPolicy, T>::call(
                     std::forward<ExPolicy>(policy),
-                    first, std::distance(first, last),
+                    first, detail::distance(first, last),
                     std::move(f1),
                     hpx::util::unwrapping(
-                        [HPX_CAPTURE_FORWARD(init),
-                            HPX_CAPTURE_FORWARD(r)
-                        ](std::vector<T> && results) -> T
+                        [HPX_CAPTURE_FORWARD(init), HPX_CAPTURE_FORWARD(r)](
+                            std::vector<T> && results) -> T
                         {
                             return util::accumulate_n(hpx::util::begin(results),
                                 hpx::util::size(results), init, r);
@@ -87,25 +87,26 @@ namespace hpx { namespace parallel { inline namespace v1
         };
         /// \endcond
         // Non Segmented Reduce
-        template <typename ExPolicy, typename FwdIter, typename T, typename F>
+        template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+            typename T, typename F>
         inline typename std::enable_if<
             execution::is_execution_policy<ExPolicy>::value,
             typename util::detail::algorithm_result<ExPolicy, T>::type
         >::type
-        reduce_(ExPolicy&& policy, FwdIter first, FwdIter last
-            , T init, F && f, std::false_type)
+        reduce_(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f,
+            std::false_type)
         {
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
             static_assert(
-                (hpx::traits::is_input_iterator<FwdIter>::value),
+                (hpx::traits::is_input_iterator<FwdIterB>::value),
                 "Requires at least input iterator.");
             typedef std::integral_constant<bool,
                     execution::is_sequenced_execution_policy<ExPolicy>::value ||
-                   !hpx::traits::is_forward_iterator<FwdIter>::value
+                   !hpx::traits::is_forward_iterator<FwdIterB>::value
                 > is_seq;
 #else
             static_assert(
-                (hpx::traits::is_forward_iterator<FwdIter>::value),
+                (hpx::traits::is_forward_iterator<FwdIterB>::value),
                 "Requires at least forward iterator.");
 
             typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
@@ -117,13 +118,14 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // Forward Declaration of Segmented Reduce
-        template <typename ExPolicy, typename FwdIter, typename T, typename F>
+        template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+            typename T, typename F>
         inline typename std::enable_if<
             execution::is_execution_policy<ExPolicy>::value,
             typename util::detail::algorithm_result<ExPolicy, T>::type
         >::type
-        reduce_(ExPolicy&& policy, FwdIter first, FwdIter last
-            , T init, F && f, std::true_type);
+        reduce_(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f,
+            std::true_type);
     }
 
     /// Returns GENERALIZED_SUM(f, init, *first, ..., *(first + (last - first) - 1)).
@@ -135,7 +137,10 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    /// \tparam FwdIterB    The type of the source begin iterator used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIterE    The type of the source end iterator used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
@@ -161,7 +166,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     \endcode \n
     ///                     The signature does not need to have const&.
     ///                     The types \a Type1 \a Ret must be
-    ///                     such that an object of type \a FwdIter can be
+    ///                     such that an object of type \a FwdIterB can be
     ///                     dereferenced and then implicitly converted to any
     ///                     of those types.
     /// \param init         The initial value for the generalized sum.
@@ -196,14 +201,15 @@ namespace hpx { namespace parallel { inline namespace v1
     /// that the behavior of reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename ExPolicy, typename FwdIter, typename T, typename F>
+    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+        typename T, typename F>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
-    reduce(ExPolicy&& policy, FwdIter first, FwdIter last, T init, F && f)
+    reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f)
     {
-        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
 
         return detail::reduce_(
             std::forward<ExPolicy>(policy), first, last,
@@ -219,7 +225,10 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    /// \tparam FwdIterB    The type of the source begin iterator used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIterE    The type of the source end iterator used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam T           The type of the value to be used as initial (and
@@ -263,14 +272,15 @@ namespace hpx { namespace parallel { inline namespace v1
     /// that the behavior of reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename ExPolicy, typename FwdIter, typename T>
+    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+        typename T>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
-    reduce(ExPolicy&& policy, FwdIter first, FwdIter last, T init)
+    reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init)
     {
-        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
 
         return detail::reduce_(
             std::forward<ExPolicy>(policy), first, last,
@@ -286,7 +296,10 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    /// \tparam FwdIterB    The type of the source begin iterator used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIterE    The type of the source end iterator used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     ///
@@ -312,13 +325,13 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns T otherwise (where T is the value_type of
-    ///           \a FwdIter).
+    ///           \a FwdIterB).
     ///           The \a reduce algorithm returns the result of the
     ///           generalized sum (applying operator+()) over the elements given
     ///           by the input range [first, last).
     ///
     /// \note   The type of the initial value (and the result type) \a T is
-    ///         determined from the value_type of the used \a FwdIter.
+    ///         determined from the value_type of the used \a FwdIterB.
     ///
     /// \note   GENERALIZED_SUM(+, a1, ..., aN) is defined as follows:
     ///         * a1 when N is 1
@@ -331,18 +344,18 @@ namespace hpx { namespace parallel { inline namespace v1
     /// that the behavior of reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename ExPolicy, typename FwdIter>
+    template <typename ExPolicy, typename FwdIterB, typename FwdIterE>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIter>::value_type
+            typename std::iterator_traits<FwdIterB>::value_type
         >::type
     >::type
-    reduce(ExPolicy&& policy, FwdIter first, FwdIter last)
+    reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last)
     {
-        typedef typename std::iterator_traits<FwdIter>::value_type value_type;
+        typedef typename std::iterator_traits<FwdIterB>::value_type value_type;
 
-        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
 
         return detail::reduce_(
             std::forward<ExPolicy>(policy), first, last,

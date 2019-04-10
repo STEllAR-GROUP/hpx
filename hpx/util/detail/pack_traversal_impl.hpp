@@ -280,7 +280,7 @@ namespace util {
             HPX_CONSTEXPR tuple<First, Rest...> voidify_empty_tuple(
                 tuple<First, Rest...> val)
             {
-                return std::move(val);
+                return val;
             }
             inline void voidify_empty_tuple(tuple<> const&) noexcept
             {

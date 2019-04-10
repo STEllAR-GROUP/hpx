@@ -264,15 +264,15 @@ namespace detail
         // continuation support
 
         // deferred execution of a given continuation
-        bool run_on_completed(completed_callback_type&& on_completed,
-            std::exception_ptr& ptr);
-        bool run_on_completed(completed_callback_vector_type&& on_completed,
-            std::exception_ptr& ptr);
+        static void run_on_completed(
+            completed_callback_type&& on_completed) noexcept;
+        static void run_on_completed(
+            completed_callback_vector_type&& on_completed) noexcept;
 
         // make sure continuation invocation does not recurse deeper than
         // allowed
         template <typename Callback>
-        void handle_on_completed(Callback&& on_completed);
+        static void handle_on_completed(Callback&& on_completed);
 
         /// Set the callback which needs to be invoked when the future becomes
         /// ready. If the future is ready the function will be invoked
@@ -305,6 +305,8 @@ namespace detail
         completed_callback_vector_type on_completed_;
         local::detail::condition_variable cond_;    // threads waiting in read
     };
+
+    struct in_place {};
 
     template <typename Result>
     struct future_data_base
@@ -341,18 +343,8 @@ namespace detail
           : base_type(no_addref)
         {}
 
-        struct default_construct {};
-
-        future_data_base(init_no_addref no_addref, default_construct)
-          : base_type(no_addref)
-        {
-            result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
-            construct(value_ptr);
-            state_.store(value, std::memory_order_relaxed);
-        }
-
         template <typename ... Ts>
-        future_data_base(init_no_addref no_addref, Ts&&... ts)
+        future_data_base(init_no_addref no_addref, in_place, Ts&&... ts)
           : base_type(no_addref)
         {
             result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
@@ -428,6 +420,10 @@ namespace detail
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
 
+            // handle all threads waiting for the future to become ready
+            auto on_completed = std::move(on_completed_);
+            on_completed_.clear();
+
             // The value has been set, changing the state to 'value' at this
             // point signals to all other threads that this future is ready.
             state expected = empty;
@@ -442,10 +438,6 @@ namespace detail
                     "data has already been set for this future");
                 return;
             }
-
-            // handle all threads waiting for the future to become ready
-            auto on_completed = std::move(on_completed_);
-            on_completed_.clear();
 
             // Note: we use notify_one repeatedly instead of notify_all as we
             //       know: a) that most of the time we have at most one thread
@@ -484,6 +476,10 @@ namespace detail
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
 
+            // handle all threads waiting for the future to become ready
+            auto on_completed = std::move(on_completed_);
+            on_completed_.clear();
+
             // The value has been set, changing the state to 'exception' at this
             // point signals to all other threads that this future is ready.
             state expected = empty;
@@ -498,10 +494,6 @@ namespace detail
                     "data has already been set for this future");
                 return;
             }
-
-            // handle all threads waiting for the future to become ready
-            auto on_completed = std::move(on_completed_);
-            on_completed_.clear();
 
             // Note: we use notify_one repeatedly instead of notify_all as we
             //       know: a) that most of the time we have at most one thread
@@ -636,8 +628,8 @@ namespace detail
         {}
 
         template <typename ... Ts>
-        future_data(init_no_addref no_addref, Ts&&... ts)
-          : future_data_base<Result>(no_addref, std::forward<Ts>(ts)...)
+        future_data(init_no_addref no_addref, in_place in_place, Ts&&... ts)
+          : future_data_base<Result>(no_addref, in_place, std::forward<Ts>(ts)...)
         {}
 
         future_data(init_no_addref no_addref, std::exception_ptr const& e)
@@ -664,9 +656,6 @@ namespace detail
                     rebind_alloc<future_data_allocator>
             other_allocator;
 
-        typedef typename future_data_base<Result>::default_construct
-            default_construct;
-
         future_data_allocator(other_allocator const& alloc)
           : future_data<Result>()
           , alloc_(alloc)
@@ -674,16 +663,8 @@ namespace detail
 
         template <typename... T>
         future_data_allocator(init_no_addref no_addref,
-                other_allocator const& alloc, T&&... ts)
-          : future_data<Result>(no_addref, std::forward<T>(ts)...)
-          , alloc_(alloc)
-        {}
-
-        template <typename... T>
-        future_data_allocator(init_no_addref no_addref,
-                default_construct defctr,
-                other_allocator const& alloc, T&&... ts)
-          : future_data<Result>(no_addref, defctr, std::forward<T>(ts)...)
+                in_place in_place, other_allocator const& alloc, T&&... ts)
+          : future_data<Result>(no_addref, in_place, std::forward<T>(ts)...)
           , alloc_(alloc)
         {}
 
@@ -749,7 +730,7 @@ namespace detail
 
             // start new thread at given point in time
             threads::set_thread_state(id, abs_time, threads::pending,
-                threads::wait_timeout, threads::thread_priority_boost, ec);
+                threads::wait_timeout, threads::thread_priority_boost, true, ec);
             if (ec) {
                 // thread scheduling failed, report error to the new future
                 this->base_type::set_exception(hpx::detail::access_exception(ec));

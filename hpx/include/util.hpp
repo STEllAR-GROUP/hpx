@@ -34,6 +34,7 @@
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unwrap.hpp>
+#include <hpx/util/yield_while.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #endif

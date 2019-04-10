@@ -406,13 +406,24 @@ void component_namespace::iterate_types(
     );
     counter_data_.increment_iterate_types_count();
 
-    std::lock_guard<mutex_type> l(mutex_);
+    std::vector<typename component_id_table_type::left_map::value_type> types;
+    types.reserve(component_ids_.size());
 
-    for (component_id_table_type::left_map::iterator it = component_ids_.left.begin()
-                                         , end = component_ids_.left.end();
-         it != end; ++it)
     {
-        f(it->first, it->second);
+        std::lock_guard<mutex_type> l(mutex_);
+
+        for (component_id_table_type::left_map::iterator
+                 it = component_ids_.left.begin(),
+                 end = component_ids_.left.end();
+             it != end; ++it)
+        {
+            types.push_back(*it);
+        }
+    }
+
+    for (auto && type : types)
+    {
+        f(type.first, type.second);
     }
 
     LAGAS_(info) << "component_namespace::iterate_types";

@@ -15,7 +15,7 @@
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 #include <hpx/util/static.hpp>
 
 #include <memory>
@@ -98,9 +98,8 @@ namespace hpx { namespace actions { namespace detail
         static threads::thread_function_type
         call(naming::address::address_type lva, F && f, std::false_type)
         {
-            return util::one_shot(util::bind(
+            return util::one_shot(util::bind_back(
                 &action_decorate_function::thread_function,
-                util::placeholders::_1,
                 traits::action_decorate_function<action_wrapper>::call(
                     lva, std::forward<F>(f))
             ));
@@ -120,9 +119,8 @@ namespace hpx { namespace actions { namespace detail
         static threads::thread_function_type
         call(naming::address::address_type lva, F && f, std::true_type)
         {
-            return util::one_shot(util::bind(
+            return util::one_shot(util::bind_back(
                 &action_decorate_function::thread_function_future,
-                util::placeholders::_1,
                 traits::action_decorate_function<action_wrapper>::call(
                     lva, std::forward<F>(f))
             ));

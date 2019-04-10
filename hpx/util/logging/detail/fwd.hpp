@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <hpx/util/logging/detail/util.hpp>
 #include <hpx/util/logging/detail/macros.hpp>
 
 // minimize inclusion of STL headers in our headers!!!

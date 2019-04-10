@@ -20,9 +20,7 @@ namespace hpx { namespace components { namespace server
     // console logging happens here
     void console_error_sink(std::exception_ptr const&);
 
-    typedef actions::action<
-        void (*)(std::exception_ptr const&), console_error_sink
-    > console_error_sink_action;
+    HPX_DEFINE_PLAIN_ACTION(console_error_sink, console_error_sink_action);
 }}}
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(

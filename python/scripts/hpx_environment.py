@@ -1,6 +1,7 @@
 #! /usr/bin/env python 
 #
 # Copyright (c) 2011 Bryce Lelbach
+# Copyright (c) 2019 Patrick Diehl
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,11 +26,11 @@ parser = OptionParser(usage=usage)
 (options, driver) = parser.parse_args()
 
 if 0 == len(driver):
-  print "No compiler driver specified."
+  print ("No compiler driver specified.")
   exit(1) 
 elif 1 != len(driver):
-  print "More than one compiler driver specified."
+  print ("More than one compiler driver specified.")
   exit(1)
 
-print identify(driver[0])
+print (identify(driver[0]))
 

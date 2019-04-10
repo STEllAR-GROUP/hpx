@@ -12,7 +12,9 @@
 
 #if defined(HPX_HAVE_CUDA)
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/lcos/dataflow.hpp>
+#endif
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
@@ -140,6 +142,10 @@ namespace hpx { namespace compute { namespace cuda
         hpx::future<std::vector<bulk_locality_result> >
         bulk_create(std::size_t count, Ts &&... ts) const
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false)
+            return hpx::future<std::vector<bulk_locality_result> >();
+#else
             std::vector<hpx::id_type> localities;
             localities.reserve(this->targets_.size());
 
@@ -181,6 +187,7 @@ namespace hpx { namespace compute { namespace cuda
                     return result;
                 },
                 std::move(objs));
+#endif
         }
 
     protected:

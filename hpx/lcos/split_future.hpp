@@ -88,6 +88,8 @@ namespace hpx
 #include <utility>
 #include <vector>
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
@@ -414,6 +416,7 @@ namespace hpx
 {
     using lcos::split_future;
 }
+#endif
 
 #endif
 #endif

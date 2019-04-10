@@ -9,15 +9,14 @@
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/exception_info.hpp>
-#include <hpx/state.hpp>
-#include <hpx/version.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
@@ -25,6 +24,8 @@
 #include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/register_locks.hpp>
+#include <hpx/version.hpp>
 
 #if defined(HPX_WINDOWS)
 #  include <process.h>
@@ -42,6 +43,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 #ifdef __APPLE__
@@ -251,21 +253,22 @@ namespace hpx { namespace detail
         // create a std::exception_ptr object encapsulating the Exception to
         // be thrown and annotate it with all the local information we have
         try {
-            throw_with_info(e, hpx::exception_info().set(
-               hpx::detail::throw_stacktrace(back_trace),
-               hpx::detail::throw_locality(node),
-               hpx::detail::throw_hostname(hostname),
-               hpx::detail::throw_pid(pid),
-               hpx::detail::throw_shepherd(shepherd),
-               hpx::detail::throw_thread_id(thread_id),
-               hpx::detail::throw_thread_name(thread_name),
-               hpx::detail::throw_function(func),
-               hpx::detail::throw_file(file),
-               hpx::detail::throw_line(line),
-               hpx::detail::throw_env(env),
-               hpx::detail::throw_config(config),
-               hpx::detail::throw_state(state_name),
-               hpx::detail::throw_auxinfo(auxinfo)));
+            throw_with_info(e,
+                std::move(hpx::exception_info().set(
+                    hpx::detail::throw_stacktrace(back_trace),
+                    hpx::detail::throw_locality(node),
+                    hpx::detail::throw_hostname(hostname),
+                    hpx::detail::throw_pid(pid),
+                    hpx::detail::throw_shepherd(shepherd),
+                    hpx::detail::throw_thread_id(thread_id),
+                    hpx::detail::throw_thread_name(thread_name),
+                    hpx::detail::throw_function(func),
+                    hpx::detail::throw_file(file),
+                    hpx::detail::throw_line(line),
+                    hpx::detail::throw_env(env),
+                    hpx::detail::throw_config(config),
+                    hpx::detail::throw_state(state_name),
+                    hpx::detail::throw_auxinfo(auxinfo))));
         }
         catch (...) {
             return std::current_exception();
@@ -284,10 +287,11 @@ namespace hpx { namespace detail
         // create a std::exception_ptr object encapsulating the Exception to
         // be thrown and annotate it with all the local information we have
         try {
-            throw_with_info(e, hpx::exception_info().set(
-               hpx::detail::throw_function(func),
-               hpx::detail::throw_file(file),
-               hpx::detail::throw_line(line)));
+            throw_with_info(e,
+                std::move(
+                    hpx::exception_info().set(hpx::detail::throw_function(func),
+                        hpx::detail::throw_file(file),
+                        hpx::detail::throw_line(line))));
         }
         catch (...) {
             return std::current_exception();
@@ -471,20 +475,23 @@ namespace hpx { namespace detail
             util::attach_debugger();
         }
 
-        bool threw = false;
+        bool has_thrown = false;
 
         std::string str("assertion '" + std::string(msg) + "' failed");
         if (expr != msg)
             str += " (" + std::string(expr) + ")";
 
         try {
+            // ignore all acquired locks while handling assertions
+            util::ignore_all_while_checking il;
+
             boost::filesystem::path p(hpx::util::create_path(file));
             hpx::detail::throw_exception(
                 hpx::exception(hpx::assertion_failure, str),
                 function, p.string(), line);
         }
         catch (...) {
-            threw = true;
+            has_thrown = true;
 
             // If the runtime pointer is available, we can safely get the prefix
             // of this locality. If it's not available, then just terminate.
@@ -501,7 +508,7 @@ namespace hpx { namespace detail
 
         // If the exception wasn't thrown, then print out the assertion message,
         // so that the program doesn't abort without any diagnostics.
-        if (!threw) {
+        if (!has_thrown) {
             std::cerr << "Runtime is not available, reporting error locally\n"
                          "{what}: " << str << std::endl;
         }

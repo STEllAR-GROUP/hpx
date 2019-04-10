@@ -132,14 +132,15 @@ namespace hpx { namespace iostreams
                 detail::get_outstream(tag));
         }
 
-//         ///////////////////////////////////////////////////////////////////////
-//         void release_ostream(char const* name, naming::id_type const& id);
-//
-//         template <typename Tag>
-//         void release_ostream(Tag tag, naming::id_type const& id)
-//         {
-//             release_ostream(get_outstream_name(tag), id);
-//         }
+        ///////////////////////////////////////////////////////////////////////
+        HPX_IOSTREAMS_EXPORT void release_ostream(
+            char const* name, naming::id_type const& id);
+
+        template <typename Tag>
+        void release_ostream(Tag tag, naming::id_type const& id)
+        {
+            release_ostream(get_outstream_name(tag), id);
+        }
 
         ///////////////////////////////////////////////////////////////////////
         void register_ostreams();
@@ -213,25 +214,20 @@ namespace hpx { namespace iostreams
             // apply the subject to the local stream
             *static_cast<stream_base_type*>(this) << subject;
 
-            // If the buffer isn't empty, send it to the destination.
-            if (!this->detail::buffer::empty_locked())
-            {
-                // Create the next buffer, returns the previous buffer
-                buffer next = this->detail::buffer::init_locked();
+            // Send even empty buffer to flush the data buffered server-side.
 
-                // Unlock the mutex before we cleanup.
-                l.unlock();
+            // Create the next buffer, returns the previous buffer
+            buffer next = this->detail::buffer::init_locked();
 
-                // Perform the write operation, then destroy the old buffer and
-                // stream.
-                typedef server::output_stream::write_sync_action action_type;
-                hpx::async<action_type>(this->get_id(), hpx::get_locality_id(),
-                    generational_count_++, next).get();
-            }
-            else
-            {
-                l.unlock();     // must unlock in any case
-            }
+            // Unlock the mutex before we cleanup.
+            l.unlock();
+
+            // Perform the write operation, then destroy the old buffer and
+            // stream.
+            typedef server::output_stream::write_sync_action action_type;
+            hpx::async<action_type>(this->get_id(), hpx::get_locality_id(),
+                generational_count_++, next).get();
+
             return *this;
         } // }}}
 
@@ -286,7 +282,7 @@ namespace hpx { namespace iostreams
             }
 
             // FIXME: find a later spot to invoke this
-//             detail::release_ostream(tag, this->get_id());
+            detail::release_ostream(tag, this->get_id());
             this->base_type::free();
         }
 

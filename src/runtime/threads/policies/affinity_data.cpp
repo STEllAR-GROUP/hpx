@@ -94,6 +94,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             throw std::runtime_error(
                 "Cannot instantiate more than one affinity data instance");
         }
+
+        threads::resize(no_affinity_, hardware_concurrency());
     }
 
     affinity_data::~affinity_data()
@@ -144,7 +146,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         else if (!affinity_desc.empty())
         {
             affinity_masks_.clear();
-            affinity_masks_.resize(num_threads_, 0);
+            affinity_masks_.resize(num_threads_, mask_type{});
 
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::resize(affinity_masks_[i], num_system_pus);
@@ -204,6 +206,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         if (threads::test(no_affinity_, global_thread_num))
         {
             static mask_type m = mask_type();
+            threads::resize(m, hardware_concurrency());
             return m;
         }
 

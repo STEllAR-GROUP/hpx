@@ -126,11 +126,6 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
 
 */
 struct named_write {
-    typedef format_write< formatter::base<>, destination::base<> > format_write_type;
-
-    typedef typename format_write_type::formatter_base_type formatter_base_type;
-    typedef typename format_write_type::destination_base_type destination_base_type;
-
     named_write() {
         m_writer.add_formatter( m_format_before);
         m_writer.add_formatter( m_format_after);
@@ -366,12 +361,10 @@ private:
     }
 
 private:
-    formatter::named_spacer_t< formatter::do_convert_format::prepend,
-        formatter_base_type > m_format_before;
-    formatter::named_spacer_t< formatter::do_convert_format::append,
-        formatter_base_type > m_format_after;
-    destination::named_t< destination_base_type > m_destination;
-    format_write_type m_writer;
+    formatter::named_spacer_t<formatter::do_convert_format::prepend> m_format_before;
+    formatter::named_spacer_t<formatter::do_convert_format::append> m_format_after;
+    destination::named m_destination;
+    format_write m_writer;
 
     std::string m_format_str;
     std::string m_format_before_str, m_format_after_str;

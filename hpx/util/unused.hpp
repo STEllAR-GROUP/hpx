@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2001-2011 Joel de Guzman
-    Copyright (c) 2007-2013 Hartmut Kaiser
+    Copyright (c) 2007-2019 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,37 +23,56 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     struct unused_type
     {
-        HPX_CONSTEXPR HPX_HOST_DEVICE unused_type() noexcept
+        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE unused_type() noexcept {}
+
+        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE unused_type(
+            unused_type const&)
+        {
+        }
+        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE unused_type(unused_type&&)
         {
         }
 
         template <typename T>
-        HPX_CONSTEXPR HPX_HOST_DEVICE unused_type(T const&) noexcept
+        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE unused_type(
+            T const&) noexcept
         {
         }
 
         template <typename T>
-        HPX_CONSTEXPR HPX_HOST_DEVICE unused_type const&
+        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE unused_type const&
         operator=(T const&) const noexcept
         {
             return *this;
         }
 
         template <typename T>
-        HPX_HOST_DEVICE unused_type&
+        HPX_HOST_DEVICE HPX_FORCEINLINE unused_type&
         operator=(T const&) noexcept
         {
             return *this;
         }
 
-        HPX_CONSTEXPR HPX_HOST_DEVICE unused_type const&
+        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE unused_type const&
         operator=(unused_type const&) const noexcept
         {
             return *this;
         }
 
-        HPX_HOST_DEVICE unused_type&
+        HPX_HOST_DEVICE HPX_FORCEINLINE unused_type&
         operator=(unused_type const&) noexcept
+        {
+            return *this;
+        }
+
+        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE unused_type const&
+        operator=(unused_type&&) const noexcept
+        {
+            return *this;
+        }
+
+        HPX_HOST_DEVICE HPX_FORCEINLINE unused_type&
+        operator=(unused_type&&) noexcept
         {
             return *this;
         }

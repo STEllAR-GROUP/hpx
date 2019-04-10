@@ -25,8 +25,8 @@
 #include <hpx/runtime_impl.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
@@ -434,11 +434,11 @@ namespace hpx
                 {
                     // schedule to run at shutdown
                     rt.add_pre_shutdown_function(
-                        util::bind(&util::query_counters::evaluate, qc));
+                        util::bind_front(&util::query_counters::evaluate, qc));
                 }
 
                 // schedule to start all counters
-                rt.add_startup_function(util::bind(&start_counters, qc));
+                rt.add_startup_function(util::bind_front(&start_counters, qc));
 
                 // register the query_counters object with the runtime system
                 rt.register_query_counters(qc);
@@ -520,7 +520,7 @@ namespace hpx
 
             // Run this runtime instance using the given function f.
             if (!f.empty())
-                return rt.run(util::bind(f, vm));
+                return rt.run(util::bind_front(f, vm));
 
             // Run this runtime instance without an hpx_main
             return rt.run();
@@ -539,7 +539,7 @@ namespace hpx
 
             if (!f.empty()) {
                 // Run this runtime instance using the given function f.
-                return rt.start(util::bind(f, vm));
+                return rt.start(util::bind_front(f, vm));
             }
 
             // Run this runtime instance without an hpx_main
@@ -559,7 +559,7 @@ namespace hpx
             start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_, std::move(startup),
                 std::move(shutdown));
 
-            rt.release();          // pointer to runtime is stored in TLS
+            (void)rt.release();          // pointer to runtime is stored in TLS
             return 0;
         }
 

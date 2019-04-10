@@ -187,7 +187,7 @@ namespace hpx { namespace threads
 
     char const* get_thread_state_name(thread_state_enum state)
     {
-        if (state < unknown || state > staged)
+        if (state < unknown || state > pending_boost)
             return "unknown";
         return strings::thread_state_names[state];
     }
@@ -480,9 +480,8 @@ namespace hpx { namespace threads
                     hpx::detail::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
-                typedef hpx::threads::policies::
-                    static_priority_queue_scheduler<>
-                        local_sched_type;
+                using local_sched_type =
+                    hpx::threads::policies::static_priority_queue_scheduler<>;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, numa_sensitive,
                     "core-static_priority_queue_scheduler");
@@ -497,7 +496,6 @@ namespace hpx { namespace threads
                         notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
-
 #else
                 throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=static-priority "
@@ -1828,16 +1826,6 @@ namespace hpx { namespace threads
             pool_iter->stop(lk, blocking);
         }
         deinit_tss();
-
-#ifdef HPX_HAVE_TIMER_POOL
-        LTM_(info) << "stop: stopping timer pool";
-        timer_pool_.stop();    // stop timer pool as well
-        if (blocking)
-        {
-            timer_pool_.join();
-            timer_pool_.clear();
-        }
-#endif
     }
 
     void threadmanager::suspend()

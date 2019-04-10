@@ -14,6 +14,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/version.hpp>
 
@@ -77,7 +78,7 @@ namespace hpx { namespace performance_counters
         counter_info info_;
     };
 
-    void counter_type_shutdown(std::shared_ptr<manage_counter_type> const& p)
+    static void counter_type_shutdown(std::shared_ptr<manage_counter_type> const& p)
     {
         error_code ec(lightweight);
         p->uninstall(ec);
@@ -98,7 +99,7 @@ namespace hpx { namespace performance_counters
 
         // Register the shutdown function which will clean up this counter type.
         get_runtime().add_shutdown_function(
-            util::bind(&counter_type_shutdown, p));
+            util::bind_front(&counter_type_shutdown, p));
         return status_valid_data;
     }
 
@@ -121,7 +122,7 @@ namespace hpx { namespace performance_counters
 
         // Register the shutdown function which will clean up this counter type.
         get_runtime().add_shutdown_function(
-            util::bind(&counter_type_shutdown, p));
+            util::bind_front(&counter_type_shutdown, p));
         return status_valid_data;
     }
 

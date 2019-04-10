@@ -370,6 +370,7 @@ struct HPX_EXPORT primary_namespace
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, allocate);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, bind_gid);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, colocate);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, begin_migration);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, end_migration);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, decrement_credit);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, increment_credit);
@@ -404,6 +405,13 @@ HPX_ACTION_USES_MEDIUM_STACK(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::bind_gid_action,
     primary_namespace_bind_gid_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::primary_namespace::begin_migration_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::begin_migration_action,
+    primary_namespace_begin_migration_action)
 
 HPX_ACTION_USES_MEDIUM_STACK(
     hpx::agas::server::primary_namespace::end_migration_action)
@@ -481,6 +489,7 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
 
 namespace hpx { namespace traits
 {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
     // Parcel routing forwards the message handler request to the routed action
     template <>
     struct action_message_handler<agas::server::primary_namespace::route_action>
@@ -506,6 +515,7 @@ namespace hpx { namespace traits
             return agas::server::primary_namespace::get_serialization_filter(p);
         }
     };
+#endif
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

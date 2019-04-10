@@ -36,9 +36,10 @@ set(tests
     future_then_executor
     future_wait
     global_spmd_block
-    make_ready_future
     local_latch
     local_barrier
+    local_barrier_count_up
+    local_barrier_reset
     local_dataflow
     local_dataflow_boost_small_vector
     local_dataflow_executor
@@ -47,6 +48,7 @@ set(tests
     local_mutex
     local_promise_allocator
     make_future
+    make_ready_future
     packaged_action
     promise
     promise_allocator

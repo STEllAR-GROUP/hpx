@@ -308,7 +308,7 @@ namespace hpx { namespace threads
             std::size_t num_numa_node
             ) const;
         mask_type init_core_affinity_mask_from_core(
-            std::size_t num_core, mask_cref_type default_mask = mask_type()
+            std::size_t num_core, mask_cref_type default_mask = empty_mask
             ) const;
         mask_type init_thread_affinity_mask(std::size_t num_thread) const;
         mask_type init_thread_affinity_mask(
@@ -437,6 +437,17 @@ namespace hpx { namespace threads
         std::vector<std::size_t> num_pus;
         parse_affinity_options(spec, affinities, 1, 1, affinities.size(),
             num_pus, ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // abstract away cache-line size
+    HPX_STATIC_CONSTEXPR std::size_t get_cache_line_size()
+    {
+#if defined(HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE)
+        return std::hardware_destructive_interference_size;
+#else
+        return 64;      // assume 64 byte cache-line size
+#endif
     }
 }}
 

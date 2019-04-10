@@ -28,10 +28,44 @@ namespace hpx { namespace util
     template <typename Sig>
     class function_ref;
 
+    namespace detail
+    {
+        template <typename Sig>
+        struct function_ref_vtable
+          : callable_vtable<Sig>, callable_info_vtable
+        {
+            template <typename T>
+            HPX_CONSTEXPR function_ref_vtable(construct_vtable<T>) noexcept
+              : callable_vtable<Sig>(construct_vtable<T>())
+              , callable_info_vtable(construct_vtable<T>())
+            {}
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename F>
+        HPX_CONSTEXPR bool is_empty_function_ptr(F* fp) noexcept
+        {
+            return fp == nullptr;
+        }
+
+        template <typename T, typename C>
+        HPX_CONSTEXPR bool is_empty_function_ptr(T C::*mp) noexcept
+        {
+            return mp == nullptr;
+        }
+
+        template <typename F>
+        HPX_CONSTEXPR bool is_empty_function_ptr(F const& f) noexcept
+        {
+            return false;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename R, typename ...Ts>
     class function_ref<R(Ts...)>
     {
-        using VTable = detail::callable_vtable<R(Ts...)>;
+        using VTable = detail::function_ref_vtable<R(Ts...)>;
 
     public:
         template <typename F, typename FD = typename std::decay<F>::type,
@@ -73,8 +107,12 @@ namespace hpx { namespace util
             >::type>
         void assign(F&& f)
         {
-            HPX_ASSERT(!detail::is_empty_function(f));
+            HPX_ASSERT(!detail::is_empty_function_ptr(f));
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             vptr = get_vtable<T>();
+#else
+            vptr = get_vtable<T>()->invoke;
+#endif
             object = reinterpret_cast<void*>(std::addressof(f));
         }
 
@@ -82,7 +120,11 @@ namespace hpx { namespace util
         void assign(T* f_ptr) noexcept
         {
             HPX_ASSERT(f_ptr != nullptr);
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             vptr = get_vtable<T>();
+#else
+            vptr = get_vtable<T>()->invoke;
+#endif
             object = reinterpret_cast<void*>(f_ptr);
         }
 
@@ -94,7 +136,11 @@ namespace hpx { namespace util
 
         HPX_FORCEINLINE R operator()(Ts... vs) const
         {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             return vptr->invoke(object, std::forward<Ts>(vs)...);
+#else
+            return vptr(object, std::forward<Ts>(vs)...);
+#endif
         }
 
         std::size_t get_function_address() const
@@ -133,7 +179,11 @@ namespace hpx { namespace util
         }
 
     protected:
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
         VTable const *vptr;
+#else
+        R (*vptr)(void*, Ts&&...);
+#endif
         void* object;
     };
 }}

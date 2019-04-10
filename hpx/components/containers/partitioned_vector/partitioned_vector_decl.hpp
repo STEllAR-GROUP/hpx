@@ -21,7 +21,6 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
@@ -255,11 +254,11 @@ namespace hpx
         // Connect this vector to the existing vector using the given symbolic
         // name.
         void get_data_helper(id_type id,
-            future<server::partitioned_vector_config_data> && f);
+            server::partitioned_vector_config_data data);
 
         // this will be called by the base class once the registered id becomes
         // available
-        future<void> connect_to_helper(shared_future<id_type> && f);
+        future<void> connect_to_helper(id_type id);
 
     public:
         future<void> connect_to(std::string const& symbolic_name);
@@ -338,9 +337,7 @@ namespace hpx
         create_helper2(DistPolicy const& policy, std::size_t count,
             std::size_t size, T const& val);
 
-        static void get_ptr_helper(std::size_t loc,
-            partitions_vector_type& partitions,
-            future<std::shared_ptr<partitioned_vector_partition_server> > && f);
+        struct get_ptr_helper;
 
         // This function is called when we are creating the vector. It
         // initializes the partitions based on the give parameters.
@@ -823,10 +820,10 @@ namespace hpx
 //         future<void> assign_async(size_type n, VALUE_TYPE const& val)
 //         {
 //             return hpx::async(launch::async,
-//                               hpx::util::bind(&vector::assign,
-//                                               this,
-//                                               n,
-//                                               val)
+//                               &vector::assign,
+//                               this,
+//                               n,
+//                               val
 //                               );
 //         }
 //

@@ -8,7 +8,7 @@
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/one_size_heap_list.hpp>
 #if defined(HPX_DEBUG)
@@ -156,8 +156,8 @@ namespace hpx { namespace util
     {
         if (nullptr == threads::get_self_ptr())
         {
-            hpx::applier::register_work(
-                util::bind(&one_size_heap_list::free, this, p, count),
+            hpx::applier::register_work_nullary(
+                util::bind_front(&one_size_heap_list::free, this, p, count),
                 "one_size_heap_list::free");
             return true;
         }

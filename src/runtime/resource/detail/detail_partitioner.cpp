@@ -227,6 +227,7 @@ namespace hpx { namespace resource { namespace detail
                 "Cannot instantiate more than one resource partitioner");
         }
 
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
         if(HPX_HAVE_MAX_CPU_COUNT < topo_.get_number_of_pus())
         {
             throw_runtime_error("partitioner::partioner",
@@ -238,6 +239,7 @@ namespace hpx { namespace resource { namespace detail
                     "HPX.",
                     HPX_HAVE_MAX_CPU_COUNT, topo_.get_number_of_pus()));
         }
+#endif
 
         // Create the default pool
         initial_thread_pools_.push_back(init_pool_data("default"));
@@ -252,6 +254,7 @@ namespace hpx { namespace resource { namespace detail
     bool partitioner::pu_exposed(std::size_t pu_num)
     {
         threads::mask_type pu_mask = threads::mask_type();
+        threads::resize(pu_mask, threads::hardware_concurrency());
         threads::set(pu_mask, pu_num);
         threads::topology& topo = get_topology();
 

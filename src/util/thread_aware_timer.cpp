@@ -5,8 +5,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/util/thread_aware_timer.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/thread_aware_timer.hpp>
 
 #include <cstdint>
 
@@ -22,7 +23,7 @@ namespace hpx { namespace util
         hpx::util::io_service_pool* pool = hpx::get_thread_pool("timer_pool");
 
         // ... and schedule the handler to run on the first of its OS-threads.
-        pool->get_io_service(0).post(hpx::util::bind(&sample_time, std::ref(p)));
+        pool->get_io_service(0).post(hpx::util::bind_front(&sample_time, std::ref(p)));
         return p.get_future().get();
     }
 }}

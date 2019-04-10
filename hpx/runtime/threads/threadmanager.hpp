@@ -282,6 +282,32 @@ namespace hpx { namespace threads
             }
         }
 
+        void add_scheduler_mode(threads::policies::scheduler_mode mode)
+        {
+            for (auto& pool_iter : pools_)
+            {
+                pool_iter->add_scheduler_mode(mode);
+            }
+        }
+
+        void add_remove_scheduler_mode(
+            threads::policies::scheduler_mode to_add_mode,
+            threads::policies::scheduler_mode to_remove_mode)
+        {
+            for (auto& pool_iter : pools_)
+            {
+                pool_iter->add_remove_scheduler_mode(to_add_mode, to_remove_mode);
+            }
+        }
+
+        void remove_scheduler_mode(threads::policies::scheduler_mode mode)
+        {
+            for (auto& pool_iter : pools_)
+            {
+                pool_iter->remove_scheduler_mode(mode);
+            }
+        }
+
         void reset_thread_distribution()
         {
             for (auto& pool_iter : pools_)
