@@ -342,7 +342,6 @@ namespace hpx { namespace threads { namespace coroutines
                     asan_stack_size = m_stack_size;
                     asan_stack_bottom = const_cast<const void*>(m_stack);
 #endif
-                }
             }
 
             std::ptrdiff_t get_available_stack_space()
