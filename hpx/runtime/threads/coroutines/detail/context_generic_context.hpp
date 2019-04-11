@@ -198,13 +198,13 @@ namespace hpx { namespace threads { namespace coroutines
 
             // Create a context that on restore invokes Functor on
             // a new stack. The stack size can be optionally specified.
-            explicit fcontext_context_impl(std::ptrdiff_t stack_size)
+            explicit fcontext_context_impl(std::ptrdiff_t stack_size = -1)
 #if BOOST_VERSION < 106100
               : cb_(reinterpret_cast<intptr_t>(this))
 #else
               : cb_(std::make_pair(reinterpret_cast<void*>(this), nullptr))
 #endif
-              , funp_(&trampoline<Functor>)
+              , funp_(&trampoline<CoroutineImpl>)
               , ctx_(0)
               , alloc_()
               , stack_size_(
@@ -258,21 +258,67 @@ namespace hpx { namespace threads { namespace coroutines
 #endif
             }
 
-            // handle stack operations
-            HPX_EXPORT void reset_stack();
-            HPX_EXPORT void rebind_stack();
+            void reset_stack()
+            {
+                if (ctx_)
+                {
+#if defined(_POSIX_VERSION)
+                    void* limit =
+                        static_cast<char*>(stack_pointer_) - stack_size_;
+                    if (posix::reset_stack(limit, stack_size_))
+                        increment_stack_unbind_count();
+#else
+                    // nothing we can do here ...
+#endif
+                }
+            }
+
+            void rebind_stack()
+            {
+                if (ctx_)
+                {
+                    increment_stack_recycle_count();
+#if BOOST_VERSION < 106100
+                    ctx_ = boost::context::make_fcontext(
+                        stack_pointer_, stack_size_, funp_);
+#else
+                    ctx_ = boost::context::detail::make_fcontext(
+                        stack_pointer_, stack_size_, funp_);
+#endif
+                }
+            }
 
             typedef std::atomic<std::int64_t> counter_type;
 
-            HPX_EXPORT static counter_type& get_stack_unbind_counter();
-            HPX_EXPORT static std::uint64_t get_stack_unbind_count(bool
-                reset);
-            HPX_EXPORT static std::uint64_t increment_stack_unbind_count();
+            static counter_type& get_stack_unbind_counter()
+            {
+                static counter_type counter(0);
+                return counter;
+            }
+            static std::uint64_t get_stack_unbind_count(bool reset)
+            {
+                return util::get_and_reset_value(
+                    get_stack_unbind_counter(), reset);
+            }
+            static std::uint64_t increment_stack_unbind_count()
+            {
+                return ++get_stack_unbind_counter();
+            }
 
-            HPX_EXPORT static counter_type& get_stack_recycle_counter();
-            HPX_EXPORT static std::uint64_t get_stack_recycle_count(bool
-                reset);
-            HPX_EXPORT static std::uint64_t increment_stack_recycle_count();
+            static counter_type& get_stack_recycle_counter()
+            {
+                static counter_type counter(0);
+                return counter;
+            }
+            static std::uint64_t get_stack_recycle_count(bool reset)
+            {
+                return util::get_and_reset_value(
+                    get_stack_recycle_counter(), reset);
+            }
+            static std::uint64_t increment_stack_recycle_count()
+            {
+                return ++get_stack_recycle_counter();
+            }
 
         private:
             friend void swap_context(fcontext_context_impl& from,
