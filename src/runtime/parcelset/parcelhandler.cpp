@@ -1562,12 +1562,13 @@ namespace hpx { namespace parcelset
         util::command_line_handling &cfg)
     {
 #if defined(HPX_HAVE_NETWORKING)
-        HPX_ASSERT(hpx::is_networking_enabled());
-
-        for (plugins::parcelport_factory_base* factory :
-            get_parcelport_factories())
+        if (hpx::is_networking_enabled())
         {
-            factory->init(argc, argv, cfg);
+            for (plugins::parcelport_factory_base* factory :
+                get_parcelport_factories())
+            {
+                factory->init(argc, argv, cfg);
+            }
         }
 #endif
     }
