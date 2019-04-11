@@ -115,7 +115,7 @@
 #define HPX_CDECL
 #endif
 
-#if defined(__has_feature)
+#if defined(HPX_HAVE_SANITIZERS) && defined(__has_feature)
 #  if __has_feature(address_sanitizer)
 #    define HPX_HAVE_ADDRESS_SANITIZER
 #  endif

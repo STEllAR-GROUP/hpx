@@ -55,7 +55,7 @@
 #include <valgrind/valgrind.h>
 #endif
 
-#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
 #include <sanitizer/asan_interface.h>
 #endif
 
@@ -100,7 +100,7 @@ namespace hpx { namespace threads { namespace coroutines
         {
         public:
             x86_linux_context_impl_base()
-#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
               : asan_fake_stack(nullptr)
               , asan_stack_bottom(nullptr)
               , asan_stack_size(0)
@@ -141,7 +141,7 @@ namespace hpx { namespace threads { namespace coroutines
             friend void swap_context(x86_linux_context_impl_base& from,
                 x86_linux_context_impl_base const& to, yield_hint);
 
-#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
             void start_switch_fiber(void** fake_stack)
             {
                 __sanitizer_start_switch_fiber(
@@ -164,7 +164,7 @@ namespace hpx { namespace threads { namespace coroutines
         protected:
             void ** m_sp;
 
-#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
         public:
             void* asan_fake_stack;
             const void* asan_stack_bottom;
@@ -236,7 +236,7 @@ namespace hpx { namespace threads { namespace coroutines
                         VALGRIND_STACK_REGISTER(m_stack, eos));
                 }
 #endif
-#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
                 asan_stack_size = m_stack_size;
                 asan_stack_bottom = const_cast<const void*>(m_stack);
 #endif
@@ -257,7 +257,7 @@ namespace hpx { namespace threads { namespace coroutines
             }
 
 #if defined(HPX_HAVE_STACKOVERFLOW_DETECTION) &&                               \
-    !defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+    !defined(HPX_HAVE_ADDRESS_SANITIZER)
 
 // heuristic value 1 kilobyte
 #define COROUTINE_STACKOVERFLOW_ADDR_EPSILON 1000UL
@@ -338,7 +338,7 @@ namespace hpx { namespace threads { namespace coroutines
                     fun * funp = trampoline<CoroutineImpl>;
                     m_sp[cb_idx] = this;
                     m_sp[funp_idx] = reinterpret_cast<void*>(funp);
-#if defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
                     asan_stack_size = m_stack_size;
                     asan_stack_bottom = const_cast<const void*>(m_stack);
 #endif
@@ -394,7 +394,7 @@ namespace hpx { namespace threads { namespace coroutines
             void set_sigsegv_handler()
             {
 #if defined(HPX_HAVE_STACKOVERFLOW_DETECTION) &&                               \
-    !defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+    !defined(HPX_HAVE_ADDRESS_SANITIZER)
                 // concept inspired by the following links:
                 //
                 // https://rethinkdb.com/blog/handling-stack-overflow-on-custom-stacks/
@@ -463,7 +463,7 @@ namespace hpx { namespace threads { namespace coroutines
             void* m_stack;
 
 #if defined(HPX_HAVE_STACKOVERFLOW_DETECTION) &&                               \
-    !defined(HPX_CONTEXT_HAVE_ADDRESS_SANITIZER)
+    !defined(HPX_HAVE_ADDRESS_SANITIZER)
             struct sigaction action;
             stack_t segv_stack;
 #endif
