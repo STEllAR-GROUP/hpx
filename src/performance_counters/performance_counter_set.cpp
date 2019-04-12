@@ -30,6 +30,7 @@ namespace hpx { namespace performance_counters
     performance_counter_set::performance_counter_set(std::string const& name,
             bool reset)
       : invocation_count_(0)
+      , print_counters_locally_(false)
     {
         add_counters(name, reset);
     }
@@ -37,6 +38,7 @@ namespace hpx { namespace performance_counters
     performance_counter_set::performance_counter_set(
             std::vector<std::string> const& names, bool reset)
       : invocation_count_(0)
+      , print_counters_locally_(false)
     {
         add_counters(names, reset);
     }

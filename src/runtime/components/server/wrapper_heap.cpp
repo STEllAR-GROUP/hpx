@@ -352,10 +352,10 @@ namespace hpx { namespace components { namespace detail
 
         free_size_ = parameters_.capacity;
 
-        LOSH_(info) //-V128
+        LOSH_(info)    //-V128
             << "wrapper_heap ("
             << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-            << "): init_pool (" << std::hex << pool_ << ")"
+            << "): init_pool (" << std::hex << static_cast<void*>(pool_) << ")"
             << " size: " << total_num_bytes << ".";
 
         return true;
@@ -381,10 +381,12 @@ namespace hpx { namespace components { namespace detail
 #endif
                 )
             {
-                LOSH_(warning) //-V128
+                LOSH_(warning)    //-V128
                     << "wrapper_heap ("
-                    << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                    << "): releasing heap (" << std::hex << pool_ << ")"
+                    << (!class_name_.empty() ? class_name_.c_str() :
+                                               "<Unknown>")
+                    << "): releasing heap (" << std::hex
+                    << static_cast<void*>(pool_) << ")"
                     << " with " << size() << " allocated object(s)!";
             }
 

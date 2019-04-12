@@ -86,59 +86,58 @@ namespace hpx {namespace parallel { inline namespace v1
                 typedef util::partitioner<ExPolicy, FwdIter, void> partitioner;
 
                 util::cancellation_token<difference_type> tok(count);
-                return partitioner::call_with_index(
-                    std::forward<ExPolicy>(policy), first, count-(diff-1), 1,
-                    [diff, count, tok, s_first,
-                        HPX_CAPTURE_FORWARD(op),
-                        HPX_CAPTURE_FORWARD(proj1),
-                        HPX_CAPTURE_FORWARD(proj2)
-                    ](FwdIter it, std::size_t part_size,
-                        std::size_t base_idx) mutable -> void
-                    {
-                        FwdIter curr = it;
 
-                        util::loop_idx_n(
-                            base_idx, it, part_size, tok,
-                            [diff, count, s_first, &tok, &curr,
-                                HPX_CAPTURE_FORWARD(op),
-                                HPX_CAPTURE_FORWARD(proj1),
-                                HPX_CAPTURE_FORWARD(proj2)
-                            ](reference v, std::size_t i) -> void
-                            {
-                                ++curr;
-                                if (hpx::util::invoke(op,
+                auto f1 = [diff, count, tok, s_first, HPX_CAPTURE_FORWARD(op),
+                              HPX_CAPTURE_FORWARD(proj1),
+                              HPX_CAPTURE_FORWARD(proj2)](FwdIter it,
+                              std::size_t part_size,
+                              std::size_t base_idx) mutable -> void {
+                    FwdIter curr = it;
+
+                    util::loop_idx_n(base_idx, it, part_size, tok,
+                        [diff, count, s_first, &tok, &curr,
+                            HPX_CAPTURE_FORWARD(op), HPX_CAPTURE_FORWARD(proj1),
+                            HPX_CAPTURE_FORWARD(proj2)](
+                            reference v, std::size_t i) -> void {
+                            ++curr;
+                            if (hpx::util::invoke(op,
                                     hpx::util::invoke(proj1, v),
                                     hpx::util::invoke(proj2, *s_first)))
+                            {
+                                difference_type local_count = 1;
+                                FwdIter2 needle = s_first;
+                                FwdIter mid = curr;
+
+                                for (difference_type len = 0;
+                                     local_count != diff && len != count;
+                                     ++local_count, ++len, ++mid)
                                 {
-                                    difference_type local_count = 1;
-                                    FwdIter2 needle = s_first;
-                                    FwdIter mid = curr;
-
-                                    for(difference_type len = 0;
-                                        local_count != diff && len != count;
-                                        ++local_count, ++len, ++mid)
-                                    {
-                                        if(!hpx::util::invoke(op,
-                                           hpx::util::invoke(proj1, *mid),
-                                           hpx::util::invoke(proj2, *++needle)))
-                                            break;
-                                    }
-
-                                    if(local_count == diff)
-                                        tok.cancel(i);
+                                    if (!hpx::util::invoke(op,
+                                            hpx::util::invoke(proj1, *mid),
+                                            hpx::util::invoke(
+                                                proj2, *++needle)))
+                                        break;
                                 }
-                            });
-                    },
-                    [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
-                    {
-                        difference_type search_res = tok.get_data();
-                        if (search_res != count)
-                            std::advance(first, search_res);
-                        else
-                            first = last;
 
-                        return std::move(first);
-                    });
+                                if (local_count == diff)
+                                    tok.cancel(i);
+                            }
+                        });
+                };
+
+                auto f2 =
+                    [=](std::vector<hpx::future<void>>&&) mutable -> FwdIter {
+                    difference_type search_res = tok.get_data();
+                    if (search_res != count)
+                        std::advance(first, search_res);
+                    else
+                        first = last;
+
+                    return std::move(first);
+                };
+                return partitioner::call_with_index(
+                    std::forward<ExPolicy>(policy), first, count - (diff - 1),
+                    1, std::move(f1), std::move(f2));
             }
         };
         /// \endcond
@@ -314,58 +313,57 @@ namespace hpx {namespace parallel { inline namespace v1
                 typedef util::partitioner<ExPolicy, FwdIter, void> partitioner;
 
                 util::cancellation_token<difference_type> tok(count);
-                return partitioner::call_with_index(
-                    std::forward<ExPolicy>(policy), first, count-(diff-1), 1,
-                    [count, diff, tok, s_first,
-                        HPX_CAPTURE_FORWARD(op),
-                        HPX_CAPTURE_FORWARD(proj1),
-                        HPX_CAPTURE_FORWARD(proj2)
-                    ](FwdIter it, std::size_t part_size,
-                        std::size_t base_idx) mutable -> void
-                    {
-                        FwdIter curr = it;
 
-                        util::loop_idx_n(
-                            base_idx, it, part_size, tok,
-                            [count, diff, s_first, &tok, &curr,
-                                HPX_CAPTURE_FORWARD(op),
-                                HPX_CAPTURE_FORWARD(proj1),
-                                HPX_CAPTURE_FORWARD(proj2)
-                            ](reference v, std::size_t i) -> void
-                            {
-                                ++curr;
-                                if (hpx::util::invoke(op,
+                auto f1 = [count, diff, tok, s_first, HPX_CAPTURE_FORWARD(op),
+                              HPX_CAPTURE_FORWARD(proj1),
+                              HPX_CAPTURE_FORWARD(proj2)](FwdIter it,
+                              std::size_t part_size,
+                              std::size_t base_idx) mutable -> void {
+                    FwdIter curr = it;
+
+                    util::loop_idx_n(base_idx, it, part_size, tok,
+                        [count, diff, s_first, &tok, &curr,
+                            HPX_CAPTURE_FORWARD(op), HPX_CAPTURE_FORWARD(proj1),
+                            HPX_CAPTURE_FORWARD(proj2)](
+                            reference v, std::size_t i) -> void {
+                            ++curr;
+                            if (hpx::util::invoke(op,
                                     hpx::util::invoke(proj1, v),
                                     hpx::util::invoke(proj2, *s_first)))
+                            {
+                                difference_type local_count = 1;
+                                FwdIter2 needle = s_first;
+                                FwdIter mid = curr;
+
+                                for (difference_type len = 0;
+                                     local_count != diff &&
+                                     len != difference_type(count);
+                                     ++local_count, ++len, ++mid)
                                 {
-                                    difference_type local_count = 1;
-                                    FwdIter2 needle = s_first;
-                                    FwdIter mid = curr;
-
-                                    for(difference_type len = 0;
-                                        local_count != diff &&
-                                        len != difference_type(count);
-                                        ++local_count, ++len, ++mid)
-                                    {
-                                        if(!hpx::util::invoke(op,
-                                           hpx::util::invoke(proj1, *mid),
-                                           hpx::util::invoke(proj2, *++needle)))
-                                           break;
-                                    }
-
-                                    if(local_count == diff)
-                                        tok.cancel(i);
+                                    if (!hpx::util::invoke(op,
+                                            hpx::util::invoke(proj1, *mid),
+                                            hpx::util::invoke(
+                                                proj2, *++needle)))
+                                        break;
                                 }
-                            });
-                    },
-                    [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
-                    {
-                        difference_type search_res = tok.get_data();
-                        if(search_res != s_difference_type(count))
-                            std::advance(first, search_res);
 
-                        return std::move(first);
-                    });
+                                if (local_count == diff)
+                                    tok.cancel(i);
+                            }
+                        });
+                };
+
+                auto f2 =
+                    [=](std::vector<hpx::future<void>>&&) mutable -> FwdIter {
+                    difference_type search_res = tok.get_data();
+                    if (search_res != s_difference_type(count))
+                        std::advance(first, search_res);
+
+                    return std::move(first);
+                };
+                return partitioner::call_with_index(
+                    std::forward<ExPolicy>(policy), first, count - (diff - 1),
+                    1, std::move(f1), std::move(f2));
             }
         };
         /// \endcond

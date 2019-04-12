@@ -49,6 +49,14 @@ namespace examples
           : base_type(gid)
         {}
 
+        ~simple_central_tuplespace()
+        {
+            if (!symbol_name_.empty())
+            {
+                hpx::agas::unregister_name(symbol_name_);
+            }
+        }
+
         bool create(std::string const& symbol_name, hpx::id_type const& locality)
         {
             if(!symbol_name_.empty())
@@ -91,8 +99,6 @@ namespace examples
             }
 
             *this = hpx::agas::resolve_name(hpx::launch::sync,symbol_name);
-
-            symbol_name_ = symbol_name;
 
             return true;
         }

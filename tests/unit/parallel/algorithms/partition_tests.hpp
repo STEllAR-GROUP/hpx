@@ -435,7 +435,7 @@ void test_partition()
         }, rand_base);
 
     ////////// Many test cases for meticulous tests.
-#if !defined(HPX_DEBUG)
+#if !defined(HPX_DEBUG) && !defined(HPX_HAVE_SANITIZERS)
     test_partition_heavy(execution::par, IteratorTag(), int(),
         [rand_base](const int n) -> bool {
             return n < rand_base;

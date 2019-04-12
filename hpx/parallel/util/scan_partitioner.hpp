@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { namespace util
                 typename FwdIter, typename T,
                 typename F1, typename F2, typename F3, typename F4>
             static R call(scan_partitioner_normal_tag,
-                ExPolicy_ && policy,
+                ExPolicy_ policy,
                 FwdIter first, std::size_t count, T && init,
                 F1 && f1, F2 && f2, F3 && f3, F4 && f4)
             {
@@ -95,7 +95,7 @@ namespace hpx { namespace parallel { namespace util
 
                     auto shape = detail::get_bulk_iteration_shape(
                         has_variable_chunk_size(),
-                        std::forward<ExPolicy_>(policy),
+                        policy,
                         workitems, f1, first, count, 1);
 
                     // schedule every chunk on a separate thread
@@ -160,7 +160,7 @@ namespace hpx { namespace parallel { namespace util
                 typename FwdIter, typename T,
                 typename F1, typename F2, typename F3, typename F4>
             static R call(scan_partitioner_sequential_f3_tag,
-                ExPolicy_ && policy,
+                ExPolicy_ policy,
                 FwdIter first, std::size_t count, T && init,
                 F1 && f1, F2 && f2, F3 && f3, F4 && f4)
             {
@@ -192,7 +192,7 @@ namespace hpx { namespace parallel { namespace util
 
                     auto shape = detail::get_bulk_iteration_shape(
                         has_variable_chunk_size(),
-                        std::forward<ExPolicy_>(policy),
+                        policy,
                         workitems, f1, first, count, 1);
 
                     // schedule every chunk on a separate thread

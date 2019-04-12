@@ -481,6 +481,17 @@ namespace hpx { namespace parallel { inline namespace v1
                             });
                     };
 
+                auto f4 =
+                    [last, dest, flags](
+                        std::vector<hpx::shared_future<std::size_t>>&& items,
+                        std::vector<hpx::future<void>>&&) mutable
+                    -> std::pair<FwdIter1, FwdIter2> {
+                    HPX_UNUSED(flags);
+
+                    std::advance(dest, items.back().get());
+                    return std::make_pair(last, dest);
+                };
+
                 return scan_partitioner_type::call(
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, flags.get()), count, init,
@@ -492,16 +503,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value
-                    [last, dest, flags](
-                        std::vector<hpx::shared_future<std::size_t> > && items,
-                        std::vector<hpx::future<void> > &&) mutable
-                    ->  std::pair<FwdIter1, FwdIter2>
-                    {
-                        HPX_UNUSED(flags);
-
-                        std::advance(dest, items.back().get());
-                        return std::make_pair(last, dest);
-                    });
+                    std::move(f4));
             }
         };
         /// \endcond
