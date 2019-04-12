@@ -21,11 +21,12 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
-#include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/version.hpp>
+
+#include <boost/filesystem/path.hpp>
 
 #if defined(HPX_WINDOWS)
 #  include <process.h>
@@ -485,7 +486,7 @@ namespace hpx { namespace detail
             // ignore all acquired locks while handling assertions
             util::ignore_all_while_checking il;
 
-            boost::filesystem::path p(hpx::util::create_path(file));
+            boost::filesystem::path p(file);
             hpx::detail::throw_exception(
                 hpx::exception(hpx::assertion_failure, str),
                 function, p.string(), line);

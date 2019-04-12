@@ -11,7 +11,6 @@
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/logging.hpp>
@@ -60,9 +59,9 @@ namespace hpx { namespace util
         if (nullptr != env) {
             namespace fs = boost::filesystem;
 
-            fs::path inipath (hpx::util::create_path(env));
+            fs::path inipath (env);
             if (nullptr != file_suffix)
-                inipath /= hpx::util::create_path(file_suffix);
+                inipath /= fs::path(file_suffix);
 
             if (handle_ini_file(ini, inipath.string())) {
                 LBT_(info) << "loaded configuration (${" << env_var << "}): "
@@ -188,7 +187,7 @@ namespace hpx { namespace util
         {
             try {
                 fs::directory_iterator nodir;
-                fs::path this_path (hpx::util::create_path(*it));
+                fs::path this_path (*it);
 
                 boost::system::error_code ec;
                 if (!fs::exists(this_path, ec) || ec)
@@ -399,7 +398,7 @@ namespace hpx { namespace util
         std::vector<std::pair<fs::path, std::string> > libdata;
         try {
             fs::directory_iterator nodir;
-            fs::path libs_path (hpx::util::create_path(libs));
+            fs::path libs_path(libs);
 
             boost::system::error_code ec;
             if (!fs::exists(libs_path, ec) || ec)
@@ -438,7 +437,8 @@ namespace hpx { namespace util
 #endif
                 // ensure base directory, remove symlinks, etc.
                 boost::system::error_code fsec;
-                fs::path canonical_curr = util::canonical_path(curr, fsec);
+                fs::path canonical_curr =
+                    fs::canonical(curr, fs::initial_path(), fsec);
                 if (fsec)
                     canonical_curr = curr;
 

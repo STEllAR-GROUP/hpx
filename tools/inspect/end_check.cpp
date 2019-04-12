@@ -49,13 +49,13 @@ namespace boost
 
       bool failed = final_char != '\n' && final_char != '\r';
 
-      if (failed && full_path.leaf() != test_file_name)
+      if (failed && full_path.filename() != test_file_name)
       {
         ++m_files_with_errors;
         error( library_name, full_path, string(name()) + ' ' + desc() );
       }
 
-      if (!failed && full_path.leaf() == test_file_name)
+      if (!failed && full_path.filename() == test_file_name)
       {
         ++m_files_with_errors;
         error( library_name, full_path, string(name()) +
