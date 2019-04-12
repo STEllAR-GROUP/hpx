@@ -132,12 +132,6 @@ set(tests
     unique_copy
    )
 
-if(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-  set(tests ${tests}
-      copyif_input
-     )
-endif()
-
 foreach(test ${tests})
   set(sources
       ${test}.cpp)

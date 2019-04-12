@@ -85,73 +85,6 @@ void test_move_async(ExPolicy p, IteratorTag)
     HPX_TEST_EQ(count, d.size());
 }
 
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-template <typename ExPolicy, typename IteratorTag>
-void test_outiter_move(ExPolicy policy, IteratorTag)
-{
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef std::back_insert_iterator<std::vector<std::size_t> > outiterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(0);
-    std::iota(std::begin(c), std::end(c), gen());
-    hpx::parallel::move(policy,
-        iterator(std::begin(c)), iterator(std::end(c)), std::back_inserter(d));
-
-    //copy contents of d back into c for testing
-    std::copy(std::begin(d), std::end(d), std::begin(d));
-
-    std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
-        [&count](std::size_t v1, std::size_t v2) -> bool {
-            HPX_TEST_EQ(v1, v2);
-            ++count;
-            return v1 == v2;
-        }));
-    HPX_TEST_EQ(count, d.size());
-
-}
-
-template <typename ExPolicy, typename IteratorTag>
-void test_outiter_move_async(ExPolicy p, IteratorTag)
-{
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef std::back_insert_iterator<std::vector<std::size_t> > outiterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(0);
-    std::iota(std::begin(c), std::end(c), gen());
-
-    auto f =
-        hpx::parallel::move(p,
-        iterator(std::begin(c)), iterator(std::end(c)),
-        std::back_inserter(d));
-
-    hpx::future<void> g = f.then(
-        [&d, &c](hpx::future<void> f)
-        {
-            HPX_TEST(!f.has_exception());
-            std::copy(std::begin(d), std::end(d), std::begin(c));
-        });
-    g.wait();
-
-    std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
-        [&count](std::size_t v1, std::size_t v2) -> bool {
-            HPX_TEST_EQ(v1, v2);
-            ++count;
-            return v1 == v2;
-        }));
-    HPX_TEST_EQ(count, d.size());
-}
-#endif
-
 template <typename IteratorTag>
 void test_move()
 {
@@ -162,25 +95,12 @@ void test_move()
 
     test_move_async(execution::seq(execution::task), IteratorTag());
     test_move_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    // output iterator test
-    test_outiter_move(execution::seq, IteratorTag());
-    test_outiter_move(execution::par, IteratorTag());
-    test_outiter_move(execution::par_unseq, IteratorTag());
-
-    test_outiter_move_async(execution::seq(execution::task), IteratorTag());
-    test_outiter_move_async(execution::par(execution::task), IteratorTag());
-#endif
 }
 
 void move_test()
 {
     test_move<std::random_access_iterator_tag>();
     test_move<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_move<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -279,9 +199,6 @@ void move_exception_test()
 {
     test_move_exception<std::random_access_iterator_tag>();
     test_move_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_move_exception<std::input_iterator_tag>();
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -378,9 +295,6 @@ void move_bad_alloc_test()
 {
     test_move_bad_alloc<std::random_access_iterator_tag>();
     test_move_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_move_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)

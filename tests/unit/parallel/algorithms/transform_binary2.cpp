@@ -32,9 +32,6 @@ void transform_binary2_test()
 {
     test_transform_binary2<std::random_access_iterator_tag>();
     test_transform_binary2<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_binary2<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,9 +56,6 @@ void transform_binary2_exception_test()
 {
     test_transform_binary2_exception<std::random_access_iterator_tag>();
     test_transform_binary2_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_binary2_exception<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -86,9 +80,6 @@ void transform_binary2_bad_alloc_test()
 {
     test_transform_binary2_bad_alloc<std::random_access_iterator_tag>();
     test_transform_binary2_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_binary2_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

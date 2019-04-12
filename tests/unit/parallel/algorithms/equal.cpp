@@ -128,9 +128,6 @@ void equal_test1()
 {
     test_equal1<std::random_access_iterator_tag>();
     test_equal1<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_equal1<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -240,9 +237,6 @@ void equal_test2()
 {
     test_equal2<std::random_access_iterator_tag>();
     test_equal2<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_equal2<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -344,9 +338,6 @@ void equal_exception_test()
 {
     test_equal_exception<std::random_access_iterator_tag>();
     test_equal_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_equal_exception<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -446,9 +437,6 @@ void equal_bad_alloc_test()
 {
     test_equal_bad_alloc<std::random_access_iterator_tag>();
     test_equal_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_equal_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

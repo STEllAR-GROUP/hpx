@@ -257,25 +257,12 @@ namespace hpx { namespace parallel { inline namespace v2
             // the for_loop should be executed sequentially if the
             // execution policy enforces sequential execution or if the
             // loop boundaries are integral types
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-            static_assert(
-                (std::is_integral<B>::value ||
-                 hpx::traits::is_input_iterator<B>::value),
-                "Requires at least input iterator or integral loop boundaries.");
-
-            typedef std::integral_constant<bool,
-                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
-                    (!std::is_integral<B>::value &&
-                     !hpx::traits::is_forward_iterator<B>::value)
-                > is_seq;
-#else
             static_assert(
                 (std::is_integral<B>::value ||
                  hpx::traits::is_forward_iterator<B>::value),
                 "Requires at least forward iterator or integral loop boundaries.");
 
             typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
 
             std::size_t size = parallel::v1::detail::distance(first, last);
             auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
@@ -306,23 +293,12 @@ namespace hpx { namespace parallel { inline namespace v2
                     hpx::traits::is_bidirectional_iterator<B>::value);
             }
 
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-            // the for_loop_n should be executed sequentially either if the
-            // execution policy enforces sequential execution or if the
-            // loop boundaries are input or output iterators
-            typedef std::integral_constant<bool,
-                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
-                    (!std::is_integral<B>::value &&
-                     !hpx::traits::is_forward_iterator<B>::value)
-                > is_seq;
-#else
             static_assert(
                 (std::is_integral<B>::value ||
                  hpx::traits::is_forward_iterator<B>::value),
                 "Requires at least forward iterator or integral loop boundaries.");
 
             typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
 
             auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
 

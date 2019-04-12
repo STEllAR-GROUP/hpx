@@ -162,93 +162,6 @@ void test_partition_copy_async(ExPolicy policy, DataType)
     HPX_TEST(equality_false);
 }
 
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-template <typename ExPolicy, typename DataType>
-void test_partition_copy_outiter(ExPolicy policy, DataType)
-{
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
-    using hpx::util::get;
-
-    int rand_base = std::rand();
-    auto pred =
-        [rand_base](DataType const& t) -> bool
-        {
-            return t < rand_base;
-        };
-
-    std::size_t const size = 10007;
-    std::vector<DataType> c(size),
-        d_true_res(0), d_false_res(0),
-        d_true_sol(0), d_false_sol(0);
-    std::generate(std::begin(c), std::end(c), random_fill(rand_base, size / 10));
-
-    auto result = hpx::parallel::partition_copy(policy,
-        c, std::back_inserter(d_true_res), std::back_inserter(d_false_res),
-        pred);
-    auto solution = std::partition_copy(std::begin(c), std::end(c),
-        std::back_inserter(d_true_sol), std::back_inserter(d_false_sol),
-        pred);
-
-    HPX_TEST(get<0>(result) == std::end(c));
-
-    bool equality_true = test::equal(
-        std::begin(d_true_res), std::end(d_true_res),
-        std::begin(d_true_sol), std::end(d_true_sol));
-    bool equality_false = test::equal(
-        std::begin(d_false_res), std::end(d_false_res),
-        std::begin(d_false_sol), std::end(d_false_sol));
-
-    HPX_TEST(equality_true);
-    HPX_TEST(equality_false);
-}
-
-template <typename ExPolicy, typename DataType>
-void test_partition_copy_outiter_async(ExPolicy policy, DataType)
-{
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
-    using hpx::util::get;
-
-    int rand_base = std::rand();
-    auto pred =
-        [rand_base](DataType const& t) -> bool
-        {
-            return t < rand_base;
-        };
-
-    std::size_t const size = 10007;
-    std::vector<DataType> c(size),
-        d_true_res(0), d_false_res(0),
-        d_true_sol(0), d_false_sol(0);
-    std::generate(std::begin(c), std::end(c), random_fill(rand_base, size / 10));
-
-    auto f = hpx::parallel::partition_copy(policy,
-        c, std::back_inserter(d_true_res), std::back_inserter(d_false_res),
-        pred);
-    auto result = f.get();
-    auto solution = std::partition_copy(std::begin(c), std::end(c),
-        std::back_inserter(d_true_sol), std::back_inserter(d_false_sol),
-        pred);
-
-    HPX_TEST(get<0>(result) == std::end(c));
-
-    bool equality_true = test::equal(
-        std::begin(d_true_res), std::end(d_true_res),
-        std::begin(d_true_sol), std::end(d_true_sol));
-    bool equality_false = test::equal(
-        std::begin(d_false_res), std::end(d_false_res),
-        std::begin(d_false_sol), std::end(d_false_sol));
-
-    HPX_TEST(equality_true);
-    HPX_TEST(equality_false);
-}
-#endif
-
 template <typename DataType>
 void test_partition_copy()
 {
@@ -260,15 +173,6 @@ void test_partition_copy()
 
     test_partition_copy_async(execution::seq(execution::task), DataType());
     test_partition_copy_async(execution::par(execution::task), DataType());
-
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_partition_copy_outiter(execution::seq, DataType());
-    test_partition_copy_outiter(execution::par, DataType());
-    test_partition_copy_outiter(execution::par_unseq, DataType());
-
-    test_partition_copy_outiter_async(execution::seq(execution::task), DataType());
-    test_partition_copy_outiter_async(execution::par(execution::task), DataType());
-#endif
 }
 
 void test_partition_copy()
