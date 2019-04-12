@@ -31,11 +31,11 @@ struct stateless_integer_add
         return p;
     }
 
-    void operator delete(void*, void*) throw()
+    void operator delete(void*, void*) noexcept
     {
     }
 
-    void operator delete(void*) throw()
+    void operator delete(void*) noexcept
     {
     }
 };
