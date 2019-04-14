@@ -13,14 +13,13 @@ namespace hpx { namespace threads { namespace policies
     {
         nothing_special = 0,            ///< As the name suggests, this option
             ///< can be used to disable all other options.
-            ///<
+
         do_background_work = 0x1,       ///< The scheduler will periodically
             ///< call a provided callback function from a special HPX thread
             ///< to enable performing background-work, for instance driving
             ///< networking progress or garbage-collect AGAS.
         reduce_thread_priority = 0x02,  ///< The kernel priority of the
             ///< os-thread driving the scheduler will be reduced below normal.
-            ///<
         delay_exit = 0x04,              ///< The scheduler will wait for some
             ///< unspecified amount of time before exiting the scheduling loop
             ///< while being terminated to make sure no other work is being
@@ -33,7 +32,16 @@ namespace hpx { namespace threads { namespace policies
             ///< scheduler to dynamically increase and reduce the number of
             ///< processing units it runs on. Setting this value not succeed for
             ///< schedulers that do not support this functionality.
-        default_mode = do_background_work | reduce_thread_priority | delay_exit
+        enable_stealing = 0x20,          ///< This option allows for certain
+            ///< schedulers to explicitly disable thread stealing
+        enable_idle_backoff = 0x40,     ///< This option allows for certain
+            ///< schedulers to explicitly disable exponential idle-back off
+        default_mode =
+                do_background_work |
+                reduce_thread_priority |
+                delay_exit |
+                enable_stealing |
+                enable_idle_backoff
             ///< This option represents the default mode.
     };
 }}}

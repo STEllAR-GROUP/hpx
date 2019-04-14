@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
-#include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
@@ -72,8 +71,7 @@ namespace hpx { namespace threads { namespace coroutines
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
     {
-        prepare_main_thread() {}
-        ~prepare_main_thread() {}
+        HPX_CONSTEXPR prepare_main_thread() {}
     };
 
     namespace detail { namespace generic_context
@@ -189,6 +187,7 @@ namespace hpx { namespace threads { namespace coroutines
         }
 #endif
 
+        template <typename CoroutineImpl>
         class fcontext_context_impl
         {
         public:
@@ -197,37 +196,33 @@ namespace hpx { namespace threads { namespace coroutines
         public:
             typedef fcontext_context_impl context_impl_base;
 
-            fcontext_context_impl()
-#if BOOST_VERSION < 106100
-              : cb_(0)
-#else
-              : cb_(std::make_pair(nullptr, nullptr))
-#endif
-              , funp_(0)
-              , ctx_(0)
-              , alloc_()
-              , stack_size_(0)
-              , stack_pointer_(0)
-            {}
-
             // Create a context that on restore invokes Functor on
             // a new stack. The stack size can be optionally specified.
-            template <typename Functor>
-            fcontext_context_impl(Functor& cb, std::ptrdiff_t stack_size)
+            explicit fcontext_context_impl(std::ptrdiff_t stack_size = -1)
 #if BOOST_VERSION < 106100
-              : cb_(reinterpret_cast<intptr_t>(&cb))
+              : cb_(reinterpret_cast<intptr_t>(this))
 #else
-              : cb_(std::make_pair(reinterpret_cast<void*>(&cb), nullptr))
+              : cb_(std::make_pair(reinterpret_cast<void*>(this), nullptr))
 #endif
-              , funp_(&trampoline<Functor>)
+              , funp_(&trampoline<CoroutineImpl>)
               , ctx_(0)
               , alloc_()
               , stack_size_(
                     (stack_size == -1) ?
                     alloc_.minimum_stacksize() : std::size_t(stack_size)
                 )
-              , stack_pointer_(alloc_.allocate(stack_size_))
+              , stack_pointer_(nullptr)
+            {}
+
+            void init()
             {
+                if (stack_pointer_ != nullptr) return;
+
+                stack_pointer_ = alloc_.allocate(stack_size_);
+                if (stack_pointer_ == nullptr)
+                {
+                    throw std::runtime_error("could not allocate memory for stack");
+                }
 #if BOOST_VERSION < 106100
                 ctx_ =
                     boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
@@ -256,33 +251,74 @@ namespace hpx { namespace threads { namespace coroutines
             {
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
                 return stack_size_ -
-                    (get_stack_ptr() -
-                        reinterpret_cast<std::size_t>(stack_pointer_));
+                    (reinterpret_cast<std::size_t>(stack_pointer_) -
+                        get_stack_ptr());
 #else
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
 #endif
             }
 
-            // global functions to be called for each OS-thread after it started
-            // running and before it exits
-            static void thread_startup(char const* thread_type) {}
-            static void thread_shutdown() {}
+            void reset_stack()
+            {
+                if (ctx_)
+                {
+#if defined(_POSIX_VERSION)
+                    void* limit =
+                        static_cast<char*>(stack_pointer_) - stack_size_;
+                    if (posix::reset_stack(limit, stack_size_))
+                        increment_stack_unbind_count();
+#else
+                    // nothing we can do here ...
+#endif
+                }
+            }
 
-            // handle stack operations
-            HPX_EXPORT void reset_stack();
-            HPX_EXPORT void rebind_stack();
+            void rebind_stack()
+            {
+                if (ctx_)
+                {
+                    increment_stack_recycle_count();
+#if BOOST_VERSION < 106100
+                    ctx_ = boost::context::make_fcontext(
+                        stack_pointer_, stack_size_, funp_);
+#else
+                    ctx_ = boost::context::detail::make_fcontext(
+                        stack_pointer_, stack_size_, funp_);
+#endif
+                }
+            }
 
             typedef std::atomic<std::int64_t> counter_type;
 
-            HPX_EXPORT static counter_type& get_stack_unbind_counter();
-            HPX_EXPORT static std::uint64_t get_stack_unbind_count(bool
-                reset);
-            HPX_EXPORT static std::uint64_t increment_stack_unbind_count();
+            static counter_type& get_stack_unbind_counter()
+            {
+                static counter_type counter(0);
+                return counter;
+            }
+            static std::uint64_t get_stack_unbind_count(bool reset)
+            {
+                return util::get_and_reset_value(
+                    get_stack_unbind_counter(), reset);
+            }
+            static std::uint64_t increment_stack_unbind_count()
+            {
+                return ++get_stack_unbind_counter();
+            }
 
-            HPX_EXPORT static counter_type& get_stack_recycle_counter();
-            HPX_EXPORT static std::uint64_t get_stack_recycle_count(bool
-                reset);
-            HPX_EXPORT static std::uint64_t increment_stack_recycle_count();
+            static counter_type& get_stack_recycle_counter()
+            {
+                static counter_type counter(0);
+                return counter;
+            }
+            static std::uint64_t get_stack_recycle_count(bool reset)
+            {
+                return util::get_and_reset_value(
+                    get_stack_recycle_counter(), reset);
+            }
+            static std::uint64_t increment_stack_recycle_count()
+            {
+                return ++get_stack_recycle_counter();
+            }
 
         private:
             friend void swap_context(fcontext_context_impl& from,
@@ -321,8 +357,6 @@ namespace hpx { namespace threads { namespace coroutines
             std::size_t stack_size_;
             void * stack_pointer_;
         };
-
-        typedef fcontext_context_impl context_impl;
     }}
 }}}
 

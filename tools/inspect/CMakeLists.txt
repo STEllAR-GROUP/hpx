@@ -14,9 +14,7 @@ if(NOT Boost_REGEX_FOUND)
   hpx_error("HPX inspect tool requires Boost.Regex")
 endif()
 
-if((NOT MSVC) OR HPX_WITH_VCPKG)
-  target_link_libraries(inspect ${HPX_TLL_PUBLIC} ${Boost_LIBRARIES})
-endif()
+target_link_libraries(inspect ${HPX_TLL_PUBLIC} ${Boost_LIBRARIES})
 
 # add dependencies to pseudo-target
 add_hpx_pseudo_dependencies(tools.inspect inspect)

@@ -139,6 +139,9 @@ namespace hpx
         length_error = 55,
         ///< Equivalent to std::length_error
 
+        migration_needs_retry = 56,     ///< migration failed because of global
+                                        ///< race, retry
+
         /// \cond NOINTERNAL
         last_error,
 
@@ -206,6 +209,7 @@ namespace hpx
         /* 53 */ "task_block_not_active",
         /* 54 */ "out_of_range",
         /* 55 */ "length_error",
+        /* 56 */ "migration_needs_retry",
 
         /*    */ ""
     };

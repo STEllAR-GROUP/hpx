@@ -48,6 +48,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         barrier_node();
         barrier_node(std::string base_name, std::size_t num, std::size_t rank);
+
         void set_event();
         hpx::future<void> gather();
 

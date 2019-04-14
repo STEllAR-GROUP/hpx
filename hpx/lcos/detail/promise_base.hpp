@@ -86,7 +86,7 @@ namespace lcos {
               : alloc_(alloc)
             {}
 
-            promise_data_allocator(init_no_addref no_addref,
+            promise_data_allocator(init_no_addref no_addref, in_place in_place,
                     other_allocator const& alloc)
               : promise_data<Result>(no_addref), alloc_(alloc)
             {}

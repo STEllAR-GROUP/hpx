@@ -4,19 +4,24 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
-  oversubscribing_resource_partitioner
-  simple_resource_partitioner
   simplest_resource_partitioner_1
   simplest_resource_partitioner_2
 )
 
-if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
-  if(NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0)
-    if (HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
-      set(example_programs ${example_programs}
-        async_customization
-        guided_pool_test
-      )
+if(HPX_WITH_MAX_CPU_COUNT AND HPX_WITH_SHARED_PRIORITY_SCHEDULER)
+  set(example_programs ${example_programs}
+    oversubscribing_resource_partitioner
+    simple_resource_partitioner
+  )
+
+  if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0)
+      if (HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
+        set(example_programs ${example_programs}
+          async_customization
+          guided_pool_test
+        )
+      endif()
     endif()
   endif()
 endif()

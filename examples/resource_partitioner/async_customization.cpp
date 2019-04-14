@@ -402,7 +402,7 @@ int test(Executor &exec)
     std::cout << "============================" << std::endl;
     std::cout << "Test 4a : dataflow()" << std::endl;
     future<std::uint16_t> f1 = make_ready_future(std::uint16_t(255));
-    future<double>   f2 = make_ready_future(127.890);
+    future<double>        f2 = make_ready_future(127.890);
     //
     auto fd = dataflow(exec,
         [](future<std::uint16_t> && f1, future<double> && f2)

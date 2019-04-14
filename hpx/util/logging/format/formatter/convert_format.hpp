@@ -23,21 +23,6 @@
 
 namespace hpx { namespace util { namespace logging {
 
-namespace tag {
-    template<
-            class string_ ,
-            class param1 ,
-            class param2 ,
-            class param3 ,
-            class param4 ,
-            class param5 ,
-            class param6 ,
-            class param7 ,
-            class param8 ,
-            class param9 ,
-            class param10> struct holder ;
-}
-
 namespace formatter {
 
 
@@ -108,32 +93,6 @@ namespace convert {
         }
 
     }
-
-    /**
-    */
-    namespace modify {
-        inline void write(const std::string & src, std::string & dest) {
-            dest = src;
-        }
-        inline void write(const std::string & src,
-            hpx::util::logging::optimize::cache_string_one_str & dest) {
-            dest.set_string(src);
-        }
-        inline void write(std::string & src,
-            hpx::util::logging::optimize::cache_string_one_str & dest) {
-            dest.set_string(src);
-        }
-
-
-
-        inline void write(const char* src, std::string & dest ) {
-            dest = src;
-        }
-        inline void write(const char* src,
-            hpx::util::logging::optimize::cache_string_one_str & dest) {
-            dest.set_string(src);
-        }
-    }
 }
 
 
@@ -175,26 +134,6 @@ struct do_convert_format {
         template<class src_type, class string> static void write(src_type & src,
             string & dest) {
             convert::append::write(src, dest);
-        }
-    };
-
-    struct modify {
-        template<class string>
-                static const std::string & get_underlying_string(const string & str) {
-            return str;
-        }
-
-        template<class string> static void write(const char * src, string & dest) {
-            convert::modify::write(src, dest);
-        }
-
-        template<class src_type, class string> static void write(const src_type & src,
-            string & dest) {
-            convert::modify::write(src, dest);
-        }
-        template<class src_type, class string> static void write(src_type & src,
-            string & dest) {
-            convert::modify::write(src, dest);
         }
     };
 };

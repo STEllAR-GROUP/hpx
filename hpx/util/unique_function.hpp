@@ -15,8 +15,6 @@
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
-#include <hpx/util/detail/vtable/unique_function_vtable.hpp>
-#include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <cstddef>
@@ -31,50 +29,39 @@ namespace hpx { namespace util
 
     template <typename R, typename ...Ts, bool Serializable>
     class unique_function<R(Ts...), Serializable>
-      : public detail::basic_function<
-            detail::unique_function_vtable<R(Ts...)>
-          , R(Ts...), Serializable
-        >
+      : public detail::basic_function<R(Ts...), false, Serializable>
     {
-        typedef detail::unique_function_vtable<R(Ts...)> vtable;
-        typedef detail::basic_function<vtable, R(Ts...), Serializable> base_type;
+        using base_type = detail::basic_function<R(Ts...), false, Serializable>;
 
     public:
-        typedef typename base_type::result_type result_type;
+        typedef R result_type;
 
-        unique_function() noexcept
-          : base_type()
+        HPX_CONSTEXPR unique_function(std::nullptr_t = nullptr) noexcept
         {}
 
-        unique_function(std::nullptr_t) noexcept
-          : base_type()
-        {}
+        unique_function(unique_function&&) noexcept = default;
+        unique_function& operator=(unique_function&&) noexcept = default;
 
-        unique_function(unique_function&& other) noexcept
-          : base_type(static_cast<base_type&&>(other))
-        {}
-
+        // the split SFINAE prevents MSVC from eagerly instantiating things
         template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable = typename std::enable_if<
+            typename Enable1 = typename std::enable_if<
                 !std::is_same<FD, unique_function>::value
-             && traits::is_invocable_r<R, FD&, Ts...>::value
+            >::type,
+            typename Enable2 = typename std::enable_if<
+                traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         unique_function(F&& f)
-          : base_type()
         {
             assign(std::forward<F>(f));
         }
 
-        unique_function& operator=(unique_function&& other) noexcept
-        {
-            base_type::operator=(static_cast<base_type&&>(other));
-            return *this;
-        }
-
+        // the split SFINAE prevents MSVC from eagerly instantiating things
         template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable = typename std::enable_if<
+            typename Enable1 = typename std::enable_if<
                 !std::is_same<FD, unique_function>::value
-             && traits::is_invocable_r<R, FD&, Ts...>::value
+            >::type,
+            typename Enable2 = typename std::enable_if<
+                traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         unique_function& operator=(F&& f)
         {
@@ -88,13 +75,6 @@ namespace hpx { namespace util
         using base_type::empty;
         using base_type::target;
     };
-
-    template <typename Sig, bool Serializable>
-    static bool is_empty_function(
-        unique_function<Sig, Serializable> const& f) noexcept
-    {
-        return f.empty();
-    }
 }}
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)

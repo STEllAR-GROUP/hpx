@@ -1177,6 +1177,15 @@ namespace hpx { namespace parallel { inline namespace v1
                         return output_iterator_offset(
                             true_count, part_size - true_count);
                     };
+
+                auto f2 = hpx::util::unwrapping(
+                    [](output_iterator_offset const& prev_sum,
+                        output_iterator_offset const& curr)
+                        -> output_iterator_offset {
+                        return output_iterator_offset(
+                            get<0>(prev_sum) + get<0>(curr),
+                            get<1>(prev_sum) + get<1>(curr));
+                    });
                 auto f3 =
                     [dest_true, dest_false, flags](
                         zip_iterator part_begin, std::size_t part_size,
@@ -1205,6 +1214,23 @@ namespace hpx { namespace parallel { inline namespace v1
                             });
                     };
 
+                auto f4 =
+                    [last, dest_true, dest_false, flags](
+                        std::vector<
+                            hpx::shared_future<output_iterator_offset>>&& items,
+                        std::vector<hpx::future<void>>&&) mutable
+                    -> hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3> {
+                    HPX_UNUSED(flags);
+
+                    output_iterator_offset count_pair = items.back().get();
+                    std::size_t count_true = get<0>(count_pair);
+                    std::size_t count_false = get<1>(count_pair);
+                    std::advance(dest_true, count_true);
+                    std::advance(dest_false, count_false);
+
+                    return hpx::util::make_tuple(last, dest_true, dest_false);
+                };
+
                 return scan_partitioner_type::call(
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, flags.get()), count, init,
@@ -1212,35 +1238,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::move(f1),
                     // step 2 propagates the partition results from left
                     // to right
-                    hpx::util::unwrapping(
-                        [](output_iterator_offset const& prev_sum,
-                            output_iterator_offset const& curr)
-                        -> output_iterator_offset
-                        {
-                            return output_iterator_offset(
-                                get<0>(prev_sum) + get<0>(curr),
-                                get<1>(prev_sum) + get<1>(curr));
-                        }),
+                    std::move(f2),
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value
-                    [last, dest_true, dest_false, flags](
-                        std::vector<
-                            hpx::shared_future<output_iterator_offset>
-                        > && items,
-                        std::vector<hpx::future<void> > &&) mutable
-                    ->  hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3>
-                    {
-                        HPX_UNUSED(flags);
-
-                        output_iterator_offset count_pair = items.back().get();
-                        std::size_t count_true = get<0>(count_pair);
-                        std::size_t count_false = get<1>(count_pair);
-                        std::advance(dest_true, count_true);
-                        std::advance(dest_false, count_false);
-
-                        return hpx::util::make_tuple(last, dest_true, dest_false);
-                    });
+                    std::move(f4));
             }
         };
         /// \endcond

@@ -103,8 +103,7 @@ namespace hpx { namespace lcos {
                 // make sure this runs as an HPX thread
                 if (hpx::threads::get_self_ptr() == nullptr)
                 {
-                    return hpx::threads::run_as_hpx_thread(
-                        &barrier::release, this);
+                    hpx::threads::run_as_hpx_thread(&barrier::release, this);
                 }
 
                 hpx::future<void> f;
@@ -126,6 +125,7 @@ namespace hpx { namespace lcos {
                     }
                 ).get();
             }
+            intrusive_ptr_release(node_->get());
             node_.reset();
         }
     }
@@ -142,6 +142,7 @@ namespace hpx { namespace lcos {
                     hpx::unregister_with_basename(
                         (*node_)->base_name_, (*node_)->rank_);
             }
+            intrusive_ptr_release(node_->get());
             node_.reset();
         }
     }

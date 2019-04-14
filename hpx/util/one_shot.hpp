@@ -10,17 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_bind_expression.hpp>
-#include <hpx/traits/is_placeholder.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/one_shot.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/tuple.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -41,12 +33,12 @@ namespace hpx { namespace util
               : _called(false)
             {}
 
-            HPX_CONSTEXPR explicit one_shot_wrapper(F const& f)
-              : _f(f)
-              , _called(false)
-            {}
-            HPX_CONSTEXPR explicit one_shot_wrapper(F&& f)
-              : _f(std::move(f))
+            template <typename F_, typename =
+                typename std::enable_if<
+                    std::is_constructible<F, F_>::value
+                >::type>
+            HPX_CONSTEXPR explicit one_shot_wrapper(F_&& f)
+              : _f(std::forward<F_>(f))
               , _called(false)
             {}
 
@@ -68,11 +60,12 @@ namespace hpx { namespace util
             HPX_CONSTEXPR one_shot_wrapper()
             {}
 
-            HPX_CONSTEXPR explicit one_shot_wrapper(F const& f)
-              : _f(f)
-            {}
-            HPX_CONSTEXPR explicit one_shot_wrapper(F&& f)
-              : _f(std::move(f))
+            template <typename F_, typename =
+                typename std::enable_if<
+                    std::is_constructible<F, F_>::value
+                >::type>
+            HPX_CONSTEXPR explicit one_shot_wrapper(F_&& f)
+              : _f(std::forward<F_>(f))
             {}
 
             HPX_CONSTEXPR one_shot_wrapper(one_shot_wrapper&& other)
@@ -89,7 +82,8 @@ namespace hpx { namespace util
             operator()(Ts&&... vs)
             {
                 check_call();
-                return util::invoke(std::move(_f), std::forward<Ts>(vs)...);
+
+                return HPX_INVOKE(std::move(_f), std::forward<Ts>(vs)...);
             }
 
             template <typename Archive>

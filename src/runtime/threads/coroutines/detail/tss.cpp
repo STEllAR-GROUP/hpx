@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <hpx/runtime/threads_fwd.hpp>
@@ -62,7 +63,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (nullptr == self)
         {
-            throw null_thread_id_exception();
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "hpx::threads::coroutines::detail::get_tss_thread_data",
+                "null thread id encountered");
             return 0;
         }
 
@@ -89,7 +92,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (nullptr == self)
         {
-            throw null_thread_id_exception();
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "hpx::threads::coroutines::detail::set_tss_thread_data",
+                "null thread id encountered");
             return 0;
         }
 
@@ -126,7 +131,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (nullptr == self)
         {
-            throw null_thread_id_exception();
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "hpx::threads::coroutines::detail::find_tss_data",
+                "null thread id encountered");
             return nullptr;
         }
 
@@ -159,7 +166,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (nullptr == self)
         {
-            throw null_thread_id_exception();
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "hpx::threads::coroutines::detail::add_new_tss_node",
+                "null thread id encountered");
             return;
         }
 
@@ -180,7 +189,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (nullptr == self)
         {
-            throw null_thread_id_exception();
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "hpx::threads::coroutines::detail::erase_tss_node",
+                "null thread id encountered");
             return;
         }
 

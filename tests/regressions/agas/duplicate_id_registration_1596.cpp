@@ -145,6 +145,9 @@ int hpx_main()
         }
     }
 
+    // Unregister everything again to avoid memory leaks
+    hpx::unregister_with_basename("Listener").get();
+
     return hpx::finalize();
 }
 

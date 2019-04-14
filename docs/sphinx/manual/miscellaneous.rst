@@ -273,7 +273,7 @@ In order to use either ``hpx::cout`` or ``hpx::cerr`` application codes need to
 ``#include <hpx/include/iostreams.hpp>``. For an example, please see the
 simplest possible 'Hello world' program as included as an example with |hpx|:
 
-.. literalinclude:: ../../examples/quickstart/simplest_hello_world_1.cpp
+.. literalinclude:: ../../examples/quickstart/hello_world_1.cpp
    :language: c++
 
 Additionally those applications need to link with the iostreams component. When
@@ -285,8 +285,8 @@ parameter, for instance:
    include(HPX_AddExecutable)
 
    add_hpx_executable(
-       simplest_hello_world
-       SOURCES simplest_hello_world.cpp
+       hello_world
+       SOURCES hello_world.cpp
        COMPONENT_DEPENDENCIES iostreams
    )
 

@@ -331,6 +331,12 @@ listed below.
      * Can be used as a highspeed communication library backend for the
        parcelport.
 
+.. note::
+
+   When using OpenMPI please note that Ubuntu (notably 18.04 LTS) and older
+   Debian ship an OpenMPI 2.x built with ``--enable-heterogeneous`` which may
+   cause communication failures at runtime and should not be used.
+
 .. list-table:: Optional software prerequisites for |hpx| on Linux systems
 
    * * Name
@@ -1015,10 +1021,9 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
   source files. Instead, it will generate Visual Studio Solution Files which
   will build HPX packages out of the HPX source tree.
 
-* Set four new environment variables (in CMake, not in Windows environment, by
-  the way): ``BOOST_ROOT``, ``HWLOC_ROOT``, ``CMAKE_INSTALL_PREFIX`` and
-  ``HPX_WITH_BOOST_ALL_DYNAMIC_LINK``. The meaning of these variables is as
-  follows:
+* Set three new environment variables (in CMake, not in Windows environment, by
+  the way): ``BOOST_ROOT``, ``HWLOC_ROOT``, ``CMAKE_INSTALL_PREFIX``. The
+  meaning of these variables is as follows:
 
   * ``BOOST_ROOT`` the root directory of the unpacked Boost headers/cpp files.
   * ``HWLOC_ROOT`` the root directory of the unpacked Portable Hardware Locality
@@ -1035,9 +1040,6 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
   To insert new env-vars click on "Add Entry" and then insert the name inside
   "Name", select ``PATH`` as Type and put the path-name in "Path" text field.
   Repeat this for the first three variables.
-
-  The last one: ``HPX_WITH_BOOST_ALL_DYNAMIC_LINK`` is a ``BOOL`` and must be
-  checked (there will be a checkbox instead of a textfield).
 
   This is how variable insertion looks like:
 

@@ -196,15 +196,19 @@ namespace hpx { namespace parcelset
         {
             flush_parcels();
 
-            io_service_pool_.stop();
             if (blocking) {
                 connection_cache_.shutdown();
                 connection_handler().do_stop();
+                io_service_pool_.wait();
+                io_service_pool_.stop();
                 io_service_pool_.join();
                 connection_cache_.clear();
                 io_service_pool_.clear();
             }
-
+            else
+            {
+                io_service_pool_.stop();
+            }
         }
 
     public:
@@ -352,9 +356,9 @@ namespace hpx { namespace parcelset
                     ec);
             if (ec) return;
 
-            threads::set_thread_state(id,
-                std::chrono::milliseconds(100), threads::pending,
-                threads::wait_signaled, threads::thread_priority_boost, ec);
+            threads::set_thread_state(id, std::chrono::milliseconds(100),
+                threads::pending, threads::wait_signaled,
+                threads::thread_priority_boost, true, ec);
         }
 
         /// Return the name of this locality
@@ -416,10 +420,9 @@ namespace hpx { namespace parcelset
             put_parcel(
                 dest
               , std::move(p)
-              , util::bind_front(
-                    &parcelport::early_pending_parcel_handler
-                  , this
-                )
+              , [=](boost::system::error_code const& ec, parcel const & p) -> void {
+                    return early_pending_parcel_handler(ec, p);
+                }
             );
         }
 

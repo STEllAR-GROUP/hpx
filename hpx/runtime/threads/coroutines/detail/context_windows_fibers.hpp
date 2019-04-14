@@ -34,7 +34,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
-#include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unused.hpp>
@@ -47,7 +46,7 @@
 #include <cstdint>
 
 #if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
-extern "C" void switch_to_fiber(void* lpFiber) throw();
+extern "C" void switch_to_fiber(void* lpFiber) noexcept;
 #endif
 
 namespace hpx { namespace threads { namespace coroutines
@@ -55,14 +54,14 @@ namespace hpx { namespace threads { namespace coroutines
     // On Windows we need a special preparation for the main coroutines thread
     struct prepare_main_thread
     {
-        prepare_main_thread()
+        prepare_main_thread() noexcept
         {
             LPVOID result = ConvertThreadToFiber(nullptr);
             HPX_ASSERT(nullptr != result);
             HPX_UNUSED(result);
         }
 
-        ~prepare_main_thread()
+        ~prepare_main_thread() noexcept
         {
             BOOL result = ConvertFiberToThread();
             HPX_ASSERT(FALSE != result);
@@ -89,7 +88,7 @@ namespace hpx { namespace threads { namespace coroutines
         /*
          * Return true if current thread is a fiber.
          */
-        inline bool is_fiber()
+        inline bool is_fiber() noexcept
         {
 #if _WIN32_WINNT >= 0x0600
             return IsThreadAFiber() ? true : false;
@@ -113,7 +112,7 @@ namespace hpx { namespace threads { namespace coroutines
              * An empty context cannot be restored from,
              * but can be saved in.
              */
-            fibers_context_impl_base() : m_ctx(nullptr) {}
+            fibers_context_impl_base() noexcept : m_ctx(nullptr) {}
 
             /*
              * Free function. Saves the current context in @p from
@@ -129,7 +128,7 @@ namespace hpx { namespace threads { namespace coroutines
              * default.
              */
             friend void swap_context(fibers_context_impl_base& from,
-                const fibers_context_impl_base& to, default_hint)
+                const fibers_context_impl_base& to, default_hint) noexcept
             {
                 if (!is_fiber())
                 {
@@ -163,7 +162,7 @@ namespace hpx { namespace threads { namespace coroutines
             ~fibers_context_impl_base() {}
 
         protected:
-            explicit fibers_context_impl_base(fiber_ptr ctx)
+            explicit fibers_context_impl_base(fiber_ptr ctx) noexcept
               : m_ctx(ctx)
             {}
 
@@ -181,6 +180,7 @@ namespace hpx { namespace threads { namespace coroutines
         // initial stack size (grows as needed)
         static const std::size_t stack_size = sizeof(void*) >= 8 ? 2048 : 1024;
 
+        template <typename CoroutineImpl>
         class fibers_context_impl
           : public fibers_context_impl_base
         {
@@ -196,16 +196,18 @@ namespace hpx { namespace threads { namespace coroutines
              * Create a context that on restore invokes Functor on
              *  a new stack. The stack size can be optionally specified.
              */
-            template<typename Functor>
-            explicit fibers_context_impl(Functor& cb, std::ptrdiff_t stack_size)
-              : fibers_context_impl_base(
-                    CreateFiberEx(stack_size == -1 ? default_stack_size : stack_size,
-                        stack_size == -1 ? default_stack_size : stack_size, 0,
-                        static_cast<LPFIBER_START_ROUTINE>(&trampoline<Functor>),
-                        static_cast<LPVOID>(&cb))
-                    ),
-                stacksize_(stack_size == -1 ? default_stack_size : stack_size)
+            explicit fibers_context_impl(std::ptrdiff_t stack_size)
+              : stacksize_(stack_size == -1 ? default_stack_size : stack_size)
+            {}
+
+            void init()
             {
+                if (m_ctx != nullptr) return;
+
+                m_ctx = CreateFiberEx(stack_size == -1 ? default_stack_size : stack_size,
+                        stack_size == -1 ? default_stack_size : stack_size, 0,
+                        static_cast<LPFIBER_START_ROUTINE>(&trampoline<CoroutineImpl>),
+                        static_cast<LPVOID>(this));
                 if (nullptr == m_ctx)
                 {
                     throw boost::system::system_error(
@@ -224,48 +226,41 @@ namespace hpx { namespace threads { namespace coroutines
             }
 
             // Return the size of the reserved stack address space.
-            std::ptrdiff_t get_stacksize() const
+            std::ptrdiff_t get_stacksize() const noexcept
             {
                 return stacksize_;
             }
 
-            void reset_stack()
+            HPX_CXX14_CONSTEXPR void reset_stack() noexcept
             {
             }
 
-            void rebind_stack()
+            void rebind_stack() noexcept
             {
                 increment_stack_recycle_count();
             }
 
             typedef std::atomic<std::int64_t> counter_type;
 
-            static counter_type& get_stack_recycle_counter()
+            static counter_type& get_stack_recycle_counter() noexcept
             {
                 static counter_type counter(0);
                 return counter;
             }
 
-            static std::uint64_t get_stack_recycle_count(bool reset)
+            static std::uint64_t get_stack_recycle_count(bool reset) noexcept
             {
                 return util::get_and_reset_value(get_stack_recycle_counter(), reset);
             }
 
-            static std::uint64_t increment_stack_recycle_count()
+            static std::uint64_t increment_stack_recycle_count() noexcept
             {
                 return ++get_stack_recycle_counter();
             }
 
-            // global functions to be called for each OS-thread after it started
-            // running and before it exits
-            static void thread_startup(char const* thread_type) {}
-            static void thread_shutdown() {}
-
         private:
             std::ptrdiff_t stacksize_;
         };
-
-        typedef fibers_context_impl context_impl;
     }}
 }}}
 

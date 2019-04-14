@@ -91,18 +91,19 @@ namespace hpx { namespace parallel { inline namespace v1
                         return !tok.was_cancelled();
                     };
 
-                return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy), first, count,
-                    std::move(f1),
-                    [](std::vector<hpx::future<bool> > && results)
-                    {
+                auto f2 =
+                    [](std::vector<hpx::future<bool>>&& results) {
                         return std::all_of(
                             hpx::util::begin(results), hpx::util::end(results),
                             [](hpx::future<bool>& val) -> bool
                             {
                                 return val.get();
                             });
-                    });
+                    };
+
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy), first, count, std::move(f1),
+                    std::move(f2));
             }
         };
         /// \endcond
@@ -223,47 +224,42 @@ namespace hpx { namespace parallel { inline namespace v1
                     return result::get(std::move(last));
 
                 util::cancellation_token<difference_type> tok(count);
-                return util::partitioner<ExPolicy, FwdIter, void>::
-                call_with_index(
-                    std::forward<ExPolicy>(policy), first, count, 1,
-                    [tok, last, HPX_CAPTURE_FORWARD(pred)](
-                        FwdIter part_begin, std::size_t part_size,
-                        std::size_t base_idx
-                    ) mutable -> void
-                    {
-                        FwdIter trail = part_begin++;
-                        util::loop_idx_n(++base_idx, part_begin,
-                            part_size - 1, tok,
-                            [&trail, &tok, &pred](
-                                reference& v, std::size_t ind
-                            ) -> void
+                auto f1 = [tok, last, HPX_CAPTURE_FORWARD(pred)](
+                              FwdIter part_begin, std::size_t part_size,
+                              std::size_t base_idx) mutable -> void {
+                    FwdIter trail = part_begin++;
+                    util::loop_idx_n(++base_idx, part_begin, part_size - 1, tok,
+                        [&trail, &tok, &pred](
+                            reference& v, std::size_t ind) -> void {
+                            if (hpx::util::invoke(pred, v, *trail++))
                             {
-                                if (hpx::util::invoke(pred, v, *trail++))
-                                {
-                                    tok.cancel(ind);
-                                }
-                            });
-
-                        FwdIter i = trail++;
-
-                        //trail now points one past the current grouping
-                        //unless canceled
-                        if (!tok.was_cancelled(base_idx + part_size)
-                            && trail != last)
-                        {
-                            if (hpx::util::invoke(pred, *trail, *i))
-                            {
-                                tok.cancel(base_idx + part_size);
+                                tok.cancel(ind);
                             }
-                        }
-                    },
-                    [first, tok](std::vector<hpx::future<void> > &&) mutable
-                    ->  FwdIter
+                        });
+
+                    FwdIter i = trail++;
+
+                    //trail now points one past the current grouping
+                    //unless canceled
+                    if (!tok.was_cancelled(base_idx + part_size) &&
+                        trail != last)
                     {
-                        difference_type loc = tok.get_data();
-                        std::advance(first, loc);
-                        return std::move(first);
-                    });
+                        if (hpx::util::invoke(pred, *trail, *i))
+                        {
+                            tok.cancel(base_idx + part_size);
+                        }
+                    }
+                };
+                auto f2 =
+                    [first, tok](
+                        std::vector<hpx::future<void>>&&) mutable -> FwdIter {
+                    difference_type loc = tok.get_data();
+                    std::advance(first, loc);
+                    return std::move(first);
+                };
+                return util::partitioner<ExPolicy, FwdIter,
+                    void>::call_with_index(std::forward<ExPolicy>(policy),
+                    first, count, 1, std::move(f1), std::move(f2));
             }
         };
         /// \endcond

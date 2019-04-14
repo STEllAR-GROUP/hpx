@@ -21,7 +21,7 @@
 #include <hpx/traits/is_valid_action.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 #include <hpx/util/lazy_enable_if.hpp>
 
 #include <type_traits>
@@ -46,8 +46,8 @@ namespace hpx { namespace detail
                 >::type
             >
         >::type
-        operator()(Policy const& launch_policy,
-            components::client_base<Client, Stub> const& c, Ts &&... ts) const
+        operator()(components::client_base<Client, Stub> const& c,
+            Policy const& launch_policy, Ts &&... ts) const
         {
             HPX_ASSERT(c.is_ready());
             return hpx::detail::async_impl<Action>(launch_policy, c.get_id(),
@@ -108,9 +108,9 @@ namespace hpx { namespace detail
             }
 
             // defer invocation otherwise
-            return c.then(util::one_shot(util::bind(
+            return c.then(util::one_shot(util::bind_back(
                 async_action_client_dispatch<Action>(),
-                std::forward<Policy_>(launch_policy), c, std::forward<Ts>(ts)...
+                std::forward<Policy_>(launch_policy), std::forward<Ts>(ts)...
             )));
         }
 

@@ -7,6 +7,7 @@
 #define HPX_PARALLEL_UTIL_DETAIL_CHUNK_SIZE_ITERATOR_JUL_03_2016_0949PM
 
 #include <hpx/config.hpp>
+#include <hpx/util/min.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/iterator_facade.hpp>
 
@@ -38,7 +39,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         HPX_HOST_DEVICE
         chunk_size_iterator(Iterator it, std::size_t chunk_size,
                 std::size_t count = 0)
-          : data_(it, (std::min)(chunk_size, count))
+          : data_(it, (hpx::util::min)(chunk_size, count))
           , chunk_size_(chunk_size)
           , count_(count)
         {}
@@ -75,7 +76,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             count_ -= chunk();
 
             iterator() =  parallel::v1::detail::next(iterator(), chunk());
-            chunk() = (std::min)(chunk_size_, count_);
+            chunk() = (hpx::util::min)(chunk_size_, count_);
         }
 
     private:
@@ -103,7 +104,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         HPX_HOST_DEVICE
         chunk_size_idx_iterator(Iterator it, std::size_t chunk_size,
                 std::size_t count = 0, std::size_t base_idx = 0)
-          : data_(it, (std::min)(chunk_size, count), base_idx)
+          : data_(it, (hpx::util::min)(chunk_size, count), base_idx)
           , count_(count)
           , chunk_size_(chunk_size)
         {}
@@ -144,7 +145,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
             iterator() = parallel::v1::detail::next(iterator(), chunk());
             base_index() += chunk();
-            chunk() = (std::min)(chunk_size_, count_);
+            chunk() = (hpx::util::min)(chunk_size_, count_);
         }
 
     private:

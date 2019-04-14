@@ -72,7 +72,6 @@ namespace hpx { namespace util
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
     protected:
-        bool regex_init();
         void line_msg(std::string msg, std::string const& file,
             int lnum = 0, std::string const& line = "");
 
@@ -90,7 +89,7 @@ namespace hpx { namespace util
             std::string const& sec_name) const;
 
         ///////////////////////////////////////////////////////////////////////////
-        section* add_section_if_new(std::unique_lock<lcos::local::spinlock>& l,
+        section* add_section_if_new(std::unique_lock<mutex_type>& l,
             std::string const& sec_name);
 
         void add_entry(std::unique_lock<mutex_type>& l, std::string const& fullkey,

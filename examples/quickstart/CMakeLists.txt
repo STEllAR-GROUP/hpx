@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2016 Hartmut Kaiser
+# Copyright (c) 2007-2019 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@ set(example_programs
     component_ctors
     component_in_executable
     component_inheritance
+    component_with_custom_heap
     component_with_executor
     composable_guard
     customize_async
@@ -29,7 +30,9 @@ set(example_programs
     file_serialization
     fractals
     fractals_struct
-    hello_world
+    hello_world_1
+    hello_world_2
+    hello_world_distributed
     init_globally
     interest_calculator
     interval_timer
@@ -46,8 +49,6 @@ set(example_programs
     shared_mutex
     sierpinski
     simple_future_continuation
-    simplest_hello_world_1
-    simplest_hello_world_2
     timed_futures
     timed_wake
     use_main_thread
@@ -72,16 +73,19 @@ set(command_line_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_in_executable_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_ctors_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_inheritance_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(component_with_custom_heap_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_with_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(customize_async_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(enumerate_threads_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(event_synchronization_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(fractals_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(hello_world_1_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(hello_world_2_FLAGS COMPONENT_DEPENDENCIES iostreams)
 if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
-  set(hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams DEPENDENCIES compress_snappy)
+  set(hello_world_distributed_FLAGS COMPONENT_DEPENDENCIES iostreams DEPENDENCIES compress_snappy)
 else()
-  set(hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
+  set(hello_world_distributed_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
 set(interval_timer_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(local_channel_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -91,8 +95,6 @@ set(partitioned_vector_spmd_foreach_FLAGS
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(potpourri_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(shared_mutex_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(simplest_hello_world_1_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(simplest_hello_world_2_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(timed_futures_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(vector_counting_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -110,13 +112,14 @@ set(enumerate_threads_PARAMETERS THREADS_PER_LOCALITY 4)
 set(event_synchronization_PARAMETERS THREADS_PER_LOCALITY 4)
 set(error_handling_PARAMETERS THREADS_PER_LOCALITY 4)
 set(fractals_PARAMETERS THREADS_PER_LOCALITY 4)
-set(hello_world_PARAMETERS THREADS_PER_LOCALITY 4)
+set(hello_world_1_PARAMETERS THREADS_PER_LOCALITY 4)
+set(hello_world_2_PARAMETERS THREADS_PER_LOCALITY 4)
+set(hello_world_distributed_PARAMETERS THREADS_PER_LOCALITY 4)
 set(interval_timer_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_channel_PARAMETERS THREADS_PER_LOCALITY 4)
 set(sierpinski_PARAMETERS THREADS_PER_LOCALITY 4)
 set(partitioned_vector_spmd_foreach_PARAMETERS THREADS_PER_LOCALITY 4)
 set(pingpong_PARAMETERS THREADS_PER_LOCALITY 4)
-set(simplest_hello_world_PARAMETERS THREADS_PER_LOCALITY 4)
 set(simple_future_continuation_PARAMETERS THREADS_PER_LOCALITY 4)
 set(timed_futures_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_counting_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)

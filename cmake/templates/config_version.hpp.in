@@ -31,7 +31,7 @@
 #define HPX_VERSION_SUBMINOR     @HPX_VERSION_SUBMINOR@u
 
 #define HPX_VERSION_FULL                                                       \
-    (HPX_VERSION_MAJOR << 16) | (HPX_VERSION_MINOR << 8) | HPX_VERSION_SUBMINOR
+    ((HPX_VERSION_MAJOR << 16) | (HPX_VERSION_MINOR << 8) | HPX_VERSION_SUBMINOR)
 
 #define HPX_VERSION_DATE         @HPX_VERSION_DATE@
 

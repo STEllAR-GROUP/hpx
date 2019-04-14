@@ -335,6 +335,10 @@ namespace hpx { namespace threads
         virtual void reset_thread_distribution() {}
 
         virtual void set_scheduler_mode(threads::policies::scheduler_mode) {}
+        virtual void add_scheduler_mode(threads::policies::scheduler_mode) {}
+        virtual void add_remove_scheduler_mode(threads::policies::scheduler_mode,
+            threads::policies::scheduler_mode) {}
+        virtual void remove_scheduler_mode(threads::policies::scheduler_mode) {}
 
         //
         virtual void abort_all_suspended_threads() {}
@@ -356,23 +360,23 @@ namespace hpx { namespace threads
         // detail::manage_executor implementation
 
         /// \brief Return the requested policy element.
-        virtual std::size_t get_policy_element(detail::executor_parameter p,
-            error_code& ec = throws) const = 0;
+        std::size_t get_policy_element(detail::executor_parameter p,
+            error_code& ec = throws) const override = 0;
 
         // \brief Return statistics collected by this scheduler.
         virtual void get_statistics(executor_statistics& stats,
-            error_code& ec = throws) const = 0;
+            error_code& ec = throws) const override = 0;
 
         // \brief Provide the given processing unit to the scheduler.
         virtual void add_processing_unit(std::size_t virt_core,
-            std::size_t thread_num, error_code& ec = throws) = 0;
+            std::size_t thread_num, error_code& ec = throws) override = 0;
 
         // \brief Remove the given processing unit from the scheduler.
         virtual void remove_processing_unit(std::size_t thread_num,
-            error_code& ec = throws) = 0;
+            error_code& ec = throws) override = 0;
 
         // \brief Return the description string of the underlying scheduler.
-        char const* get_description() const;
+        char const* get_description() const override;
 
         /// \endcond
 

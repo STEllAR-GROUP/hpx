@@ -1,6 +1,7 @@
 #! /usr/bin/env python 
 #
 # Copyright (c) 2011 Bryce Lelbach
+# Copyright (c) 2019 Patrick Diehl
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -47,7 +48,7 @@ def make_compiler_component(driver):
     # on windows, running cl.exe with no args returns what we want
     windows = 1
     proc = process("%s" % driver)
-  except ImportError, err:
+  except ImportError as err:
     # on POSIX, assume GNU-style long options
     proc = process("%s --version" % driver)
 

@@ -85,7 +85,7 @@ void rnd_strings(std::vector<std::string> &V)
 // --------------------------------------------------------------------
 // check that the array is sorted correctly
 template <class IA, typename Compare>
-int verify_(const std::vector <IA> &A, Compare comp, double elapsed,
+int verify_(const std::vector <IA> &A, Compare comp, std::uint64_t elapsed,
     bool print)
 {
     if (A.size()<2) {

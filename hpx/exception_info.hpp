@@ -38,7 +38,7 @@ namespace hpx
         {}
 
         explicit error_info(Type&& value)
-          : _value(std::forward<Type>(value))
+          : _value(std::move(value))
         {}
 
         Type _value;
@@ -137,7 +137,8 @@ namespace hpx
             using node_type = detail::exception_info_node<
                 ErrorInfo...>;
 
-            node_ptr node = std::make_shared<node_type>(std::move(tagged_values)...);
+            node_ptr node = std::make_shared<node_type>(
+                std::forward<ErrorInfo>(tagged_values)...);
             node->next = std::move(_data);
             _data = std::move(node);
             return *this;

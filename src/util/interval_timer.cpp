@@ -124,9 +124,10 @@ namespace hpx { namespace util { namespace detail
             is_started_ = false;
 
             if (id_) {
-                error_code ec(lightweight);       // avoid throwing on error
+                error_code ec(lightweight);    // avoid throwing on error
                 threads::set_thread_state(id_, threads::pending,
-                    threads::wait_abort, threads::thread_priority_boost, ec);
+                    threads::wait_abort, threads::thread_priority_boost, true,
+                    ec);
                 id_.reset();
             }
             return true;
@@ -258,10 +259,9 @@ namespace hpx { namespace util { namespace detail
         }
 
         // schedule this thread to be run after the given amount of seconds
-        threads::set_thread_state(id,
-            std::chrono::microseconds(microsecs_),
+        threads::set_thread_state(id, std::chrono::microseconds(microsecs_),
             threads::pending, threads::wait_signaled,
-            threads::thread_priority_boost, ec);
+            threads::thread_priority_boost, true, ec);
 
         if (ec) {
             is_terminated_ = true;
@@ -269,7 +269,7 @@ namespace hpx { namespace util { namespace detail
 
             // abort the newly created thread
             threads::set_thread_state(id, threads::pending, threads::wait_abort,
-                threads::thread_priority_boost, ec);
+                threads::thread_priority_boost, true, ec);
 
             return;
         }

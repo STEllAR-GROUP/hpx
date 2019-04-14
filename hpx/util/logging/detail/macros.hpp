@@ -21,7 +21,6 @@
 #define JT28092007_macros_HPP_DEFINED
 
 #include <boost/current_function.hpp>
-#include <hpx/util/logging/detail/cache_before_init_macros.hpp>
 #include <string>
 
 namespace hpx { namespace util { namespace logging {
@@ -34,19 +33,8 @@ namespace hpx { namespace util { namespace logging {
     - @ref macros_define_declare
         - @ref HPX_DECLARE_LOG
         - @ref HPX_DEFINE_LOG
-        - @ref HPX_DEFINE_LOG_WITH_ARGS
-        - @ref HPX_DECLARE_LOG_FILTER
-        - @ref HPX_DEFINE_LOG_FILTER
-        - @ref HPX_DEFINE_LOG_FILTER_WITH_ARGS
     - @ref macros_use
         - @ref HPX_LOG_USE_LOG
-        - @ref HPX_LOG_USE_LOG_IF_LEVEL
-        - @ref HPX_LOG_USE_LOG_IF_FILTER
-        - @ref HPX_LOG_USE_SIMPLE_LOG_IF_FILTER
-    - @ref macros_compile_time
-        - @ref macros_compile_time_fast
-        - @ref macros_compile_time_slow
-        - @ref HPX_LOG_compile_results
 
 
 Simply put, you need to use macros to make sure objects (logger(s) and filter(s)) :
@@ -114,7 +102,7 @@ Note that @c logger_type only needs to be a declaration (a @c typedef, for insta
 
 Example:
 @code
-typedef logger_format_write< > logger_type;
+typedef logger_format_write logger_type;
 HPX_DECLARE_LOG(g_l, logger_type)
 @endcode
 
@@ -122,216 +110,43 @@ HPX_DECLARE_LOG(g_l, logger_type)
 @subsubsection HPX_DEFINE_LOG HPX_DEFINE_LOG - defining a log
 
 @code
-HPX_DEFINE_LOG(log_name, logger_type)
+HPX_DEFINE_LOG(log_name, logger_type, ...)
 @endcode
 
-This defines a log. It should be used in a source file, to define the log.
+This defines a log - and specifies some arguments to be used at its constructed.
+It should be used in a source file, to define the log
 
 Example:
 @code
-typedef logger_format_write< > logger_type;
+typedef logger_format_write logger_type;
 ...
 HPX_DEFINE_LOG(g_l, logger_type)
 @endcode
 
 
-@subsubsection HPX_DEFINE_LOG_WITH_ARGS HPX_DEFINE_LOG_WITH_ARGS
-- defining a log with arguments
-
-@code
-HPX_DEFINE_LOG_WITH_ARGS (log_name, logger_type, args)
-@endcode
-
-This defines a log - and specifies some arguments to be used at its constructed.
-It should be used in a source file, to define the log.
-
-Example:
-@code
-typedef logger< default_, destination::file> err_log_type;
-...
-HPX_DEFINE_LOG_WITH_ARGS( g_log_err(), err_log_type, ("err.txt") )
-@endcode
-
-
-@subsubsection HPX_DECLARE_LOG_FILTER HPX_DECLARE_LOG_FILTER - declaring a log filter
-
-@code
-HPX_DECLARE_LOG_FILTER(filter_name, filter_type)
-@endcode
-
-This declares a log filter.
-It should be used in a header file, to declare the log filter.
-
-Example:
-@code
-HPX_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
-@endcode
-
-
-@subsubsection HPX_DEFINE_LOG_FILTER HPX_DEFINE_LOG_FILTER - defining a log filter
-
-@code
-HPX_DEFINE_LOG_FILTER(filter_name, filter_type)
-@endcode
-
-This defines a log filter. It should be used in a source file, to define the log filter.
-
-Example:
-@code
-HPX_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
-@endcode
-
-
-
-@subsubsection HPX_DEFINE_LOG_FILTER_WITH_ARGS HPX_DEFINE_LOG_FILTER_WITH_ARGS
-- defining a log filter with args
-
-
-@code
-HPX_DEFINE_LOG_FILTER_WITH_ARGS(filter_name, filter_type, args)
-@endcode
-
-This defines a log filter - and specifies some arguments to be used at its constructed.
-It should be used in a source file, to define the log filter.
-
-Example:
-@code
-#define L_ HPX_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
-@endcode
-
-
-
-@subsection macros_use Macros that help you define your own macros for logging
-
-@subsubsection HPX_LOG_USE_LOG_IF_LEVEL HPX_LOG_USE_LOG_IF_LEVEL
-
-Uses a logger if a filter has a certain level enabled:
-
-@code
-HPX_LOG_USE_LOG_IF_LEVEL(log, level_filter, level )
-@endcode
-
-Example:
-@code
-HPX_DECLARE_LOG_FILTER(g_log_level, hpx::util::logging::level::holder )
-HPX_DECLARE_LOG(g_log_err, logger_type)
-
-#define LERR_ HPX_LOG_USE_LOG_IF_LEVEL(g_log_err(), g_log_level(), error )
-@endcode
-
-See @ref defining_logger_macros for more details
-
-@subsubsection HPX_LOG_USE_LOG_IF_FILTER HPX_LOG_USE_LOG_IF_FILTER
-
-Uses a logger if a filter is enabled:
-
-@code
-HPX_LOG_USE_LOG_IF_FILTER(log, filter_is_enabled)
-@endcode
-
-Example:
-@code
-#define LERR_ HPX_LOG_USE_LOG_IF_FILTER(g_log_err(), g_log_filter()->is_enabled() )
-@endcode
-
-See @ref defining_logger_macros for more details
-
-@subsubsection HPX_LOG_USE_LOG HPX_LOG_USE_LOG
-
-Uses a logger:
-
-@code
-HPX_LOG_USE_LOG(l, do_func, is_log_enabled)
-@endcode
-
-Normally you don't use this directly.
-You use @ref HPX_LOG_USE_LOG_IF_FILTER or @ref HPX_LOG_USE_LOG_IF_LEVEL instead.
-
-See @ref defining_logger_macros for more details
-
-@subsubsection HPX_LOG_USE_SIMPLE_LOG_IF_FILTER HPX_LOG_USE_SIMPLE_LOG_IF_FILTER
-
-Uses a simple logger:
-
-@code
-HPX_LOG_USE_SIMPLE_LOG_IF_FILTER(l, is_log_enabled)
-@endcode
-
-Example:
-
-typedef logger< destination::cout > app_log_type;
-
-#define LAPP_ HPX_LOG_USE_SIMPLE_LOG_IF_FILTER(g_log_app(),
-g_log_filter()->is_enabled() )
-@endcode
-
-See @ref defining_logger_macros for more details
-
-
-
-\n\n
-
-@subsection macros_compile_time Macros that treat compilation time
-
-Assume you're using formatters and destinations, and you
-<tt>#include <hpx/util/logging/format.hpp> </tt> in every
-source file when you want to do logging.
-This will increase compilation time quite a bit
-(30 to 50%, in my tests; depending on your application' complexity,
-this could go higher).
-
-Thus, you can choose to:
--# have fast compilation time, and a virtual function call per
-each logged message (default on debug mode)
--# have everything inline (no virtual function calls), very fast,
-and slower compilation (default on release mode)
-
-In the former case, most of the time you won't notice the extra virtual function call,
-and the compilation time will be faster.
-
-
 */
 
 ///////////////////////////////////////////////////////////////////////////////
-// Defining filter Macros
+// Defining Macros
 
-#define HPX_DECLARE_LOG(name,type) type* name (); \
-    namespace { hpx::util::logging::ensure_early_log_creation \
-     ensure_log_is_created_before_main ## name ( * name () ); }
+#define HPX_DECLARE_LOG(NAME)                                                 \
+    ::hpx::util::logging::logger* NAME##_logger();                            \
+    namespace { void const* const ensure_creation_##NAME = NAME##_logger(); } \
 
-#define HPX_DEFINE_LOG(name,type)  type* name () \
-    { static type l; return &l; }
-
-#define HPX_DEFINE_LOG_WITH_ARGS(name,type, args)  type* name () \
-    { static type l ( args ); return &l; }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Filter Macros
-
-#define HPX_DECLARE_LOG_FILTER(name,type) type* name (); \
-    namespace { hpx::util::logging::ensure_early_log_creation \
-     ensure_log_is_created_before_main ## name ( * name () ); }
-
-#define HPX_DEFINE_LOG_FILTER(name,type)  type * name () \
-    { static type l; return &l; }
-
-#define HPX_DEFINE_LOG_FILTER_WITH_ARGS(name,type, args)  type * name () \
-    { static type l ( args ); return &l; }
+#define HPX_DEFINE_LOG(NAME, LEVEL)                                           \
+    ::hpx::util::logging::logger* NAME##_logger() {                           \
+        static ::hpx::util::logging::logger l(hpx::util::logging::level::LEVEL);\
+        return &l;                                                            \
+    }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Log Macros
+// Messages that were logged before initializing the log
+// - cache the message (and I'll write it even if the filter is turned off)
 
-#define HPX_LOG_USE_LOG_IF_LEVEL(l, holder, the_level) \
- HPX_LOG_USE_LOG(l, read_msg().gather().out(), \
- holder->is_enabled(::hpx::util::logging::level:: the_level) )
-
-#define HPX_LOG_USE_LOG_IF_FILTER(l, the_filter) \
- HPX_LOG_USE_LOG(l, read_msg().gather().out(), the_filter)
-
-#define HPX_LOG_USE_SIMPLE_LOG_IF_FILTER(l, is_log_enabled) \
- HPX_LOG_USE_LOG(l, read_msg().gather().out, is_log_enabled)
+#define HPX_LOG_USE_LOG(NAME, LEVEL)                                          \
+     if ( !(NAME##_logger()->is_enabled(LEVEL)) ) ;                           \
+     else NAME##_logger()->gather().out()
 
 
 }}}

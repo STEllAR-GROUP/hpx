@@ -166,7 +166,6 @@ namespace posix { namespace ucontext
 #include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
-#include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <atomic>
 #include <signal.h>                 // SIGSTKSZ
 
@@ -175,8 +174,7 @@ namespace hpx { namespace threads { namespace coroutines
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
     {
-        prepare_main_thread() {}
-        ~prepare_main_thread() {}
+        HPX_CONSTEXPR prepare_main_thread() {}
     };
 
     namespace detail { namespace posix
@@ -217,6 +215,7 @@ namespace hpx { namespace threads { namespace coroutines
             HPX_COROUTINE_DECLARE_CONTEXT(m_ctx);
         };
 
+        template <typename CoroutineImpl>
         class ucontext_context_impl
           : public ucontext_context_impl_base
         {
@@ -232,8 +231,7 @@ namespace hpx { namespace threads { namespace coroutines
              * Create a context that on restore invokes Functor on
              *  a new stack. The stack size can be optionally specified.
              */
-            template<typename Functor>
-            explicit ucontext_context_impl(Functor & cb, std::ptrdiff_t stack_size)
+            explicit ucontext_context_impl(std::ptrdiff_t stack_size)
               : m_stack_size(stack_size == -1 ? (std::ptrdiff_t)default_stack_size
                     : stack_size),
                 m_stack(alloc_stack(m_stack_size)),
@@ -334,11 +332,6 @@ namespace hpx { namespace threads { namespace coroutines
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
 #endif
             }
-
-            // global functions to be called for each OS-thread after it started
-            // running and before it exits
-            static void thread_startup(char const* thread_type) {}
-            static void thread_shutdown() {}
 
             void reset_stack()
             {

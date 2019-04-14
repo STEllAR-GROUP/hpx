@@ -128,6 +128,29 @@ namespace hpx { namespace threads { namespace detail
             return sched_->Scheduler::set_scheduler_mode(mode);
         }
 
+        void add_scheduler_mode(threads::policies::scheduler_mode mode) override
+        {
+            mode_ = threads::policies::scheduler_mode(mode_ | mode);
+            return sched_->Scheduler::add_scheduler_mode(mode);
+        }
+
+        void add_remove_scheduler_mode(
+            threads::policies::scheduler_mode to_add_mode,
+            threads::policies::scheduler_mode to_remove_mode) override
+        {
+            mode_ = threads::policies::scheduler_mode(
+                (mode_ | to_add_mode) & ~to_remove_mode);
+            return sched_->Scheduler::add_remove_scheduler_mode(
+                to_add_mode, to_remove_mode);
+        }
+
+        void remove_scheduler_mode(
+            threads::policies::scheduler_mode mode) override
+        {
+            mode_ = threads::policies::scheduler_mode(mode_ & ~mode);
+            return sched_->Scheduler::remove_scheduler_mode(mode);
+        }
+
         ///////////////////////////////////////////////////////////////////
         bool run(std::unique_lock<compat::mutex>& l,
             std::size_t pool_threads) override;

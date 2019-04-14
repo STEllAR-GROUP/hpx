@@ -94,6 +94,11 @@ struct test_receive_buffer
             hpx::get_locality_id());
     }
 
+    ~test_receive_buffer()
+    {
+        hpx::unregister_with_basename(buffer_basename, hpx::get_locality_id());
+    }
+
     test_receive_buffer(hpx::future<hpx::id_type> && id)
       : base_type(std::move(id))
     {}
@@ -134,6 +139,9 @@ void test_receive_buffer_server::do_work()
     {
         HPX_TEST_EQ(steps[i].get(), i);
     }
+
+    // release from to break cycle
+    from_ = hpx::shared_future<hpx::id_type>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

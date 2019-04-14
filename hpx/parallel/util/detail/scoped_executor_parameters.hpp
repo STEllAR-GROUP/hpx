@@ -23,6 +23,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             execution::mark_begin_execution(params_, exec_);
         }
 
+        void mark_end_of_scheduling() const
+        {
+            execution::mark_end_of_scheduling(params_, exec_);
+        }
+
         ~scoped_executor_parameters()
         {
             execution::mark_end_execution(params_, exec_);
@@ -43,6 +48,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail
           : params_(params), exec_(exec)
         {
             execution::mark_begin_execution(params_, exec_);
+        }
+
+        void mark_end_of_scheduling() const
+        {
+            execution::mark_end_of_scheduling(params_, exec_);
         }
 
         ~scoped_executor_parameters_ref()

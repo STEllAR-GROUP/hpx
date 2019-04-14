@@ -11,6 +11,7 @@
 
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/bitset.hpp>
+#include <hpx/runtime/serialization/brace_initializable.hpp>
 #include <hpx/runtime/serialization/complex.hpp>
 #include <hpx/runtime/serialization/datapar.hpp>
 #include <hpx/runtime/serialization/deque.hpp>

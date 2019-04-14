@@ -25,6 +25,12 @@ set(tests
     zero_copy_serialization
 )
 
+if(HPX_WITH_CXX17_STRUCTURED_BINDINGS)
+    set(tests ${tests}
+        serialization_brace_initializable
+)
+endif()
+
 add_subdirectory(polymorphic)
 
 set(serialization_partitioned_vector_FLAGS DEPENDENCIES partitioned_vector_component)
@@ -66,7 +72,6 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
 
   if(HPX_WITH_FAIL_COMPILE_TESTS)
     set(fail_compile_tests
-        fail_compile_non_serializable_class
        )
     foreach(fail_compile_test ${fail_compile_tests})
       set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)

@@ -1733,7 +1733,7 @@ ignore the option. For instance, the following PBS script passes the option
    #
    #PBS -l nodes=2:ppn=4
 
-   APP_PATH=~/packages/hpx/bin/hello_world
+   APP_PATH=~/packages/hpx/bin/hello_world_distributed
    APP_OPTIONS=
 
    pbsdsh -u $APP_PATH $APP_OPTIONS --hpx:1:pu-offset=4 --hpx:nodes=`cat $PBS_NODEFILE`
@@ -1833,13 +1833,14 @@ Here is a full grammar describing the possible format of mappings:
    type: "socket" | "numanode" | "core" | "pu"
 
 The following example assumes a system with at least 4 cores, where each core
-has more than 1 processing unit (hardware threads). Running hello_world with 4
-OS-threads (on 4 processing units), where each of those threads is bound to the
-first processing unit of each of the cores, can be achieved by invoking:
+has more than 1 processing unit (hardware threads). Running
+``hello_world_distributed`` with 4 OS-threads (on 4 processing units), where
+each of those threads is bound to the first processing unit of each of the
+cores, can be achieved by invoking:
 
 .. code-block:: bash
 
-   hello_world -t4 --hpx:bind=thread:0-3=core:0-3.pu:0
+   hello_world_distributed -t4 --hpx:bind=thread:0-3=core:0-3.pu:0
 
 Here ``thread:0-3`` specifies the OS threads for which to define affinity
 bindings, and ``core:0-3.pu:`` defines that for each of the cores (``core:0-3``)
@@ -1854,7 +1855,7 @@ only their first processing unit ``pu:0`` should be used.
 
    .. code-block:: bash
 
-      hello_world -t4 --hpx:bind=thread:0-3=core:0-3.pu:0 --hpx:print-bind
+      hello_world_distributed -t4 --hpx:bind=thread:0-3=core:0-3.pu:0 --hpx:print-bind
 
    will cause this output to be printed:
 

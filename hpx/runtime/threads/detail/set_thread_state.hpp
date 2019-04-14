@@ -39,6 +39,7 @@ namespace hpx { namespace threads { namespace detail
         thread_id_type const& id, thread_state_enum new_state,
         thread_state_ex_enum new_state_ex, thread_priority priority,
         thread_schedule_hint schedulehint = thread_schedule_hint(),
+        bool retry_on_active = true,
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -74,16 +75,16 @@ namespace hpx { namespace threads { namespace detail
         // just retry, set_state will create new thread if target is still active
         error_code ec(lightweight);      // do not throw
         detail::set_thread_state(thrd, newstate, newstate_ex, priority,
-            thread_schedule_hint(), ec);
+            thread_schedule_hint(), true, ec);
 
         return thread_result_type(terminated, invalid_thread_id);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline thread_state set_thread_state(
-        thread_id_type const& thrd, thread_state_enum new_state,
-        thread_state_ex_enum new_state_ex, thread_priority priority,
-        thread_schedule_hint schedulehint, error_code& ec)
+    inline thread_state set_thread_state(thread_id_type const& thrd,
+        thread_state_enum new_state, thread_state_ex_enum new_state_ex,
+        thread_priority priority, thread_schedule_hint schedulehint,
+        bool retry_on_active, error_code& ec)
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id, "threads::detail::set_thread_state",
@@ -134,23 +135,38 @@ namespace hpx { namespace threads { namespace detail
             switch (previous_state_val) {
             case active:
                 {
-                    // schedule a new thread to set the state
-                    LTM_(warning)
-                        << "set_thread_state: thread is currently active, scheduling "
-                            "new thread, thread(" << thrd << "), description("
-                        << thrd->get_description() << "), new state("
-                        << get_thread_state_name(new_state) << ")";
+                    if (retry_on_active)
+                    {
+                        // schedule a new thread to set the state
+                        LTM_(warning)
+                            << "set_thread_state: thread is currently active, "
+                               "scheduling new thread, thread("
+                            << thrd << "), description("
+                            << thrd->get_description() << "), new state("
+                            << get_thread_state_name(new_state) << ")";
 
-                    thread_init_data data(
-                        util::bind(&set_active_state,
-                            thrd, new_state, new_state_ex,
-                            priority, previous_state),
-                        "set state for active thread", 0, priority);
+                        thread_init_data data(
+                            util::bind(&set_active_state, thrd, new_state,
+                                new_state_ex, priority, previous_state),
+                            "set state for active thread", 0, priority);
 
-                    create_work(thrd->get_scheduler_base(), data, pending, ec);
+                        create_work(
+                            thrd->get_scheduler_base(), data, pending, ec);
 
-                    if (&ec != &throws)
+                        if (&ec != &throws)
+                            ec = make_success_code();
+                    }
+                    else
+                    {
+                        LTM_(warning)
+                            << "set_thread_state: thread is currently active, "
+                               "but not scheduling new thread because "
+                               "retry_on_active = false, thread("
+                            << thrd << "), description("
+                            << thrd->get_description() << "), new state("
+                            << get_thread_state_name(new_state) << ")";
                         ec = make_success_code();
+                    }
 
                     return previous_state;     // done
                 }
@@ -195,8 +211,14 @@ namespace hpx { namespace threads { namespace detail
                 break;      // fine, just set the new state
             case pending_do_not_schedule:
             default:
-                HPX_ASSERT(false);    // should not happen
-                break;
+                {
+                    std::ostringstream strm;
+                    strm << "set_thread_state: previous state was "
+                         << get_thread_state_name(previous_state_val) << " ("
+                         << previous_state_val << ")";
+                    HPX_ASSERT_MSG(false, strm.str().c_str());    // should not happen
+                    break;
+                }
             }
 
             // If the previous state was pending we are supposed to remove the
@@ -225,7 +247,11 @@ namespace hpx { namespace threads { namespace detail
                 << ")";
         } while (true);
 
-        if (new_state == pending) {
+        thread_state_enum previous_state_val = previous_state.state();
+        if (!(previous_state_val == pending ||
+                previous_state_val == pending_boost) &&
+            (new_state == pending || new_state == pending_boost))
+        {
             // REVIEW: Passing a specific target thread may interfere with the
             // round robin queuing.
 
@@ -245,12 +271,11 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     /// This thread function is used by the at_timer thread below to trigger
     /// the required action.
-    inline thread_result_type wake_timer_thread(
-        thread_id_type const& thrd, thread_state_enum newstate,
-        thread_state_ex_enum newstate_ex, thread_priority priority,
-        thread_id_type const& timer_id,
-        std::shared_ptr<std::atomic<bool> > const& triggered,
-        thread_state_ex_enum my_statex)
+    inline thread_result_type wake_timer_thread(thread_id_type const& thrd,
+        thread_state_enum newstate, thread_state_ex_enum newstate_ex,
+        thread_priority priority, thread_id_type const& timer_id,
+        std::shared_ptr<std::atomic<bool>> const& triggered,
+        bool retry_on_active, thread_state_ex_enum my_statex)
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
@@ -271,7 +296,8 @@ namespace hpx { namespace threads { namespace detail
         {
             error_code ec(lightweight);    // do not throw
             detail::set_thread_state(timer_id, pending, my_statex,
-                thread_priority_boost, thread_schedule_hint(), ec);
+                thread_priority_boost, thread_schedule_hint(), retry_on_active,
+                ec);
         }
 
         return thread_result_type(terminated, invalid_thread_id);
@@ -284,7 +310,7 @@ namespace hpx { namespace threads { namespace detail
         util::steady_clock::time_point& abs_time,
         thread_id_type const& thrd, thread_state_enum newstate,
         thread_state_ex_enum newstate_ex, thread_priority priority,
-        std::atomic<bool>* started)
+        std::atomic<bool>* started, bool retry_on_active)
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
@@ -304,7 +330,7 @@ namespace hpx { namespace threads { namespace detail
         thread_init_data data(
             util::bind_front(&wake_timer_thread,
                 thrd, newstate, newstate_ex, priority,
-                self_id, triggered),
+                self_id, triggered, retry_on_active),
             "wake_timer", 0, priority);
 
         thread_id_type wake_id = invalid_thread_id;
@@ -318,20 +344,19 @@ namespace hpx { namespace threads { namespace detail
             get_thread_pool("timer-pool")->get_io_service(), abs_time);
 
         // let the timer invoke the set_state on the new (suspended) thread
-        t.async_wait(
-            [wake_id, priority](const boost::system::error_code& ec)
+        t.async_wait([wake_id, priority, retry_on_active](
+                         const boost::system::error_code& ec) {
+            if (ec.value() == boost::system::errc::operation_canceled)
             {
-                if (ec.value() == boost::system::errc::operation_canceled)
-                {
-                    detail::set_thread_state(wake_id, pending, wait_abort,
-                        priority, thread_schedule_hint(), throws);
-                }
-                else
-                {
-                    detail::set_thread_state(wake_id, pending, wait_timeout,
-                        priority, thread_schedule_hint(), throws);
-                }
-            });
+                detail::set_thread_state(wake_id, pending, wait_abort, priority,
+                    thread_schedule_hint(), retry_on_active, throws);
+            }
+            else
+            {
+                detail::set_thread_state(wake_id, pending, wait_timeout,
+                    priority, thread_schedule_hint(), retry_on_active, throws);
+            }
+        });
 
         if (started != nullptr)
             started->store(true);
@@ -365,7 +390,7 @@ namespace hpx { namespace threads { namespace detail
         util::steady_time_point const& abs_time, thread_id_type const& thrd,
         thread_state_enum newstate, thread_state_ex_enum newstate_ex,
         thread_priority priority, thread_schedule_hint schedulehint,
-        std::atomic<bool>* started, error_code& ec)
+        std::atomic<bool>* started, bool retry_on_active, error_code& ec)
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
@@ -379,7 +404,7 @@ namespace hpx { namespace threads { namespace detail
         thread_init_data data(
             util::bind(&at_timer<SchedulingPolicy>,
                 std::ref(scheduler), abs_time.value(), thrd, newstate, newstate_ex,
-                priority, started),
+                priority, started, retry_on_active),
                 "at_timer (expire at)", 0, priority, schedulehint);
 
         thread_id_type newid = invalid_thread_id;
@@ -390,11 +415,11 @@ namespace hpx { namespace threads { namespace detail
     template <typename SchedulingPolicy>
     thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
         util::steady_time_point const& abs_time, thread_id_type const& id,
-        std::atomic<bool>* started, error_code& ec)
+        std::atomic<bool>* started, bool retry_on_active, error_code& ec)
     {
         return set_thread_state_timed(scheduler, abs_time, id, pending,
-            wait_timeout, thread_priority_normal,
-            thread_schedule_hint(), started, ec);
+            wait_timeout, thread_priority_normal, thread_schedule_hint(),
+            started, retry_on_active, ec);
     }
 
     /// Set a timer to set the state of the given \a thread to the given
@@ -404,20 +429,21 @@ namespace hpx { namespace threads { namespace detail
         util::steady_duration const& rel_time, thread_id_type const& thrd,
         thread_state_enum newstate, thread_state_ex_enum newstate_ex,
         thread_priority priority, thread_schedule_hint schedulehint,
-        std::atomic<bool>& started, error_code& ec)
+        std::atomic<bool>& started, bool retry_on_active, error_code& ec)
     {
         return set_thread_state_timed(scheduler, rel_time.from_now(), thrd,
-            newstate, newstate_ex, priority, schedulehint, started, ec);
+            newstate, newstate_ex, priority, schedulehint, started,
+            retry_on_active, ec);
     }
 
     template <typename SchedulingPolicy>
     thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
         util::steady_duration const& rel_time, thread_id_type const& thrd,
-        std::atomic<bool>* started, error_code& ec)
+        std::atomic<bool>* started, bool retry_on_active, error_code& ec)
     {
         return set_thread_state_timed(scheduler, rel_time.from_now(), thrd,
             pending, wait_timeout, thread_priority_normal,
-            thread_schedule_hint(), started, ec);
+            thread_schedule_hint(), started, retry_on_active, ec);
     }
 }}}
 

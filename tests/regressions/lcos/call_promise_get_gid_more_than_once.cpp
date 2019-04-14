@@ -35,6 +35,9 @@ int hpx_main()
 
         HPX_TEST_EQ(msb1, msb2);
         HPX_TEST_EQ(id1.get_lsb(), id2.get_lsb());
+
+        promise.set_value();
+        future.get();
     }
 
     return hpx::finalize();

@@ -32,7 +32,7 @@ It is also recommended that you check out the latest stable tag:
 
 .. code-block:: sh
 
-    git checkout 1.2.0
+    git checkout 1.2.1
 
 |hpx| dependencies
 ==================
@@ -107,26 +107,26 @@ tests.unit.parallel.algorithms.for_loop`` or a whole group of tests with ``ctest
 --output-on-failure -R tests.unit``.
 
 If you did not run ``make install`` earlier do so now or build the
-``simplest_hello_world_1`` example by running:
+``hello_world_1`` example by running:
 
 .. code-block:: sh
 
-   make simplest_hello_world_1
+   make hello_world_1
 
 |hpx| executables end up in the ``bin`` directory in your build directory. You
-can now run ``simplest_hello_world_1`` and should see the following output:
+can now run ``hello_world_1`` and should see the following output:
 
 .. code-block:: sh
 
-   ./bin/simplest_hello_world_1
+   ./bin/hello_world_1
    Hello World!
 
 You've just run an example which prints ``Hello World!`` from the |hpx| runtime.
-The source for the example is in
-``examples/quickstart/simplest_hello_world_1.cpp``. The ``hello_world`` example
-(also available in the ``examples/quickstart`` directory) is a distributed hello
-world program which is described in :ref:`examples_hello_world`. It provides a
-gentle introduction to the distributed aspects of |hpx|.
+The source for the example is in ``examples/quickstart/hello_world_1.cpp``. The
+``hello_world_distributed`` example (also available in the
+``examples/quickstart`` directory) is a distributed hello world program which is
+described in :ref:`examples_hello_world`. It provides a gentle introduction to
+the distributed aspects of |hpx|.
 
 .. tip::
 
@@ -138,18 +138,18 @@ gentle introduction to the distributed aspects of |hpx|.
 
    .. code-block:: sh
 
-      ... examples.quickstart.simplest_hello_world_2
-      ... simplest_hello_world_2
-      ... examples.quickstart.simplest_hello_world_1
-      ... simplest_hello_world_1
-      ... hello_world
-      ... examples.quickstart.hello_world
+      ... examples.quickstart.hello_world_2
+      ... hello_world_2
+      ... examples.quickstart.hello_world_1
+      ... hello_world_1
+      ... examples.quickstart.hello_world_distributed
+      ... hello_world_distributed
 
    It is also possible to build e.g. all quickstart examples using ``make
    examples.quickstart``.
 
-Setting up an |hpx| project
-===========================
+Hello, World!
+=============
 
 The following ``CMakeLists.txt`` is a minimal example of what you need in order to
 build an executable using |cmake|_ and |hpx|:
@@ -159,7 +159,9 @@ build an executable using |cmake|_ and |hpx|:
    cmake_minimum_required(VERSION 3.3.2)
    project(my_hpx_project CXX)
    find_package(HPX REQUIRED)
-   add_hpx_executable(my_hpx_program SOURCES main.cpp)
+   add_hpx_executable(my_hpx_program
+       SOURCES main.cpp
+       COMPONENT_DEPENDENCIES iostreams)
 
 .. note::
 
@@ -167,36 +169,28 @@ build an executable using |cmake|_ and |hpx|:
    See the section on :ref:`using_hpx_cmake` for more details on how to use
    ``add_hpx_executable``.
 
+.. note::
+
+   ``COMPONENT_DEPENDENCIES iostreams`` is optional for a minimal project but
+   lets us use the |hpx| equivalent of ``std::cout``, i.e. the |hpx|
+   :ref:`iostreams` functionality in our application.
+
 Create a new project directory and a ``CMakeLists.txt`` with the contents above.
+Also create a ``main.cpp`` with the contents below.
+
+.. literalinclude:: ../examples/quickstart/hello_world_1.cpp
+   :language: c++
+   :start-after: //[hello_world_1_getting_started
+   :end-before: //]
+
 Then, in your project directory run the following:
 
 .. code-block:: sh
 
-   touch main.cpp # Create an empty file for now
    mkdir build && cd build
    cmake -DCMAKE_PREFIX_PATH=/path/to/hpx/installation ..
    make all
    ./my_hpx_program
-
-Your program should now start but fail quickly because it doesn't contain a main
-function yet.
-
-Hello, World!
-=============
-
-Once you have your project set up change the line containing
-``add_hpx_executable`` in ``CMakeLists.txt`` to the following:
-
-.. code-block:: cmake
-
-   add_hpx_executable(my_hpx_program SOURCES main.cpp COMPONENT_DEPENDENCIES iostreams)
-
-and add the following to your ``main.cpp``:
-
-.. literalinclude:: ../examples/quickstart/simplest_hello_world_1.cpp
-   :language: c++
-   :start-after: //[simplest_hello_world_1_getting_started
-   :end-before: //]
 
 The program looks almost like a regular C++ hello world with the exception of
 the two includes and ``hpx::cout``. When you include ``hpx_main.hpp`` some
@@ -221,7 +215,7 @@ program now you should see the familiar ``Hello World!``:
    runtime. In that case you start the |hpx| runtime explicitly by calling
    ``hpx::init``:
 
-   .. literalinclude:: ../examples/quickstart/simplest_hello_world_2.cpp
+   .. literalinclude:: ../examples/quickstart/hello_world_2.cpp
       :language: c++
 
    You can also use :cpp:func:`hpx::start` and :cpp:func:`hpx::stop` for a

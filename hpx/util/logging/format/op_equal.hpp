@@ -48,10 +48,6 @@ namespace op_equal {
     */
     struct same_type_op_equal_base : virtual same_type_op_equal_top {};
 
-    struct always_equal {
-        bool operator==(const always_equal& ) const { return true; }
-    };
-
     /**
         @brief Implements operator==, which compares two objects.
         If they have the same type, it will compare them using the type's member

@@ -515,6 +515,15 @@ namespace hpx
 
         // stop the rest of the system
         parcel_handler_.stop(blocking);     // stops parcel pools as well
+#ifdef HPX_HAVE_TIMER_POOL
+        LTM_(info) << "stop: stopping timer pool";
+        timer_pool_.stop();    // stop timer pool as well
+        if (blocking)
+        {
+            timer_pool_.join();
+            timer_pool_.clear();
+        }
+#endif
 #ifdef HPX_HAVE_IO_POOL
         io_pool_.stop();                    // stops io_pool_ as well
 #endif
@@ -792,9 +801,6 @@ namespace hpx
         // initialize thread mapping for external libraries (i.e. PAPI)
         thread_support_->register_thread(name, ec);
 
-        // initialize coroutines context switcher
-        hpx::threads::coroutines::thread_startup(name);
-
         // register this thread with any possibly active Intel tool
         HPX_ITT_THREAD_SET_NAME(name);
 
@@ -852,9 +858,6 @@ namespace hpx
         {
             on_stop_func_(num, context);
         }
-
-        // initialize coroutines context switcher
-        hpx::threads::coroutines::thread_shutdown();
 
         // reset our TSS
         this->runtime::deinit_tss();

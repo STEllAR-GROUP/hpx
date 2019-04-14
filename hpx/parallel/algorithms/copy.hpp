@@ -13,6 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
@@ -87,6 +88,13 @@ namespace hpx { namespace parallel { inline namespace v1
             parallel(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
                 FwdIter2 dest)
             {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_ASSERT(false);
+                typename util::detail::algorithm_result<
+                    ExPolicy, std::pair<FwdIter1, FwdIter2>
+                >::type *dummy = nullptr;
+                return std::move(*dummy);
+#else
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
 
                 return get_iter_pair(
@@ -102,9 +110,16 @@ namespace hpx { namespace parallel { inline namespace v1
                             util::copy_synchronize(get<0>(iters), get<1>(iters));
                             return std::move(last);
                         }));
+#endif
             }
         };
 
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        template<typename FwdIter1, typename FwdIter2, typename Enable = void>
+        struct copy_iter
+          : public copy<std::pair<FwdIter1, FwdIter2> >
+        {};
+#else
         ///////////////////////////////////////////////////////////////////////
         template<typename FwdIter1, typename FwdIter2, typename Enable = void>
         struct copy_iter;
@@ -131,6 +146,7 @@ namespace hpx { namespace parallel { inline namespace v1
             >::type>
           : public copy<std::pair<FwdIter1, FwdIter2> >
         {};
+#endif
 
         /// \endcond
     }
@@ -465,6 +481,17 @@ namespace hpx { namespace parallel { inline namespace v1
                             });
                     };
 
+                auto f4 =
+                    [last, dest, flags](
+                        std::vector<hpx::shared_future<std::size_t>>&& items,
+                        std::vector<hpx::future<void>>&&) mutable
+                    -> std::pair<FwdIter1, FwdIter2> {
+                    HPX_UNUSED(flags);
+
+                    std::advance(dest, items.back().get());
+                    return std::make_pair(last, dest);
+                };
+
                 return scan_partitioner_type::call(
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, flags.get()), count, init,
@@ -476,16 +503,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value
-                    [last, dest, flags](
-                        std::vector<hpx::shared_future<std::size_t> > && items,
-                        std::vector<hpx::future<void> > &&) mutable
-                    ->  std::pair<FwdIter1, FwdIter2>
-                    {
-                        HPX_UNUSED(flags);
-
-                        std::advance(dest, items.back().get());
-                        return std::make_pair(last, dest);
-                    });
+                    std::move(f4));
             }
         };
         /// \endcond

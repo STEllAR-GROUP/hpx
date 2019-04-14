@@ -46,7 +46,7 @@ namespace hpx { namespace agas { namespace server
         );
         counter_data_.increment_route_count();
 
-        error_code ec = throws;
+        error_code& ec = throws;
 
         naming::gid_type const& gid = p.destination();
         naming::address& addr = p.addr();
@@ -96,6 +96,7 @@ namespace hpx { namespace agas { namespace server
         }
 
         naming::id_type source = p.source_id();
+
         // either send the parcel on its way or execute actions locally
         if (addr.locality_ == get_locality())
         {

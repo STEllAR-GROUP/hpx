@@ -13,6 +13,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
@@ -124,7 +125,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 this, std::move(f)));
 
         pool_->get_io_service().post(
-            util::bind(&thread_wrapper_helper::invoke, wfp));
+            util::bind_front(&thread_wrapper_helper::invoke, wfp));
     }
 
     void service_executor::add_no_count(closure_type&& f)
@@ -134,7 +135,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 this, std::move(f)));
 
         pool_->get_io_service().post(
-            util::bind(&thread_wrapper_helper::invoke, wfp));
+            util::bind_front(&thread_wrapper_helper::invoke, wfp));
     }
 
     typedef boost::asio::basic_waitable_timer<util::steady_clock> deadline_timer;

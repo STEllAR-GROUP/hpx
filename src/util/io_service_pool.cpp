@@ -14,7 +14,6 @@
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/logging.hpp>
 
@@ -103,7 +102,7 @@ namespace hpx { namespace util
         }
     }
 
-            io_service_pool::~io_service_pool()
+    io_service_pool::~io_service_pool()
     {
         std::lock_guard<compat::mutex> l(mtx_);
         stop_locked();
@@ -207,8 +206,8 @@ namespace hpx { namespace util
 
         for (std::size_t i = 0; i < num_threads; ++i)
         {
-            compat::thread t(util::bind(
-                &io_service_pool::thread_run, this, i, startup));
+            compat::thread t(
+                &io_service_pool::thread_run, this, i, startup);
             threads_.emplace_back(std::move(t));
         }
 
