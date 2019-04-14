@@ -16,6 +16,7 @@
 #include <hpx/util/unwrap.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/traits/vector_pack_count_bits.hpp>
@@ -109,10 +110,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : count::algorithm("count")
             {}
 
-            template <typename ExPolicy, typename InIter, typename T,
-                typename Proj>
+            template <typename ExPolicy, typename InIterB, typename InIterE,
+                    typename T, typename Proj>
             static difference_type
-            sequential(ExPolicy && policy, InIter first, InIter last,
+            sequential(ExPolicy && policy, InIterB first, InIterE last,
                        T const& value, Proj && proj)
             {
                 auto f1 =
@@ -120,7 +121,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         detail::compare_to<T>(value),
                         std::forward<Proj>(proj));
 
-                typename std::iterator_traits<InIter>::difference_type ret = 0;
+                typename std::iterator_traits<InIterB>::difference_type ret = 0;
 
                 util::loop(
                     policy, first, last,
@@ -129,12 +130,12 @@ namespace hpx { namespace parallel { inline namespace v1
                 return ret;
             }
 
-            template <typename ExPolicy, typename Iter, typename T,
-                typename Proj>
+            template <typename ExPolicy, typename IterB, typename IterE,
+                    typename T, typename Proj>
             static typename util::detail::algorithm_result<
                 ExPolicy, difference_type
             >::type
-            parallel(ExPolicy && policy, Iter first, Iter last,
+            parallel(ExPolicy && policy, IterB first, IterE last,
                 T const& value, Proj && proj)
             {
                 if (first == last)
@@ -151,7 +152,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 return util::partitioner<ExPolicy, difference_type>::call(
                     std::forward<ExPolicy>(policy),
-                    first, std::distance(first, last),
+                    first, detail::distance(first, last),
                     std::move(f1),
                     hpx::util::unwrapping(
                         [](std::vector<difference_type>&& results)
@@ -163,18 +164,18 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
-        template <typename ExPolicy, typename FwdIter, typename T,
-            typename Proj>
+        template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+                typename T, typename Proj>
         inline typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
+            ExPolicy, typename std::iterator_traits<FwdIterB>::difference_type
         >::type
-        count_(ExPolicy && policy, FwdIter first, FwdIter last, T const& value,
+        count_(ExPolicy && policy, FwdIterB first, FwdIterE last, T const& value,
             Proj && proj, std::false_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
 
-            typedef typename std::iterator_traits<FwdIter>::difference_type
+            typedef typename std::iterator_traits<FwdIterB>::difference_type
                 difference_type;
 
             return detail::count<difference_type>().call(
@@ -183,12 +184,12 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename FwdIter, typename T,
-            typename Proj>
+        template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+                typename T, typename Proj>
         typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
+            ExPolicy, typename std::iterator_traits<FwdIterB>::difference_type
         >::type
-        count_(ExPolicy&& policy, FwdIter first, FwdIter last, T const& value,
+        count_(ExPolicy&& policy, FwdIterB first, FwdIterE last, T const& value,
             Proj && proj, std::true_type);
 
         /// \endcond
@@ -204,7 +205,10 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    /// \tparam FwdIterB    The type of the source begin iterator used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIterE    The type of the source end iterator used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam T           The type of the value to search for (deduced).
@@ -239,27 +243,27 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
-    ///           is defined by \a std::iterator_traits<FwdIter>::difference_type.
+    ///           is defined by \a std::iterator_traits<FwdIterB>::difference_type.
     ///           The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
     ///
-    template <typename ExPolicy, typename FwdIter, typename T,
-        typename Proj = util::projection_identity,
+    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+            typename T, typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        traits::is_projected<Proj, FwdIter>::value &&
-        hpx::traits::is_iterator<FwdIter>::value)>
+        traits::is_projected<Proj, FwdIterB>::value &&
+        hpx::traits::is_iterator<FwdIterB>::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
+        ExPolicy, typename std::iterator_traits<FwdIterB>::difference_type
     >::type
-    count(ExPolicy && policy, FwdIter first, FwdIter last, T const& value,
+    count(ExPolicy && policy, FwdIterB first, FwdIterE last, T const& value,
         Proj && proj = Proj())
     {
         static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIterB>::value),
             "Required at least forward iterator.");
 
-        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
 
         return detail::count_(
             std::forward<ExPolicy>(policy), first, last, value,
@@ -281,16 +285,16 @@ namespace hpx { namespace parallel { inline namespace v1
               : count_if::algorithm("count_if")
             {}
 
-            template <typename ExPolicy, typename InIter, typename Pred,
-                typename Proj>
+            template <typename ExPolicy, typename InIterB, typename InIterE,
+                    typename Pred, typename Proj>
             static difference_type
-            sequential(ExPolicy && policy, InIter first, InIter last, Pred && op,
+            sequential(ExPolicy && policy, InIterB first, InIterE last, Pred && op,
                 Proj && proj)
             {
                 auto f1 = count_iteration<ExPolicy, Pred, Proj>(op,
                     std::forward<Proj>(proj));
 
-                typename std::iterator_traits<InIter>::difference_type ret = 0;
+                typename std::iterator_traits<InIterB>::difference_type ret = 0;
 
                 util::loop(
                     policy, first, last,
@@ -299,12 +303,12 @@ namespace hpx { namespace parallel { inline namespace v1
                 return ret;
             }
 
-            template <typename ExPolicy, typename Iter, typename Pred,
-                typename Proj>
+            template <typename ExPolicy, typename IterB, typename IterE,
+                    typename Pred, typename Proj>
             static typename util::detail::algorithm_result<
                 ExPolicy, difference_type
             >::type
-            parallel(ExPolicy && policy, Iter first, Iter last, Pred && op,
+            parallel(ExPolicy && policy, IterB first, IterE last, Pred && op,
                 Proj && proj)
             {
                 if (first == last)
@@ -319,7 +323,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 return util::partitioner<ExPolicy, difference_type>::call(
                     std::forward<ExPolicy>(policy),
-                    first, std::distance(first, last),
+                    first, detail::distance(first, last),
                     std::move(f1),
                     hpx::util::unwrapping(
                         [](std::vector<difference_type> && results)
@@ -331,19 +335,19 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
-        template <typename ExPolicy, typename FwdIter, typename F,
-            typename Proj>
+        template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+                typename F, typename Proj>
         typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
+            ExPolicy, typename std::iterator_traits<FwdIterB>::difference_type
         >::type
-        count_if_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+        count_if_(ExPolicy && policy, FwdIterB first, FwdIterE last, F && f,
             Proj && proj, std::false_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<
                         ExPolicy
                     > is_seq;
 
-            typedef typename std::iterator_traits<FwdIter>::difference_type
+            typedef typename std::iterator_traits<FwdIterB>::difference_type
                 difference_type;
 
             return detail::count_if<difference_type>().call(
@@ -353,12 +357,12 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename FwdIter, typename F,
-            typename Proj>
+        template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+                typename F, typename Proj>
         typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
+            ExPolicy, typename std::iterator_traits<FwdIterB>::difference_type
         >::type
-        count_if_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+        count_if_(ExPolicy && policy, FwdIterB first, FwdIterE last, F && f,
             Proj && proj, std::true_type);
 
         /// \endcond
@@ -375,7 +379,10 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    /// \tparam FwdIterB    The type of the source begin iterator used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIterE    The type of the source end iterator used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
@@ -403,7 +410,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a FwdIterB can be dereferenced and then
     ///                     implicitly converted to Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -425,30 +432,30 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
-    ///           is defined by \a std::iterator_traits<FwdIter>::difference_type.
+    ///           is defined by \a std::iterator_traits<FwdIterB>::difference_type.
     ///           The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
     ///
-    template <typename ExPolicy, typename FwdIter, typename F,
-        typename Proj = util::projection_identity,
+    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+            typename F, typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter>::value &&
-        traits::is_projected<Proj, FwdIter>::value &&
+        hpx::traits::is_iterator<FwdIterB>::value &&
+        traits::is_projected<Proj, FwdIterB>::value &&
         traits::is_indirect_callable<
-            ExPolicy, F, traits::projected<Proj, FwdIter>
+            ExPolicy, F, traits::projected<Proj, FwdIterB>
         >::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
+        ExPolicy, typename std::iterator_traits<FwdIterB>::difference_type
     >::type
-    count_if(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+    count_if(ExPolicy && policy, FwdIterB first, FwdIterE last, F && f,
         Proj && proj = Proj())
     {
         static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIterB>::value),
             "Required at least forward iterator.");
 
-        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
 
         return detail::count_if_(
             std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
