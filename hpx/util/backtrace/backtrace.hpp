@@ -45,7 +45,7 @@ namespace hpx { namespace util
                 frames_.resize(size);
         }
 
-        virtual ~backtrace() throw()
+        virtual ~backtrace() noexcept
         {
         }
 

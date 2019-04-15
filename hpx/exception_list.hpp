@@ -47,7 +47,7 @@ namespace hpx
 
         /// \cond NOINTERNAL
         // \throws nothing
-        ~exception_list() throw() {}
+        ~exception_list() noexcept {}
 
         exception_list();
         explicit exception_list(std::exception_ptr const& e);
