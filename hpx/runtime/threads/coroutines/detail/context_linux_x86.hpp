@@ -306,7 +306,7 @@ namespace hpx { namespace threads { namespace coroutines
 
                 check_coroutine_stack_overflow(infoptr, ctxptr);
 
-                std::terminate();
+                std::abort();
             }
 #endif
 
