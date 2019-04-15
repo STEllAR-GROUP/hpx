@@ -11,6 +11,7 @@ set(tests
     async_callback_non_deduced_context
     async_unwrap_1037
     barrier_hang
+    barrier_3792
     broadcast_unwrap_future_2885
     broadcast_wait_for_2822
     call_promise_get_gid_more_than_once
@@ -64,6 +65,7 @@ set(after_588_PARAMETERS LOCALITIES 2)
 set(async_action_1813_PARAMETERS LOCALITIES 2)
 set(async_callback_with_bound_callback_PARAMETERS LOCALITIES 2)
 set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
+set(barrier_3792_PARAMETERS LOCALITIES 3 THREADS_PER_LOCALITY 1)
 set(broadcast_unwrap_future_2885_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 4)
 set(broadcast_wait_for_2822_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 4)
 set(channel_2916_FLAGS DEPENDENCIES iostreams_component)
