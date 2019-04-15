@@ -66,22 +66,19 @@ void test_scheduler(int argc, char* argv[],
 
 int main(int argc, char* argv[])
 {
-    // NOTE: Periodic priority scheduler not tested because it does not take
-    // into account scheduler states when scheduling work.
-
     {
         // These schedulers should succeed
         std::vector<hpx::resource::scheduling_policy> schedulers =
             {
-// #if defined(HPX_HAVE_LOCAL_SCHEDULER)
-//                 hpx::resource::scheduling_policy::local,
-//                 hpx::resource::scheduling_policy::local_priority_fifo,
-//                 hpx::resource::scheduling_policy::local_priority_lifo,
-// #endif
-// #if defined(HPX_HAVE_ABP_SCHEDULER)
-//                 hpx::resource::scheduling_policy::abp_priority_fifo,
-//                 hpx::resource::scheduling_policy::abp_priority_lifo,
-// #endif
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
+                hpx::resource::scheduling_policy::local,
+                hpx::resource::scheduling_policy::local_priority_fifo,
+                hpx::resource::scheduling_policy::local_priority_lifo,
+#endif
+#if defined(HPX_HAVE_ABP_SCHEDULER)
+                hpx::resource::scheduling_policy::abp_priority_fifo,
+                hpx::resource::scheduling_policy::abp_priority_lifo,
+#endif
 #if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
                 hpx::resource::scheduling_policy::shared_priority,
 #endif
