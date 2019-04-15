@@ -94,9 +94,6 @@ void transform_exclusive_scan_test()
 {
     test_transform_exclusive_scan<std::random_access_iterator_tag>();
     test_transform_exclusive_scan<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_exclusive_scan<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -205,9 +202,6 @@ void transform_exclusive_scan_exception_test()
 {
     test_transform_exclusive_scan_exception<std::random_access_iterator_tag>();
     test_transform_exclusive_scan_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_exclusive_scan_exception<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -314,9 +308,6 @@ void transform_exclusive_scan_bad_alloc_test()
 {
     test_transform_exclusive_scan_bad_alloc<std::random_access_iterator_tag>();
     test_transform_exclusive_scan_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_exclusive_scan_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

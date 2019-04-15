@@ -85,7 +85,7 @@ namespace hpx
         /// Destruct a hpx::exception
         ///
         /// \throws nothing
-        ~exception() throw();
+        ~exception() noexcept;
 
         /// The function \a get_error() returns the hpx::error code stored
         /// in the referenced instance of a hpx::exception. It returns
@@ -187,9 +187,9 @@ namespace hpx
               : what_(w)
             {}
 
-            ~std_exception() throw() {}
+            ~std_exception() noexcept {}
 
-            const char* what() const throw()
+            const char* what() const noexcept
             {
                 return what_.c_str();
             }
@@ -205,9 +205,9 @@ namespace hpx
               : what_(w)
             {}
 
-            ~bad_alloc() throw() {}
+            ~bad_alloc() noexcept {}
 
-            const char* what() const throw()
+            const char* what() const noexcept
             {
                 return what_.c_str();
             }
@@ -223,9 +223,9 @@ namespace hpx
               : what_(w)
             {}
 
-            ~bad_exception() throw() {}
+            ~bad_exception() noexcept {}
 
-            const char* what() const throw()
+            const char* what() const noexcept
             {
                 return what_.c_str();
             }
@@ -241,9 +241,9 @@ namespace hpx
               : what_(w)
             {}
 
-            ~bad_cast() throw() {}
+            ~bad_cast() noexcept {}
 
-            const char* what() const throw()
+            const char* what() const noexcept
             {
                 return what_.c_str();
             }
@@ -259,9 +259,9 @@ namespace hpx
               : what_(w)
             {}
 
-            ~bad_typeid() throw() {}
+            ~bad_typeid() noexcept {}
 
-            const char* what() const throw()
+            const char* what() const noexcept
             {
                 return what_.c_str();
             }

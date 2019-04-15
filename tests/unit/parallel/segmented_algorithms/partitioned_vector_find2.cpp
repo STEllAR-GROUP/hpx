@@ -94,7 +94,7 @@ void find_tests(std::vector<hpx::id_type> &localities)
     hpx::partitioned_vector<T> xvalues(
         num, T(1), hpx::container_layout(localities));
     hpx::parallel::inclusive_scan(hpx::parallel::execution::seq,
-        xvalues.begin(), xvalues.end(), xvalues.begin(), T(0), std::plus<T>());
+        xvalues.begin(), xvalues.end(), xvalues.begin(), std::plus<T>(), T(0));
 
     test_find(hpx::parallel::execution::seq, xvalues, T(512));
     test_find(hpx::parallel::execution::par, xvalues, T(512));

@@ -68,11 +68,11 @@
  */
 
 #if defined(__x86_64__)
-extern "C" void swapcontext_stack (void***, void**) throw();
-extern "C" void swapcontext_stack2 (void***, void**) throw();
+extern "C" void swapcontext_stack (void***, void**) noexcept;
+extern "C" void swapcontext_stack2 (void***, void**) noexcept;
 #else
-extern "C" void swapcontext_stack (void***, void**) throw() __attribute((regparm(2)));
-extern "C" void swapcontext_stack2 (void***, void**) throw()__attribute((regparm(2)));
+extern "C" void swapcontext_stack (void***, void**) noexcept __attribute((regparm(2)));
+extern "C" void swapcontext_stack2 (void***, void**) noexcept __attribute((regparm(2)));
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -306,7 +306,7 @@ namespace hpx { namespace threads { namespace coroutines
 
                 check_coroutine_stack_overflow(infoptr, ctxptr);
 
-                std::terminate();
+                std::abort();
             }
 #endif
 

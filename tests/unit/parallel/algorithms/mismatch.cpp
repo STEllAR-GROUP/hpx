@@ -137,9 +137,6 @@ void mismatch_test1()
 {
     test_mismatch1<std::random_access_iterator_tag>();
     test_mismatch1<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_mismatch1<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -256,9 +253,6 @@ void mismatch_test2()
 {
     test_mismatch2<std::random_access_iterator_tag>();
     test_mismatch2<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_mismatch2<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -368,9 +362,6 @@ void mismatch_exception_test()
 {
     test_mismatch_exception<std::random_access_iterator_tag>();
     test_mismatch_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_mismatch_exception<std::input_iterator_tag>();
-#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -478,9 +469,6 @@ void mismatch_bad_alloc_test()
 {
     test_mismatch_bad_alloc<std::random_access_iterator_tag>();
     test_mismatch_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_mismatch_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

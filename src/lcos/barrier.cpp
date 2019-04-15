@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <string>
 #include <utility>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -56,7 +57,26 @@ namespace hpx { namespace lcos {
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
             register_with_basename(
-                base_name, node_->get_unmanaged_id(), (*node_)->rank_).get();
+                base_name, node_->get_unmanaged_id(), (*node_)->rank_)
+                .get();
+    }
+
+    barrier::barrier(std::string const& base_name,
+        std::vector<std::size_t> const& ranks, std::size_t rank)
+    {
+        auto rank_it = std::find(ranks.begin(), ranks.end(), rank);
+        HPX_ASSERT(rank_it != ranks.end());
+
+        std::size_t barrier_rank = std::distance(ranks.begin(), rank_it);
+        node_.reset(
+            new (hpx::components::component_heap<wrapping_type>().alloc())
+                wrapping_type(
+                    new wrapped_type(base_name, ranks.size(), barrier_rank)));
+
+        if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+            register_with_basename(
+                base_name, node_->get_unmanaged_id(), (*node_)->rank_)
+                .get();
     }
 
     barrier::barrier()

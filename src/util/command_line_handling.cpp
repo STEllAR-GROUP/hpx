@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1362,15 +1362,22 @@ namespace hpx { namespace util
         // Re-run program option analysis, ini settings (such as aliases)
         // will be considered now.
 
-        parcelset::parcelhandler::init(&argc, &argv, *this);
-        for (std::shared_ptr<plugins::plugin_registry_base>& reg : plugin_registries)
-        {
-            reg->init(&argc, &argv, *this);
-        }
-
         // minimally assume one locality and this is the console
         if (node_ == std::size_t(-1))
             node_ = 0;
+
+#if defined(HPX_HAVE_NETWORKING)
+        if (num_localities_ != 1 || node_ != 0 || rtcfg_.enable_networking())
+        {
+            parcelset::parcelhandler::init(&argc, &argv, *this);
+        }
+#endif
+
+        for (std::shared_ptr<plugins::plugin_registry_base>& reg :
+            plugin_registries)
+        {
+            reg->init(&argc, &argv, *this);
+        }
 
         // Now re-parse the command line using the node number (if given).
         // This will additionally detect any --hpx:N:foo options.

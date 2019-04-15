@@ -171,18 +171,8 @@ namespace hpx { namespace parallel { inline namespace v1
         count_(ExPolicy && policy, FwdIter first, FwdIter last, T const& value,
             Proj && proj, std::false_type)
         {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-            typedef std::integral_constant<bool,
-                    parallel::execution::is_sequenced_execution_policy<
-                        ExPolicy
-                    >::value ||
-                   !hpx::traits::is_forward_iterator<FwdIter>::value
-                > is_seq;
-#else
-            typedef parallel::execution::is_sequenced_execution_policy<
-                        ExPolicy
-                    > is_seq;
-#endif
+            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
+                is_seq;
 
             typedef typename std::iterator_traits<FwdIter>::difference_type
                 difference_type;
@@ -265,15 +255,9 @@ namespace hpx { namespace parallel { inline namespace v1
     count(ExPolicy && policy, FwdIter first, FwdIter last, T const& value,
         Proj && proj = Proj())
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter>::value),
-            "Required at least input iterator.");
-#else
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
-#endif
 
         typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
@@ -355,18 +339,9 @@ namespace hpx { namespace parallel { inline namespace v1
         count_if_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             Proj && proj, std::false_type)
         {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-            typedef std::integral_constant<bool,
-                    parallel::execution::is_sequenced_execution_policy<
-                        ExPolicy
-                    >::value ||
-                   !hpx::traits::is_forward_iterator<FwdIter>::value
-                > is_seq;
-#else
             typedef parallel::execution::is_sequenced_execution_policy<
                         ExPolicy
                     > is_seq;
-#endif
 
             typedef typename std::iterator_traits<FwdIter>::difference_type
                 difference_type;
@@ -469,15 +444,10 @@ namespace hpx { namespace parallel { inline namespace v1
     count_if(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
         Proj && proj = Proj())
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter>::value),
-            "Required at least input iterator.");
-#else
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
-#endif
+
         typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         return detail::count_if_(

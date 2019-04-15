@@ -290,7 +290,6 @@ namespace hpx { namespace parallel { inline namespace v1
     remove_if(ExPolicy && policy, FwdIter first, FwdIter last,
         Pred && pred, Proj && proj = Proj())
     {
-        // HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT doesn't affect.
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");

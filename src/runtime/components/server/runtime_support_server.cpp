@@ -12,7 +12,6 @@
 #include <hpx/apply.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
@@ -1507,7 +1506,7 @@ namespace hpx { namespace components { namespace server
                 boost::system::error_code fsec;
                 for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
                 {
-                    lib = hpx::util::create_path(*it);
+                    lib = fs::path(*it);
                     fs::path lib_path =
                         lib / std::string(HPX_MAKE_DLL_STRING(component));
                     if(fs::exists(lib_path, fsec))
@@ -1700,7 +1699,7 @@ namespace hpx { namespace components { namespace server
         if (ec) {
             // build path to component to load
             std::string libname(HPX_MAKE_DLL_STRING(component));
-            lib /= hpx::util::create_path(libname);
+            lib /= boost::filesystem::path(libname);
             d.load_library(ec);
             if (ec) {
                 LRT_(warning) << "dynamic loading failed: " << lib.string()
@@ -1941,7 +1940,7 @@ namespace hpx { namespace components { namespace server
                 boost::system::error_code fsec;
                 for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
                 {
-                    lib = hpx::util::create_path(*it);
+                    lib = fs::path(*it);
                     fs::path lib_path =
                         lib / std::string(HPX_MAKE_DLL_STRING(component));
                     if(fs::exists(lib_path, fsec))
@@ -2087,7 +2086,7 @@ namespace hpx { namespace components { namespace server
         if (ec) {
             // build path to component to load
             std::string libname(HPX_MAKE_DLL_STRING(plugin));
-            lib /= hpx::util::create_path(libname);
+            lib /= boost::filesystem::path(libname);
             d.load_library(ec);
             if (ec) {
                 LRT_(warning) << "dynamic loading failed: " << lib.string()
