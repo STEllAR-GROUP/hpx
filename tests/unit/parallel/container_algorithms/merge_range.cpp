@@ -158,79 +158,6 @@ void test_merge_async(ExPolicy policy, DataType)
     HPX_TEST(equality);
 }
 
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-template <typename ExPolicy, typename DataType>
-void test_merge_outiter(ExPolicy policy, DataType)
-{
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
-    using hpx::util::get;
-
-    std::size_t const size1 = 300007, size2 = 123456;
-    std::vector<DataType> src1(size1), src2(size2),
-        dest_res(0), dest_sol(0);
-
-    std::generate(std::begin(src1), std::end(src1), random_fill(0, 6));
-    std::generate(std::begin(src2), std::end(src2), random_fill(0, 8));
-    std::sort(std::begin(src1), std::end(src1));
-    std::sort(std::begin(src2), std::end(src2));
-
-    auto result = hpx::parallel::merge(policy,
-        src1, src2, std::back_inserter(dest_res));
-    auto solution = std::merge(
-        std::begin(src1), std::end(src1),
-        std::begin(src2), std::end(src2),
-        std::back_inserter(dest_sol));
-
-    HPX_TEST(get<0>(result) == std::end(src1));
-    HPX_TEST(get<1>(result) == std::end(src2));
-
-    bool equality = test::equal(
-        std::begin(dest_res), std::end(dest_res),
-        std::begin(dest_sol), std::end(dest_sol));
-
-    HPX_TEST(equality);
-}
-
-template <typename ExPolicy, typename DataType>
-void test_merge_outiter_async(ExPolicy policy, DataType)
-{
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
-    using hpx::util::get;
-
-    std::size_t const size1 = 300007, size2 = 123456;
-    std::vector<DataType> src1(size1), src2(size2),
-        dest_res(0), dest_sol(0);
-
-    std::generate(std::begin(src1), std::end(src1), random_fill(0, 6));
-    std::generate(std::begin(src2), std::end(src2), random_fill(0, 8));
-    std::sort(std::begin(src1), std::end(src1));
-    std::sort(std::begin(src2), std::end(src2));
-
-    auto f = hpx::parallel::merge(policy,
-        src1, src2, std::back_inserter(dest_res));
-    auto result = f.get();
-    auto solution = std::merge(
-        std::begin(src1), std::end(src1),
-        std::begin(src2), std::end(src2),
-        std::back_inserter(dest_sol));
-
-    HPX_TEST(get<0>(result) == std::end(src1));
-    HPX_TEST(get<1>(result) == std::end(src2));
-
-    bool equality = test::equal(
-        std::begin(dest_res), std::end(dest_res),
-        std::begin(dest_sol), std::end(dest_sol));
-
-    HPX_TEST(equality);
-}
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 template <typename DataType>
 void test_merge()
@@ -243,15 +170,6 @@ void test_merge()
 
     test_merge_async(execution::seq(execution::task), DataType());
     test_merge_async(execution::par(execution::task), DataType());
-
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_merge_outiter(execution::seq, DataType());
-    test_merge_outiter(execution::par, DataType());
-    test_merge_outiter(execution::par_unseq, DataType());
-
-    test_merge_outiter_async(execution::seq(execution::task), DataType());
-    test_merge_outiter_async(execution::par(execution::task), DataType());
-#endif
 }
 
 void test_merge()

@@ -972,22 +972,6 @@ hpx_option(HPX_WITH_VIM_YCM BOOL
 ################################################################################
 # Backwards compatibility options (edit for each release)
 
-# HPX_WITH_QUEUE_COMPATIBILITY: introduced in V1.1.0
-hpx_option(HPX_WITH_QUEUE_COMPATIBILITY BOOL
-    "Enable old style queue components in API (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_QUEUE_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_QUEUE_COMPATIBILITY)
-endif()
-
-# HPX_WITH_SCOPED_UNLOCK_COMPATIBILITY: introduced in V1.1.0
-hpx_option(HPX_WITH_SCOPED_UNLOCK_COMPATIBILITY BOOL
-    "Enable backwards compatibility for scoped_unlock utility (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_SCOPED_UNLOCK_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_SCOPED_UNLOCK_COMPATIBILITY)
-endif()
-
 # BADBAD: This enables an overload of swap which is necessary to work around the
 #         problems caused by zip_iterator not being a real random access iterator.
 #         Dereferencing zip_iterator does not yield a true reference but
@@ -1003,26 +987,18 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
-# HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY: introduced in V1.1.0
+# HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY: turned off in V1.3.0
 hpx_option(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY BOOL
-    "Enable old overloads for inclusive_scan (default: ON)"
-    ON ADVANCED)
+    "Enable old overloads for inclusive_scan (default: OFF)"
+    OFF ADVANCED)
 if(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_INCLUSIVE_SCAN_COMPATIBILITY)
 endif()
 
-# HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT: introduced in V1.1.0
-hpx_option(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT BOOL
-    "Enable weaker (non-conforming) iterator requirements for parallel algorithms (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-  hpx_add_config_define(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-endif()
-
-# HPX_WITH_UNWRAPPED_COMPATIBILITY: introduced in V1.1.0
+# HPX_WITH_UNWRAPPED_COMPATIBILITY: turned off in V1.3.0
 hpx_option(HPX_WITH_UNWRAPPED_COMPATIBILITY BOOL
-    "Enable the deprecated unwrapped function (default: ON)"
-    ON ADVANCED)
+    "Enable the deprecated unwrapped function (default: OFF)"
+    OFF ADVANCED)
 if(HPX_WITH_UNWRAPPED_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_UNWRAPPED_COMPATIBILITY)
 endif()

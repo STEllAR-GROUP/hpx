@@ -120,19 +120,8 @@ namespace hpx { namespace parallel { inline namespace v1
         transform_reduce_(ExPolicy && policy, FwdIter first, FwdIter last,
             T && init, Reduce && red_op, Convert && conv_op, std::false_type)
         {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-            typedef std::integral_constant<bool,
-                    parallel::execution::is_sequenced_execution_policy<
-                        ExPolicy
-                    >::value ||
-                   !hpx::traits::is_forward_iterator<FwdIter>::value
-                > is_seq;
-#else
-            typedef parallel::execution::is_sequenced_execution_policy<
-                        ExPolicy
-                    > is_seq;
-#endif
-
+            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
+                is_seq;
             typedef typename hpx::util::decay<T>::type init_type;
 
             return transform_reduce<init_type>().call(
@@ -265,15 +254,9 @@ namespace hpx { namespace parallel { inline namespace v1
     transform_reduce(ExPolicy && policy, FwdIter first, FwdIter last,
         T init, Reduce && red_op, Convert && conv_op)
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter>::value),
-            "Requires at least input iterator.");
-#else
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
-#endif
 
         typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 

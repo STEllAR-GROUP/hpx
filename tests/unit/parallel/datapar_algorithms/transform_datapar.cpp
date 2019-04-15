@@ -30,9 +30,6 @@ void transform_test()
 {
     test_transform<std::random_access_iterator_tag>();
     test_transform<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform<std::input_iterator_tag>();
-#endif
 }
 
 template <typename IteratorTag>
@@ -51,9 +48,6 @@ void transform_exception_test()
 {
     test_transform_exception<std::random_access_iterator_tag>();
     test_transform_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_exception<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,9 +67,6 @@ void transform_bad_alloc_test()
 {
     test_transform_bad_alloc<std::random_access_iterator_tag>();
     test_transform_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

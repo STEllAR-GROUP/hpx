@@ -143,9 +143,6 @@ void find_first_of_test()
 {
     test_find_first_of<std::random_access_iterator_tag>();
     test_find_first_of<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_find_first_of<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -86,9 +86,6 @@ void partitioned_test1()
 {
     test_partitioned1<std::random_access_iterator_tag>();
     test_partitioned1<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_partitioned1<std::input_iterator_tag>();
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -166,9 +163,6 @@ void partitioned_test2()
 {
     test_partitioned2<std::random_access_iterator_tag>();
     test_partitioned2<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_partitioned2<std::input_iterator_tag>();
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -261,9 +255,6 @@ void partitioned_test3()
 {
     test_partitioned3<std::random_access_iterator_tag>();
     test_partitioned3<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_partitioned3<std::input_iterator_tag>();
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -369,9 +360,6 @@ void partitioned_exception_test()
 {
     test_partitioned_exception<std::random_access_iterator_tag>();
     test_partitioned_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_partitioned_exception<std::input_iterator_tag>();
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -475,9 +463,6 @@ void partitioned_bad_alloc_test()
 {
     test_partitioned_bad_alloc<std::random_access_iterator_tag>();
     test_partitioned_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_partitioned_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 
