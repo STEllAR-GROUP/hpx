@@ -12,12 +12,14 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/iterator_range.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/executors/execution_information.hpp>
 #include <hpx/parallel/executors/execution_parameters.hpp>
 #include <hpx/parallel/util/detail/chunk_size_iterator.hpp>
+#include <hpx/parallel/util/detail/schedule_hint_iterator.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -53,13 +55,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         workitems.push_back(hpx::make_ready_future());
     }
 
-    template <typename ExPolicy, typename Future, typename F1,
-        typename FwdIter, typename Stride>
-        // requires traits::is_future<Future>
-    hpx::util::iterator_range<parallel::util::detail::chunk_size_iterator<FwdIter> >
-    get_bulk_iteration_shape(
-        std::false_type /*has_variable_chunk_size*/,
-        ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
+    template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
+        typename Stride>
+    // requires traits::is_future<Future>
+    hpx::util::iterator_range<
+        hpx::util::zip_iterator<parallel::util::detail::schedule_hint_iterator,
+            parallel::util::detail::chunk_size_iterator<FwdIter>>>
+    get_bulk_iteration_shape(std::false_type /*has_variable_chunk_size*/,
+        ExPolicy&& policy, std::vector<Future>& workitems, F1&& f1,
         FwdIter& begin, std::size_t& count, Stride s)
     {
         std::size_t const cores = execution::processing_units_count(
@@ -120,16 +123,28 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         iterator shape_begin(begin, chunk_size, count);
         iterator shape_end(last, chunk_size);
 
-        return hpx::util::make_iterator_range(shape_begin, shape_end);
+        std::size_t num_tasks = std::distance(shape_begin, shape_end);
+
+        using schedule_hint_iterator = parallel::util::detail::schedule_hint_iterator;
+        schedule_hint_iterator schedule_begin(0,
+            [&policy, num_tasks, cores](std::size_t task_idx) {
+                return execution::get_schedule_hint(policy.parameters(),
+                    policy.executor(), task_idx, num_tasks, cores);
+            });
+        schedule_hint_iterator schedule_end(num_tasks);
+
+        return hpx::util::make_iterator_range(
+            hpx::util::make_zip_iterator(schedule_begin, shape_begin),
+            hpx::util::make_zip_iterator(schedule_end, shape_end));
     }
 
-    template <typename ExPolicy, typename Future, typename F1,
-        typename FwdIter, typename Stride>
-        // requires traits::is_future<Future>
-    std::vector<hpx::util::tuple<FwdIter, std::size_t> >
-    get_bulk_iteration_shape(
-        std::true_type /*has_variable_chunk_size*/,
-        ExPolicy && policy, std::vector<Future>& /*workitems*/, F1 && /*f1*/,
+    template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
+        typename Stride>
+    // requires traits::is_future<Future>
+    std::vector<hpx::util::tuple<threads::thread_schedule_hint,
+        hpx::util::tuple<FwdIter, std::size_t>>>
+    get_bulk_iteration_shape(std::true_type /*has_variable_chunk_size*/,
+        ExPolicy&& policy, std::vector<Future>& /*workitems*/, F1&& /*f1*/,
         FwdIter& first, std::size_t& count, Stride s)
     {
         typedef hpx::util::tuple<FwdIter, std::size_t> tuple_type;
@@ -173,7 +188,16 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             count -= chunk;
         }
 
-        return shape;
+        const std::size_t num_tasks = shape.size();
+        std::size_t task_idx = 0;
+
+        return std::transform(
+            std::begin(shape), std::end(shape), [&](tuple_type t) {
+                return hpx::util::make_tuple(
+                    execution::get_schedule_hint(policy.parameters(),
+                        policy.executor(), task_idx++, num_tasks, cores),
+                    t);
+            });
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -202,15 +226,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         workitems.push_back(hpx::make_ready_future());
     }
 
-    template <typename ExPolicy, typename Future, typename F1,
-        typename FwdIter, typename Stride>
-        // requires traits::is_future<Future>
+    template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
+        typename Stride>
+    // requires traits::is_future<Future>
     hpx::util::iterator_range<
-        parallel::util::detail::chunk_size_idx_iterator<FwdIter>
-    >
-    get_bulk_iteration_shape_idx(
-        std::false_type /*has_variable_chunk_size*/,
-        ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
+        hpx::util::zip_iterator<parallel::util::detail::schedule_hint_iterator,
+            parallel::util::detail::chunk_size_idx_iterator<FwdIter>>>
+    get_bulk_iteration_shape_idx(std::false_type /*has_variable_chunk_size*/,
+        ExPolicy&& policy, std::vector<Future>& workitems, F1&& f1,
         FwdIter begin, std::size_t count, Stride s)
     {
         std::size_t const cores = execution::processing_units_count(
@@ -273,16 +296,28 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         iterator shape_begin(begin, chunk_size, count, base_idx);
         iterator shape_end(last, chunk_size);
 
-        return hpx::util::make_iterator_range(shape_begin, shape_end);
+        std::size_t num_tasks = std::distance(shape_begin, shape_end);
+
+        using schedule_hint_iterator = parallel::util::detail::schedule_hint_iterator;
+        schedule_hint_iterator schedule_begin(0,
+            [&policy, num_tasks, cores](std::size_t task_idx) {
+                return execution::get_schedule_hint(policy.parameters(),
+                    policy.executor(), task_idx, num_tasks, cores);
+            });
+        schedule_hint_iterator schedule_end(num_tasks);
+
+        return hpx::util::make_iterator_range(
+            hpx::util::make_zip_iterator(schedule_begin, shape_begin),
+            hpx::util::make_zip_iterator(schedule_end, shape_end));
     }
 
-    template <typename ExPolicy, typename Future, typename F1,
-        typename FwdIter, typename Stride>
-        // requires traits::is_future<Future>
-    std::vector<hpx::util::tuple<FwdIter, std::size_t, std::size_t> >
-    get_bulk_iteration_shape_idx(
-        std::true_type /*has_variable_chunk_size*/,
-        ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
+    template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
+        typename Stride>
+    // requires traits::is_future<Future>
+    std::vector<hpx::util::tuple<threads::thread_schedule_hint,
+        hpx::util::tuple<FwdIter, std::size_t, std::size_t>>>
+    get_bulk_iteration_shape_idx(std::true_type /*has_variable_chunk_size*/,
+        ExPolicy&& policy, std::vector<Future>& workitems, F1&& f1,
         FwdIter first, std::size_t count, Stride s)
     {
         typedef hpx::util::tuple<FwdIter, std::size_t, std::size_t> tuple_type;
@@ -329,7 +364,16 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             base_idx += chunk;
         }
 
-        return shape;
+        const std::size_t num_tasks = shape.size();
+        std::size_t task_idx = 0;
+
+        return std::transform(
+            std::begin(shape), std::end(shape), [&](tuple_type t) {
+                return hpx::util::make_tuple(
+                    execution::get_schedule_hint(policy.parameters(),
+                        policy.executor(), task_idx++, num_tasks, cores),
+                    t);
+            });
     }
 }}}}
 

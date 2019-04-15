@@ -304,17 +304,18 @@ namespace hpx { namespace detail
             traits::is_launch_policy<Policy>::value
         >::type>
     {
-        template <typename Policy_, typename F, typename ...Ts>
-        HPX_FORCEINLINE static auto
-        call(Policy_ && launch_policy, F && f, Ts &&... ts)
-        ->  decltype(detail::async_launch_policy_dispatch<
-                typename util::decay<F>::type
-            >::call(std::forward<Policy_>(launch_policy), std::forward<F>(f),
-                std::forward<Ts>(ts)...))
+        template <typename Policy_, typename F, typename... Ts>
+        HPX_FORCEINLINE static auto call(
+            Policy_&& launch_policy, F&& f, Ts&&... ts)
+            -> decltype(
+                detail::async_launch_policy_dispatch<typename util::decay<
+                    F>::type>::call(std::forward<Policy_>(launch_policy),
+                    threads::thread_schedule_hint(), std::forward<F>(f),
+                    std::forward<Ts>(ts)...))
         {
-            return detail::async_launch_policy_dispatch<
-                typename util::decay<F>::type
-            >::call(std::forward<Policy_>(launch_policy), std::forward<F>(f),
+            return detail::async_launch_policy_dispatch<typename util::decay<
+                F>::type>::call(std::forward<Policy_>(launch_policy),
+                threads::thread_schedule_hint(), std::forward<F>(f),
                 std::forward<Ts>(ts)...);
         }
 

@@ -390,13 +390,12 @@ namespace hpx { namespace lcos { namespace detail
                 "hpx::parallel::execution::parallel_executor::post");
 
             parallel::execution::detail::post_policy_dispatch<
-                    hpx::launch::async_policy
-                >::call(desc, hpx::launch::async,
-                    [HPX_CAPTURE_MOVE(this_),
-                        HPX_CAPTURE_MOVE(f)
-                    ]() mutable -> threads::thread_result_type {
-                        return this_->async_impl(std::move(f));
-                    });
+                hpx::launch::async_policy>::call(desc, hpx::launch::async,
+                threads::thread_schedule_hint(),
+                [HPX_CAPTURE_MOVE(this_), HPX_CAPTURE_MOVE(f)]() mutable
+                -> threads::thread_result_type {
+                    return this_->async_impl(std::move(f));
+                });
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -436,13 +435,12 @@ namespace hpx { namespace lcos { namespace detail
                 "hpx::parallel::execution::parallel_executor::post");
 
             parallel::execution::detail::post_policy_dispatch<
-                    hpx::launch::async_policy
-                >::call(desc, hpx::launch::async,
-                    [HPX_CAPTURE_MOVE(this_),
-                        HPX_CAPTURE_MOVE(f)
-                    ]() mutable -> threads::thread_result_type {
-                        return this_->async_impl_nounwrap(std::move(f));
-                    });
+                hpx::launch::async_policy>::call(desc, hpx::launch::async,
+                threads::thread_schedule_hint(),
+                [HPX_CAPTURE_MOVE(this_), HPX_CAPTURE_MOVE(f)]() mutable
+                -> threads::thread_result_type {
+                    return this_->async_impl_nounwrap(std::move(f));
+                });
 
             if (&ec != &throws)
                 ec = make_success_code();

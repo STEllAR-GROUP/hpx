@@ -25,6 +25,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \cond NOINTERNAL
         struct get_chunk_size_tag {};
         struct maximal_number_of_chunks_tag {};
+        struct get_schedule_hint_tag {};
         struct reset_thread_distribution_tag {};
         struct count_processing_units_tag {};
         struct mark_begin_execution_tag {};
@@ -43,6 +44,9 @@ namespace hpx { namespace parallel { namespace execution
 
         template <typename Parameters, typename Executor, typename Enable = void>
         struct maximal_number_of_chunks_fn_helper;
+
+        template <typename Parameters, typename Executor, typename Enable = void>
+        struct get_schedule_hint_fn_helper;
 
         template <typename Parameters, typename Executor, typename Enable = void>
         struct reset_thread_distribution_fn_helper;
@@ -133,6 +137,40 @@ namespace hpx { namespace parallel { namespace execution
                 return maximal_number_of_chunks(
                     std::forward<Parameters>(params),
                     std::forward<Executor>(exec), cores, num_tasks);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        // get_schedule_hint dispatch point
+        template <typename Parameters, typename Executor>
+        HPX_FORCEINLINE auto get_schedule_hint(Parameters&& params,
+            Executor&& exec, std::size_t task_idx, std::size_t num_tasks,
+            std::size_t cores) ->
+            typename get_schedule_hint_fn_helper<
+                typename hpx::util::decay_unwrap<Parameters>::type,
+                typename hpx::util::decay<Executor>::type>::
+                template result<Parameters, Executor>::type
+        {
+            return get_schedule_hint_fn_helper<
+                typename hpx::util::decay_unwrap<Parameters>::type,
+                typename hpx::util::decay<Executor>::type>::
+                call(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec), task_idx, num_tasks, cores);
+        }
+
+        template <>
+        struct customization_point<get_schedule_hint_tag>
+        {
+        public:
+            template <typename Parameters, typename Executor>
+            HPX_FORCEINLINE auto operator()(Parameters&& params,
+                Executor&& exec, std::size_t task_idx, std::size_t num_tasks,
+                std::size_t cores) const
+                -> decltype(get_schedule_hint(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec), task_idx, num_tasks, cores))
+            {
+                return get_schedule_hint(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec), task_idx, num_tasks, cores);
             }
         };
 
@@ -352,6 +390,26 @@ namespace hpx { namespace parallel { namespace execution
             > const& maximal_number_of_chunks =
                 detail::static_const<detail::customization_point<
                     detail::maximal_number_of_chunks_tag
+                > >::value;
+
+        /// Return the scheduling hint for the given chunk.
+        ///
+        /// \param params   [in] The executor parameters object to use for
+        ///                 determining the number of chunks for the given
+        ///                 number of \a cores.
+        /// \param exec     [in] The executor object which will be used
+        ///                 for scheduling of the loop iterations.
+        /// \param cores    [in] The number of cores the number of chunks
+        ///                 should be determined for.
+        /// \param num_tasks [in] The number of tasks the chunk size should be
+        ///                 determined for
+        /// TODO: Fix documentation.
+        ///
+        constexpr detail::customization_point<
+                detail::get_schedule_hint_tag
+            > const& get_schedule_hint =
+                detail::static_const<detail::customization_point<
+                    detail::get_schedule_hint_tag
                 > >::value;
 
         /// Reset the internal round robin thread distribution scheme for the

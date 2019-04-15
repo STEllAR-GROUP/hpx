@@ -86,7 +86,8 @@ namespace hpx { namespace parallel { namespace execution
         static hpx::future<void> async_execute(F&& f, Ts&&... ts)
         {
             return hpx::detail::async_launch_policy_dispatch<Policy>::call(
-                Policy{}, std::forward<F>(f), std::forward<Ts>(ts)...);
+                Policy{}, hpx::threads::thread_schedule_hint(),
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
@@ -96,8 +97,9 @@ namespace hpx { namespace parallel { namespace execution
             hpx::util::thread_description desc(f,
                 "parallel_executor_aggregated::post");
 
-            detail::post_policy_dispatch<Policy>::call(
-                desc, Policy{}, std::forward<F>(f), std::forward<Ts>(ts)...);
+            detail::post_policy_dispatch<Policy>::call(desc, Policy{},
+                hpx::threads::thread_schedule_hint(), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
     private:
@@ -293,8 +295,9 @@ namespace hpx { namespace parallel { namespace execution
             hpx::util::thread_description desc(f,
                 "parallel_executor_aggregated::post");
 
-            detail::post_policy_dispatch<hpx::launch>::call(
-                desc, policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
+            detail::post_policy_dispatch<hpx::launch>::call(desc, policy_,
+                hpx::threads::thread_schedule_hint(), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
     private:
@@ -350,13 +353,14 @@ namespace hpx { namespace parallel { namespace execution
                 for (std::size_t i = 0; i != size; ++i, ++it)
                 {
                     detail::post_policy_dispatch<hpx::launch>::call(
-                        desc, policy_,
+                        desc, policy_, hpx::util::get<0>(*it),
                         [&, it]() -> void
                         {
                             // properly handle all exceptions thrown from 'f'
                             try
                             {
-                                hpx::util::invoke(f, *it, ts...);
+                                hpx::util::invoke(
+                                    f, hpx::util::get<1>(*it), ts...);
                             }
                             catch (...)
                             {
@@ -389,7 +393,7 @@ namespace hpx { namespace parallel { namespace execution
                     while (size > chunk_size)
                     {
                         detail::post_policy_dispatch<hpx::launch>::call(
-                            desc, policy_,
+                            desc, policy_, hpx::util::get<0>(*it),
                             [&, chunk_size, num_tasks, it]
                             {
                                 spawn_hierarchical(l, chunk_size, num_tasks, f,

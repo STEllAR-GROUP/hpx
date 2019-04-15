@@ -25,12 +25,13 @@ namespace hpx { namespace parallel { namespace execution { namespace detail
     {
         template <typename F, typename... Ts>
         static void call(hpx::util::thread_description const& desc,
-            Policy const& policy, F && f, Ts &&... ts)
+            Policy const& policy, threads::thread_schedule_hint hint, F&& f,
+            Ts&&... ts)
         {
             threads::register_thread_nullary(
                 hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...),
-                desc, threads::pending, false, policy.priority());
+                desc, threads::pending, false, policy.priority(), hint);
         }
     };
 
@@ -39,7 +40,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail
     {
         template <typename F, typename... Ts>
         static void call(hpx::util::thread_description const& desc,
-            launch::fork_policy const& policy, F && f, Ts &&... ts)
+            launch::fork_policy const& policy,
+            threads::thread_schedule_hint /* hint */, F&& f, Ts&&... ts)
         {
             threads::thread_id_type tid = threads::register_thread_nullary(
                 hpx::util::deferred_call(

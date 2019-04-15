@@ -126,7 +126,8 @@ namespace hpx { namespace parallel { namespace execution
         async_execute(F && f, Ts &&... ts) const
         {
             return hpx::detail::async_launch_policy_dispatch<Policy>::call(
-                policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
+                policy_, threads::thread_schedule_hint(), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename Future, typename ... Ts>
@@ -161,8 +162,9 @@ namespace hpx { namespace parallel { namespace execution
             hpx::util::thread_description desc(f,
                 "hpx::parallel::execution::parallel_executor::post");
 
-            detail::post_policy_dispatch<Policy>::call(
-                desc, policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
+            detail::post_policy_dispatch<Policy>::call(desc, policy_,
+                threads::thread_schedule_hint(), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         // BulkTwoWayExecutor interface
@@ -266,7 +268,11 @@ namespace hpx { namespace parallel { namespace execution
 
             for (std::size_t i = 0; i != size; ++i, ++it)
             {
-                results[base + i] = async_execute(func, *it, ts...);
+                auto s = *it;
+                results[base + i] =
+                    hpx::detail::async_launch_policy_dispatch<Policy>::call(
+                        policy_, hpx::util::get<0>(s), func,
+                        hpx::util::get<1>(s), ts...);
             }
 
             l.count_down(size);

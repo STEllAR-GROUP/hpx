@@ -58,10 +58,6 @@ namespace hpx { namespace parallel { namespace execution
             if (chunk_size_ != 0)
                 return chunk_size_;
 
-            // Make sure the internal round robin counter of the executor is
-            // reset
-            execution::reset_thread_distribution(*this, exec);
-
             // by default use static work distribution over number of
             // available compute resources, create four times the number of
             // chunks than we have cores

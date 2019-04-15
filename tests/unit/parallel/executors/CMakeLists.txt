@@ -16,6 +16,7 @@ set(tests
     parallel_fork_executor
     parallel_policy_executor
     persistent_executor_parameters
+    schedule_hint_parameter
     sequenced_executor
     service_executors
     shared_parallel_executor

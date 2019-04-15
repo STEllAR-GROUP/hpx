@@ -162,6 +162,64 @@ namespace hpx { namespace parallel { namespace execution
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(maximal_number_of_chunks)
 
         ///////////////////////////////////////////////////////////////////////
+        // customization point for interface get_schedule_hint()
+        template <typename Parameters, typename Executor_>
+        struct get_schedule_hint_fn_helper<Parameters, Executor_,
+            typename std::enable_if<
+                hpx::traits::is_executor_any<Executor_>::value ||
+                    hpx::traits::is_threads_executor<Executor_>::value
+            >::type>
+        {
+            template <typename AnyParameters, typename Executor>
+            HPX_FORCEINLINE static hpx::threads::thread_schedule_hint call(
+                hpx::traits::detail::wrap_int, AnyParameters&&, Executor&&,
+                std::size_t /* task_idx */, std::size_t /* num_tasks */,
+                std::size_t /* cores */)
+            {
+                return hpx::threads::thread_schedule_hint();
+            }
+
+            template <typename AnyParameters, typename Executor>
+            HPX_FORCEINLINE static auto call(int, AnyParameters&& params,
+                Executor&& exec, std::size_t task_idx, std::size_t num_tasks,
+                std::size_t cores)
+                -> decltype(params.get_schedule_hint(
+                    std::forward<Executor>(exec), task_idx, num_tasks, cores))
+            {
+                return params.get_schedule_hint(
+                    std::forward<Executor>(exec), task_idx, num_tasks, cores);
+            }
+
+            template <typename Executor>
+            HPX_FORCEINLINE static threads::thread_schedule_hint call(
+                Parameters& params, Executor&& exec, std::size_t task_idx,
+                std::size_t num_tasks, std::size_t cores)
+            {
+                return call(0, params, std::forward<Executor>(exec), task_idx,
+                    num_tasks, cores);
+            }
+
+            template <typename AnyParameters, typename Executor>
+            HPX_FORCEINLINE static threads::thread_schedule_hint call(
+                AnyParameters params, Executor&& exec, std::size_t task_idx,
+                std::size_t num_tasks, std::size_t cores)
+            {
+                return call(static_cast<Parameters&>(params),
+                    std::forward<Executor>(exec), task_idx, num_tasks, cores);
+            }
+
+            template <typename AnyParameters, typename Executor>
+            struct result
+            {
+                using type = decltype(call(std::declval<AnyParameters>(),
+                    std::declval<Executor>(), std::declval<std::size_t>(),
+                    std::declval<std::size_t>(), std::declval<std::size_t>()));
+            };
+        };
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_schedule_hint)
+
+        ///////////////////////////////////////////////////////////////////////
         // customization point for interface reset_thread_distribution()
         template <typename Parameters, typename Executor_>
         struct reset_thread_distribution_fn_helper<Parameters, Executor_,
@@ -514,13 +572,34 @@ namespace hpx { namespace parallel { namespace execution
             typename std::enable_if<has_get_chunk_size<T>::value>::type>
         {
             template <typename Executor, typename F>
-            HPX_FORCEINLINE std::size_t get_chunk_size(Executor && exec, F && f,
+            HPX_FORCEINLINE std::size_t get_chunk_size(Executor&& exec, F&& f,
                 std::size_t cores, std::size_t num_tasks)
             {
                 auto& wrapped =
                     static_cast<unwrapper<Wrapper>*>(this)->member_.get();
                 return wrapped.get_chunk_size(std::forward<Executor>(exec),
                     std::forward<F>(f), cores, num_tasks);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Wrapper, typename Enable = void>
+        struct get_schedule_hint_call_helper
+        {
+        };
+
+        template <typename T, typename Wrapper>
+        struct get_schedule_hint_call_helper<T, Wrapper,
+            typename std::enable_if<has_get_schedule_hint<T>::value>::type>
+        {
+            template <typename Executor, typename F>
+            HPX_FORCEINLINE std::size_t get_schedule_hint(Executor&& exec,
+                std::size_t cores)
+            {
+                auto& wrapped =
+                    static_cast<unwrapper<Wrapper>*>(this)->member_.get();
+                return wrapped.get_schedule_hint(std::forward<Executor>(exec),
+                    cores);
             }
         };
 
@@ -638,15 +717,17 @@ namespace hpx { namespace parallel { namespace execution
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
-        struct unwrapper< ::boost::reference_wrapper<T> >
-          : base_member_helper<boost::reference_wrapper<T> >
-          , maximal_number_of_chunks_call_helper<T, boost::reference_wrapper<T> >
-          , get_chunk_size_call_helper<T, boost::reference_wrapper<T> >
-          , mark_begin_execution_call_helper<T, boost::reference_wrapper<T> >
-          , mark_end_of_scheduling_call_helper<T, boost::reference_wrapper<T> >
-          , mark_end_execution_call_helper<T, boost::reference_wrapper<T> >
-          , processing_units_count_call_helper<T, boost::reference_wrapper<T> >
-          , reset_thread_distribution_call_helper<T, boost::reference_wrapper<T> >
+        struct unwrapper<::boost::reference_wrapper<T>>
+          : base_member_helper<boost::reference_wrapper<T>>
+          , maximal_number_of_chunks_call_helper<T, boost::reference_wrapper<T>>
+          , get_chunk_size_call_helper<T, boost::reference_wrapper<T>>
+          , get_schedule_hint_call_helper<T, boost::reference_wrapper<T>>
+          , mark_begin_execution_call_helper<T, boost::reference_wrapper<T>>
+          , mark_end_of_scheduling_call_helper<T, boost::reference_wrapper<T>>
+          , mark_end_execution_call_helper<T, boost::reference_wrapper<T>>
+          , processing_units_count_call_helper<T, boost::reference_wrapper<T>>
+          , reset_thread_distribution_call_helper<T,
+                boost::reference_wrapper<T>>
         {
             typedef boost::reference_wrapper<T> wrapper_type;
 
@@ -656,15 +737,16 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         template <typename T>
-        struct unwrapper< ::std::reference_wrapper<T> >
-          : base_member_helper<std::reference_wrapper<T> >
-          , maximal_number_of_chunks_call_helper<T, std::reference_wrapper<T> >
-          , get_chunk_size_call_helper<T, std::reference_wrapper<T> >
-          , mark_begin_execution_call_helper<T, std::reference_wrapper<T> >
-          , mark_end_of_scheduling_call_helper<T, std::reference_wrapper<T> >
-          , mark_end_execution_call_helper<T, std::reference_wrapper<T> >
-          , processing_units_count_call_helper<T, std::reference_wrapper<T> >
-          , reset_thread_distribution_call_helper<T, std::reference_wrapper<T> >
+        struct unwrapper<::std::reference_wrapper<T>>
+          : base_member_helper<std::reference_wrapper<T>>
+          , maximal_number_of_chunks_call_helper<T, std::reference_wrapper<T>>
+          , get_chunk_size_call_helper<T, std::reference_wrapper<T>>
+          , get_schedule_hint_call_helper<T, std::reference_wrapper<T>>
+          , mark_begin_execution_call_helper<T, std::reference_wrapper<T>>
+          , mark_end_of_scheduling_call_helper<T, std::reference_wrapper<T>>
+          , mark_end_execution_call_helper<T, std::reference_wrapper<T>>
+          , processing_units_count_call_helper<T, std::reference_wrapper<T>>
+          , reset_thread_distribution_call_helper<T, std::reference_wrapper<T>>
         {
             typedef std::reference_wrapper<T> wrapper_type;
 
@@ -701,6 +783,7 @@ namespace hpx { namespace parallel { namespace execution
                 "objects");
 
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(get_chunk_size);
+            HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(get_schedule_hint);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_begin_execution);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_end_of_scheduling);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_end_execution);

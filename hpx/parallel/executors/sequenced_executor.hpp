@@ -74,7 +74,8 @@ namespace hpx { namespace parallel { namespace execution
         {
             return hpx::detail::async_launch_policy_dispatch<
                 launch::deferred_policy>::call(launch::deferred,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+                threads::thread_schedule_hint(), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
