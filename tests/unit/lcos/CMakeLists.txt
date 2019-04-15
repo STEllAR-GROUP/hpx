@@ -29,6 +29,7 @@ set(tests
     client_then
     condition_variable
     counting_semaphore
+    dist_object
     fold
     future
     future_ref
