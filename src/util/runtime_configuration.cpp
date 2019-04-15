@@ -12,7 +12,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
-#include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/itt_notify.hpp>
@@ -426,18 +425,18 @@ namespace hpx { namespace util
         {
             fs::path this_p(path);
             boost::system::error_code fsec;
-            fs::path canonical_p = util::canonical_path(this_p, fsec);
+            fs::path canonical_p =
+                fs::canonical(this_p, fs::initial_path(), fsec);
             if (fsec)
                 canonical_p = this_p;
 
             std::pair<std::set<std::string>::iterator, bool> p =
-                component_paths.insert(
-                    util::native_file_string(canonical_p));
+                component_paths.insert(canonical_p.string());
 
             if (p.second)
             {
                 // have all path elements, now find ini files in there...
-                fs::path this_path (hpx::util::create_path(*p.first));
+                fs::path this_path (*p.first);
                 if (fs::exists(this_path, fsec) && !fsec)
                 {
                     plugin_list_type tmp_regs =

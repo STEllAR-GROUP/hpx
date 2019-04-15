@@ -7,8 +7,8 @@
 #include <hpx/config.hpp>
 #include <hpx/error.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/filesystem_compatibility.hpp>
 
+#include <boost/filesystem/path.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <exception>
@@ -20,7 +20,7 @@ namespace hpx { namespace detail
         error errcode, std::string const& msg,
         std::string const& func, std::string const& file, long line)
     {
-        boost::filesystem::path p(hpx::util::create_path(file));
+        boost::filesystem::path p(file);
         hpx::detail::throw_exception(
             hpx::exception(errcode, msg, hpx::plain),
             func, p.string(), line);
@@ -39,7 +39,7 @@ namespace hpx { namespace detail
         std::string const& func, std::string const& file, long line,
         std::string const& auxinfo)
     {
-        boost::filesystem::path p(hpx::util::create_path(file));
+        boost::filesystem::path p(file);
         return hpx::detail::get_exception(
             hpx::exception(errcode, msg, mode),
             p.string(), file, line, auxinfo);
