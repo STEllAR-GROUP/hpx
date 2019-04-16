@@ -190,7 +190,7 @@ jobs:
           name: Building Sphinx Documentation
           command: |
               ninja -j1 docs
-          no_output_timeout: 60m
+          no_output_timeout: 2h
       - persist_to_workspace:
           root: /hpx
           paths:
