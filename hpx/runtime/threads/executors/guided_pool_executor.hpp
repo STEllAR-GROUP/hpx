@@ -16,7 +16,6 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/pack_traversal.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
 
 #include <cstddef>
