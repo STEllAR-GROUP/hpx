@@ -9,8 +9,7 @@
 // depending on the rest of HPX.
 #define HPX_USE_BOOST_ASSERT
 
-#include <hpx/compat/barrier.hpp>
-#include <hpx/compat/thread.hpp>
+#include <hpx/util/barrier.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
@@ -24,6 +23,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -188,7 +188,7 @@ bench_lifo(Lifo& lifo, std::uint64_t local_iterations)
 
 ///////////////////////////////////////////////////////////////////////////////
 void perform_iterations(
-    hpx::compat::barrier& b
+    hpx::util::barrier& b
   , std::pair<double, double>& elapsed_control
   , std::pair<double, double>& elapsed_lockfree
     )
@@ -222,18 +222,18 @@ int app_main(
         elapsed_control(threads, std::pair<double, double>(0.0, 0.0));
     std::vector<std::pair<double, double> >
         elapsed_lockfree(threads, std::pair<double, double>(0.0, 0.0));
-    std::vector<compat::thread> workers;
-    hpx::compat::barrier b(threads);
+    std::vector<std::thread> workers;
+    hpx::util::barrier b(threads);
 
     for (std::uint32_t i = 0; i != threads; ++i)
-        workers.push_back(compat::thread(
+        workers.push_back(std::thread(
             perform_iterations,
             std::ref(b),
             std::ref(elapsed_control[i]),
             std::ref(elapsed_lockfree[i])
             ));
 
-    for (compat::thread& thread : workers)
+    for (std::thread& thread : workers)
     {
         if (thread.joinable())
             thread.join();

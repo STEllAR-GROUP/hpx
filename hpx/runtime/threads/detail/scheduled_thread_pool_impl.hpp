@@ -10,9 +10,6 @@
 #include <hpx/apply.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
-#include <hpx/compat/barrier.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/exception_info.hpp>
 #include <hpx/lcos/future.hpp>
@@ -32,6 +29,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/barrier.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unlock_guard.hpp>
@@ -41,14 +39,16 @@
 
 #include <algorithm>
 #include <atomic>
-#include <numeric>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <functional>
 #include <iosfwd>
 #include <memory>
+#include <mutex>
+#include <numeric>
 #include <string>
+#include <thread>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -220,7 +220,7 @@ namespace hpx { namespace threads { namespace detail
 
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::stop(
-        std::unique_lock<compat::mutex>& l, bool blocking)
+        std::unique_lock<std::mutex>& l, bool blocking)
     {
         HPX_ASSERT(l.owns_lock());
         return stop_locked(l, blocking);
@@ -228,7 +228,7 @@ namespace hpx { namespace threads { namespace detail
 
     template <typename Scheduler>
     bool hpx::threads::detail::scheduled_thread_pool<Scheduler>::run(
-        std::unique_lock<compat::mutex>& l, std::size_t pool_threads)
+        std::unique_lock<std::mutex>& l, std::size_t pool_threads)
     {
         HPX_ASSERT(l.owns_lock());
 
@@ -260,8 +260,8 @@ namespace hpx { namespace threads { namespace detail
 
         // run threads and wait for initialization to complete
         std::size_t thread_num = 0;
-        std::shared_ptr<compat::barrier> startup =
-            std::make_shared<compat::barrier>(pool_threads + 1);
+        std::shared_ptr<util::barrier> startup =
+            std::make_shared<util::barrier>(pool_threads + 1);
         try
         {
             auto const& rp = resource::get_partitioner();
@@ -379,7 +379,7 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            compat::thread(std::move(resume_internal_wrapper)).detach();
+            std::thread(std::move(resume_internal_wrapper)).detach();
         }
     }
 
@@ -471,7 +471,7 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            compat::thread(std::move(suspend_internal_wrapper)).detach();
+            std::thread(std::move(suspend_internal_wrapper)).detach();
         }
     }
 
@@ -492,7 +492,7 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     void hpx::threads::detail::scheduled_thread_pool<Scheduler>::thread_func(
         std::size_t thread_num, std::size_t global_thread_num,
-        std::shared_ptr<compat::barrier> startup)
+        std::shared_ptr<util::barrier> startup)
     {
         auto const& rp = resource::get_partitioner();
         topology const& topo = rp.get_topology();
@@ -1933,7 +1933,7 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::add_processing_unit_internal(
         std::size_t virt_core, std::size_t thread_num,
-        std::shared_ptr<compat::barrier> startup, error_code& ec)
+        std::shared_ptr<util::barrier> startup, error_code& ec)
     {
         std::unique_lock<typename Scheduler::pu_mutex_type>
             l(sched_->Scheduler::get_pu_mutex(virt_core));
@@ -1960,7 +1960,7 @@ namespace hpx { namespace threads { namespace detail
         HPX_UNUSED(oldstate);
 
         threads_[virt_core] =
-            compat::thread(&scheduled_thread_pool::thread_func, this,
+            std::thread(&scheduled_thread_pool::thread_func, this,
                 virt_core, thread_num, std::move(startup));
 
         if (&ec != &throws)
@@ -1979,8 +1979,8 @@ namespace hpx { namespace threads { namespace detail
                 "processing units");
         }
 
-        std::shared_ptr<compat::barrier> startup =
-            std::make_shared<compat::barrier>(2);
+        std::shared_ptr<util::barrier> startup =
+            std::make_shared<util::barrier>(2);
 
         add_processing_unit_internal(virt_core, thread_num, startup, ec);
 
@@ -2037,7 +2037,7 @@ namespace hpx { namespace threads { namespace detail
             oldstate == state_stopped || oldstate == state_terminating);
 
         resource::get_partitioner().unassign_pu(id_.name(), virt_core);
-        compat::thread t;
+        std::thread t;
         std::swap(threads_[virt_core], t);
 
         l.unlock();
@@ -2171,7 +2171,7 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            compat::thread(std::move(suspend_internal_wrapper)).detach();
+            std::thread(std::move(suspend_internal_wrapper)).detach();
         }
     }
 
@@ -2264,7 +2264,7 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            compat::thread(std::move(resume_internal_wrapper)).detach();
+            std::thread(std::move(resume_internal_wrapper)).detach();
         }
     }
 }}}

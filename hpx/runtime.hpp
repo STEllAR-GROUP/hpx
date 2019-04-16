@@ -8,7 +8,6 @@
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/applier_fwd.hpp>
@@ -92,7 +91,7 @@ namespace hpx
         /// \brief Manage list of functions to call on exit
         void on_exit(util::function_nonser<void()> const& f)
         {
-            std::lock_guard<compat::mutex> l(mtx_);
+            std::lock_guard<std::mutex> l(mtx_);
             on_exit_functions_.push_back(f);
         }
 
@@ -109,7 +108,7 @@ namespace hpx
 
             typedef util::function_nonser<void()> value_type;
 
-            std::lock_guard<compat::mutex> l(mtx_);
+            std::lock_guard<std::mutex> l(mtx_);
             for (value_type const& f : on_exit_functions_)
                 f();
         }
@@ -322,7 +321,7 @@ namespace hpx
         // list of functions to call on exit
         typedef std::vector<util::function_nonser<void()> > on_exit_type;
         on_exit_type on_exit_functions_;
-        mutable compat::mutex mtx_;
+        mutable std::mutex mtx_;
 
         util::runtime_configuration ini_;
         std::shared_ptr<performance_counters::registry> counters_;

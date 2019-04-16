@@ -5,7 +5,6 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/compat/thread.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
@@ -13,6 +12,7 @@
 #include <boost/config.hpp>
 #include <boost/program_options.hpp>
 
+#include <thread>
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -24,7 +24,6 @@ using boost::program_options::store;
 using boost::program_options::command_line_parser;
 using boost::program_options::notify;
 
-namespace compat = hpx::compat;
 using hpx::util::high_resolution_timer;
 using hpx::util::thread_specific_ptr;
 
@@ -91,14 +90,14 @@ int main(
 
     ///////////////////////////////////////////////////////////////////////////
     // run the test
-    std::vector<compat::thread> workers;
+    std::vector<std::thread> workers;
 
     high_resolution_timer t;
 
     for (std::uint64_t i = 0; i != threads; ++i)
-        workers.push_back(compat::thread(worker, updates));
+        workers.push_back(std::thread(worker, updates));
 
-    for (compat::thread& thread : workers)
+    for (std::thread& thread : workers)
     {
         if (thread.joinable())
             thread.join();

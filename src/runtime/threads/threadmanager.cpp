@@ -9,8 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/future.hpp>
@@ -374,7 +372,7 @@ namespace hpx { namespace threads
 
                 // instantiate the scheduler
                 typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    compat::mutex, hpx::threads::policies::lockfree_fifo>
+                    std::mutex, hpx::threads::policies::lockfree_fifo>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, numa_sensitive,
@@ -407,7 +405,7 @@ namespace hpx { namespace threads
 
                 // instantiate the scheduler
                 typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    compat::mutex, hpx::threads::policies::lockfree_lifo>
+                    std::mutex, hpx::threads::policies::lockfree_lifo>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, numa_sensitive,
@@ -516,7 +514,7 @@ namespace hpx { namespace threads
 
                 // instantiate the scheduler
                 typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    compat::mutex, hpx::threads::policies::lockfree_fifo>
+                    std::mutex, hpx::threads::policies::lockfree_fifo>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, cfg_.numa_sensitive_,
@@ -552,7 +550,7 @@ namespace hpx { namespace threads
 
                 // instantiate the scheduler
                 typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    compat::mutex, hpx::threads::policies::lockfree_lifo>
+                    std::mutex, hpx::threads::policies::lockfree_lifo>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, cfg_.numa_sensitive_,

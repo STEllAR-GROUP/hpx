@@ -12,9 +12,8 @@
 
 #if !defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION) && \
     !(HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS))
-#include <hpx/compat/mutex.hpp>
-
-#include <memory>   // for placement new
+#include <memory>    // for placement new
+#include <mutex>
 #endif
 
 #if !defined(HPX_WINDOWS)
@@ -124,7 +123,7 @@ namespace hpx { namespace util
 
         static_()
         {
-            compat::call_once(constructed_, &default_constructor::construct);
+            std::call_once(constructed_, &default_constructor::construct);
         }
 
         operator reference()
@@ -159,14 +158,14 @@ namespace hpx { namespace util
             std::alignment_of<value_type>::value>::type storage_type;
 
         static storage_type data_;
-        static compat::once_flag constructed_;
+        static std::once_flag constructed_;
     };
 
     template <typename T, typename Tag>
     typename static_<T, Tag>::storage_type static_<T, Tag>::data_;
 
     template <typename T, typename Tag>
-    compat::once_flag static_<T, Tag>::constructed_;
+    std::once_flag static_<T, Tag>::constructed_;
 #endif
 }}
 

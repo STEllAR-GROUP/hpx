@@ -11,7 +11,6 @@
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
 #include <hpx/assertion.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -20,6 +19,7 @@
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util/logging.hpp>
 
+#include <mutex>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -45,7 +45,7 @@ namespace hpx { namespace threads { namespace policies
     /// The local_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from.
-    template <typename Mutex = compat::mutex,
+    template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>

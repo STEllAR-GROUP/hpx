@@ -4,11 +4,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/compat/barrier.hpp>
+#include <hpx/util/barrier.hpp>
 
 #include <cstddef>
 
-namespace hpx { namespace compat
+namespace hpx { namespace util
 {
     barrier::barrier(std::size_t number_of_threads)
       : number_of_threads_(number_of_threads),

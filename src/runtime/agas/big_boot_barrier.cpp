@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -669,7 +668,7 @@ void big_boot_barrier::add_locality_endpoints(std::uint32_t locality_id,
 ///////////////////////////////////////////////////////////////////////////////
 void big_boot_barrier::spin()
 {
-    std::unique_lock<compat::mutex> lock(mtx);
+    std::unique_lock<std::mutex> lock(mtx);
     while (connected)
         cond.wait(lock);
 
@@ -809,7 +808,7 @@ void big_boot_barrier::notify()
 
     bool notify = false;
     {
-        std::lock_guard<compat::mutex> lk(mtx, std::adopt_lock);
+        std::lock_guard<std::mutex> lk(mtx, std::adopt_lock);
         if (agas_client.get_status() == state_starting)
         {
             --connected;

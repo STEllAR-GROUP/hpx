@@ -5,7 +5,6 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
-#include <hpx/compat/thread.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>

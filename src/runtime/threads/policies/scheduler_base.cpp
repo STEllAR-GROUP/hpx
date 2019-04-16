@@ -5,8 +5,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
@@ -28,6 +26,7 @@
 #include <atomic>
 #include <chrono>
 #include <cmath>
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -202,7 +201,7 @@ namespace hpx { namespace threads { namespace policies
     {
         if (num_thread == std::size_t(-1))
         {
-            for (compat::condition_variable& c : suspend_conds_)
+            for (std::condition_variable& c : suspend_conds_)
             {
                 c.notify_one();
             }

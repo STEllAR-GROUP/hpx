@@ -9,11 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/compat/barrier.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/compat/thread.hpp>
-#include <hpx/config/asio.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/barrier.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/logging.hpp>
 
@@ -22,6 +19,7 @@
 #include <cstddef>
 #include <mutex>
 #include <stdexcept>
+#include <thread>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,13 +102,13 @@ namespace hpx { namespace util
 
     io_service_pool::~io_service_pool()
     {
-        std::lock_guard<compat::mutex> l(mtx_);
+        std::lock_guard<std::mutex> l(mtx_);
         stop_locked();
         join_locked();
         clear_locked();
     }
 
-    void io_service_pool::thread_run(std::size_t index, compat::barrier* startup)
+    void io_service_pool::thread_run(std::size_t index, util::barrier* startup)
     {
         // wait for all threads to start up before before starting HPX work
         if (startup != nullptr)
@@ -140,9 +138,9 @@ namespace hpx { namespace util
     }
 
     bool io_service_pool::run(std::size_t num_threads, bool join_threads,
-        compat::barrier* startup)
+        util::barrier* startup)
     {
-        std::lock_guard<compat::mutex> l(mtx_);
+        std::lock_guard<std::mutex> l(mtx_);
 
         // Create a pool of threads to run all of the io_services.
         if (!threads_.empty())   // should be called only once
@@ -165,9 +163,9 @@ namespace hpx { namespace util
         return run_locked(num_threads, join_threads, startup);
     }
 
-    bool io_service_pool::run(bool join_threads, compat::barrier* startup)
+    bool io_service_pool::run(bool join_threads, util::barrier* startup)
     {
-        std::lock_guard<compat::mutex> l(mtx_);
+        std::lock_guard<std::mutex> l(mtx_);
 
         // Create a pool of threads to run all of the io_services.
         if (!threads_.empty())   // should be called only once
@@ -191,7 +189,7 @@ namespace hpx { namespace util
     }
 
     bool io_service_pool::run_locked(std::size_t num_threads, bool join_threads,
-        compat::barrier* startup)
+        util::barrier* startup)
     {
         if (io_services_.empty())
         {
@@ -206,7 +204,7 @@ namespace hpx { namespace util
 
         for (std::size_t i = 0; i < num_threads; ++i)
         {
-            compat::thread t(
+            std::thread t(
                 &io_service_pool::thread_run, this, i, startup);
             threads_.emplace_back(std::move(t));
         }
@@ -226,7 +224,7 @@ namespace hpx { namespace util
 
     void io_service_pool::join()
     {
-        std::lock_guard<compat::mutex> l(mtx_);
+        std::lock_guard<std::mutex> l(mtx_);
         join_locked();
     }
 
@@ -240,7 +238,7 @@ namespace hpx { namespace util
 
     void io_service_pool::stop()
     {
-        std::lock_guard<compat::mutex> l(mtx_);
+        std::lock_guard<std::mutex> l(mtx_);
         stop_locked();
     }
 
@@ -260,7 +258,7 @@ namespace hpx { namespace util
 
     void io_service_pool::wait()
     {
-        std::lock_guard<compat::mutex> l(mtx_);
+        std::lock_guard<std::mutex> l(mtx_);
         wait_locked();
     }
 
@@ -286,7 +284,7 @@ namespace hpx { namespace util
 
     void io_service_pool::clear()
     {
-        std::lock_guard<compat::mutex> l(mtx_);
+        std::lock_guard<std::mutex> l(mtx_);
         clear_locked();
     }
 
@@ -302,14 +300,14 @@ namespace hpx { namespace util
 
     bool io_service_pool::stopped()
     {
-        std::lock_guard<compat::mutex> l(mtx_);
+        std::lock_guard<std::mutex> l(mtx_);
         return stopped_;
     }
 
     boost::asio::io_service& io_service_pool::get_io_service(int index)
     {
         // use this function for single group io_service pools only
-        std::lock_guard<compat::mutex> l(mtx_);
+        std::lock_guard<std::mutex> l(mtx_);
 
         if (index == -1) {
             if (++next_io_service_ == pool_size_)
@@ -325,7 +323,7 @@ namespace hpx { namespace util
         return *io_services_[index]; //-V108
     }
 
-    compat::thread& io_service_pool::get_os_thread_handle(std::size_t thread_num)
+    std::thread& io_service_pool::get_os_thread_handle(std::size_t thread_num)
     {
         HPX_ASSERT(thread_num < pool_size_);
         return threads_[thread_num];

@@ -5,25 +5,24 @@
 
 // hpxinspect:nodeprecatedname:boost::barrier
 
-#ifndef HPX_COMPAT_BARRIER_HPP
-#define HPX_COMPAT_BARRIER_HPP
+#ifndef HPX_UTIL_BARRIER_HPP
+#define HPX_UTIL_BARRIER_HPP
 
 #include <hpx/config.hpp>
 
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
-
 #include <climits>
+#include <condition_variable>
 #include <cstddef>
+#include <mutex>
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace compat
+namespace hpx { namespace util
 {
     class HPX_EXPORT barrier
     {
     private:
-        typedef compat::mutex mutex_type;
+        typedef std::mutex mutex_type;
 
         HPX_STATIC_CONSTEXPR std::size_t barrier_flag =
             static_cast<std::size_t>(1) << (CHAR_BIT * sizeof(std::size_t) - 1);
@@ -39,7 +38,7 @@ namespace hpx { namespace compat
         std::size_t total_;
 
         mutable mutex_type mtx_;
-        compat::condition_variable cond_;
+        std::condition_variable cond_;
     };
 }}
 

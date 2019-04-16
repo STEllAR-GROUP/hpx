@@ -5,7 +5,6 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
-#include <hpx/compat/thread.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/threadmanager.hpp>
@@ -20,6 +19,7 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -60,7 +60,7 @@ void test_scheduler(int argc, char* argv[],
 
         while (!suspended)
         {
-            hpx::compat::this_thread::yield();
+            std::this_thread::yield();
         }
 
         bool resumed = false;
@@ -71,7 +71,7 @@ void test_scheduler(int argc, char* argv[],
 
         while (!resumed)
         {
-            hpx::compat::this_thread::yield();
+            std::this_thread::yield();
         }
     }
 

@@ -8,9 +8,6 @@
 #include <hpx/performance_counters/counters.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/latch.hpp>
@@ -33,6 +30,7 @@
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/yield_while.hpp>
 
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -43,6 +41,7 @@
 #include <mutex>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -408,11 +407,11 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     void runtime_impl::wait_helper(
-        compat::mutex& mtx, compat::condition_variable& cond, bool& running)
+        std::mutex& mtx, std::condition_variable& cond, bool& running)
     {
         // signal successful initialization
         {
-            std::lock_guard<compat::mutex> lk(mtx);
+            std::lock_guard<std::mutex> lk(mtx);
             running = true;
             cond.notify_all();
         }
@@ -444,18 +443,18 @@ namespace hpx
         LRT_(info) << "runtime_impl: about to enter wait state";
 
         // start the wait_helper in a separate thread
-        compat::mutex mtx;
-        compat::condition_variable cond;
+        std::mutex mtx;
+        std::condition_variable cond;
         bool running = false;
 
-        compat::thread t (util::bind(
+        std::thread t (util::bind(
                 &runtime_impl::wait_helper,
                 this, std::ref(mtx), std::ref(cond), std::ref(running)
             ));
 
         // wait for the thread to run
         {
-            std::unique_lock<compat::mutex> lk(mtx);
+            std::unique_lock<std::mutex> lk(mtx);
             while (!running)
                 cond.wait(lk);
         }
@@ -492,11 +491,11 @@ namespace hpx
             // this is necessary as this function (stop()) might have been called
             // from a HPX thread, so it would deadlock by waiting for the thread
             // manager
-            compat::mutex mtx;
-            compat::condition_variable cond;
-            std::unique_lock<compat::mutex> l(mtx);
+            std::mutex mtx;
+            std::condition_variable cond;
+            std::unique_lock<std::mutex> l(mtx);
 
-            compat::thread t(util::bind(&runtime_impl::stopped, this, blocking,
+            std::thread t(util::bind(&runtime_impl::stopped, this, blocking,
                 std::ref(cond), std::ref(mtx)));
             cond.wait(l);
 
@@ -534,7 +533,7 @@ namespace hpx
     // This gets executed as a task in the timer_pool io_service and not as
     // a HPX thread!
     void runtime_impl::stopped(
-        bool blocking, compat::condition_variable& cond, compat::mutex& mtx)
+        bool blocking, std::condition_variable& cond, std::mutex& mtx)
     {
         // wait for thread manager to exit
         runtime_support_->stopped();         // re-activate shutdown HPX-thread
@@ -545,7 +544,7 @@ namespace hpx
 
         LRT_(info) << "runtime_impl: stopped all services";
 
-        std::lock_guard<compat::mutex> l(mtx);
+        std::lock_guard<std::mutex> l(mtx);
         cond.notify_all();                  // we're done now
     }
 
@@ -653,7 +652,7 @@ namespace hpx
 
             // store the exception to be able to rethrow it later
             {
-                std::lock_guard<compat::mutex> l(mtx_);
+                std::lock_guard<std::mutex> l(mtx_);
                 exception_ = e;
             }
 
@@ -698,7 +697,7 @@ namespace hpx
     {
         if (state_.load() > state_running)
         {
-            std::lock_guard<compat::mutex> l(mtx_);
+            std::lock_guard<std::mutex> l(mtx_);
             if (exception_)
             {
                 std::exception_ptr e = exception_;

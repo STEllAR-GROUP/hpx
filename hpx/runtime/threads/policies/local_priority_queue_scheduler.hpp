@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -22,11 +21,12 @@
 #include <hpx/util_fwd.hpp>
 
 #include <atomic>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <cmath>
 #include <exception>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -54,7 +54,7 @@ namespace hpx { namespace threads { namespace policies
     /// High priority threads are executed by the first N OS threads before any
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
-    template <typename Mutex = compat::mutex,
+    template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>

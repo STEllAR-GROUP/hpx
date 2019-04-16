@@ -33,15 +33,6 @@ if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
   set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono thread)
 endif()
 
-if(HPX_WITH_THREAD_COMPATIBILITY OR NOT(HPX_WITH_CXX11_THREAD))
-  set(__boost_libraries ${__boost_libraries} thread)
-  set(__boost_need_thread ON)
-endif()
-
-if(__boost_need_thread)
-  set(__boost_libraries ${__boost_libraries} chrono)
-endif()
-
 # Set configuration option to use Boost.Context or not. This depends on the
 # platform.
 set(__use_generic_coroutine_context OFF)
@@ -57,12 +48,14 @@ hpx_option(
   "Use Boost.Context as the underlying coroutines context switch implementation."
   ${__use_generic_coroutine_context} ADVANCED)
 
+if(NOT HPX_WITH_NATIVE_TLS)
+  set(__boost_libraries ${__boost_libraries} thread)
+endif()
+
 if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   set(__boost_libraries ${__boost_libraries} context)
   # if context is needed, we should still link with boost thread and chrono
-  if(NOT __boost_need_thread)
-    set(__boost_libraries ${__boost_libraries} thread chrono)
-  endif()
+  set(__boost_libraries ${__boost_libraries} thread chrono)
 endif()
 
 set(__boost_libraries

@@ -31,26 +31,26 @@ template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
 
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::policies::local_priority_queue_scheduler<
-    hpx::compat::mutex, hpx::threads::policies::lockfree_fifo>;
+    std::mutex, hpx::threads::policies::lockfree_fifo>;
 template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
-    hpx::threads::policies::local_priority_queue_scheduler<hpx::compat::mutex,
+    hpx::threads::policies::local_priority_queue_scheduler<std::mutex,
         hpx::threads::policies::lockfree_fifo>>;
 template class HPX_EXPORT hpx::threads::policies::local_priority_queue_scheduler<
-    hpx::compat::mutex, hpx::threads::policies::lockfree_lifo>;
+    std::mutex, hpx::threads::policies::lockfree_lifo>;
 template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
-    hpx::threads::policies::local_priority_queue_scheduler<hpx::compat::mutex,
+    hpx::threads::policies::local_priority_queue_scheduler<std::mutex,
         hpx::threads::policies::lockfree_lifo>>;
 
 #if defined(HPX_HAVE_ABP_SCHEDULER)
 template class HPX_EXPORT hpx::threads::policies::local_priority_queue_scheduler<
-    hpx::compat::mutex, hpx::threads::policies::lockfree_abp_fifo>;
+    std::mutex, hpx::threads::policies::lockfree_abp_fifo>;
 template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
-    hpx::threads::policies::local_priority_queue_scheduler<hpx::compat::mutex,
+    hpx::threads::policies::local_priority_queue_scheduler<std::mutex,
         hpx::threads::policies::lockfree_abp_fifo>>;
 template class HPX_EXPORT hpx::threads::policies::local_priority_queue_scheduler<
-    hpx::compat::mutex, hpx::threads::policies::lockfree_abp_lifo>;
+    std::mutex, hpx::threads::policies::lockfree_abp_lifo>;
 template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
-    hpx::threads::policies::local_priority_queue_scheduler<hpx::compat::mutex,
+    hpx::threads::policies::local_priority_queue_scheduler<std::mutex,
         hpx::threads::policies::lockfree_abp_lifo>>;
 #endif
 

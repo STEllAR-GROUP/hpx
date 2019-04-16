@@ -11,8 +11,6 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -22,11 +20,13 @@
 #include <boost/integer/common_factor.hpp>
 
 #include <chrono>
+#include <condition_variable>
 #include <cstdint>
 #include <ctime>
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <stdexcept>
 #include <string>
 #include <vector>

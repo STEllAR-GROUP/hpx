@@ -4,8 +4,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/exception_info.hpp>
@@ -25,6 +23,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <thread>
 
 namespace hpx { namespace threads
 {

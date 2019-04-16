@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
@@ -31,6 +30,7 @@
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <numeric>
 #include <sstream>
@@ -173,7 +173,7 @@ namespace example {
     /// high priority queue, the next 4 will share another one and so on. In
     /// addition, the shared_priority_queue_scheduler is NUMA-aware and takes
     /// NUMA scheduling hints into account when creating and scheduling work.
-    template <typename Mutex = compat::mutex,
+    template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>

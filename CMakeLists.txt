@@ -1176,18 +1176,6 @@ if(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
   hpx_add_config_define(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
 endif()
 
-# HPX_WITH_THREAD_COMPATIBILITY
-hpx_option(HPX_WITH_THREAD_COMPATIBILITY BOOL
-    "Use a compatibility implementation of std::thread, i.e. fall back to Boost.Thread (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_THREAD_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_THREAD_COMPATIBILITY)
-else()
-  if(NOT HPX_WITH_CXX11_THREAD)
-    hpx_error("HPX needs support for C++11 std::thread which is not available on this platform. Please enable HPX_WITH_THREAD_COMPATIBILITY to use Boost.Thread instead.")
-  endif()
-endif()
-
 ################################################################################
 # check for miscellaneous things
 ################################################################################

@@ -8,6 +8,7 @@
 #include <hpx/runtime/threads/detail/io_service_thread_pool.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/util/barrier.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <cstddef>
@@ -73,16 +74,16 @@ namespace hpx { namespace threads { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool io_service_thread_pool::run(std::unique_lock<compat::mutex>& l,
+    bool io_service_thread_pool::run(std::unique_lock<std::mutex>& l,
         std::size_t num_threads)
     {
         HPX_ASSERT(l.owns_lock());
-        compat::barrier startup(1);
+        util::barrier startup(1);
         return threads_.run(num_threads, false, &startup);
     }
 
     void io_service_thread_pool::stop(
-        std::unique_lock<compat::mutex>& l, bool blocking /*= true*/)
+        std::unique_lock<std::mutex>& l, bool blocking /*= true*/)
     {
     }
 
@@ -159,7 +160,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
 
-    hpx::compat::thread& io_service_thread_pool::get_os_thread_handle(
+    std::thread& io_service_thread_pool::get_os_thread_handle(
         std::size_t global_thread_num)
     {
         return threads_.get_os_thread_handle(

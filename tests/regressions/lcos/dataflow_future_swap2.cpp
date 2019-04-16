@@ -8,7 +8,6 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/unwrap.hpp>
@@ -25,7 +24,7 @@ struct mul
 {
     double operator()( double x1 , double x2 ) const
     {
-        //compat::this_thread::sleep_for( std::chrono::milliseconds(1000) );
+        //std::this_thread::sleep_for( std::chrono::milliseconds(1000) );
         hpx::util::format_to(hpx::cout, "func: {}, {}\n", x1, x2) << hpx::flush;
         return x1*x2;
     }
@@ -35,7 +34,7 @@ struct divide
 {
     double operator()( double x1 , double x2 ) const
     {
-        //compat::this_thread::sleep_for( std::chrono::milliseconds(1000) );
+        //std::this_thread::sleep_for( std::chrono::milliseconds(1000) );
         hpx::util::format_to(hpx::cout, "func: {}, {}\n", x1, x2) << hpx::flush;
         return x1/x2;
     }
