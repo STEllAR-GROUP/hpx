@@ -479,25 +479,6 @@ namespace hpx { namespace parallel { inline namespace v1
         RandIter3 dest, Comp && comp = Comp(),
         Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<RandIter1>::value),
-            "Required at least input iterator.");
-        static_assert(
-            (hpx::traits::is_input_iterator<RandIter2>::value),
-            "Required at least input iterator.");
-        static_assert(
-            (hpx::traits::is_output_iterator<RandIter3>::value ||
-                hpx::traits::is_random_access_iterator<RandIter3>::value),
-            "Requires at least output iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_random_access_iterator<RandIter1>::value ||
-               !hpx::traits::is_random_access_iterator<RandIter2>::value ||
-               !hpx::traits::is_random_access_iterator<RandIter3>::value
-            > is_seq;
-#else
         static_assert(
             (hpx::traits::is_random_access_iterator<RandIter1>::value),
             "Required at least random access iterator.");
@@ -509,8 +490,6 @@ namespace hpx { namespace parallel { inline namespace v1
             "Requires at least random access iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
-
         typedef hpx::util::tuple<RandIter1, RandIter2, RandIter3> result_type;
 
         return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
@@ -840,22 +819,11 @@ namespace hpx { namespace parallel { inline namespace v1
         RandIter first, RandIter middle, RandIter last,
         Comp && comp = Comp(), Proj && proj = Proj())
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_bidirectional_iterator<RandIter>::value),
-            "Required at least bidirectional iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_random_access_iterator<RandIter>::value
-            > is_seq;
-#else
         static_assert(
             (hpx::traits::is_random_access_iterator<RandIter>::value),
             "Required at least random access iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
 
         return detail::inplace_merge<RandIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),

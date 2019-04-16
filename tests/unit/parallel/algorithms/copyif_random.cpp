@@ -101,67 +101,6 @@ void test_copy_if_async(ExPolicy p)
     HPX_TEST_EQ(count, d.size());
 }
 
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-template <typename ExPolicy>
-void test_copy_if_outiter(ExPolicy policy)
-{
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag>
-        iterator;
-
-    std::vector<int> c(10007);
-    std::vector<int> d(0);
-    auto middle = std::begin(c) + c.size()/2;
-    std::iota(std::begin(c), middle, dis(gen));
-    std::fill(middle, std::end(c), -1);
-
-    hpx::parallel::copy_if(policy,
-        iterator(std::begin(c)), iterator(std::end(c)),
-        std::back_inserter(d), [](int i){ return !(i < 0); });
-
-    HPX_TEST(std::equal(std::begin(c), middle, std::begin(d),
-        [](int v1, int v2) -> bool {
-            HPX_TEST_EQ(v1, v2);
-            return v1 == v2;
-        }));
-
-    // assure D is half the size of C
-    HPX_TEST_EQ(c.size()/2, d.size());
-}
-
-template <typename ExPolicy>
-void test_copy_if_outiter_async(ExPolicy p)
-{
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag>
-        iterator;
-
-    std::vector<int> c(10007);
-    std::vector<int> d(0);
-    auto middle = std::begin(c) + c.size()/2;
-    std::iota(std::begin(c), middle, dis(gen));
-    std::fill(middle, std::end(c), -1);
-
-    auto f =
-        hpx::parallel::copy_if(p,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            std::back_inserter(d), [](int i){ return !(i < 0); });
-    f.wait();
-
-    HPX_TEST(std::equal(std::begin(c), middle, std::begin(d),
-        [](int v1, int v2) -> bool {
-            HPX_TEST_EQ(v1, v2);
-            return v1 == v2;
-        }));
-
-    HPX_TEST_EQ(c.size()/2, d.size());
-}
-#endif
-
 void test_copy_if()
 {
     using namespace hpx::parallel;
@@ -172,15 +111,6 @@ void test_copy_if()
 
     test_copy_if_async(execution::seq(execution::task));
     test_copy_if_async(execution::par(execution::task));
-
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_copy_if_outiter(execution::seq);
-    test_copy_if_outiter(execution::par);
-    test_copy_if_outiter(execution::par_unseq);
-
-    test_copy_if_outiter_async(execution::seq(execution::task));
-    test_copy_if_outiter_async(execution::par(execution::task));
-#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)

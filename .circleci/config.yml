@@ -189,8 +189,8 @@ jobs:
       - run:
           name: Building Sphinx Documentation
           command: |
-              ninja docs
-          no_output_timeout: 45m
+              ninja -j1 docs
+          no_output_timeout: 2h
       - persist_to_workspace:
           root: /hpx
           paths:
@@ -206,7 +206,7 @@ jobs:
       - run:
           name: Pushing Sphinx Documentation
           command: |
-              ninja git_docs
+              ninja -j1 git_docs
 
   core:
     <<: *defaults
@@ -306,7 +306,7 @@ jobs:
           command: |
               # Disable documentation just for this step
               cmake -DHPX_WITH_DOCUMENTATION=OFF .
-              ninja install
+              ninja -j1 install
       - run:
           name: Building Unit Tests
           command: |

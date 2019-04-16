@@ -35,10 +35,10 @@ namespace hpx { namespace serialization
         }
     }
 
-#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) && defined (HPX_HAVE_CXX17_IF_CONSTEXPR)
+    ///////////////////////////////////////////////////////////////////////////
     // This trait must live outside of 'class access' below as otherwise MSVC
     // will find the serialize() function in 'class access' as a dependend class
-    // (which is a MS extension)
+    // (which is an MS extension)
     template <typename T>
     class has_serialize_adl
     {
@@ -54,6 +54,33 @@ namespace hpx { namespace serialization
         static constexpr bool value = decltype(test<T>(0))::value;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable = void>
+    struct serialize_non_intrusive
+    {
+        template <typename T1> struct dependent_false : std::false_type {};
+
+        static_assert(dependent_false<T>::value,
+            "No serialization method found");
+    };
+
+    template <typename T>
+    struct serialize_non_intrusive<T,
+        typename std::enable_if<has_serialize_adl<T>::value>::type>
+    {
+        template <typename Archive>
+        static void call(Archive& ar, T& t, unsigned)
+        {
+            // this additional indirection level is needed to
+            // force ADL on the second phase of template lookup.
+            // call of serialize function directly from base_object
+            // finds only serialize-member function and doesn't
+            // perform ADL
+            detail::serialize_force_adl(ar, t, 0);
+        }
+    };
+
+#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS)
     template <typename T>
     class has_struct_serialization
     {
@@ -69,8 +96,40 @@ namespace hpx { namespace serialization
     public:
         static constexpr bool value = decltype(test<T>(0))::value;
     };
+
+    ///////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable = void>
+    struct serialize_brace_initialized
+    {
+        template <typename T1> struct dependent_false : std::false_type {};
+
+        static_assert(dependent_false<T>::value,
+            "No serialization method found");
+    };
+
+    template <typename T>
+    struct serialize_brace_initialized<T,
+        typename std::enable_if<has_struct_serialization<T>::value>::type>
+    {
+        template <typename Archive>
+        static void call(Archive& ar, T& t, unsigned)
+        {
+            // This is automatic serialization for types
+            // which are simple (brace-initializable) structs,
+            // what that means every struct's field
+            // has to be serializable and public.
+            serialize_struct(ar, t, 0);
+        }
+    };
+
+    template <typename T>
+    struct serialize_non_intrusive<T,
+            typename std::enable_if<!has_serialize_adl<T>::value>::type>
+      : serialize_brace_initialized<T>
+    {};
 #endif
 
+    ///////////////////////////////////////////////////////////////////////////
     class access
     {
         template <class T>
@@ -115,42 +174,10 @@ namespace hpx { namespace serialization
 
             struct non_intrusive
             {
-                template<class T1> struct dependent_false : std::false_type {};
-
                 template <class Archive>
                 static void call(Archive& ar, T& t, unsigned)
                 {
-#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) && defined (HPX_HAVE_CXX17_IF_CONSTEXPR)
-                    if constexpr (has_serialize_adl<T>::value)
-                    {
-                        // this additional indirection level is needed to
-                        // force ADL on the second phase of template lookup.
-                        // call of serialize function directly from base_object
-                        // finds only serialize-member function and doesn't
-                        // perform ADL
-                        detail::serialize_force_adl(ar, t, 0);
-                    }
-                    else if constexpr (has_struct_serialization<T>::value)
-                    {
-                        // This is automatic serialization for types
-                        // which are simple (brace-initializable) structs,
-                        // what that means every struct's field
-                        // has to be serializable and public.
-                        serialize_struct(ar, t, 0);
-                    }
-                    else
-                    {
-                        static_assert(dependent_false<T>::value,
-                                      "No serialization method found");
-                    }
-#else
-                    // this additional indirection level is needed to
-                    // force ADL on the second phase of template lookup.
-                    // call of serialize function directly from base_object
-                    // finds only serialize-member function and doesn't
-                    // perform ADL
-                    detail::serialize_force_adl(ar, t, 0);
-#endif
+                    serialize_non_intrusive<T>::call(ar, t, 0);
                 }
             };
 

@@ -25,7 +25,7 @@ set(tests
     zero_copy_serialization
 )
 
-if(HPX_WITH_CXX17_STRUCTURED_BINDINGS AND HPX_WITH_CXX17_IF_CONSTEXPR)
+if(HPX_WITH_CXX17_STRUCTURED_BINDINGS)
     set(tests ${tests}
         serialization_brace_initializable
 )

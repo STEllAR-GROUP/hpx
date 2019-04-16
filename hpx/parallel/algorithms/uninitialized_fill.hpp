@@ -201,22 +201,11 @@ namespace hpx { namespace parallel { inline namespace v1
     uninitialized_fill(ExPolicy && policy, FwdIter first, FwdIter last,
         T const& value)
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter>::value),
-            "Required at least input iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter>::value
-            > is_seq;
-#else
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
 
         return detail::uninitialized_fill().call(
             std::forward<ExPolicy>(policy), is_seq(),

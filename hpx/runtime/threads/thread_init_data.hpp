@@ -50,6 +50,31 @@ namespace hpx { namespace threads
             scheduler_base(nullptr)
         {}
 
+        thread_init_data& operator=(thread_init_data&& rhs) {
+            func            = std::move(rhs.func);
+            priority        = rhs.priority;
+            schedulehint    = rhs.schedulehint;
+            stacksize       = rhs.stacksize;
+            scheduler_base  = rhs.scheduler_base;
+#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
+            lva = rhs.lva;
+#endif
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            description = rhs.description;
+#endif
+#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
+            parent_locality_id = rhs.parent_locality_id;
+            parent_id = rhs.parent_id;
+            parent_phase = rhs.parent_phase;
+#endif
+#ifdef HPX_HAVE_APEX
+        // HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
+        // and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on
+            apex_data = apex_new_task(description, parent_locality_id, parent_id );
+#endif
+            return *this;
+        }
+
         thread_init_data(thread_init_data&& rhs)
           : func(std::move(rhs.func)),
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)

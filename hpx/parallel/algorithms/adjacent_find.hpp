@@ -72,33 +72,33 @@ namespace hpx { namespace parallel { inline namespace v1
                 difference_type count = std::distance(first, last);
                 util::cancellation_token<difference_type> tok(count);
 
-                return util::partitioner<ExPolicy, FwdIter, void>::
-                    call_with_index(
-                        std::forward<ExPolicy>(policy),
-                        hpx::util::make_zip_iterator(first, next), count-1, 1,
-                        [HPX_CAPTURE_FORWARD(op), tok](
-                            zip_iterator it, std::size_t part_size,
-                            std::size_t base_idx) mutable
-                        {
-                            util::loop_idx_n(
-                                base_idx, it, part_size, tok,
-                                [&op, &tok](reference t, std::size_t i)
-                                {
-                                    using hpx::util::get;
-                                    if(op(get<0>(t), get<1>(t)))
-                                        tok.cancel(i);
-                                });
-                        },
-                        [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
-                        {
-                            difference_type adj_find_res = tok.get_data();
-                            if(adj_find_res != count)
-                                std::advance(first, adj_find_res);
-                            else
-                                first = last;
-
-                            return std::move(first);
+                auto f1 = [HPX_CAPTURE_FORWARD(op), tok](zip_iterator it,
+                              std::size_t part_size,
+                              std::size_t base_idx) mutable {
+                    util::loop_idx_n(base_idx, it, part_size, tok,
+                        [&op, &tok](reference t, std::size_t i) {
+                            using hpx::util::get;
+                            if (op(get<0>(t), get<1>(t)))
+                                tok.cancel(i);
                         });
+                };
+
+                auto f2 =
+                    [tok, count, first, last](
+                        std::vector<hpx::future<void>>&&) mutable -> FwdIter {
+                    difference_type adj_find_res = tok.get_data();
+                    if (adj_find_res != count)
+                        std::advance(first, adj_find_res);
+                    else
+                        first = last;
+
+                    return std::move(first);
+                };
+
+                return util::partitioner<ExPolicy, FwdIter,
+                    void>::call_with_index(std::forward<ExPolicy>(policy),
+                    hpx::util::make_zip_iterator(first, next), count - 1, 1,
+                    std::move(f1), std::move(f2));
             }
         };
         template <typename ExPolicy, typename FwdIter,

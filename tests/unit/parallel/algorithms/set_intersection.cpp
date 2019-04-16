@@ -90,9 +90,6 @@ void set_intersection_test1()
 {
     test_set_intersection1<std::random_access_iterator_tag>();
     test_set_intersection1<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_intersection1<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -177,9 +174,6 @@ void set_intersection_test2()
 {
     test_set_intersection2<std::random_access_iterator_tag>();
     test_set_intersection2<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_intersection2<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -294,9 +288,6 @@ void set_intersection_exception_test()
 {
     test_set_intersection_exception<std::random_access_iterator_tag>();
     test_set_intersection_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_intersection_exception<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -409,9 +400,6 @@ void set_intersection_bad_alloc_test()
 {
     test_set_intersection_bad_alloc<std::random_access_iterator_tag>();
     test_set_intersection_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_intersection_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
