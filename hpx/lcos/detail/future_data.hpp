@@ -27,15 +27,8 @@
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/intrusive_ptr.hpp>
-
-// NOTE: small_vector was introduced in 1.58 but seems to be buggy in that
-// version, so use only from 1.59 onwards.
-#if BOOST_VERSION < 105900
-#include <vector>
-#else
 #include <boost/container/small_vector.hpp>
-#endif
+#include <boost/intrusive_ptr.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -77,13 +70,8 @@ namespace detail
     {
     public:
         typedef util::unique_function_nonser<void()> completed_callback_type;
-#if BOOST_VERSION < 105900
-        typedef std::vector<completed_callback_type>
-            completed_callback_vector_type;
-#else
         typedef boost::container::small_vector<completed_callback_type, 3>
             completed_callback_vector_type;
-#endif
 
         typedef void has_future_data_refcnt_base;
 

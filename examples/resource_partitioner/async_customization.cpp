@@ -371,7 +371,7 @@ int test(Executor &exec)
         {
             auto tup = f.get();
             auto cmplx = std::complex<double>(
-                util::get<0>(tup).get(), util::get<1>(tup).get());
+                double(util::get<0>(tup).get()), util::get<1>(tup).get());
             std::cout << "Inside when_all : " << cmplx << std::endl;
             return std::string("when_all");
         }
@@ -389,8 +389,8 @@ int test(Executor &exec)
         [](future<util::tuple<future<std::uint64_t>, shared_future<float>>> && f)
         {
             auto tup = f.get();
-            auto cmplx = std::complex<double>(
-                util::get<0>(tup).get(), util::get<1>(tup).get());
+            auto cmplx = std::complex<double>(double(util::get<0>(tup).get()),
+                double(util::get<1>(tup).get()));
             std::cout << "Inside when_all(shared) : " << cmplx << std::endl;
             return cmplx;
         }
@@ -407,7 +407,8 @@ int test(Executor &exec)
     auto fd = dataflow(exec,
         [](future<std::uint16_t> && f1, future<double> && f2)
         {
-            auto cmplx = std::complex<std::uint64_t>(f1.get(), f2.get());
+            auto cmplx =
+                std::complex<std::uint64_t>(double(f1.get()), f2.get());
             std::cout << "Inside dataflow : " << cmplx << std::endl;
             return cmplx;
         }
@@ -425,7 +426,8 @@ int test(Executor &exec)
     auto fds = dataflow(exec,
         [](future<std::uint16_t> && f1, shared_future<double> && f2)
         {
-            auto cmplx = std::complex<std::uint64_t>(f1.get(), f2.get());
+            auto cmplx =
+                std::complex<std::uint64_t>(double(f1.get()), f2.get());
             std::cout << "Inside dataflow(shared) : " << cmplx << std::endl;
             return cmplx;
         }
