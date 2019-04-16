@@ -235,7 +235,6 @@ namespace hpx { namespace threads { namespace coroutines
                   ? static_cast<std::ptrdiff_t>(default_stack_size)
                   : stack_size),
                 m_stack(nullptr),
-                cb_(&cb),
                 funp_(&trampoline<CoroutineImpl>)
             {
             }
@@ -363,7 +362,7 @@ namespace hpx { namespace threads { namespace coroutines
                     // the stack start
                     increment_stack_recycle_count();
                     int error = HPX_COROUTINE_MAKE_CONTEXT(
-                        &m_ctx, m_stack, m_stack_size, funp_, cb_, nullptr);
+                        &m_ctx, m_stack, m_stack_size, funp_, this, nullptr);
                     HPX_UNUSED(error);
                     HPX_ASSERT(error == 0);
                 }
@@ -415,7 +414,6 @@ namespace hpx { namespace threads { namespace coroutines
             stack_t segv_stack;
 #endif
         };
-        typedef ucontext_context_impl context_impl;
     }}
 }}}
 
