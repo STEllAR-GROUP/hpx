@@ -9,6 +9,7 @@
 #define HPX_TEST_ITER_SENT_APR_14_2019_1040PM
 
 #include <iterator>
+#include <cstddef>
 
 template<typename Value>
 struct Sentinel
