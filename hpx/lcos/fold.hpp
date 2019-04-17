@@ -169,6 +169,9 @@ namespace hpx { namespace lcos
 #include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/pp/cat.hpp>
+#include <hpx/pp/expand.hpp>
+#include <hpx/pp/nargs.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
@@ -176,9 +179,6 @@ namespace hpx { namespace lcos
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/expand.hpp>
-#include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
 

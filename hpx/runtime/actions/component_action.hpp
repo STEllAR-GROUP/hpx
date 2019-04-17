@@ -9,13 +9,13 @@
 #define HPX_RUNTIME_ACTIONS_COMPONENT_ACTION_MAR_26_2008_1054AM
 
 #include <hpx/config.hpp>
+#include <hpx/pp/cat.hpp>
+#include <hpx/pp/expand.hpp>
+#include <hpx/pp/nargs.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/expand.hpp>
-#include <hpx/util/detail/pp/nargs.hpp>
 
 #include <boost/utility/string_ref.hpp>
 

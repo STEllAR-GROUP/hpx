@@ -164,9 +164,9 @@ namespace hpx
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_some.hpp>
+#include <hpx/pp/strip_parens.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/utility/swap.hpp>

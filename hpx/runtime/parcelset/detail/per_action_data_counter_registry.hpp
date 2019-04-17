@@ -11,9 +11,9 @@
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
 #include <hpx/performance_counters/counters_fwd.hpp>
 
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/jenkins_hash.hpp>
+#include <hpx/pp/cat.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
 
 #include <cstdint>
