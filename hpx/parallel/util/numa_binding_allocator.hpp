@@ -12,9 +12,13 @@
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/executors/guided_pool_executor.hpp>
+#include <hpx/util/assert.hpp>
+
+#include <sstream>
+#include <string>
+#include <vector>
 
 #include <cstddef>
 #include <type_traits>
@@ -373,7 +377,8 @@ namespace hpx { namespace compute { namespace host
             std::unique_lock<std::mutex> lk(init_mutex);
             //
             threads::hwloc_bitmap_ptr bitmap =
-                threads::get_thread_manager().get_pool_numa_bitmap(binding_helper_->pool_name());
+                threads::get_thread_manager().get_pool_numa_bitmap(
+                        binding_helper_->pool_name());
             std::vector<threads::hwloc_bitmap_ptr> nodesets = create_nodesets(bitmap);
             //
             using namespace threads::executors;
@@ -424,8 +429,8 @@ namespace hpx { namespace compute { namespace host
             if (N==2) {
                 std::size_t Nc = helper->array_size(0);
                 std::size_t Nr = helper->array_size(1);
-                std::size_t xinc = std::min(helper->display_step(0), pagesize);
-                std::size_t yinc = std::min(helper->display_step(1), pagesize);
+                std::size_t xinc = (std::min)(helper->display_step(0), pagesize);
+                std::size_t yinc = (std::min)(helper->display_step(1), pagesize);
                 std::size_t xoff = helper->memory_step(0);
                 std::size_t yoff = helper->memory_step(1);
                 std::size_t m = helper->memory_bytes();
@@ -508,7 +513,8 @@ namespace hpx { namespace compute { namespace host
             LOG_NUMA_MSG("touch pages for numa " << numa_domain);
             for (size_type i=0; i<num_pages; ++i) {
                 // we pass the base pointer and current page pointer
-                size_type dom = helper->operator()(p, page_ptr, pagesize, nodesets.size());
+                size_type dom =
+                    helper->operator()(p, page_ptr, pagesize, nodesets.size());
                 if (dom==numa_domain) {
                     HPX_ASSERT( (std::size_t(page_ptr) & 4095) ==0 );
                     // trigger a memory read and rewrite without changing contents
@@ -545,7 +551,8 @@ namespace hpx { namespace compute { namespace host
             LOG_NUMA_MSG("bind pages for numa " << numa_domain);
             for (size_type i=0; i<num_pages; ++i) {
                 // we pass the base pointer and current page pointer
-                size_type dom = helper->operator()(p, page_ptr, pagesize, nodesets.size());
+                size_type dom =
+                    helper->operator()(p, page_ptr, pagesize, nodesets.size());
                 if (dom==numa_domain) {
                     threads::topology().
                         set_area_membind_nodeset(page_ptr, pagesize,

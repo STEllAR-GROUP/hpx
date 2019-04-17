@@ -2,6 +2,10 @@
 #define ALLOCATOR_BINDER_MATRIX_HPP
 
 #include <hpx/parallel/util/numa_binding_allocator.hpp>
+//
+#include <cstddef>
+#include <sstream>
+#include <string>
 
 // ------------------------------------------------------------------------
 // Example of an allocator binder for 2D matrices that are tiled.
@@ -23,7 +27,7 @@ struct matrix_numa_binder : hpx::compute::host::numa_binding_helper<T>
     {
         const int CACHE_LINE_SIZE = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
         const int PAGE_SIZE       = sysconf(_SC_PAGE_SIZE);
-        const int ALIGNMENT       = std::max(PAGE_SIZE, CACHE_LINE_SIZE);
+        const int ALIGNMENT       = (std::max)(PAGE_SIZE, CACHE_LINE_SIZE);
         const int ELEMS_ALIGN     = (ALIGNMENT/sizeof(T));
         rows_page_   = ELEMS_ALIGN;
         leading_dim_ = ELEMS_ALIGN*((rows_*sizeof(T) + ALIGNMENT-1)/ALIGNMENT);

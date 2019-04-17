@@ -82,7 +82,8 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator &allocator)
     temp << "Numa page binding for page count " << num_pages << "\n";
     for (std::size_t i=0; i<num_pages; ++i) {
         // we pass the base pointer and current page pointer
-        std::size_t dom = numa_binder->operator()(M, page_ptr, pagesize, num_numa_domains);
+        std::size_t dom =
+                numa_binder->operator()(M, page_ptr, pagesize, num_numa_domains);
         temp << dom;
         page_ptr += pageN;
     }
@@ -97,7 +98,8 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator &allocator)
     std::cout << "get_numa_domain() " << num_numa_domains << " Domain Numa pattern\n";
     for (unsigned int j=0; j<ysize; j+=ystep) {
         for (unsigned int i=0; i<xsize; i+=xstep) {
-            T *page_ptr = &M[i*numa_binder->memory_step(0) + j*numa_binder->memory_step(1)];
+            T *page_ptr =
+                    &M[i*numa_binder->memory_step(0) + j*numa_binder->memory_step(1)];
             int dom = allocator.get_numa_domain(page_ptr);
             if (dom == -1) {
                 std::cout << '-';
@@ -114,7 +116,8 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator &allocator)
         std::cout << "Contents of memory locations\n";
         for (unsigned int j=0; j<ysize; j+=ystep) {
             for (unsigned int i=0; i<xsize; i+=xstep) {
-                T *page_ptr = &M[i*numa_binder->memory_step(0) + j*numa_binder->memory_step(1)];
+                T *page_ptr =
+                    &M[i*numa_binder->memory_step(0) + j*numa_binder->memory_step(1)];
                 std::cout << *page_ptr << " ";
             }
             std::cout << "\n";
@@ -126,7 +129,8 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator &allocator)
     std::cout << "Expected " << num_numa_domains << " Domain Numa pattern\n";
     for (unsigned int j=0; j<ysize; j+=ystep) {
         for (unsigned int i=0; i<xsize; i+=xstep) {
-            T *page_ptr = &M[i*numa_binder->memory_step(0) + j*numa_binder->memory_step(1)];
+            T *page_ptr =
+                &M[i*numa_binder->memory_step(0) + j*numa_binder->memory_step(1)];
             int d = numa_binder->operator()(M, page_ptr, 4096, num_numa_domains);
             std::cout << std::hex << d;
         }

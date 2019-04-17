@@ -2,6 +2,10 @@
 #define ALLOCATOR_BINDER_LINEAR_HPP
 
 #include <hpx/parallel/util/numa_binding_allocator.hpp>
+//
+#include <cstddef>
+#include <sstream>
+#include <string>
 
 // ------------------------------------------------------------------------
 // Example of an allocator binder for 1D arrays.
@@ -16,9 +20,9 @@ struct linear_numa_binder : hpx::compute::host::numa_binding_helper<T>
     {
         const std::size_t CACHE_LINE_SIZE = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
         const std::size_t PAGE_SIZE       = sysconf(_SC_PAGE_SIZE);
-        const std::size_t ALIGNMENT       = std::max(PAGE_SIZE, CACHE_LINE_SIZE);
-        elements_page_            = (ALIGNMENT/sizeof(T));
-        N_                        = num_pages*elements_page_;
+        const std::size_t ALIGNMENT       = (std::max)(PAGE_SIZE, CACHE_LINE_SIZE);
+        elements_page_ = (ALIGNMENT / sizeof(T));
+        N_ = num_pages * elements_page_;
     }
 
     // return the domain that a given page should be bound to
