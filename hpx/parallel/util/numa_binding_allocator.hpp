@@ -11,6 +11,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/runtime/threads/executors/guided_pool_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/assert.hpp>
 
