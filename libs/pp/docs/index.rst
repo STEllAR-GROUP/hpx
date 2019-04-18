@@ -6,15 +6,15 @@
 
 .. _libs_pp:
 
-==
+===
 pp
-==
+===
 
 This library contains useful preprocessor macros:
 
-   - :c:func:`HPX_PP_CAT`
-   - :c:func:`HPX_PP_EXPAND`
-   - :c:func:`HPX_PP_NARGS`
-   - :c:func:`HPX_PP_STRINGIZE`
-   - :c:func:`HPX_PP_STRIP_PARENS`
+* :c:func:`HPX_PP_CAT`
+* :c:func:`HPX_PP_EXPAND`
+* :c:func:`HPX_PP_NARGS`
+* :c:func:`HPX_PP_STRINGIZE`
+* :c:func:`HPX_PP_STRIP_PARENS`
 

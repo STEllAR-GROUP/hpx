@@ -44,9 +44,9 @@ if(HPX_WITH_EXAMPLES_OPENMP)
      )
 
   set(openmp_homogeneous_timed_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies} hpx.pp)
+      DEPENDENCIES ${boost_library_dependencies} hpx_pp)
   set(openmp_parallel_region_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies} hpx.pp)
+      DEPENDENCIES ${boost_library_dependencies} hpx_pp)
 endif()
 
 if(HPX_WITH_EXAMPLES_QTHREADS)
@@ -60,11 +60,11 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
 
   set(qthreads_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                  ${QTHREADS_LIBRARIES} hpx.pp)
+                  ${QTHREADS_LIBRARIES} hpx_pp)
 
   set(qthreads_heterogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                  ${QTHREADS_LIBRARIES} hpx.pp)
+                  ${QTHREADS_LIBRARIES} hpx_pp)
 endif()
 
 if(HPX_WITH_EXAMPLES_TBB)
@@ -77,7 +77,7 @@ if(HPX_WITH_EXAMPLES_TBB)
 
   set(tbb_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   ${TBB_LIBRARIES} hpx.pp)
+                   ${TBB_LIBRARIES} hpx_pp)
 endif()
 
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
@@ -87,13 +87,13 @@ set(skynet_FLAGS DEPENDENCIES iostreams_component)
 set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component)
 
 set(delay_baseline_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies} hpx.pp)
+    DEPENDENCIES ${boost_library_dependencies} hpx_pp)
 
 set(delay_baseline_threaded_FLAGS
-    DEPENDENCIES ${boost_library_dependencies} hpx.pp)
+    DEPENDENCIES ${boost_library_dependencies} hpx_pp)
 
 set(print_heterogeneous_payloads_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies} hpx.pp)
+    DEPENDENCIES ${boost_library_dependencies} hpx_pp)
 
 set(benchmarks ${benchmarks}
     hpx_tls_overhead

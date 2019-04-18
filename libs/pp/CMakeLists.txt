@@ -3,7 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V3.3.2
 cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
 project(HPX.pp CXX)
@@ -22,22 +21,21 @@ set(headers
   ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/stringize.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/strip_parens.hpp)
 
-add_library(hpx.pp INTERFACE)
+add_library(hpx_pp INTERFACE)
 
-target_include_directories(hpx.pp INTERFACE
+target_include_directories(hpx_pp INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-include(HPX_AddSourceGroup)
-add_hpx_source_group(NAME hpx ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx
-  CLASS "Header Files" TARGETS ${headers})
+set_target_properties(hpx_pp PROPERTIES INTERFACE_HPX_SOURCES "")
+set_target_properties(hpx_pp PROPERTIES INTERFACE_HPX_HEADERS "${headers}")
 
-install(TARGETS hpx.pp EXPORT HPXTargets
+install(TARGETS hpx_pp EXPORT HPXTargets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT pp
 )
-hpx_export_targets(hpx.pp)
+hpx_export_targets(hpx_pp)
 
 install(
   DIRECTORY include/hpx
