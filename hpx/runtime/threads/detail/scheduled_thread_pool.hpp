@@ -8,6 +8,7 @@
 #define HPX_SCHEDULED_THREAD_POOL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
@@ -16,7 +17,6 @@
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <atomic>
 #include <cstddef>

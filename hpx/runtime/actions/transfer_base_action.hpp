@@ -12,6 +12,7 @@
 
 #include <hpx/runtime/actions_fwd.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
@@ -26,7 +27,6 @@
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/tuple.hpp>

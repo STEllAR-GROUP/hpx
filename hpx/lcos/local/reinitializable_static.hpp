@@ -8,8 +8,8 @@
 #define HPX_LCOS_LOCAL_REINITIALIZABLE_STATIC_JAN_20_2013_0409PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/local/once.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/static_reinit.hpp>
 
 #include <cstddef>

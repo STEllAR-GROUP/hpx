@@ -32,13 +32,13 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_id_type.hpp>
-#include <hpx/util/assert.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif

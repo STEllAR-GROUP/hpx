@@ -9,13 +9,13 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/runtime/agas/detail/hosted_locality_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstdint>
 #include <map>

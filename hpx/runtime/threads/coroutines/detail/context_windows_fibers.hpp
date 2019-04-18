@@ -33,8 +33,8 @@
 #include <winnt.h>
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unused.hpp>
 

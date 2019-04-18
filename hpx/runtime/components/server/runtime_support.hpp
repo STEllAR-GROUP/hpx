@@ -9,10 +9,10 @@
 #define HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/compat/condition_variable.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -25,9 +25,9 @@
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/is_component.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util_fwd.hpp>
 

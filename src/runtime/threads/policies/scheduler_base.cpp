@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/compat/condition_variable.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -16,7 +17,6 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/yield_while.hpp>
 #include <hpx/util_fwd.hpp>

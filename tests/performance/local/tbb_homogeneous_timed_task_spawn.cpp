@@ -33,7 +33,7 @@
 
 #include "worker_timed.hpp"
 
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 

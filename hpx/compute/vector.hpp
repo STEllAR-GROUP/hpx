@@ -9,13 +9,13 @@
 #define HPX_COMPUTE_VECTOR_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/compute/detail/iterator.hpp>
 #include <hpx/compute/traits/access_target.hpp>
 #include <hpx/compute/traits/allocator_traits.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/runtime/report_error.hpp>
 #include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <initializer_list>

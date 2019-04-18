@@ -30,11 +30,11 @@
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SELF_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_id_type.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>

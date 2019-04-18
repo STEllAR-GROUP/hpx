@@ -45,9 +45,9 @@
 #endif
 #include <hpx/lcos/local/packaged_task.hpp>
 
-#include <hpx/util/assert.hpp>
-#include <hpx/util/parse_command_line.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <hpx/plugins/message_handler_factory_base.hpp>

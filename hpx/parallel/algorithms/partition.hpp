@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_ALGORITHM_PARTITION_SEP_24_2016_1055AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
@@ -15,7 +16,6 @@
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_tuple.hpp>
 #include <hpx/util/unused.hpp>

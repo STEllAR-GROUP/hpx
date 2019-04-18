@@ -6,8 +6,8 @@
 
 #define HPX_NO_VERSION_CHECK
 
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/config_entry.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/lightweight_test.hpp>
 

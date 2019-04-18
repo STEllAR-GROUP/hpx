@@ -11,9 +11,9 @@
 #define HPX_DLL_WINDOWS_HPP_HK_2005_11_06
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/plugin/config.hpp>
 
 #include <boost/filesystem/convenience.hpp>

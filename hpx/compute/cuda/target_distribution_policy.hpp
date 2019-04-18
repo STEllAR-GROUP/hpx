@@ -12,6 +12,7 @@
 
 #if defined(HPX_HAVE_CUDA)
 
+#include <hpx/assertion.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/lcos/dataflow.hpp>
 #endif
@@ -19,7 +20,6 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/detail/target_distribution_policy.hpp>

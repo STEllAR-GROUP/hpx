@@ -7,12 +7,12 @@
 #define HPX_PARALLEL_UTIL_PARTITIONER_MAY_27_2014_1040PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/dataflow.hpp>
 #endif
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unused.hpp>

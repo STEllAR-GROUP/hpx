@@ -11,10 +11,10 @@
 #include <hpx/runtime/components/default_distribution_policy.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <algorithm>
 #include <cstddef>

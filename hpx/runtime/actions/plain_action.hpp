@@ -10,6 +10,7 @@
 #define HPX_RUNTIME_ACTIONS_PLAIN_ACTION_NOV_14_2008_0706PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/component_type_database.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <boost/utility/string_ref.hpp>
 

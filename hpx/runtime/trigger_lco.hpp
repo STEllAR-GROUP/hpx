@@ -9,13 +9,13 @@
 #define HPX_RUNTIME_TRIGGER_LCO_JUN_22_2015_0618PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos_fwd.hpp>
-#include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
+#include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <exception>

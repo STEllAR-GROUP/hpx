@@ -10,9 +10,9 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/dataflow.hpp>
 #endif
+#include <hpx/assertion.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>

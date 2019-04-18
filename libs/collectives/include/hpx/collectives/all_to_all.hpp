@@ -133,6 +133,7 @@ namespace hpx { namespace lcos
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
+#include <hpx/assertion.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/and_gate.hpp>

@@ -8,6 +8,7 @@
 #define HPX_PARTITIONED_VECTOR_IMPL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/when_all.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind_back.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
