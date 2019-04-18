@@ -1605,6 +1605,11 @@ hpx_libraries(${HWLOC_LIBRARIES})
 include_directories(${HWLOC_INCLUDE_DIR})
 
 ################################################################################
+# Set search paths for generated headers.
+################################################################################
+include_directories("${CMAKE_BINARY_DIR}/include/generated")
+
+################################################################################
 # Enable integration with Intel Amplifier
 ################################################################################
 if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
@@ -1812,11 +1817,6 @@ function(generate_config_defines_header TARGET_DIRECTORY)
 endfunction()
 
 ################################################################################
-# Set basic search paths for the generated HPX headers
-################################################################################
-include_directories("${CMAKE_BINARY_DIR}")
-
-################################################################################
 # Add custom targets for tests
 ################################################################################
 if (HPX_WITH_TESTS)
@@ -1932,7 +1932,7 @@ add_plugin_modules()
 ################################################################################
 # Generate config headers and helpers
 ################################################################################
-generate_config_defines_header(${CMAKE_BINARY_DIR})
+generate_config_defines_header(${CMAKE_BINARY_DIR}/include/generated)
 
 # Generate a defines.hpp to be used in the install directory ...
 set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
@@ -1944,7 +1944,7 @@ write_config_defines_file(
 # Configure version.hpp for build tree and install directory
 configure_file(
     "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
-    "${CMAKE_BINARY_DIR}/hpx/config/version.hpp"
+    "${CMAKE_BINARY_DIR}/include/generated/hpx/config/version.hpp"
     @ONLY)
 
 configure_file(

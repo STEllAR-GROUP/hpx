@@ -190,6 +190,24 @@ add_hpx_source_group(
   ROOT "${PROJECT_SOURCE_DIR}/hpx"
   TARGETS ${hpx_init_HEADERS})
 
+# Handle libs source groups specially here. We pass on headers and sources as
+# target properties because source_group has to be called here, in the same
+# scope as add_library(hpx).
+foreach(lib ${HPX_LIBS})
+  get_target_property(lib_sources hpx_${lib} INTERFACE_HPX_SOURCES)
+  get_target_property(lib_headers hpx_${lib} INTERFACE_HPX_HEADERS)
+  add_hpx_source_group(
+    NAME hpx_${lib}
+    ROOT ${PROJECT_SOURCE_DIR}/libs/${lib}/src
+    CLASS "Source Files"
+    TARGETS ${lib_sources})
+  add_hpx_source_group(
+    NAME hpx_${lib}
+    ROOT ${PROJECT_SOURCE_DIR}/libs/${lib}/include/hpx
+    CLASS "Header Files"
+    TARGETS ${lib_headers})
+endforeach()
+
 if(NOT HPX_WITH_STATIC_LINKING)
   if(MSVC)
     # The MSVC linker can't handle a static library as large as we get when
@@ -282,6 +300,8 @@ else()
     FOLDER "Core")
 endif()
 
+target_include_directories(hpx PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/hpx>)
 target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${HPX_LIBRARIES})
 if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
   target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
@@ -340,7 +360,11 @@ if(NOT HPX_WITH_STATIC_LINKING)
         ${hpx_init_SOURCES} ${hpx_init_HEADERS})
     endif()
   endif()
-  target_link_libraries(hpx_init ${HPX_TLL_PUBLIC} hpx.pp)
+  target_include_directories(hpx_init PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
+  target_link_libraries(hpx_init ${HPX_TLL_PUBLIC}
+    hpx_config
+    hpx_pp
+  )
 
   set_property(TARGET hpx_init APPEND
     PROPERTY COMPILE_DEFINITIONS
@@ -380,7 +404,12 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
       "HPX_APPLICATION_EXPORTS"
       "HPX_ENABLE_ASSERT_HANDLER")
 
-    target_link_libraries(hpx_wrap ${HPX_TLL_PUBLIC} hpx.pp)
+    target_include_directories(hpx_wrap PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
+    target_link_libraries(hpx_wrap ${HPX_TLL_PUBLIC}
+      hpx_assertion
+      hpx_config
+      hpx_pp
+    )
 
     set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
     set(hpx_targets ${hpx_targets} hpx_wrap)
