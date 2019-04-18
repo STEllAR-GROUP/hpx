@@ -20,8 +20,8 @@
 template <typename T>
 struct linear_numa_binder : hpx::compute::host::numa_binding_helper<T>
 {
-    linear_numa_binder(std::size_t num_pages) :
-        hpx::compute::host::numa_binding_helper<T>()
+    linear_numa_binder(std::size_t num_pages)
+      : hpx::compute::host::numa_binding_helper<T>()
     {
         const std::size_t CACHE_LINE_SIZE = hpx::threads::get_cache_line_size();
         const std::size_t PAGE_SIZE       = hpx::threads::get_memory_page_size();
@@ -31,14 +31,13 @@ struct linear_numa_binder : hpx::compute::host::numa_binding_helper<T>
     }
 
     // return the domain that a given page should be bound to
-    virtual std::size_t operator ()(
-            const T * const base_ptr,
-            const T * const page_ptr,
-            const std::size_t pagesize,
-            const std::size_t domains) const override
+    virtual std::size_t operator()(const T* const base_ptr,
+        const T* const page_ptr,
+        const std::size_t pagesize,
+        const std::size_t domains) const override
     {
         std::intptr_t offset = page_ptr - base_ptr;
-        std::size_t   index  = (offset / elements_page_);
+        std::size_t index = (offset / elements_page_);
         return index % domains;
     }
 
@@ -46,9 +45,8 @@ struct linear_numa_binder : hpx::compute::host::numa_binding_helper<T>
     virtual std::string description() const override
     {
         std::ostringstream temp;
-        temp << "Linear "           << std::dec
-             << " N "               << N_
-             << " elements_page_ "  << elements_page_;
+        temp << "Linear " << std::dec << " N " << N_ << " elements_page_ "
+             << elements_page_;
         return temp.str();
     }
 
@@ -67,7 +65,8 @@ struct linear_numa_binder : hpx::compute::host::numa_binding_helper<T>
     // The number of elements along dimension x=0,y=1,z=2,...
     virtual std::size_t array_size(std::size_t axis) const override
     {
-        if (axis==0) return N_;
+        if (axis == 0)
+            return N_;
         return 1;
     }
 
@@ -89,4 +88,4 @@ struct linear_numa_binder : hpx::compute::host::numa_binding_helper<T>
     std::size_t elements_page_;
 };
 
-#endif // ALLOCATOR_BINDER_LINEAR_HPP
+#endif    // ALLOCATOR_BINDER_LINEAR_HPP

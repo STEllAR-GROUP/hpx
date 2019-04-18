@@ -12,8 +12,8 @@
 #include <hpx/runtime/resource/partitioner.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/executors/guided_pool_executor.hpp>
+#include <hpx/runtime/threads/executors/pool_executor.hpp>
 //
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/runtime.hpp>
@@ -37,38 +37,42 @@
 
 // ------------------------------------------------------------------------
 // allocator maker for this test
-template <template<typename> class Binder, typename T>
+template <template <typename> class Binder, typename T>
 auto get_allocator(std::shared_ptr<Binder<T>> numa_binder, int allocator_mode)
 {
     using namespace hpx::compute::host;
-    if (allocator_mode==0) {
+    if (allocator_mode == 0)
+    {
         return numa_binding_allocator<T>(numa_binder,
             hpx::threads::hpx_hwloc_membind_policy::membind_firsttouch, 0);
     }
-    else if (allocator_mode==1) {
+    else if (allocator_mode == 1)
+    {
         return numa_binding_allocator<T>(numa_binder,
             hpx::threads::hpx_hwloc_membind_policy::membind_interleave, 0);
     }
-    else /*if (allocator_mode==2)*/ {
+    else /*if (allocator_mode==2)*/
+    {
         return numa_binding_allocator<T>(numa_binder,
             hpx::threads::hpx_hwloc_membind_policy::membind_user, 0);
     }
 }
 
 // ------------------------------------------------------------------------
-template <template<typename> class Binder, typename T, typename Allocator>
-void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator &allocator)
+template <template <typename> class Binder, typename T, typename Allocator>
+void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator& allocator)
 {
     // num_numa_domains is only correct when using the default pool
-    int num_numa_domains = hpx::resource::get_partitioner().numa_domains().size();
+    int num_numa_domains =
+        hpx::resource::get_partitioner().numa_domains().size();
 
     // create a container
     std::vector<T, Allocator> data(allocator);
 
     // resize it and trigger a page touch function for each page
     std::size_t num_bytes = numa_binder->memory_bytes();
-    data.reserve(num_bytes/sizeof(T));
-    T *M = data.data();
+    data.reserve(num_bytes / sizeof(T));
+    T* M = data.data();
     // this is a debugging function that returns a string of numa bindings
     std::string domain_string = allocator.get_page_numa_domains(M, num_bytes);
 
@@ -80,10 +84,11 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator &allocator)
 
     std::stringstream temp;
     temp << "Numa page binding for page count " << num_pages << "\n";
-    for (std::size_t i=0; i<num_pages; ++i) {
+    for (std::size_t i = 0; i < num_pages; ++i)
+    {
         // we pass the base pointer and current page pointer
         std::size_t dom =
-                numa_binder->operator()(M, page_ptr, pagesize, num_numa_domains);
+            numa_binder->operator()(M, page_ptr, pagesize, num_numa_domains);
         temp << dom;
         page_ptr += pageN;
     }
@@ -95,13 +100,17 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator &allocator)
     std::size_t ystep = numa_binder->display_step(1);
 
     std::cout << "============================\n";
-    std::cout << "get_numa_domain() " << num_numa_domains << " Domain Numa pattern\n";
-    for (unsigned int j=0; j<ysize; j+=ystep) {
-        for (unsigned int i=0; i<xsize; i+=xstep) {
-            T *page_ptr =
-                    &M[i*numa_binder->memory_step(0) + j*numa_binder->memory_step(1)];
+    std::cout << "get_numa_domain() " << num_numa_domains
+              << " Domain Numa pattern\n";
+    for (unsigned int j = 0; j < ysize; j += ystep)
+    {
+        for (unsigned int i = 0; i < xsize; i += xstep)
+        {
+            T* page_ptr = &M[i * numa_binder->memory_step(0) +
+                j * numa_binder->memory_step(1)];
             int dom = allocator.get_numa_domain(page_ptr);
-            if (dom == -1) {
+            if (dom == -1)
+            {
                 std::cout << '-';
             }
             else
@@ -112,26 +121,31 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator &allocator)
     std::cout << "============================\n\n";
 
 #ifdef NUMA_BINDING_ALLOCATOR_INIT_MEMORY
-        std::cout << "============================\n";
-        std::cout << "Contents of memory locations\n";
-        for (unsigned int j=0; j<ysize; j+=ystep) {
-            for (unsigned int i=0; i<xsize; i+=xstep) {
-                T *page_ptr =
-                    &M[i*numa_binder->memory_step(0) + j*numa_binder->memory_step(1)];
-                std::cout << *page_ptr << " ";
-            }
-            std::cout << "\n";
+    std::cout << "============================\n";
+    std::cout << "Contents of memory locations\n";
+    for (unsigned int j = 0; j < ysize; j += ystep)
+    {
+        for (unsigned int i = 0; i < xsize; i += xstep)
+        {
+            T* page_ptr = &M[i * numa_binder->memory_step(0) +
+                j * numa_binder->memory_step(1)];
+            std::cout << *page_ptr << " ";
         }
-        std::cout << "============================\n\n";
+        std::cout << "\n";
+    }
+    std::cout << "============================\n\n";
 #endif
 
     std::cout << "============================\n";
     std::cout << "Expected " << num_numa_domains << " Domain Numa pattern\n";
-    for (unsigned int j=0; j<ysize; j+=ystep) {
-        for (unsigned int i=0; i<xsize; i+=xstep) {
-            T *page_ptr =
-                &M[i*numa_binder->memory_step(0) + j*numa_binder->memory_step(1)];
-            int d = numa_binder->operator()(M, page_ptr, 4096, num_numa_domains);
+    for (unsigned int j = 0; j < ysize; j += ystep)
+    {
+        for (unsigned int i = 0; i < xsize; i += xstep)
+        {
+            T* page_ptr = &M[i * numa_binder->memory_step(0) +
+                j * numa_binder->memory_step(1)];
+            int d =
+                numa_binder->operator()(M, page_ptr, 4096, num_numa_domains);
             std::cout << std::hex << d;
         }
         std::cout << "\n";
@@ -168,7 +182,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "Test 1D" << std::endl << std::endl;
     using binder_type_1D = linear_numa_binder<matrix_elem>;
     std::shared_ptr<binder_type_1D> numa_binder_1D =
-            std::make_shared<binder_type_1D>(Nc);
+        std::make_shared<binder_type_1D>(Nc);
 
     auto allocator_1D = get_allocator(numa_binder_1D, allocator_mode);
     test_binding(numa_binder_1D, allocator_1D);
@@ -178,7 +192,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "Test 2D" << std::endl << std::endl;
     using binder_type_2D = matrix_numa_binder<matrix_elem>;
     std::shared_ptr<binder_type_2D> numa_binder_2D =
-            std::make_shared<binder_type_2D>(10*Nc, 10*Nr, Nt, Nd, p, q);
+        std::make_shared<binder_type_2D>(10 * Nc, 10 * Nr, Nt, Nd, p, q);
 
     auto allocator_2D = numa_binding_allocator<matrix_elem>(numa_binder_2D,
         hpx::threads::hpx_hwloc_membind_policy::membind_user, 0);
@@ -219,8 +233,8 @@ int main(int argc, char* argv[])
         "Number of column processes in the 2D communicator.")
         ("no-check",
          "Disable result checking")
-    // clang-format on
-    ;
+        // clang-format on
+        ;
 
     // HPX uses a boost program options variable map, but we need it before
     // hpx-main, so we will create another one here and throw it away after use
@@ -239,27 +253,24 @@ int main(int argc, char* argv[])
         hpx::threads::policies::example::shared_priority_queue_scheduler<>;
     using hpx::threads::policies::scheduler_mode;
     // setup the default pool with a numa aware scheduler
-    rp.create_thread_pool(
-        "default",
-        [](hpx::threads::policies::callback_notifier& notifier, std::size_t num_threads,
-          std::size_t thread_offset, std::size_t pool_index,
-          std::string const& pool_name) -> std::unique_ptr<hpx::threads::thread_pool_base>
-          {
+    rp.create_thread_pool("default",
+        [](hpx::threads::policies::callback_notifier& notifier,
+            std::size_t num_threads, std::size_t thread_offset,
+            std::size_t pool_index, std::string const& pool_name)
+            -> std::unique_ptr<hpx::threads::thread_pool_base> {
             std::unique_ptr<numa_scheduler> scheduler(new numa_scheduler(
                 num_threads, {2, 3, 64}, "shared-priority-scheduler"));
 
-            scheduler_mode mode = scheduler_mode(
-                scheduler_mode::do_background_work |
-                scheduler_mode::delay_exit);
+            scheduler_mode mode =
+                scheduler_mode(scheduler_mode::do_background_work |
+                    scheduler_mode::delay_exit);
 
             std::unique_ptr<hpx::threads::thread_pool_base> pool(
-              new hpx::threads::detail::scheduled_thread_pool<high_priority_sched>(
-                  std::move(scheduler), notifier, pool_index, pool_name,
-                  mode, thread_offset)
-            );
+                new hpx::threads::detail::scheduled_thread_pool<
+                    high_priority_sched>(std::move(scheduler), notifier,
+                    pool_index, pool_name, mode, thread_offset));
             return pool;
-          }
-    );
+        });
 
     hpx::init();
     return hpx::util::report_errors();
