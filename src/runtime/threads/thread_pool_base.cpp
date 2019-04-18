@@ -17,7 +17,7 @@
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/hardware/timestamp.hpp>
+#include <hpx/hardware/timestamp.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
 #include <cstddef>

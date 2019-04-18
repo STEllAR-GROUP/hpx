@@ -14,6 +14,7 @@ set(HPX_LIBS
   cache
   collectives
   config
+  hardware
   preprocessor
   CACHE INTERNAL "list of HPX modules" FORCE
 )
