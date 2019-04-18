@@ -1,9 +1,7 @@
-///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2017-2019 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-///////////////////////////////////////////////////////////////////////////////
 
 #ifndef HPX_COMPUTE_HOST_NUMA_BINDING_ALLOCATOR_HPP
 #define HPX_COMPUTE_HOST_NUMA_BINDING_ALLOCATOR_HPP
@@ -424,7 +422,7 @@ namespace hpx { namespace compute { namespace host
             std::ostringstream display;
             auto N = helper->array_rank();
             display << helper->description() << "\n";
-            std::size_t pagesize = sysconf(_SC_PAGE_SIZE)/sizeof(T);
+            std::size_t pagesize = threads::get_memory_page_size();
             pointer p2 = p;
             if (N==2) {
                 std::size_t Nc = helper->array_size(0);
@@ -503,7 +501,7 @@ namespace hpx { namespace compute { namespace host
                          numa_binding_helper_ptr helper, size_type numa_domain,
                          const std::vector<threads::hwloc_bitmap_ptr> &nodesets) const
         {
-            const size_type pagesize  = sysconf(_SC_PAGE_SIZE);
+            const size_type pagesize  = threads::get_memory_page_size();
             const size_type pageN     = pagesize/sizeof(T);
             const size_type num_pages = (n*sizeof(T) + pagesize - 1) / pagesize;
             pointer page_ptr = p;
@@ -541,7 +539,7 @@ namespace hpx { namespace compute { namespace host
                         numa_binding_helper_ptr helper, size_type numa_domain,
                         const std::vector<threads::hwloc_bitmap_ptr> &nodesets) const
         {
-            const size_type pagesize  = sysconf(_SC_PAGE_SIZE);
+            const size_type pagesize  = threads::get_memory_page_size();
             const size_type pageN     = pagesize/sizeof(T);
             const size_type num_pages = (n*sizeof(T) + pagesize - 1) / pagesize;
             pointer page_ptr = p;

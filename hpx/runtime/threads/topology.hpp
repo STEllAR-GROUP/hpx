@@ -35,6 +35,7 @@
 
 namespace hpx { namespace threads
 {
+
     struct hpx_hwloc_bitmap_wrapper
     {
         HPX_NON_COPYABLE(hpx_hwloc_bitmap_wrapper);
@@ -321,6 +322,8 @@ namespace hpx { namespace threads
 
     private:
         static mask_type empty_mask;
+        static std::size_t memory_page_size_;
+        friend std::size_t get_memory_page_size();
 
         std::size_t init_node_number(
             std::size_t num_thread, hwloc_obj_type_t type
@@ -448,6 +451,14 @@ namespace hpx { namespace threads
 #else
         return 64;      // assume 64 byte cache-line size
 #endif
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // abstract away memory page size, calls to system functions are
+    // expensive, so return a value initializaed at startup
+    inline std::size_t get_memory_page_size()
+    {
+        return hpx::threads::topology::memory_page_size_;
     }
 }}
 

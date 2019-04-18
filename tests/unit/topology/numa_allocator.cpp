@@ -73,7 +73,7 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator &allocator)
     std::string domain_string = allocator.get_page_numa_domains(M, num_bytes);
 
     // now generate the 'correct' string of numa domains per page
-    const std::size_t pagesize  = sysconf(_SC_PAGE_SIZE);
+    const std::size_t pagesize  = hpx::threads::get_memory_page_size();
     const std::size_t pageN     = pagesize/sizeof(T);
     const std::size_t num_pages = (num_bytes + pagesize - 1) / pagesize;
     T* page_ptr = M;

@@ -1,3 +1,8 @@
+//  Copyright (c) 2019 John Biddiscombe
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 #ifndef ALLOCATOR_BINDER_LINEAR_HPP
 #define ALLOCATOR_BINDER_LINEAR_HPP
 
@@ -18,8 +23,8 @@ struct linear_numa_binder : hpx::compute::host::numa_binding_helper<T>
     linear_numa_binder(std::size_t num_pages) :
         hpx::compute::host::numa_binding_helper<T>()
     {
-        const std::size_t CACHE_LINE_SIZE = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
-        const std::size_t PAGE_SIZE       = sysconf(_SC_PAGE_SIZE);
+        const std::size_t CACHE_LINE_SIZE = hpx::threads::get_cache_line_size();
+        const std::size_t PAGE_SIZE       = hpx::threads::get_memory_page_size();
         const std::size_t ALIGNMENT       = (std::max)(PAGE_SIZE, CACHE_LINE_SIZE);
         elements_page_ = (ALIGNMENT / sizeof(T));
         N_ = num_pages * elements_page_;
