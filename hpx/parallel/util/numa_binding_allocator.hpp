@@ -51,7 +51,7 @@ namespace hpx { namespace threads { namespace executors {
     {
         // The call operator () must return an int type
         // The arguments must be const ref versions of the equivalent task arguments
-        int operator()(const std::size_t& domain) const
+        int operator()(const int& domain) const
         {
             LOG_NUMA_MSG("allocator pool_numa_hint returns domain " << domain);
             return domain;
@@ -78,7 +78,7 @@ namespace hpx { namespace compute { namespace host {
             return 0;
         }
         // virtual destructor to quiet compiler warnings
-        virtual ~numa_binding_helper() {}
+        virtual ~numa_binding_helper() = default;
 
         // The allocator uses the pool name to get numa bitmap masks needed by
         // the allocation function. The "default" pool is assumed
@@ -94,9 +94,8 @@ namespace hpx { namespace compute { namespace host {
             return 0;
         }
 
-        //#ifdef NUMA_BINDING_ALLOCATOR_DEBUG_PAGE_BINDING
         // Using how many dimensions should this data be displayed
-        // This function is only required for debug purposes
+        // (This function is only required/used) for debug purposes
         virtual std::size_t array_rank() const
         {
             return 1;
@@ -207,6 +206,15 @@ namespace hpx { namespace compute { namespace host {
           , flags_(rhs.flags_)
         {
             LOG_NUMA_MSG("numa_binding_allocator : Copy allocator rebind");
+        }
+
+        // Move assignment
+        numa_binding_allocator(numa_binding_allocator&& rhs)
+          : binding_helper_(std::move(rhs.binding_helper_))
+          , policy_(rhs.policy_)
+          , flags_(rhs.flags_)
+        {
+            LOG_NUMA_MSG("numa_binding_allocator : Move constructor");
         }
 
         // Assignment operator
@@ -617,7 +625,6 @@ namespace hpx { namespace compute { namespace host {
         }
 
     private:
-        hpx::lcos::local::spinlock display_mutex;
         mutable std::mutex init_mutex;
 
     public:
