@@ -14,10 +14,10 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/pp/cat.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 /// \cond NOINTERNAL
-namespace hpx { namespace lcos { namespace dist_object { namespace server {
+namespace hpx { namespace lcos { namespace server {
     template <typename T>
     class dist_object_part
       : public hpx::components::locking_hook<
@@ -121,34 +121,34 @@ namespace hpx { namespace lcos { namespace dist_object { namespace server {
     private:
         data_type data_;
     };
-}}}}
+}}}
 
 #define REGISTER_DIST_OBJECT_PART_DECLARATION(type)                            \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
-        hpx::lcos::dist_object::server::dist_object_part<type>::fetch_action,  \
+        hpx::lcos::server::dist_object_part<type>::fetch_action,               \
         HPX_PP_CAT(__dist_object_part_fetch_action_, type));
 
 /**/
 
 #define REGISTER_DIST_OBJECT_PART(type)                                        \
     HPX_REGISTER_ACTION(                                                       \
-        hpx::lcos::dist_object::server::dist_object_part<type>::fetch_action,  \
+        hpx::lcos::server::dist_object_part<type>::fetch_action,               \
         HPX_PP_CAT(__dist_object_part_fetch_action_, type));                   \
     typedef ::hpx::components::component<                                      \
-        hpx::lcos::dist_object::server::dist_object_part<type>>                \
+        hpx::lcos::server::dist_object_part<type>>                             \
         HPX_PP_CAT(__dist_object_part_, type);                                 \
     HPX_REGISTER_COMPONENT(HPX_PP_CAT(__dist_object_part_, type))              \
     /**/
 
-namespace hpx { namespace lcos { namespace dist_object {
+namespace hpx { namespace lcos {
     enum class construction_type
     {
         Meta_Object,
         All_to_All
     };
-}}}
+}}
 
-namespace hpx { namespace lcos { namespace dist_object {
+namespace hpx { namespace lcos {
     class meta_object_server
       : public hpx::components::locking_hook<
             hpx::components::component_base<meta_object_server>>
@@ -193,18 +193,17 @@ namespace hpx { namespace lcos { namespace dist_object {
         hpx::lcos::local::spinlock lk;
         std::vector<hpx::id_type> servers;
     };
-}}}
-typedef hpx::lcos::dist_object::meta_object_server::get_server_list_action
-    get_list_action;
+}}
+typedef hpx::lcos::meta_object_server::get_server_list_action get_list_action;
 HPX_REGISTER_ACTION_DECLARATION(get_list_action, get_server_list_mo_action);
-typedef hpx::lcos::dist_object::meta_object_server::registration_action
+typedef hpx::lcos::meta_object_server::registration_action
     register_with_meta_action;
 HPX_REGISTER_ACTION_DECLARATION(register_with_meta_action, register_mo_action);
 
 // Meta_object front end, decides whether it is the root locality, and thus
 // whether to register with the root locality's meta object only or to register
 // itself as the root locality's meta object as well
-namespace hpx { namespace lcos { namespace dist_object {
+namespace hpx { namespace lcos {
     class meta_object
       : hpx::components::client_base<meta_object, meta_object_server>
     {
@@ -238,12 +237,12 @@ namespace hpx { namespace lcos { namespace dist_object {
     private:
         hpx::id_type meta_object_0;
     };
-}}}
+}}
 /// \endcond
 // The front end for the dist_object itself. Essentially wraps actions for
 // the server, and stores information locally about the localities/servers
 // that it needs to know about
-namespace hpx { namespace lcos { namespace dist_object {
+namespace hpx { namespace lcos {
     /// The dist_object is a single logical object partitioned over a set of
     /// localities/nodes/machines, where every locality shares the same global
     /// name locality for the distributed object (i.e. a universal name), but
@@ -276,19 +275,18 @@ namespace hpx { namespace lcos { namespace dist_object {
         dist_object() {}
 
         /// Creates a dist_object in every locality with a given base_name string,
-        /// data, and a construction_type
+        /// data, and a type and construction_type in the template parameters
         ///
+        /// \param construction_type The construction_type in the template parameters
+        /// accepts either Meta_Object, and it is set to All_to_All by defalut
+        /// The Meta_Object option provides meta object registration in the root
+        /// locality and meta object is essentailly a table that can find the
+        /// instances of dist_object in all localities. The All_to_All option only
+        /// locally holds the client and server of the dist_object.
         /// \param base_name The name of the dist_object, which should be a unique
         /// string across the localities
         /// \param data The data of the type T of the dist_object
-        /// \param construction_type The construction_type accepts either Meta_Object
-        /// or All_to_All option. The Meta_Object option provides meta object
-        /// registration in the root locality and meta object is essentailly a table
-        /// that can find the instances of dist_object in all localities. The
-        /// All_to_All option only locally holds the client and server of the
-        /// dist_object.
-        dist_object(
-            std::string base, data_type const& data)
+        dist_object(std::string base, data_type const& data)
           : base_type(create_server(data))
           , base_(base)
         {
@@ -307,8 +305,8 @@ namespace hpx { namespace lcos { namespace dist_object {
         }
 
         /// Creates a dist_object in every locality with a given base_name string,
-        /// data. The construction_type is not provided in this constructor and is
-        /// set to All_to_All option by default.
+        /// data. The construction_type in the template parameter is set to
+        /// All_to_All option by default.
         ///
         /// \param base_name The name of the dist_object, which should be a unique
         /// string across the localities
@@ -448,15 +446,15 @@ namespace hpx { namespace lcos { namespace dist_object {
         /// wraps an existing local instance and thus is internally referring to
         /// the local instance.
         ///
+        /// \param construction_type The construction_type in the template parameters
+        /// accepts either Meta_Object, and it is set to All_to_All by defalut
+        /// The Meta_Object option provides meta object registration in the root
+        /// locality and meta object is essentailly a table that can find the
+        /// instances of dist_object in all localities. The All_to_All option only
+        /// locally holds the client and server of the dist_object.
         /// \param base_name The name of the dist_object, which should be a unique
         /// string across the localities
         /// \param data The data of the type T of the dist_object
-        /// \param construction_type The construction_type accepts either Meta_Object
-        /// or All_to_All option. The Meta_Object option provides meta object
-        /// registration in the root locality and meta object is essentailly a table
-        /// that can find the instances of dist_object in all localities. The
-        /// All_to_All option only locally holds the client and server of the
-        /// dist_object.
         dist_object(std::string base, data_type data)
           : base_type(create_server(data))
           , base_(base)
@@ -563,6 +561,6 @@ namespace hpx { namespace lcos { namespace dist_object {
         }
         /// \endcond
     };
-}}}
+}}
 
 #endif /*HPX_LCOS_DIST_OBJECT_HPP*/

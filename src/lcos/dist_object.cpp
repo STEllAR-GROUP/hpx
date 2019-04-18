@@ -12,7 +12,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality.
 
-typedef hpx::components::component<hpx::lcos::dist_object::meta_object_server>
+typedef hpx::components::component<hpx::lcos::meta_object_server>
     meta_object_type;
 
 HPX_REGISTER_COMPONENT(meta_object_type, meta_object);

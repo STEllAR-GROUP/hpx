@@ -62,7 +62,7 @@ REGISTER_DIST_OBJECT_PART(myVectorDoubleConstRef);
 
 void test_dist_object_int()
 {
-    using hpx::lcos::dist_object::dist_object;
+    using hpx::lcos::dist_object;
     // Construct a distrtibuted object of type int in all provided localities
     // User needs to provide the distributed object with a unique basename
     // and data for construction. The unique basename string enables HPX
@@ -80,7 +80,7 @@ void test_dist_object_int()
 
 void test_accumulation_reduce_to_locality0()
 {
-    using hpx::lcos::dist_object::dist_object;
+    using hpx::lcos::dist_object;
     int expect_res = 0, target_res = 0;
     int num_localities = hpx::find_all_localities().size();
     int cur_locality = hpx::get_locality_id();
@@ -117,7 +117,7 @@ void test_accumulation_reduce_to_locality0()
 
 void test_accumulation_reduce_to_locality0_parallel()
 {
-    using hpx::lcos::dist_object::dist_object;
+    using hpx::lcos::dist_object;
     std::atomic<int> expect_res = 0;
     int target_res = 0;
     int num_localities = hpx::find_all_localities().size();
@@ -154,7 +154,7 @@ void test_accumulation_reduce_to_locality0_parallel()
 
 void test_dist_object_vector()
 {
-    using hpx::lcos::dist_object::dist_object;
+    using hpx::lcos::dist_object;
     // define vector based on the locality that it is running
     int here_ = static_cast<int>(hpx::get_locality_id());
     int len = 10;
@@ -193,7 +193,7 @@ void test_dist_object_vector()
 // element-wise addition for vector<vector<double>> for dist_object
 void test_dist_object_matrix()
 {
-    using hpx::lcos::dist_object::dist_object;
+    using hpx::lcos::dist_object;
     double val = 42.0 + static_cast<double>(hpx::get_locality_id());
     int rows = 5, cols = 5;
 
@@ -238,7 +238,7 @@ void test_dist_object_matrix()
 
 void test_dist_object_matrix_all_to_all()
 {
-    using hpx::lcos::dist_object::dist_object;
+    using hpx::lcos::dist_object;
     double val = 42.0 + static_cast<double>(hpx::get_locality_id());
     int rows = 5, cols = 5;
 
@@ -246,7 +246,7 @@ void test_dist_object_matrix_all_to_all()
     myMatrixDouble rhs(rows, std::vector<double>(cols, val));
     myMatrixDouble res(rows, std::vector<double>(cols, 0));
 
-    typedef hpx::lcos::dist_object::construction_type c_t;
+    typedef hpx::lcos::construction_type c_t;
 
     dist_object<myMatrixDouble, c_t::All_to_All> LHS("m1", lhs);
     dist_object<myMatrixDouble, c_t::All_to_All> RHS("m2", rhs);
@@ -286,7 +286,7 @@ void test_dist_object_matrix_all_to_all()
 
 void test_dist_object_matrix_mo()
 {
-    using hpx::lcos::dist_object::dist_object;
+    using hpx::lcos::dist_object;
     int val = 42 + static_cast<int>(hpx::get_locality_id());
     int rows = 5, cols = 5;
 
@@ -294,7 +294,7 @@ void test_dist_object_matrix_mo()
     myMatrixInt m2(rows, std::vector<int>(cols, val));
     myMatrixInt m3(rows, std::vector<int>(cols, 0));
 
-    typedef hpx::lcos::dist_object::construction_type c_t;
+    typedef hpx::lcos::construction_type c_t;
 
     dist_object<myMatrixInt, c_t::Meta_Object> M1("M1_meta", m1);
     dist_object<myMatrixInt, c_t::Meta_Object> M2("M2_meta", m2);
@@ -319,12 +319,12 @@ void test_dist_object_matrix_mo()
     b.wait();
 
     HPX_TEST((*M3) == m3);
-    HPX_TEST_EQ(M3->size(), static_cast<size_t> (rows));
+    HPX_TEST_EQ(M3->size(), static_cast<size_t>(rows));
 }
 
 void test_dist_object_ref()
 {
-    using hpx::lcos::dist_object::dist_object;
+    using hpx::lcos::dist_object;
     size_t n = 10;
     int val = 2;
 
@@ -340,7 +340,7 @@ void test_dist_object_ref()
 
 void test_dist_object_const_ref()
 {
-    using hpx::lcos::dist_object::dist_object;
+    using hpx::lcos::dist_object;
     size_t n = 10;
     int val = 2;
 
@@ -350,7 +350,7 @@ void test_dist_object_const_ref()
 
 void test_dist_object_matrix_mul()
 {
-    using hpx::lcos::dist_object::dist_object;
+    using hpx::lcos::dist_object;
     size_t cols = 5;    // Decide how big the matrix should be
 
     size_t num_locs = hpx::find_all_localities().size();
@@ -412,7 +412,7 @@ void test_dist_object_matrix_mul()
     std::vector<std::vector<int>> here_data_m3(
         local_rows, std::vector<int>(cols, 0));
 
-    typedef hpx::lcos::dist_object::construction_type c_t;
+    typedef hpx::lcos::construction_type c_t;
 
     dist_object<myMatrixInt, c_t::Meta_Object> M1(
         "M1_meta_mat_mul", all_data_m1[here]);

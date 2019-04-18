@@ -48,7 +48,7 @@ REGISTER_DIST_OBJECT_PART(double);
 using myVectorDouble = std::vector<double>;
 REGISTER_DIST_OBJECT_PART(myVectorDouble);
 
-using hpx::lcos::dist_object::dist_object;
+using hpx::lcos::dist_object;
 
 ///////////////////////////////////////////////////////////////////////////////
 // transpose matrix when the target matrix is in a remote node
@@ -188,8 +188,8 @@ void run_matrix_transposition(boost::program_options::variables_map& vm)
                 else
                 {
                     phase_futures.push_back(hpx::dataflow(&transpose,
-                        A[b].fetch(from_locality), A_offset, std::ref(B[b]), B_offset,
-                        block_size, block_order, tile_size));
+                        A[b].fetch(from_locality), A_offset, std::ref(B[b]),
+                        B_offset, block_size, block_order, tile_size));
                 }
             }
 
