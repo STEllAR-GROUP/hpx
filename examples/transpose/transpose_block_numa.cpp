@@ -575,7 +575,7 @@ int main(int argc, char* argv[])
     std::size_t numa_nodes = get_num_numa_nodes(topo, vm);
     std::pair<std::size_t, std::size_t> pus =
         get_num_numa_pus(topo, numa_nodes, vm);
-    std::size_t num_cores = topo.get_number_of_numa_node_cores(0);
+    //std::size_t num_cores = topo.get_number_of_numa_node_cores(0);
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
