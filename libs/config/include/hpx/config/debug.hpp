@@ -7,6 +7,13 @@
 #if !defined(HPX_CONFIG_DEBUG_HPP)
 #define HPX_CONFIG_DEBUG_HPP
 
+#if defined(DOXYGEN)
+/// Defined if HPX is compiled in debug mode.
+#define HPX_DEBUG
+/// Evaluates to ``debug`` if compiled in debug mode, ``release`` otherwise.
+#define HPX_BUILD_TYPE
+#else
+
 // Make sure DEBUG macro is defined consistently across platforms
 #if defined(_DEBUG) && !defined(DEBUG)
 #  define DEBUG
@@ -20,6 +27,7 @@
 #  define HPX_BUILD_TYPE debug
 #else
 #  define HPX_BUILD_TYPE release
+#endif
 #endif
 
 #endif

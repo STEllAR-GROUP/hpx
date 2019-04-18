@@ -8,6 +8,15 @@
 
 #include <hpx/config/defines.hpp>
 
+#if defined(DOXYGEN)
+/// Evaluates to ``var = std::forward<decltype(var)>(var)`` if the compiler
+/// supports C++14 Lambdas. Defaults to ``var``.
+#define HPX_CAPTURE_FORWARD(var)
+/// Evaluates to ``var = std::move(var)`` if the compiler supports C++14
+/// Lambdas. Defaults to `var`.
+#define HPX_CAPTURE_MOVE(var)
+#else
+
 #include <utility>
 
 #if defined(HPX_HAVE_CXX14_LAMBDAS)
@@ -16,6 +25,7 @@
 #else
 #define HPX_CAPTURE_FORWARD(var)  var
 #define HPX_CAPTURE_MOVE(var)     var
+#endif
 #endif
 
 #endif

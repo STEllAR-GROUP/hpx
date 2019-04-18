@@ -7,6 +7,12 @@
 #if !defined(HPX_EXPORT_DEFINITIONS_SEPTEMBER_25_2008_0214PM)
 #define HPX_EXPORT_DEFINITIONS_SEPTEMBER_25_2008_0214PM
 
+#if defined(DOXYGEN)
+/// Marks a class or function to be exported from HPX or imported if it is
+/// consumed.
+#define HPX_EXPORT
+#else
+
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 # define HPX_SYMBOL_EXPORT      __declspec(dllexport)
 # define HPX_SYMBOL_IMPORT      __declspec(dllimport)
@@ -83,6 +89,7 @@
 #else
 # define HPX_ALWAYS_EXPORT       HPX_SYMBOL_IMPORT
 # define HPX_ALWAYS_IMPORT       HPX_SYMBOL_IMPORT
+#endif
 #endif
 
 #endif

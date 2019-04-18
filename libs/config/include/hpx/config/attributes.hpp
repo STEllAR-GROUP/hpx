@@ -9,6 +9,23 @@
 #include <hpx/config/defines.hpp>
 #include <hpx/config/compiler_specific.hpp>
 
+#if defined(DOXYGEN)
+
+/// Function attribute to tell compiler not to inline the function.
+#define HPX_NOINLINE
+/// Function attribute to tell compiler that the function does not return.
+#define HPX_NORETURN
+/// Marks an entity as deprecated. The argument \c x specifies a custom message
+/// that is included in the compiler warning. For more details see
+/// `<https://en.cppreference.com/w/cpp/language/attributes/deprecated>`__.
+#define HPX_DEPRECATED(x)
+/// Indicates that the fall through from the previous case label is intentional
+/// and should not be diagnosed by a compiler that warns on fallthrough. For
+/// more details see
+/// `<https://en.cppreference.com/w/cpp/language/attributes/fallthrough>`__.
+#define HPX_FALLTHROUGH
+#else
+
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_MSVC)
 #   define HPX_NOINLINE __declspec(noinline)
@@ -69,4 +86,5 @@
 #   define HPX_FALLTHROUGH
 #endif
 
+#endif
 #endif

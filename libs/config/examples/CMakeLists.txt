@@ -3,14 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# This file is auto generated. Please do not edit manually.
+add_custom_target(tests.examples.config)
+add_dependencies(tests.examples tests.examples.config)
 
-set(HPX_LIBS
-  config
-  preprocessor
-  CACHE INTERNAL "" FORCE
-)
-
-foreach(lib ${HPX_LIBS})
-  add_subdirectory(${lib})
-endforeach()
