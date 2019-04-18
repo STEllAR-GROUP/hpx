@@ -302,7 +302,7 @@ namespace hpx { namespace compute { namespace host {
                 // so they can't be disabled, we can ignore it
                 if ((ret != 0) && (ret != -1))
                 {
-                    std::cout << "ERROR: MADVISE " << strerror(ret)
+                    std::cerr << "ERROR: MADVISE " << strerror(ret)
                               << std::endl;
                 }
 #endif
