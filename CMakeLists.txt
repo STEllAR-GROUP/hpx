@@ -1619,6 +1619,12 @@ if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
 endif()
 
 ################################################################################
+# Set basic search paths for the generated HPX headers
+################################################################################
+include_directories("${CMAKE_BINARY_DIR}/include")
+include_directories("${CMAKE_BINARY_DIR}")
+
+################################################################################
 # Enable integration with Apex event counters
 ################################################################################
 
@@ -1810,11 +1816,6 @@ function(generate_config_defines_header TARGET_DIRECTORY)
     NAMESPACE default
     FILENAME "${TARGET_DIRECTORY}/hpx/config/defines.hpp")
 endfunction()
-
-################################################################################
-# Set basic search paths for the generated HPX headers
-################################################################################
-include_directories("${CMAKE_BINARY_DIR}")
 
 ################################################################################
 # Add custom targets for tests
