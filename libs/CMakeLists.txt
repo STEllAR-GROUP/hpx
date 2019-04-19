@@ -6,7 +6,7 @@
 # This file is auto generated. Please do not edit manually.
 
 set(HPX_LIBS
-  pp
+  preprocessor
   CACHE INTERNAL "" FORCE
 )
 

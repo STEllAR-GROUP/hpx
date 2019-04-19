@@ -5,13 +5,13 @@
 
 cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
-project(HPX.pp CXX)
+project(HPX.preprocessor CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-option(HPX_PP_WITH_TESTS "Include tests for pp" On)
+option(HPX_PREPROCESSOR_WITH_TESTS "Include tests for preprocessor" On)
 
-message(STATUS "pp: Configuring")
+message(STATUS "preprocessor: Configuring")
 
 set(headers
   ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/cat.hpp
@@ -21,27 +21,28 @@ set(headers
   ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/stringize.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/strip_parens.hpp)
 
-add_library(hpx_pp INTERFACE)
+add_library(hpx_preprocessor INTERFACE)
 
-target_include_directories(hpx_pp INTERFACE
+target_include_directories(hpx_preprocessor INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-set_target_properties(hpx_pp PROPERTIES INTERFACE_HPX_SOURCES "")
-set_target_properties(hpx_pp PROPERTIES INTERFACE_HPX_HEADERS "${headers}")
+include(HPX_AddSourceGroup)
+add_hpx_source_group(NAME hpx_preprocessor ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx
+  CLASS "Header Files" TARGETS ${headers})
 
-install(TARGETS hpx_pp EXPORT HPXTargets
+install(TARGETS hpx_preprocessor EXPORT HPXTargets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  COMPONENT pp
+  COMPONENT preprocessor
 )
-hpx_export_targets(hpx_pp)
+hpx_export_targets(hpx_preprocessor)
 
 install(
   DIRECTORY include/hpx
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-  COMPONENT pp)
+  COMPONENT preprocessor)
 
 add_subdirectory(tests)
 
-message(STATUS "pp: Configuring done")
+message(STATUS "preprocessor: Configuring done")
