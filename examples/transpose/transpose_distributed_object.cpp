@@ -6,13 +6,13 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ///////////////////////////////////////////////////////////////////////////
-/// This is an example of distributed matrix transposition using dist_object.
+/// This is an example of distributed matrix transposition using distributed_object.
 ///
 /// A distributed object is a single logical object partitioned across
 /// a set of localities. (A locality is a single node in a cluster or a
-/// NUMA domian in a SMP machine.) Each locality constructs an instance of
-/// dist_object<T>, where a value of type T represents the value of this
-/// this locality's instance value. Once dist_object<T> is conctructed, it
+/// NUMA domain in a SMP machine.) Each locality constructs an instance of
+/// distributed_object<T>, where a value of type T represents the value of this
+/// this locality's instance value. Once distributed_object<T> is constrcuted, it
 /// has a universal name which can be used on any locality in the given
 /// localities to locate the resident instance.
 
@@ -27,7 +27,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/dataflow.hpp>
 #include <hpx/lcos/barrier.hpp>
-#include <hpx/lcos/dist_object.hpp>
+#include <hpx/lcos/distributed_object.hpp>
 #include <hpx/lcos/when_all.hpp>
 
 #include <algorithm>
@@ -44,28 +44,28 @@ typedef double* sub_block;
 #define ROW_SHIFT 0.01       // Constant to shift row index
 
 // Register type for template components
-REGISTER_DIST_OBJECT_PART(double);
+REGISTER_DISTRIBUTED_OBJECT_PART(double);
 using myVectorDouble = std::vector<double>;
-REGISTER_DIST_OBJECT_PART(myVectorDouble);
+REGISTER_DISTRIBUTED_OBJECT_PART(myVectorDouble);
 
-using hpx::lcos::dist_object;
+using hpx::lcos::distributed_object;
 
 ///////////////////////////////////////////////////////////////////////////////
 // transpose matrix when the target matrix is in a remote node
 void transpose(hpx::future<std::vector<double>> Af, std::uint64_t A_offset,
-    dist_object<std::vector<double>>& B_temp, std::uint64_t B_offset,
+    distributed_object<std::vector<double>>& B_temp, std::uint64_t B_offset,
     std::uint64_t block_size, std::uint64_t block_order,
     std::uint64_t tile_size);
 
 ///////////////////////////////////////////////////////////////////////////////
 // transpose matrix when the target and destination matrix are in a same node
-void transpose_local(dist_object<std::vector<double>>& A_temp,
-    std::uint64_t A_offset, dist_object<std::vector<double>>& B_temp,
+void transpose_local(distributed_object<std::vector<double>>& A_temp,
+    std::uint64_t A_offset, distributed_object<std::vector<double>>& B_temp,
     std::uint64_t B_offset, std::uint64_t block_size, std::uint64_t block_order,
     std::uint64_t tile_size);
 
 double test_results(std::uint64_t order, std::uint64_t block_order,
-    std::vector<dist_object<std::vector<double>>>& trans,
+    std::vector<distributed_object<std::vector<double>>>& trans,
     std::uint64_t blocks_start, std::uint64_t blocks_end);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ void run_matrix_transposition(boost::program_options::variables_map& vm)
     if (vm.count("tile_size"))
         tile_size = vm["tile_size"].as<std::uint64_t>();
 
-    verbose = vm.count("verbose") ? true : false;
+    verbose = vm.count("verbose") > 0 ? true : false;
 
     std::uint64_t bytes =
         static_cast<std::uint64_t>(2.0 * sizeof(double) * order * order);
@@ -96,8 +96,8 @@ void run_matrix_transposition(boost::program_options::variables_map& vm)
 
     std::uint64_t id = hpx::get_locality_id();
 
-    std::vector<dist_object<std::vector<double>>> A(num_blocks);
-    std::vector<dist_object<std::vector<double>>> B(num_blocks);
+    std::vector<distributed_object<std::vector<double>>> A(num_blocks);
+    std::vector<distributed_object<std::vector<double>>> B(num_blocks);
 
     std::uint64_t blocks_start = id * num_local_blocks;
     std::uint64_t blocks_end = (id + 1) * num_local_blocks;
@@ -106,9 +106,9 @@ void run_matrix_transposition(boost::program_options::variables_map& vm)
     for (std::uint64_t b = 0; b != num_local_blocks; ++b)
     {
         std::uint64_t block_idx = b + blocks_start;
-        A[block_idx] = dist_object<std::vector<double>>(
+        A[block_idx] = distributed_object<std::vector<double>>(
             "A", std::vector<double>(col_block_size));
-        B[block_idx] = dist_object<std::vector<double>>(
+        B[block_idx] = distributed_object<std::vector<double>>(
             "B", std::vector<double>(col_block_size));
     }
 
@@ -239,7 +239,7 @@ void run_matrix_transposition(boost::program_options::variables_map& vm)
 }
 
 void transpose(hpx::future<std::vector<double>> Af, std::uint64_t A_offset,
-    dist_object<std::vector<double>>& B_temp, std::uint64_t B_offset,
+    distributed_object<std::vector<double>>& B_temp, std::uint64_t B_offset,
     std::uint64_t block_size, std::uint64_t block_order,
     std::uint64_t tile_size)
 {
@@ -278,8 +278,8 @@ void transpose(hpx::future<std::vector<double>> Af, std::uint64_t A_offset,
     }
 }
 
-void transpose_local(dist_object<std::vector<double>>& A_temp,
-    std::uint64_t A_offset, dist_object<std::vector<double>>& B_temp,
+void transpose_local(distributed_object<std::vector<double>>& A_temp,
+    std::uint64_t A_offset, distributed_object<std::vector<double>>& B_temp,
     std::uint64_t B_offset, std::uint64_t block_size, std::uint64_t block_order,
     std::uint64_t tile_size)
 {
@@ -318,7 +318,7 @@ void transpose_local(dist_object<std::vector<double>>& A_temp,
 }
 
 double test_results(std::uint64_t order, std::uint64_t block_order,
-    std::vector<dist_object<std::vector<double>>>& trans,
+    std::vector<distributed_object<std::vector<double>>>& trans,
     std::uint64_t blocks_start, std::uint64_t blocks_end)
 {
     using hpx::parallel::transform_reduce;

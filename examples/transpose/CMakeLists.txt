@@ -12,7 +12,7 @@ set(example_programs
   transpose_block
   transpose_block_numa
   transpose_serial_vector
-  transpose_dist_object
+  transpose_distributed_object
 )
 
 if(HPX_WITH_AWAIT)
