@@ -989,6 +989,22 @@ jobs:
       - store_artifacts:
           path: tests.headers.util
 
+  tests.headers.libs:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.preprocessor
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.headers.libs
+      - store_artifacts:
+          path: tests.headers.libs
+
   tests.performance:
     <<: *defaults
     steps:
