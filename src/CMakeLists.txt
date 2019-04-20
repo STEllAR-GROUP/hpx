@@ -190,33 +190,6 @@ add_hpx_source_group(
   ROOT "${PROJECT_SOURCE_DIR}/hpx"
   TARGETS ${hpx_init_HEADERS})
 
-# Handle libs source groups specially here. We pass on headers and sources as
-# target properties because source_group has to be called here, in the same
-# scope as add_library(hpx).
-set(hpx_module_HEADERS)
-set(hpx_module_SOURCES)
-foreach(lib ${HPX_LIBS})
-  get_target_property(lib_sources hpx_${lib} INTERFACE_HPX_SOURCES)
-  if(lib_sources)
-    add_hpx_source_group(
-      NAME hpx_${lib}
-      ROOT ${PROJECT_SOURCE_DIR}/libs/${lib}/src
-      CLASS "Source Files\\libs"
-      TARGETS ${lib_sources})
-    set(hpx_module_SOURCES ${hpx_module_SOURCES} ${lib_sources})
-  endif()
-
-  get_target_property(lib_headers hpx_${lib} INTERFACE_HPX_HEADERS)
-  if(lib_headers)
-    add_hpx_source_group(
-      NAME hpx_${lib}
-      ROOT ${PROJECT_SOURCE_DIR}/libs/${lib}/include/hpx
-      CLASS "Header Files\\libs"
-      TARGETS ${lib_headers})
-    set(hpx_module_HEADERS ${hpx_module_HEADERS} ${lib_headers})
-  endif()
-endforeach()
-
 if(NOT HPX_WITH_STATIC_LINKING)
   if(MSVC)
     # The MSVC linker can't handle a static library as large as we get when
@@ -256,26 +229,18 @@ endif()
 if(HPX_WITH_DEFAULT_TARGETS)
   if(HPX_WITH_CUDA)
     cuda_add_library(hpx ${hpx_library_link_mode_core}
-      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_module_SOURCES}
-      ${hpx_external_OBJECTS}
-      ${hpx_HEADERS} ${hpx_module_HEADERS})
+      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
   else()
     add_library(hpx ${hpx_library_link_mode_core}
-      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_module_SOURCES}
-      ${hpx_external_OBJECTS}
-      ${hpx_HEADERS} ${hpx_module_HEADERS})
+      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
   endif()
 else()
   if(HPX_WITH_CUDA)
     cuda_add_library(hpx ${hpx_library_link_mode_core} EXCLUDE_FROM_ALL
-      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_module_SOURCES}
-      ${hpx_external_OBJECTS}
-      ${hpx_HEADERS} ${hpx_module_HEADERS})
+      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
   else()
     add_library(hpx ${hpx_library_link_mode_core} EXCLUDE_FROM_ALL
-      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_module_SOURCES}
-      ${hpx_external_OBJECTS}
-      ${hpx_HEADERS} ${hpx_module_HEADERS})
+      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
   endif()
 endif()
 

@@ -21,13 +21,20 @@ set(headers
   ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/stringize.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/strip_parens.hpp)
 
-add_library(hpx_preprocessor INTERFACE)
+add_library(hpx_preprocessor ${headers})
 
-target_include_directories(hpx_preprocessor INTERFACE
+target_include_directories(hpx_preprocessor PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-# store set of files for later use in constructing source groups
-set_property(TARGET hpx_preprocessor PROPERTY INTERFACE_HPX_HEADERS ${headers})
+include(HPX_AddSourceGroup)
+add_hpx_source_group(
+  NAME hpx_preprocessor
+  ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx
+  CLASS "Header Files"
+  TARGETS ${headers})
+
+set_target_properties(hpx_preprocessor PROPERTIES
+  FOLDER "Core/Modules")
 
 install(TARGETS hpx_preprocessor EXPORT HPXTargets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -42,6 +49,7 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   COMPONENT preprocessor)
 
+add_subdirectory(src)
 add_subdirectory(tests)
 
 message(STATUS "preprocessor: Configuring done")
