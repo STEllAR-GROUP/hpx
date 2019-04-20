@@ -21,7 +21,7 @@ set(headers
   ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/stringize.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/strip_parens.hpp)
 
-add_library(hpx_preprocessor ${headers})
+add_library(hpx_preprocessor STATIC ${headers})
 
 target_include_directories(hpx_preprocessor PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
