@@ -26,9 +26,8 @@ add_library(hpx_preprocessor INTERFACE)
 target_include_directories(hpx_preprocessor INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-include(HPX_AddSourceGroup)
-add_hpx_source_group(NAME hpx_preprocessor ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx
-  CLASS "Header Files" TARGETS ${headers})
+# store set of files for later use in constructing source groups
+set_property(TARGET hpx_preprocessor PROPERTY INTERFACE_HPX_HEADERS ${headers})
 
 install(TARGETS hpx_preprocessor EXPORT HPXTargets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
