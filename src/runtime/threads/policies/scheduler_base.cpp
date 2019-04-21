@@ -55,7 +55,7 @@ namespace hpx { namespace threads { namespace policies
         // if there is a cfg setting for the default_scheduler_mode, use that
         // instead of the built-in default
         std::string default_scheduler_mode = hpx::get_config_entry(
-            "hpx.default_scheduler_mode", "");
+            "hpx.default_scheduler_mode", std::string());
 
         if (!default_scheduler_mode.empty())
         {

@@ -552,6 +552,16 @@ namespace hpx { namespace threads
                 hwloc_bitmap_free(cpuset);
                 return mask;
             }
+            else
+            {
+                std::string errstr = std::strerror(errno);
+
+                lk.unlock();
+                HPX_THROW_EXCEPTION(no_success,
+                    "topology::get_thread_affinity_mask_from_lva",
+                    "failed calling 'hwloc_get_area_membind_nodeset', "
+                    "reported error: " + errstr);
+            }
         }
 
         hwloc_bitmap_free(nodeset);
