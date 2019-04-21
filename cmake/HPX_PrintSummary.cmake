@@ -47,7 +47,7 @@ if(hpx_config_information)
 endif()
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings.hpp.in"
-  "${CMAKE_BINARY_DIR}/include/generated/hpx/config/config_strings.hpp"
+  "${CMAKE_BINARY_DIR}/hpx/config/config_strings.hpp"
   @ONLY)
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings.hpp.in"

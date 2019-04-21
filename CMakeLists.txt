@@ -1607,7 +1607,7 @@ include_directories(${HWLOC_INCLUDE_DIR})
 ################################################################################
 # Set search paths for generated headers.
 ################################################################################
-include_directories("${CMAKE_BINARY_DIR}/include/generated")
+include_directories("${CMAKE_BINARY_DIR}")
 
 ################################################################################
 # Enable integration with Intel Amplifier
@@ -1932,7 +1932,7 @@ add_plugin_modules()
 ################################################################################
 # Generate config headers and helpers
 ################################################################################
-generate_config_defines_header(${CMAKE_BINARY_DIR}/include/generated)
+generate_config_defines_header(${CMAKE_BINARY_DIR})
 
 # Generate a defines.hpp to be used in the install directory ...
 set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
@@ -1944,7 +1944,7 @@ write_config_defines_file(
 # Configure version.hpp for build tree and install directory
 configure_file(
     "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
-    "${CMAKE_BINARY_DIR}/include/generated/hpx/config/version.hpp"
+    "${CMAKE_BINARY_DIR}/hpx/config/version.hpp"
     @ONLY)
 
 configure_file(
