@@ -34,6 +34,7 @@
 #include <memory>
 #include <mutex>
 #include <set>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -51,6 +52,18 @@ namespace hpx { namespace threads { namespace policies
       , parent_pool_(nullptr)
       , background_thread_count_(0)
     {
+        // if there is a cfg setting for the default_scheduler_mode, use that
+        // instead of the built-in default
+        std::string default_scheduler_mode = hpx::get_config_entry(
+            "hpx.default_scheduler_mode", "");
+
+        if (!default_scheduler_mode.empty())
+        {
+            mode = scheduler_mode(hpx::util::safe_lexical_cast<std::size_t>(
+                default_scheduler_mode));
+            HPX_ASSERT((mode & ~scheduler_mode::all_flags) == 0);
+        }
+
         set_scheduler_mode(mode);
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
