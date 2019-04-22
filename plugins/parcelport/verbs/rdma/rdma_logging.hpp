@@ -13,7 +13,7 @@
 #include <chrono>
 //
 #include <hpx/config.hpp>
-#include <hpx/pp/stringize.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 //

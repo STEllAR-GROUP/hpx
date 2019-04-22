@@ -10,10 +10,10 @@
 
 // hpxinspect:noinclude:HPX_PP_STRIP_PARENS
 
-#ifndef HPX_PP_STRIP_PARENS_HPP
-#define HPX_PP_STRIP_PARENS_HPP
+#ifndef HPX_PREPROCESSOR_STRIP_PARENS_HPP
+#define HPX_PREPROCESSOR_STRIP_PARENS_HPP
 
-#include <hpx/pp/cat.hpp>
+#include <hpx/preprocessor/cat.hpp>
 
 /// \cond NOINTERNAL
 #define HPX_PP_DETAILS_APPLY(macro, args) HPX_PP_DETAILS_APPLY_I(macro, args)

@@ -9,8 +9,8 @@
 #define HPX_COMPONENTS_STATIC_FACTORY_DATA_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/pp/cat.hpp>
-#include <hpx/pp/stringize.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
 #include <hpx/util/plugin/virtual_constructor.hpp>
 

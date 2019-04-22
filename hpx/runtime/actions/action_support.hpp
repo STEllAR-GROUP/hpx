@@ -11,8 +11,8 @@
 #define HPX_RUNTIME_ACTIONS_ACTION_SUPPORT_NOV_14_2008_0711PM
 
 #include <hpx/config.hpp>
-#include <hpx/pp/cat.hpp>
-#include <hpx/pp/nargs.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>

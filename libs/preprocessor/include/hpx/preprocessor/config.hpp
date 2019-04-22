@@ -17,8 +17,8 @@
 
 /* See http://www.boost.org for most recent version. */
 
-#ifndef HPX_PP_CONFIG_HPP
-#define HPX_PP_CONFIG_HPP
+#ifndef HPX_PREPROCESSOR_CONFIG_HPP
+#define HPX_PREPROCESSOR_CONFIG_HPP
 #
 #/* HPX_PP_CONFIG_FLAGS */
 #

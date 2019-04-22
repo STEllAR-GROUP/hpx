@@ -12,8 +12,8 @@
 
 // hpxinspect:noinclude:HPX_PP_CAT
 
-#ifndef HPX_PP_CAT_HPP
-#define HPX_PP_CAT_HPP
+#ifndef HPX_PREPROCESSOR_CAT_HPP
+#define HPX_PREPROCESSOR_CAT_HPP
 
 #if defined(DOXYGEN)
 /// Concatenates the tokens \c A and \c B into a single token. Evaluates to \c AB
@@ -22,7 +22,7 @@
 #define HPX_PP_CAT(A, B)
 #else
 
-#include <hpx/pp/config.hpp>
+#include <hpx/preprocessor/config.hpp>
 
 #if ~HPX_PP_CONFIG_FLAGS() & HPX_PP_CONFIG_MWCC()
 #define HPX_PP_CAT(a, b) HPX_PP_CAT_I(a, b)

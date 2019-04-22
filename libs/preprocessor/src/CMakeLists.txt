@@ -5,7 +5,7 @@
 
 # cmake will not create a separate VS project without any source files, thus
 # this adds a dummy (empty) source file to the target
-set(sources ${CMAKE_CURRENT_SOURCE_DIR}/pp.cpp)
+set(sources ${CMAKE_CURRENT_SOURCE_DIR}/preprocessor.cpp)
 
 target_sources(hpx_preprocessor PRIVATE ${sources})
 

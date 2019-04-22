@@ -7,7 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/pp/stringize.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/util/format.hpp>
 
 using boost::program_options::variables_map;

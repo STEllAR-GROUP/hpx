@@ -18,8 +18,8 @@
 
 // hpxinspect:noinclude:HPX_PP_STRINGIZE
 
-#ifndef HPX_PP_STRINGIZE_HPP
-#define HPX_PP_STRINGIZE_HPP
+#ifndef HPX_PREPROCESSOR_STRINGIZE_HPP
+#define HPX_PREPROCESSOR_STRINGIZE_HPP
 
 #if defined(DOXYGEN)
 /// The \a HPX_PP_STRINGIZE macro stringizes its argument after it has been expanded.
@@ -32,7 +32,7 @@
 #define HPX_PP_STRINGIZE(X)
 #else
 
-#include <hpx/pp/config.hpp>
+#include <hpx/preprocessor/config.hpp>
 
 #if HPX_PP_CONFIG_FLAGS() & HPX_PP_CONFIG_MSVC()
 #define HPX_PP_STRINGIZE(text) HPX_PP_STRINGIZE_A((text))

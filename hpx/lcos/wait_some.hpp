@@ -176,7 +176,7 @@ namespace hpx
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/pp/strip_parens.hpp>
+#include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>

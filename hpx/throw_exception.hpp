@@ -12,9 +12,9 @@
 #include <hpx/config.hpp>
 #include <hpx/error.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/pp/cat.hpp>
-#include <hpx/pp/expand.hpp>
-#include <hpx/pp/nargs.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/expand.hpp>
+#include <hpx/preprocessor/nargs.hpp>
 
 #include <boost/current_function.hpp>
 #include <boost/system/error_code.hpp>

@@ -14,12 +14,20 @@ option(HPX_PREPROCESSOR_WITH_TESTS "Include tests for preprocessor" On)
 message(STATUS "preprocessor: Configuring")
 
 set(headers
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/cat.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/config.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/expand.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/nargs.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/stringize.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/pp/strip_parens.hpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/preprocessor.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/preprocessor/cat.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/preprocessor/config.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/preprocessor/expand.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/preprocessor/nargs.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/preprocessor/stringize.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/preprocessor/strip_parens.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/util/detail/pp/cat.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/util/detail/pp/config.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/util/detail/pp/expand.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/util/detail/pp/nargs.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/util/detail/pp/stringize.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/util/detail/pp/strip_parens.hpp
+)
 
 add_library(hpx_preprocessor STATIC ${headers})
 

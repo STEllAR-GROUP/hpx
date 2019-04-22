@@ -10,7 +10,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 
-#include <hpx/pp/cat.hpp>
+#include <hpx/preprocessor/cat.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace examples { namespace server

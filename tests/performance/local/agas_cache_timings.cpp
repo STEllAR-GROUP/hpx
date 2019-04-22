@@ -11,7 +11,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/pp/stringize.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/util/cache/entries/lfu_entry.hpp>
 #include <hpx/util/cache/local_cache.hpp>
 #include <hpx/util/cache/statistics/local_full_statistics.hpp>
