@@ -16,5 +16,5 @@ This library contains useful preprocessor macros:
 * ``HPX_PP_STRINGIZE``: Turns a token into a string
 * ``HPX_PP_STRIP_PARENS``: Strips parenthesis from a token
 
-Extensive documentation can be found `here
+Documentation can be found `here
 <https://stellar-group.github.io/hpx/docs/sphinx/latest/html/libs/pp/docs/index.html>`__.
