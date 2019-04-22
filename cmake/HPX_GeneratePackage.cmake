@@ -53,12 +53,6 @@ foreach(dir ${HPX_LIBRARY_DIR})
   set(HPX_PKG_LIBRARY_DIR "${HPX_PKG_LIBRARY_DIR} -L${dir}")
 endforeach()
 
-find_program(FULL_PYTHON_CMD python3)
-if(NOT FULL_PYTHON_CMD)
-    find_program(FULL_PYTHON_CMD python)
-endif()
-get_filename_component(PYTHON_CMD ${FULL_PYTHON_CMD} NAME)
-
 if(HPX_WITH_STATIC_LINKING)
   set(HPX_PKG_LIBRARIES_BAZEL "${HPX_CONF_PREFIX}/lib/libhpx.a ${HPX_PKG_LIBRARIES}")
   set(HPX_PKG_DEBUG_LIBRARIES_BAZEL "${HPX_CONF_PREFIX}/lib/libhpxd.a ${HPX_PKG_DEBUG_LIBRARIES}")

@@ -1,4 +1,4 @@
-#! /usr/bin/env @PYTHON_CMD@
+#! @PYTHON_EXECUTABLE@
 #
 # Copyright (c) 2014 Thomas Heller
 #
