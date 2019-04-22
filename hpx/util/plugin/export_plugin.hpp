@@ -10,8 +10,8 @@
 #define HPX_EXPORT_PLUGIN_VP_2004_08_25
 
 #include <hpx/config.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/pp/cat.hpp>
+#include <hpx/pp/stringize.hpp>
 #include <hpx/util/plugin/abstract_factory.hpp>
 #include <hpx/util/plugin/concrete_factory.hpp>
 #include <hpx/util/plugin/config.hpp>

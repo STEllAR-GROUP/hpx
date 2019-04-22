@@ -176,6 +176,7 @@ namespace hpx
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/pp/strip_parens.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
@@ -185,7 +186,6 @@ namespace hpx
 #include <hpx/util/assert.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <algorithm>

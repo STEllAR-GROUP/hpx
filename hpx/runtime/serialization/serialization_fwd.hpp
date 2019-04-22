@@ -8,7 +8,7 @@
 #define HPX_SERIALIZATION_FWD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/detail/pp/strip_parens.hpp>
+#include <hpx/pp/strip_parens.hpp>
 
 #include <type_traits>
 

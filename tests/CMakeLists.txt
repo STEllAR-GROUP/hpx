@@ -26,8 +26,5 @@ endif()
 
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
-  if(${subdir}_FLAGS)
-    add_hpx_pseudo_dependencies(tests tests.${subdir})
-  endif()
 endforeach()
 

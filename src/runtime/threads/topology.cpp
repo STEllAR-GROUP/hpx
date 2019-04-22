@@ -18,7 +18,6 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
-#include <hpx/runtime/threads/topology.hpp>
 
 #include <boost/io/ios_state.hpp>
 
@@ -29,7 +28,6 @@
 #include <mutex>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include <errno.h>
 
@@ -1351,7 +1349,6 @@ namespace hpx { namespace threads
                 "hpx::threads::topology::get_area_membind_nodeset",
                 "hwloc_get_area_membind_nodeset failed");
             return bitmap_to_mask(ns, HWLOC_OBJ_MACHINE);
-            std::cout << "error in  ";
         }
         return bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
     }

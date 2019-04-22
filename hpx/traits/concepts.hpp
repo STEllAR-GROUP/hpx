@@ -9,7 +9,7 @@
 #if !defined(HPX_TRAITS_CONCEPTS_JUL_19_2015_0547PM)
 #define HPX_TRAITS_CONCEPTS_JUL_19_2015_0547PM
 
-#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/pp/cat.hpp>
 
 #include <type_traits>
 
