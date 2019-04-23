@@ -9,7 +9,7 @@
 #define HPX_SERIALIZATION_POLYMORPHIC_ID_FACTORY_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/pp/stringize.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/throw_exception.hpp>

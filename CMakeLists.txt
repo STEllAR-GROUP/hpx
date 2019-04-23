@@ -1605,6 +1605,11 @@ hpx_libraries(${HWLOC_LIBRARIES})
 include_directories(${HWLOC_INCLUDE_DIR})
 
 ################################################################################
+# Set search paths for generated headers.
+################################################################################
+include_directories("${CMAKE_BINARY_DIR}")
+
+################################################################################
 # Enable integration with Intel Amplifier
 ################################################################################
 if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
@@ -1812,11 +1817,6 @@ function(generate_config_defines_header TARGET_DIRECTORY)
 endfunction()
 
 ################################################################################
-# Set basic search paths for the generated HPX headers
-################################################################################
-include_directories("${CMAKE_BINARY_DIR}")
-
-################################################################################
 # Add custom targets for tests
 ################################################################################
 if (HPX_WITH_TESTS)
@@ -1854,9 +1854,9 @@ if(HPX_WITH_STATIC_LINKING)
     # The MSVC linker can't handle a static library as large as we get when
     # statically linking the main HPX library
     set(hpx_libs_link_mode SHARED)
-  else()
-    set(hpx_libs_link_mode ${hpx_library_link_mode})
   endif()
+else()
+  set(hpx_libs_link_mode ${hpx_library_link_mode})
 endif()
 add_subdirectory(libs)
 

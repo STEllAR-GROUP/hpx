@@ -10,8 +10,8 @@
 #define HPX_SERIALIZATION_POLYMORPHIC_NONINTRUSIVE_FACTORY_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/pp/stringize.hpp>
-#include <hpx/pp/strip_parens.hpp>
+#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/runtime/serialization/detail/non_default_constructible.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/throw_exception.hpp>
