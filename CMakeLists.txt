@@ -1847,6 +1847,12 @@ if (HPX_WITH_TESTS)
 endif()
 
 ################################################################################
+# Debug library postfix
+################################################################################
+set(CMAKE_DEBUG_POSTFIX "d")
+set(HPX_DEBUG_POSTFIX "d")
+
+################################################################################
 # Add libraries
 ################################################################################
 if(HPX_WITH_STATIC_LINKING)
@@ -1881,10 +1887,6 @@ endif()
 # Documentation toolchain (Sphinx, Doxygen, Breathe)
 ################################################################################
 hpx_include(Documentation)
-
-# Debug library postfix
-set(CMAKE_DEBUG_POSTFIX "d")
-set(HPX_DEBUG_POSTFIX "d")
 
 ################################################################################
 # Target specification
