@@ -74,7 +74,7 @@ void test_count_if()
     using Iter = BitCountingIterator<std::int64_t{33}>;
     using Sent = Sentinel<std::int64_t>;
 
-    auto predicate = [](auto v) { return v == 1; };
+    auto predicate = [](std::int64_t v) { return v == 1; };
     auto stdResult = std::count_if(Iter{0}, Iter{33},
                                 predicate);
 
