@@ -11,7 +11,7 @@
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/pp/nargs.hpp>
+#include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/histogram.hpp>

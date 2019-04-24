@@ -16,9 +16,9 @@
 /// asynchronous API which return the futures.
 
 #include <hpx/config.hpp>
-#include <hpx/pp/cat.hpp>
-#include <hpx/pp/expand.hpp>
-#include <hpx/pp/nargs.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/expand.hpp>
+#include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>

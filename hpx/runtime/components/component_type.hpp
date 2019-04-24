@@ -9,11 +9,11 @@
 #define HPX_RUNTIME_COMPONENTS_COMPONENT_TYPE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/pp/cat.hpp>
-#include <hpx/pp/expand.hpp>
-#include <hpx/pp/nargs.hpp>
-#include <hpx/pp/stringize.hpp>
-#include <hpx/pp/strip_parens.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/expand.hpp>
+#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/assert.hpp>

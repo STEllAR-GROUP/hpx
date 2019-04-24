@@ -8,7 +8,7 @@
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM
 
 #include <hpx/config.hpp>
-#include <hpx/pp/stringize.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>

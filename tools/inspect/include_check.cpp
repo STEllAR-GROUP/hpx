@@ -221,13 +221,14 @@ namespace boost
         {"(\\bboost\\s*::\\s*intrusive_ptr\\b)", "boost::intrusive_ptr",
             "boost/intrusive_ptr.hpp"},
         // macros
-        {"(\\bHPX_PP_CAT\\b)", "HPX_PP_CAT", "hpx/pp/cat.hpp"},
-        {"(\\bHPX_PP_EXPAND\\b)", "HPX_PP_EXPAND", "hpx/pp/expand.hpp"},
-        {"(\\bHPX_PP_NARGS\\b)", "HPX_PP_NARGS", "hpx/pp/nargs.hpp"},
+        {"(\\bHPX_PP_CAT\\b)", "HPX_PP_CAT", "hpx/preprocessor/cat.hpp"},
+        {"(\\bHPX_PP_EXPAND\\b)", "HPX_PP_EXPAND",
+            "hpx/preprocessor/expand.hpp"},
+        {"(\\bHPX_PP_NARGS\\b)", "HPX_PP_NARGS", "hpx/preprocessor/nargs.hpp"},
         {"(\\bHPX_PP_STRINGIZE\\b)", "HPX_PP_STRINGIZE",
-            "hpx/pp/stringize.hpp"},
+            "hpx/preprocessor/stringize.hpp"},
         {"(\\bHPX_PP_STRIP_PARENS\\b)", "HPX_PP_STRIP_PARENS",
-            "hpx/pp/strip_parens.hpp"},
+            "hpx/preprocessor/strip_parens.hpp"},
         //
         {"(\\HPX_ASSERT\\b)", "HPX_ASSERT", "hpx/util/assert.hpp"},
         {nullptr, nullptr, nullptr}};

@@ -8,8 +8,8 @@
 
 #include <hpx/config/defaults.hpp>
 // TODO: move parcel ports into plugins
-#include <hpx/pp/expand.hpp>
-#include <hpx/pp/stringize.hpp>
+#include <hpx/preprocessor/expand.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/find_prefix.hpp>

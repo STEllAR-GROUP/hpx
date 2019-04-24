@@ -9,10 +9,10 @@
 #define HPX_COMPONENT_REGISTRY_MAR_10_2010_0720PM
 
 #include <hpx/config.hpp>
-#include <hpx/pp/cat.hpp>
-#include <hpx/pp/expand.hpp>
-#include <hpx/pp/nargs.hpp>
-#include <hpx/pp/stringize.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/expand.hpp>
+#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/components/component_type.hpp>

@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/pp/stringize.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 

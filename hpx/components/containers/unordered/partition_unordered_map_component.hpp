@@ -18,9 +18,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/reduce.hpp>
-#include <hpx/pp/cat.hpp>
-#include <hpx/pp/expand.hpp>
-#include <hpx/pp/nargs.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/expand.hpp>
+#include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>

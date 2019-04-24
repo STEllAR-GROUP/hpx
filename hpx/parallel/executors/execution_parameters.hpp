@@ -12,8 +12,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/pp/cat.hpp>
-#include <hpx/pp/stringize.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
