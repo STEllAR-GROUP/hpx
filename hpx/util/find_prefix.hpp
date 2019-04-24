@@ -9,6 +9,7 @@
 #define HPX_09DFB7AE_8265_4667_AA02_65BF8C0B1DFD
 
 #include <hpx/config.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 
 #include <string>
 

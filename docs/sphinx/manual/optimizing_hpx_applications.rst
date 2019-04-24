@@ -2295,8 +2295,7 @@ system and application performance.
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current standard deviation (stddev) value calculated based on
        the values queried from the underlying counter (the one specified as the
-       instance name). Note that this counter will be available only for Boost
-       V1.56 and newer.
+       instance name).
      * Any parameter will be interpreted as a list of up to two comma separated
        (integer) values, where the first is the time interval (in milliseconds)
        at which the underlying counter should be queried. If no value is

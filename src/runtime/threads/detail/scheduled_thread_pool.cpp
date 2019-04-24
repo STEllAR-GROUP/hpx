@@ -55,7 +55,7 @@ template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
 #endif
 
 #if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
-#include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
+#include <hpx/runtime/threads/policies/shared_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::policies::shared_priority_queue_scheduler<>;
 template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
     hpx::threads::policies::shared_priority_queue_scheduler<>>;

@@ -1015,8 +1015,8 @@ link_directories(${CMAKE_BINARY_DIR}/lib)
 
 # Check if the selected compiler versions are supposed to work with our codebase
 if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
-    hpx_error("GCC 4.9 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0)
+    hpx_error("GCC 5.0 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
   endif()
 endif()
 
@@ -1605,6 +1605,11 @@ hpx_libraries(${HWLOC_LIBRARIES})
 include_directories(${HWLOC_INCLUDE_DIR})
 
 ################################################################################
+# Set search paths for generated headers.
+################################################################################
+include_directories("${CMAKE_BINARY_DIR}")
+
+################################################################################
 # Enable integration with Intel Amplifier
 ################################################################################
 if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
@@ -1751,11 +1756,6 @@ if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   if(NOT Boost_CONTEXT_FOUND)
     hpx_error("The usage of Boost.Context was selected but Boost.Context was not found.")
   endif()
-  if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-    if(Boost_VERSION LESS 105600)
-      hpx_error("On BlueGene/Q, Boost.Context can only be used with a Boost >=1.56")
-    endif()
-  endif()
   hpx_add_config_define(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 endif()
 
@@ -1817,11 +1817,6 @@ function(generate_config_defines_header TARGET_DIRECTORY)
 endfunction()
 
 ################################################################################
-# Set basic search paths for the generated HPX headers
-################################################################################
-include_directories("${CMAKE_BINARY_DIR}")
-
-################################################################################
 # Add custom targets for tests
 ################################################################################
 if (HPX_WITH_TESTS)
@@ -1859,9 +1854,9 @@ if(HPX_WITH_STATIC_LINKING)
     # The MSVC linker can't handle a static library as large as we get when
     # statically linking the main HPX library
     set(hpx_libs_link_mode SHARED)
-  else()
-    set(hpx_libs_link_mode ${hpx_library_link_mode})
   endif()
+else()
+  set(hpx_libs_link_mode ${hpx_library_link_mode})
 endif()
 add_subdirectory(libs)
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -189,7 +189,7 @@ namespace hpx
 
             ~std_exception() noexcept {}
 
-            const char* what() const noexcept
+            const char* what() const noexcept override
             {
                 return what_.c_str();
             }
@@ -207,7 +207,7 @@ namespace hpx
 
             ~bad_alloc() noexcept {}
 
-            const char* what() const noexcept
+            const char* what() const noexcept override
             {
                 return what_.c_str();
             }
@@ -225,7 +225,7 @@ namespace hpx
 
             ~bad_exception() noexcept {}
 
-            const char* what() const noexcept
+            const char* what() const noexcept override
             {
                 return what_.c_str();
             }
@@ -243,7 +243,7 @@ namespace hpx
 
             ~bad_cast() noexcept {}
 
-            const char* what() const noexcept
+            const char* what() const noexcept override
             {
                 return what_.c_str();
             }
@@ -261,7 +261,7 @@ namespace hpx
 
             ~bad_typeid() noexcept {}
 
-            const char* what() const noexcept
+            const char* what() const noexcept override
             {
                 return what_.c_str();
             }

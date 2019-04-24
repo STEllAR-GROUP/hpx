@@ -10,59 +10,58 @@
 
 // hpxinspect:noinclude:HPX_PP_STRIP_PARENS
 
-#ifndef HPX_PP_DETAIL_STRIP_PARENS_HPP_INCLUDED
-#define HPX_PP_DETAIL_STRIP_PARENS_HPP_INCLUDED
+#ifndef HPX_PREPROCESSOR_STRIP_PARENS_HPP
+#define HPX_PREPROCESSOR_STRIP_PARENS_HPP
 
-#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/preprocessor/cat.hpp>
 
-/*!
- * \file
- * \brief Defines the HPX_PP_STRIP_PARENS macro
- */
-
-#define HPX_PP_DETAILS_APPLY(macro, args)   HPX_PP_DETAILS_APPLY_I(macro, args)
+/// \cond NOINTERNAL
+#define HPX_PP_DETAILS_APPLY(macro, args) HPX_PP_DETAILS_APPLY_I(macro, args)
 #define HPX_PP_DETAILS_APPLY_I(macro, args) macro args
-#define HPX_PP_DETAILS_STRIP_PARENS_I(...) 1,1
+#define HPX_PP_DETAILS_STRIP_PARENS_I(...) 1, 1
 #define HPX_PP_DETAILS_EVAL(test, x) HPX_PP_DETAILS_EVAL_I(test, x)
-#define HPX_PP_DETAILS_EVAL_I(test, x)                                        \
+#define HPX_PP_DETAILS_EVAL_I(test, x)                                         \
     HPX_PP_DETAILS_MAYBE_STRIP_PARENS(HPX_PP_DETAILS_TEST_ARITY test, x)
-#define HPX_PP_DETAILS_TEST_ARITY(...)                                        \
+#define HPX_PP_DETAILS_TEST_ARITY(...)                                         \
     HPX_PP_DETAILS_APPLY(HPX_PP_DETAILS_TEST_ARITY_I, (__VA_ARGS__, 2, 1, 0))
-#define HPX_PP_DETAILS_TEST_ARITY_I(a,b,c,...) c
-#define HPX_PP_DETAILS_MAYBE_STRIP_PARENS(cond, x)                            \
+#define HPX_PP_DETAILS_TEST_ARITY_I(a, b, c, ...) c
+#define HPX_PP_DETAILS_MAYBE_STRIP_PARENS(cond, x)                             \
     HPX_PP_DETAILS_MAYBE_STRIP_PARENS_I(cond, x)
-#define HPX_PP_DETAILS_MAYBE_STRIP_PARENS_I(cond, x)                          \
+#define HPX_PP_DETAILS_MAYBE_STRIP_PARENS_I(cond, x)                           \
     HPX_PP_CAT(HPX_PP_DETAILS_MAYBE_STRIP_PARENS_, cond)(x)
 #define HPX_PP_DETAILS_MAYBE_STRIP_PARENS_1(x) x
-#define HPX_PP_DETAILS_MAYBE_STRIP_PARENS_2(x)                                \
+#define HPX_PP_DETAILS_MAYBE_STRIP_PARENS_2(x)                                 \
     HPX_PP_DETAILS_APPLY(HPX_PP_DETAILS_MAYBE_STRIP_PARENS_2_I, x)
 #define HPX_PP_DETAILS_MAYBE_STRIP_PARENS_2_I(...) __VA_ARGS__
+/// \endcond
 
 //==============================================================================
 /*!
- * \ingroup preprocessor
  * For any symbol \c X, this macro returns the same symbol from which potential
  * outer parens have been removed. If no outer parens are found, this macros
  * evaluates to \c X itself without error.
  *
  * The original implementation of this macro is from Steven Watanbe as shown
- * in http://article.gmane.org/gmane.comp.lib.boost.user/61011
+ * in http://boost.2283326.n4.nabble.com/preprocessor-removing-parentheses-td2591973.html#a2591976
  *
  * \param X Symbol to strip parens from
  *
  * \par Example Usage:
  *
- * \include pp_strip.cpp
+ * \code
+ * HPX_PP_STRIP_PARENS(no_parens)
+ * HPX_PP_STRIP_PARENS((with_parens))
+ * \endcode
  *
  * This produces the following output
  * \code
- * (no parens)
- * (with parens)
+ * no_parens
+ * with_parens
  * \endcode
  */
 //==============================================================================
-#define HPX_PP_STRIP_PARENS(X)                                                \
-    HPX_PP_DETAILS_EVAL((HPX_PP_DETAILS_STRIP_PARENS_I X), X)                 \
-/**/
+#define HPX_PP_STRIP_PARENS(X)                                                 \
+    HPX_PP_DETAILS_EVAL((HPX_PP_DETAILS_STRIP_PARENS_I X), X)                  \
+    /**/
 
 #endif

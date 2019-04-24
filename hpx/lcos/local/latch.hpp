@@ -55,7 +55,7 @@ namespace hpx { namespace lcos { namespace local
         /// Postconditions: counter_ == count.
         ///
         explicit latch(std::ptrdiff_t count)
-          : mtx_(), cond_(), counter_(count)
+          : mtx_(), cond_(), counter_(count), notified_(count == 0)
         {
         }
 
@@ -89,7 +89,10 @@ namespace hpx { namespace lcos { namespace local
             std::unique_lock<mutex_type> l(mtx_.data_);
             HPX_ASSERT(counter_ > 0);
             if (--counter_ == 0)
+            {
+                notified_ = true;
                 cond_.data_.notify_all(std::move(l));    // release the threads
+            }
             else
                 cond_.data_.wait(l, "hpx::local::latch::count_down_and_wait");
         }
@@ -113,6 +116,7 @@ namespace hpx { namespace lcos { namespace local
             if (new_count == 0)
             {
                 std::unique_lock<mutex_type> l(mtx_.data_);
+                notified_ = true;
                 cond_.data_.notify_all(std::move(l));    // release the threads
             }
         }
@@ -134,12 +138,9 @@ namespace hpx { namespace lcos { namespace local
         ///
         void wait() const
         {
-            if (counter_.load(std::memory_order_acquire) > 0)
-            {
-                std::unique_lock<mutex_type> l(mtx_.data_);
-                if (counter_.load(std::memory_order_relaxed) > 0)
-                    cond_.data_.wait(l, "hpx::local::latch::wait");
-            }
+            std::unique_lock<mutex_type> l(mtx_.data_);
+            if (counter_.load(std::memory_order_relaxed) > 0 || !notified_)
+                cond_.data_.wait(l, "hpx::local::latch::wait");
         }
 
         void abort_all()
@@ -177,12 +178,17 @@ namespace hpx { namespace lcos { namespace local
                 counter_.exchange(n, std::memory_order_acq_rel);
 
             HPX_ASSERT(old_count == 0);
+
+            std::unique_lock<mutex_type> l(mtx_.data_);
+            HPX_ASSERT(notified_);
+            notified_ = false;
         }
 
     private:
         mutable util::cache_line_data<mutex_type> mtx_;
         mutable util::cache_line_data<local::detail::condition_variable> cond_;
         std::atomic<std::ptrdiff_t> counter_;
+        bool notified_;
     };
 }}}
 

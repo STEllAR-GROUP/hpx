@@ -14,7 +14,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/preprocessor/cat.hpp>
 
 #if defined(HPX_HAVE_INTERNAL_ALLOCATOR)
 // this is currently used only for jemalloc and if a special API prefix is

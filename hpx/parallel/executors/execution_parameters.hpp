@@ -12,6 +12,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
@@ -20,8 +22,6 @@
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_parameters_fwd.hpp>

@@ -166,7 +166,7 @@ Software and libraries
 
 In the simplest case, |hpx| depends on |boost|_ and |hwloc|_. So, before you
 read further, please make sure you have a recent version of |boost|_ installed
-on your target machine. |hpx| currently requires at least Boost V1.58.0 to work
+on your target machine. |hpx| currently requires at least Boost V1.61.0 to work
 properly. It may build and run with older versions, but we do not test |hpx|
 with those versions, so please be warned.
 
@@ -228,18 +228,13 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |boost_libraries|_
-     * 1.62.0 or newer
-     * 1.58.0
+     * 1.67.0 or newer
+     * 1.61.0
      *
    * * |hwloc|_
      * 1.11
      * 1.2 (Xeon Phi: 1.6)
      *
-
-.. note::
-
-   When compiling |hpx| using clang/libc++ on OSX platform it is advised not
-   to use Boost V1.58 or V1.60.
 
 .. note::
 
@@ -282,8 +277,8 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |boost|_
-     * 1.62.0 or newer
-     * 1.58.0
+     * 1.67.0 or newer
+     * 1.61.0
      *
    * * |hwloc|_
      * 1.11
@@ -292,7 +287,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
 
 .. note::
 
-   You need to build the following Boost libraries for |hpx|: 
+   You need to build the following Boost libraries for |hpx|:
    Boost.Filesystem, Boost.ProgramOptions, Boost.Regex, and Boost.System. The
    following are not needed by default, but are required in certain
    configurations: Boost.Chrono, Boost.DateTime, Boost.Log, Boost.LogSetup, and
@@ -859,10 +854,10 @@ required libraries via MacPorts:
 
    .. code-block:: bash
 
-      wget http://sourceforge.net/projects/boost/files/boost/1.54.0/boost_1_54_0.tar.bz2
-      tar xjf boost_1_54_0.tar.bz2
-      pushd boost_1_54_0
-      export BOOST_ROOT=$HOME/boost_1_54_0
+      wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.bz2
+      tar xjf boost_1_69_0.tar.bz2
+      pushd boost_1_69_0
+      export BOOST_ROOT=$HOME/boost_1_69_0
       ./bootstrap.sh --prefix=$BOOST_DIR
       ./b2 -j8
       ./b2 -j8 install
@@ -982,9 +977,8 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 * Download the |hwloc|_ V1.11.0 (or latest version) from `here
   <http://www.open-mpi.org/software/hwloc/v1.11/downloads/hwloc-win64-build-1.11.0.zip>`__
   and unpack it.
-* Download |boost|_ libraries V1.60 (or latest version) from `here
-  <https://sourceforge.net/projects/boost/files/boost/1.60.0/>`__ and unpack
-  them.
+* Download the latest |boost|_ libraries from `here
+  <https://www.boost.org/users/download/>`__ and unpack them.
 * Build the boost DLLs and LIBs by using these commands from Command Line (or
   PowerShell). Open CMD/PowerShell inside the Boost dir and type in:
 

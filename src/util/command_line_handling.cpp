@@ -7,17 +7,17 @@
 
 #include <hpx/config/asio.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/asio_util.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/batch_environment.hpp>
 #include <hpx/util/debugging.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/detail/reset_function.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/init_logging.hpp>

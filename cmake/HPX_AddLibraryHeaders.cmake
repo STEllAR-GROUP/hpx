@@ -46,8 +46,8 @@ function(add_hpx_library_headers_noglob name)
     set(multi_value_args EXCLUDE HEADERS)
     cmake_parse_arguments(HEADERS "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-#    hpx_print_list("DEBUG" "add_hpx_library_sources_noglob.${name}"
-#      "Sources for ${name}" ${HEADERS_HEADERS})
+    hpx_print_list("DEBUG" "add_hpx_library_sources_noglob.${name}"
+      "Sources for ${name}" HEADERS_HEADERS)
 
     set(headers ${HEADERS_HEADERS})
 
@@ -67,7 +67,7 @@ function(add_hpx_library_headers_noglob name)
       endif()
 
       if(add_flag)
-        hpx_debug("add_library_headers.${name}"
+        hpx_debug("add_hpx_library_headers_noglob.${name}"
                   "Adding ${absolute_path} to header list for lib${name}")
         set(${name}_HEADERS ${${name}_HEADERS} ${absolute_path}
           CACHE INTERNAL "Headers for lib${name}." FORCE)

@@ -16,9 +16,9 @@
 #endif
 
 #include <hpx/exception.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/version.hpp>

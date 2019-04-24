@@ -139,6 +139,9 @@ namespace hpx { namespace lcos
 #include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/expand.hpp>
+#include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -149,9 +152,6 @@ namespace hpx { namespace lcos
 #include <hpx/util/assert.hpp>
 #include <hpx/util/calculate_fanout.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/expand.hpp>
-#include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <cstddef>

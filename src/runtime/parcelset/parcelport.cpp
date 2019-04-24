@@ -20,7 +20,6 @@
 #endif
 #include <hpx/util/assert.hpp>
 
-#include <cstdint>
 #include <cstddef>
 #include <cstdint>
 #include <exception>

@@ -30,7 +30,7 @@ if(HPX_WITH_THREAD_LOCAL_STORAGE)
   set(tests ${tests} tss)
 endif()
 
-set(lockfree_fifo_FLAGS NOLIBS DEPENDENCIES ${Boost_LIBRARIES})
+set(lockfree_fifo_FLAGS NOLIBS DEPENDENCIES ${Boost_LIBRARIES} hpx_preprocessor)
 
 set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -81,6 +81,8 @@ endforeach()
 
 set_property(TARGET lockfree_fifo_test APPEND
     PROPERTY COMPILE_DEFINITIONS "HPX_NO_VERSION_CHECK")
+
+target_include_directories(lockfree_fifo_test PRIVATE ${HPX_SOURCE_DIR})
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set_tests_properties(tests.unit.threads.thread_stacksize_overflow PROPERTIES

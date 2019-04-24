@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/runtime/actions_fwd.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/runtime/actions_fwd.hpp>
 
 #include <cstdint>
 #include <string>

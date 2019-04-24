@@ -26,12 +26,7 @@
 #endif
 
 #include <boost/version.hpp>
-
-#if BOOST_VERSION < 106100
-#include <boost/context/all.hpp>
-#else
 #include <boost/context/detail/fcontext.hpp>
-#endif
 
 #include <atomic>
 #include <cstddef>
@@ -125,16 +120,15 @@ namespace hpx { namespace threads { namespace coroutines
             }
 
             static std::size_t default_stacksize()
-            { return minimum_stacksize(); }
+            {
+                return minimum_stacksize();
+            }
 
             static std::size_t minimum_stacksize()
-            { return SIGSTKSZ +
-#if BOOST_VERSION < 106100
-                sizeof(boost::context::fcontext_t)
-#else
-                sizeof(boost::context::detail::fcontext_t)
-#endif
-                + 15; }
+            {
+                return SIGSTKSZ + sizeof(boost::context::detail::fcontext_t) +
+                    15;
+            }
 
             void* allocate(std::size_t size) const
             {
@@ -160,16 +154,6 @@ namespace hpx { namespace threads { namespace coroutines
 
         // Generic implementation for the context_impl_base class based on
         // Boost.Context.
-#if BOOST_VERSION < 106100
-        template <typename T>
-        HPX_FORCEINLINE void trampoline(intptr_t pv)
-        {
-            T* fun = reinterpret_cast<T*>(pv);
-            HPX_ASSERT(fun);
-            (*fun)();
-            std::abort();
-        }
-#else
         template <typename T>
         HPX_FORCEINLINE void trampoline(boost::context::detail::transfer_t tr)
         {
@@ -185,7 +169,6 @@ namespace hpx { namespace threads { namespace coroutines
 
             std::abort();
         }
-#endif
 
         template <typename CoroutineImpl>
         class fcontext_context_impl
@@ -199,11 +182,7 @@ namespace hpx { namespace threads { namespace coroutines
             // Create a context that on restore invokes Functor on
             // a new stack. The stack size can be optionally specified.
             explicit fcontext_context_impl(std::ptrdiff_t stack_size = -1)
-#if BOOST_VERSION < 106100
-              : cb_(reinterpret_cast<intptr_t>(this))
-#else
               : cb_(std::make_pair(reinterpret_cast<void*>(this), nullptr))
-#endif
               , funp_(&trampoline<CoroutineImpl>)
               , ctx_(0)
               , alloc_()
@@ -223,14 +202,9 @@ namespace hpx { namespace threads { namespace coroutines
                 {
                     throw std::runtime_error("could not allocate memory for stack");
                 }
-#if BOOST_VERSION < 106100
-                ctx_ =
-                    boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
-#else
                 ctx_ =
                     boost::context::detail::make_fcontext(
                             stack_pointer_, stack_size_, funp_);
-#endif
             }
 
             ~fcontext_context_impl()
@@ -278,13 +252,8 @@ namespace hpx { namespace threads { namespace coroutines
                 if (ctx_)
                 {
                     increment_stack_recycle_count();
-#if BOOST_VERSION < 106100
-                    ctx_ = boost::context::make_fcontext(
-                        stack_pointer_, stack_size_, funp_);
-#else
                     ctx_ = boost::context::detail::make_fcontext(
                         stack_pointer_, stack_size_, funp_);
-#endif
                 }
             }
 
@@ -329,14 +298,10 @@ namespace hpx { namespace threads { namespace coroutines
                 __splitstack_setcontext(to.alloc_.segments_ctx);
 #endif
                 // switch to other coroutine context
-#if BOOST_VERSION < 106100
-                boost::context::jump_fcontext(&from.ctx_, to.ctx_, to.cb_, false);
-#else
                 to.cb_.second = &from.ctx_;
                 auto transfer = boost::context::detail::jump_fcontext(
                         to.ctx_, reinterpret_cast<void*>(&to.cb_));
                 to.ctx_ = transfer.fctx;
-#endif
 
 #if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
                 __splitstack_setcontext(from.alloc_.segments_ctx);
@@ -344,15 +309,9 @@ namespace hpx { namespace threads { namespace coroutines
             }
 
         private:
-#if BOOST_VERSION < 106100
-            intptr_t cb_;
-            void (*funp_)(intptr_t);
-            boost::context::fcontext_t ctx_;
-#else
             std::pair<void*, boost::context::detail::fcontext_t*> cb_;
             void (*funp_)(boost::context::detail::transfer_t);
             boost::context::detail::fcontext_t ctx_;
-#endif
             stack_allocator alloc_;
             std::size_t stack_size_;
             void * stack_pointer_;
