@@ -357,5 +357,16 @@ namespace hpx { namespace iostreams
     }
 }}
 
+namespace hpx { namespace util {
+    // TODO: This overload should not be needed. See #3175.
+    template <typename Char, typename Sink, typename... Args>
+    hpx::iostreams::ostream<Char, Sink>& format_to(
+        hpx::iostreams::ostream<Char, Sink>& os, std::string const& format_str,
+        Args const&... args)
+    {
+        return os << format(format_str, args...);
+    }
+}}
+
 #endif // HPX_97FC0FA2_E773_4F83_8477_806EC68C2253
 

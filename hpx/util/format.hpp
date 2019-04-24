@@ -20,11 +20,6 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace iostreams {
-    template <typename Char, typename Sink>
-    struct ostream;
-}}
-
 namespace hpx { namespace util
 {
     namespace detail
@@ -243,14 +238,6 @@ namespace hpx { namespace util
         detail::format_arg const format_args[] = { args..., 0 };
         detail::format_to(os, format_str, format_args, sizeof...(Args));
         return os;
-    }
-
-    template <typename Char, typename Sink, typename ...Args>
-    hpx::iostreams::ostream<Char, Sink>& format_to(
-        hpx::iostreams::ostream<Char, Sink>& os,
-        std::string const& format_str, Args const&... args)
-    {
-        return os << format(format_str, args...);
     }
 }}
 
