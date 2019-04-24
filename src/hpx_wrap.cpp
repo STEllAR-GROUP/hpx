@@ -1,4 +1,4 @@
-//  Copyright (c) 20018 Nikunj Gupta
+//  Copyright (c) 2018 Nikunj Gupta
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,10 +23,12 @@ namespace hpx_start
     HPX_SYMBOL_EXPORT bool include_libhpx_wrap __attribute__((weak)) = false;
 }
 
+#include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/hpx.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/util/function.hpp>
 
-#include <iostream>
+#include <string>
 #include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
