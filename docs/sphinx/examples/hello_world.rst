@@ -120,7 +120,7 @@ OS-thread prints out the statement, the future is marked as ready, and
 executing on the correct OS-thread, it returns a value of -1, which causes
 ``hello_world_foreman()`` to leave the OS-thread id in ``attendance``.
 
-.. literalinclude:: ../../examples/quickstart/hello_world_distributed_distributed.cpp
+.. literalinclude:: ../../examples/quickstart/hello_world_distributed.cpp
    :lines: 37-61
 
 Because |hpx| features work stealing task schedulers, there is no way to

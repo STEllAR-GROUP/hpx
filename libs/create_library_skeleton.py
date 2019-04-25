@@ -195,7 +195,6 @@ libs = sorted([ lib for lib in os.listdir(cwd) if os.path.isdir(lib) ])
 # Adapting top level CMakeLists.txt
 libs_cmakelists = cmake_header + f'''
 # This file is auto generated. Please do not edit manually.
-
 '''
 
 libs_cmakelists += '''
@@ -204,7 +203,7 @@ set(HPX_LIBS
 for lib in libs:
     if not lib.startswith('_'):
         libs_cmakelists += f'  {lib}\n'
-libs_cmakelists += ')\n'
+libs_cmakelists += '  CACHE INTERNAL "" FORCE\n)\n'
 
 libs_cmakelists += '''
 foreach(lib ${HPX_LIBS})
@@ -215,23 +214,28 @@ endforeach()
 f = open(os.path.join(cwd, 'CMakeLists.txt'), 'w')
 f.write(libs_cmakelists)
 
-# Adapting top level index.rst
-index_rst = f'''..
+# Adapting all_modules.rst
+all_modules_rst = f'''..
    Copyright (c) 2018-2019 The STE||AR-Group
 
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+.. _all_modules:
+
+===========
+All modules
+===========
+
 .. toctree::
-   :caption: Libraries
    :maxdepth: 2
 
 '''
 for lib in libs:
-    index_rst += f'   /libs/{lib}/docs/index.rst\n'
+    all_modules_rst += f'   /libs/{lib}/docs/index.rst\n'
 
-f = open(os.path.join(cwd, 'index.rst'), 'w')
-f.write(index_rst)
+f = open(os.path.join(cwd, 'all_modules.rst'), 'w')
+f.write(all_modules_rst)
 
 ################################################################################
 

@@ -6,9 +6,9 @@
 
 .. _libs_preprocessor:
 
-===
+============
 preprocessor
-===
+============
 
 This library contains useful preprocessor macros:
 

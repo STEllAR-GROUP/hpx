@@ -1299,7 +1299,7 @@ How to install |hpx| on Fedora distributions
      sudo echo /opt/hpx/lib > /etc/ld.so.conf.d/hpx.conf
      sudo ldconfig
 
-.. _arch_installation
+.. _arch_installation:
 
 How to install |hpx| on Arch distributions
 ------------------------------------------
