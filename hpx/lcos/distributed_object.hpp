@@ -149,8 +149,8 @@ namespace hpx { namespace lcos { namespace server {
 namespace hpx { namespace lcos {
     enum class construction_type
     {
-        Meta_Object,
-        All_to_All
+        meta_object,
+        all_to_all
     };
 }}
 
@@ -205,7 +205,7 @@ typedef hpx::lcos::meta_object_server::registration_action
     register_with_meta_action;
 HPX_REGISTER_ACTION_DECLARATION(register_with_meta_action, register_mo_action);
 
-// Meta_object front end, decides whether it is the root locality, and thus
+// meta_object front end, decides whether it is the root locality, and thus
 // whether to register with the root locality's meta object only or to register
 // itself as the root locality's meta object as well
 namespace hpx { namespace lcos {
@@ -258,7 +258,7 @@ namespace hpx { namespace lcos {
     /// owns its local value. In other words, local data of the distributed
     /// object can be different, but they share access to one another's data
     /// globally.
-    template <typename T, construction_type C = construction_type::All_to_All>
+    template <typename T, construction_type C = construction_type::all_to_all>
     class distributed_object
       : hpx::components::client_base<distributed_object<T>,
             server::distributed_object_part<T>>
@@ -288,10 +288,10 @@ namespace hpx { namespace lcos {
         /// data, and a type and construction_type in the template parameters
         ///
         /// \param construction_type The construction_type in the template parameters
-        /// accepts either Meta_Object, and it is set to All_to_All by defalut
-        /// The Meta_Object option provides meta object registration in the root
+        /// accepts either meta_object, and it is set to all_to_all by defalut
+        /// The meta_object option provides meta object registration in the root
         /// locality and meta object is essentailly a table that can find the
-        /// instances of distributed_object in all localities. The All_to_All option only
+        /// instances of distributed_object in all localities. The all_to_all option only
         /// locally holds the client and server of the distributed_object.
         /// \param base_name The name of the distributed_object, which should be a unique
         /// string across the localities
@@ -302,13 +302,13 @@ namespace hpx { namespace lcos {
           , base_(base)
           , sub_localities_(std::move(sub_localities))
         {
-            HPX_ASSERT(C == construction_type::All_to_All ||
-                C == construction_type::Meta_Object);
+            HPX_ASSERT(C == construction_type::all_to_all ||
+                C == construction_type::meta_object);
             HPX_ASSERT(sub_localities_.size() > 0);
             ensure_ptr();
             std::sort(sub_localities_.begin(), sub_localities_.end());
 
-            if (C == construction_type::Meta_Object)
+            if (C == construction_type::meta_object)
             {
                 meta_object mo(
                     base, sub_localities_.size(), sub_localities_[0]);
@@ -337,7 +337,7 @@ namespace hpx { namespace lcos {
         }
         /// Creates a distributed_object in every locality with a given base_name string,
         /// data. The construction_type in the template parameter is set to
-        /// All_to_All option by default.
+        /// all_to_all option by default.
         ///
         /// \param base_name The name of the distributed_object, which should be a unique
         /// string across the localities
@@ -511,10 +511,10 @@ namespace hpx { namespace lcos {
         /// the local instance.
         ///
         /// \param construction_type The construction_type in the template parameters
-        /// accepts either Meta_Object, and it is set to All_to_All by defalut
-        /// The Meta_Object option provides meta object registration in the root
+        /// accepts either meta_object, and it is set to all_to_all by defalut
+        /// The meta_object option provides meta object registration in the root
         /// locality and meta object is essentailly a table that can find the
-        /// instances of distributed_object in all localities. The All_to_All option only
+        /// instances of distributed_object in all localities. The all_to_all option only
         /// locally holds the client and server of the distributed_object.
         /// \param base_name The name of the distributed_object, which should be a unique
         /// string across the localities
@@ -523,12 +523,12 @@ namespace hpx { namespace lcos {
           : base_type(create_server(data))
           , base_(base)
         {
-            HPX_ASSERT(C == construction_type::All_to_All ||
-                C == construction_type::Meta_Object);
+            HPX_ASSERT(C == construction_type::all_to_all ||
+                C == construction_type::meta_object);
             ensure_ptr();
             size_t localities = hpx::find_all_localities().size();
             init_sub_localities();
-            if (C == construction_type::Meta_Object)
+            if (C == construction_type::meta_object)
             {
                 meta_object mo(base, localities, 0);
                 locs = mo.registration(this->get_id());
@@ -547,13 +547,13 @@ namespace hpx { namespace lcos {
           , base_(base)
           , sub_localities_(std::move(sub_localities))
         {
-            HPX_ASSERT(C == construction_type::All_to_All ||
-                C == construction_type::Meta_Object);
+            HPX_ASSERT(C == construction_type::all_to_all ||
+                C == construction_type::meta_object);
             HPX_ASSERT(sub_localities_.size() > 0);
             ensure_ptr();
             std::sort(sub_localities_.begin(), sub_localities_.end());
 
-            if (C == construction_type::Meta_Object)
+            if (C == construction_type::meta_object)
             {
                 meta_object mo(
                     base, sub_localities_.size(), sub_localities_[0]);

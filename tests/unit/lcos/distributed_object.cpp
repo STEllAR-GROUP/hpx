@@ -216,7 +216,7 @@ void test_distributed_object_matrix()
     }
 }
 
-// test constructor in All_to_All option
+// test constructor in all_to_all option
 void test_distributed_object_matrix_all_to_all()
 {
     using hpx::lcos::distributed_object;
@@ -229,9 +229,9 @@ void test_distributed_object_matrix_all_to_all()
 
     typedef hpx::lcos::construction_type c_t;
 
-    distributed_object<myMatrixDouble, c_t::All_to_All> LHS("m1", lhs);
-    distributed_object<myMatrixDouble, c_t::All_to_All> RHS("m2", rhs);
-    distributed_object<myMatrixDouble, c_t::All_to_All> RES("m3", res);
+    distributed_object<myMatrixDouble, c_t::all_to_all> LHS("m1", lhs);
+    distributed_object<myMatrixDouble, c_t::all_to_all> RHS("m2", rhs);
+    distributed_object<myMatrixDouble, c_t::all_to_all> RES("m3", res);
 
     for (int i = 0; i < rows; i++)
     {
@@ -265,7 +265,7 @@ void test_distributed_object_matrix_all_to_all()
     }
 }
 
-// test constructor in Meta_Object option
+// test constructor in meta_object option
 void test_distributed_object_matrix_mo()
 {
     using hpx::lcos::distributed_object;
@@ -278,9 +278,9 @@ void test_distributed_object_matrix_mo()
 
     typedef hpx::lcos::construction_type c_t;
 
-    distributed_object<myMatrixInt, c_t::Meta_Object> M1("M1_meta", m1);
-    distributed_object<myMatrixInt, c_t::Meta_Object> M2("M2_meta", m2);
-    distributed_object<myMatrixInt, c_t::Meta_Object> M3("M3_meta", m3);
+    distributed_object<myMatrixInt, c_t::meta_object> M1("M1_meta", m1);
+    distributed_object<myMatrixInt, c_t::meta_object> M2("M2_meta", m2);
+    distributed_object<myMatrixInt, c_t::meta_object> M3("M3_meta", m3);
 
     for (int i = 0; i < rows; i++)
     {
@@ -406,11 +406,11 @@ void test_distributed_object_matrix_mul()
 
     typedef hpx::lcos::construction_type c_t;
 
-    distributed_object<myMatrixInt, c_t::Meta_Object> M1(
+    distributed_object<myMatrixInt, c_t::meta_object> M1(
         "M1_meta_mat_mul", all_data_m1[here]);
-    distributed_object<myMatrixInt, c_t::Meta_Object> M2(
+    distributed_object<myMatrixInt, c_t::meta_object> M2(
         "M2_meta_mat_mul", all_data_m2[here]);
-    distributed_object<myMatrixInt, c_t::Meta_Object> M3(
+    distributed_object<myMatrixInt, c_t::meta_object> M3(
         "M3_meta_mat_mul", here_data_m3);
 
     // Actual matrix multiplication. For non-local values, get the data
@@ -493,7 +493,7 @@ void test_dist_object_vector_mo_sub_localities_constructor()
     {
         // construct a distributed_object with vector<int> type
 
-        distributed_object<std::vector<int>, c_t::Meta_Object> LOCAL(
+        distributed_object<std::vector<int>, c_t::meta_object> LOCAL(
             "lhs_vec", local, sub_localities);
 
         // testing -> operator
