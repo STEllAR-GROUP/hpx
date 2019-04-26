@@ -9,8 +9,10 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
+#include <hpx/parallel/algorithms/detail/accumulate.hpp>
 #include <hpx/parallel/algorithms/count.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -35,19 +37,19 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         // sequential remote implementation
-        template <typename Algo, typename ExPolicy, typename SegIter,
-            typename T, typename Proj>
+        template <typename Algo, typename ExPolicy, typename SegIterB,
+            typename SegIterE, typename T, typename Proj>
         static typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<SegIter>::difference_type
+            ExPolicy, typename std::iterator_traits<SegIterB>::difference_type
         >::type
         segmented_count(Algo && algo, ExPolicy const& policy,
-            SegIter first, SegIter last, T const& value,
+            SegIterB first, SegIterE last, T const& value,
             Proj && proj, std::true_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
+            typedef hpx::traits::segmented_iterator_traits<SegIterB> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef typename std::iterator_traits<SegIter>::difference_type
+            typedef typename std::iterator_traits<SegIterB>::difference_type
                 value_type;
             typedef util::detail::algorithm_result<ExPolicy, value_type> result;
 
@@ -107,24 +109,24 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // parallel remote implementation
-        template <typename Algo, typename ExPolicy, typename SegIter,
-            typename T, typename Proj>
+        template <typename Algo, typename ExPolicy, typename SegIterB,
+            typename SegIterE, typename T, typename Proj>
         static typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<SegIter>::difference_type
+            ExPolicy, typename std::iterator_traits<SegIterB>::difference_type
         >::type
         segmented_count(Algo && algo, ExPolicy const& policy,
-            SegIter first, SegIter last, T const& value,
+            SegIterB first, SegIterE last, T const& value,
             Proj && proj, std::false_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
+            typedef hpx::traits::segmented_iterator_traits<SegIterB> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
 
             typedef std::integral_constant<bool,
-                    !hpx::traits::is_forward_iterator<SegIter>::value
+                    !hpx::traits::is_forward_iterator<SegIterB>::value
                 > forced_seq;
 
-            typedef typename std::iterator_traits<SegIter>::difference_type
+            typedef typename std::iterator_traits<SegIterB>::difference_type
                 value_type;
             typedef util::detail::algorithm_result<ExPolicy, value_type> result;
 
@@ -132,7 +134,7 @@ namespace hpx { namespace parallel { inline namespace v1
             segment_iterator send = traits::segment(last);
 
             std::vector<shared_future<value_type> > segments;
-            segments.reserve(std::distance(sit, send));
+            segments.reserve(detail::distance(sit, send));
 
             if (sit == send)
             {
@@ -181,25 +183,26 @@ namespace hpx { namespace parallel { inline namespace v1
                 dataflow(
                     hpx::util::unwrapping([=](std::vector<value_type> && r)
                     {
-                        return std::accumulate(r.begin(), r.end(), value_type());
+                        return detail::accumulate(r.begin(), r.end(), value_type());
                     }),
                     segments));
         }
 
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
-        template <typename ExPolicy, typename InIter, typename T, typename Proj>
+        template <typename ExPolicy, typename InIterB, typename InIterE,
+                typename T, typename Proj>
         inline typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<InIter>::difference_type
+            ExPolicy, typename std::iterator_traits<InIterB>::difference_type
         >::type
-        count_(ExPolicy&& policy, InIter first, InIter last, T const& value,
+        count_(ExPolicy&& policy, InIterB first, InIterE last, T const& value,
             Proj && proj, std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 >is_seq;
 
-            typedef typename std::iterator_traits<InIter>::difference_type
+            typedef typename std::iterator_traits<InIterB>::difference_type
                 difference_type;
 
             if (first == last)
@@ -214,11 +217,12 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename T, typename Proj>
+        template <typename ExPolicy, typename InIterB, typename InIterE,
+                typename T, typename Proj>
         typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<InIter>::difference_type
+            ExPolicy, typename std::iterator_traits<InIterB>::difference_type
         >::type
-        count_(ExPolicy&& policy, InIter first, InIter last, T const& value,
+        count_(ExPolicy&& policy, InIterB first, InIterE last, T const& value,
             Proj && proj, std::false_type);
 
         /// \endcond
@@ -232,18 +236,18 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         // sequential remote implementation
-        template <typename Algo, typename ExPolicy, typename SegIter,
-            typename F, typename Proj>
+        template <typename Algo, typename ExPolicy, typename SegIterB,
+            typename SegIterE, typename F, typename Proj>
         static typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<SegIter>::difference_type
+            ExPolicy, typename std::iterator_traits<SegIterB>::difference_type
         >::type
         segmented_count_if(Algo && algo, ExPolicy const& policy,
-            SegIter first, SegIter last, F && f, Proj && proj, std::true_type)
+            SegIterB first, SegIterE last, F && f, Proj && proj, std::true_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
+            typedef hpx::traits::segmented_iterator_traits<SegIterB> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef typename std::iterator_traits<SegIter>::difference_type
+            typedef typename std::iterator_traits<SegIterB>::difference_type
                 value_type;
             typedef util::detail::algorithm_result<ExPolicy, value_type> result;
 
@@ -307,23 +311,23 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // parallel remote implementation
-        template <typename Algo, typename ExPolicy, typename SegIter,
-            typename F, typename Proj>
+        template <typename Algo, typename ExPolicy, typename SegIterB,
+            typename SegIterE, typename F, typename Proj>
         static typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<SegIter>::difference_type
+            ExPolicy, typename std::iterator_traits<SegIterB>::difference_type
         >::type
         segmented_count_if(Algo && algo, ExPolicy const& policy,
-            SegIter first, SegIter last, F && f, Proj && proj, std::false_type)
+            SegIterB first, SegIterE last, F && f, Proj && proj, std::false_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
+            typedef hpx::traits::segmented_iterator_traits<SegIterB> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
 
             typedef std::integral_constant<bool,
-                    !hpx::traits::is_forward_iterator<SegIter>::value
+                    !hpx::traits::is_forward_iterator<SegIterB>::value
                 > forced_seq;
 
-            typedef typename std::iterator_traits<SegIter>::difference_type
+            typedef typename std::iterator_traits<SegIterB>::difference_type
                 value_type;
             typedef util::detail::algorithm_result<ExPolicy, value_type> result;
 
@@ -331,7 +335,7 @@ namespace hpx { namespace parallel { inline namespace v1
             segment_iterator send = traits::segment(last);
 
             std::vector<shared_future<value_type> > segments;
-            segments.reserve(std::distance(sit, send));
+            segments.reserve(detail::distance(sit, send));
 
             if (sit == send)
             {
@@ -394,7 +398,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             ExPolicy
                         >::call(r, errors);
 
-                        return std::accumulate(
+                        return detail::accumulate(
                             r.begin(), r.end(), value_type(),
                             [](value_type const& val, shared_future<value_type>& curr)
                             {
@@ -404,18 +408,19 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::move(segments)));
         }
 
-        template <typename ExPolicy, typename InIter, typename F, typename Proj>
+        template <typename ExPolicy, typename InIterB, typename InIterE,
+                typename F, typename Proj>
         inline typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<InIter>::difference_type
+            ExPolicy, typename std::iterator_traits<InIterB>::difference_type
         >::type
-        count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
+        count_if_(ExPolicy && policy, InIterB first, InIterE last, F && f,
             Proj && proj, std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
 
-            typedef typename std::iterator_traits<InIter>::difference_type
+            typedef typename std::iterator_traits<InIterB>::difference_type
                 difference_type;
 
             if (first == last)
@@ -431,11 +436,12 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename F, typename Proj>
+        template <typename ExPolicy, typename InIterB, typename InIterE,
+                typename F, typename Proj>
         typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<InIter>::difference_type
+            ExPolicy, typename std::iterator_traits<InIterB>::difference_type
         >::type
-        count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
+        count_if_(ExPolicy && policy, InIterB first, InIterE last, F && f,
             Proj && proj, std::false_type);
 
         /// \endcond
