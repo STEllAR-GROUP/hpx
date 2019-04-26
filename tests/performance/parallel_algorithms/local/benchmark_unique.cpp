@@ -10,7 +10,7 @@
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/include/parallel_unique.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/testing.hpp>
 

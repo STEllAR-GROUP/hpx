@@ -10,7 +10,6 @@ set(tests
     bind_action
     checkpoint
     config_entry
-    format
     pack_traversal
     pack_traversal_async
     parse_slurm_nodelist

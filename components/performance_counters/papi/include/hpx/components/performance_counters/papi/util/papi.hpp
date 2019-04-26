@@ -12,7 +12,7 @@
 
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <cstdint>
 #include <cstring>

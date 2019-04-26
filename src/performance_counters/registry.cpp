@@ -17,7 +17,7 @@
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_front.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/regex_from_pattern.hpp>

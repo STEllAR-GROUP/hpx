@@ -9,7 +9,7 @@
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <hwloc.h>

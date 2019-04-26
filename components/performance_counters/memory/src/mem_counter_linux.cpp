@@ -12,7 +12,7 @@
 #include <sys/param.h>
 
 #include <hpx/exception.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>

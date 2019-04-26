@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/spinlock.hpp>
 

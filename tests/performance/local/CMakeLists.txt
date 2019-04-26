@@ -44,9 +44,9 @@ if(HPX_WITH_EXAMPLES_OPENMP)
      )
 
   set(openmp_homogeneous_timed_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies} hpx_assertion hpx_config)
+      DEPENDENCIES ${boost_library_dependencies} hpx_assertion hpx_config hpx_format)
   set(openmp_parallel_region_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies})
+      DEPENDENCIES ${boost_library_dependencies} hpx_format)
 endif()
 
 if(HPX_WITH_EXAMPLES_QTHREADS)
@@ -60,11 +60,11 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
 
   set(qthreads_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                  ${QTHREADS_LIBRARIES} hpx_config hpx_preprocessor)
+                  ${QTHREADS_LIBRARIES} hpx_config hpx_format hpx_preprocessor)
 
   set(qthreads_heterogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                  ${QTHREADS_LIBRARIES} hpx_assertion)
+                  ${QTHREADS_LIBRARIES} hpx_assertion hpx_format)
 endif()
 
 if(HPX_WITH_EXAMPLES_TBB)
@@ -77,7 +77,7 @@ if(HPX_WITH_EXAMPLES_TBB)
 
   set(tbb_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   ${TBB_LIBRARIES} hpx_config hpx_preprocessor)
+                   ${TBB_LIBRARIES} hpx_config hpx_format hpx_preprocessor)
 endif()
 
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
@@ -87,13 +87,13 @@ set(skynet_FLAGS DEPENDENCIES iostreams_component)
 set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component)
 
 set(delay_baseline_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies} hpx_assertion hpx_config)
+    DEPENDENCIES ${boost_library_dependencies} hpx_config hpx_format)
 
 set(delay_baseline_threaded_FLAGS
-    DEPENDENCIES ${boost_library_dependencies})
+    DEPENDENCIES ${boost_library_dependencies} hpx_format)
 
 set(print_heterogeneous_payloads_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies} hpx_assertion hpx_config)
+    DEPENDENCIES ${boost_library_dependencies} hpx_config hpx_format)
 
 set(benchmarks ${benchmarks}
     hpx_tls_overhead
@@ -172,15 +172,6 @@ foreach(benchmark ${benchmarks})
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/Local")
-
-  list(FIND ${benchmark}_FLAGS NOLIBS has_NOLIBS)
-  if (NOT has_NOLIBS EQUAL -1)
-    target_compile_definitions(${benchmark}_test PRIVATE
-                               HPX_FORMAT_EXPORT= #empty
-                               HPX_NO_VERSION_CHECK)
-    target_sources(${benchmark}_test
-                   PRIVATE ${PROJECT_SOURCE_DIR}/src/util/format.cpp)
-  endif()
 
   if(NOT "${${benchmark}_PARAMETERS}" MATCHES NO_HPX_MAIN)
     add_hpx_test("tests.performance.local" ${benchmark} ${${benchmark}_PARAMETERS})

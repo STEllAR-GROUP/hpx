@@ -16,7 +16,7 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 

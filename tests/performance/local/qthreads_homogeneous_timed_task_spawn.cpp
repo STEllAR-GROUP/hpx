@@ -32,7 +32,7 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <hpx/config.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/program_options.hpp>

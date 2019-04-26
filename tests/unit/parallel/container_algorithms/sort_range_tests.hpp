@@ -23,7 +23,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_container_algorithm.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/util/iterator_range.hpp>
 //

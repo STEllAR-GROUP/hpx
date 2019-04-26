@@ -9,7 +9,7 @@
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/function.hpp>
 
 #include <hpx/components/performance_counters/io/io_counters.hpp>
