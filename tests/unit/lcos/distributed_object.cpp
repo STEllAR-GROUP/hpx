@@ -72,11 +72,11 @@ void test_distributed_object_int_reduce_to_locality_0()
     // register and retrive the distributed object.
     distributed_object<int> dist_int("a_unique_name_string", cur_locality);
 
-    // create a barrier and wait for the distributed object to be constructed in
-    // all localities
-    hpx::lcos::barrier wait_for_construction(
-        "wait_for_construction", num_localities, cur_locality);
-    wait_for_construction.wait();
+    //// create a barrier and wait for the distributed object to be constructed in
+    //// all localities
+    //hpx::lcos::barrier wait_for_construction(
+    //    "wait_for_construction", num_localities, cur_locality);
+    //wait_for_construction.wait();
 
     // If there exists more than 2 (and include) localities, we are able to
     // asychronously fetch a future of a copy of the instance of this
@@ -132,12 +132,12 @@ void test_distributed_object_vector_elem_wise_add()
     // testing * operator
     HPX_TEST((*LOCAL) == local);
 
-    // create a barrier and wait for the distributed object to be
-    // constructed in all localities
-    hpx::lcos::barrier b_dist_vector("wait_for_construction",
-        hpx::find_all_localities().size(),
-        hpx::get_locality_id());
-    b_dist_vector.wait();
+    //// create a barrier and wait for the distributed object to be
+    //// constructed in all localities
+    //hpx::lcos::barrier b_dist_vector("wait_for_construction",
+    //    hpx::find_all_localities().size(),
+    //    hpx::get_locality_id());
+    //b_dist_vector.wait();
 
     // perform element-wise addition between distributed_objects
     for (int i = 0; i < len; i++)
@@ -314,8 +314,8 @@ void test_distributed_object_ref()
     int val_update = 42;
     myVectorInt vec1(n, val);
     distributed_object<myVectorInt&> dist_vec("vec1", vec1);
-    hpx::lcos::barrier b("/meta/barrier", hpx::find_all_localities().size());
-    b.wait();
+    //hpx::lcos::barrier b("/meta/barrier", hpx::find_all_localities().size());
+    //b.wait();
     // The update/change to the exsiting/referring object
     // will reflect the change to the distributed object
     vec1[2] = val_update;
@@ -503,12 +503,12 @@ void test_dist_object_vector_mo_sub_localities_constructor()
         // testing * operator
         HPX_TEST((*LOCAL) == local);
 
-        // create a barrier and wait for the distributed object to be
-        // constructed in all localities
-        hpx::lcos::barrier b_dist_vector("wait_for_construction",
-            sub_localities.size(),
-            hpx::get_locality_id());
-        b_dist_vector.wait();
+        //// create a barrier and wait for the distributed object to be
+        //// constructed in all localities
+        //hpx::lcos::barrier b_dist_vector("wait_for_construction",
+        //    sub_localities.size(),
+        //    hpx::get_locality_id());
+        //b_dist_vector.wait();
 
         // perform element-wise addition between distributed_objects
         for (int i = 0; i < len; i++)
@@ -557,9 +557,9 @@ void test_distributed_object_sub_localities_constructor()
         distributed_object<std::vector<int>> vec1(
             "vec1", input, sub_localities);
     }
-    hpx::lcos::barrier b(
-        "wait_for_construction", hpx::find_all_localities().size());
-    b.wait();
+    //hpx::lcos::barrier b(
+    //    "wait_for_construction", hpx::find_all_localities().size());
+    //b.wait();
 }
 
 int hpx_main()

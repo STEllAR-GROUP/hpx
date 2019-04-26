@@ -285,17 +285,19 @@ namespace hpx { namespace lcos {
         distributed_object() = default;
 
         /// Creates a distributed_object in every locality with a given base_name string,
-        /// data, and a type and construction_type in the template parameters
+        /// data, and a type and construction_type in the template parameters.
         ///
         /// \param construction_type The construction_type in the template parameters
-        /// accepts either meta_object, and it is set to all_to_all by defalut
-        /// The meta_object option provides meta object registration in the root
+        /// accepts either meta_object or all_to_all, and it is set to all_to_all by
+        /// defalut. The meta_object option provides meta object registration in the root
         /// locality and meta object is essentailly a table that can find the
         /// instances of distributed_object in all localities. The all_to_all option only
         /// locally holds the client and server of the distributed_object.
         /// \param base_name The name of the distributed_object, which should be a unique
         /// string across the localities
         /// \param data The data of the type T of the distributed_object
+        /// \param sub_localities The sub_localities accepts a list of locality index. By
+        /// default, it is initialized to a list of all provided locality index.
         distributed_object(std::string base, data_type const& data,
             std::vector<size_t> sub_localities = all_localities())
           : base_type(create_server(data))
@@ -322,10 +324,6 @@ namespace hpx { namespace lcos {
                     sub_localities_.end())
                 {
                     basename_registration_helper(base, sub_localities_.size());
-                    hpx::lcos::barrier barrier("wait_for_all_constructors",
-                        hpx::find_all_localities().size(),
-                        hpx::get_locality_id());
-                    barrier.wait();
                 }
                 else
                 {
@@ -335,22 +333,55 @@ namespace hpx { namespace lcos {
                 }
             }
         }
+
         /// Creates a distributed_object in every locality with a given base_name string,
-        /// data. The construction_type in the template parameter is set to
-        /// all_to_all option by default.
+        /// data, and a type and construction_type in the template parameters
         ///
+        /// \param construction_type The construction_type in the template parameters
+        /// accepts either meta_object or all_to_all, and it is set to all_to_all by
+        /// defalut. The meta_object option provides meta object registration in the root
+        /// locality and meta object is essentailly a table that can find the
+        /// instances of distributed_object in all localities. The all_to_all option only
+        /// locally holds the client and server of the distributed_object.
         /// \param base_name The name of the distributed_object, which should be a unique
         /// string across the localities
         /// \param data The data of the type T of the distributed_object
+        /// \param sub_localities The sub_localities accepts a list of locality index. By
+        /// default, it is initialized to a list of all provided locality index.
         distributed_object(std::string base, data_type&& data,
             std::vector<size_t> sub_localities = all_localities())
           : base_type(create_server(std::move(data)))
           , base_(base)
           , sub_localities_(std::move(sub_localities))
         {
+            HPX_ASSERT(C == construction_type::all_to_all ||
+                C == construction_type::meta_object);
+            HPX_ASSERT(sub_localities_.size() > 0);
             ensure_ptr();
-            basename_registration_helper(
-                base, hpx::find_all_localities().size());
+            std::sort(sub_localities_.begin(), sub_localities_.end());
+
+            if (C == construction_type::meta_object)
+            {
+                meta_object mo(
+                    base, sub_localities_.size(), sub_localities_[0]);
+                locs = mo.registration(this->get_id());
+                basename_registration_helper(base, sub_localities_.size());
+            }
+            else
+            {
+                if (std::find(sub_localities_.begin(), sub_localities_.end(),
+                        static_cast<size_t>(hpx::get_locality_id())) !=
+                    sub_localities_.end())
+                {
+                    basename_registration_helper(base, sub_localities_.size());
+                }
+                else
+                {
+                    HPX_THROW_EXCEPTION(hpx::no_success, "constructor error",
+                        "distributed object is not valid within the given "
+                        "sub-locality");
+                }
+            }
         }
         /// \cond NOINTERNAL
         /// generate boilerplate code for the client
@@ -393,10 +424,13 @@ namespace hpx { namespace lcos {
             return &**ptr;
         }
 
-        /// Asynchronously returns a future of a copy of the instance of this
-        /// distributed_object associated with the given locality index. The locality
-        /// index must be a valid locality ID with this distributed_object.
-        // TODO: write exception description
+        /// fetch() function is an asynchronous function. This returns a future of a
+        /// copy of the instance of this distributed_object associated with the
+        /// given locality index. The provided locality index must be valid within
+        /// the sub localities where this distributed object is constructed. Also,
+        /// if the provided locality index is same as current locality, fetch
+        /// function still returns a future of it local data copy. It is suggested
+        /// to use star operator to access local data.
         hpx::future<data_type> fetch(int idx)
         {
             /// \cond NOINTERNAL
@@ -506,41 +540,21 @@ namespace hpx { namespace lcos {
         distributed_object() = default;
 
         /// Creates a distributed_object in every locality with a given base_name string,
-        /// data, and a construction_type. This constructor of the distributed_object
-        /// wraps an existing local instance and thus is internally referring to
-        /// the local instance.
+        /// data, and a type and construction_type in the template parameters. This
+        /// constructor of the distributed_object wraps an existing local instance and
+        /// thus is internally referring to the local instance.
         ///
         /// \param construction_type The construction_type in the template parameters
-        /// accepts either meta_object, and it is set to all_to_all by defalut
-        /// The meta_object option provides meta object registration in the root
+        /// accepts either meta_object or all_to_all, and it is set to all_to_all by
+        /// defalut. The meta_object option provides meta object registration in the root
         /// locality and meta object is essentailly a table that can find the
         /// instances of distributed_object in all localities. The all_to_all option only
         /// locally holds the client and server of the distributed_object.
         /// \param base_name The name of the distributed_object, which should be a unique
         /// string across the localities
         /// \param data The data of the type T of the distributed_object
-        /*       distributed_object(std::string base, data_type data)
-          : base_type(create_server(data))
-          , base_(base)
-        {
-            HPX_ASSERT(C == construction_type::all_to_all ||
-                C == construction_type::meta_object);
-            ensure_ptr();
-            size_t localities = hpx::find_all_localities().size();
-            init_sub_localities();
-            if (C == construction_type::meta_object)
-            {
-                meta_object mo(base, localities, 0);
-                locs = mo.registration(this->get_id());
-                basename_registration_helper(base, localities);
-            }
-            else
-            {
-                basename_registration_helper(base, localities);
-            }
-        }*/
-
-        // TODO: Doxgen doc
+        /// \param sub_localities The sub_localities accepts a list of locality index. By
+        /// default, it is initialized to a list of all provided locality index.
         distributed_object(std::string base, data_type data,
             std::vector<size_t> sub_localities = all_localities())
           : base_type(create_server(data))
@@ -567,10 +581,6 @@ namespace hpx { namespace lcos {
                     sub_localities_.end())
                 {
                     basename_registration_helper(base, sub_localities_.size());
-                    hpx::lcos::barrier barrier("wait_for_all_constructors",
-                        hpx::find_all_localities().size(),
-                        hpx::get_locality_id());
-                    barrier.wait();
                 }
                 else
                 {
@@ -622,10 +632,13 @@ namespace hpx { namespace lcos {
             return &**ptr;
         }
 
-        /// Asynchronously returns a future of a copy of the instance of this
-        /// distributed_object associated with the given locality index. The locality
-        /// index must be a valid locality ID with this distributed_object.
-        // TODO: write exception description
+        /// fetch() function is an asynchronous function. This returns a future of a
+        /// copy of the instance of this distributed_object associated with the
+        /// given locality index. The provided locality index must be valid within
+        /// the sub localities where this distributed object is constructed. Also,
+        /// if the provided locality index is same as current locality, fetch
+        /// function still returns a future of it local data copy. It is suggested
+        /// to use star operator to access local data.
         hpx::future<T> fetch(int idx)
         {
             if (std::find(sub_localities_.begin(), sub_localities_.end(),
