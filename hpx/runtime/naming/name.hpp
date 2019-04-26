@@ -45,22 +45,22 @@ namespace hpx { namespace naming
     {
         ///////////////////////////////////////////////////////////////////////
         // forward declaration
-        inline std::uint64_t strip_internal_bits_from_gid(std::uint64_t msb)
-            HPX_SUPER_PURE;
+        inline std::uint64_t strip_internal_bits_from_gid(
+            std::uint64_t msb) noexcept HPX_SUPER_PURE;
 
         inline std::uint64_t strip_internal_bits_and_component_type_from_gid(
-            std::uint64_t msb) HPX_SUPER_PURE;
+            std::uint64_t msb) noexcept HPX_SUPER_PURE;
 
-        inline std::uint64_t strip_lock_from_gid(std::uint64_t msb)
+        inline std::uint64_t strip_lock_from_gid(std::uint64_t msb) noexcept
             HPX_SUPER_PURE;
 
-        inline std::uint64_t get_internal_bits(std::uint64_t msb)
+        inline std::uint64_t get_internal_bits(std::uint64_t msb) noexcept
             HPX_SUPER_PURE;
 
         inline std::uint64_t strip_internal_bits_and_locality_from_gid(
-                std::uint64_t msb) HPX_SUPER_PURE;
+                std::uint64_t msb) noexcept HPX_SUPER_PURE;
 
-        inline bool is_locked(gid_type const& gid);
+        inline bool is_locked(gid_type const& gid) noexcept;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -110,26 +110,26 @@ namespace hpx { namespace naming
         static std::uint64_t const special_bits_mask =
             locality_id_mask | internal_bits_mask | component_type_mask;
 
-        gid_type ()
+        gid_type () noexcept
           : id_msb_(0), id_lsb_(0)
         {}
 
-        explicit gid_type (std::uint64_t lsb_id)
+        explicit gid_type (std::uint64_t lsb_id) noexcept
           : id_msb_(0), id_lsb_(lsb_id)
         {}
 
-        explicit gid_type (std::uint64_t msb_id, std::uint64_t lsb_id)
+        explicit gid_type (std::uint64_t msb_id, std::uint64_t lsb_id) noexcept
           : id_msb_(naming::detail::strip_lock_from_gid(msb_id)),
             id_lsb_(lsb_id)
         {
         }
 
-        gid_type (gid_type const& rhs)
+        gid_type (gid_type const& rhs) noexcept
           : id_msb_(naming::detail::strip_lock_from_gid(rhs.get_msb())),
             id_lsb_(rhs.get_lsb())
         {
         }
-        gid_type (gid_type && rhs)
+        gid_type (gid_type && rhs) noexcept
           : id_msb_(naming::detail::strip_lock_from_gid(rhs.get_msb())),
             id_lsb_(rhs.get_lsb())
         {
@@ -141,7 +141,7 @@ namespace hpx { namespace naming
             HPX_ASSERT(!is_locked());
         }
 
-        gid_type& operator=(std::uint64_t lsb_id)
+        gid_type& operator=(std::uint64_t lsb_id) noexcept
         {
             HPX_ASSERT(!is_locked());
             id_msb_ = 0;
@@ -149,7 +149,7 @@ namespace hpx { namespace naming
             return *this;
         }
 
-        gid_type& operator=(gid_type const& rhs)
+        gid_type& operator=(gid_type const& rhs) noexcept
         {
             if (this != &rhs)
             {
@@ -159,7 +159,7 @@ namespace hpx { namespace naming
             }
             return *this;
         }
-        gid_type& operator=(gid_type && rhs)
+        gid_type& operator=(gid_type && rhs) noexcept
         {
             if (this != &rhs)
             {
@@ -178,24 +178,24 @@ namespace hpx { namespace naming
         }
 
         // We support increment, decrement, addition and subtraction
-        gid_type& operator++()       // pre-increment
+        gid_type& operator++() noexcept         // pre-increment
         {
             *this += 1;
             return *this;
         }
-        gid_type operator++(int)     // post-increment
+        gid_type operator++(int) noexcept       // post-increment
         {
             gid_type t(*this);
             ++(*this);
             return t;
         }
 
-        gid_type& operator--()       // pre-decrement
+        gid_type& operator--() noexcept         // pre-decrement
         {
             *this -= 1;
             return *this;
         }
-        gid_type operator--(int)     // post-decrement
+        gid_type operator--(int)  noexcept      // post-decrement
         {
             gid_type t(*this);
             --(*this);
@@ -204,35 +204,35 @@ namespace hpx { namespace naming
 
         // GID + GID
         friend HPX_EXPORT gid_type operator+ (
-            gid_type const& lhs, gid_type const& rhs);
-        gid_type operator+= (gid_type const& rhs)
+            gid_type const& lhs, gid_type const& rhs) noexcept;
+        gid_type operator+= (gid_type const& rhs) noexcept
         { return (*this = *this + rhs); }
 
         // GID + std::uint64_t
-        friend gid_type operator+ (gid_type const& lhs, std::uint64_t rhs)
+        friend gid_type operator+ (gid_type const& lhs, std::uint64_t rhs) noexcept
         { return lhs + gid_type(0, rhs); }
-        gid_type operator+= (std::uint64_t rhs)
+        gid_type operator+= (std::uint64_t rhs) noexcept
         { return (*this = *this + rhs); }
 
         // GID - GID
         friend HPX_EXPORT gid_type operator- (gid_type const& lhs,
-            gid_type const& rhs);
-        gid_type operator-= (gid_type const& rhs)
+            gid_type const& rhs) noexcept;
+        gid_type operator-= (gid_type const& rhs) noexcept
         { return (*this = *this - rhs); }
 
         // GID - std::uint64_t
-        friend gid_type operator- (gid_type const& lhs, std::uint64_t rhs)
+        friend gid_type operator- (gid_type const& lhs, std::uint64_t rhs) noexcept
         { return lhs - gid_type(0, rhs); }
-        gid_type operator-= (std::uint64_t rhs)
+        gid_type operator-= (std::uint64_t rhs) noexcept
         { return (*this = *this - rhs); }
 
-        friend gid_type operator& (gid_type const& lhs, std::uint64_t rhs)
+        friend gid_type operator& (gid_type const& lhs, std::uint64_t rhs) noexcept
         {
             return gid_type(lhs.id_msb_, lhs.id_lsb_ & rhs);
         }
 
         // comparison is required as well
-        friend bool operator== (gid_type const& lhs, gid_type const& rhs)
+        friend bool operator== (gid_type const& lhs, gid_type const& rhs) noexcept
         {
             std::int64_t lhs_msb =
                 detail::strip_internal_bits_from_gid(lhs.id_msb_);
@@ -241,12 +241,12 @@ namespace hpx { namespace naming
 
             return (lhs_msb == rhs_msb) && (lhs.id_lsb_ == rhs.id_lsb_);
         }
-        friend bool operator!= (gid_type const& lhs, gid_type const& rhs)
+        friend bool operator!= (gid_type const& lhs, gid_type const& rhs) noexcept
         {
             return !(lhs == rhs);
         }
 
-        friend bool operator< (gid_type const& lhs, gid_type const& rhs)
+        friend bool operator< (gid_type const& lhs, gid_type const& rhs) noexcept
         {
             std::int64_t lhs_msb =
                 detail::strip_internal_bits_from_gid(lhs.id_msb_);
@@ -264,7 +264,7 @@ namespace hpx { namespace naming
             return lhs.id_lsb_ < rhs.id_lsb_;
         }
 
-        friend bool operator<= (gid_type const& lhs, gid_type const& rhs)
+        friend bool operator<= (gid_type const& lhs, gid_type const& rhs) noexcept
         {
             std::int64_t lhs_msb =
                 detail::strip_internal_bits_from_gid(lhs.id_msb_);
@@ -282,33 +282,33 @@ namespace hpx { namespace naming
             return lhs.id_lsb_ <= rhs.id_lsb_;
         }
 
-        friend bool operator> (gid_type const& lhs, gid_type const& rhs)
+        friend bool operator> (gid_type const& lhs, gid_type const& rhs) noexcept
         {
             return !(lhs <= rhs);
         }
 
-        friend bool operator>= (gid_type const& lhs, gid_type const& rhs)
+        friend bool operator>= (gid_type const& lhs, gid_type const& rhs) noexcept
         {
             return !(lhs < rhs);
         }
 
-        std::uint64_t get_msb() const
+        std::uint64_t get_msb() const noexcept
         {
             return id_msb_;
         }
-        void set_msb(std::uint64_t msb)
+        void set_msb(std::uint64_t msb) noexcept
         {
             id_msb_ = msb;
         }
-        std::uint64_t get_lsb() const
+        std::uint64_t get_lsb() const noexcept
         {
             return id_lsb_;
         }
-        void set_lsb(std::uint64_t lsb)
+        void set_lsb(std::uint64_t lsb) noexcept
         {
             id_lsb_ = lsb;
         }
-        void set_lsb(void* lsb)
+        void set_lsb(void* lsb) noexcept
         {
             id_lsb_ = reinterpret_cast<std::uint64_t>(lsb);
         }
@@ -360,7 +360,10 @@ namespace hpx { namespace naming
             HPX_ITT_SYNC_RELEASED(this);
         }
 
-        mutex_type& get_mutex() const { return const_cast<mutex_type&>(*this); }
+        mutex_type& get_mutex() const noexcept
+        {
+            return const_cast<mutex_type&>(*this);
+        }
 
     private:
         friend HPX_EXPORT std::ostream& operator<<(std::ostream& os,
@@ -400,12 +403,12 @@ namespace hpx { namespace naming
         }
 
         // this is used for assertions only, no need to acquire the lock
-        bool is_locked() const
+        bool is_locked() const noexcept
         {
             return (id_msb_ & is_locked_mask) ? true : false;
         }
 
-        friend bool detail::is_locked(gid_type const& gid);
+        friend bool detail::is_locked(gid_type const& gid) noexcept;
 
         // actual gid
         std::uint64_t id_msb_;
@@ -421,55 +424,57 @@ namespace hpx { namespace naming
 {
     ///////////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from locality_id
-    inline gid_type get_gid_from_locality_id(std::uint32_t locality_id)
-        HPX_SUPER_PURE;
+    inline gid_type get_gid_from_locality_id(
+        std::uint32_t locality_id) noexcept HPX_SUPER_PURE;
 
-    inline gid_type get_gid_from_locality_id(std::uint32_t locality_id)
+    inline gid_type get_gid_from_locality_id(std::uint32_t locality_id) noexcept
     {
         return gid_type(
             std::uint64_t(locality_id+1) << gid_type::locality_id_shift,
             0);
     }
 
-    inline std::uint32_t get_locality_id_from_gid(std::uint64_t msb) HPX_PURE;
+    inline std::uint32_t get_locality_id_from_gid(
+        std::uint64_t msb) noexcept HPX_PURE;
 
-    inline std::uint32_t get_locality_id_from_gid(std::uint64_t msb)
+    inline std::uint32_t get_locality_id_from_gid(std::uint64_t msb) noexcept
     {
         return std::uint32_t(msb >> gid_type::locality_id_shift) - 1;
     }
 
-    inline std::uint32_t get_locality_id_from_gid(gid_type const& id) HPX_PURE;
+    inline std::uint32_t get_locality_id_from_gid(
+        gid_type const& id) noexcept HPX_PURE;
 
-    inline std::uint32_t get_locality_id_from_gid(gid_type const& id)
+    inline std::uint32_t get_locality_id_from_gid(gid_type const& id) noexcept
     {
         return get_locality_id_from_gid(id.get_msb());
     }
 
-    inline gid_type get_locality_from_gid(gid_type const& id)
+    inline gid_type get_locality_from_gid(gid_type const& id) noexcept
     {
         return get_gid_from_locality_id(get_locality_id_from_gid(id));
     }
 
-    inline bool is_locality(gid_type const& gid)
+    inline bool is_locality(gid_type const& gid) noexcept
     {
         return get_locality_from_gid(gid) == gid;
     }
 
     inline std::uint64_t replace_locality_id(std::uint64_t msb,
-        std::uint32_t locality_id) HPX_PURE;
+        std::uint32_t locality_id) noexcept HPX_PURE;
 
     inline std::uint64_t replace_locality_id(std::uint64_t msb,
-        std::uint32_t locality_id)
+        std::uint32_t locality_id) noexcept
     {
         msb &= ~gid_type::locality_id_mask;
         return msb | get_gid_from_locality_id(locality_id).get_msb();
     }
 
     inline gid_type replace_locality_id(gid_type const& gid,
-        std::uint32_t locality_id) HPX_PURE;
+        std::uint32_t locality_id) noexcept HPX_PURE;
 
     inline gid_type replace_locality_id(gid_type const& gid,
-        std::uint32_t locality_id)
+        std::uint32_t locality_id) noexcept
     {
         std::uint64_t msb = gid.get_msb() & ~gid_type::locality_id_mask;
         msb |= get_gid_from_locality_id(locality_id).get_msb();
@@ -477,24 +482,24 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline bool refers_to_virtual_memory(std::uint64_t msb)
+    inline bool refers_to_virtual_memory(std::uint64_t msb) noexcept
     {
         return !(msb & gid_type::virtual_memory_mask);
     }
 
-    inline bool refers_to_virtual_memory(gid_type const& gid)
+    inline bool refers_to_virtual_memory(gid_type const& gid) noexcept
     {
         return refers_to_virtual_memory(gid.get_msb());
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline bool refers_to_local_lva(gid_type const& gid)
+    inline bool refers_to_local_lva(gid_type const& gid) noexcept
     {
         return !(gid.get_msb() & gid_type::dynamically_assigned);
     }
 
     inline gid_type replace_component_type(gid_type const& gid,
-        std::uint32_t type)
+        std::uint32_t type) noexcept
     {
         std::uint64_t msb = gid.get_msb() & ~gid_type::component_type_mask;
 
@@ -508,7 +513,7 @@ namespace hpx { namespace naming
     namespace detail
     {
         // We store the log2(credit) in the gid_type
-        inline std::int16_t log2(std::int64_t val)
+        inline std::int16_t log2(std::int64_t val) noexcept
         {
             std::int16_t ret = -1;
             while (val != 0)
@@ -519,90 +524,92 @@ namespace hpx { namespace naming
             return ret;
         }
 
-        inline std::int64_t power2(std::int16_t log2credits)
+        inline std::int64_t power2(std::int16_t log2credits) noexcept
         {
             HPX_ASSERT(log2credits >= 0);
             return static_cast<std::int64_t>(1) << log2credits;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline bool has_credits(gid_type const& id)
+        inline bool has_credits(gid_type const& id) noexcept
         {
             return (id.get_msb() & gid_type::has_credits_mask) ? true : false;
         }
 
-        inline bool gid_was_split(gid_type const& id)
+        inline bool gid_was_split(gid_type const& id) noexcept
         {
             return (id.get_msb() & gid_type::was_split_mask) ? true : false;
         }
 
-        inline void set_credit_split_mask_for_gid(gid_type& id)
+        inline void set_credit_split_mask_for_gid(gid_type& id) noexcept
         {
             id.set_msb(id.get_msb() | gid_type::was_split_mask);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline bool store_in_cache(gid_type const& id)
+        inline bool store_in_cache(gid_type const& id) noexcept
         {
             return (id.get_msb() & gid_type::dont_cache_mask) ? false : true;
         }
 
-        inline void set_dont_store_in_cache(gid_type& gid)
+        inline void set_dont_store_in_cache(gid_type& gid) noexcept
         {
             gid.set_msb(gid.get_msb() | gid_type::dont_cache_mask);
         }
 
-        inline void set_dont_store_in_cache(id_type& id)
+        inline void set_dont_store_in_cache(id_type& id) noexcept
         {
             id.set_msb(id.get_msb() | gid_type::dont_cache_mask);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline bool is_migratable(gid_type const& id)
+        inline bool is_migratable(gid_type const& id) noexcept
         {
             return (id.get_msb() & gid_type::is_migratable) ? true : false;
         }
 
-        inline void set_is_migratable(gid_type& gid)
+        inline void set_is_migratable(gid_type& gid) noexcept
         {
             gid.set_msb(gid.get_msb() | gid_type::is_migratable);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline std::int64_t get_credit_from_gid(gid_type const& id) HPX_PURE;
+        inline std::int64_t get_credit_from_gid(
+            gid_type const& id) noexcept HPX_PURE;
 
-        inline std::int16_t get_log2credit_from_gid(gid_type const& id)
+        inline std::int16_t get_log2credit_from_gid(gid_type const& id) noexcept
         {
             HPX_ASSERT(has_credits(id));
             return std::int16_t((id.get_msb() >> gid_type::credit_shift) &
                     gid_type::credit_base_mask);
         }
 
-        inline std::int64_t get_credit_from_gid(gid_type const& id)
+        inline std::int64_t get_credit_from_gid(gid_type const& id) noexcept
         {
             return has_credits(id) ? detail::power2(get_log2credit_from_gid(id)) : 0;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline std::uint64_t strip_internal_bits_from_gid(std::uint64_t msb)
+        inline std::uint64_t strip_internal_bits_from_gid(
+            std::uint64_t msb) noexcept
         {
             return msb & ~gid_type::internal_bits_mask;
         }
 
-        inline gid_type& strip_internal_bits_from_gid(gid_type& id)
+        inline gid_type& strip_internal_bits_from_gid(gid_type& id) noexcept
         {
             id.set_msb(strip_internal_bits_from_gid(id.get_msb()));
             return id;
         }
 
         inline std::uint64_t strip_internal_bits_except_dont_cache_from_gid(
-            std::uint64_t msb)
+            std::uint64_t msb) noexcept
         {
             return msb & ~(gid_type::credit_bits_mask | gid_type::is_locked_mask);
         }
 
         inline gid_type& strip_internal_bits_except_dont_cache_from_gid(
-            gid_type& id)
+            gid_type& id) noexcept
         {
             id.set_msb(
                 strip_internal_bits_except_dont_cache_from_gid(id.get_msb()));
@@ -610,35 +617,36 @@ namespace hpx { namespace naming
         }
 
         inline std::uint64_t strip_internal_bits_and_component_type_from_gid(
-            std::uint64_t msb)
+            std::uint64_t msb) noexcept
         {
             return msb &
                 ~(gid_type::internal_bits_mask | gid_type::component_type_mask);
         }
 
         inline gid_type& strip_internal_bits_and_component_type_from_gid(
-            gid_type& id)
+            gid_type& id) noexcept
         {
             id.set_msb(
                 strip_internal_bits_and_component_type_from_gid(id.get_msb()));
             return id;
         }
 
-        inline std::uint64_t get_internal_bits(std::uint64_t msb)
+        inline std::uint64_t get_internal_bits(std::uint64_t msb) noexcept
         {
             return msb &
                 (gid_type::internal_bits_mask | gid_type::component_type_mask);
         }
 
         inline std::uint64_t strip_internal_bits_and_locality_from_gid(
-                std::uint64_t msb)
+                std::uint64_t msb) noexcept
         {
             return msb &
                 (~gid_type::special_bits_mask | gid_type::component_type_mask);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline std::uint32_t get_component_type_from_gid(std::uint64_t msb)
+        inline std::uint32_t get_component_type_from_gid(
+            std::uint64_t msb) noexcept
         {
             HPX_ASSERT(!(msb & gid_type::dynamically_assigned));
             return (msb >> gid_type::component_type_shift) &
@@ -646,7 +654,7 @@ namespace hpx { namespace naming
         }
 
         inline std::uint64_t add_component_type_to_gid(std::uint64_t msb,
-            std::uint32_t type)
+            std::uint32_t type) noexcept
         {
             HPX_ASSERT(!(msb & gid_type::dynamically_assigned));
             return (msb & ~gid_type::component_type_mask) |
@@ -655,36 +663,37 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline std::uint64_t strip_lock_from_gid(std::uint64_t msb)
+        inline std::uint64_t strip_lock_from_gid(std::uint64_t msb) noexcept
         {
             return msb & ~gid_type::is_locked_mask;
         }
 
-        inline gid_type& strip_lock_from_gid(gid_type& gid)
+        inline gid_type& strip_lock_from_gid(gid_type& gid) noexcept
         {
             gid.set_msb(strip_lock_from_gid(gid.get_msb()));
             return gid;
         }
 
-        inline bool is_locked(gid_type const& gid)
+        inline bool is_locked(gid_type const& gid) noexcept
         {
             return gid.is_locked();
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline gid_type get_stripped_gid(gid_type const& id) HPX_PURE;
+        inline gid_type get_stripped_gid(gid_type const& id) noexcept HPX_PURE;
 
-        inline gid_type get_stripped_gid(gid_type const& id)
+        inline gid_type get_stripped_gid(gid_type const& id) noexcept
         {
             std::uint64_t const msb = strip_internal_bits_from_gid(id.get_msb());
             std::uint64_t const lsb = id.get_lsb();
             return gid_type(msb, lsb);
         }
 
-        inline gid_type get_stripped_gid_except_dont_cache(gid_type const& id)
-            HPX_PURE;
+        inline gid_type get_stripped_gid_except_dont_cache(
+            gid_type const& id) noexcept HPX_PURE;
 
-        inline gid_type get_stripped_gid_except_dont_cache(gid_type const& id)
+        inline gid_type get_stripped_gid_except_dont_cache(
+            gid_type const& id) noexcept
         {
             std::uint64_t const msb =
                 strip_internal_bits_except_dont_cache_from_gid(id.get_msb());
@@ -692,19 +701,20 @@ namespace hpx { namespace naming
             return gid_type(msb, lsb);
         }
 
-        inline std::uint64_t strip_credits_from_gid(std::uint64_t msb)
+        inline std::uint64_t strip_credits_from_gid(std::uint64_t msb) noexcept
         {
             return msb & ~gid_type::credit_bits_mask;
         }
 
-        inline gid_type& strip_credits_from_gid(gid_type& id)
+        inline gid_type& strip_credits_from_gid(gid_type& id) noexcept
         {
             id.set_msb(strip_credits_from_gid(id.get_msb()));
             return id;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline void set_log2credit_for_gid(gid_type& id, std::int16_t log2credits)
+        inline void set_log2credit_for_gid(
+            gid_type & id, std::int16_t log2credits) noexcept
         {
             // credit should be a clean log2
             HPX_ASSERT(log2credits >= 0);
@@ -716,7 +726,8 @@ namespace hpx { namespace naming
                 gid_type::has_credits_mask);
         }
 
-        inline void set_credit_for_gid(gid_type& id, std::int64_t credits)
+        inline void set_credit_for_gid(
+            gid_type & id, std::int64_t credits) noexcept
         {
             if (credits != 0)
             {
@@ -759,8 +770,10 @@ namespace hpx { namespace naming
             std::unique_lock<gid_type::mutex_type>& l, gid_type& id);
     }
 
-    HPX_EXPORT gid_type operator+ (gid_type const& lhs, gid_type const& rhs);
-    HPX_EXPORT gid_type operator- (gid_type const& lhs, gid_type const& rhs);
+    HPX_EXPORT gid_type operator+(
+        gid_type const& lhs, gid_type const& rhs) noexcept;
+    HPX_EXPORT gid_type operator-(
+        gid_type const& lhs, gid_type const& rhs) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     gid_type const invalid_gid = gid_type();
@@ -902,28 +915,30 @@ namespace hpx { namespace naming
     // Handle conversion to/from locality_id
     // FIXME: these names are confusing, 'id' appears in identifiers far too
     // frequently.
-    inline id_type get_id_from_locality_id(std::uint32_t locality_id) HPX_SUPER_PURE;
+    inline id_type get_id_from_locality_id(
+        std::uint32_t locality_id) noexcept HPX_SUPER_PURE;
 
-    inline id_type get_id_from_locality_id(std::uint32_t locality_id)
+    inline id_type get_id_from_locality_id(std::uint32_t locality_id) noexcept
     {
         return id_type(
             std::uint64_t(locality_id+1) << gid_type::locality_id_shift,
             0, id_type::unmanaged);
     }
 
-    inline std::uint32_t get_locality_id_from_id(id_type const& id) HPX_PURE;
+    inline std::uint32_t get_locality_id_from_id(
+        id_type const& id) noexcept HPX_PURE;
 
-    inline std::uint32_t get_locality_id_from_id(id_type const& id)
+    inline std::uint32_t get_locality_id_from_id(id_type const& id) noexcept
     {
         return std::uint32_t(id.get_msb() >> gid_type::locality_id_shift) - 1;
     }
 
-    inline id_type get_locality_from_id(id_type const& id)
+    inline id_type get_locality_from_id(id_type const& id) noexcept
     {
         return get_id_from_locality_id(get_locality_id_from_id(id));
     }
 
-    inline bool is_locality(id_type const& id)
+    inline bool is_locality(id_type const& id) noexcept
     {
         return is_locality(id.get_gid());
     }

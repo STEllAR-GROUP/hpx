@@ -583,7 +583,7 @@ namespace hpx { namespace naming
     }   // detail
 
     ///////////////////////////////////////////////////////////////////////////
-    gid_type operator+ (gid_type const& lhs, gid_type const& rhs)
+    gid_type operator+ (gid_type const& lhs, gid_type const& rhs) noexcept
     {
         std::uint64_t lsb = lhs.id_lsb_ + rhs.id_lsb_;
         std::uint64_t msb = lhs.id_msb_ + rhs.id_msb_;
@@ -606,7 +606,7 @@ namespace hpx { namespace naming
         return gid_type(msb, lsb);
     }
 
-    gid_type operator- (gid_type const& lhs, gid_type const& rhs)
+    gid_type operator- (gid_type const& lhs, gid_type const& rhs) noexcept
     {
         std::uint64_t lsb = lhs.id_lsb_ - rhs.id_lsb_;
         std::uint64_t msb = lhs.id_msb_ - rhs.id_msb_;
