@@ -13,7 +13,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/lcos/barrier.hpp>
-#include <hpx/pp/cat.hpp>
+#include <hpx/preprocessor/cat.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/serialization/unordered_map.hpp>
 #include <hpx/throw_exception.hpp>
