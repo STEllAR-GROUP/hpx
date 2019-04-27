@@ -99,10 +99,13 @@ if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
-# attempt to load Boost.Regex (if available), it's needed for inspect
-find_package(Boost 1.61 QUIET MODULE COMPONENTS regex)
-if(Boost_REGEX_FOUND)
-  hpx_info("  regex")
+if(HPX_WITH_TOOLS)
+  find_package(Boost 1.61 QUIET MODULE COMPONENTS regex)
+  if(Boost_REGEX_FOUND)
+    hpx_info("  regex")
+  else()
+    hpx_error("Could not find Boost.Regex but HPX_WITH_TOOLS=On (the inspect tool requires Boost.Regex). Either set it to off or provide a boost installation including the regex library")
+  endif()
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
