@@ -14,6 +14,8 @@
 #include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/lexicographical_compare.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
@@ -44,26 +46,27 @@ namespace hpx { namespace parallel { inline namespace v1
               : lexicographical_compare::algorithm("lexicographical_compare")
             {}
 
-           template <typename ExPolicy, typename InIter1, typename InIter2,
-                typename Pred>
+           template <typename ExPolicy, typename InIter1B, typename InIter1E,
+                   typename InIter2B, typename InIter2E, typename Pred>
            static bool
-           sequential(ExPolicy, InIter1 first1, InIter1 last1, InIter2 first2,
-                InIter2 last2, Pred && pred)
+           sequential(ExPolicy, InIter1B first1, InIter1E last1, InIter2B first2,
+                InIter2E last2, Pred && pred)
             {
-                return std::lexicographical_compare(first1, last1, first2, last2, pred);
+                return detail::lexicographical_compare_(first1, last1,
+                        first2, last2, std::forward<Pred>(pred));
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-                typename Pred>
+            template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+                    typename FwdIter2B, typename FwdIter2E, typename Pred>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, FwdIter2 last2, Pred && pred)
+            parallel(ExPolicy && policy, FwdIter1B first1, FwdIter1E last1,
+                FwdIter2B first2, FwdIter2E last2, Pred && pred)
             {
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
+                typedef hpx::util::zip_iterator<FwdIter1B, FwdIter2B> zip_iterator;
                 typedef typename zip_iterator::reference reference;
 
-                std::size_t count1 = std::distance(first1, last1);
-                std::size_t count2 = std::distance(first2, last2);
+                std::size_t count1 = detail::distance(first1, last1);
+                std::size_t count2 = detail::distance(first2, last2);
 
                 // An empty range is lexicographically less than any non-empty
                 // range
@@ -132,11 +135,19 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used for the
+    /// \tparam FwdIter1B   The type of the source iterators used for the
     ///                     first range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the source iterators used for the
+    /// \tparam FwdIter1E   The type of the end iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2B   The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2E   The type of the end iterators used for the
     ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -195,20 +206,21 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           it returns false.
     /// range [first2, last2), it returns false.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+    template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+            typename FwdIter2B, typename FwdIter2E,
         typename Pred = detail::less>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
-    lexicographical_compare(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter2 last2, Pred && pred = Pred())
+    lexicographical_compare(ExPolicy && policy, FwdIter1B first1, FwdIter1E last1,
+        FwdIter2B first2, FwdIter2E last2, Pred && pred = Pred())
     {
         static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            (hpx::traits::is_forward_iterator<FwdIter1B>::value),
             "Requires at least forward iterator.");
         static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            (hpx::traits::is_forward_iterator<FwdIter2B>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
