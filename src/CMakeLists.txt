@@ -299,7 +299,18 @@ foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
   endif()
 endforeach()
 
-target_link_libraries(hpx ${HPX_TLL_PUBLIC} hpx_preprocessor)
+# integrate the hpx modules with the main library
+set(_modules hpx_preprocessor)
+foreach(_module ${_modules})
+  # add module binaries as PRIVATE dependencies to the core hpx library to
+  # avoid dependent applicatons have to link against those
+  target_link_libraries(hpx ${HPX_TLL_PRIVATE} ${_module})
+
+  # add module include directories as PUBLIC to core hpx library to enable
+  # compilation against indirectly included headers
+  get_target_property(_module_includes ${_module} INTERFACE_INCLUDE_DIRECTORIES)
+  target_include_directories(hpx PUBLIC ${_module_includes})
+endforeach()
 
 set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
@@ -343,7 +354,13 @@ if(NOT HPX_WITH_STATIC_LINKING)
     endif()
   endif()
   target_include_directories(hpx_init PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
-  target_link_libraries(hpx_init ${HPX_TLL_PUBLIC} hpx_preprocessor)
+
+  foreach(_module ${_modules})
+    # add module include directories as PRIVATE to the hpx_init library to
+    # enable its compilation against indirectly included headers
+    get_target_property(_module_includes ${_module} INTERFACE_INCLUDE_DIRECTORIES)
+    target_include_directories(hpx_init PRIVATE ${_module_includes})
+  endforeach()
 
   set_property(TARGET hpx_init APPEND
     PROPERTY COMPILE_DEFINITIONS
@@ -384,7 +401,13 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
       "HPX_ENABLE_ASSERT_HANDLER")
 
     target_include_directories(hpx_wrap PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
-    target_link_libraries(hpx_wrap ${HPX_TLL_PUBLIC} hpx_preprocessor)
+
+    foreach(_module ${_modules})
+      # add module include directories as PRIVATE to the hpx_wrap library to
+      # enable its compilation against indirectly included headers
+      get_target_property(_module_includes ${_module} INTERFACE_INCLUDE_DIRECTORIES)
+      target_include_directories(hpx_wrap PRIVATE ${_module_includes})
+    endforeach()
 
     set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
     set(hpx_targets ${hpx_targets} hpx_wrap)
