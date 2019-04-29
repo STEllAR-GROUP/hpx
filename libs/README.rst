@@ -11,25 +11,41 @@ The tool ```create_library_skeleton.py`` can be used to generate a basic
 skeleton. The structure of this skeleton should be as follows:
 
 * ``<lib_name>/``
+
   * ``README.rst``
   * ``CMakeLists.txt``
   * ``cmake``
   * ``docs/``
+
     * ``index.rst``
+
   * ``examples/``
+
     * ``CMakeLists.txt``
+
   * ``include/``
+
     * ``hpx/``
+
       * ``<lib_name>``
+
   * ``src/``
+
     * ``CMakeLists.txt``
+
   * ``tests/``
+
     * ``CMakeLists.txt``
     * ``unit/``
+
       * ``CMakeLists.txt``
+
     * ``regressions/``
+
       * ``CMakeLists.txt``
+
     * ``performance/``
+
       * ``CMakeLists.txt``
 
 A ``README.rst`` should be always included which explains the basic purpose of

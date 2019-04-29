@@ -8,10 +8,15 @@
 API reference
 =============
 
+Main |hpx| library reference
+============================
+
+.. doxygenindex::
+
+Modules reference
+=================
+
 .. toctree::
    :maxdepth: 1
 
 {}
-
-.. doxygenindex::
-

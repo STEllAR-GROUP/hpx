@@ -334,7 +334,11 @@ endforeach()
 file(GLOB_RECURSE sphinx_libs_source_files LIST_DIRECTORIES false RELATIVE
     "${CMAKE_SOURCE_DIR}/libs" "${CMAKE_SOURCE_DIR}/libs/*/docs/*")
 
-set(sphinx_libs_source_files "index.rst" ${sphinx_libs_source_files})
+set(sphinx_libs_source_files
+    "all_modules.rst"
+    "index.rst"
+    "overview.rst"
+    ${sphinx_libs_source_files})
 
 foreach(sphinx_source_file ${sphinx_libs_source_files})
   add_custom_command(

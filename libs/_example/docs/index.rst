@@ -6,12 +6,11 @@
 
 .. _libs__example:
 
-===========
-HPX Modules
-===========
+==============
+Example module
+==============
 
-|hpx| itself is organized into different sub-libraries. Those libraries can be
-seen as independent modules, with clear dependencies and no cycles.
+This is an example module used to explain the structure of an |hpx| module.
 
 The tool `create_library_skeleton.py
 <https://github.com/STEllAR-GROUP/hpx/blob/master/libs/create_library_skeleton.py>`_
@@ -19,25 +18,41 @@ can be used to generate a basic skeleton. The structure of this skeleton is as
 follows:
 
 * ``<lib_name>/``
+
   * ``README.rst``
   * ``CMakeLists.txt``
   * ``cmake``
   * ``docs/``
+
     * ``index.rst``
+
   * ``examples/``
+
     * ``CMakeLists.txt``
+
   * ``include/``
+
     * ``hpx/``
+
       * ``<lib_name>``
+
   * ``src/``
+
     * ``CMakeLists.txt``
+
   * ``tests/``
+
     * ``CMakeLists.txt``
     * ``unit/``
+
       * ``CMakeLists.txt``
+
     * ``regressions/``
+
       * ``CMakeLists.txt``
+
     * ``performance/``
+
       * ``CMakeLists.txt``
 
 A ``README.rst`` should be always included which explains the basic purpose of

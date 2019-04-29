@@ -23,7 +23,9 @@ Please see the :ref:`documentation prerequisites <documentation_prerequisites>`
 section for details on what you need in order to build the |hpx| documentation.
 Enable building of the documentation by setting ``HPX_WITH_DOCUMENTATION=ON``
 during |cmake|_ configuration. To build the documentation build the ``docs``
-target using your build tool.
+target using your build tool. The default output format is HTML documentation.
+You can choose alternative output formats (single-page HTML, PDF, and man) with
+the ``HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS`` |cmake|_ option.
 
 .. note::
 
