@@ -772,6 +772,31 @@ jobs:
       - store_artifacts:
           path: tests.unit.util
 
+  tests.unit.libs:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 tests.unit.preprocessor
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.preprocessor
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.libs
+      - store_artifacts:
+          path: tests.unit.libs
   tests.regressions:
     <<: *defaults
     steps:
@@ -1179,6 +1204,8 @@ workflows:
           <<: *core_dependency
       - tests.unit.util:
           <<: *core_dependency
+      - tests.unit.libs:
+          <<: *core_dependency
       - tests.regressions:
           <<: *core_dependency
       - tests.performance:
@@ -1206,6 +1233,8 @@ workflows:
       - tests.headers.traits:
           <<: *core_dependency
       - tests.headers.util:
+          <<: *core_dependency
+      - tests.headers.libs:
           <<: *core_dependency
       - examples:
           <<: *core_dependency
@@ -1241,6 +1270,7 @@ workflows:
             - tests.unit.threads
             - tests.unit.traits
             - tests.unit.util
+            - tests.unit.libs
             - tests.headers.compat
             - tests.headers.components
             - tests.headers.compute
@@ -1253,6 +1283,7 @@ workflows:
             - tests.headers.runtime
             - tests.headers.traits
             - tests.headers.util
+            - tests.headers.libs
             - tests.performance
             - tests.regressions
             - examples
