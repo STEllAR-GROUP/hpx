@@ -9,10 +9,14 @@ project(HPX.preprocessor CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-option(HPX_PREPROCESSOR_WITH_TESTS "Include tests for preprocessor" On)
-
 include(HPX_AddDefinitions)
 include(HPX_Option)
+
+hpx_option(HPX_PREPROCESSOR_WITH_TESTS
+  BOOL
+  "Build HPX preprocessor module tests. (default: ON)"
+  ON ADVANCED
+  CATEGORY "Modules")
 
 hpx_option(HPX_PREPROCESSOR_WITH_DEPRECATION_WARNINGS
   BOOL

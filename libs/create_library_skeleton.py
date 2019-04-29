@@ -67,7 +67,14 @@ project(HPX.{lib_name} CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${{CMAKE_CURRENT_SOURCE_DIR}}/cmake")
 
-option(HPX_{lib_name_upper}_WITH_TESTS "Include tests for {lib_name}" On)
+include(HPX_AddDefinitions)
+include(HPX_Option)
+
+hpx_option(HPX_{lib_name_upper}_WITH_TESTS
+  BOOL
+  "Build HPX {lib_name} module tests. (default: ON)"
+  ON ADVANCED
+  CATEGORY "Modules")
 
 message(STATUS "{lib_name}: Configuring")
 
