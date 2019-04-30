@@ -20,9 +20,10 @@ set(collectives_sources
 include(HPX_AddModule)
 add_hpx_module(collectives
     DEPRECATION_WARNINGS
+    FORCE_LINKING_GEN
     SOURCES ${collectives_sources}
     HEADERS ${collectives_headers}
-    DEPENDENCIES hpx_assertion hpx_config hpx_format hpx_logging hpx_preprocessor hpx_timing
-    FORCE_LINKING_GEN
+    DEPENDENCIES hpx_assertion hpx_config hpx_format hpx_logging
+      hpx_preprocessor hpx_timing hpx_util
     CMAKE_SUBDIRS examples tests
 )
