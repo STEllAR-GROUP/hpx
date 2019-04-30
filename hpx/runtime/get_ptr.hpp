@@ -47,6 +47,19 @@ namespace hpx
             naming::id_type id_;                // holds component alive
         };
 
+        struct get_ptr_no_unpin_deleter
+        {
+            get_ptr_no_unpin_deleter(naming::id_type const& id) : id_(id) {}
+
+            template <typename Component>
+            void operator()(Component* p)
+            {
+                id_ = naming::invalid_id;       // release component
+            }
+
+            naming::id_type id_;                // holds component alive
+        };
+
         struct get_ptr_for_migration_deleter
         {
             get_ptr_for_migration_deleter(naming::id_type const& id)
@@ -233,6 +246,16 @@ namespace hpx
     get_ptr(launch::sync_policy, naming::id_type const& id,
         error_code& ec = throws)
     {
+        // shortcut for local, non-migratable objects
+        naming::gid_type gid = id.get_gid();
+        if (naming::refers_to_local_lva(gid) &&
+            naming::get_locality_id_from_gid(gid) == agas::get_locality_id(ec))
+        {
+            return std::shared_ptr<Component>(
+                get_lva<Component>::call(gid.get_lsb()),
+                detail::get_ptr_no_unpin_deleter(id));
+        }
+
         hpx::future<std::shared_ptr<Component> > ptr =
             get_ptr<Component>(id);
         return ptr.get(ec);
