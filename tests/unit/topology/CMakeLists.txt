@@ -30,7 +30,7 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Unit/Topology/")
 
-  add_hpx_unit_test("util" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test("topology" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.unit.topology.${test})
