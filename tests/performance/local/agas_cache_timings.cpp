@@ -16,7 +16,7 @@
 #include <hpx/cache/statistics/local_full_statistics.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/util/histogram.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/accumulators/accumulators.hpp>

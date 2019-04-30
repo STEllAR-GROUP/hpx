@@ -12,7 +12,7 @@
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <atomic>
 #include <cstddef>

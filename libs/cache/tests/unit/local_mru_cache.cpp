@@ -7,7 +7,7 @@
 #include <hpx/cache/local_cache.hpp>
 #include <hpx/cache/statistics/local_statistics.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <string>
 #include <map>

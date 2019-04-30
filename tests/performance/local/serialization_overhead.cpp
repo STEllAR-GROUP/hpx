@@ -8,7 +8,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/runtime/serialization/detail/preprocess.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/predef/other/endian.h>

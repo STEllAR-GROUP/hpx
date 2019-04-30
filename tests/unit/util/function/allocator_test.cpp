@@ -11,7 +11,7 @@
 // For more information, see http://www.boost.org
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/function.hpp>
 
 #include <cstddef>

@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_TEST_FOREACH_MAY26_15_1414
 
 #include <hpx/include/parallel_container_algorithm.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/iterator_range.hpp>
 
 #include <cstddef>

@@ -5,7 +5,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_range.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <vector>
 

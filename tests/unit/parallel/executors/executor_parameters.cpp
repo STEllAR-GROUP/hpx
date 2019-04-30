@@ -10,7 +10,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/iterator_range.hpp>
 
 #include <algorithm>

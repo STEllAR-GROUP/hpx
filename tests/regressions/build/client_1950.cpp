@@ -8,7 +8,7 @@
 
 #include <hpx/include/iostreams.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include "server_1950.hpp"
 

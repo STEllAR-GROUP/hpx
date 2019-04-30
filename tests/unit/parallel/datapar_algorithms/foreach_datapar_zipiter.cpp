@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/datapar.hpp>
 #include <hpx/include/parallel_for_each.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

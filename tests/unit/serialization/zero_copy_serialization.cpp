@@ -14,7 +14,7 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <boost/predef/other/endian.h>
 

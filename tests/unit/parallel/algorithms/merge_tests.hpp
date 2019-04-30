@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_TEST_MERGE_AUG_11_2017_0540PM
 
 #include <hpx/include/parallel_merge.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <algorithm>

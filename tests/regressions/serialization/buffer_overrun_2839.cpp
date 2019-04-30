@@ -6,7 +6,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/runtime/serialization/complex.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <complex>
 #include <vector>

@@ -21,12 +21,15 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <sstream>
+#include <functional>
 #include <iostream>
 #include <mutex>
+#include <sstream>
 
 namespace hpx { namespace util
 {
+using test_failure_handler_type = std::function<void()>;
+HPX_EXPORT void set_test_failure_handler(test_failure_handler_type f);
 
 enum counter_type
 {

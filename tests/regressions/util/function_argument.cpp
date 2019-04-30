@@ -9,7 +9,7 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <vector>
 

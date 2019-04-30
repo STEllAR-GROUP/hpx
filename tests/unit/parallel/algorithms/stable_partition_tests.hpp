@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_TEST_STABLE_PARTITION_SEP_24_2016_1210PM
 
 #include <hpx/include/parallel_partition.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

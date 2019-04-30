@@ -12,7 +12,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <stdexcept>

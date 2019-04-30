@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_TEST_TRANSFORM_SEP_08_2014_0927AM
 
 #include <hpx/include/parallel_transform.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

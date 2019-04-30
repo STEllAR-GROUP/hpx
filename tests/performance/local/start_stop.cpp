@@ -10,7 +10,7 @@
 #include <hpx/hpx_start.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/yield_while.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <boost/program_options.hpp>
 

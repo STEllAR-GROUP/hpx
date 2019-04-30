@@ -16,6 +16,7 @@ set(HPX_LIBS
   config
   hardware
   preprocessor
+  testing
   CACHE INTERNAL "list of HPX modules" FORCE
 )
 

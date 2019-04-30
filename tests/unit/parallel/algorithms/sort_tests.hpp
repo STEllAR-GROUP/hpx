@@ -24,7 +24,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_sort.hpp>
 #include <hpx/util/format.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 //
 #include "test_utils.hpp"
 

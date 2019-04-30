@@ -25,7 +25,7 @@
 
 #include <iostream>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 unsigned int hash = 0;
 

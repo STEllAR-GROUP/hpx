@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/atomic_count.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unused.hpp>

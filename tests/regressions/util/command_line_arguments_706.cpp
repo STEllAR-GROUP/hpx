@@ -7,7 +7,7 @@
 // line arguments before last `=` sign)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 char const* argv[] =
 {

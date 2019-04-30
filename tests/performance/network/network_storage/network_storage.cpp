@@ -9,7 +9,7 @@
 #include <hpx/components/iostreams/standard_streams.hpp>
 #include <hpx/lcos/local/detail/sliding_semaphore.hpp>
 #include <hpx/util/format.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <boost/assert.hpp>
 

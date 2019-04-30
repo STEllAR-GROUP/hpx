@@ -6,7 +6,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/traits.hpp>
 #include <hpx/include/unordered_map.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <algorithm>
 #include <cstddef>

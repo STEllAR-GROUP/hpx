@@ -10,7 +10,7 @@
 #include <hpx/include/apply.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <cstddef>

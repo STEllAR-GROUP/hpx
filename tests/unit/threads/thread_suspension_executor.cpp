@@ -10,7 +10,7 @@
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/thread_executors.hpp>
 #include <hpx/include/threadmanager.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

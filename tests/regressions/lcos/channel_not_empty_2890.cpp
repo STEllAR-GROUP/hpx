@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/local/channel.hpp>
 #include <hpx/lcos/channel.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 HPX_REGISTER_CHANNEL(int);
 

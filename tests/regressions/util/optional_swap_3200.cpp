@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/util/optional.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 int main()
 {

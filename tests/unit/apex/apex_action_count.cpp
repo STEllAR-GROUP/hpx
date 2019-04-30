@@ -14,7 +14,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/format.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <apex_api.hpp>
 

@@ -10,7 +10,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 struct test_server : hpx::components::simple_component_base<test_server>
 {

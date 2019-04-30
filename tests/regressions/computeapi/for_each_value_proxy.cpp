@@ -7,7 +7,7 @@
 #include <hpx/include/compute.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/traits/is_value_proxy.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <algorithm>
 #include <cstddef>

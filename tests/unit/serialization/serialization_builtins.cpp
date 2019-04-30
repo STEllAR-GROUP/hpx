@@ -52,7 +52,7 @@ std::ostream& operator<<(std::ostream& s, boost::uint128_type i)
 }
 #endif
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 void test_bool()
 {

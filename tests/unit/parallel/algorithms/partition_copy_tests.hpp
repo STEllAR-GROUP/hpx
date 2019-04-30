@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_TEST_PARTITION_COPY_JUN_18_2017_0245AM
 
 #include <hpx/include/parallel_partition.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <algorithm>

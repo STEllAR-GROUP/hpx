@@ -8,7 +8,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/lcos/future.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <atomic>
 #include <utility>

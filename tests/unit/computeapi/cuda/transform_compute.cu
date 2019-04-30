@@ -10,7 +10,7 @@
 #include <hpx/include/parallel_transform.hpp>
 #include <hpx/include/parallel_copy.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <hpx/hpx_init.hpp>
 

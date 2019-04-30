@@ -8,7 +8,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <boost/program_options.hpp>
 

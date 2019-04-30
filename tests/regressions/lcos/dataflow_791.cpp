@@ -13,7 +13,7 @@
 #include <hpx/dataflow.hpp>
 #include <hpx/util/unwrap.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstdint>
 #include <cstdio>
