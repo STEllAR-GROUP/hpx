@@ -3,16 +3,17 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests
+if (HPX_WITH_SHARED_PRIORITY_SCHEDULER AND HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
+  set(tests ${tests}
     numa_allocator
-)
+  )
 
-###############################################################################
-# NB. threads = -2 = threads = 'cores'
-# NB. threads = -1 = threads = 'all'
-set(numa_allocator_PARAMETERS
+  # NB. threads = -2 = threads = 'cores'
+  # NB. threads = -1 = threads = 'all'
+  set(numa_allocator_PARAMETERS
     THREADS_PER_LOCALITY -2
     ARGS --size=1024 --nb=512 --tiles-per-domain=2 --col-proc=1 --row-proc=1)
+endif()
 
 ###############################################################################
 foreach(test ${tests})

@@ -164,7 +164,7 @@ namespace hpx { namespace compute { namespace host {
         using numa_binding_helper_ptr = std::shared_ptr<numa_binding_helper<T>>;
 
         // default constructor produces an unusable allocator
-        numa_binding_allocator() {}
+        numa_binding_allocator() = default;
 
         // construct without a memory binder function
         // only first touch or interleave policies are valid
@@ -209,7 +209,7 @@ namespace hpx { namespace compute { namespace host {
             LOG_NUMA_MSG("numa_binding_allocator : Copy allocator rebind");
         }
 
-        // Move assignment
+        // Move constructor
         numa_binding_allocator(numa_binding_allocator&& rhs)
           : binding_helper_(std::move(rhs.binding_helper_))
           , policy_(rhs.policy_)
