@@ -61,7 +61,8 @@ namespace hpx { namespace threads { namespace policies
         {
             mode = scheduler_mode(hpx::util::safe_lexical_cast<std::size_t>(
                 default_scheduler_mode));
-            HPX_ASSERT((mode & ~scheduler_mode::all_flags) == 0);
+            HPX_ASSERT_MSG((mode & ~scheduler_mode::all_flags) == 0,
+                "hpx.default_scheduler_mode contains unknown scheduler modes");
         }
 
         set_scheduler_mode(mode);
