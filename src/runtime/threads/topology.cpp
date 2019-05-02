@@ -10,13 +10,13 @@
 #include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/format.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/format.hpp>
-#include <hpx/util/logging.hpp>
 #include <hpx/util/spinlock.hpp>
 
 #include <boost/io/ios_state.hpp>

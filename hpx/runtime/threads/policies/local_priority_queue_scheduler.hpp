@@ -17,7 +17,7 @@
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/cache_aligned_data.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <atomic>

@@ -12,7 +12,7 @@
 #include <hpx/format.hpp>
 #include <hpx/util/one_size_heap_list.hpp>
 #if defined(HPX_DEBUG)
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #endif
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/wrapper_heap_base.hpp>

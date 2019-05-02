@@ -22,7 +22,7 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/tuple.hpp>
 

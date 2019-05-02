@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/tuple.hpp>

@@ -24,7 +24,7 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <exception>

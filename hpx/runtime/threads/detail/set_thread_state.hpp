@@ -10,6 +10,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/logging.hpp>
 
 #include <boost/asio/basic_waitable_timer.hpp>
 

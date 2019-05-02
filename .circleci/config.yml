@@ -798,6 +798,7 @@ jobs:
               ninja -j2 -k 0 tests.unit.modules.config
               ninja -j2 -k 0 tests.unit.modules.format
               ninja -j2 -k 0 tests.unit.modules.hardware
+              ninja -j2 -k 0 tests.unit.modules.logging
               ninja -j2 -k 0 tests.unit.modules.preprocessor
       - run:
           name: Running Unit Tests
@@ -810,6 +811,7 @@ jobs:
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.format
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.hardware
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.logging
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
       - run:
           <<: *convert_xml

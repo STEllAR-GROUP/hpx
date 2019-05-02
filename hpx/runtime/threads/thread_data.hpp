@@ -21,7 +21,7 @@
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
