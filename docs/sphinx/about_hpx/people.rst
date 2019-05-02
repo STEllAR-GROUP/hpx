@@ -107,12 +107,21 @@ Acknowledgements
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Jan Mełech, for adding automatic serialization of simple structs.
+* Austin McCartney, for adding concept emulation of the Ranges TS bidirectional
+  and random access iterator concepts.
+* Marco Diers, reporting and fixing issues related PMIx.
+* Maximilian Bremer, for reporting multiple issues and extending the component
+  migration tests.
+* Piotr Mikołajczyk, for his improvements and fixes to the set and count
+  algorithms.
+* Grant Rostig, for reporting several deficiencies on our web pages.
 * Jakub Golinowski, for implementing an |hpx| backend for OpenCV and in the
   process improving documentation and reporting issues.
 * Mikael Simberg (|cscs|_), for his tireless help cleaning up and maintaining
   |hpx|.
-* Tianyi Zhang, for his work on HPXMP
-* Shahrzad Shirzad, for her contributions related to Phylanx
+* Tianyi Zhang, for his work on HPXMP.
+* Shahrzad Shirzad, for her contributions related to Phylanx.
 * Christopher Ogle, for his contributions to the parallel algorithms.
 * Surya Priy, for his work with statistic performance counters.
 * Anushi Maheshwari, for her work on random number generation.
@@ -228,12 +237,12 @@ the project through discussions, pull requests, documentation patches, etc.
   Bryant Lam, and Alex Hirsch who improved our CMake.
 * Praveen Velliengiri, Jean-Loup Tastet, Michael Levine, Aalekh Nigam,
   HadrienG2, Prayag Verma, and Avyav Kumar who improved the documentation.
-* Jayesh Badwaik, J. F. Bastien, Christoph Garth,
-  Christopher Hinz, Brandon Kohn,
-  Mario Lang, Maikel Nadolski, pierrele, hendrx,
-  Dekken, woodmeister123, xaguilar, Andrew Kemp, Dylan Stark,
-  and Matthew Anderson who
-  contributed to the general improvement of |hpx|
+* Jayesh Badwaik, J. F. Bastien, Christoph Garth, Christopher Hinz, Brandon
+  Kohn, Mario Lang, Maikel Nadolski, pierrele, hendrx, Dekken, woodmeister123,
+  xaguilar, Andrew Kemp, Dylan Stark, Matthew Anderson, Jeremy Wilke, Jiazheng
+  Yuan, CyberDrudge, david8dixon, Maxwell Reeser, Raffaele Solcà, Marco
+  Ippolito, Jules Pénuchot, and yurivict who contributed to the general
+  improvement of |hpx|.
 
 In addition to the people who worked directly with |hpx| development we would
 like to acknowledge the NSF, DoE, DARPA, |cct|_, |inf3|_, and |cscs|_ who fund
