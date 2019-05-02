@@ -124,6 +124,11 @@ namespace hpx { namespace parallel { namespace util
             }
             hpx::wait_all(first_touch);
 
+            for (auto && f : first_touch)
+            {
+                f.get();        // rethrow exceptions
+            }
+
             // return the overall memory block
             return p;
         }

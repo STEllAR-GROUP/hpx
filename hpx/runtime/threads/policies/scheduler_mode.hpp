@@ -41,8 +41,16 @@ namespace hpx { namespace threads { namespace policies
                 reduce_thread_priority |
                 delay_exit |
                 enable_stealing |
-                enable_idle_backoff
+                enable_idle_backoff,
             ///< This option represents the default mode.
+        all_flags =
+                do_background_work |
+                reduce_thread_priority |
+                delay_exit |
+                fast_idle_mode |
+                enable_elasticity |
+                enable_stealing |
+                enable_idle_backoff
     };
 }}}
 
