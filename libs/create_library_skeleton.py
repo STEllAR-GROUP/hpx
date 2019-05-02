@@ -87,7 +87,7 @@ endif()
 '''
 
 tests_cmakelists_template = cmake_header + f'''
-if (NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
+if (NOT HPX_WITH_TESTS)
   return()
 endif()
 if (NOT HPX_{lib_name_upper}_WITH_TESTS)
