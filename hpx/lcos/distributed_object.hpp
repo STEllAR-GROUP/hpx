@@ -457,7 +457,7 @@ namespace hpx { namespace lcos {
         /// \cond NOINTERNAL
         /// force compilation error if serialization of client occurs
         template <typename Archive, typename Type>
-        HPX_FORCEINLINE void serialize(
+        void serialize(
             Archive& ar, base_type& f, unsigned version) = delete;
 
     private:
@@ -661,7 +661,7 @@ namespace hpx { namespace lcos {
         /// \cond NOINTERNAL
         /// force compilation error if serialization of client occurs
         template <typename Archive, typename Type>
-        HPX_FORCEINLINE void serialize(
+        void serialize(
             Archive& ar, base_type& f, unsigned version) = delete;
 
     private:
