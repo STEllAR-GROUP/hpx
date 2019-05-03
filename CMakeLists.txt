@@ -1855,15 +1855,6 @@ set(HPX_DEBUG_POSTFIX "d")
 ################################################################################
 # Add libraries
 ################################################################################
-if(HPX_WITH_STATIC_LINKING)
-  if(MSVC)
-    # The MSVC linker can't handle a static library as large as we get when
-    # statically linking the main HPX library
-    set(hpx_libs_link_mode SHARED)
-  endif()
-else()
-  set(hpx_libs_link_mode ${hpx_library_link_mode})
-endif()
 add_subdirectory(libs)
 
 ################################################################################

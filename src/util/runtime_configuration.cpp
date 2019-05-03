@@ -200,6 +200,7 @@ namespace hpx { namespace util
             "max_idle_backoff_time = ${HPX_MAX_IDLE_BACKOFF_TIME:"
             HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_IDLE_BACKOFF_TIME_MAX)) "}",
 #endif
+            "default_scheduler_mode = ${HPX_DEFAULT_SCHEDULER_MODE}",
 
             /// If HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE is set,
             /// then apply the test-failure value as default.
