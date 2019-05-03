@@ -26,6 +26,7 @@
 #include <hpx/runtime/serialization/set.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/runtime/serialization/string.hpp>
+#include <hpx/runtime/serialization/tuple.hpp>
 #include <hpx/runtime/serialization/unique_ptr.hpp>
 #include <hpx/runtime/serialization/unordered_map.hpp>
 #include <hpx/runtime/serialization/valarray.hpp>

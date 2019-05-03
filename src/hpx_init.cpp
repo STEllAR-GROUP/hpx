@@ -32,6 +32,7 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
