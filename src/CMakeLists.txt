@@ -300,15 +300,14 @@ foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
 endforeach()
 
 # integrate the hpx modules with the main library
-set(_modules hpx_preprocessor)
-foreach(_module ${_modules})
+foreach(_module ${HPX_LIBS})
   # add module binaries as PRIVATE dependencies to the core hpx library to
   # avoid dependent applicatons have to link against those
-  target_link_libraries(hpx ${HPX_TLL_PRIVATE} ${_module})
+  target_link_libraries(hpx ${HPX_TLL_PRIVATE} hpx_${_module})
 
   # add module include directories as PUBLIC to core hpx library to enable
   # compilation against indirectly included headers
-  get_target_property(_module_includes ${_module} INTERFACE_INCLUDE_DIRECTORIES)
+  get_target_property(_module_includes hpx_${_module} INTERFACE_INCLUDE_DIRECTORIES)
   target_include_directories(hpx PUBLIC ${_module_includes})
 endforeach()
 
@@ -355,10 +354,10 @@ if(NOT HPX_WITH_STATIC_LINKING)
   endif()
   target_include_directories(hpx_init PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
 
-  foreach(_module ${_modules})
+  foreach(_module ${HPX_LIBS})
     # add module include directories as PRIVATE to the hpx_init library to
     # enable its compilation against indirectly included headers
-    get_target_property(_module_includes ${_module} INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(_module_includes hpx_${_module} INTERFACE_INCLUDE_DIRECTORIES)
     target_include_directories(hpx_init PRIVATE ${_module_includes})
   endforeach()
 
@@ -402,10 +401,10 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
 
     target_include_directories(hpx_wrap PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
 
-    foreach(_module ${_modules})
+    foreach(_module ${HPX_LIBS})
       # add module include directories as PRIVATE to the hpx_wrap library to
       # enable its compilation against indirectly included headers
-      get_target_property(_module_includes ${_module} INTERFACE_INCLUDE_DIRECTORIES)
+      get_target_property(_module_includes hpx_${_module} INTERFACE_INCLUDE_DIRECTORIES)
       target_include_directories(hpx_wrap PRIVATE ${_module_includes})
     endforeach()
 
