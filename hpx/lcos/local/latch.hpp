@@ -55,7 +55,7 @@ namespace hpx { namespace lcos { namespace local
         /// Postconditions: counter_ == count.
         ///
         explicit latch(std::ptrdiff_t count)
-          : mtx_(), cond_(), notified_(count == 0), counter_(count)
+          : mtx_(), cond_(), counter_(count), notified_(count == 0)
         {
         }
 
@@ -184,12 +184,11 @@ namespace hpx { namespace lcos { namespace local
             notified_ = false;
         }
 
-    private:
+    protected:
         mutable util::cache_line_data<mutex_type> mtx_;
         mutable util::cache_line_data<local::detail::condition_variable> cond_;
-        bool notified_;
-    protected:
         std::atomic<std::ptrdiff_t> counter_;
+        bool notified_;
     };
 }}}
 
