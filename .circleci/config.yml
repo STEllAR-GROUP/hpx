@@ -232,7 +232,12 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.examples
+              # NOTE: transpose_block_numa is disabled because
+              # hwloc_get_area_membind_nodeset (which is used by the
+              # numa_allocator) fails with EPERM.
+              ctest -T test --no-compress-output --output-on-failure \
+                  -R tests.examples \
+                  -E tests.examples.transpose.transpose_block_numa
       - run:
           <<: *convert_xml
       - run:
