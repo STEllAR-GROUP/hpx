@@ -3,7 +3,7 @@
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-|circleci_status| |zenodo_doi|
+|circleci_status| |zenodo_doi| |codacy|
 
 Documentation: `latest
 <https://stellar-group.github.io/hpx/docs/sphinx/latest/html/index.html>`_,
@@ -84,6 +84,8 @@ stable and usable, sometimes new bugs trick their way into the code base. The
 `CircleCI <https://circleci.com/gh/STEllAR-GROUP/hpx>`_ continuous integration
 service additionally tracks the current build status for the master branch:
 |circleci_status|.
+
+We use `Codacy <https://www.codacy.com/>`_ to assess the code quality of this project: |codacy|.
 
 If you can't find what you are looking for in the documentation or you suspect
 you've found a bug in HPX we very much encourage and appreciate any issue
@@ -172,3 +174,7 @@ HPX is currently funded by
 
 .. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.598202.svg
      :target: https://doi.org/10.5281/zenodo.598202
+     
+.. |codacy| image:: https://api.codacy.com/project/badge/Grade/fef52e7a84d04123921152e35fbb1594
+     :target: https://www.codacy.com/app/STEllAR-GROUP/hpx
+     :alt: HPX Code Quality Assessment
