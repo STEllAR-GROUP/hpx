@@ -854,7 +854,6 @@ namespace hpx { namespace threads { namespace detail
 
         return executed_phases - reset_executed_phases;
     }
-#endif
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
     template <typename Scheduler>
@@ -1279,8 +1278,8 @@ namespace hpx { namespace threads { namespace detail
         return std::int64_t(
             (double(tfunc_total) - double(exec_total)) * timestamp_scale_);
     }
-#endif
-#endif
+#endif // HPX_HAVE_THREAD_IDLE_RATES
+#endif // HPX_HAVE_THREAD_CUMULATIVE_COUNTS
 
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
     ////////////////////////////////////////////////////////////
@@ -1530,7 +1529,7 @@ namespace hpx { namespace threads { namespace detail
             (cleanup_total / double(tfunc_total - exec_total));
         return std::int64_t(10000. * percent);    // 0.01 percent
     }
-#endif
+#endif // HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
 
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::avg_idle_rate_all(bool reset)
@@ -1612,7 +1611,7 @@ namespace hpx { namespace threads { namespace detail
             1. - (double(exec_time) / double(tfunc_time));
         return std::int64_t(10000. * percent);    // 0.01 percent
     }
-#endif
+#endif // HPX_HAVE_THREAD_IDLE_RATES
 
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::get_idle_loop_count(
@@ -2038,3 +2037,5 @@ namespace hpx { namespace threads { namespace detail
         }
     }
 }}}
+
+#endif
