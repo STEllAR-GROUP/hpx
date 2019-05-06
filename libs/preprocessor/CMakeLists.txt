@@ -55,8 +55,7 @@ set(headers
 )
 
 if(HPX_PREPROCESSOR_WITH_COMPATIBILITY_HEADERS)
-  set(headers
-    ${headers}
+  set(compat_headers
     ${CMAKE_CURRENT_SOURCE_DIR}/include_compatibility/hpx/util/detail/pp/cat.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include_compatibility/hpx/util/detail/pp/config.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include_compatibility/hpx/util/detail/pp/expand.hpp
@@ -66,7 +65,7 @@ if(HPX_PREPROCESSOR_WITH_COMPATIBILITY_HEADERS)
   )
 endif()
 
-add_library(hpx_preprocessor STATIC ${headers})
+add_library(hpx_preprocessor STATIC ${headers} ${compat_headers})
 
 target_include_directories(hpx_preprocessor PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
@@ -82,6 +81,14 @@ add_hpx_source_group(
   ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx
   CLASS "Header Files"
   TARGETS ${headers})
+
+if(HPX_PREPROCESSOR_WITH_COMPATIBILITY_HEADERS)
+  add_hpx_source_group(
+    NAME hpx_preprocessor
+    ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include_compatibility/hpx
+    CLASS "Header Files"
+    TARGETS ${compat_headers})
+endif()
 
 set_target_properties(hpx_preprocessor PROPERTIES
   FOLDER "Core/Modules")
