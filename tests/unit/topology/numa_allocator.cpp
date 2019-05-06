@@ -145,7 +145,7 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator& allocator)
             T* page_ptr = &M[i * numa_binder->memory_step(0) +
                 j * numa_binder->memory_step(1)];
             int d =
-                numa_binder->operator()(M, page_ptr, 4096, num_numa_domains);
+                numa_binder->operator()(M, page_ptr, pagesize, num_numa_domains);
             std::cout << std::hex << d;
         }
         std::cout << "\n";

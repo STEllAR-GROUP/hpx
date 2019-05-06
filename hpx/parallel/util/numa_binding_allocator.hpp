@@ -378,7 +378,7 @@ namespace hpx { namespace compute { namespace host {
         {
 #if defined(NUMA_ALLOCATOR_LINUX)
             // @TODO replace with topology::page_size
-            int pagesize = 4096;
+            int pagesize = threads::get_memory_page_size();
             HPX_ASSERT((std::size_t(addr) & (pagesize - 1)) == 0);
 
             std::size_t count = (len + pagesize - 1) / pagesize;
@@ -574,7 +574,8 @@ namespace hpx { namespace compute { namespace host {
                     helper->operator()(p, page_ptr, pagesize, nodesets.size());
                 if (dom == numa_domain)
                 {
-                    HPX_ASSERT((std::size_t(page_ptr) & 4095) == 0);
+                    HPX_ASSERT((std::size_t(page_ptr) &
+                                (threads::get_memory_page_size()-1)) == 0);
                     // trigger a memory read and rewrite without changing contents
                     volatile T* vaddr = const_cast<volatile T*>(page_ptr);
                     *vaddr = *vaddr;
