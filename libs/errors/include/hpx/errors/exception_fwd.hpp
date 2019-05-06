@@ -10,7 +10,7 @@
 #define HPX_EXCEPTION_FWD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/error.hpp>
+#include <hpx/errors/error.hpp>
 
 namespace hpx
 {
@@ -59,6 +59,6 @@ namespace hpx
     HPX_EXCEPTION_EXPORT extern error_code throws;
 }
 
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors/throw_exception.hpp>
 
 #endif

@@ -16,7 +16,7 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/components/performance_counters/papi/server/papi.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 
 #include <boost/version.hpp>
 

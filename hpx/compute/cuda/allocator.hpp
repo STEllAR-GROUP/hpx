@@ -16,7 +16,7 @@
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/target_ptr.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/statistics/min.hpp>
 #include <hpx/type_support/unused.hpp>
 

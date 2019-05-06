@@ -12,7 +12,7 @@
 #define HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/agas_fwd.hpp>

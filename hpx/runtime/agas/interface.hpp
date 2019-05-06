@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components_fwd.hpp>

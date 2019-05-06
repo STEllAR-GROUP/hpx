@@ -4,8 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/exception_list.hpp>
+#include <hpx/errors/exception.hpp>
+#include <hpx/errors/exception_list.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
 #include <boost/system/system_error.hpp>

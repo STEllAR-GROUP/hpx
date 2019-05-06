@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>

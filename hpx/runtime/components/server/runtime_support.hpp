@@ -22,7 +22,7 @@
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/plugin.hpp>

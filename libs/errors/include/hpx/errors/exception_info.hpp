@@ -8,13 +8,15 @@
 #define HPX_EXCEPTION_INFO_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/error_code.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/errors/error_code.hpp>
+#include <hpx/errors/exception_info.hpp>
 
 #include <cstddef>
 #include <exception>
 #include <memory>
+#include <tuple>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
@@ -87,7 +89,7 @@ namespace hpx
             {
                 using entry_type = std::pair<std::type_info const&, void const*>;
                 entry_type const entries[] = {
-                    {typeid(typename Ts::tag), std::addressof(util::get<Is>(data))}...
+                    {typeid(typename Ts::tag), std::addressof(std::get<Is>(data))}...
                 };
 
                 for (auto const& entry : entries)
@@ -109,7 +111,7 @@ namespace hpx
             }
 
             using exception_info_node_base::next;
-            util::tuple<typename Ts::type...> data;
+	    std::tuple<typename Ts::type...> data;
         };
     }
 

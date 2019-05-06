@@ -28,6 +28,8 @@
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/custom_exception_info.hpp>
 #include <hpx/format.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/util/function.hpp>
@@ -603,6 +605,8 @@ namespace hpx
         {
             hpx::assertion::set_assertion_handler(&detail::assertion_handler);
             hpx::util::set_test_failure_handler(&detail::test_failure_handler);
+            hpx::set_custom_exception_info_handler(&detail::custom_exception_info);
+            hpx::set_pre_exception_handler(&detail::pre_exception_handler);
 #if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
             set_error_handlers();
 #endif

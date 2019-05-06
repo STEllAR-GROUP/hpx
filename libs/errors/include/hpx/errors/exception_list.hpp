@@ -9,10 +9,10 @@
 #define HPX_EXCEPTION_LIST_OCT_06_2008_0942AM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/errors/exception.hpp>
 
 #include <boost/system/error_code.hpp>
+#include <boost/smart_ptr/detail/spinlock.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -35,7 +35,10 @@ namespace hpx
     class HPX_EXCEPTION_EXPORT exception_list : public hpx::exception
     {
     private:
-        typedef hpx::lcos::local::spinlock mutex_type;
+        // TODO: Does this need to be hpx::lcos::local::spinlock?
+        // typedef hpx::lcos::local::spinlock mutex_type;
+        // TODO: Add correct initialization of boost spinlock.
+        typedef boost::detail::spinlock mutex_type;
 
         typedef std::list<std::exception_ptr> exception_list_type;
         exception_list_type exceptions_;

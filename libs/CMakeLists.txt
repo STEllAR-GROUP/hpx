@@ -18,6 +18,7 @@ set(HPX_LIBS
   concepts
   config
   datastructures
+  errors
   format
   hardware
   hashing

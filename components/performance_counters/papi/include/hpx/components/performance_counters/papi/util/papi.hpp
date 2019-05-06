@@ -11,7 +11,7 @@
 #if defined(HPX_HAVE_PAPI)
 
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 
 #include <cstdint>

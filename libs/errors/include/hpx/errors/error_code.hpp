@@ -10,8 +10,8 @@
 #define HPX_ERROR_CODE_MAR_24_2008_0929AM
 
 #include <hpx/config.hpp>
-#include <hpx/error.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors/error.hpp>
+#include <hpx/errors/exception_fwd.hpp>
 
 #include <boost/system/error_code.hpp>
 
@@ -292,6 +292,6 @@ namespace hpx
     }
 }
 
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors/throw_exception.hpp>
 
 #endif

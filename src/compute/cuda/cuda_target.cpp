@@ -9,7 +9,7 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/compute/cuda/target.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type_impl.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

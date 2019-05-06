@@ -8,8 +8,7 @@
 #include <hpx/runtime/naming/name.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
@@ -21,7 +20,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>

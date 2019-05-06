@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/logging.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/timing/scoped_timer.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>

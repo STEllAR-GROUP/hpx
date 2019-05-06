@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
@@ -16,7 +16,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 
 #include <cstdint>
 #include <mutex>

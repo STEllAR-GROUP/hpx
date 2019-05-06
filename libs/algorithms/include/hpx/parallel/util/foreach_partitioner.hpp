@@ -11,7 +11,7 @@
 #include <hpx/dataflow.hpp>
 #endif
 #include <hpx/assertion.hpp>
-#include <hpx/exception_list.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/type_support/unused.hpp>
 

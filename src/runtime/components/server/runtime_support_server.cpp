@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>

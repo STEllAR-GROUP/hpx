@@ -9,7 +9,7 @@
 #define HPX_THREADS_THREAD_DATA_FWD_AUG_11_2015_0228PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_id_type.hpp>

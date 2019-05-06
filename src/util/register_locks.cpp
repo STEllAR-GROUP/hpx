@@ -6,11 +6,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/backtrace.hpp>
 
 #include <map>
 #include <string>
@@ -29,7 +30,7 @@ namespace hpx { namespace util
               , user_data_(nullptr)
             {
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
-                backtrace_ = hpx::detail::backtrace_direct();
+                backtrace_ = hpx::util::trace();
 #endif
             }
 
@@ -38,7 +39,7 @@ namespace hpx { namespace util
               , user_data_(data)
             {
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
-                backtrace_ = hpx::detail::backtrace_direct();
+                backtrace_ = hpx::detail::trace();
 #endif
             }
 
@@ -216,7 +217,7 @@ namespace hpx { namespace util
                     // temporarily cleaning held locks to avoid endless recursions
                     // when acquiring the back-trace
                     detail::reset_lock_enabled_on_exit e;
-                    std::string back_trace = hpx::detail::backtrace_direct(128);
+                    std::string back_trace = hpx::util::trace(std::size_t(128));
 
                     // throw or log, depending on config options
                     if (get_config_entry("hpx.throw_on_held_lock", "1") == "0")

@@ -10,7 +10,7 @@
 #define HPX_RUNTIME_THREADS_THREAD_HELPERS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>

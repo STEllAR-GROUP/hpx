@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/state.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/one_size_heap_list.hpp>

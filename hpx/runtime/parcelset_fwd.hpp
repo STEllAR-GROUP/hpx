@@ -8,7 +8,7 @@
 #define HPX_RUNTIME_PARCELSET_FWD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/system/error_code.hpp>

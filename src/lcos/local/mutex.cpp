@@ -7,7 +7,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>

@@ -13,7 +13,7 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/type_support/static.hpp>
 

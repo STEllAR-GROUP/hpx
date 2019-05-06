@@ -10,8 +10,8 @@
 #define HPX_THROW_EXCEPTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/error.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors/error.hpp>
+#include <hpx/errors/exception_fwd.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>

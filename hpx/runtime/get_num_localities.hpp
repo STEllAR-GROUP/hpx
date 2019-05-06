@@ -10,7 +10,7 @@
 #define HPX_RUNTIME_GET_NUM_LOCALITIES_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/components/component_type.hpp>

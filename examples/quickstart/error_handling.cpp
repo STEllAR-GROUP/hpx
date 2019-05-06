@@ -8,6 +8,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/custom_exception_info.hpp>
 
 //[error_handling_raise_exception
 void raise_exception()

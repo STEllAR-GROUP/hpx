@@ -6,7 +6,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 
 namespace hpx

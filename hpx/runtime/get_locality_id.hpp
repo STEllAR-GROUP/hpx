@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 
 #include <cstdint>
 

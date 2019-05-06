@@ -7,7 +7,7 @@
 #define HPX_RUNTIME_APPLIER_BIND_NAMING_WRAPPERS_MAY_26_20111234PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 

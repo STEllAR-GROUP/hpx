@@ -11,7 +11,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
-#include <hpx/exception_list.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/plugins/parcelport/tcp/connection_handler.hpp>
 #include <hpx/plugins/parcelport/tcp/receiver.hpp>

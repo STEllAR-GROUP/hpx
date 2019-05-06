@@ -8,7 +8,8 @@
 #include <hpx/performance_counters/counters.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/custom_exception_info.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/latch.hpp>
 #include <hpx/logging.hpp>

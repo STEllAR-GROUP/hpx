@@ -13,7 +13,7 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>

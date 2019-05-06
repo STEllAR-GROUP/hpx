@@ -7,9 +7,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/util/barrier.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/logging.hpp>

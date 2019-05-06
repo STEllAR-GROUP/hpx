@@ -10,7 +10,7 @@
 #define HPX_8B1A4443_7D95_4C0D_9970_7CEA4D049608
 
 #include <hpx/config.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 

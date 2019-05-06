@@ -12,7 +12,7 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/function.hpp>

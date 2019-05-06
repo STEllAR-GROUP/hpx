@@ -13,7 +13,7 @@
 #include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/parallel/executors/fused_bulk_execute.hpp>
 
-#include <hpx/exception_list.hpp>
+#include <hpx/errors.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/lcos/dataflow.hpp>
 #endif

@@ -13,7 +13,7 @@
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/assertion.hpp>
 #include <hpx/compute/cuda/target.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 
 #include <cuda_runtime.h>
 

@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_UTIL_DETAIL_HANDLE_REMOTE_EXCEPTIONS_DEC_28_2014_0316PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception_list.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/parallel/execution_policy.hpp>

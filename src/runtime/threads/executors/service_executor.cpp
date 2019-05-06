@@ -7,11 +7,10 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/io_service_pool.hpp>

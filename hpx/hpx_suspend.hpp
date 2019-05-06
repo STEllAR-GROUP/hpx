@@ -8,7 +8,7 @@
 #ifndef HPX_HPX_SUSPEND_HPP
 #define HPX_HPX_SUSPEND_HPP
 
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 
 /// \namespace hpx
 namespace hpx

@@ -13,7 +13,7 @@
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 
 #include <cstddef>
 #include <exception>

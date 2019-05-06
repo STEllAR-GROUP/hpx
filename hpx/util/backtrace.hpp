@@ -19,12 +19,12 @@ namespace hpx { namespace util
 {
     class backtrace {};
 
-    inline std::string trace(std::size_t frames_no = 0)
+    inline std::string trace(std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
     {
         return "";
     }
 
-    inline std::string trace_on_new_stack(std::size_t frames_no = 0)
+    inline std::string trace_on_new_stack(std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
     {
         return "";
     }

@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
@@ -17,7 +17,6 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_front.hpp>

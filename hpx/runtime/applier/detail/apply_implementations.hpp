@@ -13,7 +13,7 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>

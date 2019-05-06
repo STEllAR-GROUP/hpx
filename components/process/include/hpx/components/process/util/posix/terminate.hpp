@@ -14,8 +14,7 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_WINDOWS)
-#include <hpx/error_code.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 
 #include <signal.h>
 

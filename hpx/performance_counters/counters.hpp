@@ -11,7 +11,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/util/function.hpp>
 
 #include <cstddef>

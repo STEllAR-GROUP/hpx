@@ -12,7 +12,7 @@
 #include <hpx/apply.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/when_all.hpp>

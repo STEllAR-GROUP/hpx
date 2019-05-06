@@ -13,7 +13,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/exception/exception.hpp>

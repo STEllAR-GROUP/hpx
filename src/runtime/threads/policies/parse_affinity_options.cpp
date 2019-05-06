@@ -7,10 +7,9 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/throw_exception.hpp>
 
 #include <hwloc.h>
 
