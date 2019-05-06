@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
     // clang-format off
     desc_cmdline.add_options()
         ("size,n",
-         boost::program_options::value<int>()->default_value(4096),
+         boost::program_options::value<int>()->default_value(1024),
          "Matrix size.")
         ("tiles-per-domain,t",
          boost::program_options::value<int>()->default_value(1),
