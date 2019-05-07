@@ -739,7 +739,9 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.topology
+              ctest -T test --no-compress-output --output-on-failure \
+                  -R tests.unit.topology \
+                  -E tests.unit.topology.numa_allocator
       - run:
           <<: *convert_xml
       - run:
