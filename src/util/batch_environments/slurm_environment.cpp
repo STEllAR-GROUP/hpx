@@ -86,51 +86,56 @@ namespace hpx { namespace util { namespace batch_environments
             std::vector<std::string> node_tokens;
             boost::split(node_tokens, tasks_per_node, boost::is_any_of(","));
 
-            if (node_tokens.size() == 1 &&
-                node_tokens[0].find_first_of('x') == std::string::npos)
+            std::size_t task_count = 0;
+            for (std::string& node_token : node_tokens)
             {
-                num_tasks_ = safe_lexical_cast<std::size_t>(node_tokens[0]);
-            }
-            else
-            {
-                for(std::string & node_token: node_tokens)
+                std::size_t num_tasks = 0;
+
+                // A token can be either of the form N(xM), where N is the number
+                // of tasks per node and M the number of nodes to follow
+                // or just N, where N is the number of tasks for a single node.
+                std::size_t paren_pos = node_token.find_first_of('(');
+
+                // We just got a single number of tasks per this node...
+                if (paren_pos == std::string::npos)
                 {
-                    std::size_t paren_pos = node_token.find_first_of('(');
-                    HPX_ASSERT(paren_pos != std::string::npos);
-                    std::size_t num_tasks
-                        = safe_lexical_cast<std::size_t>(
-                                node_token.substr(0, paren_pos));
-                    std::size_t repetition = 1;
-                    if(paren_pos != std::string::npos)
-                    {
-                        HPX_ASSERT(node_token[paren_pos + 1] == 'x');
-                        HPX_ASSERT(node_token[node_token.size() - 1] == ')');
-                        std::size_t begin = paren_pos + 2;
-                        std::size_t end = node_token.size() - 1;
-                        repetition =
-                            safe_lexical_cast<std::size_t>(
-                                node_token.substr(paren_pos + 2, end - begin));
-                    }
+                    num_tasks = safe_lexical_cast<std::size_t>(node_token);
+                }
+                // We got M times N tasks.
+                else
+                {
+                    HPX_ASSERT(node_token[paren_pos + 1] == 'x');
+                    HPX_ASSERT(node_token[node_token.size() - 1] == ')');
+                    std::size_t begin = paren_pos + 2;
+                    std::size_t end = node_token.size() - 1;
+                    std::size_t repetition = safe_lexical_cast<std::size_t>(
+                        node_token.substr(paren_pos + 2, end - begin));
 
-                    std::size_t next_task_count
-                        = task_count + num_tasks * repetition;
-                    if(node_num_ >= task_count && node_num_ < next_task_count)
-                    {
-                        num_tasks_ = num_tasks;
-                    }
+                    num_tasks = safe_lexical_cast<std::size_t>(
+                                    node_token.substr(0, paren_pos)) *
+                        repetition;
+                }
 
-                    task_count = next_task_count;
+                std::size_t next_task_count = task_count + num_tasks;
 
-                    if(task_count > node_num_)
+                // We set the number of tasks per node, if we are in the range
+                // of the currently parsed...
+                if (node_num_ >= task_count && node_num_ < next_task_count)
+                {
+                    num_tasks_ = num_tasks;
+                }
+
+                task_count = next_task_count;
+
+                if (task_count > node_num_)
+                {
+                    if (debug)
                     {
-                        if (debug) {
-                            std::cerr
-                                << "SLURM node number outside of available "
-                                    "list of tasks"
-                                << std::endl;
-                        }
-                        break;
+                        std::cerr << "SLURM node number outside of available "
+                                     "list of tasks"
+                                  << std::endl;
                     }
+                    break;
                 }
             }
         }
