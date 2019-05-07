@@ -109,9 +109,9 @@ namespace hpx { namespace util
         {
             for (int i = 0; i < N; ++i)
             {
-                HPX_ITT_SYNC_CREATE(&spinlock_pool<Tag, N>::pool_[i].data_,
+                HPX_ITT_SYNC_CREATE((&spinlock_pool<Tag, N>::pool_[i].data_),
                     "boost::detail::spinlock", 0);
-                HPX_ITT_SYNC_RENAME(&spinlock_pool<Tag, N>::pool_[i].data_,
+                HPX_ITT_SYNC_RENAME((&spinlock_pool<Tag, N>::pool_[i].data_),
                     "boost::detail::spinlock");
             }
         }
@@ -121,7 +121,7 @@ namespace hpx { namespace util
         {
             for (int i = 0; i < N; ++i)
             {
-                HPX_ITT_SYNC_DESTROY(&spinlock_pool<Tag, N>::pool_[i].data_);
+                HPX_ITT_SYNC_DESTROY((&spinlock_pool<Tag, N>::pool_[i].data_));
             }
         }
     }
