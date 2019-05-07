@@ -20,7 +20,7 @@
 template <typename T>
 struct linear_numa_binder : hpx::compute::host::numa_binding_helper<T>
 {
-    linear_numa_binder(std::size_t num_pages)
+    explicit linear_numa_binder(std::size_t num_pages)
       : hpx::compute::host::numa_binding_helper<T>()
     {
         const std::size_t CACHE_LINE_SIZE = hpx::threads::get_cache_line_size();

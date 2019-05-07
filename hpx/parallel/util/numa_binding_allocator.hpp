@@ -172,6 +172,7 @@ namespace hpx { namespace compute { namespace host {
             unsigned int flags)
           : policy_(policy)
           , flags_(flags)
+          , init_mutex()
         {
             LOG_NUMA_MSG("numa_binding_allocator : no binder function");
             HPX_ASSERT(
@@ -186,6 +187,7 @@ namespace hpx { namespace compute { namespace host {
           : binding_helper_(bind_func)
           , policy_(policy)
           , flags_(flags)
+          , init_mutex()
         {
             LOG_NUMA_MSG("numa_binding_allocator : allocator");
         }
@@ -195,6 +197,7 @@ namespace hpx { namespace compute { namespace host {
           : binding_helper_(rhs.binding_helper_)
           , policy_(rhs.policy_)
           , flags_(rhs.flags_)
+          , init_mutex()
         {
             LOG_NUMA_MSG("numa_binding_allocator : Copy allocator");
         }
@@ -205,6 +208,7 @@ namespace hpx { namespace compute { namespace host {
           : binding_helper_(rhs.binding_helper_)
           , policy_(rhs.policy_)
           , flags_(rhs.flags_)
+          , init_mutex()
         {
             LOG_NUMA_MSG("numa_binding_allocator : Copy allocator rebind");
         }
@@ -214,6 +218,7 @@ namespace hpx { namespace compute { namespace host {
           : binding_helper_(std::move(rhs.binding_helper_))
           , policy_(rhs.policy_)
           , flags_(rhs.flags_)
+          , init_mutex()
         {
             LOG_NUMA_MSG("numa_binding_allocator : Move constructor");
         }
@@ -284,8 +289,6 @@ namespace hpx { namespace compute { namespace host {
             }
             else if (policy_ == threads::hpx_hwloc_membind_policy::membind_user)
             {
-                result = reinterpret_cast<pointer>(
-                    threads::topology().allocate(n * sizeof(T)));
                 threads::hwloc_bitmap_ptr bitmap =
                     threads::get_thread_manager().get_pool_numa_bitmap(
                         binding_helper_->pool_name());
@@ -626,13 +629,13 @@ namespace hpx { namespace compute { namespace host {
             }
         }
 
-    private:
-        mutable std::mutex init_mutex;
-
     public:
         std::shared_ptr<numa_binding_helper<T>> binding_helper_;
         threads::hpx_hwloc_membind_policy policy_;
         unsigned int flags_;
+
+    private:
+        mutable std::mutex init_mutex;
     };
 }}}
 
