@@ -19,7 +19,7 @@ namespace hpx { namespace util { namespace detail
     /// Attach the debugger if this is enabled in the config
     static void may_attach_debugger()
     {
-        if (get_config_entry("hpx.attach-debugger", "") == "test-failure")
+        if (get_config_entry("hpx.attach_debugger", "") == "test-failure")
         {
             attach_debugger();
         }
