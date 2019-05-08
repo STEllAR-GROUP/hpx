@@ -205,9 +205,9 @@ namespace hpx { namespace util
             /// If HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE is set,
             /// then apply the test-failure value as default.
 #if defined(HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE)
-            "attach-debugger = ${HPX_ATTACH_DEBUGGER:test-failure}",
+            "attach_debugger = ${HPX_ATTACH_DEBUGGER:test-failure}",
 #else
-            "attach-debugger = ${HPX_ATTACH_DEBUGGER}",
+            "attach_debugger = ${HPX_ATTACH_DEBUGGER}",
 #endif
 
             // arity for collective operations implemented in a tree fashion
