@@ -85,7 +85,7 @@ to find them by passing one or more of the following options to |cmake|_:
 
 .. code-block:: sh
 
-    -DBOOST_DIR=/path/to/boost
+    -DBOOST_ROOT=/path/to/boost
     -DHWLOC_ROOT=/path/to/hwloc
     -DTCMALLOC_ROOT=/path/to/tcmalloc
     -DJEMALLOC_ROOT=/path/to/jemalloc
