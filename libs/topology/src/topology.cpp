@@ -5,15 +5,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/threads/topology.hpp>
-
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime/threads/cpu_mask.hpp>
-#include <hpx/runtime/threads/topology.hpp>
-#include <hpx/concurrency/spinlock.hpp>
+#include <hpx/topology/cpu_mask.hpp>
+#include <hpx/topology/topology.hpp>
 
 #include <boost/io/ios_state.hpp>
 

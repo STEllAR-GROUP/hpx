@@ -9,16 +9,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <atomic>

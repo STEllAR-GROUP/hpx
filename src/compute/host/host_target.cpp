@@ -11,7 +11,7 @@
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS)
 # if defined(HPX_HAVE_MAX_CPU_COUNT)

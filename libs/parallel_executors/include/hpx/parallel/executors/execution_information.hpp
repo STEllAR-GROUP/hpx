@@ -8,10 +8,10 @@
 #define HPX_PARALLEL_EXECUTORS_EXECUTION_INFORMATION_JAN_16_2017_0444PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/topology.hpp>
-#include <hpx/type_support/detail/wrap_int.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
+#include <hpx/type_support/detail/wrap_int.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_information_fwd.hpp>

@@ -16,7 +16,7 @@
 #include <hpx/parallel/executors/execution_information.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <limits>

@@ -32,6 +32,7 @@ set(HPX_LIBS
   testing
   thread_support
   timing
+  topology
   type_support
   util
   CACHE INTERNAL "list of HPX modules" FORCE

@@ -13,7 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/threads/cpu_mask.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 #include <hpx/type_support/static.hpp>
 
 #include <cstddef>
@@ -391,7 +391,6 @@ namespace hpx { namespace threads
         std::vector<std::size_t> socket_numbers_;
         std::vector<std::size_t> numa_node_numbers_;
         std::vector<std::size_t> core_numbers_;
-//        std::vector<std::size_t> pu_numbers_; // (empty vector)
 
         // Affinity masks: vectors of bitmasks
         // - Length of the vector: number of PUs of the machine

@@ -10,7 +10,7 @@
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 
 #include <hpx/parallel/executors/execution_information.hpp>
