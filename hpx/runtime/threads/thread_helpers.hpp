@@ -496,6 +496,9 @@ namespace hpx { namespace threads
     /// Remove the given flags from the scheduler mode
     HPX_API_EXPORT void remove_scheduler_mode(
         threads::policies::scheduler_mode to_remove);
+
+    /// Get the global topology instance
+    HPX_API_EXPORT topology const& get_topology();
     /// \endcond
 }}
 

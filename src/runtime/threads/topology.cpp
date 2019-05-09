@@ -11,7 +11,6 @@
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/concurrency/spinlock.hpp>
@@ -1529,17 +1528,6 @@ namespace hpx { namespace threads
         print_vector(os, core_numbers_);
         //os << "PUs (/threads)        : \n";
         //print_vector(os, pu_numbers_);
-    }
-
-    topology const& get_topology()
-    {
-        hpx::runtime* rt = hpx::get_runtime_ptr();
-        if (rt == nullptr)
-        {
-            HPX_THROW_EXCEPTION(invalid_status, "hpx::threads::get_topology",
-                "the hpx runtime system has not been initialized yet");
-        }
-        return rt->get_topology();
     }
 
     ///////////////////////////////////////////////////////////////////////////

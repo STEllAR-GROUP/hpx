@@ -421,8 +421,6 @@ namespace hpx { namespace threads
 
     HPX_API_EXPORT std::size_t hardware_concurrency();
 
-    HPX_API_EXPORT topology const& get_topology();
-
     ///////////////////////////////////////////////////////////////////////////
     // abstract away memory page size, calls to system functions are
     // expensive, so return a value initializaed at startup
