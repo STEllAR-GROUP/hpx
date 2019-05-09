@@ -12,7 +12,6 @@
 #include <hpx/format.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/concurrency/spinlock.hpp>
@@ -528,10 +527,8 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     mask_type topology::get_thread_affinity_mask_from_lva(
-        naming::address_type lva
-      , error_code& ec
-        ) const
-    { // {{{
+        void const* lva, error_code& ec) const
+    {    // {{{
         if (&ec != &throws)
             ec = make_success_code();
 
@@ -542,11 +539,11 @@ namespace hpx { namespace threads
             std::unique_lock<mutex_type> lk(topo_mtx);
             int ret =
 #if HWLOC_API_VERSION >= 0x00010b06
-                hwloc_get_area_membind(topo, reinterpret_cast<void const*>(lva),
-                    1, nodeset, &policy, HWLOC_MEMBIND_BYNODESET);
+                hwloc_get_area_membind(
+                    topo, lva, 1, nodeset, &policy, HWLOC_MEMBIND_BYNODESET);
 #else
-                hwloc_get_area_membind_nodeset(topo,
-                    reinterpret_cast<void const*>(lva), 1, nodeset, &policy, 0);
+                hwloc_get_area_membind_nodeset(
+                    topo, lva, 1, nodeset, &policy, 0);
 #endif
 
             if (-1 != ret)

@@ -12,7 +12,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 
@@ -213,7 +212,7 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        mask_type get_thread_affinity_mask_from_lva(naming::address_type,
+        mask_type get_thread_affinity_mask_from_lva(void const* lva,
             error_code& ec = throws) const;
 
         /// \brief Prints the \param m to os in a human readable form

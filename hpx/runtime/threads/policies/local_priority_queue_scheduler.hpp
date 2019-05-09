@@ -519,16 +519,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread =
                 data.schedulehint.mode == thread_schedule_hint_mode_thread ?
                 data.schedulehint.hint : std::size_t(-1);
-#ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
-//             // try to figure out the NUMA node where the data lives
-//             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
-//                 mask_cref_type mask =
-//                     topology_.get_thread_affinity_mask_from_lva(data.lva);
-//                 if (any(mask)) {
-//                     num_thread = find_first(mask);
-//                 }
-//             }
-#endif
+
             if (std::size_t(-1) == num_thread)
             {
                 num_thread = curr_queue_++ % num_queues_;
