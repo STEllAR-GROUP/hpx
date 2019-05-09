@@ -11,11 +11,9 @@
 #define HPX_RUNTIME_THREADS_TOPOLOGY_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/concurrency/spinlock.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
-
-#include <hpx/concurrency/spinlock.hpp>
 #include <hpx/type_support/static.hpp>
 
 #include <cstddef>
@@ -76,6 +74,8 @@ namespace hpx { namespace threads
         // the raw bitmap object
         hwloc_bitmap_t bmp_;
     };
+
+    using hwloc_bitmap_ptr = std::shared_ptr<hpx_hwloc_bitmap_wrapper>;
 
     /// \brief Please see hwloc documentation for the corresponding
     /// enums HWLOC_MEMBIND_XXX
