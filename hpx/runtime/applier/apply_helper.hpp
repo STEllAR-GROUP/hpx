@@ -68,9 +68,6 @@ namespace hpx { namespace applier { namespace detail
                 comptype, std::forward<Ts>(vs)...);
         }
 
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-        data.lva = lva;
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         data.description = util::thread_description(
@@ -110,9 +107,6 @@ namespace hpx { namespace applier { namespace detail
             std::forward<Continuation>(cont), lva, comptype,
             std::forward<Ts>(vs)...);
 
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-        data.lva = lva;
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         data.description = util::thread_description(

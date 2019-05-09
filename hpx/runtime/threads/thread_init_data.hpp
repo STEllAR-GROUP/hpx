@@ -32,9 +32,6 @@ namespace hpx { namespace threads
     public:
         thread_init_data()
           : func(),
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-            lva(0),
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             description(),
 #endif
@@ -56,9 +53,6 @@ namespace hpx { namespace threads
             schedulehint    = rhs.schedulehint;
             stacksize       = rhs.stacksize;
             scheduler_base  = rhs.scheduler_base;
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-            lva = rhs.lva;
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             description = rhs.description;
 #endif
@@ -77,9 +71,6 @@ namespace hpx { namespace threads
 
         thread_init_data(thread_init_data&& rhs)
           : func(std::move(rhs.func)),
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-            lva(rhs.lva),
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             description(rhs.description),
 #endif
@@ -103,15 +94,11 @@ namespace hpx { namespace threads
 
         template <typename F>
         thread_init_data(F && f, util::thread_description const& desc,
-                naming::address_type lva_ = 0,
                 thread_priority priority_ = thread_priority_normal,
                 thread_schedule_hint os_thread = thread_schedule_hint(),
                 std::ptrdiff_t stacksize_ = std::ptrdiff_t(-1),
                 policies::scheduler_base* scheduler_base_ = nullptr)
           : func(std::forward<F>(f)),
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-            lva(lva_),
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             description(desc),
 #endif
@@ -134,9 +121,6 @@ namespace hpx { namespace threads
 
         threads::thread_function_type func;
 
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-        naming::address_type lva;
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
         util::thread_description description;
 #endif
