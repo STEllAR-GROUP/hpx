@@ -19,7 +19,7 @@
 #include <hpx/util/backtrace.hpp>
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS
-#  include <hpx/util/register_locks.hpp>
+#  include <hpx/concurrency/register_locks.hpp>
 #endif
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>

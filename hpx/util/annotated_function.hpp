@@ -19,7 +19,7 @@
 
 #if HPX_HAVE_ITTNOTIFY != 0
 #include <hpx/runtime/get_thread_name.hpp>
-#include <hpx/util/itt_notify.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #elif defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif

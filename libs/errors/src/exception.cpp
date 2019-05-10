@@ -373,4 +373,40 @@ namespace hpx {
             return unknown_error;
         }
     }
+
+    /// Return the function name from which the exception was thrown.
+    std::string get_error_function_name(hpx::exception_info const& xi)
+    {
+        std::string const* function =
+            xi.get<hpx::detail::throw_function>();
+        if (function)
+            return *function;
+
+        return std::string();
+    }
+
+    /// Return the (source code) file name of the function from which the
+    /// exception was thrown.
+    std::string get_error_file_name(hpx::exception_info const& xi)
+    {
+        std::string const* file =
+            xi.get<hpx::detail::throw_file>();
+        if (file)
+            return *file;
+
+        return "<unknown>";
+    }
+
+
+    /// Return the line number in the (source code) file of the function from
+    /// which the exception was thrown.
+    long get_error_line_number(hpx::exception_info const& xi)
+    {
+        long const* line =
+            xi.get<hpx::detail::throw_line>();
+        if (line)
+            return *line;
+        return -1;
+    }
+
 }    // namespace hpx

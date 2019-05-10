@@ -10,6 +10,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
@@ -18,10 +22,6 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/detail/yield_k.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/util/itt_notify.hpp>
-#include <hpx/util/register_locks.hpp>
-#include <hpx/util/spinlock_pool.hpp>
 
 #include <cstddef>
 #include <cstdint>

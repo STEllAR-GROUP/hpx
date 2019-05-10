@@ -14,7 +14,7 @@
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_action.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <hpx/util/itt_notify.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #endif
 
 #include <cstddef>

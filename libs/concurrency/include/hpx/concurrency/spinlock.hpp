@@ -9,8 +9,8 @@
 #define HPX_DF595582_FEBC_4EE0_A606_A1EEB171D770
 
 #include <hpx/config.hpp>
-#include <hpx/util/itt_notify.hpp>
-#include <hpx/util/register_locks.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/concurrency/register_locks.hpp>
 
 #include <boost/smart_ptr/detail/spinlock.hpp>
 

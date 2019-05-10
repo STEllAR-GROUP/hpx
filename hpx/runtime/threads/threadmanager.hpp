@@ -9,6 +9,7 @@
 #define HPX_THREADMANAGER_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
@@ -19,7 +20,7 @@
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/concurrency/spinlock.hpp>
 
 #include <atomic>
 #include <cstddef>

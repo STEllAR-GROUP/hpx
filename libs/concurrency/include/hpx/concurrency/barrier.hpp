@@ -5,8 +5,8 @@
 
 // hpxinspect:nodeprecatedname:boost::barrier
 
-#ifndef HPX_UTIL_BARRIER_HPP
-#define HPX_UTIL_BARRIER_HPP
+#ifndef HPX_COMPAT_BARRIER_HPP
+#define HPX_COMPAT_BARRIER_HPP
 
 #include <hpx/config.hpp>
 

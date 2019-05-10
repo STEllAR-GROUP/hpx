@@ -17,7 +17,7 @@
 #include <hpx/util/detail/vtable/serializable_function_vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
-#include <hpx/util/itt_notify.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 
 #include <cstddef>
 #include <cstring>

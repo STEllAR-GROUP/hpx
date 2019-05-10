@@ -7,11 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/runtime/config_entry.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/util/register_locks.hpp>
-#include <hpx/util/backtrace.hpp>
+#include <hpx/concurrency/register_locks.hpp>
 
 #include <cstddef>
 #include <map>
@@ -58,7 +54,6 @@ namespace hpx { namespace util
 
         struct register_locks
         {
-            typedef lcos::local::spinlock mutex_type;
             typedef std::map<void const*, lock_data> held_locks_map;
 
             struct held_locks_data
@@ -128,13 +123,28 @@ namespace hpx { namespace util
         detail::register_locks::lock_detection_enabled_ = true;
     }
 
+    static registered_locks_error_handler_type registered_locks_error_handler;
+
+    void set_registered_locks_error_handler(
+        registered_locks_error_handler_type f)
+    {
+        registered_locks_error_handler = f;
+    }
+
+    static register_locks_predicate_type register_locks_predicate;
+
+    void set_register_locks_predicate(register_locks_predicate_type f)
+    {
+        register_locks_predicate = f;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     bool register_lock(void const* lock, util::register_lock_data* data)
     {
         using detail::register_locks;
 
         if (register_locks::lock_detection_enabled_ &&
-            nullptr != threads::get_self_ptr())
+            (!register_locks_predicate || register_locks_predicate()))
         {
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
@@ -161,7 +171,7 @@ namespace hpx { namespace util
         using detail::register_locks;
 
         if (register_locks::lock_detection_enabled_ &&
-            nullptr != threads::get_self_ptr())
+            (!register_locks_predicate || register_locks_predicate()))
         {
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
@@ -204,7 +214,7 @@ namespace hpx { namespace util
             register_locks::get_lock_enabled();
 
         if (enabled && register_locks::lock_detection_enabled_ &&
-            nullptr != threads::get_self_ptr())
+            (!register_locks_predicate || register_locks_predicate()))
         {
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
@@ -213,44 +223,21 @@ namespace hpx { namespace util
             // this OS-thread
             if (!held_locks.empty())
             {
+                // Temporarily disable verifying locks in case verify_no_locks
+                // gets called recursively.
+                detail::reset_lock_enabled_on_exit e;
+
                 if (detail::some_locks_are_not_ignored(held_locks))
                 {
-                    // temporarily cleaning held locks to avoid endless recursions
-                    // when acquiring the back-trace
-                    detail::reset_lock_enabled_on_exit e;
-                    std::string back_trace = hpx::util::trace(std::size_t(128));
-
-                    // throw or log, depending on config options
-                    if (get_config_entry("hpx.throw_on_held_lock", "1") == "0")
+                    if (registered_locks_error_handler)
                     {
-                        if (back_trace.empty()) {
-                            LERR_(debug)
-                                << "suspending thread while at least one lock is "
-                                   "being held (stack backtrace was disabled at "
-                                   "compile time)";
-                        }
-                        else {
-                            LERR_(debug)
-                                << "suspending thread while at least one lock is "
-                                << "being held, stack backtrace: "
-                                << back_trace;
-                        }
+                        registered_locks_error_handler();
                     }
                     else
                     {
-                        if (back_trace.empty()) {
-                           HPX_THROW_EXCEPTION(
-                                invalid_status, "verify_no_locks",
-                               "suspending thread while at least one lock is "
-                               "being held (stack backtrace was disabled at "
-                               "compile time)");
-                        }
-                        else {
-                           HPX_THROW_EXCEPTION(
-                                invalid_status, "verify_no_locks",
-                               "suspending thread while at least one lock is "
-                               "being held, stack backtrace: " + back_trace);
-                        }
+                        HPX_THROW_EXCEPTION(invalid_status, "verify_no_locks",
+                            "suspending thread while at least one lock is "
+                            "being held (default handler)");
                     }
                 }
             }
@@ -283,7 +270,7 @@ namespace hpx { namespace util
         void set_ignore_status(void const* lock, bool status)
         {
             if (register_locks::lock_detection_enabled_ &&
-                nullptr != threads::get_self_ptr())
+                (!register_locks_predicate || register_locks_predicate()))
             {
                 register_locks::held_locks_map& held_locks =
                     register_locks::get_lock_map();
@@ -322,41 +309,6 @@ namespace hpx { namespace util
     void reset_ignored_all()
     {
         detail::register_locks::set_ignore_all_locks(false);
-    }
-#else
-
-    bool register_lock(void const*, util::register_lock_data*)
-    {
-        return true;
-    }
-
-    bool unregister_lock(void const*)
-    {
-        return true;
-    }
-
-    void verify_no_locks()
-    {
-    }
-
-    void force_error_on_lock()
-    {
-    }
-
-    void ignore_lock(void const* lock)
-    {
-    }
-
-    void reset_ignored(void const* lock)
-    {
-    }
-
-    void ignore_all_locks()
-    {
-    }
-
-    void reset_ignored_all()
-    {
     }
 #endif
 }}

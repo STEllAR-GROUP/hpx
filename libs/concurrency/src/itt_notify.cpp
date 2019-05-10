@@ -4,9 +4,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/concurrency/thread_name.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/thread_support/thread_specific_ptr.hpp>
-#include <hpx/util/itt_notify.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0
 
@@ -274,7 +274,7 @@ namespace hpx { namespace util { namespace itt
         if (thread_domain_.get() == nullptr)
         {
             thread_domain_.reset(
-                HPX_ITT_DOMAIN_CREATE(get_thread_name().c_str()));
+                HPX_ITT_DOMAIN_CREATE(detail::thread_name().c_str()));
         }
 
         domain_ = thread_domain_.get();
