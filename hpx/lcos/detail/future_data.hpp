@@ -23,7 +23,7 @@
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/steady_clock.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
 

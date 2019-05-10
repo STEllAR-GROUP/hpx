@@ -8,7 +8,7 @@
 #ifndef HPX_UTIL_SCOPED_TIMER_HPP
 #define HPX_UTIL_SCOPED_TIMER_HPP
 
-#include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstdint>
 

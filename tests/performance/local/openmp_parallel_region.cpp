@@ -9,7 +9,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_start.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <boost/program_options.hpp>

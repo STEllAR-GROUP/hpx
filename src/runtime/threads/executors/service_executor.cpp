@@ -15,7 +15,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/steady_clock.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 

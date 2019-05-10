@@ -22,6 +22,7 @@
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/timing/scoped_timer.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
@@ -30,7 +31,6 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/util/scoped_timer.hpp>
 
 #include <atomic>
 #include <cstddef>

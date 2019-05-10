@@ -5,6 +5,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/format.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
@@ -14,10 +15,9 @@
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/bind_front.hpp>
-#include <hpx/format.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/unlock_guard.hpp>
 

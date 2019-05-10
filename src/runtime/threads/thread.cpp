@@ -16,10 +16,10 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unlock_guard.hpp>
 

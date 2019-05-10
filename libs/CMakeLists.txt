@@ -19,6 +19,7 @@ set(HPX_LIBS
   hardware
   preprocessor
   testing
+  timing
   CACHE INTERNAL "list of HPX modules" FORCE
 )
 

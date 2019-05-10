@@ -32,8 +32,9 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <hpx/config.hpp>
+
 #include <hpx/format.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 
 #include <boost/program_options.hpp>
 

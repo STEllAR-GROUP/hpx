@@ -14,7 +14,7 @@
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <hpx/plugins/message_handler_factory.hpp>

@@ -5,14 +5,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/include/parallel_partition.hpp>
-#include <hpx/format.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 
 #include <boost/program_options.hpp>
 

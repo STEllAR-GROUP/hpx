@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/iostreams.hpp>
 #include "worker_timed.hpp"

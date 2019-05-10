@@ -21,7 +21,7 @@
 #include <hpx/format.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
-#include <hpx/util/scoped_timer.hpp>
+#include <hpx/timing/scoped_timer.hpp>
 
 #include <atomic>
 #include <cstddef>

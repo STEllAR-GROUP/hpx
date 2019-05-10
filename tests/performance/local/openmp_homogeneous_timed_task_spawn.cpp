@@ -33,7 +33,7 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/format.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 
 #include <boost/program_options.hpp>
 

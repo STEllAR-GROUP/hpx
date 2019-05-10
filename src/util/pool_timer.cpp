@@ -15,7 +15,7 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/pool_timer.hpp>
-#include <hpx/util/steady_clock.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/asio/basic_waitable_timer.hpp>

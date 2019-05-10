@@ -37,7 +37,7 @@
 #include <hpx/util/lazy_enable_if.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/serialize_exception.hpp>
-#include <hpx/util/steady_clock.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/void_guard.hpp>
 
 #if defined(HPX_HAVE_AWAIT)

@@ -9,8 +9,7 @@
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/util/steady_clock.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 

@@ -7,7 +7,7 @@
 #define HPX_UTIL_HIGH_RESOLUTION_TIMER_MAR_24_2008_1222PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstdint>
 
