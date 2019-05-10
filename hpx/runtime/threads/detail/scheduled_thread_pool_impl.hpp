@@ -12,6 +12,8 @@
 #include <hpx/async.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
@@ -25,11 +27,10 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <boost/system/system_error.hpp>

@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/util/detail/vtable/vtable.hpp>
+#include <hpx/functional/detail/vtable/vtable.hpp>
 
 #include <cstddef>
 #include <new>

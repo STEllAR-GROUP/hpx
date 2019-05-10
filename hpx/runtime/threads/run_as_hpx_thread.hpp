@@ -8,12 +8,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/datastructures/optional.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/result_of.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/datastructures/optional.hpp>
-#include <hpx/util/result_of.hpp>
-#include <hpx/datastructures/tuple.hpp>
 
 #include <chrono>
 #include <condition_variable>

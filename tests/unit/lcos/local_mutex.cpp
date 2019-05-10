@@ -11,7 +11,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/testing.hpp>
 
 

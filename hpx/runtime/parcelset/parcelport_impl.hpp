@@ -13,6 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/yield_k.hpp>

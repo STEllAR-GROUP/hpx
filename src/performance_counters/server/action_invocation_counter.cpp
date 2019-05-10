@@ -7,7 +7,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstdint>
 #include <utility>

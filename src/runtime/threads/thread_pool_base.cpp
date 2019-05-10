@@ -12,7 +12,7 @@
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 

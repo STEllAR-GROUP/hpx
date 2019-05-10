@@ -4,11 +4,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
 #include <thread>

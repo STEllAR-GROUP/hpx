@@ -14,7 +14,7 @@
 #include <hpx/runtime/applier/detail/apply_colocated_fwd.hpp>
 #include <hpx/runtime/applier/register_apply_colocated.hpp>
 #include <hpx/traits/is_continuation.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
 

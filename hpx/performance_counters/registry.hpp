@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstddef>
 #include <cstdint>

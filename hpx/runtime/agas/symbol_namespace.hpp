@@ -14,7 +14,7 @@
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstdint>
 #include <map>

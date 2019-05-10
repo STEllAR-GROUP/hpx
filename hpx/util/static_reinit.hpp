@@ -7,7 +7,7 @@
 #define HPX_UTIL_STATIC_REINIT_OCT_25_2012_0921AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 namespace hpx { namespace util
 {

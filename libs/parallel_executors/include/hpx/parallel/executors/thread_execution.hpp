@@ -24,8 +24,8 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_back.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unwrap.hpp>
 

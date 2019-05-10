@@ -11,6 +11,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/detail/serializable_basic_function.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 #endif

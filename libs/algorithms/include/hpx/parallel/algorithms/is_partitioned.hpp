@@ -10,9 +10,9 @@
 #define HPX_PARALLEL_ALGORITHMS_IS_PARTITIONED_FEB_11_2015_0331PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

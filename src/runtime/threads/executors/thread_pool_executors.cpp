@@ -25,7 +25,7 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 #include <atomic>
 #include <chrono>

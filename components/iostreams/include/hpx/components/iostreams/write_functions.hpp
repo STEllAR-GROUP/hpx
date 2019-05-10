@@ -9,8 +9,8 @@
 #define HPX_B72D9BF0_B236_46F6_83AA_E45A70BD1FAA
 
 #include <hpx/config.hpp>
-#include <hpx/util/bind_back.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <algorithm>
 #include <deque>

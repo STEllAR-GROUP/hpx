@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/functional/invoke.hpp>
 
 #include <exception>
 #include <type_traits>

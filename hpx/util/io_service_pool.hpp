@@ -12,8 +12,8 @@
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/concurrency/barrier.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
-#include <hpx/util/function.hpp>
 
 #include <boost/asio/io_service.hpp>
 

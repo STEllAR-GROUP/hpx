@@ -12,7 +12,7 @@
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <hpx/components/iostreams/server/output_stream.hpp>
 #include <hpx/components/iostreams/ostream.hpp>

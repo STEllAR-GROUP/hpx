@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>

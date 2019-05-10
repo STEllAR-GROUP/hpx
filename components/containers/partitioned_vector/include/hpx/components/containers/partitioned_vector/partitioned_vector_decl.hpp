@@ -21,7 +21,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>

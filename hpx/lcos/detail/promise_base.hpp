@@ -20,7 +20,7 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

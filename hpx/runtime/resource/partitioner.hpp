@@ -11,7 +11,7 @@
 #include <hpx/runtime/resource/detail/create_partitioner.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <hpx/program_options.hpp>
 

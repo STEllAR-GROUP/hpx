@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/functional/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>

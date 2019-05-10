@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <boost/bimap.hpp>
 

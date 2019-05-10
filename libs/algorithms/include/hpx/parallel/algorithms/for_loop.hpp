@@ -17,12 +17,12 @@
 #endif
 #include <hpx/assertion.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/util/annotated_function.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
-#include <hpx/util/invoke.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/util/annotated_function.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>

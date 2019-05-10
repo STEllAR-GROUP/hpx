@@ -25,6 +25,7 @@ All modules
    /libs/errors/docs/index.rst
    /libs/filesystem/docs/index.rst
    /libs/format/docs/index.rst
+   /libs/functional/docs/index.rst
    /libs/hardware/docs/index.rst
    /libs/hashing/docs/index.rst
    /libs/iterator_support/docs/index.rst

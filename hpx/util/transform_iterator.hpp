@@ -7,10 +7,10 @@
 #define HPX_UTIL_TRANSFORM_ITERATOR_MAR_19_2015_0813AM
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/identity.hpp>
+#include <hpx/functional/result_of.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
+#include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
-#include <hpx/util/result_of.hpp>
 
 #include <iterator>
 #include <type_traits>

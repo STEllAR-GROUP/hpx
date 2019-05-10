@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/util/plugin/abstract_factory.hpp>
 #include <hpx/util/plugin/dll.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>

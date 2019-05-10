@@ -18,7 +18,7 @@
 #include <hpx/plugins/parcelport/tcp/sender.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/util/asio_util.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/io/ios_state.hpp>

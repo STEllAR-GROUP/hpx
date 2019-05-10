@@ -9,6 +9,8 @@
 #define HPX_UTIL_BIND_ACTION_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/applier/apply.hpp>
@@ -18,8 +20,6 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_placeholder.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/datastructures/tuple.hpp>
 
 #include <cstddef>
 #include <type_traits>

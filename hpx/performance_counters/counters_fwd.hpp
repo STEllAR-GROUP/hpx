@@ -11,7 +11,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstddef>
 #include <cstdint>

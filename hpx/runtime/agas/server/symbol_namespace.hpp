@@ -14,7 +14,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <atomic>
 #include <cstdint>

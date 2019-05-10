@@ -29,6 +29,7 @@ add_hpx_module(collectives
       hpx_config
       hpx_errors
       hpx_format
+      hpx_functional
       hpx_logging
       hpx_preprocessor
       hpx_timing

@@ -22,6 +22,7 @@ set(HPX_LIBS
   errors
   filesystem
   format
+  functional
   hardware
   hashing
   iterator_support
