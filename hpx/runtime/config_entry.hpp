@@ -7,7 +7,7 @@
 #define HPX_GET_CONFIG_ENTRY_SEP_01_2015_0638PM
 
 #include <hpx/config.hpp>
-#include <hpx/util_fwd.hpp>
+#include <hpx/util/function.hpp>
 
 #include <cstddef>
 #include <cstdlib>

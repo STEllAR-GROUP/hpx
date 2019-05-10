@@ -24,7 +24,7 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig, bool Serializable>
+    template <typename Sig, bool Serializable = true>
     class function;
 
     template <typename R, typename ...Ts, bool Serializable>
@@ -77,6 +77,9 @@ namespace hpx { namespace util
         using base_type::empty;
         using base_type::target;
     };
+
+    template <typename Sig>
+    using function_nonser = function<Sig, false>;
 }}
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)

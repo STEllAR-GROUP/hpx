@@ -16,10 +16,10 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/traits/component_type_database.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/traits/component_type_database.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util_fwd.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <cstdint>
 #include <string>

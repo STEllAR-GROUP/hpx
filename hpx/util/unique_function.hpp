@@ -24,7 +24,7 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig, bool Serializable>
+    template <typename Sig, bool Serializable = true>
     class unique_function;
 
     template <typename R, typename ...Ts, bool Serializable>
@@ -75,6 +75,9 @@ namespace hpx { namespace util
         using base_type::empty;
         using base_type::target;
     };
+
+    template <typename Sig>
+    using unique_function_nonser = unique_function<Sig, false>;
 }}
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
