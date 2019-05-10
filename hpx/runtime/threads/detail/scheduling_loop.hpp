@@ -628,8 +628,8 @@ namespace hpx { namespace threads { namespace detail
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
                                 util::itt::caller_context cctx(ctx);
 //                                 util::itt::undo_frame_context undoframe(fctx);
-                                util::itt::task task(thread_domain,
-                                     thrd->get_description());
+                                util::itt::task task = thrd->get_description()
+                                    .get_task_itt(thread_domain);
                                 task.add_metadata(task_id, thrd);
                                 task.add_metadata(task_phase, thrd->get_thread_phase());
 #endif

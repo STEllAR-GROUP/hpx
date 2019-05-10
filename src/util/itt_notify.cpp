@@ -5,9 +5,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/util/itt_notify.hpp>
-#include <hpx/util/thread_description.hpp>
 #include <hpx/thread_support/thread_specific_ptr.hpp>
+#include <hpx/util/itt_notify.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0
 
@@ -286,36 +285,25 @@ namespace hpx { namespace util { namespace itt
         }
     }
 
-    task::task(domain const& domain, util::thread_description const& name)
-      : domain_(domain), id_(0), sh_()
-    {
-        if (name.kind() == util::thread_description::data_type_description)
-        {
-            sh_ = name.get_description_itt();
-        }
-        else
-        {
-            sh_ = HPX_ITT_STRING_HANDLE_CREATE("address");
-        }
-
-        id_ = HPX_ITT_MAKE_ID(domain_.domain_,
-            reinterpret_cast<std::size_t>(sh_.handle_));
-
-        HPX_ITT_TASK_BEGIN_ID(domain_.domain_, id_, sh_.handle_);
-
-        if (name.kind() == util::thread_description::data_type_address)
-        {
-            add_metadata(sh_.handle_, name.get_address());
-        }
-    }
-
     task::task(domain const& domain, string_handle const& name)
       : domain_(domain), id_(0), sh_(name)
     {
-        id_ = HPX_ITT_MAKE_ID(domain_.domain_,
-            reinterpret_cast<std::size_t>(sh_.handle_));
+        id_ = HPX_ITT_MAKE_ID(
+            domain_.domain_, reinterpret_cast<std::size_t>(sh_.handle_));
 
         HPX_ITT_TASK_BEGIN_ID(domain_.domain_, id_, sh_.handle_);
+    }
+
+    task::task(domain const& domain, string_handle const& name, std::uint64_t metadata)
+      : domain_(domain)
+      , id_(0)
+      , sh_(name)
+    {
+        id_ = HPX_ITT_MAKE_ID(
+            domain_.domain_, reinterpret_cast<std::size_t>(sh_.handle_));
+
+        HPX_ITT_TASK_BEGIN_ID(domain_.domain_, id_, sh_.handle_);
+        add_metadata(sh_.handle_, metadata);
     }
 
     task::~task()

@@ -363,7 +363,8 @@ namespace hpx { namespace util { namespace itt
     ///////////////////////////////////////////////////////////////////////////
     struct task
     {
-        HPX_EXPORT task(domain const&, util::thread_description const&);
+        HPX_EXPORT task(
+            domain const&, string_handle const&, std::uint64_t metadata);
         HPX_EXPORT task(domain const&, string_handle const&);
         HPX_EXPORT ~task();
 
@@ -693,7 +694,7 @@ namespace hpx { namespace util { namespace itt
     //////////////////////////////////////////////////////////////////////////
     struct task
     {
-        task(domain const&, util::thread_description const&) {}
+        task(domain const&, string_handle const&, std::uint64_t) {}
         task(domain const&, string_handle const&) {}
 
         ~task() {}

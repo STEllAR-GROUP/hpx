@@ -148,6 +148,25 @@ namespace hpx { namespace util
             return desc_itt_ ? desc_itt_ :
                 util::itt::string_handle(get_description());
         }
+
+        util::itt::task get_task_itt(util::itt::domain const& domain) const
+            noexcept
+        {
+            switch (kind())
+            {
+            case util::thread_description::data_type_description:
+                return util::itt::task(domain, get_description_itt());
+                break;
+            case util::thread_description::data_type_address:
+                return util::itt::task(domain, "address", get_address());
+                break;
+            default:
+                HPX_ASSERT(false);
+                break;
+            }
+
+            return util::itt::task(domain, "<error>");
+        }
 #endif
 
         std::size_t get_address() const noexcept
@@ -228,6 +247,25 @@ namespace hpx { namespace util
         {
             HPX_ASSERT(type_ == data_type_description);
             return util::itt::string_handle(get_description());
+        }
+
+        util::itt::task get_task_itt(util::itt::domain const& domain) const
+            noexcept
+        {
+            switch (kind())
+            {
+            case util::thread_description::data_type_description:
+                return util::itt::task(domain, get_description_itt());
+                break;
+            case util::thread_description::data_type_address:
+                return util::itt::task(domain, "address", get_address());
+                break;
+            default:
+                HPX_ASSERT(false);
+                break;
+            }
+
+            return util::itt::task(domain, "<error>");
         }
 #endif
 
