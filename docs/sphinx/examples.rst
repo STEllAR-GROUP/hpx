@@ -27,3 +27,4 @@ powerful |hpx| concepts.
    examples/accumulator
    examples/interest_calculator
    examples/1d_stencil
+   examples/task_based_programming
