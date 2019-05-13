@@ -231,7 +231,12 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.examples
+              # NOTE: transpose_block_numa is disabled because
+              # hwloc_get_area_membind_nodeset (which is used by the
+              # numa_allocator) fails with EPERM.
+              ctest -T test --no-compress-output --output-on-failure \
+                  -R tests.examples \
+                  -E tests.examples.transpose.transpose_block_numa
       - run:
           <<: *convert_xml
       - run:
@@ -719,6 +724,34 @@ jobs:
       - store_artifacts:
           path: tests.unit.threads
 
+  tests.unit.topology:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 tests.unit.topology
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest -T test --no-compress-output --output-on-failure \
+                  -R tests.unit.topology \
+                  -E tests.unit.topology.numa_allocator
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.topology
+      - store_artifacts:
+          path: tests.unit.topology
+
   tests.unit.traits:
     <<: *defaults
     steps:
@@ -1199,6 +1232,8 @@ workflows:
           <<: *core_dependency
       - tests.unit.threads:
           <<: *core_dependency
+      - tests.unit.topology:
+          <<: *core_dependency
       - tests.unit.traits:
           <<: *core_dependency
       - tests.unit.util:
@@ -1267,6 +1302,7 @@ workflows:
             - tests.unit.resource
             - tests.unit.serialization
             - tests.unit.threads
+            - tests.unit.topology
             - tests.unit.traits
             - tests.unit.util
             - tests.unit.libs

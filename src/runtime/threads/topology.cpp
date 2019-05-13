@@ -50,6 +50,10 @@
 #include <sys/resource.h>
 #endif
 
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
 namespace hpx { namespace threads { namespace detail
 {
     std::size_t hwloc_hardware_concurrency()
@@ -124,7 +128,26 @@ namespace hpx { namespace threads { namespace detail
 #endif
         return node;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // abstract away memory page size
+    std::size_t get_memory_page_size_impl()
+    {
+#if defined(HPX_HAVE_UNISTD_H)
+        return sysconf(_SC_PAGE_SIZE);
+#elif defined(HPX_WINDOWS)
+        SYSTEM_INFO systemInfo;
+        GetSystemInfo(&systemInfo);
+        return systemInfo.dwPageSize;
+#else
+        return 4096;
+#endif
+    }
+
 }}}
+
+std::size_t hpx::threads::topology::memory_page_size_ =
+        hpx::threads::detail::get_memory_page_size_impl();
 
 namespace hpx { namespace threads
 {
