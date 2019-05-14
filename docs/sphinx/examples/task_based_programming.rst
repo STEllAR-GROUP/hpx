@@ -55,7 +55,7 @@ Task decomposition
     - race conditions and other thread related problems (deadlocks etc)
   - the leaf nodes of the tree are the smallest bits of work you can express
     - but those leaf nodes might be broken further by HPX
-    - even ``parallel::for(...)`` loops decompose into tasks
+    - even ``parallel:::for_each()`` loops decompose into tasks
     - all parallel::algorithm's are made up of tasks
   - HPX differs from (most) other libraries because the same API and the same scheduling/runtime can be used for the whole heirarchy of tasks
   - We aim to replace OpenMP+MPI+Acc with a single framework
@@ -85,7 +85,7 @@ Suspended tasks
     * the future is not ready (:disappointed:)
         * Use CPS - don't call get ever!
 
-    * `auto val = future->get()` would block (if we were not HPX)
+    * `auto val = future.get()` would block (if we were not HPX)
 
     * the current task cannot progress so it changes state to _suspended_
 
