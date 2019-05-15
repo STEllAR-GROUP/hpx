@@ -215,7 +215,7 @@ function(hpx_setup_target target)
     target_compile_options(${target} PUBLIC ${CXX_FLAG})
   endif()
 
-  target_link_libraries(${target} ${HPX_TLL_PUBLIC} ${hpx_libs} ${target_DEPENDENCIES})
+  target_link_libraries(${target} PUBLIC ${hpx_libs} ${target_DEPENDENCIES})
 
   if(TARGET hpx_internal_flags)
     target_link_libraries(${target} PRIVATE hpx_internal_flags)
