@@ -14,5 +14,6 @@ All modules
    :maxdepth: 2
 
    /libs/_example/docs/index.rst
+   /libs/cache/docs/index.rst
    /libs/config/docs/index.rst
    /libs/preprocessor/docs/index.rst

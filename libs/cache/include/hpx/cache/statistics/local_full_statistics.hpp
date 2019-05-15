@@ -7,7 +7,7 @@
 #define HPX_UTIL_CACHE_LOCAL_FULL_STATISTICS_AUG_11_2014_1029AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/cache/statistics/local_statistics.hpp>
+#include <hpx/cache/statistics/local_statistics.hpp>
 
 #if defined(__bgq__)
 #include <hwi/include/bqc/A2_inlines.h>

@@ -7,8 +7,8 @@
 #define HPX_UTIL_CACHE_LOCAL_CACHE_NOV_17_2008_1003AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/cache/policies/always.hpp>
-#include <hpx/util/cache/statistics/no_statistics.hpp>
+#include <hpx/cache/policies/always.hpp>
+#include <hpx/cache/statistics/no_statistics.hpp>
 
 #include <algorithm>
 #include <deque>
@@ -20,7 +20,7 @@
 namespace hpx { namespace util { namespace cache
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class local_cache local_cache.hpp hpx/util/cache/local_cache.hpp
+    /// \class local_cache local_cache.hpp hpx/cache/local_cache.hpp
     ///
     /// \brief The \a local_cache implements the basic functionality needed for
     ///        a local (non-distributed) cache.

@@ -7,7 +7,7 @@
 #define HPX_UTIL_CACHE_LRU_CACHE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/cache/statistics/no_statistics.hpp>
+#include <hpx/cache/statistics/no_statistics.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -19,7 +19,7 @@
 namespace hpx { namespace util { namespace cache
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class lru_cache lru_cache.hpp hpx/util/cache/lru_cache.hpp
+    /// \class lru_cache lru_cache.hpp hpx/cache/lru_cache.hpp
     ///
     /// \brief The \a lru_cache implements the basic functionality needed for
     ///        a local (non-distributed) LRU cache.

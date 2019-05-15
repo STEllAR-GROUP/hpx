@@ -7,7 +7,7 @@
 #define HPX_UTIL_CACHE_LOCAL_STATISTICS_NOV_20_2008_1148AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/cache/statistics/no_statistics.hpp>
+#include <hpx/cache/statistics/no_statistics.hpp>
 
 #include <cstddef>
 

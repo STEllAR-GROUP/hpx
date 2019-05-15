@@ -36,7 +36,7 @@ namespace hpx { namespace util { namespace cache { namespace entries
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class entry entry.hpp hpx/util/cache/entries/entry.hpp
+    /// \class entry entry.hpp hpx/cache/entries/entry.hpp
     ///
     /// \tparam Value     The data type to be stored in a cache. It has to be
     ///                   default constructible, copy constructible and

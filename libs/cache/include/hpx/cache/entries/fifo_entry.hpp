@@ -7,7 +7,7 @@
 #define HPX_UTIL_CACHE_FIFO_ENTRY_NOV_19_2008_0748PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/cache/entries/entry.hpp>
+#include <hpx/cache/entries/entry.hpp>
 
 #include <chrono>
 
@@ -15,7 +15,7 @@
 namespace hpx { namespace util { namespace cache { namespace entries
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class fifo_entry fifo_entry.hpp hpx/util/cache/entries/fifo_entry.hpp
+    /// \class fifo_entry fifo_entry.hpp hpx/cache/entries/fifo_entry.hpp
     ///
     /// The \a fifo_entry type can be used to store arbitrary values in a cache.
     /// Using this type as the cache's entry type makes sure that the least

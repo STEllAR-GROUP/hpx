@@ -7,7 +7,7 @@
 #define HPX_UTIL_CACHE_SIZE_ENTRY_NOV_19_2008_0800M
 
 #include <hpx/config.hpp>
-#include <hpx/util/cache/entries/entry.hpp>
+#include <hpx/cache/entries/entry.hpp>
 
 #include <cstddef>
 
@@ -35,7 +35,7 @@ namespace hpx { namespace util { namespace cache { namespace entries
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class size_entry size_entry.hpp hpx/util/cache/entries/size_entry.hpp
+    /// \class size_entry size_entry.hpp hpx/cache/entries/size_entry.hpp
     ///
     /// The \a size_entry type can be used to store values in a cache which
     /// have a size associated (such as files, etc.).

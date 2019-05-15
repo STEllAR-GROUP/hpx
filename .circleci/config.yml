@@ -812,6 +812,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
+              ninja -j2 -k 0 tests.unit.cache
               ninja -j2 -k 0 tests.unit.config
               ninja -j2 -k 0 tests.unit.preprocessor
       - run:
@@ -819,6 +820,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.cache
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.config
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.preprocessor
       - run:
@@ -1056,6 +1058,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.cache
               ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.config
               ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.preprocessor
       - run:
