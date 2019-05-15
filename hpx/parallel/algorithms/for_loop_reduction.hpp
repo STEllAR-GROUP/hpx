@@ -13,6 +13,7 @@
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/cache_aligned_data.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 
@@ -39,9 +40,9 @@ namespace hpx { namespace parallel { inline namespace v2
               : var_(var), op_(std::forward<Op_>(op))
             {
                 std::size_t cores = hpx::get_os_thread_count();
-                data_.reset(new T[cores]);
+                data_.reset(new hpx::util::cache_line_data<T>[cores]);
                 for (std::size_t i = 0; i != cores; ++i)
-                    data_[i] = identity;
+                    data_[i].data_ = identity;
             }
 
             void init_iteration(std::size_t)
@@ -51,7 +52,7 @@ namespace hpx { namespace parallel { inline namespace v2
 
             T& iteration_value()
             {
-                return data_[hpx::get_worker_thread_num()];
+                return data_[hpx::get_worker_thread_num()].data_;
             }
 
             void next_iteration(std::size_t /*index*/) noexcept {}
@@ -60,13 +61,13 @@ namespace hpx { namespace parallel { inline namespace v2
             {
                 std::size_t cores = hpx::get_os_thread_count();
                 for (std::size_t i = 0; i != cores; ++i)
-                    var_ = op_(var_, data_[i]);
+                    var_ = op_(var_, data_[i].data_);
             }
 
         private:
             T& var_;
             Op op_;
-            boost::shared_array<T> data_;
+            boost::shared_array<hpx::util::cache_line_data<T>> data_;
         };
 
         /// \endcond
