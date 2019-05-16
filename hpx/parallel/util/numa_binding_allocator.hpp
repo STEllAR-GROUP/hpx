@@ -33,7 +33,7 @@
 
 // Can be used to enable debugging of the allocator page mapping
 //#define NUMA_BINDING_ALLOCATOR_INIT_MEMORY
-// #define NUMA_BINDING_ALLOCATOR_DEBUG_PAGE_BINDING
+//#define NUMA_BINDING_ALLOCATOR_DEBUG_PAGE_BINDING
 
 #if defined(NUMA_BINDING_ALLOCATOR_DEBUG_PAGE_BINDING) && !defined(HPX_MSVC)
 #include <plugins/parcelport/parcelport_logging.hpp>
@@ -630,9 +630,16 @@ namespace hpx { namespace compute { namespace host {
         }
 
     public:
+        // return the binding helper cast to a specific type
+        template <typename Binder>
+        std::shared_ptr<Binder> get_binding_helper_cast() const
+        {
+            return std::dynamic_pointer_cast<Binder>(binding_helper_);
+        }
+
         std::shared_ptr<numa_binding_helper<T>> binding_helper_;
-        threads::hpx_hwloc_membind_policy policy_;
-        unsigned int flags_;
+        threads::hpx_hwloc_membind_policy       policy_;
+        unsigned int                            flags_;
 
     private:
         mutable std::mutex init_mutex;

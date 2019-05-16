@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/tuple.hpp>
-
+#include <hpx/util/assert.hpp>
 #include <boost/program_options.hpp>
 
 #include <atomic>
@@ -127,6 +127,15 @@ namespace hpx { namespace resource { namespace detail
         // resource partitioner called in hpx_init
         void configure_pools();
 
+        // returns the number of threads(pus) requested
+        // by the user at startup.
+        // This should not be called before the RP has parsed the config and
+        // assigned affinity data
+        std::size_t threads_needed() {
+            HPX_ASSERT(pus_needed_ != std::size_t(-1));
+            return pus_needed_;
+        }
+
         ////////////////////////////////////////////////////////////////////////
         scheduling_policy which_scheduler(std::string const& pool_name);
         threads::topology &get_topology() const;
@@ -224,7 +233,7 @@ namespace hpx { namespace resource { namespace detail
         // holds all of the command line switches
         util::command_line_handling cfg_;
         std::size_t first_core_;
-        std::size_t cores_needed_;
+        std::size_t pus_needed_;
 
         // contains the basic characteristics of the thread pool partitioning ...
         // that will be passed to the runtime
