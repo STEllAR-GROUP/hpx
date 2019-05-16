@@ -25,8 +25,8 @@
 // #include <boost/range/begin.hpp>
 // #include <boost/range/end.hpp>
 
-template <typename T> //, typename Allocator = std::allocator<T>>
-using small_vector = boost::container::small_vector<T, 3>;
+template <typename T, typename Allocator = boost::container::new_allocator<T>>
+using small_vector = boost::container::small_vector<T, 3, Allocator>;
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<std::uint32_t> void_f_count;
