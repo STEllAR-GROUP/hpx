@@ -1175,7 +1175,11 @@ else()
 endif()
 
 # enable C++17 style alignment on allocations for pre=C++17
-hpx_add_target_compile_option_if_available(-faligned-new PUBLIC)
+if(CMAKE_COMPILER_IS_GNUCXX)
+  hpx_add_target_compile_option_if_available(-faligned-new PUBLIC)
+elseif(MSVC)
+  hpx_add_target_compile_option_if_available(/Zc:alignedNew PUBLIC)
+endif()
 
 ################################################################################
 # check for miscellaneous things

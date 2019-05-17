@@ -680,6 +680,13 @@ function(hpx_check_for_libfun_std_experimental_optional)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx17_aligned_new)
+  add_hpx_config_test(HPX_WITH_CXX17_ALIGNED_NEW
+    SOURCE cmake/tests/cxx17_aligned_new.cpp
+    FILE ${ARGN} REQUIRED)
+endfunction()
+
+###############################################################################
 function(hpx_check_for_cxx17_fold_expressions)
   add_hpx_config_test(HPX_WITH_CXX17_FOLD_EXPRESSIONS
     SOURCE cmake/tests/cxx17_fold_expressions.cpp

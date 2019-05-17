@@ -191,6 +191,11 @@ function(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx14_return_type_deduction()
   endif()
 
+  # We check for this in all cases since it can be enabled in GCC 7 onwards with
+  # -faligned-new even in C++11 and 14.
+  hpx_check_for_cxx17_aligned_new(
+    DEFINITIONS HPX_HAVE_CXX17_ALIGNED_NEW)
+
   if(HPX_WITH_CXX1Z OR HPX_WITH_CXX17 OR HPX_WITH_CXX2A)
     # Check the availability of certain C++17 language features
     hpx_check_for_cxx17_fold_expressions(
