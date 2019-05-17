@@ -1365,6 +1365,9 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # 'int': forcing value to bool 'true' or 'false' (performance warning)
     hpx_add_compile_flag(-wd4800)
 
+    # Do not warn about over-aligned allocations not being respected
+    hpx_add_compile_flag(-wd4316)
+
     # vcpkg enables the /utf-8 option which causes (benign) warnings in the
     # Spirit headers
     if(HPX_WITH_VCPKG)
