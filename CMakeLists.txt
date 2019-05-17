@@ -1174,6 +1174,9 @@ else()
   endif()
 endif()
 
+# enable C++17 style alignment on allocations for pre=C++17
+hpx_add_target_compile_option_if_available(-faligned-new PUBLIC)
+
 ################################################################################
 # check for miscellaneous things
 ################################################################################
@@ -1395,9 +1398,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # Boost.Logging is built on fprintf, sadly
     hpx_add_compile_flag_if_available(-Wformat=2)
     hpx_add_compile_flag_if_available(-Wno-format-nonliteral)
-
-    # enable C++17 style alignment on allocations for pre=C++17
-    hpx_add_compile_flag_if_available(-faligned-new)
 
     # prevent warnings about over-aligned types for pre-C++17
     hpx_add_compile_flag_if_available(-Wno-aligned-new)
