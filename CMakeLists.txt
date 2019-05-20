@@ -1174,13 +1174,6 @@ else()
   endif()
 endif()
 
-# enable C++17 style alignment on allocations for pre=C++17
-if(CMAKE_COMPILER_IS_GNUCXX)
-  hpx_add_target_compile_option_if_available(-faligned-new PUBLIC)
-elseif(MSVC)
-  hpx_add_target_compile_option_if_available(/Zc:alignedNew PUBLIC)
-endif()
-
 ################################################################################
 # check for miscellaneous things
 ################################################################################
@@ -1365,9 +1358,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # 'int': forcing value to bool 'true' or 'false' (performance warning)
     hpx_add_compile_flag(-wd4800)
 
-    # Do not warn about over-aligned allocations not being respected
-    hpx_add_compile_flag(-wd4316)
-
     # vcpkg enables the /utf-8 option which causes (benign) warnings in the
     # Spirit headers
     if(HPX_WITH_VCPKG)
@@ -1405,9 +1395,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # Boost.Logging is built on fprintf, sadly
     hpx_add_compile_flag_if_available(-Wformat=2)
     hpx_add_compile_flag_if_available(-Wno-format-nonliteral)
-
-    # prevent warnings about over-aligned types for pre-C++17
-    hpx_add_compile_flag_if_available(-Wno-aligned-new)
 
     # Self initialization is dangerous
     hpx_add_compile_flag_if_available(-Winit-self)
