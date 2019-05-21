@@ -259,6 +259,13 @@ namespace hpx { namespace resource
         // Access all available NUMA domains
         HPX_EXPORT std::vector<numa_domain> const& numa_domains() const;
 
+        // Returns the threads requested at startup --hpx:threads=cores
+        // for example will return the number actually created
+        HPX_EXPORT std::size_t get_number_requested_threads();
+
+        // return the topology object managed by the internal partitioner
+        HPX_EXPORT hpx::threads::topology const &get_topology() const;
+
     private:
         detail::partitioner& partitioner_;
     };

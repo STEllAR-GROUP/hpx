@@ -216,7 +216,7 @@ namespace hpx { namespace resource { namespace detail
     ////////////////////////////////////////////////////////////////////////
     partitioner::partitioner()
       : first_core_(std::size_t(-1))
-      , cores_needed_(std::size_t(-1))
+      , pus_needed_(std::size_t(-1))
       , mode_(mode_default)
       , topo_(threads::create_topology())
     {
@@ -361,8 +361,8 @@ namespace hpx { namespace resource { namespace detail
         }
 
         // should have been initialized by now
-        HPX_ASSERT(cores_needed_ != std::size_t(-1));
-        return cores_needed_;
+        HPX_ASSERT(pus_needed_ != std::size_t(-1));
+        return pus_needed_;
     }
 
     // This function is called in hpx_init, before the instantiation of the
@@ -916,7 +916,7 @@ namespace hpx { namespace resource { namespace detail
         cfg_.parse_result_ = cfg_.call(desc_cmdline, argc, argv);
 
         // set all parameters related to affinity data
-        cores_needed_ = affinity_data_.init(cfg_);
+        pus_needed_ = affinity_data_.init(cfg_);
 
         if (fill_internal_topology)
         {
