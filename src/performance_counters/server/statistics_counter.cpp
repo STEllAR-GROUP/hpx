@@ -26,8 +26,8 @@
 #include <boost/accumulators/statistics/rolling_mean.hpp>
 #include <boost/accumulators/statistics/rolling_variance.hpp>
 
-#include <hpx/util/rolling_min.hpp>
-#include <hpx/util/rolling_max.hpp>
+#include <hpx/statistics/rolling_min.hpp>
+#include <hpx/statistics/rolling_max.hpp>
 
 #if defined(HPX_MSVC)
 #  pragma warning(push)

@@ -11,9 +11,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(util_headers
   hpx/util/await_traits.hpp
   hpx/util/manage_config.hpp
-  hpx/util/max.hpp
   hpx/util/memory_chunk.hpp
-  hpx/util/min.hpp
   hpx/util/safe_lexical_cast.hpp
 )
 

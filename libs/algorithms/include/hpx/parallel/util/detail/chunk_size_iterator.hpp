@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_UTIL_DETAIL_CHUNK_SIZE_ITERATOR_JUL_03_2016_0949PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/min.hpp>
+#include <hpx/statistics/min.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 
