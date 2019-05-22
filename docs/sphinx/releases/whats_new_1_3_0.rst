@@ -33,15 +33,15 @@ Breaking changes
 ================
 
 * Executable and library targets are now created without the ``_exe`` and
-  ``_lib`` suffix respectively. For example, the target ``hello_world_exe`` is
-  now simply called ``hello_world``.
+  ``_lib`` suffix respectively. For example, the target ``1d_stencil_1_exe`` is
+  now simply called ``1d_stencil_1``.
 * We have removed the following deprecated functionality: ``queue``,
-  ``scoped_unlock``, ``inclusive_scan`` compatibility overloads, support for
-  input iterators in algorithms.
+  ``scoped_unlock``, and support for input iterators in algorithms.
 * We have turned off the compatibility layer for ``unwrapped`` by default. The
   functionality will be removed in the next release. The option can still be
-  turned on using the |cmake|_ option
-  ``HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT``.
+  turned on using the |cmake|_ option ``HPX_WITH_UNWRAPPED_SUPPORT``. Likewise,
+  ``inclusive_scan`` compatibility overloads have been turned off by default.
+  They can still be turned on with ``HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY``.
 * The minimum compiler and dependency versions have been updated. We now support
   GCC from version 5 onwards, Clang from version 4 onwards, and Boost from
   version 1.61.0 onwards.
@@ -55,6 +55,10 @@ Breaking changes
 Closed issues
 =============
 
+* :hpx-issue:`3863` - shouldn't "-faligned-new" be a usage requirement?
+* :hpx-issue:`3841` - Build error with msvc 19 caused by SFINAE and C++17
+* :hpx-issue:`3836` - master branch does not build with idle rate counters
+  enabled
 * :hpx-issue:`3819` - Add debug suffix to modules built in debug mode
 * :hpx-issue:`3817` - ``HPX_INCLUDE_DIRS`` contains non-existent directory
 * :hpx-issue:`3810` - Source groups are not created for files in modules
@@ -77,6 +81,7 @@ Closed issues
 * :hpx-issue:`3724` - Allow to pre-set command line options through environment
 * :hpx-issue:`3723` - examples/resource_partitioner build issue on master branch
   / ubuntu 18
+* :hpx-issue:`3721` - faced a building error
 * :hpx-issue:`3720` - Hello World example fails to link
 * :hpx-issue:`3719` - pkg-config produces invalid output: ``-l-pthread``
 * :hpx-issue:`3718` - Please make the python executable configurable through
@@ -94,7 +99,8 @@ Closed issues
 * :hpx-issue:`3670` - Generate PDF again from documention (with Sphinx)
 * :hpx-issue:`3643` - Warnings when compiling HPX 1.2.1 with gcc 9
 * :hpx-issue:`3641` - Trouble with using ranges-v3 and ``hpx::parallel::reduce``
-* :hpx-issue:`3639` - ``util::unwrapping`` does not work well with member functions
+* :hpx-issue:`3639` - ``util::unwrapping`` does not work well with member
+  functions
 * :hpx-issue:`3634` - The build fails if ``shared_future<>::then`` is called
   with a thread executor
 * :hpx-issue:`3622` - VTune Amplifier 2019 not working with ``use_itt_notify=1``
@@ -134,6 +140,29 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`3865` - adds hpx_target_compile_option_if_available
+* :hpx-pr:`3864` - Helper functions that are useful in numa binding and testing
+  of allocator
+* :hpx-pr:`3862` - Temporary fix to local_dataflow_boost_small_vector test
+* :hpx-pr:`3860` - Add cache line padding to intermediate results in for loop
+  reduction
+* :hpx-pr:`3859` - Remove HPX_TLL_PUBLIC and HPX_TLL_PRIVATE from CMake files
+* :hpx-pr:`3858` - Add compile flags and definitions to modules
+* :hpx-pr:`3851` - update hpxmp release tag to v0.2.0
+* :hpx-pr:`3849` - Correct BOOST_ROOT variable name in quick start guide
+* :hpx-pr:`3847` - Fix attach_debugger configuration option
+* :hpx-pr:`3846` - Add tests for libs header tests
+* :hpx-pr:`3844` - Fixing source_groups in preprocessor module to properly
+  handle compatibility headers
+* :hpx-pr:`3843` - This fixes the launch_process/launched_process pair of tests
+* :hpx-pr:`3842` - Fix macro call with ITTNOTIFY enabled
+* :hpx-pr:`3840` - Fixing SLURM environment parsing
+* :hpx-pr:`3837` - Fixing misplaced #endif
+* :hpx-pr:`3835` - make all latch members protected for consistency
+* :hpx-pr:`3834` - Disable transpose_block_numa example on CircleCI
+* :hpx-pr:`3833` - make latch counter_ protected for deriving latch in hpxmp
+* :hpx-pr:`3831` - Fix CircleCI config for modules
+* :hpx-pr:`3830` - minor fix: option HPX_WITH_TEST was not working correctly
 * :hpx-pr:`3828` - Avoid for binaries that depend on HPX to directly link
   against internal modules
 * :hpx-pr:`3827` - Adding shortcut for ``hpx::get_ptr<>(sync, id)`` for a local,
@@ -145,6 +174,8 @@ Closed pull requests
 * :hpx-pr:`3821` - Disable barrier_3792 test when networking is disabled
 * :hpx-pr:`3820` - Assorted CMake fixes
 * :hpx-pr:`3815` - Removing left-over debug output
+* :hpx-pr:`3814` - Allow setting default scheduler mode via the configuration
+  database
 * :hpx-pr:`3813` - Make the deprecation warnings issued by the old pp headers
   optional
 * :hpx-pr:`3812` - Windows requires to handle symlinks to directories
@@ -153,6 +184,7 @@ Closed pull requests
 * :hpx-pr:`3806` - Moving include path configuration to before APEX
 * :hpx-pr:`3804` - Fix latch
 * :hpx-pr:`3803` - Update hpxcxx to look at lib64 and use python3
+* :hpx-pr:`3802` - Numa binding allocator
 * :hpx-pr:`3801` - Remove duplicated includes
 * :hpx-pr:`3800` - Attempt to fix Posix context switching after lazy init
   changes
