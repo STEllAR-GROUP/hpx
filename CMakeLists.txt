@@ -359,9 +359,6 @@ if(HPX_WITH_CUDA)
   # keywords for target_link_libraries (cuda)
   set(CUDA_LINK_LIBRARIES_KEYWORD "PRIVATE")
 endif()
-# keywords for target_link_libraries (hpx)
-set(HPX_TLL_PUBLIC "PUBLIC")
-set(HPX_TLL_PRIVATE "PRIVATE")
 if(HPX_WITH_CUDA_CLANG AND NOT (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
   hpx_error("To use Cuda Clang, please select Clang as your default C++ compiler")
 endif()
@@ -1398,12 +1395,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # Boost.Logging is built on fprintf, sadly
     hpx_add_compile_flag_if_available(-Wformat=2)
     hpx_add_compile_flag_if_available(-Wno-format-nonliteral)
-
-    # enable C++17 style alignment on allocations for pre=C++17
-    hpx_add_compile_flag_if_available(-faligned-new)
-
-    # prevent warnings about over-aligned types for pre-C++17
-    hpx_add_compile_flag_if_available(-Wno-aligned-new)
 
     # Self initialization is dangerous
     hpx_add_compile_flag_if_available(-Winit-self)

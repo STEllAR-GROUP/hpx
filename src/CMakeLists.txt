@@ -284,17 +284,17 @@ endif()
 
 target_include_directories(hpx PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/hpx>)
-target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${HPX_LIBRARIES})
+target_link_libraries(hpx PUBLIC ${HPX_LIBRARIES})
 if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
-  target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
+  target_link_libraries(hpx PUBLIC ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
 endif()
 if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
-  target_link_libraries(hpx ${HPX_TLL_PRIVATE} ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
+  target_link_libraries(hpx PRIVATE ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
 endif()
 
 foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
   if (_parcelport_${_plugin}_LIBRARIES)
-    target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${_parcelport_${_plugin}_LIBRARIES})
+    target_link_libraries(hpx PUBLIC ${_parcelport_${_plugin}_LIBRARIES})
     hpx_export_targets(${_parcelport_${_plugin}_LIBRARIES})
   endif()
 endforeach()
@@ -303,7 +303,7 @@ endforeach()
 foreach(_module ${HPX_LIBS})
   # add module binaries as PRIVATE dependencies to the core hpx library to
   # avoid dependent applicatons have to link against those
-  target_link_libraries(hpx ${HPX_TLL_PRIVATE} hpx_${_module})
+  target_link_libraries(hpx PRIVATE hpx_${_module})
 
   # add module include directories as PUBLIC to core hpx library to enable
   # compilation against indirectly included headers
@@ -425,6 +425,9 @@ foreach(_keyword PUBLIC;PRIVATE)
     if(NOT HPX_WITH_STATIC_LINKING)
       target_compile_definitions(hpx_init ${_keyword} ${_flag})
     endif()
+    foreach(_module ${HPX_LIBS})
+      target_compile_definitions(hpx_${_module} ${_keyword} ${_flag})
+    endforeach()
   endforeach()
 
   get_property(HPX_TARGET_COMPILE_OPTIONS_VAR
@@ -438,6 +441,9 @@ foreach(_keyword PUBLIC;PRIVATE)
     if(NOT HPX_WITH_STATIC_LINKING)
       target_compile_options(hpx_init ${_keyword} ${_flag})
     endif()
+    foreach(_module ${HPX_LIBS})
+      target_compile_options(hpx_${_module} ${_keyword} ${_flag})
+    endforeach()
   endforeach()
 endforeach()
 
