@@ -41,7 +41,7 @@ void test_async(Executor& exec)
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id test_f(hpx::future<void> f, int passed_through)
 {
-    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 
@@ -106,7 +106,7 @@ void test_bulk_async(Executor& exec)
 void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
     int passed_through) //-V813
 {
-    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 

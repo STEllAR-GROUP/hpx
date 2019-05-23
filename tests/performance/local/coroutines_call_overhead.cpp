@@ -246,7 +246,7 @@ int hpx_main(
                     boost::algorithm::is_any_of(","),
                     boost::algorithm::token_compress_on);
 
-                HPX_ASSERT(entry.size() == 2);
+                HPX_TEST(entry.size() == 2);
 
                 counter_shortnames.push_back(entry[0]);
                 counters.push_back(entry[1]);

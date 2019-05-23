@@ -11,6 +11,7 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/range/irange.hpp>
 
@@ -65,7 +66,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t loop,
     // align used buffers on page boundaries
     unsigned long align_size = getpagesize();
     (void)align_size;
-    HPX_ASSERT(align_size <= MAX_ALIGNMENT);
+    HPX_TEST(align_size <= MAX_ALIGNMENT);
 
     std::unique_ptr<char[]> send_buffer(new char[size]);
     std::memset(send_buffer.get(), 'a', size);
