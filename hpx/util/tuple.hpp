@@ -9,8 +9,6 @@
 #define HPX_UTIL_TUPLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/detail/non_default_constructible.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
 
@@ -304,37 +302,6 @@ namespace hpx { namespace util
                 return static_cast<tuple_member<
                         I, typename detail::at_index<I, Ts...>::type
                     > const&>(*this).value();
-            }
-
-            template <typename Archive>
-            void serialize(Archive& ar, unsigned int const)
-            {
-                int const _sequencer[] = {
-                    ((ar & this->get<Is>()), 0)...
-                };
-                (void)_sequencer;
-            }
-
-            template <typename Archive>
-            friend void load_construct_data(
-                Archive& ar, tuple_impl* t, unsigned int const version)
-            {
-                using serialization::detail::load_construct_data;
-                int const _sequencer[] = {
-                    (load_construct_data(ar, &t->get<Is>(), version), 0)...
-                };
-                (void)_sequencer;
-            }
-
-            template <typename Archive>
-            friend void save_construct_data(
-                Archive& ar, tuple_impl const* t, unsigned int const version)
-            {
-                using serialization::detail::save_construct_data;
-                int const _sequencer[] = {
-                    (save_construct_data(ar, &t->get<Is>(), version), 0)...
-                };
-                (void)_sequencer;
             }
         };
 
@@ -1055,64 +1022,6 @@ namespace hpx { namespace util
         x.swap(y);
     }
 #endif
-}}
-
-namespace hpx { namespace traits
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Is, typename ...Ts>
-    struct is_bitwise_serializable<
-        ::hpx::util::detail::tuple_impl<Is, Ts...>
-    > : ::hpx::util::detail::all_of<
-            hpx::traits::is_bitwise_serializable<
-                typename std::remove_const<Ts>::type
-            >...
-        >
-    {};
-}}
-
-namespace hpx { namespace serialization
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Archive, typename ...Ts>
-    HPX_FORCEINLINE
-    void serialize(
-        Archive& ar
-      , ::hpx::util::tuple<Ts...>& t
-      , unsigned int const /*version*/ = 0
-    )
-    {
-        ar & t._impl;
-    }
-
-    template <typename Archive>
-    HPX_FORCEINLINE
-    void serialize(
-        Archive& ar
-      , ::hpx::util::tuple<>& t
-      , unsigned int const version = 0
-    )
-    {}
-
-    template <typename Archive, typename ...Ts>
-    HPX_FORCEINLINE
-    void load_construct_data(
-        Archive& ar
-      , ::hpx::util::tuple<Ts...>* t
-      , unsigned int const version = 0)
-    {
-        load_construct_data(ar, &(t->_impl), version);
-    }
-
-    template <typename Archive, typename ...Ts>
-    HPX_FORCEINLINE
-    void save_construct_data(
-        Archive& ar
-      , ::hpx::util::tuple<Ts...> const* t
-      , unsigned int const version = 0)
-    {
-        save_construct_data(ar, &(t->_impl), version);
-    }
 }}
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
