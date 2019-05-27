@@ -38,7 +38,7 @@ namespace hpx { namespace actions
     public:
         HPX_NON_COPYABLE(transfer_action);
 
-        typedef transfer_base_action<Action> base_type;
+        using base_type = transfer_base_action<Action>;
 
     public:
         // construct an empty transfer_action to avoid serialization overhead

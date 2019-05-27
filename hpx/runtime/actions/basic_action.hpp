@@ -234,32 +234,32 @@ namespace hpx { namespace actions
             >::value,
             "Using non-const references as arguments for actions is not supported.");
 
-        typedef Component component_type;
-        typedef Derived derived_type;
+        using component_type = Component;
+        using derived_type = Derived;
 
         // result_type represents the type returned when invoking operator()
-        typedef typename traits::promise_local_result<R>::type result_type;
+        using result_type = typename traits::promise_local_result<R>::type;
 
         // The remote_result_type is the remote type for the type_continuation
-        typedef typename traits::action_remote_result<R>::type remote_result_type;
+        using remote_result_type = typename traits::action_remote_result<R>::type;
 
         // The local_result_type is the local type for the type_continuation
-        typedef
+        using local_result_type =
             typename traits::promise_local_result<
                 remote_result_type
-            >::type local_result_type;
+            >::type;
 
-        typedef
+        using continuation_type =
             hpx::actions::typed_continuation<
                 local_result_type,
                 remote_result_type
-            > continuation_type;
+            >;
 
-        typedef R internal_result_type;
+        using internal_result_type = R;
         static const std::size_t arity = sizeof...(Args);
-        typedef util::tuple<typename std::decay<Args>::type...> arguments_type;
+        using arguments_type = util::tuple<typename std::decay<Args>::type...>;
 
-        typedef void action_tag;
+        using action_tag = void;
 
         ///////////////////////////////////////////////////////////////////////
         static std::string get_action_name(naming::address::address_type /*lva*/)
@@ -462,7 +462,7 @@ namespace hpx { namespace actions
             return static_cast<int>(components::get_component_type<Component>());
         }
 
-        typedef std::false_type direct_execution;
+        using direct_execution = std::false_type;
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
@@ -514,13 +514,13 @@ namespace hpx { namespace actions
         template <typename Action, typename Derived>
         struct action_type
         {
-            typedef Derived type;
+            using type = Derived;
         };
 
         template <typename Action>
         struct action_type<Action, this_type>
         {
-            typedef Action type;
+            using type = Action;
         };
     }
 
@@ -537,11 +537,11 @@ namespace hpx { namespace actions
                 Derived
             >::type>
     {
-        typedef typename detail::action_type<
+        using derived_type = typename detail::action_type<
             direct_action, Derived
-        >::type derived_type;
+        >::type;
 
-        typedef std::true_type direct_execution;
+        using direct_execution = std::true_type;
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
@@ -557,20 +557,17 @@ namespace hpx { namespace actions
     // supported function pointer.
     template <typename TF, TF F, typename Derived = detail::this_type,
         typename Direct = std::false_type>
-    struct make_action;
-
-    template <typename TF, TF F, typename Derived>
-    struct make_action<TF, F, Derived, std::false_type>
+    struct make_action
       : action<TF, F, Derived>
     {
-        typedef action<TF, F, Derived> type;
+        using type = action<TF, F, Derived>;
     };
 
     template <typename TF, TF F, typename Derived>
     struct make_action<TF, F, Derived, std::true_type>
       : direct_action<TF, F, Derived>
     {
-        typedef direct_action<TF, F, Derived> type;
+        using type = direct_action<TF, F, Derived>;
     };
 
     template <typename TF, TF F, typename Derived = detail::this_type>

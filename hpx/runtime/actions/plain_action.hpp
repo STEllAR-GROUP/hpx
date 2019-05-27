@@ -74,9 +74,8 @@ namespace hpx { namespace actions
         >
     {
     public:
-        typedef typename detail::action_type<
-            action, Derived
-        >::type derived_type;
+        using derived_type =
+            typename detail::action_type<action, Derived>::type;
 
         static std::string get_action_name(naming::address::address_type /*lva*/)
         {
@@ -179,12 +178,11 @@ namespace hpx { namespace traits
     struct name : hpx::actions::make_action<                                  \
         typename std::add_pointer<                                            \
             typename std::remove_pointer<decltype(&func)>::type               \
-        >::type, &func, name>::type {}                                        \
+        >::type, &func>::type {}                                              \
     /**/
 #else
 #define HPX_DEFINE_PLAIN_ACTION_2(func, name)                                 \
-    struct name : hpx::actions::make_action<                                  \
-        decltype(&func), &func, name>::type {}                                \
+    struct name : hpx::actions::make_action<decltype(&func), &func>::type {}  \
     /**/
 #endif
 
@@ -193,8 +191,8 @@ namespace hpx { namespace traits
     /**/
 
 #define HPX_DEFINE_PLAIN_DIRECT_ACTION_2(func, name)                          \
-    struct name : hpx::actions::make_direct_action<                           \
-        decltype(&func), &func, name>::type {}                                \
+    struct name                                                               \
+      : hpx::actions::make_direct_action<decltype(&func), &func>::type {}     \
     /**/
 
 /// \endcond

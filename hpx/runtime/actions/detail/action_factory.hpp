@@ -25,10 +25,10 @@ namespace hpx { namespace actions { namespace detail
         HPX_NON_COPYABLE(action_registry);
 
     public:
-        typedef base_action* (*ctor_t)(bool);
-        typedef std::unordered_map<std::string, ctor_t> typename_to_ctor_t;
-        typedef std::unordered_map<std::string, std::uint32_t> typename_to_id_t;
-        typedef std::vector<ctor_t> cache_t;
+        using ctor_t = base_action* (*)(bool);
+        using typename_to_ctor_t = std::unordered_map<std::string, ctor_t>;
+        using typename_to_id_t = std::unordered_map<std::string, std::uint32_t>;
+        using cache_t = std::vector<ctor_t>;
 
         HPX_STATIC_CONSTEXPR std::uint32_t invalid_id = ~0;
 

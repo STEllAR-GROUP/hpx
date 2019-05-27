@@ -44,7 +44,7 @@ namespace hpx { namespace traits
         template <>
         struct action_remote_result_customization_point<void>
         {
-            typedef util::unused_type type;
+            using type = util::unused_type;
         };
     }
 }}

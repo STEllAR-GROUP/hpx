@@ -12,7 +12,7 @@
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/is_future.hpp>
@@ -97,9 +97,8 @@ namespace hpx { namespace actions
         >
     {
     public:
-        typedef typename detail::action_type<
-            action, Derived
-        >::type derived_type;
+        using derived_type =
+            typename detail::action_type<action, Derived>::type;
 
         static std::string get_action_name(naming::address::address_type lva)
         {
@@ -138,9 +137,8 @@ namespace hpx { namespace actions
         >
     {
     public:
-        typedef typename detail::action_type<
-            action, Derived
-        >::type derived_type;
+        using derived_type =
+            typename detail::action_type<action, Derived>::type;
 
         static std::string get_action_name(naming::address::address_type lva)
         {
@@ -243,7 +241,7 @@ namespace hpx { namespace actions
 
 #define HPX_DEFINE_COMPONENT_ACTION_3(component, func, name)                  \
     struct name : hpx::actions::make_action<                                  \
-        decltype(&component::func), &component::func, name>::type {}          \
+        decltype(&component::func), &component::func>::type {}                \
     /**/
 #define HPX_DEFINE_COMPONENT_ACTION_2(component, func)                        \
     HPX_DEFINE_COMPONENT_ACTION_3(component, func,                            \
@@ -265,7 +263,7 @@ namespace hpx { namespace actions
 
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(component, func, name)           \
     struct name : hpx::actions::make_direct_action<                           \
-        decltype(&component::func), &component::func, name>::type {}          \
+        decltype(&component::func), &component::func>::type {}                \
     /**/
 
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_2(component, func)                 \

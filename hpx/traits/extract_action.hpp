@@ -17,10 +17,10 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct extract_action
     {
-        typedef typename Action::derived_type type;
-        typedef typename type::result_type result_type;
-        typedef typename type::local_result_type local_result_type;
-        typedef typename type::remote_result_type remote_result_type;
+        using type = typename Action::derived_type;
+        using result_type = typename type::result_type;
+        using local_result_type = typename type::local_result_type;
+        using remote_result_type = typename type::remote_result_type;
     };
 
     template <typename Action>

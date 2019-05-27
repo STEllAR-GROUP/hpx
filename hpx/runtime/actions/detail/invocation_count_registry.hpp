@@ -26,10 +26,10 @@ namespace hpx { namespace actions { namespace detail
         HPX_NON_COPYABLE(invocation_count_registry);
 
     public:
-        typedef std::int64_t (*get_invocation_count_type)(bool);
-        typedef std::unordered_map<
+        using get_invocation_count_type = std::int64_t (*)(bool);
+        using map_type = std::unordered_map<
                 std::string, get_invocation_count_type, hpx::util::jenkins_hash
-            > map_type;
+            >;
 
         invocation_count_registry() {}
 

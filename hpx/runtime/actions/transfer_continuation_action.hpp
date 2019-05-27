@@ -39,8 +39,8 @@ namespace hpx { namespace actions
     public:
         HPX_NON_COPYABLE(transfer_continuation_action);
 
-        typedef transfer_base_action<Action> base_type;
-        typedef typename base_type::continuation_type continuation_type;
+        using base_type = transfer_base_action<Action>;
+        using continuation_type = typename base_type::continuation_type;
 
     public:
         // construct an empty transfer_continuation_action to avoid serialization
