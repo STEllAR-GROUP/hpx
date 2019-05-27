@@ -32,8 +32,8 @@ are completed to avoid confusion.
 
 #. Write release notes in ``docs/sphinx/releases/whats_new_$VERSION.rst``. Keep
    adding merged PRs and closed issues to this until just before the release is
-   made. Add the new release notes to the table of contents in
-   ``docs/sphinx/releases.rst``.
+   made. Use ``tools/generate_pr_issue_list.sh`` to generate the lists. Add the
+   new release notes to the table of contents in ``docs/sphinx/releases.rst``.
 
 #. Build the docs, and proof-read them. Update any documentation that may have
    changed, and correct any typos. Pay special attention to:
@@ -111,13 +111,9 @@ are completed to avoid confusion.
    #. Change ``HPX_VERSION_TAG`` in ``CMakeLists.txt`` to ``-rcN``, where ``N``
       is the current iteration of this step. Start with ``-rc1``.
 
-   #. Tag a release candidate from the release branch, where tag name is the
-      version to be released with a ``-rcN`` suffix and description is "HPX
-      V$VERSION: The C++ Standards Library for Parallelism and Concurrency".
-
-      * ``git tag -a [tag name] -m '[description]'``
-      * ``git push origin [tag name]``
-      * Create a pre-release on GitHub
+   #. Tag and create a pre-release on GitHub using the script
+      ``tools/roll_release.sh``. The script requires that you have the |stellar|
+      Group signing key.
 
    #. This step is not necessary for patch releases. Notify
       ``hpx-users@stellar.cct.lsu.edu`` and ``stellar@cct.lsu.edu`` of the
@@ -146,42 +142,15 @@ are completed to avoid confusion.
    the docs, and change the value of ``HPX_VERSION_DATE`` in
    ``CMakeLists.txt``.
 
-#. Tag the release from the release branch, where tag name is the version to be
-   released and description is "HPX V$VERSION: The C++ Standards Library for
-   Parallelism and Concurrency". Sign the release tag with the
-   ``contact@stellar-group.org`` key by adding the ``-s`` flag to ``git tag``.
-   Make sure you change git to sign with the ``contact@stellar-group.org`` key,
-   rather than your own key if you use one. You also need to change the name and
-   email used for commits. Change them to ``STE||AR Group`` and
-   ``contact@stellar-group.org``, respectively. Finally, the
-   ``contact@stellar-group.org`` email address needs to be added to your GitHub
-   account for the tag to show up as verified.
-
-   * ``git tag -s -a [tag name] -m '[description]'``
-   * ``git push origin [tag name]``
-
-#. Create a release on GitHub
-
-   * Refer to the 'What's New' section in the documentation you uploaded in the
-     notes for the Github release (see previous releases for a hint).
-   * A DOI number using Zenodo is automatically assigned once the release is
-     created as such on github.
-   * Verify on Zenodo (https://zenodo.org/) that release was uploaded. Logging
-     into zenodo using the github credentials might be necessary to see the new
-     release as it usually takes a while for it to propagate to the search
-     engine used on zenodo.
+#. Tag and create a release on GitHub using the script
+   ``tools/roll_release.sh``. The script requires that you have the |stellar|
+   Group signing key.
 
 #. Update the websites (`stellar-group.org <https://stellar-group.org>`_ and
    `stellar.cct.lsu.edu <https://stellar.cct.lsu.edu>`_) with the following:
 
-   * Download links on the download page
-
-     * Run the script ``tools/roll_release.sh``. The script creates archives of
-       the release and prints HTML for the download pages. Upload the archives
-       to `stellar.cct.lsu.edu <https://stellar.cct.lsu.edu>`_, and add the
-       provided HTML to the downloads pages of both websites.
-     * Check that the download links work.
-
+   * Download links on the downloads pages. Use the direct link to the release
+     printed by the previous step.
    * Documentation links on the docs page (link to generated documentation on
      GitHub Pages). Follow the style of previous releases.
    * A new blog post announcing the release, which links to downloads and the
