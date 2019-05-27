@@ -97,8 +97,8 @@ void tree_boot(
   , thread_id_type thread
     )
 {
-    HPX_ASSERT(grain_size);
-    HPX_ASSERT(count);
+    HPX_TEST(grain_size);
+    HPX_TEST(count);
 
     std::vector<future<void> > promises;
 

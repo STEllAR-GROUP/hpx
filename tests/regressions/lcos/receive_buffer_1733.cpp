@@ -19,7 +19,7 @@ char const* buffer_basename = "/receive_buffer_1733/buffer/";
 
 inline std::size_t idx(std::size_t i, int dir)
 {
-    HPX_ASSERT(dir == 1 || dir == -1);
+    HPX_TEST(dir == 1 || dir == -1);
 
     std::size_t size = hpx::get_num_localities(hpx::launch::sync);
 
@@ -28,7 +28,7 @@ inline std::size_t idx(std::size_t i, int dir)
     if (i == size - 1 && dir == +1)
         return 0;
 
-    HPX_ASSERT((i + dir) < size);
+    HPX_TEST((i + dir) < size);
 
     return i + dir;
 }

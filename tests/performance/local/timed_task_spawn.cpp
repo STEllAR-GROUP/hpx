@@ -15,6 +15,7 @@
 #include <hpx/compat/mutex.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/format.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -427,7 +428,7 @@ int hpx_main(
                     boost::algorithm::is_any_of(","),
                     boost::algorithm::token_compress_on);
 
-                HPX_ASSERT(entry.size() == 2);
+                HPX_TEST(entry.size() == 2);
 
                 counter_shortnames.push_back(entry[0]);
                 counters.push_back(entry[1]);

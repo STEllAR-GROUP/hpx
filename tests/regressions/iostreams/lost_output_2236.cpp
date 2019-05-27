@@ -306,12 +306,12 @@ namespace server {
         state();
         if (w < weight)
         {
-            HPX_ASSERT(strong_count > 0);
+            HPX_TEST(strong_count > 0);
             strong_count--;
         }
         else
         {
-            HPX_ASSERT(weak_count > 0);
+            HPX_TEST(weak_count > 0);
             weak_count--;
         }
         cd->phantom_count++;
@@ -325,7 +325,7 @@ namespace server {
         if (strong_count > 0)
         {
             // we can build
-            HPX_ASSERT("build not handled" == nullptr);
+            HPX_TEST("build not handled" == nullptr);
         }
         else
         {
@@ -337,7 +337,7 @@ namespace server {
     {
         if (cid > cd->cid)
         {
-            HPX_ASSERT(
+            HPX_TEST(
                 "change of owner during recovery not handled" == nullptr);
         }
         if (!cd->recovered)
@@ -375,12 +375,12 @@ namespace server {
     void collectable::recover_done()
     {
         cd->wc--;
-        HPX_ASSERT(cd->wc > 0);
+        HPX_TEST(cd->wc > 0);
         check_recover_done();
     }
     void collectable::done(hpx::id_type child)
     {
-        HPX_ASSERT(cd->wc > 0);
+        HPX_TEST(cd->wc > 0);
         cd->wc--;
         if (cd->wc == 0 && cd->cid == this->get_id())
         {
@@ -430,7 +430,7 @@ namespace server {
         }
         else
         {
-            HPX_ASSERT(weak_count > 0);
+            HPX_TEST(weak_count > 0);
             weak_count--;
             if (weak_count == 0 && strong_count == 0)
             {
