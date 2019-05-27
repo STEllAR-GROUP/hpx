@@ -6,7 +6,6 @@
 
 #include <hpx/util/runtime_configuration.hpp>
 
-#include <hpx/config/defaults.hpp>
 // TODO: move parcel ports into plugins
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>

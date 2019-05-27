@@ -26,8 +26,8 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/cache/lru_cache.hpp>
-#include <hpx/util/cache/statistics/local_full_statistics.hpp>
+#include <hpx/cache/lru_cache.hpp>
+#include <hpx/cache/statistics/local_full_statistics.hpp>
 #include <hpx/util_fwd.hpp>
 #include <hpx/util/function.hpp>
 
