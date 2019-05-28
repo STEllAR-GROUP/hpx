@@ -82,7 +82,7 @@ string dataflows together and construct an execution tree.
 
 After the values of the futures in dataflow are ready, the values must be pulled
 out of the future container to be passed to the function ``heat``. In order to
-do this, we use the HPX facility ``unwrapped``, which underneath calls
+do this, we use the HPX facility ``unwrapping``, which underneath calls
 ``.get()`` on each of the futures so that the function ``heat`` will be passed
 doubles and not futures to doubles.
 
