@@ -91,9 +91,10 @@ if(HPX_CACHE_WITH_COMPATIBILITY_HEADERS)
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include_compatibility>)
 endif()
 
-target_compile_definitions(hpx_cache PUBLIC
+target_compile_definitions(hpx_cache PRIVATE
   $<$<CONFIG:Debug>:DEBUG>
   $<$<CONFIG:Debug>:_DEBUG>
+  HPX_MODULE_EXPORTS
 )
 
 include(HPX_AddSourceGroup)

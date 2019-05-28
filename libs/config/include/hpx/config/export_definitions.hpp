@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -52,7 +52,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // define the export/import helper macros used by the runtime module
-#if defined(HPX_EXPORTS)
+#if defined(HPX_EXPORTS) || defined(HPX_MODULE_EXPORTS)
 # define  HPX_EXPORT             HPX_SYMBOL_EXPORT
 # define  HPX_EXCEPTION_EXPORT   HPX_SYMBOL_EXPORT
 # define  HPX_API_EXPORT         HPX_APISYMBOL_EXPORT
@@ -83,7 +83,7 @@
 // components
 #if defined(HPX_EXPORTS) || defined(HPX_COMPONENT_EXPORTS) || \
     defined(HPX_APPLICATION_EXPORTS) || defined(HPX_SERIALIZATION_EXPORTS) || \
-    defined(HPX_LIBRARY_EXPORTS)
+    defined(HPX_LIBRARY_EXPORTS) || defined(HPX_MODULE_EXPORTS)
 # define HPX_ALWAYS_EXPORT       HPX_SYMBOL_EXPORT
 # define HPX_ALWAYS_IMPORT       HPX_SYMBOL_IMPORT
 #else
