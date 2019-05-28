@@ -110,7 +110,7 @@ this manner, each future represents several data points. Because the user can
 define how many data points are contained in each partition (and therefore how
 many data points that are represented by one future) a user can now control the
 grainsize of the simulation. The rest of the code was then futurized in the same
-manner that was done in example 2. It should be noted how strikingly similar
+manner as was done in example 2. It should be noted how strikingly similar
 example 4 is to example 2.
 
 Example 4 finally shows good results. This code scales equivalently to the
@@ -150,12 +150,12 @@ called unless the data from the neighboring partitions have arrived. Therefore
 it should come as no surprise that we synchronize this operation with another
 instance of dataflow (found in ``heat_part``). This dataflow is passed futures
 to the data in the current and surrounding partitions by calling ``get_data()``
-on each respective partition. When these futures are ready dataflow passes then
-to the ``unwrapped`` function, which extracts the shared_array of doubles and
+on each respective partition. When these futures are ready dataflow passes them
+to the ``unwrapping`` function, which extracts the shared_array of doubles and
 passes them to the lambda. The lambda calls ``heat_part_data`` on the
 :term:`locality` which the middle partition is on.
 
-Although this example could run in distributed, it only runs on one
+Although this example could run distributed, it only runs on one
 :term:`locality` as it always uses ``hpx::find_here()`` as the target for the
 functions to run on.
 
