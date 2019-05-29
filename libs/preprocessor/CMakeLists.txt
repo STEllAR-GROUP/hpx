@@ -75,6 +75,12 @@ if(HPX_PREPROCESSOR_WITH_COMPATIBILITY_HEADERS)
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include_compatibility>)
 endif()
 
+target_compile_definitions(hpx_preprocessor PRIVATE
+  $<$<CONFIG:Debug>:DEBUG>
+  $<$<CONFIG:Debug>:_DEBUG>
+  HPX_MODULE_EXPORTS
+)
+
 include(HPX_AddSourceGroup)
 add_hpx_source_group(
   NAME hpx_preprocessor
