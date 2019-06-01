@@ -18,7 +18,7 @@ component actions.
 
 Components are globally named, meaning that a component action can be called
 remotely (e.g.  from another machine). There are two accumulator examples in
-|hpx|; accumulator.
+|hpx|;.
 
 In the :ref:`examples_fibonacci` and the :ref:`examples_hello_world`, we
 introduced plain actions, which wrapped global functions. The target of a plain
