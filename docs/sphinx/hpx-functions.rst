@@ -14,7 +14,7 @@ Async in C++ allows running asynchronous programming. Async programming is usefu
 in compute heavy implementations. Basic async function would look like
 
 .. code-block:: text
-   #include <future>
+   #include <hpx/lcos/future.hpp>
    using namespace hpx;
    int main() {
     future<int> f = async([]() -> int { return 91; });
@@ -41,7 +41,7 @@ by lambda function. Example implementation using hpx is
 
 .. code-block:: text
 
-   #include <future>
+   #include <hpx/lcos/future.hpp>
 
    int main() {
      future<int> fA = async([])(){});
@@ -60,7 +60,7 @@ implementation using hpx is
 
 .. code-block:: text
 
-   #include <future>
+   #include <hpx/lcos/future.hpp>
    #include <thread>
 
    int main(){
@@ -92,7 +92,7 @@ wait_all is implemented in hpx as wrapper on ``std::wait`` function
 
 .. code-block:: text
 
-   #include <future>
+   #include <hpx/lcos/future.hpp>
    int main() {
      std::vector<hpx::future<void>> results;
      for (int i = 0; i != NUM; ++i)
