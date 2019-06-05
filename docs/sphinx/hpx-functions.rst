@@ -26,7 +26,7 @@ You can chain multiple async operations. For implementing chain async programmin
 
 Implementing async functions should have input parameters as
 
-- Lambda function
+- Function/Function Object/Lambda
 - Executor function
 - Launch policy
 
