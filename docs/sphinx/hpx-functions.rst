@@ -81,11 +81,10 @@ implementation using hpx is
 wait_all
 ========
 
-``wait_all`` implementation is present in hpx. std has ``wait`` and ``wait_for``.
-``wait_all`` depends on ``wait`` function in case of chained implementations.
-Example of ``wait_all`` in hpx is
-
-wait_all is implemented in hpx as wrapper on ``std::wait`` function
+The function ``wait_all`` is an operator allowing to join on the result of all
+given futures. It AND-composes all future objects given and returns after they
+finished executing. The function ``wait_all`` returns after all futures have
+become ready. All input futures are still valid after wait all returns.
 
 .. literalinclude:: ../../hpx/lcos/wait_all.hpp
    :lines: 48-91
