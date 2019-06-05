@@ -1357,3 +1357,21 @@ or Unix variants.
 .. include:: ../../generated/cmake_toolchains.rst
 
 .. include:: ../../generated/cmake_variables.rst
+
+
+CMAKE Variable
+==============
+
+This lists the CMAKE variables and how user can enable CMAKE variables during
+make.
+
+- `PLUGIN` : This component is a plugin-able library.
+- `TYPE` : The type can be: EXECUTABLE, LIBRARY or COMPONENT.
+- `INSTALL`: Generates a install rule for the target.
+- `HPX_SetOutputPaths.cmake`: If you want the libs in directory where you can
+  add_executable, you can use `*_OUTPUT_DIRECTORY` variable. To mimic HPX's
+  behavior, set ``include(HPX_SetOutputPaths``) after ``find_package(HPX)``.
+- `LD_LIBRARY_PATH` : In |hpx| libraries are in a path that isn't found by the
+  dynamic linker. User should add the path ``$HPX_LOCATION/lib`` in linker path,
+  for example ``LD_LIBRARY_PATH`` on Linux.
+  Set the ``LD_LIBRARY_PATH`` before you run make.
