@@ -17,7 +17,7 @@ in compute heavy implementations. Basic async function would look like
    #include <future>
    using namespace hpx;
    int main() {
-    future<int> f = async([]() {});
+    future<int> f = async([]() -> int { return 91; });
     int val = f.get();
    }
 
