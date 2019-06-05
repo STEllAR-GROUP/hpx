@@ -1,0 +1,102 @@
+.. _HPX Functions:
+
+=============
+HPX Functions
+=============
+
+This document describes the prototypes, the allowable arguments of the listed
+HPX functions.
+
+async
+=====
+
+Async in C++ allows running asynchronous programming. Async programming is useful
+in compute heavy implementations. Basic async function would look like
+
+.. code-block:: text
+   #include <future>
+   using namespace hpx;
+   int main() {
+    future<int> f = async([]() {});
+    int val = f.get();
+   }
+
+You can chain multiple async operations. For implementing chain async programming
+``objFuture.then(...).then(...).then(...).then(...).then(...)``.
+
+Implementing async functions should have input parameters as
+
+- Lambda function
+- Executor function
+- Launch policy
+
+then
+====
+
+then in asychronous programming is used in chained async implementations. Using
+then function will avoid blocking waits or wasting threads on polling. Future
+can have then chained implementations. With then the antecedent future is ready
+(has a value or exception stored) before the continuation starts as instructed
+by lambda function. Example implementation using hpx is
+
+.. code-block:: text
+
+   #include <future>
+
+   int main() {
+     future<int> fA = async([])(){});
+     future<string> fB = fA.then([](future<int> f)) {
+       return g.get().to_string();
+     });
+   }
+
+
+wait
+====
+
+``hpx::future<T>::wait`` blocks the function implementation until the call is
+available. This function call can be checked using ``valid() == true``. Example
+implementation using hpx is
+
+.. code-block:: text
+
+   #include <future>
+   #include <thread>
+
+   int main(){
+     hpx::future<int> fA = hpx::async([])(){});{
+       func(valA);
+     });
+     hpx::future<string> fB = hpx::async(hpx::launch::async, [](){
+       func(valB);
+     });
+
+     fA.wait();
+     fB.wait();
+
+     hpx::cout << fA.get() << `\n`;
+     hpx::cout << fB.get() << `\n`;
+   }
+
+wait_all
+========
+
+``wait_all`` implementation is present in hpx. std has ``wait`` and ``wait_for``.
+``wait_all`` depends on ``wait`` function in case of chained implementations.
+Example of ``wait_all`` in hpx is
+
+wait_all is implemented in hpx as wrapper on ``std::wait`` function
+
+.. literalinclude:: ../../hpx/lcos/wait_all.hpp
+   :lines: 48-91
+
+.. code-block:: text
+
+   #include <future>
+   int main() {
+     std::vector<hpx::future<void>> results;
+     for (int i = 0; i != NUM; ++i)
+       results.push_back(hpx::async(...));
+       hpx::wait_all(results);
+     }
+   }
