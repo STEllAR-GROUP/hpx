@@ -26,6 +26,7 @@
 #include <hpx/util/regex_from_pattern.hpp>
 #include <hpx/util/scoped_timer.hpp>
 #include <hpx/util/unlock_guard.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -471,6 +472,7 @@ bool symbol_namespace::on_event(
         // This overload of insert always returns the iterator pointing
         // to the inserted value. It should never point to end
         HPX_ASSERT(it != on_event_data_.end());
+        HPX_UNUSED(it);
     }
     l.unlock();
 

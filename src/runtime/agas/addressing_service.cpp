@@ -50,6 +50,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/unlock_guard.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -352,6 +353,7 @@ void addressing_service::register_console(parcelset::endpoints_type const & eps)
           , eps
         ));
     HPX_ASSERT(res.second);
+    HPX_UNUSED(res);
 }
 
 bool addressing_service::has_resolved_locality(
