@@ -10,8 +10,19 @@ HPX functions.
 async
 =====
 
-Async in C++ allows running asynchronous programming. Async programming is useful
-in compute heavy implementations. Basic async function would look like
+``async`` in C++ allows running the function f asynchronously and returns a
+``hpx::future`` having the result of that function call.
+
+``async`` calls a function f with arguments args as per launch policy. You can
+have async flag set or deferred flag set.
+
+Implementing async functions should have input parameters as
+
+- Function/Function Object/Lambda
+- Executor function
+- Launch policy
+
+return value is ``hpx::future``.
 
 .. code-block:: text
    #include <hpx/lcos/future.hpp>
@@ -23,12 +34,6 @@ in compute heavy implementations. Basic async function would look like
 
 You can chain multiple async operations. For implementing chain async programming
 ``objFuture.then(...).then(...).then(...).then(...).then(...)``.
-
-Implementing async functions should have input parameters as
-
-- Function/Function Object/Lambda
-- Executor function
-- Launch policy
 
 then
 ====
