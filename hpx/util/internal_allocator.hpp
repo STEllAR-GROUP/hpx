@@ -65,8 +65,7 @@ namespace hpx { namespace util
             return &x;
         }
 
-        pointer allocate(size_type n,
-            std::allocator<void>::const_pointer hint = nullptr)
+        pointer allocate(size_type n, void const* hint = nullptr)
         {
             return reinterpret_cast<pointer>(
                 HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, malloc)(n * sizeof(T)));
