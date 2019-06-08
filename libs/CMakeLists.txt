@@ -5,6 +5,8 @@
 
 # This file is auto generated. Please do not edit manually.
 
+include(HPX_Message)
+
 set(HPX_LIBS
   cache
   config
@@ -12,6 +14,9 @@ set(HPX_LIBS
   CACHE INTERNAL "" FORCE
 )
 
+hpx_info("Configuring modules:")
+
 foreach(lib ${HPX_LIBS})
   add_subdirectory(${lib})
 endforeach()
+

@@ -10,12 +10,15 @@ project(HPX.cache CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(HPX_AddDefinitions)
+include(HPX_Message)
 include(HPX_Option)
+
+hpx_info("  cache")
 
 hpx_option(HPX_CACHE_WITH_TESTS
   BOOL
-  "Build HPX cache module tests. (default: ON)"
-  ON ADVANCED
+  "Build HPX cache module tests. (default: ${HPX_WITH_TESTS})"
+  ${HPX_WITH_TESTS} ADVANCED
   CATEGORY "Modules")
 
 hpx_option(HPX_CACHE_WITH_DEPRECATION_WARNINGS
@@ -42,8 +45,6 @@ if(HPX_CACHE_WITH_COMPATIBILITY_HEADERS)
       DEFINE HPX_CACHE_HAVE_COMPATIBILITY_HEADERS
       NAMESPACE CACHE)
 endif()
-
-message(STATUS "cache: Configuring")
 
 set(headers
   ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/cache/local_cache.hpp
@@ -151,4 +152,3 @@ write_config_defines_file(
 add_subdirectory(examples)
 add_subdirectory(tests)
 
-message(STATUS "cache: Configuring done")

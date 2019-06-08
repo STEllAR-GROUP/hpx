@@ -48,3 +48,39 @@ function(hpx_option option type description default)
   set(${option}Category ${_category} CACHE INTERNAL "")
 endfunction()
 
+# simplify setting an option in cache
+function(hpx_set_option option)
+  set(options FORCE)
+  set(one_value_args VALUE TYPE HELPSTRING)
+  set(multi_value_args)
+  cmake_parse_arguments(HPX_SET_OPTION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  if(NOT DEFINED ${option})
+    hpx_error("attempting to set an undefined option: ${option}")
+  endif()
+
+  set(${option}_force)
+  if(HPX_SET_OPTION_FORCE)
+    set(${option}_force FORCE)
+  endif()
+
+  if(HPX_SET_OPTION_HELPSTRING)
+    set(${option}_description ${HPX_SET_OPTION_HELPSTRING})
+  else()
+    get_property(${option}_description CACHE "${option}" PROPERTY HELPSTRING)
+  endif()
+
+  if(HPX_SET_OPTION_TYPE)
+    set(${option}_type ${HPX_SET_OPTION_TYPE})
+  else()
+    get_property(${option}_type CACHE "${option}" PROPERTY TYPE)
+  endif()
+
+  if(DEFINED HPX_SET_OPTION_VALUE)
+    set(${option}_value ${HPX_SET_OPTION_VALUE})
+  else()
+    get_property(${option}_value CACHE "${option}" PROPERTY VALUE)
+  endif()
+
+  set(${option} ${${option}_value} CACHE ${${option}_type} "${${option}_description}" ${${option}_force})
+endfunction()

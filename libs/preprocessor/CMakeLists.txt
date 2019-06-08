@@ -10,12 +10,15 @@ project(HPX.preprocessor CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(HPX_AddDefinitions)
+include(HPX_Message)
 include(HPX_Option)
+
+hpx_info("  preprocessor")
 
 hpx_option(HPX_PREPROCESSOR_WITH_TESTS
   BOOL
-  "Build HPX preprocessor module tests. (default: ON)"
-  ON ADVANCED
+  "Build HPX preprocessor module tests. (default: ${HPX_WITH_TESTS})"
+  ${HPX_WITH_TESTS} ADVANCED
   CATEGORY "Modules")
 
 hpx_option(HPX_PREPROCESSOR_WITH_DEPRECATION_WARNINGS
@@ -41,8 +44,6 @@ if(HPX_PREPROCESSOR_WITH_COMPATIBILITY_HEADERS)
     DEFINE HPX_PREPROCESSOR_HAVE_COMPATIBILITY_HEADERS
     NAMESPACE PREPROCESSOR)
 endif()
-
-message(STATUS "preprocessor: Configuring")
 
 set(headers
   ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/preprocessor.hpp
@@ -130,4 +131,3 @@ write_config_defines_file(
   NAMESPACE PREPROCESSOR
   FILENAME "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/preprocessor/config/defines.hpp")
 
-message(STATUS "preprocessor: Configuring done")
