@@ -11,9 +11,7 @@
 
 namespace hpx { namespace traits
 {
-    // This template meta function can be used to extract the action type, no
-    // matter whether it got specified directly or by passing the
-    // corresponding make_action<> specialization.
+    // This template meta function can be used to extract the action type.
     template <typename Action, typename Enable = void>
     struct extract_action
     {
@@ -22,12 +20,6 @@ namespace hpx { namespace traits
         typedef typename type::local_result_type local_result_type;
         typedef typename type::remote_result_type remote_result_type;
     };
-
-    template <typename Action>
-    struct extract_action<Action
-      , typename util::always_void<typename Action::type>::type>
-      : extract_action<typename Action::type>
-    {};
 }}
 
 #endif
