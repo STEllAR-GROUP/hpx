@@ -558,14 +558,12 @@ namespace hpx { namespace actions
     template <typename TF, TF F, typename Derived = detail::this_type,
         typename Direct = std::false_type>
     struct make_action
-      : action<TF, F, Derived>
     {
         typedef action<TF, F, Derived> type;
     };
 
     template <typename TF, TF F, typename Derived>
     struct make_action<TF, F, Derived, std::true_type>
-      : direct_action<TF, F, Derived>
     {
         typedef direct_action<TF, F, Derived> type;
     };
