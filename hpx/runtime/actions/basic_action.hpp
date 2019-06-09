@@ -557,10 +557,7 @@ namespace hpx { namespace actions
     // supported function pointer.
     template <typename TF, TF F, typename Derived = detail::this_type,
         typename Direct = std::false_type>
-    struct make_action;
-
-    template <typename TF, TF F, typename Derived>
-    struct make_action<TF, F, Derived, std::false_type>
+    struct make_action
       : action<TF, F, Derived>
     {
         typedef action<TF, F, Derived> type;
