@@ -17,27 +17,28 @@ set(source_root ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(header_root ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(compat_header_root ${CMAKE_CURRENT_SOURCE_DIR}/include_compatibility)
 
-# Full path here to avoid a prepend loop
+# No full path here cause easier to create a global include file inside
+# add_hpx_module and because cmake 3.12 not always used
 set(${module_name}_headers
-  ${header_root}/hpx/config.hpp
-  ${header_root}/hpx/${module_name}/asio.hpp
-  ${header_root}/hpx/${module_name}/attributes.hpp
-  ${header_root}/hpx/${module_name}/autolink.hpp
-  ${header_root}/hpx/${module_name}/branch_hints.hpp
-  ${header_root}/hpx/${module_name}/compiler_fence.hpp
-  ${header_root}/hpx/${module_name}/compiler_native_tls.hpp
-  ${header_root}/hpx/${module_name}/compiler_specific.hpp
-  ${header_root}/hpx/${module_name}/constexpr.hpp
-  ${header_root}/hpx/${module_name}/debug.hpp
-  ${header_root}/hpx/${module_name}/emulate_deleted.hpp
-  ${header_root}/hpx/${module_name}/export_definitions.hpp
-  ${header_root}/hpx/${module_name}/forceinline.hpp
-  ${header_root}/hpx/${module_name}/lambda_capture.hpp
-  ${header_root}/hpx/${module_name}/manual_profiling.hpp
-  ${header_root}/hpx/${module_name}/threads_stack.hpp
-  ${header_root}/hpx/${module_name}/warnings_prefix.hpp
-  ${header_root}/hpx/${module_name}/warnings_suffix.hpp
-  ${header_root}/hpx/${module_name}/weak_symbol.hpp
+  hpx/config.hpp
+  hpx/${module_name}/asio.hpp
+  hpx/${module_name}/attributes.hpp
+  hpx/${module_name}/autolink.hpp
+  hpx/${module_name}/branch_hints.hpp
+  hpx/${module_name}/compiler_fence.hpp
+  hpx/${module_name}/compiler_native_tls.hpp
+  hpx/${module_name}/compiler_specific.hpp
+  hpx/${module_name}/constexpr.hpp
+  hpx/${module_name}/debug.hpp
+  hpx/${module_name}/emulate_deleted.hpp
+  hpx/${module_name}/export_definitions.hpp
+  hpx/${module_name}/forceinline.hpp
+  hpx/${module_name}/lambda_capture.hpp
+  hpx/${module_name}/manual_profiling.hpp
+  hpx/${module_name}/threads_stack.hpp
+  hpx/${module_name}/warnings_prefix.hpp
+  hpx/${module_name}/warnings_suffix.hpp
+  hpx/${module_name}/weak_symbol.hpp
 )
 
 set(${module_name}_sources

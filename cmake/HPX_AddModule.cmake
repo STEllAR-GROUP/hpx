@@ -63,12 +63,30 @@ function(add_hpx_module name)
           NAMESPACE ${name_upper})
     endif()
   endif()
-  
-  message(STATUS "${name}: Configuring")
-  
+
   set(sources ${${name}_SOURCES})
-  set(headers ${${name}_HEADERS})
+  set(tmp_headers ${${name}_HEADERS})
   set(compat_headers ${${name}_COMPAT_HEADERS})
+
+  # Add a global include file that include all module headers
+  FILE(WRITE ${${name}_HEADER_ROOT}/hpx/${name}/${name}_module.hpp
+      "//  Copyright (c) 2019 The STE||AR GROUP\n"
+      "//\n"
+      "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
+      "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n\n"
+  )
+  foreach(header_file ${tmp_headers})
+    FILE(APPEND ${${name}_HEADER_ROOT}/hpx/${name}/${name}_module.hpp
+      "#include <${header_file}>\n"
+    )
+    list(APPEND headers "${${name}_HEADER_ROOT}/${header_file}")
+  endforeach(header_file)
+
+  foreach(header_file ${headers})
+      hpx_debug(${header_file})
+  endforeach(header_file)
+
+  message(STATUS "${name}: Configuring")
   
   add_library(hpx_${name} STATIC ${sources} ${headers} ${compat_headers})
   

@@ -18,15 +18,16 @@ set(source_root ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(header_root ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(compat_header_root ${CMAKE_CURRENT_SOURCE_DIR}/include_compatibility)
 
-# Full path here to avoid a prepend loop
+# No full path here cause easier to create a global include file inside
+# add_hpx_module and because cmake 3.12 not always used
 set(${module_name}_headers
-  ${header_root}/hpx/preprocessor.hpp
-  ${header_root}/hpx/${module_name}/cat.hpp
-  ${header_root}/hpx/${module_name}/config.hpp
-  ${header_root}/hpx/${module_name}/expand.hpp
-  ${header_root}/hpx/${module_name}/nargs.hpp
-  ${header_root}/hpx/${module_name}/stringize.hpp
-  ${header_root}/hpx/${module_name}/strip_parens.hpp
+  hpx/preprocessor.hpp
+  hpx/${module_name}/cat.hpp
+  hpx/${module_name}/config.hpp
+  hpx/${module_name}/expand.hpp
+  hpx/${module_name}/nargs.hpp
+  hpx/${module_name}/stringize.hpp
+  hpx/${module_name}/strip_parens.hpp
 )
 
 if(HPX_${upper_module_name}_WITH_COMPATIBILITY_HEADERS)
