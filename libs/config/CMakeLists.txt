@@ -5,89 +5,53 @@
 
 cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
-project(HPX.config CXX)
+set(module_name config)
+string(TOUPPER ${module_name} upper_module_name)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-include(HPX_AddDefinitions)
 include(HPX_Message)
-include(HPX_Option)
-
 hpx_info("  config")
+project(HPX.${module_name} CXX)
 
-hpx_option(HPX_CONFIG_WITH_TESTS
-  BOOL
-  "Build HPX config module tests. (default: ${HPX_WITH_TESTS})"
-  ${HPX_WITH_TESTS} ADVANCED
-  CATEGORY "Modules")
+set(source_root ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(header_root ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(compat_header_root ${CMAKE_CURRENT_SOURCE_DIR}/include_compatibility)
 
-set(headers
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/asio.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/attributes.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/autolink.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/branch_hints.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/compiler_fence.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/compiler_native_tls.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/compiler_specific.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/constexpr.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/debug.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/emulate_deleted.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/export_definitions.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/forceinline.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/lambda_capture.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/manual_profiling.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/threads_stack.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/warnings_prefix.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/warnings_suffix.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config/weak_symbol.hpp
+# Full path here to avoid a prepend loop
+set(${module_name}_headers
+  ${header_root}/hpx/config.hpp
+  ${header_root}/hpx/${module_name}/asio.hpp
+  ${header_root}/hpx/${module_name}/attributes.hpp
+  ${header_root}/hpx/${module_name}/autolink.hpp
+  ${header_root}/hpx/${module_name}/branch_hints.hpp
+  ${header_root}/hpx/${module_name}/compiler_fence.hpp
+  ${header_root}/hpx/${module_name}/compiler_native_tls.hpp
+  ${header_root}/hpx/${module_name}/compiler_specific.hpp
+  ${header_root}/hpx/${module_name}/constexpr.hpp
+  ${header_root}/hpx/${module_name}/debug.hpp
+  ${header_root}/hpx/${module_name}/emulate_deleted.hpp
+  ${header_root}/hpx/${module_name}/export_definitions.hpp
+  ${header_root}/hpx/${module_name}/forceinline.hpp
+  ${header_root}/hpx/${module_name}/lambda_capture.hpp
+  ${header_root}/hpx/${module_name}/manual_profiling.hpp
+  ${header_root}/hpx/${module_name}/threads_stack.hpp
+  ${header_root}/hpx/${module_name}/warnings_prefix.hpp
+  ${header_root}/hpx/${module_name}/warnings_suffix.hpp
+  ${header_root}/hpx/${module_name}/weak_symbol.hpp
 )
 
-set(sources
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/version.cpp
+set(${module_name}_sources
+  ${source_root}/version.cpp
 )
 
-add_library(hpx_config STATIC ${sources} ${headers})
-
-target_link_libraries(hpx_config hpx_preprocessor)
-target_include_directories(hpx_config PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)
-
-target_compile_definitions(hpx_config PRIVATE
-  $<$<CONFIG:Debug>:DEBUG>
-  $<$<CONFIG:Debug>:_DEBUG>
-  HPX_MODULE_EXPORTS
+include(HPX_AddModule)
+add_hpx_module(${module_name}
+    FOLDER ${CMAKE_CURRENT_SOURCE_DIR}
+    SOURCE_ROOT ${source_root}
+    HEADER_ROOT ${header_root}
+    COMPAT_HEADER_ROOT ""
+    SOURCES ${${module_name}_sources}
+    HEADERS ${${module_name}_headers}
+    DEPENDENCIES hpx_preprocessor
+    CMAKE_SUBDIRS examples tests
 )
-
-include(HPX_AddSourceGroup)
-add_hpx_source_group(
-  NAME hpx
-  ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx
-  CLASS "Header Files"
-  TARGETS ${headers})
-add_hpx_source_group(
-  NAME hpx
-  ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src
-  CLASS "Source Files"
-  TARGETS ${sources})
-
-set_target_properties(hpx_config PROPERTIES
-  FOLDER "Core/Modules")
-
-install(TARGETS hpx_config EXPORT HPXTargets
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  COMPONENT config
-)
-hpx_export_targets(hpx_config)
-
-install(
-  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-  COMPONENT config)
-
-add_subdirectory(examples)
-add_subdirectory(tests)
-
