@@ -1,3 +1,9 @@
+..
+    Copyright (C) 2019 Tapasweni Pathak
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 .. _HPX Functions:
 
 =============
@@ -35,6 +41,8 @@ return value is ``hpx::future``.
 You can chain multiple async operations. For implementing chain async programming
 ``objFuture.then(...).then(...).then(...).then(...).then(...)``.
 
+Throws ``hpx::system_error`` with error condition ``hpx::errc::resource_unavailable_try_again`` if the launch policy equals ``hpx::launch::async`` and the implementation is unable to start a new thread (if the policy is async|deferred or has additional bits set, it will fall back to deferred or the implementation-defined policies in this case), or ``hpx::bad_alloc`` if memory for the internal data structures could not be allocated.
+
 then
 ====
 
@@ -55,6 +63,7 @@ by lambda function. Example implementation using hpx is
      });
    }
 
+If implicit unwrapping takes place and the continuation returns an invalid future, then the shared state is made ready with an exception of type ``hpx::future_error`` with an error condition of ``hpx::future_errc::broken_promise``.
 
 wait
 ====
@@ -98,7 +107,7 @@ become ready. All input futures are still valid after wait all returns.
 
    #include <hpx/lcos/future.hpp>
    int main() {
-     std::vector<hpx::future<void>> results;
+     hpx::vector<hpx::future<void>> results;
      for (int i = 0; i != NUM; ++i)
        results.push_back(hpx::async(...));
        hpx::wait_all(results);
