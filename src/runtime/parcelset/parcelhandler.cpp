@@ -249,20 +249,21 @@ namespace hpx { namespace parcelset
 
     ///////////////////////////////////////////////////////////////////////////
     bool parcelhandler::do_background_work(std::size_t num_thread,
-        bool stop_buffering)
+        bool stop_buffering, parcelport_background_mode mode)
     {
         bool did_some_work = false;
 
 #if defined(HPX_HAVE_NETWORKING)
         // flush all parcel buffers
-        if (is_networking_enabled_ && 0 == num_thread)
+        if (is_networking_enabled_ && 0 == num_thread &&
+            (mode & parcelport_background_mode_flush_buffers))
         {
             std::unique_lock<mutex_type> l(handlers_mtx_, std::try_to_lock);
 
             if(l.owns_lock())
             {
                 using parcelset::policies::message_handler;
-                message_handler::flush_mode mode =
+                message_handler::flush_mode flush_mode =
                     message_handler::flush_mode_background_work;
 
                 message_handler_map::iterator end = handlers_.end();
@@ -274,7 +275,7 @@ namespace hpx { namespace parcelset
                         std::shared_ptr<policies::message_handler> p((*it).second);
                         util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
                         did_some_work =
-                            p->flush(mode, stop_buffering) || did_some_work;
+                            p->flush(flush_mode, stop_buffering) || did_some_work;
                     }
                 }
             }
@@ -285,7 +286,8 @@ namespace hpx { namespace parcelset
         {
             if(pp.first > 0)
             {
-                did_some_work = pp.second->do_background_work(num_thread) ||
+                did_some_work =
+                    pp.second->do_background_work(num_thread, mode) ||
                     did_some_work;
             }
         }

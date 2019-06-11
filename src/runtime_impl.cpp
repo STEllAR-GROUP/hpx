@@ -478,7 +478,7 @@ namespace hpx
         LRT_(warning) << "runtime_impl: about to stop services";
 
         // flush all parcel buffers, stop buffering parcels at this point
-        //parcel_handler_.do_background_work(true);
+        //parcel_handler_.do_background_work(true, parcelport_background_mode_all);
 
         // execute all on_exit functions whenever the first thread calls this
         this->runtime::stopping();

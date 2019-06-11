@@ -237,6 +237,16 @@ namespace hpx { namespace threads
             std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
         virtual std::int64_t get_background_overhead(
             std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+
+        virtual std::int64_t get_background_send_duration(
+            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+        virtual std::int64_t get_background_send_overhead(
+            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+
+        virtual std::int64_t get_background_receive_duration(
+            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+        virtual std::int64_t get_background_receive_overhead(
+            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)

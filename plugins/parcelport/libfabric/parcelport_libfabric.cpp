@@ -425,7 +425,9 @@ namespace libfabric
     // This is called whenever the main thread scheduler is idling,
     // is used to poll for events, messages on the libfabric connection
     // --------------------------------------------------------------------
-    bool parcelport::background_work(std::size_t num_thread) {
+    bool parcelport::background_work(
+        std::size_t num_thread, parcelport_background_mode mode)
+    {
         if (stopped_ || hpx::is_stopped()) {
             return false;
         }

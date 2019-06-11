@@ -108,7 +108,8 @@ namespace hpx { namespace parcelset
         ///
         /// \returns Whether any work has been performed
         bool do_background_work(std::size_t num_thread = 0,
-            bool stop_buffering = false);
+            bool stop_buffering = false,
+            parcelport_background_mode mode = parcelport_background_mode_all);
 
         /// \brief Allow access to AGAS resolver instance.
         ///

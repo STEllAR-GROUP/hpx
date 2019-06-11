@@ -426,7 +426,8 @@ int background_work()
 {
     while(FuturesActive)
     {
-        hpx::parcelset::do_background_work(0);
+        hpx::parcelset::do_background_work(
+            0, hpx::parcelset::parcelport_background_mode_all);
         hpx::this_thread::suspend(std::chrono::microseconds(10));
     }
     return 1;
