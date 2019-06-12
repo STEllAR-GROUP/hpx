@@ -202,7 +202,7 @@ namespace hpx { namespace resource
             boost::program_options::options_description const& desc_cmdline,
             int argc, char **argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode, runtime_mode mode,
-            bool check)
+            bool check, int* result)
         {
             std::unique_ptr<detail::partitioner>& rp = detail::get_partitioner();
 
@@ -229,12 +229,21 @@ namespace hpx { namespace resource
                             "allowed to parse the command line options.");
                     }
                 }
+
                 // no need to parse a second time
+                if (result != nullptr)
+                {
+                    *result = 0;
+                }
             }
             else
             {
-                rp->parse(f, desc_cmdline, argc, argv, std::move(ini_config),
-                    rpmode, mode);
+                int r = rp->parse(f, desc_cmdline, argc, argv,
+                    std::move(ini_config), rpmode, mode);
+                if (result != nullptr)
+                {
+                    *result = r;
+                }
             }
             return *rp;
         }
