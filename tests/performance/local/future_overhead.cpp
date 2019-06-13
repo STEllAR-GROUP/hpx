@@ -52,6 +52,11 @@ using hpx::util::high_resolution_timer;
 using hpx::cout;
 using hpx::flush;
 
+// global vars we stick here to make printouts easy for plotting
+std::string queuing = "";
+std::size_t numa_sensitive = 0;
+std::uint64_t num_threads = 1;
+
 ///////////////////////////////////////////////////////////////////////////////
 void print_stats(const char* title, const char* wait, const char* exec,
     std::int64_t count, double duration, bool csv)
@@ -59,14 +64,12 @@ void print_stats(const char* title, const char* wait, const char* exec,
     double us = 1e6*duration/count;
     if (csv)
         hpx::util::format_to(cout,
-            "{1},{2},{3},{4},{5},{6},\n",
-           count, title, wait, exec, duration, us) << flush;
+            "{1}, {:10}, {:15}, {:20}, {:10}, {:10}, {:20}, {:4}, {:4}\n",
+           count, title, wait, exec, duration, us, queuing, numa_sensitive, num_threads) << flush;
     else
         hpx::util::format_to(cout,
-            "invoked {1}, futures {:10} {:15} {:20} in \t{5} seconds \t: "
-            "{6} us per future \n",
-            count, title, wait, exec, duration, us) << flush;
-
+            "invoked {1}, futures {:10} {:15} {:20} in \t{5} seconds \t: {6} us/future, queue {7} numa {8}, threads {9}\n",
+            count, title, wait, exec, duration, us, queuing, numa_sensitive, num_threads) << flush;
     // CDash graph plotting
     //hpx::util::print_cdash_timing(title, duration);
 }
@@ -129,7 +132,7 @@ void measure_action_futures_wait_each(std::uint64_t count, bool csv)
 
     // stop the clock
     const double duration = walltime.elapsed();
-    print_stats("Actions", "WaitEach", "no-executor", count, duration, csv);
+    print_stats("action", "WaitEach", "no-executor", count, duration, csv);
 }
 
 // Time async action execution using wait each on futures vector
@@ -147,7 +150,7 @@ void measure_action_futures_wait_all(std::uint64_t count, bool csv)
 
     // stop the clock
     const double duration = walltime.elapsed();
-    print_stats("Actions", "WaitAll", "no-executor", count, duration, csv);
+    print_stats("action", "WaitAll", "no-executor", count, duration, csv);
 }
 
 // Time async execution using wait each on futures vector
@@ -208,10 +211,13 @@ void measure_function_futures_thread_count(
     }
 
     // Yield until there is only this and background threads left.
-    hpx::util::yield_while(
-        [&sanity_check]()
+    hpx::util::yield_while([this_pool, &sanity_check]()
         {
-            return (sanity_check > 0);
+        auto u = this_pool->get_thread_count_unknown(std::size_t(-1), false);
+        auto b = this_pool->get_background_thread_count() + 1;
+        return u>b;
+//            return this_pool->get_thread_count_unknown(std::size_t(-1), false) >
+//                this_pool->get_background_thread_count() + 1;
         });
 
     // stop the clock
@@ -281,13 +287,25 @@ void measure_function_futures_sliding_semaphore(
 
     // stop the clock
     const double duration = walltime.elapsed();
-    print_stats("Apply", "Sliding-Sem", ExecName(exec), count, duration, csv);
+    print_stats("apply", "Sliding-Sem", ExecName(exec), count, duration, csv);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
     {
+        if (vm.count("hpx:queuing"))
+            queuing = vm["hpx:queuing"].as<std::string>();
+
+        if (vm.count("hpx:numa-sensitive"))
+            numa_sensitive = 1;
+        else
+            numa_sensitive = 0;
+
+        bool test_all = (vm.count("test-all")>0);
+
+        num_threads = hpx::get_num_worker_threads();
+
         num_iterations = vm["delay-iterations"].as<std::uint64_t>();
 
         const std::uint64_t count = vm["futures"].as<std::uint64_t>();
@@ -300,17 +318,20 @@ int hpx_main(variables_map& vm)
         hpx::parallel::execution::parallel_executor par;
 
         for (int i=0; i<nl; i++) {
-            measure_function_futures_thread_count(count, csv, def);
-            measure_function_futures_thread_count(count, csv, par);
+            if (test_all) {
+                measure_action_futures_wait_each(count, csv);
+                measure_action_futures_wait_all(count, csv);
+                measure_function_futures_wait_each(count, csv, def);
+                measure_function_futures_wait_each(count, csv, par);
+                measure_function_futures_wait_all(count, csv, def);
+                measure_function_futures_wait_all(count, csv, par);
+                measure_function_futures_thread_count(count, csv, def);
+                measure_function_futures_thread_count(count, csv, par);
+                measure_function_futures_sliding_semaphore(count, csv, def);
+                measure_function_futures_sliding_semaphore(count, csv, par);
+            }
             measure_function_futures_limiting_executor(count, csv, def);
             measure_function_futures_limiting_executor(count, csv, par);
-            measure_action_futures_wait_each(count, csv);
-            measure_action_futures_wait_all(count, csv);
-            measure_function_futures_wait_each(count, csv, def);
-            measure_function_futures_wait_each(count, csv, par);
-            measure_function_futures_wait_all(count, csv, def);
-            measure_function_futures_wait_all(count, csv, par);
-//          measure_function_futures_sliding_semaphore(count, csv, def);
         }
     }
 
