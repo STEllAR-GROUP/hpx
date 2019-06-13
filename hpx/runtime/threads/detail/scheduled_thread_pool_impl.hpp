@@ -45,6 +45,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <functional>
 #include <iosfwd>
 #include <memory>
 #include <string>
@@ -582,7 +583,9 @@ namespace hpx { namespace threads { namespace detail
                     counter_data.busy_loop_counts_,
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
                     counter_data.tasks_active_,
-                    counter_data.background_duration_);
+                    counter_data.background_duration_,
+                    counter_data.background_send_duration_,
+                    counter_data.background_receive_duration_);
 #else
                     counter_data.tasks_active_);
 #endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
@@ -595,9 +598,17 @@ namespace hpx { namespace threads { namespace detail
 
                 if (mode_ & policies::do_background_work)
                 {
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+                    callbacks.background_ = util::deferred_call(    //-V107
+                        &policies::scheduler_base::background_callback,
+                        sched_.get(), global_thread_num,
+                        std::ref(counter_data.background_send_duration_),
+                        std::ref(counter_data.background_receive_duration_));
+#else
                     callbacks.background_ = util::deferred_call(    //-V107
                         &policies::scheduler_base::background_callback,
                         sched_.get(), global_thread_num);
+#endif
                 }
 
                 sched_->Scheduler::set_scheduler_mode(mode_);
@@ -1380,6 +1391,224 @@ namespace hpx { namespace threads { namespace detail
                     counter_data_.begin(),
                     &scheduling_counter_data::background_duration_,
                     &scheduling_counter_data::reset_background_duration_);
+            }
+        }
+
+        HPX_ASSERT(bg_total >= reset_bg_total);
+        bg_total -= reset_bg_total;
+        return std::int64_t(double(bg_total) * timestamp_scale_);
+    }
+
+    ////////////////////////////////////////////////////////////
+    template <typename Scheduler>
+    std::int64_t scheduled_thread_pool<Scheduler>::get_background_send_overhead(
+        std::size_t num, bool reset)
+    {
+        std::int64_t bg_total = 0;
+        std::int64_t reset_bg_total = 0;
+        std::int64_t tfunc_total = 0;
+        std::int64_t reset_tfunc_total = 0;
+
+        if (num != std::size_t(-1))
+        {
+            tfunc_total = counter_data_[num].tfunc_times_;
+            reset_tfunc_total = counter_data_[num].reset_background_send_tfunc_times_;
+
+            bg_total = counter_data_[num].background_send_duration_;
+            reset_bg_total = counter_data_[num].reset_background_send_overhead_;
+
+            if (reset)
+            {
+                counter_data_[num].reset_background_send_overhead_ = bg_total;
+                counter_data_[num].reset_background_send_tfunc_times_ = tfunc_total;
+            }
+        }
+        else
+        {
+            tfunc_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::tfunc_times_);
+            reset_tfunc_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::reset_background_send_tfunc_times_);
+
+            bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::background_send_duration_);
+            reset_bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::reset_background_send_overhead_);
+
+            if (reset)
+            {
+                copy_projected(counter_data_.begin(), counter_data_.end(),
+                    counter_data_.begin(),
+                    &scheduling_counter_data::tfunc_times_,
+                    &scheduling_counter_data::reset_background_send_tfunc_times_);
+                copy_projected(counter_data_.begin(), counter_data_.end(),
+                    counter_data_.begin(),
+                    &scheduling_counter_data::background_send_duration_,
+                    &scheduling_counter_data::reset_background_send_overhead_);
+            }
+        }
+
+        HPX_ASSERT(bg_total >= reset_bg_total);
+        HPX_ASSERT(tfunc_total >= reset_tfunc_total);
+
+        if (tfunc_total == 0)    // avoid division by zero
+            return 1000LL;
+
+        tfunc_total -= reset_tfunc_total;
+        bg_total -= reset_bg_total;
+
+        // this is now a 0.1 %
+        return std::int64_t((double(bg_total) / tfunc_total) * 1000);
+    }
+
+    template <typename Scheduler>
+    std::int64_t scheduled_thread_pool<Scheduler>::get_background_send_duration(
+        std::size_t num, bool reset)
+    {
+        std::int64_t bg_total = 0;
+        std::int64_t reset_bg_total = 0;
+
+        if (num != std::size_t(-1))
+        {
+            bg_total = counter_data_[num].background_send_duration_;
+            reset_bg_total = counter_data_[num].reset_background_send_duration_;
+
+            if (reset)
+            {
+                counter_data_[num].reset_background_send_duration_ = bg_total;
+            }
+        }
+        else
+        {
+            bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::background_send_duration_);
+            reset_bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::reset_background_send_duration_);
+
+            if (reset)
+            {
+                copy_projected(counter_data_.begin(), counter_data_.end(),
+                    counter_data_.begin(),
+                    &scheduling_counter_data::background_send_duration_,
+                    &scheduling_counter_data::reset_background_send_duration_);
+            }
+        }
+
+        HPX_ASSERT(bg_total >= reset_bg_total);
+        bg_total -= reset_bg_total;
+        return std::int64_t(double(bg_total) * timestamp_scale_);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename Scheduler>
+    std::int64_t
+    scheduled_thread_pool<Scheduler>::get_background_receive_overhead(
+        std::size_t num, bool reset)
+    {
+        std::int64_t bg_total = 0;
+        std::int64_t reset_bg_total = 0;
+        std::int64_t tfunc_total = 0;
+        std::int64_t reset_tfunc_total = 0;
+
+        if (num != std::size_t(-1))
+        {
+            tfunc_total = counter_data_[num].tfunc_times_;
+            reset_tfunc_total =
+                counter_data_[num].reset_background_receive_tfunc_times_;
+
+            bg_total = counter_data_[num].background_receive_duration_;
+            reset_bg_total =
+                counter_data_[num].reset_background_receive_overhead_;
+
+            if (reset)
+            {
+                counter_data_[num].reset_background_receive_overhead_ =
+                    bg_total;
+                counter_data_[num].reset_background_receive_tfunc_times_ =
+                    tfunc_total;
+            }
+        }
+        else
+        {
+            tfunc_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::tfunc_times_);
+            reset_tfunc_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::reset_background_receive_tfunc_times_);
+
+            bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::background_receive_duration_);
+            reset_bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::reset_background_receive_overhead_);
+
+            if (reset)
+            {
+                copy_projected(counter_data_.begin(), counter_data_.end(),
+                    counter_data_.begin(),
+                    &scheduling_counter_data::tfunc_times_,
+                    &scheduling_counter_data::reset_background_receive_tfunc_times_);
+                copy_projected(counter_data_.begin(), counter_data_.end(),
+                    counter_data_.begin(),
+                    &scheduling_counter_data::background_receive_duration_,
+                    &scheduling_counter_data::reset_background_receive_overhead_);
+            }
+        }
+
+        HPX_ASSERT(bg_total >= reset_bg_total);
+        HPX_ASSERT(tfunc_total >= reset_tfunc_total);
+
+        if (tfunc_total == 0)    // avoid division by zero
+            return 1000LL;
+
+        tfunc_total -= reset_tfunc_total;
+        bg_total -= reset_bg_total;
+
+        // this is now a 0.1 %
+        return std::int64_t((double(bg_total) / tfunc_total) * 1000);
+    }
+
+    template <typename Scheduler>
+    std::int64_t
+    scheduled_thread_pool<Scheduler>::get_background_receive_duration(
+        std::size_t num, bool reset)
+    {
+        std::int64_t bg_total = 0;
+        std::int64_t reset_bg_total = 0;
+
+        if (num != std::size_t(-1))
+        {
+            bg_total = counter_data_[num].background_receive_duration_;
+            reset_bg_total = counter_data_[num].reset_background_receive_duration_;
+
+            if (reset)
+            {
+                counter_data_[num].reset_background_receive_duration_ = bg_total;
+            }
+        }
+        else
+        {
+            bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::background_receive_duration_);
+            reset_bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::reset_background_receive_duration_);
+
+            if (reset)
+            {
+                copy_projected(counter_data_.begin(), counter_data_.end(),
+                    counter_data_.begin(),
+                    &scheduling_counter_data::background_receive_duration_,
+                    &scheduling_counter_data::reset_background_receive_duration_);
             }
         }
 

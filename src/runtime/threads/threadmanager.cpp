@@ -866,6 +866,40 @@ namespace hpx { namespace threads
             result += pool_iter->get_background_overhead(all_threads, reset);
         return result;
     }
+
+    std::int64_t threadmanager::get_background_send_duration(bool reset)
+    {
+        std::int64_t result = 0;
+        for (auto const& pool_iter : pools_)
+            result += pool_iter->get_background_send_duration(all_threads, reset);
+        return result;
+    }
+
+    std::int64_t threadmanager::get_background_send_overhead(bool reset)
+    {
+        std::int64_t result = 0;
+        for (auto const& pool_iter : pools_)
+            result += pool_iter->get_background_send_overhead(all_threads, reset);
+        return result;
+    }
+
+    std::int64_t threadmanager::get_background_receive_duration(bool reset)
+    {
+        std::int64_t result = 0;
+        for (auto const& pool_iter : pools_)
+            result +=
+                pool_iter->get_background_receive_duration(all_threads, reset);
+        return result;
+    }
+
+    std::int64_t threadmanager::get_background_receive_overhead(bool reset)
+    {
+        std::int64_t result = 0;
+        for (auto const& pool_iter : pools_)
+            result +=
+                pool_iter->get_background_receive_overhead(all_threads, reset);
+        return result;
+    }
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
@@ -1557,6 +1591,50 @@ namespace hpx { namespace threads
                     &threadmanager::locality_pool_thread_counter_creator, this,
                     &threadmanager::get_background_overhead,
                     &thread_pool_base::get_background_overhead),
+                &performance_counters::locality_pool_thread_counter_discoverer,
+                "0.1%"},
+            {"/threads/time/background-send-duration",
+                performance_counters::counter_raw,
+                "returns the overall time spent running background work "
+                    "related to sending parcels",
+                HPX_PERFORMANCE_COUNTER_V1,
+                util::bind_front(
+                    &threadmanager::locality_pool_thread_counter_creator, this,
+                    &threadmanager::get_background_send_duration,
+                    &thread_pool_base::get_background_send_duration),
+                &performance_counters::locality_pool_thread_counter_discoverer,
+                "ns"},
+            {"/threads/background-send-overhead",
+                performance_counters::counter_raw,
+                "returns the overall background overhead "
+                    "related to sending parcels",
+                HPX_PERFORMANCE_COUNTER_V1,
+                util::bind_front(
+                    &threadmanager::locality_pool_thread_counter_creator, this,
+                    &threadmanager::get_background_send_overhead,
+                    &thread_pool_base::get_background_send_overhead),
+                &performance_counters::locality_pool_thread_counter_discoverer,
+                "0.1%"},
+            {"/threads/time/background-receive-duration",
+                performance_counters::counter_raw,
+                "returns the overall time spent running background work "
+                    "related to receiving parcels",
+                HPX_PERFORMANCE_COUNTER_V1,
+                util::bind_front(
+                    &threadmanager::locality_pool_thread_counter_creator, this,
+                    &threadmanager::get_background_receive_duration,
+                    &thread_pool_base::get_background_receive_duration),
+                &performance_counters::locality_pool_thread_counter_discoverer,
+                "ns"},
+            {"/threads/background-receive-overhead",
+                performance_counters::counter_raw,
+                "returns the overall background overhead "
+                    "related to receiving parcels",
+                HPX_PERFORMANCE_COUNTER_V1,
+                util::bind_front(
+                    &threadmanager::locality_pool_thread_counter_creator, this,
+                    &threadmanager::get_background_receive_overhead,
+                    &thread_pool_base::get_background_receive_overhead),
                 &performance_counters::locality_pool_thread_counter_discoverer,
                 "0.1%"},
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS

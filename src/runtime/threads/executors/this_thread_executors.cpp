@@ -354,10 +354,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
             std::int64_t bg_work = 0;
+            std::int64_t bg_send = 0;
+            std::int64_t bg_receive = 0;
             threads::detail::scheduling_counters counters(
                 executed_threads, executed_thread_phases,
                 overall_times, thread_times, idle_loop_count, busy_loop_count,
-                task_active, bg_work);
+                task_active, bg_work, bg_send, bg_receive);
 #else
             threads::detail::scheduling_counters counters(
                 executed_threads, executed_thread_phases,

@@ -281,6 +281,12 @@ namespace hpx { namespace threads { namespace detail
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
         std::int64_t get_background_work_duration(std::size_t, bool) override;
         std::int64_t get_background_overhead(std::size_t, bool) override;
+
+        std::int64_t get_background_send_duration(std::size_t, bool) override;
+        std::int64_t get_background_send_overhead(std::size_t, bool) override;
+
+        std::int64_t get_background_receive_duration(std::size_t, bool) override;
+        std::int64_t get_background_receive_overhead(std::size_t, bool) override;
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
@@ -406,10 +412,23 @@ namespace hpx { namespace threads { namespace detail
             std::int64_t reset_tfunc_times_;
 
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+            // overall counters for background work
             std::int64_t background_duration_;
             std::int64_t reset_background_duration_;
             std::int64_t reset_background_tfunc_times_;
             std::int64_t reset_background_overhead_;
+
+            // counters for background work related to sending parcels
+            std::int64_t background_send_duration_;
+            std::int64_t reset_background_send_duration_;
+            std::int64_t reset_background_send_tfunc_times_;
+            std::int64_t reset_background_send_overhead_;
+
+            // counters for background work related to receiving parcels
+            std::int64_t background_receive_duration_;
+            std::int64_t reset_background_receive_duration_;
+            std::int64_t reset_background_receive_tfunc_times_;
+            std::int64_t reset_background_receive_overhead_;
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
             std::int64_t idle_loop_counts_;
