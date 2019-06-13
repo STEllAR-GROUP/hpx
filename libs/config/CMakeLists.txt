@@ -10,15 +10,16 @@ project(HPX.config CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(HPX_AddDefinitions)
+include(HPX_Message)
 include(HPX_Option)
+
+hpx_info("  config")
 
 hpx_option(HPX_CONFIG_WITH_TESTS
   BOOL
-  "Build HPX config module tests. (default: ON)"
-  ON ADVANCED
+  "Build HPX config module tests. (default: ${HPX_WITH_TESTS})"
+  ${HPX_WITH_TESTS} ADVANCED
   CATEGORY "Modules")
-
-message(STATUS "config: Configuring")
 
 set(headers
   ${CMAKE_CURRENT_SOURCE_DIR}/include/hpx/config.hpp
@@ -90,4 +91,3 @@ install(
 add_subdirectory(examples)
 add_subdirectory(tests)
 
-message(STATUS "config: Configuring done")

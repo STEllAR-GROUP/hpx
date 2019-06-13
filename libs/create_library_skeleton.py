@@ -68,25 +68,24 @@ project(HPX.{lib_name} CXX)
 list(APPEND CMAKE_MODULE_PATH "${{CMAKE_CURRENT_SOURCE_DIR}}/cmake")
 
 include(HPX_AddDefinitions)
+include(HPX_Message)
 include(HPX_Option)
+
+hpx_info("  {lib_name}")
 
 hpx_option(HPX_{lib_name_upper}_WITH_TESTS
   BOOL
-  "Build HPX {lib_name} module tests. (default: ON)"
-  ON ADVANCED
+  "Build HPX {lib_name} module tests. (default: ${HPX_WITH_TESTS})"
+  ${HPX_WITH_TESTS} ADVANCED
   CATEGORY "Modules")
-
-message(STATUS "{lib_name}: Configuring")
 
 add_subdirectory(examples)
 add_subdirectory(src)
 add_subdirectory(tests)
-
-message(STATUS "{lib_name}: Configuring done")
 '''
 
 examples_cmakelists_template = cmake_header + f'''
-if (HPX_WITH_TESTS_EXAMPLES)
+if (HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
   add_hpx_pseudo_target(tests.examples.{lib_name})
   add_hpx_pseudo_dependencies(tests.examples tests.examples.{lib_name})
 endif()
@@ -94,7 +93,10 @@ endif()
 '''
 
 tests_cmakelists_template = cmake_header + f'''
-if (NOT HPX_WITH_TESTS)
+include(HPX_Option)
+
+if (NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
+  hpx_set_option(HPX_{lib_name_upper}_WITH_TESTS VALUE OFF FORCE)
   return()
 endif()
 if (NOT HPX_{lib_name_upper}_WITH_TESTS)
@@ -205,6 +207,8 @@ libs_cmakelists = cmake_header + f'''
 '''
 
 libs_cmakelists += '''
+include(HPX_Message)
+
 set(HPX_LIBS
 '''
 for lib in libs:
@@ -213,6 +217,8 @@ for lib in libs:
 libs_cmakelists += '  CACHE INTERNAL "" FORCE\n)\n'
 
 libs_cmakelists += '''
+hpx_info("Configuring modules:")
+
 foreach(lib ${HPX_LIBS})
   add_subdirectory(${lib})
 endforeach()

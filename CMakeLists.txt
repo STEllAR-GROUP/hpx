@@ -323,6 +323,16 @@ hpx_option(HPX_WITH_FAIL_COMPILE_TESTS BOOL
   "Create build system support for fail compile HPX tests (default ON)"
   ON CATEGORY "Build Targets")
 
+  # disable all tests if HPX_WITH_TESTS=OFF
+if(NOT HPX_WITH_TESTS)
+  hpx_set_option(HPX_WITH_TESTS_BENCHMARKS VALUE OFF FORCE)
+  hpx_set_option(HPX_WITH_TESTS_REGRESSIONS VALUE OFF FORCE)
+  hpx_set_option(HPX_WITH_TESTS_UNIT VALUE OFF FORCE)
+  hpx_set_option(HPX_WITH_TESTS_HEADERS VALUE OFF FORCE)
+  hpx_set_option(HPX_WITH_TESTS_EXTERNAL_BUILD VALUE OFF FORCE)
+  hpx_set_option(HPX_WITH_TESTS_EXAMPLES VALUE OFF FORCE)
+endif()
+
 # Enable IO-counters on linux systems only
 set(HPX_WITH_IO_COUNTERS_DEFAULT OFF)
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
