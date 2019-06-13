@@ -60,7 +60,7 @@ void print_stats(const char* title, const char* wait, const char* exec,
     if (csv)
         hpx::util::format_to(cout,
             "{1},{2},{3},{4},{5},{6},\n",
-           count, title, duration, us) << flush;
+           count, title, wait, exec, duration, us) << flush;
     else
         hpx::util::format_to(cout,
             "invoked {1}, futures {:10} {:15} {:20} in \t{5} seconds \t: "
@@ -300,17 +300,17 @@ int hpx_main(variables_map& vm)
         hpx::parallel::execution::parallel_executor par;
 
         for (int i=0; i<nl; i++) {
+            measure_function_futures_thread_count(count, csv, def);
+            measure_function_futures_thread_count(count, csv, par);
+            measure_function_futures_limiting_executor(count, csv, def);
+            measure_function_futures_limiting_executor(count, csv, par);
             measure_action_futures_wait_each(count, csv);
             measure_action_futures_wait_all(count, csv);
             measure_function_futures_wait_each(count, csv, def);
             measure_function_futures_wait_each(count, csv, par);
             measure_function_futures_wait_all(count, csv, def);
             measure_function_futures_wait_all(count, csv, par);
-            measure_function_futures_thread_count(count, csv, def);
-            measure_function_futures_thread_count(count, csv, par);
-            measure_function_futures_limiting_executor(count, csv, def);
-            measure_function_futures_limiting_executor(count, csv, par);
-            measure_function_futures_sliding_semaphore(count, csv, def);
+//          measure_function_futures_sliding_semaphore(count, csv, def);
         }
     }
 
