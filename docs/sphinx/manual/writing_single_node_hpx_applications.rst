@@ -183,7 +183,7 @@ asynchronous operations to ``hpx::future``, ``hpx::shared_future`` and
      * In asynchronous programming, it is very common for one asynchronous
        operation, on completion, to invoke a second operation and pass data to
        it. The current C++ standard does not allow one to register a
-       continuation to a future. With``then`` instead of waiting for the result,
+       continuation to a future. With ``then`` instead of waiting for the result,
        a continuation is "attached" to the asynchronous operation, which is
        invoked when the result is ready. Continuations registered using then
        function will help to avoid blocking waits or wasting threads on polling,
@@ -205,7 +205,7 @@ asynchronous operations to ``hpx::future``, ``hpx::shared_future`` and
    * * ``hpx::make_ready_future``
      * Some functions may know the value at the point of construction. In these
        cases the value is immediately available, but needs to be returned as a
-       future. By using``hpx::make_ready_future``a future can be created which
+       future. By using ``hpx::make_ready_future`` a future can be created which
        holds a pre-computed result in its shared state. In the current standard
        it is non-trivial to create a future directly from a value. First a
        promise must be created, then the promise is set, and lastly the future
