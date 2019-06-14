@@ -852,7 +852,7 @@ In |hpx| we have implemented the following executor parameter types:
   STATIC scheduling directive.
 * :cpp:class:`hpx::parallel::execution::dynamic_chunk_size`: Loop iterations are
   divided into pieces of a given size and then dynamically scheduled among the
-  cores; when an core finishes one chunk, it is dynamically assigned another If
+  cores; when a core finishes one chunk, it is dynamically assigned another If
   the size is not specified, the default chunk size is 1. This executor
   parameters type is equivalent to OpenMP's DYNAMIC scheduling directive.
 * :cpp:class:`hpx::parallel::execution::guided_chunk_size`: Iterations are
