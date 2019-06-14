@@ -1163,7 +1163,7 @@ categories at the console instance of an application.
 Levels
 ------
 
-All |hpx| logging output have seven different logging levels. These levels can
+All |hpx| logging output has seven different logging levels. These levels can
 be set explicitly or through environmental variables in the main |hpx| ini file
 as shown below. The logging levels and their associated integral values are
 shown in the table below, ordered from most verbose to least verbose. By
