@@ -186,7 +186,7 @@ rst_prolog += '''
 .. |hpx_stackoverflow| replace:: StackOverflow |hpx| questions
 .. _hpx_stackoverflow: https://stackoverflow.com/questions/tagged/hpx
 .. |hpx_buildbot| replace:: |hpx| Buildbot Website
-.. _hpx_buildbot: https://rostam.cct.lsu.edu/
+.. _hpx_buildbot: http://rostam.cct.lsu.edu/
 .. |pycicle| replace:: pycicle
 .. _pycicle: https://github.com/biddisco/pycicle/
 .. |circleci| replace:: CircleCI
