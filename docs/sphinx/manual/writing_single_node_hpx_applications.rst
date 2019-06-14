@@ -338,7 +338,7 @@ Parallel exceptions
 -------------------
 
 During the execution of a standard parallel algorithm, if temporary memory
-resources are required by any of the algorithms and no memory are available, the
+resources are required by any of the algorithms and no memory is available, the
 algorithm throws a ``std::bad_alloc`` exception.
 
 During the execution of any of the parallel algorithms, if the application of a
