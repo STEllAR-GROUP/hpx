@@ -875,7 +875,7 @@ The ``define_task_block``, ``run`` and the ``wait`` functions implemented based
 on |cpp11_n4088|_ are based on the ``task_block`` concept that is a part of the
 common subset of the |ppl|_ and the |tbb|_ libraries.
 
-This implementations adopts a simpler syntax than exposed by those libraries---
+These implementations adopt a simpler syntax than exposed by those libraries---
 one that is influenced by language-based concepts such as spawn and sync from
 |cilk_pp|_ and async and finish from |x10|_. It improves on existing practice in
 the following ways:
