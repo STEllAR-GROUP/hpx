@@ -997,7 +997,7 @@ Using executors to run tasks
 ............................
 
 Often, we want to be able to not only define an execution policy to use by
-default for all spawned tasks inside the task block, but in addition to
+default for all spawned tasks inside the task block, but also to
 customize the execution context for one of the tasks executed by
 ``task_block::run``. Adding an optionally passed executor instance to that
 function enables this use case::
