@@ -299,7 +299,7 @@ which is declared in the (inline) namespace ``hpx::parallel::v1``.
    well.
 
 All parallel algorithms are very similar in semantics to their sequential
-counterparts (as defined in the ``namespace std`` with an additional formal
+counterparts (as defined in the ``namespace std``) with an additional formal
 template parameter named ``ExecutionPolicy``. The execution policy is generally
 passed as the first argument to any of the parallel algorithms and describes the
 manner in which the execution of these algorithms may be parallelized and the
@@ -361,7 +361,7 @@ for_each is unspecified. When |par_for_each| is executed sequentially, only one
 exception will be contained in the |exception_list| object.
 
 These guarantees imply that, unless the algorithm has failed to allocate memory
-and terminated with ``std::bad_alloc`` all exceptions thrown during the execution
+and terminated with ``std::bad_alloc`` , all exceptions thrown during the execution
 of the algorithm are communicated to the caller. It is unspecified whether an
 algorithm implementation will "forge ahead" after encountering and capturing a
 user exception.
