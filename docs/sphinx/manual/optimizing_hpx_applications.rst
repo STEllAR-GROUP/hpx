@@ -129,7 +129,7 @@ is identified by the ``objectname`` and the ``countername`` parts of the name.
 
    /objectname/countername
 
-At application start, |hpx| will register all available counter types on each of
+When an application starts |hpx| will register all available counter types on each of
 the localities. These counter types are held in a special Performance Counter
 registration database which can be later used to retrieve the meta data related
 to a counter type and to create counter instances based on a given counter
