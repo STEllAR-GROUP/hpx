@@ -390,7 +390,7 @@ invocation.
 It is very important to understand that this 'synchronous' invocation syntax in
 fact conceals an asynchronous function call. This is beneficial as the calling
 thread is suspended while waiting for the outcome of a potentially remote
-operation. The |hpx| thread scheduler will schedule other work in the mean time,
+operation. The |hpx| thread scheduler will schedule other work in the meantime,
 allowing the application to make further progress while the remote result is
 computed. This helps overlapping computation with communication and hiding
 communication latencies.

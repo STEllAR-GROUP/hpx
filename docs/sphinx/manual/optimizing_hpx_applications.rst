@@ -129,7 +129,7 @@ is identified by the ``objectname`` and the ``countername`` parts of the name.
 
    /objectname/countername
 
-At application start, |hpx| will register all available counter types on each of
+When an application starts |hpx| will register all available counter types on each of
 the localities. These counter types are held in a special Performance Counter
 registration database which can be later used to retrieve the meta data related
 to a counter type and to create counter instances based on a given counter
@@ -156,7 +156,7 @@ counters have the full counter name of the embedded counter as its instance
 name.
 
 Not all simple counter types require specifying all 4 elements of a full counter
-instance name, some of the parts ``parentinstancename``, ``parentindex``,
+instance name, some of the parts (``parentinstancename``, ``parentindex``,
 ``instancename``, and ``instanceindex``) are optional for specific counters.
 Please refer to the documentation of a particular counter for more information
 about the formatting requirements for the name of this counter (see
@@ -578,7 +578,7 @@ Counter to provide the data. When a consumer queries performance data, the |hpx|
 runtime system calls the provider to collect the data. The runtime system uses
 an internal registry to determine which provider to call.
 
-Generally, there two ways of exposing your own Performance Counter data: a
+Generally, there are two ways of exposing your own Performance Counter data: a
 simple, function based way and a more complex, but more powerful way of
 implementing a full Performance Counter. Both alternatives are described in the
 following sections.

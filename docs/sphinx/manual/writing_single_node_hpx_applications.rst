@@ -183,7 +183,7 @@ asynchronous operations to ``hpx::future``, ``hpx::shared_future`` and
      * In asynchronous programming, it is very common for one asynchronous
        operation, on completion, to invoke a second operation and pass data to
        it. The current C++ standard does not allow one to register a
-       continuation to a future. With``then`` instead of waiting for the result,
+       continuation to a future. With ``then`` instead of waiting for the result,
        a continuation is "attached" to the asynchronous operation, which is
        invoked when the result is ready. Continuations registered using then
        function will help to avoid blocking waits or wasting threads on polling,
@@ -205,7 +205,7 @@ asynchronous operations to ``hpx::future``, ``hpx::shared_future`` and
    * * ``hpx::make_ready_future``
      * Some functions may know the value at the point of construction. In these
        cases the value is immediately available, but needs to be returned as a
-       future. By using``hpx::make_ready_future``a future can be created which
+       future. By using ``hpx::make_ready_future`` a future can be created which
        holds a pre-computed result in its shared state. In the current standard
        it is non-trivial to create a future directly from a value. First a
        promise must be created, then the promise is set, and lastly the future
@@ -299,7 +299,7 @@ which is declared in the (inline) namespace ``hpx::parallel::v1``.
    well.
 
 All parallel algorithms are very similar in semantics to their sequential
-counterparts (as defined in the ``namespace std`` with an additional formal
+counterparts (as defined in the ``namespace std``) with an additional formal
 template parameter named ``ExecutionPolicy``. The execution policy is generally
 passed as the first argument to any of the parallel algorithms and describes the
 manner in which the execution of these algorithms may be parallelized and the
@@ -338,7 +338,7 @@ Parallel exceptions
 -------------------
 
 During the execution of a standard parallel algorithm, if temporary memory
-resources are required by any of the algorithms and no memory are available, the
+resources are required by any of the algorithms and no memory is available, the
 algorithm throws a ``std::bad_alloc`` exception.
 
 During the execution of any of the parallel algorithms, if the application of a
@@ -361,10 +361,10 @@ for_each is unspecified. When |par_for_each| is executed sequentially, only one
 exception will be contained in the |exception_list| object.
 
 These guarantees imply that, unless the algorithm has failed to allocate memory
-and terminated with ``std::bad_alloc`` all exceptions thrown during the execution
-of the algorithm are communicated to the caller. It is unspecified whether an
-algorithm implementation will "forge ahead" after encountering and capturing a
-user exception.
+and terminated with ``std::bad_alloc``, all exceptions thrown during the
+execution of the algorithm are communicated to the caller. It is unspecified
+whether an algorithm implementation will "forge ahead" after encountering and
+capturing a user exception.
 
 The algorithm may terminate with the ``std::bad_alloc`` exception even if one or
 more user-provided function objects have terminated with an exception. For
@@ -852,7 +852,7 @@ In |hpx| we have implemented the following executor parameter types:
   STATIC scheduling directive.
 * :cpp:class:`hpx::parallel::execution::dynamic_chunk_size`: Loop iterations are
   divided into pieces of a given size and then dynamically scheduled among the
-  cores; when an core finishes one chunk, it is dynamically assigned another If
+  cores; when a core finishes one chunk, it is dynamically assigned another. If
   the size is not specified, the default chunk size is 1. This executor
   parameters type is equivalent to OpenMP's DYNAMIC scheduling directive.
 * :cpp:class:`hpx::parallel::execution::guided_chunk_size`: Iterations are
@@ -875,7 +875,7 @@ The ``define_task_block``, ``run`` and the ``wait`` functions implemented based
 on |cpp11_n4088|_ are based on the ``task_block`` concept that is a part of the
 common subset of the |ppl|_ and the |tbb|_ libraries.
 
-This implementations adopts a simpler syntax than exposed by those libraries---
+These implementations adopt a simpler syntax than exposed by those libraries---
 one that is influenced by language-based concepts such as spawn and sync from
 |cilk_pp|_ and async and finish from |x10|_. It improves on existing practice in
 the following ways:
@@ -997,7 +997,7 @@ Using executors to run tasks
 ............................
 
 Often, we want to be able to not only define an execution policy to use by
-default for all spawned tasks inside the task block, but in addition to
+default for all spawned tasks inside the task block, but also to
 customize the execution context for one of the tasks executed by
 ``task_block::run``. Adding an optionally passed executor instance to that
 function enables this use case::
