@@ -156,7 +156,7 @@ counters have the full counter name of the embedded counter as its instance
 name.
 
 Not all simple counter types require specifying all 4 elements of a full counter
-instance name, some of the parts ``parentinstancename``, ``parentindex``,
+instance name, some of the parts ( `parentinstancename``, ``parentindex``,
 ``instancename``, and ``instanceindex``) are optional for specific counters.
 Please refer to the documentation of a particular counter for more information
 about the formatting requirements for the name of this counter (see
