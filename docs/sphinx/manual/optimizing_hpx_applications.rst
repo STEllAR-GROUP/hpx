@@ -578,7 +578,7 @@ Counter to provide the data. When a consumer queries performance data, the |hpx|
 runtime system calls the provider to collect the data. The runtime system uses
 an internal registry to determine which provider to call.
 
-Generally, there two ways of exposing your own Performance Counter data: a
+Generally, there are two ways of exposing your own Performance Counter data: a
 simple, function based way and a more complex, but more powerful way of
 implementing a full Performance Counter. Both alternatives are described in the
 following sections.
