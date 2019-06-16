@@ -98,7 +98,7 @@ struct stepper
 
         // Now the asynchronous computation is running; the above for-loop does not
         // wait on anything. There is no implicit waiting at the end of each timestep;
-        // the computation of each U[t][i] will begin when as soon as its dependencies
+        // the computation of each U[t][i] will begin as soon as its dependencies
         // are ready and hardware is available.
 
         // Return the solution at time-step 'nt'.

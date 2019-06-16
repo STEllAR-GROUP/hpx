@@ -2031,6 +2031,133 @@ system and application performance.
        ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
        unit of measure displayed for this counter is 0.1%.
      * None
+   * * ``/threads/time/background-send-duration``
+     * ``locality#*/total`` or
+
+       ``locality#*/worker-thread#*``
+
+       where:
+
+       ``locality#*`` is defining the locality for which the overall time spent
+       performing background work related to sending parcels should be queried
+       for. The locality id (given by ``*``) is a (zero based) number
+       identifying the locality.
+
+       ``worker-thread#*`` is defining the worker thread for which the overall
+       time spent performing background work related to sending parcels should
+       be queried for. The worker thread number (given by the ``*``) is a (zero
+       based) number identifying the worker thread. The number of available
+       worker threads is usually specified on the command line for the
+       application using the option :option:`--hpx:threads`.
+
+     * Returns the overall time spent performing background work related to
+       sending parcels on the given locality since application start. If the
+       instance name is ``total`` the counter returns the overall time spent
+       performing background work for all worker threads (cores) on that
+       locality. If the instance name is ``worker-thread#*`` the counter will
+       return the overall time spent performing background work for all worker
+       threads separately. This counter is available only if the configuration
+       time constants ``HPX_WITH_BACKGROUND_THREAD_COUNTERS`` (default: ``OFF``)
+       and ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``).
+       The unit of measure for this counter is nanosecond [ns].
+
+       This counter will currently return meaningful values for the MPI
+       parcelport only.
+
+     * None
+   * * ``/threads/background-send-overhead``
+     * ``locality#*/total`` or
+
+       ``locality#*/worker-thread#*``
+
+       where:
+
+       ``locality#*`` is defining the locality for which the background overhead
+       related to sending parcels should be queried for. The locality id (given
+       by ``*``) is a (zero based) number identifying the locality.
+
+       ``worker-thread#*`` is defining the worker thread for which the
+       background overhead related to sending parcels should be queried for.
+       The worker thread number (given by the ``*``) is a (zero based) number
+       identifying the worker thread. The number of available worker threads is
+       usually specified on the command line for the application using the option
+       :option:`--hpx:threads`.
+     * Returns the background overhead related to sending parcels on the given
+       locality since application start. If the instance name is ``total`` the
+       counter returns the background overhead for all worker threads (cores) on
+       that locality. If the instance name is ``worker-thread#*`` the counter
+       will return background overhead for all worker threads separately. This
+       counter is available only if the configuration time constants
+       ``HPX_WITH_BACKGROUND_THREAD_COUNTERS`` (default: ``OFF``) and
+       ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
+       unit of measure displayed for this counter is 0.1%.
+
+       This counter will currently return meaningful values for the MPI
+       parcelport only.
+     * None
+   * * ``/threads/time/background-receive-duration``
+     * ``locality#*/total`` or
+
+       ``locality#*/worker-thread#*``
+
+       where:
+
+       ``locality#*`` is defining the locality for which the overall time spent
+       performing background work related to receiving parcels should be queried
+       for. The locality id (given by ``*``) is a (zero based) number identifying
+       the locality.
+
+       ``worker-thread#*`` is defining the worker thread for which the overall
+       time spent performing background work related to receiving parcels should
+       be queried for. The worker thread number (given by the ``*``) is a (zero
+       based) number identifying the worker thread. The number of available
+       worker threads is usually specified on the command line for the
+       application using the option :option:`--hpx:threads`.
+
+     * Returns the overall time spent performing background work related to
+       receiving parcels on the given locality since application start. If the
+       instance name is ``total`` the counter returns the overall time spent
+       performing background work for all worker threads (cores) on that
+       locality. If the instance name is ``worker-thread#*`` the counter will
+       return the overall time spent performing background work for all worker
+       threads separately. This counter is available only if the configuration
+       time constants ``HPX_WITH_BACKGROUND_THREAD_COUNTERS`` (default: ``OFF``)
+       and ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``).
+       The unit of measure for this counter is nanosecond [ns].
+
+       This counter will currently return meaningful values for the MPI
+       parcelport only.
+     * None
+   * * ``/threads/background-receive-overhead``
+     * ``locality#*/total`` or
+
+       ``locality#*/worker-thread#*``
+
+       where:
+
+       ``locality#*`` is defining the locality for which the background overhead
+       related to receiving should be queried for. The locality id (given by
+       ``*``) is a (zero based) number identifying the locality.
+
+       ``worker-thread#*`` is defining the worker thread for which the
+       background overhead related to receiving parcels should be queried for.
+       The worker thread number (given by the ``*``) is a (zero based) number
+       identifying the worker thread. The number of available worker threads is
+       usually specified on the command line for the application using the option
+       :option:`--hpx:threads`.
+     * Returns the background overhead related to receiving parcels on the given
+       locality since application start. If the instance name is ``total`` the
+       counter returns the background overhead for all worker threads (cores) on
+       that locality. If the instance name is ``worker-thread#*`` the counter
+       will return background overhead for all worker threads separately. This
+       counter is available only if the configuration time constants
+       ``HPX_WITH_BACKGROUND_THREAD_COUNTERS`` (default: ``OFF``) and
+       ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
+       unit of measure displayed for this counter is 0.1%.
+
+       This counter will currently return meaningful values for the MPI
+       parcelport only.
+     * None
 
 .. list-table:: General performance counters exposing characteristics of localities
 

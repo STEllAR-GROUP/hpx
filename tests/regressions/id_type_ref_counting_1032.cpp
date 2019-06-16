@@ -33,19 +33,19 @@ struct test_server1
 {
     test_server1()
     {
-        HPX_ASSERT(!alive);
+        HPX_TEST(!alive);
         alive = true;
     }
     test_server1(hpx::id_type o)
       : other(o)
     {
-        HPX_ASSERT(!alive);
+        HPX_TEST(!alive);
         alive = true;
     }
 
     ~test_server1()
     {
-        HPX_ASSERT(alive);
+        HPX_TEST(alive);
         void (*f)(hpx::id_type) = func<ComponentBase>;
         hpx::apply(f, other);
         alive = false;
@@ -66,12 +66,12 @@ struct test_server2
 {
     test_server2()
     {
-        HPX_ASSERT(!alive);
+        HPX_TEST(!alive);
         alive = true;
     }
     ~test_server2()
     {
-        HPX_ASSERT(alive);
+        HPX_TEST(alive);
         alive = false;
     }
 

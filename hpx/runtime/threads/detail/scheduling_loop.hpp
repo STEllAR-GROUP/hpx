@@ -279,42 +279,6 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
-    struct background_work_duration_counter
-    {
-        background_work_duration_counter(std::int64_t& background_exec_time)
-          : background_exec_time_(background_exec_time)
-        {
-        }
-
-        void collect_background_exec_time(std::int64_t timestamp)
-        {
-            background_exec_time_ += util::hardware::timestamp() - timestamp;
-        }
-
-        std::int64_t& background_exec_time_;
-    };
-
-    struct background_exec_time_wrapper
-    {
-        background_exec_time_wrapper(
-            background_work_duration_counter& background_work_duration)
-          : timestamp_(util::hardware::timestamp())
-          , background_work_duration_(background_work_duration)
-        {
-        }
-
-        ~background_exec_time_wrapper()
-        {
-            background_work_duration_.collect_background_exec_time(timestamp_);
-        }
-
-        std::int64_t timestamp_;
-        background_work_duration_counter& background_work_duration_;
-    };
-#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
-
-    ///////////////////////////////////////////////////////////////////////////
     struct is_active_wrapper
     {
         is_active_wrapper(bool& is_active)
@@ -335,18 +299,22 @@ namespace hpx { namespace threads { namespace detail
     struct scheduling_counters
     {
         scheduling_counters(std::int64_t& executed_threads,
-                std::int64_t& executed_thread_phases,
-                std::int64_t& tfunc_time, std::int64_t& exec_time,
-                std::int64_t& idle_loop_count, std::int64_t& busy_loop_count,
-                bool& is_active, std::int64_t& background_work_duration)
-          : executed_threads_(executed_threads),
-            executed_thread_phases_(executed_thread_phases),
-            tfunc_time_(tfunc_time),
-            exec_time_(exec_time),
-            idle_loop_count_(idle_loop_count),
-            busy_loop_count_(busy_loop_count),
-            background_work_duration_(background_work_duration),
-            is_active_(is_active)
+                std::int64_t& executed_thread_phases, std::int64_t& tfunc_time,
+                std::int64_t& exec_time, std::int64_t& idle_loop_count,
+                std::int64_t& busy_loop_count, bool& is_active,
+                std::int64_t& background_work_duration,
+                std::int64_t& background_send_duration,
+                std::int64_t& background_receive_duration)
+          : executed_threads_(executed_threads)
+          , executed_thread_phases_(executed_thread_phases)
+          , tfunc_time_(tfunc_time)
+          , exec_time_(exec_time)
+          , idle_loop_count_(idle_loop_count)
+          , busy_loop_count_(busy_loop_count)
+          , background_work_duration_(background_work_duration)
+          , background_send_duration_(background_send_duration)
+          , background_receive_duration_(background_receive_duration)
+          , is_active_(is_active)
         {}
 
         std::int64_t& executed_threads_;
@@ -356,6 +324,8 @@ namespace hpx { namespace threads { namespace detail
         std::int64_t& idle_loop_count_;
         std::int64_t& busy_loop_count_;
         std::int64_t& background_work_duration_;
+        std::int64_t& background_send_duration_;
+        std::int64_t& background_receive_duration_;
         bool& is_active_;
     };
 #else
@@ -501,13 +471,16 @@ namespace hpx { namespace threads { namespace detail
                             thrd_stat.get_previous() == pending))
                     {
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
-                        // count background work duration
+                        // measure background work duration
                         background_work_duration_counter bg_work_duration(
                             background_work_exec_time_init);
                         background_exec_time_wrapper bg_exec_time(
                             bg_work_duration);
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
+
+                        // invoke background thread
                         thrd_stat = (*background_thread)();
+
                         thread_data* next = thrd_stat.get_next_thread();
                         if (next != nullptr && next != background_thread.get())
                         {

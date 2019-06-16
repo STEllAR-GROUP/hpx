@@ -9,6 +9,7 @@
 #include <hpx/components/iostreams/standard_streams.hpp>
 #include <hpx/lcos/local/detail/sliding_semaphore.hpp>
 #include <hpx/util/format.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/assert.hpp>
 
@@ -246,13 +247,13 @@ public:
 
   pointer allocate(size_type n, void const* hint = nullptr)
   {
-    HPX_ASSERT(n == size_);
+    HPX_TEST(n == size_);
     return static_cast<T*>(pointer_);
   }
 
   void deallocate(pointer p, size_type n)
   {
-    HPX_ASSERT(p == pointer_ && n == size_);
+    HPX_TEST(p == pointer_ && n == size_);
   }
 
 private:
@@ -425,7 +426,8 @@ int background_work()
 {
     while(FuturesActive)
     {
-        hpx::parcelset::do_background_work(0);
+        hpx::parcelset::do_background_work(
+            0, hpx::parcelset::parcelport_background_mode_all);
         hpx::this_thread::suspend(std::chrono::microseconds(10));
     }
     return 1;

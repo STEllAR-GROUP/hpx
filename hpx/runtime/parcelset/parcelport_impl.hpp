@@ -299,10 +299,11 @@ namespace hpx { namespace parcelset
             return nullptr;
         }
 
-        bool do_background_work(std::size_t num_thread) override
+        bool do_background_work(
+            std::size_t num_thread, parcelport_background_mode mode) override
         {
             trigger_pending_work();
-            return do_background_work_impl<ConnectionHandler>(num_thread);
+            return do_background_work_impl<ConnectionHandler>(num_thread, mode);
         }
 
         /// support enable_shared_from_this
@@ -445,9 +446,10 @@ namespace hpx { namespace parcelset
             >::do_background_work::value,
             bool
         >::type
-        do_background_work_impl(std::size_t num_thread)
+        do_background_work_impl(std::size_t num_thread,
+            parcelport_background_mode mode)
         {
-            return connection_handler().background_work(num_thread);
+            return connection_handler().background_work(num_thread, mode);
         }
 
         template <typename ConnectionHandler_>
@@ -457,7 +459,7 @@ namespace hpx { namespace parcelset
             >::do_background_work::value,
             bool
         >::type
-        do_background_work_impl(std::size_t)
+        do_background_work_impl(std::size_t, parcelport_background_mode)
         {
             return false;
         }

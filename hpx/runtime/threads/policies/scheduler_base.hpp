@@ -11,6 +11,7 @@
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/runtime/threads/scoped_background_timer.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
@@ -78,7 +79,13 @@ namespace hpx { namespace threads { namespace policies
 
         void idle_callback(std::size_t num_thread);
 
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+        bool background_callback(std::size_t num_thread,
+            std::int64_t& background_work_exec_time_send,
+            std::int64_t& background_work_exec_time_receive);
+#else
         bool background_callback(std::size_t num_thread);
+#endif
 
         /// This function gets called by the thread-manager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of

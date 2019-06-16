@@ -52,7 +52,7 @@ public:
       : key_(hpx::naming::detail::get_stripped_gid(id),
             hpx::naming::detail::get_stripped_gid(id) + (count - 1))
     {
-        HPX_ASSERT(count);
+        HPX_TEST(count);
     }
 
     hpx::naming::gid_type get_gid() const
@@ -63,7 +63,7 @@ public:
     std::uint64_t get_count() const
     {
         hpx::naming::gid_type const size = key_.second - key_.first;
-        HPX_ASSERT(size.get_msb() == 0);
+        HPX_TEST(size.get_msb() == 0);
         return size.get_lsb();
     }
 
