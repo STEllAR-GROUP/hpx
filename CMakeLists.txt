@@ -680,6 +680,8 @@ if(HPX_WITH_HPXMP)
     OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")))
     hpx_option(HPX_WITH_HPXMP_NO_UPDATE BOOL
       "Do not update code from remote hpxMP repository." OFF CATEGORY "OpenMP")
+    hpx_option(HPX_WITH_HPXMP_TAG STRING
+      "hpxMP repository tag or branch" "v0.2.0" CATEGORY "OpenMP")
   else()
     hpx_warn("hpxMP can be used only when compiling with clang or gcc")
     set(HPX_WITH_HPXMP OFF)
@@ -1637,11 +1639,6 @@ if(HPX_WITH_APEX)
   if(HPX_WITH_APEX_NO_UPDATE)
     set(_hpx_apex_no_update NO_UPDATE)
   endif()
-  set(_hpx_apex_tag "v2.1.4")
-  if(HPX_WITH_APEX_TAG)
-    message("Overriding APEX git tag ${_hpx_apex_tag} with ${HPX_WITH_APEX_TAG}")
-    set(_hpx_apex_tag ${HPX_WITH_APEX_TAG})
-  endif()
 
   # We want to track parent dependencies
   hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
@@ -1649,7 +1646,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    ${_hpx_apex_tag}
+    ${HPX_WITH_APEX_TAG}
     ${_hpx_apex_no_update}
     VERBOSE)
 
@@ -1701,17 +1698,12 @@ if(HPX_WITH_HPXMP)
   if(HPX_WITH_HPXMP_NO_UPDATE)
     set(_hpxmp_no_update NO_UPDATE)
   endif()
-  set(_hpx_hpxmp_tag "v0.2.0")
-  if(HPX_WITH_HPXMP_TAG)
-    message("Overriding hpxMP git tag ${_hpx_hpxmp_tag} with ${HPX_WITH_HPXMP_TAG}")
-    set(_hpx_hpxmp_tag ${HPX_WITH_HPXMP_TAG})
-  endif()
 
   # handle hpxMP library
   include(GitExternal)
   git_external(hpxmp
     https://github.com/STEllAR-GROUP/hpxMP.git
-    ${_hpx_hpxmp_tag}
+    ${HPX_WITH_HPXMP_TAG}
     ${_hpxmp_no_update}
     VERBOSE)
 
