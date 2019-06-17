@@ -14,9 +14,9 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/latch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/executors/default_schedule.hpp>
 #include <hpx/parallel/executors/fused_bulk_execute.hpp>
 #include <hpx/parallel/executors/post_policy_dispatch.hpp>
-#include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -87,9 +87,9 @@ namespace hpx { namespace parallel { namespace execution
         /// with this executor.
         typedef parallel_execution_tag execution_category;
 
-        /// Associate the static_chunk_size executor parameters type as a default
+        /// Associate the default_schedule executor parameters type as a default
         /// with this executor.
-        typedef static_chunk_size executor_parameters_type;
+        typedef default_schedule executor_parameters_type;
 
         /// Create a new parallel executor
         HPX_CONSTEXPR explicit parallel_policy_executor(

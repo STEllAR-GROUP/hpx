@@ -11,6 +11,7 @@
 #include <hpx/parallel/executors/auto_chunk_size.hpp>
 #include <hpx/parallel/executors/chunked_placement.hpp>
 #include <hpx/parallel/executors/default_placement.hpp>
+#include <hpx/parallel/executors/default_schedule.hpp>
 #include <hpx/parallel/executors/dynamic_chunk_size.hpp>
 #include <hpx/parallel/executors/guided_chunk_size.hpp>
 #include <hpx/parallel/executors/persistent_auto_chunk_size.hpp>
