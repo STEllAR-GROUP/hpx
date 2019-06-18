@@ -10,7 +10,8 @@ function(add_hpx_module name)
   set(multi_value_args SOURCES HEADERS COMPAT_HEADERS DEPENDENCIES CMAKE_SUBDIRS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-  include(HPX_AddDefinitions)
+  project(HPX.${name} CXX)
+
   include(HPX_Message)
   include(HPX_Option)
   
