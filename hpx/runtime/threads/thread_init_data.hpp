@@ -65,7 +65,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_APEX
         // HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
         // and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on
-            apex_data = apex_new_task(description, parent_locality_id, parent_id );
+            apex_data = apex_new_task(description, parent_id);
 #endif
             return *this;
         }
@@ -82,7 +82,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_APEX
         /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
          * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
-            apex_data(apex_new_task(description, parent_locality_id, parent_id )),
+            apex_data(apex_new_task(description, parent_id)),
 #endif
             priority(rhs.priority),
             schedulehint(rhs.schedulehint),
@@ -109,7 +109,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_APEX
         /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
          * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
-            apex_data(apex_new_task(description,parent_locality_id,parent_id)),
+            apex_data(apex_new_task(description, parent_id)),
 #endif
             priority(priority_), schedulehint(os_thread),
             stacksize(stacksize_),

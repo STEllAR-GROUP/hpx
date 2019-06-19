@@ -21,6 +21,7 @@
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
@@ -49,6 +50,10 @@
 #include <thread>
 #include <utility>
 #include <vector>
+
+#ifdef HPX_HAVE_APEX
+#include "apex_api.hpp"
+#endif
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
@@ -404,7 +409,11 @@ namespace hpx
         // {{{ early startup code - local
 
         // initialize instrumentation system
-        util::apex_init();
+#ifdef HPX_HAVE_APEX
+        apex::init(nullptr, hpx::get_locality_id(),
+                hpx::get_initial_num_localities());
+#endif
+
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
 
@@ -608,6 +617,9 @@ namespace hpx
         io_pool_.stop();                    // stops io_pool_ as well
 #endif
 //         deinit_tss();
+#ifdef HPX_HAVE_APEX
+        apex::finalize();
+#endif
     }
 
     // Second step in termination: shut down all services.

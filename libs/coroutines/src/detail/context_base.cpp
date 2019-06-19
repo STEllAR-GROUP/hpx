@@ -33,7 +33,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         if (id.get()->get_apex_data() == nullptr)
         {
             return ::hpx::util::apex_new_task(id.get()->get_description(),
-                id.get()->get_parent_locality_id(),
                 id.get()->get_parent_thread_id());
         }
         return id.get()->get_apex_data();
