@@ -4,9 +4,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/util/cache/entries/lru_entry.hpp>
-#include <hpx/util/cache/statistics/local_statistics.hpp>
-#include <hpx/util/cache/local_cache.hpp>
+#include <hpx/cache/entries/lru_entry.hpp>
+#include <hpx/cache/statistics/local_statistics.hpp>
+#include <hpx/cache/local_cache.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <string>
