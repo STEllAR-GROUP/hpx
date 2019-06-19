@@ -341,6 +341,11 @@ namespace hpx
             hpx::util::may_attach_debugger("test-failure");
         }
 
+        bool enable_parent_task_handler()
+        {
+            return (hpx::get_initial_num_localities() == 1);
+        }
+
 #if defined(HPX_HAVE_VERIFY_LOCKS)
         void registered_locks_error_handler()
         {
@@ -655,6 +660,9 @@ namespace hpx
 
             hpx::assertion::set_assertion_handler(&detail::assertion_handler);
             hpx::util::set_test_failure_handler(&detail::test_failure_handler);
+#if defined(HPX_HAVE_APEX)
+            hpx::util::set_enable_parent_task_handler(&detail::enable_parent_task_handler);
+#endif
             hpx::set_custom_exception_info_handler(&detail::custom_exception_info);
             hpx::set_pre_exception_handler(&detail::pre_exception_handler);
 #if defined(HPX_HAVE_VERIFY_LOCKS)
@@ -737,8 +745,6 @@ namespace hpx
                               << hpx::get_error_what(e) << "\n";
                     return -1;
                 }
-
-                util::apex_wrapper_init apex(argc, argv);
 
                 // Initialize and start the HPX runtime.
                 LPROGRESS_ << "run_local: create runtime";
@@ -999,5 +1005,5 @@ namespace hpx
             // Invoke custom startup functions
             return f(static_cast<int>(argcount), argv.data());
         }
-    }
-}
+    } // namespace detail
+} // namespace hpx

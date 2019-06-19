@@ -6,9 +6,7 @@
 #pragma once // prevent multiple inclusions of this header file.
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/startup_function.hpp>
 
 #ifdef HPX_HAVE_APEX
@@ -25,22 +23,9 @@ namespace hpx { namespace util
 {
 #ifdef HPX_HAVE_APEX
 
-    static void hpx_util_apex_init_startup(void)
-    {
-        apex::init(nullptr, hpx::get_locality_id(),
-            hpx::get_initial_num_localities());
-    }
-
-    inline void apex_init()
-    {
-        hpx_util_apex_init_startup();
-        //hpx::register_pre_startup_function(&hpx_util_apex_init_startup);
-    }
-
-    inline void apex_finalize()
-    {
-        apex::finalize();
-    }
+    using enable_parent_task_handler_type = std::function<bool()>;
+    
+    HPX_EXPORT void set_enable_parent_task_handler(enable_parent_task_handler_type f);
 
     HPX_EXPORT apex_task_wrapper apex_new_task(
                 thread_description const& description,
@@ -119,23 +104,7 @@ namespace hpx { namespace util
         apex_task_wrapper data_;
     };
 
-    struct apex_wrapper_init
-    {
-        apex_wrapper_init(int /*argc*/, char ** /*argv*/)
-        {
-            //apex::init(nullptr, hpx::get_locality_id(),
-            //    hpx::get_initial_num_localities());
-            hpx::register_pre_startup_function(&hpx_util_apex_init_startup);
-        }
-        ~apex_wrapper_init()
-        {
-            apex::finalize();
-        }
-    };
 #else
-    inline void apex_init() {}
-    inline void apex_finalize() {}
-
     inline apex_task_wrapper apex_new_task(
                 thread_description const& description,
                 std::uint32_t parent_task_locality,
@@ -155,11 +124,6 @@ namespace hpx { namespace util
         void yield(void) {}
     };
 
-    struct apex_wrapper_init
-    {
-        apex_wrapper_init(int argc, char **argv) {}
-        ~apex_wrapper_init() {}
-    };
 #endif
 }}
 
