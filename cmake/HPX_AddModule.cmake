@@ -74,21 +74,18 @@ function(add_hpx_module name)
   if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
     prepend(compat_headers ${COMPAT_HEADER_ROOT} ${${name}_COMPAT_HEADERS})
   endif()
-  # To make the global header file
-  set(tmp_headers ${${name}_HEADERS})
 
   # Add a global include file that include all module headers
-  FILE(WRITE ${HEADER_ROOT}/hpx/${name}/${name}_module.hpp
+  FILE(WRITE ${CMAKE_BINARY_DIR}/hpx/${name}.hpp
       "//  Copyright (c) 2019 The STE||AR GROUP\n"
       "//\n"
       "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
       "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n\n"
   )
-  foreach(header_file ${tmp_headers})
-    FILE(APPEND ${HEADER_ROOT}/hpx/${name}/${name}_module.hpp
+  foreach(header_file ${${name}_HEADERS})
+    FILE(APPEND ${CMAKE_BINARY_DIR}/hpx/${name}.hpp
       "#include <${header_file}>\n"
     )
-    list(APPEND headers "${HEADER_ROOT}/${header_file}")
   endforeach(header_file)
 
   foreach(header_file ${headers})
