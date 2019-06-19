@@ -25,12 +25,10 @@ namespace hpx { namespace util
     template <typename Data>
     struct cache_aligned_data
     {
-        static_assert(threads::get_cache_line_size() >= sizeof(Data),
-            "threads::get_cache_line_size() >= sizeof(Data)");
-
         // pad to cache line size bytes
         Data data_;
-        char cacheline_pad[threads::get_cache_line_size() - sizeof(Data)];
+        char cacheline_pad[threads::get_cache_line_size() -
+            (sizeof(Data) % threads::get_cache_line_size())];
     };
 #endif
 
@@ -42,22 +40,19 @@ namespace hpx { namespace util
     template <typename Data>
     struct alignas(threads::get_cache_line_size()) cache_line_data
     {
-        static_assert(threads::get_cache_line_size() >= sizeof(Data),
-            "threads::get_cache_line_size() >= sizeof(Data)");
-
         Data data_;
-        char cacheline_pad[threads::get_cache_line_size() - sizeof(Data)];
+        char cacheline_pad[threads::get_cache_line_size() -
+            (sizeof(Data) % threads::get_cache_line_size())];
+
     };
 #else
     template <typename Data>
     struct cache_line_data
     {
-        static_assert(threads::get_cache_line_size() >= sizeof(Data),
-            "threads::get_cache_line_size() >= sizeof(Data)");
-
         // pad to cache line size bytes
         Data data_;
-        char cacheline_pad[threads::get_cache_line_size() - sizeof(Data)];
+        char cacheline_pad[threads::get_cache_line_size() -
+            (sizeof(Data) % threads::get_cache_line_size())];
     };
 #endif
 }}
