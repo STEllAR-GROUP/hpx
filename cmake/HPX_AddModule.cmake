@@ -6,7 +6,7 @@
 function(add_hpx_module name)
   # Retrieve arguments
   set(options DEPRECATION_WARNINGS)
-  set(one_value_args COMPATIBILITY_HEADERS)
+  set(one_value_args COMPATIBILITY_HEADERS GLOBAL_HEADER_GEN)
   set(multi_value_args SOURCES HEADERS COMPAT_HEADERS DEPENDENCIES CMAKE_SUBDIRS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
@@ -20,6 +20,10 @@ function(add_hpx_module name)
   # Compatibility header off is not specified
   if (NOT ${name}_COMPATIBILITY_HEADERS)
       set(${name}_COMPATIBILITY_HEADERS OFF)
+  endif()
+
+  if ("${${name}_GLOBAL_HEADER_GEN}" STREQUAL "")
+      set(${name}_GLOBAL_HEADER_GEN ON)
   endif()
 
   # Main directories of the module
@@ -75,18 +79,27 @@ function(add_hpx_module name)
     prepend(compat_headers ${COMPAT_HEADER_ROOT} ${${name}_COMPAT_HEADERS})
   endif()
 
-  # Add a global include file that include all module headers
-  FILE(WRITE ${CMAKE_BINARY_DIR}/hpx/${name}.hpp
-      "//  Copyright (c) 2019 The STE||AR GROUP\n"
-      "//\n"
-      "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
-      "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n\n"
-  )
-  foreach(header_file ${${name}_HEADERS})
-    FILE(APPEND ${CMAKE_BINARY_DIR}/hpx/${name}.hpp
-      "#include <${header_file}>\n"
+  # This header generation is disabled for config module specific generated
+  # headers are included
+  if (${name}_GLOBAL_HEADER_GEN)
+    # Add a global include file that include all module headers
+    FILE(WRITE ${CMAKE_BINARY_DIR}/hpx/${name}.hpp
+        "//  Copyright (c) 2019 The STE||AR GROUP\n"
+        "//\n"
+        "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
+        "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n\n"
+        "#ifndef HPX_${name_upper}_HPP\n"
+        "#define HPX_${name_upper}_HPP\n\n"
     )
-  endforeach(header_file)
+    foreach(header_file ${${name}_HEADERS})
+      FILE(APPEND ${CMAKE_BINARY_DIR}/hpx/${name}.hpp
+        "#include <${header_file}>\n"
+      )
+    endforeach(header_file)
+    FILE(APPEND ${CMAKE_BINARY_DIR}/hpx/${name}.hpp
+      "\n#endif"
+    )
+  endif()
 
   foreach(header_file ${headers})
       hpx_debug(${header_file})

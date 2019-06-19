@@ -9,7 +9,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/preprocessor/include
 set(preprocessor_headers
-  hpx/preprocessor.hpp
   hpx/preprocessor/cat.hpp
   hpx/preprocessor/config.hpp
   hpx/preprocessor/expand.hpp
