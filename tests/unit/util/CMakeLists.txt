@@ -30,7 +30,6 @@ endif()
 
 set(subdirs
     bind
-    cache
     function
     iterator
     mem_fn

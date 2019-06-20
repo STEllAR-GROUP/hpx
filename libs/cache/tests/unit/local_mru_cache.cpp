@@ -4,12 +4,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/util/cache/entries/lru_entry.hpp>
-#include <hpx/util/cache/statistics/local_statistics.hpp>
-#include <hpx/util/cache/local_cache.hpp>
+#include <hpx/cache/entries/lru_entry.hpp>
+#include <hpx/cache/statistics/local_statistics.hpp>
+#include <hpx/cache/local_cache.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <string>
+#include <map>
+#include <functional>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct data
@@ -34,10 +36,12 @@ data cache_entries[] =
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_lru_insert()
+void test_mru_insert()
 {
     typedef hpx::util::cache::entries::lru_entry<std::string> entry_type;
-    typedef hpx::util::cache::local_cache<std::string, entry_type> cache_type;
+    typedef hpx::util::cache::local_cache<
+        std::string, entry_type, std::greater<entry_type>
+    > cache_type;
 
     cache_type c(3);
 
@@ -54,10 +58,12 @@ void test_lru_insert()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_lru_insert_with_touch()
+void test_mru_insert_with_touch()
 {
     typedef hpx::util::cache::entries::lru_entry<std::string> entry_type;
-    typedef hpx::util::cache::local_cache<std::string, entry_type> cache_type;
+    typedef hpx::util::cache::local_cache<
+        std::string, entry_type, std::greater<entry_type>
+    > cache_type;
 
     cache_type c(3);
 
@@ -74,10 +80,15 @@ void test_lru_insert_with_touch()
 
     HPX_TEST(3 == c.size());
 
-    // now touch the first item
+    // now touch the first two items (will now be ejected first, even if they
+    // are the oldest)
     std::string white;
     HPX_TEST(c.get_entry("white", white));
     HPX_TEST(white == "255,255,255");
+
+    std::string yellow;
+    HPX_TEST(c.get_entry("yellow", yellow));
+    HPX_TEST(yellow == "255,255,0");
 
     // add two more items
     for (i = 0; i < 2 && d->key != nullptr; ++d, ++i) {
@@ -85,16 +96,20 @@ void test_lru_insert_with_touch()
         HPX_TEST(3 == c.size());
     }
 
-    // there should be 3 items in the cache, and white should be there as well
+    // there should be 3 items in the cache, and green should be there as well
     HPX_TEST(3 == c.size());
-    HPX_TEST(c.holds_key("white"));
+    HPX_TEST(c.holds_key("green"));
+    HPX_TEST(c.holds_key("green"));
+    HPX_TEST(c.holds_key("green"));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_lru_clear()
+void test_mru_clear()
 {
     typedef hpx::util::cache::entries::lru_entry<std::string> entry_type;
-    typedef hpx::util::cache::local_cache<std::string, entry_type> cache_type;
+    typedef hpx::util::cache::local_cache<
+        std::string, entry_type, std::greater<entry_type>
+    > cache_type;
 
     cache_type c(3);
 
@@ -128,10 +143,12 @@ struct erase_func
     std::string key_;
 };
 
-void test_lru_erase_one()
+void test_mru_erase_one()
 {
     typedef hpx::util::cache::entries::lru_entry<std::string> entry_type;
-    typedef hpx::util::cache::local_cache<std::string, entry_type> cache_type;
+    typedef hpx::util::cache::local_cache<
+        std::string, entry_type, std::greater<entry_type>
+    > cache_type;
 
     cache_type c(3);
 
@@ -143,21 +160,27 @@ void test_lru_erase_one()
         HPX_TEST(3 >= c.size());
     }
 
-    entry_type blue;
-    HPX_TEST(c.get_entry("blue", blue));
+    entry_type black;
+    HPX_TEST(c.get_entry("black", black));
 
-    c.erase(erase_func("blue"));
+    c.erase(erase_func("black"));
 
     // there should be 2 items in the cache
-    HPX_TEST(!c.get_entry("blue", blue));
+    HPX_TEST(!c.get_entry("black", black));
     HPX_TEST(2 == c.size());
+
+    entry_type white, yellow;
+    HPX_TEST(c.get_entry("white", white));
+    HPX_TEST(c.get_entry("yellow", yellow));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_lru_update()
+void test_mru_update()
 {
     typedef hpx::util::cache::entries::lru_entry<std::string> entry_type;
-    typedef hpx::util::cache::local_cache<std::string, entry_type> cache_type;
+    typedef hpx::util::cache::local_cache<
+        std::string, entry_type, std::greater<entry_type>
+    > cache_type;
 
     cache_type c(4);    // this time we can hold 4 items
 
@@ -190,11 +213,11 @@ void test_lru_update()
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    test_lru_insert();
-    test_lru_insert_with_touch();
-    test_lru_clear();
-    test_lru_erase_one();
-    test_lru_update();
+    test_mru_insert();
+    test_mru_insert_with_touch();
+    test_mru_clear();
+    test_mru_erase_one();
+    test_mru_update();
 
     return hpx::util::report_errors();
 }
