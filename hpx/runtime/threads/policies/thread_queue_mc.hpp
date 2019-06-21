@@ -222,7 +222,7 @@ namespace hpx { namespace threads { namespace policies
         std::int64_t get_thread_count() const
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "queue_holder_thread::get_thread_count",
+                "thread_queue_mc::get_thread_count",
                 "use get_queue_length_staged/get_queue_length_pending");
             return 0;
         }
@@ -276,17 +276,17 @@ namespace hpx { namespace threads { namespace policies
         bool get_next_thread(threads::thread_data*& thrd,
             bool allow_stealing, bool other_end) HPX_HOT
         {
-            std::int64_t work_items_count =
+            std::int64_t work_items_count_count =
                 work_items_count_.data_.load(std::memory_order_relaxed);
 
             if (allow_stealing &&
-                parameters_.min_tasks_to_steal_pending_ > work_items_count)
+                parameters_.min_tasks_to_steal_pending_ > work_items_count_.data_)
             {
                 holder_->debug("nostealing", queue_index, new_tasks_count_.data_, work_items_count_.data_, thrd);
                 return false;
             }
 
-            if (0 != work_items_count && work_items_.pop(thrd, other_end))
+            if (0 != work_items_count_count && work_items_.pop(thrd, other_end))
             {
                 --work_items_count_.data_;
                 holder_->debug("get       ", queue_index, new_tasks_count_.data_, work_items_count_.data_, thrd);
@@ -303,7 +303,7 @@ namespace hpx { namespace threads { namespace policies
             holder_->debug("schedule  ", queue_index, new_tasks_count_.data_, t, thrd);
             work_items_.push(thrd, other_end);
 #ifdef SHARED_PRIORITY_SCHEDULER_DEBUG
-//            debug_queue(work_items_);
+//            debug_queue(work_items_count_);
 #endif
         }
 
@@ -344,7 +344,7 @@ namespace hpx { namespace threads { namespace policies
 
         // pops all tasks off the queue, prints info and pushes them back on
         // just because we can't iterate over the queue/stack in general
-#ifdef SHARED_PRIORITY_SCHEDULER_DEBUG
+#if defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
         void debug_queue(work_items_type &q) {
             std::unique_lock<std::mutex> Lock(special_mtx_);
             //
@@ -377,10 +377,14 @@ namespace hpx { namespace threads { namespace policies
 
         // count of new tasks to run, separate to new cache line to avoid false
         // sharing
-        util::cache_line_data<std::atomic<std::int64_t>> new_tasks_count_;
+        mutable util::cache_line_data<
+            std::atomic<std::int64_t>
+        > new_tasks_count_;
 
-        // count of active work items
-        util::cache_line_data<std::atomic<std::int64_t>> work_items_count_;
+        mutable util::cache_line_data<
+            std::atomic<std::int64_t>
+        > work_items_count_;
+
 
 #ifdef SHARED_PRIORITY_SCHEDULER_DEBUG
         std::mutex special_mtx_;
