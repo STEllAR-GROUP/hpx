@@ -72,7 +72,8 @@ namespace hpx { namespace util { namespace batch_environments
         else
         {
             if (debug) {
-                std::cerr << "SLURM_STEP_NUM_TASKS not found: set num_localities to 1" << std::endl;
+                std::cerr << "SLURM_STEP_NUM_TASKS not found: set num_localities to 1"
+                          << std::endl;
             }
             num_localities_ = 1;
         }
@@ -83,8 +84,8 @@ namespace hpx { namespace util { namespace batch_environments
         char *slurm_step_tasks_per_node = std::getenv("SLURM_STEP_TASKS_PER_NODE");
         if(slurm_step_tasks_per_node)
         {
-            std::vector<std::string> slurm_step_tasks_per_node_tokens;
-            boost::split(slurm_step_tasks_per_node_tokens, slurm_step_tasks_per_node, boost::is_any_of(","));
+            std::vector<std::string> tokens;
+            boost::split(tokens, slurm_step_tasks_per_node, boost::is_any_of(","));
 
             char *slurm_node_id = std::getenv("SLURM_NODEID");
             HPX_ASSERT(slurm_node_id != nullptr);
@@ -92,16 +93,18 @@ namespace hpx { namespace util { namespace batch_environments
             {
                 std::size_t node_id = safe_lexical_cast<std::size_t>(slurm_node_id);
                 std::size_t task_count = 0;
-                for( auto& slurm_step_tasks_per_node_token : slurm_step_tasks_per_node_tokens )
+                for( auto& token : tokens )
                 {
-                    std::size_t paren_pos = slurm_step_tasks_per_node_token.find_first_of('(');
+                    std::size_t paren_pos = token.find_first_of('(');
                     if(paren_pos != std::string::npos)
                     {
-                        HPX_ASSERT(slurm_step_tasks_per_node_token[paren_pos + 1] == 'x');
-                        HPX_ASSERT(slurm_step_tasks_per_node_token[slurm_step_tasks_per_node_token.size() - 1] == ')');
+                        HPX_ASSERT(token[paren_pos + 1] == 'x');
+                        HPX_ASSERT(token[token.size() - 1] == ')');
                         std::size_t begin = paren_pos + 2;
-                        std::size_t end = slurm_step_tasks_per_node_token.size() - 1;
-                        task_count += safe_lexical_cast<std::size_t>(slurm_step_tasks_per_node_token.substr(paren_pos + 2, end - begin));
+                        std::size_t end = token.size() - 1;
+                        task_count +=
+                              safe_lexical_cast<std::size_t>(
+                                 token.substr(paren_pos + 2, end - begin));
                     }
                     else
                     {
@@ -110,7 +113,8 @@ namespace hpx { namespace util { namespace batch_environments
 
                     if( task_count > node_id )
                     {
-                       num_tasks_ = safe_lexical_cast<std::size_t>(slurm_step_tasks_per_node_token.substr(0, paren_pos));
+                       num_tasks_ =
+                             safe_lexical_cast<std::size_t>(token.substr(0, paren_pos));
                        break;
                     }
                 }
@@ -120,7 +124,8 @@ namespace hpx { namespace util { namespace batch_environments
         else
         {
             if (debug) {
-                std::cerr << "SLURM_STEP_TASKS_PER_NODE not found: set num_tasks to 1" << std::endl;
+                std::cerr << "SLURM_STEP_TASKS_PER_NODE not found: set num_tasks to 1"
+                          << std::endl;
             }
             num_tasks_ = 1;
         }
@@ -321,8 +326,8 @@ namespace hpx { namespace util { namespace batch_environments
             HPX_ASSERT(slurm_job_cpus_on_node != nullptr);
             if(slurm_job_cpus_on_node)
             {
-                std::vector<std::string> slurm_job_cpus_on_node_tokens;
-                boost::split(slurm_job_cpus_on_node_tokens, slurm_job_cpus_on_node, boost::is_any_of(","));
+                std::vector<std::string> tokens;
+                boost::split(tokens, slurm_job_cpus_on_node, boost::is_any_of(","));
 
                 char *slurm_node_id = std::getenv("SLURM_NODEID");
                 HPX_ASSERT(slurm_node_id != nullptr);
@@ -330,16 +335,18 @@ namespace hpx { namespace util { namespace batch_environments
                 {
                     std::size_t node_id = safe_lexical_cast<std::size_t>(slurm_node_id);
                     std::size_t task_count = 0;
-                    for( auto& slurm_job_cpus_on_node_token : slurm_job_cpus_on_node_tokens )
+                    for( auto& token : tokens )
                     {
-                        std::size_t paren_pos = slurm_job_cpus_on_node_token.find_first_of('(');
+                        std::size_t paren_pos = token.find_first_of('(');
                         if(paren_pos != std::string::npos)
                         {
-                            HPX_ASSERT(slurm_job_cpus_on_node_token[paren_pos + 1] == 'x');
-                            HPX_ASSERT(slurm_job_cpus_on_node_token[slurm_job_cpus_on_node_token.size() - 1] == ')');
+                            HPX_ASSERT(token[paren_pos + 1] == 'x');
+                            HPX_ASSERT(token[token.size() - 1] == ')');
                             std::size_t begin = paren_pos + 2;
-                            std::size_t end = slurm_job_cpus_on_node_token.size() - 1;
-                            task_count += safe_lexical_cast<std::size_t>(slurm_job_cpus_on_node_token.substr(paren_pos + 2, end - begin));
+                            std::size_t end = token.size() - 1;
+                            task_count +=
+                                  safe_lexical_cast<std::size_t>(
+                                     token.substr(paren_pos + 2, end - begin));
                         }
                         else
                         {
@@ -347,7 +354,9 @@ namespace hpx { namespace util { namespace batch_environments
                         }
                         if( task_count > node_id )
                         {
-                           num_threads_ = safe_lexical_cast<std::size_t>(slurm_job_cpus_on_node_token.substr(0, paren_pos)) / num_tasks_;
+                           num_threads_ =
+                                 safe_lexical_cast<std::size_t>(
+                                    token.substr(0, paren_pos)) / num_tasks_;
                            break;
                         }
                     }

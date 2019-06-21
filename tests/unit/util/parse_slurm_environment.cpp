@@ -17,12 +17,16 @@ static constexpr bool enable_debug = false;
 //   NodeName=inode11 CPUs=4 Sockets=1 CoresPerSocket=4 ThreadsPerCore=1
 
 
-static auto run_in_slurm_env( std::vector<std::pair<const char*, const char*>>&& environment,
-                              std::vector<std::size_t>&& num_threads ) -> void
+static auto run_in_slurm_env(
+      std::vector<std::pair<const char*, const char*>>&& environment,
+      std::vector<std::size_t>&& num_threads ) -> void
 {
-    static const std::vector<std::string> hpx_nodelist { "anode1", "anode2", "inode7", "inode11", "inode14", "inode20" };
-    static constexpr std::array<const char*, 13u> procids { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
-    static constexpr std::array<const char*, 13u> nodeids { "0", "0", "0", "1", "1", "2", "2", "3", "3", "4", "4", "5", "5" };
+    static const std::vector<std::string> hpx_nodelist
+        { "anode1", "anode2", "inode7", "inode11", "inode14", "inode20" };
+    static constexpr std::array<const char*, 13u> procids
+        { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
+    static constexpr std::array<const char*, 13u> nodeids
+        { "0", "0", "0", "1", "1", "2", "2", "3", "3", "4", "4", "5", "5" };
 
     for( auto& procid : procids )
     {
@@ -35,7 +39,8 @@ static auto run_in_slurm_env( std::vector<std::pair<const char*, const char*>>&&
            { "SLURM_PROCID", procid },
            { "SLURM_NODEID", nodeids[index] }
         };
-        std::copy( std::begin( environment ), std::end( environment ), std::back_inserter( defaultenvironment ) );
+        std::copy( std::begin( environment ), std::end( environment ),
+                   std::back_inserter( defaultenvironment ) );
         for( auto& env : defaultenvironment )
         {
             ::setenv( env.first, env.second, 1 );
