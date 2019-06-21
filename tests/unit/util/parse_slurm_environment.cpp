@@ -5,6 +5,9 @@
 
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/batch_environments/slurm_environment.hpp>
+#include <vector>
+#include <utility>
+#include <string>
 
 static constexpr bool enable_debug = false;
 
