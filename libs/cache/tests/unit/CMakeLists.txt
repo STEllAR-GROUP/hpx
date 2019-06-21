@@ -21,7 +21,7 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/Cache")
+                     FOLDER "Tests/Modules/Unit/Cache")
 
   add_hpx_unit_test("cache" ${test} ${${test}_PARAMETERS})
 
