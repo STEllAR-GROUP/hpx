@@ -25,14 +25,14 @@
 #include <type_traits>
 #include <utility>
 
+//#define GUIDED_EXECUTOR_DEBUG 1
+//#define GUIDED_POOL_EXECUTOR_FAKE_NOOP
+
 #ifdef GUIDED_EXECUTOR_DEBUG
 #include <iostream>
 #endif
 
 #include <hpx/config/warnings_prefix.hpp>
-
-//#define GUIDED_EXECUTOR_DEBUG 1
-//#define GUIDED_POOL_EXECUTOR_FAKE_NOOP
 
 // --------------------------------------------------------------------
 // pool_numa_hint
@@ -431,7 +431,7 @@ namespace hpx { namespace threads { namespace executors
 #else
                          decltype(unwrapped_futures_tuple)>(" | ")
 #endif
-                      << "\n"
+                      << "\n";
 
             std::cout << "dataflow hint returning " << domain << "\n";
 #endif
