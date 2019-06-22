@@ -142,7 +142,7 @@ namespace libfabric
     {
         while (hpx::is_starting())
         {
-            background_work(0);
+            background_work(0, parcelport_background_mode_all);
         }
         LOG_DEBUG_MSG("io service task completed");
     }
