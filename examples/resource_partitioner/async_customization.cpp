@@ -478,19 +478,18 @@ namespace hpx { namespace threads { namespace executors
 
 int hpx_main()
 {
-    int val = 0;
 
     test_async_executor exec;
-    val = test("Testing async custom executor", exec);
+    test("Testing async custom executor", exec);
 
     typedef hpx::threads::executors::pool_numa_hint<dummy_tag> dummy_hint;
     hpx::threads::executors::guided_pool_executor<dummy_hint> exec2("default");
-    val = test("Testing guided_pool_executor<dummy_hint>", exec2);
+    test("Testing guided_pool_executor<dummy_hint>", exec2);
 
     hpx::threads::executors::guided_pool_executor_shim<dummy_hint> exec3(true, "default");
-    val = test("Testing guided_pool_executor_shim<dummy_hint>", exec3);
+    test("Testing guided_pool_executor_shim<dummy_hint>", exec3);
 
-    return hpx::finalize(val);
+    return hpx::finalize(0);
 }
 
 int main(int argc, char** argv)
