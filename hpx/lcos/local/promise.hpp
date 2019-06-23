@@ -123,7 +123,8 @@ namespace hpx { namespace lcos { namespace local
                 {
                     HPX_THROWS_IF(ec, future_already_retrieved,
                         "local::detail::promise_base<R>::get_future",
-                        "future has already been retrieved from this promise");
+                        "future or shared future has already been retrieved "
+                        "from this promise");
                     return future<R>();
                 }
 
@@ -141,12 +142,11 @@ namespace hpx { namespace lcos { namespace local
 
             shared_future<R> get_shared_future(error_code& ec = throws)
             {
-                if (shared_future_retrieved_)
+                if (future_retrieved_)
                 {
                     HPX_THROWS_IF(ec, future_already_retrieved,
                         "local::detail::promise_base<R>::get_shared_future",
-                        "shared future has already been retrieved from this "
-                        "promise");
+                        "future has already been retrieved from this promise");
                     return shared_future<R>();
                 }
 

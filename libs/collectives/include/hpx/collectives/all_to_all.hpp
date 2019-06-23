@@ -175,16 +175,21 @@ namespace hpx { namespace lcos
             {
                 f.get();       // propagate any exceptions
 
-                std::vector<T> data(num_sites_);
+                std::vector<T> data;
+                std::string name;
 
                 {
                     std::unique_lock<mutex_type> l(mtx_);
-                    std::swap(data, data_);
+                    data = data_;
+                    std::swap(name, name_);
                 }
 
                 // this is a one-shot object (generations counters are not
-                // supported), unregister ourselves
-                hpx::unregister_with_basename(name_, site_);
+                // supported), unregister ourselves (but only once)
+                if (!name.empty())
+                {
+                    hpx::unregister_with_basename(name, site_);
+                }
 
                 return data;
             }
@@ -209,7 +214,7 @@ namespace hpx { namespace lcos
                 std::unique_lock<mutex_type> l(mtx_);
 
                 hpx::future<std::vector<T>> f =
-                    gate_.get_shared_future().then(hpx::launch::async,
+                    gate_.get_shared_future(l).then(hpx::launch::async,
                         util::bind_front(&all_to_all_server::on_ready, this));
 
                 gate_.synchronize(1, l);
