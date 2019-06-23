@@ -15,20 +15,22 @@ if (NOT HPX_CACHE_WITH_TESTS)
 endif()
 
 if (HPX_WITH_TESTS_UNIT)
-  add_hpx_pseudo_target(tests.unit.cache)
-  add_hpx_pseudo_dependencies(tests.unit tests.unit.cache)
+  add_hpx_pseudo_target(tests.unit.modules.cache)
+  add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.cache)
   add_subdirectory(unit)
 endif()
 
 if (HPX_WITH_TESTS_REGRESSIONS)
-  add_hpx_pseudo_target(tests.regressions.cache)
-  add_hpx_pseudo_dependencies(tests.regressions tests.regressions.cache)
+  add_hpx_pseudo_target(tests.regressions.modules.cache)
+  add_hpx_pseudo_dependencies(tests.regressions.modules
+    tests.regressions.modules.cache)
   add_subdirectory(regressions)
 endif()
 
 if (HPX_WITH_TESTS_BENCHMARKS)
-  add_hpx_pseudo_target(tests.performance.cache)
-  add_hpx_pseudo_dependencies(tests.performance tests.performance.cache)
+  add_hpx_pseudo_target(tests.performance.modules.cache)
+  add_hpx_pseudo_dependencies(tests.performance.modules
+    tests.performance.modules.cache)
   add_subdirectory(performance)
 endif()
 

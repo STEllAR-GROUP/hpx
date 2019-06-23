@@ -182,6 +182,10 @@ namespace hpx { namespace lcos
                     std::swap(data, data_);
                 }
 
+                // this is a one-shot object (generations counters are not
+                // supported), unregister ourselves
+                hpx::unregister_with_basename(name_, site_);
+
                 return data;
             }
 
@@ -199,11 +203,6 @@ namespace hpx { namespace lcos
               , name_(name)
               , site_(site)
             {}
-
-            ~all_to_all_server()
-            {
-                hpx::unregister_with_basename(name_, site_);
-            }
 
             hpx::future<std::vector<T> > get_result(std::size_t which, T&& t)
             {
@@ -240,7 +239,7 @@ namespace hpx { namespace lcos
             hpx::id_type target = f.get();
 
             // Register unmanaged id to avoid cyclic dependencies, unregister
-            // is done in the destructor of the component above.
+            // is done after all data has been collected in the component above.
             hpx::future<bool> result = hpx::register_with_basename(
                 basename, hpx::unmanaged(target), site);
 

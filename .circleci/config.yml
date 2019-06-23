@@ -804,25 +804,27 @@ jobs:
       - store_artifacts:
           path: tests.unit.util
 
-  tests.unit.libs:
+  tests.unit.modules:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Unit Tests
+          name: Building Module Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.cache
-              ninja -j2 -k 0 tests.unit.config
-              ninja -j2 -k 0 tests.unit.preprocessor
+              ninja -j2 -k 0 tests.unit.modules.cache
+              ninja -j2 -k 0 tests.unit.modules.collectives
+              ninja -j2 -k 0 tests.unit.modules.config
+              ninja -j2 -k 0 tests.unit.modules.preprocessor
       - run:
           name: Running Unit Tests
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.cache
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.config
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.preprocessor
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
       - run:
           <<: *convert_xml
       - run:
@@ -830,9 +832,10 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.unit.libs
+          path: tests.unit.modules
       - store_artifacts:
-          path: tests.unit.libs
+          path: tests.unit.modules
+
   tests.regressions:
     <<: *defaults
     steps:
@@ -866,7 +869,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.compat
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.compat
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -882,7 +885,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.components
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.components
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -898,7 +901,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.compute
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.compute
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -914,7 +917,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.config
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.config
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -930,7 +933,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.include
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.include
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -946,7 +949,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.lcos
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.lcos
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -962,7 +965,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.parallel
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.parallel
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -978,7 +981,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.performance_counters
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.performance_counters
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -994,7 +997,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.plugins
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.plugins
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -1010,7 +1013,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.runtime
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.runtime
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -1026,7 +1029,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.traits
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.traits
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -1042,7 +1045,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.util
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.util
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -1050,23 +1053,24 @@ jobs:
       - store_artifacts:
           path: tests.headers.util
 
-  tests.headers.libs:
+  tests.headers.modules:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Header Tests
+          name: Building Modules Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.cache
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.config
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.preprocessor
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.modules.cache
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.modules.collectives
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.modules.config
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.modules.preprocessor
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: tests.headers.libs
+          path: tests.headers.modules
       - store_artifacts:
-          path: tests.headers.libs
+          path: tests.headers.modules
 
   tests.performance:
     <<: *defaults
@@ -1135,7 +1139,7 @@ jobs:
               docker create -v /hpx --name sources stellargroup/hpx:dev /bin/true
               docker cp ./source/examples/quickstart/hello_world_distributed.cpp sources:/hpx
               docker run --volumes-from sources -w /hpx ${TARGET_IMAGE_NAME} \
-                hpxcxx --exe=hello_world_distributed_test_build                          \
+                hpxcxx --exe=hello_world_distributed_test_build              \
                 hello_world_distributed.cpp -g -lhpx_iostreamsd
               docker run --volumes-from sources -w /hpx ${TARGET_IMAGE_NAME} \
                 ./hello_world_distributed_test_build --hpx:bind=none
@@ -1244,7 +1248,7 @@ workflows:
           <<: *core_dependency
       - tests.unit.util:
           <<: *core_dependency
-      - tests.unit.libs:
+      - tests.unit.modules:
           <<: *core_dependency
       - tests.regressions:
           <<: *core_dependency
@@ -1274,7 +1278,7 @@ workflows:
           <<: *core_dependency
       - tests.headers.util:
           <<: *core_dependency
-      - tests.headers.libs:
+      - tests.headers.modules:
           <<: *core_dependency
       - examples:
           <<: *core_dependency
@@ -1311,7 +1315,7 @@ workflows:
             - tests.unit.topology
             - tests.unit.traits
             - tests.unit.util
-            - tests.unit.libs
+            - tests.unit.modules
             - tests.headers.compat
             - tests.headers.components
             - tests.headers.compute
@@ -1324,7 +1328,7 @@ workflows:
             - tests.headers.runtime
             - tests.headers.traits
             - tests.headers.util
-            - tests.headers.libs
+            - tests.headers.modules
             - tests.performance
             - tests.regressions
             - examples

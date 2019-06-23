@@ -15,6 +15,22 @@ set(HPX_LIBS
   CACHE INTERNAL "" FORCE
 )
 
+if (HPX_WITH_TESTS_UNIT)
+  add_hpx_pseudo_target(tests.unit.modules)
+endif()
+
+if (HPX_WITH_TESTS_REGRESSIONS)
+  add_hpx_pseudo_target(tests.regressions.modules)
+endif()
+
+if (HPX_WITH_TESTS_BENCHMARKS)
+  add_hpx_pseudo_target(tests.performance.modules)
+endif()
+
+if (HPX_WITH_TESTS_HEADERS)
+  add_custom_target(tests.headers.modules)
+endif()
+
 hpx_info("Configuring modules:")
 
 foreach(lib ${HPX_LIBS})

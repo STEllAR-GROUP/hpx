@@ -19,9 +19,8 @@ set(collectives_sources
 
 include(HPX_AddModule)
 add_hpx_module(collectives
-    DEPRECATION_WARNINGS
     SOURCES ${collectives_sources}
     HEADERS ${collectives_headers}
-    DEPENDENCIES hpx_config
+    DEPENDENCIES hpx_config hpx_preprocessor
     CMAKE_SUBDIRS examples tests
 )

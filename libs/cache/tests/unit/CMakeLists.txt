@@ -23,17 +23,17 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Modules/Unit/Cache")
 
-  add_hpx_unit_test("cache" ${test} ${${test}_PARAMETERS})
+  add_hpx_test("tests.unit.modules.cache" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.cache.${test})
+  add_hpx_pseudo_target(tests.unit.modules.cache.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.cache
-                              tests.unit.cache.${test})
+  add_hpx_pseudo_dependencies(tests.unit.modules.cache
+                              tests.unit.modules.cache.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.cache.${test}
+  add_hpx_pseudo_dependencies(tests.unit.modules.cache.${test}
                               ${test}_test)
 endforeach()
 

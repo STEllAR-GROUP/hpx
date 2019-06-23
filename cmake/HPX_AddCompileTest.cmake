@@ -51,10 +51,13 @@ function(add_hpx_headers_compile_test category name)
 endfunction()
 
 function(add_hpx_lib_header_tests lib)
-  file(GLOB_RECURSE headers ${DO_CONFIGURE_DEPENDS} "${PROJECT_SOURCE_DIR}/include/hpx/*hpp")
+  file(GLOB_RECURSE headers ${DO_CONFIGURE_DEPENDS}
+      "${PROJECT_SOURCE_DIR}/include/hpx/*hpp")
+
   set(all_headers)
-  add_custom_target(tests.headers.${lib})
-  add_dependencies(tests.headers tests.headers.${lib})
+  add_custom_target(tests.headers.modules.${lib})
+  add_dependencies(tests.headers.modules tests.headers.modules.${lib})
+
   foreach(header ${headers})
 
     # skip all headers in directories containing 'detail'
@@ -80,14 +83,14 @@ function(add_hpx_lib_header_tests lib)
 
       set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
 
-      add_library(tests.headers.${lib}.${test_name} ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file})
-      target_link_libraries(tests.headers.${lib}.${test_name} hpx_${lib})
-      add_dependencies(tests.headers.${lib} tests.headers.${lib}.${test_name})
+      add_library(tests.headers.modules.${lib}.${test_name} ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file})
+      target_link_libraries(tests.headers.modules.${lib}.${test_name} hpx_${lib})
+      add_dependencies(tests.headers.modules.${lib} tests.headers.modules.${lib}.${test_name})
 
-      add_test(NAME "tests.headers.${lib}.${test_name}"
+      add_test(NAME "tests.headers.modules.${lib}.${test_name}"
         COMMAND ${CMAKE_COMMAND}
         --build ${CMAKE_BINARY_DIR}
-          --target tests.headers.${lib}.${test_name}
+          --target tests.headers.modules.${lib}.${test_name}
           --config $<CONFIGURATION>
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
     endif()
@@ -101,14 +104,14 @@ function(add_hpx_lib_header_tests lib)
     "int main(int argc, char** argv) { return 0; }\n"
     "#endif\n")
 
-  add_library(tests.headers.${lib}.${test_name} "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
-  target_link_libraries(tests.headers.${lib}.${test_name} hpx_${lib})
-  add_dependencies(tests.headers.${lib} tests.headers.${lib}.${test_name})
+  add_library(tests.headers.modules.${lib}.${test_name} "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
+  target_link_libraries(tests.headers.modules.${lib}.${test_name} hpx_${lib})
+  add_dependencies(tests.headers.modules.${lib} tests.headers.modules.${lib}.${test_name})
 
-  add_test(NAME "tests.headers.${lib}.${test_name}"
+  add_test(NAME "tests.headers.modules.${lib}.${test_name}"
     COMMAND ${CMAKE_COMMAND}
     --build ${CMAKE_BINARY_DIR}
-      --target tests.headers.${lib}.${test_name}
+      --target tests.headers.modules.${lib}.${test_name}
       --config $<CONFIGURATION>
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 endfunction()

@@ -15,20 +15,22 @@ if (NOT HPX_COLLECTIVES_WITH_TESTS)
 endif()
 
 if (HPX_WITH_TESTS_UNIT)
-  add_hpx_pseudo_target(tests.unit.collectives)
-  add_hpx_pseudo_dependencies(tests.unit tests.unit.collectives)
+  add_hpx_pseudo_target(tests.unit.modules.collectives)
+  add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.collectives)
   add_subdirectory(unit)
 endif()
 
 if (HPX_WITH_TESTS_REGRESSIONS)
-  add_hpx_pseudo_target(tests.regressions.collectives)
-  add_hpx_pseudo_dependencies(tests.regressions tests.regressions.collectives)
+  add_hpx_pseudo_target(tests.regressions.modules.collectives)
+  add_hpx_pseudo_dependencies(tests.regressions.modules
+    tests.regressions.modules.collectives)
   add_subdirectory(regressions)
 endif()
 
 if (HPX_WITH_TESTS_BENCHMARKS)
-  add_hpx_pseudo_target(tests.performance.collectives)
-  add_hpx_pseudo_dependencies(tests.performance tests.performance.collectives)
+  add_hpx_pseudo_target(tests.performance.modules.collectives)
+  add_hpx_pseudo_dependencies(tests.performance.modules
+    tests.performance.modules.collectives)
   add_subdirectory(performance)
 endif()
 

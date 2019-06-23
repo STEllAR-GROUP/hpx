@@ -17,6 +17,7 @@ function(add_hpx_module name)
 
   hpx_info("  ${name}")
 
+  # Global headers should be always generated except if explicitly disabled
   if ("${${name}_GLOBAL_HEADER_GEN}" STREQUAL "")
       set(${name}_GLOBAL_HEADER_GEN ON)
   endif()

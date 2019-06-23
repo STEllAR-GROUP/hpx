@@ -15,20 +15,22 @@ if (NOT HPX_CONFIG_WITH_TESTS)
 endif()
 
 if (HPX_WITH_TESTS_UNIT)
-  add_hpx_pseudo_target(tests.unit.config)
-  add_hpx_pseudo_dependencies(tests.unit tests.unit.config)
+  add_hpx_pseudo_target(tests.unit.modules.config)
+  add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.config)
   add_subdirectory(unit)
 endif()
 
 if (HPX_WITH_TESTS_REGRESSIONS)
-  add_hpx_pseudo_target(tests.regressions.config)
-  add_hpx_pseudo_dependencies(tests.regressions tests.regressions.config)
+  add_hpx_pseudo_target(tests.regressions.modules.config)
+  add_hpx_pseudo_dependencies(tests.regressions.modules
+    tests.regressions.modules.config)
   add_subdirectory(regressions)
 endif()
 
 if (HPX_WITH_TESTS_BENCHMARKS)
-  add_hpx_pseudo_target(tests.performance.config)
-  add_hpx_pseudo_dependencies(tests.performance tests.performance.config)
+  add_hpx_pseudo_target(tests.performance.modules.config)
+  add_hpx_pseudo_dependencies(tests.performance.modules
+    tests.performance.modules.config)
   add_subdirectory(performance)
 endif()
 
