@@ -9,6 +9,7 @@ include(HPX_Message)
 
 set(HPX_LIBS
   cache
+  collectives
   config
   preprocessor
   CACHE INTERNAL "" FORCE

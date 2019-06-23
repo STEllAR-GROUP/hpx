@@ -117,6 +117,35 @@ namespace hpx { namespace lcos { namespace local
             return hpx::future<void>();
         }
 
+        /// \brief get a shared future allowing to wait for the gate to fire
+        shared_future<void> get_shared_future(std::size_t count = std::size_t(-1),
+            std::size_t* generation_value = nullptr,
+            error_code& ec = hpx::throws)
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+
+            // by default we use as many segments as specified during construction
+            if (count == std::size_t(-1))
+                count = received_segments_.size();
+            HPX_ASSERT(count != 0);
+
+            init_locked(l, count, ec);
+            if (!ec) {
+                HPX_ASSERT(generation_ != std::size_t(-1));
+
+// FIXME: get_shared_future is called more than once for each generation
+//                 ++generation_;
+
+                trigger_conditions(ec);   // re-check/trigger condition, if needed
+                if (!ec) {
+                    if (generation_value)
+                        *generation_value = generation_;
+                    return promise_.get_shared_future(ec);
+                }
+            }
+            return hpx::future<void>().share();
+        }
+
         /// \brief Set the data which has to go into the segment \a which.
         template <typename OuterLock>
         bool set(std::size_t which, OuterLock & outer_lock, error_code& ec = throws)
