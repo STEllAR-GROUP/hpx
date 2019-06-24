@@ -8,6 +8,8 @@
 #include <vector>
 #include <utility>
 #include <string>
+#include <cstddef>
+#include <array>
 
 static constexpr bool enable_debug = false;
 
