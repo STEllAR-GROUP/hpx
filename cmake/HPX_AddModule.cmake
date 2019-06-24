@@ -17,11 +17,6 @@ function(add_hpx_module name)
 
   hpx_info("  ${name}")
 
-  # Compatibility header off is not specified
-  if (NOT ${name}_COMPATIBILITY_HEADERS)
-      set(${name}_COMPATIBILITY_HEADERS OFF)
-  endif()
-
   if ("${${name}_GLOBAL_HEADER_GEN}" STREQUAL "")
       set(${name}_GLOBAL_HEADER_GEN ON)
   endif()
@@ -84,22 +79,23 @@ function(add_hpx_module name)
   # This header generation is disabled for config module specific generated
   # headers are included
   if (${name}_GLOBAL_HEADER_GEN)
+    set(global_header "${CMAKE_BINARY_DIR}/hpx/${name}.hpp")
     # Add a global include file that include all module headers
-    FILE(WRITE ${CMAKE_BINARY_DIR}/hpx/${name}.hpp
-      "//  Copyright (c) 2019 The STE||AR GROUP\n"
-      "//\n"
-      "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
-      "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n\n"
-      "#ifndef HPX_${name_upper}_HPP\n"
-      "#define HPX_${name_upper}_HPP\n\n"
+    FILE(WRITE ${global_header}
+        "//  Copyright (c) 2019 The STE||AR GROUP\n"
+        "//\n"
+        "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
+        "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n\n"
+        "#ifndef HPX_${name_upper}_HPP\n"
+        "#define HPX_${name_upper}_HPP\n\n"
     )
     foreach(header_file ${${name}_HEADERS})
-      FILE(APPEND ${CMAKE_BINARY_DIR}/hpx/${name}.hpp
+      FILE(APPEND ${global_header}
         "#include <${header_file}>\n"
       )
     endforeach(header_file)
-    FILE(APPEND ${CMAKE_BINARY_DIR}/hpx/${name}.hpp
-      "\n#endif\n"
+    FILE(APPEND ${global_header}
+      "\n#endif"
     )
   endif()
 
@@ -107,8 +103,8 @@ function(add_hpx_module name)
     hpx_debug(${header_file})
   endforeach(header_file)
 
-  add_library(hpx_${name} STATIC ${sources} ${headers} ${compat_headers})
-
+  add_library(hpx_${name} STATIC ${sources} ${headers} ${global_header} ${compat_headers})
+  
   target_link_libraries(hpx_${name} ${${name}_DEPENDENCIES})
   target_include_directories(hpx_${name} PUBLIC
     $<BUILD_INTERFACE:${HEADER_ROOT}>
@@ -166,6 +162,15 @@ function(add_hpx_module name)
       COMPONENT ${name})
   endif()
 
+  # Installing the global header file
+  if (${${name}_GLOBAL_HEADER_GEN})
+    install(
+      FILES ${global_header}
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx
+      COMPONENT ${name}
+    )
+  endif()
+  
   write_config_defines_file(
     NAMESPACE ${name_upper}
     FILENAME "${CMAKE_BINARY_DIR}/hpx/${name}/config/defines.hpp")
@@ -177,5 +182,5 @@ function(add_hpx_module name)
   foreach(dir ${${name}_CMAKE_SUBDIRS})
     add_subdirectory(${dir})
   endforeach(dir)
-
-endfunction()
+  
+endfunction(add_hpx_module)
