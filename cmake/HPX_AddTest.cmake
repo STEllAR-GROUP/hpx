@@ -131,10 +131,12 @@ function(add_hpx_test category name)
         endif()
       endif()
     endif()
+
 endfunction()
 
 function(add_hpx_unit_test category name)
   add_hpx_test("tests.unit.${category}" ${name} ${ARGN})
+  add_hpx_test_target_dependencies(tests.unit.${category} ${name})
 endfunction()
 
 function(add_hpx_regression_test category name)
@@ -145,4 +147,11 @@ function(add_hpx_example_test category name)
   add_hpx_test("tests.examples.${category}" ${name} ${ARGN})
 endfunction()
 
-
+function(add_hpx_test_target_dependencies category name)
+  # add a custom target for this example
+  add_hpx_pseudo_target(${category}.${name})
+  # make pseudo-targets depend on master pseudo-target
+  add_hpx_pseudo_dependencies(${category} ${category}.${name})
+  # add dependencies to pseudo-target
+  add_hpx_pseudo_dependencies(${category}.${name} ${name}_test)
+endfunction()

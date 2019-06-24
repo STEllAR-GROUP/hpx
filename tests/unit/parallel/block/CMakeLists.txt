@@ -33,14 +33,4 @@ foreach(test ${tests})
 
   add_hpx_unit_test("parallel.block" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.parallel.block.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.parallel.block
-                              tests.unit.parallel.block.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.parallel.block.${test}
-                              ${test}_test)
 endforeach()

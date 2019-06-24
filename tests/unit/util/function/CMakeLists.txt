@@ -8,6 +8,8 @@ set(tests
     contains_test
     function_arith
     function_args
+    function_object_size
+    function_ref
     function_ref_wrapper
     function_target
     function_test
@@ -32,16 +34,6 @@ foreach(test ${tests})
 
   add_hpx_unit_test("util.function" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.util.functiondir.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.util.functiondir
-                              tests.unit.util.functiondir.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.util.functiondir.${test}
-                              ${test}_test)
 endforeach()
 
 

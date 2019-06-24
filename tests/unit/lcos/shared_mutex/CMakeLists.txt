@@ -27,15 +27,4 @@ foreach(test ${tests})
 
   add_hpx_unit_test("lcos.shared_mutex" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.lcos.shared_mutexdir.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.lcos.shared_mutexdir
-                              tests.unit.lcos.shared_mutexdir.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.lcos.shared_mutexdir.${test}
-                              ${test}_test)
-
 endforeach()
