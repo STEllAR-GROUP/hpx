@@ -102,18 +102,34 @@ function(add_hpx_component name)
     set(exclude_from_all EXCLUDE_FROM_ALL)
   else()
     if(${name}_PLUGIN AND NOT HPX_WITH_STATIC_LINKING)
-      set(install_destination ${CMAKE_INSTALL_LIBDIR}/hpx)
+      if(MSVC)
+        set(library_install_destination ${CMAKE_INSTALL_BINDIR}/hpx)
+      else()
+        set(library_install_destination ${CMAKE_INSTALL_LIBDIR}/hpx)
+      endif()
+      set(archive_install_destination ${CMAKE_INSTALL_LIBDIR}/hpx)
+      set(runtime_install_destination ${CMAKE_INSTALL_BINDIR}/hpx)
       set(${name}_OUTPUT_SUFFIX hpx)
     else()
-      set(install_destination ${CMAKE_INSTALL_LIBDIR})
+      if(MSVC)
+        set(library_install_destination ${CMAKE_INSTALL_BINDIR})
+      else()
+        set(library_install_destination ${CMAKE_INSTALL_LIBDIR})
+      endif()
+      set(archive_install_destination ${CMAKE_INSTALL_LIBDIR})
+      set(runtime_install_destination ${CMAKE_INSTALL_BINDIR})
     endif()
     if(${name}_INSTALL_SUFFIX)
-      set(install_destination ${${name}_INSTALL_SUFFIX})
+      set(library_install_destination ${${name}_INSTALL_SUFFIX})
+      set(archive_install_destination ${${name}_INSTALL_SUFFIX})
+      set(runtime_install_destination ${${name}_INSTALL_SUFFIX})
     endif()
     set(_target_flags
       INSTALL
       INSTALL_FLAGS
-        DESTINATION ${install_destination}
+        LIBRARY DESTINATION ${library_install_destination}
+        ARCHIVE DESTINATION ${archive_install_destination}
+        RUNTIME DESTINATION ${runtime_install_destination}
     )
   endif()
 
@@ -154,16 +170,16 @@ function(add_hpx_component name)
     if(MSVC)
       set_target_properties("${name}_component" PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/bin/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/lib/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/bin/${${name}_OUTPUT_SUFFIX}"
         ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/lib/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/bin/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/lib/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/bin/${${name}_OUTPUT_SUFFIX}"
         ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/lib/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/bin/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/lib/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/bin/${${name}_OUTPUT_SUFFIX}"
         ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/lib/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/bin/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/lib/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/bin/${${name}_OUTPUT_SUFFIX}"
         ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/lib/${${name}_OUTPUT_SUFFIX}")
     else()
       set_target_properties("${name}_component" PROPERTIES
