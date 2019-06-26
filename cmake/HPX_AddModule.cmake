@@ -6,7 +6,7 @@
 function(add_hpx_module name)
   # Retrieve arguments
   set(options DEPRECATION_WARNINGS)
-  set(one_value_args COMPATIBILITY_HEADERS GLOBAL_HEADER_GEN)
+  set(one_value_args COMPATIBILITY_HEADERS GLOBAL_HEADER_GEN INSTALL_BINARIES)
   set(multi_value_args SOURCES HEADERS COMPAT_HEADERS DEPENDENCIES CMAKE_SUBDIRS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
@@ -142,12 +142,14 @@ function(add_hpx_module name)
   set_target_properties(hpx_${name} PROPERTIES
     FOLDER "Core/Modules")
 
-  install(TARGETS hpx_${name} EXPORT HPXTargets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT ${name}
-  )
+  if(${name}_INSTALL_BINARIES)
+    install(TARGETS hpx_${name} EXPORT HPXTargets
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+      COMPONENT ${name}
+    )
+  endif()
   hpx_export_targets(hpx_${name})
 
   install(

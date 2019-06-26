@@ -38,6 +38,7 @@ include(HPX_AddModule)
 add_hpx_module(preprocessor
     DEPRECATION_WARNINGS
     COMPATIBILITY_HEADERS OFF
+    INSTALL_BINARIES OFF
     SOURCES ${preprocessor_sources}
     HEADERS ${preprocessor_headers}
     COMPAT_HEADERS ${preprocessor_compat_headers}
