@@ -22,5 +22,6 @@ add_hpx_module(collectives
     SOURCES ${collectives_sources}
     HEADERS ${collectives_headers}
     DEPENDENCIES hpx_config hpx_preprocessor
+    INSTALL_BINARIES OFF
     CMAKE_SUBDIRS examples tests
 )
