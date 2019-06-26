@@ -1,5 +1,6 @@
 # Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2015 Andreas Schäfer
+# Copyright (c) 2019 Patrick Diehl
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +11,7 @@ include(GNUInstallDirs)
 include(HPX_Utils)
 
 function(hpx_check_compiler_compatibility)
-  if(HPX_IGNORE_COMPILER_COMPATIBILITY)
+    if(HPX_IGNORE_COMPILER_COMPATIBILITY OR HPX_WITH_BUILD_BINARY_PACKAGE)
     return()
   endif()
 
