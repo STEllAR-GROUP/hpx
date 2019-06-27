@@ -3,10 +3,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/cache/force_linking.hpp>
+#include <hpx/config/export_definitions.hpp>
 
+@MODULE_FORCE_LINKING_INCLUDES@
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace cache
+namespace hpx
 {
-    void force_linking() {}
-}}
+    // Enforce for this function to be linked into the main HPX library
+    HPX_EXPORT void force_linking()
+    {@MODULE_FORCE_LINKING_CALLS@
+    }
+}

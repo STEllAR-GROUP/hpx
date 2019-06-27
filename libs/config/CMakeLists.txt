@@ -22,6 +22,7 @@ set(config_headers
   hpx/config/emulate_deleted.hpp
   hpx/config/export_definitions.hpp
   hpx/config/forceinline.hpp
+  hpx/config/force_linking.hpp
   hpx/config/lambda_capture.hpp
   hpx/config/manual_profiling.hpp
   hpx/config/threads_stack.hpp

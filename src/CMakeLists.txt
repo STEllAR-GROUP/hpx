@@ -49,6 +49,10 @@ add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/compat/*.cpp"
   APPEND)
 
+add_hpx_library_sources(hpx_generated
+  GLOB GLOBS "${CMAKE_BINARY_DIR}/libs/modules.cpp"
+  APPEND)
+
 # libhpx_wrap sources
 if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
   add_hpx_library_sources (hpx_wrap
@@ -160,6 +164,11 @@ add_hpx_source_group(
   TARGETS ${hpx_SOURCES})
 
 add_hpx_source_group(
+  NAME hpx_generated CLASS "Source Files"
+  ROOT "${CMAKE_BINARY_DIR}/libs"
+  TARGETS ${hpx_generated_SOURCES})
+
+add_hpx_source_group(
   NAME hpx CLASS "External Source Files"
   ROOT "${PROJECT_SOURCE_DIR}"
   TARGETS ${hpx_external_SOURCES})
@@ -224,23 +233,27 @@ endforeach()
 ################################################################################
 # libhpx
 if(HPX_WITH_STATIC_LINKING)
-  set(hpx_SOURCES ${hpx_SOURCES} ${hpx_init_SOURCES})
+  set(hpx_SOURCES ${hpx_SOURCES} ${hpx_init_SOURCES} ${hpx_generated_SOURCES})
 endif()
 if(HPX_WITH_DEFAULT_TARGETS)
   if(HPX_WITH_CUDA)
     cuda_add_library(hpx ${hpx_library_link_mode_core}
-      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_generated_SOURCES}
+      ${hpx_external_OBJECTS} ${hpx_HEADERS})
   else()
     add_library(hpx ${hpx_library_link_mode_core}
-      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_generated_SOURCES}
+      ${hpx_external_OBJECTS} ${hpx_HEADERS})
   endif()
 else()
   if(HPX_WITH_CUDA)
     cuda_add_library(hpx ${hpx_library_link_mode_core} EXCLUDE_FROM_ALL
-      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_generated_SOURCES}
+      ${hpx_external_OBJECTS} ${hpx_HEADERS})
   else()
     add_library(hpx ${hpx_library_link_mode_core} EXCLUDE_FROM_ALL
-      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_generated_SOURCES}
+      ${hpx_external_OBJECTS} ${hpx_HEADERS})
   endif()
 endif()
 
