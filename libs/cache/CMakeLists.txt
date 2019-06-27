@@ -9,6 +9,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/cache/include
 set(cache_headers
+  hpx/cache/force_linking.hpp
   hpx/cache/local_cache.hpp
   hpx/cache/lru_cache.hpp
   hpx/cache/entries/entry.hpp
