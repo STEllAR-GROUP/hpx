@@ -23,6 +23,7 @@ set(tests
     async_unwrap_result
     barrier
     broadcast
+    broadcast_component
     broadcast_apply
     channel
     channel_local
