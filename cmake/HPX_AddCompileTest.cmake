@@ -50,7 +50,7 @@ function(add_hpx_headers_compile_test category name)
   add_hpx_compile_test("tests.headers.${category}" ${name} ${ARGN})
 endfunction()
 
-function(add_hpx_lib_header_tests lib)
+function(add_hpx_module_header_tests lib)
   file(GLOB_RECURSE headers ${DO_CONFIGURE_DEPENDS}
       "${PROJECT_SOURCE_DIR}/include/hpx/*hpp")
 

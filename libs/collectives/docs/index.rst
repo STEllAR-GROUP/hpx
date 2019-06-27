@@ -6,7 +6,14 @@
 
 .. _libs_collectives:
 
-=====
+===========
 collectives
-=====
+===========
+
+The collectives module exposes a set of distributed collective operations. Those
+can be used to exchange data between participating sites in a coordinated way.
+At this point the module exposes the following collective primitives:
+
+* ``all_to_all``: each participating site provides its element of the data to
+  collect while all participating sites receive the data from every other site.
 

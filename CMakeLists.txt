@@ -1830,13 +1830,17 @@ if (HPX_WITH_TESTS)
     add_hpx_pseudo_target(tests.headers)
     add_hpx_pseudo_dependencies(tests tests.headers)
   endif()
-  if (HPX_WITH_TESTS_EXAMPLES)
+  if (HPX_WITH_EXAMPLES AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_pseudo_target(tests.examples)
     add_hpx_pseudo_dependencies(tests tests.examples)
   endif()
 
   enable_testing()
   include(CTest)
+endif()
+
+if(HPX_WITH_EXAMPLES)
+  add_hpx_pseudo_target(examples)
 endif()
 
 ################################################################################
@@ -1901,7 +1905,6 @@ if(HPX_WITH_TESTS)
 endif()
 
 if(HPX_WITH_EXAMPLES)
-  add_hpx_pseudo_target(examples)
   include_directories(examples)
   add_subdirectory(examples)
 endif()

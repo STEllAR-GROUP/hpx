@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if (HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-  add_hpx_pseudo_target(tests.examples.config)
-  add_hpx_pseudo_dependencies(tests.examples tests.examples.config)
+  add_hpx_pseudo_target(tests.examples.modules.config)
+  add_hpx_pseudo_dependencies(tests.examples.modules tests.examples.modules.config)
 endif()
 

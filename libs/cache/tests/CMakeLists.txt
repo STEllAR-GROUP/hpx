@@ -35,5 +35,5 @@ if (HPX_WITH_TESTS_BENCHMARKS)
 endif()
 
 if (HPX_WITH_TESTS_HEADERS)
-  add_hpx_lib_header_tests(cache)
+  add_hpx_module_header_tests(cache)
 endif()
