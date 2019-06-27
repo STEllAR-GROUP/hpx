@@ -36,22 +36,38 @@ function(add_hpx_compile_test category name)
     set_tests_properties("${category}.${name}" PROPERTIES WILL_FAIL TRUE)
   endif()
 
-endfunction()
+endfunction(add_hpx_compile_test)
 
-function(add_hpx_unit_compile_test category name)
-  add_hpx_compile_test("tests.unit.${category}" ${name} ${ARGN})
-  add_hpx_compile_test_target_dependencies(tests.unit.${category} ${name})
-endfunction()
+function(add_hpx_compile_test_target_dependencies category name)
+  # add a custom target for this example
+  add_hpx_pseudo_target(${category}.${name})
+  # make pseudo-targets depend on master pseudo-target
+  add_hpx_pseudo_dependencies(${category} ${category}.${name})
+endfunction(add_hpx_compile_test_target_dependencies)
 
-function(add_hpx_regression_compile_test category name)
-  add_hpx_compile_test("tests.regressions.${category}" ${name} ${ARGN})
-  add_hpx_compile_test_target_dependencies(tests.regressions.${category} ${name})
-endfunction()
+# To add test to the category root as in tests/regressions/
+function(add_target_deps_compile_test category subcategory name)
+  if ("${subcategory}" STREQUAL "")
+    add_hpx_compile_test_target_dependencies(tests.${category} ${name})
+  else()
+    add_hpx_compile_test_target_dependencies(tests.${category}.${subcategory} ${name})
+  endif()
+endfunction(add_target_deps_compile_test)
 
-function(add_hpx_headers_compile_test category name)
-  add_hpx_compile_test("tests.headers.${category}" ${name} ${ARGN})
-  add_hpx_compile_test_target_dependencies(tests.regressions.${category} ${name})
-endfunction()
+function(add_hpx_unit_compile_test subcategory name)
+  add_hpx_compile_test("tests.unit.${subcategory}" ${name} ${ARGN})
+  add_target_deps_compile_test("unit" "${subcategory}" ${name})
+endfunction(add_hpx_unit_compile_test)
+
+function(add_hpx_regression_compile_test subcategory name)
+  add_hpx_compile_test("tests.regressions.${subcategory}" ${name} ${ARGN})
+  add_target_deps_compile_test("regressions" "${subcategory}" ${name})
+endfunction(add_hpx_regression_compile_test)
+
+function(add_hpx_headers_compile_test subcategory name)
+  add_hpx_compile_test("tests.headers.${subcategory}" ${name} ${ARGN})
+  add_target_deps_compile_test("headers" "${subcategory}" ${name})
+endfunction(add_hpx_headers_compile_test)
 
 function(add_hpx_module_header_tests lib)
   file(GLOB_RECURSE headers ${DO_CONFIGURE_DEPENDS}
@@ -123,9 +139,3 @@ function(add_hpx_module_header_tests lib)
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 endfunction()
 
-function(add_hpx_compile_test_target_dependencies category name)
-  # add a custom target for this example
-  add_hpx_pseudo_target(${category}.${name})
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(${category} ${category}.${name})
-endfunction()

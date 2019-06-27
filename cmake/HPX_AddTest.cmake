@@ -132,22 +132,7 @@ function(add_hpx_test category name)
       endif()
     endif()
 
-endfunction()
-
-function(add_hpx_unit_test category name)
-  add_hpx_test("tests.unit.${category}" ${name} ${ARGN})
-  add_hpx_test_target_dependencies(tests.unit.${category} ${name})
-endfunction()
-
-function(add_hpx_regression_test category name)
-  add_hpx_test("tests.regressions.${category}" ${name} ${ARGN})
-  # ARGN needed in case we add a test with the same executable
-  add_hpx_test_target_dependencies(tests.regressions.${category} ${name} ${ARGN})
-endfunction()
-
-function(add_hpx_example_test category name)
-  add_hpx_test("tests.examples.${category}" ${name} ${ARGN})
-endfunction()
+endfunction(add_hpx_test)
 
 function(add_hpx_test_target_dependencies category name)
   set(one_value_args PSEUDO_DEPS_NAME)
@@ -162,4 +147,27 @@ function(add_hpx_test_target_dependencies category name)
   else()
     add_hpx_pseudo_dependencies(${category}.${name} ${name}_test)
   endif()
-endfunction()
+endfunction(add_hpx_test_target_dependencies)
+
+function(add_target_deps_test category subcategory name)
+  if ("${subcategory}" STREQUAL "")
+    add_hpx_test_target_dependencies(tests.${category} ${name} ${ARGN})
+  else()
+    add_hpx_test_target_dependencies(tests.${category}.${subcategory} ${name} ${ARGN})
+  endif()
+endfunction(add_target_deps_test)
+
+function(add_hpx_unit_test subcategory name)
+  add_hpx_test("tests.unit.${subcategory}" ${name} ${ARGN})
+  add_target_deps_test("unit" "${subcategory}" ${name})
+endfunction(add_hpx_unit_test)
+
+function(add_hpx_regression_test subcategory name)
+  add_hpx_test("tests.regressions.${subcategory}" ${name} ${ARGN})
+  # ARGN needed in case we add a test with the same executable
+  add_target_deps_test("regressions" "${subcategory}" ${name} ${ARGN})
+endfunction(add_hpx_regression_test)
+
+function(add_hpx_example_test subcategory name)
+  add_hpx_test("tests.examples.${subcategory}" ${name} ${ARGN})
+endfunction(add_hpx_example_test)
