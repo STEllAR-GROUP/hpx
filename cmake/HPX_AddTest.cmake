@@ -141,6 +141,8 @@ endfunction()
 
 function(add_hpx_regression_test category name)
   add_hpx_test("tests.regressions.${category}" ${name} ${ARGN})
+  # ARGN needed in case we add a test with the same executable
+  add_hpx_test_target_dependencies(tests.regressions.${category} ${name} ${ARGN})
 endfunction()
 
 function(add_hpx_example_test category name)
@@ -148,10 +150,16 @@ function(add_hpx_example_test category name)
 endfunction()
 
 function(add_hpx_test_target_dependencies category name)
+  set(one_value_args PSEUDO_DEPS_NAME)
+  cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
   # add a custom target for this example
   add_hpx_pseudo_target(${category}.${name})
   # make pseudo-targets depend on master pseudo-target
   add_hpx_pseudo_dependencies(${category} ${category}.${name})
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(${category}.${name} ${name}_test)
+  if (${name}_PSEUDO_DEPS_NAME)
+    add_hpx_pseudo_dependencies(${category}.${name} ${${name}_PSEUDO_DEPS_NAME}_test)
+  else()
+    add_hpx_pseudo_dependencies(${category}.${name} ${name}_test)
+  endif()
 endfunction()

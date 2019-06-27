@@ -35,16 +35,6 @@ foreach(test ${tests})
 
   add_hpx_regression_test("parallel" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.parallel_dir.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.parallel_dir
-                              tests.regressions.parallel_dir.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.parallel_dir.${test}
-                              ${test}_test)
 endforeach()
 
 # add subdirectories
@@ -59,9 +49,9 @@ if(HPX_WITH_DATAPAR)
 endif()
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.regressions.parallel_dir.${subdir}_dir)
+  add_hpx_pseudo_target(tests.regressions.parallel.${subdir})
   add_subdirectory(${subdir})
   add_hpx_pseudo_dependencies(
-    tests.regressions.parallel_dir tests.regressions.parallel_dir.${subdir}_dir)
+    tests.regressions.parallel tests.regressions.parallel.${subdir})
 endforeach()
 
