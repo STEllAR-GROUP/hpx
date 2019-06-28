@@ -9,7 +9,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/cache/include
 set(cache_headers
-  hpx/cache/force_linking.hpp
   hpx/cache/local_cache.hpp
   hpx/cache/lru_cache.hpp
   hpx/cache/entries/entry.hpp
@@ -40,7 +39,6 @@ set(cache_compat_headers
 
 # Default location is $HPX_ROOT/libs/cache/src
 set(cache_sources
-  cache.cpp
 )
 
 include(HPX_AddModule)
@@ -48,6 +46,7 @@ add_hpx_module(cache
     DEPRECATION_WARNINGS
     COMPATIBILITY_HEADERS ON    # Added in 1.4.0
     INSTALL_BINARIES OFF
+    FORCE_LINKING_GEN ON
     SOURCES ${cache_sources}
     HEADERS ${cache_headers}
     COMPAT_HEADERS ${cache_compat_headers}

@@ -191,9 +191,10 @@ namespace hpx { namespace lcos
 }}
 #else
 
+#include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/config.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/and_gate.hpp>
@@ -267,7 +268,7 @@ namespace hpx { namespace lcos
             {
                 std::unique_lock<mutex_type> l(mtx_);
 
-                hpx::future<std::vector<T> > f = gate_.get_future().then(
+                hpx::future<std::vector<T> > f = gate_.get_future(l).then(
                         util::bind_front(&gather_server::on_ready, this));
 
                 set_result_locked(which, std::move(t), l);
@@ -324,7 +325,7 @@ namespace hpx { namespace lcos
                     {
                         HPX_THROW_EXCEPTION(bad_parameter,
                             "hpx::lcos::detail::register_gather_name",
-                            "the given base name for gather opration was "
+                            "the given base name for the gather operation was "
                             "already registered: " + basename);
                     }
                     return target;
