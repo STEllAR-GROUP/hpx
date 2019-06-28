@@ -97,7 +97,6 @@ if(HPX_WITH_CUDA)
     # and https://gitlab.kitware.com/cmake/cmake/issues/16602 for more details.
     if(CMAKE_VERSION VERSION_LESS "3.9")
       set(CUDA_LIBRARIES PUBLIC ${CUDA_LIBRARIES})
-      set(CUDA_cudadevrt_LIBRARY PUBLIC ${CUDA_cudadevrt_LIBRARY})
     else()
       set(CUDA_LINK_LIBRARIES_KEYWORD PUBLIC)
     endif()
