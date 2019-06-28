@@ -29,7 +29,6 @@ set(preprocessor_compat_headers
 
 # Default location is $HPX_ROOT/libs/preprocessor/src
 set(preprocessor_sources
-  preprocessor.cpp
 )
 
 include(HPX_AddModule)
@@ -37,9 +36,10 @@ add_hpx_module(preprocessor
     DEPRECATION_WARNINGS
     COMPATIBILITY_HEADERS OFF
     INSTALL_BINARIES OFF
+    FORCE_LINKING_GEN ON
     SOURCES ${preprocessor_sources}
     HEADERS ${preprocessor_headers}
     COMPAT_HEADERS ${preprocessor_compat_headers}
     DEPENDENCIES hpx_config
-    CMAKE_SUBDIRS src tests
+    CMAKE_SUBDIRS tests
 )

@@ -6,7 +6,7 @@
 function(add_hpx_module name)
   # Retrieve arguments
   set(options DEPRECATION_WARNINGS)
-  set(one_value_args COMPATIBILITY_HEADERS GLOBAL_HEADER_GEN INSTALL_BINARIES)
+  set(one_value_args COMPATIBILITY_HEADERS GLOBAL_HEADER_GEN FORCE_LINKING_GEN INSTALL_BINARIES)
   set(multi_value_args SOURCES HEADERS COMPAT_HEADERS DEPENDENCIES CMAKE_SUBDIRS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
@@ -77,16 +77,21 @@ function(add_hpx_module name)
     prepend(compat_headers ${COMPAT_HEADER_ROOT} ${${name}_COMPAT_HEADERS})
   endif()
 
+  set(copyright
+    "//  Copyright (c) 2019 The STE||AR GROUP\n"
+    "//\n"
+    "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
+    "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"
+    "\n"
+  )
+
   # This header generation is disabled for config module specific generated
   # headers are included
   if (${name}_GLOBAL_HEADER_GEN)
     set(global_header "${CMAKE_BINARY_DIR}/hpx/${name}.hpp")
     # Add a global include file that include all module headers
     FILE(WRITE ${global_header}
-        "//  Copyright (c) 2019 The STE||AR GROUP\n"
-        "//\n"
-        "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
-        "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n\n"
+        ${copyright}
         "#ifndef HPX_${name_upper}_HPP\n"
         "#define HPX_${name_upper}_HPP\n\n"
     )
@@ -96,29 +101,48 @@ function(add_hpx_module name)
       )
     endforeach(header_file)
     FILE(APPEND ${global_header}
-      "\n#endif"
+      "\n#endif\n"
     )
   endif()
 
-  set(force_linking_header "${CMAKE_BINARY_DIR}/hpx/${name}/force_linking.hpp")
-  # Add a header to force linking of modules on Windows
-  FILE(WRITE ${force_linking_header}
-      "//  Copyright (c) 2019 The STE||AR GROUP\n"
-      "//\n"
-      "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
-      "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"
-      "\n"
-      "namespace hpx { namespace config\n"
-      "{\n"
-      "    void force_linking();\n"
-      "}}\n"
-  )
+  if(${name}_FORCE_LINKING_GEN)
+      # Add a header to force linking of modules on Windows
+      set(force_linking_header "${CMAKE_BINARY_DIR}/hpx/${name}/force_linking.hpp")
+      FILE(WRITE ${force_linking_header}
+          ${copyright}
+          "#if !defined(HPX_${name_upper}_FORCE_LINKING_HPP)\n"
+          "#define HPX_${name_upper}_FORCE_LINKING_HPP\n"
+          "\n"
+          "namespace hpx { namespace ${name}\n"
+          "{\n"
+          "    void force_linking();\n"
+          "}}\n"
+          "\n"
+          "#endif\n"
+      )
+
+      # Add a source file implementing the above function
+      set(force_linking_source "${CMAKE_BINARY_DIR}/libs/${name}/force_linking.cpp")
+      FILE(WRITE ${force_linking_source}
+          ${copyright}
+          "#include <hpx/${name}/force_linking.hpp>\n"
+          "\n"
+          "namespace hpx { namespace ${name}\n"
+          "{\n"
+          "    void force_linking() {}\n"
+          "}}\n"
+          "\n"
+      )
+  endif()
 
   foreach(header_file ${headers})
     hpx_debug(${header_file})
   endforeach(header_file)
 
-  add_library(hpx_${name} STATIC ${sources} ${headers} ${global_header} ${compat_headers})
+  add_library(hpx_${name} STATIC
+    ${sources} ${force_linking_source}
+    ${headers} ${global_header} ${compat_headers}
+    ${force_linking_header})
 
   target_link_libraries(hpx_${name} ${${name}_DEPENDENCIES})
   target_include_directories(hpx_${name} PUBLIC
@@ -154,6 +178,26 @@ function(add_hpx_module name)
       TARGETS ${compat_headers})
   endif()
 
+  if (${name}_GLOBAL_HEADER_GEN)
+    add_hpx_source_group(
+      NAME hpx_{name}
+      ROOT ${CMAKE_BINARY_DIR}/hpx
+      CLASS "Generated Files"
+      TARGETS ${global_header})
+  endif()
+  if (${name}_FORCE_LINKING_GEN)
+    add_hpx_source_group(
+      NAME hpx_{name}
+      ROOT ${CMAKE_BINARY_DIR}/hpx
+      CLASS "Generated Files"
+      TARGETS ${force_linking_header})
+    add_hpx_source_group(
+      NAME hpx_{name}
+      ROOT ${CMAKE_BINARY_DIR}/libs
+      CLASS "Generated Files"
+      TARGETS ${force_linking_source})
+  endif()
+
   set_target_properties(hpx_${name} PROPERTIES
     FOLDER "Core/Modules")
 
@@ -164,8 +208,8 @@ function(add_hpx_module name)
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
       COMPONENT ${name}
     )
+    hpx_export_targets(hpx_${name})
   endif()
-  hpx_export_targets(hpx_${name})
 
   install(
     DIRECTORY include/hpx

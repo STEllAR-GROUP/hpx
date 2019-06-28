@@ -39,7 +39,6 @@ set(cache_compat_headers
 
 # Default location is $HPX_ROOT/libs/cache/src
 set(cache_sources
-  cache.cpp
 )
 
 include(HPX_AddModule)
@@ -47,6 +46,7 @@ add_hpx_module(cache
     DEPRECATION_WARNINGS
     COMPATIBILITY_HEADERS ON    # Added in 1.4.0
     INSTALL_BINARIES OFF
+    FORCE_LINKING_GEN ON
     SOURCES ${cache_sources}
     HEADERS ${cache_headers}
     COMPAT_HEADERS ${cache_compat_headers}
