@@ -86,8 +86,8 @@ add_subdirectory(tests)
 
 examples_cmakelists_template = cmake_header + f'''
 if (HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-  add_hpx_pseudo_target(tests.examples.{lib_name})
-  add_hpx_pseudo_dependencies(tests.examples tests.examples.{lib_name})
+  add_hpx_pseudo_target(tests.examples.module.{lib_name})
+  add_hpx_pseudo_dependencies(tests.examples.module tests.examples.module.{lib_name})
 endif()
 
 '''
@@ -105,25 +105,25 @@ if (NOT HPX_{lib_name_upper}_WITH_TESTS)
 endif()
 
 if (HPX_WITH_TESTS_UNIT)
-  add_hpx_pseudo_target(tests.unit.{lib_name})
-  add_hpx_pseudo_dependencies(tests.unit tests.unit.{lib_name})
+  add_hpx_pseudo_target(tests.unit.module.{lib_name})
+  add_hpx_pseudo_dependencies(tests.unit.module tests.unit.module.{lib_name})
   add_subdirectory(unit)
 endif()
 
 if (HPX_WITH_TESTS_REGRESSIONS)
-  add_hpx_pseudo_target(tests.regressions.{lib_name})
-  add_hpx_pseudo_dependencies(tests.regressions tests.regressions.{lib_name})
+  add_hpx_pseudo_target(tests.regressions.module.{lib_name})
+  add_hpx_pseudo_dependencies(tests.regressions.module tests.regressions.module.{lib_name})
   add_subdirectory(regressions)
 endif()
 
 if (HPX_WITH_TESTS_BENCHMARKS)
-  add_hpx_pseudo_target(tests.performance.{lib_name})
-  add_hpx_pseudo_dependencies(tests.performance tests.performance.{lib_name})
+  add_hpx_pseudo_target(tests.performance.module.{lib_name})
+  add_hpx_pseudo_dependencies(tests.performance.module tests.performance.module.{lib_name})
   add_subdirectory(performance)
 endif()
 
 if (HPX_WITH_TESTS_HEADERS)
-  add_hpx_lib_header_tests({lib_name})
+  add_hpx_module_header_tests({lib_name})
 endif()
 '''
 
@@ -208,13 +208,52 @@ libs_cmakelists = cmake_header + f'''
 
 libs_cmakelists += '''
 include(HPX_Message)
+include(HPX_AddPseudoDependencies)
+include(HPX_AddPseudoTarget)
 
 set(HPX_LIBS
 '''
 for lib in libs:
     if not lib.startswith('_'):
         libs_cmakelists += f'  {lib}\n'
-libs_cmakelists += '  CACHE INTERNAL "" FORCE\n)\n'
+libs_cmakelists += '  CACHE INTERNAL "list of HPX modules" FORCE\n)\n\n'
+
+libs_cmakelists += '''
+# add example pseudo targets needed for modules
+if(HPX_WITH_EXAMPLES)
+  add_hpx_pseudo_target(examples.modules)
+  add_hpx_pseudo_dependencies(examples examples.modules)
+endif()
+
+# add test pseudo targets needed for modules
+if(HPX_WITH_TESTS)
+  if (HPX_WITH_TESTS_UNIT)
+    add_hpx_pseudo_target(tests.unit.modules)
+    add_hpx_pseudo_dependencies(tests.unit tests.unit.modules)
+  endif()
+
+  if (HPX_WITH_EXAMPLES AND HPX_WITH_TESTS_EXAMPLES)
+    add_hpx_pseudo_target(tests.examples.modules)
+    add_hpx_pseudo_dependencies(tests.examples tests.examples.modules)
+  endif()
+
+  if (HPX_WITH_TESTS_REGRESSIONS)
+    add_hpx_pseudo_target(tests.regressions.modules)
+    add_hpx_pseudo_dependencies(tests.regressions tests.regressions.modules)
+  endif()
+
+  if (HPX_WITH_TESTS_BENCHMARKS)
+    add_hpx_pseudo_target(tests.performance.modules)
+    add_hpx_pseudo_dependencies(tests.performance tests.performance.modules)
+  endif()
+
+  if (HPX_WITH_TESTS_HEADERS)
+    add_custom_target(tests.headers.modules)
+    add_hpx_pseudo_dependencies(tests.headers tests.headers.modules)
+  endif()
+endif()
+
+'''
 
 libs_cmakelists += '''
 hpx_info("Configuring modules:")

@@ -21,8 +21,8 @@ set(config_headers
   hpx/config/debug.hpp
   hpx/config/emulate_deleted.hpp
   hpx/config/export_definitions.hpp
-  hpx/config/forceinline.hpp
   hpx/config/force_linking.hpp
+  hpx/config/forceinline.hpp
   hpx/config/lambda_capture.hpp
   hpx/config/manual_profiling.hpp
   hpx/config/threads_stack.hpp
@@ -33,6 +33,7 @@ set(config_headers
 
 # Default location is $HPX_ROOT/libs/config/src
 set(config_sources
+  force_linking.cpp
   version.cpp
 )
 
@@ -41,6 +42,7 @@ add_hpx_module(config
     COMPATIBILITY_HEADERS OFF
     GLOBAL_HEADER_GEN OFF
     INSTALL_BINARIES OFF
+    FORCE_LINKING_GEN OFF
     SOURCES ${config_sources}
     HEADERS ${config_headers}
     DEPENDENCIES hpx_preprocessor

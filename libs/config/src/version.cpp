@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config/export_definitions.hpp>
-#include <hpx/config/force_linking.hpp>
 #include <hpx/config/version.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 
@@ -18,9 +17,4 @@ namespace hpx
         HPX_PP_STRINGIZE(HPX_CHECK_VERSION);
     HPX_EXPORT char const HPX_CHECK_BOOST_VERSION[] =
         HPX_PP_STRINGIZE(HPX_CHECK_BOOST_VERSION);
-
-    namespace config
-    {
-        void force_linking() {}
-    }
 }
