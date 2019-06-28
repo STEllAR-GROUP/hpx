@@ -199,7 +199,8 @@ function(add_hpx_module name)
   endif()
 
   set_target_properties(hpx_${name} PROPERTIES
-    FOLDER "Core/Modules")
+    FOLDER "Core/Modules"
+    POSITION_INDEPENDENT_CODE ON)
 
   if(${name}_INSTALL_BINARIES)
     install(TARGETS hpx_${name} EXPORT HPXTargets
