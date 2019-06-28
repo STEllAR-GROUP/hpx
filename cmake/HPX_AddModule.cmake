@@ -104,7 +104,7 @@ function(add_hpx_module name)
   endforeach(header_file)
 
   add_library(hpx_${name} STATIC ${sources} ${headers} ${global_header} ${compat_headers})
-  
+
   target_link_libraries(hpx_${name} ${${name}_DEPENDENCIES})
   target_include_directories(hpx_${name} PUBLIC
     $<BUILD_INTERFACE:${HEADER_ROOT}>
@@ -150,7 +150,10 @@ function(add_hpx_module name)
       COMPONENT ${name}
     )
   endif()
-  hpx_export_targets(hpx_${name})
+
+  if(${name}_EXPORT)
+    hpx_export_targets(hpx_${name})
+  endif()
 
   install(
     DIRECTORY include/hpx
@@ -172,7 +175,7 @@ function(add_hpx_module name)
       COMPONENT ${name}
     )
   endif()
-  
+
   write_config_defines_file(
     NAMESPACE ${name_upper}
     FILENAME "${CMAKE_BINARY_DIR}/hpx/${name}/config/defines.hpp")
@@ -184,5 +187,5 @@ function(add_hpx_module name)
   foreach(dir ${${name}_CMAKE_SUBDIRS})
     add_subdirectory(${dir})
   endforeach(dir)
-  
+
 endfunction(add_hpx_module)
