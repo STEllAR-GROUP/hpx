@@ -4,13 +4,13 @@
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-.. _libs__example:
+.. _module_structure:
 
-==============
-Example module
-==============
+================
+Module structure
+================
 
-This is an example module used to explain the structure of an |hpx| module.
+This section explains the structure of an |hpx| module.
 
 The tool `create_library_skeleton.py
 <https://github.com/STEllAR-GROUP/hpx/blob/master/libs/create_library_skeleton.py>`_
