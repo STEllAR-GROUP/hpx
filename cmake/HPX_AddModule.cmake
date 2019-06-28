@@ -100,12 +100,26 @@ function(add_hpx_module name)
     )
   endif()
 
+  set(force_linking_header "${CMAKE_BINARY_DIR}/hpx/${name}/force_linking.hpp")
+  # Add a header to force linking of modules on Windows
+  FILE(WRITE ${force_linking_header}
+      "//  Copyright (c) 2019 The STE||AR GROUP\n"
+      "//\n"
+      "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
+      "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"
+      "\n"
+      "namespace hpx { namespace config\n"
+      "{\n"
+      "    void force_linking();\n"
+      "}}\n"
+  )
+
   foreach(header_file ${headers})
     hpx_debug(${header_file})
   endforeach(header_file)
 
   add_library(hpx_${name} STATIC ${sources} ${headers} ${global_header} ${compat_headers})
-  
+
   target_link_libraries(hpx_${name} ${${name}_DEPENDENCIES})
   target_include_directories(hpx_${name} PUBLIC
     $<BUILD_INTERFACE:${HEADER_ROOT}>
@@ -173,7 +187,7 @@ function(add_hpx_module name)
       COMPONENT ${name}
     )
   endif()
-  
+
   write_config_defines_file(
     NAMESPACE ${name_upper}
     FILENAME "${CMAKE_BINARY_DIR}/hpx/${name}/config/defines.hpp")
@@ -185,5 +199,5 @@ function(add_hpx_module name)
   foreach(dir ${${name}_CMAKE_SUBDIRS})
     add_subdirectory(${dir})
   endforeach(dir)
-  
+
 endfunction(add_hpx_module)
