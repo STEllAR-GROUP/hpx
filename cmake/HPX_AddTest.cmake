@@ -137,15 +137,21 @@ endfunction(add_hpx_test)
 function(add_hpx_test_target_dependencies category name)
   set(one_value_args PSEUDO_DEPS_NAME)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
-  # add a custom target for this example
+  # default target_extension is _test but for examples.* target, it may vary
+  if (NOT ("${category}" MATCHES "tests.examples.*"))
+    set(_ext "_test")
+  endif()
+  # Add a custom target for this example
   add_hpx_pseudo_target(${category}.${name})
-  # make pseudo-targets depend on master pseudo-target
+  # Make pseudo-targets depend on master pseudo-target
   add_hpx_pseudo_dependencies(${category} ${category}.${name})
-  # add dependencies to pseudo-target
+  # Add dependencies to pseudo-target
   if (${name}_PSEUDO_DEPS_NAME)
-    add_hpx_pseudo_dependencies(${category}.${name} ${${name}_PSEUDO_DEPS_NAME}_test)
+    # When the test depend on another executable name
+    add_hpx_pseudo_dependencies(${category}.${name}
+      ${${name}_PSEUDO_DEPS_NAME}${_ext})
   else()
-    add_hpx_pseudo_dependencies(${category}.${name} ${name}_test)
+    add_hpx_pseudo_dependencies(${category}.${name} ${name}${_ext})
   endif()
 endfunction(add_hpx_test_target_dependencies)
 
@@ -170,4 +176,20 @@ endfunction(add_hpx_regression_test)
 
 function(add_hpx_example_test subcategory name)
   add_hpx_test("tests.examples.${subcategory}" ${name} ${ARGN})
+  add_target_deps_test("examples" "${subcategory}" ${name})
 endfunction(add_hpx_example_test)
+
+# To create target examples.<name> when calling make examples
+# need 2 distinct rules for examples and tests.examples
+function(add_hpx_example_target_dependencies subcategory name)
+  set(option DEPS_ONLY)
+  cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  if (NOT ${name}_DEPS_ONLY)
+    # Add a custom target for this example
+    add_hpx_pseudo_target(examples.${subcategory}.${name})
+  endif()
+  # Make pseudo-targets depend on master pseudo-target
+  add_hpx_pseudo_dependencies(examples.${subcategory} examples.${subcategory}.${name})
+  # Add dependencies to pseudo-target
+  add_hpx_pseudo_dependencies(examples.${subcategory}.${name} ${name})
+endfunction(add_hpx_example_target_dependencies)

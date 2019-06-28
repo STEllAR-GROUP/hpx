@@ -50,25 +50,12 @@ foreach(jacobi_smp_application ${jacobi_smp_applications})
         ${${jacobi_smp_application}_FLAGS}
         FOLDER "Examples/JacobiSMP")
 
-    # add a custom target for this example
-    add_hpx_pseudo_target(examples.jacobi_smp.${jacobi_smp_application})
-
-    # make pseudo-targets depend on master pseudo-target
-    add_hpx_pseudo_dependencies(examples.jacobi_smp
-        examples.jacobi_smp.${jacobi_smp_application})
-
-    # add dependencies to pseudo-target
-    add_hpx_pseudo_dependencies(examples.jacobi_smp.${jacobi_smp_application}
-        ${jacobi_smp_application})
+    add_hpx_example_target_dependencies("jacobi_smp" ${jacobi_smp_application})
 
     if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND
         NOT ("${jacobi_smp_application}" IN_LIST disabled_tests))
-        add_hpx_example_test("jacobi_smp" ${jacobi_smp_application} ${${jacobi_smp_application}_PARAMETERS})
-        add_hpx_pseudo_target(tests.examples.jacobi_smp.${jacobi_smp_application})
-        add_hpx_pseudo_dependencies(tests.examples.jacobi_smp
-                                    tests.examples.jacobi_smp.${jacobi_smp_application})
-        add_hpx_pseudo_dependencies(tests.examples.jacobi_smp.${jacobi_smp_application}
-                                    ${jacobi_smp_application})
+        add_hpx_example_test("jacobi_smp" ${jacobi_smp_application}
+          ${${jacobi_smp_application}_PARAMETERS})
     endif()
 endforeach()
 
