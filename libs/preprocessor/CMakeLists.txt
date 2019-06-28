@@ -12,22 +12,21 @@ set(preprocessor_headers
   hpx/preprocessor/cat.hpp
   hpx/preprocessor/config.hpp
   hpx/preprocessor/expand.hpp
+  hpx/preprocessor/force_linking.hpp
   hpx/preprocessor/nargs.hpp
   hpx/preprocessor/stringize.hpp
   hpx/preprocessor/strip_parens.hpp
 )
 
 # Default location is $HPX_ROOT/libs/preprocessor/include_compatibility
-if(HPX_${upper_module_name}_WITH_COMPATIBILITY_HEADERS)
-  set(preprocessor_compat_headers
-    hpx/util/detail/pp/cat.hpp
-    hpx/util/detail/pp/config.hpp
-    hpx/util/detail/pp/expand.hpp
-    hpx/util/detail/pp/nargs.hpp
-    hpx/util/detail/pp/stringize.hpp
-    hpx/util/detail/pp/strip_parens.hpp
-  )
-endif()
+set(preprocessor_compat_headers
+  hpx/util/detail/pp/cat.hpp
+  hpx/util/detail/pp/config.hpp
+  hpx/util/detail/pp/expand.hpp
+  hpx/util/detail/pp/nargs.hpp
+  hpx/util/detail/pp/stringize.hpp
+  hpx/util/detail/pp/strip_parens.hpp
+)
 
 # Default location is $HPX_ROOT/libs/preprocessor/src
 set(preprocessor_sources

@@ -298,9 +298,5 @@ namespace hpx
 
         return strm.str();
     }
-
-    //////////////////////////////////////////////////////////////////////////
-    char const HPX_CHECK_VERSION[] = HPX_PP_STRINGIZE(HPX_CHECK_VERSION);
-    char const HPX_CHECK_BOOST_VERSION[] = HPX_PP_STRINGIZE(HPX_CHECK_BOOST_VERSION);
 }
 
