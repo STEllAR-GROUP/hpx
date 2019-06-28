@@ -33,6 +33,7 @@ set(config_headers
 
 # Default location is $HPX_ROOT/libs/config/src
 set(config_sources
+  force_linking.cpp
   version.cpp
 )
 

@@ -8,7 +8,13 @@
 
 namespace hpx { namespace config
 {
-    void force_linking();
+    struct force_linking_helper
+    {
+        const char* const hpx_version;
+        const char* const boost_version;
+    };
+
+    force_linking_helper& force_linking();
 }}
 
 #endif
