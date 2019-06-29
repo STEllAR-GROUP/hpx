@@ -43,6 +43,7 @@ namespace hpx { namespace util
         {
             batch_name_ = "ALPS";
             num_threads_ = alps_env.num_threads();
+            num_localities_ = alps_env.num_localities();
             node_num_ = alps_env.node_num();
             return;
         }
