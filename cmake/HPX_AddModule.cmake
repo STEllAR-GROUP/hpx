@@ -107,7 +107,7 @@ function(add_hpx_module name)
 
   if(${name}_FORCE_LINKING_GEN)
       # Add a header to force linking of modules on Windows
-      set(force_linking_header "${CMAKE_BINARY_DIR}/hpx/${name}/force_linking.hpp")
+      set(force_linking_header "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}/force_linking.hpp")
       FILE(WRITE ${force_linking_header}
           ${copyright}
           "#if !defined(HPX_${name_upper}_FORCE_LINKING_HPP)\n"
@@ -122,7 +122,7 @@ function(add_hpx_module name)
       )
 
       # Add a source file implementing the above function
-      set(force_linking_source "${CMAKE_BINARY_DIR}/libs/${name}/force_linking.cpp")
+      set(force_linking_source "${CMAKE_CURRENT_BINARY_DIR}/src/force_linking.cpp")
       FILE(WRITE ${force_linking_source}
           ${copyright}
           "#include <hpx/${name}/force_linking.hpp>\n"
@@ -189,12 +189,12 @@ function(add_hpx_module name)
   if (${name}_FORCE_LINKING_GEN)
     add_hpx_source_group(
       NAME hpx_{name}
-      ROOT ${CMAKE_BINARY_DIR}/hpx
+      ROOT ${CMAKE_CURRENT_BINARY_DIR}/include/hpx
       CLASS "Generated Files"
       TARGETS ${force_linking_header})
     add_hpx_source_group(
       NAME hpx_{name}
-      ROOT ${CMAKE_BINARY_DIR}/libs
+      ROOT ${CMAKE_CURRENT_BINARY_DIR}/src
       CLASS "Generated Files"
       TARGETS ${force_linking_source})
   endif()
