@@ -209,7 +209,9 @@ function(add_hpx_module name)
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
       COMPONENT ${name}
     )
-    hpx_export_targets(hpx_${name})
+    if(${name}_EXPORT)
+      hpx_export_targets(hpx_${name})
+    endif()
   endif()
 
   install(

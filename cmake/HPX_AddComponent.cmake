@@ -6,7 +6,7 @@
 
 function(add_hpx_component name)
   # retrieve arguments
-  set(options EXCLUDE_FROM_ALL AUTOGLOB STATIC PLUGIN)
+  set(options EXCLUDE_FROM_ALL NOEXPORT AUTOGLOB STATIC PLUGIN)
   set(one_value_args INI FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX LANGUAGE)
   set(multi_value_args SOURCES HEADERS AUXILIARY DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
@@ -137,6 +137,10 @@ function(add_hpx_component name)
     set(_target_flags ${_target_flags} PLUGIN)
   endif()
 
+  if(NOT ${${name}_NOEXPORT})
+    set(_target_flags ${_target_flags} EXPORT)
+  endif()
+
   if(${${name}_STATIC})
     set(${name}_lib_linktype STATIC)
   else()
@@ -193,7 +197,6 @@ function(add_hpx_component name)
     ${name}_component
     TYPE COMPONENT
     NAME ${name}
-    EXPORT
     FOLDER ${${name}_FOLDER}
     COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
     LINK_FLAGS ${${name}_LINK_FLAGS}
