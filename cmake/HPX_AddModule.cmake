@@ -147,7 +147,6 @@ function(add_hpx_module name)
   target_link_libraries(hpx_${name} ${${name}_DEPENDENCIES})
   target_include_directories(hpx_${name} PUBLIC
     $<BUILD_INTERFACE:${HEADER_ROOT}>
-    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
 
   if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
