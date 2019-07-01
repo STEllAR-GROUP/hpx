@@ -47,7 +47,7 @@ namespace hpx { namespace lcos
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
-        std::size_t root_sire = 0);
+        std::size_t root_site = 0);
 
     /// AllToAll a set of values from different call sites
     ///
@@ -85,7 +85,7 @@ namespace hpx { namespace lcos
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
-        std::size_t root_sire = 0);
+        std::size_t root_site = 0);
 
     /// \def HPX_REGISTER_ALLTOALL_DECLARATION(type, name)
     ///
@@ -188,7 +188,7 @@ namespace hpx { namespace lcos
                 // supported), unregister ourselves (but only once)
                 if (!name.empty())
                 {
-                    hpx::unregister_with_basename(name, site_);
+                    hpx::unregister_with_basename(name, site_).get();
                 }
 
                 return data;
@@ -258,7 +258,7 @@ namespace hpx { namespace lcos
                     if (!result)
                     {
                         HPX_THROW_EXCEPTION(bad_parameter,
-                            "hpx::lcos::detail::register_gather_name",
+                            "hpx::lcos::detail::register_all_to_all_name",
                             "the given base name for the all_to_all operation "
                             "was already registered: " + basename);
                     }
