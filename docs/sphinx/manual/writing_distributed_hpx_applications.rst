@@ -239,7 +239,7 @@ extensions added by |hpx| (light gray) where:
 
 .. _figure_hpx_the_api:
 
-.. figure:: /_static/images/hpx_the_api.png
+.. figure:: ../_static/images/hpx_the_api.png
 
    Overview of the main API exposed by |hpx|.
 

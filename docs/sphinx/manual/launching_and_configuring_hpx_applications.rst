@@ -1880,7 +1880,7 @@ using the ``scatter`` or ``balanced``/``numa-balanced`` options in most cases.
 
 .. _commandline_affinities:
 
-.. figure:: /_static/images/affinities.png
+.. figure:: ../_static/images/affinities.png
 
    Schematic of thread affinity type distributions.
 
