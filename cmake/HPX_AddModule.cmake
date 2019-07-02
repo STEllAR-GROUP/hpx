@@ -7,7 +7,8 @@ function(add_hpx_module name)
   # Retrieve arguments
   set(options DEPRECATION_WARNINGS)
   set(one_value_args COMPATIBILITY_HEADERS GLOBAL_HEADER_GEN FORCE_LINKING_GEN INSTALL_BINARIES)
-  set(multi_value_args SOURCES HEADERS COMPAT_HEADERS DEPENDENCIES CMAKE_SUBDIRS)
+  set(multi_value_args SOURCES HEADERS COMPAT_HEADERS DEPENDENCIES CMAKE_SUBDIRS
+    EXCLUDE_FROM_GLOBAL_HEADER)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   project(HPX.${name} CXX)
@@ -96,9 +97,12 @@ function(add_hpx_module name)
         "#define HPX_${name_upper}_HPP\n\n"
     )
     foreach(header_file ${${name}_HEADERS})
-      FILE(APPEND ${global_header}
-        "#include <${header_file}>\n"
-      )
+      # Exclude the files specified
+      if (NOT (${header_file} IN_LIST ${name}_EXCLUDE_FROM_GLOBAL_HEADER))
+        FILE(APPEND ${global_header}
+          "#include <${header_file}>\n"
+        )
+      endif()
     endforeach(header_file)
     FILE(APPEND ${global_header}
       "\n#endif\n"
