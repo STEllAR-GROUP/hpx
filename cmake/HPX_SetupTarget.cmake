@@ -11,8 +11,8 @@ hpx_set_cmake_policy(CMP0054 NEW)
 
 function(hpx_setup_target target)
   # retrieve arguments
-  set(options EXPORT NOHPX_INIT INSTALL NOLIBS PLUGIN NONAMEPREFIX NOTLLKEYWORD)
-  set(one_value_args TYPE FOLDER NAME SOVERSION VERSION HPX_PREFIX)
+  set(options EXPORT NOHPX_INIT INSTALL INSTALL_HEADERS NOLIBS PLUGIN NONAMEPREFIX NOTLLKEYWORD)
+  set(one_value_args TYPE FOLDER NAME SOVERSION VERSION HPX_PREFIX HEADER_ROOT)
   set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INSTALL_FLAGS)
   cmake_parse_arguments(target "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
@@ -241,6 +241,12 @@ function(hpx_setup_target target)
       ${install_export}
       ${target_INSTALL_FLAGS}
     )
+    if(target_INSTALL_HEADERS AND (NOT target_HEADER_ROOT STREQUAL ""))
+      install(
+        DIRECTORY "${target_HEADER_ROOT}/"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+        COMPONENT ${name})
+    endif()
   endif()
 endfunction()
 

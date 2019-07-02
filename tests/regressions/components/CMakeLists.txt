@@ -15,6 +15,7 @@ set(tests
 
 set(bulk_new_3054_PARAMETERS LOCALITIES 2)
 set(new_2848_PARAMETERS LOCALITIES 2)
+set(partitioned_vector_2201_FLAGS COMPONENT_DEPENDENCIES partitioned_vector)
 
 if(HPX_WITH_NETWORKING)
     set(tests ${tests}
