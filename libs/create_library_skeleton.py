@@ -83,11 +83,14 @@ add_hpx_module(cache
 '''
 
 examples_cmakelists_template = cmake_header + f'''
-if (HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-  add_hpx_pseudo_target(tests.examples.module.{lib_name})
-  add_hpx_pseudo_dependencies(tests.examples.module tests.examples.module.{lib_name})
+if (HPX_WITH_EXAMPLES)
+  add_hpx_pseudo_target(examples.modules.{lib_name})
+  add_hpx_pseudo_dependencies(examples.modules examples.modules.{lib_name})
+  if (HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND HPX_{lib_name_upper}_WITH_TESTS)
+    add_hpx_pseudo_target(tests.examples.modules.{lib_name})
+    add_hpx_pseudo_dependencies(tests.examples.modules tests.examples.modules.{lib_name})
+  endif()
 endif()
-
 '''
 
 tests_cmakelists_template = cmake_header + f'''
@@ -103,20 +106,20 @@ if (NOT HPX_{lib_name_upper}_WITH_TESTS)
 endif()
 
 if (HPX_WITH_TESTS_UNIT)
-  add_hpx_pseudo_target(tests.unit.module.{lib_name})
-  add_hpx_pseudo_dependencies(tests.unit.module tests.unit.module.{lib_name})
+  add_hpx_pseudo_target(tests.unit.modules.{lib_name})
+  add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.{lib_name})
   add_subdirectory(unit)
 endif()
 
 if (HPX_WITH_TESTS_REGRESSIONS)
-  add_hpx_pseudo_target(tests.regressions.module.{lib_name})
-  add_hpx_pseudo_dependencies(tests.regressions.module tests.regressions.module.{lib_name})
+  add_hpx_pseudo_target(tests.regressions.modules.{lib_name})
+  add_hpx_pseudo_dependencies(tests.regressions.modules tests.regressions.modules.{lib_name})
   add_subdirectory(regressions)
 endif()
 
 if (HPX_WITH_TESTS_BENCHMARKS)
-  add_hpx_pseudo_target(tests.performance.module.{lib_name})
-  add_hpx_pseudo_dependencies(tests.performance.module tests.performance.module.{lib_name})
+  add_hpx_pseudo_target(tests.performance.modules.{lib_name})
+  add_hpx_pseudo_dependencies(tests.performance.modules tests.performance.modules.{lib_name})
   add_subdirectory(performance)
 endif()
 
