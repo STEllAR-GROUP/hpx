@@ -1,5 +1,5 @@
 # Copyright (c) 2014 Thomas Heller
-# Copyright (c) 2015 Andreas Sch‰fer
+# Copyright (c) 2015 Andreas Sch√§fer
 # Copyright (c) 2019 Patrick Diehl
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@ include(GNUInstallDirs)
 include(HPX_Utils)
 
 function(hpx_check_compiler_compatibility)
+
     if(HPX_IGNORE_COMPILER_COMPATIBILITY)
        return()
     endif()
@@ -30,7 +31,7 @@ function(hpx_check_compiler_compatibility)
           "HPX_CXX_MAJOR_VERSION=${HPX_MAJOR_VERSION}, "
           "CMAKE_CXX_COMPILER_VERSION=${CXX_MAJOR_VERSION}."
           "To disable this message set HPX_IGNORE_COMPILER_COMPATIBILITY to On."
-        )
+
         if (HPX_FIND_REQUIRED)
             hpx_error("${MESSAGE}")
         else()

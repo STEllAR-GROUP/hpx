@@ -238,8 +238,8 @@ function(hpx_setup_target target)
 
   if(target_INSTALL AND NOT target_EXCLUDE_FROM_ALL)
     install(TARGETS ${target}
-      ${target_INSTALL_FLAGS}
       ${install_export}
+      ${target_INSTALL_FLAGS}
     )
   endif()
 endfunction()

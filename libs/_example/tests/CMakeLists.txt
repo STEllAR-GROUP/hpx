@@ -4,31 +4,34 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if (NOT HPX_WITH_TESTS)
+  hpx_set_option(HPX__EXAMPLE_WITH_TESTS VALUE OFF FORCE)
   return()
 endif()
 if (NOT HPX__EXAMPLE_WITH_TESTS)
-  message(STATUS "Tests for example disabled")
+  message(STATUS "Tests for _example disabled")
   return()
 endif()
 
 if (HPX_WITH_TESTS_UNIT)
-  add_hpx_pseudo_target(tests.unit.example)
-  add_hpx_pseudo_dependencies(tests.unit tests.unit.example)
+  add_hpx_pseudo_target(tests.unit.modules.example)
+  add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.example)
   add_subdirectory(unit)
 endif()
 
 if (HPX_WITH_TESTS_REGRESSIONS)
-  add_hpx_pseudo_target(tests.regressions.example)
-  add_hpx_pseudo_dependencies(tests.regressions tests.regressions.example)
+  add_hpx_pseudo_target(tests.regressions.modules.example)
+  add_hpx_pseudo_dependencies(tests.regressions.modules
+    tests.regressions.modules.example)
   add_subdirectory(regressions)
 endif()
 
 if (HPX_WITH_TESTS_BENCHMARKS)
-  add_hpx_pseudo_target(tests.performance.example)
-  add_hpx_pseudo_dependencies(tests.performance tests.performance.example)
+  add_hpx_pseudo_target(tests.performance.modules.example)
+  add_hpx_pseudo_dependencies(tests.performance.modules
+    tests.performance.modules.example)
   add_subdirectory(performance)
 endif()
 
 if (HPX_WITH_TESTS_HEADERS)
-  add_hpx_lib_header_tests(example)
+  add_hpx_module_header_tests(example)
 endif()

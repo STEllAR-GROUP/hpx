@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # collect a list of all header files in the source tree
-file(GLOB_RECURSE headers "${PROJECT_SOURCE_DIR}/hpx/*hpp")
+file(GLOB_RECURSE headers ${DO_CONFIGURE_DEPENDS} "${PROJECT_SOURCE_DIR}/hpx/*hpp")
 
 set(all_headers)
 
