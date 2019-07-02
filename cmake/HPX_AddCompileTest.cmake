@@ -83,7 +83,9 @@ function(add_hpx_module_header_tests lib)
 
       set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
 
-      add_library(tests.headers.modules.${lib}.${test_name} ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file})
+      add_library(tests.headers.modules.${lib}.${test_name}
+          EXCLUDE_FROM_ALL
+          ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file})
       target_link_libraries(tests.headers.modules.${lib}.${test_name} hpx_${lib})
       add_dependencies(tests.headers.modules.${lib} tests.headers.modules.${lib}.${test_name})
 
@@ -104,7 +106,9 @@ function(add_hpx_module_header_tests lib)
     "int main(int argc, char** argv) { return 0; }\n"
     "#endif\n")
 
-  add_library(tests.headers.modules.${lib}.${test_name} "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
+  add_library(tests.headers.modules.${lib}.${test_name}
+    EXCLUDE_FROM_ALL
+    "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
   target_link_libraries(tests.headers.modules.${lib}.${test_name} hpx_${lib})
   add_dependencies(tests.headers.modules.${lib} tests.headers.modules.${lib}.${test_name})
 
