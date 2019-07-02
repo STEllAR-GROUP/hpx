@@ -88,7 +88,7 @@ function(add_hpx_module name)
   # This header generation is disabled for config module specific generated
   # headers are included
   if (${name}_GLOBAL_HEADER_GEN)
-    set(global_header "${CMAKE_BINARY_DIR}/hpx/${name}.hpp")
+    set(global_header "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}.hpp")
     # Add a global include file that include all module headers
     FILE(WRITE ${global_header}
         ${copyright}
@@ -107,7 +107,7 @@ function(add_hpx_module name)
 
   if(${name}_FORCE_LINKING_GEN)
       # Add a header to force linking of modules on Windows
-      set(force_linking_header "${CMAKE_BINARY_DIR}/hpx/${name}/force_linking.hpp")
+      set(force_linking_header "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}/force_linking.hpp")
       FILE(WRITE ${force_linking_header}
           ${copyright}
           "#if !defined(HPX_${name_upper}_FORCE_LINKING_HPP)\n"
@@ -122,7 +122,7 @@ function(add_hpx_module name)
       )
 
       # Add a source file implementing the above function
-      set(force_linking_source "${CMAKE_BINARY_DIR}/libs/${name}/force_linking.cpp")
+      set(force_linking_source "${CMAKE_CURRENT_BINARY_DIR}/src/force_linking.cpp")
       FILE(WRITE ${force_linking_source}
           ${copyright}
           "#include <hpx/${name}/force_linking.hpp>\n"
@@ -147,7 +147,7 @@ function(add_hpx_module name)
   target_link_libraries(hpx_${name} ${${name}_DEPENDENCIES})
   target_include_directories(hpx_${name} PUBLIC
     $<BUILD_INTERFACE:${HEADER_ROOT}>
-    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
 
   if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
     target_include_directories(hpx_${name} PUBLIC
@@ -181,19 +181,19 @@ function(add_hpx_module name)
   if (${name}_GLOBAL_HEADER_GEN)
     add_hpx_source_group(
       NAME hpx_{name}
-      ROOT ${CMAKE_BINARY_DIR}/hpx
+      ROOT ${CMAKE_CURRENT_BINARY_DIR}/include/hpx
       CLASS "Generated Files"
       TARGETS ${global_header})
   endif()
   if (${name}_FORCE_LINKING_GEN)
     add_hpx_source_group(
       NAME hpx_{name}
-      ROOT ${CMAKE_BINARY_DIR}/hpx
+      ROOT ${CMAKE_CURRENT_BINARY_DIR}/include/hpx
       CLASS "Generated Files"
       TARGETS ${force_linking_header})
     add_hpx_source_group(
       NAME hpx_{name}
-      ROOT ${CMAKE_BINARY_DIR}/libs
+      ROOT ${CMAKE_CURRENT_BINARY_DIR}/src
       CLASS "Generated Files"
       TARGETS ${force_linking_source})
   endif()
@@ -202,6 +202,7 @@ function(add_hpx_module name)
     FOLDER "Core/Modules"
     POSITION_INDEPENDENT_CODE ON)
 
+  # Install the static library for the module
   if(${name}_INSTALL_BINARIES)
     install(TARGETS hpx_${name} EXPORT HPXTargets
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -214,11 +215,13 @@ function(add_hpx_module name)
     endif()
   endif()
 
+  # Install the headers from the source
   install(
     DIRECTORY include/hpx
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT ${name})
 
+  # Install the compatibility headers from the source
   if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
     install(
       DIRECTORY include_compatibility/hpx
@@ -226,22 +229,16 @@ function(add_hpx_module name)
       COMPONENT ${name})
   endif()
 
-  # Installing the global header file
-  if (${${name}_GLOBAL_HEADER_GEN})
-    install(
-      FILES ${global_header}
-      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx
-      COMPONENT ${name}
-    )
-  endif()
-
   write_config_defines_file(
     NAMESPACE ${name_upper}
-    FILENAME "${CMAKE_BINARY_DIR}/hpx/${name}/config/defines.hpp")
+    FILENAME "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}/config/defines.hpp")
 
-  write_config_defines_file(
-    NAMESPACE ${name_upper}
-    FILENAME "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/${name}/config/defines.hpp")
+  # Installing the generated header files from the build dir
+  install(
+    DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/hpx
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx
+    COMPONENT ${name}
+  )
 
   foreach(dir ${${name}_CMAKE_SUBDIRS})
     add_subdirectory(${dir})
