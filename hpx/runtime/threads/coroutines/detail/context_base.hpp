@@ -322,7 +322,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 //             return ++m_allocation_counters.get(heap_num);
 //         }
 
-    protected:
+    public:
         // global coroutine state
         enum context_state
         {
@@ -331,6 +331,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             ctx_exited    // context is finished.
         };
 
+    protected:
         // exit request state
         enum context_exit_state
         {

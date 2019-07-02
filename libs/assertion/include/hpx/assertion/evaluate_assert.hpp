@@ -7,15 +7,17 @@
 #define HPX_ASSERT_EVALUATE_ASSERT_HPP
 
 #include <hpx/config.hpp>
+
 #if defined(HPX_DEBUG)
 #include <hpx/assertion/source_location.hpp>
 
 #include <string>
 #include <utility>
 
-namespace hpx { namespace assertion { namespace detail {
+namespace hpx { namespace assertion { namespace detail
+{
     /// \cond NOINTERNAL
-    void handle_assert(
+    HPX_EXPORT void handle_assert(
         source_location const& loc, const char* expr, std::string const& msg);
 
     template <typename Expr, typename Msg>

@@ -12,6 +12,7 @@ set(assertion_headers
   hpx/assertion.hpp
   hpx/assertion/current_function.hpp
   hpx/assertion/evaluate_assert.hpp
+  hpx/assertion/force_linking.hpp
   hpx/assertion/source_location.hpp
 )
 
@@ -23,6 +24,7 @@ set(assertion_compat_headers
 # Default location is $HPX_ROOT/libs/assertion/src
 set(assertion_sources
   assertion.cpp
+  force_linking.cpp
   source_location.cpp
 )
 
@@ -32,7 +34,7 @@ add_hpx_module(assertion
     COMPATIBILITY_HEADERS ON    # Added in 1.4.0
     GLOBAL_HEADER_GEN OFF
     INSTALL_BINARIES OFF
-    FORCE_LINKING_GEN ON
+    FORCE_LINKING_GEN OFF
     SOURCES ${assertion_sources}
     HEADERS ${assertion_headers}
     COMPAT_HEADERS ${assertion_compat_headers}
