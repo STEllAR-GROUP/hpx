@@ -154,6 +154,7 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind_back.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/unused.hpp>
 
@@ -265,8 +266,7 @@ namespace hpx { namespace lcos
             hpx::future<bool> result = hpx::register_with_basename(
                 basename, hpx::unmanaged(target), site);
 
-            return result.then(
-                hpx::launch::sync,
+            return result.then(hpx::launch::sync,
                 [HPX_CAPTURE_MOVE(target), HPX_CAPTURE_MOVE(basename)](
                     hpx::future<bool>&& f)
                 -> hpx::id_type
@@ -337,13 +337,12 @@ namespace hpx { namespace lcos
                     async(action_type(), id, this_site, local_result.get(),
                         std::forward<F>(op));
 
-                return result.then(
-                        hpx::launch::sync,
-                        [HPX_CAPTURE_MOVE(id)](hpx::future<T> && f) -> T
-                        {
-                            HPX_UNUSED(id);
-                            return f.get();
-                        });
+                return result.then(hpx::launch::sync,
+                    [HPX_CAPTURE_MOVE(id)](hpx::future<T> && f) -> T
+                    {
+                        HPX_UNUSED(id);
+                        return f.get();
+                    });
             };
 
         return dataflow(hpx::launch::sync, std::move(all_reduce_data),

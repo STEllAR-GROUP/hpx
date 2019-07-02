@@ -8,6 +8,7 @@ set(tests
     all_to_all
    )
 
+set(all_reduce_PARAMETERS LOCALITIES 2)
 set(all_to_all_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})

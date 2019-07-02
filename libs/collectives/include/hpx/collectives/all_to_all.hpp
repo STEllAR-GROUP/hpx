@@ -149,7 +149,6 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind_back.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/unused.hpp>
 
@@ -171,29 +170,6 @@ namespace hpx { namespace lcos
         {
             using mutex_type = lcos::local::spinlock;
 
-            std::vector<T> on_ready(shared_future<void>&& f)
-            {
-                f.get();       // propagate any exceptions
-
-                std::vector<T> data;
-                std::string name;
-
-                {
-                    std::unique_lock<mutex_type> l(mtx_);
-                    data = data_;
-                    std::swap(name, name_);
-                }
-
-                // this is a one-shot object (generations counters are not
-                // supported), unregister ourselves (but only once)
-                if (!name.empty())
-                {
-                    hpx::unregister_with_basename(name, site_).get();
-                }
-
-                return data;
-            }
-
         public:
             all_to_all_server() //-V730
             {
@@ -209,13 +185,36 @@ namespace hpx { namespace lcos
               , site_(site)
             {}
 
-            hpx::future<std::vector<T> > get_result(std::size_t which, T&& t)
+            hpx::future<std::vector<T> > get_result(std::size_t which, T t)
             {
                 std::unique_lock<mutex_type> l(mtx_);
 
+                auto on_ready =
+                    [this](shared_future<void>&& f) -> std::vector<T>
+                    {
+                        f.get();       // propagate any exceptions
+
+                        std::vector<T> data;
+                        std::string name;
+
+                        {
+                            std::unique_lock<mutex_type> l(mtx_);
+                            data = data_;
+                            std::swap(name, name_);
+                        }
+
+                        // this is a one-shot object (generations counters are not
+                        // supported), unregister ourselves (but only once)
+                        if (!name.empty())
+                        {
+                            hpx::unregister_with_basename(name, site_).get();
+                        }
+
+                        return data;
+                    };
+
                 hpx::future<std::vector<T>> f =
-                    gate_.get_shared_future(l).then(hpx::launch::async,
-                        util::bind_front(&all_to_all_server::on_ready, this));
+                    gate_.get_shared_future(l).then(hpx::launch::async, on_ready);
 
                 gate_.synchronize(1, l);
                 data_[which] = std::move(t);
@@ -248,8 +247,7 @@ namespace hpx { namespace lcos
             hpx::future<bool> result = hpx::register_with_basename(
                 basename, hpx::unmanaged(target), site);
 
-            return result.then(
-                hpx::launch::sync,
+            return result.then(hpx::launch::sync,
                 [HPX_CAPTURE_MOVE(target), HPX_CAPTURE_MOVE(basename)](
                     hpx::future<bool>&& f)
                 -> hpx::id_type
@@ -264,45 +262,6 @@ namespace hpx { namespace lcos
                     }
                     return target;
                 });
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename T>
-        hpx::future<std::vector<T> >
-        all_to_all_data(hpx::future<hpx::id_type>&& f,
-            hpx::future<T>&& local_result, std::size_t site)
-        {
-            using action_type = typename all_to_all_server<T>::get_result_action;
-
-            // make sure id is kept alive as long as the returned future
-            hpx::id_type id = f.get();
-            return async(action_type(), id, site, local_result.get()).then(
-                hpx::launch::sync,
-                [HPX_CAPTURE_MOVE(id)](hpx::future<std::vector<T>> && f)
-                -> std::vector<T>
-                {
-                    HPX_UNUSED(id);
-                    return f.get();
-                });
-        }
-
-        template <typename T>
-        hpx::future<std::vector<T> >
-        all_to_all_data_direct(hpx::future<hpx::id_type>&& f, T&& local_result,
-            std::size_t site)
-        {
-            using action_type = typename all_to_all_server<T>::get_result_action;
-
-            // make sure id is kept alive as long as the returned future
-            hpx::id_type id = f.get();
-            return async(action_type(), id, site, std::forward<T>(local_result))
-                .then(hpx::launch::sync,
-                    [HPX_CAPTURE_MOVE(id)](hpx::future<std::vector<T>> && f)
-                    -> std::vector<T>
-                    {
-                        HPX_UNUSED(id);
-                        return f.get();
-                    });
         }
     }
 
@@ -344,8 +303,27 @@ namespace hpx { namespace lcos
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
-        return dataflow(hpx::launch::sync,
-            util::bind_back(&detail::all_to_all_data<T>, this_site),
+        auto all_to_all_data =
+            [this_site](
+                    hpx::future<hpx::id_type>&& f, hpx::future<T>&& local_result)
+            -> hpx::future<std::vector<T> >
+            {
+                using action_type =
+                    typename detail::all_to_all_server<T>::get_result_action;
+
+                // make sure id is kept alive as long as the returned future
+                hpx::id_type id = f.get();
+                return async(action_type(), id, this_site, local_result.get())
+                    .then(hpx::launch::sync,
+                        [HPX_CAPTURE_MOVE(id)](hpx::future<std::vector<T>> && f)
+                        -> std::vector<T>
+                        {
+                            HPX_UNUSED(id);
+                            return f.get();
+                        });
+            };
+
+        return dataflow(hpx::launch::sync, std::move(all_to_all_data),
             std::move(f), std::move(local_result));
     }
 
@@ -388,11 +366,32 @@ namespace hpx { namespace lcos
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
-        using result_type = typename util::decay<T>::type;
-        return dataflow(hpx::launch::sync,
-            util::bind_back(
-                &detail::all_to_all_data_direct<result_type>, this_site),
-            std::move(f), std::forward<T>(local_result));
+        using arg_type = typename util::decay<T>::type;
+
+        auto all_to_all_data_direct =
+            [HPX_CAPTURE_MOVE(local_result), this_site](
+                    hpx::future<hpx::id_type>&& f)
+            -> hpx::future<std::vector<arg_type> >
+            {
+                using action_type =
+                    typename detail::all_to_all_server<arg_type>::
+                        get_result_action;
+
+                // make sure id is kept alive as long as the returned future
+                hpx::id_type id = f.get();
+                return async(action_type(), id, this_site, std::move(local_result))
+                    .then(hpx::launch::sync,
+                        [HPX_CAPTURE_MOVE(id)](
+                                hpx::future<std::vector<arg_type>> && f)
+                        -> std::vector<arg_type>
+                        {
+                            HPX_UNUSED(id);
+                            return f.get();
+                        });
+            };
+
+        return dataflow(hpx::launch::sync, std::move(all_to_all_data_direct),
+            std::move(f));
     }
 
     template <typename T>
