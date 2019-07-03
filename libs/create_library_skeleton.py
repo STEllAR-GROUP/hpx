@@ -63,25 +63,23 @@ index_rst = f'''..
 root_cmakelists_template = cmake_header + f'''
 cmake_minimum_required(VERSION {cmake_version} FATAL_ERROR)
 
-project(HPX.{lib_name} CXX)
+set({lib_name}_headers)
 
-list(APPEND CMAKE_MODULE_PATH "${{CMAKE_CURRENT_SOURCE_DIR}}/cmake")
+set({lib_name}_compat_headers)
 
-include(HPX_AddDefinitions)
-include(HPX_Message)
-include(HPX_Option)
+set({lib_name}_sources)
 
-hpx_info("  {lib_name}")
-
-hpx_option(HPX_{lib_name_upper}_WITH_TESTS
-  BOOL
-  "Build HPX {lib_name} module tests. (default: ${HPX_WITH_TESTS})"
-  ${HPX_WITH_TESTS} ADVANCED
-  CATEGORY "Modules")
-
-add_subdirectory(examples)
-add_subdirectory(src)
-add_subdirectory(tests)
+include(HPX_AddModule)
+add_hpx_module(cache
+    DEPRECATION_WARNINGS
+    COMPATIBILITY_HEADERS OFF
+    INSTALL_BINARIES OFF
+    SOURCES ${{{lib_name}_sources}}
+    HEADERS ${{{lib_name}_headers}}
+    COMPAT_HEADERS ${{{lib_name}_compat_headers}}
+    DEPENDENCIES
+    CMAKE_SUBDIRS examples tests
+)
 '''
 
 examples_cmakelists_template = cmake_header + f'''
@@ -258,9 +256,22 @@ endif()
 libs_cmakelists += '''
 hpx_info("Configuring modules:")
 
+set(MODULE_FORCE_LINKING_INCLUDES)
+set(MODULE_FORCE_LINKING_CALLS)
 foreach(lib ${HPX_LIBS})
   add_subdirectory(${lib})
+
+  set(MODULE_FORCE_LINKING_INCLUDES
+    "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\n")
+
+  set(MODULE_FORCE_LINKING_CALLS
+    "${MODULE_FORCE_LINKING_CALLS}\n        ${lib}::force_linking();")
 endforeach()
+
+configure_file(
+    "${PROJECT_SOURCE_DIR}/cmake/templates/modules.cpp.in"
+    "${CMAKE_BINARY_DIR}/libs/modules.cpp"
+    @ONLY)
 '''
 
 f = open(os.path.join(cwd, 'CMakeLists.txt'), 'w')
