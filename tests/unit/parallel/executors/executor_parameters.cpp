@@ -25,7 +25,7 @@
 
 #include <boost/ref.hpp>
 
-#include "../algorithms/foreach_tests.hpp"
+#include "foreach_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ... Parameters>

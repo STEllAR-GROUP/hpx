@@ -203,5 +203,5 @@ endif()
 
 add_hpx_pseudo_target(tests.performance.local.htts_v2)
 add_subdirectory(htts_v2)
-add_hpx_pseudo_dependencies(tests.performance tests.performance.local.htts_v2)
+add_hpx_pseudo_dependencies(tests.performance.local tests.performance.local.htts_v2)
 

@@ -6,8 +6,8 @@
 #include <hpx/config.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/traits/is_iterator.hpp>
-#include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/util/iterator_adaptor.hpp>
 
 #include <cstddef>
 #include <forward_list>
@@ -16,7 +16,25 @@
 #include <type_traits>
 #include <vector>
 
-#include "../parallel/algorithms/test_utils.hpp"
+namespace test
+{
+    template <typename BaseIterator, typename IteratorTag>
+    struct test_iterator
+      : hpx::util::iterator_adaptor<
+            test_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, void, IteratorTag>
+    {
+    private:
+        typedef hpx::util::iterator_adaptor<
+            test_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, void, IteratorTag>
+        base_type;
+
+    public:
+        test_iterator() : base_type() {}
+        test_iterator(BaseIterator base) : base_type(base) {}
+    };
+}
 
 template<typename T, typename = void>
 struct has_nested_type

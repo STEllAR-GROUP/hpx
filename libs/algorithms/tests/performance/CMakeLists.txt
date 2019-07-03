@@ -28,16 +28,16 @@ foreach(benchmark ${benchmarks})
                      SOURCES ${sources}
                      EXCLUDE_FROM_ALL
                      ${${benchmark}_FLAGS}
-                     FOLDER "Benchmarks/ParallelAlgorithms/Local")
+                     FOLDER "Benchmarks/Modules/Algorithms")
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.performance.parallel_algorithms.local_.${benchmark})
+  add_hpx_pseudo_target(tests.performance.modules.algorithms.${benchmark})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.parallel_algorithms.local_
-                        tests.performance.parallel_algorithms.local_.${benchmark})
+  add_hpx_pseudo_dependencies(tests.performance.modules.algorithms
+                        tests.performance.modules.algorithms.${benchmark})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.parallel_algorithms.local_.${benchmark}
+  add_hpx_pseudo_dependencies(tests.performance.modules.algorithms.${benchmark}
                               ${benchmark})
 endforeach()

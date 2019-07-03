@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "../algorithms/foreach_tests.hpp"
+#include "foreach_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Parameters>

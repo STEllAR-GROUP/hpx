@@ -95,6 +95,9 @@ endif()
 # Get the include directories we need ...
 get_directory_property(_INCLUDE_DIRS INCLUDE_DIRECTORIES)
 
+# Add core HPX library include directory
+set(_INCLUDE_DIRS ${_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR})
+
 # replace all characters with special regex meaning
 set(special_chars "^;+;*;?;$;.;-;|;(;);]")
 set(binarydir_escaped ${CMAKE_BINARY_DIR})

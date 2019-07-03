@@ -13,6 +13,7 @@ All modules
 .. toctree::
    :maxdepth: 2
 
+   /libs/algorithms/docs/index.rst
    /libs/assertion/docs/index.rst
    /libs/cache/docs/index.rst
    /libs/collectives/docs/index.rst
