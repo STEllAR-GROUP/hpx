@@ -45,28 +45,29 @@ function(add_hpx_compile_test_target_dependencies category name)
   add_hpx_pseudo_dependencies(${category} ${category}.${name})
 endfunction(add_hpx_compile_test_target_dependencies)
 
-# To add test to the category root as in tests/regressions/
-function(add_target_deps_compile_test category subcategory name)
+# To add test to the category root as in tests/regressions/ with correct name
+function(add_test_and_deps_compile_test category subcategory name)
   if ("${subcategory}" STREQUAL "")
+    add_hpx_compile_test(tests.${category} ${name} ${ARGN})
     add_hpx_compile_test_target_dependencies(tests.${category} ${name})
   else()
+    add_hpx_compile_test(tests.${category}.${subcategory} ${name} ${ARGN})
     add_hpx_compile_test_target_dependencies(tests.${category}.${subcategory} ${name})
   endif()
-endfunction(add_target_deps_compile_test)
+endfunction(add_test_and_deps_compile_test)
 
 function(add_hpx_unit_compile_test subcategory name)
-  add_hpx_compile_test("tests.unit.${subcategory}" ${name} ${ARGN})
-  add_target_deps_compile_test("unit" "${subcategory}" ${name})
+  add_test_and_deps_compile_test("unit" "${subcategory}" ${name} ${ARGN})
 endfunction(add_hpx_unit_compile_test)
 
 function(add_hpx_regression_compile_test subcategory name)
-  add_hpx_compile_test("tests.regressions.${subcategory}" ${name} ${ARGN})
-  add_target_deps_compile_test("regressions" "${subcategory}" ${name})
+  add_test_and_deps_compile_test("regressions" "${subcategory}" ${name} ${ARGN})
 endfunction(add_hpx_regression_compile_test)
 
 function(add_hpx_headers_compile_test subcategory name)
-  add_hpx_compile_test("tests.headers.${subcategory}" ${name} ${ARGN})
-  add_target_deps_compile_test("headers" "${subcategory}" ${name})
+  # Important to keep the double quotes around subcategory otherwise
+  # don't consider empty argument but just remove it
+  add_test_and_deps_compile_test("headers" "${subcategory}" ${name} ${ARGN})
 endfunction(add_hpx_headers_compile_test)
 
 function(add_hpx_module_header_tests lib)

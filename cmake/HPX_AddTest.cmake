@@ -138,7 +138,7 @@ function(add_hpx_test_target_dependencies category name)
   set(one_value_args PSEUDO_DEPS_NAME)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
   # default target_extension is _test but for examples.* target, it may vary
-  if (NOT ("${category}" MATCHES "tests.examples.*"))
+  if (NOT ("${category}" MATCHES "tests.examples*"))
     set(_ext "_test")
   endif()
   # Add a custom target for this example
@@ -155,28 +155,29 @@ function(add_hpx_test_target_dependencies category name)
   endif()
 endfunction(add_hpx_test_target_dependencies)
 
-function(add_target_deps_test category subcategory name)
+
+# To add test to the category root as in tests/regressions/ with correct name
+function(add_test_and_deps_test category subcategory name)
   if ("${subcategory}" STREQUAL "")
+    add_hpx_test(tests.${category} ${name} ${ARGN})
     add_hpx_test_target_dependencies(tests.${category} ${name} ${ARGN})
   else()
+    add_hpx_test(tests.${category}.${subcategory} ${name} ${ARGN})
     add_hpx_test_target_dependencies(tests.${category}.${subcategory} ${name} ${ARGN})
   endif()
-endfunction(add_target_deps_test)
+endfunction(add_test_and_deps_test)
 
 function(add_hpx_unit_test subcategory name)
-  add_hpx_test("tests.unit.${subcategory}" ${name} ${ARGN})
-  add_target_deps_test("unit" "${subcategory}" ${name})
+  add_test_and_deps_test("unit" "${subcategory}" ${name} ${ARGN})
 endfunction(add_hpx_unit_test)
 
 function(add_hpx_regression_test subcategory name)
-  add_hpx_test("tests.regressions.${subcategory}" ${name} ${ARGN})
   # ARGN needed in case we add a test with the same executable
-  add_target_deps_test("regressions" "${subcategory}" ${name} ${ARGN})
+  add_test_and_deps_test("regressions" "${subcategory}" ${name} ${ARGN})
 endfunction(add_hpx_regression_test)
 
 function(add_hpx_example_test subcategory name)
-  add_hpx_test("tests.examples.${subcategory}" ${name} ${ARGN})
-  add_target_deps_test("examples" "${subcategory}" ${name})
+  add_test_and_deps_test("examples" "${subcategory}" ${name} ${ARGN})
 endfunction(add_hpx_example_test)
 
 # To create target examples.<name> when calling make examples
