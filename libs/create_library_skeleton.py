@@ -70,7 +70,7 @@ set({lib_name}_compat_headers)
 set({lib_name}_sources)
 
 include(HPX_AddModule)
-add_hpx_module(cache
+add_hpx_module({lib_name}
     DEPRECATION_WARNINGS
     COMPATIBILITY_HEADERS OFF
     INSTALL_BINARIES OFF
