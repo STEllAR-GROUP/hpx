@@ -37,7 +37,7 @@ function(add_hpx_module name)
       "Enable warnings for deprecated facilities. (default: ${HPX_WITH_DEPRECATION_WARNINGS})"
       ${HPX_WITH_DEPRECATION_WARNINGS} ADVANCED
       CATEGORY "Modules")
-    if(HPX_${name}_WITH_DEPRECATION_WARNINGS)
+    if(HPX_${name_upper}_WITH_DEPRECATION_WARNINGS)
       hpx_add_config_define_namespace(
           DEFINE HPX_${name_upper}_HAVE_DEPRECATION_WARNINGS
           NAMESPACE ${name_upper})
