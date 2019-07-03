@@ -59,25 +59,14 @@ namespace hpx { namespace assertion {
         HPX_PP_STRINGIZE(expr), [&]() { return msg; });                        \
 /**/
 
-// Helper macros to extract the first and the second macro paramater, the first
-// is the expression ...
-#define HPX_ASSERT_EXPR_(expr, ...) expr
-// ... and the second is the msg. msg is optional
-#define HPX_ASSERT_MSG_(expr, msg, ...) msg
-/// \encond
-
 #if defined(HPX_DEBUG)
-#define HPX_ASSERT(...)                                                        \
-    HPX_ASSERT_(HPX_ASSERT_EXPR_(__VA_ARGS__, ""),                             \
-        HPX_ASSERT_MSG_(__VA_ARGS__, std::string(), ""))                       \
-    /**/
-
-#define HPX_ASSERT_MSG(...) HPX_ASSERT(__VA_ARGS__)
+#define HPX_ASSERT(expr) HPX_ASSERT_(expr, std::string())
+#define HPX_ASSERT_MSG(expr, msg) HPX_ASSERT_(expr, msg)
 #else
-#define HPX_ASSERT(...)                                                        \
+#define HPX_ASSERT(expr)                                                       \
     {                                                                          \
     }
-#define HPX_ASSERT_MSG(...)                                                    \
+#define HPX_ASSERT_MSG(expr, msg)                                              \
     {                                                                          \
     }
 #endif
