@@ -313,14 +313,16 @@ namespace hpx { namespace lcos
 
                 // make sure id is kept alive as long as the returned future
                 hpx::id_type id = f.get();
-                return async(action_type(), id, this_site, local_result.get())
-                    .then(hpx::launch::sync,
-                        [HPX_CAPTURE_MOVE(id)](hpx::future<std::vector<T>> && f)
-                        -> std::vector<T>
-                        {
-                            HPX_UNUSED(id);
-                            return f.get();
-                        });
+                auto result =
+                    async(action_type(), id, this_site, local_result.get());
+
+                return result.then(hpx::launch::sync,
+                    [HPX_CAPTURE_MOVE(id)](hpx::future<std::vector<T>>&& f)
+                    -> std::vector<T>
+                    {
+                        HPX_UNUSED(id);
+                        return f.get();
+                    });
             };
 
         return dataflow(hpx::launch::sync, std::move(all_to_all_data),
@@ -379,15 +381,17 @@ namespace hpx { namespace lcos
 
                 // make sure id is kept alive as long as the returned future
                 hpx::id_type id = f.get();
-                return async(action_type(), id, this_site, std::move(local_result))
-                    .then(hpx::launch::sync,
-                        [HPX_CAPTURE_MOVE(id)](
-                                hpx::future<std::vector<arg_type>> && f)
-                        -> std::vector<arg_type>
-                        {
-                            HPX_UNUSED(id);
-                            return f.get();
-                        });
+                auto result =
+                    async(action_type(), id, this_site, std::move(local_result));
+
+                return result.then(hpx::launch::sync,
+                    [HPX_CAPTURE_MOVE(id)](
+                            hpx::future<std::vector<arg_type>> && f)
+                    -> std::vector<arg_type>
+                    {
+                        HPX_UNUSED(id);
+                        return f.get();
+                    });
             };
 
         return dataflow(hpx::launch::sync, std::move(all_to_all_data_direct),
