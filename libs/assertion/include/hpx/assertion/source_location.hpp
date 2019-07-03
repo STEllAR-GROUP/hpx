@@ -6,6 +6,8 @@
 #ifndef HPX_ASSERT_SOURCE_LOCATION_HPP
 #define HPX_ASSERT_SOURCE_LOCATION_HPP
 
+#include <hpx/config/export_definitions.hpp>
+
 #include <iosfwd>
 
 namespace hpx { namespace assertion {
@@ -17,7 +19,7 @@ namespace hpx { namespace assertion {
         unsigned line_number;
         const char* function_name;
     };
-    std::ostream& operator<<(std::ostream& os, source_location const& loc);
+    HPX_EXPORT std::ostream& operator<<(std::ostream& os, source_location const& loc);
 }}
 
 #endif
