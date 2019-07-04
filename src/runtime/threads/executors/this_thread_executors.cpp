@@ -15,6 +15,9 @@
 #endif
 
 #include <hpx/assertion.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
@@ -23,12 +26,9 @@
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/deferred_call.hpp>
+#include <hpx/threading/thread_enums.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/functional/unique_function.hpp>
 
 #include <atomic>
 #include <chrono>

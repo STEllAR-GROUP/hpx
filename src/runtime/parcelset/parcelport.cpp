@@ -16,7 +16,7 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/errors.hpp>
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
+#include <hpx/threading/apex.hpp>
 #endif
 #include <hpx/assertion.hpp>
 

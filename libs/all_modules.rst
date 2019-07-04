@@ -40,6 +40,7 @@ All modules
    /libs/statistics/docs/index.rst
    /libs/testing/docs/index.rst
    /libs/thread_support/docs/index.rst
+   /libs/threading/docs/index.rst
    /libs/timing/docs/index.rst
    /libs/topology/docs/index.rst
    /libs/type_support/docs/index.rst

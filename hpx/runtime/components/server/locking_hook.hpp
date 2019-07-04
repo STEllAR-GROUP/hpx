@@ -11,8 +11,8 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/get_lva.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/threading/coroutines/coroutine.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 
 #include <mutex>

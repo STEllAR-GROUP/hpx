@@ -7,9 +7,9 @@
 #define HPX_UTIL_INTERVAL_TIMER_SEP_27_2011_0434PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/threading/thread_enums.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <algorithm>

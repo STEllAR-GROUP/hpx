@@ -14,7 +14,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
+#include <hpx/threading/apex.hpp>
 #endif
 
 #include <cstddef>

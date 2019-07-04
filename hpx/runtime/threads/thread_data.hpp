@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
-#include <hpx/runtime/threads/detail/combined_tagged_state.hpp>
+#include <hpx/threading/coroutines/coroutine.hpp>
+#include <hpx/threading/detail/combined_tagged_state.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/errors.hpp>
@@ -25,7 +25,7 @@
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/util/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
+#include <hpx/threading/apex.hpp>
 #endif
 
 #include <boost/intrusive_ptr.hpp>

@@ -37,6 +37,7 @@ set(HPX_LIBS
   statistics
   testing
   thread_support
+  threading
   timing
   topology
   type_support

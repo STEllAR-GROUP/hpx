@@ -13,12 +13,12 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/threading/coroutines/coroutine.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/io_service_pool.hpp>
 

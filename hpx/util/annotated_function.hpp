@@ -21,7 +21,7 @@
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #elif defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
+#include <hpx/threading/apex.hpp>
 #endif
 #endif
 

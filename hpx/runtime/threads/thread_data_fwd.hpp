@@ -10,9 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_id_type.hpp>
+#include <hpx/threading/coroutines/coroutine_fwd.hpp>
+#include <hpx/threading/thread_enums.hpp>
+#include <hpx/threading/thread_id_type.hpp>
 #include <hpx/util_fwd.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/unique_function.hpp>

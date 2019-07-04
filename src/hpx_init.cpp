@@ -32,7 +32,7 @@
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/apex.hpp>
+#include <hpx/threading/apex.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>

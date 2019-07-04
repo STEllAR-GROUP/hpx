@@ -10,7 +10,7 @@
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/threading/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/annotated_function.hpp>
