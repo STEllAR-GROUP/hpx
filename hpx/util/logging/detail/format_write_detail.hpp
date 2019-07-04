@@ -216,34 +216,34 @@ private:
     }
 
     // generic manipulator
-    template<class formatter> void add_formatter_impl(formatter fmt,
+    template<class my_formatter> void add_formatter_impl(my_formatter fmt,
         const std::true_type& ) {
         typedef hpx::util::logging::manipulator::detail
-            ::generic_holder<formatter,formatter_base> holder;
+         ::generic_holder<my_formatter, formatter_base> holder;
         add_formatter_impl( holder(fmt), std::false_type() );
     }
 
     // generic manipulator
-    template<class formatter> void del_formatter_impl(formatter fmt,
+    template<class my_formatter> void del_formatter_impl(my_formatter fmt,
         const std::true_type& ) {
         typedef hpx::util::logging::manipulator::detail
-            ::generic_holder<formatter,formatter_base> holder;
+            ::generic_holder<my_formatter, formatter_base> holder;
         del_formatter_impl( holder(fmt), std::false_type() );
     }
 
     // generic manipulator
-    template<class destination> void add_destination_impl(destination dest,
+    template<class my_destination> void add_destination_impl(my_destination dest,
         const std::true_type& ) {
         typedef hpx::util::logging::manipulator::detail
-            ::generic_holder<destination,destination_base> holder;
+            ::generic_holder<my_destination, destination_base> holder;
         add_destination_impl( holder(dest), std::false_type() );
     }
 
     // generic manipulator
-    template<class destination> void del_destination_impl(destination dest,
+    template<class my_destination> void del_destination_impl(my_destination dest,
         const std::true_type& ) {
         typedef hpx::util::logging::manipulator::detail
-            ::generic_holder<destination,destination_base> holder;
+            ::generic_holder<my_destination, destination_base> holder;
         del_destination_impl( holder(dest), std::false_type() );
     }
 
