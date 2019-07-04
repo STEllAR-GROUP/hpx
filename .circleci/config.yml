@@ -139,6 +139,47 @@ jobs:
           paths:
             - ./build
 
+  configure_test_combinations:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Running CMake with tests on and examples off
+          command: |
+            cmake \
+                /hpx/source \
+                -G "Ninja" \
+                -DHPX_WITH_MALLOC=system \
+                -DHPX_WITH_TESTS=On \
+                -DHPX_WITH_EXAMPLES=Off
+            rm -rf *
+      - run:
+          name: Running CMake with tests off and examples on
+          command: |
+            cmake \
+                /hpx/source \
+                -G "Ninja" \
+                -DHPX_WITH_MALLOC=system \
+                -DHPX_WITH_TESTS=Off \
+                -DHPX_WITH_EXAMPLES=On
+            rm -rf *
+      - run:
+          name: Running CMake with APEX on
+          command: |
+            cmake \
+                /hpx/source \
+                -G "Ninja" \
+                -DHPX_WITH_MALLOC=system \
+                -DHPX_WITH_APEX=On \
+                -DHPX_WITH_TESTS=On \
+                -DHPX_WITH_EXAMPLES=On
+            rm -rf *
+      - persist_to_workspace:
+          root: /hpx
+          paths:
+            - ./build
+
   clang_tidy:
     <<: *defaults
     steps:
@@ -1178,6 +1219,10 @@ workflows:
       - checkout_code:
           <<: *gh_pages_filter
       - configure:
+          requires:
+            - checkout_code
+          <<: *gh_pages_filter
+      - configure_test_combinations:
           requires:
             - checkout_code
           <<: *gh_pages_filter
