@@ -7,10 +7,10 @@
 #include <hpx/util/runtime_configuration.hpp>
 
 // TODO: move parcel ports into plugins
+#include <hpx/assertion.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/itt_notify.hpp>

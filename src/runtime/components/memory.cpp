@@ -4,11 +4,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/server/memory.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/runtime/components/server/memory.hpp>
 
 #include <cstddef>
 #include <cstdint>

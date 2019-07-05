@@ -7,6 +7,7 @@
 #define HPX_UTIL_DEC_21_2011_0340PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -14,7 +15,6 @@
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/util/activate_counters.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_back.hpp>

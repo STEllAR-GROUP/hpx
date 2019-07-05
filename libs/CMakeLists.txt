@@ -10,6 +10,7 @@ include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
 
 set(HPX_LIBS
+  assertion
   cache
   collectives
   config

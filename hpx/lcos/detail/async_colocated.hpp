@@ -7,6 +7,7 @@
 #define HPX_LCOS_ASYNC_COLOCATED_FEB_01_2014_0105PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/async_continue_fwd.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <type_traits>

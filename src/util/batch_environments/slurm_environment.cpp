@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/batch_environments/slurm_environment.hpp>
 
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3

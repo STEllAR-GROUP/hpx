@@ -8,6 +8,7 @@
 #define HPX_UTIL_NUMA_ALLOCATOR_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
@@ -16,7 +17,6 @@
 #include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <limits>

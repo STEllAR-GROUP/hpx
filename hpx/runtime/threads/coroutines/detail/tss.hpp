@@ -12,7 +12,7 @@
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_TSS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 
 #include <cstddef>
 #include <map>

@@ -18,7 +18,7 @@
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 
 #include <cstddef>
 #include <cstdint>

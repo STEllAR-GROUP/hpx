@@ -853,6 +853,7 @@ jobs:
       - run:
           name: Building Module Unit Tests
           command: |
+              ninja -j2 -k 0 tests.unit.modules.assertion
               ninja -j2 -k 0 tests.unit.modules.cache
               ninja -j2 -k 0 tests.unit.modules.collectives
               ninja -j2 -k 0 tests.unit.modules.config
@@ -862,6 +863,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.assertion
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
@@ -1102,6 +1104,7 @@ jobs:
       - run:
           name: Building Modules Header Tests
           command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.modules.assertion
               ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.modules.cache
               ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.modules.collectives
               ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.modules.config

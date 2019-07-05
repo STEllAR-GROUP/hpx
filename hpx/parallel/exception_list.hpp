@@ -8,10 +8,10 @@
 #define HPX_PARALLEL_EXCEPTION_LIST_JUN_25_2014_1055PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/execution_policy_fwd.hpp>

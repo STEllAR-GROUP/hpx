@@ -8,6 +8,7 @@
 #define HPX_SCHEDULED_THREAD_POOL_IMPL_HPP
 
 #include <hpx/apply.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
@@ -28,10 +29,9 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/state.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unlock_guard.hpp>
@@ -552,6 +552,7 @@ namespace hpx { namespace threads { namespace detail
             sched_->Scheduler::get_state(thread_num);
         hpx::state oldstate = state.exchange(state_running);
         HPX_ASSERT(oldstate <= state_running);
+        HPX_UNUSED(oldstate);
 
         // wait for all threads to start up before before starting HPX work
         startup->wait();
@@ -1956,6 +1957,7 @@ namespace hpx { namespace threads { namespace detail
             sched_->Scheduler::get_state(virt_core);
         hpx::state oldstate = state.exchange(state_initialized);
         HPX_ASSERT(oldstate == state_stopped || oldstate == state_initialized);
+        HPX_UNUSED(oldstate);
 
         threads_[virt_core] =
             compat::thread(&scheduled_thread_pool::thread_func, this,

@@ -8,6 +8,7 @@
 #define HPX_LCOS_PACKAGED_ACTION_JUN_27_2008_0420PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
@@ -18,7 +19,6 @@
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/internal_allocator.hpp>
 
 #include <boost/asio/error.hpp>

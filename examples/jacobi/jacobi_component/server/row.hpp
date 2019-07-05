@@ -9,8 +9,8 @@
 
 #include "../row_range.hpp"
 
+#include <hpx/assertion.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/smart_ptr/shared_array.hpp>
