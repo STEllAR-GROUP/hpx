@@ -157,14 +157,14 @@ struct format_write {
 private:
 
     // non-generic
-    template<class formatter> void add_formatter_impl(formatter fmt,
+    template<class Formatter> void add_formatter_impl(Formatter fmt,
         const std::false_type& ) {
         formatter_ptr p = m_formatters.append(fmt);
         m_router.append_formatter(p);
     }
 
     // non-generic
-    template<class formatter> void del_formatter_impl(formatter fmt,
+    template<class Formatter> void del_formatter_impl(Formatter fmt,
         const std::false_type& ) {
         formatter_ptr p = m_formatters.get_ptr(fmt);
         m_router.del_formatter(p);
@@ -172,14 +172,14 @@ private:
     }
 
     // non-generic
-    template<class destination> void add_destination_impl(destination dest,
+    template<class Destination> void add_destination_impl(Destination dest,
         const std::false_type& ) {
         destination_ptr p = m_destinations.append(dest);
         m_router.append_destination(p);
     }
 
     // non-generic
-    template<class destination> void del_destination_impl(destination dest,
+    template<class Destination> void del_destination_impl(Destination dest,
         const std::false_type& ) {
         destination_ptr p = m_destinations.get_ptr(dest);
         m_router.del_destination(p);
@@ -187,34 +187,34 @@ private:
     }
 
     // generic manipulator
-    template<class formatter> void add_formatter_impl(formatter fmt,
+    template<class Formatter> void add_formatter_impl(Formatter fmt,
         const std::true_type& ) {
         typedef hpx::util::logging::manipulator::detail
-            ::generic_holder<formatter,formatter_base> holder;
+         ::generic_holder<Formatter, formatter_base> holder;
         add_formatter_impl( holder(fmt), std::false_type() );
     }
 
     // generic manipulator
-    template<class formatter> void del_formatter_impl(formatter fmt,
+    template<class Formatter> void del_formatter_impl(Formatter fmt,
         const std::true_type& ) {
         typedef hpx::util::logging::manipulator::detail
-            ::generic_holder<formatter,formatter_base> holder;
+            ::generic_holder<Formatter, formatter_base> holder;
         del_formatter_impl( holder(fmt), std::false_type() );
     }
 
     // generic manipulator
-    template<class destination> void add_destination_impl(destination dest,
+    template<class Destination> void add_destination_impl(Destination dest,
         const std::true_type& ) {
         typedef hpx::util::logging::manipulator::detail
-            ::generic_holder<destination,destination_base> holder;
+            ::generic_holder<Destination, destination_base> holder;
         add_destination_impl( holder(dest), std::false_type() );
     }
 
     // generic manipulator
-    template<class destination> void del_destination_impl(destination dest,
+    template<class Destination> void del_destination_impl(Destination dest,
         const std::true_type& ) {
         typedef hpx::util::logging::manipulator::detail
-            ::generic_holder<destination,destination_base> holder;
+            ::generic_holder<Destination, destination_base> holder;
         del_destination_impl( holder(dest), std::false_type() );
     }
 
