@@ -9,6 +9,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/collectives/include
 set(collectives_headers
+  hpx/collectives/all_reduce.hpp
   hpx/collectives/all_to_all.hpp
 )
 
