@@ -31,12 +31,17 @@ set(preprocessor_compat_headers
 set(preprocessor_sources
 )
 
+# Apex depends on hpx_preprocessor, need to export it
+if(HPX_WITH_APEX)
+  set(_export_module INSTALL_BINARIES ON EXPORT ON)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(preprocessor
     DEPRECATION_WARNINGS
     COMPATIBILITY_HEADERS OFF
-    INSTALL_BINARIES OFF
     FORCE_LINKING_GEN ON
+    ${_export_module}           # Necessary for apex
     SOURCES ${preprocessor_sources}
     HEADERS ${preprocessor_headers}
     COMPAT_HEADERS ${preprocessor_compat_headers}

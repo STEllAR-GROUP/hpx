@@ -6,7 +6,7 @@
 function(add_hpx_module name)
   # Retrieve arguments
   set(options DEPRECATION_WARNINGS)
-  set(one_value_args COMPATIBILITY_HEADERS GLOBAL_HEADER_GEN FORCE_LINKING_GEN INSTALL_BINARIES)
+  set(one_value_args COMPATIBILITY_HEADERS GLOBAL_HEADER_GEN FORCE_LINKING_GEN INSTALL_BINARIES EXPORT)
   set(multi_value_args SOURCES HEADERS COMPAT_HEADERS DEPENDENCIES CMAKE_SUBDIRS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 

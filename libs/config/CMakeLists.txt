@@ -37,12 +37,17 @@ set(config_sources
   version.cpp
 )
 
+# Apex depends on hpx_config, need to export it
+if(HPX_WITH_APEX)
+  set(_export_module INSTALL_BINARIES ON EXPORT ON)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(config
     COMPATIBILITY_HEADERS OFF
     GLOBAL_HEADER_GEN OFF
-    INSTALL_BINARIES OFF
     FORCE_LINKING_GEN OFF
+    ${_export_module}           # Necessary for apex
     SOURCES ${config_sources}
     HEADERS ${config_headers}
     DEPENDENCIES hpx_preprocessor

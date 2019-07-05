@@ -41,12 +41,17 @@ set(cache_compat_headers
 set(cache_sources
 )
 
+# Apex depends on hpx_cache, need to export it
+if(HPX_WITH_APEX)
+  set(_export_module INSTALL_BINARIES ON EXPORT ON)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(cache
     DEPRECATION_WARNINGS
     COMPATIBILITY_HEADERS ON    # Added in 1.4.0
-    INSTALL_BINARIES OFF
     FORCE_LINKING_GEN ON
+    ${_export_module}           # Necessary for apex
     SOURCES ${cache_sources}
     HEADERS ${cache_headers}
     COMPAT_HEADERS ${cache_compat_headers}

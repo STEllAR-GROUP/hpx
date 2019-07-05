@@ -28,13 +28,18 @@ set(assertion_sources
   source_location.cpp
 )
 
+# Apex depends on hpx_assertion, need to export it
+if(HPX_WITH_APEX)
+  set(_export_module INSTALL_BINARIES ON EXPORT ON)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(assertion
     DEPRECATION_WARNINGS
     COMPATIBILITY_HEADERS ON    # Added in 1.4.0
     GLOBAL_HEADER_GEN OFF
-    INSTALL_BINARIES OFF
     FORCE_LINKING_GEN OFF
+    ${_export_module}
     SOURCES ${assertion_sources}
     HEADERS ${assertion_headers}
     COMPAT_HEADERS ${assertion_compat_headers}
