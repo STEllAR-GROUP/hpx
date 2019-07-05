@@ -138,6 +138,7 @@ namespace hpx { namespace lcos
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
+#include <hpx/assertion.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/and_gate.hpp>
@@ -153,7 +154,6 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/unused.hpp>
