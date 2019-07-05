@@ -12,6 +12,7 @@ set(datastructures_headers
   hpx/datastructures/optional.hpp
   hpx/datastructures/detail/pack.hpp
   hpx/traits/supports_streaming_with_any.hpp
+  hpx/traits/is_tuple_like.hpp
 )
 
 set(datastructures_compat_headers

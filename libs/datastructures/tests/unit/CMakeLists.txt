@@ -22,7 +22,8 @@ foreach(test ${tests})
   # add example executable
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
-                     ${${test}_FLAGS}
+                     NOLIBS
+                     DEPENDENCIES hpx_datastructures hpx_testing
                      EXCLUDE_FROM_ALL
                      FOLDER ${folder_name})
 

@@ -18,12 +18,18 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>    // for size_t
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable : 4520)    // multiple default constructors specified
+#endif
+
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmismatched-tags"
 #endif
 
 namespace hpx { namespace util {
@@ -55,7 +61,26 @@ namespace hpx { namespace util {
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
         typename tuple_element<I, Tuple>::type const&&
         get(Tuple const&& t) noexcept;
+}}
 
+// Adapt hpx::util::tuple to be useable with std::tuple
+namespace std
+{
+    template <typename... Ts>
+    struct tuple_size<hpx::util::tuple<Ts...>>
+      : public hpx::util::tuple_size<hpx::util::tuple<Ts...>>
+    {};
+
+    template <std::size_t I, typename... Ts>
+    struct tuple_element<I, hpx::util::tuple<Ts...>>
+      : public hpx::util::tuple_element<I, hpx::util::tuple<Ts...>>
+    {};
+
+    using hpx::util::get;
+}
+
+namespace hpx { namespace util
+{
     namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <std::size_t I, typename T, typename Enable = void>
@@ -307,6 +332,18 @@ namespace hpx { namespace util {
                     typename detail::at_index<I, Ts...>::type> const&>(*this)
                     .value();
             }
+
+            HPX_HOST_DEVICE
+            operator std::tuple<Ts...>() const &
+            {
+                return std::make_tuple(get<Is>()...);
+            }
+
+            HPX_HOST_DEVICE
+            operator std::tuple<Ts...>() &&
+            {
+                return std::make_tuple(std::move(get<Is>())...);
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -362,6 +399,11 @@ namespace hpx { namespace util {
         // Calls swap for each element in *this and its corresponding element
         // in rhs.
         HPX_HOST_DEVICE void swap(tuple& /*other*/) noexcept {}
+
+        operator std::tuple<>() const
+        {
+            return std::tuple<>();
+        }
     };
 
     template <typename... Ts>
@@ -503,6 +545,16 @@ namespace hpx { namespace util {
         {
             _impl.swap(other._impl);
         }
+
+        operator std::tuple<Ts...>() const&
+        {
+            return _impl;
+        }
+
+        operator std::tuple<Ts...>() &&
+        {
+            return _impl;
+        }
     };
 
     // 20.4.2.5, tuple helper classes
@@ -552,6 +604,11 @@ namespace hpx { namespace util {
       : std::integral_constant<std::size_t, Size>
     {
     };
+
+    template <typename ...Ts>
+    struct tuple_size<std::tuple<Ts...>>
+       : std::tuple_size<std::tuple<Ts...>>
+    {};
 
     // template <size_t I, class Tuple>
     // class tuple_element
@@ -665,6 +722,24 @@ namespace hpx { namespace util {
             std::array<Type, Size> const& tuple) noexcept
         {
             return tuple[I];
+        }
+    };
+
+    template <std::size_t I, typename ...Ts>
+    struct tuple_element<I, std::tuple<Ts...>>
+    {
+        using type = typename std::tuple_element<I, std::tuple<Ts...>>::type;
+
+        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&
+        get(std::tuple<Ts...>& tuple) noexcept
+        {
+            return std::get<I>(tuple);
+        }
+
+        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const&
+        get(std::tuple<Ts...> const& tuple) noexcept
+        {
+            return std::get<I>(tuple);
         }
     };
 
@@ -1016,6 +1091,10 @@ namespace hpx { namespace util {
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
+#endif
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
 #endif
 
 #endif
