@@ -7,6 +7,7 @@
 #if !defined(HPX_TRAITS_PACK_TRAVERSAL_REBIND_CONTAINER_JUN_10_2019_1020AM)
 #define HPX_TRAITS_PACK_TRAVERSAL_REBIND_CONTAINER_JUN_10_2019_1020AM
 
+#include <array>
 #include <memory>
 #include <list>
 #include <type_traits>
@@ -101,6 +102,16 @@ namespace hpx { namespace traits
             // that is capable of allocating the mapped type.
             return std::list<NewType, NewAllocator>(
                 NewAllocator(container.get_allocator()));
+        }
+    };
+
+    template <typename NewType, typename OldType, std::size_t N>
+    struct pack_traversal_rebind_container<NewType, std::array<OldType, N>>
+    {
+        static std::array<NewType, N> call(
+            std::array<OldType, N> const& /*container*/)
+        {
+            return std::array<NewType, N>();
         }
     };
 }}
