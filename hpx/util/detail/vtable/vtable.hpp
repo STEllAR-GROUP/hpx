@@ -11,10 +11,7 @@
 #include <hpx/config.hpp>
 
 #include <cstddef>
-#include <memory>
 #include <type_traits>
-#include <typeinfo>
-#include <utility>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -25,18 +22,19 @@ namespace hpx { namespace util { namespace detail
     template <typename VTable, typename T>
     struct vtables
     {
-        static VTable const instance;
+        static HPX_CONSTEXPR_OR_CONST VTable instance =
+            detail::construct_vtable<T>();
     };
 
     template <typename VTable, typename T>
-    VTable const vtables<VTable, T>::instance = construct_vtable<T>();
+    HPX_CONSTEXPR_OR_CONST VTable vtables<VTable, T>::instance;
 
     template <typename VTable, typename T>
-    HPX_CONSTEXPR inline VTable const* get_vtable() noexcept
+    HPX_CONSTEXPR VTable const* get_vtable() noexcept
     {
         static_assert(
-            std::is_same<T, typename std::decay<T>::type>::value,
-            "T shall have no cv-ref-qualifiers");
+            !std::is_reference<T>::value,
+            "T shall have no ref-qualifiers");
 
         return &vtables<VTable, T>::instance;
     }
@@ -44,90 +42,49 @@ namespace hpx { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct vtable
     {
-        static const std::size_t function_storage_size = 3*sizeof(void*);
+        template <typename T>
+        static T& get(void* obj) noexcept
+        {
+            return *reinterpret_cast<T*>(obj);
+        }
 
         template <typename T>
-        HPX_FORCEINLINE static T& get(void** v)
+        static T const& get(void const* obj) noexcept
         {
-            if (sizeof(T) <= function_storage_size)
-            {
-                return *reinterpret_cast<T*>(v);
-            } else {
-                return **reinterpret_cast<T**>(v);
+            return *reinterpret_cast<T const*>(obj);
+        }
+
+        template <typename T>
+        static void* allocate(void* storage, std::size_t storage_size)
+        {
+            using storage_t =
+                typename std::aligned_storage<sizeof(T), alignof(T)>::type;
+
+            if (sizeof(T) > storage_size) {
+                return new storage_t;
+            }
+            return storage;
+        }
+
+        template <typename T>
+        static void _deallocate(void* obj, std::size_t storage_size, bool destroy)
+        {
+            using storage_t =
+                typename std::aligned_storage<sizeof(T), alignof(T)>::type;
+
+            if (destroy) {
+                get<T>(obj).~T();
+            }
+
+            if (sizeof(T) > storage_size) {
+                delete static_cast<storage_t*>(obj);
             }
         }
-
-        template <typename T>
-        HPX_FORCEINLINE static T const& get(void* const* v)
-        {
-            if (sizeof(T) <= function_storage_size)
-            {
-                return *reinterpret_cast<T const*>(v);
-            } else {
-                return **reinterpret_cast<T* const*>(v);
-            }
-        }
-
-        template <typename T>
-        HPX_FORCEINLINE static void default_construct(void** v)
-        {
-            if (sizeof(T) <= function_storage_size)
-            {
-                ::new (static_cast<void*>(v)) T; //-V206
-            } else {
-                *v = new T;
-            }
-        }
-
-        template <typename T, typename Arg>
-        HPX_FORCEINLINE static void construct(void** v, Arg&& arg)
-        {
-            if (sizeof(T) <= function_storage_size)
-            {
-                ::new (static_cast<void*>(v)) T(std::forward<Arg>(arg)); //-V206
-            } else {
-                *v = new T(std::forward<Arg>(arg));
-            }
-        }
-
-        template <typename T, typename Arg>
-        HPX_FORCEINLINE static void reconstruct(void** v, Arg&& arg)
-        {
-            _delete<T>(v);
-            construct<T, Arg>(v, std::forward<Arg>(arg));
-        }
-
-        template <typename T>
-        HPX_FORCEINLINE static std::type_info const& _get_type()
-        {
-            return typeid(T);
-        }
-        std::type_info const& (*get_type)();
-
-        template <typename T>
-        HPX_FORCEINLINE static void _destruct(void** v)
-        {
-            get<T>(v).~T();
-        }
-        void (*destruct)(void**);
-
-        template <typename T>
-        HPX_FORCEINLINE static void _delete(void** v)
-        {
-            if (sizeof(T) <= function_storage_size)
-            {
-                _destruct<T>(v);
-            } else {
-                delete &get<T>(v);
-            }
-        }
-        void (*delete_)(void**);
+        void (*deallocate)(void*, std::size_t storage_size, bool);
 
         template <typename T>
         HPX_CONSTEXPR vtable(construct_vtable<T>) noexcept
-          : get_type(&vtable::template _get_type<T>)
-          , destruct(&vtable::template _destruct<T>)
-          , delete_(&vtable::template _delete<T>)
+          : deallocate(&vtable::template _deallocate<T>)
         {}
     };
 }}}

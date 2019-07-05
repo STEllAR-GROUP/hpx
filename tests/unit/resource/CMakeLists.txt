@@ -5,26 +5,28 @@
 
 set(tests
     named_pool_executor
-    resource_partitioner
+    resource_partitioner_info
     shutdown_suspended_pus
     suspend_disabled
     suspend_pool
     suspend_pool_external
     suspend_runtime
-    throttle
-    throttle_timed
+    suspend_thread
+    suspend_thread_external
+    suspend_thread_timed
     used_pus
 )
 
 set(named_pool_executor_PARAMETERS THREADS_PER_LOCALITY 4)
-set(resource_partitioner_PARAMETERS THREADS_PER_LOCALITY 4)
+set(resource_partitioner_info_PARAMETERS THREADS_PER_LOCALITY 4)
 set(shutdown_suspended_pus_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_disabled_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_pool_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_pool_external_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_runtime_PARAMETERS THREADS_PER_LOCALITY 4)
-set(throttle_PARAMETERS THREADS_PER_LOCALITY 4)
-set(throttle_timed_PARAMETERS THREADS_PER_LOCALITY 4)
+set(suspend_thread_PARAMETERS THREADS_PER_LOCALITY 4)
+set(suspend_thread_external_PARAMETERS THREADS_PER_LOCALITY 4)
+set(suspend_thread_timed_PARAMETERS THREADS_PER_LOCALITY 4)
 set(used_pus_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
@@ -52,6 +54,6 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.unit.resource.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()
 

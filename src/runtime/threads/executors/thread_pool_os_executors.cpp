@@ -16,8 +16,8 @@
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
 #endif
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
@@ -162,13 +162,15 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     void thread_pool_os_executor<Scheduler>::add(closure_type && f,
         util::thread_description const& desc,
-        threads::thread_state_enum initial_state,
-        bool run_now, threads::thread_stacksize stacksize, error_code& ec)
+        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_stacksize stacksize,
+        threads::thread_schedule_hint schedulehint,
+        error_code& ec)
     {
         // create a new thread
-        thread_init_data data(util::bind(
-            util::one_shot(&thread_pool_os_executor::thread_function_nullary),
-            std::move(f)), desc);
+        thread_init_data data(util::one_shot(util::bind(
+            &thread_pool_os_executor::thread_function_nullary,
+            std::move(f))), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
@@ -191,9 +193,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new suspended thread
-        thread_init_data data(util::bind(
-            util::one_shot(&thread_pool_os_executor::thread_function_nullary),
-            std::move(f)), desc);
+        thread_init_data data(util::one_shot(util::bind(
+            &thread_pool_os_executor::thread_function_nullary,
+            std::move(f))), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;

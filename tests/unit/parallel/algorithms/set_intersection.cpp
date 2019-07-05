@@ -84,26 +84,12 @@ void test_set_intersection1()
 
     test_set_intersection1_async(execution::seq(execution::task), IteratorTag());
     test_set_intersection1_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_intersection1(execution_policy(execution::seq), IteratorTag());
-    test_set_intersection1(execution_policy(execution::par), IteratorTag());
-    test_set_intersection1(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_set_intersection1(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_intersection1(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_intersection_test1()
 {
     test_set_intersection1<std::random_access_iterator_tag>();
     test_set_intersection1<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_intersection1<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -182,26 +168,12 @@ void test_set_intersection2()
 
     test_set_intersection2_async(execution::seq(execution::task), IteratorTag());
     test_set_intersection2_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_intersection2(execution_policy(execution::seq), IteratorTag());
-    test_set_intersection2(execution_policy(execution::par), IteratorTag());
-    test_set_intersection2(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_set_intersection2(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_intersection2(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_intersection_test2()
 {
     test_set_intersection2<std::random_access_iterator_tag>();
     test_set_intersection2<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_intersection2<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -310,29 +282,12 @@ void test_set_intersection_exception()
         IteratorTag());
     test_set_intersection_exception_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_intersection_exception(execution_policy(execution::seq),
-        IteratorTag());
-    test_set_intersection_exception(execution_policy(execution::par),
-        IteratorTag());
-
-    test_set_intersection_exception(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_intersection_exception(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_intersection_exception_test()
 {
     test_set_intersection_exception<std::random_access_iterator_tag>();
     test_set_intersection_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_intersection_exception<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -439,29 +394,12 @@ void test_set_intersection_bad_alloc()
         IteratorTag());
     test_set_intersection_bad_alloc_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_intersection_bad_alloc(execution_policy(execution::seq),
-        IteratorTag());
-    test_set_intersection_bad_alloc(execution_policy(execution::par),
-        IteratorTag());
-
-    test_set_intersection_bad_alloc(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_intersection_bad_alloc(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_intersection_bad_alloc_test()
 {
     test_set_intersection_bad_alloc<std::random_access_iterator_tag>();
     test_set_intersection_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_intersection_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

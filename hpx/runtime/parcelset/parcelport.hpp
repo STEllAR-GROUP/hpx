@@ -172,7 +172,8 @@ namespace hpx { namespace parcelset
         };
 
         // invoke pending background work
-        virtual bool do_background_work(std::size_t num_thread) = 0;
+        virtual bool do_background_work(
+            std::size_t num_thread, parcelport_background_mode mode) = 0;
 
         // retrieve performance counter value for given statistics type
         virtual std::int64_t get_connection_cache_statistics(
@@ -316,11 +317,6 @@ namespace hpx { namespace parcelset
             return allow_zero_copy_optimizations_;
         }
 
-        bool enable_security() const
-        {
-            return enable_security_;
-        }
-
         bool async_serialization() const
         {
             return async_serialization_;
@@ -368,9 +364,6 @@ namespace hpx { namespace parcelset
         /// serialization is allowed to use array optimization
         bool allow_array_optimizations_;
         bool allow_zero_copy_optimizations_;
-
-        /// enable security
-        bool enable_security_;
 
         /// async serialization of parcels
         bool async_serialization_;

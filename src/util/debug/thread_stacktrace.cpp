@@ -7,9 +7,10 @@
 #include <hpx/util/debug/thread_stacktrace.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 
-#include <vector>
+#include <iomanip>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace hpx {
 namespace util {

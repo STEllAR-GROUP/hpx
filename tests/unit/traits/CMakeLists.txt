@@ -5,6 +5,7 @@
 
 set(tests
     is_callable
+    is_iterator
     is_range
     is_tuple_like
    )
@@ -34,6 +35,6 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.unit.traits.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()
 

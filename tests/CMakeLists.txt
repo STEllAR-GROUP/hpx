@@ -25,10 +25,6 @@ if(HPX_WITH_TESTS_HEADERS)
 endif()
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.${subdir})
   add_subdirectory(${subdir})
-  if(${subdir}_FLAGS)
-    add_hpx_pseudo_dependencies(tests tests.${subdir})
-  endif()
 endforeach()
 

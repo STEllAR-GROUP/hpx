@@ -12,26 +12,33 @@
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
+#include <cstddef>
+#include <new>
+
 namespace hpx { namespace util { namespace detail
 {
     struct serializable_vtable
     {
         template <typename T>
-        static void _save_object(void* const* v,
-            serialization::output_archive& ar, unsigned version)
+        static void _save_object(void const* obj,
+            serialization::output_archive& ar, unsigned /*version*/)
         {
-            ar << vtable::get<T>(v);
+            ar << vtable::get<T>(obj);
         }
-        void (*save_object)(void* const*, serialization::output_archive&, unsigned);
+        void (*save_object)(void const*,
+            serialization::output_archive&, unsigned);
 
         template <typename T>
-        static void _load_object(void** v,
-            serialization::input_archive& ar, unsigned version)
+        static void* _load_object(void* storage, std::size_t storage_size,
+            serialization::input_archive& ar, unsigned /*version*/)
         {
-            vtable::default_construct<T>(v);
-            ar >> vtable::get<T>(v);
+            void* buffer = vtable::allocate<T>(storage, storage_size);
+            void* obj = ::new (buffer) T;
+            ar >> vtable::get<T>(obj);
+            return obj;
         }
-        void (*load_object)(void**, serialization::input_archive&, unsigned);
+        void* (*load_object)(void*, std::size_t,
+            serialization::input_archive&, unsigned);
 
         template <typename T>
         HPX_CONSTEXPR serializable_vtable(construct_vtable<T>) noexcept

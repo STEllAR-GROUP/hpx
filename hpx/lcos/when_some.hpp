@@ -225,6 +225,7 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -235,7 +236,6 @@ namespace hpx
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
@@ -506,7 +506,9 @@ namespace hpx { namespace lcos
                 std::move(lazy_values_), n);
 
         lcos::local::futures_factory<when_some_result<result_type>()> p(
-            util::deferred_call(&detail::when_some<result_type>::operator(), f));
+            [HPX_CAPTURE_MOVE(f)]() -> when_some_result<result_type> {
+                return (*f)();
+            });
 
         p.apply();
         return p.get_future();
@@ -609,7 +611,9 @@ namespace hpx { namespace lcos
                 std::move(lazy_values), n);
 
         lcos::local::futures_factory<when_some_result<result_type>()> p(
-            util::deferred_call(&detail::when_some<result_type>::operator(), f));
+            [HPX_CAPTURE_MOVE(f)]() -> when_some_result<result_type> {
+                return (*f)();
+            });
 
         p.apply();
         return p.get_future();
@@ -656,7 +660,9 @@ namespace hpx { namespace lcos
                 std::move(lazy_values), n);
 
         lcos::local::futures_factory<when_some_result<result_type>()> p(
-            util::deferred_call(&detail::when_some<result_type>::operator(), f));
+            [HPX_CAPTURE_MOVE(f)]() -> when_some_result<result_type> {
+                return (*f)();
+            });
 
         p.apply();
         return p.get_future();

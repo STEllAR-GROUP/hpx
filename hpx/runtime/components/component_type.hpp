@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c)      2017 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -9,16 +9,17 @@
 #define HPX_RUNTIME_COMPONENTS_COMPONENT_TYPE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/expand.hpp>
+#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/traits/component_type_database.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/detail/pp/strip_parens.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/expand.hpp>
-#include <hpx/util/detail/pp/nargs.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <cstdint>
 #include <string>
@@ -43,43 +44,40 @@ namespace hpx { namespace components
         // Pseudo-component for direct access to local virtual memory.
         component_memory = 2,
 
-        // Generic memory blocks.
-        component_memory_block = 3,
-
         // Base component for LCOs that do not produce a value.
-        component_base_lco = 4,
+        component_base_lco = 3,
 
         // Base component for LCOs that produce values.
-        component_base_lco_with_value_unmanaged = 5,
+        component_base_lco_with_value_unmanaged = 4,
 
         // (Managed) base component for LCOs that produce values.
-        component_base_lco_with_value = 6,
+        component_base_lco_with_value = 5,
 
         // Synchronization latch, barrier, and flex_barrier LCOs.
-        component_latch = ((7 << 16) | component_base_lco_with_value),
-        component_barrier = ((8 << 16) | component_base_lco),
-        component_flex_barrier = ((9 << 16) | component_base_lco),
+        component_latch = ((6 << 10) | component_base_lco_with_value),
+        component_barrier = ((7 << 10) | component_base_lco),
+        component_flex_barrier = ((8 << 10) | component_base_lco),
 
         // An LCO representing a value which may not have been computed yet.
-        component_promise = ((10 << 16) | component_base_lco_with_value),
+        component_promise = ((9 << 10) | component_base_lco_with_value),
 
         // AGAS locality services.
-        component_agas_locality_namespace = 11,
+        component_agas_locality_namespace = 10,
 
         // AGAS primary address resolution services.
-        component_agas_primary_namespace = 12,
+        component_agas_primary_namespace = 11,
 
         // AGAS global type system.
-        component_agas_component_namespace = 13,
+        component_agas_component_namespace = 12,
 
         // AGAS symbolic naming services.
-        component_agas_symbol_namespace = 14,
+        component_agas_symbol_namespace = 13,
 
         component_last,
         component_first_dynamic = component_last,
 
-        // Force this enum type to be at least 32 bits.
-        component_upper_bound = 0x7fffffffL    //-V112
+        // Force this enum type to be at least 20 bits.
+        component_upper_bound = 0xfffffL    //-V112
     };
 
     enum factory_state_enum
@@ -89,11 +87,15 @@ namespace hpx { namespace components
         factory_check    = 2
     };
 
+    // access data related to component instance counts
     HPX_EXPORT bool& enabled(component_type type);
     HPX_EXPORT util::atomic_count& instance_count(component_type type);
     typedef void(*component_deleter_type)(
         hpx::naming::gid_type const&, hpx::naming::address const&);
     HPX_EXPORT component_deleter_type& deleter(component_type type);
+
+    HPX_EXPORT bool enumerate_instance_counts(
+        util::unique_function_nonser<bool(component_type)> const& f);
 
     /// \brief Return the string representation for a given component type id
     HPX_EXPORT std::string const get_component_type_name(component_type type);
@@ -102,13 +104,13 @@ namespace hpx { namespace components
     /// exposing the actions.
     inline component_type get_base_type(component_type t)
     {
-        return component_type(t & 0xFFFF);
+        return component_type(t & 0x3FF);
     }
 
     /// The upper short word of the component is the actual component type
     inline component_type get_derived_type(component_type t)
     {
-        return component_type((t >> 16) & 0xFFFF);
+        return component_type((t >> 10) & 0x3FF);
     }
 
     /// A component derived from a base component exposing the actions needs to
@@ -116,7 +118,7 @@ namespace hpx { namespace components
     inline component_type
     derived_component_type(component_type derived, component_type base)
     {
-        return component_type(derived << 16 | base);
+        return component_type(derived << 10 | base);
     }
 
     /// \brief Verify the two given component types are matching (compatible)

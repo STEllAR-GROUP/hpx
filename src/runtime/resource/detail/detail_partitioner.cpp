@@ -4,13 +4,15 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/resource/partitioner.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/static.hpp>
 
@@ -55,10 +57,12 @@ namespace hpx { namespace resource { namespace detail
     std::size_t init_pool_data::num_threads_overall = 0;
 
     init_pool_data::init_pool_data(
-            std::string const& name, scheduling_policy sched)
+            std::string const& name, scheduling_policy sched,
+            hpx::threads::policies::scheduler_mode mode)
         : pool_name_(name)
         , scheduling_policy_(sched)
         , num_threads_(0)
+        , mode_(mode)
     {
         if (name.empty())
         {
@@ -72,6 +76,7 @@ namespace hpx { namespace resource { namespace detail
         : pool_name_(name)
         , scheduling_policy_(user_defined)
         , num_threads_(0)
+        , mode_(hpx::threads::policies::scheduler_mode::default_mode)
         , create_function_(std::move(create_func))
     {
         if (name.empty())
@@ -150,6 +155,9 @@ namespace hpx { namespace resource { namespace detail
         case resource::abp_priority_lifo:
             sched = "abp_priority_lifo";
             break;
+        case resource::shared_priority:
+            sched = "shared_priority";
+            break;
         }
 
         os << "\"" << sched << "\" is running on PUs : \n";
@@ -208,7 +216,7 @@ namespace hpx { namespace resource { namespace detail
     ////////////////////////////////////////////////////////////////////////
     partitioner::partitioner()
       : first_core_(std::size_t(-1))
-      , cores_needed_(std::size_t(-1))
+      , pus_needed_(std::size_t(-1))
       , mode_(mode_default)
       , topo_(threads::create_topology())
     {
@@ -218,6 +226,20 @@ namespace hpx { namespace resource { namespace detail
             throw_runtime_error("partitioner::partitioner",
                 "Cannot instantiate more than one resource partitioner");
         }
+
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
+        if(HPX_HAVE_MAX_CPU_COUNT < topo_.get_number_of_pus())
+        {
+            throw_runtime_error("partitioner::partioner",
+                hpx::util::format(
+                    "Currently, HPX_HAVE_MAX_CPU_COUNT is set to {1} "
+                    "while your system has {2} processing units. Please "
+                    "reconfigure HPX with -DHPX_WITH_MAX_CPU_COUNT={2} (or "
+                    "higher) to increase the maximal CPU count supported by "
+                    "HPX.",
+                    HPX_HAVE_MAX_CPU_COUNT, topo_.get_number_of_pus()));
+        }
+#endif
 
         // Create the default pool
         initial_thread_pools_.push_back(init_pool_data("default"));
@@ -232,9 +254,11 @@ namespace hpx { namespace resource { namespace detail
     bool partitioner::pu_exposed(std::size_t pu_num)
     {
         threads::mask_type pu_mask = threads::mask_type();
+        threads::resize(pu_mask, threads::hardware_concurrency());
         threads::set(pu_mask, pu_num);
+        threads::topology& topo = get_topology();
 
-        threads::mask_type comp = affinity_data_.get_used_pus_mask(pu_num);
+        threads::mask_type comp = affinity_data_.get_used_pus_mask(topo, pu_num);
         return threads::any(comp & pu_mask);
     }
 
@@ -276,7 +300,7 @@ namespace hpx { namespace resource { namespace detail
                     if (pu_exposed(pid))
                     {
                         c.pus_.emplace_back(pid, &c,
-                            affinity_data_.get_thread_occupancy(pid));
+                            affinity_data_.get_thread_occupancy(topo, pid));
                         pu &p = c.pus_.back();
 
                         if (p.thread_occupancy_ == 0)
@@ -337,8 +361,8 @@ namespace hpx { namespace resource { namespace detail
         }
 
         // should have been initialized by now
-        HPX_ASSERT(cores_needed_ != std::size_t(-1));
-        return cores_needed_;
+        HPX_ASSERT(pus_needed_ != std::size_t(-1));
+        return pus_needed_;
     }
 
     // This function is called in hpx_init, before the instantiation of the
@@ -430,6 +454,10 @@ namespace hpx { namespace resource { namespace detail
         {
             default_scheduler = scheduling_policy::abp_priority_lifo;
         }
+        else if (0 == std::string("shared-priority").find(cfg_.queuing_))
+        {
+            default_scheduler = scheduling_policy::shared_priority;
+        }
         else
         {
             throw hpx::detail::command_line_error(
@@ -504,7 +532,7 @@ namespace hpx { namespace resource { namespace detail
         {
             if (initial_thread_pools_[i].assigned_pus_.empty())
             {
-                return false;
+                return true;
             }
             for (auto assigned_pus : initial_thread_pools_[i].assigned_pus_)
             {
@@ -519,8 +547,9 @@ namespace hpx { namespace resource { namespace detail
     }
 
     // create a new thread_pool
-    void partitioner::create_thread_pool(
-        std::string const& pool_name, scheduling_policy sched)
+    void partitioner::create_thread_pool(std::string const& pool_name,
+        scheduling_policy sched,
+        hpx::threads::policies::scheduler_mode mode)
     {
         if (get_runtime_ptr() != nullptr)
         {
@@ -543,7 +572,7 @@ namespace hpx { namespace resource { namespace detail
         if (pool_name==get_default_pool_name())
         {
             initial_thread_pools_[0] = detail::init_pool_data(
-                get_default_pool_name(), sched);
+                get_default_pool_name(), sched, mode);
             return;
         }
 
@@ -560,7 +589,7 @@ namespace hpx { namespace resource { namespace detail
             }
         }
 
-        initial_thread_pools_.push_back(detail::init_pool_data(pool_name, sched));
+        initial_thread_pools_.push_back(detail::init_pool_data(pool_name, sched, mode));
     }
 
     // create a new thread_pool
@@ -812,6 +841,13 @@ namespace hpx { namespace resource { namespace detail
         return get_pool_data(l, pool_name).num_threads_;
     }
 
+    hpx::threads::policies::scheduler_mode
+    partitioner::get_scheduler_mode(std::size_t pool_index) const
+    {
+        std::unique_lock<mutex_type> l(mtx_);
+        return get_pool_data(l, pool_index).mode_;
+    }
+
     detail::init_pool_data const& partitioner::get_pool_data(
         std::unique_lock<mutex_type>&l, std::size_t pool_index) const
     {
@@ -880,7 +916,7 @@ namespace hpx { namespace resource { namespace detail
         cfg_.parse_result_ = cfg_.call(desc_cmdline, argc, argv);
 
         // set all parameters related to affinity data
-        cores_needed_ = affinity_data_.init(cfg_);
+        pus_needed_ = affinity_data_.init(cfg_);
 
         if (fill_internal_topology)
         {

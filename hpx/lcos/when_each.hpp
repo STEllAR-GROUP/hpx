@@ -129,15 +129,15 @@ namespace hpx
 #include <hpx/config.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/when_some.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
@@ -221,9 +221,6 @@ namespace hpx { namespace lcos
                 typedef typename traits::future_traits<future_type>::type
                     future_result_type;
 
-                void (when_each_frame::*f)(Iter, Iter) =
-                    &when_each_frame::await_range<I>;
-
                 for(/**/; next != end; ++next)
                 {
                     typename traits::detail::shared_state_ptr<
@@ -244,9 +241,12 @@ namespace hpx { namespace lcos
                             // (if any).
                             boost::intrusive_ptr<when_each_frame> this_(this);
                             next_future_data->set_on_completed(
-                                util::deferred_call(
-                                    f, std::move(this_),
-                                    std::move(next), std::move(end)));
+                                [HPX_CAPTURE_MOVE(this_),
+                                    HPX_CAPTURE_MOVE(next), HPX_CAPTURE_MOVE(end)
+                                ]() mutable -> void {
+                                    return this_->template await_range<I>(
+                                        std::move(next), std::move(end));
+                                });
                             return;
                         }
                     }
@@ -308,12 +308,12 @@ namespace hpx { namespace lcos
                         // Attach a continuation to this future which will
                         // re-evaluate it and continue to the next argument
                         // (if any).
-                        void (when_each_frame::*f)(std::true_type, std::false_type) =
-                            &when_each_frame::await_next<I>;
-
                         boost::intrusive_ptr<when_each_frame> this_(this);
-                        next_future_data->set_on_completed(util::deferred_call(
-                            f, std::move(this_), std::true_type(), std::false_type()));
+                        next_future_data->set_on_completed(
+                            [HPX_CAPTURE_MOVE(this_)]() -> void {
+                                return this_->template await_next<I>(
+                                    std::true_type(), std::false_type());
+                            });
                         return;
                     }
                 }
@@ -405,16 +405,6 @@ namespace hpx { namespace lcos
         return lcos::when_each(std::forward<F>(f), lazy_values);
     }
 
-    namespace detail
-    {
-        template <typename Iterator>
-        Iterator return_iterator(hpx::future<void>&& fut, Iterator end)
-        {
-            fut.get();      // rethrow exceptions, if any
-            return end;
-        }
-    }
-
     template <typename F, typename Iterator>
     typename std::enable_if<
         !traits::is_future<Iterator>::value,
@@ -430,8 +420,13 @@ namespace hpx { namespace lcos
         std::transform(begin, end, std::back_inserter(lazy_values_),
             traits::acquire_future_disp());
 
-        return lcos::when_each(std::forward<F>(f), lazy_values_).then(
-            util::bind_back(&detail::return_iterator<Iterator>, end));
+        return lcos::when_each(std::forward<F>(f), lazy_values_)
+            .then(hpx::launch::sync, [
+                HPX_CAPTURE_MOVE(end)
+            ](lcos::future<void> fut) -> Iterator {
+                fut.get();      // rethrow exceptions, if any
+                return end;
+            });
     }
 
     template <typename F, typename Iterator>
@@ -449,8 +444,13 @@ namespace hpx { namespace lcos
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
 
-        return lcos::when_each(std::forward<F>(f), lazy_values_).then(
-            util::bind_back(&detail::return_iterator<Iterator>, begin));
+        return lcos::when_each(std::forward<F>(f), lazy_values_)
+            .then(hpx::launch::sync, [
+                HPX_CAPTURE_MOVE(begin)
+            ](lcos::future<void> fut) -> Iterator {
+                fut.get();      // rethrow exceptions, if any
+                return begin;
+            });
     }
 
     template <typename F>

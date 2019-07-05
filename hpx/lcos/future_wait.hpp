@@ -7,13 +7,13 @@
 #define HPX_LCOS_FUTURE_WAIT_OCT_23_2008_1140AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 
@@ -70,8 +70,8 @@ namespace hpx { namespace lcos
             }
 
             template <typename Index>
-            void on_future_ready_(Index i, threads::thread_id_type const& id,
-                std::false_type)
+            void on_future_ready(std::false_type,
+                Index i, threads::thread_id_type const& id)
             {
                 if (lazy_values_[i].has_value()) {
                     if (success_counter_)
@@ -85,8 +85,8 @@ namespace hpx { namespace lcos
             }
 
             template <typename Index>
-            void on_future_ready_(Index i, threads::thread_id_type const& id,
-                std::true_type)
+            void on_future_ready(std::true_type,
+                Index i, threads::thread_id_type const& id)
             {
                 if (lazy_values_[i].has_value()) {
                     if (success_counter_)
@@ -97,12 +97,6 @@ namespace hpx { namespace lcos
 
                 // keep track of ready futures
                 on_future_ready_(id);
-            }
-
-            void on_future_ready(std::size_t i, threads::thread_id_type const& id)
-            {
-                on_future_ready_(i, id,
-                    std::is_void<typename traits::future_traits<Future>::type>());
             }
 
         public:
@@ -165,8 +159,11 @@ namespace hpx { namespace lcos
                         traits::detail::get_shared_state(lazy_values_[i]);
 
                     current->execute_deferred();
-                    current->set_on_completed(
-                        util::bind(&wait_each::on_future_ready, this, i, id));
+                    current->set_on_completed([=]() -> void {
+                        using is_void = std::is_void<
+                            typename traits::future_traits<Future>::type>;
+                        return on_future_ready(is_void{}, i, id);
+                    });
                 }
 
                 // If all of the requested futures are already set then our

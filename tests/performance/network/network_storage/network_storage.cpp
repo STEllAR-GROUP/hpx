@@ -9,6 +9,7 @@
 #include <hpx/components/iostreams/standard_streams.hpp>
 #include <hpx/lcos/local/detail/sliding_semaphore.hpp>
 #include <hpx/util/format.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/assert.hpp>
 
@@ -246,13 +247,13 @@ public:
 
   pointer allocate(size_type n, void const* hint = nullptr)
   {
-    HPX_ASSERT(n == size_);
+    HPX_TEST(n == size_);
     return static_cast<T*>(pointer_);
   }
 
   void deallocate(pointer p, size_type n)
   {
-    HPX_ASSERT(p == pointer_ && n == size_);
+    HPX_TEST(p == pointer_ && n == size_);
   }
 
 private:
@@ -410,7 +411,6 @@ HPX_REGISTER_ACTION_DECLARATION(CopyToStorage_action);
 
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyFromStorage, CopyFromStorage_action);
 //HPX_REGISTER_ACTION_DECLARATION(CopyFromStorage_action);
-//HPX_ACTION_INVOKE_NO_MORE_THAN(CopyFromStorage_action, 5);
 
 // and these in a cpp
 HPX_REGISTER_ACTION(CopyToStorage_action);
@@ -426,7 +426,8 @@ int background_work()
 {
     while(FuturesActive)
     {
-        hpx::parcelset::do_background_work(0);
+        hpx::parcelset::do_background_work(
+            0, hpx::parcelset::parcelport_background_mode_all);
         hpx::this_thread::suspend(std::chrono::microseconds(10));
     }
     return 1;
@@ -674,8 +675,8 @@ void test_write(
         std::cout << "Aggregate BW Write   : " << writeBW   << " MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
         char const* msg = "CSVData, write, network, "
-            "%1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, "
-            "IOPS/s, %6%, BW(MB/s), %7%, ";
+            "{1}, ranks, {2}, threads, {3}, Memory, {4}, IOPsize, {5}, "
+            "IOPS/s, {6}, BW(MB/s), {7}, ";
         if (!options.warmup) {
             hpx::util::format_to(std::cout, msg,
                 options.network,
@@ -891,9 +892,9 @@ void test_read(
         std::cout << "IOPs/s (local)       : " << IOPs_s    << "\n";
         std::cout << "Aggregate BW Read    : " << readBW << " MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
-        char const* msg = "CSVData, read, network, %1%, ranks, "
-            "%2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, "
-            "BW(MB/s), %7%, ";
+        char const* msg = "CSVData, read, network, {1}, ranks, "
+            "{2}, threads, {3}, Memory, {4}, IOPsize, {5}, IOPS/s, {6}, "
+            "BW(MB/s), {7}, ";
         hpx::util::format_to(std::cout, msg, options.network, nranks,
             options.threads, readMB, options.transfer_size_B,
             IOPs_s, readBW) << std::endl;
@@ -923,8 +924,8 @@ int hpx_main(boost::program_options::variables_map& vm)
       return 1;
     }
 
-    char const* msg = "hello world from OS-thread %1% on locality "
-        "%2% rank %3% hostname %4%";
+    char const* msg = "hello world from OS-thread {1} on locality "
+        "{2} rank {3} hostname {4}";
     hpx::util::format_to(std::cout, msg, current, hpx::get_locality_id(),
         rank, name.c_str()) << std::endl;
     //

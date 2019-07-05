@@ -92,23 +92,23 @@ namespace hpx { namespace parallel { inline namespace v1
                 typedef typename set_operations_buffer<FwdIter>::type buffer_type;
                 typedef typename hpx::util::decay<F>::type func_type;
 
-                return set_operation(std::forward<ExPolicy>(policy),
-                    first1, last1, first2, last2, dest, std::forward<F>(f),
-                    // calculate approximate destination index
-                    [](difference_type1 idx1, difference_type2 idx2)
-                    ->  difference_type1
-                    {
-                        return idx1 + idx2;
-                    },
-                    // perform required set operation for one chunk
-                    [](RanIter1 part_first1, RanIter1 part_last1,
-                        RanIter2 part_first2, RanIter2 part_last2,
-                        buffer_type* dest, func_type const& f)
-                    ->  buffer_type*
-                    {
-                        return std::set_union(part_first1, part_last1,
-                            part_first2, part_last2, dest, f);
-                    });
+                // calculate approximate destination index
+                auto f1 = [](difference_type1 idx1,
+                              difference_type2 idx2) -> difference_type1 {
+                    return idx1 + idx2;
+                };
+                // perform required set operation for one chunk
+                auto f2 = [](RanIter1 part_first1, RanIter1 part_last1,
+                              RanIter2 part_first2, RanIter2 part_last2,
+                              buffer_type* dest,
+                              func_type const& f) -> buffer_type* {
+                    return std::set_union(part_first1, part_last1, part_first2,
+                        part_last2, dest, f);
+                };
+
+                return set_operation(std::forward<ExPolicy>(policy), first1,
+                    last1, first2, last2, dest, std::forward<F>(f),
+                    std::move(f1), std::move(f2));
             }
         };
         /// \endcond
@@ -208,18 +208,6 @@ namespace hpx { namespace parallel { inline namespace v1
     set_union(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred && op = Pred())
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter1>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter2>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_output_iterator<FwdIter3>::value ||
-                hpx::traits::is_forward_iterator<FwdIter3>::value),
-            "Requires at least output iterator.");
-#else
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
@@ -229,7 +217,6 @@ namespace hpx { namespace parallel { inline namespace v1
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter3>::value),
             "Requires at least forward iterator.");
-#endif
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||

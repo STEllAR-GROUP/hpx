@@ -35,7 +35,7 @@ namespace hpx { namespace detail
         if (!traits::action_is_target_valid<Action>::call(id)) {
             HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
                 hpx::util::format(
-                    "the target (destination) does not match the action type (%s)",
+                    "the target (destination) does not match the action type ({})",
                     hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
@@ -83,7 +83,7 @@ namespace hpx { namespace detail
             if (!traits::action_is_target_valid<Action>::call(id)) {
                 HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
                     hpx::util::format(
-                        "the target (destination) does not match the action type (%s)",
+                        "the target (destination) does not match the action type ({})",
                         hpx::actions::detail::get_action_name<Action>()));
                 return false;
             }
@@ -131,7 +131,7 @@ namespace hpx { namespace detail
         if (!traits::action_is_target_valid<Action>::call(id)) {
             HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
                 hpx::util::format(
-                    "the target (destination) does not match the action type (%s)",
+                    "the target (destination) does not match the action type ({})",
                     hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
@@ -175,7 +175,7 @@ namespace hpx { namespace detail
             if (!traits::action_is_target_valid<Action>::call(id)) {
                 HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
                     hpx::util::format(
-                        "the target (destination) does not match the action type (%s)",
+                        "the target (destination) does not match the action type ({})",
                         hpx::actions::detail::get_action_name<Action>()));
                 return false;
             }
@@ -221,7 +221,7 @@ namespace hpx { namespace detail
         if (!traits::action_is_target_valid<Action>::call(id)) {
             HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_cb_impl",
                 hpx::util::format(
-                    "the target (destination) does not match the action type (%s)",
+                    "the target (destination) does not match the action type ({})",
                     hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
@@ -273,7 +273,7 @@ namespace hpx { namespace detail
         if (!traits::action_is_target_valid<Action>::call(id)) {
             HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_cb_impl",
                 hpx::util::format(
-                    "the target (destination) does not match the action type (%s)",
+                    "the target (destination) does not match the action type ({})",
                     hpx::actions::detail::get_action_name<Action>()));
             return false;
         }

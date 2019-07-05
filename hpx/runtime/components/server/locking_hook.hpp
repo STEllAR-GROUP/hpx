@@ -11,7 +11,6 @@
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
@@ -55,12 +54,11 @@ namespace hpx { namespace components
         static threads::thread_function_type
         decorate_action(naming::address::address_type lva, F && f)
         {
-            return util::bind(
-                util::one_shot(&locking_hook::thread_function),
+            return util::one_shot(util::bind_front(
+                &locking_hook::thread_function,
                 get_lva<this_component_type>::call(lva),
-                util::placeholders::_1,
-                traits::action_decorate_function<base_type>::call(
-                    lva, std::forward<F>(f)));
+                traits::component_decorate_function<base_type>::call(
+                    lva, std::forward<F>(f))));
         }
 
     protected:
@@ -87,7 +85,7 @@ namespace hpx { namespace components
         // Execute the wrapped action. This locks the mutex ensuring a thread
         // safe action invocation.
         threads::thread_result_type thread_function(
-            threads::thread_arg_type state, threads::thread_function_type f)
+            threads::thread_function_type f, threads::thread_arg_type state)
         {
             threads::thread_result_type result(threads::unknown,
                 threads::invalid_thread_id);

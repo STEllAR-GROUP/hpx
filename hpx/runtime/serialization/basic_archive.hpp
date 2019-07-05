@@ -38,7 +38,7 @@ namespace hpx { namespace serialization
     };
 
     void HPX_FORCEINLINE
-    reverse_bytes(char size, char* address)
+    reverse_bytes(std::size_t size, char* address)
     {
         std::reverse(address, address + size);
     }

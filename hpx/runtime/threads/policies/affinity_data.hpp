@@ -7,8 +7,8 @@
 #define HPX_RUNTIME_THREADS_POLICIES_AFFINITY_DATA_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -54,8 +54,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         mask_cref_type get_pu_mask(threads::topology const& topo,
             std::size_t num_thread) const;
 
-        mask_type get_used_pus_mask(std::size_t pu_num) const;
-        std::size_t get_thread_occupancy(std::size_t pid) const;
+        mask_type get_used_pus_mask(threads::topology const& topo,
+            std::size_t pu_num) const;
+        std::size_t get_thread_occupancy(threads::topology const& topo,
+            std::size_t pu_num) const;
 
         std::size_t get_pu_num(std::size_t num_thread) const
         {

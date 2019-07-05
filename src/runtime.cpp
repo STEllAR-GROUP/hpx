@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -15,18 +16,17 @@
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
-#include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>    // EXPORTS get_next_id
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/thread_hooks.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
@@ -45,6 +45,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
@@ -239,6 +240,11 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    threads::policies::callback_notifier::on_startstop_type global_on_start_func;
+    threads::policies::callback_notifier::on_startstop_type global_on_stop_func;
+    threads::policies::callback_notifier::on_error_type global_on_error_func;
+
+    ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(util::runtime_configuration & rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
@@ -246,7 +252,10 @@ namespace hpx
         topology_(resource::get_partitioner().get_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
-        runtime_support_(new components::server::runtime_support(ini_))
+        runtime_support_(new components::server::runtime_support(ini_)),
+        on_start_func_(global_on_start_func),
+        on_stop_func_(global_on_stop_func),
+        on_error_func_(global_on_error_func)
     {
         LPROGRESS_;
 
@@ -277,46 +286,49 @@ namespace hpx
     std::atomic<int> runtime::instance_number_counter_(-1);
 
     ///////////////////////////////////////////////////////////////////////////
-    util::thread_specific_ptr<runtime*, runtime::tls_tag> runtime::runtime_;
-    util::thread_specific_ptr<std::string, runtime::tls_tag> runtime::thread_name_;
-    util::thread_specific_ptr<std::uint64_t, runtime::tls_tag> runtime::uptime_;
+
+    namespace {
+        std::uint64_t& runtime_uptime()
+        {
+            static HPX_NATIVE_TLS std::uint64_t uptime;
+            return uptime;
+        }
+    }
+
+    namespace detail
+    {
+        std::string& runtime_thread_name()
+        {
+            static HPX_NATIVE_TLS std::string thread_name_;
+            return thread_name_;
+        }
+    }
 
     void runtime::init_tss()
     {
         // initialize our TSS
-        if (nullptr == runtime::runtime_.get())
+        runtime*& runtime_ = get_runtime_ptr();
+        if (nullptr == runtime_)
         {
             HPX_ASSERT(nullptr == threads::thread_self::get_self());
 
-            runtime::runtime_.reset(new runtime* (this));
-            runtime::uptime_.reset(new std::uint64_t);
-            *runtime::uptime_.get() = util::high_resolution_clock::now();
-
-            threads::thread_self::init_self(); // done in resource_partitioner
+            runtime_ = this;
+            runtime_uptime() = util::high_resolution_clock::now();
         }
     }
 
     void runtime::deinit_tss()
     {
         // reset our TSS
-        threads::thread_self::reset_self();
-        runtime::uptime_.reset();
-        runtime::runtime_.reset();
-        util::reset_held_lock_data();
-
+        runtime_uptime() = 0;
+        get_runtime_ptr() = nullptr;
         threads::reset_continuation_recursion_count();
-    }
-
-    std::string runtime::get_thread_name()
-    {
-        std::string const* str = runtime::thread_name_.get();
-        return str ? *str : "<unknown>";
     }
 
     std::uint64_t runtime::get_system_uptime()
     {
         std::int64_t diff =
-            util::high_resolution_clock::now() - *runtime::uptime_.get();
+            util::high_resolution_clock::now() - runtime_uptime();
         return diff < 0LL ? 0ULL : static_cast<std::uint64_t>(diff);
     }
 
@@ -442,7 +454,6 @@ namespace hpx
               ""
             },
 
-#if BOOST_VERSION >= 105600
             // rolling stddev counter
             { "/statistics/rolling_stddev", performance_counters::counter_aggregating,
               "returns the rolling standard deviation value of its base counter over "
@@ -453,7 +464,6 @@ namespace hpx
               &performance_counters::default_counter_discoverer,
               ""
             },
-#endif
 
             // median counter
             { "/statistics/median", performance_counters::counter_aggregating,
@@ -696,21 +706,168 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime& get_runtime()
+    threads::policies::callback_notifier::on_startstop_type
+        runtime::on_start_func() const
     {
-        HPX_ASSERT(nullptr != runtime::runtime_.get());   // should have been initialized
-        return **runtime::runtime_;
+        return on_start_func_;
     }
 
-    runtime* get_runtime_ptr()
+    threads::policies::callback_notifier::on_startstop_type
+        runtime::on_stop_func() const
     {
-        runtime** rt = runtime::runtime_.get();
-        return rt ? *rt : nullptr;
+        return on_stop_func_;
+    }
+
+    threads::policies::callback_notifier::on_error_type
+        runtime::on_error_func() const
+    {
+        return on_error_func_;
+    }
+
+    threads::policies::callback_notifier::on_startstop_type
+    runtime::on_start_func(
+        threads::policies::callback_notifier::on_startstop_type&& f)
+    {
+        threads::policies::callback_notifier::on_startstop_type newf =
+            std::move(f);
+        std::swap(on_start_func_, newf);
+        return newf;
+    }
+
+    threads::policies::callback_notifier::on_startstop_type
+    runtime::on_stop_func(
+        threads::policies::callback_notifier::on_startstop_type&& f)
+    {
+        threads::policies::callback_notifier::on_startstop_type newf =
+            std::move(f);
+        std::swap(on_stop_func_, newf);
+        return newf;
+    }
+
+    threads::policies::callback_notifier::on_error_type
+    runtime::on_error_func(
+        threads::policies::callback_notifier::on_error_type&& f)
+    {
+        threads::policies::callback_notifier::on_error_type newf =
+            std::move(f);
+        std::swap(on_error_func_, newf);
+        return newf;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    threads::policies::callback_notifier::on_startstop_type
+        get_thread_on_start_func()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->on_start_func();
+        }
+        else
+        {
+            return global_on_start_func;
+        }
+    }
+
+    threads::policies::callback_notifier::on_startstop_type
+        get_thread_on_stop_func()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->on_stop_func();
+        }
+        else
+        {
+            return global_on_stop_func;
+        }
+    }
+
+    threads::policies::callback_notifier::on_error_type
+        get_thread_on_error_func()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->on_error_func();
+        }
+        else
+        {
+            return global_on_error_func;
+        }
+    }
+
+    threads::policies::callback_notifier::on_startstop_type
+    register_thread_on_start_func(
+        threads::policies::callback_notifier::on_startstop_type&& f)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->on_start_func(std::move(f));
+        }
+
+        threads::policies::callback_notifier::on_startstop_type newf =
+            std::move(f);
+        std::swap(global_on_start_func, newf);
+        return newf;
+    }
+
+    threads::policies::callback_notifier::on_startstop_type
+    register_thread_on_stop_func(
+        threads::policies::callback_notifier::on_startstop_type&& f)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->on_stop_func(std::move(f));
+        }
+
+        threads::policies::callback_notifier::on_startstop_type newf =
+            std::move(f);
+        std::swap(global_on_stop_func, newf);
+        return newf;
+    }
+
+    threads::policies::callback_notifier::on_error_type
+    register_thread_on_error_func(
+        threads::policies::callback_notifier::on_error_type&& f)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->on_error_func(std::move(f));
+        }
+
+        threads::policies::callback_notifier::on_error_type newf =
+            std::move(f);
+        std::swap(global_on_error_func, newf);
+        return newf;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    runtime& get_runtime()
+    {
+        HPX_ASSERT(get_runtime_ptr() != nullptr);
+        return *get_runtime_ptr();
+    }
+
+    runtime*& get_runtime_ptr()
+    {
+        static HPX_NATIVE_TLS runtime* runtime_;
+        return runtime_;
     }
 
     naming::gid_type const & get_locality()
     {
         return get_runtime().get_agas_client().get_local_locality();
+    }
+
+    std::string get_thread_name()
+    {
+        std::string& thread_name = detail::runtime_thread_name();
+        if (thread_name.empty()) return "<unkown>";
+        return thread_name;
     }
 
     /// Register the current kernel thread with HPX, this should be done once
@@ -875,8 +1032,10 @@ namespace hpx
             return naming::invalid_id;
         }
 
-        return naming::id_type(hpx::applier::get_applier().get_raw_locality(ec),
+        static naming::id_type here(
+            hpx::applier::get_applier().get_raw_locality(ec),
             naming::id_type::unmanaged);
+        return here;
     }
 
     naming::id_type find_root_locality(error_code& ec)
@@ -1087,16 +1246,7 @@ namespace hpx
 
     std::size_t get_worker_thread_num(error_code& ec)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-        {
-            HPX_THROWS_IF(
-                ec, invalid_status,
-                "hpx::get_worker_thread_num",
-                "the runtime system has not been initialized yet");
-            return std::size_t(-1);
-        }
-        return rt->get_thread_manager().get_worker_thread_num();
+        return threads::detail::get_thread_num_tss();
     }
 
     std::size_t get_num_worker_threads()
@@ -1129,8 +1279,7 @@ namespace hpx
         }
 
         bool numa_sensitive = false;
-        if (std::size_t(-1) !=
-            rt->get_thread_manager().get_worker_thread_num(&numa_sensitive))
+        if (std::size_t(-1) != get_worker_thread_num())
             return numa_sensitive;
         return false;
     }
@@ -1219,9 +1368,11 @@ namespace hpx { namespace naming
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    bool do_background_work(std::size_t num_thread)
+    bool do_background_work(
+        std::size_t num_thread, parcelport_background_mode mode)
     {
-        return get_runtime().get_parcel_handler().do_background_work(num_thread);
+        return get_runtime().get_parcel_handler().do_background_work(
+            num_thread, mode);
     }
 }}
 
@@ -1259,6 +1410,23 @@ namespace hpx { namespace threads
         get_runtime().get_thread_manager().set_scheduler_mode(m);
     }
 
+    HPX_API_EXPORT void add_scheduler_mode(threads::policies::scheduler_mode m)
+    {
+        get_runtime().get_thread_manager().add_scheduler_mode(m);
+    }
+
+    HPX_API_EXPORT void add_remove_scheduler_mode(
+        threads::policies::scheduler_mode to_add_mode,
+        threads::policies::scheduler_mode to_remove_mode)
+    {
+        get_runtime().get_thread_manager().add_remove_scheduler_mode(
+            to_add_mode, to_remove_mode);
+    }
+
+    HPX_API_EXPORT void remove_scheduler_mode(threads::policies::scheduler_mode m)
+    {
+        get_runtime().get_thread_manager().remove_scheduler_mode(m);
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1267,11 +1435,6 @@ namespace hpx
     std::uint32_t get_locality_id(error_code& ec)
     {
         return agas::get_locality_id(ec);
-    }
-
-    std::string get_thread_name()
-    {
-        return runtime::get_thread_name();
     }
 
     std::uint64_t get_system_uptime()
@@ -1404,5 +1567,21 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt) rt->stop_evaluating_counters();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Return true if networking is enabled.
+    bool is_networking_enabled()
+    {
+#if defined(HPX_HAVE_NETWORKING)
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->get_config().enable_networking();
+        }
+        return true;        // be on the safe side, enable networking
+#else
+        return false;
+#endif
     }
 }

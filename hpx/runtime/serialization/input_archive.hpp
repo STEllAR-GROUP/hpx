@@ -10,14 +10,15 @@
 #define HPX_SERIALIZATION_INPUT_ARCHIVE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/runtime/serialization/input_container.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <boost/cstdint.hpp>
+#include <boost/predef/other/endian.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -228,7 +229,7 @@ namespace hpx { namespace serialization
             char* cptr = reinterpret_cast<char *>(&l); //-V206
             load_binary(cptr, static_cast<std::size_t>(size));
 
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
             if (endian_little())
                 reverse_bytes(size, cptr);
 #else

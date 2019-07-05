@@ -20,10 +20,6 @@
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/v1/is_executor.hpp>
-#include <hpx/parallel/executors/v1/executor_traits.hpp>
-#endif
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/parallel_executor.hpp>
 
@@ -54,30 +50,6 @@ namespace hpx { namespace detail
                 exec, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
     };
-
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-    // parallel::executor
-    template <typename Executor>
-    struct async_dispatch<Executor,
-        typename std::enable_if<
-            traits::is_executor<Executor>::value
-        >::type>
-    {
-        template <typename F, typename ...Ts>
-        HPX_FORCEINLINE static
-        typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            hpx::future<
-                typename util::detail::invoke_deferred_result<F, Ts...>::type
-            >
-        >::type
-        call(Executor& exec, F && f, Ts &&... ts)
-        {
-            return parallel::executor_traits<Executor>::async_execute(
-                exec, std::forward<F>(f), std::forward<Ts>(ts)...);
-        }
-    };
-#endif
 
     // The overload for hpx::async taking an executor simply forwards to the
     // corresponding executor customization point.

@@ -7,16 +7,16 @@
 #include <hpx/lcos/detail/future_data.hpp>
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/lcos/local/futures_factory.hpp>
+#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/lcos/local/futures_factory.hpp>
-#include <hpx/runtime/threads/thread.hpp>
-#include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/components/client_base.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -47,10 +47,10 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    static bool run_on_completed_on_new_thread(
-        util::unique_function_nonser<bool()> && f, error_code& ec)
+    template <typename Callback>
+    static void run_on_completed_on_new_thread(Callback&& f)
     {
-        lcos::local::futures_factory<bool()> p(std::move(f));
+        lcos::local::futures_factory<void()> p(std::forward<Callback>(f));
 
         bool is_hpx_thread = nullptr != hpx::threads::get_self_ptr();
         hpx::launch policy = launch::fork;
@@ -60,24 +60,18 @@ namespace hpx { namespace lcos { namespace detail
         // launch a new thread executing the given function
         threads::thread_id_type tid = p.apply(
             policy, threads::thread_priority_boost,
-            threads::thread_stacksize_current, ec);
-        if (ec) return false;
+            threads::thread_stacksize_current,
+            threads::thread_schedule_hint());
 
         // wait for the task to run
         if (is_hpx_thread)
         {
             // make sure this thread is executed last
             hpx::this_thread::yield_to(thread::id(std::move(tid)));
-            return p.get_future().get(ec);
+            return p.get_future().get();
         }
-        else
-        {
-            // If we are not on a HPX thread, we need to return immediately, to
-            // allow the newly spawned thread to execute. This might swallow
-            // possible exceptions bubbling up from the completion handler (which
-            // shouldn't happen anyway...
-            return true;
-        }
+        // If we are not on a HPX thread, we need to return immediately, to
+        // allow the newly spawned thread to execute.
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -85,11 +79,13 @@ namespace hpx { namespace lcos { namespace detail
         ~future_data_base()
     {}
 
+    static util::unused_type unused_;
+
     util::unused_type* future_data_base<traits::detail::future_data_void>::
         get_result_void(void const* storage, error_code& ec)
     {
         // yields control if needed
-        wait(ec);
+        state s = wait(ec);
         if (ec) return nullptr;
 
         // No locking is required. Once a future has been made ready, which
@@ -99,7 +95,20 @@ namespace hpx { namespace lcos { namespace detail
         // - there are multiple readers only (shared_future, lock hurts
         //   concurrency)
 
-        if (state_ == empty) {
+        // Avoid retrieving state twice. If wait() returns 'empty' then this
+        // thread was suspended, in this case we need to load it again.
+        if (s == empty)
+        {
+            s = state_.load(std::memory_order_relaxed);
+        }
+
+        if (s == value)
+        {
+            return &unused_;
+        }
+
+        if (s == empty)
+        {
             // the value has already been moved out of this future
             HPX_THROWS_IF(ec, no_state,
                 "future_data_base::get_result",
@@ -110,7 +119,7 @@ namespace hpx { namespace lcos { namespace detail
         // the thread has been re-activated by one of the actions
         // supported by this promise (see promise::set_event
         // and promise::set_exception).
-        if (state_ == exception)
+        if (s == exception)
         {
             std::exception_ptr const* exception_ptr =
                 static_cast<std::exception_ptr const*>(storage);
@@ -123,84 +132,87 @@ namespace hpx { namespace lcos { namespace detail
             else {
                 ec = make_error_code(*exception_ptr);
             }
-            return nullptr;
         }
 
-        static util::unused_type unused_;
-        return &unused_;
+        return nullptr;
     }
 
     // deferred execution of a given continuation
-    bool future_data_base<traits::detail::future_data_void>::
-        run_on_completed(completed_callback_vector_type && on_completed,
-        std::exception_ptr& ptr)
+    void future_data_base<traits::detail::future_data_void>::run_on_completed(
+        completed_callback_type&& on_completed) noexcept
     {
         try {
-            for (auto& func: on_completed)
-            {
-                hpx::util::annotate_function annotate(func);
-                func();
-            }
+            hpx::util::annotate_function annotate(on_completed);
+            on_completed();
         }
         catch (...) {
-            ptr = std::current_exception();
-            return false;
+            // If the completion handler throws an exception, there's nothing
+            // we can do, report the exception and terminate.
+            hpx::detail::report_exception_and_terminate(std::current_exception());
         }
-        return true;
+    }
+
+    void future_data_base<traits::detail::future_data_void>::run_on_completed(
+        completed_callback_vector_type&& on_completed) noexcept
+    {
+        for (auto&& func: on_completed)
+        {
+            run_on_completed(std::move(func));
+        }
     }
 
     // make sure continuation invocation does not recurse deeper than
     // allowed
+    template <typename Callback>
     void future_data_base<traits::detail::future_data_void>::
-        handle_on_completed(completed_callback_vector_type && on_completed)
+        handle_on_completed(Callback && on_completed)
     {
         // We need to run the completion on a new thread if we are on a
         // non HPX thread.
-        bool recurse_asynchronously = hpx::threads::get_self_ptr() == nullptr;
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-        recurse_asynchronously =
+        bool recurse_asynchronously =
             !this_thread::has_sufficient_stack_space();
 #else
         handle_continuation_recursion_count cnt;
-        recurse_asynchronously = recurse_asynchronously ||
-            cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
+        bool recurse_asynchronously =
+            cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH ||
+            (hpx::threads::get_self_ptr() == nullptr);
 #endif
         if (!recurse_asynchronously)
         {
             // directly execute continuation on this thread
-            std::exception_ptr ptr;
-            if (!run_on_completed(std::move(on_completed), ptr))
-            {
-                error_code ec(lightweight);
-                set_exception(hpx::detail::access_exception(ec));
-            }
+            run_on_completed(std::forward<Callback>(on_completed));
         }
         else
         {
             // re-spawn continuation on a new thread
-            boost::intrusive_ptr<future_data_base> this_(this);
+            void (*p)(Callback &&) = &future_data_base::run_on_completed;
 
-            error_code ec(lightweight);
-            std::exception_ptr ptr;
-            if (!run_on_completed_on_new_thread(
-                    util::deferred_call(
-                        &future_data_base::run_on_completed,
-                        std::move(this_), std::move(on_completed),
-                        std::ref(ptr)),
-                    ec))
+            try
             {
-                // thread creation went wrong
-                if (ec) {
-                    set_exception(hpx::detail::access_exception(ec));
-                    return;
-                }
-
-                // re-throw exception in this context
-                HPX_ASSERT(ptr);        // exception should have been set
-                std::rethrow_exception(ptr);
+                run_on_completed_on_new_thread(
+                    util::deferred_call(
+                        p, std::forward<Callback>(on_completed)));
+            }
+            catch(...)
+            {
+                // If an exception while creating the new task or inside the
+                // completion handler is thrown, there is nothing we can do...
+                // ... but terminate and report the error
+                hpx::detail::report_exception_and_terminate(std::current_exception());
             }
         }
     }
+
+    // We need only one explicit instantiation here as the second version
+    // (single callback) is implicitly instantiated below.
+    using completed_callback_vector_type =
+        future_data_refcnt_base::completed_callback_vector_type;
+
+    template HPX_EXPORT
+    void future_data_base<traits::detail::future_data_void>::
+        handle_on_completed<completed_callback_vector_type>(
+            completed_callback_vector_type&&);
 
     /// Set the callback which needs to be invoked when the future becomes
     /// ready. If the future is ready the function will be invoked
@@ -210,55 +222,66 @@ namespace hpx { namespace lcos { namespace detail
     {
         if (!data_sink) return;
 
-        std::unique_lock<mutex_type> l(mtx_);
-
-        if (is_ready_locked(l)) {
-
-            HPX_ASSERT(on_completed_.empty());
-
+        if (is_ready())
+        {
             // invoke the callback (continuation) function right away
-            l.unlock();
-
-            completed_callback_vector_type on_completed;
-            on_completed.push_back(std::move(data_sink));
-            handle_on_completed(std::move(on_completed));
+            handle_on_completed(std::move(data_sink));
         }
-        else {
-            on_completed_.push_back(std::move(data_sink));
+        else
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            if (is_ready())
+            {
+                l.unlock();
+
+                // invoke the callback (continuation) function
+                handle_on_completed(std::move(data_sink));
+            }
+            else
+            {
+                on_completed_.push_back(std::move(data_sink));
+            }
         }
     }
 
-    void future_data_base<traits::detail::future_data_void>::
-        wait(error_code& ec)
+    future_data_base<traits::detail::future_data_void>::state
+    future_data_base<traits::detail::future_data_void>::wait(error_code& ec)
     {
-        std::unique_lock<mutex_type> l(mtx_);
-
         // block if this entry is empty
-        if (state_ == empty) {
-            cond_.wait(l, "future_data_base::wait", ec);
-            if (ec) return;
+        state s = state_.load(std::memory_order_acquire);
+        if (s == empty)
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            s = state_.load(std::memory_order_relaxed);
+            if (s == empty)
+            {
+                cond_.wait(l, "future_data_base::wait", ec);
+                if (ec) return s;
+            }
         }
 
         if (&ec != &throws)
             ec = make_success_code();
+        return s;
     }
 
     future_status future_data_base<traits::detail::future_data_void>::
         wait_until(util::steady_clock::time_point const& abs_time, error_code& ec)
     {
-        std::unique_lock<mutex_type> l(mtx_);
-
         // block if this entry is empty
-        if (state_ == empty) {
-            threads::thread_state_ex_enum const reason =
-                cond_.wait_until(l, abs_time,
-                    "future_data_base::wait_until", ec);
-            if (ec) return future_status::uninitialized;
+        if (state_.load(std::memory_order_acquire) == empty)
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            if (state_.load(std::memory_order_relaxed) == empty)
+            {
+                threads::thread_state_ex_enum const reason =
+                    cond_.wait_until(l, abs_time,
+                        "future_data_base::wait_until", ec);
+                if (ec) return future_status::uninitialized;
 
-            if (reason == threads::wait_timeout)
-                return future_status::timeout;
-
-            return future_status::ready;
+                if (reason == threads::wait_timeout)
+                    return future_status::timeout;
+            }
         }
 
         if (&ec != &throws)

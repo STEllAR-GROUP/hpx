@@ -7,6 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 
@@ -117,8 +118,8 @@ void tree_boot(
   , std::uint64_t thread
     )
 {
-    HPX_ASSERT(grain_size);
-    HPX_ASSERT(count);
+    HPX_TEST(grain_size);
+    HPX_TEST(count);
 
     std::vector<future<void> > promises;
 
@@ -199,8 +200,8 @@ int hpx_main(variables_map& vm)
     {
         id_type const prefix = find_here();
 
-        thread_id_type thread = register_thread_nullary
-            (hpx::util::bind(&test_dummy_thread, futures));
+        thread_id_type thread = register_thread_nullary(
+            hpx::util::deferred_call(&test_dummy_thread, futures));
 
         tree_boot(futures, grain_size, prefix,
             reinterpret_cast<std::uint64_t>(thread.get()));

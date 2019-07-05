@@ -143,7 +143,7 @@ void run_benchmark(std::size_t vector_left_size, std::size_t vector_right_size,
             org_first, org_last, first, middle, last);
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
-    auto fmt = "inplace_merge (%1%) : %2%(sec)";
+    auto fmt = "inplace_merge ({1}) : {2}(sec)";
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;

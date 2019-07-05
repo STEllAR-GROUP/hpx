@@ -9,6 +9,9 @@ set(example_programs
 
 set(os_thread_num_FLAGS DEPENDENCIES iostreams_component)
 
+set(os_thread_num_PARAMETERS THREADS_PER_LOCALITY 4)
+set(hpx_thread_phase_PARAMETERS THREADS_PER_LOCALITY 4)
+
 foreach(example_program ${example_programs})
   set(sources ${example_program}.cpp)
 
@@ -29,6 +32,14 @@ foreach(example_program ${example_programs})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.balancing.${example_program}
-                              ${example_program}_exe)
-endforeach()
+                              ${example_program})
 
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
+    add_hpx_example_test("balancing" ${example_program} ${${example_program}_PARAMETERS})
+    add_hpx_pseudo_target(tests.examples.balancing.${example_program})
+    add_hpx_pseudo_dependencies(tests.examples.balancing
+                                tests.examples.balancing.${example_program})
+    add_hpx_pseudo_dependencies(tests.examples.balancing.${example_program}
+                                ${example_program})
+  endif()
+endforeach()

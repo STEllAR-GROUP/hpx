@@ -7,21 +7,22 @@
 #define HPX_UTIL_DEC_21_2011_0340PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/expand.hpp>
+#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/util/activate_counters.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/bind_back.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/expand.hpp>
-#include <hpx/util/detail/pp/nargs.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
-#include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/function_ref.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -31,7 +32,9 @@
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/util/unwrap.hpp>
+#include <hpx/util/yield_while.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #endif

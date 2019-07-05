@@ -15,11 +15,11 @@
 #define HPX_UTIL_ANY_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <boost/detail/sp_typeinfo.hpp>
@@ -52,7 +52,7 @@ namespace hpx { namespace util
           : from(src.name()), to(dest.name())
         {}
 
-        virtual const char* what() const throw() { return "bad any cast"; }
+        virtual const char* what() const noexcept { return "bad any cast"; }
 
         const char* from;
         const char* to;

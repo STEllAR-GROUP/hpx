@@ -7,12 +7,12 @@
 #define HPX_PARALLEL_UTIL_PARTITIONER_MAY_27_2014_1040PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/dataflow.hpp>
+#endif
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unused.hpp>
@@ -20,17 +20,18 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_parameters.hpp>
-#include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
+#include <hpx/parallel/util/detail/select_partitioner.hpp>
 
 #include <cstddef>
 #include <exception>
 #include <iterator>
 #include <list>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -40,648 +41,428 @@ namespace hpx { namespace parallel { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        template <typename Result, typename ExPolicy, typename FwdIter,
+            typename F>
+        std::vector<hpx::future<Result>> partition(
+            ExPolicy&& policy, FwdIter first, std::size_t count, F&& f)
+        {
+            // estimate a chunk size based on number of cores used
+            using parameters_type =
+                typename std::decay<ExPolicy>::type::executor_parameters_type;
+            using has_variable_chunk_size =
+                typename execution::extract_has_variable_chunk_size<
+                    parameters_type
+                >::type;
+
+            std::vector<hpx::future<Result>> inititems;
+            auto shape = detail::get_bulk_iteration_shape(
+                has_variable_chunk_size{},
+                std::forward<ExPolicy>(policy),
+                inititems, f, first, count, 1);
+
+            std::vector<hpx::future<Result>> workitems =
+                execution::bulk_async_execute(policy.executor(),
+                    partitioner_iteration<Result, F>{std::forward<F>(f)},
+                    std::move(shape));
+
+            if (inititems.empty())
+                return workitems;
+
+            // add the newly created workitems to the list
+            inititems.insert(inititems.end(),
+                std::make_move_iterator(workitems.begin()),
+                std::make_move_iterator(workitems.end()));
+            return inititems;
+        }
+
+        template <
+            typename Result,
+            typename ExPolicy, typename FwdIter, typename Stride, typename F>
+        std::vector<hpx::future<Result>> partition_with_index(
+            ExPolicy && policy,
+            FwdIter first, std::size_t count, Stride stride, F && f)
+        {
+            // estimate a chunk size based on number of cores used
+            using parameters_type =
+                typename std::decay<ExPolicy>::type::executor_parameters_type;
+            using has_variable_chunk_size =
+                typename execution::extract_has_variable_chunk_size<
+                    parameters_type
+                >::type;
+
+            std::vector<hpx::future<Result>> inititems;
+            auto shape = detail::get_bulk_iteration_shape_idx(
+                has_variable_chunk_size{},
+                std::forward<ExPolicy>(policy),
+                inititems, f, first, count, stride);
+
+            std::vector<hpx::future<Result>> workitems =
+                execution::bulk_async_execute(
+                    policy.executor(),
+                    partitioner_iteration<Result, F>{std::forward<F>(f)},
+                    std::move(shape));
+
+            if (inititems.empty())
+                return workitems;
+
+            // add the newly created workitems to the list
+            inititems.insert(inititems.end(),
+                std::make_move_iterator(workitems.begin()),
+                std::make_move_iterator(workitems.end()));
+            return inititems;
+        }
+
+        template <
+            typename Result,
+            typename ExPolicy, typename FwdIter, typename Data, typename F>
+        // requires is_container<Data>
+        std::vector<hpx::future<Result>> partition_with_data(
+            ExPolicy && policy,
+            FwdIter first, std::size_t count,
+            std::vector<std::size_t> const& chunk_sizes, Data && data,
+            F && f)
+        {
+            HPX_ASSERT(hpx::util::size(data) >= hpx::util::size(chunk_sizes));
+
+            typedef typename std::decay<Data>::type data_type;
+
+            typename data_type::const_iterator data_it = hpx::util::begin(data);
+            typename std::vector<std::size_t>::const_iterator chunk_size_it =
+                hpx::util::begin(chunk_sizes);
+
+            typedef typename hpx::util::tuple<
+                    typename data_type::value_type, FwdIter, std::size_t
+                > tuple_type;
+
+            // schedule every chunk on a separate thread
+            std::vector<tuple_type> shape;
+            shape.reserve(chunk_sizes.size());
+
+            while (count != 0)
+            {
+                std::size_t chunk = (std::min)(count, *chunk_size_it);
+                HPX_ASSERT(chunk != 0);
+
+                shape.push_back(hpx::util::make_tuple(
+                    *data_it, first, chunk));
+
+                count -= chunk;
+                std::advance(first, chunk);
+
+                ++data_it;
+                ++chunk_size_it;
+            }
+            HPX_ASSERT(chunk_size_it == chunk_sizes.end());
+
+            return execution::bulk_async_execute(policy.executor(),
+                partitioner_iteration<Result, F>{std::forward<F>(f)},
+                std::move(shape));
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // The static partitioner simply spawns one chunk of iterations for
         // each available core.
-        template <typename ExPolicy_, typename R, typename Result = void>
+        template <typename ExPolicy, typename R, typename Result>
         struct static_partitioner
         {
-            template <typename ExPolicy, typename FwdIter, typename F1, typename F2>
-            static R call(ExPolicy && policy, FwdIter first,
-                std::size_t count, F1 && f1, F2 && f2)
+            using parameters_type = typename ExPolicy::executor_parameters_type;
+            using executor_type = typename ExPolicy::executor_type;
+
+            using scoped_executor_parameters =
+                detail::scoped_executor_parameters_ref<
+                    parameters_type, executor_type>;
+
+            using handle_local_exceptions =
+                detail::handle_local_exceptions<ExPolicy>;
+
+            template <
+                typename ExPolicy_,
+                typename FwdIter, typename F1, typename F2>
+            static R call(
+                ExPolicy_ && policy,
+                FwdIter first, std::size_t count,
+                F1 && f1, F2 && f2)
             {
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                    parameters_type;
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-
                 // inform parameter traits
-                scoped_executor_parameters_ref<
-                        parameters_type, executor_type
-                    > scoped_param(policy.parameters(), policy.executor());
+                scoped_executor_parameters scoped_params(
+                    policy.parameters(), policy.executor());
 
-                std::vector<hpx::future<Result> > inititems;
+                std::vector<hpx::future<Result>> workitems;
                 std::list<std::exception_ptr> errors;
+                try
+                {
+                    workitems = detail::partition<Result>(
+                        std::forward<ExPolicy_>(policy),
+                        first, count,
+                        std::forward<F1>(f1));
 
-                try {
-                    // estimate a chunk size based on number of cores used
-                    typedef typename execution::extract_has_variable_chunk_size<
-                            parameters_type
-                        >::type has_variable_chunk_size;
+                    scoped_params.mark_end_of_scheduling();
 
-                    auto shapes =
-                        get_bulk_iteration_shape(policy, inititems, f1,
-                            first, count, 1, has_variable_chunk_size());
-
-                    std::vector<hpx::future<Result> > workitems =
-                        execution::bulk_async_execute(
-                            policy.executor(),
-                            partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
-                            std::move(shapes));
-
-                    // add the newly created workitems to the list
-                    inititems.reserve(inititems.size() + workitems.size());
-                    std::move(workitems.begin(), workitems.end(),
-                        std::back_inserter(inititems));
-                }
-                catch (...) {
-                    handle_local_exceptions<ExPolicy>::call(
+                } catch (...) {
+                    handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-
-                // wait for all tasks to finish
-                hpx::wait_all(inititems);
-
-                // always rethrow if 'errors' is not empty or inititems has
-                // exceptional future
-                handle_local_exceptions<ExPolicy>::call(inititems, errors);
-
-                try {
-                    return f2(std::move(inititems));
-                }
-                catch (...) {
-                    // rethrow either bad_alloc or exception_list
-                    handle_local_exceptions<ExPolicy>::call(
-                        std::current_exception());
-                }
+                return reduce(
+                    std::move(workitems), std::move(errors),
+                    std::forward<F2>(f2));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename F1,
-                typename F2, typename Data>
-                // requires is_container<Data>
-            static R call_with_data(ExPolicy && policy,
-                FwdIter first, std::size_t count, F1 && f1, F2 && f2,
-                std::vector<std::size_t> const& chunk_sizes, Data && data)
+            template <
+                typename ExPolicy_,
+                typename FwdIter, typename Stride, typename F1, typename F2>
+            static R call_with_index(
+                ExPolicy_ && policy,
+                FwdIter first, std::size_t count, Stride stride,
+                F1 && f1, F2 && f2)
             {
-                HPX_ASSERT(hpx::util::size(data) >= hpx::util::size(chunk_sizes));
-
-                typedef typename hpx::util::decay<Data>::type data_type;
-
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                    parameters_type;
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-
                 // inform parameter traits
-                scoped_executor_parameters_ref<
-                        parameters_type, executor_type
-                    > scoped_param(policy.parameters(), policy.executor());
+                scoped_executor_parameters scoped_params(
+                    policy.parameters(), policy.executor());
 
-                typename data_type::const_iterator data_it = hpx::util::begin(data);
-                typename std::vector<std::size_t>::const_iterator chunk_size_it =
-                    hpx::util::begin(chunk_sizes);
-
-                typedef typename hpx::util::tuple<
-                        typename data_type::value_type, FwdIter, std::size_t
-                    > tuple_type;
-
-                std::vector<hpx::future<Result> > workitems;
+                std::vector<hpx::future<Result>> workitems;
                 std::list<std::exception_ptr> errors;
+                try
+                {
+                    workitems = detail::partition_with_index<Result>(
+                        std::forward<ExPolicy_>(policy),
+                        first, count, stride,
+                        std::forward<F1>(f1));
 
-                try {
-                    // schedule every chunk on a separate thread
-                    std::vector<tuple_type> shape;
-                    shape.reserve(chunk_sizes.size());
+                    scoped_params.mark_end_of_scheduling();
 
-                    while(count != 0)
-                    {
-                        std::size_t chunk = (std::min)(count, *chunk_size_it);
-                        HPX_ASSERT(chunk != 0);
-
-                        shape.push_back(hpx::util::make_tuple(
-                            *data_it, first, chunk));
-
-                        count -= chunk;
-                        std::advance(first, chunk);
-
-                        ++data_it;
-                        ++chunk_size_it;
-                    }
-
-                    HPX_ASSERT(chunk_size_it == chunk_sizes.end());
-
-                    workitems = execution::bulk_async_execute(
-                        policy.executor(),
-                        partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
-                        std::move(shape));
-                }
-                catch (...) {
-                    handle_local_exceptions<ExPolicy>::call(
+                } catch (...) {
+                    handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
+                return reduce(
+                    std::move(workitems), std::move(errors),
+                    std::forward<F2>(f2));
+            }
 
+            template <
+                typename ExPolicy_,
+                typename FwdIter, typename F1, typename F2, typename Data>
+                // requires is_container<Data>
+            static R call_with_data(
+                ExPolicy_ && policy,
+                FwdIter first, std::size_t count,
+                F1 && f1, F2 && f2,
+                std::vector<std::size_t> const& chunk_sizes, Data && data)
+            {
+                // inform parameter traits
+                scoped_executor_parameters scoped_params(
+                    policy.parameters(), policy.executor());
+
+                std::vector<hpx::future<Result>> workitems;
+                std::list<std::exception_ptr> errors;
+                try
+                {
+                    workitems = detail::partition_with_data<Result>(
+                        std::forward<ExPolicy_>(policy),
+                        first, count, chunk_sizes, std::forward<Data>(data),
+                        std::forward<F1>(f1));
+
+                    scoped_params.mark_end_of_scheduling();
+
+                } catch (...) {
+                    handle_local_exceptions::call(
+                        std::current_exception(), errors);
+                }
+                return reduce(
+                    std::move(workitems), std::move(errors),
+                    std::forward<F2>(f2));
+            }
+
+        private:
+            template <typename F>
+            static R reduce(
+                std::vector<hpx::future<Result>>&& workitems,
+                std::list<std::exception_ptr>&& errors, F && f)
+            {
                 // wait for all tasks to finish
                 hpx::wait_all(workitems);
 
-                // always rethrow if 'errors' is not empty or inititems has
+                // always rethrow if 'errors' is not empty or workitems has
                 // exceptional future
-                handle_local_exceptions<ExPolicy>::call(workitems, errors);
+                handle_local_exceptions::call(workitems, errors);
 
-                try {
-                    return f2(std::move(workitems));
-                }
-                catch (...) {
+                try
+                {
+                    return f(std::move(workitems));
+                } catch (...) {
                     // rethrow either bad_alloc or exception_list
-                    handle_local_exceptions<ExPolicy>::call(
-                        std::current_exception());
-                }
-            }
-
-            template <typename ExPolicy, typename FwdIter, typename Stride,
-                typename F1, typename F2, typename...Args>
-            static R call_with_index(ExPolicy && policy, FwdIter first,
-                std::size_t count, Stride stride, F1 && f1, F2 && f2, Args &&...args)
-            {
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                    parameters_type;
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-
-                // inform parameter traits
-                scoped_executor_parameters_ref<
-                        parameters_type, executor_type
-                    > scoped_param(policy.parameters(), policy.executor());
-
-                std::vector<hpx::future<Result> > inititems;
-                std::list<std::exception_ptr> errors;
-
-                try {
-                    // estimate a chunk size based on number of cores used
-                    typedef typename execution::extract_has_variable_chunk_size<
-                            parameters_type
-                        >::type has_variable_chunk_size;
-
-                    auto shapes =
-                        get_bulk_iteration_shape_idx(policy, inititems, f1,
-                            first, count, stride, has_variable_chunk_size(),
-                            std::forward<Args>(args)...);
-
-                    std::vector<hpx::future<Result> > workitems =
-                        execution::bulk_async_execute(
-                            policy.executor(),
-                            partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
-                            std::move(shapes), std::forward<Args>(args)...);
-
-                    inititems.reserve(inititems.size() + workitems.size());
-                    std::move(workitems.begin(), workitems.end(),
-                        std::back_inserter(inititems));
-                }
-                catch (...) {
-                    handle_local_exceptions<ExPolicy>::call(
-                        std::current_exception(), errors);
-                }
-
-                // wait for all tasks to finish
-                hpx::wait_all(inititems);
-
-                // always rethrow if 'errors' is not empty or inititems has
-                // exceptional future
-                handle_local_exceptions<ExPolicy>::call(inititems, errors);
-
-                try {
-                    return f2(std::move(inititems), std::forward<Args>(args)...);
-                }
-                catch (...) {
-                    // rethrow either bad_alloc or exception_list
-                    handle_local_exceptions<ExPolicy>::call(
-                        std::current_exception());
+                    handle_local_exceptions::call(std::current_exception());
                 }
             }
         };
-
-        template <typename R, typename Result>
-        struct static_partitioner<execution::parallel_task_policy, R, Result>
-        {
-            template <typename ExPolicy, typename FwdIter, typename F1, typename F2>
-            static hpx::future<R> call(ExPolicy && policy,
-                FwdIter first, std::size_t count, F1 && f1, F2 && f2)
-            {
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                    parameters_type;
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-
-                typedef scoped_executor_parameters<
-                        parameters_type, executor_type
-                    > scoped_executor_parameters;
-
-                // inform parameter traits
-                std::shared_ptr<scoped_executor_parameters>
-                    scoped_param(std::make_shared<
-                            scoped_executor_parameters
-                        >(policy.parameters(), policy.executor()));
-
-                std::vector<hpx::future<Result> > inititems;
-                std::list<std::exception_ptr> errors;
-
-                try {
-                    // estimate a chunk size based on number of cores used
-                    typedef typename execution::extract_has_variable_chunk_size<
-                            parameters_type
-                        >::type has_variable_chunk_size;
-
-                    auto shapes =
-                        get_bulk_iteration_shape(policy, inititems, f1,
-                            first, count, 1, has_variable_chunk_size());
-
-                    std::vector<hpx::future<Result> > workitems =
-                        execution::bulk_async_execute(
-                            policy.executor(),
-                            partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
-                            std::move(shapes));
-
-                    inititems.reserve(inititems.size() + workitems.size());
-                    std::move(workitems.begin(), workitems.end(),
-                        std::back_inserter(inititems));
-                }
-                catch (std::bad_alloc const&) {
-                    return hpx::make_exceptional_future<R>(
-                        std::current_exception());
-                }
-                catch (...) {
-                    errors.push_back(std::current_exception());
-                }
-
-                // wait for all tasks to finish
-                return hpx::dataflow(
-                    [errors,
-                        HPX_CAPTURE_MOVE(scoped_param),
-                        HPX_CAPTURE_FORWARD(f2)
-                    ](std::vector<hpx::future<Result> > && r) mutable -> R
-                    {
-                        HPX_UNUSED(scoped_param);
-
-                        // inform parameter traits
-                        handle_local_exceptions<ExPolicy>::call(r, errors);
-                        return f2(std::move(r));
-                    },
-                    std::move(inititems));
-            }
-
-            template <typename ExPolicy, typename FwdIter, typename F1,
-                typename F2, typename Data>
-                // requires is_container<Data>
-            static hpx::future<R> call_with_data(ExPolicy && policy,
-                FwdIter first, std::size_t count, F1 && f1, F2 && f2,
-                std::vector<std::size_t> const& chunk_sizes, Data && data)
-            {
-                HPX_ASSERT(hpx::util::size(data) >= hpx::util::size(chunk_sizes));
-
-                typedef typename hpx::util::decay<Data>::type data_type;
-
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                    parameters_type;
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-
-                typedef scoped_executor_parameters<
-                        parameters_type, executor_type
-                    > scoped_executor_parameters;
-
-                // inform parameter traits
-                std::shared_ptr<scoped_executor_parameters>
-                    scoped_param(std::make_shared<
-                            scoped_executor_parameters
-                        >(policy.parameters(), policy.executor()));
-
-                typename data_type::const_iterator data_it = hpx::util::begin(data);
-                typename std::vector<std::size_t>::const_iterator chunk_size_it =
-                    hpx::util::begin(chunk_sizes);
-
-                typedef typename hpx::util::tuple<
-                        typename data_type::value_type, FwdIter, std::size_t
-                    > tuple_type;
-
-                std::vector<hpx::future<Result> > workitems;
-                std::list<std::exception_ptr> errors;
-
-                try {
-                    // schedule every chunk on a separate thread
-                    std::vector<tuple_type> shape;
-                    shape.reserve(chunk_sizes.size());
-
-                    while(count != 0)
-                    {
-                        std::size_t chunk = (std::min)(count, *chunk_size_it);
-                        HPX_ASSERT(chunk != 0);
-
-                        shape.push_back(hpx::util::make_tuple(
-                            *data_it, first, chunk));
-
-                        count -= chunk;
-                        std::advance(first, chunk);
-
-                        ++data_it;
-                        ++chunk_size_it;
-                    }
-                    HPX_ASSERT(chunk_size_it == chunk_sizes.end());
-
-                    workitems = execution::bulk_async_execute(
-                        policy.executor(),
-                        partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
-                        std::move(shape));
-                }
-                catch (std::bad_alloc const&) {
-                    return hpx::make_exceptional_future<R>(
-                        std::current_exception());
-                }
-                catch (...) {
-                    errors.push_back(std::current_exception());
-                }
-
-                // wait for all tasks to finish
-                return hpx::dataflow(
-                    [errors,
-                        HPX_CAPTURE_MOVE(scoped_param),
-                        HPX_CAPTURE_FORWARD(f2)
-                    ](std::vector<hpx::future<Result> > && r) mutable -> R
-                    {
-                        // inform parameter traits
-                        handle_local_exceptions<ExPolicy>::call(r, errors);
-                        return f2(std::move(r));
-                    },
-                    std::move(workitems));
-            }
-
-            template <typename ExPolicy, typename FwdIter, typename Stride,
-                typename F1, typename F2, typename...Args>
-            static hpx::future<R> call_with_index(ExPolicy && policy,
-                FwdIter first, std::size_t count, Stride stride,
-                F1 && f1, F2 && f2, Args &&...args)
-            {
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                    parameters_type;
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-
-                typedef scoped_executor_parameters<
-                        parameters_type, executor_type
-                    > scoped_executor_parameters;
-
-                // inform parameter traits
-                std::shared_ptr<scoped_executor_parameters>
-                    scoped_param(std::make_shared<
-                            scoped_executor_parameters
-                        >(policy.parameters(), policy.executor()));
-
-                std::vector<hpx::future<Result> > inititems;
-                std::list<std::exception_ptr> errors;
-
-                try {
-                    // estimate a chunk size based on number of cores used
-                    typedef typename execution::extract_has_variable_chunk_size<
-                            parameters_type
-                        >::type has_variable_chunk_size;
-
-                    auto shapes =
-                        get_bulk_iteration_shape_idx(policy, inititems, f1,
-                            first, count, stride, has_variable_chunk_size(),
-                            std::forward<Args>(args)...);
-
-                    std::vector<hpx::future<Result> > workitems =
-                        execution::bulk_async_execute(
-                            policy.executor(),
-                            partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
-                            std::move(shapes), std::forward<Args>(args)...);
-
-                    std::move(workitems.begin(), workitems.end(),
-                        std::back_inserter(inititems));
-                }
-                catch (std::bad_alloc const&) {
-                    return hpx::make_exceptional_future<R>(
-                        std::current_exception());
-                }
-                catch (...) {
-                    errors.push_back(std::current_exception());
-                }
-
-                // wait for all tasks to finish
-                return hpx::dataflow(
-                    [errors,
-                        HPX_CAPTURE_MOVE(scoped_param),
-                        HPX_CAPTURE_FORWARD(f2)
-                    ](std::vector<hpx::future<Result> > && r,
-                        typename hpx::util::decay<Args>::type&&... args
-                    ) mutable -> R
-                    {
-                        HPX_UNUSED(scoped_param);
-
-                        // inform parameter traits
-                        handle_local_exceptions<ExPolicy>::call(r, errors);
-                        return f2(std::move(r), std::move(args)...);
-                    },
-                    std::move(inititems), std::forward<Args>(args)...);
-            }
-        };
-
-        template <typename Executor, typename Parameters, typename R,
-            typename Result>
-        struct static_partitioner<
-                execution::parallel_task_policy_shim<Executor, Parameters>,
-                R, Result>
-          : static_partitioner<execution::parallel_task_policy, R, Result>
-        {};
-
-        ///////////////////////////////////////////////////////////////////////
-        // ExPolicy: execution policy
-        // R:        overall result type
-        // Result:   intermediate result type of first step
-        // PartTag:  select appropriate partitioner
-        template <typename ExPolicy, typename R, typename Result, typename Tag>
-        struct partitioner;
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy_, typename R, typename Result>
-        struct partitioner<ExPolicy_, R, Result,
-            parallel::traits::static_partitioner_tag>
-        {
-            template <typename ExPolicy, typename FwdIter, typename F1, typename F2>
-            static R call(ExPolicy && policy, FwdIter first,
-                std::size_t count, F1 && f1, F2 && f2)
-            {
-                return static_partitioner<
-                        typename hpx::util::decay<ExPolicy>::type, R, Result
-                    >::call(
-                        std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1), std::forward<F2>(f2));
-            }
-
-            template <typename ExPolicy, typename FwdIter, typename F1,
-                typename F2, typename Data>
-            static R call_with_data(ExPolicy && policy, FwdIter first,
-                std::size_t count, F1 && f1, F2 && f2,
-                std::vector<std::size_t> const& chunk_sizes, Data && data)
-            {
-                return static_partitioner<
-                        typename hpx::util::decay<ExPolicy>::type, R, Result
-                    >::call_with_data(
-                        std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1), std::forward<F2>(f2), chunk_sizes,
-                        std::forward<Data>(data));
-            }
-
-            template <typename ExPolicy, typename FwdIter, typename Stride, typename F1,
-                typename F2, typename...Args>
-            static R call_with_index(ExPolicy && policy, FwdIter first,
-                std::size_t count, Stride stride, F1 && f1, F2 && f2, Args &&... args)
-            {
-                return static_partitioner<
-                        typename hpx::util::decay<ExPolicy>::type, R, Result
-                    >::call_with_index(
-                        std::forward<ExPolicy>(policy), first, count, stride,
-                        std::forward<F1>(f1), std::forward<F2>(f2),
-                        std::forward<Args>(args)...);
-            }
-        };
-
-        template <typename R, typename Result>
-        struct partitioner<execution::parallel_task_policy, R, Result,
-            parallel::traits::static_partitioner_tag>
-        {
-            template <typename ExPolicy, typename FwdIter, typename F1,
-                typename F2>
-            static hpx::future<R> call(ExPolicy && policy,
-                FwdIter first, std::size_t count, F1 && f1, F2 && f2)
-            {
-                return static_partitioner<
-                        typename hpx::util::decay<ExPolicy>::type, R, Result
-                    >::call(
-                        std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1), std::forward<F2>(f2));
-            }
-
-            template <typename ExPolicy, typename FwdIter, typename F1,
-                typename F2, typename Data>
-            static hpx::future<R> call_with_data(ExPolicy && policy,
-                FwdIter first, std::size_t count, F1 && f1, F2 && f2,
-                std::vector<std::size_t> const& chunk_sizes, Data && data)
-            {
-                return static_partitioner<
-                        typename hpx::util::decay<ExPolicy>::type, R, Result
-                    >::call_with_data(
-                        std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1), std::forward<F2>(f2),
-                        chunk_sizes, std::forward<Data>(data));
-            }
-
-            template <typename ExPolicy, typename FwdIter, typename Stride,
-                typename F1, typename F2, typename... Args>
-            static hpx::future<R> call_with_index(ExPolicy && policy,
-                FwdIter first, std::size_t count, Stride stride,
-                F1 && f1, F2 && f2, Args &&... args)
-            {
-                return static_partitioner<
-                        typename hpx::util::decay<ExPolicy>::type, R, Result
-                    >::call_with_index(
-                        std::forward<ExPolicy>(policy), first, count, stride,
-                        std::forward<F1>(f1), std::forward<F2>(f2),
-                        std::forward<Args>(args)...);
-            }
-        };
-
-#if defined(HPX_HAVE_DATAPAR)
-        template <typename R, typename Result>
-        struct partitioner<execution::datapar_task_policy, R, Result,
-            parallel::traits::static_partitioner_tag>
-        {
-            template <typename ExPolicy, typename FwdIter, typename F1,
-                typename F2>
-            static hpx::future<R> call(ExPolicy && policy,
-                FwdIter first, std::size_t count, F1 && f1, F2 && f2)
-            {
-                return static_partitioner<
-                        execution::parallel_task_policy, R, Result
-                    >::call(
-                        std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1), std::forward<F2>(f2));
-            }
-
-            template <typename ExPolicy, typename FwdIter, typename F1,
-                typename F2, typename Data>
-            static hpx::future<R> call_with_data(ExPolicy && policy,
-                FwdIter first, std::size_t count, F1 && f1, F2 && f2,
-                std::vector<std::size_t> const& chunk_sizes, Data && data)
-            {
-                return static_partitioner<
-                        execution::parallel_task_policy, R, Result
-                    >::call_with_data(
-                        std::forward<ExPolicy>(policy), first, count,
-                        std::forward<F1>(f1), std::forward<F2>(f2),
-                        chunk_sizes, std::forward<Data>(data));
-            }
-
-            template <typename ExPolicy, typename FwdIter, typename Stride,
-                typename F1, typename F2, typename... Args>
-            static hpx::future<R> call_with_index(ExPolicy && policy,
-                FwdIter first, std::size_t count, Stride stride,
-                F1 && f1, F2 && f2, Args &&... args)
-            {
-                return static_partitioner<
-                        execution::parallel_task_policy, R, Result
-                    >::call_with_index(
-                        std::forward<ExPolicy>(policy), first, count, stride,
-                        std::forward<F1>(f1), std::forward<F2>(f2),
-                        std::forward<Args>(args)...);
-            }
-        };
-#endif
-
-        template <typename Executor, typename Parameters, typename R,
-            typename Result>
-        struct partitioner<
-                execution::parallel_task_policy_shim<Executor, Parameters>,
-                R, Result, parallel::traits::static_partitioner_tag>
-          : partitioner<execution::parallel_task_policy, R, Result,
-                parallel::traits::static_partitioner_tag>
-        {};
-
-        template <typename Executor, typename Parameters, typename R,
-            typename Result>
-        struct partitioner<
-                execution::parallel_task_policy_shim<Executor, Parameters>,
-                R, Result, parallel::traits::auto_partitioner_tag>
-          : partitioner<execution::parallel_task_policy, R, Result,
-                parallel::traits::auto_partitioner_tag>
-        {};
-
-        template <typename Executor, typename Parameters, typename R,
-            typename Result>
-        struct partitioner<
-                execution::parallel_task_policy_shim<Executor, Parameters>,
-                R, Result, parallel::traits::default_partitioner_tag>
-          : partitioner<execution::parallel_task_policy, R, Result,
-                parallel::traits::static_partitioner_tag>
-        {};
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename R, typename Result>
-        struct partitioner<ExPolicy, R, Result,
-                parallel::traits::default_partitioner_tag>
-          : partitioner<ExPolicy, R, Result,
-                parallel::traits::static_partitioner_tag>
-        {};
+        struct task_static_partitioner
+        {
+            using parameters_type = typename ExPolicy::executor_parameters_type;
+            using executor_type = typename ExPolicy::executor_type;
+
+            using scoped_executor_parameters =
+                detail::scoped_executor_parameters<
+                    parameters_type, executor_type>;
+
+            using handle_local_exceptions =
+                detail::handle_local_exceptions<ExPolicy>;
+
+            template <
+                typename ExPolicy_, typename FwdIter, typename F1, typename F2>
+            static hpx::future<R> call(
+                ExPolicy_ && policy,
+                FwdIter first, std::size_t count,
+                F1 && f1, F2 && f2)
+            {
+                // inform parameter traits
+                std::shared_ptr<scoped_executor_parameters> scoped_params =
+                    std::make_shared<scoped_executor_parameters>(
+                        policy.parameters(), policy.executor());
+
+                std::vector<hpx::future<Result>> workitems;
+                std::list<std::exception_ptr> errors;
+                try
+                {
+                    workitems = detail::partition<Result>(
+                        std::forward<ExPolicy_>(policy),
+                        first, count,
+                        std::forward<F1>(f1));
+
+                    scoped_params->mark_end_of_scheduling();
+
+                } catch (std::bad_alloc const&) {
+                    return hpx::make_exceptional_future<R>(
+                        std::current_exception());
+                } catch (...) {
+                    handle_local_exceptions::call(
+                        std::current_exception(), errors);
+                }
+                return reduce(
+                    std::move(scoped_params),
+                    std::move(workitems), std::move(errors),
+                    std::forward<F2>(f2));
+            }
+
+            template <
+                typename ExPolicy_,
+                typename FwdIter, typename Stride, typename F1, typename F2>
+            static hpx::future<R> call_with_index(
+                ExPolicy_ && policy,
+                FwdIter first, std::size_t count, Stride stride,
+                F1 && f1, F2 && f2)
+            {
+                // inform parameter traits
+                std::shared_ptr<scoped_executor_parameters> scoped_params =
+                    std::make_shared<scoped_executor_parameters>(
+                        policy.parameters(), policy.executor());
+
+                std::vector<hpx::future<Result>> workitems;
+                std::list<std::exception_ptr> errors;
+                try
+                {
+                    workitems = detail::partition_with_index<Result>(
+                        std::forward<ExPolicy_>(policy),
+                        first, count, stride,
+                        std::forward<F1>(f1));
+
+                    scoped_params->mark_end_of_scheduling();
+
+                } catch (std::bad_alloc const&) {
+                    return hpx::make_exceptional_future<R>(
+                        std::current_exception());
+                } catch (...) {
+                    handle_local_exceptions::call(
+                        std::current_exception(), errors);
+                }
+                return reduce(
+                    std::move(scoped_params),
+                    std::move(workitems), std::move(errors),
+                    std::forward<F2>(f2));
+            }
+
+            template <
+                typename ExPolicy_,
+                typename FwdIter, typename F1, typename F2, typename Data>
+            // requires is_container<Data>
+            static hpx::future<R> call_with_data(
+                ExPolicy_ && policy,
+                FwdIter first, std::size_t count,
+                F1 && f1, F2 && f2,
+                std::vector<std::size_t> const& chunk_sizes, Data && data)
+            {
+                // inform parameter traits
+                std::shared_ptr<scoped_executor_parameters> scoped_params =
+                    std::make_shared<scoped_executor_parameters>(
+                        policy.parameters(), policy.executor());
+
+                std::vector<hpx::future<Result>> workitems;
+                std::list<std::exception_ptr> errors;
+                try
+                {
+                    workitems = detail::partition_with_data<Result>(
+                        std::forward<ExPolicy_>(policy),
+                        first, count, chunk_sizes, std::forward<Data>(data),
+                        std::forward<F1>(f1));
+
+                    scoped_params->mark_end_of_scheduling();
+
+                } catch (std::bad_alloc const&) {
+                    return hpx::make_exceptional_future<R>(
+                        std::current_exception());
+                } catch (...) {
+                    handle_local_exceptions::call(
+                        std::current_exception(), errors);
+                }
+                return reduce(
+                    std::move(scoped_params),
+                    std::move(workitems), std::move(errors),
+                    std::forward<F2>(f2));
+            }
+
+        private:
+            template <typename F>
+            static hpx::future<R> reduce(
+                std::shared_ptr<scoped_executor_parameters>&& scoped_params,
+                std::vector<hpx::future<Result>>&& workitems,
+                std::list<std::exception_ptr>&& errors,
+                F && f)
+            {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_ASSERT(false);
+                return hpx::future<R>();
+#else
+                // wait for all tasks to finish
+                return hpx::dataflow(
+                    [HPX_CAPTURE_MOVE(errors),
+                        HPX_CAPTURE_MOVE(scoped_params),
+                        HPX_CAPTURE_FORWARD(f)
+                    ](std::vector<hpx::future<Result> > && r) mutable -> R
+                    {
+                        HPX_UNUSED(scoped_params);
+
+                        handle_local_exceptions::call(r, errors);
+                        return f(std::move(r));
+                    },
+                    std::move(workitems));
+#endif
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename R = void, typename Result = R,
-        typename PartTag = typename parallel::traits::extract_partitioner<
-            typename hpx::util::decay<ExPolicy>::type
-        >::type>
+    // ExPolicy: execution policy
+    // R:        overall result type
+    // Result:   intermediate result type of first step
+    template <typename ExPolicy, typename R = void, typename Result = R>
     struct partitioner
-      : detail::partitioner<
-            typename hpx::util::decay<ExPolicy>::type, R, Result, PartTag>
+      : detail::select_partitioner<
+            typename std::decay<ExPolicy>::type,
+            detail::static_partitioner,
+            detail::task_static_partitioner
+        >::template apply<R, Result>
     {};
 }}}
 

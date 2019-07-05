@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
+#include <hpx/assertion.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -18,7 +19,6 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
@@ -110,29 +110,30 @@ namespace hpx { namespace threads { namespace policies
         typedef init_parameter init_parameter_type;
 
         local_queue_scheduler(init_parameter_type const& init,
-                bool deferred_initialization = true)
-          : scheduler_base(init.num_queues_, init.description_),
-            max_queue_thread_count_(init.max_queue_thread_count_),
-            queues_(init.num_queues_),
-            curr_queue_(0),
-            numa_sensitive_(init.numa_sensitive_),
-#ifndef HPX_NATIVE_MIC        // we know that the MIC has one NUMA domain only
-            steals_in_numa_domain_(),
-            steals_outside_numa_domain_(),
+            bool deferred_initialization = true)
+          : scheduler_base(init.num_queues_, init.description_)
+          , max_queue_thread_count_(init.max_queue_thread_count_)
+          , queues_(init.num_queues_)
+          , curr_queue_(0)
+          , numa_sensitive_(init.numa_sensitive_)
+          ,
+#ifndef HPX_NATIVE_MIC    // we know that the MIC has one NUMA domain only
+          steals_in_numa_domain_()
+          , steals_outside_numa_domain_()
 #endif
-#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || defined(HPX_HAVE_MAX_CPU_COUNT)
-            numa_domain_masks_(init.num_queues_),
-            outside_numa_domain_masks_(init.num_queues_)
-#else
-            numa_domain_masks_(init.num_queues_,
-                topology_.get_machine_affinity_mask()),
-            outside_numa_domain_masks_(init.num_queues_,
-                topology_.get_machine_affinity_mask())
-#endif
+          , numa_domain_masks_(init.num_queues_,
+              resource::get_partitioner()
+                  .get_topology()
+                  .get_machine_affinity_mask())
+          , outside_numa_domain_masks_(init.num_queues_,
+                resource::get_partitioner()
+                    .get_topology()
+                    .get_machine_affinity_mask())
         {
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
-            resize(steals_in_numa_domain_, init.num_queues_);
-            resize(steals_outside_numa_domain_, init.num_queues_);
+            resize(steals_in_numa_domain_, threads::hardware_concurrency());
+            resize(
+                steals_outside_numa_domain_, threads::hardware_concurrency());
 #endif
             if (!deferred_initialization)
             {
@@ -148,7 +149,11 @@ namespace hpx { namespace threads { namespace policies
                 delete queues_[i];
         }
 
-        bool numa_sensitive() const { return numa_sensitive_ != 0; }
+        bool numa_sensitive() const override { return numa_sensitive_ != 0; }
+        virtual bool has_thread_stealing(std::size_t num_thread) const override
+        {
+            return true;
+        }
 
         static std::string get_scheduler_name()
         {
@@ -178,7 +183,8 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-        std::int64_t get_num_pending_misses(std::size_t num_thread, bool reset)
+        std::int64_t get_num_pending_misses(
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_pending_misses = 0;
             if (num_thread == std::size_t(-1))
@@ -195,7 +201,8 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_misses;
         }
 
-        std::int64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
+        std::int64_t get_num_pending_accesses(
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_pending_accesses = 0;
             if (num_thread == std::size_t(-1))
@@ -212,7 +219,8 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_accesses;
         }
 
-        std::int64_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_from_pending(
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
@@ -227,7 +235,8 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::int64_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_to_pending(
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
@@ -241,7 +250,8 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::int64_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_from_staged(
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
@@ -255,7 +265,8 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::int64_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_to_staged(
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
@@ -271,14 +282,14 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        void abort_all_suspended_threads()
+        void abort_all_suspended_threads() override
         {
             for (std::size_t i = 0; i != queues_.size(); ++i)
                 queues_[i]->abort_all_suspended_threads();
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool cleanup_terminated(bool delete_all)
+        bool cleanup_terminated(bool delete_all) override
         {
             bool empty = true;
             for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -287,7 +298,7 @@ namespace hpx { namespace threads { namespace policies
             return empty;
         }
 
-        bool cleanup_terminated(std::size_t num_thread, bool delete_all)
+        bool cleanup_terminated(std::size_t num_thread, bool delete_all) override
         {
             return queues_[num_thread]->cleanup_terminated(delete_all);
         }
@@ -296,10 +307,11 @@ namespace hpx { namespace threads { namespace policies
         // create a new thread and schedule it if the initial state is equal to
         // pending
         void create_thread(thread_init_data& data, thread_id_type* id,
-            thread_state_enum initial_state, bool run_now, error_code& ec,
-            std::size_t num_thread,
-            std::size_t num_thread_fallback = std::size_t(-1))
+            thread_state_enum initial_state, bool run_now, error_code& ec) override
         {
+            std::size_t num_thread =
+                data.schedulehint.mode == thread_schedule_hint_mode_thread ?
+                data.schedulehint.hint : std::size_t(-1);
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
 //             // try to figure out the NUMA node where the data lives
 //             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
@@ -322,13 +334,8 @@ namespace hpx { namespace threads { namespace policies
                 num_thread %= queue_size;
             }
 
-            if (num_thread_fallback != std::size_t(-1))
-            {
-                num_thread_fallback %= queue_size;
-            }
-
             std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
+            num_thread = select_active_pu(l, num_thread);
 
             HPX_ASSERT(num_thread < queue_size);
             queues_[num_thread]->create_thread(data, id, initial_state,
@@ -338,7 +345,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if none is
         /// available
         virtual bool get_next_thread(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count, threads::thread_data*& thrd)
+            threads::thread_data*& thrd, bool /*enable_stealing*/) override
         {
             std::size_t queues_size = queues_.size();
 
@@ -359,6 +366,11 @@ namespace hpx { namespace threads { namespace policies
                 // Give up, we should have work to convert.
                 if (have_staged)
                     return false;
+            }
+
+            if (!running)
+            {
+                return false;
             }
 
             if (numa_sensitive_ != 0)
@@ -453,10 +465,22 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_data* thrd, std::size_t num_thread,
-            std::size_t num_thread_fallback = std::size_t(-1),
-            thread_priority priority = thread_priority_normal)
+        void schedule_thread(threads::thread_data* thrd,
+            threads::thread_schedule_hint schedulehint,
+            bool allow_fallback,
+            thread_priority priority = thread_priority_normal) override
         {
+            // NOTE: This scheduler ignores NUMA hints.
+            std::size_t num_thread = std::size_t(-1);
+            if (schedulehint.mode == thread_schedule_hint_mode_thread)
+            {
+                num_thread = schedulehint.hint;
+            }
+            else
+            {
+                allow_fallback = false;
+            }
+
             std::size_t queue_size = queues_.size();
 
             if (std::size_t(-1) == num_thread)
@@ -468,13 +492,8 @@ namespace hpx { namespace threads { namespace policies
                 num_thread %= queue_size;
             }
 
-            if (num_thread_fallback != std::size_t(-1))
-            {
-                num_thread_fallback %= queue_size;
-            }
-
             std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
+            num_thread = select_active_pu(l, num_thread, allow_fallback);
 
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 
@@ -483,10 +502,21 @@ namespace hpx { namespace threads { namespace policies
         }
 
         void schedule_thread_last(threads::thread_data* thrd,
-            std::size_t num_thread,
-            std::size_t num_thread_fallback = std::size_t(-1),
-            thread_priority priority = thread_priority_normal)
+            threads::thread_schedule_hint schedulehint,
+            bool allow_fallback,
+            thread_priority priority = thread_priority_normal) override
         {
+            // NOTE: This scheduler ignores NUMA hints.
+            std::size_t num_thread = std::size_t(-1);
+            if (schedulehint.mode == thread_schedule_hint_mode_thread)
+            {
+                num_thread = schedulehint.hint;
+            }
+            else
+            {
+                allow_fallback = false;
+            }
+
             std::size_t queue_size = queues_.size();
 
             if (std::size_t(-1) == num_thread)
@@ -498,13 +528,8 @@ namespace hpx { namespace threads { namespace policies
                 num_thread %= queue_size;
             }
 
-            if (num_thread_fallback != std::size_t(-1))
-            {
-                num_thread_fallback %= queue_size;
-            }
-
             std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
+            num_thread = select_active_pu(l, num_thread, allow_fallback);
 
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 
@@ -513,7 +538,8 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        void destroy_thread(threads::thread_data* thrd, std::int64_t& busy_count)
+        void destroy_thread(
+            threads::thread_data* thrd, std::int64_t& busy_count) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
             thrd->get_queue<thread_queue_type>().destroy_thread(thrd, busy_count);
@@ -521,7 +547,8 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)
-        std::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
+        std::int64_t get_queue_length(
+            std::size_t num_thread = std::size_t(-1)) const override
         {
             // Return queue length of one specific queue.
             std::int64_t count = 0;
@@ -541,7 +568,8 @@ namespace hpx { namespace threads { namespace policies
         // Queries the current thread count of the queues.
         std::int64_t get_thread_count(thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
-            std::size_t num_thread = std::size_t(-1), bool reset = false) const
+            std::size_t num_thread = std::size_t(-1),
+            bool reset = false) const override
         {
             // Return thread count of one specific queue.
             std::int64_t count = 0;
@@ -600,7 +628,7 @@ namespace hpx { namespace threads { namespace policies
         // Enumerate matching threads from all queues
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = unknown) const
+            thread_state_enum state = unknown) const override
         {
             bool result = true;
             for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -667,16 +695,18 @@ namespace hpx { namespace threads { namespace policies
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count)
+            std::int64_t& idle_loop_count, bool /*enable_stealing*/,
+            std::size_t& added) override
         {
             std::size_t queues_size = queues_.size();
             HPX_ASSERT(num_thread < queues_.size());
 
-            std::size_t added = 0;
+            added = 0;
+
             bool result = true;
 
-            result = queues_[num_thread]->wait_or_add_new(running,
-                idle_loop_count, added) && result;
+            result =
+                queues_[num_thread]->wait_or_add_new(running, added) && result;
             if (0 != added) return result;
 
             // Check if we have been disabled
@@ -713,8 +743,9 @@ namespace hpx { namespace threads { namespace policies
                             continue;
                         }
 
-                        result = queues_[num_thread]->wait_or_add_new(running,
-                            idle_loop_count, added, queues_[idx]) && result;
+                        result = queues_[num_thread]->wait_or_add_new(
+                                     running, added, queues_[idx]) &&
+                            result;
                         if (0 != added)
                         {
                             queues_[idx]->increment_num_stolen_from_staged(added);
@@ -747,7 +778,7 @@ namespace hpx { namespace threads { namespace policies
                         }
 
                         result = queues_[num_thread]->wait_or_add_new(running,
-                            idle_loop_count, added, queues_[idx]) && result;
+                            added, queues_[idx]) && result;
                         if (0 != added)
                         {
                             queues_[idx]->increment_num_stolen_from_staged(added);
@@ -769,7 +800,7 @@ namespace hpx { namespace threads { namespace policies
                     HPX_ASSERT(idx != num_thread);
 
                     result = queues_[num_thread]->wait_or_add_new(running,
-                        idle_loop_count, added, queues_[idx]) && result;
+                        added, queues_[idx]) && result;
                     if (0 != added)
                     {
                         queues_[idx]->increment_num_stolen_from_staged(added);
@@ -811,7 +842,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void on_start_thread(std::size_t num_thread)
+        void on_start_thread(std::size_t num_thread) override
         {
             if (nullptr == queues_[num_thread])
             {
@@ -858,17 +889,18 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
-        void on_stop_thread(std::size_t num_thread)
+        void on_stop_thread(std::size_t num_thread) override
         {
             queues_[num_thread]->on_stop_thread(num_thread);
         }
 
-        void on_error(std::size_t num_thread, std::exception_ptr const& e)
+        void on_error(
+            std::size_t num_thread, std::exception_ptr const& e) override
         {
             queues_[num_thread]->on_error(num_thread, e);
         }
 
-        void reset_thread_distribution()
+        void reset_thread_distribution() override
         {
             curr_queue_.store(0);
         }

@@ -7,6 +7,7 @@
 #define HPX_LCOS_LOCAL_CHANNEL_JUL_23_2016_0707PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
@@ -14,7 +15,6 @@
 #include <hpx/lcos/local/receive_buffer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/iterator_facade.hpp>
@@ -266,8 +266,7 @@ namespace hpx { namespace lcos { namespace local
             }
             local::packaged_task<T()> pop_pt()
             {
-                return local::packaged_task<T()>(
-                    util::deferred_call(&one_element_queue_async::get, this));
+                return local::packaged_task<T()>([=]() -> T { return get(); });
             }
 
         public:
@@ -456,7 +455,7 @@ namespace hpx { namespace lcos { namespace local
                 return buffer_.push(std::move(t), l);
             }
 
-            std::size_t close(bool force_delete_entries = false)
+            std::size_t close(bool /*force_delete_entries*/ = false)
             {
                 std::unique_lock<mutex_type> l(mtx_);
 

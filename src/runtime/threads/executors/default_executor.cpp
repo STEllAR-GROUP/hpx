@@ -5,11 +5,11 @@
 
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
@@ -22,16 +22,12 @@
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
     default_executor::default_executor()
-      : stacksize_(thread_stacksize_default),
-        priority_(thread_priority_default),
-        os_thread_(std::size_t(-1))
+      : scheduled_executor_base()
     {}
 
     default_executor::default_executor(thread_priority priority,
-        thread_stacksize stacksize, std::size_t os_thread)
-      : stacksize_(stacksize),
-        priority_(priority),
-        os_thread_(os_thread)
+        thread_stacksize stacksize, thread_schedule_hint schedulehint)
+      : scheduled_executor_base(priority, stacksize, schedulehint)
     {}
 
     // Schedule the specified function for execution in this executor.
@@ -39,14 +35,16 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // situations.
     void default_executor::add(closure_type&& f,
         util::thread_description const& desc,
-        threads::thread_state_enum initial_state,
-        bool run_now, threads::thread_stacksize stacksize, error_code& ec)
+        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_stacksize stacksize,
+        threads::thread_schedule_hint schedulehint,
+        error_code& ec)
     {
         if (stacksize == threads::thread_stacksize_default)
             stacksize = stacksize_;
 
         register_thread_nullary(std::move(f), desc, initial_state, run_now,
-            priority_, os_thread_, stacksize, ec);
+            priority_, schedulehint, stacksize, ec);
     }
 
     // Schedule given function for execution in this executor no sooner
@@ -63,7 +61,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // create new thread
         thread_id_type id = register_thread_nullary(
             std::move(f), description, suspended, false,
-            priority_, os_thread_, stacksize, ec);
+            priority_, schedulehint_, stacksize, ec);
         if (ec) return;
 
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise

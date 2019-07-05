@@ -26,27 +26,12 @@ void test_transform_binary2()
         IteratorTag());
     test_transform_binary2_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_binary2(execution_policy(execution::seq), IteratorTag());
-    test_transform_binary2(execution_policy(execution::par), IteratorTag());
-    test_transform_binary2(execution_policy(execution::par_unseq),
-        IteratorTag());
-
-    test_transform_binary2(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_transform_binary2(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void transform_binary2_test()
 {
     test_transform_binary2<std::random_access_iterator_tag>();
     test_transform_binary2<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_binary2<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,29 +50,12 @@ void test_transform_binary2_exception()
         IteratorTag());
     test_transform_binary2_exception_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_binary2_exception(execution_policy(execution::seq),
-        IteratorTag());
-    test_transform_binary2_exception(execution_policy(execution::par),
-        IteratorTag());
-
-    test_transform_binary2_exception(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_transform_binary2_exception(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void transform_binary2_exception_test()
 {
     test_transform_binary2_exception<std::random_access_iterator_tag>();
     test_transform_binary2_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_binary2_exception<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,29 +74,12 @@ void test_transform_binary2_bad_alloc()
         IteratorTag());
     test_transform_binary2_bad_alloc_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_binary2_bad_alloc(execution_policy(execution::seq),
-        IteratorTag());
-    test_transform_binary2_bad_alloc(execution_policy(execution::par),
-        IteratorTag());
-
-    test_transform_binary2_bad_alloc(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_transform_binary2_bad_alloc(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void transform_binary2_bad_alloc_test()
 {
     test_transform_binary2_bad_alloc<std::random_access_iterator_tag>();
     test_transform_binary2_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_binary2_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

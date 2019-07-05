@@ -31,13 +31,13 @@ struct ViewRegistrationListener
     ViewRegistrationListener(const string &name) :
         name(name)
     {
-        hpx::util::format_to(cout, "constructed server listener %1% (%2%)",
+        hpx::util::format_to(cout, "constructed server listener {1} ({2})",
             name, this) << endl;
     }
 
     void register_view()
     {
-        hpx::util::format_to(cout, "register view at listener %1% (%2%)",
+        hpx::util::format_to(cout, "register view at listener {1} ({2})",
             name, this) << endl;
     }
     HPX_DEFINE_COMPONENT_ACTION(ViewRegistrationListener, register_view);
@@ -144,6 +144,9 @@ int hpx_main()
             cout << "registered everything at this id" << endl;
         }
     }
+
+    // Unregister everything again to avoid memory leaks
+    hpx::unregister_with_basename("Listener").get();
 
     return hpx::finalize();
 }

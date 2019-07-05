@@ -13,9 +13,9 @@
 #include <hpx/plugins/parcelport_factory_base.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
+#include <hpx/preprocessor/cat.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/traits/plugin_config_data.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
@@ -69,9 +69,9 @@ namespace hpx { namespace plugins
         }
 
         ///
-        ~parcelport_factory() {}
+        ~parcelport_factory() override {}
 
-        void get_plugin_info(std::vector<std::string> & fillini)
+        void get_plugin_info(std::vector<std::string> & fillini) override
         {
             using namespace boost::assign;
             std::string name = unique_plugin_name<parcelport_factory>::call();
@@ -101,9 +101,6 @@ namespace hpx { namespace plugins
                 "zero_copy_optimization = ${HPX_PARCEL_" + name_uc +
                     "_ZERO_COPY_OPTIMIZATION:"
                     "$[hpx.parcel.zero_copy_optimization]}",
-                "enable_security = ${HPX_PARCEL_" + name_uc +
-                    "_ENABLE_SECURITY:"
-                    "$[hpx.parcel.enable_security]}",
                 "async_serialization = ${HPX_PARCEL_" + name_uc +
                     "_ASYNC_SERIALIZATION:"
                     "$[hpx.parcel.async_serialization]}",
@@ -121,7 +118,8 @@ namespace hpx { namespace plugins
             }
         }
 
-        void init(int *argc, char ***argv, util::command_line_handling &cfg)
+        void init(int* argc, char*** argv,
+            util::command_line_handling& cfg) override
         {
             // initialize the parcelport with the parameters we got passed in at start
             traits::plugin_config_data<Parcelport>::init(argc, argv, cfg);
@@ -132,10 +130,11 @@ namespace hpx { namespace plugins
         /// return Returns the newly created instance of the message handler
         ///        supported by this factory
         parcelset::parcelport* create(
-            hpx::util::runtime_configuration const & cfg,
-            hpx::util::function_nonser<void(std::size_t, char const*)>
-              const& on_start_thread,
-            hpx::util::function_nonser<void()> const& on_stop_thread)
+            hpx::util::runtime_configuration const& cfg,
+            hpx::util::function_nonser<void(std::size_t, char const*)> const&
+                on_start_thread,
+            hpx::util::function_nonser<void(std::size_t, char const*)> const&
+                on_stop_thread) override
         {
             return new Parcelport(cfg, on_start_thread, on_stop_thread);
         }

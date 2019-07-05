@@ -46,8 +46,8 @@ void exclusive_scan_benchmark()
       bool ok = std::equal(std::begin(d), std::end(d), std::begin(e));
       HPX_TEST(ok);
       if (ok) {
-          std::cout << "<DartMeasurement name=\"ExclusiveScanTime\" \n"
-              << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+          // CDash graph plotting
+          hpx::util::print_cdash_timing("ExclusiveScanTime", elapsed);
       }
     }
     catch (...) {
@@ -129,26 +129,12 @@ void test_exclusive_scan1()
 
     test_exclusive_scan1_async(execution::seq(execution::task), IteratorTag());
     test_exclusive_scan1_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_exclusive_scan1(execution_policy(execution::seq), IteratorTag());
-    test_exclusive_scan1(execution_policy(execution::par), IteratorTag());
-    test_exclusive_scan1(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_exclusive_scan1(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_exclusive_scan1(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void exclusive_scan_test1()
 {
     test_exclusive_scan1<std::random_access_iterator_tag>();
     test_exclusive_scan1<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_exclusive_scan1<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -161,16 +147,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    // if benchmark is requested we run it even in debug mode
-    if (vm.count("benchmark")) {
-        exclusive_scan_benchmark();
-    }
-    else {
-        exclusive_scan_test1();
-#ifndef HPX_DEBUG
-        exclusive_scan_benchmark();
-#endif
-    }
+    exclusive_scan_test1();
+    exclusive_scan_benchmark();
 
   return hpx::finalize();
 }
@@ -184,8 +162,8 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+        "the random number generator seed to use for this run");
+
     // By default this test should run on all available cores
     std::vector<std::string> const cfg = {
         "hpx.os_threads=all"

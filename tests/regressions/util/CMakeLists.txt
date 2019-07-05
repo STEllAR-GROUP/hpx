@@ -18,7 +18,6 @@ set(tests
     tuple_serialization_803
     unwrapped_1528
     use_all_cores_2262
-    zero_copy_parcels_1001
    )
 
 set(function_argument_FLAGS DEPENDENCIES iostreams_component)
@@ -38,7 +37,13 @@ if(WITH_PARCEL_COALESCING)
 endif()
 set(function_serialization_728_FLAGS DEPENDENCIES ${function_serialization_728_dependencies})
 
-set(zero_copy_parcels_1001_PARAMETERS LOCALITIES 2)
+if(HPX_WITH_NETWORKING)
+    set(tests ${tests}
+        zero_copy_parcels_1001
+       )
+
+  set(zero_copy_parcels_1001_PARAMETERS LOCALITIES 2)
+endif()
 
 foreach(test ${tests})
   set(sources
@@ -65,18 +70,20 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.regressions.util_dir.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()
 
-# run zero_copy_parcels_1001 with two additional configurations
-add_hpx_regression_test(
-    "util" zero_copy_parcels_1001_no_array_optimization
-    EXECUTABLE zero_copy_parcels_1001
-    ${zero_copy_parcels_1001_PARAMETERS}
-    ARGS --hpx:ini=hpx.parcel.array_optimization=0)
+if(HPX_WITH_NETWORKING)
+  # run zero_copy_parcels_1001 with two additional configurations
+  add_hpx_regression_test(
+      "util" zero_copy_parcels_1001_no_array_optimization
+      EXECUTABLE zero_copy_parcels_1001
+      ${zero_copy_parcels_1001_PARAMETERS}
+      ARGS --hpx:ini=hpx.parcel.array_optimization=0)
 
-add_hpx_regression_test(
-    "util" zero_copy_parcels_1001_no_zero_copy_optimization
-    EXECUTABLE zero_copy_parcels_1001
-    ${zero_copy_parcels_1001_PARAMETERS}
-    ARGS --hpx:ini=hpx.parcel.zero_copy_optimization=0)
+  add_hpx_regression_test(
+      "util" zero_copy_parcels_1001_no_zero_copy_optimization
+      EXECUTABLE zero_copy_parcels_1001
+      ${zero_copy_parcels_1001_PARAMETERS}
+      ARGS --hpx:ini=hpx.parcel.zero_copy_optimization=0)
+endif()

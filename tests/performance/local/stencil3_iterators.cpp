@@ -9,6 +9,7 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/transform_iterator.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -497,7 +498,7 @@ std::uint64_t bench_stencil3_iterator_explicit()
     // handle all elements explicitly
     int result = values.back() + values.front() + values[1];
 
-    auto range = boost::irange(0, partition_size);
+    auto range = boost::irange(1, partition_size - 1);
 
     std::for_each(std::begin(range), std::end(range),
         [&result, &values](std::size_t i)
@@ -533,6 +534,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_full();
             hpx::cout << "full: " << (t * 1e-9) / test_count << std::endl;
+            hpx::util::print_cdash_timing("Stencil3Full", (t * 1e-9) / test_count);
         }
 
         // now run explicit (no-check) stencil3 tests
@@ -541,6 +543,8 @@ int hpx_main(boost::program_options::variables_map& vm)
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_v1();
             hpx::cout << "nocheck(v1): " << (t * 1e-9) / test_count << std::endl;
+            hpx::util::print_cdash_timing("Stencil3NocheckV1",
+                (t * 1e-9) / test_count);
         }
 
         {
@@ -548,6 +552,8 @@ int hpx_main(boost::program_options::variables_map& vm)
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_v2();
             hpx::cout << "nocheck(v2): " << (t * 1e-9) / test_count << std::endl;
+            hpx::util::print_cdash_timing("Stencil3NocheckV2",
+                (t * 1e-9) / test_count);
         }
 
         // now run explicit tests
@@ -556,6 +562,8 @@ int hpx_main(boost::program_options::variables_map& vm)
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_explicit();
             hpx::cout << "explicit: " << (t * 1e-9) / test_count << std::endl;
+            hpx::util::print_cdash_timing("Stencil3Explicit",
+                (t * 1e-9) / test_count);
         }
     }
 

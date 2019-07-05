@@ -5,16 +5,16 @@
 
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
-#include <hpx/state.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/state.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/steady_clock.hpp>
@@ -54,13 +54,15 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // situations.
     void current_executor::add(
         closure_type&& f, util::thread_description const& desc,
-        threads::thread_state_enum initial_state,
-        bool run_now, threads::thread_stacksize stacksize, error_code& ec)
+        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_stacksize stacksize,
+        threads::thread_schedule_hint schedulehint,
+        error_code& ec)
     {
         // create a new thread
-        thread_init_data data(util::bind(
-            util::one_shot(&current_executor::thread_function_nullary),
-            std::move(f)), desc);
+        thread_init_data data(util::one_shot(util::bind(
+            &current_executor::thread_function_nullary,
+            std::move(f))), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
@@ -78,9 +80,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new suspended thread
-        thread_init_data data(util::bind(
-            util::one_shot(&current_executor::thread_function_nullary),
-            std::move(f)), desc);
+        thread_init_data data(util::one_shot(util::bind(
+            &current_executor::thread_function_nullary,
+            std::move(f))), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
@@ -91,7 +93,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         // now schedule new thread for execution
         threads::detail::set_thread_state_timed(
-            *scheduler_base_, abs_time, id, nullptr, ec);
+            *scheduler_base_, abs_time, id, nullptr, true, ec);
         if (ec) return;
 
         if (&ec != &throws)

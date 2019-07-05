@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
@@ -65,11 +65,11 @@ void locality_namespace::register_counter_types(
         if (detail::locality_namespace_services[i].target_ ==
             detail::counter_target_count)
             help = hpx::util::format(
-                "returns the number of invocations of the AGAS service '%s'",
+                "returns the number of invocations of the AGAS service '{}'",
                 name.substr(p+1));
         else
             help = hpx::util::format(
-                "returns the overall execution time of the AGAS service '%s'",
+                "returns the overall execution time of the AGAS service '{}'",
                 name.substr(p+1));
 
         performance_counters::install_counter_type(
@@ -167,7 +167,8 @@ std::uint32_t locality_namespace::allocate(
     )
 { // {{{ allocate implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.allocate_.time_
+        counter_data_.allocate_.time_,
+        counter_data_.allocate_.enabled_
     );
     counter_data_.increment_allocate_count();
 
@@ -235,8 +236,8 @@ std::uint32_t locality_namespace::allocate(
           , "locality_namespace::allocate"
           , hpx::util::format(
                 "partition table insertion failed due to a locking "
-                "error or memory corruption, endpoint(%1%), "
-                "prefix(%2%)", endpoints, prefix));
+                "error or memory corruption, endpoint({1}), "
+                "prefix({2})", endpoints, prefix));
     }
 
 
@@ -253,14 +254,14 @@ std::uint32_t locality_namespace::allocate(
             HPX_THROW_EXCEPTION(bad_request
               , "locality_namespace::allocate"
               , hpx::util::format(
-                    "unable to bind prefix(%1%) to a gid", prefix));
+                    "unable to bind prefix({1}) to a gid", prefix));
         }
         return prefix;
     }
 
     LAGAS_(info) << hpx::util::format(
-        "locality_namespace::allocate, ep(%1%), count(%2%), "
-        "prefix(%3%)",
+        "locality_namespace::allocate, ep({1}), count({2}), "
+        "prefix({3})",
         endpoints, count, prefix);
 
     return prefix;
@@ -270,7 +271,8 @@ parcelset::endpoints_type locality_namespace::resolve_locality(
     naming::gid_type locality)
 { // {{{ resolve_locality implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.resolve_locality_.time_
+        counter_data_.resolve_locality_.time_,
+        counter_data_.resolve_locality_.enabled_
     );
     counter_data_.increment_resolve_locality_count();
 
@@ -291,7 +293,8 @@ parcelset::endpoints_type locality_namespace::resolve_locality(
 void locality_namespace::free(naming::gid_type locality)
 { // {{{ free implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.free_.time_
+        counter_data_.free_.time_,
+        counter_data_.free_.enabled_
     );
     counter_data_.increment_free_count();
 
@@ -347,14 +350,14 @@ void locality_namespace::free(naming::gid_type locality)
 
         /*
         LAGAS_(info) << hpx::util::format(
-            "locality_namespace::free, ep(%1%)",
+            "locality_namespace::free, ep({1})",
             ep);
         */
     }
 
     /*
     LAGAS_(info) << hpx::util::format(
-        "locality_namespace::free, ep(%1%), "
+        "locality_namespace::free, ep({1}), "
         "response(no_success)",
         ep);
     */
@@ -363,7 +366,8 @@ void locality_namespace::free(naming::gid_type locality)
 std::vector<std::uint32_t> locality_namespace::localities()
 { // {{{ localities implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.localities_.time_
+        counter_data_.localities_.time_,
+        counter_data_.localities_.enabled_
     );
     counter_data_.increment_localities_count();
 
@@ -378,7 +382,7 @@ std::vector<std::uint32_t> locality_namespace::localities()
         p.push_back(it->first);
 
     LAGAS_(info) << hpx::util::format(
-        "locality_namespace::localities, localities(%1%)",
+        "locality_namespace::localities, localities({1})",
         p.size());
 
     return p;
@@ -387,7 +391,8 @@ std::vector<std::uint32_t> locality_namespace::localities()
 std::uint32_t locality_namespace::get_num_localities()
 { // {{{ get_num_localities implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.num_localities_.time_
+        counter_data_.num_localities_.time_,
+        counter_data_.num_localities_.enabled_
     );
     counter_data_.increment_num_localities_count();
     std::lock_guard<mutex_type> l(mutex_);
@@ -396,7 +401,7 @@ std::uint32_t locality_namespace::get_num_localities()
         static_cast<std::uint32_t>(partitions_.size());
 
     LAGAS_(info) << hpx::util::format(
-        "locality_namespace::get_num_localities, localities(%1%)",
+        "locality_namespace::get_num_localities, localities({1})",
         num_localities);
 
     return num_localities;
@@ -417,7 +422,7 @@ std::vector<std::uint32_t> locality_namespace::get_num_threads()
     }
 
     LAGAS_(info) << hpx::util::format(
-        "locality_namespace::get_num_threads, localities(%1%)",
+        "locality_namespace::get_num_threads, localities({1})",
         num_threads.size());
 
     return num_threads;
@@ -438,7 +443,7 @@ std::uint32_t locality_namespace::get_num_overall_threads()
     }
 
     LAGAS_(info) << hpx::util::format(
-        "locality_namespace::get_num_overall_threads, localities(%1%)",
+        "locality_namespace::get_num_overall_threads, localities({1})",
         num_threads);
 
     return num_threads;
@@ -488,30 +493,37 @@ naming::gid_type locality_namespace::statistics_counter(std::string name)
         case locality_ns_allocate:
             get_data_func = util::bind_front(&cd::get_allocate_count,
                 &counter_data_);
+            counter_data_.allocate_.enabled_ = true;
             break;
         case locality_ns_resolve_locality:
             get_data_func = util::bind_front(&cd::get_resolve_locality_count,
                 &counter_data_);
+            counter_data_.resolve_locality_.enabled_ = true;
             break;
         case locality_ns_free:
             get_data_func = util::bind_front(&cd::get_free_count,
                 &counter_data_);
+            counter_data_.free_.enabled_ = true;
             break;
         case locality_ns_localities:
             get_data_func = util::bind_front(&cd::get_localities_count,
                 &counter_data_);
+            counter_data_.localities_.enabled_ = true;
             break;
         case locality_ns_num_localities:
             get_data_func = util::bind_front(&cd::get_num_localities_count,
                 &counter_data_);
+            counter_data_.num_localities_.enabled_ = true;
             break;
         case locality_ns_num_threads:
             get_data_func = util::bind_front(&cd::get_num_threads_count,
                 &counter_data_);
+            counter_data_.num_threads_.enabled_ = true;
             break;
         case locality_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_count,
                 &counter_data_);
+            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -525,30 +537,37 @@ naming::gid_type locality_namespace::statistics_counter(std::string name)
         case locality_ns_allocate:
             get_data_func = util::bind_front(&cd::get_allocate_time,
                 &counter_data_);
+            counter_data_.allocate_.enabled_ = true;
             break;
         case locality_ns_resolve_locality:
             get_data_func = util::bind_front(&cd::get_resolve_locality_time,
                 &counter_data_);
+            counter_data_.resolve_locality_.enabled_ = true;
             break;
         case locality_ns_free:
             get_data_func = util::bind_front(&cd::get_free_time,
                 &counter_data_);
+            counter_data_.free_.enabled_ = true;
             break;
         case locality_ns_localities:
             get_data_func = util::bind_front(&cd::get_localities_time,
                 &counter_data_);
+            counter_data_.localities_.enabled_ = true;
             break;
         case locality_ns_num_localities:
             get_data_func = util::bind_front(&cd::get_num_localities_time,
                 &counter_data_);
+            counter_data_.num_localities_.enabled_ = true;
             break;
         case locality_ns_num_threads:
             get_data_func = util::bind_front(&cd::get_num_threads_time,
                 &counter_data_);
+            counter_data_.num_threads_.enabled_ = true;
             break;
         case locality_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_time,
                 &counter_data_);
+            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -609,6 +628,16 @@ std::int64_t locality_namespace::counter_data::get_overall_count(bool reset)
         util::get_and_reset_value(num_threads_.count_, reset);
 }
 
+void locality_namespace::counter_data::enable_all()
+{
+    allocate_.enabled_ = true;
+    resolve_locality_.enabled_ = true;
+    free_.enabled_ = true;
+    localities_.enabled_ = true;
+    num_localities_.enabled_ = true;
+    num_threads_.enabled_ = true;
+}
+
 // access execution time counters
 std::int64_t locality_namespace::counter_data::get_allocate_time(bool reset)
 {
@@ -653,32 +682,50 @@ std::int64_t locality_namespace::counter_data::get_overall_time(bool reset)
 // increment counter values
 void locality_namespace::counter_data::increment_allocate_count()
 {
-    ++allocate_.count_;
+    if (allocate_.enabled_)
+    {
+        ++allocate_.count_;
+    }
 }
 
 void locality_namespace::counter_data::increment_resolve_locality_count()
 {
-    ++resolve_locality_.count_;
+    if (resolve_locality_.enabled_)
+    {
+        ++resolve_locality_.count_;
+    }
 }
 
 void locality_namespace::counter_data::increment_free_count()
 {
-    ++free_.count_;
+    if (free_.enabled_)
+    {
+        ++free_.count_;
+    }
 }
 
 void locality_namespace::counter_data::increment_localities_count()
 {
-    ++localities_.count_;
+    if (localities_.enabled_)
+    {
+        ++localities_.count_;
+    }
 }
 
 void locality_namespace::counter_data::increment_num_localities_count()
 {
-    ++num_localities_.count_;
+    if (num_localities_.enabled_)
+    {
+        ++num_localities_.count_;
+    }
 }
 
 void locality_namespace::counter_data::increment_num_threads_count()
 {
-    ++num_threads_.count_;
+    if (num_threads_.enabled_)
+    {
+        ++num_threads_.count_;
+    }
 }
 }}}
 

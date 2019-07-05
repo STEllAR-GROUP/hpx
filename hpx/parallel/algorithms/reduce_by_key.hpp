@@ -342,7 +342,6 @@ namespace hpx { namespace parallel { inline namespace v1
                 typedef zip_iterator<
                     FwdIter2, std::vector<reduce_key_series_states>::iterator
                 > zip_iterator_vout;
-                typedef typename zip_iterator_vout::value_type zip_type_out;
 
                 typedef typename std::iterator_traits<RanIter2>::value_type value_type;
 

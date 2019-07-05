@@ -16,10 +16,6 @@
 #ifndef JT28092007_op_equal_HPP_DEFINED
 #define JT28092007_op_equal_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <vector>
 #include <typeinfo>
@@ -52,10 +48,6 @@ namespace op_equal {
     */
     struct same_type_op_equal_base : virtual same_type_op_equal_top {};
 
-    struct always_equal {
-        bool operator==(const always_equal& ) const { return true; }
-    };
-
     /**
         @brief Implements operator==, which compares two objects.
         If they have the same type, it will compare them using the type's member
@@ -78,4 +70,3 @@ namespace op_equal {
 }}}}
 
 #endif
-

@@ -9,15 +9,15 @@
 #define HPX_LCOS_DETAIL_PROMISE_LCO_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/lcos/local/promise.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
+#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/component_type_database.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/unused.hpp>
 
@@ -73,7 +73,7 @@ namespace lcos {
             void set_value(RemoteResult&& result)
             {
                 HPX_ASSERT(shared_state_);
-                shared_state_->set_data(std::move(result));
+                shared_state_->set_remote_data(std::move(result));
             }
 
             void set_exception(std::exception_ptr const& e)
@@ -96,13 +96,13 @@ namespace lcos {
         private:
             // intrusive reference counting, noop since we don't require
             // reference counting here.
-            friend void intrusive_ptr_add_ref(promise_lco_base* p)
+            friend void intrusive_ptr_add_ref(promise_lco_base* /*p*/)
             {
             }
 
             // intrusive reference counting, noop since we don't require
             // reference counting here.
-            friend void intrusive_ptr_release(promise_lco_base* p)
+            friend void intrusive_ptr_release(promise_lco_base* /*p*/)
             {
             }
         };

@@ -8,6 +8,7 @@
 #ifndef HPX_PARTITIONED_VECTOR_VIEW_HPP
 #define HPX_PARTITIONED_VECTOR_VIEW_HPP
 
+#include <hpx/assertion.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view_iterator.hpp>

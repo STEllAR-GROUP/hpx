@@ -105,17 +105,6 @@ void test_is_heap()
 
     test_is_heap_async(execution::seq(execution::task), DataType());
     test_is_heap_async(execution::par(execution::task), DataType());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_is_heap(execution_policy(execution::seq), DataType());
-    test_is_heap(execution_policy(execution::par), DataType());
-    test_is_heap(execution_policy(execution::par_unseq), DataType());
-
-    test_is_heap(execution_policy(execution::seq(execution::task)),
-        DataType());
-    test_is_heap(execution_policy(execution::par(execution::task)),
-        DataType());
-#endif
 }
 
 void test_is_heap()

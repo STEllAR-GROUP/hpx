@@ -43,11 +43,13 @@
 // This needs to be first for building on Macs
 #include <hpx/runtime/threads/coroutines/detail/context_impl.hpp>
 
-#include <hpx/runtime/threads/coroutines/detail/swap_context.hpp> //for swap hints
+#include <hpx/assertion.hpp>
+#include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>    //for swap hints
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
-#include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <hpx/runtime/threads/thread_id_type.hpp>
-#include <hpx/util/assert.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#endif
 
 #include <atomic>
 #include <cstddef>
@@ -88,29 +90,37 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     /////////////////////////////////////////////////////////////////////////////
     std::ptrdiff_t const default_stack_size = -1;
 
-    class context_base : public default_context_impl
+#if defined(HPX_HAVE_APEX)
+    apex_task_wrapper rebind_base_apex(thread_id_type id);
+#endif
+
+    template <typename CoroutineImpl>
+    class context_base : public default_context_impl<CoroutineImpl>
     {
     public:
         typedef void deleter_type(context_base const*);
         typedef hpx::threads::thread_id_type thread_id_type;
 
-        template <typename Derived>
-        context_base(Derived& derived, std::ptrdiff_t stack_size, thread_id_type id)
-          : default_context_impl(derived, stack_size),
-            m_caller(),
-            m_state(ctx_ready),
-            m_exit_state(ctx_exit_not_requested),
-            m_exit_status(ctx_not_exited),
+        context_base(std::ptrdiff_t stack_size, thread_id_type id)
+          : default_context_impl<CoroutineImpl>(stack_size)
+          , m_caller()
+          , m_state(ctx_ready)
+          , m_exit_state(ctx_exit_not_requested)
+          , m_exit_status(ctx_not_exited)
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-            m_phase(0),
+          , m_phase(0)
 #endif
-            m_thread_data(0),
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
+          , m_thread_data(nullptr)
+#else
+          , m_thread_data(0)
+#endif
 #if defined(HPX_HAVE_APEX)
-            m_apex_data(0ull),
+          , m_apex_data(nullptr)
 #endif
-            m_type_info(),
-            m_thread_id(id),
-            continuation_recursion_count_(0)
+          , m_type_info()
+          , m_thread_id(id)
+          , continuation_recursion_count_(0)
         {}
 
         void reset()
@@ -124,7 +134,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             m_thread_data = 0;
 #endif
 #if defined(HPX_HAVE_APEX)
-            m_apex_data = 0ull;
+            m_apex_data = nullptr;
 #endif
             m_thread_id.reset();
         }
@@ -169,6 +179,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         // on return.
         void invoke()
         {
+            this->init();
             HPX_ASSERT(is_ready());
             do_invoke();
             // TODO: could use a binary or here to eliminate
@@ -206,7 +217,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             HPX_ASSERT(running());
 
             m_state = ctx_ready;
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
+            this->start_yield_fiber(&this->asan_fake_stack, m_caller);
+#endif
             do_yield();
+
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
+            this->finish_switch_fiber(this->asan_fake_stack, m_caller);
+#endif
 
             HPX_ASSERT(running());
         }
@@ -223,7 +241,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             m_thread_data = 0;
 #endif
 #if defined(HPX_HAVE_APEX)
-            m_apex_data = 0ull;
+            m_apex_data = nullptr;
 #endif
         }
 
@@ -250,7 +268,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
 #if defined(HPX_HAVE_APEX)
-        void** get_apex_data() const
+        apex_task_wrapper get_apex_data() const
         {
             // APEX wants the ADDRESS of a location to store
             // data.  This storage could be updated asynchronously,
@@ -258,7 +276,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             // to remember state for the HPX thread in-betweeen
             // calls to apex::start/stop/yield/resume().
             // APEX will change the value pointed to by the address.
-            return const_cast<void**>(&m_apex_data);
+            return m_apex_data;
+        }
+        void set_apex_data(apex_task_wrapper data)
+        {
+            m_apex_data = data;
         }
 #endif
 
@@ -300,7 +322,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 //             return ++m_allocation_counters.get(heap_num);
 //         }
 
-    protected:
+    public:
         // global coroutine state
         enum context_state
         {
@@ -309,6 +331,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             ctx_exited    // context is finished.
         };
 
+    protected:
         // exit request state
         enum context_exit_state
         {
@@ -336,9 +359,13 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
             HPX_ASSERT(m_phase == 0);
 #endif
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
+            HPX_ASSERT(m_thread_data == nullptr);
+#else
             HPX_ASSERT(m_thread_data == 0);
+#endif
 #if defined(HPX_HAVE_APEX)
-            HPX_ASSERT(m_apex_data == 0ull);
+            m_apex_data = rebind_base_apex(id);
 #endif
             m_type_info = std::exception_ptr();
         }
@@ -352,6 +379,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             m_type_info = std::move(info);
             m_state = ctx_exited;
             m_exit_status = status;
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
+            this->start_yield_fiber(&this->asan_fake_stack, m_caller);
+#endif
             do_yield();
         }
 
@@ -371,10 +401,19 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             ++m_phase;
 #endif
             m_state = ctx_running;
+
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
+            this->start_switch_fiber(&this->asan_fake_stack);
+#endif
+
             swap_context(m_caller, *this, detail::invoke_hint());
+
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
+            this->finish_switch_fiber(this->asan_fake_stack, m_caller);
+#endif
         }
 
-        typedef default_context_impl::context_impl_base ctx_type;
+        typedef typename default_context_impl<CoroutineImpl>::context_impl_base ctx_type;
         ctx_type m_caller;
 
         static HPX_EXPORT allocation_counters m_allocation_counters;
@@ -392,7 +431,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #if defined(HPX_HAVE_APEX)
         // This is a pointer that APEX will use to maintain state
         // when an HPX thread is pre-empted.
-        void* m_apex_data;
+        apex_task_wrapper m_apex_data;
 #endif
 
         // This is used to generate a meaningful exception trace.

@@ -11,8 +11,8 @@
 #define HPX_LCOS_RECURSIVE_MUTEX_AUG_03_2009_0459PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -28,7 +28,7 @@ namespace hpx { namespace lcos { namespace local
         {
             typedef std::size_t thread_id_type;
 
-            static thread_id_type invalid_id() { return thread_id_type(~0u); }
+            static thread_id_type invalid_id() { return ~0u; }
 
             static thread_id_type call()
             {
@@ -45,7 +45,7 @@ namespace hpx { namespace lcos { namespace local
         {
             typedef std::size_t thread_id_type;
 
-            static thread_id_type invalid_id() { return thread_id_type(~0u); }
+            static thread_id_type invalid_id() { return ~0u; }
 
             static thread_id_type call()
             {

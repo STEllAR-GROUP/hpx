@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
@@ -31,8 +32,7 @@
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
@@ -237,7 +237,7 @@ namespace hpx { namespace agas
         HPX_ASSERT(pp);
         naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
         parcelset::parcel p(
-            parcelset::detail::create_parcel::call(std::false_type(),
+            parcelset::detail::create_parcel::call(
                 naming::get_gid_from_locality_id(target_locality_id),
                 std::move(addr), act, std::forward<Args>(args)...));
 #if defined(HPX_HAVE_PARCEL_PROFILING)
@@ -467,7 +467,7 @@ void register_worker(registration_header const& header)
         HPX_THROW_EXCEPTION(internal_server_error
             , "agas::register_worker"
             , hpx::util::format(
-                "worker node (%s) can't suggest locality_id zero, "
+                "worker node ({}) can't suggest locality_id zero, "
                 "this is reserved for the console",
                 header.endpoints));
         return;
@@ -478,7 +478,7 @@ void register_worker(registration_header const& header)
         HPX_THROW_EXCEPTION(internal_server_error
             , "agas::register_worker"
             , hpx::util::format(
-                "attempt to register locality %s more than once",
+                "attempt to register locality {} more than once",
                 header.endpoints));
         return;
     }
@@ -560,13 +560,13 @@ void register_worker(registration_header const& header)
         // delay the final response until the runtime system is up and running
         util::unique_function_nonser<void()>* thunk =
             new util::unique_function_nonser<void()>(
-                util::bind(
-                    util::one_shot(&big_boot_barrier::apply_notification)
-                  , std::ref(get_big_boot_barrier())
+                util::one_shot(util::bind_front(
+                    &big_boot_barrier::apply_notification
+                  , &get_big_boot_barrier()
                   , 0
                   , naming::get_locality_id_from_gid(prefix)
                   , dest
-                  , std::move(hdr)));
+                  , std::move(hdr))));
         get_big_boot_barrier().add_thunk(thunk);
     }
 }
@@ -599,7 +599,7 @@ void notify_worker(notification_header const& header)
     agas_client.set_local_locality(header.prefix);
     agas_client.register_console(header.agas_endpoints);
     cfg.parse("assigned locality",
-        hpx::util::format("hpx.locality!=%1%",
+        hpx::util::format("hpx.locality!={1}",
             naming::get_locality_id_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local service

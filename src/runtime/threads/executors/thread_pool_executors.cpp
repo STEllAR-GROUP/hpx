@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,13 +16,13 @@
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
 #endif
-#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
+#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
@@ -156,13 +156,15 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::add(closure_type && f,
         util::thread_description const& desc,
-        threads::thread_state_enum initial_state,
-        bool run_now, threads::thread_stacksize stacksize, error_code& ec)
+        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_stacksize stacksize,
+        threads::thread_schedule_hint schedulehint,
+        error_code& ec)
     {
         // create a new thread
-        thread_init_data data(util::bind(
-            util::one_shot(&thread_pool_executor::thread_function_nullary),
-            this, std::move(f)), desc);
+        thread_init_data data(util::one_shot(util::bind(
+            &thread_pool_executor::thread_function_nullary,
+            this, std::move(f))), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         // update statistics
@@ -190,9 +192,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new suspended thread
-        thread_init_data data(util::bind(
-            util::one_shot(&thread_pool_executor::thread_function_nullary),
-            this, std::move(f)), desc);
+        thread_init_data data(util::one_shot(util::bind(
+            &thread_pool_executor::thread_function_nullary,
+            this, std::move(f))), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
@@ -205,9 +207,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         ++tasks_scheduled_;
 
         // now schedule new thread for execution
-        threads::detail::set_thread_state_timed(scheduler_, abs_time, id,
-            nullptr, ec);
-        if (ec) {
+        threads::detail::set_thread_state_timed(
+            scheduler_, abs_time, id, nullptr, true, ec);
+        if (ec)
+        {
             --tasks_scheduled_;
             return;
         }
@@ -339,18 +342,28 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
             // FIXME: turn these values into performance counters
             std::int64_t executed_threads = 0, executed_thread_phases = 0;
-            std::uint64_t overall_times = 0, thread_times = 0;
+            std::int64_t overall_times = 0, thread_times = 0;
             std::int64_t idle_loop_count = 0, busy_loop_count = 0;
-            std::uint8_t task_active = 0;
+            bool task_active = false;
 
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+            std::int64_t bg_work = 0;
+            std::int64_t bg_send = 0;
+            std::int64_t bg_receive = 0;
+            threads::detail::scheduling_counters counters(
+                executed_threads, executed_thread_phases,
+                overall_times, thread_times, idle_loop_count, busy_loop_count,
+                task_active, bg_work, bg_send, bg_receive);
+#else
             threads::detail::scheduling_counters counters(
                 executed_threads, executed_thread_phases,
                 overall_times, thread_times, idle_loop_count, busy_loop_count,
                 task_active);
+#endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
             threads::detail::scheduling_callbacks callbacks(
-                threads::detail::scheduling_callbacks::callback_type(),
-                util::bind( //-V107
+                nullptr,
+                util::deferred_call( //-V107
                     &thread_pool_executor::suspend_back_into_calling_context,
                     this, virt_core));
 
@@ -423,12 +436,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         {
             ++curr_punits_;
             register_thread_nullary(
-                util::bind(
-                    util::one_shot(&thread_pool_executor::run),
-                    this, virt_core, thread_num
-                ),
+                util::deferred_call(&thread_pool_executor::run, this,
+                    virt_core, thread_num),
                 "thread_pool_executor thread", threads::pending, true,
-                threads::thread_priority_normal, thread_num,
+                threads::thread_priority_normal,
+                threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(thread_num)),
                 threads::thread_stacksize_default, ec);
         }
     }
@@ -444,6 +457,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         HPX_ASSERT(oldstate == state_starting ||
             oldstate == state_running || oldstate == state_suspended ||
             oldstate == state_stopped);
+        HPX_UNUSED(oldstate);
         --curr_punits_;
     }
 }}}}

@@ -33,7 +33,7 @@ namespace hpx { namespace threads { namespace executors
             default_executor();
 
             default_executor(thread_priority priority,
-                thread_stacksize stacksize, std::size_t os_thread);
+                thread_stacksize stacksize, thread_schedule_hint schedulehint);
 
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
@@ -41,7 +41,9 @@ namespace hpx { namespace threads { namespace executors
             void add(closure_type&& f,
                 util::thread_description const& description,
                 threads::thread_state_enum initial_state, bool run_now,
-                threads::thread_stacksize stacksize, error_code& ec);
+                threads::thread_stacksize stacksize,
+                threads::thread_schedule_hint schedulehint,
+                error_code& ec) override;
 
             // Schedule given function for execution in this executor no sooner
             // than time abs_time. This call never blocks, and may violate
@@ -49,7 +51,7 @@ namespace hpx { namespace threads { namespace executors
             void add_at(
                 util::steady_clock::time_point const& abs_time,
                 closure_type&& f, util::thread_description const& description,
-                threads::thread_stacksize stacksize, error_code& ec);
+                threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Schedule given function for execution in this executor no sooner
             // than time rel_time from now. This call never blocks, and may
@@ -57,30 +59,27 @@ namespace hpx { namespace threads { namespace executors
             inline void add_after(
                 util::steady_clock::duration const& rel_time,
                 closure_type&& f, util::thread_description const& description,
-                threads::thread_stacksize stacksize, error_code& ec)
+                threads::thread_stacksize stacksize, error_code& ec) override
             {
                 return add_at(util::steady_clock::now() + rel_time,
                     std::move(f), description, stacksize, ec);
             }
 
             // Return an estimate of the number of waiting tasks.
-            std::uint64_t num_pending_closures(error_code& ec) const;
+            std::uint64_t num_pending_closures(error_code& ec) const override;
 
             // Reset internal (round robin) thread distribution scheme
-            void reset_thread_distribution();
+            void reset_thread_distribution() override;
 
             /// Set the new scheduler mode
-            void set_scheduler_mode(threads::policies::scheduler_mode mode);
+            void set_scheduler_mode(
+                threads::policies::scheduler_mode mode) override;
 
         protected:
             // Return the requested policy element
             std::size_t get_policy_element(
-                threads::detail::executor_parameter p, error_code& ec) const;
-
-        private:
-            thread_stacksize stacksize_;
-            thread_priority priority_;
-            std::size_t os_thread_;
+                threads::detail::executor_parameter p,
+                error_code& ec) const override;
         };
     }
 
@@ -93,19 +92,19 @@ namespace hpx { namespace threads { namespace executors
 
         default_executor(thread_stacksize stacksize)
           : scheduled_executor(new detail::default_executor(
-                thread_priority_default, stacksize, std::size_t(-1)))
+                thread_priority_default, stacksize, thread_schedule_hint()))
         {}
 
         default_executor(thread_priority priority,
                 thread_stacksize stacksize = thread_stacksize_default,
-                std::size_t os_thread = std::size_t(-1))
+                thread_schedule_hint schedulehint = thread_schedule_hint())
           : scheduled_executor(new detail::default_executor(
-                priority, stacksize, os_thread))
+                priority, stacksize, schedulehint))
         {}
 
-        default_executor(std::size_t os_thread)
+        default_executor(thread_schedule_hint schedulehint)
           : scheduled_executor(new detail::default_executor(
-                thread_priority_default, thread_stacksize_default, os_thread))
+                thread_priority_default, thread_stacksize_default, schedulehint))
         {}
     };
 }}}

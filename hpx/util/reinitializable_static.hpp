@@ -8,9 +8,9 @@
 #define HPX_UTIL_REINITIALIZABLE_STATIC_OCT_25_2012_1129AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/compat/mutex.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/static_reinit.hpp>
 
 #include <cstddef>
@@ -85,7 +85,7 @@ namespace hpx { namespace util
         static void value_constructor(U const* pv)
         {
             value_construct(*pv);
-            reinit_register(util::bind(
+            reinit_register(util::bind_front(
                 &reinitializable_static::template value_construct<U>, *pv),
                 &reinitializable_static::destruct);
         }
@@ -109,7 +109,7 @@ namespace hpx { namespace util
 #if !defined(__CUDACC__)
             // do not rely on ADL to find the proper call_once
             compat::call_once(constructed_,
-                util::bind(
+                util::bind_front(
                     &reinitializable_static::template value_constructor<U>,
                     const_cast<U const *>(std::addressof(val))));
 #endif

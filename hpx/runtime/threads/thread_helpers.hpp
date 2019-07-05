@@ -74,6 +74,7 @@ namespace hpx { namespace threads
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_signaled,
         thread_priority priority = thread_priority_normal,
+        bool retry_on_active = true,
         hpx::error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////
@@ -111,6 +112,7 @@ namespace hpx { namespace threads
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_timeout,
         thread_priority priority = thread_priority_normal,
+        bool retry_on_active = true,
         error_code& ec = throws);
 
     inline thread_id_type set_thread_state(thread_id_type const& id,
@@ -118,10 +120,11 @@ namespace hpx { namespace threads
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_timeout,
         thread_priority priority = thread_priority_normal,
-        error_code& ec = throws)
+        bool retry_on_active = true,
+        error_code& /*ec*/ = throws)
     {
-        return set_thread_state(id, abs_time, nullptr, state, stateex,
-            priority, throws);
+        return set_thread_state(id, abs_time, nullptr, state, stateex, priority,
+            retry_on_active, throws);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -156,10 +159,11 @@ namespace hpx { namespace threads
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_timeout,
         thread_priority priority = thread_priority_normal,
+        bool retry_on_active = true,
         error_code& ec = throws)
     {
         return set_thread_state(id, rel_time.from_now(), state, stateex,
-            priority, ec);
+            priority, retry_on_active, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -477,7 +481,21 @@ namespace hpx { namespace threads
     HPX_API_EXPORT void reset_thread_distribution();
 
     /// Set the new scheduler mode
-    HPX_API_EXPORT void set_scheduler_mode(threads::policies::scheduler_mode);
+    HPX_API_EXPORT void set_scheduler_mode(
+        threads::policies::scheduler_mode new_mode);
+
+    /// Add the given flags to the scheduler mode
+    HPX_API_EXPORT void add_scheduler_mode(
+        threads::policies::scheduler_mode to_add);
+
+    /// Add/remove the given flags to the scheduler mode
+    HPX_API_EXPORT void add_remove_scheduler_mode(
+        threads::policies::scheduler_mode to_add,
+        threads::policies::scheduler_mode to_remove);
+
+    /// Remove the given flags from the scheduler mode
+    HPX_API_EXPORT void remove_scheduler_mode(
+        threads::policies::scheduler_mode to_remove);
     /// \endcond
 }}
 
@@ -773,7 +791,7 @@ namespace hpx { namespace applier
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
+        threads::thread_schedule_hint = threads::thread_schedule_hint(),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws);
 
@@ -853,7 +871,7 @@ namespace hpx { namespace applier
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
+        threads::thread_schedule_hint os_thread = threads::thread_schedule_hint(),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws)
     {
@@ -884,7 +902,7 @@ namespace hpx { namespace applier
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
+        threads::thread_schedule_hint os_thread = threads::thread_schedule_hint(),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws)
     {
@@ -950,7 +968,7 @@ namespace hpx { namespace applier
         std::uint64_t /*naming::address_type*/ lva = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
+        threads::thread_schedule_hint = threads::thread_schedule_hint(),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws);
 
@@ -987,7 +1005,7 @@ namespace hpx { namespace applier
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
+        threads::thread_schedule_hint os_thread = threads::thread_schedule_hint(),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws)
     {
@@ -1017,7 +1035,7 @@ namespace hpx { namespace applier
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
+        threads::thread_schedule_hint os_thread = threads::thread_schedule_hint(),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws)
     {

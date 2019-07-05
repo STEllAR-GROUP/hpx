@@ -3,12 +3,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/compat/thread.hpp>
+#include <hpx/hpx.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
@@ -117,7 +117,7 @@ namespace throttle { namespace server
             description.c_str(),
             hpx::threads::pending, true,
             hpx::threads::thread_priority_high,
-            shepherd);
+            hpx::threads::thread_schedule_hint(shepherd));
     }
 
     // schedule a high priority task on the given shepherd thread to suspend
@@ -131,7 +131,7 @@ namespace throttle { namespace server
             description.c_str(),
             hpx::threads::pending, true,
             hpx::threads::thread_priority_high,
-            shepherd);
+            hpx::threads::thread_schedule_hint(shepherd));
     }
 }}
 

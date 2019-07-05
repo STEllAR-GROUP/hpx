@@ -43,7 +43,7 @@ void test_async(Executor& exec)
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id test_f(hpx::future<void> f, int passed_through)
 {
-    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 
@@ -108,7 +108,7 @@ void test_bulk_async(Executor& exec)
 void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
     int passed_through) //-V813
 {
-    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 
@@ -155,20 +155,27 @@ int hpx_main(int argc, char* argv[])
     using namespace hpx::parallel;
     using hpx::threads::executors::service_executor_type;
 
+#if defined(HPX_HAVE_IO_POOL)
     {
         execution::service_executor exec(service_executor_type::io_thread_pool);
         test_service_executor(exec);
     }
+#endif
 
+#if defined(HPX_HAVE_NETWORKING)
+    if (hpx::is_networking_enabled())
     {
         execution::service_executor exec(service_executor_type::parcel_thread_pool);
         test_service_executor(exec);
     }
+#endif
 
+#if defined(HPX_HAVE_TIMER_POOL)
     {
         execution::service_executor exec(service_executor_type::timer_thread_pool);
         test_service_executor(exec);
     }
+#endif
 
     {
         execution::service_executor exec(service_executor_type::main_thread);

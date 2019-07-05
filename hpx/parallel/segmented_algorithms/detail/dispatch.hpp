@@ -7,11 +7,12 @@
 #define HPX_PARALLEL_ALGORITHM_REMOTE_DISPATCH_OCT_15_2014_0938PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/colocating_distribution_policy.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/tuple.hpp>
 
@@ -134,6 +135,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         {
             typedef future<typename traits::local_raw_iterator> argtype;
             return f.then(
+                hpx::launch::sync,
                 [](argtype&& f) -> Iterator
                 {
                     return traits::remote(f.get());
@@ -164,6 +166,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         call(future<arg_type> && f)
         {
             return f.then(
+                hpx::launch::sync,
                 [](future<arg_type> && f)
                 ->  std::pair<
                         typename traits1::local_iterator,
@@ -205,6 +208,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         call(future<arg_type> && f)
         {
             return f.then(
+                hpx::launch::sync,
                 [](future<arg_type> && f)
                 ->  hpx::util::tuple<
                         typename traits1::local_iterator,

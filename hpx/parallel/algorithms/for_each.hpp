@@ -81,6 +81,48 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
+        template <typename F>
+        struct invoke_projected<F, util::projection_identity>
+        {
+            invoke_projected(typename hpx::util::decay<F>::type& f,
+                    util::projection_identity)
+              : f_(f)
+            {
+            }
+
+            typename hpx::util::decay<F>::type& f_;
+
+            template <typename T>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename std::enable_if<
+               !hpx::traits::is_value_proxy<T>::value
+            >::type
+            call(T && t)
+            {
+                T && tmp = std::forward<T>(t);
+                hpx::util::invoke(f_, tmp);
+            }
+
+            template <typename T>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename std::enable_if<
+                hpx::traits::is_value_proxy<T>::value
+            >::type
+            call(T && t)
+            {
+                auto tmp = std::forward<T>(t);
+                hpx::util::invoke_r<void>(f_, tmp);
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            void operator()(Iter curr)
+            {
+                call(*curr);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename F, typename Proj>
         struct for_each_iteration
         {
@@ -133,6 +175,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename Iter>
         struct for_each_n : public detail::algorithm<for_each_n<Iter>, Iter>
         {
@@ -180,17 +223,9 @@ namespace hpx { namespace parallel { inline namespace v1
         for_each_n_(ExPolicy && policy, FwdIter first, Size count, F && f,
             std::false_type, Proj && proj)
         {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-            typedef std::integral_constant<bool,
-                    parallel::execution::is_sequenced_execution_policy<
-                        ExPolicy
-                    >::value ||
-                   !hpx::traits::is_forward_iterator<FwdIter>::value
-                > is_seq;
-#else
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
-#endif
+
             return detail::for_each_n<FwdIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
                 first, std::size_t(count), std::forward<F>(f),
@@ -203,7 +238,7 @@ namespace hpx { namespace parallel { inline namespace v1
         for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             Proj && proj, std::true_type);
 
-        /// Segmented implementaion using for_each.
+        /// Segmented implementation using for_each.
         template <typename ExPolicy, typename FwdIter, typename Size, typename F,
             typename Proj>
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
@@ -309,22 +344,9 @@ namespace hpx { namespace parallel { inline namespace v1
     for_each_n(ExPolicy && policy, FwdIter first, Size count, F && f,
         Proj && proj = Proj())
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter>::value),
-            "Requires at least input iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter>::value
-            > is_seq;
-#else
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
-
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
 
         // if count is representing a negative value, we do nothing
         if (detail::is_negative(count))
@@ -353,7 +375,22 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj>
-            static InIter
+            static typename std::enable_if<
+                hpx::traits::is_random_access_iterator<InIter>::value, InIter
+            >::type
+            sequential(ExPolicy && policy, InIter first, InIter last, F && f,
+                Proj && proj)
+            {
+                return util::loop_n<typename std::decay<ExPolicy>::type>(first,
+                    static_cast<std::size_t>(std::distance(first, last)),
+                    invoke_projected<F, Proj>{f, proj});
+            }
+
+            template <typename ExPolicy, typename InIter, typename F,
+                typename Proj>
+            static typename std::enable_if<
+                !hpx::traits::is_random_access_iterator<InIter>::value, InIter
+            >::type
             sequential(ExPolicy && policy, InIter first, InIter last, F && f,
                 Proj && proj)
             {
@@ -393,17 +430,9 @@ namespace hpx { namespace parallel { inline namespace v1
         for_each_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             Proj && proj, std::false_type)
         {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-            typedef std::integral_constant<bool,
-                    parallel::execution::is_sequenced_execution_policy<
-                        ExPolicy
-                    >::value ||
-                   !hpx::traits::is_forward_iterator<FwdIter>::value
-                > is_seq;
-#else
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
-#endif
+
             if (first == last)
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
@@ -511,15 +540,9 @@ namespace hpx { namespace parallel { inline namespace v1
     for_each(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
         Proj && proj = Proj())
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter>::value),
-            "Requires at least input iterator.");
-#else
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
-#endif
 
         typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 

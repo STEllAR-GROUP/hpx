@@ -9,6 +9,7 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/apply.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/hpx_user_main_config.hpp>
@@ -24,15 +25,15 @@
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/util/apex.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/debugging.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/init_logging.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -183,7 +184,7 @@ namespace hpx { namespace detail
               << '\n';
 
         strm << "version:  ";        // 0xMMmmrrrr
-        hpx::util::format_to(strm, "%d.%d.%d\n",
+        hpx::util::format_to(strm, "{}.{}.{}\n",
             info.version_ / 0x1000000,
             info.version_ / 0x10000 % 0x100,
             info.version_ % 0x10000);
@@ -252,7 +253,7 @@ namespace hpx { namespace detail
     void list_component_type(std::string const& name,
         components::component_type ctype)
     {
-        print(hpx::util::format("%1%, %|40t|%2%",
+        print(hpx::util::format("{1:-40}, {2}",
             name, components::get_component_type_name(ctype)));
     }
 
@@ -284,6 +285,18 @@ namespace hpx { namespace detail
     }
 }}
 
+#if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) && \
+    (defined(__linux) || defined(__linux__) || defined(linux) || \
+    defined(__APPLE__))
+namespace hpx_start
+{
+    // Importing weak symbol from libhpx_wrap.a which may be shadowed by one present in
+    // hpx_main.hpp.
+    HPX_SYMBOL_EXPORT __attribute__((weak)) bool include_libhpx_wrap = false;
+}
+
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -299,6 +312,29 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        HPX_NORETURN void assertion_handler(
+            hpx::assertion::source_location const& loc, const char* expr,
+            std::string const& msg)
+        {
+            if (get_config_entry("hpx.attach_debugger", "") == "exception")
+            {
+                util::attach_debugger();
+            }
+            std::ostringstream strm;
+            strm << "Assertion '" << expr << "' failed";
+            if (!msg.empty())
+            {
+                strm << " (" << msg << ")";
+            }
+
+            hpx::exception e(hpx::assertion_failure, strm.str());
+            std::cerr << hpx::diagnostic_information(
+                             hpx::detail::get_exception(e, loc.function_name,
+                                 loc.file_name, loc.line_number))
+                      << std::endl;
+            std::abort();
+        }
+
         ///////////////////////////////////////////////////////////////////////
         struct dump_config
         {
@@ -423,11 +459,11 @@ namespace hpx
                 {
                     // schedule to run at shutdown
                     rt.add_pre_shutdown_function(
-                        util::bind(&util::query_counters::evaluate, qc));
+                        util::bind_front(&util::query_counters::evaluate, qc));
                 }
 
                 // schedule to start all counters
-                rt.add_startup_function(util::bind(&start_counters, qc));
+                rt.add_startup_function(util::bind_front(&start_counters, qc));
 
                 // register the query_counters object with the runtime system
                 rt.register_query_counters(qc);
@@ -509,7 +545,7 @@ namespace hpx
 
             // Run this runtime instance using the given function f.
             if (!f.empty())
-                return rt.run(util::bind(f, vm));
+                return rt.run(util::bind_front(f, vm));
 
             // Run this runtime instance without an hpx_main
             return rt.run();
@@ -528,7 +564,7 @@ namespace hpx
 
             if (!f.empty()) {
                 // Run this runtime instance using the given function f.
-                return rt.start(util::bind(f, vm));
+                return rt.start(util::bind_front(f, vm));
             }
 
             // Run this runtime instance without an hpx_main
@@ -548,7 +584,7 @@ namespace hpx
             start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_, std::move(startup),
                 std::move(shutdown));
 
-            rt.release();          // pointer to runtime is stored in TLS
+            (void)rt.release();          // pointer to runtime is stored in TLS
             return 0;
         }
 
@@ -562,6 +598,7 @@ namespace hpx
             startup_function_type startup, shutdown_function_type shutdown,
             hpx::runtime_mode mode, bool blocking)
         {
+            hpx::assertion::set_assertion_handler(&detail::assertion_handler);
 #if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
             set_error_handlers();
 #endif
@@ -588,25 +625,54 @@ namespace hpx
                 // make sure the runtime system is not active yet
                 if (get_runtime_ptr() != nullptr)
                 {
+                #if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) && \
+                (defined(__linux) || defined(__linux__) || defined(linux) || \
+                defined(__APPLE__))
+                    // make sure the runtime system is not initialized
+                    // after its activation from int main()
+                    if(hpx_start::include_libhpx_wrap)
+                    {
+                        std::cerr << "hpx is already initialized from main.\n"
+                            "Note: Delete hpx_main.hpp to initialize hpx system "
+                            "using hpx::init. Exiting...\n";
+                        return -1;
+                    }
+                #endif
+
                     std::cerr << "hpx::init: can't initialize runtime system "
                         "more than once! Exiting...\n";
                     return -1;
                 }
 
-                // Construct resource partitioner if this has not been done yet
-                // and get a handle to it
-                // (if the command-line parsing has not yet been done, do it now)
-                auto& rp = hpx::resource::detail::create_partitioner(f,
-                    desc_cmdline, argc, argv, std::move(ini_config),
-                    resource::mode_default, mode, false);
+                // scope exception handling to resource partitioner initialization
+                // any exception thrown during run_or_start below are handled
+                // separately
+                try {
+                    // Construct resource partitioner if this has not been done yet
+                    // and get a handle to it
+                    // (if the command-line parsing has not yet been done, do it now)
+                    auto& rp = hpx::resource::detail::create_partitioner(f,
+                        desc_cmdline, argc, argv, std::move(ini_config),
+                        resource::mode_default, mode, false, &result);
 
-                // Setup all internal parameters of the resource_partitioner
-                rp.configure_pools();
+                    // check whether HPX should be exited at this point
+                    // (parse_result is returning a result > 0, if the program options
+                    // contain --hpx:help or --hpx:version, on error result is < 0)
+                    if (result != 0)
+                    {
+                        if (result > 0)
+                            result = 0;
+                        return result;
+                    }
 
-                // initialize logging
-                util::command_line_handling& cms = rp.get_command_line_switches();
-                util::detail::init_logging(
-                    cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode_console);
+                    // Setup all internal parameters of the resource_partitioner
+                    rp.configure_pools();
+                }
+                catch (hpx::exception const& e) {
+                    std::cerr << "hpx::init: hpx::exception caught: "
+                              << hpx::get_error_what(e) << "\n";
+                    return -1;
+                }
 
                 util::apex_wrapper_init apex(argc, argv);
 
@@ -615,26 +681,17 @@ namespace hpx
 
                 // Build and configure this runtime instance.
                 typedef hpx::runtime_impl runtime_type;
+
+                util::command_line_handling& cms =
+                    resource::get_partitioner().get_command_line_switches();
                 std::unique_ptr<hpx::runtime> rt(new runtime_type(cms.rtcfg_));
-
-                result = rp.parse_result();
-
-                // check whether HPX should be exited at this point
-                // (parse_result is returning a result > 0, if the program options
-                // contain --hpx:help or --hpx:version, on error result is < 0)
-                if (result != 0)
-                {
-                    if (result > 0)
-                        result = 0;
-                    return result;
-                }
 
                 result = run_or_start(blocking, std::move(rt),
                     cms, std::move(startup), std::move(shutdown));
             }
             catch (detail::command_line_error const& e) {
-                std::cerr << "{env}: " << hpx::detail::get_execution_environment();
-                std::cerr << "hpx::init: std::exception caught: " << e.what() << "\n";
+                std::cerr << "hpx::init: std::exception caught: " << e.what()
+                          << "\n";
                 return -1;
             }
             return result;

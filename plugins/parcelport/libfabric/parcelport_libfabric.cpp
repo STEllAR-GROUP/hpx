@@ -25,7 +25,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 //
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/util/debug/thread_stacktrace.hpp>
 //
 #include <boost/asio/ip/host_name.hpp>
@@ -40,16 +40,10 @@
 // when we have maxed out the number of sends we can handle
 #define HPX_PARCELPORT_LIBFABRIC_SUSPEND_WAKE  (HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS/2)
 
-
 // --------------------------------------------------------------------
 // Enable the use of boost small_vector for certain short lived storage
 // elements within the parcelport. This can reduce some memory allocations
 #define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR    true
-
-// until we implement immediate data, or counted rdma send completions
-// we will use a small message returned to the sender to signal ok
-// to release buffers.
-#define HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED 1
 
 // --------------------------------------------------------------------
 #include <plugins/parcelport/unordered_map.hpp>
@@ -98,7 +92,7 @@ namespace libfabric
     // --------------------------------------------------------------------
     parcelport::parcelport(util::runtime_configuration const& ini,
         util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-        util::function_nonser<void()> const& on_stop_thread)
+        util::function_nonser<void(std::size_t, char const*)> const& on_stop_thread)
         : base_type(ini, locality(), on_start_thread, on_stop_thread)
         , stopped_(false)
         , completions_handled_(0)
@@ -148,7 +142,7 @@ namespace libfabric
     {
         while (hpx::is_starting())
         {
-            background_work(0);
+            background_work(0, parcelport_background_mode_all);
         }
         LOG_DEBUG_MSG("io service task completed");
     }
@@ -267,8 +261,8 @@ namespace libfabric
             delete snd;
         }
         LOG_DEBUG_MSG(
-            << "sends_posted "  << decnumber(sends_posted)
-            << "sends_deleted " << decnumber(sends_posted)
+               "sends_posted "  << decnumber(sends_posted)
+            << "sends_deleted " << decnumber(sends_deleted)
             << "acks_received " << decnumber(acks_received)
             << "non_rma-send "  << decnumber(sends_posted-acks_received));
         //
@@ -431,7 +425,9 @@ namespace libfabric
     // This is called whenever the main thread scheduler is idling,
     // is used to poll for events, messages on the libfabric connection
     // --------------------------------------------------------------------
-    bool parcelport::background_work(std::size_t num_thread) {
+    bool parcelport::background_work(
+        std::size_t num_thread, parcelport_background_mode mode)
+    {
         if (stopped_ || hpx::is_stopped()) {
             return false;
         }

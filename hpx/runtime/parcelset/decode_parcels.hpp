@@ -8,16 +8,17 @@
 #define HPX_PARCELSET_DECODE_PARCELS_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/exception_info.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
+#include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>
 
@@ -211,16 +212,17 @@ namespace hpx { namespace parcelset
                         {
                             // schedule all but the first parcel on a new thread.
                             hpx::applier::register_thread_nullary(
-                                util::bind(
-                                    util::one_shot(
-                                        [num_thread](parcel&& p)
-                                        {
-                                            p.schedule_action(num_thread);
-                                        }
-                                    ), std::move(deferred_parcels[i])),
+                                util::deferred_call(
+                                    [num_thread](parcel&& p)
+                                    {
+                                        p.schedule_action(num_thread);
+                                    }, std::move(deferred_parcels[i])),
                                 "schedule_parcel",
-                                threads::pending, true, threads::thread_priority_boost,
-                                num_thread, threads::thread_stacksize_default);
+                                threads::pending, true,
+                                threads::thread_priority_boost,
+                                threads::thread_schedule_hint(
+                                    static_cast<std::int16_t>(num_thread)),
+                                threads::thread_stacksize_default);
                         }
                         // If we are the first deferred parcel, we don't need to spin
                         // a new thread...
@@ -287,8 +289,8 @@ namespace hpx { namespace parcelset
 //         if(hpx::is_running() && parcelport.async_serialization())
 //         {
 //             hpx::applier::register_thread_nullary(
-//                 util::bind(
-//                     util::one_shot(&decode_message<Parcelport, Buffer>),
+//                 util::deferred_call(
+//                     &decode_message<Parcelport, Buffer>,
 //                     std::ref(parcelport), std::move(buffer), 1, num_thread),
 //                 "decode_parcels",
 //                 threads::pending, true, threads::thread_priority_boost,
@@ -306,8 +308,8 @@ namespace hpx { namespace parcelset
 //         if(hpx::is_running() && parcelport.async_serialization())
 //         {
 //             hpx::applier::register_thread_nullary(
-//                 util::bind(
-//                     util::one_shot(&decode_message<Parcelport, Buffer>),
+//                 util::deferred_call(
+//                     &decode_message<Parcelport, Buffer>,
 //                     std::ref(parcelport), std::move(buffer), 0, num_thread),
 //                 "decode_parcels",
 //                 threads::pending, true, threads::thread_priority_boost,

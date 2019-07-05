@@ -111,26 +111,6 @@ void test_all_of()
 
     test_all_of_async(execution::seq(execution::task), IteratorTag(), proj());
     test_all_of_async(execution::par(execution::task), IteratorTag(), proj());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_all_of(execution_policy(execution::seq), IteratorTag());
-    test_all_of(execution_policy(execution::par), IteratorTag());
-    test_all_of(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_all_of(execution_policy(execution::seq), IteratorTag(), proj());
-    test_all_of(execution_policy(execution::par), IteratorTag(), proj());
-    test_all_of(execution_policy(execution::par_unseq), IteratorTag(), proj());
-
-    test_all_of(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_all_of(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-
-    test_all_of(execution_policy(execution::seq(execution::task)),
-        IteratorTag(), proj());
-    test_all_of(execution_policy(execution::par(execution::task)),
-        IteratorTag()), proj();
-#endif
 }
 
 // template <typename IteratorTag>
@@ -161,9 +141,6 @@ void all_of_test()
 {
     test_all_of<std::random_access_iterator_tag>();
     test_all_of<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_all_of<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -255,25 +232,12 @@ void test_all_of_exception()
 
     test_all_of_exception_async(execution::seq(execution::task), IteratorTag());
     test_all_of_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_all_of_exception(execution_policy(execution::seq), IteratorTag());
-    test_all_of_exception(execution_policy(execution::par), IteratorTag());
-
-    test_all_of_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_all_of_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void all_of_exception_test()
 {
     test_all_of_exception<std::random_access_iterator_tag>();
     test_all_of_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_all_of_exception<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -363,25 +327,12 @@ void test_all_of_bad_alloc()
 
     test_all_of_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_all_of_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_all_of_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_all_of_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_all_of_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_all_of_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void all_of_bad_alloc_test()
 {
     test_all_of_bad_alloc<std::random_access_iterator_tag>();
     test_all_of_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_all_of_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

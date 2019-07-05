@@ -48,7 +48,7 @@ void sync_bulk_test_void(int value, hpx::thread::id tid, int passed_through) //-
 
 hpx::thread::id then_test(hpx::future<void> f, int passed_through)
 {
-    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 
@@ -58,7 +58,7 @@ hpx::thread::id then_test(hpx::future<void> f, int passed_through)
 
 void then_test_void(hpx::future<void> f, int passed_through)
 {
-    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 
@@ -68,7 +68,7 @@ void then_test_void(hpx::future<void> f, int passed_through)
 hpx::thread::id then_bulk_test(int value, hpx::shared_future<void> f,
     hpx::thread::id tid, int passed_through) //-V813
 {
-    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 
@@ -81,7 +81,7 @@ hpx::thread::id then_bulk_test(int value, hpx::shared_future<void> f,
 void then_bulk_test_void(int value, hpx::shared_future<void> f,
     hpx::thread::id tid, int passed_through) //-V813
 {
-    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 

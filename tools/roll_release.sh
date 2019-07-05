@@ -1,91 +1,73 @@
-#! /bin/bash
+#!/usr/bin/env bash
 #
+# Copyright (c)      2019 Mikael Simberg
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-VERSION_MAJOR=`grep '#define HPX_VERSION_MAJOR' hpx/config/version.hpp | awk {' print $3 '}`
-VERSION_MINOR=`grep '#define HPX_VERSION_MINOR' hpx/config/version.hpp | awk {' print $3 '}`
-VERSION_SUBMINOR=`grep '#define HPX_VERSION_SUBMINOR' hpx/config/version.hpp | awk {' print $3 '}`
+# This script tags a release locally and creates a release on GitHub. It relies
+# on the hub command line tool (https://hub.github.com/).
 
-DOT_VERSION=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_SUBMINOR
-DASH_VERSION=$VERSION_MAJOR-$VERSION_MINOR-$VERSION_SUBMINOR
+set -o errexit
 
-WEBSITE="http://stellar.cct.lsu.edu"
+VERSION_MAJOR=$(sed -n 's/set(HPX_VERSION_MAJOR \(.*\))/\1/p' CMakeLists.txt)
+VERSION_MINOR=$(sed -n 's/set(HPX_VERSION_MINOR \(.*\))/\1/p' CMakeLists.txt)
+VERSION_SUBMINOR=$(sed -n 's/set(HPX_VERSION_SUBMINOR \(.*\))/\1/p' CMakeLists.txt)
+VERSION_TAG=$(sed -n 's/set(HPX_VERSION_TAG "\(.*\)")/\1/p' CMakeLists.txt)
+VERSION_FULL_NOTAG=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_SUBMINOR
+VERSION_FULL_TAG=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_SUBMINOR$VERSION_TAG
+VERSION_DESCRIPTION="HPX V${VERSION_FULL_NOTAG}: The C++ Standards Library for Parallelism and Concurrency"
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-ZIP=hpx_$DOT_VERSION.zip
-TARGZ=hpx_$DOT_VERSION.tar.gz
-TARBZ2=hpx_$DOT_VERSION.tar.bz2
-SEVENZ=hpx_$DOT_VERSION.7z
-
-rm -rf packages
-mkdir -p packages/zip/hpx_$DOT_VERSION
-mkdir -p packages/tar.gz/hpx_$DOT_VERSION
-mkdir -p packages/tar.bz2/hpx_$DOT_VERSION
-mkdir -p packages/7z/hpx_$DOT_VERSION
-
-echo -n "Packaging $ZIP... "
-zip -q -x .git\* -x packages -x packages/\* -r packages/$ZIP .
-(cd packages/zip/hpx_$DOT_VERSION && unzip -qq ../../$ZIP)
-rm -f packages/$ZIP
-(cd packages/zip && zip -q -r ../$ZIP hpx_$DOT_VERSION)
-rm -rf packages/zip/hpx_$DOT_VERSION
-(cd packages/zip && unzip -qq ../$ZIP)
-echo "DONE"
-
-echo -n "Packaging $TARGZ... "
-tar --exclude=.git\* --exclude=packages --exclude=packages/\* -czf packages/$TARGZ .
-(cd packages/tar.gz/hpx_$DOT_VERSION && tar -xf ../../$TARGZ)
-rm -f packages/$TARGZ
-(cd packages/tar.gz && tar -czf ../$TARGZ hpx_$DOT_VERSION)
-rm -rf packages/tar.gz/hpx_$DOT_VERSION
-(cd packages/tar.gz && tar -xf ../$TARGZ)
-echo "DONE"
-
-echo -n "Packaging $TARBZ2... "
-tar --exclude=.git\* --exclude=packages --exclude=packages/\* -cjf packages/$TARBZ2 .
-(cd packages/tar.bz2/hpx_$DOT_VERSION && tar -xf ../../$TARBZ2)
-rm -f packages/$TARBZ2
-(cd packages/tar.bz2 && tar -cjf ../$TARBZ2 hpx_$DOT_VERSION)
-rm -rf packages/tar.bz2/hpx_$DOT_VERSION
-(cd packages/tar.bz2 && tar -xf ../$TARBZ2)
-echo "DONE"
-
-if type -t "7za" > /dev/null; 
-then
-	SEVENZIP=7za
-else
-	SEVENZIP=7zr
+if [ "$CURRENT_BRANCH" != "release" ]; then
+    echo "Not on release branch. Not continuing to make release."
+    exit 1
 fi
-echo -n "Packaging $SEVENZ... "
-$SEVENZIP a -xr\!.git -xr\!packages packages/$SEVENZ . > /dev/null
-(cd packages/7z/hpx_$DOT_VERSION && $SEVENZIP x ../../$SEVENZ > /dev/null)
-rm -f packages/$SEVENZ
-(cd packages/7z && $SEVENZIP a ../$SEVENZ hpx_$DOT_VERSION > /dev/null)
-rm -rf packages/7z/hpx_$DOT_VERSION
-(cd packages/7z && $SEVENZIP x ../$SEVENZ > /dev/null)
-echo "DONE"
 
-ZIP_MD5=`md5sum packages/$ZIP | awk {'print $1'}`
-TARGZ_MD5=`md5sum packages/$TARGZ | awk {'print $1'}`
-TARBZ2_MD5=`md5sum packages/$TARBZ2 | awk {'print $1'}`
-SEVENZ_MD5=`md5sum packages/$SEVENZ | awk {'print $1'}`
+if [ -z "$VERSION_TAG" ]; then
+    echo "You are about to tag and create a final release on GitHub."
+else
+    echo "You are about to tag and create a pre-release on GitHub."
+    echo "If you intended to make a final release, remove the tag in the main CMakeLists.txt first."
+fi
 
-ZIP_SIZE=`ls -s -h packages/$ZIP | awk {'print $1'}`
-TARGZ_SIZE=`ls -s -h packages/$TARGZ | awk {'print $1'}`
-TARBZ2_SIZE=`ls -s -h packages/$TARBZ2 | awk {'print $1'}`
-SEVENZ_SIZE=`ls -s -h packages/$SEVENZ | awk {'print $1'}`
+echo ""
+echo "The version is \"${VERSION_FULL_TAG}\"."
+echo "The version description is:"
+echo "\"${VERSION_DESCRIPTION}\"."
+echo ""
 
-echo "<ul>"
-echo "  <li>HPX V$DOT_VERSION: <a title=\"HPX V$DOT_VERSION Release Notes\" href=\"$WEBSITE/downloads/hpx-v$DASH_VERSION-release-notes/\">release notes</a>"
-echo "  <table>"
-echo "    <tr><th>File</th><th>MD5 Hash</th></tr>"
-echo "    <tr><td><a title=\"HPX V$DOT_VERSION (zip)\" href=\"$WEBSITE/files/$ZIP\">zip ($ZIP_SIZE)</a></td><td><code>$ZIP_MD5</code></td></tr>"
-echo "    <tr><td><a title=\"HPX V$DOT_VERSION (gz)\" href=\"$WEBSITE/files/$TARGZ\">gz ($TARGZ_SIZE)</a></td><td><code>$TARGZ_MD5</code></td></tr>"
-echo "    <tr><td><a title=\"HPX V$DOT_VERSION (bz2)\" href=\"$WEBSITE/files/$TARBZ2\">bz2 ($TARBZ2_SIZE)</a></td><td><code>$TARBZ2_MD5</code></td></tr>"
-echo "    <tr><td><a title=\"HPX V$DOT_VERSION (7z)\" href=\"$WEBSITE/files/$SEVENZ\">7z ($SEVENZ_SIZE)</a></td><td><code>$SEVENZ_MD5</code></td></tr>"
-echo "  </table>"
-echo "  </li>"
-echo "</ul>"
+echo "Do you want to continue?"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) break;;
+        No ) exit;;
+    esac
+done
 
+if [ -z "$VERSION_TAG" ]; then
+    PRERELEASE_FLAG=""
+else
+    PRERELEASE_FLAG="--prerelease"
+fi
+
+echo ""
+echo "Setting the signing key for signing the release. It is up to you to change it back to your own afterwards."
+git config user.signingkey E18AE35E86BB194F
+git config user.email "contact@stellar-group.org"
+git config user.name "STE||AR Group"
+
+echo ""
+echo "Tagging release."
+git tag -s -a "${VERSION_FULL_TAG}" -m "${VERSION_DESCRIPTION}"
+
+echo ""
+echo "Creating release."
+hub release create \
+    ${PRERELEASE_FLAG} \
+    --message "${VERSION_DESCRIPTION}" \
+    "${VERSION_FULL_TAG}"
+
+echo ""
+echo "Now add the above URL to the downloads pages on stellar.cct.lsu.edu and stellar-group.org."

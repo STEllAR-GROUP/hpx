@@ -24,26 +24,12 @@ void test_for_each()
 
     test_for_each_async(execution::seq(execution::task), IteratorTag());
     test_for_each_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_for_each(execution_policy(execution::seq), IteratorTag());
-    test_for_each(execution_policy(execution::par), IteratorTag());
-    test_for_each(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_for_each(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_for_each(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void for_each_test()
 {
     test_for_each<std::random_access_iterator_tag>();
     test_for_each<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_for_each<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,24 +46,12 @@ void test_for_each_exception()
 
     test_for_each_exception_async(execution::seq(execution::task), IteratorTag());
     test_for_each_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_for_each_exception(execution_policy(execution::seq), IteratorTag());
-    test_for_each_exception(execution_policy(execution::par), IteratorTag());
-    test_for_each_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_for_each_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void for_each_exception_test()
 {
     test_for_each_exception<std::random_access_iterator_tag>();
     test_for_each_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_for_each_exception<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -94,24 +68,12 @@ void test_for_each_bad_alloc()
 
     test_for_each_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_for_each_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_for_each_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_for_each_bad_alloc(execution_policy(execution::par), IteratorTag());
-    test_for_each_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_for_each_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void for_each_bad_alloc_test()
 {
     test_for_each_bad_alloc<std::random_access_iterator_tag>();
     test_for_each_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_for_each_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

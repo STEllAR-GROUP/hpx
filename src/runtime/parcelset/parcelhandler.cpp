@@ -7,6 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
@@ -14,6 +15,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/config_entry.hpp>
@@ -26,11 +28,9 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/apex.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/itt_notify.hpp>
@@ -44,7 +44,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
-#include <boost/detail/endian.hpp>
+#include <boost/predef/other/endian.h>
 
 #include <algorithm>
 #include <cstddef>
@@ -98,24 +98,26 @@ namespace hpx { namespace parcelset
         sent_future.get(); // wait for the parcel to be sent
     }
 
-    parcelhandler::parcelhandler(
-            util::runtime_configuration & cfg,
-            threads::threadmanager* tm,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread)
-      : tm_(tm),
-        use_alternative_parcelports_(false),
-        enable_parcel_handling_(true),
-        load_message_handlers_(
-            util::get_entry_as<int>(cfg, "hpx.parcel.message_handlers", "0") != 0
-        ),
-        count_routed_(0),
-        write_handler_(&default_write_handler)
+    parcelhandler::parcelhandler(util::runtime_configuration& cfg,
+        threads::threadmanager* tm,
+        util::function_nonser<void(std::size_t, char const*)> const&
+            on_start_thread,
+        util::function_nonser<void(std::size_t, char const*)> const&
+            on_stop_thread)
+      : tm_(tm)
+      , use_alternative_parcelports_(false)
+      , enable_parcel_handling_(true)
+      , load_message_handlers_(util::get_entry_as<int>(cfg,
+                                   "hpx.parcel.message_handlers", "0") != 0)
+      , count_routed_(0)
+      , write_handler_(&default_write_handler)
+      , is_networking_enabled_(hpx::is_networking_enabled())
     {
         LPROGRESS_;
 
 #if defined(HPX_HAVE_NETWORKING)
-        if (cfg.get_entry("hpx.parcel.enable", "1") != "0")
+        if (is_networking_enabled_ &&
+            cfg.get_entry("hpx.parcel.enable", "1") != "0")
         {
             for (plugins::parcelport_factory_base* factory :
                     get_parcelport_factories())
@@ -204,13 +206,13 @@ namespace hpx { namespace parcelset
     void parcelhandler::attach_parcelport(std::shared_ptr<parcelport> const& pp)
     {
 #if defined(HPX_HAVE_NETWORKING)
-
-        if(!pp) return;
+        if (!hpx::is_networking_enabled() || !pp)
+            return;
 
         // add the new parcelport to the list of parcel-ports we care about
         int priority = pp->priority();
         std::string cfgkey(std::string("hpx.parcel.") + pp->type() + ".enable");
-        if(get_config_entry(cfgkey, "0") != "1")
+        if (get_config_entry(cfgkey, "0") != "1")
         {
             priority = -priority;
         }
@@ -247,20 +249,21 @@ namespace hpx { namespace parcelset
 
     ///////////////////////////////////////////////////////////////////////////
     bool parcelhandler::do_background_work(std::size_t num_thread,
-        bool stop_buffering)
+        bool stop_buffering, parcelport_background_mode mode)
     {
         bool did_some_work = false;
 
 #if defined(HPX_HAVE_NETWORKING)
         // flush all parcel buffers
-        if(0 == num_thread)
+        if (is_networking_enabled_ && 0 == num_thread &&
+            (mode & parcelport_background_mode_flush_buffers))
         {
             std::unique_lock<mutex_type> l(handlers_mtx_, std::try_to_lock);
 
             if(l.owns_lock())
             {
                 using parcelset::policies::message_handler;
-                message_handler::flush_mode mode =
+                message_handler::flush_mode flush_mode =
                     message_handler::flush_mode_background_work;
 
                 message_handler_map::iterator end = handlers_.end();
@@ -272,7 +275,7 @@ namespace hpx { namespace parcelset
                         std::shared_ptr<policies::message_handler> p((*it).second);
                         util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
                         did_some_work =
-                            p->flush(mode, stop_buffering) || did_some_work;
+                            p->flush(flush_mode, stop_buffering) || did_some_work;
                     }
                 }
             }
@@ -283,7 +286,8 @@ namespace hpx { namespace parcelset
         {
             if(pp.first > 0)
             {
-                did_some_work = pp.second->do_background_work(num_thread) ||
+                did_some_work =
+                    pp.second->do_background_work(num_thread, mode) ||
                     did_some_work;
             }
         }
@@ -437,6 +441,7 @@ namespace hpx { namespace parcelset
     void parcelhandler::put_parcel(parcel p, write_handler_type f)
     {
 #if defined(HPX_HAVE_NETWORKING)
+        HPX_ASSERT(is_networking_enabled_);
         HPX_ASSERT(resolver_);
 
         naming::gid_type const& gid = p.destination();
@@ -462,7 +467,8 @@ namespace hpx { namespace parcelset
                     util::deferred_call(put_parcel_ptr, this,
                         std::move(p), std::move(f)),
                     "parcelhandler::put_parcel", threads::pending, true,
-                    threads::thread_priority_boost, std::size_t(-1),
+                    threads::thread_priority_boost,
+                    threads::thread_schedule_hint(),
                     threads::thread_stacksize_medium);
                 return;
             }
@@ -529,6 +535,7 @@ namespace hpx { namespace parcelset
         std::vector<write_handler_type> handlers)
     {
 #if defined(HPX_HAVE_NETWORKING)
+        HPX_ASSERT(is_networking_enabled_);
         HPX_ASSERT(resolver_);
 
         if (parcels.size() != handlers.size())
@@ -556,7 +563,8 @@ namespace hpx { namespace parcelset
                     util::deferred_call(put_parcels_ptr, this,
                         std::move(parcels), std::move(handlers)),
                     "parcelhandler::put_parcels", threads::pending, true,
-                    threads::thread_priority_boost, std::size_t(-1),
+                    threads::thread_priority_boost,
+                    threads::thread_schedule_hint(),
                     threads::thread_stacksize_medium);
                 return;
             }
@@ -732,6 +740,9 @@ namespace hpx { namespace parcelset
         locality const& loc, error_code& ec)
     {
 #if defined(HPX_HAVE_NETWORKING)
+        if (!is_networking_enabled_)
+            return nullptr;
+
         std::unique_lock<mutex_type> l(handlers_mtx_);
         handler_key_type key(loc, action);
         message_handler_map::iterator it = handlers_.find(key);
@@ -1099,6 +1110,9 @@ namespace hpx { namespace parcelset
     void parcelhandler::register_counter_types(std::string const& pp_type)
     {
 #if defined(HPX_HAVE_NETWORKING)
+        if (!is_networking_enabled_)
+            return;
+
         using util::placeholders::_1;
         using util::placeholders::_2;
 
@@ -1190,10 +1204,10 @@ namespace hpx { namespace parcelset
 
         performance_counters::generic_counter_type_data const counter_types[] =
         {
-            { hpx::util::format("/parcels/count/%s/sent", pp_type),
+            { hpx::util::format("/parcels/count/{}/sent", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
-                  "returns the number of parcels sent using the %s "
+                  "returns the number of parcels sent using the {} "
                   "connection type for the referenced locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
@@ -1209,10 +1223,10 @@ namespace hpx { namespace parcelset
 #endif
               ""
             },
-            { hpx::util::format("/parcels/count/%s/received", pp_type),
+            { hpx::util::format("/parcels/count/{}/received", pp_type),
                performance_counters::counter_raw,
               hpx::util::format(
-                  "returns the number of parcels received using the %s "
+                  "returns the number of parcels received using the {} "
                   "connection type for the referenced locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
@@ -1228,10 +1242,10 @@ namespace hpx { namespace parcelset
 #endif
               ""
             },
-            { hpx::util::format("/messages/count/%s/sent", pp_type),
+            { hpx::util::format("/messages/count/{}/sent", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
-                  "returns the number of messages sent using the %s "
+                  "returns the number of messages sent using the {} "
                   "connection type for the referenced locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
@@ -1239,10 +1253,10 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { hpx::util::format("/messages/count/%s/received", pp_type),
+            { hpx::util::format("/messages/count/{}/received", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
-                  "returns the number of messages received using the %s "
+                  "returns the number of messages received using the {} "
                   "connection type for the referenced locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
@@ -1251,12 +1265,12 @@ namespace hpx { namespace parcelset
               ""
             },
 
-            { hpx::util::format("/data/time/%s/sent", pp_type),
+            { hpx::util::format("/data/time/{}/sent", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the total time between the start of each "
                   "asynchronous write and the invocation of the write callback "
-                  "using the %s connection type for the referenced locality",
+                  "using the {} connection type for the referenced locality",
                       pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
@@ -1264,12 +1278,12 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
-            { hpx::util::format("/data/time/%s/received", pp_type),
+            { hpx::util::format("/data/time/{}/received", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the total time between the start of each "
                   "asynchronous read and the invocation of the read callback "
-                  "using the %s connection type for the referenced locality",
+                  "using the {} connection type for the referenced locality",
                       pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
@@ -1277,11 +1291,11 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
-            { hpx::util::format("/serialize/time/%s/sent", pp_type),
+            { hpx::util::format("/serialize/time/{}/sent", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the total time required to serialize all sent "
-                  "parcels using the %s connection type for the referenced "
+                  "parcels using the {} connection type for the referenced "
                   "locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
@@ -1297,11 +1311,11 @@ namespace hpx { namespace parcelset
 #endif
               "ns"
             },
-            { hpx::util::format("/serialize/time/%s/received", pp_type),
+            { hpx::util::format("/serialize/time/{}/received", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the total time required to de-serialize all "
-                  "received parcels using the %s connection type for the "
+                  "received parcels using the {} connection type for the "
                   "referenced locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
@@ -1318,11 +1332,11 @@ namespace hpx { namespace parcelset
               "ns"
             },
 
-            { hpx::util::format("/data/count/%s/sent", pp_type),
+            { hpx::util::format("/data/count/{}/sent", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the amount of (uncompressed) parcel argument data "
-                  "sent using the %s connection type by the referenced "
+                  "sent using the {} connection type by the referenced "
                   "locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
@@ -1330,11 +1344,11 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
-            { hpx::util::format("/data/count/%s/received", pp_type),
+            { hpx::util::format("/data/count/{}/received", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the amount of (uncompressed) parcel argument data "
-                  "received using the %s connection type by the referenced "
+                  "received using the {} connection type by the referenced "
                   "locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
@@ -1343,11 +1357,11 @@ namespace hpx { namespace parcelset
               "bytes"
             },
             { hpx::util::format(
-                  "/serialize/count/%s/sent", pp_type),
+                  "/serialize/count/{}/sent", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the amount of parcel data (including headers, "
-                  "possibly compressed) sent using the %s connection type "
+                  "possibly compressed) sent using the {} connection type "
                   "by the referenced locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
@@ -1364,11 +1378,11 @@ namespace hpx { namespace parcelset
               "bytes"
             },
             { hpx::util::format(
-                  "/serialize/count/%s/received", pp_type),
+                  "/serialize/count/{}/received", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the amount of parcel data (including headers, "
-                  "possibly compressed) received using the %s connection type "
+                  "possibly compressed) received using the {} connection type "
                   "by the referenced locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
@@ -1385,11 +1399,11 @@ namespace hpx { namespace parcelset
               "bytes"
             },
             { hpx::util::format(
-                "/parcels/time/%s/buffer_allocate/received", pp_type),
+                "/parcels/time/{}/buffer_allocate/received", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the time needed to allocate the buffers for "
-                  "serializing using the %s connection type", pp_type),
+                  "serializing using the {} connection type", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, std::move(buffer_allocate_time_received), _2),
@@ -1397,11 +1411,11 @@ namespace hpx { namespace parcelset
               "ns"
             },
             { hpx::util::format(
-                "/parcels/time/%s/buffer_allocate/sent", pp_type),
+                "/parcels/time/{}/buffer_allocate/sent", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the time needed to allocate the buffers for "
-                  "serializing using the %s connection type", pp_type),
+                  "serializing using the {} connection type", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, std::move(buffer_allocate_time_sent), _2),
@@ -1419,10 +1433,13 @@ namespace hpx { namespace parcelset
     void parcelhandler::register_connection_cache_counter_types(
         std::string const& pp_type)
     {
+#if defined(HPX_HAVE_NETWORKING)
+        if (!is_networking_enabled_)
+            return;
+
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
 
-#if defined(HPX_HAVE_NETWORKING)
         util::function_nonser<std::int64_t(bool)> cache_insertions(
             util::bind_front(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_insertions));
@@ -1443,11 +1460,11 @@ namespace hpx { namespace parcelset
             connection_cache_types[] =
         {
             { hpx::util::format(
-                  "/parcelport/count/%s/cache-insertions", pp_type),
+                  "/parcelport/count/{}/cache-insertions", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the number of cache insertions while accessing the "
-                  "connection cache for the %s connection type on the "
+                  "connection cache for the {} connection type on the "
                   "referenced locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
@@ -1456,11 +1473,11 @@ namespace hpx { namespace parcelset
               ""
             },
             { hpx::util::format(
-                  "/parcelport/count/%s/cache-evictions", pp_type),
+                  "/parcelport/count/{}/cache-evictions", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the number of cache evictions while accessing the "
-                  "connection cache for the %s connection type on the "
+                  "connection cache for the {} connection type on the "
                   "referenced locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
@@ -1469,11 +1486,11 @@ namespace hpx { namespace parcelset
               ""
             },
             { hpx::util::format(
-                  "/parcelport/count/%s/cache-hits", pp_type),
+                  "/parcelport/count/{}/cache-hits", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the number of cache hits while accessing the "
-                  "connection cache for the %s connection type on the "
+                  "connection cache for the {} connection type on the "
                   "referenced locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
@@ -1482,11 +1499,11 @@ namespace hpx { namespace parcelset
               ""
             },
             { hpx::util::format(
-                  "/parcelport/count/%s/cache-misses", pp_type),
+                  "/parcelport/count/{}/cache-misses", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the number of cache misses while accessing the "
-                  "connection cache for the %s connection type on the "
+                  "connection cache for the {} connection type on the "
                   "referenced locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
@@ -1495,11 +1512,11 @@ namespace hpx { namespace parcelset
               ""
             },
             { hpx::util::format(
-                  "/parcelport/count/%s/cache-reclaims", pp_type),
+                  "/parcelport/count/{}/cache-reclaims", pp_type),
               performance_counters::counter_raw,
               hpx::util::format(
                   "returns the number of cache reclaims while accessing the "
-                  "connection cache for the %s connection type on the "
+                  "connection cache for the {} connection type on the "
                   "referenced locality", pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
@@ -1517,32 +1534,44 @@ namespace hpx { namespace parcelset
     parcelhandler::get_parcelport_factories()
     {
         static std::vector<plugins::parcelport_factory_base *> factories;
-        if(factories.empty())
+#if defined(HPX_HAVE_NETWORKING)
+        if(factories.empty() && hpx::is_networking_enabled())
         {
             init_static_parcelport_factories(factories);
         }
+#endif
         return factories;
     }
 
     void parcelhandler::add_parcelport_factory(
         plugins::parcelport_factory_base *factory)
     {
-        auto & factories = get_parcelport_factories();
-        if (std::find(factories.begin(), factories.end(), factory) !=
-            factories.end())
+#if defined(HPX_HAVE_NETWORKING)
+        if (hpx::is_networking_enabled())
         {
-            return;
+            auto & factories = get_parcelport_factories();
+            if (std::find(factories.begin(), factories.end(), factory) !=
+                factories.end())
+            {
+                return;
+            }
+            factories.push_back(factory);
         }
-        factories.push_back(factory);
+#endif
     }
 
     void parcelhandler::init(int *argc, char ***argv,
         util::command_line_handling &cfg)
     {
-        for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
+#if defined(HPX_HAVE_NETWORKING)
+        HPX_ASSERT(hpx::is_networking_enabled());
+
+        for (plugins::parcelport_factory_base* factory :
+            get_parcelport_factories())
         {
             factory->init(argc, argv, cfg);
         }
+#endif
     }
 
     std::vector<std::string> parcelhandler::load_runtime_configuration()
@@ -1567,7 +1596,7 @@ namespace hpx { namespace parcelset
                 HPX_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
             "max_outbound_message_size = ${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:"
                 HPX_PP_STRINGIZE(HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}",
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
             "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}",
 #else
             "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}",
@@ -1575,7 +1604,6 @@ namespace hpx { namespace parcelset
             "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}",
             "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
                 "$[hpx.parcel.array_optimization]}",
-            "enable_security = ${HPX_PARCEL_ENABLE_SECURITY:0}",
             "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}",
 #if defined(HPX_HAVE_PARCEL_COALESCING)
             "message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:1}"

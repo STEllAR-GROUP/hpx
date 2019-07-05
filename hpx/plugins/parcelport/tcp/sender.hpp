@@ -13,6 +13,7 @@
 
 #if defined(HPX_HAVE_PARCELPORT_TCP)
 
+#include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
@@ -20,11 +21,13 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/state.hpp>
+#include <hpx/util/asio_util.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/util/asio_util.hpp>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>
@@ -43,6 +46,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     class sender
       : public parcelset::parcelport_connection<sender, std::vector<char> >
     {
+        using postprocess_handler_type = util::unique_function_nonser<void(
+            boost::system::error_code const&)>;
+
     public:
         /// Construct a sending parcelport_connection with the given io_service.
         sender(boost::asio::io_service& io_service,
@@ -164,6 +170,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
 
     private:
+        static void reset_handler(postprocess_handler_type handler)
+        {
+            handler.reset();
+        }
+
         /// handle completed write operation
         void handle_write(boost::system::error_code const& e, std::size_t bytes)
         {
@@ -172,7 +183,22 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 #endif
             // just call initial handler
             handler_(e);
-            handler_.reset();
+
+            postprocess_handler_type handler;
+            std::swap(handler, handler_);
+
+            if (threads::threadmanager_is(state_running))
+            {
+                // the handler needs to be reset on an HPX thread (it destroys
+                // the parcel, which in turn might invoke HPX functions)
+                threads::register_thread_nullary(util::deferred_call(
+                    &sender::reset_handler, std::move(handler)));
+            }
+            else
+            {
+                reset_handler(std::move(handler));
+            }
+
             if (e)
             {
                 // inform post-processing handler of error as well
@@ -241,17 +267,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         util::high_resolution_timer timer_;
         parcelset::parcelport* pp_;
 
+        postprocess_handler_type handler_;
         util::unique_function_nonser<
             void(
                 boost::system::error_code const&
-            )
-        > handler_;
-        util::unique_function_nonser<
-            void(
-                boost::system::error_code const&
-              , parcelset::locality const&
-              , std::shared_ptr<sender>
-            )
+                , parcelset::locality const&
+                , std::shared_ptr<sender>
+                )
         > postprocess_handler_;
     };
 }}}}

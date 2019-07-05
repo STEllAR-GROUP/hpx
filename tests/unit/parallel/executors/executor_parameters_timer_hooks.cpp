@@ -70,6 +70,11 @@ struct timer_hooks_parameters
     }
 
     template <typename Executor>
+    void mark_end_of_scheduling(Executor &&)
+    {
+    }
+
+    template <typename Executor>
     void mark_end_execution(Executor &&)
     {
         time_ = hpx::util::high_resolution_clock::now() - time_;

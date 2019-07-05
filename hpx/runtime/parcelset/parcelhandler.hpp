@@ -9,6 +9,7 @@
 #define HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>
@@ -86,11 +86,12 @@ namespace hpx { namespace parcelset
         ///                 parcelhandler is connected to. This \a parcelport
         ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
-        parcelhandler(
-            util::runtime_configuration& cfg,
+        parcelhandler(util::runtime_configuration& cfg,
             threads::threadmanager* tm,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread);
+            util::function_nonser<void(std::size_t, char const*)> const&
+                on_start_thread,
+            util::function_nonser<void(std::size_t, char const*)> const&
+                on_stop_thread);
 
         ~parcelhandler() {}
 
@@ -107,7 +108,8 @@ namespace hpx { namespace parcelset
         ///
         /// \returns Whether any work has been performed
         bool do_background_work(std::size_t num_thread = 0,
-            bool stop_buffering = false);
+            bool stop_buffering = false,
+            parcelport_background_mode mode = parcelport_background_mode_all);
 
         /// \brief Allow access to AGAS resolver instance.
         ///
@@ -195,8 +197,10 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         HPX_FORCEINLINE void put_parcel(parcel p)
         {
-            put_parcel(std::move(p), util::bind_front(
-                &parcelhandler::invoke_write_handler, this));
+            put_parcel(std::move(p), [=](
+                boost::system::error_code const& ec, parcel const & p) -> void {
+                    return invoke_write_handler(ec, p);
+                });
         }
 
         /// A parcel is submitted for transport at the source locality site to
@@ -231,8 +235,10 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         void put_parcels(std::vector<parcel> parcels)
         {
-            std::vector<write_handler_type> handlers(parcels.size(),
-                util::bind_front(&parcelhandler::invoke_write_handler, this));
+            std::vector<write_handler_type> handlers(parcels.size(), [=](
+                boost::system::error_code const& ec, parcel const & p) -> void {
+                    return invoke_write_handler(ec, p);
+                });
 
             put_parcels(std::move(parcels), std::move(handlers));
         }
@@ -482,6 +488,9 @@ namespace hpx { namespace parcelset
         /// parcel layer
         mutable mutex_type mtx_;
         write_handler_type write_handler_;
+
+        /// cache whether networking has been enabled
+        bool is_networking_enabled_;
 
     private:
         static std::vector<plugins::parcelport_factory_base *> &

@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_ALGORITHM_PARTITION_SEP_24_2016_1055AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
@@ -15,7 +16,6 @@
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_tuple.hpp>
 #include <hpx/util/unused.hpp>
@@ -1063,7 +1063,6 @@ namespace hpx { namespace parallel { inline namespace v1
     partition(ExPolicy&& policy, FwdIter first, FwdIter last,
         Pred && pred, Proj && proj = Proj())
     {
-        // HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT doesn't affect.
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
@@ -1177,6 +1176,15 @@ namespace hpx { namespace parallel { inline namespace v1
                         return output_iterator_offset(
                             true_count, part_size - true_count);
                     };
+
+                auto f2 = hpx::util::unwrapping(
+                    [](output_iterator_offset const& prev_sum,
+                        output_iterator_offset const& curr)
+                        -> output_iterator_offset {
+                        return output_iterator_offset(
+                            get<0>(prev_sum) + get<0>(curr),
+                            get<1>(prev_sum) + get<1>(curr));
+                    });
                 auto f3 =
                     [dest_true, dest_false, flags](
                         zip_iterator part_begin, std::size_t part_size,
@@ -1205,6 +1213,23 @@ namespace hpx { namespace parallel { inline namespace v1
                             });
                     };
 
+                auto f4 =
+                    [last, dest_true, dest_false, flags](
+                        std::vector<
+                            hpx::shared_future<output_iterator_offset>>&& items,
+                        std::vector<hpx::future<void>>&&) mutable
+                    -> hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3> {
+                    HPX_UNUSED(flags);
+
+                    output_iterator_offset count_pair = items.back().get();
+                    std::size_t count_true = get<0>(count_pair);
+                    std::size_t count_false = get<1>(count_pair);
+                    std::advance(dest_true, count_true);
+                    std::advance(dest_false, count_false);
+
+                    return hpx::util::make_tuple(last, dest_true, dest_false);
+                };
+
                 return scan_partitioner_type::call(
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, flags.get()), count, init,
@@ -1212,35 +1237,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::move(f1),
                     // step 2 propagates the partition results from left
                     // to right
-                    hpx::util::unwrapping(
-                        [](output_iterator_offset const& prev_sum,
-                            output_iterator_offset const& curr)
-                        -> output_iterator_offset
-                        {
-                            return output_iterator_offset(
-                                get<0>(prev_sum) + get<0>(curr),
-                                get<1>(prev_sum) + get<1>(curr));
-                        }),
+                    std::move(f2),
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value
-                    [last, dest_true, dest_false, flags](
-                        std::vector<
-                            hpx::shared_future<output_iterator_offset>
-                        > && items,
-                        std::vector<hpx::future<void> > &&) mutable
-                    ->  hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3>
-                    {
-                        HPX_UNUSED(flags);
-
-                        output_iterator_offset count_pair = items.back().get();
-                        std::size_t count_true = get<0>(count_pair);
-                        std::size_t count_false = get<1>(count_pair);
-                        std::advance(dest_true, count_true);
-                        std::advance(dest_false, count_false);
-
-                        return hpx::util::make_tuple(last, dest_true, dest_false);
-                    });
+                    std::move(f4));
             }
         };
         /// \endcond
@@ -1350,24 +1351,6 @@ namespace hpx { namespace parallel { inline namespace v1
         FwdIter2 dest_true, FwdIter3 dest_false, Pred && pred,
         Proj && proj = Proj())
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter1>::value),
-            "Required at least input iterator.");
-        static_assert(
-            (hpx::traits::is_output_iterator<FwdIter2>::value ||
-                hpx::traits::is_forward_iterator<FwdIter2>::value) &&
-            (hpx::traits::is_output_iterator<FwdIter3>::value ||
-                hpx::traits::is_forward_iterator<FwdIter3>::value),
-            "Requires at least output iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter1>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter2>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter3>::value
-            > is_seq;
-#else
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Required at least forward iterator.");
@@ -1379,8 +1362,6 @@ namespace hpx { namespace parallel { inline namespace v1
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
-
         typedef hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3> result_type;
 
         return hpx::util::make_tagged_tuple<tag::in, tag::out1, tag::out2>(

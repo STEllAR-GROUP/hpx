@@ -7,12 +7,12 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_DESCRIPTION_FEB_19_2016_0200PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_action.hpp>
-#include <hpx/util/assert.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif
@@ -74,6 +74,7 @@ namespace hpx { namespace util
         }
 #endif
 
+        /* The priority of description is name, altname, address */
         template <typename F, typename =
             typename std::enable_if<
                 !std::is_same<F, thread_description>::value &&
@@ -84,6 +85,7 @@ namespace hpx { namespace util
           : type_(data_type_description)
         {
             char const* name = traits::get_function_annotation<F>::call(f);
+            // If a name exists, use it, not the altname.
             if (name != nullptr)
             {
                 altname = name;
@@ -188,7 +190,7 @@ namespace hpx { namespace util
         {
         }
 
-        thread_description(char const* desc) noexcept
+        thread_description(char const* /*desc*/) noexcept
         {
         }
 
@@ -197,8 +199,8 @@ namespace hpx { namespace util
                 !std::is_same<F, thread_description>::value &&
                 !traits::is_action<F>::value
             >::type>
-        explicit thread_description(F const& f,
-            char const* altname = nullptr) noexcept
+        explicit thread_description(F const& /*f*/,
+            char const* /*altname*/ = nullptr) noexcept
         {
         }
 
@@ -207,7 +209,7 @@ namespace hpx { namespace util
                 traits::is_action<Action>::value
             >::type>
         explicit thread_description(Action,
-            char const* altname = nullptr) noexcept
+            char const* /*altname*/ = nullptr) noexcept
         {
         }
 

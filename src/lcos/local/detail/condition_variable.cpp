@@ -6,13 +6,13 @@
 
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
@@ -89,8 +89,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             bool not_empty = !queue_.empty();
             lock.unlock();
 
-            threads::set_thread_state(id,
-                threads::pending, threads::wait_signaled, priority, ec);
+            threads::set_thread_state(id, threads::pending,
+                threads::wait_signaled, priority, true, ec);
 
             return not_empty;
         }
@@ -138,8 +138,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 error_code local_ec;
                 {
                     util::ignore_while_checking<std::unique_lock<mutex_type> > il(&lock);
-                    threads::set_thread_state(id,
-                        threads::pending, threads::wait_signaled, priority, local_ec);
+                    threads::set_thread_state(id, threads::pending,
+                        threads::wait_signaled, priority, true, local_ec);
                 }
 
                 if (local_ec)
@@ -264,9 +264,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                 // forcefully abort thread, do not throw
                 error_code ec(lightweight);
-                threads::set_thread_state(id,
-                    threads::pending, threads::wait_abort,
-                    threads::thread_priority_default, ec);
+                threads::set_thread_state(id, threads::pending,
+                    threads::wait_abort, threads::thread_priority_default, true,
+                    ec);
                 if (ec)
                 {
                     LERR_(fatal)

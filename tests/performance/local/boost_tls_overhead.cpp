@@ -118,14 +118,14 @@ int main(
     // output results
     if (vm.count("csv"))
         hpx::util::format_to(std::cout,
-            "%1%,%2%,%3%\n",
+            "{1},{2},{3}\n",
             updates,
             threads,
             duration);
     else
         hpx::util::format_to(std::cout,
-            "ran %1% updates per OS-thread on %2% "
-            "OS-threads in %3% seconds\n",
+            "ran {1} updates per OS-thread on {2} "
+            "OS-threads in {3} seconds\n",
             updates,
             threads,
             duration);

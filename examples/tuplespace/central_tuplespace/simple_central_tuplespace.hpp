@@ -7,8 +7,8 @@
 #if !defined(HPX_SIMPLE_CENTRAL_TUPLESPACE_MAR_31_2013_0555PM)
 #define HPX_SIMPLE_CENTRAL_TUPLESPACE_MAR_31_2013_0555PM
 
+#include <hpx/assertion.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <string>
 
@@ -48,6 +48,14 @@ namespace examples
         simple_central_tuplespace(hpx::naming::id_type const& gid)
           : base_type(gid)
         {}
+
+        ~simple_central_tuplespace()
+        {
+            if (!symbol_name_.empty())
+            {
+                hpx::agas::unregister_name(symbol_name_);
+            }
+        }
 
         bool create(std::string const& symbol_name, hpx::id_type const& locality)
         {
@@ -91,8 +99,6 @@ namespace examples
             }
 
             *this = hpx::agas::resolve_name(hpx::launch::sync,symbol_name);
-
-            symbol_name_ = symbol_name;
 
             return true;
         }

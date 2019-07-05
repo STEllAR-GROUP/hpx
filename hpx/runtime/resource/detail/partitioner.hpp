@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/tuple.hpp>
-
+#include <hpx/assertion.hpp>
 #include <boost/program_options.hpp>
 
 #include <atomic>
@@ -53,7 +53,9 @@ namespace hpx { namespace resource { namespace detail
 
     private:
         init_pool_data(const std::string &name,
-            scheduling_policy = scheduling_policy::unspecified);
+            scheduling_policy = scheduling_policy::unspecified,
+            hpx::threads::policies::scheduler_mode =
+                hpx::threads::policies::scheduler_mode::default_mode);
 
         init_pool_data(std::string const& name, scheduler_function create_func);
 
@@ -68,6 +70,7 @@ namespace hpx { namespace resource { namespace detail
 
         // counter for number of threads bound to this pool
         std::size_t num_threads_;
+        hpx::threads::policies::scheduler_mode mode_;
         scheduler_function create_function_;
     };
 
@@ -84,7 +87,9 @@ namespace hpx { namespace resource { namespace detail
 
         // create a thread_pool
         void create_thread_pool(std::string const& name,
-            scheduling_policy sched = scheduling_policy::unspecified);
+            scheduling_policy sched = scheduling_policy::unspecified,
+            hpx::threads::policies::scheduler_mode =
+                hpx::threads::policies::scheduler_mode::default_mode);
 
         // create a thread_pool with a callback function for creating a custom
         // scheduler
@@ -122,6 +127,15 @@ namespace hpx { namespace resource { namespace detail
         // resource partitioner called in hpx_init
         void configure_pools();
 
+        // returns the number of threads(pus) requested
+        // by the user at startup.
+        // This should not be called before the RP has parsed the config and
+        // assigned affinity data
+        std::size_t threads_needed() {
+            HPX_ASSERT(pus_needed_ != std::size_t(-1));
+            return pus_needed_;
+        }
+
         ////////////////////////////////////////////////////////////////////////
         scheduling_policy which_scheduler(std::string const& pool_name);
         threads::topology &get_topology() const;
@@ -134,6 +148,9 @@ namespace hpx { namespace resource { namespace detail
         std::size_t get_num_threads() const;
         std::size_t get_num_threads(std::string const& pool_name) const;
         std::size_t get_num_threads(std::size_t pool_index) const;
+
+        hpx::threads::policies::scheduler_mode
+        get_scheduler_mode(std::size_t pool_index) const;
 
         std::string const& get_pool_name(std::size_t index) const;
         std::size_t get_pool_index(std::string const& pool_name) const;
@@ -216,7 +233,7 @@ namespace hpx { namespace resource { namespace detail
         // holds all of the command line switches
         util::command_line_handling cfg_;
         std::size_t first_core_;
-        std::size_t cores_needed_;
+        std::size_t pus_needed_;
 
         // contains the basic characteristics of the thread pool partitioning ...
         // that will be passed to the runtime

@@ -43,8 +43,6 @@ namespace hpx { namespace actions
             lambda_action<F, ReturnType, Args...>>
         {
             typedef lambda_action derived_type;
-            typedef std::false_type direct_execution;
-            typedef void is_plain_action;
 
             static std::string get_action_name(naming::address::address_type /*lva*/)
             {
@@ -78,18 +76,11 @@ namespace hpx { namespace actions
                 typename extract_lambda_action<F, decltype(&F::operator())>::type;
         };
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-// suppress: 'operator +=': in C++14 'constexpr' will not imply 'const';
-// consider explicitly specifying 'const'
-#pragma warning(push)
-#pragma warning(disable: 4814)
-#endif
-
         struct action_maker
         {
             template<typename F>
             HPX_CONSTEXPR typename hpx::actions::detail::action_from_lambda<F>::type
-            operator += (F* f)
+            operator += (F*) const
             {
                 static_assert(
                     //!std::is_assignable<F,F>::value &&
@@ -101,10 +92,6 @@ namespace hpx { namespace actions
                     hpx::actions::detail::action_from_lambda<F>::type();
             }
         };
-
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
-#endif
     }
 
     template<typename F>

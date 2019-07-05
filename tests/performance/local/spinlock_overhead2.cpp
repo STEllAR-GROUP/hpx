@@ -15,6 +15,7 @@
 #include <hpx/util/register_locks.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -153,7 +154,7 @@ namespace test
 
 #if !defined( BOOST_SP_HAS_SYNC )
             std::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
-            HPX_COMPILER_FENCE
+            HPX_COMPILER_FENCE;
 #else
             std::uint64_t r = __sync_lock_test_and_set(&v_, 1);
 #endif
@@ -173,7 +174,7 @@ namespace test
             HPX_ITT_SYNC_RELEASING(this);
 
 #if !defined( BOOST_SP_HAS_SYNC )
-            HPX_COMPILER_FENCE
+            HPX_COMPILER_FENCE;
             *const_cast<std::uint64_t volatile*>(&v_) = 0;
 #else
             __sync_lock_release(&v_);
@@ -254,7 +255,7 @@ int hpx_main(
 
                 if (vm.count("csv"))
                     hpx::util::format_to(cout,
-                        "%3%,%4%,%5%,%2%\n",
+                        "{3},{4},{5},{2}\n",
                         count,
                         duration,
                         k1,
@@ -263,14 +264,15 @@ int hpx_main(
                     ) << flush;
                 else
                     hpx::util::format_to(cout,
-                        "invoked %1% futures in %2% seconds "
-                        "(k1 = %3%, k2 = %4%, k3 = %5%)\n",
+                        "invoked {1} futures in {2} seconds "
+                        "(k1 = {3}, k2 = {4}, k3 = {5})\n",
                         count,
                         duration,
                         k1,
                         k2,
                         k3
                     ) << flush;
+                hpx::util::print_cdash_timing("Spinlock2", duration);
             }
         }
     }

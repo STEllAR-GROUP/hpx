@@ -24,9 +24,6 @@
 #include <string>
 #include <vector>
 
-#include <string>
-#include <vector>
-
 namespace hpx { namespace agas { namespace detail
 {
     struct bootstrap_locality_namespace : locality_namespace

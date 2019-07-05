@@ -89,23 +89,25 @@ namespace hpx { namespace threads { namespace detail
             }
         }
 
+        // create the new thread
         if (data.priority == thread_priority_default)
             data.priority = thread_priority_normal;
 
-        // create the new thread
         if (thread_priority_high == data.priority ||
             thread_priority_high_recursive == data.priority ||
             thread_priority_boost == data.priority)
         {
             // For critical priority threads, create the thread immediately.
-            scheduler->create_thread(data, nullptr, initial_state, true, ec,
-                data.num_os_thread);
+            scheduler->create_thread(data, nullptr, initial_state, true, ec);
         }
         else {
             // Create a task description for the new thread.
-            scheduler->create_thread(data, nullptr, initial_state, false, ec,
-                data.num_os_thread);
+            scheduler->create_thread(data, nullptr, initial_state, false, ec);
         }
+
+        // NOTE: Don't care if the hint is a NUMA hint, just want to wake up a
+        // thread.
+        scheduler->do_some_work(data.schedulehint.hint);
     }
 }}}
 

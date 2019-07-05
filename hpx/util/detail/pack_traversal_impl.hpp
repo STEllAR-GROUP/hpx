@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/detail/reserve.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/pack_traversal_rebind_container.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/detail/container_category.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -280,7 +281,7 @@ namespace util {
             HPX_CONSTEXPR tuple<First, Rest...> voidify_empty_tuple(
                 tuple<First, Rest...> val)
             {
-                return std::move(val);
+                return val;
             }
             inline void voidify_empty_tuple(tuple<> const&) noexcept
             {
@@ -347,35 +348,11 @@ namespace util {
             };
 
             /// Specialization for a container with a single type T
-            template <typename NewType, template <class> class Base,
-                typename OldType>
-            auto rebind_container(Base<OldType> const & /*container*/)
-                -> Base<NewType>
+            template <typename NewType, typename Container>
+            auto rebind_container(Container const& container)
             {
-                return Base<NewType>();
-            }
-
-            /// Specialization for a container with a single type T and
-            /// a particular allocator,
-            /// which is preserved across the remap.
-            /// -> We remap the allocator through std::allocator_traits.
-            template <typename NewType, template <class, class> class Base,
-                typename OldType, typename OldAllocator,
-                // Check whether the second argument of the container was
-                // the used allocator.
-                typename std::enable_if<std::uses_allocator<
-                    Base<OldType, OldAllocator>, OldAllocator>::value>::type* =
-                    nullptr,
-                typename NewAllocator = typename std::allocator_traits<
-                    OldAllocator>::template rebind_alloc<NewType>>
-            auto rebind_container(
-                Base<OldType, OldAllocator> const& container)
-                -> Base<NewType, NewAllocator>
-            {
-                // Create a new version of the allocator, that is capable of
-                // allocating the mapped type.
-                return Base<NewType, NewAllocator>(
-                    NewAllocator(container.get_allocator()));
+                return traits::pack_traversal_rebind_container<
+                    NewType, Container>::call(container);
             }
 
             /// Returns the default iterators of the container in case
@@ -510,8 +487,7 @@ namespace util {
             template <typename M, typename T>
             auto remap_container(
                 container_mapping_tag<false, false>, M&& mapper, T&& container)
-                -> decltype(
-                    rebind_container<mapped_type_from_t<T, M>>(container))
+            -> decltype(rebind_container<mapped_type_from_t<T, M>>(container))
             {
                 static_assert(has_push_back<typename std::decay<T>::type,
                                   element_of_t<T>>::value,
@@ -519,7 +495,7 @@ namespace util {
                     "method!");
 
                 // Create the new container, which is capable of holding
-                // the remappped types.
+                // the re-mapped types.
                 auto remapped =
                     rebind_container<mapped_type_from_t<T, M>>(container);
 
@@ -608,7 +584,7 @@ namespace util {
             struct tuple_like_remapper;
 
             /// Specialization for std::tuple like types which contain
-            /// an arbitrary amount of heterogenous arguments.
+            /// an arbitrary amount of heterogeneous arguments.
             template <typename M, template <typename...> class Base,
                 typename... OldArgs>
             struct tuple_like_remapper<strategy_remap_tag, M, Base<OldArgs...>,
@@ -702,7 +678,7 @@ namespace util {
             }
         }    // end namespace tuple_like_remapping
 
-        /// Base class for making strategy dependent behaviour available
+        /// Base class for making strategy dependent behavior available
         /// to the mapping_helper class.
         template <typename Strategy>
         struct mapping_strategy_base
@@ -886,7 +862,7 @@ namespace util {
             auto traverse(Strategy, T&& element)
                 -> decltype(std::declval<mapping_helper>().match(
                     std::declval<container_category_of_t<
-                        typename std::decay<T>::type>>(),
+                        typename hpx::util::decay_unwrap<T>::type>>(),
                     std::declval<T>()));
 
             /// \copybrief traverse
@@ -894,14 +870,14 @@ namespace util {
             auto try_traverse(Strategy, T&& element)
                 -> decltype(std::declval<mapping_helper>().try_match(
                     std::declval<container_category_of_t<
-                        typename std::decay<T>::type>>(),
+                        typename hpx::util::decay_unwrap<T>::type>>(),
                     std::declval<T>()))
             {
                 // We use tag dispatching here, to categorize the type T whether
                 // it satisfies the container or tuple like requirements.
                 // Then we can choose the underlying implementation accordingly.
                 return try_match(
-                    container_category_of_t<typename std::decay<T>::type>{},
+                    container_category_of_t<typename hpx::util::decay_unwrap<T>::type>{},
                     std::forward<T>(element));
             }
 

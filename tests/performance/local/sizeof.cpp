@@ -3,11 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/include/util.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/util/format.hpp>
 
 using boost::program_options::variables_map;
@@ -29,7 +29,7 @@ int hpx_main(
 {
     {
 #       define HPX_SIZEOF(type)                                               \
-            hpx::util::format("%1% %|40t|%2%\n",                              \
+            hpx::util::format("{1:-40} {2}\n",                                \
                 HPX_PP_STRINGIZE(type), sizeof(type))                         \
             /**/
 

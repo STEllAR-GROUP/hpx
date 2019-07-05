@@ -10,6 +10,7 @@
 #define HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
@@ -17,11 +18,11 @@
 #include <hpx/runtime/serialization/output_container.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/util/assert.hpp>
 
 #if defined(BOOST_HAS_INT128) && !defined(__NVCC__) && !defined(__CUDACC__)
 #include <boost/cstdint.hpp>
 #endif
+#include <boost/predef/other/endian.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -341,7 +342,7 @@ namespace hpx { namespace serialization
         {
             const std::size_t size = sizeof(Promoted);
             char* cptr = reinterpret_cast<char *>(&l); //-V206
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
             if(endian_little())
                 reverse_bytes(size, cptr);
 #else

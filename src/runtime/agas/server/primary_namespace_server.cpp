@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2017 Hartmut Kaiser
+//  Copyright (c) 2012-2019 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
@@ -85,11 +85,11 @@ void primary_namespace::register_counter_types(
         if (detail::primary_namespace_services[i].target_
             == detail::counter_target_count)
             help = hpx::util::format(
-                "returns the number of invocations of the AGAS service '%s'",
+                "returns the number of invocations of the AGAS service '{}'",
                 name.substr(p+1));
         else
             help = hpx::util::format(
-                "returns the overall execution time of the AGAS service '%s'",
+                "returns the overall execution time of the AGAS service '{}'",
                 name.substr(p+1));
 
         performance_counters::install_counter_type(
@@ -222,7 +222,8 @@ std::pair<naming::id_type, naming::address>
 primary_namespace::begin_migration(naming::gid_type id)
 {
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.begin_migration_.time_
+        counter_data_.begin_migration_.time_,
+        counter_data_.begin_migration_.enabled_
     );
     counter_data_.increment_begin_migration_count();
     using hpx::util::get;
@@ -236,7 +237,7 @@ primary_namespace::begin_migration(naming::gid_type id)
         l.unlock();
 
         LAGAS_(info) << hpx::util::format(
-            "primary_namespace::begin_migration, gid(%1%), response(no_success)",
+            "primary_namespace::begin_migration, gid({1}), response(no_success)",
             id);
 
         return std::make_pair(naming::invalid_id, naming::address());
@@ -269,7 +270,8 @@ primary_namespace::begin_migration(naming::gid_type id)
 bool primary_namespace::end_migration(naming::gid_type id)
 {
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.end_migration_.time_
+        counter_data_.end_migration_.time_,
+        counter_data_.end_migration_.enabled_
     );
     counter_data_.increment_end_migration_count();
 
@@ -278,13 +280,19 @@ bool primary_namespace::end_migration(naming::gid_type id)
     using hpx::util::get;
 
     migration_table_type::iterator it = migrating_objects_.find(id);
-    if (it == migrating_objects_.end() || !get<0>(it->second))
-        return false;
-
-    // flag this id as not being migrated anymore
-    get<0>(it->second) = false;
-
-    get<2>(it->second).notify_all(std::move(l), hpx::throws);
+    if (it != migrating_objects_.end())
+    {
+        // flag this id as not being migrated anymore
+        get<0>(it->second) = false;
+        if (get<1>(it->second) != 0)
+        {
+            get<2>(it->second).notify_all(std::move(l), hpx::throws);
+        }
+        else
+        {
+            migrating_objects_.erase(it);
+        }
+    }
 
     return true;
 }
@@ -300,15 +308,24 @@ void primary_namespace::wait_for_migration_locked(
     using hpx::util::get;
 
     migration_table_type::iterator it = migrating_objects_.find(id);
-    if (it != migrating_objects_.end() && get<0>(it->second))
+    if (it != migrating_objects_.end())
     {
-        ++get<1>(it->second);
+        if (get<0>(it->second))
+        {
+            ++get<1>(it->second);
 
-        get<2>(it->second).wait(l, ec);
+            get<2>(it->second).wait(l, ec);
 
-        HPX_ASSERT(hpx::util::get<0>(it->second) == false);
-        if (--get<1>(it->second) == 0)
-            migrating_objects_.erase(it);
+            if (--get<1>(it->second) == 0)
+                migrating_objects_.erase(it);
+        }
+        else
+        {
+            if (get<1>(it->second) == 0)
+            {
+                migrating_objects_.erase(it);
+            }
+        }
     }
 }
 
@@ -319,11 +336,13 @@ bool primary_namespace::bind_gid(
     )
 { // {{{ bind_gid implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.bind_gid_.time_
+        counter_data_.bind_gid_.time_,
+        counter_data_.bind_gid_.enabled_
     );
     counter_data_.increment_bind_gid_count();
     using hpx::util::get;
 
+    naming::gid_type gid = id;
     naming::detail::strip_internal_bits_from_gid(id);
 
     std::unique_lock<mutex_type> l(mutex_);
@@ -338,6 +357,18 @@ bool primary_namespace::bind_gid(
         // binding (e.g. move semantics).
         if (it->first == id)
         {
+            // non-migratable gids can't be rebound
+            if (naming::refers_to_local_lva(gid) &&
+                !naming::refers_to_virtual_memory(gid))
+            {
+                l.unlock();
+
+                HPX_THROW_EXCEPTION(bad_parameter, "primary_namespace::bind_gid",
+                    "cannot rebind gids for non-migratable objects");
+
+                return false;
+            }
+
             gva& gaddr = it->second.first;
             naming::gid_type& loc = it->second.second;
 
@@ -361,7 +392,7 @@ bool primary_namespace::bind_gid(
                   , "primary_namespace::bind_gid"
                   , hpx::util::format(
                         "attempt to update a GVA with an invalid type, "
-                        "gid(%1%), gva(%2%), locality(%3%)",
+                        "gid({1}), gva({2}), locality({3})",
                         id, g, locality));
             }
 
@@ -373,7 +404,7 @@ bool primary_namespace::bind_gid(
                   , "primary_namespace::bind_gid"
                   , hpx::util::format(
                         "attempt to update a GVA with an invalid locality id, "
-                        "gid(%1%), gva(%2%), locality(%3%)",
+                        "gid({1}), gva({2}), locality({3})",
                         id, g, locality));
             }
 
@@ -387,8 +418,8 @@ bool primary_namespace::bind_gid(
             l.unlock();
 
             LAGAS_(info) << hpx::util::format(
-                "primary_namespace::bind_gid, gid(%1%), gva(%2%), "
-                "locality(%3%), response(repeated_request)",
+                "primary_namespace::bind_gid, gid({1}), gva({2}), "
+                "locality({3}), response(repeated_request)",
                 id, g, locality);
 
             return false;
@@ -429,6 +460,17 @@ bool primary_namespace::bind_gid(
         }
     }
 
+    // non-migratable gids don't need to be bound
+    if (naming::refers_to_local_lva(gid) &&
+        !naming::refers_to_virtual_memory(gid))
+    {
+        LAGAS_(info) << hpx::util::format(
+            "primary_namespace::bind_gid, gid({1}), gva({2}), locality({3})",
+            gid, g, locality);
+
+        return true;
+    }
+
     naming::gid_type upper_bound(id + (g.count - 1));
 
     if (HPX_UNLIKELY(id.get_msb() != upper_bound.get_msb()))
@@ -448,7 +490,7 @@ bool primary_namespace::bind_gid(
           , "primary_namespace::bind_gid"
           , hpx::util::format(
                 "attempt to insert a GVA with an invalid type, "
-                "gid(%1%), gva(%2%), locality(%3%)",
+                "gid({1}), gva({2}), locality({3})",
                 id, g, locality));
     }
 
@@ -462,14 +504,14 @@ bool primary_namespace::bind_gid(
           , "primary_namespace::bind_gid"
           , hpx::util::format(
                 "GVA table insertion failed due to a locking error or "
-                "memory corruption, gid(%1%), gva(%2%), locality(%3%)",
+                "memory corruption, gid({1}), gva({2}), locality({3})",
                 id, g, locality));
     }
 
     l.unlock();
 
     LAGAS_(info) << hpx::util::format(
-        "primary_namespace::bind_gid, gid(%1%), gva(%2%), locality(%3%)",
+        "primary_namespace::bind_gid, gid({1}), gva({2}), locality({3})",
         id, g, locality);
 
     return true;
@@ -478,7 +520,8 @@ bool primary_namespace::bind_gid(
 primary_namespace::resolved_type primary_namespace::resolve_gid(naming::gid_type id)
 { // {{{ resolve_gid implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.resolve_gid_.time_
+        counter_data_.resolve_gid_.time_,
+        counter_data_.resolve_gid_.enabled_
     );
     counter_data_.increment_resolve_gid_count();
     using hpx::util::get;
@@ -489,7 +532,10 @@ primary_namespace::resolved_type primary_namespace::resolve_gid(naming::gid_type
         std::unique_lock<mutex_type> l(mutex_);
 
         // wait for any migration to be completed
-        wait_for_migration_locked(l, id, hpx::throws);
+        if (naming::detail::is_migratable(id))
+        {
+            wait_for_migration_locked(l, id, hpx::throws);
+        }
 
         // now, resolve the id
         r = resolve_gid_locked(l, id, hpx::throws);
@@ -498,15 +544,15 @@ primary_namespace::resolved_type primary_namespace::resolve_gid(naming::gid_type
     if (get<0>(r) == naming::invalid_gid)
     {
         LAGAS_(info) << hpx::util::format(
-            "primary_namespace::resolve_gid, gid(%1%), response(no_success)",
+            "primary_namespace::resolve_gid, gid({1}), response(no_success)",
             id);
 
         return resolved_type(naming::invalid_gid, gva(), naming::invalid_gid);
     }
 
     LAGAS_(info) << hpx::util::format(
-        "primary_namespace::resolve_gid, gid(%1%), base(%2%), "
-        "gva(%3%), locality_id(%4%)",
+        "primary_namespace::resolve_gid, gid({1}), base({2}), "
+        "gva({3}), locality_id({4})",
         id, get<0>(r), get<1>(r), get<2>(r));
 
     return r;
@@ -524,7 +570,8 @@ naming::address primary_namespace::unbind_gid(
     )
 { // {{{ unbind_gid implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.unbind_gid_.time_
+        counter_data_.unbind_gid_.time_,
+        counter_data_.unbind_gid_.enabled_
     );
     counter_data_.increment_unbind_gid_count();
 
@@ -552,18 +599,35 @@ naming::address primary_namespace::unbind_gid(
 
         l.unlock();
         LAGAS_(info) << hpx::util::format(
-            "primary_namespace::unbind_gid, gid(%1%), count(%2%), gva(%3%), "
-            "locality_id(%4%)",
+            "primary_namespace::unbind_gid, gid({1}), count({2}), gva({3}), "
+            "locality_id({4})",
             id, count, data.first, data.second);
 
         gva g = data.first;
         return naming::address(g.prefix, g.type, g.lva());
     }
 
+    // non-migratable gids are not bound
+    if (naming::refers_to_local_lva(id) &&
+        !naming::refers_to_virtual_memory(id))
+    {
+        naming::gid_type locality = naming::get_locality_from_gid(id);
+        gva g(locality,
+            naming::detail::get_component_type_from_gid(id.get_msb()),
+            0, id.get_lsb());
+
+        LAGAS_(info) << hpx::util::format(
+            "primary_namespace::unbind_gid, gid({1}), count({2}), gva({3}), "
+            "locality({4})",
+            id, count, g, g.prefix);
+
+        return naming::address(g.prefix, g.type, g.lva());
+    }
+
     l.unlock();
 
     LAGAS_(info) << hpx::util::format(
-        "primary_namespace::unbind_gid, gid(%1%), count(%2%), "
+        "primary_namespace::unbind_gid, gid({1}), count({2}), "
         "response(no_success)",
         id, count);
 
@@ -577,7 +641,8 @@ std::int64_t primary_namespace::increment_credit(
     )
 { // increment_credit implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.increment_credit_.time_
+        counter_data_.increment_credit_.time_,
+        counter_data_.increment_credit_.enabled_
     );
     counter_data_.increment_increment_credit_count();
 
@@ -597,7 +662,7 @@ std::int64_t primary_namespace::increment_credit(
     {
         HPX_THROW_EXCEPTION(bad_parameter
           , "primary_namespace::increment_credit"
-          , hpx::util::format("invalid credit count of %1%", credits));
+          , hpx::util::format("invalid credit count of {1}", credits));
         return 0;
     }
 
@@ -611,7 +676,8 @@ std::vector<std::int64_t> primary_namespace::decrement_credit(
     )
 { // decrement_credit implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.decrement_credit_.time_
+        counter_data_.decrement_credit_.time_,
+        counter_data_.decrement_credit_.enabled_
     );
     counter_data_.increment_decrement_credit_count();
 
@@ -633,7 +699,7 @@ std::vector<std::int64_t> primary_namespace::decrement_credit(
         // Decrement.
         if (credits < 0)
         {
-            std::list<free_entry> free_list;
+            free_entry_list_type free_list;
             decrement_sweep(free_list, lower, upper, -credits, hpx::throws);
 
             free_components_sync(free_list, lower, upper, hpx::throws);
@@ -642,7 +708,7 @@ std::vector<std::int64_t> primary_namespace::decrement_credit(
         {
             HPX_THROW_EXCEPTION(bad_parameter
               , "primary_namespace::decrement_credit"
-              , hpx::util::format("invalid credit count of %1%", credits));
+              , hpx::util::format("invalid credit count of {1}", credits));
         }
         res_credits.push_back(credits);
     }
@@ -655,7 +721,8 @@ std::pair<naming::gid_type, naming::gid_type> primary_namespace::allocate(
     )
 { // {{{ allocate implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.allocate_.time_
+        counter_data_.allocate_.time_,
+        counter_data_.allocate_.enabled_
     );
     counter_data_.increment_allocate_count();
 
@@ -666,8 +733,8 @@ std::pair<naming::gid_type, naming::gid_type> primary_namespace::allocate(
     if (0 == count)
     {
         LAGAS_(info) << hpx::util::format(
-            "primary_namespace::allocate, count(%1%), "
-            "lower(%1%), upper(%3%), prefix(%4%), response(repeated_request)",
+            "primary_namespace::allocate, count({1}), "
+            "lower({1}), upper({3}), prefix({4}), response(repeated_request)",
             count, next_id_, next_id_,
             naming::get_locality_id_from_gid(next_id_));
 
@@ -706,8 +773,8 @@ std::pair<naming::gid_type, naming::gid_type> primary_namespace::allocate(
     naming::detail::set_credit_for_gid(upper, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
 
     LAGAS_(info) << hpx::util::format(
-        "primary_namespace::allocate, count(%1%), "
-        "lower(%2%), upper(%3%), response(success)",
+        "primary_namespace::allocate, count({1}), "
+        "lower({2}), upper({3}), response(success)",
         count, lower, upper);
 
     return std::make_pair(lower, upper);
@@ -731,8 +798,8 @@ std::pair<naming::gid_type, naming::gid_type> primary_namespace::allocate(
 
         std::stringstream ss;
         hpx::util::format_to(ss,
-            "%1%, dumping server-side refcnt table matches, lower(%2%), "
-            "upper(%3%):",
+            "{1}, dumping server-side refcnt table matches, lower({2}), "
+            "upper({3}):",
             func_name, lower, upper);
 
         for (/**/; lower_it != upper_it; ++lower_it)
@@ -740,7 +807,7 @@ std::pair<naming::gid_type, naming::gid_type> primary_namespace::allocate(
             // The [server] tag is in there to make it easier to filter
             // through the logs.
             hpx::util::format_to(ss,
-                "\n  [server] lower(%1%), credits(%2%)",
+                "\n  [server] lower({1}), credits({2})",
                 lower_it->first,
                 lower_it->second);
         }
@@ -810,7 +877,7 @@ void primary_namespace::increment(
                     , "primary_namespace::increment"
                     , hpx::util::format(
                         "couldn't create entry in reference count table, "
-                        "raw(%1%), ref-count(%2%)",
+                        "raw({1}), ref-count({2})",
                         raw, count));
                 return;
             }
@@ -823,7 +890,7 @@ void primary_namespace::increment(
         }
 
         LAGAS_(info) << hpx::util::format(
-            "primary_namespace::increment, raw(%1%), refcnt(%2%)",
+            "primary_namespace::increment, raw({1}), refcnt({2})",
             lower, it->second);
     }
 
@@ -835,7 +902,7 @@ void primary_namespace::increment(
 void primary_namespace::resolve_free_list(
     std::unique_lock<mutex_type>& l
   , std::list<refcnt_table_type::iterator> const& free_list
-  , std::list<free_entry>& free_entry_list
+  , free_entry_list_type& free_entry_list
   , naming::gid_type const& lower
   , naming::gid_type const& upper
   , error_code& ec
@@ -854,8 +921,11 @@ void primary_namespace::resolve_free_list(
         // The mapping's key space.
         key_type gid = it->first;
 
-        // wait for any migration to be completed
-        wait_for_migration_locked(l, gid, ec);
+        if (naming::detail::is_migratable(gid))
+        {
+            // wait for any migration to be completed
+            wait_for_migration_locked(l, gid, ec);
+        }
 
         // Resolve the query GID.
         resolved_type r = resolve_gid_locked(l, gid, ec);
@@ -870,7 +940,7 @@ void primary_namespace::resolve_free_list(
                 , "primary_namespace::resolve_free_list"
                 , hpx::util::format(
                     "primary_namespace::resolve_free_list, failed to resolve "
-                    "gid, gid(%1%)",
+                    "gid, gid({1})",
                     gid));
             return;       // couldn't resolve this one
         }
@@ -887,7 +957,7 @@ void primary_namespace::resolve_free_list(
                 , "primary_namespace::resolve_free_list"
                 , hpx::util::format(
                     "encountered a GVA with an invalid type while "
-                    "performing a decrement, gid(%1%), gva(%2%)",
+                    "performing a decrement, gid({1}), gva({2})",
                     gid, g));
             return;
         }
@@ -899,14 +969,14 @@ void primary_namespace::resolve_free_list(
                 , "primary_namespace::resolve_free_list"
                 , hpx::util::format(
                     "encountered a GVA with a count of zero while "
-                    "performing a decrement, gid(%1%), gva(%2%)",
+                    "performing a decrement, gid({1}), gva({2})",
                     gid, g));
             return;
         }
 
         LAGAS_(info) << hpx::util::format(
             "primary_namespace::resolve_free_list, resolved match, "
-            "gid(%1%), gva(%2%)",
+            "gid({1}), gva({2})",
             gid, g);
 
         // Fully resolve the range.
@@ -923,7 +993,7 @@ void primary_namespace::resolve_free_list(
 
 ///////////////////////////////////////////////////////////////////////////////
 void primary_namespace::decrement_sweep(
-    std::list<free_entry>& free_entry_list
+    free_entry_list_type& free_entry_list
   , naming::gid_type const& lower
   , naming::gid_type const& upper
   , std::int64_t credits
@@ -931,8 +1001,8 @@ void primary_namespace::decrement_sweep(
     )
 { // {{{ decrement_sweep implementation
     LAGAS_(info) << hpx::util::format(
-        "primary_namespace::decrement_sweep, lower(%1%), upper(%2%), "
-        "credits(%3%)",
+        "primary_namespace::decrement_sweep, lower({1}), upper({2}), "
+        "credits({3})",
         lower, upper, credits);
 
     free_entry_list.clear();
@@ -985,8 +1055,8 @@ void primary_namespace::decrement_sweep(
                     HPX_THROWS_IF(ec, invalid_data
                       , "primary_namespace::decrement_sweep"
                       , hpx::util::format(
-                            "negative entry in reference count table, raw(%1%), "
-                            "refcount(%2%)",
+                            "negative entry in reference count table, raw({1}), "
+                            "refcount({2})",
                             raw,
                             std::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits));
                     return;
@@ -1005,7 +1075,7 @@ void primary_namespace::decrement_sweep(
                       , "primary_namespace::decrement_sweep"
                       , hpx::util::format(
                             "couldn't create entry in reference count table, "
-                            "raw(%1%), ref-count(%2%)",
+                            "raw({1}), ref-count({2})",
                             raw, count));
                     return;
                 }
@@ -1025,8 +1095,8 @@ void primary_namespace::decrement_sweep(
                 HPX_THROWS_IF(ec, invalid_data
                   , "primary_namespace::decrement_sweep"
                   , hpx::util::format(
-                        "negative entry in reference count table, raw(%1%), "
-                        "refcount(%2%)",
+                        "negative entry in reference count table, raw({1}), "
+                        "refcount({2})",
                         raw, it->second));
                 return;
             }
@@ -1047,7 +1117,7 @@ void primary_namespace::decrement_sweep(
 
 ///////////////////////////////////////////////////////////////////////////////
 void primary_namespace::free_components_sync(
-    std::list<free_entry>& free_list
+    free_entry_list_type& free_list
   , naming::gid_type const& lower
   , naming::gid_type const& upper
   , error_code& ec
@@ -1065,8 +1135,8 @@ void primary_namespace::free_components_sync(
         {
             LAGAS_(info) << hpx::util::format(
                 "primary_namespace::free_components_sync, cancelling free "
-                "operation because the threadmanager is down, lower(%1%), "
-                "upper(%2%), base(%3%), gva(%4%), locality(%5%)",
+                "operation because the threadmanager is down, lower({1}), "
+                "upper({2}), base({3}), gva({4}), locality({5})",
                 lower,
                 upper,
                 e.gid_, e.gva_, e.locality_);
@@ -1075,7 +1145,7 @@ void primary_namespace::free_components_sync(
 
         LAGAS_(info) << hpx::util::format(
             "primary_namespace::free_components_sync, freeing component, "
-            "lower(%1%), upper(%2%), base(%3%), gva(%4%), locality(%5%)",
+            "lower({1}), upper({2}), base({3}), gva({4}), locality({5})",
             lower,
             upper,
             e.gid_, e.gva_, e.locality_);
@@ -1113,6 +1183,17 @@ primary_namespace::resolved_type primary_namespace::resolve_gid_locked(
     )
 { // {{{ resolve_gid_locked implementation
     HPX_ASSERT_OWNS_LOCK(l);
+
+    // handle (non-migratable) components located on this locality first
+    if (naming::refers_to_local_lva(gid) &&
+        !naming::refers_to_virtual_memory(gid))
+    {
+        naming::gid_type locality = naming::get_locality_from_gid(gid);
+        gva addr(locality,
+            naming::detail::get_component_type_from_gid(gid.get_msb()),
+            1, gid.get_lsb());
+        return resolved_type(gid, addr, locality);
+    }
 
     // parameters
     naming::gid_type id = gid;
@@ -1242,42 +1323,52 @@ naming::gid_type primary_namespace::statistics_counter(std::string const& name)
         case primary_ns_route:
             get_data_func = util::bind_front(&cd::get_route_count,
                 &counter_data_);
+            counter_data_.route_.enabled_ = true;
             break;
         case primary_ns_bind_gid:
             get_data_func = util::bind_front(&cd::get_bind_gid_count,
                 &counter_data_);
+            counter_data_.bind_gid_.enabled_ = true;
             break;
         case primary_ns_resolve_gid:
             get_data_func = util::bind_front(&cd::get_resolve_gid_count,
                 &counter_data_);
+            counter_data_.resolve_gid_.enabled_ = true;
             break;
         case primary_ns_unbind_gid:
             get_data_func = util::bind_front(&cd::get_unbind_gid_count,
                 &counter_data_);
+            counter_data_.unbind_gid_.enabled_ = true;
             break;
         case primary_ns_increment_credit:
             get_data_func = util::bind_front(&cd::get_increment_credit_count,
                 &counter_data_);
+            counter_data_.increment_credit_.enabled_ = true;
             break;
         case primary_ns_decrement_credit:
             get_data_func = util::bind_front(&cd::get_decrement_credit_count,
                 &counter_data_);
+            counter_data_.decrement_credit_.enabled_ = true;
             break;
         case primary_ns_allocate:
             get_data_func = util::bind_front(&cd::get_allocate_count,
                 &counter_data_);
+            counter_data_.allocate_.enabled_ = true;
             break;
         case primary_ns_begin_migration:
             get_data_func = util::bind_front(&cd::get_begin_migration_count,
                 &counter_data_);
+            counter_data_.begin_migration_.enabled_ = true;
             break;
         case primary_ns_end_migration:
             get_data_func = util::bind_front(&cd::get_end_migration_count,
                 &counter_data_);
+            counter_data_.end_migration_.enabled_ = true;
             break;
         case primary_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_count,
                 &counter_data_);
+            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -1291,42 +1382,52 @@ naming::gid_type primary_namespace::statistics_counter(std::string const& name)
         case primary_ns_route:
             get_data_func = util::bind_front(&cd::get_route_time,
                 &counter_data_);
+            counter_data_.route_.enabled_ = true;
             break;
         case primary_ns_bind_gid:
             get_data_func = util::bind_front(&cd::get_bind_gid_time,
                 &counter_data_);
+            counter_data_.bind_gid_.enabled_ = true;
             break;
         case primary_ns_resolve_gid:
             get_data_func = util::bind_front(&cd::get_resolve_gid_time,
                 &counter_data_);
+            counter_data_.resolve_gid_.enabled_ = true;
             break;
         case primary_ns_unbind_gid:
             get_data_func = util::bind_front(&cd::get_unbind_gid_time,
                 &counter_data_);
+            counter_data_.unbind_gid_.enabled_ = true;
             break;
         case primary_ns_increment_credit:
             get_data_func = util::bind_front(&cd::get_increment_credit_time,
                 &counter_data_);
+            counter_data_.increment_credit_.enabled_ = true;
             break;
         case primary_ns_decrement_credit:
             get_data_func = util::bind_front(&cd::get_decrement_credit_time,
                 &counter_data_);
+            counter_data_.decrement_credit_.enabled_ = true;
             break;
         case primary_ns_allocate:
             get_data_func = util::bind_front(&cd::get_allocate_time,
                 &counter_data_);
+            counter_data_.allocate_.enabled_ = true;
             break;
         case primary_ns_begin_migration:
             get_data_func = util::bind_front(&cd::get_begin_migration_time,
                 &counter_data_);
+            counter_data_.begin_migration_.enabled_ = true;
             break;
         case primary_ns_end_migration:
             get_data_func = util::bind_front(&cd::get_end_migration_time,
                 &counter_data_);
+            counter_data_.end_migration_.enabled_ = true;
             break;
         case primary_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_time,
                 &counter_data_);
+            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -1467,50 +1568,90 @@ std::int64_t primary_namespace::counter_data::get_overall_time(bool reset)
         util::get_and_reset_value(end_migration_.time_, reset);
 }
 
+void primary_namespace::counter_data::enable_all()
+{
+    route_.enabled_ = true;
+    bind_gid_.enabled_ = true;
+    resolve_gid_.enabled_ = true;
+    unbind_gid_.enabled_ = true;
+    increment_credit_.enabled_ = true;
+    decrement_credit_.enabled_ = true;
+    allocate_.enabled_ = true;
+    begin_migration_.enabled_ = true;
+    end_migration_.enabled_ = true;
+}
+
 // increment counter values
 void primary_namespace::counter_data::increment_route_count()
 {
-    ++route_.count_;
+    if (route_.enabled_)
+    {
+        ++route_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_bind_gid_count()
 {
-    ++bind_gid_.count_;
+    if (bind_gid_.enabled_)
+    {
+        ++bind_gid_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_resolve_gid_count()
 {
-    ++resolve_gid_.count_;
+    if (resolve_gid_.enabled_)
+    {
+        ++resolve_gid_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_unbind_gid_count()
 {
-    ++unbind_gid_.count_;
+    if (unbind_gid_.enabled_)
+    {
+        ++unbind_gid_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_increment_credit_count()
 {
-    ++increment_credit_.count_;
+    if (increment_credit_.enabled_)
+    {
+        ++increment_credit_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_decrement_credit_count()
 {
-    ++decrement_credit_.count_;
+    if (decrement_credit_.enabled_)
+    {
+        ++decrement_credit_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_allocate_count()
 {
-    ++allocate_.count_;
+    if (allocate_.enabled_)
+    {
+        ++allocate_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_begin_migration_count()
 {
-    ++begin_migration_.count_;
+    if (begin_migration_.enabled_)
+    {
+        ++begin_migration_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_end_migration_count()
 {
-    ++end_migration_.count_;
+    if (end_migration_.enabled_)
+    {
+        ++end_migration_.count_;
+    }
 }
 
 }}}

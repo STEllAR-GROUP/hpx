@@ -7,7 +7,7 @@ get support for using HPX.
 
 ### Documentation
 
-* [User Documentation](https://stellar-group.github.io/hpx/docs/html/)
+* [User Documentation](https://stellar-group.github.io/hpx/docs/sphinx/branches/master/html/index.html)
 
 
 ### Real-time Chat

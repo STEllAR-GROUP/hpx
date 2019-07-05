@@ -7,6 +7,7 @@
 #define HPX_LCOS_ASYNC_COLOCATED_FEB_01_2014_0105PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/async_continue_fwd.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
@@ -95,6 +96,9 @@ namespace hpx { namespace detail
             agas::primary_namespace::get_service_instance(gid.get_gid())
           , naming::id_type::unmanaged);
 
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_ASSERT(false);
+#else
         typedef
             typename hpx::traits::extract_action<Action>::remote_result_type
             remote_result_type;
@@ -107,6 +111,7 @@ namespace hpx { namespace detail
                     util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Ts>(vs)...)
                 ), service_target, gid.get_gid());
+#endif
     }
 
     template <
@@ -136,6 +141,9 @@ namespace hpx { namespace detail
     async_colocated(Continuation && cont,
         naming::id_type const& gid, Ts&&... vs)
     {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_ASSERT(false);
+#else
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
         naming::id_type service_target(
@@ -155,6 +163,7 @@ namespace hpx { namespace detail
                       , std::forward<Ts>(vs)...)
                   , std::forward<Continuation>(cont))
               , service_target, gid.get_gid());
+#endif
     }
 
     template <

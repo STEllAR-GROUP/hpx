@@ -4,13 +4,16 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    count_3646
     for_each_annotated_function
     for_loop_2281
     minimal_findend
+    reduce_3641
     scan_different_inits
     scan_non_commutative
     scan_shortlength
     search_zerolength
+    set_operations_3442
     stable_merge_2964
     static_chunker_2282
    )
@@ -41,7 +44,7 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.regressions.parallel_dir.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()
 
 # add subdirectories

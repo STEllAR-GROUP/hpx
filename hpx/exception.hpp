@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -50,6 +50,12 @@ namespace hpx
         /// Construct a hpx::exception from a boost#system_error.
         explicit exception(boost::system::system_error const& e);
 
+        /// Construct a hpx::exception from a boost#system#error_code (this is
+        /// new for Boost V1.69). This constructor is required to compensate
+        /// for the changes introduced as a resolution to LWG3162
+        /// (https://cplusplus.github.io/LWG/issue3162).
+        explicit exception(boost::system::error_code const& e);
+
         /// Construct a hpx::exception from a \a hpx::error and an error message.
         ///
         /// \param e      The parameter \p e holds the hpx::error code the new
@@ -79,7 +85,7 @@ namespace hpx
         /// Destruct a hpx::exception
         ///
         /// \throws nothing
-        ~exception() throw();
+        ~exception() noexcept;
 
         /// The function \a get_error() returns the hpx::error code stored
         /// in the referenced instance of a hpx::exception. It returns
@@ -181,9 +187,9 @@ namespace hpx
               : what_(w)
             {}
 
-            ~std_exception() throw() {}
+            ~std_exception() noexcept {}
 
-            const char* what() const throw()
+            const char* what() const noexcept override
             {
                 return what_.c_str();
             }
@@ -199,9 +205,9 @@ namespace hpx
               : what_(w)
             {}
 
-            ~bad_alloc() throw() {}
+            ~bad_alloc() noexcept {}
 
-            const char* what() const throw()
+            const char* what() const noexcept override
             {
                 return what_.c_str();
             }
@@ -217,9 +223,9 @@ namespace hpx
               : what_(w)
             {}
 
-            ~bad_exception() throw() {}
+            ~bad_exception() noexcept {}
 
-            const char* what() const throw()
+            const char* what() const noexcept override
             {
                 return what_.c_str();
             }
@@ -235,9 +241,9 @@ namespace hpx
               : what_(w)
             {}
 
-            ~bad_cast() throw() {}
+            ~bad_cast() noexcept {}
 
-            const char* what() const throw()
+            const char* what() const noexcept override
             {
                 return what_.c_str();
             }
@@ -253,9 +259,9 @@ namespace hpx
               : what_(w)
             {}
 
-            ~bad_typeid() throw() {}
+            ~bad_typeid() noexcept {}
 
-            const char* what() const throw()
+            const char* what() const noexcept override
             {
                 return what_.c_str();
             }
@@ -344,18 +350,13 @@ namespace hpx
                 std::string const& state = "", std::string const& auxinfo = "");
 
         template <typename Exception>
-        HPX_EXPORT std::exception_ptr
-            construct_lightweight_exception(Exception const& e);
+        HPX_EXPORT std::exception_ptr get_exception(Exception const& e,
+            std::string const& func, std::string const& file, long line,
+            std::string const& auxinfo);
 
-        // HPX_ASSERT handler
-        HPX_NORETURN HPX_EXPORT
-        void assertion_failed(char const* expr, char const* function,
-            char const* file, long line);
-
-        // HPX_ASSERT_MSG handler
-        HPX_NORETURN HPX_EXPORT
-        void assertion_failed_msg(char const* msg, char const* expr,
-            char const* function, char const* file, long line);
+        template <typename Exception>
+        HPX_EXPORT std::exception_ptr construct_lightweight_exception(
+            Exception const& e);
 
         // If backtrace support is enabled, this function returns the current
         // stack backtrace, otherwise it will return an empty string.
@@ -1059,16 +1060,6 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // \cond NOINTERNAL
-    // forwarder for HPX_ASSERT handler
-    HPX_NORETURN HPX_EXPORT
-    void assertion_failed(char const* expr, char const* function,
-        char const* file, long line);
-
-    // forwarder for HPX_ASSERT_MSG handler
-    HPX_NORETURN HPX_EXPORT
-    void assertion_failed_msg(char const* msg, char const* expr,
-        char const* function, char const* file, long line);
-
     // For testing purposes we sometime expect to see exceptions, allow those
     // to go through without attaching a debugger.
     //

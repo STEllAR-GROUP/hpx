@@ -5,14 +5,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# ---------------------------------------------------------------------
-# Function to add variables to a list that will be later written out
-# to file hpx/config/defines.hpp
-# ---------------------------------------------------------------------
-# on startup, this is unset, but we'll set it to an empty string anyway
-set_property(GLOBAL PROPERTY HPX_CONFIG_DEFINITIONS "")
-set_property(GLOBAL PROPERTY HPX_CONFIG_COND_DEFINITIONS "")
-
 function(hpx_add_config_define definition)
 
   # if(ARGN) ignores an argument "0"
@@ -111,7 +103,7 @@ function(write_config_defines_file)
   if (NOT OPTION_TEMPLATE)
     string(TOUPPER ${OPTION_NAMESPACE} NAMESPACE_UPPER)
     set(PREAMBLE
-      "//  Copyright (c) Ste||ar Group\n"
+      "//  Copyright (c) 2019 STE||AR Group\n"
       "//\n"
       "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
       "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"

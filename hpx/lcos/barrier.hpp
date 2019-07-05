@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -69,6 +70,18 @@ namespace hpx { namespace lcos {
         /// A barrier \a base_name is created. It expects that
         /// \a num participate and the local rank is \a rank.
         barrier(std::string const&  base_name, std::size_t num, std::size_t rank);
+
+        /// Creates a barrier with a vector of ranks
+        ///
+        /// \param base_name The name of the barrier
+        /// \param ranks Gives a list of participating ranks (this could be derived
+        ///              from a list of locality ids
+        /// \param rank The rank of the calling site for this invocation
+        ///
+        /// A barrier \a base_name is created. It expects that ranks.size()
+        /// and the local rank is \a rank (must be contained in \a ranks).
+        barrier(std::string const& base_name,
+            std::vector<std::size_t> const& ranks, std::size_t rank);
 
         /// \cond NOINTERNAL
         barrier(barrier&& other);

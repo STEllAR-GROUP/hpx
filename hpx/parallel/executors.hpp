@@ -8,20 +8,10 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/executors/v1/executor_information_traits.hpp>
-#include <hpx/parallel/executors/v1/executor_parameter_traits.hpp>
-#include <hpx/parallel/executors/v1/executor_traits.hpp>
-#include <hpx/parallel/executors/v1/timed_executor_traits.hpp>
-#include <hpx/parallel/executors/v1/thread_executor_information_traits.hpp>
-#include <hpx/parallel/executors/v1/thread_executor_parameter_traits.hpp>
-#include <hpx/parallel/executors/v1/thread_executor_traits.hpp>
-#include <hpx/parallel/executors/v1/thread_timed_executor_traits.hpp>
-#endif
-
 #include <hpx/parallel/executors/default_executor.hpp>
 #include <hpx/parallel/executors/distribution_policy_executor.hpp>
 #include <hpx/parallel/executors/parallel_executor.hpp>
+#include <hpx/parallel/executors/parallel_executor_aggregated.hpp>
 #include <hpx/parallel/executors/pool_executor.hpp>
 #include <hpx/parallel/executors/sequenced_executor.hpp>
 #include <hpx/parallel/executors/service_executors.hpp>

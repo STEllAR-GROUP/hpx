@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
@@ -14,8 +15,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/apex.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/query_counters.hpp>
@@ -48,8 +48,8 @@ namespace hpx { namespace util
         destination_(dest), format_(form),
         counter_shortnames_(shortnames), csv_header_(csv_header),
         print_counters_locally_(print_counters_locally),
-        timer_(util::bind(&query_counters::evaluate, this_()),
-            util::bind(&query_counters::terminate, this_()),
+        timer_(util::bind_front(&query_counters::evaluate, this_()),
+            util::bind_front(&query_counters::terminate, this_()),
             interval*1000, "query_counters", true)
     {
         // add counter prefix, if necessary
@@ -149,7 +149,7 @@ namespace hpx { namespace util
             *out  << "," << value.count_ << ",";
 
             double elapsed = static_cast<double>(value.time_) * 1e-9;
-            *out << hpx::util::format("%.6f", elapsed)
+            *out << hpx::util::format("{:.6}", elapsed)
                 << ",[s]," << val;
             if (!uom.empty())
                 *out << ",[" << uom << "]";
@@ -175,7 +175,7 @@ namespace hpx { namespace util
         *out << "," << value.count_ << ",";
 
         double elapsed = static_cast<double>(value.time_) * 1e-9;
-        *out << hpx::util::format("%.6f", elapsed) << ",[s],";
+        *out << hpx::util::format("{:.6}", elapsed) << ",[s],";
 
         bool first = true;
         for (std::int64_t val : value.values_)

@@ -10,15 +10,15 @@
 #define HPX_SERIALIZATION_POLYMORPHIC_NONINTRUSIVE_FACTORY_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/runtime/serialization/detail/non_default_constructible.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/demangle_helper.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
-#include <hpx/util/detail/pp/strip_parens.hpp>
+#include <hpx/util/debug/demangle_helper.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
 
@@ -48,7 +48,7 @@ namespace hpx { namespace serialization { namespace detail
             static_assert(
                 traits::needs_automatic_registration<T>::value,
                 "HPX_REGISTER_ACTION_DECLARATION missing");
-            return util::type_id<T>::typeid_.type_id();
+            return util::debug::type_id<T>::typeid_.type_id();
         }
     };
 #endif
@@ -281,7 +281,7 @@ namespace hpx { namespace serialization { namespace detail
 #define HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE(Parameters, Template)       \
     HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(                           \
         Parameters, Template,                                                 \
-        hpx::util::type_id<HPX_PP_STRIP_PARENS(Template) >::typeid_.type_id())\
+        hpx::util::debug::type_id<HPX_PP_STRIP_PARENS(Template) >::typeid_.type_id())\
     HPX_PP_STRIP_PARENS(Parameters) hpx::serialization::detail::register_class< \
         HPX_PP_STRIP_PARENS(Template)>                                        \
         HPX_PP_STRIP_PARENS(Template)::hpx_register_class_instance;           \

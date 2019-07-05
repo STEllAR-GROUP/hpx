@@ -7,8 +7,8 @@
 #define HPX_PARALLEL_DETAIL_PREDICATES_JUL_13_2014_0824PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>

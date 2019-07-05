@@ -15,10 +15,11 @@
 #include <hpx/compat/mutex.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/format.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/math/common_factor.hpp>
+#include <boost/integer/common_factor.hpp>
 
 #include <chrono>
 #include <cstdint>
@@ -148,7 +149,7 @@ void print_results(
     }
 
     hpx::util::format_to(cout,
-        "%lu, %lu, %lu, %lu, %.14g, %.14g",
+        "{}, {}, {}, {}, {:.14g}, {:.14g}",
         delay,
         tasks,
         suspended_tasks,
@@ -160,7 +161,7 @@ void print_results(
     if (ac)
     {
         for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
-            hpx::util::format_to(cout, ", %.14g",
+            hpx::util::format_to(cout, ", {:.14g}",
                 counter_values[i].get_value<double>());
     }
 
@@ -234,7 +235,7 @@ void stage_worker_static_balanced_stackbased(
           , hpx::threads::pending
           , false
           , hpx::threads::thread_priority_normal
-          , target_thread
+          , hpx::threads::thread_schedule_hint(target_thread)
             );
     else
         hpx::threads::register_thread_plain(
@@ -243,7 +244,7 @@ void stage_worker_static_balanced_stackbased(
           , hpx::threads::pending
           , false
           , hpx::threads::thread_priority_normal
-          , target_thread
+          , hpx::threads::thread_schedule_hint(target_thread)
             );
 }
 
@@ -259,7 +260,7 @@ void stage_worker_static_imbalanced(
           , hpx::threads::pending
           , false
           , hpx::threads::thread_priority_normal
-          , 0
+          , hpx::threads::thread_schedule_hint(0)
             );
     else
         hpx::threads::register_thread_plain(
@@ -268,7 +269,7 @@ void stage_worker_static_imbalanced(
           , hpx::threads::pending
           , false
           , hpx::threads::thread_priority_normal
-          , 0
+          , hpx::threads::thread_schedule_hint(0)
             );
 }
 
@@ -310,7 +311,7 @@ void stage_workers(
             , "stage_workers"
             , hpx::threads::pending
             , hpx::threads::thread_priority_normal
-            , target_thread
+            , hpx::threads::thread_schedule_hint(target_thread)
               );
         return;
     }
@@ -403,8 +404,8 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         if (suspended_tasks != 0)
         {
-            std::uint64_t gcd = boost::math::gcd(tasks_per_feeder
-                                                 , suspended_tasks_per_feeder);
+            std::uint64_t gcd = boost::integer::gcd(
+                tasks_per_feeder, suspended_tasks_per_feeder);
 
             suspend_step = suspended_tasks_per_feeder / gcd;
             // We check earlier to make sure that there are never more
@@ -427,7 +428,7 @@ int hpx_main(
                     boost::algorithm::is_any_of(","),
                     boost::algorithm::token_compress_on);
 
-                HPX_ASSERT(entry.size() == 2);
+                HPX_TEST(entry.size() == 2);
 
                 counter_shortnames.push_back(entry[0]);
                 counters.push_back(entry[1]);
@@ -462,7 +463,7 @@ int hpx_main(
                 , "stage_workers"
                 , hpx::threads::pending
                 , hpx::threads::thread_priority_normal
-                , i
+                , hpx::threads::thread_schedule_hint(i)
                   );
         }
 

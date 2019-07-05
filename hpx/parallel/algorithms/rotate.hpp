@@ -341,18 +341,6 @@ namespace hpx { namespace parallel { inline namespace v1
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_output_iterator<FwdIter2>::value ||
-                hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least output iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_bidirectional_iterator<FwdIter1>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter2>::value
-            > is_seq;
-#else
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
@@ -361,7 +349,6 @@ namespace hpx { namespace parallel { inline namespace v1
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_bidirectional_iterator<FwdIter1>::value
             > is_seq;
-#endif
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
             detail::rotate_copy<std::pair<FwdIter1, FwdIter2> >().call(

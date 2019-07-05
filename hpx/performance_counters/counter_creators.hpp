@@ -12,8 +12,6 @@
 #include <hpx/util/function.hpp>
 
 #include <cstdint>
-
-#include <cstdint>
 #include <string>
 #include <vector>
 

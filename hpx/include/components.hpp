@@ -18,7 +18,6 @@
 
 #include <hpx/runtime/components/component_type.hpp>
 
-#include <hpx/runtime/components/memory_block.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 
 #include <hpx/runtime/components/server/memory.hpp>
@@ -36,6 +35,7 @@
 #include <hpx/runtime/components/server/component_base.hpp>
 
 #include <hpx/runtime/components/server/abstract_component_base.hpp>
+#include <hpx/runtime/components/server/abstract_migration_support.hpp>
 #include <hpx/runtime/components/server/distributed_metadata_base.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
@@ -52,6 +52,7 @@
 #include <hpx/runtime/components/binpacking_distribution_policy.hpp>
 #include <hpx/runtime/components/colocating_distribution_policy.hpp>
 #include <hpx/runtime/components/default_distribution_policy.hpp>
+#include <hpx/runtime/components/unwrapping_result_policy.hpp>
 
 #include <hpx/runtime/get_ptr.hpp>
 

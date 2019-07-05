@@ -86,31 +86,12 @@ void test_set_symmetric_difference1()
         IteratorTag());
     test_set_symmetric_difference1_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_symmetric_difference1(execution_policy(execution::seq),
-        IteratorTag());
-    test_set_symmetric_difference1(execution_policy(execution::par),
-        IteratorTag());
-    test_set_symmetric_difference1(execution_policy(execution::par_unseq),
-        IteratorTag());
-
-    test_set_symmetric_difference1(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_symmetric_difference1(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_symmetric_difference_test1()
 {
     test_set_symmetric_difference1<std::random_access_iterator_tag>();
     test_set_symmetric_difference1<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_symmetric_difference1<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -191,31 +172,12 @@ void test_set_symmetric_difference2()
         IteratorTag());
     test_set_symmetric_difference2_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_symmetric_difference2(execution_policy(execution::seq),
-        IteratorTag());
-    test_set_symmetric_difference2(execution_policy(execution::par),
-        IteratorTag());
-    test_set_symmetric_difference2(execution_policy(execution::par_unseq),
-        IteratorTag());
-
-    test_set_symmetric_difference2(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_symmetric_difference2(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_symmetric_difference_test2()
 {
     test_set_symmetric_difference2<std::random_access_iterator_tag>();
     test_set_symmetric_difference2<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_symmetric_difference2<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -324,29 +286,12 @@ void test_set_symmetric_difference_exception()
         execution::seq(execution::task), IteratorTag());
     test_set_symmetric_difference_exception_async(
         execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_symmetric_difference_exception(execution_policy(execution::seq),
-        IteratorTag());
-    test_set_symmetric_difference_exception(execution_policy(execution::par),
-        IteratorTag());
-
-    test_set_symmetric_difference_exception(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_symmetric_difference_exception(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_symmetric_difference_exception_test()
 {
     test_set_symmetric_difference_exception<std::random_access_iterator_tag>();
     test_set_symmetric_difference_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_symmetric_difference_exception<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -453,29 +398,12 @@ void test_set_symmetric_difference_bad_alloc()
         execution::seq(execution::task), IteratorTag());
     test_set_symmetric_difference_bad_alloc_async(
         execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_symmetric_difference_bad_alloc(execution_policy(execution::seq),
-        IteratorTag());
-    test_set_symmetric_difference_bad_alloc(execution_policy(execution::par),
-        IteratorTag());
-
-    test_set_symmetric_difference_bad_alloc(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_symmetric_difference_bad_alloc(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_symmetric_difference_bad_alloc_test()
 {
     test_set_symmetric_difference_bad_alloc<std::random_access_iterator_tag>();
     test_set_symmetric_difference_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_symmetric_difference_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

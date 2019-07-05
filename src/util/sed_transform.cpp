@@ -7,9 +7,9 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/util/sed_transform.hpp>
-#include <boost/regex.hpp>
 
 #include <memory>
+#include <regex>
 #include <string>
 
 namespace hpx { namespace util
@@ -84,7 +84,7 @@ struct sed_transform::command
       , replace_(replace)
     {}
 
-    boost::regex search_;
+    std::regex search_;
     std::string replace_;
 };
 
@@ -112,10 +112,11 @@ std::string sed_transform::operator()(
     if (!command_)
         return input;
 
-    return boost::regex_replace(input
+    return std::regex_replace(input
                               , command_->search_
                               , command_->replace_
-                              , boost::match_default | boost::format_sed);
+                              , std::regex_constants::match_default
+                              | std::regex_constants::format_sed);
 }
 
 }}

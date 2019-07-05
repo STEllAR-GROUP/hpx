@@ -11,6 +11,7 @@ include(HPX_AddLibrary)
 ################################################################################
 if(HPX_WITH_PARCELPORT_MPI)
   find_package(MPI)
+
   if(NOT MPI_CXX_FOUND)
     hpx_error("MPI could not be found and HPX_WITH_PARCELPORT_MPI=On, please specify MPI_CXX_COMPILER to point to a working MPI C++ compiler for your platform")
   endif()
@@ -25,6 +26,12 @@ if(HPX_WITH_PARCELPORT_MPI)
   endif()
   if(MPI_CXX_LINK_FLAGS)
     #    hpx_add_link_flag_if_available(${MPI_CXX_LINK_FLAGS})
+  endif()
+
+  if(MPI_CXX_COMPILE_DEFINITIONS)
+    # Emulate add_compile_definitions.
+    # This command was only introduced as part of CMake 3.11, but we already require it for versions >= 3.10.
+    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ${MPI_CXX_COMPILE_DEFINITIONS})
   endif()
 
   # This list is to detect whether we run inside an mpi environment.
@@ -50,11 +57,11 @@ if(HPX_WITH_PARCELPORT_MPI)
     endif()
 
     set(_mpi_libraries)
-    if(MPI_C_LIBRARIES)
-      set(_mpi_libraries ${_mpi_libraries} ${MPI_C_LIBRARIES})
-    elseif(MPI_C_LIB_NAMES)
+    if(MPI_CXX_LIBRARIES)
+      set(_mpi_libraries ${_mpi_libraries} ${MPI_CXX_LIBRARIES})
+    elseif(MPI_CXX_LIB_NAMES)
       # cmake V3.10.2 has changed the way MPI libraries are being discovered
-      foreach(lib ${MPI_C_LIB_NAMES})
+      foreach(lib ${MPI_CXX_LIB_NAMES})
         set(_mpi_libraries ${_mpi_libraries} ${MPI_${lib}_LIBRARY})
       endforeach()
     endif()

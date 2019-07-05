@@ -7,6 +7,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
+#include <hpx/util/logging.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/static.hpp>
-#include <hpx/util/logging.hpp>
 #include <hpx/util/logging/format/named_write.hpp>
 #include <hpx/util/logging/format/destination/defaults.hpp>
 #include <hpx/util/init_logging.hpp>
@@ -46,7 +46,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-    typedef logging::writer::named_write<> logger_writer_type;
+    typedef logging::writer::named_write logger_writer_type;
 
     namespace detail
     {
@@ -142,9 +142,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: shepherd
     struct shepherd_thread_id
-      : hpx::util::logging::formatter::class_<
-            shepherd_thread_id,
-            hpx::util::logging::formatter::implement_op_equal::no_context>
+      : hpx::util::logging::formatter::class_<shepherd_thread_id>
     {
         shepherd_thread_id()
         {}
@@ -172,9 +170,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: locality prefix
     struct locality_prefix
-      : hpx::util::logging::formatter::class_<
-            locality_prefix,
-            hpx::util::logging::formatter::implement_op_equal::no_context>
+      : hpx::util::logging::formatter::class_<locality_prefix>
     {
         locality_prefix()
         {}
@@ -199,9 +195,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX thread id
     struct thread_id
-      : hpx::util::logging::formatter::class_<
-            thread_id,
-            hpx::util::logging::formatter::implement_op_equal::no_context>
+      : hpx::util::logging::formatter::class_<thread_id>
     {
         void operator()(param str) const
         {
@@ -227,9 +221,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX thread phase
     struct thread_phase
-      : hpx::util::logging::formatter::class_<
-            thread_phase,
-            hpx::util::logging::formatter::implement_op_equal::no_context>
+      : hpx::util::logging::formatter::class_<thread_phase>
     {
         void operator()(param str) const
         {
@@ -254,9 +246,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: locality prefix of parent thread
     struct parent_thread_locality
-      : hpx::util::logging::formatter::class_<
-            parent_thread_locality,
-            hpx::util::logging::formatter::implement_op_equal::no_context>
+      : hpx::util::logging::formatter::class_<parent_thread_locality>
     {
         void operator()(param str) const
         {
@@ -278,9 +268,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX parent thread id
     struct parent_thread_id
-      : hpx::util::logging::formatter::class_<
-            parent_thread_id,
-            hpx::util::logging::formatter::implement_op_equal::no_context>
+      : hpx::util::logging::formatter::class_<parent_thread_id>
     {
         void operator()(param str) const
         {
@@ -303,9 +291,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX parent thread phase
     struct parent_thread_phase
-      : hpx::util::logging::formatter::class_<
-            parent_thread_phase,
-            hpx::util::logging::formatter::implement_op_equal::no_context>
+      : hpx::util::logging::formatter::class_<parent_thread_phase>
     {
         void operator()(param str) const
         {
@@ -327,9 +313,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX component id of current thread
     struct thread_component_id
-      : hpx::util::logging::formatter::class_<
-            thread_component_id,
-            hpx::util::logging::formatter::implement_op_equal::no_context>
+      : hpx::util::logging::formatter::class_<thread_component_id>
     {
         void operator()(param str) const
         {
@@ -413,9 +397,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // this is required in order to use the logging library
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(agas_level, filter_type,
-        hpx::util::logging::level::disable_all)
-    HPX_DEFINE_LOG(agas_logger, logger_type)
+    HPX_DEFINE_LOG(agas, disable_all)
 
     // initialize logging for AGAS
     void init_agas_log(util::section const& ini, bool isconsole)
@@ -459,15 +441,13 @@ namespace hpx { namespace util
             detail::define_formatters(writer);
 
             agas_logger()->mark_as_initialized();
-            agas_level()->set_enabled(lvl);
+            agas_logger()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // this is required in order to use the logging library
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(parcel_level, filter_type,
-        hpx::util::logging::level::disable_all)
-    HPX_DEFINE_LOG(parcel_logger, logger_type)
+    HPX_DEFINE_LOG(parcel, disable_all)
 
     // initialize logging for the parcel transport
     void init_parcel_log(util::section const& ini, bool isconsole)
@@ -512,15 +492,13 @@ namespace hpx { namespace util
             detail::define_formatters(writer);
 
             parcel_logger()->mark_as_initialized();
-            parcel_level()->set_enabled(lvl);
+            parcel_logger()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // this is required in order to use the logging library for timings
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(timing_level, filter_type,
-        hpx::util::logging::level::disable_all)
-    HPX_DEFINE_LOG(timing_logger, logger_type)
+    HPX_DEFINE_LOG(timing, disable_all)
 
     // initialize logging for performance measurements
     void init_timing_log(util::section const& ini, bool isconsole)
@@ -565,18 +543,13 @@ namespace hpx { namespace util
             detail::define_formatters(writer);
 
             timing_logger()->mark_as_initialized();
-            timing_level()->set_enabled(lvl);
+            timing_logger()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(hpx_level, filter_type,
-        hpx::util::logging::level::disable_all)
-    HPX_DEFINE_LOG(hpx_logger, logger_type)
-
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(hpx_error_level, filter_type,
-        hpx::util::logging::level::fatal)
-    HPX_DEFINE_LOG(hpx_error_logger, logger_type)
+    HPX_DEFINE_LOG(hpx, disable_all)
+    HPX_DEFINE_LOG(hpx_error, fatal)
 
     void init_hpx_logs(util::section const& ini, bool isconsole)
     {
@@ -621,7 +594,7 @@ namespace hpx { namespace util
             detail::define_formatters(writer);
 
             hpx_logger()->mark_as_initialized();
-            hpx_level()->set_enabled(lvl);
+            hpx_logger()->set_enabled(lvl);
 
             // errors are logged to the given destination and to cerr
             error_writer.add_destination("console",
@@ -633,7 +606,7 @@ namespace hpx { namespace util
             detail::define_formatters(error_writer);
 
             hpx_error_logger()->mark_as_initialized();
-            hpx_error_level()->set_enabled(lvl);
+            hpx_error_logger()->set_enabled(lvl);
         }
         else {
             // errors are always logged to cerr
@@ -652,18 +625,13 @@ namespace hpx { namespace util
             detail::define_formatters(error_writer);
 
             hpx_error_logger()->mark_as_initialized();
-            hpx_error_level()->set_enabled(hpx::util::logging::level::fatal);
+            hpx_error_logger()->set_enabled(hpx::util::logging::level::fatal);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(app_level, filter_type,
-        hpx::util::logging::level::disable_all)
-    HPX_DEFINE_LOG(app_logger, logger_type)
-
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(app_error_level, filter_type,
-        hpx::util::logging::level::fatal)
-    HPX_DEFINE_LOG(app_error_logger, logger_type)
+    HPX_DEFINE_LOG(app, disable_all)
+    HPX_DEFINE_LOG(app_error, fatal)
 
     // initialize logging for application
     void init_app_logs(util::section const& ini, bool isconsole)
@@ -706,18 +674,13 @@ namespace hpx { namespace util
             detail::define_formatters(writer);
 
             app_logger()->mark_as_initialized();
-            app_level()->set_enabled(lvl);
+            app_logger()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(debuglog_level, filter_type,
-        hpx::util::logging::level::disable_all)
-    HPX_DEFINE_LOG(debuglog_logger, logger_type)
-
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(debuglog_error_level, filter_type,
-        hpx::util::logging::level::fatal)
-    HPX_DEFINE_LOG(debuglog_error_logger, logger_type)
+    HPX_DEFINE_LOG(debuglog, disable_all)
+    HPX_DEFINE_LOG(debuglog_error, fatal)
 
     // initialize logging for application
     void init_debuglog_logs(util::section const& ini, bool isconsole)
@@ -761,14 +724,12 @@ namespace hpx { namespace util
             detail::define_formatters(writer);
 
             debuglog_logger()->mark_as_initialized();
-            debuglog_level()->set_enabled(lvl);
+            debuglog_logger()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(agas_console_level, filter_type,
-        hpx::util::logging::level::disable_all)
-    HPX_DEFINE_LOG(agas_console_logger, logger_type)
+    HPX_DEFINE_LOG(agas_console, disable_all)
 
     // initialize logging for AGAS
     void init_agas_console_log(util::section const& ini)
@@ -809,14 +770,12 @@ namespace hpx { namespace util
             writer.write(logformat, logdest);
 
             agas_console_logger()->mark_as_initialized();
-            agas_console_level()->set_enabled(lvl);
+            agas_console_logger()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(parcel_console_level, filter_type,
-        hpx::util::logging::level::disable_all)
-    HPX_DEFINE_LOG(parcel_console_logger, logger_type)
+    HPX_DEFINE_LOG(parcel_console, disable_all)
 
     // initialize logging for the parcel transport
     void init_parcel_console_log(util::section const& ini)
@@ -858,14 +817,12 @@ namespace hpx { namespace util
             writer.write(logformat, logdest);
 
             parcel_console_logger()->mark_as_initialized();
-            parcel_console_level()->set_enabled(lvl);
+            parcel_console_logger()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(timing_console_level, filter_type,
-        hpx::util::logging::level::disable_all)
-    HPX_DEFINE_LOG(timing_console_logger, logger_type)
+    HPX_DEFINE_LOG(timing_console, disable_all)
 
     // initialize logging for performance measurements
     void init_timing_console_log(util::section const& ini)
@@ -906,14 +863,12 @@ namespace hpx { namespace util
             writer.write(logformat, logdest);
 
             timing_console_logger()->mark_as_initialized();
-            timing_console_level()->set_enabled(lvl);
+            timing_console_logger()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(hpx_console_level, filter_type,
-        hpx::util::logging::level::disable_all)
-    HPX_DEFINE_LOG(hpx_console_logger, logger_type)
+    HPX_DEFINE_LOG(hpx_console, disable_all)
 
     // initialize logging for HPX runtime
     void init_hpx_console_log(util::section const& ini)
@@ -954,14 +909,12 @@ namespace hpx { namespace util
             writer.write(logformat, logdest);
 
             hpx_console_logger()->mark_as_initialized();
-            hpx_console_level()->set_enabled(lvl);
+            hpx_console_logger()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(app_console_level, filter_type,
-        hpx::util::logging::level::disable_all)
-    HPX_DEFINE_LOG(app_console_logger, logger_type)
+    HPX_DEFINE_LOG(app_console, disable_all)
 
     // initialize logging for applications
     void init_app_console_log(util::section const& ini)
@@ -1003,14 +956,12 @@ namespace hpx { namespace util
             writer.write(logformat, logdest);
 
             app_console_logger()->mark_as_initialized();
-            app_console_level()->set_enabled(lvl);
+            app_console_logger()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_DEFINE_LOG_FILTER_WITH_ARGS(debuglog_console_level, filter_type,
-        hpx::util::logging::level::disable_all)
-    HPX_DEFINE_LOG(debuglog_console_logger, logger_type)
+    HPX_DEFINE_LOG(debuglog_console, disable_all)
 
     // initialize logging for applications
     void init_debuglog_console_log(util::section const& ini)
@@ -1052,7 +1003,7 @@ namespace hpx { namespace util
             writer.write(logformat, logdest);
 
             debuglog_console_logger()->mark_as_initialized();
-            debuglog_console_level()->set_enabled(lvl);
+            debuglog_console_logger()->set_enabled(lvl);
         }
     }
 }}
@@ -1236,6 +1187,114 @@ namespace hpx { namespace util { namespace detail
         init_debuglog_console_log(ini);
     }
 }}}
+
+
+///////////////////////////////////////////////////////////////////////////////
+#include <hpx/util/logging/detail/cache_before_init.hpp>
+
+namespace hpx { namespace util { namespace logging { namespace detail
+{
+    void cache_before_init::turn_cache_off(writer::named_write const& writer_) {
+        if ( m_is_caching_off )
+            return; // already turned off
+
+        m_is_caching_off = true;
+
+        // dump messages
+        message_array msgs;
+        std::swap( m_cache, msgs );
+
+        for ( auto& msg : msgs ) {
+            writer_( msg );
+        }
+    }
+}}}}
+
+
+///////////////////////////////////////////////////////////////////////////////
+#include <hpx/util/logging/format/destination/file.hpp>
+
+namespace hpx { namespace util { namespace logging { namespace destination
+{
+    file::mutex_type file::mtx_;
+}}}}
+
+
+///////////////////////////////////////////////////////////////////////////////
+#include <hpx/util/logging/format/destination/named.hpp>
+
+namespace hpx { namespace util { namespace logging { namespace destination {
+namespace detail
+{
+    void named_context::compute_write_steps() {
+        m_info.write_steps.clear();
+
+        std::istringstream in(m_info.format_string);
+        std::string word;
+        while ( in >> word) {
+            if ( word[0] == '+')
+                word.erase( word.begin());
+            else if ( word[0] == '-')
+                // ignore this word
+                continue;
+
+            if ( m_info.name_to_destination.find(word) !=
+                m_info.name_to_destination.end())
+                m_info.write_steps.push_back( m_info.
+                    name_to_destination.find(word)->second);
+        }
+    }
+}
+}}}}
+
+
+///////////////////////////////////////////////////////////////////////////////
+#include <hpx/util/logging/format/formatter/named_spacer.hpp>
+
+namespace hpx { namespace util { namespace logging { namespace formatter {
+namespace detail
+{
+    void base_named_spacer_context::compute_write_steps() {
+        typedef std::size_t size_type;
+
+        m_info.write_steps.clear();
+        std::string remaining = m_info.format_string;
+        size_type start_search_idx = 0;
+        while ( !remaining.empty() ) {
+            size_type idx = remaining.find('%', start_search_idx);
+            if ( idx != std::string::npos) {
+                // see if just escaped
+                if ( (idx < remaining.size() - 1) && remaining[idx + 1] == '%') {
+                    // we found an escaped char
+                    start_search_idx = idx + 2;
+                    continue;
+                }
+
+                // up to here, this is a spacer string
+                start_search_idx = 0;
+                std::string spacer = unescape( remaining.substr(0, idx) );
+                remaining = remaining.substr(idx + 1);
+                // find end of formatter name
+                idx = remaining.find('%');
+                format_base_type * fmt = nullptr;
+                if ( idx != std::string::npos) {
+                    std::string name = remaining.substr(0, idx);
+                    remaining = remaining.substr(idx + 1);
+                    fmt = m_info.name_to_formatter[name];
+                }
+                // note: fmt could be null, in case
+                m_info.write_steps.push_back( write_step( spacer, fmt) );
+            }
+            else {
+                // last part
+                m_info.write_steps.push_back(
+                    write_step( unescape(remaining), nullptr) );
+                remaining.clear();
+            }
+        }
+    }
+}
+}}}}
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)

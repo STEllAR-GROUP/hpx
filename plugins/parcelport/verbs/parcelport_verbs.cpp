@@ -8,9 +8,10 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 // util
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -321,7 +322,7 @@ namespace verbs
         // --------------------------------------------------------------------
         parcelport(util::runtime_configuration const& ini,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread)
+            util::function_nonser<void(std::size_t, char const*)> const& on_stop_thread)
             : base_type(ini, here(ini), on_start_thread, on_stop_thread)
             , active_send_count_(0)
             , immediate_send_allowed_(true)
@@ -356,7 +357,7 @@ namespace verbs
             // We only execute work on the IO service while HPX is starting
             while (hpx::is_starting())
             {
-                background_work(0);
+                background_work(0, parcelport_background_mode_all);
             }
             LOG_DEBUG_MSG("io service task completed");
         }
@@ -1547,7 +1548,9 @@ namespace verbs
         // This is called whenever the main thread scheduler is idling,
         // is used to poll for events, messages on the verbs connection
         // --------------------------------------------------------------------
-        bool background_work(std::size_t num_thread) {
+        bool background_work(
+            std::size_t num_thread, parcelport_background_mode mode)
+        {
             if (stopped_ || hpx::is_stopped()) {
                 return false;
             }
@@ -1668,7 +1671,7 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
             boost::log::keywords::format =
                 (
                     boost::log::expressions::stream
-                    // << hpx::util::format("%05d", expr::attr< unsigned int >("LineID"))
+                    // << hpx::util::format("{:05}", expr::attr< unsigned int >("LineID"))
                     << boost::log::expressions::attr< unsigned int >("LineID")
                     << ": <" << boost::log::trivial::severity
                     << "> " << boost::log::expressions::smessage

@@ -167,7 +167,7 @@ namespace hpx { namespace parallel { inline namespace v2
                     errors.add(f.get_exception_ptr());
             }
             if (errors.size() != 0)
-                throw errors;
+                throw std::forward<parallel::exception_list>(errors);
         }
 
         // return future representing the execution of all tasks
@@ -194,9 +194,8 @@ namespace hpx { namespace parallel { inline namespace v2
             return
                 result::get(
                     hpx::dataflow(
-                        hpx::util::bind_back(
-                            hpx::util::one_shot(&task_block::on_ready),
-                            std::move(errors)),
+                        hpx::util::one_shot(hpx::util::bind_back(
+                            &task_block::on_ready, std::move(errors))),
                         std::move(tasks)
                     ));
         }
@@ -451,60 +450,6 @@ namespace hpx { namespace parallel { inline namespace v2
     {
         define_task_block(parallel::execution::par, std::forward<F>(f));
     }
-
-    /// \cond NOINTERNAL
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-#if defined(HPX_HAVE_CXX14_LAMBDAS)
-    template <typename F>
-    inline void define_task_block(parallel::execution_policy && policy, F && f)
-    {
-        // this implementation is not nice, however we don't have variadic
-        // virtual functions accepting template arguments and supporting
-        // perfect forwarding
-        std::type_info const& t = policy.type();
-
-        if (t == typeid(execution::sequenced_policy))
-        {
-            return define_task_block(
-                *policy.get<execution::sequenced_policy>(),
-                std::forward<F>(f));
-        }
-
-        if (t == typeid(execution::sequenced_task_policy))
-        {
-            return define_task_block(parallel::execution::seq,
-                std::forward<F>(f));
-        }
-
-        if (t == typeid(execution::parallel_policy))
-        {
-            return define_task_block(
-                *policy.get<execution::parallel_policy>(),
-                std::forward<F>(f));
-        }
-
-        if (t == typeid(execution::parallel_task_policy))
-        {
-            execution::parallel_task_policy const& task_policy =
-                *policy.get<execution::parallel_task_policy>();
-            return define_task_block(execution::par.with(
-                task_policy.parameters()), std::forward<F>(f));
-        }
-
-        if (t == typeid(execution::parallel_unsequenced_policy))
-        {
-            return define_task_block(
-                *policy.get<execution::parallel_unsequenced_policy>(),
-                std::forward<F>(f));
-        }
-
-        HPX_THROW_EXCEPTION(hpx::bad_parameter,
-            "define_task_block",
-            "The given execution policy is not supported");
-    }
-#endif
-#endif
-    /// \endcond
 
     /// Constructs a \a task_block, tr, and invokes the expression
     /// \a f(tr) on the user-provided object, \a f.

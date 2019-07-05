@@ -7,6 +7,7 @@
 #define HPX_COMPONENTS_CLIENT_BASE_OCT_31_2008_0424PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -22,7 +23,6 @@
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind_back.hpp>
 
 #include <boost/intrusive_ptr.hpp>
@@ -90,10 +90,10 @@ namespace hpx { namespace traits
 
             template <typename SharedState>
             HPX_FORCEINLINE static Derived
-            create(SharedState* shared_state)
+            create(SharedState* shared_state, bool addref = true)
             {
                 return Derived(future<id_type>(
-                    boost::intrusive_ptr<SharedState>(shared_state)));
+                    boost::intrusive_ptr<SharedState>(shared_state, addref)));
             }
 
             HPX_FORCEINLINE static
@@ -103,14 +103,12 @@ namespace hpx { namespace traits
                 return client.shared_state_;
             }
 
-#if BOOST_VERSION >= 105600
             HPX_FORCEINLINE static
             typename traits::detail::shared_state_ptr<id_type>::type::element_type*
             detach_shared_state(Derived const& f)
             {
                 return f.shared_state_.get();
             }
-#endif
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -174,16 +172,16 @@ namespace hpx { namespace lcos { namespace detail
           : future_data_base<id_type>(no_addref)
         {}
 
-        template <typename Target>
-        future_data(Target && data, init_no_addref no_addref)
-          : future_data_base<id_type>(std::forward<Target>(data), no_addref)
+        template <typename ... T>
+        future_data(init_no_addref no_addref, in_place in_place, T&& ... ts)
+          : future_data_base<id_type>(no_addref, in_place, std::forward<T>(ts)...)
         {}
 
-        future_data(std::exception_ptr const& e, init_no_addref no_addref)
-          : future_data_base<id_type>(e, no_addref)
+        future_data(init_no_addref no_addref, std::exception_ptr const& e)
+          : future_data_base<id_type>(no_addref, e)
         {}
-        future_data(std::exception_ptr && e, init_no_addref no_addref)
-          : future_data_base<id_type>(std::move(e), no_addref)
+        future_data(init_no_addref no_addref, std::exception_ptr && e)
+          : future_data_base<id_type>(no_addref, std::move(e))
         {}
 
         ~future_data() noexcept override
@@ -577,8 +575,11 @@ namespace hpx { namespace components
             typename hpx::traits::detail::shared_state_ptr<void>::type p =
                 lcos::detail::make_continuation<void>(
                     *this, launch::sync,
-                    util::bind_back(&client_base::register_as_helper,
-                        symbolic_name, manage_lifetime));
+                    [=](client_base const& f) -> void {
+                        return register_as_helper(
+                            f, symbolic_name, manage_lifetime);
+                    });
+
             return hpx::traits::future_access<future<void> >::
                 create(std::move(p));
         }

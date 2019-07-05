@@ -6,12 +6,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -48,6 +48,11 @@ bool register_name(
   , error_code& ec
     )
 {
+    if (&ec == &throws)
+    {
+        naming::resolver_client& agas_ = naming::get_agas_client();
+        return agas_.register_name(name, id);
+    }
     return register_name(name, id).get(ec);
 }
 
@@ -162,6 +167,13 @@ std::uint32_t get_num_overall_threads(
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_overall_threads(ec);
+}
+
+std::string get_component_type_name(
+    components::component_type type, error_code& ec)
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.get_component_type_name(type, ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -395,11 +407,17 @@ naming::gid_type get_next_id(
     )
 {
     runtime* rt = get_runtime_ptr();
-    if (rt == nullptr || rt->get_state() == state_invalid)
+    if (rt == nullptr)
     {
         HPX_THROWS_IF(ec, invalid_status,
             "get_next_id", "the runtime system has not been started yet.");
         return naming::invalid_gid;
+    }
+
+    // during bootstrap we use the id pool
+    if (rt->get_state() == state_invalid)
+    {
+        return rt->get_id_pool().get_id(count);
     }
 
     naming::resolver_client& agas_ = naming::get_agas_client();
@@ -483,7 +501,7 @@ hpx::future<hpx::id_type> on_symbol_namespace_event(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-std::pair<naming::id_type, naming::address>
+hpx::future<std::pair<naming::id_type, naming::address>>
     begin_migration(naming::id_type const& id)
 {
     naming::resolver_client& resolver = naming::get_agas_client();
@@ -497,10 +515,12 @@ bool end_migration(naming::id_type const& id)
 }
 
 hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
-    util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f)
+    util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f,
+    bool expect_to_be_marked_as_migrating)
 {
     naming::resolver_client& resolver = naming::get_agas_client();
-    return resolver.mark_as_migrated(gid, std::move(f));
+    return resolver.mark_as_migrated(
+        gid, std::move(f), expect_to_be_marked_as_migrating);
 }
 
 std::pair<bool, components::pinned_ptr>

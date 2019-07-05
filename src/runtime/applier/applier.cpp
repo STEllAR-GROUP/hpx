@@ -6,17 +6,18 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/thread_description.hpp>
 
@@ -34,7 +35,8 @@ namespace hpx { namespace applier
     threads::thread_id_type register_thread_plain(
         threads::thread_function_type && func,
         util::thread_description const& desc, threads::thread_state_enum state,
-        bool run_now, threads::thread_priority priority, std::size_t os_thread,
+        bool run_now, threads::thread_priority priority,
+        threads::thread_schedule_hint schedulehint,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -50,7 +52,7 @@ namespace hpx { namespace applier
             desc ? desc : util::thread_description(func, "register_thread_plain");
 
         threads::thread_init_data data(std::move(func),
-            d, 0, priority, os_thread, threads::get_stack_size(stacksize));
+            d, 0, priority, schedulehint, threads::get_stack_size(stacksize));
 
         threads::thread_id_type id = threads::invalid_thread_id;
         app->get_thread_manager().register_thread(data, id, state, run_now, ec);
@@ -80,7 +82,8 @@ namespace hpx { namespace applier
         threads::thread_function_type && func,
         util::thread_description const& desc, naming::address::address_type lva,
         threads::thread_state_enum state, threads::thread_priority priority,
-        std::size_t os_thread, threads::thread_stacksize stacksize,
+        threads::thread_schedule_hint schedulehint,
+        threads::thread_stacksize stacksize,
         error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -96,7 +99,7 @@ namespace hpx { namespace applier
             desc ? desc : util::thread_description(func, "register_work_plain");
 
         threads::thread_init_data data(std::move(func),
-            d, lva, priority, os_thread, threads::get_stack_size(stacksize));
+            d, lva, priority, schedulehint, threads::get_stack_size(stacksize));
 
         app->get_thread_manager().register_work(data, state, ec);
     }
@@ -118,11 +121,10 @@ namespace hpx { namespace applier
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::util::thread_specific_ptr<applier*, applier::tls_tag> applier::applier_;
-
     applier::applier(parcelset::parcelhandler &ph, threads::threadmanager& tm)
       : parcel_handler_(ph), thread_manager_(tm)
-    {}
+    {
+    }
 
     void applier::initialize(std::uint64_t rts, std::uint64_t mem)
     {
@@ -213,35 +215,14 @@ namespace hpx { namespace applier
         return true;
     }
 
-    void applier::init_tss()
-    {
-        if (nullptr == applier::applier_.get())
-            applier::applier_.reset(new applier* (this));
-    }
-
-    void applier::deinit_tss()
-    {
-        applier::applier_.reset();
-    }
-
     applier& get_applier()
     {
-        // should have been initialized
-        HPX_ASSERT(nullptr != applier::applier_.get());
-        return **applier::applier_;
+        return hpx::get_runtime().get_applier();
     }
 
     applier* get_applier_ptr()
     {
-        applier** appl = applier::applier_.get();
-        return appl ? *appl : nullptr;
-    }
-
-    // The function \a get_locality_id returns the id of this locality
-    std::uint32_t get_locality_id(error_code& ec) //-V659
-    {
-        applier** appl = applier::applier_.get();
-        return appl ? (*appl)->get_locality_id(ec) : naming::invalid_locality_id;
+        return &hpx::get_runtime().get_applier();
     }
 }}
 

@@ -1,0 +1,47 @@
+#  Copyright (c) 2018 Thomas Heller
+#
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+get conv.xsl:
+    image: stellargroup/build_env:ubuntu
+    stage: checkout
+    script:
+        - curl
+            https://raw.githubusercontent.com/Kitware/CDash/master/tests/circle/conv.xsl
+            -o conv.xsl
+    artifacts:
+        paths:
+            - conv.xsl
+
+get junit2html:
+    image: stellargroup/build_env:ubuntu
+    stage: checkout
+    script:
+        - git clone https://github.com/inorton/junit2html.git
+    artifacts:
+        paths:
+            - junit2html
+
+.test:
+    image: stellargroup/build_env:ubuntu
+    stage: test
+    script:
+      - cd build
+      - ninja ${TESTS}
+      # since the container is run as root, we just execute the tests as the
+      # user nobody...
+      - chown -R nobody .
+      - su -s /bin/bash nobody -c "ctest -T test --no-compress-output --output-on-failure -R ${TESTS}"
+    after_script:
+      - xsltproc conv.xsl build/Testing/`head -n 1 < build/Testing/TAG`/Test.xml > ${TESTS}.xml
+      - ./junit2html/junit2html ./${TESTS}.xml ./${TESTS}.html
+    artifacts:
+        when: always
+        reports:
+            junit: ${TESTS}.xml
+        paths:
+            - ${TESTS}.xml
+            - ${TESTS}.html
+    except:
+        - gh-pages

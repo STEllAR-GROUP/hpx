@@ -19,6 +19,19 @@ find_path(JEMALLOC_INCLUDE_DIR jemalloc/jemalloc.h
     ${PC_JEMALLOC_INCLUDE_DIRS}
   PATH_SUFFIXES include)
 
+if(MSVC)
+  # MSVC needs additional header files provided by jemalloc to compensate for
+  # missing posix headers
+  find_path(JEMALLOC_ADDITIONAL_INCLUDE_DIR msvc_compat/strings.h
+    HINTS
+      ${JEMALLOC_ROOT} ENV JEMALLOC_ROOT
+      ${PC_JEMALLOC_MINIMAL_INCLUDEDIR}
+      ${PC_JEMALLOC_MINIMAL_INCLUDE_DIRS}
+      ${PC_JEMALLOC_INCLUDEDIR}
+      ${PC_JEMALLOC_INCLUDE_DIRS}
+    PATH_SUFFIXES include)
+endif()
+
 find_library(JEMALLOC_LIBRARY NAMES jemalloc libjemalloc
   HINTS
     ${JEMALLOC_ROOT} ENV JEMALLOC_ROOT

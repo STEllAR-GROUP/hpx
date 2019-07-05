@@ -10,6 +10,7 @@
 #define HPX_PARTITIONED_VECTOR_DECL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/runtime/components/client_base.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
@@ -255,29 +255,20 @@ namespace hpx
         // Connect this vector to the existing vector using the given symbolic
         // name.
         void get_data_helper(id_type id,
-            future<server::partitioned_vector_config_data> && f);
+            server::partitioned_vector_config_data data);
 
         // this will be called by the base class once the registered id becomes
         // available
-        future<void> connect_to_helper(shared_future<id_type> && f);
+        future<void> connect_to_helper(id_type id);
 
     public:
         future<void> connect_to(std::string const& symbolic_name);
         void connect_to(launch::sync_policy, std::string const& symbolic_name);
 
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void connect_to_sync(std::string const& symbolic_name);
-#endif
-
         // Register this vector with AGAS using the given symbolic name
         future<void> register_as(std::string const& symbolic_name);
 
         void register_as(launch::sync_policy, std::string const& symbolic_name);
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void register_as_sync(std::string const& symbolic_name);
-#endif
 
         // construct from id
         partitioned_vector(future<id_type> && f);
@@ -347,9 +338,7 @@ namespace hpx
         create_helper2(DistPolicy const& policy, std::size_t count,
             std::size_t size, T const& val);
 
-        static void get_ptr_helper(std::size_t loc,
-            partitions_vector_type& partitions,
-            future<std::shared_ptr<partitioned_vector_partition_server> > && f);
+        struct get_ptr_helper;
 
         // This function is called when we are creating the vector. It
         // initializes the partitions based on the give parameters.
@@ -528,13 +517,7 @@ namespace hpx
             return get_value(launch::sync, get_partition(pos),
                 get_local_index(pos));
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        T get_value_sync(size_type pos) const
-        {
-            return get_value(launch::sync, pos);
-        }
-#endif
+
         /// Returns the element at position \a pos in the vector container.
         ///
         /// \param part  Sequence number of the partition
@@ -552,13 +535,6 @@ namespace hpx
             return partitioned_vector_partition_client(part_data.partition_)
                 .get_value(launch::sync, pos);
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        T get_value_sync(size_type part, size_type pos) const
-        {
-            return get_value(launch::sync, part, pos);
-        }
-#endif
 
         /// Returns the element at position \a pos in the vector container
         /// asynchronously.
@@ -614,13 +590,6 @@ namespace hpx
             return partitioned_vector_partition_client(part_data.partition_)
                 .get_values(launch::sync, pos);
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG) std::vector<T>
-        get_values_sync(size_type part, std::vector<size_type> const& pos) const
-        {
-            return get_values(part, pos);
-        }
-#endif
 
         /// Asynchronously returns the elements at the positions \a pos from
         /// the given partition in the vector container.
@@ -738,13 +707,6 @@ namespace hpx
         {
             return get_values(pos_vec).get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG) std::vector<T>
-        get_values_sync(std::vector<size_type> const & pos_vec) const
-        {
-            return get_values(launch::sync, pos_vec);
-        }
-#endif
 
 //         //FRONT (never throws exception)
 //         /** @brief Access the value of first element in the vector.
@@ -859,10 +821,10 @@ namespace hpx
 //         future<void> assign_async(size_type n, VALUE_TYPE const& val)
 //         {
 //             return hpx::async(launch::async,
-//                               hpx::util::bind(&vector::assign,
-//                                               this,
-//                                               n,
-//                                               val)
+//                               &vector::assign,
+//                               this,
+//                               n,
+//                               val
 //                               );
 //         }
 //
@@ -894,14 +856,6 @@ namespace hpx
             return set_value(launch::sync, get_partition(pos),
                 get_local_index(pos), std::forward<T_>(val));
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        template <typename T_>
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void set_value_sync(size_type pos, T_ && val)
-        {
-            return set_value(launch::sync, pos, std::forward<T_>(val));
-        }
-#endif
 
         /// Copy the value of \a val in the element at position \a pos in
         /// the vector container.
@@ -925,14 +879,6 @@ namespace hpx
                     .set_value(launch::sync, pos, std::forward<T_>(val));
             }
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        template <typename T_>
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void set_value_sync(size_type part, size_type pos, T_ && val)
-        {
-            return set_value(launch::sync, part, pos, std::forward<T_>(val));
-        }
-#endif
 
         /// Asynchronous set the element at position \a pos of the partition
         /// \a part to the given value \a val.
@@ -986,14 +932,6 @@ namespace hpx
         {
             set_values(pos, val).get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void set_values_sync(size_type part, std::vector<size_type> const& pos,
-            std::vector<T> const& val)
-        {
-            set_values(launch::sync, pos, val);
-        }
-#endif
 
         /// Asynchronously set the element at position \a pos in
         /// the partition \part to the given value \a val.
@@ -1098,14 +1036,6 @@ namespace hpx
         {
             return set_values(pos, val).get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void set_values_sync(std::vector<size_type> const& pos,
-            std::vector<T> const& val)
-        {
-            return set_values(launch::sync, pos, val);
-        }
-#endif
 
 //   //CLEAR
 //   //TODO if number of partitions is kept constant every time then

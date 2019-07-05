@@ -32,7 +32,7 @@ foreach(lib ${HPX_LIBRARIES})
     set(_is_debug FALSE)
     set(_is_release FALSE)
   else()
-    if(NOT EXISTS "${lib}")
+    if(NOT EXISTS "${lib}" AND NOT "${lib}" MATCHES "^-")
       set(lib "-l${lib}")
     endif()
     if(_is_debug)
@@ -60,18 +60,36 @@ if(HPX_WITH_STATIC_LINKING)
   set(HPX_PKG_LIBRARIES "\${libdir}/libhpx.a ${HPX_PKG_LIBRARIES}")
   set(HPX_PKG_DEBUG_LIBRARIES "\${libdir}/libhpxd.a ${HPX_PKG_DEBUG_LIBRARIES}")
 else()
-  set(HPX_CONF_LIBRARIES "general;hpx;general;hpx_init;${HPX_LIBRARIES}")
+  set(HPX_CONF_LIBRARIES "general;hpx_init;general;hpx;${HPX_LIBRARIES}")
   if(APPLE)
-    set(HPX_PKG_LIBRARIES_BAZEL "${HPX_CONF_PREFIX}/lib/libhpx.dylib ${HPX_CONF_PREFIX}/lib/libhpx_init.a ${HPX_PKG_LIBRARIES}")
-    set(HPX_PKG_DEBUG_LIBRARIES_BAZEL "${HPX_CONF_PREFIX}/lib/libhpxd.dylib ${HPX_CONF_PREFIX}/lib/libhpx_initd.a ${HPX_PKG_DEBUG_LIBRARIES}")
-    set(HPX_PKG_LIBRARIES "\${libdir}/libhpx.dylib \${libdir}/libhpx_init.a ${HPX_PKG_LIBRARIES}")
-    set(HPX_PKG_DEBUG_LIBRARIES "\${libdir}/libhpxd.dylib \${libdir}/libhpx_initd.a ${HPX_PKG_DEBUG_LIBRARIES}")
+    set(HPX_PKG_LIBRARIES_BAZEL "${HPX_CONF_PREFIX}/lib/libhpx_init.a ${HPX_CONF_PREFIX}/lib/libhpx.dylib ${HPX_PKG_LIBRARIES}")
+    set(HPX_PKG_DEBUG_LIBRARIES_BAZEL "${HPX_CONF_PREFIX}/lib/libhpx_initd.a ${HPX_CONF_PREFIX}/lib/libhpxd.dylib ${HPX_PKG_DEBUG_LIBRARIES}")
+    set(HPX_PKG_LIBRARIES "\${libdir}/libhpx_init.a \${libdir}/libhpx.dylib ${HPX_PKG_LIBRARIES}")
+    set(HPX_PKG_DEBUG_LIBRARIES "\${libdir}/libhpx_initd.a \${libdir}/libhpxd.dylib ${HPX_PKG_DEBUG_LIBRARIES}")
   else()
-    set(HPX_PKG_LIBRARIES_BAZEL "${HPX_CONF_PREFIX}/lib/libhpx.so ${HPX_CONF_PREFIX}/lib/libhpx_init.a ${HPX_PKG_LIBRARIES}")
-    set(HPX_PKG_DEBUG_LIBRARIES_BAZEL "${HPX_CONF_PREFIX}/lib/libhpxd.so ${HPX_CONF_PREFIX}/lib/libhpx_initd.a ${HPX_PKG_DEBUG_LIBRARIES}")
-    set(HPX_PKG_LIBRARIES "\${libdir}/libhpx.so \${libdir}/libhpx_init.a ${HPX_PKG_LIBRARIES}")
-    set(HPX_PKG_DEBUG_LIBRARIES "\${libdir}/libhpxd.so \${libdir}/libhpx_initd.a ${HPX_PKG_DEBUG_LIBRARIES}")
+    set(HPX_PKG_LIBRARIES_BAZEL "${HPX_CONF_PREFIX}/lib/libhpx_init.a ${HPX_CONF_PREFIX}/lib/libhpx.so ${HPX_PKG_LIBRARIES}")
+    set(HPX_PKG_DEBUG_LIBRARIES_BAZEL "${HPX_CONF_PREFIX}/lib/libhpx_initd.a ${HPX_CONF_PREFIX}/lib/libhpxd.so ${HPX_PKG_DEBUG_LIBRARIES}")
+    set(HPX_PKG_LIBRARIES "\${libdir}/libhpx_init.a \${libdir}/libhpx.so ${HPX_PKG_LIBRARIES}")
+    set(HPX_PKG_DEBUG_LIBRARIES "\${libdir}/libhpx_initd.a \${libdir}/libhpxd.so ${HPX_PKG_DEBUG_LIBRARIES}")
   endif()
+endif()
+
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+  set(HPX_LINK_LIBRARIES "general;hpx_wrap;")
+endif()
+
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+    set(HPX_PKG_DEBUG_LINK_LIBRARIES "\${libdir}/libhpx_wrapd.a")
+    set(HPX_PKG_LINK_LIBRARIES "\${libdir}/libhpx_wrap.a")
+endif()
+
+set(HPX_LINKER_FLAGS "")
+if(HPX_WITH_DYNAMIC_HPX_MAIN)
+    if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+        set(HPX_LINKER_FLAGS "-Wl,-wrap=main")
+    elseif(APPLE)
+        set(HPX_LINKER_FLAGS "-Wl,-e,_initialize_main")
+    endif()
 endif()
 
 # Get the include directories we need ...
@@ -108,14 +126,19 @@ endif()
 
 # Configure config for the install dir ...
 set(HPX_CONF_INCLUDE_DIRS
-  "-I${CMAKE_INSTALL_PREFIX}/include -I${CMAKE_INSTALL_PREFIX}/include/hpx/external ${_NEEDED_INCLUDE_DIRS}"
+  "-I${CMAKE_INSTALL_FULL_INCLUDEDIR} ${_NEEDED_INCLUDE_DIRS}"
 )
 set(HPX_CMAKE_CONF_INCLUDE_DIRS
-  "${CMAKE_INSTALL_PREFIX}/include"
-  "${CMAKE_INSTALL_PREFIX}/include/hpx/external"
+  "${CMAKE_INSTALL_FULL_INCLUDEDIR}"
   "${_NEEDED_CMAKE_INCLUDE_DIRS}"
 )
+if("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
+  set(HPX_CONF_INCLUDE_DIRS "${HPX_CONF_INCLUDE_DIRS} -I${CMAKE_INSTALL_FULL_INCLUDEDIR}/hpx/external")
+  set(HPX_CMAKE_CONF_INCLUDE_DIRS "${HPX_CMAKE_CONF_INCLUDE_DIRS} ${CMAKE_INSTALL_FULL_INCLUDEDIR}/hpx/external")
+endif()
 set(HPX_CONF_PREFIX ${CMAKE_INSTALL_PREFIX})
+set(HPX_CONF_LIBDIR "${CMAKE_INSTALL_LIBDIR}")
+set(HPX_CONF_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}")
 set(HPX_CONF_LIBRARY_DIR ${HPX_LIBRARY_DIR})
 
 configure_file(cmake/templates/${HPX_PACKAGE_NAME}Config.cmake.in
@@ -145,9 +168,15 @@ configure_file(${hpx_bazel_file}
 
 # ... and the build dir
 set(HPX_CONF_PREFIX "${CMAKE_BINARY_DIR}")
+set(HPX_CONF_LIBDIR "lib")
+set(HPX_CONF_INCLUDEDIR "include")
 set(HPX_CONF_INCLUDE_DIRS
-  "${_NEEDED_BUILD_DIR_INCLUDE_DIRS} ${_NEEDED_INCLUDE_DIRS}"
+  "${_NEEDED_BUILD_DIR_INCLUDE_DIRS} ${_NEEDED_INCLUDE_DIRS} -I${CMAKE_BINARY_DIR}/include"
 )
+foreach(lib ${HPX_LIBS})
+  set(HPX_CONF_INCLUDE_DIRS
+    "${HPX_CONF_INCLUDE_DIRS} -I${PROJECT_SOURCE_DIR}/libs/${lib}/include")
+endforeach()
 set(HPX_CMAKE_CONF_INCLUDE_DIRS
   ${_NEEDED_CMAKE_BUILD_DIR_INCLUDE_DIRS}
   ${_NEEDED_CMAKE_INCLUDE_DIRS}
@@ -178,7 +207,7 @@ configure_file(${hpx_bazel_file}
   @ONLY)
 
 # Configure macros for the install dir ...
-set(HPX_CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/lib/cmake/${HPX_PACKAGE_NAME}")
+set(HPX_CMAKE_MODULE_PATH "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}")
 configure_file(cmake/templates/HPXMacros.cmake.in
   "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/HPXMacros.cmake"
   ESCAPE_QUOTES @ONLY)
@@ -192,7 +221,7 @@ install(
   EXPORT HPXTargets
   FILE HPXTargets.cmake
 #  NAMESPACE hpx::
-  DESTINATION ${LIB}/cmake/${HPX_PACKAGE_NAME}
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
 )
 
 install(
@@ -200,7 +229,7 @@ install(
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${HPX_PACKAGE_NAME}Config.cmake"
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/HPXMacros.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/${HPX_PACKAGE_NAME}ConfigVersion.cmake"
-    DESTINATION ${LIB}/cmake/${HPX_PACKAGE_NAME}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
   COMPONENT cmake
 )
 
@@ -210,14 +239,14 @@ install(
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx_application_debug.pc"
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx_component.pc"
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx_component_debug.pc"
-  DESTINATION ${LIB}/pkgconfig
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
   COMPONENT pkgconfig
 )
 
 install(
   FILES
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpxcxx"
-  DESTINATION bin
+  DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT compiler_wrapper
   PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
   GROUP_READ GROUP_EXECUTE
@@ -227,7 +256,6 @@ install(
 install(
   FILES
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx_bazel_defs.bzl"
-  DESTINATION ${LIB}/bazel
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/bazel
   COMPONENT bazel
 )
-

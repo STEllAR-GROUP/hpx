@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011-2017 Thomas Heller
 //
@@ -9,9 +9,10 @@
 #define HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/compat/condition_variable.hpp>
 #include <hpx/compat/mutex.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -24,11 +25,10 @@
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/is_component.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/plugin.hpp>
-#include <hpx/util/unlock_guard.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <boost/program_options/options_description.hpp>
@@ -39,7 +39,6 @@
 #include <list>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <set>
 #include <sstream>
 #include <string>
@@ -106,7 +105,7 @@ namespace hpx { namespace components { namespace server
         /// \param self [in] The HPX \a thread used to execute this function.
         /// \param appl [in] The applier to be used for finalization of the
         ///             component instance.
-        void finalize() {}
+        HPX_CXX14_CONSTEXPR static void finalize() {}
 
         void delete_function_lists();
         void tidy();
@@ -142,10 +141,6 @@ namespace hpx { namespace components { namespace server
         template <typename Component>
         naming::gid_type migrate_component_to_here(
             std::shared_ptr<Component> const& p, naming::id_type);
-
-        /// \brief Action to create new memory block
-        naming::gid_type create_memory_block(std::size_t count,
-            hpx::actions::manage_object_action_base const& act);
 
         /// \brief Gracefully shutdown this runtime system instance
         void shutdown(double timeout, naming::id_type const& respond_to);
@@ -196,7 +191,6 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, create_memory_block);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, load_components);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_startup_functions);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_shutdown_functions);
@@ -243,31 +237,12 @@ namespace hpx { namespace components { namespace server
         void stopped();
         void notify_waiting_main();
 
-        bool was_stopped() const { return stopped_; }
+        bool was_stopped() const { return stop_called_; }
 
-        void add_pre_startup_function(startup_function_type f)
-        {
-            std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            pre_startup_functions_.push_back(std::move(f));
-        }
-
-        void add_startup_function(startup_function_type f)
-        {
-            std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            startup_functions_.push_back(std::move(f));
-        }
-
-        void add_pre_shutdown_function(shutdown_function_type f)
-        {
-            std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            pre_shutdown_functions_.push_back(std::move(f));
-        }
-
-        void add_shutdown_function(shutdown_function_type f)
-        {
-            std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            shutdown_functions_.push_back(std::move(f));
-        }
+        void add_pre_startup_function(startup_function_type f);
+        void add_startup_function(startup_function_type f);
+        void add_pre_shutdown_function(shutdown_function_type f);
+        void add_shutdown_function(shutdown_function_type f);
 
         void remove_here_from_connection_cache();
         void remove_here_from_console_connection_cache();
@@ -365,8 +340,10 @@ namespace hpx { namespace components { namespace server
         compat::mutex mtx_;
         compat::condition_variable wait_condition_;
         compat::condition_variable stop_condition_;
-        bool stopped_;
+        bool stop_called_;
+        bool stop_done_;
         bool terminated_;
+        compat::thread::id main_thread_id_;
         bool dijkstra_color_;   // false: white, true: black
         std::atomic<bool> shutdown_all_invoked_;
 
@@ -587,9 +564,6 @@ HPX_ACTION_USES_MEDIUM_STACK(
     hpx::components::server::runtime_support::dijkstra_termination_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::server::runtime_support::create_memory_block_action,
-    create_memory_block_action)
-HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::load_components_action,
     load_components_action)
 HPX_REGISTER_ACTION_DECLARATION(
@@ -716,6 +690,7 @@ namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     // Termination detection does not make this locality black
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <>
     struct action_does_termination_detection<
         hpx::components::server::runtime_support::dijkstra_termination_action>
@@ -725,6 +700,7 @@ namespace hpx { namespace traits
             return true;
         }
     };
+#endif
 
     // runtime_support is a (hand-rolled) component
     template <>

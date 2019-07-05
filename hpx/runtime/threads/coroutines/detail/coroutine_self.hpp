@@ -30,12 +30,15 @@
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SELF_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_id_type.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#endif
 
 #include <cstddef>
 #include <exception>
@@ -191,16 +194,27 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
     public:
-        static HPX_EXPORT void set_self(coroutine_self* self);
-        static HPX_EXPORT coroutine_self* get_self();
-        static HPX_EXPORT void init_self();
-        static HPX_EXPORT void reset_self();
+        static HPX_EXPORT coroutine_self*& local_self();
+
+        static void set_self(coroutine_self* self)
+        {
+            local_self() = self;
+        }
+        static coroutine_self* get_self()
+        {
+            return local_self();
+        }
 
 #if defined(HPX_HAVE_APEX)
-        void** get_apex_data() const
+        apex_task_wrapper get_apex_data(void) const
         {
             HPX_ASSERT(m_pimpl);
             return m_pimpl->get_apex_data();
+        }
+        void set_apex_data(apex_task_wrapper data)
+        {
+            HPX_ASSERT(m_pimpl);
+            m_pimpl->set_apex_data(data);
         }
 #endif
 

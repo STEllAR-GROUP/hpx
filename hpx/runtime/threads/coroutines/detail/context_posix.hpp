@@ -43,7 +43,7 @@
 #endif
 #endif
 
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unused.hpp>
 
@@ -166,7 +166,6 @@ namespace posix { namespace ucontext
 #include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
-#include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <atomic>
 #include <signal.h>                 // SIGSTKSZ
 
@@ -175,8 +174,7 @@ namespace hpx { namespace threads { namespace coroutines
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
     {
-        prepare_main_thread() {}
-        ~prepare_main_thread() {}
+        HPX_CONSTEXPR prepare_main_thread() {}
     };
 
     namespace detail { namespace posix
@@ -217,8 +215,8 @@ namespace hpx { namespace threads { namespace coroutines
             HPX_COROUTINE_DECLARE_CONTEXT(m_ctx);
         };
 
-        class ucontext_context_impl
-          : public ucontext_context_impl_base
+        template <typename CoroutineImpl>
+        class ucontext_context_impl : public ucontext_context_impl_base
         {
         public:
             HPX_NON_COPYABLE(ucontext_context_impl);
@@ -232,17 +230,28 @@ namespace hpx { namespace threads { namespace coroutines
              * Create a context that on restore invokes Functor on
              *  a new stack. The stack size can be optionally specified.
              */
-            template<typename Functor>
-            explicit ucontext_context_impl(Functor & cb, std::ptrdiff_t stack_size)
-              : m_stack_size(stack_size == -1 ? (std::ptrdiff_t)default_stack_size
-                    : stack_size),
-                m_stack(alloc_stack(m_stack_size)),
-                cb_(&cb)
+            explicit ucontext_context_impl(std::ptrdiff_t stack_size = -1)
+              : m_stack_size(stack_size == -1
+                  ? static_cast<std::ptrdiff_t>(default_stack_size)
+                  : stack_size),
+                m_stack(nullptr),
+                funp_(&trampoline<CoroutineImpl>)
             {
-                HPX_ASSERT(m_stack);
-                funp_ = &trampoline<Functor>;
+            }
+
+            void init()
+            {
+                if (m_stack != nullptr) return;
+
+                m_stack = alloc_stack(static_cast<std::size_t>(m_stack_size));
+                if (m_stack == nullptr)
+                {
+                    throw std::runtime_error("could not allocate memory for stack");
+                }
+
                 int error = HPX_COROUTINE_MAKE_CONTEXT(
-                    &m_ctx, m_stack, m_stack_size, funp_, cb_, nullptr);
+                    &m_ctx, m_stack, m_stack_size, funp_, this, nullptr);
+
                 HPX_UNUSED(error);
                 HPX_ASSERT(error == 0);
 
@@ -335,11 +344,6 @@ namespace hpx { namespace threads { namespace coroutines
 #endif
             }
 
-            // global functions to be called for each OS-thread after it started
-            // running and before it exits
-            static void thread_startup(char const* thread_type) {}
-            static void thread_shutdown() {}
-
             void reset_stack()
             {
                 if (m_stack)
@@ -358,7 +362,7 @@ namespace hpx { namespace threads { namespace coroutines
                     // the stack start
                     increment_stack_recycle_count();
                     int error = HPX_COROUTINE_MAKE_CONTEXT(
-                        &m_ctx, m_stack, m_stack_size, funp_, cb_, nullptr);
+                        &m_ctx, m_stack, m_stack_size, funp_, this, nullptr);
                     HPX_UNUSED(error);
                     HPX_ASSERT(error == 0);
                 }
@@ -403,14 +407,13 @@ namespace hpx { namespace threads { namespace coroutines
             // declare m_stack_size first so we can use it to initialize m_stack
             std::ptrdiff_t m_stack_size;
             void * m_stack;
-            void * cb_;
             void(*funp_)(void*);
 
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
             struct sigaction action;
             stack_t segv_stack;
+#endif
         };
-
-        typedef ucontext_context_impl context_impl;
     }}
 }}}
 

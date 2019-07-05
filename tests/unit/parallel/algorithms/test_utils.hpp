@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c)      2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -175,40 +176,6 @@ namespace test
         }
     };
 
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    template <typename IteratorTag>
-    struct test_num_exceptions<hpx::parallel::execution_policy, IteratorTag>
-    {
-        static void call(hpx::parallel::execution_policy const& policy,
-            hpx::exception_list const& e)
-        {
-            using namespace hpx::parallel::v1::detail;
-
-            if (policy.type() == typeid(hpx::parallel::execution::sequenced_policy))
-            {
-                HPX_TEST_EQ(e.size(), 1u);
-            }
-            else
-            {
-                // The static partitioner uses the number of threads/cores for
-                // the number chunks to create.
-                HPX_TEST_LTE(e.size(), hpx::get_num_worker_threads());
-            }
-        }
-    };
-
-    template <>
-    struct test_num_exceptions<
-        hpx::parallel::execution_policy, std::input_iterator_tag>
-    {
-        static void call(hpx::parallel::execution_policy const&,
-            hpx::exception_list const& e)
-        {
-            HPX_TEST_EQ(e.size(), 1u);
-        }
-    };
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     inline std::vector<std::size_t> iota(std::size_t size, std::size_t start)
     {
@@ -290,6 +257,17 @@ namespace test
             ++i;
         }
         return c;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename InputIter1, typename InputIter2>
+    bool equal(InputIter1 first1, InputIter1 last1,
+        InputIter2 first2, InputIter2 last2)
+    {
+        if (std::distance(first1, last1) != std::distance(first2, last2))
+            return false;
+
+        return std::equal(first1, last1, first2);
     }
 }
 

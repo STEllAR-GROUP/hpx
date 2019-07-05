@@ -143,31 +143,6 @@ namespace hpx
             return reinterpret_cast<components::server::memory const*>(lva);
         }
     };
-
-    // specialization for components::server::memory_block
-    template <>
-    struct get_lva<components::server::memory_block>
-    {
-        // for server::memory_block the provided lva is directly usable as the
-        // required local address
-        static components::server::memory_block*
-        call(naming::address::address_type lva)
-        {
-            return reinterpret_cast<components::server::memory_block*>(lva);
-        }
-    };
-
-    template <>
-    struct get_lva<components::server::memory_block const>
-    {
-        // for server::memory_block the provided lva is directly usable as the
-        // required local address
-        static components::server::memory_block const*
-        call(naming::address::address_type lva)
-        {
-            return reinterpret_cast<components::server::memory_block const*>(lva);
-        }
-    };
 }
 
 #endif

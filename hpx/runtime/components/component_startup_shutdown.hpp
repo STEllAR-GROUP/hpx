@@ -7,8 +7,8 @@
 #define HPX_COMPONENT_STARTUP_SHUTDOWN_SEP_20_2011_0217PM
 
 #include <hpx/config.hpp>
+#include <hpx/preprocessor/cat.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

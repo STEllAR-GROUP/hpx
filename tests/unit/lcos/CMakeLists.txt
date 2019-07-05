@@ -20,14 +20,16 @@ set(tests
     async_local_executor
     async_remote
     async_remote_client
+    async_unwrap_result
+    barrier
     broadcast
+    broadcast_component
     broadcast_apply
     channel
     channel_local
     client_then
     condition_variable
     counting_semaphore
-    barrier
     fold
     future
     future_ref
@@ -37,16 +39,21 @@ set(tests
     global_spmd_block
     local_latch
     local_barrier
+    local_barrier_count_up
+    local_barrier_reset
     local_dataflow
+    local_dataflow_boost_small_vector
     local_dataflow_executor
     local_dataflow_std_array
     local_event
     local_mutex
     local_promise_allocator
     make_future
+    make_ready_future
     packaged_action
     promise
     promise_allocator
+    promise_emplace
     reduce
     remote_dataflow
     remote_latch
@@ -55,6 +62,7 @@ set(tests
     sliding_semaphore
     split_future
     split_shared_future
+    sync_remote
     use_allocator
     wait_all_std_array
     wait_any_std_array
@@ -66,15 +74,6 @@ set(tests
     when_some
     when_some_std_array
    )
-
-if(HPX_WITH_EXECUTOR_COMPATIBILITY)
-  set(tests ${tests}
-      apply_local_executor_v1
-      async_local_executor_v1
-      future_then_executor_v1
-      local_dataflow_executor_v1
-     )
-endif()
 
 if(HPX_WITH_AWAIT)
   set(tests ${tests} await)
@@ -138,11 +137,6 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   set(folder_name "Tests/Unit/LCOs")
-  string(FIND ${test} "_v1" _is_v1_test)
-
-  if(NOT (_is_v1_test EQUAL -1))
-    set(folder_name "Tests/Unit/LCOs/V1")
-  endif()
 
   # add example executable
   add_hpx_executable(${test}_test
@@ -163,20 +157,26 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.unit.lcos.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()
 
 if(HPX_WITH_COMPILE_ONLY_TESTS)
   # add compile time tests
   set(compile_tests
-      fail_compile_mutex_move
-      fail_compile_spinlock_move
-      fail_compile_spinlock_no_backoff_move
      )
 
-  set(fail_compile_mutex_move_FLAGS FAILURE_EXPECTED)
-  set(fail_compile_spinlock_move_FLAGS FAILURE_EXPECTED)
-  set(fail_compile_spinlock_no_backoff_move_FLAGS FAILURE_EXPECTED)
+  if(HPX_WITH_FAIL_COMPILE_TESTS)
+    set(fail_compile_tests
+        fail_compile_mutex_move
+        fail_compile_spinlock_move
+        fail_compile_spinlock_no_backoff_move
+       )
+    foreach(fail_compile_test ${fail_compile_tests})
+      set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
+    endforeach()
+
+    set(compile_tests ${compile_tests} ${fail_compile_tests})
+  endif()
 
   foreach(compile_test ${compile_tests})
     set(sources

@@ -10,7 +10,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
@@ -81,6 +81,8 @@ namespace hpx { namespace components { namespace server
 
             if (pin_count == ~0x0u)
             {
+                agas::unmark_as_migrated(to_migrate.get_gid());
+
                 HPX_THROW_EXCEPTION(invalid_status,
                     "hpx::components::server::migrate_to_storage_here",
                     "attempting to migrate an instance of a component which was "
@@ -90,6 +92,8 @@ namespace hpx { namespace components { namespace server
 
             if (pin_count > 1)
             {
+                agas::unmark_as_migrated(to_migrate.get_gid());
+
                 HPX_THROW_EXCEPTION(invalid_status,
                     "hpx::components::server::migrate_to_storage_here",
                     "attempting to migrate an instance of a component which is "
@@ -112,9 +116,9 @@ namespace hpx { namespace components { namespace server
 
             return hpx::async<action_type>(
                     target_storage, std::move(data), to_migrate, addr)
-                .then(util::bind(
+                .then(util::bind_back(
                     &migrate_to_storage_here_cleanup<Component>,
-                    util::placeholders::_1, ptr, to_migrate));
+                    ptr, to_migrate));
         }
     }
 
@@ -180,13 +184,16 @@ namespace hpx { namespace components { namespace server
             return make_ready_future(naming::invalid_id);
         }
 
-        auto r= agas::begin_migration(to_migrate);
+        auto r = agas::begin_migration(to_migrate).get();
 
         // perform actual object migration
         typedef server::migrate_to_storage_here_action<Component>
             action_type;
-        return async<action_type>(r.first, to_migrate, r.second,
-            target_storage).then(
+
+        future<id_type> f = async<action_type>(r.first, to_migrate, r.second,
+            target_storage);
+
+        return f.then(
                 [to_migrate](future<naming::id_type> && f) -> naming::id_type
                 {
                     agas::end_migration(to_migrate);

@@ -12,8 +12,12 @@ endif()
 # Add additional version to recognize
 set(Boost_ADDITIONAL_VERSIONS
     ${Boost_ADDITIONAL_VERSIONS}
+    "1.70.0" "1.70"
+    "1.69.0" "1.69"
+    "1.68.0" "1.68"
+    "1.67.0" "1.67"
     "1.66.0" "1.66"
-    "1.65.0" "1.65"
+    "1.65.0" "1.65" "1.65.1" "1.65.1"
     "1.64.0" "1.64"
     "1.63.0" "1.63"
     "1.62.0" "1.62"
@@ -26,7 +30,7 @@ set(Boost_ADDITIONAL_VERSIONS
 set(__boost_libraries)
 if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
    HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE)
-  set(__boost_libraries ${__boost_libraries} log log_setup)
+  set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono thread)
 endif()
 
 if(HPX_WITH_THREAD_COMPATIBILITY OR NOT(HPX_WITH_CXX11_THREAD))
@@ -34,7 +38,7 @@ if(HPX_WITH_THREAD_COMPATIBILITY OR NOT(HPX_WITH_CXX11_THREAD))
   set(__boost_need_thread ON)
 endif()
 
-if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY OR __boost_need_thread)
+if(__boost_need_thread)
   set(__boost_libraries ${__boost_libraries} chrono)
 endif()
 
@@ -44,7 +48,7 @@ set(__use_generic_coroutine_context OFF)
 if(APPLE)
   set(__use_generic_coroutine_context ON)
 endif()
-if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ" AND Boost_VERSION GREATER 105500)
+if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ")
   set(__use_generic_coroutine_context ON)
 endif()
 hpx_option(
@@ -63,13 +67,12 @@ endif()
 
 set(__boost_libraries
   ${__boost_libraries}
-  atomic
   filesystem
   program_options
-  regex
   system)
 
-find_package(Boost 1.55 REQUIRED COMPONENTS ${__boost_libraries})
+set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
+find_package(Boost 1.61 MODULE REQUIRED COMPONENTS ${__boost_libraries})
 
 if(NOT Boost_FOUND)
   hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
@@ -87,11 +90,21 @@ endif()
 set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 
 if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
-  find_package(Boost 1.55 QUIET COMPONENTS iostreams)
+  find_package(Boost 1.61 QUIET MODULE COMPONENTS iostreams)
   if(Boost_IOSTREAMS_FOUND)
     hpx_info("  iostreams")
   else()
     hpx_error("Could not find Boost.Iostreams but HPX_WITH_COMPRESSION_BZIP2=On or HPX_WITH_COMPRESSION_LIB=On. Either set it to off or provide a boost installation including the iostreams library")
+  endif()
+  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
+endif()
+
+if(HPX_WITH_TOOLS)
+  find_package(Boost 1.61 QUIET MODULE COMPONENTS regex)
+  if(Boost_REGEX_FOUND)
+    hpx_info("  regex")
+  else()
+    hpx_error("Could not find Boost.Regex but HPX_WITH_TOOLS=On (the inspect tool requires Boost.Regex). Either set it to off or provide a boost installation including the regex library")
   endif()
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
@@ -107,24 +120,14 @@ endif()
 
 # Boost preprocessor definitions
 hpx_add_config_cond_define(BOOST_PARAMETER_MAX_ARITY 7)
-if(MSVC)
-  hpx_option(HPX_WITH_BOOST_ALL_DYNAMIC_LINK BOOL
-    "Add BOOST_ALL_DYN_LINK to compile flags (default: OFF)"
-    OFF ADVANCED)
-  if (HPX_WITH_BOOST_ALL_DYNAMIC_LINK)
-    hpx_add_config_cond_define(BOOST_ALL_DYN_LINK)
-  endif()
-else()
+if(NOT Boost_USE_STATIC_LIBS)
+  hpx_add_config_cond_define(BOOST_ALL_DYN_LINK)
+endif()
+if(NOT MSVC)
   hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
-hpx_add_config_define(HPX_HAVE_LOG_NO_TSS)
-hpx_add_config_define(HPX_HAVE_LOG_NO_TS)
 hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
-link_directories(${Boost_LIBRARY_DIRS})
-if((NOT MSVC) OR HPX_WITH_BOOST_ALL_DYNAMIC_LINK OR HPX_WITH_VCPKG)
-  hpx_libraries(${Boost_LIBRARIES})
-else()
-  hpx_library_dir(${Boost_LIBRARY_DIRS})
-endif()
+add_definitions(-DBOOST_ALL_NO_LIB) # disable auto-linking
+hpx_libraries(${Boost_LIBRARIES})

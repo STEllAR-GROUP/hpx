@@ -79,26 +79,12 @@ void test_generate_n()
 
     test_generate_n_async(execution::seq(execution::task), IteratorTag());
     test_generate_n_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_generate_n(execution_policy(execution::seq), IteratorTag());
-    test_generate_n(execution_policy(execution::par), IteratorTag());
-    test_generate_n(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_generate_n(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_generate_n(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void generate_n_test()
 {
     test_generate_n<std::random_access_iterator_tag>();
     test_generate_n<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_generate_n<std::output_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -190,16 +176,6 @@ void test_generate_n_exception()
         IteratorTag());
     test_generate_n_exception_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_generate_n_exception(execution_policy(execution::seq), IteratorTag());
-    test_generate_n_exception(execution_policy(execution::par), IteratorTag());
-
-    test_generate_n_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_generate_n_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void generate_n_exception_test()
@@ -296,16 +272,6 @@ void test_generate_n_bad_alloc()
         IteratorTag());
     test_generate_n_bad_alloc_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_generate_n_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_generate_n_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_generate_n_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_generate_n_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void generate_n_bad_alloc_test()

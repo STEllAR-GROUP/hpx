@@ -1,25 +1,25 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/throw_exception.hpp>
-
-#include <hpx/lcos/local/spinlock.hpp>
-
 #include <hpx/util/atomic_count.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/reinitializable_static.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <map>
 #include <mutex>
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -81,6 +81,30 @@ namespace hpx { namespace components
 
                 return it->second;
             }
+
+            static bool enumerate_instance_counts(
+                util::unique_function_nonser<bool(component_type)> const& f)
+            {
+                std::vector<component_type> types;
+
+                {
+                    std::lock_guard<mutex_type> l(mtx());
+                    types.reserve(data().size());
+
+                    for (auto const& e : data())
+                    {
+                        types.push_back(e.first);
+                    }
+                }
+
+                for (component_type t : types)
+                {
+                    if (!f(t))
+                        return false;
+                }
+
+                return true;
+            }
         };
     }
 
@@ -99,6 +123,12 @@ namespace hpx { namespace components
         return detail::component_database::get_entry(type).deleter_;
     }
 
+    bool enumerate_instance_counts(
+        util::unique_function_nonser<bool(component_type)> const& f)
+    {
+        return detail::component_database::enumerate_instance_counts(f);
+    }
+
     namespace detail
     {
         // the entries in this array need to be in exactly the same sequence
@@ -108,14 +138,13 @@ namespace hpx { namespace components
             "component_runtime_support",                        /*  0 */
             "component_plain_function",                         /*  1 */
             "component_memory",                                 /*  2 */
-            "component_memory_block",                           /*  3 */
-            "component_base_lco",                               /*  4 */
-            "component_base_lco_with_value_unmanaged",          /*  5 */
-            "component_base_lco_with_value",                    /*  6 */
-            "component_latch",                                  /*  7 (0x70006) */
-            "component_barrier",                                /*  8 (0x80004) */
-            "component_flex_barrier",                           /*  9 (0x90004) */
-            "component_promise",                                /* 10 (0xa0006) */
+            "component_base_lco",                               /*  3 */
+            "component_base_lco_with_value_unmanaged",          /*  4 */
+            "component_base_lco_with_value",                    /*  5 */
+            "component_latch",                                  /*  6 (0x60006) */
+            "component_barrier",                                /*  7 (0x70004) */
+            "component_flex_barrier",                           /*  8 (0x80004) */
+            "component_promise",                                /*  9 (0x90006) */
 
             "component_agas_locality_namespace",                /* 10 */
             "component_agas_primary_namespace",                 /* 11 */

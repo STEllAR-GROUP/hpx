@@ -97,8 +97,8 @@ void tree_boot(
   , thread_id_type thread
     )
 {
-    HPX_ASSERT(grain_size);
-    HPX_ASSERT(count);
+    HPX_TEST(grain_size);
+    HPX_TEST(count);
 
     std::vector<future<void> > promises;
 
@@ -158,7 +158,7 @@ int hpx_main(variables_map& vm)
 
     {
         thread_id_type thread_id = register_thread_nullary(
-            hpx::util::bind(&test_dummy_thread, futures));
+            hpx::util::deferred_call(&test_dummy_thread, futures));
         HPX_TEST(thread_id != hpx::threads::invalid_thread_id);
 
         // Flood the queues with suspension operations before the rescheduling

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +7,7 @@
 #define HPX_COMPONENTS_SERVER_MIGRATION_SUPPORT_FEB_03_2014_0230PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -15,8 +16,7 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 
 #include <cstdint>
 #include <mutex>
@@ -54,14 +54,23 @@ namespace hpx { namespace components
         naming::gid_type get_base_gid(
             naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
-            // we don't store migrating objects in the AGAS cache
-            naming::gid_type result = this->base_type::get_base_gid(assign_gid);
-            naming::detail::set_dont_store_in_cache(result);
+            naming::gid_type result =
+                this->BaseComponent::get_base_gid_dynamic(assign_gid,
+                    static_cast<this_component_type const&>(*this)
+                        .get_current_address(),
+                    [](naming::gid_type gid) -> naming::gid_type
+                    {
+                        // we don't store migrating objects in the AGAS cache
+                        naming::detail::set_dont_store_in_cache(gid);
+                        // also mark gid as migratable
+                        naming::detail::set_is_migratable(gid);
+                        return gid;
+                    });
             return result;
         }
 
         // This component type supports migration.
-        static HPX_CONSTEXPR bool supports_migration() { return true; }
+        HPX_CONSTEXPR static bool supports_migration() { return true; }
 
         // Pinning functionality
         void pin()
@@ -73,8 +82,28 @@ namespace hpx { namespace components
         }
         bool unpin()
         {
-            bool was_migrated = false;
+            {
+                // no need to go through AGAS if the object is currently pinned
+                // more than once
+                std::unique_lock<mutex_type> l(mtx_);
+                if (pin_count_ != ~0x0u && pin_count_ > 1)
+                {
+                    --pin_count_;
+                    return false;
+                }
+
+                // no need to go through AGAS either if this object is not
+                // currently being migrated (unpin will be called for each
+                // action run on this object)
+                if (!was_marked_for_migration_)
+                {
+                    --pin_count_;
+                    return false;
+                }
+            }
+
             // make sure to always grab the AGAS lock first
+            bool was_migrated = false;
             agas::mark_as_migrated(this->gid_,
                 [this, &was_migrated]() mutable -> std::pair<bool, hpx::future<void> >
                 {
@@ -103,7 +132,7 @@ namespace hpx { namespace components
                         }
                     }
                     return std::make_pair(false, make_ready_future());
-                }).get();
+                }, true).get();
 
             return was_migrated;
         }
@@ -153,12 +182,12 @@ namespace hpx { namespace components
 
                     l.unlock();
                     return std::make_pair(true, std::move(f));
-                });
+                }, false);
         }
 
         /// This hook is invoked on the newly created object after the migration
         /// has been finished
-        void on_migrated() {}
+        HPX_CXX14_CONSTEXPR void on_migrated() {}
 
         typedef void decorates_action;
 
@@ -172,13 +201,12 @@ namespace hpx { namespace components
             // Make sure we pin the component at construction of the bound object
             // which will also unpin it once the thread runs to completion (the
             // bound object goes out of scope).
-            return util::bind(
-                util::one_shot(&migration_support::thread_function),
+            return util::one_shot(util::bind_front(
+                &migration_support::thread_function,
                 get_lva<this_component_type>::call(lva),
-                util::placeholders::_1,
-                traits::action_decorate_function<base_type>::call(
+                traits::component_decorate_function<base_type>::call(
                     lva, std::forward<F>(f)),
-                components::pinned_ptr::create<this_component_type>(lva));
+                components::pinned_ptr::create<this_component_type>(lva)));
         }
 
         // Return whether the given object was migrated, if it was not
@@ -198,9 +226,9 @@ namespace hpx { namespace components
         // Execute the wrapped action. This function is bound in decorate_action
         // above. The bound object performs the pinning/unpinning.
         threads::thread_result_type thread_function(
-            threads::thread_state_ex_enum state,
             threads::thread_function_type && f,
-            components::pinned_ptr)
+            components::pinned_ptr,
+            threads::thread_state_ex_enum state)
         {
             return f(state);
         }

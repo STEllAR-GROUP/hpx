@@ -9,9 +9,6 @@
 if(NOT BOOST_SIMD_ROOT)
   hpx_error("Using Boost.SIMD requires to set the variable BOOST_SIMD_ROOT to the Boost.SIMD installation directory.")
 endif()
-if(Boost_VERSION LESS 106000)
-  hpx_error("Boost.SIMD requires using Boost V1.60 or above")
-endif()
 
 include_directories(SYSTEM ${BOOST_SIMD_ROOT}/include)
 

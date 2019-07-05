@@ -11,7 +11,7 @@
 #define HPX_RUNTIME_THREADS_CPU_MASK_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 
 #include <climits>
 #include <cstddef>
@@ -69,12 +69,12 @@ namespace hpx { namespace threads
         mask &= not_(bits(idx));
     }
 
-    inline std::size_t mask_size(mask_cref_type mask)
+    inline std::size_t mask_size(mask_cref_type /*mask*/)
     {
         return CHAR_BIT * sizeof(mask_type);
     }
 
-    inline void resize(mask_type& mask, std::size_t s)
+    inline void resize(mask_type& /*mask*/, std::size_t s)
     {
         HPX_ASSERT(s <= CHAR_BIT * sizeof(mask_type));
     }

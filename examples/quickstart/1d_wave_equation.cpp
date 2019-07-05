@@ -137,7 +137,7 @@ double calculate_u_tplus_x_1st(double u_t_xplus, double u_t_x,
 double wave(std::uint64_t t, std::uint64_t x)
 {
   std::lock_guard<hpx::lcos::local::mutex> l(u[t][x].mtx);
-  //  hpx::util::format_to(cout, "calling wave... t=%1% x=%2%\n", t, x) << flush;
+  //  hpx::util::format_to(cout, "calling wave... t={1} x={2}\n", t, x) << flush;
   if (u[t][x].computed)
     {
       //cout << ("already computed!\n") << flush;
@@ -216,9 +216,9 @@ int hpx_main(variables_map& vm)
 
   u = std::vector<std::vector<data> >(nt, std::vector<data>(nx));
 
-  hpx::util::format_to(cout, "dt = %1%\n", dt) << flush;
-  hpx::util::format_to(cout, "dx = %1%\n", dx) << flush;
-  hpx::util::format_to(cout, "alpha^2 = %1%\n", alpha_squared) << flush;
+  hpx::util::format_to(cout, "dt = {1}\n", dt) << flush;
+  hpx::util::format_to(cout, "dx = {1}\n", dx) << flush;
+  hpx::util::format_to(cout, "alpha^2 = {1}\n", alpha_squared) << flush;
 
   {
     // Keep track of the time required to execute.
@@ -234,11 +234,11 @@ int hpx_main(variables_map& vm)
 
     wait(futures, [&](std::size_t i, double n)
          { double x_here = i*dx;
-           hpx::util::format_to(outfile, "%1% %2%\n", x_here, n) << flush; });
+           hpx::util::format_to(outfile, "{1} {2}\n", x_here, n) << flush; });
 
     outfile.close();
 
-    char const* fmt = "elapsed time: %1% [s]\n";
+    char const* fmt = "elapsed time: {1} [s]\n";
     hpx::util::format_to(std::cout, fmt, t.elapsed());
   }
 

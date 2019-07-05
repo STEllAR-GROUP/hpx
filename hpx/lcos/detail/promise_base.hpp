@@ -86,7 +86,7 @@ namespace lcos {
               : alloc_(alloc)
             {}
 
-            promise_data_allocator(init_no_addref no_addref,
+            promise_data_allocator(init_no_addref no_addref, in_place in_place,
                     other_allocator const& alloc)
               : promise_data<Result>(no_addref), alloc_(alloc)
             {}
@@ -110,8 +110,8 @@ namespace lcos {
         {
             template <typename SharedState>
             HPX_FORCEINLINE static void call(hpx::traits::detail::wrap_int,
-                SharedState const& shared_state, id_type const& id,
-                bool& id_retrieved)
+                SharedState const& /*shared_state*/, id_type const& /*id*/,
+                bool& /*id_retrieved*/)
             {
                 // by default, do nothing
             }

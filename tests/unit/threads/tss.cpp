@@ -10,8 +10,10 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <chrono>
 #include <mutex>
 #include <vector>
+#include <utility>
 
 hpx::lcos::local::spinlock check_mutex;
 hpx::lcos::local::spinlock tss_mutex;
@@ -20,7 +22,8 @@ int tss_total = 0;
 
 struct tss_value_t
 {
-    tss_value_t()
+    tss_value_t(hpx::lcos::local::promise<void> pp)
+      : p(std::move(pp))
     {
         std::unique_lock<hpx::lcos::local::spinlock> lock(tss_mutex);
         ++tss_instances;
@@ -31,15 +34,17 @@ struct tss_value_t
     {
         std::unique_lock<hpx::lcos::local::spinlock> lock(tss_mutex);
         --tss_instances;
+        p.set_value();
     }
+    hpx::lcos::local::promise<void> p;
     int value;
 };
 
 hpx::threads::thread_specific_ptr<tss_value_t> tss_value;
 
-void test_tss_thread()
+void test_tss_thread(hpx::lcos::local::promise<void> p)
 {
-    tss_value.reset(new tss_value_t());
+    tss_value.reset(new tss_value_t(std::move(p)));
     for (int i = 0; i < 1000; ++i)
     {
         int& n = tss_value->value;
@@ -58,9 +63,16 @@ void test_tss()
 
     int const NUMTHREADS = 5;
 
-    std::vector<hpx::future<void> > threads;
+    std::vector<hpx::future<void> > threads(NUMTHREADS);
     for (int i = 0; i < NUMTHREADS; ++i)
-        threads.push_back(hpx::async(&test_tss_thread));
+    {
+        hpx::lcos::local::promise<void> p;
+        threads.push_back(p.get_future());
+        // The future obtained from this promise will be set ready from the tss
+        // variable's dtor. The tss destructors are called after the threads
+        // signal its completion through their asynchronous return.
+        hpx::apply(&test_tss_thread, std::move(p));
+    }
     hpx::wait_all(threads);
 
     HPX_TEST_EQ(tss_instances, 0);
@@ -89,6 +101,12 @@ void test_tss_with_custom_cleanup()
 {
     hpx::thread t(&tss_thread_with_custom_cleanup);
     t.join();
+
+    // make sure the custom cleanup can run first (this is necessary as the TSS
+    // cleanup runs after the exit callbacks of a thread, which in this case
+    // might cause the t.join() above to return before the TSS was actually
+    // cleaned up.
+    hpx::this_thread::sleep_for(std::chrono::microseconds(100));
 
     HPX_TEST(tss_cleanup_called);
 }
@@ -130,7 +148,7 @@ struct dummy_class_tracks_deletions
 unsigned dummy_class_tracks_deletions::deletions = 0;
 
 hpx::threads::thread_specific_ptr<dummy_class_tracks_deletions>
-    tss_with_null_cleanup(0);
+    tss_with_null_cleanup(nullptr);
 
 void tss_thread_with_null_cleanup(dummy_class_tracks_deletions* delete_tracker)
 {
@@ -180,7 +198,7 @@ void test_tss_cleanup_not_called_for_null_pointer()
     local_tss.reset(new Dummy);
 
     tss_cleanup_called = false;
-    local_tss.reset(0);
+    local_tss.reset(nullptr);
     HPX_TEST(tss_cleanup_called);
 
     tss_cleanup_called = false;

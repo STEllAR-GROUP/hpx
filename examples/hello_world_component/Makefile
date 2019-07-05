@@ -22,6 +22,7 @@ APP_CFLAGS += -DHPX_APPLICATION_NAME=test
 
 COMP_CFLAGS = $(CXX_FLAGS)
 COMP_CFLAGS += $(shell PKG_CONFIG_PATH=$(HPX_DIR) $(PKG_CONFIG) --cflags --libs $(hpx_component))
+COMP_CFLAGS += -lhpx_iostreams$(debug_suffix)
 COMP_CFLAGS += -DHPX_COMPONENT_NAME=test_component
 
 ifneq ($(wildcard $(HPX_DIR)/*),)

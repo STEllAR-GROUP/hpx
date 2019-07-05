@@ -23,21 +23,20 @@
 #include <utility>
 #include <vector>
 
-int hpx_main(int argc, char* argv[])
-{
-    return 0;
-}
-
-int main(int argc, char* argv[])
+void test_scheduler(int argc, char* argv[],
+    hpx::resource::scheduling_policy scheduler)
 {
     std::vector<std::string> cfg =
     {
         "hpx.os_threads=4"
     };
 
-    hpx::start(argc, argv, std::move(cfg));
+    hpx::resource::partitioner rp(nullptr, argc, argv, std::move(cfg));
 
-    hpx::threads::executors::pool_executor default_exec("default");
+    rp.create_thread_pool("default", scheduler);
+
+    hpx::start(nullptr, argc, argv);
+
     hpx::threads::thread_pool_base& default_pool =
         hpx::resource::get_thread_pool("default");
     std::size_t const default_pool_threads =
@@ -45,19 +44,19 @@ int main(int argc, char* argv[])
 
     hpx::util::high_resolution_timer t;
 
-    while (t.elapsed() < 5)
+    while (t.elapsed() < 2)
     {
         for (std::size_t i = 0;
              i < default_pool_threads * 10000; ++i)
         {
-            hpx::apply(default_exec, [](){});
+            hpx::apply([](){});
         }
 
         bool suspended = false;
         default_pool.suspend_cb([&suspended]()
-            {
-                suspended = true;
-            });
+                                {
+                                    suspended = true;
+                                });
 
         while (!suspended)
         {
@@ -66,9 +65,9 @@ int main(int argc, char* argv[])
 
         bool resumed = false;
         default_pool.resume_cb([&resumed]()
-            {
-                resumed = true;
-            });
+                               {
+                                   resumed = true;
+                               });
 
         while (!resumed)
         {
@@ -76,9 +75,39 @@ int main(int argc, char* argv[])
         }
     }
 
-    hpx::apply(default_exec, []() { hpx::finalize(); });
+    hpx::apply([]() { hpx::finalize(); });
 
     HPX_TEST_EQ(hpx::stop(), 0);
+}
+
+int main(int argc, char* argv[])
+{
+    std::vector<hpx::resource::scheduling_policy> schedulers =
+        {
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
+            hpx::resource::scheduling_policy::local,
+            hpx::resource::scheduling_policy::local_priority_fifo,
+            hpx::resource::scheduling_policy::local_priority_lifo,
+#endif
+#if defined(HPX_HAVE_ABP_SCHEDULER)
+            hpx::resource::scheduling_policy::abp_priority_fifo,
+            hpx::resource::scheduling_policy::abp_priority_lifo,
+#endif
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+            hpx::resource::scheduling_policy::static_,
+#endif
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+            hpx::resource::scheduling_policy::static_priority,
+#endif
+#if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
+            hpx::resource::scheduling_policy::shared_priority,
+#endif
+        };
+
+    for (auto const scheduler : schedulers)
+    {
+        test_scheduler(argc, argv, scheduler);
+    }
 
     return hpx::util::report_errors();
 }

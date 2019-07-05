@@ -245,14 +245,6 @@ namespace hpx { namespace threads
             }
         }
 
-        // Return the (global) sequence number of the current thread
-        std::size_t get_worker_thread_num(bool* numa_sensitive = nullptr)
-        {
-            if (get_self_ptr() == nullptr)
-                return std::size_t(-1);
-            return detail::thread_num_tss_.get_worker_thread_num();
-        }
-
     public:
         /// The function register_counter_types() is called during startup to
         /// allow the registration of all performance counter types for this
@@ -290,6 +282,32 @@ namespace hpx { namespace threads
             }
         }
 
+        void add_scheduler_mode(threads::policies::scheduler_mode mode)
+        {
+            for (auto& pool_iter : pools_)
+            {
+                pool_iter->add_scheduler_mode(mode);
+            }
+        }
+
+        void add_remove_scheduler_mode(
+            threads::policies::scheduler_mode to_add_mode,
+            threads::policies::scheduler_mode to_remove_mode)
+        {
+            for (auto& pool_iter : pools_)
+            {
+                pool_iter->add_remove_scheduler_mode(to_add_mode, to_remove_mode);
+            }
+        }
+
+        void remove_scheduler_mode(threads::policies::scheduler_mode mode)
+        {
+            for (auto& pool_iter : pools_)
+            {
+                pool_iter->remove_scheduler_mode(mode);
+            }
+        }
+
         void reset_thread_distribution()
         {
             for (auto& pool_iter : pools_)
@@ -300,12 +318,12 @@ namespace hpx { namespace threads
 
         void init_tss(std::size_t num)
         {
-            detail::thread_num_tss_.init_tss(num);
+            detail::set_thread_num_tss(num);
         }
 
         void deinit_tss()
         {
-            detail::thread_num_tss_.deinit_tss();
+            detail::set_thread_num_tss(std::size_t(-1));
         }
 
     public:
@@ -346,6 +364,17 @@ namespace hpx { namespace threads
         std::int64_t get_average_thread_wait_time(bool reset);
         std::int64_t get_average_task_wait_time(bool reset);
 #endif
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+        std::int64_t get_background_work_duration(bool reset);
+        std::int64_t get_background_overhead(bool reset);
+
+        std::int64_t get_background_send_duration(bool reset);
+        std::int64_t get_background_send_overhead(bool reset);
+
+        std::int64_t get_background_receive_duration(bool reset);
+        std::int64_t get_background_receive_overhead(bool reset);
+#endif    //HPX_HAVE_BACKGROUND_THREAD_COUNTERS
+
         std::int64_t get_cumulative_duration(bool reset);
 
         std::int64_t get_thread_count_unknown(bool reset)

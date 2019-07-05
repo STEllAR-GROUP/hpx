@@ -84,26 +84,12 @@ void test_set_union1()
 
     test_set_union1_async(execution::seq(execution::task), IteratorTag());
     test_set_union1_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_union1(execution_policy(execution::seq), IteratorTag());
-    test_set_union1(execution_policy(execution::par), IteratorTag());
-    test_set_union1(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_set_union1(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_union1(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_union_test1()
 {
     test_set_union1<std::random_access_iterator_tag>();
     test_set_union1<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_union1<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -182,26 +168,12 @@ void test_set_union2()
 
     test_set_union2_async(execution::seq(execution::task), IteratorTag());
     test_set_union2_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_union2(execution_policy(execution::seq), IteratorTag());
-    test_set_union2(execution_policy(execution::par), IteratorTag());
-    test_set_union2(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_set_union2(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_union2(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_union_test2()
 {
     test_set_union2<std::random_access_iterator_tag>();
     test_set_union2<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_union2<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -310,25 +282,12 @@ void test_set_union_exception()
         IteratorTag());
     test_set_union_exception_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_union_exception(execution_policy(execution::seq), IteratorTag());
-    test_set_union_exception(execution_policy(execution::par), IteratorTag());
-
-    test_set_union_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_union_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_union_exception_test()
 {
     test_set_union_exception<std::random_access_iterator_tag>();
     test_set_union_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_union_exception<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -435,25 +394,12 @@ void test_set_union_bad_alloc()
         IteratorTag());
     test_set_union_bad_alloc_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_set_union_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_set_union_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_set_union_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_set_union_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void set_union_bad_alloc_test()
 {
     test_set_union_bad_alloc<std::random_access_iterator_tag>();
     test_set_union_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_set_union_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

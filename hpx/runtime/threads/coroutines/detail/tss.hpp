@@ -12,7 +12,7 @@
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_TSS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 
 #include <cstddef>
 #include <map>
@@ -50,6 +50,25 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
           : func_(f),
             value_(val)
         {}
+
+        tss_data_node(tss_data_node const&) = delete;
+        tss_data_node& operator=(tss_data_node const&) = delete;
+
+        tss_data_node(tss_data_node&& other)
+          : func_(std::move(other.func_)),
+            value_(other.value_)
+        {
+            other.value_ = nullptr;
+        }
+
+        tss_data_node& operator=(tss_data_node&& other)
+        {
+            cleanup();
+            func_ = std::move(other.func_);
+            value_ = other.value_;
+            other.value_ = nullptr;
+            return *this;
+        }
 
         ~tss_data_node()
         {
@@ -122,7 +141,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         {
             return 0;
         }
-        std::size_t set_thread_data(std::size_t val)
+        std::size_t set_thread_data(std::size_t /*val*/)
         {
             return 0;
         }

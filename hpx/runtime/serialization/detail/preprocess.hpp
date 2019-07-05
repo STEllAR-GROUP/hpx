@@ -10,15 +10,15 @@
 // This 'container' is used to gather the required archive size for a given
 // type before it is serialized. In addition, it allows to register futures
 // to ensure each future is ready before serializing it.
-#include <hpx/lcos_fwd.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/binary_filter.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/traits/serialization_access_data.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <map>

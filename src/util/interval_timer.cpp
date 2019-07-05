@@ -4,11 +4,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/interval_timer.hpp>
@@ -124,9 +124,10 @@ namespace hpx { namespace util { namespace detail
             is_started_ = false;
 
             if (id_) {
-                error_code ec(lightweight);       // avoid throwing on error
+                error_code ec(lightweight);    // avoid throwing on error
                 threads::set_thread_state(id_, threads::pending,
-                    threads::wait_abort, threads::thread_priority_boost, ec);
+                    threads::wait_abort, threads::thread_priority_boost, true,
+                    ec);
                 id_.reset();
             }
             return true;
@@ -166,15 +167,12 @@ namespace hpx { namespace util { namespace detail
         return microsecs_;
     }
 
-    void interval_timer::slow_down(std::int64_t max_interval)
+    void interval_timer::change_interval(std::int64_t new_interval)
     {
+        HPX_ASSERT(new_interval > 0);
+
         std::lock_guard<mutex_type> l(mtx_);
-        microsecs_ = (std::min)((110 * microsecs_) / 100, max_interval);
-    }
-    void interval_timer::speed_up(std::int64_t min_interval)
-    {
-        std::lock_guard<mutex_type> l(mtx_);
-        microsecs_ = (std::max)((90 * microsecs_) / 100, min_interval);
+        microsecs_ = new_interval;
     }
 
     threads::thread_result_type interval_timer::evaluate(
@@ -249,7 +247,8 @@ namespace hpx { namespace util { namespace detail
                 util::bind_front(&interval_timer::evaluate,
                     this->shared_from_this()),
                 description_.c_str(), threads::suspended, true,
-                threads::thread_priority_boost, std::size_t(-1),
+                threads::thread_priority_boost,
+                threads::thread_schedule_hint(),
                 threads::thread_stacksize_default, ec);
         }
 
@@ -260,10 +259,9 @@ namespace hpx { namespace util { namespace detail
         }
 
         // schedule this thread to be run after the given amount of seconds
-        threads::set_thread_state(id,
-            std::chrono::microseconds(microsecs_),
+        threads::set_thread_state(id, std::chrono::microseconds(microsecs_),
             threads::pending, threads::wait_signaled,
-            threads::thread_priority_boost, ec);
+            threads::thread_priority_boost, true, ec);
 
         if (ec) {
             is_terminated_ = true;
@@ -271,7 +269,7 @@ namespace hpx { namespace util { namespace detail
 
             // abort the newly created thread
             threads::set_thread_state(id, threads::pending, threads::wait_abort,
-                threads::thread_priority_boost, ec);
+                threads::thread_priority_boost, true, ec);
 
             return;
         }
@@ -326,23 +324,13 @@ namespace hpx { namespace util
         return timer_->get_interval();
     }
 
-    void interval_timer::slow_down(std::int64_t max_interval)
+    void interval_timer::change_interval(std::int64_t new_interval)
     {
-        return timer_->slow_down(max_interval);
+        return timer_->change_interval(new_interval);
     }
 
-    void interval_timer::speed_up(std::int64_t min_interval)
+    void interval_timer::change_interval(util::steady_duration const& new_interval)
     {
-        return timer_->speed_up(min_interval);
-    }
-
-    void interval_timer::slow_down(util::steady_duration const& max_interval)
-    {
-        return timer_->slow_down(max_interval.value().count() / 1000);
-    }
-
-    void interval_timer::speed_up(util::steady_duration const& min_interval)
-    {
-        return timer_->speed_up(min_interval.value().count() / 1000);
+        return timer_->change_interval(new_interval.value().count() / 1000);
     }
 }}

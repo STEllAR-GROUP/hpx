@@ -12,12 +12,16 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_reduce1(ExPolicy policy, IteratorTag)
 {
@@ -29,7 +33,7 @@ void test_reduce1(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t val(42);
     auto op =
@@ -52,7 +56,7 @@ void test_reduce1_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t val(42);
     auto op =
@@ -81,24 +85,12 @@ void test_reduce1()
 
     test_reduce1_async(execution::seq(execution::task), IteratorTag());
     test_reduce1_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_reduce1(execution_policy(execution::seq), IteratorTag());
-    test_reduce1(execution_policy(execution::par), IteratorTag());
-    test_reduce1(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_reduce1(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_reduce1(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void reduce_test1()
 {
     test_reduce1<std::random_access_iterator_tag>();
     test_reduce1<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_reduce1<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -113,7 +105,7 @@ void test_reduce2(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t const val(42);
     std::size_t r1 = hpx::parallel::reduce(policy,
@@ -131,7 +123,7 @@ void test_reduce2_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t const val(42);
     hpx::future<std::size_t> f =
@@ -155,24 +147,12 @@ void test_reduce2()
 
     test_reduce2_async(execution::seq(execution::task), IteratorTag());
     test_reduce2_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_reduce2(execution_policy(execution::seq), IteratorTag());
-    test_reduce2(execution_policy(execution::par), IteratorTag());
-    test_reduce2(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_reduce2(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_reduce2(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void reduce_test2()
 {
     test_reduce2<std::random_access_iterator_tag>();
     test_reduce2<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_reduce2<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -187,7 +167,7 @@ void test_reduce3(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t r1 = hpx::parallel::reduce(policy,
         iterator(std::begin(c)), iterator(std::end(c)));
@@ -204,7 +184,7 @@ void test_reduce3_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     hpx::future<std::size_t> f =
         hpx::parallel::reduce(p,
@@ -227,24 +207,12 @@ void test_reduce3()
 
     test_reduce3_async(execution::seq(execution::task), IteratorTag());
     test_reduce3_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_reduce3(execution_policy(execution::seq), IteratorTag());
-    test_reduce3(execution_policy(execution::par), IteratorTag());
-    test_reduce3(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_reduce3(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_reduce3(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void reduce_test3()
 {
     test_reduce3<std::random_access_iterator_tag>();
     test_reduce3<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_reduce3<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -259,7 +227,7 @@ void test_reduce_exception(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
     try {
@@ -290,7 +258,7 @@ void test_reduce_exception_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -332,25 +300,12 @@ void test_reduce_exception()
 
     test_reduce_exception_async(execution::seq(execution::task), IteratorTag());
     test_reduce_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_reduce_exception(execution_policy(execution::seq), IteratorTag());
-    test_reduce_exception(execution_policy(execution::par), IteratorTag());
-
-    test_reduce_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_reduce_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void reduce_exception_test()
 {
     test_reduce_exception<std::random_access_iterator_tag>();
     test_reduce_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_reduce_exception<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -365,7 +320,7 @@ void test_reduce_bad_alloc(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
     try {
@@ -395,7 +350,7 @@ void test_reduce_bad_alloc_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -436,25 +391,12 @@ void test_reduce_bad_alloc()
 
     test_reduce_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_reduce_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_reduce_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_reduce_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_reduce_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_reduce_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void reduce_bad_alloc_test()
 {
     test_reduce_bad_alloc<std::random_access_iterator_tag>();
     test_reduce_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_reduce_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -465,7 +407,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     reduce_test1();
     reduce_test2();

@@ -10,10 +10,10 @@
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/parallel/datapar/loop.hpp>
 #endif
+#include <hpx/assertion.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
@@ -149,18 +149,32 @@ namespace hpx { namespace parallel { namespace util
             // handle sequences of non-futures
             template <typename Iter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            static Iter call(Iter it, std::size_t count, F && f)
+            static Iter call(Iter it, std::size_t num, F && f)
             {
-                for (/**/; count != 0; (void) --count, ++it)
+                std::size_t count(num & std::size_t(-4));
+                for (std::size_t i = 0; i < count; (void) ++it, i += 4)
+                {
+                    f(it); f(++it); f(++it); f(++it);
+                }
+                for (/**/; count < num; (void) ++count, ++it)
+                {
                     f(it);
+                }
                 return it;
             }
 
             template <typename Iter, typename CancelToken, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            static Iter call(Iter it, std::size_t count, CancelToken& tok, F && f)
+            static Iter call(Iter it, std::size_t num, CancelToken& tok, F && f)
             {
-                for (/**/; count != 0; (void) --count, ++it)
+                std::size_t count(num & std::size_t(-4));
+                for (std::size_t i = 0; i < count; (void) ++it, i += 4)
+                {
+                    if (tok.was_cancelled())
+                        break;
+                    f(it); f(++it); f(++it); f(++it);
+                }
+                for (/**/; count < num; (void) ++count, ++it)
                 {
                     if (tok.was_cancelled())
                         break;
@@ -444,7 +458,7 @@ namespace hpx { namespace parallel { namespace util
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         return detail::loop_with_cleanup_n<cat>::call_with_token(it, count,
             tok, std::forward<F>(f), std::forward<Cleanup>(cleanup));
-    };
+    }
 
     template <typename Iter, typename FwdIter, typename CancelToken,
         typename F, typename Cleanup>
@@ -455,7 +469,7 @@ namespace hpx { namespace parallel { namespace util
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         return detail::loop_with_cleanup_n<cat>::call_with_token(it, count,
             dest, tok, std::forward<F>(f), std::forward<Cleanup>(cleanup));
-    };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -511,7 +525,7 @@ namespace hpx { namespace parallel { namespace util
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         return detail::loop_idx_n<cat>::call(base_idx, it, count, tok,
             std::forward<F>(f));
-    };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -552,6 +566,23 @@ namespace hpx { namespace parallel { namespace util
         {
             val = hpx::util::invoke(r, val, *first);
             ++first;
+        }
+        return val;
+    }
+
+    template <typename T, typename Iter1, typename Iter2, typename Reduce,
+        typename Conv>
+    HPX_FORCEINLINE T
+    accumulate(Iter1 first1, Iter1 last1, Iter2 first2, Reduce && r, Conv && conv)
+    {
+        T val = hpx::util::invoke(conv, *first1, *first2);
+        ++first1;
+        ++first2;
+        while(last1 != first1)
+        {
+            val = hpx::util::invoke(r, val, hpx::util::invoke(conv, *first1, *first2));
+            ++first1;
+            ++first2;
         }
         return val;
     }

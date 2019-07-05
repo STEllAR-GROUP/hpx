@@ -18,14 +18,12 @@
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
+#include <hpx/runtime/thread_hooks.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
-
-#include <boost/smart_ptr/scoped_ptr.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -58,7 +56,7 @@ namespace hpx
         namespace server
         {
             class runtime_support;
-            class memory;
+            class HPX_EXPORT memory;
         }
     }
 
@@ -122,13 +120,6 @@ namespace hpx
             return state_.load() == state_stopped;
         }
 
-        // the TSS holds a pointer to the runtime associated with a given
-        // OS thread
-        struct tls_tag {};
-        static util::thread_specific_ptr<runtime*, tls_tag> runtime_;
-        static util::thread_specific_ptr<std::string, tls_tag> thread_name_;
-        static util::thread_specific_ptr<std::uint64_t, tls_tag> uptime_;
-
         /// \brief access configuration information
         util::runtime_configuration& get_config()
         {
@@ -143,9 +134,6 @@ namespace hpx
         {
             return static_cast<std::size_t>(instance_number_);
         }
-
-        /// \brief Return the name of the calling thread.
-        static std::string get_thread_name();
 
         /// \brief Return the system uptime measure on the thread executing this call
         static std::uint64_t get_system_uptime();
@@ -210,10 +198,10 @@ namespace hpx
 
         virtual std::uint64_t get_memory_lva() const = 0;
 
-        virtual void report_error(std::size_t num_thread,
+        virtual bool report_error(std::size_t num_thread,
             std::exception_ptr const& e) = 0;
 
-        virtual void report_error(std::exception_ptr const& e) = 0;
+        virtual bool report_error(std::exception_ptr const& e) = 0;
 
         virtual naming::gid_type get_next_id(std::size_t count = 1) = 0;
 
@@ -312,6 +300,17 @@ namespace hpx
             char const* binary_filter_type, bool compress,
             serialization::binary_filter* next_filter, error_code& ec = throws);
 
+        notification_policy_type::on_startstop_type on_start_func() const;
+        notification_policy_type::on_startstop_type on_stop_func() const;
+        notification_policy_type::on_error_type on_error_func() const;
+
+        notification_policy_type::on_startstop_type on_start_func(
+            notification_policy_type::on_startstop_type&&);
+        notification_policy_type::on_startstop_type on_stop_func(
+            notification_policy_type::on_startstop_type&&);
+        notification_policy_type::on_error_type on_error_func(
+            notification_policy_type::on_error_type&&);
+
     protected:
         void init_tss();
         void deinit_tss();
@@ -334,7 +333,7 @@ namespace hpx
 
         // certain components (such as PAPI) require all threads to be
         // registered with the library
-        boost::scoped_ptr<util::thread_mapper> thread_support_;
+        std::unique_ptr<util::thread_mapper> thread_support_;
 
         // topology and affinity data
         threads::topology& topology_;
@@ -345,8 +344,13 @@ namespace hpx
 
         std::atomic<state> state_;
 
-        boost::scoped_ptr<components::server::memory> memory_;
-        boost::scoped_ptr<components::server::runtime_support> runtime_support_;
+        std::unique_ptr<components::server::memory> memory_;
+        std::unique_ptr<components::server::runtime_support> runtime_support_;
+
+        // support tieing in external functions to be called for thread events
+        notification_policy_type::on_startstop_type on_start_func_;
+        notification_policy_type::on_startstop_type on_stop_func_;
+        notification_policy_type::on_error_type on_error_func_;
     };
 }   // namespace hpx
 

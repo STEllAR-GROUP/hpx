@@ -39,38 +39,39 @@ namespace hpx { namespace threads { namespace executors
             // situations.
             void add(closure_type&& f, util::thread_description const& desc,
                 threads::thread_state_enum initial_state, bool run_now,
-                threads::thread_stacksize stacksize, error_code& ec);
+                threads::thread_stacksize stacksize,
+                threads::thread_schedule_hint schedulehint,
+                error_code& ec) override;
 
             // Schedule given function for execution in this executor no sooner
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
-            void add_at(
-                util::steady_clock::time_point const& abs_time,
+            void add_at(util::steady_clock::time_point const& abs_time,
                 closure_type&& f, util::thread_description const& desc,
-                threads::thread_stacksize stacksize, error_code& ec);
+                threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Schedule given function for execution in this executor no sooner
             // than time rel_time from now. This call never blocks, and may
             // violate bounds on the executor's queue size.
-            void add_after(
-                util::steady_clock::duration const& rel_time,
+            void add_after(util::steady_clock::duration const& rel_time,
                 closure_type&& f, util::thread_description const& desc,
-                threads::thread_stacksize stacksize, error_code& ec);
+                threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Return an estimate of the number of waiting tasks.
-            std::uint64_t num_pending_closures(error_code& ec) const;
+            std::uint64_t num_pending_closures(error_code& ec) const override;
 
             // Reset internal (round robin) thread distribution scheme
-            void reset_thread_distribution();
+            void reset_thread_distribution() override;
 
             // Set the new scheduler mode
-            void set_scheduler_mode(threads::policies::scheduler_mode mode);
+            void set_scheduler_mode(
+                threads::policies::scheduler_mode mode) override;
 
             // Return the runtime status of the underlying scheduler
             hpx::state get_state() const;
 
             // retrieve executor id
-            executor_id get_id() const
+            executor_id get_id() const override
             {
                 return create_id(reinterpret_cast<std::size_t>(scheduler_base_));
             }
@@ -81,7 +82,8 @@ namespace hpx { namespace threads { namespace executors
 
             // Return the requested policy element
             std::size_t get_policy_element(
-                threads::detail::executor_parameter p, error_code& ec) const;
+                threads::detail::executor_parameter p,
+                error_code& ec) const override;
 
         private:
             policies::scheduler_base* scheduler_base_;

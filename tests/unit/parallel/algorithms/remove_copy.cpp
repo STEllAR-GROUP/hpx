@@ -12,12 +12,16 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_copy(ExPolicy policy, IteratorTag)
 {
@@ -30,7 +34,9 @@ void test_remove_copy(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size()/2);
-    std::size_t middle_idx =std::rand() % (c.size()/2);
+    std::uniform_int_distribution<> dis(0,(c.size()>>1)-1);
+
+    std::size_t middle_idx =dis(gen);
     auto middle = std::begin(c) + middle_idx;
     std::fill(std::begin(c), middle, 1);
     std::fill(middle, std::end(c), 2);
@@ -56,7 +62,9 @@ void test_remove_copy_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size()/2);
-    std::size_t middle_idx =std::rand() % (c.size()/2);
+    std::uniform_int_distribution<> dis(0,(c.size()>>1)-1);
+
+    std::size_t middle_idx =dis(gen);
     auto middle = std::begin(c) + middle_idx;
     std::fill(std::begin(c), middle, 1);
     std::fill(middle, std::end(c), 2);
@@ -155,49 +163,12 @@ void test_remove_copy()
 
     test_remove_copy_async(execution::seq(execution::task), IteratorTag());
     test_remove_copy_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_remove_copy(execution_policy(execution::seq), IteratorTag());
-    test_remove_copy(execution_policy(execution::par), IteratorTag());
-    test_remove_copy(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_remove_copy(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_remove_copy(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
-
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    // assure output iterator will work
-    test_remove_copy_outiter(execution::seq, IteratorTag());
-    test_remove_copy_outiter(execution::par, IteratorTag());
-    test_remove_copy_outiter(execution::par_unseq, IteratorTag());
-
-    test_remove_copy_outiter_async(execution::seq(execution::task),
-        IteratorTag());
-    test_remove_copy_outiter_async(execution::par(execution::task),
-        IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_remove_copy_outiter(execution_policy(execution::seq), IteratorTag());
-    test_remove_copy_outiter(execution_policy(execution::par), IteratorTag());
-    test_remove_copy_outiter(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_remove_copy_outiter(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_remove_copy_outiter(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
-#endif
 }
 
 void remove_copy_test()
 {
     test_remove_copy<std::random_access_iterator_tag>();
     test_remove_copy<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_remove_copy<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -290,25 +261,12 @@ void test_remove_copy_exception()
         IteratorTag());
     test_remove_copy_exception_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_remove_copy_exception(execution_policy(execution::seq), IteratorTag());
-    test_remove_copy_exception(execution_policy(execution::par), IteratorTag());
-
-    test_remove_copy_exception(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_remove_copy_exception(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void remove_copy_exception_test()
 {
     test_remove_copy_exception<std::random_access_iterator_tag>();
     test_remove_copy_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_remove_copy_exception<std::input_iterator_tag>();
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -399,25 +357,12 @@ void test_remove_copy_bad_alloc()
         IteratorTag());
     test_remove_copy_bad_alloc_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_remove_copy_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_remove_copy_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_remove_copy_bad_alloc(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_remove_copy_bad_alloc(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void remove_copy_bad_alloc_test()
 {
     test_remove_copy_bad_alloc<std::random_access_iterator_tag>();
     test_remove_copy_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_remove_copy_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
@@ -427,7 +372,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     remove_copy_test();
     remove_copy_exception_test();

@@ -10,6 +10,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <atomic>
+#include <chrono>
 #include <cstdint>
 #include <vector>
 
@@ -55,13 +56,15 @@ void test_remote_async_cb(hpx::id_type const& target)
         callback_called.store(0);
         hpx::future<std::int32_t> f1 = hpx::async_cb(call, dec_f, &cb, 42);
         HPX_TEST_EQ(f1.get(), 41);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         hpx::future<std::int32_t> f2 =
             hpx::async_cb(hpx::launch::all, call, dec_f, &cb, 42);
         HPX_TEST_EQ(f2.get(), 41);
-        HPX_TEST_EQ(callback_called.load(), 1);
+
+        // The callback should have been called 2 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST_EQ(callback_called.load(), 2);
     }
 
     {
@@ -73,13 +76,15 @@ void test_remote_async_cb(hpx::id_type const& target)
         hpx::future<std::int32_t> f1 =
             hpx::async_cb<call_action>(dec_f, &cb, 42);
         HPX_TEST_EQ(f1.get(), 41);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         hpx::future<std::int32_t> f2 =
             hpx::async_cb<call_action>(hpx::launch::all, dec_f, &cb, 42);
         HPX_TEST_EQ(f2.get(), 41);
-        HPX_TEST_EQ(callback_called.load(), 1);
+
+        // The callback should have been called 2 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST_EQ(callback_called.load(), 2);
     }
 }
 

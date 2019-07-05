@@ -29,11 +29,11 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -81,6 +81,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         // loop as long this coroutine has been rebound
         do
         {
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
+            finish_switch_fiber(nullptr, m_caller);
+#endif
             std::exception_ptr tinfo;
             try
             {
@@ -91,8 +94,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
                     result_last = m_fun(*this->args());
                     HPX_ASSERT(result_last.first == thread_state_enum::terminated);
-
-                    this->reset();
                 }
 
                 // return value to other side of the fence
@@ -101,9 +102,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             catch (...) {
                 status = super_type::ctx_exited_abnormally;
                 tinfo = std::current_exception();
-                this->reset();
             }
 
+            this->reset();
             this->do_return(status, std::move(tinfo));
         } while (this->m_state == super_type::ctx_running);
 

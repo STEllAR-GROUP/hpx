@@ -13,17 +13,9 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-#ifndef JT28092007_format_HPP_DEFINED
-#error do not include directly include hpx/util/logging/format.hpp or hpx/util/logging/writer/format_write.hpp instead
-#endif
-
 // this is fixed!
 #ifndef JT28092007_format_write_detail_HPP_DEFINED
 #define JT28092007_format_write_detail_HPP_DEFINED
-
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
 
 #include <hpx/util/logging/detail/fwd.hpp>
 
@@ -33,7 +25,7 @@
 namespace hpx { namespace util { namespace logging {
 
 namespace format_and_write {
-    template<class msg_type> struct simple ;
+    struct simple ;
 }
 
 /**
@@ -48,8 +40,7 @@ namespace writer {
 @brief Allows custom formatting of the message before %logging it,
 and writing it to several destinations.
 
-Once the message has been @ref hpx::util::logging::gather "gathered",
-it's time to write it.
+Once the message has been "gathered", it's time to write it.
 The current class defines the following concepts:
 - formatter - allows formatting the message before writing it
 - destination - is a place where the message is to be written to (like, the console,
@@ -72,8 +63,7 @@ and then all destinations are called, in the order they were added.
 You can easily access the router() instance.
 
 @code
-typedef logger< gather::ostream_like::return_cache_str<> ,
-format_write< ... > > logger_type;
+typedef logger< format_write > logger_type;
 HPX_DECLARE_LOG(g_l, logger_type)
 HPX_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
 #define L_ HPX_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
@@ -95,10 +85,6 @@ L_ << "testing " << i << i+1 << i+2;
 In the above case, @c formatter::idx() is called, then @c formatter::time(),
 then @c formatter::append_newline(). Now, the destinations are called:
 @c destination::cout(), and then @c destination::file().
-
-Most of the time this is ok, and this is what the @ref msg_route::simple "default router"
-does. However, there are other routers
-in the msg_route namespace. For instance, take a look at msg_route::with_route class.
 
 
 
@@ -130,8 +116,6 @@ See manipulator.
 @param destination_base The base class for all destination classes from your application.
 See manipulator.
 
-@param lock_resource How will we lock important resources - routing them (msg_route)
-
 @param apply_format_and_write [optional] The class that knows how to call
 the formatters and destinations. See @ref apply_format_and_write_object
 
@@ -153,31 +137,18 @@ if we were to keep smart pointers within the router itself.
 @bug adding a spaced generic formatter and deleting the formatter - it won't happen
 
 */
-template<
-        class formatter_base,
-        class destination_base,
-        class lock_resource = default_ ,
-        class apply_format_and_write = default_ ,
-        class router_type = msg_route::simple<formatter_base, destination_base,
-            lock_resource> ,
-        class formatter_array = array::shared_ptr_holder<formatter_base> ,
-        class destination_array = array::shared_ptr_holder<destination_base> >
 struct format_write {
+    using formatter_base = formatter::base;
+    using destination_base = destination::base;
+    using router_type = msg_route::simple;
+    using formatter_array = array::ptr_holder<formatter_base>;
+    using destination_array = array::ptr_holder<destination_base>;
+
     typedef typename formatter_base::ptr_type formatter_ptr;
     typedef typename destination_base::ptr_type destination_ptr;
 
-    typedef typename use_default<apply_format_and_write,
-        ::hpx::util::logging::format_and_write
-        ::simple<typename formatter_base::raw_param> >
-        ::type apply_format_and_write_type;
-
-    typedef typename hpx::util::logging::detail::to_override<formatter_base>
-        ::type override_;
-    typedef typename use_default<lock_resource, typename hpx::util::logging
-        ::types<override_>::lock_resource > ::type lock_resource_type;
-
-    typedef formatter_base formatter_base_type;
-    typedef destination_base destination_base_type;
+    typedef ::hpx::util::logging::format_and_write::simple
+        apply_format_and_write_type;
 
 
     format_write() : m_router(m_formatters, m_destinations) {}
@@ -268,7 +239,7 @@ public:
         "spacer" string
     */
     template<class formatter> void add_formatter(formatter fmt,
-        const char_type * format_str) {
+        const char * format_str) {
         add_formatter( spacer(fmt, format_str) );
     }
 
@@ -314,7 +285,7 @@ public:
     /**
         does the actual write
     */
-    template<class msg_type> void operator()(msg_type & msg) const {
+    void operator()(msg_type & msg) const {
         router().template write<apply_format_and_write_type>(msg);
     }
 
@@ -328,7 +299,4 @@ private:
 
 }}}
 
-#include <hpx/util/logging/detail/use_format_write.hpp>
-
 #endif
-

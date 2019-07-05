@@ -48,6 +48,7 @@ set(tests
     shared_future_then_2166
     shared_mutex_1702
     shared_stated_leaked_1211
+    shared_future_then_with_executor_3634
     sliding_semaphore_2338
     split_future_2246
     wait_all_hang_1946
@@ -85,6 +86,11 @@ set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
 set(wait_all_hang_1946_PARAMETERS THREADS_PER_LOCALITY 8)
 set(wait_all_hang_1946_FLAGS DEPENDENCIES iostreams_component)
 
+if(HPX_WITH_NETWORKING)
+  set(tests ${tests} barrier_3792)
+  set(barrier_3792_PARAMETERS LOCALITIES 3 THREADS_PER_LOCALITY 1)
+endif()
+
 # Create test cases
 foreach(test ${tests})
   set(sources
@@ -111,7 +117,7 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.regressions.lcos_dir.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()
 
 add_hpx_test(
@@ -123,12 +129,21 @@ add_hpx_test(
 # compile only tests
 if(HPX_WITH_COMPILE_ONLY_TESTS)
   set(compile_tests
-      fail_future_2667
+      dataflow_future_ref_3639
       future_range_ambiguity_2032
       wait_all_std_array_2035
      )
 
-  set(fail_future_2667_FLAGS FAILURE_EXPECTED)
+  if(HPX_WITH_FAIL_COMPILE_TESTS)
+    set(fail_compile_tests
+        fail_future_2667
+       )
+    foreach(fail_compile_test ${fail_compile_tests})
+      set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
+    endforeach()
+
+    set(compile_tests ${compile_tests} ${fail_compile_tests})
+  endif()
 
   foreach(compile_test ${compile_tests})
     set(sources

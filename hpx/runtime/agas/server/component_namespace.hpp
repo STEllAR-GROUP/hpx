@@ -13,7 +13,6 @@
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/util/function.hpp>
@@ -79,16 +78,17 @@ struct HPX_EXPORT component_namespace
         struct api_counter_data
         {
             api_counter_data()
-                : count_(0)
-                , time_(0)
+              : count_(0)
+              , time_(0)
+              , enabled_(false)
             {}
 
             std::atomic<std::int64_t> count_;
             std::atomic<std::int64_t> time_;
+            bool enabled_;
         };
 
-        counter_data()
-        {}
+        counter_data() = default;
 
     public:
         // access current counter values
@@ -118,6 +118,8 @@ struct HPX_EXPORT component_namespace
         void increment_iterate_types_count();
         void increment_get_component_type_name_count();
         void increment_num_localities_count();
+
+        void enable_all();
 
     private:
         friend struct component_namespace;

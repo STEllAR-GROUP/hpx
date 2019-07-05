@@ -13,11 +13,18 @@
 
 #ifdef HPX_HAVE_APEX
 #include "apex_api.hpp"
+#include <memory>
+#include <cstdint>
+#include <string>
+typedef std::shared_ptr<apex::task_wrapper> apex_task_wrapper;
+#else
+typedef void* apex_task_wrapper;
 #endif
 
 namespace hpx { namespace util
 {
 #ifdef HPX_HAVE_APEX
+
     static void hpx_util_apex_init_startup(void)
     {
         apex::init(nullptr, hpx::get_locality_id(),
@@ -35,36 +42,48 @@ namespace hpx { namespace util
         apex::finalize();
     }
 
+    HPX_EXPORT apex_task_wrapper apex_new_task(
+                thread_description const& description,
+                std::uint32_t parent_task_locality,
+                threads::thread_id_type const& parent_task);
+
+    inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
+                thread_description const& description)
+    {
+        if (wrapper == nullptr) {
+            threads::thread_id_type parent_task(nullptr);
+            // doesn't matter which locality we use, the parent is null
+            return apex_new_task(description, 0, parent_task);
+        } else if (description.kind() == thread_description::data_type_description) {
+            return apex::update_task(wrapper,
+                description.get_description());
+        } else {
+            return apex::update_task(wrapper,
+                description.get_address());
+        }
+    }
+
+    inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper, char const* name)
+    {
+        if (wrapper == nullptr) {
+            apex_task_wrapper parent_task(nullptr);
+            return apex::new_task(std::string(name), UINTMAX_MAX, parent_task);
+        }
+        return apex::update_task(wrapper, name);
+    }
+
+    /* This is a scoped object around task scheduling to measure the time
+     * spent executing hpx threads */
     struct apex_wrapper
     {
-        apex_wrapper(thread_description const& name)
-          : name_(name), stopped(false)
+        apex_wrapper(apex_task_wrapper data_ptr) : stopped(false), data_(nullptr)
         {
-            if (name_.kind() == thread_description::data_type_description)
-            {
-                profiler_ = apex::start(name_.get_description());
-            }
-            else
-            {
-                profiler_ = apex::start(
-                    apex_function_address(name_.get_address()));
-            }
-        }
-        apex_wrapper(thread_description const& name, void** const data_ptr)
-          : name_(name), stopped(false)
-        {
-            if (name_.kind() == thread_description::data_type_description)
-            {
-                // not a mistake... we need to pass in the address of this
-                // pointer, so that we can assign data to it in apex...
-                profiler_ = apex::start(name_.get_description(), data_ptr);
-            }
-            else
-            {
-                // not a mistake... we need to pass in the address of this
-                // pointer, so that we can assign data to it in apex...
-                profiler_ = apex::start(
-                    apex_function_address(name_.get_address()), data_ptr);
+            /* APEX internal actions are not timed.  Otherwise, we would
+             * end up with recursive timers. So it's possible to have
+             * a null task wrapper pointer here. */
+            if (data_ptr != nullptr) {
+                data_ = data_ptr;
+                apex::start(data_);
             }
         }
         ~apex_wrapper()
@@ -75,25 +94,34 @@ namespace hpx { namespace util
         void stop() {
             if(!stopped) {
                 stopped = true;
-                apex::stop(profiler_);
+            /* APEX internal actions are not timed.  Otherwise, we would
+             * end up with recursive timers. So it's possible to have
+             * a null task wrapper pointer here. */
+                if (data_ != nullptr) {
+                    apex::stop(data_);
+                }
             }
         }
 
         void yield() {
             if(!stopped) {
                 stopped = true;
-                apex::yield(profiler_);
+            /* APEX internal actions are not timed.  Otherwise, we would
+             * end up with recursive timers. So it's possible to have
+             * a null task wrapper pointer here. */
+                if (data_ != nullptr) {
+                    apex::yield(data_);
+                }
             }
         }
 
-        thread_description name_;
         bool stopped;
-        apex::profiler * profiler_;
+        apex_task_wrapper data_;
     };
 
     struct apex_wrapper_init
     {
-        apex_wrapper_init(int argc, char **argv)
+        apex_wrapper_init(int /*argc*/, char ** /*argv*/)
         {
             //apex::init(nullptr, hpx::get_locality_id(),
             //    hpx::get_initial_num_localities());
@@ -108,10 +136,23 @@ namespace hpx { namespace util
     inline void apex_init() {}
     inline void apex_finalize() {}
 
+    inline apex_task_wrapper apex_new_task(
+                thread_description const& description,
+                std::uint32_t parent_task_locality,
+                threads::thread_id_type const& parent_task) {return nullptr;}
+
+    inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
+                thread_description const& description) {return nullptr;}
+
+    inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
+                char const* name) {return nullptr;}
+
     struct apex_wrapper
     {
-        apex_wrapper(thread_description const& name) {}
+        apex_wrapper(apex_task_wrapper data_ptr) {}
         ~apex_wrapper() {}
+        void stop(void) {}
+        void yield(void) {}
     };
 
     struct apex_wrapper_init

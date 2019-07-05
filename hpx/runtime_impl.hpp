@@ -23,7 +23,6 @@
 #include <hpx/runtime/threads/topology.hpp> //! FIXME remove
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <cstddef>
@@ -32,6 +31,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -89,7 +89,7 @@ namespace hpx
         ///                   invocation of the function object given by the
         ///                   parameter \p func. Otherwise it will return zero.
         int start(util::function_nonser<hpx_main_function_type> const& func,
-                bool blocking = false);
+                bool blocking = false) override;
 
         /// \brief Start the runtime system
         ///
@@ -103,14 +103,14 @@ namespace hpx
         ///                   return the value as returned as the result of the
         ///                   invocation of the function object given by the
         ///                   parameter \p func. Otherwise it will return zero.
-        int start(bool blocking = false);
+        int start(bool blocking = false) override;
 
         /// \brief Wait for the shutdown action to be executed
         ///
         /// \returns          This function will return the value as returned
         ///                   as the result of the invocation of the function
         ///                   object given by the parameter \p func.
-        int wait();
+        int wait() override;
 
         /// \brief Initiate termination of the runtime system
         ///
@@ -121,7 +121,7 @@ namespace hpx
         ///                   return immediately. Use a second call to stop
         ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
-        void stop(bool blocking = true);
+        void stop(bool blocking = true) override;
 
         /// \brief Stop the runtime system, wait for termination
         ///
@@ -137,11 +137,11 @@ namespace hpx
 
         /// \brief Suspend the runtime system
         ///
-        int suspend();
+        int suspend() override;
 
         /// \brief Resume the runtime system
         ///
-        int resume();
+        int resume() override;
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
@@ -149,8 +149,8 @@ namespace hpx
         ///                   the error has been detected in.
         /// \param e          [in] This is an instance encapsulating an
         ///                   exception which lead to this function call.
-        void report_error(std::size_t num_thread,
-            std::exception_ptr const& e);
+        bool report_error(std::size_t num_thread,
+            std::exception_ptr const& e) override;
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
@@ -160,7 +160,7 @@ namespace hpx
         /// \note This function will retrieve the number of the current
         ///       shepherd thread and forward to the report_error function
         ///       above.
-        void report_error(std::exception_ptr const& e);
+        bool report_error(std::exception_ptr const& e) override;
 
         /// \brief Run the HPX runtime system, use the given function for the
         ///        main \a thread and block waiting for all threads to
@@ -184,60 +184,58 @@ namespace hpx
         /// \returns          This function will return the value as returned
         ///                   as the result of the invocation of the function
         ///                   object given by the parameter \p func.
-        int run(util::function_nonser<hpx_main_function_type> const& func);
+        int run(
+            util::function_nonser<hpx_main_function_type> const& func) override;
 
         /// \brief Run the HPX runtime system, initially use the given number
         ///        of (OS) threads in the thread-manager and block waiting for
         ///        all threads to finish.
         ///
         /// \returns          This function will always return 0 (zero).
-        int run();
+        int run() override;
 
         /// Rethrow any stored exception (to be called after stop())
-        void rethrow_exception();
+        void rethrow_exception() override;
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Connection>
-        bool register_error_sink(F sink, Connection& conn,
-            bool unregister_default = true)
+        template <typename F>
+        components::server::console_error_dispatcher::sink_type
+        set_error_sink(F&& sink)
         {
-            if (unregister_default)
-                default_error_sink_.disconnect();
-
             return components::server::get_error_dispatcher().
-                register_error_sink(sink, conn);
+                set_error_sink(std::forward<F>(sink));
         }
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Allow access to the AGAS client instance used by the HPX
         ///        runtime.
-        naming::resolver_client& get_agas_client()
+        naming::resolver_client& get_agas_client() override
         {
             return agas_client_;
         }
 
         /// \brief Allow access to the parcel handler instance used by the HPX
         ///        runtime.
-        parcelset::parcelhandler const& get_parcel_handler() const
+        parcelset::parcelhandler const& get_parcel_handler() const override
         {
             return parcel_handler_;
         }
 
-        parcelset::parcelhandler& get_parcel_handler()
+        parcelset::parcelhandler& get_parcel_handler() override
         {
             return parcel_handler_;
         }
 
         /// \brief Allow access to the thread manager instance used by the HPX
         ///        runtime.
-        hpx::threads::threadmanager& get_thread_manager()
+        hpx::threads::threadmanager& get_thread_manager() override
         {
             return *thread_manager_;
         }
 
         /// \brief Allow access to the applier instance used by the HPX
         ///        runtime.
-        applier::applier& get_applier()
+        applier::applier& get_applier() override
         {
             return applier_;
         }
@@ -247,32 +245,32 @@ namespace hpx
         ///
         /// This accessor returns a reference to the locality endpoints this runtime
         /// instance is associated with.
-        parcelset::endpoints_type const& endpoints() const
+        parcelset::endpoints_type const& endpoints() const override
         {
             return parcel_handler_.endpoints();
         }
 
         /// \brief Returns a string of the locality endpoints (usable in debug output)
-        std::string here() const
+        std::string here() const override
         {
             std::ostringstream strm;
             strm << get_runtime().endpoints();
             return strm.str();
         }
 
-        std::uint64_t get_runtime_support_lva() const
+        std::uint64_t get_runtime_support_lva() const override
         {
             return reinterpret_cast<std::uint64_t>(runtime_support_.get());
         }
 
-        std::uint64_t get_memory_lva() const
+        std::uint64_t get_memory_lva() const override
         {
             return reinterpret_cast<std::uint64_t>(memory_.get());
         }
 
-        naming::gid_type get_next_id(std::size_t count = 1);
+        naming::gid_type get_next_id(std::size_t count = 1) override;
 
-        util::unique_id_ranges& get_id_pool()
+        util::unique_id_ranges& get_id_pool() override
         {
             return id_pool_;
         }
@@ -289,7 +287,7 @@ namespace hpx
         /// \note       The difference to a startup function is that all
         ///             pre-startup functions will be (system-wide) executed
         ///             before any startup function.
-        void add_pre_startup_function(startup_function_type f);
+        void add_pre_startup_function(startup_function_type f) override;
 
         /// Add a function to be executed inside a HPX thread before hpx_main
         ///
@@ -297,7 +295,7 @@ namespace hpx
         ///             thread before hpx_main is executed. This is very useful
         ///             to setup the runtime environment of the application
         ///             (install performance counters, etc.)
-        void add_startup_function(startup_function_type f);
+        void add_startup_function(startup_function_type f) override;
 
         /// Add a function to be executed inside a HPX thread during
         /// hpx::finalize, but guaranteed before any of teh shutdown functions
@@ -311,7 +309,7 @@ namespace hpx
         /// \note       The difference to a shutdown function is that all
         ///             pre-shutdown functions will be (system-wide) executed
         ///             before any shutdown function.
-        void add_pre_shutdown_function(shutdown_function_type f);
+        void add_pre_shutdown_function(shutdown_function_type f) override;
 
         /// Add a function to be executed inside a HPX thread during hpx::finalize
         ///
@@ -319,28 +317,29 @@ namespace hpx
         ///             thread while hpx::finalize is executed. This is very
         ///             useful to tear down the runtime environment of the
         ///             application (uninstall performance counters, etc.)
-        void add_shutdown_function(shutdown_function_type f);
+        void add_shutdown_function(shutdown_function_type f) override;
 
         /// Access one of the internal thread pools (io_service instances)
         /// HPX is using to perform specific tasks. The three possible values
         /// for the argument \p name are "main_pool", "io_pool", "parcel_pool",
         /// and "timer_pool". For any other argument value the function will
         /// return zero.
-        hpx::util::io_service_pool* get_thread_pool(char const* name);
+        hpx::util::io_service_pool* get_thread_pool(char const* name) override;
 
         /// Register an external OS-thread with HPX
         bool register_thread(char const* name, std::size_t num = 0,
-            bool service_thread = true, error_code& ec = throws);
+            bool service_thread = true, error_code& ec = throws) override;
 
         /// Unregister an external OS-thread with HPX
-        bool unregister_thread();
+        bool unregister_thread() override;
 
         /// Generate a new notification policy instance for the given thread
         /// name prefix
-        notification_policy_type get_notification_policy(char const* prefix);
+        notification_policy_type get_notification_policy(
+            char const* prefix) override;
 
     private:
-        void deinit_tss();
+        void deinit_tss(char const* context, std::size_t num);
 
         void init_tss_ex(std::string const& locality, char const* context,
             std::size_t num, char const* postfix, bool service_thread,
@@ -365,7 +364,6 @@ namespace hpx
         parcelset::parcelhandler parcel_handler_;
         naming::resolver_client agas_client_;
         applier::applier applier_;
-        boost::signals2::scoped_connection default_error_sink_;
 
         compat::mutex mtx_;
         std::exception_ptr exception_;

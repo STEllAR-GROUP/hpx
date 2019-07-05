@@ -23,7 +23,7 @@ namespace hpx { namespace traits { namespace detail
     ///////////////////////////////////////////////////////////////////////
     // not every random access sequence is reservable
     // so we need an explicit trait to determine this
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(reserve);
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(reserve)
 
     template <typename Range>
     using is_reservable = std::integral_constant<bool,

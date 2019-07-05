@@ -4,8 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/thread_description.hpp>
 
@@ -48,28 +48,36 @@ namespace hpx { namespace util
 #endif
     }
 
+    /* The priority of description is id::name, altname, id::address */
     void thread_description::init_from_alternative_name(char const* altname)
     {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION) && !defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
-        type_ = data_type_description;
-        data_.desc_ = altname;
-        if (altname == nullptr)
+        hpx::threads::thread_id_type id = hpx::threads::get_self_id();
+        if (id)
         {
-            hpx::threads::thread_id_type id = hpx::threads::get_self_id();
-            if (id)
+            // get the current task description
+            thread_description desc = hpx::threads::get_thread_description(id);
+            type_ = desc.kind();
+            // if the current task has a description, use it.
+            if (type_ == data_type_description)
             {
-                thread_description desc = hpx::threads::get_thread_description(id);
-                type_ = desc.kind();
-                if (type_ == data_type_description)
-                {
-                    data_.desc_ = desc.get_description();
-                }
-                else
-                {
+                data_.desc_ = desc.get_description();
+            }
+            else
+            {
+                // if there is an alternate name passed in, use it.
+                if (altname != nullptr) {
+                    type_ = data_type_description;
+                    data_.desc_ = altname;
+                } else {
+                    // otherwise, use the address of the task.
                     HPX_ASSERT(type_ == data_type_address);
                     data_.addr_ = desc.get_address();
                 }
             }
+        } else {
+            type_ = data_type_description;
+            data_.desc_ = altname;
         }
 #endif
     }

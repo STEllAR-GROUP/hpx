@@ -6,12 +6,11 @@
 
 prefix=@HPX_CONF_PREFIX@
 exec_prefix=${prefix}
-libdir=${exec_prefix}/lib
-includedir=${exec_prefix}/include
+libdir=${exec_prefix}/@HPX_CONF_LIBDIR@
+includedir=${exec_prefix}/@HPX_CONF_INCLUDEDIR@
 
 Name: hpx_application
 Description: High Performance ParalleX (application configuration)
 Version: @HPX_VERSION@
-Libs: @CXX_FLAG@ -L${libdir} @HPX_PKG_LIBRARY_DIR@ @HPX_PKG_LIBRARIES@
+Libs: @CXX_FLAG@ -L${libdir} @HPX_PKG_LINK_LIBRARIES@ @HPX_PKG_LIBRARY_DIR@ @HPX_PKG_LIBRARIES@ @HPX_LINKER_FLAGS@
 Cflags: @CXX_FLAG@ @HPX_CONF_INCLUDE_DIRS@ -DHPX_APPLICATION_EXPORTS -DHPX_ENABLE_ASSERT_HANDLER
-

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,13 +8,14 @@
 #define HPX_LCOS_FUTURE_MAR_06_2012_1059AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
-#include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/concepts.hpp>
@@ -22,18 +23,16 @@
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_callable.hpp>
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/v1/is_executor.hpp>
-#endif
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/util/allocator_deleter.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/identity.hpp>
+#include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/lazy_enable_if.hpp>
 #include <hpx/util/result_of.hpp>
@@ -74,7 +73,8 @@ namespace hpx { namespace lcos { namespace detail
         ar >> value;
 
         boost::intrusive_ptr<shared_state> p(
-            new shared_state(std::move(value), init_no_addref()), false);
+            new shared_state(init_no_addref{}, in_place{}, std::move(value)),
+            false);
 
         f = hpx::traits::future_access<Future>::create(std::move(p));
     }
@@ -90,7 +90,8 @@ namespace hpx { namespace lcos { namespace detail
             serialization::detail::constructor_selector<value_type>::create(ar));
 
         boost::intrusive_ptr<shared_state> p(
-            new shared_state(std::move(*value), init_no_addref()), false);
+            new shared_state(init_no_addref{}, in_place{}, std::move(*value)),
+            false);
 
         f = hpx::traits::future_access<Future>::create(std::move(p));
     }
@@ -116,7 +117,8 @@ namespace hpx { namespace lcos { namespace detail
             ar >> exception;
 
             boost::intrusive_ptr<shared_state> p(
-                new shared_state(std::move(exception), init_no_addref()), false);
+                new shared_state(init_no_addref{}, std::move(exception)),
+                false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::invalid) {
@@ -141,7 +143,8 @@ namespace hpx { namespace lcos { namespace detail
         if (state == future_state::has_value)
         {
             boost::intrusive_ptr<shared_state> p(
-                new shared_state(hpx::util::unused, init_no_addref()), false);
+                new shared_state(init_no_addref{}, in_place{}, hpx::util::unused),
+                false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::has_exception) {
@@ -149,7 +152,8 @@ namespace hpx { namespace lcos { namespace detail
             ar >> exception;
 
             boost::intrusive_ptr<shared_state> p(
-                new shared_state(std::move(exception), init_no_addref()), false);
+                new shared_state(init_no_addref{}, std::move(exception)),
+                false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::invalid) {
@@ -385,20 +389,25 @@ namespace hpx { namespace lcos { namespace detail
     >::type
     make_continuation(Future const& future, Policy && policy, F && f);
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-    template <typename ContResult, typename Future, typename Executor,
-        typename F>
-    inline typename hpx::traits::detail::shared_state_ptr<
-        typename continuation_result<ContResult>::type
-    >::type
-    make_continuation_exec_v1(Future const& future, Executor& exec, F && f);
-#endif
-
     // create non-unwrapping continuations
     template <typename ContResult, typename Future, typename Executor,
         typename F>
     inline typename traits::detail::shared_state_ptr<ContResult>::type
     make_continuation_exec(Future const& future, Executor && exec, F && f);
+
+    template <typename ContResult, typename Allocator, typename Future,
+        typename Policy, typename F>
+    inline typename traits::detail::shared_state_ptr<
+        typename continuation_result<ContResult>::type
+    >::type
+    make_continuation_alloc(Allocator const& a,
+        Future const& future, Policy&& policy, F&& f);
+
+    template <typename ContResult, typename Allocator, typename Future,
+        typename Policy, typename F>
+    inline typename traits::detail::shared_state_ptr<ContResult>::type
+    make_continuation_alloc_nounwrap(Allocator const& a,
+        Future const& future, Policy&& policy, F&& f);
 
     template <typename Executor, typename Future, typename F>
     inline typename hpx::traits::future_then_executor_result<
@@ -428,26 +437,19 @@ namespace hpx { namespace lcos { namespace detail
                 typename hpx::util::invoke_result<F, Future>::type;
 
             typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
-                detail::make_continuation<continuation_result_type>(
+                detail::make_continuation_alloc<continuation_result_type>(
+                    hpx::util::internal_allocator<>{},
                     std::move(fut), std::forward<Policy_>(policy),
                     std::forward<F>(f));
             return hpx::traits::future_access<future<result_type> >::create(
                 std::move(p));
         }
-    };
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-    // parallel executors v1
-    template <typename Future, typename Executor>
-    struct future_then_dispatch<Future, Executor,
-        typename std::enable_if<
-            traits::is_executor<Executor>::value
-        >::type>
-    {
-        template <typename Executor_, typename F>
-        HPX_FORCEINLINE
-        static typename hpx::traits::future_then_result<Future, F>::type
-        call(Future && fut, Executor_ && exec, F && f)
+        template <typename Allocator, typename Policy_, typename F>
+        HPX_FORCEINLINE static
+        typename hpx::traits::future_then_result<Future, F>::type
+        call_alloc(
+            Allocator const& alloc, Future&& fut, Policy_&& policy, F&& f)
         {
             using result_type =
                 typename hpx::traits::future_then_result<Future, F>::result_type;
@@ -455,14 +457,13 @@ namespace hpx { namespace lcos { namespace detail
                 typename hpx::util::invoke_result<F, Future>::type;
 
             typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
-                detail::make_continuation_exec_v1<continuation_result_type>(
-                    std::move(fut), std::forward<Executor_>(exec),
+                detail::make_continuation_alloc<continuation_result_type>(
+                    alloc, std::move(fut), std::forward<Policy_>(policy),
                     std::forward<F>(f));
             return hpx::traits::future_access<future<result_type> >::create(
                 std::move(p));
         }
     };
-#endif
 
     // The overload for future::then taking an executor simply forwards to the
     // corresponding executor customization point.
@@ -487,15 +488,22 @@ namespace hpx { namespace lcos { namespace detail
             return detail::then_execute_helper(std::forward<Executor_>(exec),
                 std::forward<F>(f), std::move(fut));
         }
+
+        template <typename Allocator, typename Executor_, typename F>
+        HPX_FORCEINLINE
+        static typename hpx::traits::future_then_executor_result<
+            Executor_, Future, F>::type
+        call_alloc(Allocator const&, Future && fut, Executor_ && exec, F && f)
+        {
+            return call(std::forward<Future>(fut),
+                std::forward<Executor_>(exec), std::forward<F>(f));
+        }
     };
 
     // plain function, or function object
     template <typename Future, typename FD>
     struct future_then_dispatch<Future, FD, typename std::enable_if<
         !traits::is_launch_policy<FD>::value &&
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-        !traits::is_executor<FD>::value &&
-#endif
         !(
             traits::is_one_way_executor<FD>::value ||
             traits::is_two_way_executor<FD>::value ||
@@ -511,13 +519,33 @@ namespace hpx { namespace lcos { namespace detail
             return future_then_dispatch<Future, launch>::call(
                 std::move(fut), launch::all, std::forward<F>(f));
         }
+
+        template <typename Allocator, typename F>
+        HPX_FORCEINLINE static auto
+        call_alloc(Allocator const& alloc, Future && fut, F && f)
+        ->  decltype(future_then_dispatch<Future, launch>::call_alloc(
+                alloc, std::move(fut), launch::all, std::forward<F>(f)))
+        {
+            return future_then_dispatch<Future, launch>::call_alloc(
+                alloc, std::move(fut), launch::all, std::forward<F>(f));
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
+//     template <typename R>
+//     typename hpx::traits::detail::shared_state_ptr<
+//         typename future_unwrap_result<future<R>>::result_type>::type
+//     unwrap(future<R> && future, error_code& ec = throws);
+
+    template <typename Allocator, typename Future>
+    typename traits::detail::shared_state_ptr<
+        typename future_unwrap_result<Future>::result_type>::type
+    unwrap_alloc(Allocator const& a, Future&& future, error_code& ec = throws);
+
     template <typename Future>
     typename hpx::traits::detail::shared_state_ptr<
         typename future_unwrap_result<Future>::result_type>::type
-    unwrap(Future && future, error_code& ec = throws);
+    unwrap(Future&& future, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
@@ -714,6 +742,29 @@ namespace hpx { namespace lcos { namespace detail
                 std::move(fut), std::forward<T0>(t0), std::forward<F>(f));
         }
 
+        template <typename Allocator, typename F>
+        static auto then_alloc(Allocator const& alloc, Derived && fut, F && f,
+                error_code& ec = throws)
+        ->  decltype(future_then_dispatch<typename std::decay<F>::type>::
+                call_alloc(alloc, std::move(fut), std::forward<F>(f)))
+        {
+            using result_type = decltype(
+                future_then_dispatch<typename std::decay<F>::type>::call_alloc(
+                    alloc, std::move(fut), std::forward<F>(f)));
+
+            if (!fut.shared_state_)
+            {
+                HPX_THROWS_IF(ec, no_state,
+                    "future_base<R>::then",
+                    "this future has no valid shared state");
+                return result_type();
+            }
+
+            return future_then_dispatch<
+                typename std::decay<F>::type>::call_alloc(alloc, std::move(fut),
+                std::forward<F>(f));
+        }
+
         // Effects: blocks until the shared state is ready.
         void wait(error_code& ec = throws) const
         {
@@ -896,13 +947,8 @@ namespace hpx { namespace lcos
         ) : base_type(other.valid() ?
                 detail::downcast_to_void(other, false) : nullptr)
         {
-#if BOOST_VERSION >= 105600
             traits::future_access<future<T> >::
                 detach_shared_state(std::move(other));
-#else
-            // Boost before 1.56 doesn't support detaching intrusive pointers
-            other = future<T>();
-#endif
         }
 
         // Effects:
@@ -994,10 +1040,6 @@ namespace hpx { namespace lcos
         typename util::lazy_enable_if<
             !hpx::traits::is_launch_policy<
                 typename std::decay<F>::type>::value &&
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-            !hpx::traits::is_executor<
-                typename std::decay<F>::type>::value &&
-#endif
             !hpx::traits::is_one_way_executor<
                 typename std::decay<F>::type>::value &&
             !hpx::traits::is_two_way_executor<
@@ -1027,21 +1069,6 @@ namespace hpx { namespace lcos
                 std::forward<Policy>(policy), std::forward<F>(f), ec);
         }
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-        template <typename Executor, typename F>
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        typename util::lazy_enable_if<
-            hpx::traits::is_executor<Executor>::value
-          , hpx::traits::future_then_result<future, F>
-        >::type
-        then(Executor && exec, F && f, error_code& ec = throws)
-        {
-            invalidate on_exit(*this);
-            return base_type::then(std::move(*this),
-                exec, std::forward<F>(f), ec);
-        }
-#endif
-
         template <typename Executor, typename F>
         typename util::lazy_enable_if<
             hpx::traits::is_one_way_executor<
@@ -1057,6 +1084,16 @@ namespace hpx { namespace lcos
             invalidate on_exit(*this);
             return base_type::then(std::move(*this),
                 exec, std::forward<F>(f), ec);
+        }
+
+        template <typename Allocator, typename F>
+        auto then_alloc(Allocator const& alloc, F && f, error_code& ec = throws)
+        ->  decltype(base_type::then_alloc(alloc, std::move(*this),
+                std::forward<F>(f), ec))
+        {
+            invalidate on_exit(*this);
+            return base_type::then_alloc(alloc, std::move(*this),
+                std::forward<F>(f), ec);
         }
 
         using base_type::wait;
@@ -1085,6 +1122,7 @@ namespace hpx { namespace lcos
         make_future_helper(Future && f) //-V659
         {
             return f.then(
+                hpx::launch::sync,
                 [](Future && f) -> T
                 {
                     return util::void_guard<T>(), f.get();
@@ -1126,6 +1164,7 @@ namespace hpx { namespace lcos
         convert_future_helper(Future && f, Conv && conv) //-V659
         {
             return f.then(
+                hpx::launch::sync,
                 [HPX_CAPTURE_FORWARD(conv)](Future && f) -> T
                 {
                     return hpx::util::invoke(conv, f.get());
@@ -1330,10 +1369,6 @@ namespace hpx { namespace lcos
                 typename std::decay<F>::type>::value &&
             !hpx::traits::is_threads_executor<
                 typename std::decay<F>::type>::value &&
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-            !hpx::traits::is_executor<
-                typename std::decay<F>::type>::value &&
-#endif
             !hpx::traits::is_one_way_executor<
                 typename std::decay<F>::type>::value &&
             !hpx::traits::is_two_way_executor<
@@ -1359,33 +1394,13 @@ namespace hpx { namespace lcos
                 std::forward<Policy>(policy), std::forward<F>(f), ec);
         }
 
-        template <typename F>
-        typename hpx::traits::future_then_result<shared_future, F>::type
-        then(threads::executor& sched, F && f, error_code& ec = throws) const
-        {
-            return base_type::then(shared_future(*this),
-                sched, std::forward<F>(f), ec);
-        }
-
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-        template <typename Executor, typename F>
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        typename util::lazy_enable_if<
-            hpx::traits::is_executor<Executor>::value
-          , hpx::traits::future_then_result<shared_future, F>
-        >::type
-        then(Executor && exec, F && f, error_code& ec = throws) const
-        {
-            return base_type::then(shared_future(*this),
-                exec, std::forward<F>(f), ec);
-        }
-#endif
-
         template <typename Executor, typename F>
         typename util::lazy_enable_if<
             hpx::traits::is_one_way_executor<
                 typename std::decay<Executor>::type>::value ||
             hpx::traits::is_two_way_executor<
+                typename std::decay<Executor>::type>::value ||
+            hpx::traits::is_threads_executor<
                 typename std::decay<Executor>::type>::value
           , hpx::traits::future_then_executor_result<Executor, shared_future, F>
         >::type
@@ -1393,6 +1408,15 @@ namespace hpx { namespace lcos
         {
             return base_type::then(shared_future(*this),
                 exec, std::forward<F>(f), ec);
+        }
+
+        template <typename Allocator, typename F>
+        auto then_alloc(Allocator const& alloc, F && f, error_code& ec = throws)
+        ->  decltype(base_type::then_alloc(alloc, std::move(*this),
+                std::forward<F>(f), ec))
+        {
+            return base_type::then_alloc(alloc, shared_future(*this),
+                std::forward<F>(f), ec);
         }
 
         using base_type::wait;
@@ -1427,6 +1451,7 @@ namespace hpx { namespace lcos
             "result type by using the supplied conversion function");
 
         return f.then(
+                hpx::launch::sync,
             [HPX_CAPTURE_FORWARD(conv)](hpx::shared_future<U> const& f)
             {
                 return hpx::util::invoke(conv, f.get());
@@ -1468,22 +1493,76 @@ namespace hpx { namespace lcos
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    // extension: create a pre-initialized future object
-    template <typename Result>
-    future<typename hpx::util::decay_unwrap<Result>::type>
-    make_ready_future(Result && init)
+    // Extension (see wg21.link/P0319), with allocator
+    template <typename T, typename Allocator, typename ... Ts>
+    typename std::enable_if<
+        std::is_constructible<T, Ts&&...>::value || std::is_void<T>::value,
+        future<T>
+    >::type
+    make_ready_future_alloc(Allocator const& a, Ts&&... ts)
     {
-        typedef typename hpx::util::decay_unwrap<Result>::type result_type;
-        typedef lcos::detail::future_data<result_type> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
+        using result_type = T;
 
-        boost::intrusive_ptr<shared_state> p(
-            new shared_state(std::forward<Result>(init), init_no_addref()),
-            false);
+        using base_allocator = Allocator;
+        using shared_state = typename traits::detail::shared_state_allocator<
+                lcos::detail::future_data<result_type>, base_allocator
+            >::type;
 
-        return hpx::traits::future_access<future<result_type> >::create(std::move(p));
+        using other_allocator = typename std::allocator_traits<base_allocator>::
+            template rebind_alloc<shared_state>;
+        using traits = std::allocator_traits<other_allocator>;
+
+        using init_no_addref = typename shared_state::init_no_addref;
+
+        using unique_ptr = std::unique_ptr<shared_state,
+            util::allocator_deleter<other_allocator>>;
+
+        using detail::in_place;
+        other_allocator alloc(a);
+        unique_ptr p(traits::allocate(alloc, 1),
+            util::allocator_deleter<other_allocator>{alloc});
+        traits::construct(alloc, p.get(), init_no_addref{}, in_place{}, alloc,
+            std::forward<Ts>(ts)...);
+
+        return hpx::traits::future_access<future<result_type>>::create(
+            p.release(), false);
     }
 
+    // Extension (see wg21.link/P0319)
+    template <typename T, typename ... Ts>
+    HPX_FORCEINLINE typename std::enable_if<
+        std::is_constructible<T, Ts&&...>::value || std::is_void<T>::value,
+        future<T>
+    >::type
+    make_ready_future(Ts&&... ts)
+    {
+        return make_ready_future_alloc<T>(
+            hpx::util::internal_allocator<>{},
+            std::forward<Ts>(ts)...);
+    }
+    ///////////////////////////////////////////////////////////////////////////
+    // extension: create a pre-initialized future object, with allocator
+    template <int DeductionGuard = 0, typename Allocator, typename T>
+    future<typename hpx::util::decay_unwrap<T>::type>
+    make_ready_future_alloc(Allocator const& a, T&& init)
+    {
+        using result_type = typename hpx::util::decay_unwrap<T>::type;
+        return make_ready_future_alloc<result_type>(a, std::forward<T>(init));
+    }
+
+    // extension: create a pre-initialized future object
+    template <int DeductionGuard = 0, typename T>
+    HPX_FORCEINLINE future<typename hpx::util::decay_unwrap<T>::type>
+    make_ready_future(T&& init)
+    {
+        using result_type = typename hpx::util::decay_unwrap<T>::type;
+        return make_ready_future_alloc<result_type>(
+            hpx::util::internal_allocator<>{},
+            std::forward<T>(init));
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object which holds the
     // given error
     template <typename T>
@@ -1493,7 +1572,7 @@ namespace hpx { namespace lcos
         typedef typename shared_state::init_no_addref init_no_addref;
 
         boost::intrusive_ptr<shared_state> p(
-            new shared_state(e, init_no_addref()), false);
+            new shared_state(init_no_addref{}, e), false);
 
         return hpx::traits::future_access<future<T> >::create(std::move(p));
     }
@@ -1511,39 +1590,56 @@ namespace hpx { namespace lcos
         return future<T>();
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
-    template <typename Result>
-    future<typename hpx::util::decay_unwrap<Result>::type>
+    template <int DeductionGuard = 0, typename T>
+    future<typename hpx::util::decay_unwrap<T>::type>
     make_ready_future_at(hpx::util::steady_time_point const& abs_time,
-        Result&& init)
+        T&& init)
     {
-        typedef typename hpx::util::decay_unwrap<Result>::type result_type;
+        typedef typename hpx::util::decay_unwrap<T>::type result_type;
         typedef lcos::detail::timed_future_data<result_type> shared_state;
 
+        boost::intrusive_ptr<shared_state> p(
+            new shared_state(abs_time.value(), std::forward<T>(init)));
+
         return hpx::traits::future_access<future<result_type> >::create(
-            new shared_state(abs_time.value(), std::forward<Result>(init)));
+            std::move(p));
     }
 
-    template <typename Result>
-    future<typename hpx::util::decay_unwrap<Result>::type>
+    template <int DeductionGuard = 0, typename T>
+    future<typename hpx::util::decay_unwrap<T>::type>
     make_ready_future_after(hpx::util::steady_duration const& rel_time,
-        Result && init)
+        T&& init)
     {
         return make_ready_future_at(rel_time.from_now(),
-            std::forward<Result>(init));
+            std::forward<T>(init));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // extension: create a pre-initialized future object, with allocator
+    template <typename Allocator>
+    inline future<void> make_ready_future_alloc(Allocator const& a)
+    {
+        return make_ready_future_alloc<void>(a, util::unused);
     }
 
     // extension: create a pre-initialized future object
-    inline future<void> make_ready_future()
+    HPX_FORCEINLINE future<void> make_ready_future()
     {
-        typedef lcos::detail::future_data<void> shared_state;
-        typedef shared_state::init_no_addref init_no_addref;
+        return make_ready_future_alloc<void>(
+            hpx::util::internal_allocator<>{}, util::unused);
+    }
 
-        boost::intrusive_ptr<shared_state> p(
-            new shared_state(hpx::util::unused, init_no_addref()), false);
-
-        return hpx::traits::future_access<future<void> >::create(std::move(p));
+    // Extension (see wg21.link/P0319)
+    template <typename T>
+    HPX_FORCEINLINE typename std::enable_if<
+        std::is_void<T>::value, future<void>
+    >::type
+    make_ready_future()
+    {
+        return make_ready_future();
     }
 
     // extension: create a pre-initialized future object which gets ready at
@@ -1557,8 +1653,27 @@ namespace hpx { namespace lcos
             new shared_state(abs_time.value(), hpx::util::unused));
     }
 
+    template <typename T>
+    typename std::enable_if<
+        std::is_void<T>::value, future<void>
+    >::type
+    make_ready_future_at(hpx::util::steady_time_point const& abs_time)
+    {
+        return make_ready_future_at(abs_time);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     inline future<void> make_ready_future_after(
         hpx::util::steady_duration const& rel_time)
+    {
+        return make_ready_future_at(rel_time.from_now());
+    }
+
+    template <typename T>
+    typename std::enable_if<
+        std::is_void<T>::value, future<void>
+    >::type
+    make_ready_future_after(hpx::util::steady_duration const& rel_time)
     {
         return make_ready_future_at(rel_time.from_now());
     }
@@ -1586,6 +1701,8 @@ namespace hpx { namespace serialization
 namespace hpx
 {
     using lcos::make_ready_future;
+    using lcos::make_ready_future_alloc;
+
     using lcos::make_exceptional_future;
     using lcos::make_ready_future_at;
     using lcos::make_ready_future_after;

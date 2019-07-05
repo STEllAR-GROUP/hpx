@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/preprocessor/cat.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -91,7 +91,7 @@ namespace hpx { namespace lcos
             {
                 {
                     std::lock_guard<mutex_type> lk(mtx);
-                    bcast_future = bcast_gate.get_future(1);
+                    bcast_future = bcast_gate.get_future(lk, 1);
 
                     ready_promise.set_value();
                     ready_promise = hpx::lcos::local::promise<void>();

@@ -29,7 +29,7 @@ add_hpx_executable(heartbeat
                    DEPENDENCIES iostreams_component)
 
 # add pseudo-target dependencies
-add_hpx_pseudo_dependencies(examples.heartbeat heartbeat_exe)
+add_hpx_pseudo_dependencies(examples.heartbeat heartbeat)
 
 ###############################################################################
 add_hpx_executable(heartbeat_console
@@ -38,5 +38,6 @@ add_hpx_executable(heartbeat_console
                    DEPENDENCIES iostreams_component)
 
 # add pseudo-target dependencies
-add_hpx_pseudo_dependencies(examples.heartbeat heartbeat_console_exe)
+add_hpx_pseudo_dependencies(examples.heartbeat heartbeat_console)
 
+# TODO: Add non-interactive version that can be tested.

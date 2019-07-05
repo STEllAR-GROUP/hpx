@@ -9,11 +9,14 @@
 ################################################################################
 # C++ feature tests
 ################################################################################
-macro(hpx_perform_cxx_feature_tests)
+function(hpx_perform_cxx_feature_tests)
 
   # Check the availability of certain C++11 language features
   hpx_check_for_cxx11_alias_templates(
     REQUIRED "HPX needs support for C++11 alias templates")
+
+  hpx_check_for_cxx11_alignas(
+    DEFINITIONS HPX_HAVE_CXX11_ALIGNAS)
 
   hpx_check_for_cxx11_auto(
     REQUIRED "HPX needs support for C++11 auto")
@@ -98,6 +101,9 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_exception_ptr(
     REQUIRED "HPX needs support for C++11 std::exception_ptr")
 
+  hpx_check_for_cxx11_std_forward_list(
+    REQUIRED "HPX needs support for C++11 std::forward_list")
+
   hpx_check_for_cxx11_std_initializer_list(
     REQUIRED "HPX needs support for C++11 std::initializer_list")
 
@@ -121,6 +127,9 @@ macro(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx11_std_reference_wrapper(
     REQUIRED "HPX needs support for C++11 std::ref and std::reference_wrapper")
+
+  hpx_check_for_cxx11_std_regex(
+    REQUIRED "HPX needs support for C++11 std::regex")
 
   hpx_check_for_cxx11_std_shared_ptr(
     REQUIRED "HPX needs support for C++11 std::shared_ptr")
@@ -152,7 +161,7 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_noreturn_attribute(
     DEFINITIONS HPX_HAVE_CXX11_NORETURN_ATTRIBUTE)
 
-  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14 OR HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
+  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14 OR HPX_WITH_CXX1Z OR HPX_WITH_CXX17 OR HPX_WITH_CXX2A)
     # Check the availability of certain C++14 language features
     hpx_check_for_cxx14_constexpr(
       DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)
@@ -182,12 +191,24 @@ macro(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx14_return_type_deduction()
   endif()
 
-  if(HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
+  if(HPX_WITH_CXX1Z OR HPX_WITH_CXX17 OR HPX_WITH_CXX2A)
     # Check the availability of certain C++17 language features
     hpx_check_for_cxx17_fold_expressions(
         DEFINITIONS HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
 
     hpx_check_for_cxx17_fallthrough_attribute(
       DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
+
+    hpx_check_for_cxx17_hardware_destructive_interference_size(
+      DEFINITIONS HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE)
+
+    hpx_check_for_cxx17_structured_bindings(
+      DEFINITIONS HPX_HAVE_CXX17_STRUCTURED_BINDINGS)
+
+    hpx_check_for_cxx17_if_constexpr(
+      DEFINITIONS HPX_HAVE_CXX17_IF_CONSTEXPR)
+
+    hpx_check_for_cxx17_aligned_new(
+      DEFINITIONS HPX_HAVE_CXX17_ALIGNED_NEW)
   endif()
-endmacro()
+endfunction()

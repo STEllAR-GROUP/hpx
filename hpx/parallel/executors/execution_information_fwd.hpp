@@ -29,42 +29,6 @@ namespace hpx { namespace parallel { namespace execution
         struct has_pending_closures_tag {};
         struct get_pu_mask_tag {};
         struct set_scheduler_mode_tag {};
-
-#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
-        // forward declare customization point implementations
-        template <>
-        struct customization_point<processing_units_count_tag>
-        {
-            template <typename Executor, typename Parameters>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, Parameters& params) const;
-        };
-
-        template <>
-        struct customization_point<has_pending_closures_tag>
-        {
-            template <typename Executor>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec) const;
-        };
-
-        template <>
-        struct customization_point<get_pu_mask_tag>
-        {
-            template <typename Executor>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, threads::topology& topo,
-                std::size_t thread_num) const;
-        };
-
-        template <>
-        struct customization_point<set_scheduler_mode_tag>
-        {
-            template <typename Executor, typename Mode>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, Mode const& mode) const;
-        };
-#endif
         /// \endcond
     }
 
@@ -96,23 +60,15 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Executor, typename Parameters>
         HPX_FORCEINLINE auto
         processing_units_count(Executor && exec, Parameters& params)
-        -> decltype(processing_units_count_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(0, std::forward<Executor>(exec), params))
+        -> typename processing_units_count_fn_helper<
+                typename std::decay<Executor>::type
+            >::template result<Executor, Parameters>::type
         {
             return processing_units_count_fn_helper<
                     typename std::decay<Executor>::type
                 >::call(0, std::forward<Executor>(exec), params);
         }
 
-#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
-        template <typename Executor, typename Parameters>
-        HPX_FORCEINLINE auto customization_point<processing_units_count_tag>::
-        operator()(Executor&& exec, Parameters& params) const
-        {
-            return processing_units_count(std::forward<Executor>(exec), params);
-        }
-#else
         template <>
         struct customization_point<processing_units_count_tag>
         {
@@ -127,30 +83,21 @@ namespace hpx { namespace parallel { namespace execution
                     std::forward<Executor>(exec), params);
             }
         };
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         // has_pending_closures dispatch point
         template <typename Executor>
         HPX_FORCEINLINE auto
         has_pending_closures(Executor && exec)
-        -> decltype(has_pending_closures_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(0, std::forward<Executor>(exec)))
+        -> typename has_pending_closures_fn_helper<
+                typename std::decay<Executor>::type
+            >::template result<Executor>::type
         {
             return has_pending_closures_fn_helper<
                     typename std::decay<Executor>::type
                 >::call(0, std::forward<Executor>(exec));
         }
 
-#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
-        template <typename Executor>
-        HPX_FORCEINLINE auto customization_point<has_pending_closures_tag>::
-        operator()(Executor&& exec) const
-        {
-            return has_pending_closures(std::forward<Executor>(exec));
-        }
-#else
         template <>
         struct customization_point<has_pending_closures_tag>
         {
@@ -162,7 +109,6 @@ namespace hpx { namespace parallel { namespace execution
                 return has_pending_closures(std::forward<Executor>(exec));
             }
         };
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         // get_pu_mask dispatch point
@@ -170,24 +116,15 @@ namespace hpx { namespace parallel { namespace execution
         HPX_FORCEINLINE auto
         get_pu_mask(Executor && exec, threads::topology& topo,
                 std::size_t thread_num)
-        -> decltype(get_pu_mask_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(0, std::forward<Executor>(exec), topo, thread_num))
+        -> typename get_pu_mask_fn_helper<
+                typename std::decay<Executor>::type
+            >::template result<Executor>::type
         {
             return get_pu_mask_fn_helper<
                     typename std::decay<Executor>::type
                 >::call(0, std::forward<Executor>(exec), topo, thread_num);
         }
 
-#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
-        template <typename Executor>
-        HPX_FORCEINLINE auto customization_point<get_pu_mask_tag>::operator()(
-            Executor&& exec, threads::topology& topo,
-            std::size_t thread_num) const
-        {
-            return get_pu_mask(std::forward<Executor>(exec), topo, thread_num);
-        }
-#else
         template <>
         struct customization_point<get_pu_mask_tag>
         {
@@ -202,29 +139,20 @@ namespace hpx { namespace parallel { namespace execution
                     std::forward<Executor>(exec), topo, thread_num);
             }
         };
-#endif
 
         // set_scheduler_mode dispatch point
         template <typename Executor, typename Mode>
         HPX_FORCEINLINE auto
         set_scheduler_mode(Executor && exec, Mode const& mode)
-        -> decltype(set_scheduler_mode_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(0, std::forward<Executor>(exec), mode))
+        -> typename set_scheduler_mode_fn_helper<
+                typename std::decay<Executor>::type
+            >::template result<Executor, Mode>::type
         {
             return set_scheduler_mode_fn_helper<
                     typename std::decay<Executor>::type
                 >::call(0, std::forward<Executor>(exec), mode);
         }
 
-#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
-        template <typename Executor, typename Mode>
-        HPX_FORCEINLINE auto customization_point<set_scheduler_mode_tag>::
-        operator()(Executor&& exec, Mode const& mode) const
-        {
-            return set_scheduler_mode(std::forward<Executor>(exec), mode);
-        }
-#else
         template <>
         struct customization_point<set_scheduler_mode_tag>
         {
@@ -237,7 +165,6 @@ namespace hpx { namespace parallel { namespace execution
                 return set_scheduler_mode(std::forward<Executor>(exec), mode);
             }
         };
-#endif
         /// \endcond
     }
 

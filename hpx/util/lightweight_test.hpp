@@ -9,8 +9,8 @@
 #define HPX_F646702C_6556_48FA_BF9D_3E7959983122
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 
 #include <boost/current_function.hpp>
 #include <boost/io/ios_state.hpp>
@@ -20,6 +20,8 @@
 #include <boost/smart_ptr/detail/spinlock.hpp>
 
 #include <cstddef>
+#include <cstdint>
+#include <sstream>
 #include <iostream>
 #include <mutex>
 
@@ -204,6 +206,20 @@ inline int report_errors(std::ostream& stream = std::cerr)
                << std::endl;
         return 1;
     }
+}
+
+inline void print_cdash_timing(const char *name, double time)
+{
+    // use stringstream followed by single cout for better multithreaded output
+    std::stringstream temp;
+    temp << "<DartMeasurement name=\"" << name << "\" "
+         << "type=\"numeric/double\">" << time << "</DartMeasurement>";
+    std::cout << temp.str() << std::endl;
+}
+
+inline void print_cdash_timing(const char *name, std::uint64_t time)
+{
+    print_cdash_timing(name, time / 1e9);
 }
 
 }} // hpx::util

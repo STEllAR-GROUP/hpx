@@ -150,7 +150,7 @@ namespace libfabric
         // --------------------------------------------------------------------
         parcelport(util::runtime_configuration const& ini,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread);
+            util::function_nonser<void(std::size_t, char const*)> const& on_stop_thread);
 
         // Start the handling of connections.
         bool do_run();
@@ -204,7 +204,8 @@ namespace libfabric
         // This is called whenever the main thread scheduler is idling,
         // is used to poll for events, messages on the libfabric connection
         // --------------------------------------------------------------------
-        bool background_work(std::size_t num_thread);
+        bool background_work(
+            std::size_t num_thread, parcelport_background_mode mode);
         void io_service_work();
         bool background_work_OS_thread();
 
@@ -237,7 +238,7 @@ struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
             boost::log::keywords::format =
                 (
                     boost::log::expressions::stream
-                    // << hpx::util::format("%05d", expr::attr< unsigned int >("LineID"))
+                    // << hpx::util::format("{:05}", expr::attr< unsigned int >("LineID"))
                     << boost::log::expressions::attr< unsigned int >("LineID")
                     << ": <" << boost::log::trivial::severity
                     << "> " << boost::log::expressions::smessage

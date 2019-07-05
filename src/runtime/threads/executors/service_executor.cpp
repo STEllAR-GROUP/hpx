@@ -5,14 +5,15 @@
 
 #include <hpx/runtime/threads/executors/service_executors.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/error_code.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
@@ -113,7 +114,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     void service_executor::add(closure_type&& f,
         util::thread_description const& desc,
         threads::thread_state_enum initial_state, bool run_now,
-        threads::thread_stacksize stacksize, error_code& ec)
+        threads::thread_stacksize stacksize,
+        threads::thread_schedule_hint schedulehint,
+        error_code& ec)
     {
         ++task_count_;
 
@@ -122,7 +125,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 this, std::move(f)));
 
         pool_->get_io_service().post(
-            util::bind(&thread_wrapper_helper::invoke, wfp));
+            util::bind_front(&thread_wrapper_helper::invoke, wfp));
     }
 
     void service_executor::add_no_count(closure_type&& f)
@@ -132,7 +135,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 this, std::move(f)));
 
         pool_->get_io_service().post(
-            util::bind(&thread_wrapper_helper::invoke, wfp));
+            util::bind_front(&thread_wrapper_helper::invoke, wfp));
     }
 
     typedef boost::asio::basic_waitable_timer<util::steady_clock> deadline_timer;

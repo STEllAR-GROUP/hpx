@@ -5,13 +5,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/config_entry.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <map>
 #include <string>
@@ -72,83 +71,37 @@ namespace hpx { namespace util
                 bool ignore_all_locks_;
             };
 
-            struct tls_tag {};
-            static hpx::util::thread_specific_ptr<held_locks_data, tls_tag> held_locks_;
+            static HPX_NATIVE_TLS held_locks_data held_locks_;
 
             static bool lock_detection_enabled_;
 
             static held_locks_map& get_lock_map()
             {
-                if (nullptr == held_locks_.get())
-                {
-                    held_locks_.reset(new held_locks_data());
-                }
-
-                HPX_ASSERT(nullptr != held_locks_.get());
-                return held_locks_.get()->data_;
+                return held_locks_.data_;
             }
 
             static bool get_lock_enabled()
             {
-                if (nullptr == held_locks_.get())
-                {
-                    held_locks_.reset(new held_locks_data());
-                }
-
-                detail::register_locks::held_locks_data* m = held_locks_.get();
-                HPX_ASSERT(nullptr != m);
-
-                return m->enabled_;
+                return held_locks_.enabled_;
             }
 
             static void set_lock_enabled(bool enable)
             {
-                if (nullptr == held_locks_.get())
-                {
-                    held_locks_.reset(new held_locks_data());
-                }
-
-                detail::register_locks::held_locks_data* m = held_locks_.get();
-                HPX_ASSERT(nullptr != m);
-
-                m->enabled_ = enable;
+                held_locks_.enabled_ = enable;
             }
 
             static bool get_ignore_all_locks()
             {
-                if (nullptr == held_locks_.get())
-                {
-                    held_locks_.reset(new held_locks_data());
-                }
-
-                detail::register_locks::held_locks_data* m = held_locks_.get();
-                HPX_ASSERT(nullptr != m);
-
-                return !m->ignore_all_locks_;
+                return !held_locks_.ignore_all_locks_;
             }
 
             static void set_ignore_all_locks(bool enable)
             {
-                if (nullptr == held_locks_.get())
-                {
-                    held_locks_.reset(new held_locks_data());
-                }
-
-                detail::register_locks::held_locks_data* m = held_locks_.get();
-                HPX_ASSERT(nullptr != m);
-
-                m->ignore_all_locks_ = enable;
-            }
-
-            static void reset_held_lock_data()
-            {
-                held_locks_.reset();
+                held_locks_.ignore_all_locks_ = enable;
             }
         };
 
-        hpx::util::thread_specific_ptr<
-            register_locks::held_locks_data, register_locks::tls_tag
-        > register_locks::held_locks_;
+        HPX_NATIVE_TLS register_locks::held_locks_data register_locks::held_locks_;
         bool register_locks::lock_detection_enabled_ = false;
 
         struct reset_lock_enabled_on_exit
@@ -368,11 +321,6 @@ namespace hpx { namespace util
     {
         detail::register_locks::set_ignore_all_locks(false);
     }
-
-    void reset_held_lock_data()
-    {
-        detail::register_locks::reset_held_lock_data();
-    }
 #else
 
     bool register_lock(void const*, util::register_lock_data*)
@@ -406,10 +354,6 @@ namespace hpx { namespace util
     }
 
     void reset_ignored_all()
-    {
-    }
-
-    void reset_held_lock_data()
     {
     }
 #endif

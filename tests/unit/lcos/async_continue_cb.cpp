@@ -10,6 +10,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <atomic>
+#include <chrono>
 #include <cstdint>
 #include <vector>
 
@@ -57,18 +58,20 @@ int hpx_main()
         hpx::future<int> f1 = hpx::async_continue_cb(
             inc, make_continuation(), hpx::find_here(), &cb, 42);
         HPX_TEST_EQ(f1.get(), 43);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
         hpx::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
-        callback_called.store(0);
         hpx::future<int> f2 = hpx::async_continue_cb(
             inc_f, make_continuation(), hpx::find_here(), &cb, f);
 
         p.set_value(42);
         HPX_TEST_EQ(f2.get(), 43);
-        HPX_TEST_EQ(callback_called.load(), 1);
+
+        // The callback should have been called 2 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST_EQ(callback_called.load(), 2);
     }
 
     // test remotely, if possible, fully equivalent to plain hpx::async
@@ -79,18 +82,20 @@ int hpx_main()
         hpx::future<int> f1 = hpx::async_continue_cb(
             inc, make_continuation(), localities[0], &cb, 42);
         HPX_TEST_EQ(f1.get(), 43);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
         hpx::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
-        callback_called.store(0);
         hpx::future<int> f2 = hpx::async_continue_cb(
             inc_f, make_continuation(), localities[0], &cb, f);
 
         p.set_value(42);
         HPX_TEST_EQ(f2.get(), 43);
-        HPX_TEST_EQ(callback_called.load(), 1);
+
+        // The callback should have been called 2 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST_EQ(callback_called.load(), 2);
     }
 
     // test chaining locally
@@ -99,28 +104,26 @@ int hpx_main()
         hpx::future<int> f = hpx::async_continue_cb(
             inc, make_continuation(mult), hpx::find_here(), &cb, 42);
         HPX_TEST_EQ(f.get(), 86);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, make_continuation()), hpx::find_here(),
             &cb, 42);
         HPX_TEST_EQ(f.get(), 86);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, make_continuation(inc)), hpx::find_here(),
             &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, make_continuation(inc, make_continuation())),
             hpx::find_here(), &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
-        HPX_TEST_EQ(callback_called.load(), 1);
+
+        // The callback should have been called 4 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST_EQ(callback_called.load(), 4);
     }
 
     // test chaining remotely, if possible
@@ -130,57 +133,47 @@ int hpx_main()
         hpx::future<int> f = hpx::async_continue_cb(inc,
             make_continuation(mult, localities[0]), localities[0], &cb, 42);
         HPX_TEST_EQ(f.get(), 86);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, localities[0], make_continuation()),
             localities[0], &cb, 42);
         HPX_TEST_EQ(f.get(), 86);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, localities[0],
                 make_continuation(inc)), localities[0], &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, localities[0],
                 make_continuation(inc, make_continuation())), localities[0],
             &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, localities[0],
                 make_continuation(inc, localities[0])), localities[0], &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, localities[0],
                 make_continuation(inc, localities[0], make_continuation())),
                 localities[0], &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         f = hpx::async_continue_cb(inc,
             make_continuation(mult), localities[0], &cb, 42);
         HPX_TEST_EQ(f.get(), 86);
-        HPX_TEST_EQ(callback_called.load(), 1);
 
-        callback_called.store(0);
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, make_continuation()), localities[0],
             &cb, 42);
         HPX_TEST_EQ(f.get(), 86);
-        HPX_TEST_EQ(callback_called.load(), 1);
+
+        // The callback should have been called 8 times. wait for a short period
+        // of time, to allow it for it to be fully executed
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST_EQ(callback_called.load(), 8);
     }
 
     return hpx::finalize();

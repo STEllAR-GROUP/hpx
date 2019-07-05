@@ -116,7 +116,7 @@ namespace libfabric
 
         // Map of connections started, needed until connection is completed
         hpx::concurrent::unordered_map<uint32_t, promise_tuple_type> endpoint_tmp_;
-        std::unordered_map<uint32_t, fi_addr_t> endpoint_av_;
+        std::unordered_map<uint64_t, fi_addr_t> endpoint_av_;
 
         locality here_;
         locality agas_;
@@ -411,6 +411,13 @@ namespace libfabric
             bind_endpoint_to_queues(ep_active_);
 #else
             bind_endpoint_to_queues(ep_passive_);
+            fabric_info_->handle = &(ep_passive->fid);
+
+            LOG_DEBUG_MSG("Creating active endpoint");
+            new_endpoint_active(fabric_info_, &ep_active_);
+            LOG_DEBUG_MSG("active endpoint " << hexpointer(ep_active_);
+
+            bind_endpoint_to_queues(ep_active_);
 #endif
 
             // filling our vector of receivers...
@@ -487,6 +494,7 @@ namespace libfabric
         locality create_local_endpoint()
         {
             struct fid *id;
+            int ret;
 #ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
             LOG_DEBUG_MSG("Creating active endpoint");
             new_endpoint_active(fabric_info_, &ep_active_);
@@ -501,10 +509,18 @@ namespace libfabric
             LOG_DEBUG_MSG("passive endpoint " << hexpointer(ep_passive_));
             id = &ep_passive_->fid;
 #endif
+
+#ifdef HPX_HAVE_PARCELPORT_TCP
+            // with tcp we do not use PMI boot, so enable the endpoint now
+            LOG_DEBUG_MSG("Enabling endpoint (TCP) " << hexpointer(ep_active_));
+            ret = fi_enable(ep_active_);
+            if (ret) throw fabric_error(ret, "fi_enable");
+#endif
+
             locality::locality_data local_addr;
             std::size_t addrlen = locality::array_size;
             LOG_DEBUG_MSG("Fetching local address using size " << decnumber(addrlen));
-            int ret = fi_getname(id, local_addr.data(), &addrlen);
+            ret = fi_getname(id, local_addr.data(), &addrlen);
             if (ret || (addrlen>locality::array_size)) {
                 fabric_error(ret, "fi_getname - size error or other problem");
             }
@@ -613,7 +629,8 @@ namespace libfabric
         // --------------------------------------------------------------------
         fi_addr_t get_fabric_address(const locality &dest_fabric)
         {
-            return endpoint_av_.find(dest_fabric.ip_address())->second;
+            uint64_t key = (uint64_t)dest_fabric.ip_address() << 32 | dest_fabric.port();
+            return endpoint_av_.find(key)->second;
         }
 
         // --------------------------------------------------------------------
@@ -717,7 +734,16 @@ namespace libfabric
             }
             else if (ret == -FI_EAVAIL) {
                 struct fi_cq_err_entry e = {};
-                /*int err_sz =*/ fi_cq_readerr(txcq_, &e ,0);
+                int err_sz = fi_cq_readerr(txcq_, &e ,0);
+                // from the manpage 'man 3 fi_cq_readerr'
+                //
+                // On error, a negative value corresponding to
+                // 'fabric errno' is returned
+                //
+                if(e.err == err_sz) {
+                    LOG_ERROR_MSG("txcq_ Error with len " << hexlength(e.len)
+                        << "context " << hexpointer(e.op_context));
+                }
                 // flags might not be set correctly
                 if (e.flags == (FI_MSG | FI_SEND)) {
                     LOG_ERROR_MSG("txcq Error for FI_SEND with len " << hexlength(e.len)
@@ -787,7 +813,16 @@ namespace libfabric
             }
             else if (ret == -FI_EAVAIL) {
                 struct fi_cq_err_entry e = {};
-                /*int err_sz =*/ fi_cq_readerr(rxcq_, &e ,0);
+                int err_sz = fi_cq_readerr(rxcq_, &e ,0);
+                // from the manpage 'man 3 fi_cq_readerr'
+                //
+                // On error, a negative value corresponding to
+                // 'fabric errno' is returned
+                //
+                if(e.err == err_sz) {
+                    LOG_ERROR_MSG("txcq_ Error with len " << hexlength(e.len)
+                        << "context " << hexpointer(e.op_context));
+                }
                 LOG_ERROR_MSG("rxcq Error with flags " << hexlength(e.flags)
                     << "len " << hexlength(e.len));
             }
@@ -1037,9 +1072,11 @@ namespace libfabric
             else if (ret != 1) {
                 fabric_error(ret, "fi_av_insert did not return 1");
             }
-            endpoint_av_.insert(std::make_pair(remote.ip_address(), result));
+            uint64_t key = (uint64_t)remote.ip_address() << 32 | remote.port();
+            endpoint_av_.insert(std::make_pair(key, result));
             LOG_DEBUG_MSG("Address inserted in vector "
-                << ipaddress(remote.ip_address()) << hexuint64(result));
+                << ipaddress(remote.ip_address()) << ":"
+                << remote.port() << hexuint64(result));
             FUNC_END_DEBUG_MSG;
             return result;
         }

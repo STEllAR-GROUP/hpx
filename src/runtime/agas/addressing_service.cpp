@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2018 Hartmut Kaiser
+//  Copyright (c) 2011-2019 Hartmut Kaiser
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
@@ -9,45 +9,47 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
-#include <hpx/traits/action_priority.hpp>
-#include <hpx/traits/action_was_object_migrated.hpp>
-#include <hpx/traits/component_supports_migration.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/lcos/wait_all.hpp>
+#include <hpx/lcos/when_all.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
+#include <hpx/runtime/agas/detail/bootstrap_component_namespace.hpp>
+#include <hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp>
 #include <hpx/runtime/agas/locality_namespace.hpp>
-#include <hpx/runtime/agas/primary_namespace.hpp>
-#include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
+#include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
-#include <hpx/runtime/agas/detail/bootstrap_component_namespace.hpp>
-#include <hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp>
+#include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/find_localities.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/traits/action_priority.hpp>
+#include <hpx/traits/action_was_object_migrated.hpp>
+#include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_back.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
+#include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
-#include <hpx/util/insert_checked.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/lcos/wait_all.hpp>
-#include <hpx/lcos/when_all.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -129,8 +131,7 @@ namespace hpx { namespace agas
     }; // }}}
 
 addressing_service::addressing_service(
-    parcelset::parcelhandler& ph
-  , util::runtime_configuration const& ini_
+    util::runtime_configuration const& ini_
   , runtime_mode runtime_type_
     )
   : gva_cache_(new gva_cache_type)
@@ -148,23 +149,27 @@ addressing_service::addressing_service(
   , mem_lva_(0)
   , state_(state_starting)
   , locality_()
+{
+    if (caching_)
+        gva_cache_->reserve(ini_.get_agas_local_cache_size());
+}
+
+void addressing_service::bootstrap(
+    parcelset::parcelhandler& ph, util::runtime_configuration const& ini)
 { // {{{
     LPROGRESS_;
 
-    if (caching_)
-        gva_cache_->reserve(ini_.get_agas_local_cache_size());
-
 #if defined(HPX_HAVE_NETWORKING)
     std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
-    create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini_);
+    create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini);
     if (service_type == service_mode_bootstrap)
     {
-        launch_bootstrap(pp, ph.endpoints(), ini_);
+        launch_bootstrap(pp, ph.endpoints(), ini);
     }
 #else
-    create_big_boot_barrier(nullptr, ph.endpoints(), ini_);
+    create_big_boot_barrier(nullptr, ph.endpoints(), ini);
     HPX_ASSERT(service_type == service_mode_bootstrap);
-    launch_bootstrap(nullptr, ph.endpoints(), ini_);
+    launch_bootstrap(nullptr, ph.endpoints(), ini);
 #endif
 } // }}}
 
@@ -250,7 +255,7 @@ void addressing_service::launch_bootstrap(
             symbol_ns_.ptr());
 
     rt.get_config().parse("assigned locality",
-        hpx::util::format("hpx.locality!=%1%",
+        hpx::util::format("hpx.locality!={1}",
             naming::get_locality_id_from_gid(here)));
 
     std::uint32_t num_threads = hpx::util::get_entry_as<std::uint32_t>(
@@ -266,13 +271,13 @@ void addressing_service::launch_bootstrap(
       , components::get_component_type<components::server::runtime_support>()
       , 1U, rt.get_runtime_support_lva());
 
-    register_name("/0/agas/locality#0", here);
-    if (is_console())
-        register_name("/0/locality#console", here);
-
     naming::gid_type lower, upper;
     get_id_range(HPX_INITIAL_GID_RANGE, lower, upper);
     rt.get_id_pool().set_range(lower, upper);
+
+    register_name("/0/agas/locality#0", here);
+    if (is_console())
+        register_name("/0/locality#console", here);
 } // }}}
 
 void addressing_service::launch_hosted()
@@ -289,8 +294,8 @@ void addressing_service::adjust_local_cache_size(std::size_t cache_size)
             gva_cache_->reserve(cache_size);
 
         LAGAS_(info) << hpx::util::format(
-            "addressing_service::adjust_local_cache_size, previous size: %1%, "
-            "new size: %2%",
+            "addressing_service::adjust_local_cache_size, previous size: {1}, "
+            "new size: {2}",
             previous, cache_size);
     }
 } // }}}
@@ -511,7 +516,7 @@ bool addressing_service::get_console_locality(
 
             LAGAS_(debug) << hpx::util::format(
                 "addressing_server::get_console_locality, "
-                "caching console locality, prefix(%1%)",
+                "caching console locality, prefix({1})",
                 console);
 
             return true;
@@ -761,7 +766,7 @@ bool addressing_service::bind_range_local(
 } // }}}
 
 bool addressing_service::bind_postproc(
-    future<bool> f, naming::gid_type const& lower_id, gva const& g
+    naming::gid_type const& lower_id, gva const& g, future<bool> f
     )
 {
     f.get();
@@ -801,10 +806,12 @@ hpx::future<bool> addressing_service::bind_range_async(
 
     future<bool> f = primary_ns_.bind_gid_async(g, id, locality);
 
-    return f.then(util::bind(
-            util::one_shot(&addressing_service::bind_postproc),
-            this, _1, id, g
-        ));
+    return f.then(
+        hpx::launch::sync,
+        util::one_shot(util::bind_front(
+            &addressing_service::bind_postproc,
+            this, id, g
+        )));
 }
 
 hpx::future<naming::address> addressing_service::unbind_range_async(
@@ -866,6 +873,7 @@ bool addressing_service::is_local_address_cached(
     // Assume non-local operation if the gid is known to have been migrated
     naming::gid_type id(naming::detail::get_stripped_gid_except_dont_cache(gid));
 
+    if (naming::detail::is_migratable(gid))
     {
         std::lock_guard<mutex_type> lock(migrated_objects_mtx_);
         if (was_object_migrated_locked(id))
@@ -923,7 +931,7 @@ bool addressing_service::is_local_lva_encoded_address(
     )
 {
     // NOTE: This should still be migration safe.
-    return naming::detail::strip_internal_bits_from_gid(msb) ==
+    return naming::detail::strip_internal_bits_and_component_type_from_gid(msb) ==
         get_local_locality().get_msb();
 }
 
@@ -934,31 +942,41 @@ bool addressing_service::resolve_locally_known_addresses(
 {
     // LVA-encoded GIDs (located on this machine)
     std::uint64_t lsb = id.get_lsb();
-    std::uint64_t msb =
-        naming::detail::strip_internal_bits_from_gid(id.get_msb());
+    std::uint64_t msb = id.get_msb();
 
     if (is_local_lva_encoded_address(msb))
     {
         addr.locality_ = get_local_locality();
 
         // An LSB of 0 references the runtime support component
-        HPX_ASSERT(rts_lva_);
-
         if (0 == lsb || lsb == rts_lva_)
         {
+            HPX_ASSERT(rts_lva_);
+
             addr.type_ = components::component_runtime_support;
             addr.address_ = rts_lva_;
+            return true;
         }
-        else
+
+        if (naming::refers_to_local_lva(id))
+        {
+            // handle (non-migratable) components located on this locality first
+            addr.type_ = naming::detail::get_component_type_from_gid(msb);
+            addr.address_ = lsb;
+            return true;
+        }
+
+        if (naming::refers_to_virtual_memory(msb))
         {
             HPX_ASSERT(mem_lva_);
 
             addr.type_ = components::component_memory;
             addr.address_ = mem_lva_;
+            return true;
         }
-
-        return true;
     }
+
+    msb = naming::detail::strip_internal_bits_from_gid(msb);
 
     // explicitly resolve localities
     if (naming::is_locality(id))
@@ -995,8 +1013,8 @@ bool addressing_service::resolve_locally_known_addresses(
             addr.locality_ = dest;
             addr.type_ = hpx::components::component_agas_primary_namespace;
             // addr.address_ will be supplied on the target locality
-            return true;
         }
+        return true;
     }
 
     if (HPX_AGAS_SYMBOL_NS_LSB == lsb)
@@ -1013,7 +1031,6 @@ bool addressing_service::resolve_locally_known_addresses(
             addr.type_ = hpx::components::component_agas_symbol_namespace;
             // addr.address_ will be supplied on the target locality
         }
-
         return true;
     }
 
@@ -1085,7 +1102,11 @@ bool addressing_service::resolve_cached(
 
     // special cases
     if (resolve_locally_known_addresses(id, addr))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
         return true;
+    }
 
     // If caching is disabled, bail
     if (!caching_)
@@ -1113,6 +1134,7 @@ bool addressing_service::resolve_cached(
     }
 
     // force routing if target object was migrated
+    if (naming::detail::is_migratable(id))
     {
         std::lock_guard<mutex_type> lock(migrated_objects_mtx_);
         if (was_object_migrated_locked(id))
@@ -1138,7 +1160,7 @@ bool addressing_service::resolve_cached(
 /*
         LAGAS_(debug) << hpx::util::format(
             "addressing_service::resolve_cached, "
-            "cache hit for address %1%, lva %2% (base %3%, lva %4%)",
+            "cache hit for address {1}, lva {2} (base {3}, lva {4})",
             id,
             reinterpret_cast<void*>(addr.address_),
             idbase.get_gid(),
@@ -1153,7 +1175,7 @@ bool addressing_service::resolve_cached(
 
     LAGAS_(debug) << hpx::util::format(
         "addressing_service::resolve_cached, "
-        "cache miss for address %1%",
+        "cache miss for address {1}",
         id);
 
     return false;
@@ -1207,7 +1229,7 @@ hpx::future<naming::id_type> addressing_service::get_colocation_id_async(
 
 ///////////////////////////////////////////////////////////////////////////////
 naming::address addressing_service::resolve_full_postproc(
-    future<primary_namespace::resolved_type> f, naming::gid_type const& id
+    naming::gid_type const& id, future<primary_namespace::resolved_type> f
     )
 {
     using hpx::util::get;
@@ -1267,11 +1289,12 @@ hpx::future<naming::address> addressing_service::resolve_full_async(
     future<primary_namespace::resolved_type> f =
         primary_ns_.resolve_full(gid);
 
-    using util::placeholders::_1;
-    return f.then(util::bind(
-            util::one_shot(&addressing_service::resolve_full_postproc),
-            this, _1, gid
-        ));
+    return f.then(
+        hpx::launch::sync,
+        util::one_shot(util::bind_front(
+            &addressing_service::resolve_full_postproc,
+            this,  gid
+        )));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1403,7 +1426,8 @@ void addressing_service::route(
             util::deferred_call(
                 route_ptr, this, std::move(p), std::move(f), local_priority),
             "addressing_service::route", threads::pending, true,
-            threads::thread_priority_normal, std::size_t(-1),
+            threads::thread_priority_normal,
+            threads::thread_schedule_hint(),
             threads::thread_stacksize_default);
         return;
     }
@@ -1450,7 +1474,7 @@ lcos::future<std::int64_t> addressing_service::incref_async(
     {
         HPX_THROW_EXCEPTION(bad_parameter
           , "addressing_service::incref_async"
-          , hpx::util::format("invalid credit count of %1%", credit));
+          , hpx::util::format("invalid credit count of {1}", credit));
         return lcos::future<std::int64_t>();
     }
 
@@ -1529,10 +1553,12 @@ lcos::future<std::int64_t> addressing_service::incref_async(
 
     // pass the amount of compensated decrefs to the callback
     using util::placeholders::_1;
-    return f.then(util::bind(
-            util::one_shot(&addressing_service::synchronize_with_async_incref),
+    return f.then(
+        hpx::launch::sync,
+        util::one_shot(util::bind(
+            &addressing_service::synchronize_with_async_incref,
             this, _1, keep_alive, pending_decrefs
-        ));
+        )));
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1547,16 +1573,13 @@ void addressing_service::decref(
     if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
-        void (addressing_service::*decref_ptr)(
-            naming::gid_type const&
-          , std::int64_t
-          , error_code&
-        ) = &addressing_service::decref;
-
         threads::register_thread_nullary(
-            util::deferred_call(decref_ptr, this, raw, credit, std::ref(throws)),
+            [=]() -> void {
+                return decref(raw, credit, throws);
+            },
             "addressing_service::decref", threads::pending, true,
-            threads::thread_priority_normal, std::size_t(-1),
+            threads::thread_priority_normal,
+            threads::thread_schedule_hint(),
             threads::thread_stacksize_default, ec);
 
         return;
@@ -1566,7 +1589,7 @@ void addressing_service::decref(
     {
         HPX_THROWS_IF(ec, bad_parameter
           , "addressing_service::decref"
-          , hpx::util::format("invalid credit count of %1%", credit));
+          , hpx::util::format("invalid credit count of {1}", credit));
         return;
     }
 
@@ -1594,7 +1617,7 @@ void addressing_service::decref(
                 HPX_THROWS_IF(ec, bad_parameter
                   , "addressing_service::decref"
                   , hpx::util::format("couldn't insert decref request "
-                        "for %1% (%2%)", raw, credit));
+                        "for {1} ({2})", raw, credit));
                 return;
             }
         }
@@ -1607,21 +1630,6 @@ void addressing_service::decref(
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-bool addressing_service::register_name(
-    std::string const& name
-  , naming::gid_type const& id
-  , error_code& ec
-    )
-{ // {{{
-    try {
-        return symbol_ns_.bind(name, naming::detail::get_stripped_gid(id));
-    }
-    catch (hpx::exception const& e) {
-        HPX_RETHROWS_IF(ec, e, "addressing_service::register_name");
-        return false;
-    }
-} // }}}
-
 static bool correct_credit_on_failure(future<bool> f, naming::id_type id,
     std::int64_t mutable_gid_credit, std::int64_t new_gid_credit)
 {
@@ -1634,10 +1642,45 @@ static bool correct_credit_on_failure(future<bool> f, naming::id_type id,
     return true;
 }
 
+bool addressing_service::register_name(
+    std::string const& name, naming::gid_type const& id, error_code& ec)
+{ // {{{
+    try
+    {
+        return symbol_ns_.bind(name, naming::detail::get_stripped_gid(id));
+    }
+    catch (hpx::exception const& e)
+    {
+        HPX_RETHROWS_IF(ec, e, "addressing_service::register_name");
+    }
+    return false;
+} // }}}
+
+bool addressing_service::register_name(
+    std::string const& name, naming::id_type const& id, error_code& ec)
+{
+    // We need to modify the reference count.
+    naming::gid_type& mutable_gid = const_cast<naming::id_type&>(id).get_gid();
+    naming::gid_type new_gid = naming::detail::split_gid_if_needed(mutable_gid).get();
+    std::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
+
+    try
+    {
+        return symbol_ns_.bind(name, new_gid);
+    }
+    catch (hpx::exception const& e)
+    {
+        if (new_credit != 0)
+        {
+            naming::detail::add_credit_to_gid(mutable_gid, new_credit);
+        }
+        HPX_RETHROWS_IF(ec, e, "addressing_service::register_name");
+    }
+    return false;
+}
+
 lcos::future<bool> addressing_service::register_name_async(
-    std::string const& name
-  , naming::id_type const& id
-    )
+    std::string const& name, naming::id_type const& id)
 { // {{{
     // We need to modify the reference count.
     naming::gid_type& mutable_gid = const_cast<naming::id_type&>(id).get_gid();
@@ -1648,10 +1691,12 @@ lcos::future<bool> addressing_service::register_name_async(
     std::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
     if (new_credit != 0)
     {
-        return f.then(util::bind_back(
-                util::one_shot(&correct_credit_on_failure),
+        return f.then(
+            hpx::launch::sync,
+            util::one_shot(util::bind_back(
+                &correct_credit_on_failure,
                 id, std::int64_t(HPX_GLOBALCREDIT_INITIAL), new_credit
-            ));
+            )));
     }
 
     return f;
@@ -1728,9 +1773,11 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
         symbol_ns_.on_event(name, call_for_past_events, p.get_id());
 
     using util::placeholders::_1;
-    return f.then(util::bind(
-            util::one_shot(&detail::on_register_event), _1, std::move(result_f)
-        ));
+    return f.then(
+        hpx::launch::sync,
+        util::one_shot(util::bind_back(
+            &detail::on_register_event, std::move(result_f)
+        )));
 }
 
 // Return all matching entries in the symbol namespace
@@ -1791,15 +1838,13 @@ void addressing_service::update_cache_entry(
         {
             return;
         }
-        void (addressing_service::*update_cache_entry_ptr)(
-            naming::gid_type const&
-          , gva const &
-          , error_code&
-        ) = &addressing_service::update_cache_entry;
         threads::register_thread_nullary(
-            util::deferred_call(update_cache_entry_ptr, this, id, g, std::ref(throws)),
+            [=]() -> void {
+                return update_cache_entry(id, g, throws);
+            },
             "addressing_service::update_cache_entry", threads::pending, true,
-            threads::thread_priority_normal, std::size_t(-1),
+            threads::thread_priority_normal,
+            threads::thread_schedule_hint(),
             threads::thread_stacksize_default, ec);
     }
 
@@ -1809,7 +1854,7 @@ void addressing_service::update_cache_entry(
         const std::uint64_t count = (g.count ? g.count : 1);
 
         LAGAS_(debug) << hpx::util::format(
-            "addressing_service::update_cache_entry, gid(%1%), count(%2%)",
+            "addressing_service::update_cache_entry, gid({1}), count({2})",
             gid, count);
 
         const gva_cache_key key(gid, count);
@@ -1837,7 +1882,7 @@ void addressing_service::update_cache_entry(
                     LAGAS_(warning) << hpx::util::format(
                         "addressing_service::update_cache_entry, "
                         "aborting update due to key collision in cache, "
-                        "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)",
+                        "new_gid({1}), new_count({2}), old_gid({3}), old_count({4})",
                         gid, count, idbase.get_gid(), idbase.get_count());
                 }
             }
@@ -2403,7 +2448,7 @@ void addressing_service::send_refcnt_requests(
 
         std::stringstream ss;
         hpx::util::format_to(ss,
-            "%1%, dumping client-side refcnt table, requests(%2%):",
+            "{1}, dumping client-side refcnt table, requests({2}):",
             func_name, requests.size());
 
         typedef addressing_service::refcnt_requests_type::const_reference
@@ -2414,7 +2459,7 @@ void addressing_service::send_refcnt_requests(
             // The [client] tag is in there to make it easier to filter
             // through the logs.
             hpx::util::format_to(ss,
-                "\n  [client] gid(%1%), credits(%2%)",
+                "\n  [client] gid({1}), credits({2})",
                 e.first,
                 e.second);
         }
@@ -2446,7 +2491,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
 
         LAGAS_(info) << hpx::util::format(
             "addressing_service::send_refcnt_requests_non_blocking, "
-            "requests(%1%)",
+            "requests({1})",
             p->size());
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
@@ -2519,7 +2564,7 @@ addressing_service::send_refcnt_requests_async(
 
     LAGAS_(info) << hpx::util::format(
         "addressing_service::send_refcnt_requests_async, "
-        "requests(%1%)",
+        "requests({1})",
         p->size());
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
@@ -2584,6 +2629,7 @@ void addressing_service::send_refcnt_requests_sync(
 hpx::future<void> addressing_service::mark_as_migrated(
     naming::gid_type const& gid_
   , util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f //-V669
+  , bool expect_to_be_marked_as_migrating
     )
 {
     if (!gid_)
@@ -2593,6 +2639,8 @@ hpx::future<void> addressing_service::mark_as_migrated(
                 "addressing_service::mark_as_migrated",
                 "invalid reference gid"));
     }
+
+    HPX_ASSERT(naming::detail::is_migratable(gid_));
 
     naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
 
@@ -2623,7 +2671,14 @@ hpx::future<void> addressing_service::mark_as_migrated(
 
         // insert the object into the map of migrated objects
         if (it == migrated_objects_table_.end())
+        {
+            HPX_ASSERT(!expect_to_be_marked_as_migrating);
             migrated_objects_table_.insert(gid);
+        }
+        else
+        {
+            HPX_ASSERT(expect_to_be_marked_as_migrating);
+        }
 
         // avoid interactions with the locking in the cache
         lock.unlock();
@@ -2647,6 +2702,8 @@ void addressing_service::unmark_as_migrated(
         return;
     }
 
+    HPX_ASSERT(naming::detail::is_migratable(gid_));
+
     naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
 
     std::unique_lock<mutex_type> lock(migrated_objects_mtx_);
@@ -2654,7 +2711,7 @@ void addressing_service::unmark_as_migrated(
     migrated_objects_table_type::iterator it =
         migrated_objects_table_.find(gid);
 
-    // insert the object into the map of migrated objects
+    // remove the object from the map of migrated objects
     if (it != migrated_objects_table_.end())
     {
         migrated_objects_table_.erase(it);
@@ -2671,7 +2728,7 @@ void addressing_service::unmark_as_migrated(
     }
 }
 
-std::pair<naming::id_type, naming::address>
+hpx::future<std::pair<naming::id_type, naming::address>>
 addressing_service::begin_migration(naming::id_type const& id)
 {
     typedef std::pair<naming::id_type, naming::address> result_type;
@@ -2679,9 +2736,11 @@ addressing_service::begin_migration(naming::id_type const& id)
     if (!id)
     {
         HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::begin_migration_async",
+            "addressing_service::begin_migration",
             "invalid reference id");
     }
+
+    HPX_ASSERT(naming::detail::is_migratable(id.get_gid()));
 
     naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
 
@@ -2695,9 +2754,11 @@ bool addressing_service::end_migration(
     if (!id)
     {
         HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::end_migration_async",
+            "addressing_service::end_migration",
             "invalid reference id");
     }
+
+    HPX_ASSERT(naming::detail::is_migratable(id.get_gid()));
 
     naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
 
@@ -2727,6 +2788,11 @@ std::pair<bool, components::pinned_ptr>
             "addressing_service::was_object_migrated",
             "invalid reference gid");
         return std::make_pair(false, components::pinned_ptr());
+    }
+
+    if (!naming::detail::is_migratable(gid))
+    {
+        return std::make_pair(false, f());
     }
 
     // Always first grab the AGAS lock before invoking the user supplied
@@ -2825,7 +2891,7 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == std::size_t(~0U))
+        if (sequence_nr == ~0U)
         {
             sequence_nr =
                 std::size_t(naming::get_locality_id_from_id(find_here()));
@@ -2845,7 +2911,7 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == std::size_t(~0U))
+        if (sequence_nr == ~0U)
         {
             sequence_nr =
                 std::size_t(naming::get_locality_id_from_id(find_here()));
@@ -2859,6 +2925,7 @@ namespace hpx
         hpx::future<hpx::id_type> f, std::size_t sequence_nr)
     {
         return f.then(
+            hpx::launch::sync,
             [sequence_nr, HPX_CAPTURE_MOVE(base_name)](
                 hpx::future<hpx::id_type> && f
             ) mutable -> hpx::future<bool>
@@ -2878,7 +2945,7 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == std::size_t(~0U))
+        if (sequence_nr == ~0U)
         {
             sequence_nr =
                 std::size_t(naming::get_locality_id_from_id(find_here()));

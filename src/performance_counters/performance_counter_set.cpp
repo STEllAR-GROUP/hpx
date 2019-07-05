@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -12,7 +13,6 @@
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/unwrap.hpp>
@@ -30,6 +30,7 @@ namespace hpx { namespace performance_counters
     performance_counter_set::performance_counter_set(std::string const& name,
             bool reset)
       : invocation_count_(0)
+      , print_counters_locally_(false)
     {
         add_counters(name, reset);
     }
@@ -37,6 +38,7 @@ namespace hpx { namespace performance_counters
     performance_counter_set::performance_counter_set(
             std::vector<std::string> const& names, bool reset)
       : invocation_count_(0)
+      , print_counters_locally_(false)
     {
         add_counters(names, reset);
     }
@@ -89,7 +91,7 @@ namespace hpx { namespace performance_counters
             HPX_THROWS_IF(ec, bad_parameter,
                 "performance_counter_set::find_counter",
                 hpx::util::format(
-                    "unknown performance counter: '%1%' (%2%)",
+                    "unknown performance counter: '{1}' ({2})",
                     info.fullname_, ec.get_message()));
             return false;
         }

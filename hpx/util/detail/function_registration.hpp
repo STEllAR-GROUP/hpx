@@ -9,9 +9,9 @@
 #define HPX_UTIL_DETAIL_FUNCTION_REGISTRATION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/demangle_helper.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
-#include <hpx/util/detail/pp/strip_parens.hpp>
+#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/preprocessor/strip_parens.hpp>
+#include <hpx/util/debug/demangle_helper.hpp>
 
 #include <type_traits>
 
@@ -30,7 +30,7 @@ namespace hpx { namespace util { namespace detail
         static char const* call()
 #ifdef HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION
         {
-            return util::type_id<F>::typeid_.type_id();
+            return debug::type_id<F>::typeid_.type_id();
         }
 #else
         = delete;

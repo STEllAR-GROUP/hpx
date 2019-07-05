@@ -11,11 +11,12 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/util/cache/entries/lfu_entry.hpp>
-#include <hpx/util/cache/local_cache.hpp>
-#include <hpx/util/cache/statistics/local_full_statistics.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/cache/entries/lfu_entry.hpp>
+#include <hpx/cache/local_cache.hpp>
+#include <hpx/cache/statistics/local_full_statistics.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/util/histogram.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/accumulators/accumulators.hpp>
@@ -51,7 +52,7 @@ public:
       : key_(hpx::naming::detail::get_stripped_gid(id),
             hpx::naming::detail::get_stripped_gid(id) + (count - 1))
     {
-        HPX_ASSERT(count);
+        HPX_TEST(count);
     }
 
     hpx::naming::gid_type get_gid() const
@@ -62,7 +63,7 @@ public:
     std::uint64_t get_count() const
     {
         hpx::naming::gid_type const size = key_.second - key_.first;
-        HPX_ASSERT(size.get_msb() == 0);
+        HPX_TEST(size.get_msb() == 0);
         return size.get_lsb();
     }
 
@@ -242,9 +243,14 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     hpx::naming::gid_type first_key = hpx::detail::get_next_id();
 
+    hpx::util::high_resolution_timer t1;
+
     test_insert(cache, num_entries);
     test_get(cache, first_key);
     test_update(cache, first_key);
+
+    double elapsed = t1.elapsed();
+    hpx::util::print_cdash_timing("AGASCache", elapsed);
 
     return hpx::finalize();
 }

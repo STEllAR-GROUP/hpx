@@ -12,11 +12,12 @@
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
+#include <hpx/assertion.hpp>
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver_connection.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <algorithm>
+#include <deque>
 #include <iterator>
 #include <list>
 #include <memory>

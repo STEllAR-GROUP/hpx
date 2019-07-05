@@ -9,20 +9,20 @@
 #define HPX_RUNTIME_ACTIONS_COMPONENT_ACTION_MAR_26_2008_1054AM
 
 #include <hpx/config.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/expand.hpp>
+#include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/components/console_error_sink.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/expand.hpp>
-#include <hpx/util/detail/pp/nargs.hpp>
-#include <hpx/util/detail/pp/strip_parens.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/traits/is_future.hpp>
+
+#include <boost/utility/string_ref.hpp>
 
 #include <cstdlib>
 #include <sstream>
-#include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -31,6 +31,55 @@
 namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
+    namespace detail
+    {
+        struct keep_object_pinned
+        {
+            void operator()() const {}
+
+            components::pinned_ptr p_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        inline std::string make_component_action_name(
+            boost::string_ref action_name, void const* lva)
+        {
+            std::stringstream name;
+            name << "component action(" << action_name << ") lva(" << lva << ")";
+            return name.str();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Component, typename R, typename F, typename ...Ts>
+        R component_invoke(std::false_type,
+            naming::address::address_type lva,
+            naming::address::component_type /*comptype*/,
+            F Component::*f, Ts&&... vs)
+        {
+            Component* component = get_lva<Component>::call(lva);
+            return (component->*f)(std::forward<Ts>(vs)...);
+        }
+
+        template <typename Component, typename R, typename F, typename ...Ts>
+        R component_invoke(std::true_type,
+            naming::address::address_type lva,
+            naming::address::component_type comptype,
+            F Component::*f, Ts&&... vs)
+        {
+            // additional pinning is required such that the object becomes
+            // unpinned only after the returned future has become ready
+            components::pinned_ptr p =
+                components::pinned_ptr::create<Component>(lva);
+
+            Component* component = get_lva<Component>::call(lva);
+            R result = (component->*f)(std::forward<Ts>(vs)...);
+
+            traits::detail::get_shared_state(result)->set_on_completed(
+                detail::keep_object_pinned{std::move(p)});
+
+            return result;
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     //  Specialized generic non-const component action types allowing to hold
@@ -38,31 +87,38 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename R, typename ...Ps,
-        typename TF, TF F, typename Derived>
-    class basic_action_impl<
-            R (Component::*)(Ps...), TF, F, Derived>
-      : public basic_action<Component, R(Ps...), Derived>
+        R (Component::*F)(Ps...), typename Derived>
+    struct action<R (Component::*)(Ps...), F, Derived>
+      : public basic_action<Component, R(Ps...),
+            typename detail::action_type<
+                action<R (Component::*)(Ps...), F, Derived>,
+                Derived
+            >::type
+        >
     {
     public:
+        typedef typename detail::action_type<
+            action, Derived
+        >::type derived_type;
+
         static std::string get_action_name(naming::address::address_type lva)
         {
-            std::stringstream name;
-            name << "component action("
-                 << detail::get_action_name<Derived>()
-                 << ") lva("
-                 << reinterpret_cast<void const*>(get_lva<Component>::call(lva))
-                 << ")";
-            return name.str();
+            return detail::make_component_action_name(
+                detail::get_action_name<derived_type>(),
+                get_lva<Component>::call(lva));
         }
 
         template <typename ...Ts>
-        static R invoke(naming::address::address_type lva,
+        static R invoke(
+            naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs)
         {
-            basic_action<Component, R(Ps...), Derived>::
+            basic_action<Component, R(Ps...), derived_type>::
                 increment_invocation_count();
-            return (get_lva<Component>::call(lva)->*F)
-                (std::forward<Ts>(vs)...);
+
+            using is_future = typename traits::is_future<R>::type;
+            return detail::component_invoke<Component, R>(is_future{},
+                lva, comptype, F, std::forward<Ts>(vs)...);
         }
     };
 
@@ -72,31 +128,38 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename R, typename ...Ps,
-        typename TF, TF F, typename Derived>
-    class basic_action_impl<
-            R (Component::*)(Ps...) const, TF, F, Derived>
-      : public basic_action<Component const, R(Ps...), Derived>
+        R (Component::*F)(Ps...) const, typename Derived>
+    struct action<R (Component::*)(Ps...) const, F, Derived>
+      : public basic_action<Component const, R(Ps...),
+            typename detail::action_type<
+                action<R (Component::*)(Ps...) const, F, Derived>,
+                Derived
+            >::type
+        >
     {
     public:
+        typedef typename detail::action_type<
+            action, Derived
+        >::type derived_type;
+
         static std::string get_action_name(naming::address::address_type lva)
         {
-            std::stringstream name;
-            name << "component action("
-                 << detail::get_action_name<Derived>()
-                 << ") lva("
-                 << reinterpret_cast<void const*>(get_lva<Component>::call(lva))
-                 << ")";
-            return name.str();
+            return detail::make_component_action_name(
+                detail::get_action_name<derived_type>(),
+                get_lva<Component>::call(lva));
         }
 
         template <typename ...Ts>
-        static R invoke(naming::address::address_type lva,
+        static R invoke(
+            naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs)
         {
-            basic_action<Component const, R(Ps...), Derived>::
+            basic_action<Component const, R(Ps...), derived_type>::
                 increment_invocation_count();
-            return (get_lva<Component const>::call(lva)->*F)
-                (std::forward<Ts>(vs)...);
+
+            using is_future = typename traits::is_future<R>::type;
+            return detail::component_invoke<Component const, R>(is_future{},
+                lva, comptype, F, std::forward<Ts>(vs)...);
         }
     };
 
@@ -153,6 +216,20 @@ namespace hpx { namespace actions
 /// if the second argument with an appended suffix '_action' resolves to a valid,
 /// unqualified C++ type name.
 ///
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+#define HPX_DEFINE_COMPONENT_ACTION(...)                                      \
+    /**/
+#define HPX_DEFINE_COMPONENT_ACTION_3(component, func, name)                  \
+    /**/
+#define HPX_DEFINE_COMPONENT_ACTION_2(component, func)                        \
+    /**/
+#define HPX_DEFINE_COMPONENT_DIRECT_ACTION(...)                               \
+    /**/
+#define HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(component, func, name)           \
+    /**/
+#define HPX_DEFINE_COMPONENT_DIRECT_ACTION_2(component, func)                 \
+    /**/
+#else
 #define HPX_DEFINE_COMPONENT_ACTION(...)                                      \
     HPX_DEFINE_COMPONENT_ACTION_(__VA_ARGS__)                                 \
     /**/
@@ -196,6 +273,7 @@ namespace hpx { namespace actions
         HPX_PP_CAT(func, _action))                                            \
     /**/
 /// \endcond
+#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 

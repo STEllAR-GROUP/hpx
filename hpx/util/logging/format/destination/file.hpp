@@ -17,10 +17,6 @@
 #ifndef JT28092007_destination_file_HPP_DEFINED
 #define JT28092007_destination_file_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable: 4355)
@@ -78,12 +74,12 @@ namespace detail {
     struct file_info {
         file_info(const std::string& name_, file_settings const& settings_)
             : name(name_),
-//               out( new std::basic_ofstream<char_type>
+//               out( new std::ofstream
 //                   ( name_.c_str(), open_flags(settings_) )),
               settings(settings_) {}
 
         void open() {
-            out.reset( new std::basic_ofstream<char_type>( name.c_str(),
+            out.reset( new std::ofstream( name.c_str(),
                 open_flags(settings) ) );
         }
 
@@ -92,7 +88,7 @@ namespace detail {
         }
 
         std::string name;
-        std::shared_ptr< std::basic_ofstream<char_type> > out;
+        std::shared_ptr< std::ofstream > out;
         file_settings settings;
     };
 }
@@ -100,8 +96,7 @@ namespace detail {
 /**
     @brief Writes the string to a file
 */
-template <class convert_dest = do_convert_destination >
-struct file_t : is_generic, non_const_context<detail::file_info>
+struct file : is_generic, non_const_context<detail::file_info>
 {
     typedef non_const_context<detail::file_info> non_const_context_base;
     typedef util::spinlock mutex_type;
@@ -113,30 +108,29 @@ struct file_t : is_generic, non_const_context<detail::file_info>
         @param set [optional] file settings - see file_settings class,
         and @ref dealing_with_flags
     */
-    file_t(const std::string & file_name, file_settings set = file_settings() )
+    file(const std::string & file_name, file_settings set = file_settings() )
       : non_const_context_base(file_name,set)
     {}
 
-    template <class msg_type>
     void operator()(const msg_type & msg) const
     {
         std::lock_guard<mutex_type> l(mtx_);
 
         if (!non_const_context_base::context().out)
             non_const_context_base::context().open();   // make sure file is opened
-        convert_dest::write(msg, *( non_const_context_base::context().out) );
+        convert::write(msg, *( non_const_context_base::context().out) );
         if ( non_const_context_base::context().settings.flush_each_time() )
             non_const_context_base::context().out->flush();
     }
 
-    bool operator==(const file_t & other) const {
+    bool operator==(const file & other) const {
         return non_const_context_base::context().name == other.context().name;
     }
 
     /** configure through script
         right now, you can only specify the file name
     */
-    void configure(const hold_string_type & str) {
+    void configure(const std::string & str) {
         // configure - the file name, for now
         non_const_context_base::context().close();
         non_const_context_base::context().name.assign( str.begin(), str.end() );
@@ -145,14 +139,6 @@ struct file_t : is_generic, non_const_context<detail::file_info>
     static mutex_type mtx_;
 };
 
-template <typename convert_dest>
-typename file_t<convert_dest>::mutex_type file_t<convert_dest>::mtx_;
-
-/** @brief file_t with default values. See file_t
-
-@copydoc file_t
-*/
-typedef file_t<> file;
 
 }}}}
 
@@ -161,4 +147,3 @@ typedef file_t<> file;
 #endif
 
 #endif
-

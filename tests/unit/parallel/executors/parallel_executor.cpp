@@ -44,7 +44,7 @@ void test_async()
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id test_f(hpx::future<void> f, int passed_through)
 {
-    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 
@@ -116,7 +116,7 @@ void test_bulk_async()
 void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
     int passed_through) //-V813
 {
-    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 
@@ -160,8 +160,8 @@ void static_check_executor()
         has_async_execute_member<executor>::value,
         "has_async_execute_member<executor>::value");
     static_assert(
-        !has_then_execute_member<executor>::value,
-        "!has_then_execute_member<executor>::value");
+        has_then_execute_member<executor>::value,
+        "has_then_execute_member<executor>::value");
     static_assert(
         !has_bulk_sync_execute_member<executor>::value,
         "!has_bulk_sync_execute_member<executor>::value");
@@ -169,8 +169,8 @@ void static_check_executor()
         has_bulk_async_execute_member<executor>::value,
         "has_bulk_async_execute_member<executor>::value");
     static_assert(
-        !has_bulk_then_execute_member<executor>::value,
-        "!has_bulk_then_execute_member<executor>::value");
+        has_bulk_then_execute_member<executor>::value,
+        "has_bulk_then_execute_member<executor>::value");
     static_assert(
         has_post_member<executor>::value,
         "check has_post_member<executor>::value");

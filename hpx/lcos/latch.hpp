@@ -7,11 +7,9 @@
 #define HPX_LCOS_LATCH_APR_19_2015_1002AM
 
 #include <hpx/config.hpp>
-#include <hpx/async.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/server/latch.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/components/new.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -20,7 +18,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
-    class latch : public components::client_base<latch, lcos::server::latch>
+    class HPX_EXPORT latch
+      : public components::client_base<latch, lcos::server::latch>
     {
         typedef components::client_base<latch, lcos::server::latch> base_type;
 
@@ -34,10 +33,7 @@ namespace hpx { namespace lcos
         /// Synchronization: None
         /// Postconditions: counter_ == count.
         ///
-        explicit latch(std::ptrdiff_t count)
-          : base_type(hpx::new_<lcos::server::latch>(hpx::find_here(), count))
-        {
-        }
+        explicit latch(std::ptrdiff_t count);
 
         /// Extension: Create a client side representation for the existing
         /// \a server#latch instance with the given global id \a id.
@@ -113,35 +109,16 @@ namespace hpx { namespace lcos
 
         /// \cond NOINTERNAL
         // extended API
-        hpx::future<void> count_down_and_wait_async()
-        {
-            lcos::server::latch::set_event_action act;
-            return hpx::async(act, get_id());
-        }
+        hpx::future<void> count_down_and_wait_async();
 
-        hpx::future<void> count_down_async(std::ptrdiff_t n)
-        {
-            lcos::server::latch::set_value_action act;
-            return hpx::async(act, get_id(), std::move(n));
-        }
+        hpx::future<void> count_down_async(std::ptrdiff_t n);
 
-        hpx::future<bool> is_ready_async() const
-        {
-            lcos::server::latch::get_value_action act;
-            return hpx::async(act, get_id());
-        }
+        hpx::future<bool> is_ready_async() const;
 
-        hpx::future<void> wait_async() const
-        {
-            lcos::server::latch::wait_action act;
-            return hpx::async(act, get_id());
-        }
+        hpx::future<void> wait_async() const;
 
-        hpx::future<void> set_exception_async(std::exception_ptr const& e)
-        {
-            lcos::server::latch::set_exception_action act;
-             return hpx::async(act, get_id(), e);
-        }
+        hpx::future<void> set_exception_async(std::exception_ptr const& e);
+
         void set_exception(std::exception_ptr const& e)
         {
             set_exception_async(e).get();
@@ -151,4 +128,3 @@ namespace hpx { namespace lcos
 }}
 
 #endif
-

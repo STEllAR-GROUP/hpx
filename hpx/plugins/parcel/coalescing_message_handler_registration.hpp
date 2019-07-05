@@ -9,18 +9,19 @@
 #include <hpx/config.hpp>
 
 // the module itself should not register any actions which coalesce parcels
-#if defined(HPX_HAVE_PARCEL_COALESCING) && !defined(HPX_PARCEL_COALESCING_MODULE_EXPORTS)
+#if defined(HPX_HAVE_PARCEL_COALESCING) &&                                     \
+    !defined(HPX_PARCEL_COALESCING_MODULE_EXPORTS) &&                          \
+    !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/error_code.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/expand.hpp>
+#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/message_handler_fwd.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/traits/action_message_handler.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/expand.hpp>
-#include <hpx/util/detail/pp/nargs.hpp>
 
 #include <cstddef>
 

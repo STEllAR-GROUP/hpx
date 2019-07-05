@@ -10,7 +10,7 @@
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 //
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/util/yield_while.hpp>
 //
 #include <cstddef>
@@ -315,7 +315,7 @@ namespace libfabric
                     std::fill(buffer, buffer + get_region->get_size()/4,
                        0xDEADC0DE);
                     LOG_TRACE_MSG(
-                        CRC32_MEM(get_region->get_address(), c.size_,
+                        CRC32_MEM(get_region->get_address(), get_region->get_size(),
                                   "(RDMA GET region (pre-fi_read))"));
                     );
 

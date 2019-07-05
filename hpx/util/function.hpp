@@ -15,8 +15,6 @@
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
-#include <hpx/util/detail/vtable/function_vtable.hpp>
-#include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <cstddef>
@@ -31,91 +29,44 @@ namespace hpx { namespace util
 
     template <typename R, typename ...Ts, bool Serializable>
     class function<R(Ts...), Serializable>
-      : public detail::basic_function<
-            detail::function_vtable<R(Ts...)>
-          , R(Ts...), Serializable
-        >
+      : public detail::basic_function<R(Ts...), true, Serializable>
     {
-        typedef detail::function_vtable<R(Ts...)> vtable;
-        typedef detail::basic_function<vtable, R(Ts...), Serializable> base_type;
+        using base_type = detail::basic_function<R(Ts...), true, Serializable>;
 
     public:
-        typedef typename base_type::result_type result_type;
+        typedef R result_type;
 
-        function() noexcept
-          : base_type()
+        HPX_CONSTEXPR function(std::nullptr_t = nullptr) noexcept
         {}
 
-        function(std::nullptr_t) noexcept
-          : base_type()
-        {}
+        function(function const&) = default;
+        function(function&&) noexcept = default;
+        function& operator=(function const&) = default;
+        function& operator=(function&&) noexcept = default;
 
-        function(function const& other)
-          : base_type()
-        {
-            detail::vtable::_delete<
-                detail::empty_function<R(Ts...)>
-            >(this->object);
-
-            this->vptr = other.vptr;
-            if (!this->vptr->empty)
-            {
-                this->vptr->copy(this->object, other.object);
-            }
-        }
-
-        function(function&& other) noexcept
-          : base_type(static_cast<base_type&&>(other))
-        {}
-
+        // the split SFINAE prevents MSVC from eagerly instantiating things
         template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable = typename std::enable_if<
+            typename Enable1 = typename std::enable_if<
                 !std::is_same<FD, function>::value
-             && traits::is_invocable_r<R, FD&, Ts...>::value
+            >::type,
+            typename Enable2 = typename std::enable_if<
+                traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         function(F&& f)
-          : base_type()
         {
-            static_assert(
-                std::is_constructible<FD, FD const&>::value,
-                "F shall be CopyConstructible");
             assign(std::forward<F>(f));
         }
 
-        function& operator=(function const& other)
-        {
-            if (this != &other)
-            {
-                reset();
-                detail::vtable::_delete<
-                    detail::empty_function<R(Ts...)>
-                >(this->object);
-
-                this->vptr = other.vptr;
-                if (!this->vptr->empty)
-                {
-                    this->vptr->copy(this->object, other.object);
-                }
-            }
-            return *this;
-        }
-
-        function& operator=(function&& other) noexcept
-        {
-            base_type::operator=(static_cast<base_type&&>(other));
-            return *this;
-        }
-
+        // the split SFINAE prevents MSVC from eagerly instantiating things
         template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable = typename std::enable_if<
+            typename Enable1 = typename std::enable_if<
                 !std::is_same<FD, function>::value
-             && traits::is_invocable_r<R, FD&, Ts...>::value
+            >::type,
+            typename Enable2 = typename std::enable_if<
+                traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         function& operator=(F&& f)
         {
-            static_assert(
-                std::is_constructible<FD, FD const&>::value,
-                "F shall be CopyConstructible");
             assign(std::forward<F>(f));
             return *this;
         }
@@ -124,16 +75,8 @@ namespace hpx { namespace util
         using base_type::assign;
         using base_type::reset;
         using base_type::empty;
-        using base_type::target_type;
         using base_type::target;
     };
-
-    template <typename Sig, bool Serializable>
-    static bool is_empty_function(
-        function<Sig, Serializable> const& f) noexcept
-    {
-        return f.empty();
-    }
 }}
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)

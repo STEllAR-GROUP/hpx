@@ -8,11 +8,11 @@
 #define HPX_RUNTIME_ACTIONS_MANAGE_OBJECT_ACTION_JAN_26_2010_0141PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <cstddef>

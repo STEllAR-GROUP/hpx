@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,15 +14,17 @@
 #  include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 #endif
 
-#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
-#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
+#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
@@ -131,8 +133,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::add(closure_type && f,
         util::thread_description const& desc,
-        threads::thread_state_enum initial_state,
-        bool run_now, threads::thread_stacksize stacksize, error_code& ec)
+        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_stacksize stacksize,
+        threads::thread_schedule_hint schedulehint,
+        error_code& ec)
     {
         HPX_ASSERT(std::size_t(-1) != thread_num_);
 
@@ -142,9 +146,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
 
         // create a new thread
-        thread_init_data data(util::bind(
-            util::one_shot(&this_thread_executor::thread_function_nullary),
-            this, std::move(f)), desc);
+        thread_init_data data(util::one_shot(util::bind(
+            &this_thread_executor::thread_function_nullary,
+            this, std::move(f))), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         // update statistics
@@ -181,9 +185,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         scheduler_.get_state(0).compare_exchange_strong(expected, state_starting);
 
         // create a new suspended thread
-        thread_init_data data(util::bind(
-            util::one_shot(&this_thread_executor::thread_function_nullary),
-            this, std::move(f)), desc);
+        thread_init_data data(util::one_shot(util::bind(
+            &this_thread_executor::thread_function_nullary,
+            this, std::move(f))), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
@@ -196,9 +200,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         ++tasks_scheduled_;
 
         // now schedule new thread for execution
-        threads::detail::set_thread_state_timed(scheduler_, abs_time, id,
-            nullptr, ec);
-        if (ec) {
+        threads::detail::set_thread_state_timed(
+            scheduler_, abs_time, id, nullptr, true, ec);
+        if (ec)
+        {
             --tasks_scheduled_;
             return;
         }
@@ -343,18 +348,28 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
             // FIXME: turn these values into performance counters
             std::int64_t executed_threads = 0, executed_thread_phases = 0;
-            std::uint64_t overall_times = 0, thread_times = 0;
+            std::int64_t overall_times = 0, thread_times = 0;
             std::int64_t idle_loop_count = 0, busy_loop_count = 0;
-            std::uint8_t task_active = 0;
+            bool task_active = false;
 
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+            std::int64_t bg_work = 0;
+            std::int64_t bg_send = 0;
+            std::int64_t bg_receive = 0;
+            threads::detail::scheduling_counters counters(
+                executed_threads, executed_thread_phases,
+                overall_times, thread_times, idle_loop_count, busy_loop_count,
+                task_active, bg_work, bg_send, bg_receive);
+#else
             threads::detail::scheduling_counters counters(
                 executed_threads, executed_thread_phases,
                 overall_times, thread_times, idle_loop_count, busy_loop_count,
                 task_active);
+#endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
             threads::detail::scheduling_callbacks callbacks(
-                threads::detail::scheduling_callbacks::callback_type(),
-                util::bind( //-V107
+                nullptr,
+                util::deferred_call( //-V107
                     &this_thread_executor::suspend_back_into_calling_context,
                     this));
 
@@ -421,12 +436,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         HPX_ASSERT(std::size_t(-1) == orig_thread_num_);
 
         thread_num_ = thread_num;
-        orig_thread_num_ = threads::detail::thread_num_tss_.get_worker_thread_num();
+        orig_thread_num_ = hpx::get_worker_thread_num();
 
         std::atomic<hpx::state>& state = scheduler_.get_state(0);
         hpx::state expected = state_initialized;
         bool result = state.compare_exchange_strong(expected, state_starting);
         HPX_ASSERT(result);
+        HPX_UNUSED(result);
     }
 
     // Remove the given processing unit from the scheduler.
@@ -441,6 +457,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         std::atomic<hpx::state>& state = scheduler_.get_state(0);
         hpx::state oldstate = state.exchange(state_stopped);
         HPX_ASSERT(oldstate == state_suspended || oldstate == state_stopped);
+        HPX_UNUSED(oldstate);
 
         thread_num_ = std::size_t(-1);
         parent_thread_num_ = std::size_t(-1);

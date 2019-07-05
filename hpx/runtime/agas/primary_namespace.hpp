@@ -55,8 +55,8 @@ struct HPX_EXPORT primary_namespace
     naming::address addr() const;
     naming::id_type gid() const;
 
-    std::pair<naming::id_type, naming::address>
-    begin_migration(naming::gid_type id);
+    hpx::future<std::pair<naming::id_type, naming::address>>
+        begin_migration(naming::gid_type id);
     bool end_migration(naming::gid_type id);
 
     bool bind_gid(gva g, naming::gid_type id, naming::gid_type locality);

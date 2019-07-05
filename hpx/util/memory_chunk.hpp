@@ -7,8 +7,8 @@
 #define HPX_UTIL_MEMORY_CHUNK_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/assert.hpp>
 
 // include unist.d conditionally to check for POSIX version. Not all OSs have the
 // unistd header...
@@ -49,7 +49,7 @@ namespace hpx { namespace util
         explicit memory_chunk(std::size_t chunk_size)
           : chunk_size_(chunk_size)
           , allocated_(0)
-          , current_(0)
+          , current_(nullptr)
         {}
 
         void charge()
@@ -163,7 +163,7 @@ namespace hpx { namespace util
 
             if(!data_) charge();
 
-            iterator result = 0;
+            iterator result = nullptr;
 
             HPX_ASSERT(size <= chunk_size_);
 
@@ -204,7 +204,7 @@ namespace hpx { namespace util
                 return result;
             }
             check_invariants_locked(0, size);
-            return 0;
+            return nullptr;
         }
 
         bool deallocate(char * p, size_type size)

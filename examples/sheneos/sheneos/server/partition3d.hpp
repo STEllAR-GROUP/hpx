@@ -10,12 +10,11 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "../dimension.hpp"
-
-#include <boost/scoped_array.hpp>
 
 namespace sheneos
 {
@@ -45,10 +44,10 @@ namespace sheneos { namespace server
     {
     private:
         inline void init_dimension(std::string const&, int, dimension const&,
-            char const*, boost::scoped_array<double>&);
+            char const*, std::unique_ptr<double[]>&);
 
         inline void init_data(std::string const& datafilename,
-            char const* name, boost::scoped_array<double>& values,
+            char const* name, std::unique_ptr<double[]>& values,
             std::size_t array_size);
 
         /// Get index of a given value in the one-dimensional array-slice.
@@ -164,33 +163,33 @@ namespace sheneos { namespace server
         double delta_[dimension::dim];
 
         // Values of independent variables.
-        boost::scoped_array<double> ye_values_;
-        boost::scoped_array<double> logtemp_values_;
-        boost::scoped_array<double> logrho_values_;
+        std::unique_ptr<double[]> ye_values_;
+        std::unique_ptr<double[]> logtemp_values_;
+        std::unique_ptr<double[]> logrho_values_;
 
         double energy_shift_;
 
         // Dependent variables.
-        boost::scoped_array<double> logpress_values_;
-        boost::scoped_array<double> logenergy_values_;
-        boost::scoped_array<double> entropy_values_;
-        boost::scoped_array<double> munu_values_;
-        boost::scoped_array<double> cs2_values_;
-        boost::scoped_array<double> dedt_values_;
-        boost::scoped_array<double> dpdrhoe_values_;
-        boost::scoped_array<double> dpderho_values_;
+        std::unique_ptr<double[]> logpress_values_;
+        std::unique_ptr<double[]> logenergy_values_;
+        std::unique_ptr<double[]> entropy_values_;
+        std::unique_ptr<double[]> munu_values_;
+        std::unique_ptr<double[]> cs2_values_;
+        std::unique_ptr<double[]> dedt_values_;
+        std::unique_ptr<double[]> dpdrhoe_values_;
+        std::unique_ptr<double[]> dpderho_values_;
 #if SHENEOS_SUPPORT_FULL_API
-        boost::scoped_array<double> muhat_values_;
-        boost::scoped_array<double> mu_e_values_;
-        boost::scoped_array<double> mu_p_values_;
-        boost::scoped_array<double> mu_n_values_;
-        boost::scoped_array<double> xa_values_;
-        boost::scoped_array<double> xh_values_;
-        boost::scoped_array<double> xn_values_;
-        boost::scoped_array<double> xp_values_;
-        boost::scoped_array<double> abar_values_;
-        boost::scoped_array<double> zbar_values_;
-        boost::scoped_array<double> gamma_values_;
+        std::unique_ptr<double[]> muhat_values_;
+        std::unique_ptr<double[]> mu_e_values_;
+        std::unique_ptr<double[]> mu_p_values_;
+        std::unique_ptr<double[]> mu_n_values_;
+        std::unique_ptr<double[]> xa_values_;
+        std::unique_ptr<double[]> xh_values_;
+        std::unique_ptr<double[]> xn_values_;
+        std::unique_ptr<double[]> xp_values_;
+        std::unique_ptr<double[]> abar_values_;
+        std::unique_ptr<double[]> zbar_values_;
+        std::unique_ptr<double[]> gamma_values_;
 #endif
     };
 }}

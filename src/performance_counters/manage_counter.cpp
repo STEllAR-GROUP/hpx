@@ -4,14 +4,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/version.hpp>
 
 #include <memory>
@@ -65,7 +65,7 @@ namespace hpx { namespace performance_counters
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void counter_shutdown(std::shared_ptr<manage_counter> const& p)
+    static void counter_shutdown(std::shared_ptr<manage_counter> const& p)
     {
         HPX_ASSERT(p);
         p->uninstall();
@@ -80,7 +80,7 @@ namespace hpx { namespace performance_counters
         p->install(id, info, ec);
 
         // Register the shutdown function which will clean up this counter.
-        get_runtime().add_shutdown_function(util::bind(&counter_shutdown, p));
+        get_runtime().add_shutdown_function(util::bind_front(&counter_shutdown, p));
     }
 }}
 

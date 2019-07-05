@@ -11,6 +11,8 @@
 #define HPX_RUNTIME_ACTIONS_ACTION_SUPPORT_NOV_14_2008_0711PM
 
 #include <hpx/config.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
@@ -20,9 +22,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/traits/action_remote_result.hpp>
-#include <hpx/util/detail/pp/cat.hpp>
-#include <hpx/util/detail/pp/nargs.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/util/debug/demangle_helper.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif
@@ -72,7 +72,7 @@ namespace hpx { namespace actions
             static_assert(
                 traits::needs_automatic_registration<Action>::value,
                 "HPX_REGISTER_ACTION_DECLARATION missing");
-            return util::type_id<Action>::typeid_.type_id();
+            return util::debug::type_id<Action>::typeid_.type_id();
         }
 #endif
 

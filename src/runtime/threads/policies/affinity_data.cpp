@@ -3,13 +3,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
@@ -94,6 +94,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             throw std::runtime_error(
                 "Cannot instantiate more than one affinity data instance");
         }
+
+        threads::resize(no_affinity_, hardware_concurrency());
     }
 
     affinity_data::~affinity_data()
@@ -144,7 +146,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         else if (!affinity_desc.empty())
         {
             affinity_masks_.clear();
-            affinity_masks_.resize(num_threads_, 0);
+            affinity_masks_.resize(num_threads_, mask_type{});
 
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::resize(affinity_masks_[i], num_system_pus);
@@ -158,8 +160,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                     "affinity_data::affinity_data",
                     hpx::util::format(
                         "The number of OS threads requested "
-                        "(%1%) does not match the number of threads to "
-                        "bind (%2%)", num_threads_, num_initialized));
+                        "({1}) does not match the number of threads to "
+                        "bind ({2})", num_threads_, num_initialized));
             }
         }
         else if (pu_offset == std::size_t(-1))
@@ -204,6 +206,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         if (threads::test(no_affinity_, global_thread_num))
         {
             static mask_type m = mask_type();
+            threads::resize(m, hardware_concurrency());
             return m;
         }
 
@@ -240,7 +243,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return topo.get_machine_affinity_mask();
     }
 
-    mask_type affinity_data::get_used_pus_mask(std::size_t pu_num) const
+    mask_type affinity_data::get_used_pus_mask(threads::topology const& topo,
+        std::size_t pu_num) const
     {
         mask_type ret = mask_type();
         threads::resize(ret, hardware_concurrency());
@@ -252,13 +256,16 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             return ret;
         }
 
-        for(mask_cref_type pu_mask : affinity_masks_)
-            ret |= pu_mask;
+        for (std::size_t thread_num = 0; thread_num < num_threads_; ++thread_num)
+        {
+            ret |= get_pu_mask(topo, thread_num);
+        }
 
         return ret;
     }
 
-    std::size_t affinity_data::get_thread_occupancy(std::size_t pu_num) const
+    std::size_t affinity_data::get_thread_occupancy(
+        threads::topology const& topo, std::size_t pu_num) const
     {
         std::size_t count = 0;
         if (threads::test(no_affinity_, pu_num))
@@ -272,8 +279,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             threads::resize(pu_mask, hardware_concurrency());
             threads::set(pu_mask, pu_num);
 
-            for (mask_cref_type affinity_mask : affinity_masks_)
+            for (std::size_t num_thread = 0; num_thread < num_threads_; ++num_thread)
             {
+                mask_cref_type affinity_mask = get_pu_mask(topo, num_thread);
                 if (threads::any(pu_mask & affinity_mask))
                     ++count;
             }

@@ -20,27 +20,27 @@ set(HPX_LIBRARIES "@HPX_CONF_LIBRARIES@")
 set(HPX_LIBRARY_DIR "@HPX_CONF_LIBRARY_DIR@")
 
 set(HPX_VERSION_STRING "@HPX_VERSION@")
-set(HPX_MAJOR_VERSION @HPX_MAJOR_VERSION@)
-set(HPX_MINOR_VERSION @HPX_MINOR_VERSION@)
-set(HPX_PATCH_LEVEL   @HPX_PATCH_LEVEL@)
+set(HPX_VERSION_MAJOR @HPX_VERSION_MAJOR@)
+set(HPX_VERSION_MINOR @HPX_VERSION_MINOR@)
+set(HPX_VERSION_SUBMINOR @HPX_VERSION_SUBMINOR@)
 
 set(HPX_PREFIX "${_hpx_root_dir}")
 set(HPX_DEBUG_POSTFIX "@HPX_DEBUG_POSTFIX@")
 set(HPX_BUILD_TYPE "@CMAKE_BUILD_TYPE@")
 
-set(HPX_GIT_COMMIT "@HPX_WITH_GIT_COMMIT@" CACHE STRING "Revision of HPX from Git")
+set(HPX_GIT_COMMIT "@HPX_WITH_GIT_COMMIT@" CACHE STRING "Revision of HPX from Git" FORCE)
 
-set(HPX_C_COMPILER "@CMAKE_C_COMPILER@" CACHE STRING "C compiler for HPX")
-set(HPX_C_COMPILER_ID "@CMAKE_C_COMPILER_ID@" CACHE STRING "C compiler id for HPX")
-set(HPX_C_COMPILER_VERSION "@CMAKE_C_COMPILER_VERSION@" CACHE STRING "C compiler version for HPX")
+set(HPX_C_COMPILER "@CMAKE_C_COMPILER@" CACHE STRING "C compiler for HPX" FORCE)
+set(HPX_C_COMPILER_ID "@CMAKE_C_COMPILER_ID@" CACHE STRING "C compiler id for HPX" FORCE)
+set(HPX_C_COMPILER_VERSION "@CMAKE_C_COMPILER_VERSION@" CACHE STRING "C compiler version for HPX" FORCE)
 
-set(HPX_CXX_COMPILER "@CMAKE_CXX_COMPILER@" CACHE STRING "CXX compiler for HPX")
-set(HPX_CXX_COMPILER_ID "@CMAKE_CXX_COMPILER_ID@" CACHE STRING "CXX compiler id for HPX")
-set(HPX_CXX_COMPILER_VERSION "@CMAKE_CXX_COMPILER_VERSION@" CACHE STRING "CXX compiler version for HPX")
+set(HPX_CXX_COMPILER "@CMAKE_CXX_COMPILER@" CACHE STRING "CXX compiler for HPX" FORCE)
+set(HPX_CXX_COMPILER_ID "@CMAKE_CXX_COMPILER_ID@" CACHE STRING "CXX compiler id for HPX" FORCE)
+set(HPX_CXX_COMPILER_VERSION "@CMAKE_CXX_COMPILER_VERSION@" CACHE STRING "CXX compiler version for HPX" FORCE)
 
-set(HPX_Fortran_COMPILER "@CMAKE_Fortran_COMPILER@" CACHE STRING "Fortran compiler for HPX")
-set(HPX_Fortran_COMPILER_ID "@CMAKE_Fortran_COMPILER_ID@" CACHE STRING "Fortran compiler id for HPX")
-set(HPX_Fortran_COMPILER_VERSION "@CMAKE_Fortran_COMPILER_VERSION@" CACHE STRING "Fortran compiler version for HPX")
+set(HPX_Fortran_COMPILER "@CMAKE_Fortran_COMPILER@" CACHE STRING "Fortran compiler for HPX" FORCE)
+set(HPX_Fortran_COMPILER_ID "@CMAKE_Fortran_COMPILER_ID@" CACHE STRING "Fortran compiler id for HPX" FORCE)
+set(HPX_Fortran_COMPILER_VERSION "@CMAKE_Fortran_COMPILER_VERSION@" CACHE STRING "Fortran compiler version for HPX" FORCE)
 
 set(HPX_BOOST_ROOT "@BOOST_ROOT@")
 set(HPX_BOOST_LIBRARIES "@Boost_LIBRARIES@")
@@ -54,14 +54,15 @@ set(HPX_WITH_APEX @HPX_WITH_APEX@)
 if(MSVC)
   set(HPX_WITH_VCPKG @HPX_WITH_VCPKG@)
 endif()
+set(HPX_WITH_DYNAMIC_HPX_MAIN @HPX_WITH_DYNAMIC_HPX_MAIN@)
+set(HPX_WITH_DATAPAR @HPX_WITH_DATAPAR@)
+set(HPX_WITH_DATAPAR_VC @HPX_WITH_DATAPAR_VC@)
 
 if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
 
-if(NOT LIB)
-  set(LIB "lib")
-endif()
+set(HPX_LINK_LIBRARIES "@HPX_LINK_LIBRARIES@")
 
 enable_language(C)
 
@@ -85,5 +86,24 @@ if(HPX_WITH_CUDA)
     set(CUDA_SEPARABLE_COMPILATION ON)
     set(CUDA_NVCC_FLAGS @CUDA_NVCC_FLAGS@)
     set(HPX_CUDA_CLANG_FLAGS @HPX_CUDA_CLANG_FLAGS@)
+    # The following is a workaround to make sure that target_link_libraries in
+    # cuda_add_executable/library is called with a link keyword, not with a
+    # plain signature. From CMake 3.9 onwards this can be done officially with
+    # the CUDA_LINK_LIBRARIES_KEYWORD. For older versions we can emulate this by
+    # prepending a link keyword to CUDA_LIBRARIES.
+    #
+    # See
+    # https://gitlab.kitware.com/cmake/cmake/commit/9f41bfd7b9e6e8a7545f741f872949d2ae801978
+    # and https://gitlab.kitware.com/cmake/cmake/issues/16602 for more details.
+    if(CMAKE_VERSION VERSION_LESS "3.9")
+      set(CUDA_LIBRARIES PUBLIC ${CUDA_LIBRARIES})
+    else()
+      set(CUDA_LINK_LIBRARIES_KEYWORD PUBLIC)
+    endif()
     cuda_include_directories("@HPX_CMAKE_CONF_INCLUDE_DIRS@")
+endif()
+
+# Add HPX linker flag to CMAKE_EXE_LINKER_FLAGS
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+    set(HPX_LINKER_FLAGS "@HPX_LINKER_FLAGS@")
 endif()

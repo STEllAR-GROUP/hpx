@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -77,7 +77,7 @@ void test_unique(ExPolicy policy, DataType)
     auto result = hpx::parallel::unique(policy, c);
     auto solution = std::unique(std::begin(d), std::end(d));
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(c), result,
         std::begin(d), solution);
 
@@ -102,7 +102,7 @@ void test_unique_async(ExPolicy policy, DataType)
     auto result = f.get();
     auto solution = std::unique(std::begin(d), std::end(d));
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(c), result,
         std::begin(d), solution);
 
@@ -120,17 +120,6 @@ void test_unique()
 
     test_unique_async(execution::seq(execution::task), DataType());
     test_unique_async(execution::par(execution::task), DataType());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_unique(execution_policy(execution::seq), DataType());
-    test_unique(execution_policy(execution::par), DataType());
-    test_unique(execution_policy(execution::par_unseq), DataType());
-
-    test_unique(execution_policy(execution::seq(execution::task)),
-        DataType());
-    test_unique(execution_policy(execution::par(execution::task)),
-        DataType());
-#endif
 }
 
 void test_unique()

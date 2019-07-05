@@ -115,13 +115,25 @@ namespace lcos {
 
         // Returns: A future<Result> object with the same shared state as *this.
         // Throws: future_error if *this has no shared state or if get_future
-        //         has already been called on a promise with the same shared
-        //         state as *this.
+        //         or get_shared_future has already been called on a promise
+        //         with the same shared state as *this.
         // Error conditions:
-        //   - future_already_retrieved if get_future has already been called
-        //     on a promise with the same shared state as *this.
+        //   - future_already_retrieved if get_future or get_shared_future has
+        //     already been called on a promise with the same shared state as
+        //     *this.
         //   - no_state if *this has no shared state.
         using base_type::get_future;
+
+        // Returns: A shared_future<Result> object with the same shared state
+        //          as *this.
+        // Throws: future_error if *this has no shared state or if
+        //         get_shared_future has already been called on a promise
+        //         with the same shared state as *this.
+        // Error conditions:
+        //   - future_already_retrieved if get_shared_future has already been
+        //     called on a promise with the same shared state as *this.
+        //   - no_state if *this has no shared state.
+        using base_type::get_shared_future;
 
         // Effects: atomically stores the value r in the shared state and makes
         //          that state ready (30.6.4).
@@ -202,13 +214,25 @@ namespace lcos {
 
         // Returns: A future<Result> object with the same shared state as *this.
         // Throws: future_error if *this has no shared state or if get_future
-        //         has already been called on a promise with the same shared
-        //         state as *this.
+        //         or get_shared_future has already been called on a promise
+        //         with the same shared state as *this.
         // Error conditions:
-        //   - future_already_retrieved if get_future has already been called
-        //     on a promise with the same shared state as *this.
+        //   - future_already_retrieved if get_future or get_shared_future has
+        //     already been called on a promise with the same shared state as
+        //     *this.
         //   - no_state if *this has no shared state.
         using base_type::get_future;
+
+        // Returns: A shared_future<Result> object with the same shared state
+        //          as *this.
+        // Throws: future_error if *this has no shared state or if
+        //         get_shared_future has already been called on a promise
+        //         with the same shared state as *this.
+        // Error conditions:
+        //   - future_already_retrieved if get_shared_future has already been
+        //     called on a promise with the same shared state as *this.
+        //   - no_state if *this has no shared state.
+        using base_type::get_shared_future;
 
         // Effects: atomically stores the value r in the shared state and makes
         //          that state ready (30.6.4).
@@ -221,9 +245,9 @@ namespace lcos {
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_value(error_code& ec = throws)
+        void set_value()
         {
-            base_type::set_value(hpx::util::unused, ec);
+            base_type::set_value(hpx::util::unused);
         }
 
         // Effects: atomically stores the exception pointer p in the shared

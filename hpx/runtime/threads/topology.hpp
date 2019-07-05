@@ -18,7 +18,6 @@
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/resource/partitioner_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/static.hpp>
@@ -36,17 +35,36 @@
 
 namespace hpx { namespace threads
 {
+
     struct hpx_hwloc_bitmap_wrapper
     {
         HPX_NON_COPYABLE(hpx_hwloc_bitmap_wrapper);
 
         // take ownership of the hwloc allocated bitmap
-        hpx_hwloc_bitmap_wrapper(void *bmp) {
-            bmp_ = reinterpret_cast<hwloc_bitmap_t >(bmp);
+        hpx_hwloc_bitmap_wrapper()
+          : bmp_(nullptr)
+        {
+        }
+
+        hpx_hwloc_bitmap_wrapper(void* bmp)
+          : bmp_(reinterpret_cast<hwloc_bitmap_t>(bmp))
+        {
         }
         // frees the hwloc allocated bitmap
-        ~hpx_hwloc_bitmap_wrapper() {
+        ~hpx_hwloc_bitmap_wrapper()
+        {
             hwloc_bitmap_free(bmp_);
+        }
+
+        void reset(hwloc_bitmap_t bmp)
+        {
+            if (bmp_) hwloc_bitmap_free(bmp_);
+            bmp_ = bmp;
+        }
+
+        explicit operator bool() const
+        {
+            return bmp_ != nullptr;
         }
 
         hwloc_bitmap_t get_bmp() const {
@@ -92,7 +110,7 @@ namespace hpx { namespace threads
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         std::size_t get_socket_number(std::size_t num_thread,
-            error_code& ec = throws) const
+            error_code& /*ec*/ = throws) const
         {
             return socket_numbers_[num_thread % num_of_pus_];
         }
@@ -104,7 +122,7 @@ namespace hpx { namespace threads
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         std::size_t get_numa_node_number(std::size_t num_thread,
-            error_code& ec = throws) const
+            error_code& /*ec*/ = throws) const
         {
             return numa_node_numbers_[num_thread % num_of_pus_];
         }
@@ -239,7 +257,7 @@ namespace hpx { namespace threads
         std::size_t get_number_of_socket_cores(std::size_t socket) const;
 
         std::size_t get_core_number(std::size_t num_thread,
-            error_code& ec = throws) const
+            error_code& /*ec*/ = throws) const
         {
             return core_numbers_[num_thread % num_of_pus_];
         }
@@ -291,7 +309,7 @@ namespace hpx { namespace threads
             std::size_t num_numa_node
             ) const;
         mask_type init_core_affinity_mask_from_core(
-            std::size_t num_core, mask_cref_type default_mask = mask_type()
+            std::size_t num_core, mask_cref_type default_mask = empty_mask
             ) const;
         mask_type init_thread_affinity_mask(std::size_t num_thread) const;
         mask_type init_thread_affinity_mask(
@@ -304,6 +322,8 @@ namespace hpx { namespace threads
 
     private:
         static mask_type empty_mask;
+        static std::size_t memory_page_size_;
+        friend std::size_t get_memory_page_size();
 
         std::size_t init_node_number(
             std::size_t num_thread, hwloc_obj_type_t type
@@ -314,10 +334,7 @@ namespace hpx { namespace threads
             return init_node_number(num_thread, HWLOC_OBJ_SOCKET);
         }
 
-        std::size_t init_numa_node_number(std::size_t num_thread)
-        {
-            return init_node_number(num_thread, HWLOC_OBJ_NODE);
-        }
+        std::size_t init_numa_node_number(std::size_t num_thread);
 
         std::size_t init_core_number(std::size_t num_thread)
         {
@@ -391,10 +408,6 @@ namespace hpx { namespace threads
         std::vector<mask_type> numa_node_affinity_masks_;
         std::vector<mask_type> core_affinity_masks_;
         std::vector<mask_type> thread_affinity_masks_;
-
-        struct tls_tag {};
-        static util::thread_specific_ptr<hpx_hwloc_bitmap_wrapper, tls_tag>
-            bitmap_storage_;
     };
 
 #include <hpx/config/warnings_suffix.hpp>
@@ -427,6 +440,25 @@ namespace hpx { namespace threads
         std::vector<std::size_t> num_pus;
         parse_affinity_options(spec, affinities, 1, 1, affinities.size(),
             num_pus, ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // abstract away cache-line size
+    HPX_STATIC_CONSTEXPR std::size_t get_cache_line_size()
+    {
+#if defined(HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE)
+        return std::hardware_destructive_interference_size;
+#else
+        return 64;      // assume 64 byte cache-line size
+#endif
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // abstract away memory page size, calls to system functions are
+    // expensive, so return a value initializaed at startup
+    inline std::size_t get_memory_page_size()
+    {
+        return hpx::threads::topology::memory_page_size_;
     }
 }}
 

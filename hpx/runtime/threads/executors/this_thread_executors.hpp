@@ -49,7 +49,9 @@ namespace hpx { namespace threads { namespace executors
             void add(closure_type && f,
                 util::thread_description const& description,
                 threads::thread_state_enum initial_state, bool run_now,
-                threads::thread_stacksize stacksize, error_code& ec);
+                threads::thread_stacksize stacksize,
+                threads::thread_schedule_hint schedulehint,
+                error_code& ec) override;
 
             // Schedule given function for execution in this executor no sooner
             // than time abs_time. This call never blocks, and may violate
@@ -57,7 +59,7 @@ namespace hpx { namespace threads { namespace executors
             void add_at(
                 util::steady_clock::time_point const& abs_time,
                 closure_type && f, util::thread_description const& description,
-                threads::thread_stacksize stacksize, error_code& ec);
+                threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Schedule given function for execution in this executor no sooner
             // than time rel_time from now. This call never blocks, and may
@@ -65,23 +67,24 @@ namespace hpx { namespace threads { namespace executors
             void add_after(
                 util::steady_clock::duration const& rel_time,
                 closure_type && f, util::thread_description const& description,
-                threads::thread_stacksize stacksize, error_code& ec);
+                threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Return an estimate of the number of waiting tasks.
-            std::uint64_t num_pending_closures(error_code& ec) const;
+            std::uint64_t num_pending_closures(error_code& ec) const override;
 
             // Reset internal (round robin) thread distribution scheme
-            void reset_thread_distribution();
+            void reset_thread_distribution() override;
 
             /// Set the new scheduler mode
-            void set_scheduler_mode(threads::policies::scheduler_mode mode);
+            void set_scheduler_mode(
+                threads::policies::scheduler_mode mode) override;
 
         protected:
             friend class manage_thread_executor<this_thread_executor>;
 
             // Return the requested policy element
             std::size_t get_policy_element(threads::detail::executor_parameter p,
-                error_code& ec) const;
+                error_code& ec) const override;
 
             // The function below are used by the resource manager to
             // interact with the scheduler.

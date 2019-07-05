@@ -8,12 +8,12 @@
 #ifndef HPX_HPX_INIT_IMPL_HPP
 #define HPX_HPX_INIT_IMPL_HPP
 
+#include <hpx/assertion.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/function.hpp>
@@ -328,7 +328,7 @@ namespace hpx
     }
 
     inline int
-    init(std::nullptr_t f, std::string const& app_name, int argc, char** argv,
+    init(std::nullptr_t, std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
         using boost::program_options::options_description;
@@ -355,7 +355,7 @@ namespace hpx
     }
 
     inline int
-    init(std::nullptr_t f,
+    init(std::nullptr_t,
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {

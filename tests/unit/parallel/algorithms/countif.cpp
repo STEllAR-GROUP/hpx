@@ -23,24 +23,12 @@ void test_count_if()
 
     test_count_if_async(execution::seq(execution::task), IteratorTag());
     test_count_if_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_count_if(execution_policy(execution::seq), IteratorTag());
-    test_count_if(execution_policy(execution::par), IteratorTag());
-    test_count_if(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_count_if(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_count_if(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void count_if_test()
 {
     test_count_if<std::random_access_iterator_tag>();
     test_count_if<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_count_if<std::input_iterator_tag>();
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -57,25 +45,12 @@ void test_count_if_exception()
 
     test_count_if_exception_async(execution::seq(execution::task), IteratorTag());
     test_count_if_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_count_if_exception(execution_policy(execution::seq), IteratorTag());
-    test_count_if_exception(execution_policy(execution::par), IteratorTag());
-
-    test_count_if_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_count_if_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void count_if_exception_test()
 {
     test_count_if_exception<std::random_access_iterator_tag>();
     test_count_if_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_count_if_exception<std::input_iterator_tag>();
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -92,25 +67,12 @@ void test_count_if_bad_alloc()
 
     test_count_if_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_count_if_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_count_if_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_count_if_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_count_if_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_count_if_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void count_if_bad_alloc_test()
 {
     test_count_if_bad_alloc<std::random_access_iterator_tag>();
     test_count_if_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_count_if_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)

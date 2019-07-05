@@ -5,7 +5,7 @@
 
 set(HPX_ADDPSEUDOTARGET_LOADED TRUE)
 
-macro(add_hpx_pseudo_target)
+function(add_hpx_pseudo_target)
   hpx_debug("add_hpx_pseudo_target" "adding pseudo target: ${ARGV}")
   if(HPX_WITH_PSEUDO_DEPENDENCIES)
     set(shortened_args)
@@ -16,5 +16,5 @@ macro(add_hpx_pseudo_target)
     hpx_debug("add_hpx_pseudo_target" "adding shortened pseudo target: ${shortened_args}")
     add_custom_target(${shortened_args})
   endif()
-endmacro()
+endfunction()
 

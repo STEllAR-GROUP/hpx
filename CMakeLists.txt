@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2018 Hartmut Kaiser
+# Copyright (c) 2007-2019 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
@@ -14,6 +14,10 @@
 
 # We require at least CMake V3.3.2
 cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+
+if (HPX_WITH_CUDA AND CMAKE_VERSION VERSION_LESS 3.9)
+  message(FATAL_ERROR "CUDA support requires at least CMake 3.9.")
+endif()
 
 # Overrides must go before the project() statement, otherwise they are ignored.
 
@@ -41,12 +45,15 @@ endif()
 ################################################################################
 project(HPX CXX C)
 
-set(HPX_MAJOR_VERSION 1)
-set(HPX_MINOR_VERSION 1)
-set(HPX_PATCH_LEVEL   0)
-set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
+set(HPX_VERSION_MAJOR 1)
+set(HPX_VERSION_MINOR 4)
+set(HPX_VERSION_SUBMINOR 0)
+set(HPX_VERSION_DATE 20190523)
+set(HPX_VERSION_TAG "-trunk")
+
+set(HPX_VERSION "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}")
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
-set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
+set(HPX_SOVERSION ${HPX_VERSION_MAJOR})
 set(HPX_PACKAGE_NAME HPX)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -56,6 +63,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 ################################################################################
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
+include(GNUInstallDirs)
 include(HPX_Utils)
 
 # explicitly set certain policies
@@ -66,6 +74,13 @@ if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
   hpx_set_cmake_policy(CMP0054 OLD)
 endif()
 hpx_set_cmake_policy(CMP0060 NEW)
+
+# If we have a cmake version older than 3.12, we can't rely on CONFIGURE_DEPENDS
+if(${CMAKE_VERSION} VERSION_LESS "3.12")
+  set(DO_CONFIGURE_DEPENDS)
+else()
+  set(DO_CONFIGURE_DEPENDS CONFIGURE_DEPENDS)
+endif()
 
 # We save the passed compiler flag to a special variable. This is needed for our
 # build system unit tests. Some flags might influence the created symbols
@@ -90,8 +105,8 @@ if(NOT HPX_CMAKE_LOGLEVEL)
 endif()
 
 # print initial diagnostics
-hpx_info("CMake version: " ${CMAKE_VERSION})
-hpx_info("HPX version: " ${HPX_VERSION})
+hpx_info("CMake version: ${CMAKE_VERSION}")
+hpx_info("HPX version: ${HPX_VERSION}")
 
 ################################################################################
 # Fortran compiler detection
@@ -178,6 +193,21 @@ hpx_option(HPX_WITH_MALLOC
   ${DEFAULT_MALLOC}
   STRINGS "system;tcmalloc;jemalloc;tbbmalloc;custom")
 
+# On some systems jemalloc requires an explicit prefix for the API functions
+# (i.e. 'malloc' is called 'je_malloc', etc.)
+if(${HPX_WITH_MALLOC} STREQUAL "jemalloc")
+  if(MSVC)
+    set(HPX_WITH_JEMALLOC_PREFIX_DEFAULT "je_")
+  else()
+    set(HPX_WITH_JEMALLOC_PREFIX_DEFAULT "<none>")
+  endif()
+  hpx_option(HPX_WITH_JEMALLOC_PREFIX
+    STRING
+    "Optional naming prefix for jemalloc API functions"
+    ${HPX_WITH_JEMALLOC_PREFIX_DEFAULT}
+    ADVANCED)
+endif()
+
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL
   "Build HPX with logging enabled (default: ON)."
@@ -207,13 +237,30 @@ hpx_option(HPX_WITH_COMPILER_WARNINGS BOOL
   "Enable compiler warnings (default: ON)"
   ON ADVANCED)
 
+hpx_option(HPX_WITH_COMPILER_WARNINGS_AS_ERRORS BOOL
+  "Turn compiler warnings into errors (default: OFF)"
+  OFF ADVANCED)
+
+hpx_option(HPX_WITH_EXECUTABLE_PREFIX STRING
+  "Executable prefix (default none), 'hpx_' useful for system install."
+  "" CATEGORY "Build Targets")
+
 hpx_option(HPX_WITH_DOCUMENTATION BOOL
   "Build the HPX documentation (default OFF)."
   OFF CATEGORY "Build Targets")
 
-hpx_option(HPX_WITH_DOCUMENTATION_SINGLEPAGE BOOL
-  "The HPX documentation should be built as a single page HTML (default OFF)."
-  OFF CATEGORY "Build Targets")
+if(HPX_WITH_DOCUMENTATION)
+  set(valid_output_formats html singlehtml latexpdf man)
+  hpx_option(HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS STRING
+    "List of documentation output formats to generate. Valid options are ${valid_output_formats}. Multiple values can be separated with semicolons. (default html)."
+    "html" CATEGORY "Build Targets")
+
+  foreach(output_format ${HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS})
+    if(NOT ${output_format} IN_LIST valid_output_formats)
+      hpx_error("${output_format} is not a valid value for HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS. Valid output format are: ${valid_output_formats}.")
+    endif()
+  endforeach()
+endif()
 
 if(MSVC)
   hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
@@ -223,6 +270,13 @@ else()
   hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
     "Force creating pseudo targets and pseudo dependencies (default ON)."
     ON CATEGORY "Build Targets")
+endif()
+
+hpx_option(HPX_WITH_DYNAMIC_HPX_MAIN BOOL
+  "Enable dynamic overload of system ``main()`` (Linux only, default: ON)"
+  ON ADVANCED)
+if(HPX_WITH_DYNAMIC_HPX_MAIN)
+  hpx_add_config_cond_define(HPX_HAVE_DYNAMIC_HPX_MAIN 1)
 endif()
 
 ################################################################################
@@ -250,6 +304,10 @@ else()
   set(hpx_library_link_mode SHARED)
 endif()
 
+if (NOT MSVC)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
+
 ################################################################################
 
 hpx_option(HPX_WITH_EXAMPLES BOOL "Build the HPX examples (default ON)" ON CATEGORY "Build Targets")
@@ -259,12 +317,25 @@ hpx_option(HPX_WITH_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default:
 hpx_option(HPX_WITH_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_HEADERS BOOL "Build HPX header tests (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
+hpx_option(HPX_WITH_TESTS_EXAMPLES BOOL "Add HPX examples as tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
-hpx_option(HPX_WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 
 hpx_option(HPX_WITH_COMPILE_ONLY_TESTS BOOL
   "Create build system support for compile time only HPX tests (default ON)"
   ON CATEGORY "Build Targets")
+hpx_option(HPX_WITH_FAIL_COMPILE_TESTS BOOL
+  "Create build system support for fail compile HPX tests (default ON)"
+  ON CATEGORY "Build Targets")
+
+  # disable all tests if HPX_WITH_TESTS=OFF
+if(NOT HPX_WITH_TESTS)
+  hpx_set_option(HPX_WITH_TESTS_BENCHMARKS VALUE OFF FORCE)
+  hpx_set_option(HPX_WITH_TESTS_REGRESSIONS VALUE OFF FORCE)
+  hpx_set_option(HPX_WITH_TESTS_UNIT VALUE OFF FORCE)
+  hpx_set_option(HPX_WITH_TESTS_HEADERS VALUE OFF FORCE)
+  hpx_set_option(HPX_WITH_TESTS_EXTERNAL_BUILD VALUE OFF FORCE)
+  hpx_set_option(HPX_WITH_TESTS_EXAMPLES VALUE OFF FORCE)
+endif()
 
 # Enable IO-counters on linux systems only
 set(HPX_WITH_IO_COUNTERS_DEFAULT OFF)
@@ -299,21 +370,8 @@ if(HPX_WITH_CUDA)
   set(HPX_WITH_COMPUTE On)
   hpx_add_config_define(HPX_HAVE_CUDA)
   hpx_add_config_define(HPX_HAVE_COMPUTE)
-  if(NOT HPX_WITH_CUDA_ARCH)
-    hpx_info("HPX_WITH_CUDA_ARCH has not been defined, default value is sm_20")
-    set(HPX_WITH_CUDA_ARCH sm_20)
-  endif()
-  foreach(arch ${HPX_WITH_CUDA_ARCH})
-    string(REGEX MATCHALL "sm_[0-9][0-9]" arch ${arch})
-    if(NOT arch)
-      hpx_error("Each architecture defined in HPX_WITH_CUDA_ARCH should be a list of items, each of the form sm_XX")
-    endif()
-    string(APPEND HPX_CUDA_CLANG_FLAGS " --cuda-gpu-arch=${arch}")
-  endforeach()
-  string(REGEX REPLACE ";" " " HPX_WITH_CUDA_ARCH_INFO "${HPX_WITH_CUDA_ARCH}")
-else()
-  set(HPX_TLL_PUBLIC "PUBLIC")      # keywords for target_link_libraries
-  set(HPX_TLL_PRIVATE "PRIVATE")
+  # keywords for target_link_libraries (cuda)
+  set(CUDA_LINK_LIBRARIES_KEYWORD "PRIVATE")
 endif()
 if(HPX_WITH_CUDA_CLANG AND NOT (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
   hpx_error("To use Cuda Clang, please select Clang as your default C++ compiler")
@@ -428,13 +486,22 @@ endif()
 
 set(HPX_MAX_CPU_COUNT_DEFAULT "64")
 hpx_option(HPX_WITH_MAX_CPU_COUNT STRING
-  "HPX applications will not use more that this number of OS-Threads (default: ${HPX_MAX_CPU_COUNT_DEFAULT})"
-  ${HPX_MAX_CPU_COUNT_DEFAULT}
+  "HPX applications will not use more that this number of OS-Threads (empty string means dynamic) (default: ${HPX_MAX_CPU_COUNT_DEFAULT})"
+  "${HPX_MAX_CPU_COUNT_DEFAULT}"
   CATEGORY "Thread Manager" ADVANCED)
-hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
+if(HPX_WITH_MAX_CPU_COUNT)
+  hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
+endif()
+
+set(HPX_MAX_NUMA_DOMAIN_COUNT_DEFAULT "8")
+hpx_option(HPX_WITH_MAX_NUMA_DOMAIN_COUNT STRING
+  "HPX applications will not run on machines with more NUMA domains (default: ${HPX_MAX_NUMA_DOMAIN_COUNT_DEFAULT})"
+  ${HPX_MAX_NUMA_DOMAIN_COUNT_DEFAULT}
+  CATEGORY "Thread Manager" ADVANCED)
+hpx_add_config_define(HPX_HAVE_MAX_NUMA_DOMAIN_COUNT ${HPX_WITH_MAX_NUMA_DOMAIN_COUNT})
 
 set(HPX_MORE_THAN_64_THREADS_DEFAULT OFF)
-if(HPX_WITH_MAX_CPU_COUNT GREATER 65)
+if((NOT HPX_WITH_MAX_CPU_COUNT) OR (HPX_WITH_MAX_CPU_COUNT GREATER 64))
   set(HPX_MORE_THAN_64_THREADS_DEFAULT ON)
 endif()
 hpx_option(HPX_WITH_MORE_THAN_64_THREADS BOOL
@@ -451,7 +518,7 @@ hpx_option(HPX_WITH_THREAD_STACK_MMAP BOOL
   CATEGORY "Thread Manager" ADVANCED)
 
 hpx_option(HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF BOOL
-  "HPX scheduler threads are backing off on idle queues (default: ON)"
+  "HPX scheduler threads do exponential backoff on idle queues (default: ON)"
   ON
   CATEGORY "Thread Manager" ADVANCED)
 
@@ -488,7 +555,7 @@ if(HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
     OFF
     CATEGORY "Thread Manager" ADVANCED)
   if(HPX_WITH_THREAD_FULLBACKTRACE_ON_SUSPENSION)
-    hpx_add_config_define(HPX_HAVE_THREAD_FULLBAKCTRACE_ON_SUSPENSION)
+    hpx_add_config_define(HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION)
   endif()
 endif()
 
@@ -532,8 +599,8 @@ if(HPX_WITH_THREAD_CUMULATIVE_COUNTS)
 endif()
 
 hpx_option(HPX_WITH_THREAD_STEALING_COUNTS BOOL
-  "Enable keeping track of counts of thread stealing incidents in the schedulers (default: ON)"
-  ON CATEGORY "Thread Manager" ADVANCED)
+  "Enable keeping track of counts of thread stealing incidents in the schedulers (default: OFF)"
+  OFF CATEGORY "Thread Manager" ADVANCED)
 
 if(HPX_WITH_THREAD_STEALING_COUNTS)
   hpx_add_config_define(HPX_HAVE_THREAD_STEALING_COUNTS)
@@ -554,6 +621,12 @@ hpx_option(HPX_WITH_SCHEDULER_LOCAL_STORAGE BOOL
 if(HPX_WITH_SCHEDULER_LOCAL_STORAGE)
   hpx_add_config_define(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 endif()
+
+hpx_option(HPX_WITH_SPINLOCK_POOL_NUM STRING
+  "Number of elements a spinlock pool manages (default: 128)"
+  128 CATEGORY "Thread Manager" ADVANCED)
+
+hpx_add_config_define(HPX_HAVE_SPINLOCK_POOL_NUM ${HPX_WITH_SPINLOCK_POOL_NUM})
 
 # Count number of terminated threads before forcefully cleaning up all of
 # them. Note: terminated threads are cleaned up either when this number is
@@ -583,9 +656,10 @@ hpx_option(HPX_WITH_APEX BOOL
   "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_APEX)   # tell HPX that we use APEX
-  hpx_add_config_define(APEX_HAVE_HPX)   # tell APEX that we use HPX
   hpx_option(HPX_WITH_APEX_NO_UPDATE BOOL
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling")
+  hpx_option(HPX_WITH_APEX_TAG STRING
+    "APEX repository tag or branch" "v2.1.4" CATEGORY "Profiling")
 endif()
 hpx_option(HPX_WITH_PAPI BOOL
   "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
@@ -600,16 +674,33 @@ endif()
 
 hpx_option(HPX_WITH_ITTNOTIFY BOOL
   "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
+################################################################################
+# enable OpenMP emulation
+################################################################################
+hpx_option(HPX_WITH_HPXMP BOOL
+  "Enable hpxMP OpenMP emulation." OFF CATEGORY "OpenMP")
+if(HPX_WITH_HPXMP)
+  if(NOT MSVC AND (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")))
+    hpx_option(HPX_WITH_HPXMP_NO_UPDATE BOOL
+      "Do not update code from remote hpxMP repository." OFF CATEGORY "OpenMP")
+    hpx_option(HPX_WITH_HPXMP_TAG STRING
+      "hpxMP repository tag or branch" "v0.2.0" CATEGORY "OpenMP")
+  else()
+    hpx_warn("hpxMP can be used only when compiling with clang or gcc")
+    set(HPX_WITH_HPXMP OFF)
+  endif()
+endif()
 
 ################################################################################
 # Scheduler configuration
 ################################################################################
 hpx_option(HPX_WITH_THREAD_SCHEDULERS STRING
-  "Which thread schedulers are built. Options are: all, abp-priority, local, static-priority, static. For multiple enabled schedulers, separate with a semicolon (default: all)"
+  "Which thread schedulers are built. Options are: all, abp-priority, local, static-priority, static, shared-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
   "all"
   CATEGORY "Thread Manager" ADVANCED)
 
-string(TOUPPER ${HPX_WITH_THREAD_SCHEDULERS} HPX_WITH_THREAD_SCHEDULERS_UC)
+string(TOUPPER "${HPX_WITH_THREAD_SCHEDULERS}" HPX_WITH_THREAD_SCHEDULERS_UC)
 foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "ALL")
     set(_all On)
@@ -630,6 +721,10 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "STATIC" OR _all)
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
     set(HPX_WITH_STATIC_SCHEDULER ON CACHE INTERNAL "")
+  endif()
+  if(_scheduler STREQUAL "SHARED-PRIORITY" OR _all)
+    hpx_add_config_define(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
+    set(HPX_WITH_SHARED_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
   endif()
   unset(_all)
 endforeach()
@@ -700,8 +795,8 @@ if(HPX_WITH_NETWORKING)
 
   ## mpi parcelport settings
   hpx_option(HPX_WITH_PARCELPORT_MPI_ENV STRING
-    "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE)."
-    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE" CATEGORY "Parcelport" ADVANCED)
+    "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK)."
+    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK" CATEGORY "Parcelport" ADVANCED)
   hpx_option(HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
     "Turn on MPI multithreading support (default: ON)."
     ON CATEGORY "Parcelport" ADVANCED)
@@ -762,6 +857,9 @@ endif()
 hpx_option(HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support."
   OFF CATEGORY "Debugging")
 
+hpx_option(HPX_WITH_SANITIZERS BOOL "Configure with sanitizer instrumentation support."
+  OFF CATEGORY "Debugging")
+
 hpx_option(HPX_WITH_VERIFY_LOCKS BOOL
   "Enable lock verification code (default: OFF, implicitly enabled in debug builds)"
   OFF
@@ -819,6 +917,16 @@ if(HPX_WITH_ATTACH_DEBUGGER_ON_TEST_FAILURE)
   hpx_add_config_define(HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE)
 endif()
 
+hpx_option(HPX_WITH_TESTS_DEBUG_LOG BOOL
+  "Turn on debug logs (--hpx:debug-hpx-log) for tests (default: OFF)"
+  OFF
+  CATEGORY "Debugging" ADVANCED)
+
+hpx_option(HPX_WITH_TESTS_DEBUG_LOG_DESTINATION STRING
+  "Destination for test debug logs (default: cout)"
+  "cout"
+  CATEGORY "Debugging" ADVANCED)
+
 # If APEX is defined, the action timers need thread debug info.
 if(HPX_WITH_APEX)
     hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
@@ -857,6 +965,15 @@ if(HPX_WITH_NETWORKING)
     "Enable the parcel coalescing plugin (default: ON)." ON ADVANCED)
   if(HPX_WITH_PARCEL_COALESCING)
     hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
+    # Adaptive parcel coalescing related metrics counters are enabled only if both
+    # parcel coalescing plugin and thread idle rate counters are enabled.
+      if(HPX_WITH_THREAD_IDLE_RATES)
+        hpx_option(HPX_WITH_BACKGROUND_THREAD_COUNTERS BOOL
+           "Enable performance counters related to adaptive parcel coalescing (default: OFF)." OFF ADVANCED)
+        if(HPX_WITH_BACKGROUND_THREAD_COUNTERS)
+          hpx_add_config_define(HPX_HAVE_BACKGROUND_THREAD_COUNTERS)
+        endif()
+       endif()
   endif()
 endif()
 
@@ -867,46 +984,6 @@ hpx_option(HPX_WITH_VIM_YCM BOOL
 
 ################################################################################
 # Backwards compatibility options (edit for each release)
-
-# HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY: introduced in V0.9.99
-hpx_option(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY BOOL
-    "Enable backwards compatibility for hpx::lcos::local::dataflow() functions"
-    OFF ADVANCED)
-if(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_LOCAL_DATAFLOW_COMPATIBILITY)
-endif()
-
-# HPX_WITH_GENERIC_EXECUTION_POLICY: introduced in V0.9.99
-hpx_option(HPX_WITH_GENERIC_EXECUTION_POLICY BOOL
-    "Enable the generic execution policy (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_GENERIC_EXECUTION_POLICY)
-  hpx_add_config_define(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-endif()
-
-# HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY BOOL
-    "Enable old style ..._sync/..._async functions in API (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-endif()
-
-# HPX_WITH_QUEUE_COMPATIBILITY: introduced in V1.1.0
-hpx_option(HPX_WITH_QUEUE_COMPATIBILITY BOOL
-    "Enable old style queue components in API (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_QUEUE_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_QUEUE_COMPATIBILITY)
-endif()
-
-# HPX_WITH_SCOPED_UNLOCK_COMPATIBILITY: introduced in V1.1.0
-hpx_option(HPX_WITH_SCOPED_UNLOCK_COMPATIBILITY BOOL
-    "Enable backwards compatibility for scoped_unlock utility (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_SCOPED_UNLOCK_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_SCOPED_UNLOCK_COMPATIBILITY)
-endif()
 
 # BADBAD: This enables an overload of swap which is necessary to work around the
 #         problems caused by zip_iterator not being a real random access iterator.
@@ -923,58 +1000,18 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
-# HPX_WITH_BOOST_CHRONO_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_BOOST_CHRONO_COMPATIBILITY BOOL
-    "Enable support for boost::chrono (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_BOOST_CHRONO_COMPATIBILITY)
-endif()
-
-# HPX_WITH_EXECUTOR_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_EXECUTOR_COMPATIBILITY BOOL
-    "Enable old (pre-concurrency TS) executor API (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_EXECUTOR_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-endif()
-
-# HPX_WITH_EXECUTION_POLICY_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY BOOL
-    "Enable old execution policy names in API (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
-endif()
-
-# HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY BOOL
-    "Enable old overloads for transform_reduce and inner_product (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
-endif()
-
-# HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY: introduced in V1.1.0
+# HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY: turned off in V1.3.0
 hpx_option(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY BOOL
-    "Enable old overloads for inclusive_scan (default: ON)"
-    ON ADVANCED)
+    "Enable old overloads for inclusive_scan (default: OFF)"
+    OFF ADVANCED)
 if(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_INCLUSIVE_SCAN_COMPATIBILITY)
 endif()
 
-# HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT: introduced in V1.1.0
-hpx_option(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT BOOL
-    "Enable weaker (non-conforming) iterator requirements for parallel algorithms (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-  hpx_add_config_define(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-endif()
-
-# HPX_WITH_UNWRAPPED_COMPATIBILITY: introduced in V1.1.0
+# HPX_WITH_UNWRAPPED_COMPATIBILITY: turned off in V1.3.0
 hpx_option(HPX_WITH_UNWRAPPED_COMPATIBILITY BOOL
-    "Enable the deprecated unwrapped function (default: ON)"
-    ON ADVANCED)
+    "Enable the deprecated unwrapped function (default: OFF)"
+    OFF ADVANCED)
 if(HPX_WITH_UNWRAPPED_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_UNWRAPPED_COMPATIBILITY)
 endif()
@@ -991,8 +1028,8 @@ link_directories(${CMAKE_BINARY_DIR}/lib)
 
 # Check if the selected compiler versions are supposed to work with our codebase
 if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
-    hpx_error("GCC 4.9 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0)
+    hpx_error("GCC 5.0 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
   endif()
 endif()
 
@@ -1015,13 +1052,13 @@ elseif("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
   endif()
 elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-  if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     hpx_error("HPX on the BG/Q can only be compiled with bgclang")
   endif()
   hpx_info("Compiling for BlueGene/Q")
 endif()
 
-if((MSVC14 AND CMAKE_CL_64) OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+if((MSVC14 AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
   hpx_option(HPX_WITH_AWAIT BOOL
       "Enable the use of experimental co_await functionality"
       OFF ADVANCED CATEGORY "LCOs")
@@ -1037,16 +1074,22 @@ if((MSVC14 AND CMAKE_CL_64) OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
     endif()
 
     if(MSVC14 AND CMAKE_CL_64)
-      hpx_add_target_compile_option(-await)
+      hpx_add_target_compile_option(-await PUBLIC)
     endif()
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-      hpx_add_target_compile_option(-Xclang -fcoroutines-ts)
+      hpx_add_target_compile_option(-Xclang -fcoroutines-ts PUBLIC)
     endif()
   endif()
 endif()
 
 ################################################################################
+# Some special handling of the compilation is need on build infrastructure for
+# generating packages for target architecture, see issue #3575
+
+hpx_option(HPX_WITH_BUILD_BINARY_PACKAGE BOOL
+  "Build HPX on the build infrastructure on any LINUX distribution (default: OFF)."
+  OFF ADVANCED)
 
 ################################################################################
 # Add necessary compiler flags. Flags added here include flags to disable/enable
@@ -1054,11 +1097,11 @@ endif()
 # optimization flags is not handled here and is left to the responsibility of
 # the user to avoid conflicts in the resulting binaries
 
-hpx_add_target_compile_definition(_DEBUG CONFIGURATIONS Debug)
-hpx_add_target_compile_definition(DEBUG CONFIGURATIONS Debug)
-hpx_add_target_compile_definition(HPX_DISABLE_ASSERTS
+hpx_add_target_compile_definition(_DEBUG PUBLIC CONFIGURATIONS Debug)
+hpx_add_target_compile_definition(DEBUG PUBLIC CONFIGURATIONS Debug)
+hpx_add_target_compile_definition(HPX_DISABLE_ASSERTS PUBLIC
   CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
-hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS
+hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS PUBLIC
   CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
 
 # Make sure we compile in proper C++xx mode (MSVC uses it automatically)
@@ -1069,9 +1112,7 @@ hpx_detect_cpp_dialect()
 # CUDA features
 ################################################################################
 if(HPX_WITH_CUDA)
-  hpx_info("HPX_WITH_CUDA_ARCH has been set with values: ${HPX_WITH_CUDA_ARCH_INFO}")
   if(NOT HPX_WITH_CUDA_CLANG)
-    hpx_libraries(cudadevrt)
     if(NOT MSVC)
       hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
       link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
@@ -1090,19 +1131,12 @@ if(HPX_WITH_CUDA)
       set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O2;-Xcompiler=-MD,-Ox;-Xcompiler=-bigobj)
     endif()
     set(CUDA_SEPARABLE_COMPILATION ON)
-    foreach(arch ${HPX_WITH_CUDA_ARCH})
-      string(REPLACE "sm_" "" arch ${arch})
-      set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_${arch},code=sm_${arch})
-    endforeach()
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};${CXX_FLAG})
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-relaxed-constexpr)
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-extended-lambda)
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--default-stream per-thread)
-    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-lcudadevrt)
-    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-rdc=true)
   else()
-    hpx_add_target_compile_option(-DBOOST_THREAD_USES_MOVE)
-    hpx_add_target_compile_option(--cuda-path=${CUDA_TOOLKIT_ROOT_DIR})
+    hpx_add_target_compile_option(-DBOOST_THREAD_USES_MOVE PUBLIC)
     hpx_libraries(cudart)
     hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
     link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
@@ -1194,6 +1228,10 @@ if(NOT WIN32)
     endif()
   endif()
 
+  if(HPX_HAVE_LIBSUPCPP)
+    hpx_libraries(supc++)
+  endif()
+
   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     hpx_libraries(dl)
   endif()
@@ -1215,31 +1253,31 @@ if(WIN32)
   if(MSVC)
     enable_language(ASM_MASM)
 
-    hpx_add_target_compile_option(-Ox CONFIGURATIONS Release)
+    hpx_add_target_compile_option(-Ox PUBLIC CONFIGURATIONS Release)
 
     # even VS2017 has an ICE when compiling with -Ob2
-    hpx_add_target_compile_option(-Ob1 CONFIGURATIONS Release)
+    hpx_add_target_compile_option(-Ob1 PUBLIC CONFIGURATIONS Release)
 
     if(NOT HPX_WITH_AWAIT)
       # /RTC1 is incompatible with /await
-      hpx_add_target_compile_option(/RTC1 CONFIGURATIONS Debug)
+      hpx_add_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
     else()
-      hpx_remove_target_compile_option(/RTC1 CONFIGURATIONS Debug)
+      hpx_remove_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
     endif()
 
     # VS2012 and above has a special flag for improving the debug experience by
     # adding more symbol information to the build (-d2Zi)
-    hpx_add_target_compile_option(-d2Zi+ CONFIGURATIONS RelWithDebInfo)
+    hpx_add_target_compile_option(-d2Zi+ PUBLIC CONFIGURATIONS RelWithDebInfo)
 
     # VS2013 and above know how to do link time constant data segment folding
     # VS2013 update 2 and above know how to remove debug information for
     #     non-referenced functions and data (-Zc:inline)
-    hpx_add_target_compile_option(-Zc:inline)
-    hpx_add_target_compile_option(-Gw
+    hpx_add_target_compile_option(-Zc:inline PUBLIC)
+    hpx_add_target_compile_option(-Gw PUBLIC
       CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
-    hpx_add_target_compile_option(-Zo CONFIGURATIONS RelWithDebInfo)
+    hpx_add_target_compile_option(-Zo PUBLIC CONFIGURATIONS RelWithDebInfo)
     if(HPX_WITH_DATAPAR_VC)
-      hpx_add_target_compile_option(-std:c++latest)
+      hpx_add_target_compile_option(-std:c++latest PUBLIC)
       hpx_add_config_cond_define(_HAS_AUTO_PTR_ETC 1)
     endif()
 
@@ -1247,7 +1285,7 @@ if(WIN32)
     hpx_add_target_compile_option(-EHsc)
     if(MSVC14)
       # assume conforming (throwing) operator new implementations
-      hpx_add_target_compile_option(-Zc:throwingNew)
+      hpx_add_target_compile_option(-Zc:throwingNew PUBLIC)
 
       # enable faster linking (requires VS2015 Update1)
       # disabled for now as this flag crashes debugger
@@ -1260,16 +1298,20 @@ if(WIN32)
 
       # Update 3 allows to flag rvalue misuses and enforces strict string const-
       # qualification conformance
-      hpx_add_target_compile_option(-Zc:rvalueCast)
-      hpx_add_target_compile_option(-Zc:strictStrings)
+      hpx_add_target_compile_option(-Zc:rvalueCast PUBLIC)
+      hpx_add_target_compile_option(-Zc:strictStrings PUBLIC)
+
+      # Update 8 requires to set _ENABLE_EXTENDED_ALIGNED_STORAGE for it to
+      # compile atomics
+      hpx_add_config_cond_define(_ENABLE_EXTENDED_ALIGNED_STORAGE)
     endif()
 
     # Runtime type information
-    hpx_add_target_compile_option(-GR)
+    hpx_add_target_compile_option(-GR PUBLIC)
     # Multiprocessor build
-    hpx_add_target_compile_option(-MP)
+    hpx_add_target_compile_option(-MP PUBLIC)
     # Increase the maximum size of object file sections
-    hpx_add_target_compile_option(-bigobj)
+    hpx_add_target_compile_option(-bigobj PUBLIC)
   endif()
 
   hpx_libraries(psapi shlwapi)
@@ -1287,6 +1329,7 @@ if(WIN32)
   hpx_add_config_cond_define(_CRT_NONSTDC_NO_WARNINGS)
   hpx_add_config_cond_define(_WINSOCK_DEPRECATED_NO_WARNINGS)
   hpx_add_config_cond_define(_CRT_NON_CONFORMING_SWPRINTFS)
+  hpx_add_config_cond_define(_SILENCE_FPOS_SEEKPOS_DEPRECATION_WARNING)
 
   ##############################################################################
   # Boost
@@ -1311,13 +1354,17 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag(-W3 LANGUAGES C CXX)
     # According to the ifort Windows manual, W3 isn't supported
     hpx_add_compile_flag(-W1 LANGUAGES Fortran)
-    # Boost.Lockfree triggers 'warning C4307: '+' : integral constant overflow'
-    # which is benign
-    hpx_add_compile_flag(-wd4307)
 
     # MSVC2012/2013 are overeager to report 'qualifier applied to function type
     # has no meaning; ignored'
     hpx_add_compile_flag(-wd4180)
+
+    # Boost.Lockfree triggers 'warning C4307: '+' : integral constant overflow'
+    # which is benign
+    hpx_add_compile_flag(-wd4307)
+
+    # object allocated on the heap may not be aligned
+    hpx_add_compile_flag(-wd4316)
 
     # max symbol length exceeded
     hpx_add_compile_flag(-wd4503)
@@ -1331,6 +1378,17 @@ if(HPX_WITH_COMPILER_WARNINGS)
       # The file contains a character starting at offset ... that is illegal in
       # the current source character set
       hpx_add_compile_flag(-wd4828)
+    endif()
+
+    if(HPX_WITH_DATAPAR_VC)
+      # unary minus operator applied to unsigned type, result still unsigned
+      hpx_add_compile_flag(-wd4146)
+
+      # '<=': signed/unsigned mismatch
+      hpx_add_compile_flag(-wd4018)
+
+      # 'return': conversion from 'short' to 'Vc_1::schar', possible loss of data
+      hpx_add_compile_flag(-wd4244)
     endif()
 
   else() # Trial and error approach for any other compiler ...
@@ -1377,10 +1435,25 @@ if(HPX_WITH_COMPILER_WARNINGS)
   endif()
 endif()
 
+# Configure compiler warnings as errors
+if(HPX_WITH_COMPILER_WARNINGS_AS_ERRORS)
+  if(MSVC)
+    hpx_add_compile_flag(-WX LANGUAGES C CXX Fortran)
+  else()
+    hpx_add_compile_flag_if_available(-Werror LANGUAGES CXX C Fortran)
+  endif()
+endif()
+
 # Diagnostics
 if(MSVC)
   # Display full paths in diagnostics
   hpx_add_compile_flag(-FC LANGUAGES C CXX)
+  if(CMAKE_CL_64)
+    set(__target_arch "x86_64")
+  else()
+    set(__target_arch "x84")
+  endif()
+  hpx_info("Architecture detected: ${__target_arch}")
 else()
   # Show the flags that toggle each warning
   hpx_add_compile_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX C Fortran)
@@ -1454,20 +1527,51 @@ else()
     hpx_add_compile_flag_if_available(-wd2536)
   endif()
 
-  # rdtsc is an x86 instruction that reads the value of a CPU time stamp
-  # counter. rdtscp is an extension to rdtsc. The difference is that rdtscp is
-  # a serializing instruction.
-  hpx_cpuid("rdtsc" HPX_WITH_RDTSC
-    DEFINITIONS HPX_HAVE_RDTSC)
+  set(__has_timestamp_support OFF)
+  include(TargetArch)
 
-  # XeonPhi's do not support RDTSCP
-  if(NOT ("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI"))
-    hpx_cpuid("rdtscp" HPX_WITH_RDTSCP
-      DEFINITIONS HPX_HAVE_RDTSCP)
+  target_architecture(__target_arch)
+  if("${__target_arch}" STREQUAL "i386" OR
+     "${__target_arch}" STREQUAL "ix86" OR
+     "${__target_arch}" STREQUAL "x86_64" OR
+     "${__target_arch}" STREQUAL "ia64")
+
+      # rdtsc is an x86 instruction that reads the value of a CPU time stamp
+      # counter. rdtscp is an extension to rdtsc. The difference is that rdtscp is
+      # a serializing instruction.
+      hpx_cpuid("rdtsc" HPX_WITH_RDTSC DEFINITIONS HPX_HAVE_RDTSC)
+
+      # One can not assume if RDTSCP is available on the hardware
+      # of the build infrastructure, that it will be available on
+      # all potential target hardware, see Issue  #3575
+      if(NOT ${HPX_WITH_BUILD_BINARY_PACKAGE})
+
+        # XeonPhi's do not support RDTSCP
+        if(NOT ("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI"))
+          hpx_cpuid("rdtscp" HPX_WITH_RDTSCP DEFINITIONS HPX_HAVE_RDTSCP)
+        endif()
+
+      endif()
+      if(HPX_WITH_RDTSC OR HPX_WITH_RDTSCP)
+        set(__has_timestamp_support ON)
+      endif()
+  elseif("${__target_arch}" STREQUAL "arm" OR
+         "${__target_arch}" STREQUAL "armv5" OR
+         "${__target_arch}" STREQUAL "armv6" OR
+         "${__target_arch}" STREQUAL "armv7")
+    set(__has_timestamp_support ON)
+  elseif("${__target_arch}" STREQUAL "ppc" OR
+         "${__target_arch}" STREQUAL "ppc64")
+    set(__has_timestamp_support ON)
+  elseif("${__target_arch}" STREQUAL "bgq")
+    set(__has_timestamp_support ON)
+  elseif("${__target_arch}" STREQUAL "s390x")
+    set(__has_timestamp_support ON)
   endif()
 
-  if(NOT HPX_WITH_RDTSC AND NOT HPX_WITH_RDTSCP)
-    hpx_warn("Neither rdtsc nor rdtscp is available; some performance counters may report incorrect results")
+  hpx_info("Architecture detected: ${__target_arch}")
+  if(NOT __has_timestamp_support)
+    hpx_warn("No timestamp support is available; some performance counters may report incorrect results")
   endif()
 endif()
 
@@ -1490,6 +1594,13 @@ include(HPX_SetupAllocator)
 
 # convey selected allocator type to the build configuration
 hpx_add_config_define(HPX_HAVE_MALLOC "\"${HPX_WITH_MALLOC}\"")
+if(${HPX_WITH_MALLOC} STREQUAL "jemalloc")
+  if(NOT ("${HPX_WITH_JEMALLOC_PREFIX}" STREQUAL "<none>") AND
+     NOT ("${HPX_WITH_JEMALLOC_PREFIX}x" STREQUAL "x"))
+    hpx_add_config_define(HPX_HAVE_JEMALLOC_PREFIX ${HPX_WITH_JEMALLOC_PREFIX})
+    hpx_add_config_define(HPX_HAVE_INTERNAL_ALLOCATOR)
+  endif()
+endif()
 
 find_package(Hwloc)
 if(NOT HWLOC_FOUND)
@@ -1497,6 +1608,11 @@ if(NOT HWLOC_FOUND)
 endif()
 hpx_libraries(${HWLOC_LIBRARIES})
 include_directories(${HWLOC_INCLUDE_DIR})
+
+################################################################################
+# Set search paths for generated headers.
+################################################################################
+include_directories("${CMAKE_BINARY_DIR}")
 
 ################################################################################
 # Enable integration with Intel Amplifier
@@ -1515,16 +1631,24 @@ endif()
 ################################################################################
 # Enable integration with Apex event counters
 ################################################################################
-set(_hpx_apex_no_update)
-if(HPX_WITH_APEX_NO_UPDATE)
-  set(_hpx_apex_no_update NO_UPDATE)
-endif()
+
+# reset external source lists
+add_hpx_library_sources_noglob(hpx_external)
+add_hpx_library_headers_noglob(hpx_external)
+
 if(HPX_WITH_APEX)
+  set(_hpx_apex_no_update)
+  if(HPX_WITH_APEX_NO_UPDATE)
+    set(_hpx_apex_no_update NO_UPDATE)
+  endif()
+
+  # We want to track parent dependencies
+  hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
   # handle APEX library
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    master
+    ${HPX_WITH_APEX_TAG}
     ${_hpx_apex_no_update}
     VERBOSE)
 
@@ -1539,7 +1663,7 @@ if(HPX_WITH_APEX)
 
   include_directories(${APEX_SOURCE_DIR})
   set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-      ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} apex_lib)
+      ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} apex)
   if(APEX_WITH_MSR)
     set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
         ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} -L${MSR_ROOT}/lib -lmsr)
@@ -1562,8 +1686,33 @@ if(HPX_WITH_APEX)
     include_directories(${ITTNOTIFY_SOURCE_DIR})
     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
     set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} ittnotify_lib)
+        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} ittnotify)
   endif()
+endif()
+
+if(HPX_WITH_HPXMP)
+
+  # hpxMP requires ASM support
+  enable_language(ASM)
+  set(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
+
+  set(_hpxmp_no_update)
+  if(HPX_WITH_HPXMP_NO_UPDATE)
+    set(_hpxmp_no_update NO_UPDATE)
+  endif()
+
+  # handle hpxMP library
+  include(GitExternal)
+  git_external(hpxmp
+    https://github.com/STEllAR-GROUP/hpxMP.git
+    ${HPX_WITH_HPXMP_TAG}
+    ${_hpxmp_no_update}
+    VERBOSE)
+
+  add_subdirectory(hpxmp)
+
+  # make sure thread-local storage is supported
+  hpx_add_config_define(HPX_HAVE_THREAD_LOCAL_STORAGE)
 endif()
 
 if(HPX_WITH_GOOGLE_PERFTOOLS)
@@ -1584,6 +1733,10 @@ if(HPX_WITH_VALGRIND)
   hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()
 
+if(HPX_WITH_SANITIZERS)
+  hpx_add_config_define(HPX_HAVE_SANITIZERS)
+endif()
+
 if(HPX_WITH_VIM_YCM)
   SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 endif()
@@ -1597,11 +1750,6 @@ if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   # Check if we can use generic coroutine contexts without any problems
   if(NOT Boost_CONTEXT_FOUND)
     hpx_error("The usage of Boost.Context was selected but Boost.Context was not found.")
-  endif()
-  if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-    if(Boost_VERSION LESS 105600)
-      hpx_error("On BlueGene/Q, Boost.Context can only be used with a Boost >=1.56")
-    endif()
   endif()
   hpx_add_config_define(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 endif()
@@ -1635,18 +1783,12 @@ else()
 endif()
 
 
-# ################################################################################
-# # search path configuration
-# ################################################################################
-
-if (NOT DEFINED LIB)
-  set(LIB "lib")
-endif(NOT DEFINED LIB)
-
+################################################################################
+# search path configuration
+################################################################################
 if(HPX_WITH_FULL_RPATH)
   hpx_include(SetFullRPATH)
 endif()
-###############################################################################
 
 ################################################################################
 # Git commit detection
@@ -1658,21 +1800,61 @@ hpx_include(SetOutputPaths)
 ##############################################################################
 
 ################################################################################
-# Provide a macro for generating config headers
+# Provide a function for generating config headers
 ################################################################################
-macro(generate_config_defines_header TARGET_DIRECTORY)
+function(generate_config_defines_header TARGET_DIRECTORY)
   # Generate a defines.hpp to be used in the build directory ...
   set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
   write_config_defines_file(
     TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
     NAMESPACE default
     FILENAME "${TARGET_DIRECTORY}/hpx/config/defines.hpp")
-endmacro()
+endfunction()
 
 ################################################################################
-# Set basic search paths for the generated HPX headers
+# Add custom targets for tests
 ################################################################################
-include_directories("${CMAKE_BINARY_DIR}")
+if (HPX_WITH_TESTS)
+  add_hpx_pseudo_target(tests)
+  if (HPX_WITH_TESTS_UNIT)
+    add_hpx_pseudo_target(tests.unit)
+    add_hpx_pseudo_dependencies(tests tests.unit)
+  endif()
+  if (HPX_WITH_TESTS_REGRESSIONS)
+    add_hpx_pseudo_target(tests.regressions)
+    add_hpx_pseudo_dependencies(tests tests.regressions)
+  endif()
+  if (HPX_WITH_TESTS_BENCHMARKS)
+    add_hpx_pseudo_target(tests.performance)
+    add_hpx_pseudo_dependencies(tests tests.performance)
+  endif()
+  if (HPX_WITH_TESTS_HEADERS)
+    add_hpx_pseudo_target(tests.headers)
+    add_hpx_pseudo_dependencies(tests tests.headers)
+  endif()
+  if (HPX_WITH_EXAMPLES AND HPX_WITH_TESTS_EXAMPLES)
+    add_hpx_pseudo_target(tests.examples)
+    add_hpx_pseudo_dependencies(tests tests.examples)
+  endif()
+
+  enable_testing()
+  include(CTest)
+endif()
+
+if(HPX_WITH_EXAMPLES)
+  add_hpx_pseudo_target(examples)
+endif()
+
+################################################################################
+# Debug library postfix
+################################################################################
+set(CMAKE_DEBUG_POSTFIX "d")
+set(HPX_DEBUG_POSTFIX "d")
+
+################################################################################
+# Add libraries
+################################################################################
+add_subdirectory(libs)
 
 ################################################################################
 # Configure compression and other plugins
@@ -1692,13 +1874,9 @@ if(HPX_WITH_COMPRESSION_ZLIB)
 endif()
 
 ################################################################################
-# Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc)
+# Documentation toolchain (Sphinx, Doxygen, Breathe)
 ################################################################################
 hpx_include(Documentation)
-
-# Debug library postfix
-set(CMAKE_DEBUG_POSTFIX "d")
-set(HPX_DEBUG_POSTFIX "d")
 
 ################################################################################
 # Target specification
@@ -1714,12 +1892,6 @@ endif()
 add_hpx_pseudo_target(core)
 add_subdirectory(src)
 
-if(HPX_WITH_EXAMPLES)
-  add_hpx_pseudo_target(examples)
-  include_directories(examples)
-  add_subdirectory(examples)
-endif()
-
 ###############################################################################
 # Tests
 ###############################################################################
@@ -1730,18 +1902,13 @@ if(HPX_WITH_TESTS)
     hpx_warn("A python interpreter could not be found. The test suite can not be run automatically.")
   endif()
 
-  add_hpx_pseudo_target(tests)
-
-  enable_testing()
-  include(CTest)
-
   include_directories(tests)
   add_subdirectory(tests)
 endif()
 
-if(HPX_WITH_RUNTIME)
-  add_hpx_pseudo_target(runtime)
-  add_subdirectory(runtime)
+if(HPX_WITH_EXAMPLES)
+  include_directories(examples)
+  add_subdirectory(examples)
 endif()
 
 if(HPX_WITH_DOCUMENTATION)
@@ -1754,7 +1921,7 @@ endif()
 add_plugin_modules()
 
 ################################################################################
-# Configure the header to include all compile definitions
+# Generate config headers and helpers
 ################################################################################
 generate_config_defines_header(${CMAKE_BINARY_DIR})
 
@@ -1764,6 +1931,17 @@ write_config_defines_file(
   TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
   NAMESPACE default
   FILENAME "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
+
+# Configure version.hpp for build tree and install directory
+configure_file(
+    "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
+    "${CMAKE_BINARY_DIR}/hpx/config/version.hpp"
+    @ONLY)
+
+configure_file(
+    "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
+    "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/version.hpp"
+    @ONLY)
 
 # Configure hpxrun.py
 configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
@@ -1775,7 +1953,7 @@ configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
 ################################################################################
 install(
   FILES "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
-  DESTINATION bin
+  DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT core
   PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
   GROUP_READ GROUP_EXECUTE
@@ -1783,7 +1961,7 @@ install(
 
 install( # install all hpx header files
   DIRECTORY hpx/
-  DESTINATION include/hpx
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"
   PATTERN ".git" EXCLUDE
@@ -1794,56 +1972,24 @@ install( # install all hpx header files
 # cmake options
 install(
   DIRECTORY "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/"
-  DESTINATION include/hpx
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".git" EXCLUDE
-  PATTERN "CMakeFiles" EXCLUDE
-  PATTERN "CTestFiles" EXCLUDE)
-
-install( # install all hpx header files
-  DIRECTORY hpx
-  DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-  COMPONENT core
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".git" EXCLUDE
-  PATTERN "CMakeFiles" EXCLUDE
-  PATTERN "CTestFiles" EXCLUDE)
-
-install( # install all hpx source files
-  DIRECTORY src
-  DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-  COMPONENT core
-  PATTERN ".git" EXCLUDE
-  PATTERN "CMakeFiles" EXCLUDE
-  PATTERN "CTestFiles" EXCLUDE)
-
-install( # install all hpx examples source files
-  DIRECTORY examples
-  DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-  COMPONENT core
-  PATTERN ".git" EXCLUDE
-  PATTERN "CMakeFiles" EXCLUDE
-  PATTERN "CTestFiles" EXCLUDE)
-
-install( # install all hpx tests source files
-  DIRECTORY tests
-  DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-  COMPONENT core
   PATTERN ".git" EXCLUDE
   PATTERN "CMakeFiles" EXCLUDE
   PATTERN "CTestFiles" EXCLUDE)
 
 install( # Install all HPX cmake utility files
   DIRECTORY cmake/
-  DESTINATION ${LIB}/cmake/${HPX_PACKAGE_NAME}
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
   COMPONENT core
-  PATTERN ".cmake.in" EXCLUDE
+  PATTERN "templates" EXCLUDE
+  PATTERN "packaging" EXCLUDE
   PATTERN ".git" EXCLUDE)
 
 install( # Install HPX Python scripts
   DIRECTORY python/scripts/
-  DESTINATION bin
+  DESTINATION ${CMAKE_INSTALL_BINDIR}
   FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                    GROUP_READ GROUP_EXECUTE
                    WORLD_READ WORLD_EXECUTE
@@ -1868,13 +2014,13 @@ install( # Install HPX Python scripts
 #         COMMAND "${CMAKE_COMMAND}" -E create_symlink "${script_name}" "${script_name_we}"
 #   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 #
-#       install(FILES "${CMAKE_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "bin")
+#       install(FILES "${CMAKE_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "${CMAKE_INSTALL_BINDIR}")
 #     endforeach()
 #   endif()
 #
 #   install( # Install HPX Python module (TODO: this is a temporary hack)
 #     DIRECTORY python/hpx
-#     DESTINATION share/hpx-${HPX_VERSION}/python
+#     DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx-${HPX_VERSION}/python
 #     COMPONENT core
 #     FILES_MATCHING PATTERN "*.py"
 #     PATTERN ".git" EXCLUDE)
@@ -1885,13 +2031,13 @@ install( # Install HPX Python scripts
 #     "hpx-${HPX_VERSION}" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
 #   # create a symlink in share pointing to the latest HPX installation
 #   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
-#   install(DIRECTORY "${CMAKE_BINARY_DIR}/python/hpx" DESTINATION "share")
+#   install(DIRECTORY "${CMAKE_BINARY_DIR}/python/hpx" DESTINATION "${CMAKE_INSTALL_DATADIR}")
 
 if("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
   # FIXME: push changes upstream
   install(
     DIRECTORY external/asio/boost
-    DESTINATION include/hpx/external
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx/external
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
     PATTERN ".git" EXCLUDE)
@@ -1899,41 +2045,44 @@ endif()
 
 install(
   FILES "${PROJECT_SOURCE_DIR}/LICENSE_1_0.txt"
-  DESTINATION share/hpx-${HPX_VERSION}
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx
   COMPONENT license)
 
 if(HPX_WITH_DOCUMENTATION)
-  # Install HPX documentation files
-  install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/"
-    DESTINATION share/hpx-${HPX_VERSION}/docs
-    COMPONENT docs
-    OPTIONAL
-    FILES_MATCHING PATTERN "*.html"
-    PATTERN "*.pdf"
-    PATTERN ".git" EXCLUDE
-    PATTERN "*code*" EXCLUDE
-    PATTERN "*src*" EXCLUDE
-    PATTERN "*images*" EXCLUDE)
-
   install(
     FILES "${PROJECT_SOURCE_DIR}/docs/index.html"
-    DESTINATION share/hpx-${HPX_VERSION}/
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/
     COMPONENT docs)
 
-  install(
-    DIRECTORY "${PROJECT_SOURCE_DIR}/docs/html/src/"
-    DESTINATION share/hpx-${HPX_VERSION}/docs/html/src
-    COMPONENT docs
-    FILES_MATCHING PATTERN "*.css"
-    PATTERN ".git" EXCLUDE)
+  if("html" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    install(
+      DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx/docs/html/"
+      DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/html
+      COMPONENT docs
+      PATTERN "*.buildinfo" EXCLUDE)
+  endif()
 
-  install(
-    DIRECTORY "${PROJECT_SOURCE_DIR}/docs/html/images/"
-    DESTINATION share/hpx-${HPX_VERSION}/docs/html/images
-    COMPONENT docs
-    FILES_MATCHING PATTERN "*.png"
-    PATTERN ".git" EXCLUDE)
+  if("singlehtml" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    install(
+      DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx/docs/singlehtml/"
+      DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/singlehtml
+      COMPONENT docs
+      PATTERN "*.buildinfo" EXCLUDE)
+  endif()
+
+  if("latexpdf" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    install(
+      FILES "${CMAKE_BINARY_DIR}/share/hpx/docs/latexpdf/latex/HPX.pdf"
+      DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/pdf/
+      COMPONENT docs)
+  endif()
+
+  if("man" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
+    install(
+      FILES "${CMAKE_BINARY_DIR}/share/hpx/docs/man/hpx.1"
+      DESTINATION ${CMAKE_INSTALL_MANDIR}/
+      COMPONENT docs)
+  endif()
 endif()
 
 if(HPX_WITH_VIM_YCM)
@@ -1951,6 +2100,18 @@ if(HPX_WITH_VIM_YCM)
 endif()
 
 ################################################################################
+# Add rpm packaging
+
+hpx_option(HPX_WITH_RPM
+  BOOL
+  "Enable or disable the generation of rpm packages"
+OFF ADVANCED)
+
+if(HPX_WITH_RPM)
+add_subdirectory(cmake/packaging/rpm)
+endif()
+
+################################################################################
 # print overall configuration summary
 include(HPX_PrintSummary)
 
@@ -1959,10 +2120,6 @@ include(HPX_PrintSummary)
 ################################################################################
 
 include(HPX_GeneratePackage)
-
-# Create a symlink in share pointing to the latest HPX installation
-create_symbolic_link("${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}"
-                     "${CMAKE_BINARY_DIR}/share/hpx")
 
 message("")
 message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")

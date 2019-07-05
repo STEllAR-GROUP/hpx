@@ -28,7 +28,7 @@ generate_parcel(hpx::id_type const& dest_id, hpx::id_type const& cont, T && data
     hpx::naming::address addr;
     hpx::naming::gid_type dest = dest_id.get_gid();
     hpx::parcelset::parcel p(hpx::parcelset::detail::create_parcel::call(
-        std::true_type(), std::move(dest), std::move(addr),
+        std::move(dest), std::move(addr),
         hpx::actions::typed_continuation<hpx::id_type>(cont),
         Action(), hpx::threads::thread_priority_normal,
         std::forward<T>(data)));
@@ -218,9 +218,14 @@ int hpx_main(boost::program_options::variables_map& vm)
         test_mixed_arguments(id);
     }
 
-    // compare number of parcels with number of messages generated
-    print_counters("/parcels/count/*/sent");
-    print_counters("/messages/count/*/sent");
+#if defined(HPX_HAVE_NETWORKING)
+    if (hpx::is_networking_enabled())
+    {
+        // compare number of parcels with number of messages generated
+        print_counters("/parcels/count/*/sent");
+        print_counters("/messages/count/*/sent");
+    }
+#endif
 
     return hpx::finalize();
 }
@@ -240,7 +245,9 @@ int main(int argc, char* argv[])
 
     // explicitly disable message handlers (parcel coalescing)
     std::vector<std::string> const cfg = {
+#if defined(HPX_HAVE_NETWORKING)
         "hpx.parcel.message_handlers=0"
+#endif
     };
 
     // Initialize and run HPX

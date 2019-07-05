@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2018 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 set(tests
     block_os_threads_1036
     resume_priority
+    run_as_hpx_thread_exceptions_3304
     run_as_os_thread_lockup_2991
     thread_data_1111
     thread_pool_executor_1112
@@ -54,6 +55,6 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.regressions.threads_dir.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()
 

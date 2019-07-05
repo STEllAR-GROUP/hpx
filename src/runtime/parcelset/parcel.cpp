@@ -5,21 +5,21 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/serialization/access.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
-#include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/util/apex.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/itt_notify.hpp>
 
@@ -159,22 +159,17 @@ namespace hpx { namespace parcelset
     }
 #endif
 
-    parcel::parcel()
-    {}
+    parcel::parcel() {}
 
-    parcel::~parcel()
-    {}
+    parcel::~parcel() {}
 
-    parcel::parcel(
-        naming::gid_type&& dest,
-        naming::address&& addr,
-        std::unique_ptr<actions::base_action> act
-    )
-      : data_(std::move(dest), std::move(addr), act->has_continuation()),
-        action_(std::move(act)),
-        size_(0)
+    parcel::parcel(naming::gid_type&& dest, naming::address&& addr,
+            std::unique_ptr<actions::base_action> act)
+      : data_(std::move(dest), std::move(addr), act->has_continuation())
+      , action_(std::move(act))
+      , size_(0)
     {
-//             HPX_ASSERT(is_valid());
+//         HPX_ASSERT(is_valid());
     }
 
     parcel::parcel(parcel && other)

@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/one_size_heap_list.hpp>
 #if defined(HPX_DEBUG)
@@ -29,8 +29,8 @@ namespace hpx { namespace util
     {
 #if defined(HPX_DEBUG)
         LOSH_(info) << hpx::util::format(
-            "%1%::~%1%: size(%2%), max_count(%3%), alloc_count(%4%), "
-            "free_count(%5%)",
+            "{1}::~{1}: size({2}), max_count({3}), alloc_count({4}), "
+            "free_count({5})",
             name(),
             heap_count_,
             max_alloc_count_,
@@ -40,7 +40,7 @@ namespace hpx { namespace util
         if (alloc_count_ > free_count_)
         {
             LOSH_(warning) << hpx::util::format(
-                "%1%::~%1%: releasing with %2% allocated objects",
+                "{1}::~{1}: releasing with {2} allocated objects",
                 name(),
                 alloc_count_ - free_count_);
         }
@@ -87,9 +87,9 @@ namespace hpx { namespace util
 
 #if defined(HPX_DEBUG)
                     LOSH_(info) << hpx::util::format(
-                        "%1%::alloc: failed to allocate from heap[%2%] "
-                        "(heap[%2%] has allocated %3% objects and has "
-                        "space for %4% more objects)",
+                        "{1}::alloc: failed to allocate from heap[{2}] "
+                        "(heap[{2}] has allocated {3} objects and has "
+                        "space for {4} more objects)",
                         name(),
                         heap->heap_count(),
                         heap->size(),
@@ -126,7 +126,7 @@ namespace hpx { namespace util
                 HPX_THROW_EXCEPTION(out_of_memory,
                     name() + "::alloc",
                     hpx::util::format(
-                        "new heap failed to allocate %1% objects",
+                        "new heap failed to allocate {1} objects",
                         count));
             }
 
@@ -135,7 +135,7 @@ namespace hpx { namespace util
             ++heap_count_;
 
             LOSH_(info) << hpx::util::format(
-                "%1%::alloc: creating new heap[%2%], size is now %3%",
+                "{1}::alloc: creating new heap[{2}], size is now {3}",
                 name(),
                 heap_count_,
                 heap_list_.size());
@@ -156,8 +156,8 @@ namespace hpx { namespace util
     {
         if (nullptr == threads::get_self_ptr())
         {
-            hpx::applier::register_work(
-                util::bind(&one_size_heap_list::free, this, p, count),
+            hpx::applier::register_work_nullary(
+                util::bind_front(&one_size_heap_list::free, this, p, count),
                 "one_size_heap_list::free");
             return true;
         }
@@ -202,7 +202,7 @@ namespace hpx { namespace util
         HPX_THROW_EXCEPTION(bad_parameter,
             name() + "::free",
             hpx::util::format(
-                "pointer %1% was not allocated by this %2%",
+                "pointer {1} was not allocated by this {2}",
                 p, name()));
     }
 

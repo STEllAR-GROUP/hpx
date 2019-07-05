@@ -26,6 +26,7 @@ foreach(benchmark ${benchmarks})
   # add example executable
   add_hpx_executable(${benchmark}
                      SOURCES ${sources}
+                     EXCLUDE_FROM_ALL
                      ${${benchmark}_FLAGS}
                      FOLDER "Benchmarks/ParallelAlgorithms/Local")
 
@@ -38,5 +39,5 @@ foreach(benchmark ${benchmarks})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.performance.parallel_algorithms.local_.${benchmark}
-                              ${benchmark}_exe)
+                              ${benchmark})
 endforeach()

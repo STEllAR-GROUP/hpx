@@ -15,11 +15,11 @@
 #include <hpx/util/regex_from_pattern.hpp>
 
 #include <cstdint>
+#include <regex>
 #include <string>
 #include <unordered_set>
 #include <utility>
 
-#include <boost/regex.hpp>
 
 namespace hpx { namespace parcelset { namespace detail
 {
@@ -99,12 +99,12 @@ namespace hpx { namespace parcelset { namespace detail
             if (ec) return false;
 
             bool found_one = false;
-            boost::regex rx(str_rx, boost::regex::perl);
+            std::regex rx(str_rx);
 
             map_type::const_iterator end = map_.end();
             for (map_type::const_iterator it = map_.begin(); it != end; ++it)
             {
-                if (!boost::regex_match(*it, rx))
+                if (!std::regex_match(*it, rx))
                     continue;
                 found_one = true;
 
@@ -136,8 +136,8 @@ namespace hpx { namespace parcelset { namespace detail
                 HPX_THROWS_IF(ec, bad_parameter,
                     "per_action_data_counter_registry::counter_discoverer",
                     hpx::util::format(
-                        "action type %s does not match any known type, "
-                        "known action types: \n%s", p.parameters_, types));
+                        "action type {} does not match any known type, "
+                        "known action types: \n{}", p.parameters_, types));
                 return false;
             }
 
@@ -162,8 +162,8 @@ namespace hpx { namespace parcelset { namespace detail
             HPX_THROWS_IF(ec, bad_parameter,
                 "per_action_data_counter_registry::counter_discoverer",
                 hpx::util::format(
-                    "action type %s does not match any known type, "
-                    "known action types: \n%s", p.parameters_, types));
+                    "action type {} does not match any known type, "
+                    "known action types: \n{}", p.parameters_, types));
             return false;
         }
 

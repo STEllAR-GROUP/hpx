@@ -3,9 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if((NOT MSVC) OR HPX_WITH_VCPKG)
-  set(boost_library_dependencies ${Boost_LIBRARIES})
-endif()
+set(boost_library_dependencies ${Boost_LIBRARIES})
 
 set(benchmarks
     htts2_payload_precision
@@ -13,25 +11,25 @@ set(benchmarks
     htts2_hpx
    )
 
-set(htts2_payload_precision_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies})
+set(htts2_payload_precision_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} hpx_assertion hpx_config)
 
 if(HPX_WITH_EXAMPLES_OPENMP)
   set(benchmarks ${benchmarks} htts2_omp)
-  set(htts2_omp_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies})
+  set(htts2_omp_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} hpx_assertion hpx_config)
 endif()
 
 if(HPX_WITH_EXAMPLES_QTHREADS)
   include_directories(${QTHREADS_INCLUDE_DIR})
 
   set(benchmarks ${benchmarks} htts2_qthreads)
-  set(htts2_qthreads_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARY})
+  set(htts2_qthreads_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARY} hpx_assertion hpx_config)
 endif()
 
 if(HPX_WITH_EXAMPLES_TBB)
   include_directories(${TBB_INCLUDE_DIR})
 
   set(benchmarks ${benchmarks} htts2_tbb)
-  set(htts2_tbb_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${TBB_LIBRARY})
+  set(htts2_tbb_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${TBB_LIBRARY} hpx_assertion hpx_config)
 endif()
 
 foreach(benchmark ${benchmarks})
@@ -47,6 +45,15 @@ foreach(benchmark ${benchmarks})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/HTTS v2/${benchmark}")
 
+  list(FIND ${benchmark}_FLAGS NOLIBS has_NOLIBS)
+  if (NOT has_NOLIBS EQUAL -1)
+    target_compile_definitions(${benchmark} PRIVATE
+                               HPX_FORMAT_EXPORT= #empty
+                               HPX_NO_VERSION_CHECK)
+    target_sources(${benchmark}
+                   PRIVATE ${PROJECT_SOURCE_DIR}/src/util/format.cpp)
+  endif()
+
   # add a custom target for this example
   add_hpx_pseudo_target(tests.performance.local.htts_v2.${benchmark})
 
@@ -56,11 +63,11 @@ foreach(benchmark ${benchmarks})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.performance.local.htts_v2.${benchmark}
-                              ${benchmark}_exe)
+                              ${benchmark})
 endforeach()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
-  set_target_properties(htts2_omp_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(htts2_omp_exe PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
+  set_target_properties(htts2_omp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+  set_target_properties(htts2_omp PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()
 

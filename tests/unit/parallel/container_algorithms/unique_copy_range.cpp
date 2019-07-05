@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -80,7 +80,7 @@ void test_unique_copy(ExPolicy policy, DataType)
 
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(dest_res), get<1>(result),
         std::begin(dest_sol), solution);
 
@@ -108,69 +108,12 @@ void test_unique_copy_async(ExPolicy policy, DataType)
 
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(dest_res), get<1>(result),
         std::begin(dest_sol), solution);
 
     HPX_TEST(equality);
 }
-
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-template <typename ExPolicy, typename DataType>
-void test_unique_copy_outiter(ExPolicy policy, DataType)
-{
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
-    using hpx::util::get;
-
-    std::size_t const size = 10007;
-    std::vector<DataType> c(size), dest_res(0), dest_sol(0);
-    std::generate(std::begin(c), std::end(c), random_fill(0, 6));
-
-    auto result = hpx::parallel::unique_copy(policy,
-        c, std::back_inserter(dest_res));
-    auto solution = std::unique_copy(std::begin(c), std::end(c),
-        std::back_inserter(dest_sol));
-
-    HPX_TEST(get<0>(result) == std::end(c));
-
-    bool equality = std::equal(
-        std::begin(dest_res), std::end(dest_res),
-        std::begin(dest_sol), std::end(dest_sol));
-
-    HPX_TEST(equality);
-}
-
-template <typename ExPolicy, typename DataType>
-void test_unique_copy_outiter_async(ExPolicy policy, DataType)
-{
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
-    using hpx::util::get;
-
-    std::size_t const size = 10007;
-    std::vector<DataType> c(size), dest_res(0), dest_sol(0);
-    std::generate(std::begin(c), std::end(c), random_fill(0, 6));
-
-    auto f = hpx::parallel::unique_copy(policy,
-        c, std::back_inserter(dest_res));
-    auto result = f.get();
-    auto solution = std::unique_copy(std::begin(c), std::end(c),
-        std::back_inserter(dest_sol));
-
-    HPX_TEST(get<0>(result) == std::end(c));
-
-    bool equality = std::equal(
-        std::begin(dest_res), std::end(dest_res),
-        std::begin(dest_sol), std::end(dest_sol));
-
-    HPX_TEST(equality);
-}
-#endif
 
 template <typename DataType>
 void test_unique_copy()
@@ -183,37 +126,6 @@ void test_unique_copy()
 
     test_unique_copy_async(execution::seq(execution::task), DataType());
     test_unique_copy_async(execution::par(execution::task), DataType());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_unique_copy(execution_policy(execution::seq), DataType());
-    test_unique_copy(execution_policy(execution::par), DataType());
-    test_unique_copy(execution_policy(execution::par_unseq), DataType());
-
-    test_unique_copy(execution_policy(execution::seq(execution::task)),
-        DataType());
-    test_unique_copy(execution_policy(execution::par(execution::task)),
-        DataType());
-#endif
-
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_unique_copy_outiter(execution::seq, DataType());
-    test_unique_copy_outiter(execution::par, DataType());
-    test_unique_copy_outiter(execution::par_unseq, DataType());
-
-    test_unique_copy_outiter_async(execution::seq(execution::task), DataType());
-    test_unique_copy_outiter_async(execution::par(execution::task), DataType());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_unique_copy_outiter(execution_policy(execution::seq), DataType());
-    test_unique_copy_outiter(execution_policy(execution::par), DataType());
-    test_unique_copy_outiter(execution_policy(execution::par_unseq), DataType());
-
-    test_unique_copy_outiter(execution_policy(execution::seq(execution::task)),
-        DataType());
-    test_unique_copy_outiter(execution_policy(execution::par(execution::task)),
-        DataType());
-#endif
-#endif
 }
 
 void test_unique_copy()

@@ -1,5 +1,5 @@
 // Copyright Vladimir Prus 2004.
-// Copyright (c) 2005-2015 Hartmut Kaiser
+// Copyright (c) 2005-2018 Hartmut Kaiser
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,10 +11,10 @@
 #define HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/plugin/config.hpp>
 
 #include <boost/filesystem/convenience.hpp>
@@ -22,6 +22,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <sstream>
 #include <stdexcept>
@@ -111,14 +112,16 @@ namespace hpx { namespace util { namespace plugin {
         template<typename T>
         struct free_dll
         {
-            free_dll(HMODULE h) : h_(h) {}
+            free_dll(HMODULE h, std::shared_ptr<compat::recursive_mutex> mtx)
+              : h_(h), mtx_(mtx)
+            {
+            }
 
             void operator()(T)
             {
                 if (nullptr != h_)
                 {
-                    std::lock_guard<compat::recursive_mutex> lock(
-                        dll::mutex_instance());
+                    std::lock_guard<compat::recursive_mutex> lock(*mtx_);
 
                     dll::deinit_library(h_);
                     dlerror();
@@ -127,20 +130,24 @@ namespace hpx { namespace util { namespace plugin {
             }
 
             HMODULE h_;
+            std::shared_ptr<compat::recursive_mutex> mtx_;
         };
         template <typename T> friend struct free_dll;
 
     public:
         dll()
         :   dll_handle (nullptr)
+          , mtx_(mutex_instance())
         {}
 
         dll(dll const& rhs)
-        :   dll_name(rhs.dll_name), map_name(rhs.map_name), dll_handle(nullptr)
+          : dll_name(rhs.dll_name), map_name(rhs.map_name), dll_handle(nullptr)
+          , mtx_(rhs.mtx_)
         {}
 
         dll(std::string const& name)
-        :   dll_name(name), map_name(""), dll_handle(nullptr)
+          : dll_name(name), map_name(""), dll_handle(nullptr)
+          , mtx_(mutex_instance())
         {
             // map_name defaults to dll base name
             namespace fs = boost::filesystem;
@@ -160,12 +167,14 @@ namespace hpx { namespace util { namespace plugin {
 
         dll(std::string const& libname, std::string const& mapname)
         :   dll_name(libname), map_name(mapname), dll_handle(nullptr)
+          , mtx_(mutex_instance())
         {}
 
         dll(dll && rhs)
           : dll_name(std::move(rhs.dll_name))
           , map_name(std::move(rhs.map_name))
           , dll_handle(rhs.dll_handle)
+          , mtx_(std::move(rhs.mtx_))
         {
             rhs.dll_handle = nullptr;
         }
@@ -179,6 +188,7 @@ namespace hpx { namespace util { namespace plugin {
             //  load the library for this instance of the dll class
                 dll_name = rhs.dll_name;
                 map_name = rhs.map_name;
+                mtx_ = rhs.mtx_;
                 LoadLibrary();
             }
             return *this;
@@ -191,6 +201,7 @@ namespace hpx { namespace util { namespace plugin {
                 map_name = std::move(rhs.map_name);
                 dll_handle = rhs.dll_handle;
                 rhs.dll_handle = nullptr;
+                mtx_ = std::move(rhs.mtx_);
             }
             return *this;
         }
@@ -211,7 +222,7 @@ namespace hpx { namespace util { namespace plugin {
             // make sure everything is initialized
             if (ec) return std::pair<SymbolType, Deleter>();
 
-            std::unique_lock<compat::recursive_mutex> lock(mutex_instance());
+            std::unique_lock<compat::recursive_mutex> lock(*mtx_);
 
             static_assert(
                 std::is_pointer<SymbolType>::value,
@@ -268,7 +279,7 @@ namespace hpx { namespace util { namespace plugin {
             // Cast to the right type.
             dlerror();              // Clear the error state.
 
-            return std::make_pair(address, free_dll<SymbolType>(handle));
+            return std::make_pair(address, free_dll<SymbolType>(handle, mtx_));
         }
 
         void keep_alive(error_code& ec = throws)
@@ -280,7 +291,7 @@ namespace hpx { namespace util { namespace plugin {
         void LoadLibrary(error_code& ec = throws, bool force = false)
         {
             if (!dll_handle || force) {
-                std::unique_lock<compat::recursive_mutex> lock(mutex_instance());
+                std::unique_lock<compat::recursive_mutex> lock(*mtx_);
 
                 ::dlerror();                // Clear the error state.
                 dll_handle = MyLoadLibrary(
@@ -366,7 +377,7 @@ namespace hpx { namespace util { namespace plugin {
         {
             if (nullptr != dll_handle)
             {
-                std::lock_guard<compat::recursive_mutex> lock(mutex_instance());
+                std::lock_guard<compat::recursive_mutex> lock(*mtx_);
 
                 deinit_library(dll_handle);
                 dlerror();
@@ -375,9 +386,10 @@ namespace hpx { namespace util { namespace plugin {
         }
 
         // protect access to dl... functions
-        static compat::recursive_mutex &mutex_instance()
+        static std::shared_ptr<compat::recursive_mutex> mutex_instance()
         {
-            static compat::recursive_mutex mutex;
+            static std::shared_ptr<compat::recursive_mutex> mutex =
+                std::make_shared<compat::recursive_mutex>();
             return mutex;
         }
 
@@ -385,6 +397,7 @@ namespace hpx { namespace util { namespace plugin {
         std::string dll_name;
         std::string map_name;
         HMODULE dll_handle;
+        std::shared_ptr<compat::recursive_mutex> mtx_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

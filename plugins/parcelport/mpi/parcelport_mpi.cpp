@@ -117,7 +117,7 @@ namespace hpx { namespace parcelset
         public:
             parcelport(util::runtime_configuration const& ini,
                 util::function_nonser<void(std::size_t, char const*)> const& on_start,
-                util::function_nonser<void()> const& on_stop)
+                util::function_nonser<void(std::size_t, char const*)> const& on_stop)
               : base_type(ini, here(), on_start, on_stop)
               , stopped_(false)
               , receiver_(*this)
@@ -144,10 +144,10 @@ namespace hpx { namespace parcelset
                 return true;
             }
 
-            /// Stop the handling of connectons.
+            /// Stop the handling of connections.
             void do_stop()
             {
-                while(do_background_work(0))
+                while(do_background_work(0, parcelport_background_mode_all))
                 {
                     if(threads::get_self_ptr())
                         hpx::this_thread::suspend(hpx::threads::pending,
@@ -158,7 +158,7 @@ namespace hpx { namespace parcelset
             }
 
             /// Return the name of this locality
-            std::string get_locality_name() const
+            std::string get_locality_name() const override
             {
                 return util::mpi_environment::get_processor_name();
             }
@@ -171,7 +171,7 @@ namespace hpx { namespace parcelset
             }
 
             parcelset::locality agas_locality(
-                util::runtime_configuration const & ini) const
+                util::runtime_configuration const & ini) const override
             {
                 return
                     parcelset::locality(
@@ -181,19 +181,26 @@ namespace hpx { namespace parcelset
                     );
             }
 
-            parcelset::locality create_locality() const
+            parcelset::locality create_locality() const override
             {
                 return parcelset::locality(locality());
             }
 
-            bool background_work(std::size_t num_thread)
+            bool background_work(
+                std::size_t num_thread, parcelport_background_mode mode)
             {
                 if (stopped_)
                     return false;
 
                 bool has_work = false;
-                has_work = sender_.background_work();
-                has_work = receiver_.background_work() || has_work;
+                if (mode & parcelport_background_mode_send)
+                {
+                    has_work = sender_.background_work();
+                }
+                if (mode & parcelport_background_mode_receive)
+                {
+                    has_work = receiver_.background_work() || has_work;
+                }
                 return has_work;
             }
 

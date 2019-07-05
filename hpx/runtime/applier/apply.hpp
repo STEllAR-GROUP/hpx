@@ -8,6 +8,7 @@
 #define HPX_APPLIER_APPLY_NOV_27_2008_0957AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
@@ -25,7 +26,6 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_valid_action.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -398,7 +398,7 @@ namespace hpx
             HPX_ASSERT(id.get_management_type() == naming::id_type::unmanaged);
             naming::gid_type gid = id.get_gid();
             parcelset::parcel p =
-                parcelset::detail::create_parcel::call(std::false_type(),
+                parcelset::detail::create_parcel::call(
                     std::move(gid), complement_addr<action_type_>(addr),
                     action_type_(), priority
                 );
@@ -435,6 +435,12 @@ namespace hpx
                 typename action_type::component_type>::call(addr));
 
             threads::thread_init_data data;
+#ifdef HPX_HAVE_APEX
+            data.apex_data = hpx::util::apex_new_task(
+                data.description,
+                data.parent_locality_id,
+                data.parent_id);
+#endif
             apply_helper<action_type>::call(std::move(data),
                 std::forward<Continuation>(cont), target,
                 addr.address_, addr.type_, priority, std::forward<Ts>(vs)...);

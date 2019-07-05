@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 #define HPX_THREADMANAGER_THREAD_QUEUE_AUG_25_2009_0132PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/config_entry.hpp>
@@ -15,11 +16,12 @@
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/cache_aligned_data.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
@@ -171,7 +173,12 @@ namespace hpx { namespace threads { namespace policies
         int const max_terminated_threads;
 
         // this is the type of a map holding all threads (except depleted ones)
-        typedef std::unordered_set<thread_id_type> thread_map_type;
+        using thread_map_type = std::unordered_set<thread_id_type,
+            std::hash<thread_id_type>, std::equal_to<thread_id_type>,
+            util::internal_allocator<thread_id_type>>;
+
+        using thread_heap_type =
+            std::list<thread_id_type, util::internal_allocator<thread_id_type>>;
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         typedef
@@ -206,7 +213,7 @@ namespace hpx { namespace threads { namespace policies
 
             std::ptrdiff_t stacksize = data.stacksize;
 
-            std::list<thread_id_type>* heap = nullptr;
+            thread_heap_type* heap = nullptr;
 
             if (stacksize == get_stack_size(thread_stacksize_small))
             {
@@ -265,12 +272,15 @@ namespace hpx { namespace threads { namespace policies
             {
                 hpx::util::unlock_guard<Lock> ull(lk);
 
-
                 // Allocate a new thread object.
-                thrd = thread_id_type(
-                    new threads::thread_data(data, this, state));
+                threads::thread_data* p = thread_alloc_.allocate(1);
+                new (p) threads::thread_data(data, this, state);
+                thrd = thread_id_type(p);
             }
         }
+
+        static util::internal_allocator<threads::thread_data> thread_alloc_;
+        static util::internal_allocator<task_description> task_description_alloc_;
 
         ///////////////////////////////////////////////////////////////////////
         // add new threads if there is some amount of work available
@@ -293,8 +303,6 @@ namespace hpx { namespace threads { namespace policies
                     ++addfrom->new_tasks_wait_count_;
                 }
 #endif
-
-
                 // measure thread creation time
                 util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
 
@@ -305,14 +313,15 @@ namespace hpx { namespace threads { namespace policies
 
                 create_thread_object(thrd, data, state, lk);
 
-                delete task;
+                task->~task_description();
+                task_description_alloc_.deallocate(task, 1);
 
                 // add the new entry to the map of all threads
                 std::pair<thread_map_type::iterator, bool> p =
                     thread_map_.insert(thrd);
 
                 if (HPX_UNLIKELY(!p.second)) {
-                    --addfrom->new_tasks_count_;
+                    --addfrom->new_tasks_count_.data_;
                     lk.unlock();
                     HPX_THROW_EXCEPTION(hpx::out_of_memory,
                         "threadmanager::add_new",
@@ -323,7 +332,7 @@ namespace hpx { namespace threads { namespace policies
                 ++thread_map_count_;
 
                 // Decrement only after thread_map_count_ has been incremented
-                --addfrom->new_tasks_count_;
+                --addfrom->new_tasks_count_.data_;
 
                 // only insert the thread into the work-items queue if it is in
                 // pending state
@@ -462,7 +471,7 @@ namespace hpx { namespace threads { namespace policies
                     bool deleted = thread_map_.erase(tid) != 0;
                     HPX_ASSERT(deleted);
                     if (deleted) {
-                        delete todelete;
+                        deallocate(todelete);
                         --thread_map_count_;
                         HPX_ASSERT(thread_map_count_ >= 0);
                     }
@@ -538,7 +547,6 @@ namespace hpx { namespace threads { namespace policies
             max_terminated_threads(detail::get_max_terminated_threads()),
             thread_map_count_(0),
             work_items_(128, queue_num),
-            work_items_count_(0),
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             work_items_wait_(0),
             work_items_wait_count_(0),
@@ -549,7 +557,6 @@ namespace hpx { namespace threads { namespace policies
                       ? static_cast<std::size_t>(max_thread_count)
                       : max_count),
             new_tasks_(128),
-            new_tasks_count_(0),
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             new_tasks_wait_(0),
             new_tasks_wait_count_(0),
@@ -571,21 +578,31 @@ namespace hpx { namespace threads { namespace policies
             stolen_to_staged_(0),
 #endif
             add_new_logger_("thread_queue::add_new")
-        {}
+        {
+            new_tasks_count_.data_ = 0;
+            work_items_count_.data_ = 0;
+        }
+
+        static void deallocate(threads::thread_data* p)
+        {
+            using threads::thread_data;
+            p->~thread_data();
+            thread_alloc_.deallocate(p, 1);
+        }
 
         ~thread_queue()
         {
             for(auto t: thread_heap_small_)
-                delete t.get();
+                deallocate(t.get());
 
             for(auto t: thread_heap_medium_)
-                delete t.get();
+                deallocate(t.get());
 
             for(auto t: thread_heap_large_)
-                delete t.get();
+                deallocate(t.get());
 
             for(auto t: thread_heap_huge_)
-                delete t.get();
+                deallocate(t.get());
         }
 
         void set_max_count(std::size_t max_count = max_thread_count)
@@ -609,20 +626,20 @@ namespace hpx { namespace threads { namespace policies
         // This returns the current length of the queues (work items and new items)
         std::int64_t get_queue_length() const
         {
-            return work_items_count_ + new_tasks_count_;
+            return work_items_count_.data_ + new_tasks_count_.data_;
         }
 
         // This returns the current length of the pending queue
         std::int64_t get_pending_queue_length() const
         {
-            return work_items_count_;
+            return work_items_count_.data_;
         }
 
         // This returns the current length of the staged queue
         std::int64_t get_staged_queue_length(
             std::memory_order order = std::memory_order_seq_cst) const
         {
-            return new_tasks_count_.load(order);
+            return new_tasks_count_.data_.load(order);
         }
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
@@ -651,7 +668,7 @@ namespace hpx { namespace threads { namespace policies
 
         void increment_num_pending_misses(std::size_t num = 1)
         {
-            pending_misses_ += num;
+            pending_misses_.fetch_add(num, std::memory_order_relaxed);
         }
 
         std::int64_t get_num_pending_accesses(bool reset)
@@ -661,7 +678,7 @@ namespace hpx { namespace threads { namespace policies
 
         void increment_num_pending_accesses(std::size_t num = 1)
         {
-            pending_accesses_ += num;
+            pending_accesses_.fetch_add(num, std::memory_order_relaxed);
         }
 
         std::int64_t get_num_stolen_from_pending(bool reset)
@@ -671,7 +688,7 @@ namespace hpx { namespace threads { namespace policies
 
         void increment_num_stolen_from_pending(std::size_t num = 1)
         {
-            stolen_from_pending_ += num;
+            stolen_from_pending_.fetch_add(num, std::memory_order_relaxed);
         }
 
         std::int64_t get_num_stolen_from_staged(bool reset)
@@ -681,7 +698,7 @@ namespace hpx { namespace threads { namespace policies
 
         void increment_num_stolen_from_staged(std::size_t num = 1)
         {
-            stolen_from_staged_ += num;
+            stolen_from_staged_.fetch_add(num, std::memory_order_relaxed);
         }
 
         std::int64_t get_num_stolen_to_pending(bool reset)
@@ -691,7 +708,7 @@ namespace hpx { namespace threads { namespace policies
 
         void increment_num_stolen_to_pending(std::size_t num = 1)
         {
-            stolen_to_pending_ += num;
+            stolen_to_pending_.fetch_add(num, std::memory_order_relaxed);
         }
 
         std::int64_t get_num_stolen_to_staged(bool reset)
@@ -701,15 +718,33 @@ namespace hpx { namespace threads { namespace policies
 
         void increment_num_stolen_to_staged(std::size_t num = 1)
         {
-            stolen_to_staged_ += num;
+            stolen_to_staged_.fetch_add(num, std::memory_order_relaxed);
         }
 #else
-        void increment_num_pending_misses(std::size_t num = 1) {}
-        void increment_num_pending_accesses(std::size_t num = 1) {}
-        void increment_num_stolen_from_pending(std::size_t num = 1) {}
-        void increment_num_stolen_from_staged(std::size_t num = 1) {}
-        void increment_num_stolen_to_pending(std::size_t num = 1) {}
-        void increment_num_stolen_to_staged(std::size_t num = 1) {}
+        HPX_CXX14_CONSTEXPR void increment_num_pending_misses(
+            std::size_t num = 1)
+        {
+        }
+        HPX_CXX14_CONSTEXPR void increment_num_pending_accesses(
+            std::size_t num = 1)
+        {
+        }
+        HPX_CXX14_CONSTEXPR void increment_num_stolen_from_pending(
+            std::size_t num = 1)
+        {
+        }
+        HPX_CXX14_CONSTEXPR void increment_num_stolen_from_staged(
+            std::size_t num = 1)
+        {
+        }
+        HPX_CXX14_CONSTEXPR void increment_num_stolen_to_pending(
+            std::size_t num = 1)
+        {
+        }
+        HPX_CXX14_CONSTEXPR void increment_num_stolen_to_staged(
+            std::size_t num = 1)
+        {
+        }
 #endif
 
         ///////////////////////////////////////////////////////////////////////
@@ -765,17 +800,16 @@ namespace hpx { namespace threads { namespace policies
 
             // do not execute the work, but register a task description for
             // later thread creation
-            ++new_tasks_count_;
+            ++new_tasks_count_.data_;
 
+            task_description* td = task_description_alloc_.allocate(1);
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            new_tasks_.push(new task_description(
-                std::move(data), initial_state,
-                util::high_resolution_clock::now()
-            ));
+            new (td) task_description(std::move(data), initial_state,
+                util::high_resolution_clock::now());
 #else
-            new_tasks_.push(new task_description( //-V106
-                std::move(data), initial_state));
+            new (td) task_description(std::move(data), initial_state); //-V106
 #endif
+            new_tasks_.push(td);
             if (&ec != &throws)
                 ec = make_success_code();
         }
@@ -785,7 +819,7 @@ namespace hpx { namespace threads { namespace policies
             thread_description* trd;
             while (src->work_items_.pop(trd))
             {
-                --src->work_items_count_;
+                --src->work_items_count_.data_;
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
                 if (maintain_queue_wait_times) {
@@ -796,7 +830,7 @@ namespace hpx { namespace threads { namespace policies
                 }
 #endif
 
-                bool finished = count == ++work_items_count_;
+                bool finished = count == ++work_items_count_.data_;
                 work_items_.push(trd);
                 if (finished)
                     break;
@@ -809,8 +843,6 @@ namespace hpx { namespace threads { namespace policies
             task_description* task;
             while (src->new_tasks_.pop(task))
             {
-
-
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
                 if (maintain_queue_wait_times) {
                     std::int64_t now = util::high_resolution_clock::now();
@@ -820,11 +852,11 @@ namespace hpx { namespace threads { namespace policies
                 }
 #endif
 
-                bool finish = count == ++new_tasks_count_;
+                bool finish = count == ++new_tasks_count_.data_;
 
                 // Decrement only after the local new_tasks_count_ has
                 // been incremented
-                --src->new_tasks_count_;
+                --src->new_tasks_count_.data_;
 
                 if (new_tasks_.push(task))
                 {
@@ -833,7 +865,7 @@ namespace hpx { namespace threads { namespace policies
                 }
                 else
                 {
-                    --new_tasks_count_;
+                    --new_tasks_count_.data_;
                 }
             }
         }
@@ -844,7 +876,7 @@ namespace hpx { namespace threads { namespace policies
             bool allow_stealing = false, bool steal = false) HPX_HOT
         {
             std::int64_t work_items_count =
-                work_items_count_.load(std::memory_order_relaxed);
+                work_items_count_.data_.load(std::memory_order_relaxed);
 
             if (allow_stealing && min_tasks_to_steal_pending > work_items_count)
             {
@@ -855,7 +887,7 @@ namespace hpx { namespace threads { namespace policies
             thread_description* tdesc;
             if (0 != work_items_count && work_items_.pop(tdesc, steal))
             {
-                --work_items_count_;
+                --work_items_count_.data_;
 
                 if (maintain_queue_wait_times) {
                     work_items_wait_ += util::high_resolution_clock::now() -
@@ -871,7 +903,7 @@ namespace hpx { namespace threads { namespace policies
 #else
             if (0 != work_items_count && work_items_.pop(thrd, steal))
             {
-                --work_items_count_;
+                --work_items_count_.data_;
                 return true;
             }
 #endif
@@ -881,7 +913,7 @@ namespace hpx { namespace threads { namespace policies
         /// Schedule the passed thread
         void schedule_thread(threads::thread_data* thrd, bool other_end = false)
         {
-            ++work_items_count_;
+            ++work_items_count_.data_;
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             work_items_.push(new thread_description(
                 thrd, util::high_resolution_clock::now()), other_end);
@@ -911,10 +943,13 @@ namespace hpx { namespace threads { namespace policies
                 return terminated_items_count_;
 
             if (staged == state)
-                return new_tasks_count_;
+                return new_tasks_count_.data_;
 
             if (unknown == state)
-                return thread_map_count_ + new_tasks_count_ - terminated_items_count_;
+            {
+                return thread_map_count_ + new_tasks_count_.data_ -
+                    terminated_items_count_;
+            }
 
             // acquire lock only if absolutely necessary
             std::lock_guard<mutex_type> lk(mtx_);
@@ -1002,33 +1037,46 @@ namespace hpx { namespace threads { namespace policies
         /// manager to allow for maintenance tasks to be executed in the
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        inline bool wait_or_add_new(bool running,
-            std::int64_t& idle_loop_count, std::size_t& added,
-            thread_queue* addfrom = nullptr, bool steal = false) HPX_HOT
+        inline bool wait_or_add_new(bool, std::size_t& added) HPX_HOT
+        {
+            if (0 == new_tasks_count_.data_.load(std::memory_order_relaxed))
+            {
+                return true;
+            }
+
+            // No obvious work has to be done, so a lock won't hurt too much.
+            //
+            // We prefer to exit this function (some kind of very short
+            // busy waiting) to blocking on this lock. Locking fails either
+            // when a thread is currently doing thread maintenance, which
+            // means there might be new work, or the thread owning the lock
+            // just falls through to the cleanup work below (no work is available)
+            // in which case the current thread (which failed to acquire
+            // the lock) will just retry to enter this loop.
+            std::unique_lock<mutex_type> lk(mtx_, std::try_to_lock);
+            if (!lk.owns_lock())
+                return false;            // avoid long wait on lock
+
+            // stop running after all HPX threads have been terminated
+            return add_new_always(added, this, lk);
+        }
+
+        inline bool wait_or_add_new(bool running, std::size_t& added,
+            thread_queue* addfrom, bool steal = false) HPX_HOT
         {
             // try to generate new threads from task lists, but only if our
             // own list of threads is empty
-            if (0 == work_items_count_.load(std::memory_order_relaxed))
+            if (0 == work_items_count_.data_.load(std::memory_order_relaxed))
             {
                 // see if we can avoid grabbing the lock below
-                if (addfrom)
+
+                // don't try to steal if there are only a few tasks left on
+                // this queue
+                if (running && min_tasks_to_steal_staged >
+                        addfrom->new_tasks_count_.data_.load(
+                            std::memory_order_relaxed))
                 {
-                    // don't try to steal if there are only a few tasks left on
-                    // this queue
-                    if (running && min_tasks_to_steal_staged >
-                        addfrom->new_tasks_count_.load(std::memory_order_relaxed))
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    if (running &&
-                        0 == new_tasks_count_.load(std::memory_order_relaxed))
-                    {
-                        return false;
-                    }
-                    addfrom = this;
+                    return false;
                 }
 
                 // No obvious work has to be done, so a lock won't hurt too much.
@@ -1076,8 +1124,8 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool dump_suspended_threads(std::size_t num_thread
-          , std::int64_t& idle_loop_count, bool running)
+        bool dump_suspended_threads(
+            std::size_t num_thread, std::int64_t& idle_loop_count, bool running)
         {
 #ifndef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             return false;
@@ -1097,46 +1145,33 @@ namespace hpx { namespace threads { namespace policies
         void on_error(std::size_t num_thread, std::exception_ptr const& e) {}
 
     private:
-        mutable mutex_type mtx_;                    ///< mutex protecting the members
+        mutable mutex_type mtx_;            // mutex protecting the members
 
-        thread_map_type thread_map_;
-        ///< mapping of thread id's to HPX-threads
-        std::atomic<std::int64_t> thread_map_count_;
-        ///< overall count of work items
+        thread_map_type thread_map_;        // mapping of thread id's to HPX-threads
+        std::atomic<std::int64_t> thread_map_count_; // overall count of work items
 
-        work_items_type work_items_;
-        ///< list of active work items
-        std::atomic<std::int64_t> work_items_count_;
-        ///< count of active work items
+        work_items_type work_items_;        // list of active work items
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        std::atomic<std::int64_t> work_items_wait_;
-        ///< overall wait time of work items
-        std::atomic<std::int64_t> work_items_wait_count_;
-        ///< overall number of work items in queue
+        std::atomic<std::int64_t> work_items_wait_; // overall wait time of work items
+        std::atomic<std::int64_t> work_items_wait_count_; // overall number of
+                                                          // work items in queue
 #endif
-        terminated_items_type terminated_items_;     ///< list of terminated threads
-        std::atomic<std::int64_t> terminated_items_count_;
-        ///< count of terminated items
+        terminated_items_type terminated_items_;    // list of terminated threads
+        std::atomic<std::int64_t> terminated_items_count_; // count of terminated items
 
-        std::size_t max_count_;
-        ///< maximum number of existing HPX-threads
-        task_items_type new_tasks_;
-        ///< list of new tasks to run
+        std::size_t max_count_;     // maximum number of existing HPX-threads
+        task_items_type new_tasks_; // list of new tasks to run
 
-        std::atomic<std::int64_t> new_tasks_count_;
-        ///< count of new tasks to run
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        std::atomic<std::int64_t> new_tasks_wait_;
-        ///< overall wait time of new tasks
-        std::atomic<std::int64_t> new_tasks_wait_count_;
-        ///< overall number tasks waited
+        std::atomic<std::int64_t> new_tasks_wait_;  // overall wait time of new tasks
+        std::atomic<std::int64_t> new_tasks_wait_count_; // overall number tasks waited
 #endif
 
-        std::list<thread_id_type> thread_heap_small_;
-        std::list<thread_id_type> thread_heap_medium_;
-        std::list<thread_id_type> thread_heap_large_;
-        std::list<thread_id_type> thread_heap_huge_;
+        thread_heap_type thread_heap_small_;
+        thread_heap_type thread_heap_medium_;
+        thread_heap_type thread_heap_large_;
+        thread_heap_type thread_heap_huge_;
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         std::uint64_t add_new_time_;
@@ -1150,18 +1185,38 @@ namespace hpx { namespace threads { namespace policies
         // # of times our associated worker-thread looked for work in work_items
         std::atomic<std::int64_t> pending_accesses_;
 
+        // count of work_items stolen from this queue
         std::atomic<std::int64_t> stolen_from_pending_;
-        ///< count of work_items stolen from this queue
+        // count of new_tasks stolen from this queue
         std::atomic<std::int64_t> stolen_from_staged_;
-        ///< count of new_tasks stolen from this queue
+        // count of work_items stolen to this queue from other queues
         std::atomic<std::int64_t> stolen_to_pending_;
-        ///< count of work_items stolen to this queue from other queues
+        // count of new_tasks stolen to this queue from other queues
         std::atomic<std::int64_t> stolen_to_staged_;
-        ///< count of new_tasks stolen to this queue from other queues
 #endif
 
         util::block_profiler<add_new_tag> add_new_logger_;
+
+        // count of new tasks to run, separate to new cache line to avoid false
+        // sharing
+        util::cache_line_data<std::atomic<std::int64_t>> new_tasks_count_;
+
+        // count of active work items
+        util::cache_line_data<std::atomic<std::int64_t>> work_items_count_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Mutex, typename PendingQueuing, typename StagedQueuing,
+        typename TerminatedQueuing>
+    util::internal_allocator<threads::thread_data> thread_queue<Mutex,
+        PendingQueuing, StagedQueuing, TerminatedQueuing>::thread_alloc_;
+
+    template <typename Mutex, typename PendingQueuing, typename StagedQueuing,
+        typename TerminatedQueuing>
+    util::internal_allocator<typename thread_queue<Mutex, PendingQueuing,
+            StagedQueuing, TerminatedQueuing>::task_description>
+        thread_queue<Mutex, PendingQueuing, StagedQueuing,
+            TerminatedQueuing>::task_description_alloc_;
 }}}
 
 #endif

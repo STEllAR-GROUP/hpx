@@ -100,8 +100,8 @@
      make copyable.
 */
 
-#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)                              \
- && defined(HPX_HAVE_FIBER_BASED_COROUTINES)
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES) &&                            \
+    defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #   error HPX_HAVE_GENERIC_CONTEXT_COROUTINES and HPX_HAVE_FIBER_BASED_COROUTINES cannot be defined at the same time.
 #endif
 
@@ -110,24 +110,28 @@
 #include <hpx/runtime/threads/coroutines/detail/context_generic_context.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
-    typedef generic_context::context_impl default_context_impl;
+    template <typename CoroutineImpl>
+    using default_context_impl = generic_context::fcontext_context_impl<CoroutineImpl>;
 }}}}
 
-#elif (defined(__linux) || defined(linux) || defined(__linux__)) \
-       && !defined(__bgq__) && !defined(__powerpc__)
+#elif (defined(__linux) || defined(linux) || defined(__linux__)) &&            \
+    !defined(__bgq__) && !defined(__powerpc__) && !defined(__s390x_)
 
 #include <hpx/runtime/threads/coroutines/detail/context_linux_x86.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
-    typedef lx::context_impl default_context_impl;
+    template <typename CoroutineImpl>
+    using default_context_impl = lx::x86_linux_context_impl<CoroutineImpl>;
 }}}}
 
-#elif defined(_POSIX_VERSION) || defined(__bgq__) || defined(__powerpc__)
+#elif defined(_POSIX_VERSION) || defined(__bgq__) || defined(__powerpc__) ||   \
+    defined(__s390x_)
 
 #include <hpx/runtime/threads/coroutines/detail/context_posix.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
-    typedef posix::context_impl default_context_impl;
+    template <typename CoroutineImpl>
+    using default_context_impl = posix::ucontext_context_impl<CoroutineImpl>;
 }}}}
 
 #elif defined(HPX_HAVE_FIBER_BASED_COROUTINES)
@@ -135,7 +139,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #include <hpx/runtime/threads/coroutines/detail/context_windows_fibers.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
-    typedef windows::context_impl default_context_impl;
+    template <typename CoroutineImpl>
+    using default_context_impl = windows::fibers_context_impl<CoroutineImpl>;
 }}}}
 
 #else
@@ -143,20 +148,5 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #error No default_context_impl available for this system
 
 #endif // HPX_HAVE_GENERIC_CONTEXT_COROUTINES
-
-namespace hpx { namespace threads { namespace coroutines
-{
-    // functions to be called for each thread after it started running
-    // and before it exits
-    inline void thread_startup(char const* thread_type)
-    {
-        detail::default_context_impl::thread_startup(thread_type);
-    }
-
-    inline void thread_shutdown()
-    {
-        detail::default_context_impl::thread_shutdown();
-    }
-}}}
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_IMPL_HPP*/

@@ -12,10 +12,10 @@
 
 #include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
 
-#include <boost/regex.hpp>
 
 #include <cstdint>
 #include <mutex>
+#include <regex>
 #include <string>
 #include <utility>
 #include <vector>
@@ -260,38 +260,29 @@ namespace hpx { namespace plugins { namespace parcel
             std::string str_rx(util::regex_from_pattern(parameters, ec));
             if (ec) return false;
 
-            bool found_one = false;
-            boost::regex rx(str_rx, boost::regex::perl);
+            std::regex rx(str_rx);
 
-            std::unique_lock<mutex_type> l(mtx_);
+            std::vector<performance_counters::counter_path_elements> counters;
 
             {
+                std::unique_lock<mutex_type> l(mtx_);
+
                 map_type::const_iterator end = map_.end();
                 for (map_type::const_iterator it = map_.begin(); it != end; ++it)
                 {
-                    if (!boost::regex_match((*it).first, rx))
+                    if (!std::regex_match((*it).first, rx))
                         continue;
-                    found_one = true;
 
-                    // propagate parameters
-                    std::string fullname;
                     performance_counters::counter_path_elements cp = p;
                     cp.parameters_ = (*it).first;
                     if (!additional_parameters.empty())
                         cp.parameters_ += additional_parameters;
 
-                    performance_counters::get_counter_name(cp, fullname, ec);
-                    if (ec) return false;
-
-                    performance_counters::counter_info cinfo = info;
-                    cinfo.fullname_ = fullname;
-
-                    if (!f(cinfo, ec) || ec)
-                        return false;
+                    counters.push_back(std::move(cp));
                 }
             }
 
-            if (!found_one)
+            if (counters.empty())
             {
                 // compose a list of known action types
                 std::string types;
@@ -309,9 +300,24 @@ namespace hpx { namespace plugins { namespace parcel
                 HPX_THROWS_IF(ec, bad_parameter,
                     "coalescing_counter_registry::counter_discoverer",
                     hpx::util::format(
-                        "action type %s does not match any known type, "
-                        "known action types: \n%s", p.parameters_, types));
+                        "action type {} does not match any known type, "
+                        "known action types: \n{}", p.parameters_, types));
                 return false;
+            }
+
+            for (auto && cp : counters)
+            {
+                // propagate parameters
+                std::string fullname;
+
+                performance_counters::get_counter_name(cp, fullname, ec);
+                if (ec) return false;
+
+                performance_counters::counter_info cinfo = info;
+                cinfo.fullname_ = fullname;
+
+                if (!f(cinfo, ec) || ec)
+                    return false;
             }
 
             if (&ec != &throws)
@@ -339,8 +345,8 @@ namespace hpx { namespace plugins { namespace parcel
                 HPX_THROWS_IF(ec, bad_parameter,
                     "coalescing_counter_registry::counter_discoverer",
                     hpx::util::format(
-                        "action type %s does not match any known type, "
-                        "known action types: \n%s", p.parameters_, types));
+                        "action type {} does not match any known type, "
+                        "known action types: \n{}", p.parameters_, types));
                 return false;
             }
         }

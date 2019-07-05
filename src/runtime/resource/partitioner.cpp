@@ -117,9 +117,9 @@ namespace hpx { namespace resource
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        compat::mutex& partitioner_mtx()
+        compat::recursive_mutex& partitioner_mtx()
         {
-            static compat::mutex mtx;
+            static compat::recursive_mutex mtx;
             return mtx;
         }
 
@@ -131,7 +131,7 @@ namespace hpx { namespace resource
 
         std::unique_ptr<detail::partitioner>& get_partitioner()
         {
-            std::lock_guard<compat::mutex> l(partitioner_mtx());
+            std::lock_guard<compat::recursive_mutex> l(partitioner_mtx());
             std::unique_ptr<detail::partitioner>& part = partitioner_ref();
             if (!part)
                 part.reset(new detail::partitioner);
@@ -190,7 +190,7 @@ namespace hpx { namespace resource
 
     bool is_partitioner_valid()
     {
-        return bool(detail::get_partitioner());
+        return detail::partitioner_ref() != nullptr;
     }
 
     namespace detail
@@ -202,7 +202,7 @@ namespace hpx { namespace resource
             boost::program_options::options_description const& desc_cmdline,
             int argc, char **argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode, runtime_mode mode,
-            bool check)
+            bool check, int* result)
         {
             std::unique_ptr<detail::partitioner>& rp = detail::get_partitioner();
 
@@ -229,12 +229,21 @@ namespace hpx { namespace resource
                             "allowed to parse the command line options.");
                     }
                 }
+
                 // no need to parse a second time
+                if (result != nullptr)
+                {
+                    *result = 0;
+                }
             }
             else
             {
-                rp->parse(f, desc_cmdline, argc, argv, std::move(ini_config),
-                    rpmode, mode);
+                int r = rp->parse(f, desc_cmdline, argc, argv,
+                    std::move(ini_config), rpmode, mode);
+                if (result != nullptr)
+                {
+                    *result = r;
+                }
             }
             return *rp;
         }
@@ -242,9 +251,10 @@ namespace hpx { namespace resource
 
     ///////////////////////////////////////////////////////////////////////////
     void partitioner::create_thread_pool(std::string const& name,
-        scheduling_policy sched /*= scheduling_policy::unspecified*/)
+        scheduling_policy sched /*= scheduling_policy::unspecified*/,
+        hpx::threads::policies::scheduler_mode mode)
     {
-        partitioner_.create_thread_pool(name, sched);
+        partitioner_.create_thread_pool(name, sched, mode);
     }
 
     void partitioner::create_thread_pool(
@@ -302,4 +312,15 @@ namespace hpx { namespace resource
     {
         return partitioner_.numa_domains();
     }
+
+    hpx::threads::topology const &partitioner::get_topology() const
+    {
+        return partitioner_.get_topology();
+    }
+
+    std::size_t partitioner::get_number_requested_threads()
+    {
+        return partitioner_.threads_needed();
+    }
+
 }}    // namespace hpx

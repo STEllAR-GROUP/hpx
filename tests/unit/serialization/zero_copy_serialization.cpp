@@ -16,6 +16,8 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/predef/other/endian.h>
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -167,7 +169,7 @@ void test_normal_serialization(T& arg)
 
     // compose archive flags
     unsigned out_archive_flags = hpx::serialization::disable_data_chunking;
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
     out_archive_flags |= hpx::serialization::endian_little;
@@ -176,7 +178,7 @@ void test_normal_serialization(T& arg)
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(std::true_type(),
+        hpx::parcelset::detail::create_parcel::call(
             std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             Action(), hpx::threads::thread_priority_normal, arg
@@ -198,7 +200,7 @@ void test_normal_serialization(T1& arg1, T2& arg2)
 
     // compose archive flags
     unsigned out_archive_flags = hpx::serialization::disable_data_chunking;
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
     out_archive_flags |= hpx::serialization::endian_little;
@@ -207,7 +209,7 @@ void test_normal_serialization(T1& arg1, T2& arg2)
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(std::true_type(),
+        hpx::parcelset::detail::create_parcel::call(
             std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action2(), hpx::threads::thread_priority_normal, arg1, arg2
@@ -230,7 +232,7 @@ void test_normal_serialization(double d, T1& arg1, std::string const& s,
 
     // compose archive flags
     unsigned out_archive_flags = hpx::serialization::disable_data_chunking;
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
     out_archive_flags |= hpx::serialization::endian_little;
@@ -239,7 +241,7 @@ void test_normal_serialization(double d, T1& arg1, std::string const& s,
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(std::true_type(),
+        hpx::parcelset::detail::create_parcel::call(
             std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action3(),
@@ -263,7 +265,7 @@ void test_zero_copy_serialization(T& arg)
 
     // compose archive flags
     unsigned out_archive_flags = 0U;
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
     out_archive_flags |= hpx::serialization::endian_little;
@@ -272,7 +274,7 @@ void test_zero_copy_serialization(T& arg)
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(std::true_type(),
+        hpx::parcelset::detail::create_parcel::call(
             std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             Action(), hpx::threads::thread_priority_normal, arg
@@ -294,7 +296,7 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
 
     // compose archive flags
     unsigned out_archive_flags = 0U;
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
     out_archive_flags |= hpx::serialization::endian_little;
@@ -303,7 +305,7 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(std::true_type(),
+        hpx::parcelset::detail::create_parcel::call(
             std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action2(), hpx::threads::thread_priority_normal, arg1, arg2
@@ -326,7 +328,7 @@ void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
 
     // compose archive flags
     unsigned out_archive_flags = 0U;
-#ifdef BOOST_BIG_ENDIAN
+#if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
     out_archive_flags |= hpx::serialization::endian_little;
@@ -335,7 +337,7 @@ void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(std::true_type(),
+        hpx::parcelset::detail::create_parcel::call(
             std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action3(), hpx::threads::thread_priority_normal, d, arg1, s, i, arg2

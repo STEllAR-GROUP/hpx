@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_FIND_JUL_21_2014_0248PM
 
 #include <hpx/parallel/algorithms/find.hpp>
+#include <hpx/parallel/container_algorithms/find.hpp>
 #include <hpx/parallel/segmented_algorithms/find.hpp>
 
 #endif

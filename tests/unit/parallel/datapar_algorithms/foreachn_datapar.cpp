@@ -31,7 +31,6 @@ void for_each_n_test()
 {
     test_for_each_n<std::random_access_iterator_tag>();
     test_for_each_n<std::forward_iterator_tag>();
-    test_for_each_n<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

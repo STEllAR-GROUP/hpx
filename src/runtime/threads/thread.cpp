@@ -6,16 +6,18 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unique_function.hpp>
@@ -79,14 +81,12 @@ namespace hpx
     {
         // If the thread is still running, we terminate the whole application
         // as we have no chance of reporting this error (we can't throw)
-        if (joinable_locked()) {
+        if (joinable())
+        {
             terminate("thread::~thread", "destroying running thread");
         }
-        threads::thread_id_type id = threads::invalid_thread_id;
-        {
-            std::lock_guard<mutex_type> l(mtx_);
-            std::swap(id_, id);
-        }
+
+        HPX_ASSERT(id_ == threads::invalid_thread_id);
     }
 
     void thread::swap(thread& rhs) noexcept
@@ -154,8 +154,8 @@ namespace hpx
     void thread::start_thread(util::unique_function_nonser<void()>&& func)
     {
         threads::thread_init_data data(
-            util::bind(util::one_shot(&thread::thread_function_nullary),
-                std::move(func)),
+            util::one_shot(util::bind(&thread::thread_function_nullary,
+                std::move(func))),
             "thread::thread_function_nullary");
 
         // create the new thread, note that id_ is guaranteed to be valid
@@ -196,7 +196,7 @@ namespace hpx
 
         // register callback function to be called when thread exits
         if (threads::add_thread_exit_callback(id_,
-                util::bind(&resume_thread, this_id)))
+                util::bind_front(&resume_thread, this_id)))
         {
             // wait for thread to be terminated
             util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
@@ -248,7 +248,7 @@ namespace hpx
             thread_task_base(threads::thread_id_type const& id)
             {
                 if (threads::add_thread_exit_callback(id,
-                        util::bind(&thread_task_base::thread_exit_function,
+                        util::bind_front(&thread_task_base::thread_exit_function,
                             future_base_type(this))))
                 {
                     id_ = id;

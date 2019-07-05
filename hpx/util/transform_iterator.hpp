@@ -7,8 +7,10 @@
 #define HPX_UTIL_TRANSFORM_ITERATOR_MAR_19_2015_0813AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/util/identity.hpp>
 #include <hpx/util/iterator_adaptor.hpp>
+#include <hpx/util/lazy_conditional.hpp>
+#include <hpx/util/result_of.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -17,34 +19,47 @@ namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator, typename Transformer,
-            typename Reference = void, typename Value = void>
+            typename Reference = void, typename Value = void,
+            typename Category = void, typename Difference = void>
     class transform_iterator;
 
     namespace detail
     {
         template <typename Iterator, typename Transformer, typename Reference,
-            typename Value>
+            typename Value, typename Category, typename Difference>
         struct transform_iterator_base
         {
-            typedef typename std::conditional<
+            // the following type calculations use lazy_conditional to avoid
+            // premature instantiations
+            using reference_type = typename util::lazy_conditional<
                     std::is_void<Reference>::value,
-                    typename util::invoke_result<Transformer, Iterator>::type,
-                    Reference
-                >::type reference_type;
+                    util::invoke_result<Transformer, Iterator>,
+                    util::identity<Reference>
+                >::type;
 
-            typedef typename std::conditional<
+            using value_type = typename util::lazy_conditional<
                     std::is_void<Value>::value,
-                    typename std::remove_reference<reference_type>::type,
-                    Value
-                >::type value_type;
+                    std::remove_reference<reference_type>,
+                    util::identity<Value>
+                >::type;
 
-            typedef typename std::iterator_traits<Iterator>::iterator_category
-                iterator_category;
+            using iterator_category = typename util::lazy_conditional<
+                    std::is_void<Category>::value,
+                    category_iterator_traits_helper<Iterator>,
+                    util::identity<Category>
+                >::type;
 
-            typedef hpx::util::iterator_adaptor<
-                transform_iterator<Iterator, Transformer, Reference, Value>,
-                Iterator, value_type, iterator_category, reference_type
-            > type;
+            using difference_type = typename util::lazy_conditional<
+                    std::is_void<Difference>::value,
+                    difference_type_iterator_traits_helper<Iterator>,
+                    util::identity<Difference>
+                >::type;
+
+            using type = hpx::util::iterator_adaptor<
+                transform_iterator<Iterator, Transformer, Reference, Value,
+                    Category, Difference>,
+                Iterator, value_type, iterator_category, reference_type,
+                difference_type>;
         };
     }
 
@@ -53,15 +68,15 @@ namespace hpx { namespace util
     // function will be invoked with the iterator, not with the result of
     // dereferencing the base iterator.
     template <typename Iterator, typename Transformer, typename Reference,
-        typename Value>
+        typename Value, typename Category, typename Difference>
     class transform_iterator
       : public detail::transform_iterator_base<
-            Iterator, Transformer, Reference, Value
+            Iterator, Transformer, Reference, Value, Category, Difference
         >::type
     {
     private:
         typedef typename detail::transform_iterator_base<
-                Iterator, Transformer, Reference, Value
+                Iterator, Transformer, Reference, Value, Category, Difference
             >::type base_type;
 
     public:
@@ -75,14 +90,18 @@ namespace hpx { namespace util
         {}
 
         template <typename OtherIterator, typename OtherTransformer,
-            typename OtherReference, typename OtherValue>
+            typename OtherReference, typename OtherValue,
+            typename OtherCategory, typename OtherDifference>
         transform_iterator(
                 transform_iterator<
-                    OtherIterator, OtherTransformer,  OtherReference, OtherValue
+                    OtherIterator, OtherTransformer,  OtherReference,
+                    OtherValue, OtherCategory, OtherDifference
                 > const& t,
                 typename std::enable_if<
                     std::is_convertible<OtherIterator, Iterator>::value &&
-                    std::is_convertible<OtherTransformer, Transformer>::value
+                    std::is_convertible<OtherTransformer, Transformer>::value &&
+                    std::is_convertible<OtherCategory, Category>::value &&
+                    std::is_convertible<OtherDifference, Difference>::value
                 >::type* = nullptr)
           : base_type(t.base()), transformer_(t.transformer())
         {}

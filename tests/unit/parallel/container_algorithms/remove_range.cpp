@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -84,7 +84,7 @@ void test_remove(ExPolicy policy, DataType)
     auto result = hpx::parallel::remove(policy, c, value);
     auto solution = std::remove(std::begin(d), std::end(d), value);
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(c), result,
         std::begin(d), solution);
 
@@ -111,7 +111,7 @@ void test_remove_async(ExPolicy policy, DataType)
     auto result = f.get();
     auto solution = std::remove(std::begin(d), std::end(d), value);
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(c), result,
         std::begin(d), solution);
 
@@ -129,17 +129,6 @@ void test_remove()
 
     test_remove_async(execution::seq(execution::task), DataType());
     test_remove_async(execution::par(execution::task), DataType());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_remove(execution_policy(execution::seq), DataType());
-    test_remove(execution_policy(execution::par), DataType());
-    test_remove(execution_policy(execution::par_unseq), DataType());
-
-    test_remove(execution_policy(execution::seq(execution::task)),
-        DataType());
-    test_remove(execution_policy(execution::par(execution::task)),
-        DataType());
-#endif
 }
 
 void test_remove()

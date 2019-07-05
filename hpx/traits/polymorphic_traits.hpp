@@ -7,9 +7,9 @@
 #ifndef HPX_TRAITS_POLYMORPHIC_TRAITS_HPP
 #define HPX_TRAITS_POLYMORPHIC_TRAITS_HPP
 
+#include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/has_xxx.hpp>
-#include <hpx/util/detail/pp/strip_parens.hpp>
 
 #include <type_traits>
 
@@ -18,7 +18,7 @@ namespace hpx { namespace traits
     namespace detail
     {
         HPX_HAS_XXX_TRAIT_DEF(serialized_with_id);
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(hpx_serialization_get_name);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(hpx_serialization_get_name)
     } // namespace detail
 
     template <typename T>

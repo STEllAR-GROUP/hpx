@@ -12,12 +12,16 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_copy_if_exception(ExPolicy policy, IteratorTag)
 {
@@ -30,7 +34,7 @@ void test_copy_if_exception(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
     try {
@@ -60,7 +64,7 @@ void test_copy_if_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -103,35 +107,21 @@ void test_copy_if_exception()
 
     test_copy_if_exception_async(execution::seq(execution::task), IteratorTag());
     test_copy_if_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_if_exception(execution_policy(execution::seq), IteratorTag());
-    test_copy_if_exception(execution_policy(execution::par), IteratorTag());
-
-    test_copy_if_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_copy_if_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void copy_if_exception_test()
 {
     test_copy_if_exception<std::random_access_iterator_tag>();
     test_copy_if_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_copy_if_exception<std::input_iterator_tag>();
-#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     copy_if_exception_test();
     return hpx::finalize();

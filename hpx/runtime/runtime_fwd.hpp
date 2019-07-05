@@ -21,7 +21,15 @@ namespace hpx
     /// The function \a get_runtime returns a reference to the (thread
     /// specific) runtime instance.
     HPX_API_EXPORT runtime& get_runtime();
-    HPX_API_EXPORT runtime* get_runtime_ptr();
+    HPX_API_EXPORT runtime*& get_runtime_ptr();
+
+    /// Return true if networking is enabled.
+    ///
+    /// \note Networking is enabled if `-DHPX_WITH_NETWORKING=On` was used at
+    ///       configuration time and more than one locality is used or the
+    ///       command line option `--hpx:expect-connecting-localities` was
+    ///       specified
+    HPX_API_EXPORT bool is_networking_enabled();
 }
 
 #endif

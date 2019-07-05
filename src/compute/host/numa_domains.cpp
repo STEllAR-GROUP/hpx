@@ -10,6 +10,7 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
@@ -26,6 +27,11 @@ namespace hpx { namespace compute { namespace host
         if (numa_nodes == 0)
             numa_nodes = topo.get_number_of_sockets();
         std::vector<hpx::threads::mask_type> node_masks(numa_nodes);
+        for (auto& mask : node_masks)
+        {
+            hpx::threads::resize(mask, topo.get_number_of_pus());
+        }
+
 
         auto& rp = hpx::resource::get_partitioner();
 

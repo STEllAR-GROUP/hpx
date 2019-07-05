@@ -67,23 +67,6 @@ namespace hpx { namespace util
         hpx::util::itt::thread_domain thread_domain_;
         hpx::util::itt::task task_;
     };
-#elif defined(HPX_HAVE_APEX)
-    struct annotate_function
-    {
-        HPX_NON_COPYABLE(annotate_function);
-
-        explicit annotate_function(char const* name)
-          : apex_profiler_(name, threads::get_self_apex_data())
-        {}
-        template <typename F>
-        explicit annotate_function(F && f)
-          : apex_profiler_(hpx::util::thread_description(f),
-                threads::get_self_apex_data())
-        {}
-
-    private:
-        hpx::util::apex_wrapper apex_profiler_;
-    };
 #else
     struct annotate_function
     {
@@ -94,7 +77,13 @@ namespace hpx { namespace util
                 hpx::threads::set_thread_description(
                     hpx::threads::get_self_id(), name) :
                 nullptr)
-        {}
+        {
+#if defined(HPX_HAVE_APEX)
+            threads::set_self_apex_data(
+                apex_update_task(threads::get_self_apex_data(),
+                desc_));
+#endif
+        }
 
         template <typename F>
         explicit annotate_function(F && f)
@@ -103,7 +92,13 @@ namespace hpx { namespace util
                     hpx::threads::get_self_id(),
                     hpx::util::thread_description(f)) :
                 nullptr)
-        {}
+        {
+#if defined(HPX_HAVE_APEX)
+            threads::set_self_apex_data(
+                apex_update_task(threads::get_self_apex_data(),
+                desc_));
+#endif
+        }
 
         ~annotate_function()
         {
@@ -187,9 +182,9 @@ namespace hpx { namespace util
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(char const* name) {}
+        explicit annotate_function(char const* /*name*/) {}
         template <typename F>
-        explicit HPX_HOST_DEVICE annotate_function(F && f) {}
+        explicit HPX_HOST_DEVICE annotate_function(F && /*f*/) {}
 
         // add empty (but non-trivial) destructor to silence warnings
         HPX_HOST_DEVICE ~annotate_function() {}

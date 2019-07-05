@@ -96,18 +96,9 @@ namespace hpx { namespace parallel { inline namespace v1
         fill_(ExPolicy && policy, FwdIter first, FwdIter last, T const& value,
             std::false_type)
         {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-            typedef std::integral_constant<bool,
-                parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy
-                >::value ||
-               !hpx::traits::is_forward_iterator<FwdIter>::value
-            > is_seq;
-#else
             typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
-#endif
 
             return detail::fill().call(
                 std::forward<ExPolicy>(policy), is_seq(),
@@ -167,15 +158,9 @@ namespace hpx { namespace parallel { inline namespace v1
     typename util::detail::algorithm_result<ExPolicy>::type
     fill(ExPolicy && policy, FwdIter first, FwdIter last, T value)
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter>::value),
-            "Requires at least input iterator.");
-#else
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
-#endif
 
         typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
@@ -276,23 +261,11 @@ namespace hpx { namespace parallel { inline namespace v1
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     fill_n(ExPolicy && policy, FwdIter first, Size count, T value)
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_output_iterator<FwdIter>::value ||
-                hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least output iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter>::value
-            > is_seq;
-#else
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
 
         // if count is representing a negative value, we do nothing
         if (detail::is_negative(count))

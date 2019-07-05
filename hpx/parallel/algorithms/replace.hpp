@@ -493,21 +493,6 @@ namespace hpx { namespace parallel { inline namespace v1
     replace_copy(ExPolicy && policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
         T1 const& old_value, T2 const& new_value, Proj && proj = Proj())
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter1>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_output_iterator<FwdIter2>::value||
-                hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least output iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter1>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter2>::value
-            > is_seq;
-#else
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
@@ -516,7 +501,6 @@ namespace hpx { namespace parallel { inline namespace v1
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
             detail::replace_copy<std::pair<FwdIter1, FwdIter2> >().call(
@@ -699,21 +683,6 @@ namespace hpx { namespace parallel { inline namespace v1
     replace_copy_if(ExPolicy && policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
         F && f, T const& new_value, Proj && proj = Proj())
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter1>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_output_iterator<FwdIter2>::value||
-                hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least output iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter1>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter2>::value
-            > is_seq;
-#else
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
@@ -722,7 +691,6 @@ namespace hpx { namespace parallel { inline namespace v1
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
             detail::replace_copy_if<std::pair<FwdIter1, FwdIter2> >().call(

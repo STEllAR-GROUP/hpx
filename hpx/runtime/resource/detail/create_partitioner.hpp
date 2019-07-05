@@ -47,13 +47,14 @@ namespace hpx { namespace resource { namespace detail
         int argc, char** argv, std::vector<std::string> ini_config,
         resource::partitioner_mode rpmode = resource::mode_default,
         runtime_mode mode = runtime_mode_default,
-        bool check = true);
+        bool check = true, int* result = nullptr);
 
 #if !defined(HPX_EXPORTS)
     inline partitioner& create_partitioner(
         int argc, char** argv,
         resource::partitioner_mode rpmode = resource::mode_default,
-        runtime_mode mode = runtime_mode_default, bool check = true)
+        runtime_mode mode = runtime_mode_default, bool check = true,
+        int* result = nullptr)
     {
         boost::program_options::options_description desc_cmdline(
             std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
@@ -62,13 +63,14 @@ namespace hpx { namespace resource { namespace detail
 
         return create_partitioner(static_cast<hpx_main_type>(::hpx_main),
             desc_cmdline, argc, argv, std::vector<std::string>(),
-            rpmode, mode, check);
+            rpmode, mode, check, result);
     }
 
     inline partitioner& create_partitioner(
         util::function_nonser<int(int, char**)> const& f, int argc, char** argv,
         resource::partitioner_mode rpmode = resource::mode_default,
-        hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true)
+        hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true,
+        int* result = nullptr)
     {
         boost::program_options::options_description desc_cmdline(
             std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
@@ -77,14 +79,15 @@ namespace hpx { namespace resource { namespace detail
 
         return create_partitioner(util::bind_back(hpx::detail::init_helper, f),
             desc_cmdline, argc, argv, std::vector<std::string>(), rpmode, mode,
-            check);
+            check, result);
     }
 
     inline partitioner& create_partitioner(
         util::function_nonser<int(int, char**)> const& f, int argc, char** argv,
         std::vector<std::string> const& cfg,
         resource::partitioner_mode rpmode = resource::mode_default,
-        hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true)
+        hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true,
+        int* result = nullptr)
     {
         boost::program_options::options_description desc_cmdline(
             std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
@@ -92,13 +95,14 @@ namespace hpx { namespace resource { namespace detail
         util::set_hpx_prefix(HPX_PREFIX);
 
         return create_partitioner(util::bind_back(hpx::detail::init_helper, f),
-            desc_cmdline, argc, argv, cfg, rpmode, mode, check);
+            desc_cmdline, argc, argv, cfg, rpmode, mode, check, result);
     }
 
     inline partitioner &create_partitioner(
         int argc, char **argv, std::vector<std::string> ini_config,
         resource::partitioner_mode rpmode = resource::mode_default,
-        runtime_mode mode = runtime_mode_default, bool check = true)
+        runtime_mode mode = runtime_mode_default, bool check = true,
+        int* result = nullptr)
     {
         boost::program_options::options_description desc_cmdline(
             std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
@@ -107,7 +111,7 @@ namespace hpx { namespace resource { namespace detail
 
         return create_partitioner(static_cast<hpx_main_type>(::hpx_main),
             desc_cmdline, argc, argv, std::move(ini_config),
-            rpmode, mode, check);
+            rpmode, mode, check, result);
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -115,26 +119,83 @@ namespace hpx { namespace resource { namespace detail
         boost::program_options::options_description const& desc_cmdline,
         int argc, char **argv,
         resource::partitioner_mode rpmode = resource::mode_default,
-        runtime_mode mode = runtime_mode_default, bool check = true)
+        runtime_mode mode = runtime_mode_default, bool check = true,
+        int* result = nullptr)
     {
         util::set_hpx_prefix(HPX_PREFIX);
 
         return create_partitioner(static_cast<hpx_main_type>(::hpx_main),
             desc_cmdline, argc, argv, std::vector<std::string>(),
-            rpmode, mode, check);
+            rpmode, mode, check, result);
     }
 
     inline partitioner &create_partitioner(
         boost::program_options::options_description const& desc_cmdline,
         int argc, char **argv, std::vector<std::string> ini_config,
         resource::partitioner_mode rpmode = resource::mode_default,
-        runtime_mode mode = runtime_mode_default, bool check = true)
+        runtime_mode mode = runtime_mode_default, bool check = true,
+        int* result = nullptr)
     {
         util::set_hpx_prefix(HPX_PREFIX);
 
         return create_partitioner(static_cast<hpx_main_type>(::hpx_main),
             desc_cmdline, argc, argv, std::move(ini_config), rpmode, mode,
-            check);
+            check, result);
+    }
+
+    inline partitioner& create_partitioner(
+        std::nullptr_t /*f*/, int argc, char** argv,
+        resource::partitioner_mode rpmode = resource::mode_default,
+        hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true,
+        int* result = nullptr)
+    {
+        boost::program_options::options_description desc_cmdline(
+            std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
+
+        util::set_hpx_prefix(HPX_PREFIX);
+
+        return create_partitioner(
+            util::function_nonser<
+                int(boost::program_options::variables_map& vm)
+            >(),
+            desc_cmdline, argc, argv, std::vector<std::string>(), rpmode, mode,
+            check, result);
+    }
+
+    inline partitioner& create_partitioner(
+        std::nullptr_t /*f*/, int argc, char** argv,
+        std::vector<std::string> const& cfg,
+        resource::partitioner_mode rpmode = resource::mode_default,
+        hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true,
+        int* result = nullptr)
+    {
+        boost::program_options::options_description desc_cmdline(
+            std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
+
+        util::set_hpx_prefix(HPX_PREFIX);
+
+        return create_partitioner(
+            util::function_nonser<
+                int(boost::program_options::variables_map& vm)
+            >(),
+            desc_cmdline, argc, argv, cfg, rpmode, mode, check, result);
+    }
+
+    inline partitioner& create_partitioner(
+        std::nullptr_t /*f*/,
+        boost::program_options::options_description const& desc_cmdline,
+        int argc, char** argv, std::vector<std::string> const& cfg,
+        resource::partitioner_mode rpmode = resource::mode_default,
+        hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true,
+        int* result = nullptr)
+    {
+        util::set_hpx_prefix(HPX_PREFIX);
+
+        return create_partitioner(
+            util::function_nonser<
+                int(boost::program_options::variables_map& vm)
+            >(),
+            desc_cmdline, argc, argv, cfg, rpmode, mode, check, result);
     }
 #endif
 }}}

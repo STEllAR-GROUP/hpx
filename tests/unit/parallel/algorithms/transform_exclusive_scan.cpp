@@ -88,31 +88,12 @@ void test_transform_exclusive_scan()
         IteratorTag());
     test_transform_exclusive_scan_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_exclusive_scan(execution_policy(execution::seq),
-        IteratorTag());
-    test_transform_exclusive_scan(execution_policy(execution::par),
-        IteratorTag());
-    test_transform_exclusive_scan(execution_policy(execution::par_unseq),
-        IteratorTag());
-
-    test_transform_exclusive_scan(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_transform_exclusive_scan(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void transform_exclusive_scan_test()
 {
     test_transform_exclusive_scan<std::random_access_iterator_tag>();
     test_transform_exclusive_scan<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_exclusive_scan<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -215,29 +196,12 @@ void test_transform_exclusive_scan_exception()
     test_transform_exclusive_scan_exception_async(
         execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_exclusive_scan_exception(execution_policy(execution::seq),
-        IteratorTag());
-    test_transform_exclusive_scan_exception(execution_policy(execution::par),
-        IteratorTag());
-
-    test_transform_exclusive_scan_exception(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_transform_exclusive_scan_exception(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void transform_exclusive_scan_exception_test()
 {
     test_transform_exclusive_scan_exception<std::random_access_iterator_tag>();
     test_transform_exclusive_scan_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_exclusive_scan_exception<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -338,29 +302,12 @@ void test_transform_exclusive_scan_bad_alloc()
     test_transform_exclusive_scan_bad_alloc_async(
         execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_exclusive_scan_bad_alloc(execution_policy(execution::seq),
-        IteratorTag());
-    test_transform_exclusive_scan_bad_alloc(execution_policy(execution::par),
-        IteratorTag());
-
-    test_transform_exclusive_scan_bad_alloc(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_transform_exclusive_scan_bad_alloc(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void transform_exclusive_scan_bad_alloc_test()
 {
     test_transform_exclusive_scan_bad_alloc<std::random_access_iterator_tag>();
     test_transform_exclusive_scan_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_transform_exclusive_scan_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

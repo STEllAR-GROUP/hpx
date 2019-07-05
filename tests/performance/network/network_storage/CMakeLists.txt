@@ -24,7 +24,7 @@ add_hpx_pseudo_dependencies(
 
 add_hpx_pseudo_dependencies(
   tests.performance.network.network_storage_perf.network_storage_dir
-  network_storage_exe)
+  network_storage)
 
 hpx_option(HPX_WITH_BENCHMARK_SCRIPTS_PATH PATH
   "Directory to place batch scripts in"
@@ -78,7 +78,7 @@ else()
     ADD_CUSTOM_COMMAND(
         DEPENDS   "${CMAKE_CURRENT_SOURCE_DIR}/${script}.sh.in"
         COMMAND   "${CMAKE_COMMAND}"
-        ARGS      -DEXE_PATH="$<TARGET_FILE:network_storage_exe>"
+        ARGS      -DEXE_PATH="$<TARGET_FILE:network_storage>"
                   -DMPIEXEC="${MPIEXEC}"
                   -DSCRIPT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
                   -DSCRIPT_NAME=${script}

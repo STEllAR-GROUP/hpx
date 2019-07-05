@@ -12,12 +12,16 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_move(ExPolicy policy, IteratorTag)
 {
@@ -30,7 +34,7 @@ void test_move(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
     hpx::parallel::move(policy,
         iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
 
@@ -56,7 +60,7 @@ void test_move_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     auto f =
         hpx::parallel::move(p,
@@ -81,73 +85,6 @@ void test_move_async(ExPolicy p, IteratorTag)
     HPX_TEST_EQ(count, d.size());
 }
 
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-template <typename ExPolicy, typename IteratorTag>
-void test_outiter_move(ExPolicy policy, IteratorTag)
-{
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef std::back_insert_iterator<std::vector<std::size_t> > outiterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(0);
-    std::iota(std::begin(c), std::end(c), std::rand());
-    hpx::parallel::move(policy,
-        iterator(std::begin(c)), iterator(std::end(c)), std::back_inserter(d));
-
-    //copy contents of d back into c for testing
-    std::copy(std::begin(d), std::end(d), std::begin(d));
-
-    std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
-        [&count](std::size_t v1, std::size_t v2) -> bool {
-            HPX_TEST_EQ(v1, v2);
-            ++count;
-            return v1 == v2;
-        }));
-    HPX_TEST_EQ(count, d.size());
-
-}
-
-template <typename ExPolicy, typename IteratorTag>
-void test_outiter_move_async(ExPolicy p, IteratorTag)
-{
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef std::back_insert_iterator<std::vector<std::size_t> > outiterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(0);
-    std::iota(std::begin(c), std::end(c), std::rand());
-
-    auto f =
-        hpx::parallel::move(p,
-        iterator(std::begin(c)), iterator(std::end(c)),
-        std::back_inserter(d));
-
-    hpx::future<void> g = f.then(
-        [&d, &c](hpx::future<void> f)
-        {
-            HPX_TEST(!f.has_exception());
-            std::copy(std::begin(d), std::end(d), std::begin(c));
-        });
-    g.wait();
-
-    std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
-        [&count](std::size_t v1, std::size_t v2) -> bool {
-            HPX_TEST_EQ(v1, v2);
-            ++count;
-            return v1 == v2;
-        }));
-    HPX_TEST_EQ(count, d.size());
-}
-#endif
-
 template <typename IteratorTag>
 void test_move()
 {
@@ -158,43 +95,12 @@ void test_move()
 
     test_move_async(execution::seq(execution::task), IteratorTag());
     test_move_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_move(execution_policy(execution::seq), IteratorTag());
-    test_move(execution_policy(execution::par), IteratorTag());
-    test_move(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_move(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_move(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
-
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    // output iterator test
-    test_outiter_move(execution::seq, IteratorTag());
-    test_outiter_move(execution::par, IteratorTag());
-    test_outiter_move(execution::par_unseq, IteratorTag());
-
-    test_outiter_move_async(execution::seq(execution::task), IteratorTag());
-    test_outiter_move_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_outiter_move(execution_policy(execution::seq), IteratorTag());
-    test_outiter_move(execution_policy(execution::par), IteratorTag());
-    test_outiter_move(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_outiter_move(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_outiter_move(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
-#endif
 }
 
 void move_test()
 {
     test_move<std::random_access_iterator_tag>();
     test_move<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_move<std::input_iterator_tag>();
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -212,7 +118,7 @@ void test_move_exception(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
     try {
@@ -245,7 +151,7 @@ void test_move_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -287,23 +193,12 @@ void test_move_exception()
 
     test_move_exception_async(execution::seq(execution::task), IteratorTag());
     test_move_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_move_exception(execution_policy(execution::seq), IteratorTag());
-    test_move_exception(execution_policy(execution::par), IteratorTag());
-
-    test_move_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_move_exception(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void move_exception_test()
 {
     test_move_exception<std::random_access_iterator_tag>();
     test_move_exception<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_move_exception<std::input_iterator_tag>();
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -321,7 +216,7 @@ void test_move_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(100007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
     try {
@@ -353,7 +248,7 @@ void test_move_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
@@ -394,23 +289,12 @@ void test_move_bad_alloc()
 
     test_move_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_move_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_move_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_move_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_move_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_move_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void move_bad_alloc_test()
 {
     test_move_bad_alloc<std::random_access_iterator_tag>();
     test_move_bad_alloc<std::forward_iterator_tag>();
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_move_bad_alloc<std::input_iterator_tag>();
-#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
@@ -420,7 +304,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     move_test();
     move_exception_test();

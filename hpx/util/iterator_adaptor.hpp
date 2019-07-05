@@ -13,7 +13,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/identity.hpp>
 #include <hpx/util/iterator_facade.hpp>
+#include <hpx/util/lazy_conditional.hpp>
 
 #include <iterator>
 #include <memory>
@@ -25,6 +27,35 @@ namespace hpx { namespace util
     // Default template argument handling for iterator_adaptor
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Iterator>
+        struct value_type_iterator_traits_helper
+        {
+            using type =
+                typename std::iterator_traits<Iterator>::value_type;
+        };
+
+        template <typename Iterator>
+        struct reference_iterator_traits_helper
+        {
+            using type =
+                typename std::iterator_traits<Iterator>::reference;
+        };
+
+        template <typename Iterator>
+        struct category_iterator_traits_helper
+        {
+            using type =
+                typename std::iterator_traits<Iterator>::iterator_category;
+        };
+
+        template <typename Iterator>
+        struct difference_type_iterator_traits_helper
+        {
+            using type =
+                typename std::iterator_traits<Iterator>::difference_type;
+        };
+
         // A meta-function which computes an iterator_adaptor's base class,
         // a specialization of iterator_facade.
         template <typename Derived, typename Base, typename Value,
@@ -32,42 +63,42 @@ namespace hpx { namespace util
             typename Pointer>
         struct iterator_adaptor_base
         {
-            typedef typename std::conditional<
+            // the following type calculations use lazy_conditional to avoid
+            // premature instantiations
+            using value_type = typename std::conditional<
                     std::is_void<Value>::value,
-                    typename std::conditional<
+                    typename util::lazy_conditional<
                         std::is_void<Reference>::value,
-                        typename std::iterator_traits<Base>::value_type,
-                        typename std::remove_reference<Reference>::type
+                        value_type_iterator_traits_helper<Base>,
+                        std::remove_reference<Reference>
                     >::type,
                     Value
-                >::type value_type;
+                >::type;
 
-            typedef typename std::conditional<
+            using reference_type = typename std::conditional<
                     std::is_void<Reference>::value,
-                    typename std::conditional<
+                    typename util::lazy_conditional<
                         std::is_void<Value>::value,
-                        typename std::iterator_traits<Base>::reference,
-                        typename std::add_lvalue_reference<Value>::type
+                        reference_iterator_traits_helper<Base>,
+                        std::add_lvalue_reference<Value>
                     >::type,
                     Reference
-                >::type reference_type;
+                >::type;
 
-            typedef typename std::conditional<
+            using iterator_category = typename util::lazy_conditional<
                     std::is_void<Category>::value,
-                    typename std::iterator_traits<Base>::iterator_category,
-                    Category
-                >::type iterator_category;
+                    category_iterator_traits_helper<Base>,
+                    util::identity<Category>
+                >::type;
 
-            typedef typename std::conditional<
+            using difference_type = typename util::lazy_conditional<
                     std::is_void<Difference>::value,
-                    typename std::iterator_traits<Base>::difference_type,
-                    Difference
-                >::type distance_type;
+                    difference_type_iterator_traits_helper<Base>,
+                    util::identity<Difference>
+                >::type;
 
-            typedef iterator_facade<
-                    Derived, value_type, iterator_category, reference_type,
-                    distance_type, Pointer
-                > type;
+            using type = iterator_facade<Derived, value_type, iterator_category,
+                reference_type, difference_type, Pointer>;
         };
     }
 
@@ -172,8 +203,10 @@ namespace hpx { namespace util
             return iterator_ == x.base();
         }
 
+        // prevent this function from being instantiated if not needed
+        template <typename DifferenceType>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        void advance(typename base_adaptor_type::difference_type n)
+        void advance(DifferenceType n)
         {
             iterator_ += n;
         }
@@ -184,6 +217,11 @@ namespace hpx { namespace util
             ++iterator_;
         }
 
+        // prevent this function from being instantiated if not needed
+        template <typename Iterator = Base,
+            typename Enable = typename std::enable_if<
+                traits::is_bidirectional_iterator<Iterator>::value
+            >::type>
         HPX_HOST_DEVICE HPX_FORCEINLINE
         void decrement()
         {

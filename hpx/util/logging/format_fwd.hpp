@@ -18,17 +18,16 @@
 #ifndef JT28092007_format_fwd_HPP_DEFINED
 #define JT28092007_format_fwd_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
+#include <hpx/config.hpp>
 
-#include <hpx/util/logging/detail/format_fwd_detail.hpp>
+namespace hpx { namespace util { namespace logging {
 
-#if !defined( HPX_LOG_COMPILE_FAST)
-// slow compile
+namespace writer {
+    struct named_write ;
+}
+
+}}}
+
 #include <hpx/util/logging/format.hpp>
-#endif
-
 
 #endif
-

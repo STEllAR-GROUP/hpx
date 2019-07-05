@@ -8,8 +8,8 @@
 #define HPX_UTIL_ONE_SIZE_HEAP_LIST_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/wrapper_heap_base.hpp>
 
 #include <cstddef>
@@ -44,6 +44,7 @@ namespace hpx { namespace util
 #if defined(HPX_DEBUG)
             return std::make_shared<Heap>(name, counter, parameters);
 #else
+            (void)counter;
             return std::make_shared<Heap>(name, 0, parameters);
 #endif
         }

@@ -7,7 +7,7 @@
 #define HPX_IOSTREAMS_SERVER_ORDER_OUTPUT_JUL_18_2014_0711PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <hpx/components/iostreams/server/buffer.hpp>
@@ -36,7 +36,6 @@ namespace hpx { namespace iostreams { namespace detail
             if (count == data.first)
             {
                 // this is the next expected output line
-                if (!in.empty())
                 {
                     // output the line as requested
                     util::unlock_guard<std::unique_lock<Mutex> > ul(l);
@@ -49,7 +48,6 @@ namespace hpx { namespace iostreams { namespace detail
                 while (next != data.second.end())
                 {
                     buffer next_in = (*next).second;
-                    if (!next_in.empty())
                     {
                         // output the next line
                         util::unlock_guard<std::unique_lock<Mutex> > ul(l);

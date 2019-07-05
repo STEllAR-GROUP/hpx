@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-macro(add_hpx_executable name)
+function(add_hpx_executable name)
   # retrieve arguments
   set(options EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD AUTOGLOB NOLIBS NOHPX_INIT)
   set(one_value_args INI FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX LANGUAGE HPX_PREFIX)
@@ -101,7 +101,7 @@ macro(add_hpx_executable name)
   if(${name}_EXCLUDE_FROM_ALL)
     set(exclude_from_all EXCLUDE_FROM_ALL TRUE)
   else()
-    set(install_destination bin)
+    set(install_destination ${CMAKE_INSTALL_BINDIR})
     if(${name}_INSTALL_SUFFIX)
       set(install_destination ${${name}_INSTALL_SUFFIX})
     endif()
@@ -129,30 +129,30 @@ macro(add_hpx_executable name)
   endif()
 
   if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-    cuda_add_executable(${name}_exe
+    cuda_add_executable(${name}
       ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY})
   else()
-    add_executable(${name}_exe
+    add_executable(${name}
       ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY})
   endif()
 
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)
-      set_target_properties("${name}_exe" PROPERTIES
+      set_target_properties(${name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/bin/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/bin/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/bin/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/bin/${${name}_OUTPUT_SUFFIX}")
     else()
-      set_target_properties("${name}_exe" PROPERTIES
+      set_target_properties(${name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${${name}_OUTPUT_SUFFIX}")
     endif()
   endif()
 
-  set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME ${name})
+  set_target_properties(${name} PROPERTIES OUTPUT_NAME "${HPX_WITH_EXECUTABLE_PREFIX}${name}")
 
   if(exclude_from_all)
-    set_target_properties(${name}_exe PROPERTIES ${exclude_from_all})
+    set_target_properties(${name} PROPERTIES ${exclude_from_all})
   endif()
 
   if(${${name}_NOLIBS})
@@ -164,7 +164,7 @@ macro(add_hpx_executable name)
   endif()
 
   hpx_setup_target(
-    ${name}_exe
+    ${name}
     TYPE EXECUTABLE
     FOLDER ${${name}_FOLDER}
     COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
@@ -174,5 +174,5 @@ macro(add_hpx_executable name)
     HPX_PREFIX ${${name}_HPX_PREFIX}
     ${_target_flags}
   )
-endmacro()
+endfunction()
 

@@ -30,7 +30,6 @@ void for_each_test()
 {
     test_for_each<std::random_access_iterator_tag>();
     test_for_each<std::forward_iterator_tag>();
-    test_for_each<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -50,7 +49,6 @@ void for_each_exception_test()
 {
     test_for_each_exception<std::random_access_iterator_tag>();
     test_for_each_exception<std::forward_iterator_tag>();
-    test_for_each_exception<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -70,7 +68,6 @@ void for_each_bad_alloc_test()
 {
     test_for_each_bad_alloc<std::random_access_iterator_tag>();
     test_for_each_bad_alloc<std::forward_iterator_tag>();
-    test_for_each_bad_alloc<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

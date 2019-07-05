@@ -37,6 +37,7 @@ set(tests
     id_type_ref_counting_1032
     multiple_init
     multiple_init_2918
+    options_as_config_3339
     unhandled_exception_582
    )
 
@@ -70,7 +71,7 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.regressions.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()
 
 add_hpx_test(

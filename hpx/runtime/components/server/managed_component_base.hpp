@@ -9,16 +9,16 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
+#include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <cstddef>
@@ -169,11 +169,6 @@ namespace hpx { namespace components
             /// \brief finalize() will be called just before the instance gets
             ///        destructed
             HPX_CXX14_CONSTEXPR static void finalize() {}
-
-            // Pinning functionality
-            HPX_CXX14_CONSTEXPR static void pin() {}
-            HPX_CXX14_CONSTEXPR static void unpin() {}
-            HPX_CONSTEXPR static std::uint32_t pin_count() { return 0; }
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
             HPX_CXX14_CONSTEXPR static void mark_as_migrated()

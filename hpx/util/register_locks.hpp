@@ -37,7 +37,6 @@ namespace hpx { namespace util
     HPX_API_EXPORT void reset_ignored(void const* lock);
     HPX_API_EXPORT void ignore_all_locks();
     HPX_API_EXPORT void reset_ignored_all();
-    HPX_API_EXPORT void reset_held_lock_data();
 
     ///////////////////////////////////////////////////////////////////////////
     struct ignore_all_while_checking
@@ -55,7 +54,7 @@ namespace hpx { namespace util
 
     namespace detail
     {
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mutex);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mutex)
     }
 
     template <typename Lock>
@@ -83,7 +82,7 @@ namespace hpx { namespace util
     template <typename Lock, typename Enable>
     struct ignore_while_checking
     {
-        ignore_while_checking(void const* lock) {}
+        ignore_while_checking(void const* /*lock*/) {}
     };
 
     struct ignore_all_while_checking
@@ -119,9 +118,6 @@ namespace hpx { namespace util
     {
     }
     inline void reset_ignored_all()
-    {
-    }
-    inline void reset_held_lock_data()
     {
     }
 #endif

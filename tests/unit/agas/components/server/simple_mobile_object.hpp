@@ -27,9 +27,14 @@ struct HPX_COMPONENT_EXPORT simple_mobile_object
         return reinterpret_cast<std::uint64_t>(this);
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(simple_mobile_object
-                              , get_lva
-                              , get_lva_action);
+    HPX_DEFINE_COMPONENT_ACTION(simple_mobile_object, get_lva, get_lva_action);
+
+    // the tests using this object rely on rebind-able gids
+    naming::gid_type get_base_gid(
+        naming::gid_type const& assign_gid = naming::invalid_gid) const
+    {
+        return get_base_gid_dynamic(assign_gid, get_current_address());
+    }
 };
 
 }}}

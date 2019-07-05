@@ -9,9 +9,9 @@
 #define HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/util/demangle_helper.hpp>
-#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/util/debug/demangle_helper.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 
 #include <string>
@@ -157,12 +157,12 @@ namespace hpx { namespace serialization { namespace detail
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(Class)                         \
   HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(                                    \
-      Class, hpx::util::type_id<Class>::typeid_.type_id();)                   \
+      Class, hpx::util::debug::type_id<Class>::typeid_.type_id();)            \
 /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED(Class)                \
   HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(                           \
-      Class, hpx::util::type_id<T>::typeid_.type_id();)                       \
+      Class, hpx::util::debug::type_id<T>::typeid_.type_id();)                \
 /**/
 
 #endif

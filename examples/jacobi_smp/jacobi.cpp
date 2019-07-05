@@ -38,8 +38,11 @@ namespace jacobi_smp {
         for(std::size_t x = 1; x < n-1; ++x)
         {
             dst[x]
-                = (src[x-n] + src[x+n] + src[x] + src[x-1] + src[x+1])
-                * 0.2;
+                // x-n might underflow an unsigned type. Casting to a signed type has the
+                // wanted effect
+                = (src[std::ptrdiff_t(x - n)] + src[x + n] + src[x] +
+                      src[x - 1] + src[x + 1]) *
+                0.2;
         }
     }
 }

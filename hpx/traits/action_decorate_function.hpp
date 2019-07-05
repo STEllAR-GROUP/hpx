@@ -12,7 +12,6 @@
 #include <hpx/traits/has_xxx.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace traits
@@ -21,36 +20,19 @@ namespace hpx { namespace traits
     // Customization point for action capabilities
     namespace detail
     {
-        struct decorate_function_helper
+        // by default we return the unchanged function
+        template <typename Component, typename F>
+        F && decorate_function(wrap_int, naming::address_type /*lva*/, F && f)
         {
-            // by default we return the unchanged function
-            template <typename Action, typename F>
-            static threads::thread_function_type
-            call(wrap_int, naming::address_type lva, F && f)
-            {
-                return std::forward<F>(f);
-            }
+            return std::forward<F>(f);
+        }
 
-            // forward the call if the component implements the function
-            template <typename Action, typename F>
-            static auto
-            call(int, naming::address_type lva, F && f)
-            ->  decltype(
-                    Action::component_type::decorate_action(
-                        lva, std::forward<F>(f))
-                )
-            {
-                typedef typename Action::component_type component_type;
-                return component_type::decorate_action(lva, std::forward<F>(f));
-            }
-        };
-
-        template <typename Action, typename F>
-        threads::thread_function_type
-        call_decorate_function(naming::address_type lva, F && f)
+        // forward the call if the component implements the function
+        template <typename Component, typename F>
+        auto decorate_function(int, naming::address_type lva, F && f)
+        ->  decltype(Component::decorate_action(lva, std::forward<F>(f)))
         {
-            return decorate_function_helper::template call<Action>(
-                0, lva, std::forward<F>(f));
+            return Component::decorate_action(lva, std::forward<F>(f));
         }
 
         HPX_HAS_XXX_TRAIT_DEF(decorates_action);
@@ -58,7 +40,7 @@ namespace hpx { namespace traits
 
     template <typename Action, typename Enable = void>
     struct has_decorates_action
-      : detail::has_decorates_action<typename std::decay<Action>::type>
+      : detail::has_decorates_action<typename Action::component_type>
     {};
 
     template <typename Action, typename Enable = void>
@@ -70,11 +52,28 @@ namespace hpx { namespace traits
         static threads::thread_function_type
         call(naming::address_type lva, F && f)
         {
-            return detail::call_decorate_function<Action>(
+            using component_type = typename Action::component_type;
+            return detail::decorate_function<component_type>(0,
+                lva, std::forward<F>(f));
+        }
+    };
+
+    template <typename Action, typename Enable = void>
+    struct component_decorates_action
+      : detail::has_decorates_action<Action>
+    {};
+
+    template <typename Component, typename Enable = void>
+    struct component_decorate_function
+    {
+        template <typename F>
+        static threads::thread_function_type
+        call(naming::address_type lva, F && f)
+        {
+            return detail::decorate_function<Component>(0,
                 lva, std::forward<F>(f));
         }
     };
 }}
 
 #endif
-
