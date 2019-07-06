@@ -8,6 +8,7 @@
 #define HPX_TRAITS_PACK_TRAVERSAL_REBIND_CONTAINER_JUN_10_2019_1020AM
 
 #include <array>
+#include <cstddef>
 #include <memory>
 #include <list>
 #include <type_traits>
