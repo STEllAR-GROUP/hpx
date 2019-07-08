@@ -4,42 +4,48 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 function(add_hpx_compile_test category name)
-  set(options FAILURE_EXPECTED)
+  set(options FAILURE_EXPECTED NOHPX_INIT NOLIBS)
   set(one_value_args SOURCE_ROOT FOLDER)
-  set(multi_value_args SOURCES)
+  set(multi_value_args SOURCES COMPONENT_DEPENDENCIES)
 
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-  set(expected FALSE)
-
-  if(${name}_FAILURE_EXPECTED)
-    set(expected TRUE)
+  set(_additional_flags)
+  if(${category}_NOHPX_INIT)
+    set(_additional_flags ${_additional_flags} NOHPX_INIT)
+  endif()
+  if(${category}_NOLIBS)
+    set(_additional_flags ${_additional_flags} NOLIBS)
   endif()
 
+  string(REGEX REPLACE "\\." "_" test_name "${category}.${name}")
+
   add_hpx_library(
-    ${name}
+    ${test_name}
     SOURCE_ROOT ${${name}_SOURCE_ROOT}
     SOURCES ${${name}_SOURCES}
     EXCLUDE_FROM_ALL
     EXCLUDE_FROM_DEFAULT_BUILD
     FOLDER ${${name}_FOLDER}
-    STATIC)
+    STATIC
+    COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
+    DEPENDENCIES ${${name}_DEPENDENCIES}
+    ${_additional_flags})
 
   add_test(NAME "${category}.${name}"
     COMMAND ${CMAKE_COMMAND}
     --build ${CMAKE_BINARY_DIR}
-      --target ${name}
+      --target ${test_name}
       --config $<CONFIGURATION>
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
-  if(expected)
+  if(${name}_FAILURE_EXPECTED)
     set_tests_properties("${category}.${name}" PROPERTIES WILL_FAIL TRUE)
   endif()
 
 endfunction(add_hpx_compile_test)
 
 function(add_hpx_compile_test_target_dependencies category name)
-  # add a custom target for this example
   add_hpx_pseudo_target(${category}.${name})
   # make pseudo-targets depend on master pseudo-target
   add_hpx_pseudo_dependencies(${category} ${category}.${name})
@@ -70,25 +76,33 @@ function(add_hpx_headers_compile_test subcategory name)
   add_test_and_deps_compile_test("headers" "${subcategory}" ${name} ${ARGN})
 endfunction(add_hpx_headers_compile_test)
 
-function(add_hpx_module_header_tests lib)
-  set(multi_value_args EXCLUDE)
-  cmake_parse_arguments(${lib} "" "" "${multi_value_args}" ${ARGN})
-  file(GLOB_RECURSE headers ${DO_CONFIGURE_DEPENDS}
-      "${PROJECT_SOURCE_DIR}/include/hpx/*hpp")
+function(add_hpx_header_tests category)
+  set(options NOHPX_INIT NOLIBS)
+  set(one_value_args HEADER_ROOT)
+  set(multi_value_args HEADERS EXCLUDE EXCLUDE_FROM_ALL COMPONENT_DEPENDENCIES DEPENDENCIES)
+
+  cmake_parse_arguments(${category} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  set(_additional_flags)
+  if(${category}_NOHPX_INIT)
+    set(_additional_flags ${_additional_flags} NOHPX_INIT)
+  endif()
+  if(${category}_NOLIBS)
+    set(_additional_flags ${_additional_flags} NOLIBS)
+  endif()
 
   set(all_headers)
-  add_custom_target(tests.headers.modules.${lib})
-  add_dependencies(tests.headers.modules tests.headers.modules.${lib})
+  add_custom_target(tests.headers.${category})
 
-  foreach(header ${headers})
+  foreach(header ${${category}_HEADERS})
 
     # skip all headers in directories containing 'detail'
-    set(detail_pos -1)
     string(FIND "${header}" "detail" detail_pos)
+    list(FIND ${category}_EXCLUDE "${header}" exclude_pos)
 
-    if(${detail_pos} EQUAL -1)
+    if(${detail_pos} EQUAL -1 AND ${exclude_pos} EQUAL -1)
       # extract relative path of header
-      string(REGEX REPLACE "${PROJECT_SOURCE_DIR}/include/hpx/" "" relpath "${header}")
+      string(REGEX REPLACE "${${category}_HEADER_ROOT}/" "" relpath "${header}")
 
       # .hpp --> .cpp
       string(REGEX REPLACE ".hpp" ".cpp" full_test_file "${relpath}")
@@ -98,51 +112,46 @@ function(add_hpx_module_header_tests lib)
 
       # generate the test
       file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}
-        "#include <hpx/${relpath}>\n"
+        "#include <${relpath}>\n"
         "#ifndef HPX_MAIN_DEFINED\n"
         "int main(int argc, char** argv) { return 0; }\n"
         "#endif\n")
 
-      set(exclude_pos -1)
-      list(FIND ${lib}_EXCLUDE "${relpath}" exclude_pos)
-      if(${exclude_pos} EQUAL -1)
-        set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
+      set(exclude_all_pos -1)
+      list(FIND ${category}_EXCLUDE_FROM_ALL "${header}" exclude_all_pos)
+      if(${exclude_all_pos} EQUAL -1)
+        set(all_headers ${all_headers} "#include <${relpath}>\n")
       endif()
 
-      add_library(tests.headers.modules.${lib}.${test_name}
-          EXCLUDE_FROM_ALL
-          ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file})
-      target_link_libraries(tests.headers.modules.${lib}.${test_name} hpx_${lib})
-      add_dependencies(tests.headers.modules.${lib} tests.headers.modules.${lib}.${test_name})
+      get_filename_component(header_dir "${relpath}" DIRECTORY)
 
-      add_test(NAME "tests.headers.modules.${lib}.${test_name}"
-        COMMAND ${CMAKE_COMMAND}
-        --build ${CMAKE_BINARY_DIR}
-          --target tests.headers.modules.${lib}.${test_name}
-          --config $<CONFIGURATION>
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+      add_hpx_headers_compile_test(
+        "${category}"
+        ${test_name}
+        SOURCES "${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}"
+        SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
+        FOLDER "Tests/Headers/${header_dir}"
+        COMPONENT_DEPENDENCIES ${${category}_COMPONENT_DEPENDENCIES}
+        DEPENDENCIES ${${category}_DEPENDENCIES})
     endif()
   endforeach()
 
   set(test_name "all_headers")
-  set(all_headers_test_name "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
-  file(WRITE ${all_headers_test_name}
+  set(all_headers_test_file "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
+  file(WRITE ${all_headers_test_file}
     ${all_headers}
     "#ifndef HPX_MAIN_DEFINED\n"
     "int main(int argc, char** argv) { return 0; }\n"
     "#endif\n")
 
-  add_library(tests.headers.modules.${lib}.${test_name}
-    EXCLUDE_FROM_ALL
-    "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
-  target_link_libraries(tests.headers.modules.${lib}.${test_name} hpx_${lib})
-  add_dependencies(tests.headers.modules.${lib} tests.headers.modules.${lib}.${test_name})
-
-  add_test(NAME "tests.headers.modules.${lib}.${test_name}"
-    COMMAND ${CMAKE_COMMAND}
-    --build ${CMAKE_BINARY_DIR}
-      --target tests.headers.modules.${lib}.${test_name}
-      --config $<CONFIGURATION>
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+  add_hpx_headers_compile_test(
+    "${category}"
+    ${test_name}
+    SOURCES "${all_headers_test_file}"
+    SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}"
+    FOLDER "Tests/Headers"
+    COMPONENT_DEPENDENCIES ${${category}_COMPONENT_DEPENDENCIES}
+    DEPENDENCIES ${${category}_DEPENDENCIES}
+    ${_additional_flags})
 endfunction()
 

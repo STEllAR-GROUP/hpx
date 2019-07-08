@@ -7,7 +7,6 @@
 #if !defined(HPX_PARALLEL_TEST_ITERATOR_MAY_29_2014_0110PM)
 #define HPX_PARALLEL_TEST_ITERATOR_MAY_29_2014_0110PM
 
-#include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/parallel_execution_policy.hpp>
 #include <hpx/include/util.hpp>

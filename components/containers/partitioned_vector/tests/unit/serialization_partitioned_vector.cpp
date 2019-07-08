@@ -7,7 +7,7 @@
 
 #include <hpx/include/parallel_fill.hpp>
 #include <hpx/include/partitioned_vector.hpp>
-#include <hpx/include/serialization.hpp>
+#include <hpx/runtime/serialization/partitioned_vector.hpp>
 
 #include <hpx/testing.hpp>
 

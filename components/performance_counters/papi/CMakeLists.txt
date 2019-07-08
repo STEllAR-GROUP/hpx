@@ -29,6 +29,7 @@ if(HPX_WITH_PAPI)
   add_hpx_component(papi_counters
     FOLDER "Core/Components/IO"
     INSTALL_HEADERS
+    PLUGIN
     HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
     HEADERS ${papi_counters_headers}
     SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
@@ -36,4 +37,7 @@ if(HPX_WITH_PAPI)
     ${_exclude_from_all_flag})
 
   add_hpx_pseudo_dependencies(components.performance_counters.papi_counters papi_counters_component)
+
+  add_subdirectory(tests)
+  add_subdirectory(examples)
 endif()

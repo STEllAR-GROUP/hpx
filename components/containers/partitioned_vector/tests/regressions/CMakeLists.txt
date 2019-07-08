@@ -4,26 +4,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    bulk_new_3054
-    client_base_registration
-    create_n_components_2323
-    moveonly_constructor_arguments_1405
-    new_2848
     partitioned_vector_2201
-    returned_client_2150
    )
 
-set(bulk_new_3054_PARAMETERS LOCALITIES 2)
-set(new_2848_PARAMETERS LOCALITIES 2)
 set(partitioned_vector_2201_FLAGS COMPONENT_DEPENDENCIES partitioned_vector)
-
-if(HPX_WITH_NETWORKING)
-    set(tests ${tests}
-        create_remote_component_2334
-       )
-
-  set(create_remote_component_2334_PARAMETERS LOCALITIES 2)
-endif()
 
 foreach(test ${tests})
   set(sources
@@ -39,7 +23,6 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Regressions/Components")
 
-  add_hpx_regression_test("components" ${test} ${${test}_PARAMETERS})
-
+  add_hpx_regression_test("components.partitioned_vector" ${test} ${${test}_PARAMETERS})
 endforeach()
 

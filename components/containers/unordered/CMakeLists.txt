@@ -24,3 +24,6 @@ add_hpx_component(unordered
   ${_exclude_from_all_flag})
 
 add_hpx_pseudo_dependencies(components.containers.unordered unordered_component)
+
+add_subdirectory(tests)
+add_subdirectory(examples)

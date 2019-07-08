@@ -18,7 +18,6 @@ set(tests
     serialization_smart_ptr
     serialization_unordered_map
     serialization_vector
-    serialization_partitioned_vector
     serialization_variant
     serialize_buffer
     serialize_with_incompatible_signature
@@ -32,9 +31,6 @@ if(HPX_WITH_CXX17_STRUCTURED_BINDINGS)
 endif()
 
 add_subdirectory(polymorphic)
-
-set(serialization_partitioned_vector_FLAGS DEPENDENCIES partitioned_vector_component)
-set(serialization_partitioned_vector_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources

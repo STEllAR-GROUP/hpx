@@ -50,3 +50,6 @@ target_compile_definitions(partitioned_vector_component
   PRIVATE HPX_PARTITIONED_VECTOR_MODULE_EXPORTS)
 
 add_hpx_pseudo_dependencies(components.containers.partitioned_vector partitioned_vector_component)
+
+add_subdirectory(tests)
+add_subdirectory(examples)

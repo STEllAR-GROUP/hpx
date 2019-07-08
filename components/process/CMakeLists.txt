@@ -116,3 +116,6 @@ target_compile_definitions(process_component
   PRIVATE HPX_PROCESS_EXPORTS)
 
 add_hpx_pseudo_dependencies(components.process process_component)
+
+add_subdirectory(tests)
+add_subdirectory(examples)

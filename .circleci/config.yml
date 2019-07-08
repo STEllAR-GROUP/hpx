@@ -381,7 +381,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.component
+              ninja -j2 -k 0 tests.unit.component tests.unit.components
       - run:
           name: Running Unit Tests
           when: always

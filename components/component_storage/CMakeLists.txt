@@ -38,3 +38,6 @@ target_compile_definitions(component_storage_component
   PRIVATE HPX_MIGRATE_TO_STORAGE_MODULE_EXPORTS)
 
 add_hpx_pseudo_dependencies(components.component_storage component_storage_component)
+
+add_subdirectory(tests)
+add_subdirectory(examples)

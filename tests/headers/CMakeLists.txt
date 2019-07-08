@@ -6,18 +6,15 @@
 # collect a list of all header files in the source tree
 file(GLOB_RECURSE headers ${DO_CONFIGURE_DEPENDS} "${PROJECT_SOURCE_DIR}/hpx/*hpp")
 
-set(all_headers)
-
+# These files can't be included at the same time.
 set(exclude_from_all_headers)
 
 # These files are either known to expose incomplete types or are known to
 # require special handling to avoid circular #include dependencies.
 set(exclude_from_headers
-  "parallel/executors/execution_fwd.hpp"
-  "parallel/executors/execution_information_fwd.hpp"
-  "parallel/executors/timed_execution_fwd.hpp"
-  "parallel/executors/parallel_executor.hpp"
-  "lcos/local/futures_factory.hpp"
+  "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/timed_execution_fwd.hpp"
+  "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/parallel_executor.hpp"
+  "${PROJECT_SOURCE_DIR}/hpx/lcos/local/futures_factory.hpp"
 )
 
 # If we compile with the MPI parcelport enabled, we need to additionally
@@ -38,74 +35,9 @@ if(HPX_WITH_PAPI)
   include_directories(${PAPI_INCLUDE_DIR})
 endif()
 
-# for each of the found headers, generate a test executable
-foreach(header ${headers})
-
-  # skip all headers in directories containing 'detail'
-  set(detail_pos -1)
-  string(FIND "${header}" "detail" detail_pos)
-
-  if(${detail_pos} EQUAL -1)
-    # extract relative path of header
-    string(REGEX REPLACE "${PROJECT_SOURCE_DIR}/hpx/" "" relpath "${header}")
-
-    # .hpp --> .cpp
-    string(REGEX REPLACE ".hpp" ".cpp" full_test_file "${relpath}")
-
-    # exclude marked files
-    set(detail_pos -1)
-    list(FIND exclude_from_headers "${relpath}" detail_pos)
-    if(${detail_pos} EQUAL -1)
-
-      # remove extension, '/' --> '_'
-      string(REGEX REPLACE ".hpp" "_hpp" test_file "${relpath}")
-      string(REGEX REPLACE "/" "_" test_name "${test_file}")
-
-      # generate the test
-      file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}
-        "#include <hpx/${relpath}>\n"
-        "#ifndef HPX_MAIN_DEFINED\n"
-        "int main(int argc, char** argv) { return 0; }\n"
-        "#endif\n")
-
-      # exclude from all files
-      set(detail_pos -1)
-      list(FIND exclude_from_all_headers "${relpath}" detail_pos)
-      if(${detail_pos} EQUAL -1)
-        set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
-      endif()
-
-      get_filename_component(header_dir "${relpath}" DIRECTORY)
-
-      # add compile only test
-      add_hpx_headers_compile_test(
-        ""
-        ${test_name}
-        SOURCES "${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}"
-        SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
-        FOLDER "Tests/Headers/${header_dir}")
-
-      # make sure #including 'hpx/config/autolink.hpp' does not cause errors
-      target_compile_definitions(${test_name} PUBLIC -DHPX_AUTOLINK_LIB_NAME=hpx)
-
-    endif()
-
-  endif()
-
-endforeach()
-
-# generate a test executable project including all found header files
-set(test_name "all_headers")
-set(all_headers_test_name "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
-file(WRITE ${all_headers_test_name}
-  ${all_headers}
-  "#ifndef HPX_MAIN_DEFINED\n"
-  "int main(int argc, char** argv) { return 0; }\n"
-  "#endif\n")
-
-add_hpx_headers_compile_test(
-  ""
-  ${test_name}
-  SOURCES "${all_headers_test_name}"
-  SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}"
-  FOLDER "Tests/Headers")
+add_hpx_header_tests(
+  "core"
+  HEADER_ROOT ${PROJECT_SOURCE_DIR}
+  HEADERS ${headers}
+  EXCLUDE ${exclude_from_headers}
+  EXCLUDE_FROM_ALL ${exclude_from_all_headers})

@@ -15,11 +15,44 @@ set(HPX_COMPONENTS
   CACHE INTERNAL "list of HPX components" FORCE
 )
 
+if(HPX_WITH_EXAMPLES)
+  add_hpx_pseudo_target(examples.components)
+  add_hpx_pseudo_dependencies(examples examples.components)
+endif()
+
+if(HPX_WITH_TESTS)
+  if (HPX_WITH_TESTS_UNIT)
+    add_hpx_pseudo_target(tests.unit.components)
+    add_hpx_pseudo_dependencies(tests.unit tests.unit.components)
+  endif()
+
+  if (HPX_WITH_EXAMPLES AND HPX_WITH_TESTS_EXAMPLES)
+    add_hpx_pseudo_target(tests.examples.components)
+    add_hpx_pseudo_dependencies(tests.examples tests.examples.components)
+  endif()
+
+  if (HPX_WITH_TESTS_REGRESSIONS)
+    add_hpx_pseudo_target(tests.regressions.components)
+    add_hpx_pseudo_dependencies(tests.regressions tests.regressions.components)
+  endif()
+
+  if (HPX_WITH_TESTS_BENCHMARKS)
+    add_hpx_pseudo_target(tests.performance.components)
+    add_hpx_pseudo_dependencies(tests.performance tests.performance.components)
+  endif()
+
+  if (HPX_WITH_TESTS_HEADERS)
+    add_custom_target(tests.headers.components)
+    add_hpx_pseudo_dependencies(tests.headers tests.headers.components)
+  endif()
+endif()
+
 hpx_info("Configuring components:")
 
 add_hpx_pseudo_target(components)
 
 foreach(component ${HPX_COMPONENTS})
+  hpx_info("  ${component}")
   add_hpx_pseudo_target(components.${component})
   add_subdirectory(${component})
   add_hpx_pseudo_dependencies(components components.${component})

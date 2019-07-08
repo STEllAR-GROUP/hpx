@@ -21,6 +21,7 @@ set(memory_sources
 add_hpx_component(memory
   FOLDER "Core/Components/IO"
   INSTALL_HEADERS
+  PLUGIN
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${memory_headers}
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
@@ -28,3 +29,6 @@ add_hpx_component(memory
   ${_exclude_from_all_flag})
 
 add_hpx_pseudo_dependencies(components.performance_counters.memory memory_component)
+
+add_subdirectory(tests)
+add_subdirectory(examples)

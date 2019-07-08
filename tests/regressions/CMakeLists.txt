@@ -9,9 +9,8 @@ set(subdirs
     actions
     build
     block_matrix
-    components
+    component
     computeapi
-    iostreams
     lcos
     parallel
     performance_counters

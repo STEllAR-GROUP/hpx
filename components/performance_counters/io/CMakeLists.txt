@@ -19,6 +19,7 @@ if(HPX_WITH_IO_COUNTERS)
   add_hpx_component(io_counters
     FOLDER "Core/Components/IO"
     INSTALL_HEADERS
+    PLUGIN
     HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
     HEADERS ${io_counters_headers}
     SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
@@ -26,4 +27,7 @@ if(HPX_WITH_IO_COUNTERS)
     ${_exclude_from_all_flag})
 
   add_hpx_pseudo_dependencies(components.performance_counters.io io_counters_component)
+
+  add_subdirectory(tests)
+  add_subdirectory(examples)
 endif()
