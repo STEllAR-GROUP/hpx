@@ -30,7 +30,7 @@ when the future is created.
 
 .. _future_schematics:
 
-.. figure:: /_static/images/future_schematics.png
+.. figure:: ../_static/images/future_schematics.png
 
    Schematic of a future execution.
 
