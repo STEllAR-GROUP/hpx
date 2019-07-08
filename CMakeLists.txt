@@ -1628,19 +1628,25 @@ if(HPX_WITH_APEX)
 
   # We want to track parent dependencies
   hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
-  # handle APEX library
-  include(GitExternal)
-  git_external(apex
-    https://github.com/khuck/xpress-apex.git
-    ${HPX_WITH_APEX_TAG}
-    ${_hpx_apex_no_update}
-    VERBOSE)
 
-  LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")
-  add_subdirectory(apex/src/apex)
-  if(NOT APEX_FOUND)
-    hpx_error("Apex could not be found and HPX_WITH_APEX=On")
-  endif()
+  # If APEX_ROOT not specified, local clone into hpx source dir
+  if (NOT APEX_ROOT)
+    # handle APEX library
+    include(GitExternal)
+    git_external(apex
+      https://github.com/khuck/xpress-apex.git
+      ${HPX_WITH_APEX_TAG}
+      ${_hpx_apex_no_update}
+      VERBOSE)
+    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/apex)
+      set(APEX_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/apex)
+    else()
+      hpx_error("Apex could not be found and HPX_WITH_APEX=On")
+    endif()
+  endif(NOT APEX_ROOT)
+
+  LIST(APPEND CMAKE_MODULE_PATH "${APEX_ROOT}/cmake/Modules")
+  add_subdirectory(${APEX_ROOT}/src/apex ${CMAKE_BINARY_DIR}/apex/src/apex)
   if(AMPLIFIER_FOUND)
     hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
   endif()
@@ -1663,7 +1669,7 @@ if(HPX_WITH_APEX)
 
   # handle optional ITTNotify library
   if(HPX_WITH_ITTNOTIFY)
-    add_subdirectory(apex/src/ITTNotify)
+    add_subdirectory(${APEX_ROOT}/src/ITTNotify)
     if(NOT ITTNOTIFY_FOUND)
       hpx_error("ITTNotify could not be found and HPX_WITH_ITTNOTIFY=On")
     endif()
