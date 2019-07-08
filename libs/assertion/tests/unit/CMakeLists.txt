@@ -22,16 +22,6 @@ foreach(test ${tests})
 
   add_hpx_unit_test("modules.assertion" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.modules.assertion.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.modules.assertion
-                              tests.unit.modules.assertion.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.modules.assertion.${test}
-                              ${test}_test)
 endforeach()
 
 set_tests_properties(tests.unit.modules.assertion.assert_fail
