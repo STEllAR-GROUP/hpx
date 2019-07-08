@@ -45,15 +45,5 @@ foreach(test ${tests})
 
   add_hpx_unit_test("resource" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.resource.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.resource
-                              tests.unit.resource.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.resource.${test}
-                              ${test}_test)
 endforeach()
 

@@ -62,26 +62,15 @@ foreach(example_program ${example_programs})
                      ${${example_program}_FLAGS}
                      FOLDER "Examples/1D Stencil/${example_program}")
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(examples.1d_stencil.${example_program})
+  add_hpx_example_target_dependencies("1d_stencil" ${example_program})
 
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(examples.1d_stencil
-                              examples.1d_stencil.${example_program})
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND
+    NOT ("${example_program}" IN_LIST disabled_tests))
 
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.1d_stencil.${example_program}
-                              ${example_program})
-
-    if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND
-      NOT ("${example_program}" IN_LIST disabled_tests))
     add_hpx_example_test("1d_stencil" ${example_program} ${${example_program}_PARAMETERS})
-    add_hpx_pseudo_target(tests.examples.1d_stencil.${example_program})
-    add_hpx_pseudo_dependencies(tests.examples.1d_stencil
-                                tests.examples.1d_stencil.${example_program})
-    add_hpx_pseudo_dependencies(tests.examples.1d_stencil.${example_program}
-                                ${example_program})
+
   endif()
+
 endforeach()
 
 if(HPX_WITH_EXAMPLES_OPENMP)

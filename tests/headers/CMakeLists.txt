@@ -85,7 +85,7 @@ foreach(header ${headers})
 
       # add compile only test
       add_hpx_headers_compile_test(
-        "headers"
+        ""
         ${test_name}
         SOURCES "${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}"
         SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
@@ -94,14 +94,6 @@ foreach(header ${headers})
       # make sure #including 'hpx/config/autolink.hpp' does not cause errors
       target_compile_definitions(${test_name} PUBLIC -DHPX_AUTOLINK_LIB_NAME=hpx)
 
-      # add a custom target for this example
-      add_hpx_pseudo_target(tests.headers.${test_name})
-
-      # make pseudo-targets depend on master pseudo-target
-      add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
-
-      # add dependencies to pseudo-target
-      add_hpx_pseudo_dependencies(tests.headers.${test_name} ${test_name})
     endif()
 
   endif()
@@ -118,17 +110,8 @@ file(WRITE ${all_headers_test_name}
   "#endif\n")
 
 add_hpx_headers_compile_test(
-  "all_headers"
+  ""
   ${test_name}
   SOURCES "${all_headers_test_name}"
   SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}"
   FOLDER "Tests/Headers")
-
-# add a custom target for this example
-add_hpx_pseudo_target(tests.headers.${test_name})
-
-# make pseudo-targets depend on master pseudo-target
-add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
-
-# add dependencies to pseudo-target
-add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}")

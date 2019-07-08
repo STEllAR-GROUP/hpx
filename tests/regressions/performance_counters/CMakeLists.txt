@@ -42,16 +42,6 @@ foreach(test ${tests})
 
   add_hpx_regression_test("performance_counters" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.performance_counters_dir.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.performance_counters_dir
-                              tests.regressions.performance_counters_dir.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.performance_counters_dir.${test}
-                              ${test}_test)
 endforeach()
 
 

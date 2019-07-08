@@ -26,17 +26,7 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Regressions/Compute")
 
-  add_hpx_regression_test("computeapi_dir" ${test} ${${test}_PARAMETERS})
+  add_hpx_regression_test("computeapi" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this test
-  add_hpx_pseudo_target(tests.regressions.computeapi_dir.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.computeapi_dir
-                              tests.regressions.computeapi_dir.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.computeapi_dir.${test}
-                              ${test}_test)
 endforeach()
 
