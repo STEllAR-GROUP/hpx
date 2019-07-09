@@ -3,7 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/compat/mutex.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/resource_partitioner.hpp>
@@ -14,6 +13,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
     {
         using scheduler_type =
             hpx::threads::policies::local_priority_queue_scheduler<
-                hpx::compat::mutex, hpx::threads::policies::lockfree_lifo
+                std::mutex, hpx::threads::policies::lockfree_lifo
             >;
         test_scheduler<scheduler_type>(argc, argv);
     }
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     {
         using scheduler_type =
             hpx::threads::policies::local_priority_queue_scheduler<
-                hpx::compat::mutex, hpx::threads::policies::lockfree_fifo
+                std::mutex, hpx::threads::policies::lockfree_fifo
             >;
         test_scheduler<scheduler_type>(argc, argv);
     }
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
     {
         using scheduler_type =
             hpx::threads::policies::local_priority_queue_scheduler<
-                hpx::compat::mutex, hpx::threads::policies::lockfree_abp_lifo
+                std::mutex, hpx::threads::policies::lockfree_abp_lifo
             >;
         test_scheduler<scheduler_type>(argc, argv);
     }
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
     {
         using scheduler_type =
             hpx::threads::policies::local_priority_queue_scheduler<
-                hpx::compat::mutex, hpx::threads::policies::lockfree_abp_fifo
+                std::mutex, hpx::threads::policies::lockfree_abp_fifo
             >;
         test_scheduler<scheduler_type>(argc, argv);
     }

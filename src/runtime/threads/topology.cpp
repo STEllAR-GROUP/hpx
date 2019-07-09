@@ -8,7 +8,6 @@
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime.hpp>
@@ -22,6 +21,7 @@
 
 #include <boost/io/ios_state.hpp>
 
+#include <thread>
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
@@ -1248,7 +1248,7 @@ namespace hpx { namespace threads
         return mask;
     }
 
-    mask_type topology::get_cpubind_mask(compat::thread& handle,
+    mask_type topology::get_cpubind_mask(std::thread& handle,
         error_code& ec) const
     {
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();

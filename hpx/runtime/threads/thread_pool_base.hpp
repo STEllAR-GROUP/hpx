@@ -8,9 +8,6 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_POOL_JUN_11_2015_1137AM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/barrier.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/future.hpp>
@@ -25,9 +22,11 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
+#include <hpx/util/barrier.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util_fwd.hpp>
 
+#include <thread>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -75,11 +74,11 @@ namespace hpx { namespace threads
 
         virtual void init(std::size_t num_threads, std::size_t threads_offset);
 
-        virtual bool run(std::unique_lock<compat::mutex>& l,
+        virtual bool run(std::unique_lock<std::mutex>& l,
             std::size_t num_threads) = 0;
 
         virtual void stop(
-            std::unique_lock<compat::mutex>& l, bool blocking = true) = 0;
+            std::unique_lock<std::mutex>& l, bool blocking = true) = 0;
 
         virtual void print_pool(std::ostream&) = 0;
 
@@ -167,7 +166,7 @@ namespace hpx { namespace threads
         /// \cond NOINTERNAL
         virtual std::size_t get_os_thread_count() const = 0;
 
-        virtual compat::thread& get_os_thread_handle(
+        virtual std::thread& get_os_thread_handle(
             std::size_t num_thread) = 0;
 
         virtual std::size_t get_active_os_thread_count() const;

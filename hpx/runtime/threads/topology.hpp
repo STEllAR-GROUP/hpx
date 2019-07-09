@@ -11,7 +11,6 @@
 #define HPX_RUNTIME_THREADS_TOPOLOGY_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
@@ -25,6 +24,7 @@
 #include <cstddef>
 #include <iosfwd>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <hwloc.h>
@@ -266,7 +266,7 @@ namespace hpx { namespace threads
             error_code& ec = throws) const;
 
         mask_type get_cpubind_mask(error_code& ec = throws) const;
-        mask_type get_cpubind_mask(compat::thread & handle,
+        mask_type get_cpubind_mask(std::thread & handle,
             error_code& ec = throws) const;
 
         /// convert a cpu mask into a numa node mask in hwloc bitmap form

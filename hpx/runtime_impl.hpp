@@ -8,8 +8,6 @@
 #define HPX_RUNTIME_RUNTIME_IMPL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -25,10 +23,12 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util_fwd.hpp>
 
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -54,7 +54,7 @@ namespace hpx
             util::function_nonser<runtime::hpx_main_function_type> const& func,
             int& result);
 
-        void wait_helper(compat::mutex& mtx, compat::condition_variable& cond,
+        void wait_helper(std::mutex& mtx, std::condition_variable& cond,
             bool& running);
 
     public:
@@ -132,8 +132,8 @@ namespace hpx
         ///                   return immediately. Use a second call to stop
         ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
-        void stopped(bool blocking, compat::condition_variable& cond,
-            compat::mutex& mtx);
+        void stopped(bool blocking, std::condition_variable& cond,
+            std::mutex& mtx);
 
         /// \brief Suspend the runtime system
         ///
@@ -365,7 +365,7 @@ namespace hpx
         naming::resolver_client agas_client_;
         applier::applier applier_;
 
-        compat::mutex mtx_;
+        std::mutex mtx_;
         std::exception_ptr exception_;
     };
 }

@@ -7,12 +7,12 @@
 #define HPX_UTIL_THREAD_MAPPER_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/bimap.hpp>
 
+#include <thread>
 #include <cstdint>
 #include <map>
 #include <string>
@@ -58,7 +58,7 @@ namespace hpx { namespace util
         };
 
         typedef hpx::lcos::local::spinlock mutex_type;
-        typedef std::map<compat::thread::id, std::uint32_t> thread_map_type;
+        typedef std::map<std::thread::id, std::uint32_t> thread_map_type;
         typedef boost::bimap<std::string, std::uint32_t> label_map_type;
 
         // main lock

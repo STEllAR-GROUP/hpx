@@ -11,7 +11,6 @@
 #include <hpx/apply.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>

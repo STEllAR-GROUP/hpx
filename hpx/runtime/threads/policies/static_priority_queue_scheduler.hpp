@@ -12,11 +12,11 @@
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/assertion.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 
+#include <mutex>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -35,7 +35,7 @@ namespace hpx { namespace threads { namespace policies
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
     /// This scheduler does not do any work stealing.
-    template <typename Mutex = compat::mutex,
+    template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>

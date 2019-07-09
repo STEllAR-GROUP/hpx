@@ -11,7 +11,6 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/plugins/parcelport/tcp/connection_handler.hpp>
@@ -25,6 +24,7 @@
 #include <boost/io/ios_state.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
+#include <thread>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -188,7 +188,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         "connection_handler(tcp)::create_connection");
                 }
                 else {
-                    compat::this_thread::sleep_for(
+                    std::this_thread::sleep_for(
                         std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
             }

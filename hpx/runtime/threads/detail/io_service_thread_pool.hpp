@@ -7,8 +7,6 @@
 #define HPX_IO_SERVICE_THREAD_POOL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/barrier.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
@@ -16,6 +14,7 @@
 #include <hpx/state.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
+#include <mutex>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -61,10 +60,10 @@ namespace hpx { namespace threads { namespace detail
         void report_error(std::size_t num, std::exception_ptr const& e);
 
         ///////////////////////////////////////////////////////////////////////
-        bool run(std::unique_lock<compat::mutex>& l, std::size_t pool_threads);
+        bool run(std::unique_lock<std::mutex>& l, std::size_t pool_threads);
 
         ///////////////////////////////////////////////////////////////////////
-        void stop (std::unique_lock<compat::mutex>& l, bool blocking = true);
+        void stop (std::unique_lock<std::mutex>& l, bool blocking = true);
 
         ///////////////////////////////////////////////////////////////////////
         hpx::future<void> resume();
@@ -89,7 +88,7 @@ namespace hpx { namespace threads { namespace detail
             error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
-        compat::thread& get_os_thread_handle(std::size_t global_thread_num);
+        std::thread& get_os_thread_handle(std::size_t global_thread_num);
 
         std::size_t get_os_thread_count() const;
 

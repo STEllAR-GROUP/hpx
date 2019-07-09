@@ -1179,7 +1179,7 @@ namespace hpx { namespace util
                 // returned by the system (see #973: Would like option to
                 // report HWLOC bindings).
                 error_code ec(lightweight);
-                compat::thread& blob = tm.get_os_thread_handle(i);
+                std::thread& blob = tm.get_os_thread_handle(i);
                 threads::mask_type boundcpu = top.get_cpubind_mask(blob, ec);
 
                 /* threads::mask_type boundcpu = top.get_cpubind_mask(

@@ -8,8 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/scoped_background_timer.hpp>
@@ -23,6 +21,7 @@
 #endif
 
 #include <atomic>
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -45,7 +44,7 @@ namespace hpx { namespace threads { namespace policies
         HPX_NON_COPYABLE(scheduler_base);
 
     public:
-        typedef compat::mutex pu_mutex_type;
+        typedef std::mutex pu_mutex_type;
 
         scheduler_base(std::size_t num_threads,
             char const* description = "",
@@ -235,7 +234,7 @@ namespace hpx { namespace threads { namespace policies
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues
         pu_mutex_type mtx_;
-        compat::condition_variable cond_;
+        std::condition_variable cond_;
         struct idle_backoff_data
         {
             std::uint32_t wait_count_;
@@ -246,7 +245,7 @@ namespace hpx { namespace threads { namespace policies
 
         // support for suspension of pus
         std::vector<pu_mutex_type> suspend_mtxs_;
-        std::vector<compat::condition_variable> suspend_conds_;
+        std::vector<std::condition_variable> suspend_conds_;
 
         std::vector<pu_mutex_type> pu_mtxs_;
 

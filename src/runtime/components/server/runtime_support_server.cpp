@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
@@ -72,6 +71,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -268,7 +268,7 @@ namespace hpx { namespace components { namespace server
       : stop_called_(false)
       , stop_done_(false)
       , terminated_(false)
-      , main_thread_id_(compat::this_thread::get_id())
+      , main_thread_id_(std::this_thread::get_id())
       , dijkstra_color_(false)
       , shutdown_all_invoked_(false)
       , modules_(cfg.modules())
@@ -781,7 +781,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     void runtime_support::run()
     {
-        std::unique_lock<compat::mutex> l(mtx_);
+        std::unique_lock<std::mutex> l(mtx_);
         stop_called_ = false;
         stop_done_ = false;
         terminated_ = false;
@@ -790,7 +790,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::wait()
     {
-        std::unique_lock<compat::mutex> l(mtx_);
+        std::unique_lock<std::mutex> l(mtx_);
         while (!stop_done_) {
             LRT_(info) << "runtime_support: about to enter wait state";
             wait_condition_.wait(l);
@@ -801,7 +801,7 @@ namespace hpx { namespace components { namespace server
     void runtime_support::stop(double timeout,
         naming::id_type const& respond_to, bool remove_from_remote_caches)
     {
-        std::unique_lock<compat::mutex> l(mtx_);
+        std::unique_lock<std::mutex> l(mtx_);
         if (!stop_called_) {
             // push pending logs
             components::cleanup_logging();
@@ -820,7 +820,7 @@ namespace hpx { namespace components { namespace server
             stop_called_ = true;
 
             {
-                util::unlock_guard<compat::mutex> ul(mtx_);
+                util::unlock_guard<std::mutex> ul(mtx_);
 
                 util::yield_while(
                     [&tm, timeout, &t, start_time, &timed_out]()
@@ -903,7 +903,7 @@ namespace hpx { namespace components { namespace server
 
             // The main thread notifies stop_condition_, so don't wait if we're
             // on the main thread.
-            if (compat::this_thread::get_id() != main_thread_id_)
+            if (std::this_thread::get_id() != main_thread_id_)
             {
                 stop_condition_.wait(l);        // wait for termination
             }
@@ -912,7 +912,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::notify_waiting_main()
     {
-        std::unique_lock<compat::mutex> l(mtx_);
+        std::unique_lock<std::mutex> l(mtx_);
         if (!stop_called_) {
             stop_called_ = true;
             stop_done_ = true;
@@ -920,7 +920,7 @@ namespace hpx { namespace components { namespace server
 
             // The main thread notifies stop_condition_, so don't wait if we're
             // on the main thread.
-            if (compat::this_thread::get_id() != main_thread_id_)
+            if (std::this_thread::get_id() != main_thread_id_)
             {
                 stop_condition_.wait(l);        // wait for termination
             }
@@ -930,7 +930,7 @@ namespace hpx { namespace components { namespace server
     // this will be called after the thread manager has exited
     void runtime_support::stopped()
     {
-        std::lock_guard<compat::mutex> l(mtx_);
+        std::lock_guard<std::mutex> l(mtx_);
         if (!terminated_) {
             terminated_ = true;
             stop_condition_.notify_all();   // finished cleanup/termination

@@ -11,15 +11,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/compat/barrier.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/compat/thread.hpp>
+#include <hpx/util/barrier.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/asio/io_service.hpp>
 
 #include <cstddef>
 #include <memory>
+#include <mutex>
+#include <thread>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -68,12 +68,12 @@ namespace hpx { namespace util
 
         /// Run all io_service objects in the pool. If join_threads is true
         /// this will also wait for all threads to complete
-        bool run(bool join_threads = true, compat::barrier* startup = nullptr);
+        bool run(bool join_threads = true, barrier* startup = nullptr);
 
         /// Run all io_service objects in the pool. If join_threads is true
         /// this will also wait for all threads to complete
         bool run(std::size_t num_threads, bool join_threads = true,
-            compat::barrier* startup = nullptr);
+            barrier* startup = nullptr);
 
         /// \brief Stop all io_service objects in the pool.
         void stop();
@@ -93,13 +93,13 @@ namespace hpx { namespace util
         boost::asio::io_service& get_io_service(int index = -1);
 
         /// \brief access underlying thread handle
-        compat::thread& get_os_thread_handle(std::size_t thread_num);
+        std::thread& get_os_thread_handle(std::size_t thread_num);
 
         /// \brief Get number of threads associated with this I/O service.
         std::size_t size() const { return pool_size_; }
 
         /// \brief Activate the thread \a index for this thread pool
-        void thread_run(std::size_t index, compat::barrier* startup = nullptr);
+        void thread_run(std::size_t index, barrier* startup = nullptr);
 
         /// \brief Return name of this pool
         char const* get_name() const { return pool_name_; }
@@ -116,7 +116,7 @@ namespace hpx { namespace util
 
     protected:
         bool run_locked(std::size_t num_threads, bool join_threads,
-            compat::barrier* startup);
+            barrier* startup);
         void stop_locked();
         void join_locked();
         void clear_locked();
@@ -143,11 +143,11 @@ namespace hpx { namespace util
             );
         }
 
-        compat::mutex mtx_;
+        std::mutex mtx_;
 
         /// The pool of io_services.
         std::vector<io_service_ptr> io_services_;
-        std::vector<compat::thread> threads_;
+        std::vector<std::thread> threads_;
 
         /// The work that keeps the io_services running.
         std::vector<work_type> work_;
@@ -172,8 +172,8 @@ namespace hpx { namespace util
         bool waiting_;
 
         // Barriers for waiting for work to finish on all worker threads
-        compat::barrier wait_barrier_;
-        compat::barrier continue_barrier_;
+        barrier wait_barrier_;
+        barrier continue_barrier_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

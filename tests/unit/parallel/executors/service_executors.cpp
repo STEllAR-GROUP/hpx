@@ -5,7 +5,6 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/parallel/executors/service_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -13,15 +12,14 @@
 #include <cstdlib>
 #include <iterator>
 #include <numeric>
+#include <thread>
 #include <vector>
 
-namespace compat = hpx::compat;
-
 ///////////////////////////////////////////////////////////////////////////////
-compat::thread::id test(int passed_through)
+std::thread::id test(int passed_through)
 {
     HPX_TEST_EQ(passed_through, 42);
-    return compat::this_thread::get_id();
+    return std::this_thread::get_id();
 }
 
 template <typename Executor>
@@ -29,7 +27,7 @@ void test_sync(Executor& exec)
 {
     HPX_TEST(
         hpx::parallel::execution::sync_execute(exec, &test, 42) !=
-        compat::this_thread::get_id());
+        std::this_thread::get_id());
 }
 
 template <typename Executor>
@@ -37,7 +35,7 @@ void test_async(Executor& exec)
 {
     HPX_TEST(
         hpx::parallel::execution::async_execute(exec, &test, 42).get() !=
-        compat::this_thread::get_id());
+        std::this_thread::get_id());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,20 +56,20 @@ void test_then(Executor& exec)
 
     HPX_TEST(
         hpx::parallel::execution::async_execute(exec, &test, 42).get() !=
-        compat::this_thread::get_id());
+        std::this_thread::get_id());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test(int value, compat::thread::id tid, int passed_through)
+void bulk_test(int value, std::thread::id tid, int passed_through)
 {
-    HPX_TEST(tid != compat::this_thread::get_id());
+    HPX_TEST(tid != std::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
 template <typename Executor>
 void test_bulk_sync(Executor& exec)
 {
-    compat::thread::id tid = compat::this_thread::get_id();
+    std::thread::id tid = std::this_thread::get_id();
 
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
@@ -88,7 +86,7 @@ void test_bulk_sync(Executor& exec)
 template <typename Executor>
 void test_bulk_async(Executor& exec)
 {
-    compat::thread::id tid = compat::this_thread::get_id();
+    std::thread::id tid = std::this_thread::get_id();
 
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());

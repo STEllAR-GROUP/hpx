@@ -10,9 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -34,14 +31,17 @@
 #include <boost/program_options/options_description.hpp>
 
 #include <atomic>
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <list>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <set>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -337,13 +337,13 @@ namespace hpx { namespace components { namespace server
 #endif
 
     private:
-        compat::mutex mtx_;
-        compat::condition_variable wait_condition_;
-        compat::condition_variable stop_condition_;
+        std::mutex mtx_;
+        std::condition_variable wait_condition_;
+        std::condition_variable stop_condition_;
         bool stop_called_;
         bool stop_done_;
         bool terminated_;
-        compat::thread::id main_thread_id_;
+        std::thread::id main_thread_id_;
         bool dijkstra_color_;   // false: white, true: black
         std::atomic<bool> shutdown_all_invoked_;
 

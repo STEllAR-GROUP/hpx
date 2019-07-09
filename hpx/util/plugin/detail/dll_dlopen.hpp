@@ -12,7 +12,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/plugin/config.hpp>
@@ -112,7 +111,7 @@ namespace hpx { namespace util { namespace plugin {
         template<typename T>
         struct free_dll
         {
-            free_dll(HMODULE h, std::shared_ptr<compat::recursive_mutex> mtx)
+            free_dll(HMODULE h, std::shared_ptr<std::recursive_mutex> mtx)
               : h_(h), mtx_(mtx)
             {
             }
@@ -121,7 +120,7 @@ namespace hpx { namespace util { namespace plugin {
             {
                 if (nullptr != h_)
                 {
-                    std::lock_guard<compat::recursive_mutex> lock(*mtx_);
+                    std::lock_guard<std::recursive_mutex> lock(*mtx_);
 
                     dll::deinit_library(h_);
                     dlerror();
@@ -130,7 +129,7 @@ namespace hpx { namespace util { namespace plugin {
             }
 
             HMODULE h_;
-            std::shared_ptr<compat::recursive_mutex> mtx_;
+            std::shared_ptr<std::recursive_mutex> mtx_;
         };
         template <typename T> friend struct free_dll;
 
@@ -222,7 +221,7 @@ namespace hpx { namespace util { namespace plugin {
             // make sure everything is initialized
             if (ec) return std::pair<SymbolType, Deleter>();
 
-            std::unique_lock<compat::recursive_mutex> lock(*mtx_);
+            std::unique_lock<std::recursive_mutex> lock(*mtx_);
 
             static_assert(
                 std::is_pointer<SymbolType>::value,
@@ -291,7 +290,7 @@ namespace hpx { namespace util { namespace plugin {
         void LoadLibrary(error_code& ec = throws, bool force = false)
         {
             if (!dll_handle || force) {
-                std::unique_lock<compat::recursive_mutex> lock(*mtx_);
+                std::unique_lock<std::recursive_mutex> lock(*mtx_);
 
                 ::dlerror();                // Clear the error state.
                 dll_handle = MyLoadLibrary(
@@ -377,7 +376,7 @@ namespace hpx { namespace util { namespace plugin {
         {
             if (nullptr != dll_handle)
             {
-                std::lock_guard<compat::recursive_mutex> lock(*mtx_);
+                std::lock_guard<std::recursive_mutex> lock(*mtx_);
 
                 deinit_library(dll_handle);
                 dlerror();
@@ -386,10 +385,10 @@ namespace hpx { namespace util { namespace plugin {
         }
 
         // protect access to dl... functions
-        static std::shared_ptr<compat::recursive_mutex> mutex_instance()
+        static std::shared_ptr<std::recursive_mutex> mutex_instance()
         {
-            static std::shared_ptr<compat::recursive_mutex> mutex =
-                std::make_shared<compat::recursive_mutex>();
+            static std::shared_ptr<std::recursive_mutex> mutex =
+                std::make_shared<std::recursive_mutex>();
             return mutex;
         }
 
@@ -397,7 +396,7 @@ namespace hpx { namespace util { namespace plugin {
         std::string dll_name;
         std::string map_name;
         HMODULE dll_handle;
-        std::shared_ptr<compat::recursive_mutex> mtx_;
+        std::shared_ptr<std::recursive_mutex> mtx_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

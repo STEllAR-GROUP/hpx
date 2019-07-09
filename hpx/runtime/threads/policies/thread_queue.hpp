@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
@@ -146,7 +145,7 @@ namespace hpx { namespace threads { namespace policies
     //         typedef ... type;
     //     };
     // };
-    template <typename Mutex = compat::mutex,
+    template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_lifo,
         typename StagedQueuing = lockfree_lifo,
         typename TerminatedQueuing = lockfree_fifo>

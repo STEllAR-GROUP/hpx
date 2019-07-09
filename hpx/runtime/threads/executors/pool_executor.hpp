@@ -7,7 +7,6 @@
 #ifndef HPX_RUNTIME_THREADS_CUSTOMIZED_POOL_EXECUTOR
 #define HPX_RUNTIME_THREADS_CUSTOMIZED_POOL_EXECUTOR
 
-#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/util/steady_clock.hpp>
@@ -16,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <mutex>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -86,7 +86,7 @@ namespace hpx { namespace threads { namespace executors
             pool_type& pool_;
 
             // protect scheduler initialization
-            typedef compat::mutex mutex_type;
+            typedef std::mutex mutex_type;
             mutable mutex_type mtx_;
         };
     }   // namespace detail
