@@ -73,7 +73,8 @@ namespace hpx { namespace lcos { namespace local
         void set_max_difference(std::int64_t max_difference,
                 std::int64_t lower_limit = 0)
         {
-            sem_.set_max_difference(max_difference, lower_limit);
+            std::unique_lock<mutex_type> l(mtx_);
+            sem_.set_max_difference(l, max_difference, lower_limit);
         }
 
         /// \brief Wait for the semaphore to be signaled
