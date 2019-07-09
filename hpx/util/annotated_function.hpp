@@ -113,8 +113,6 @@ namespace hpx { namespace util
     };
 #endif
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Gets useful information for the input function.
 		namespace detail
     {
         template <typename F>
