@@ -37,7 +37,6 @@ set(hardware_compat_headers
 
 # Default location is $HPX_ROOT/libs/hardware/src
 set(hardware_sources
-  hardware.cpp
 )
 
 include(HPX_AddModule)
