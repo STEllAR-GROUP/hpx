@@ -113,7 +113,7 @@ namespace hpx { namespace util
     };
 #endif
 
-		namespace detail
+    namespace detail
     {
         template <typename F>
         struct annotated_function
