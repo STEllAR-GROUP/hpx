@@ -209,7 +209,7 @@ namespace hpx { namespace util
     /// Annotating includes setting the thread description per thread id.
     ///
     /// \param function
-		template <typename F>
+    template <typename F>
     F && annotated_function(F && f, char const* = nullptr)
     {
         return std::forward<F>(f);
