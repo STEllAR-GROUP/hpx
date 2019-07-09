@@ -14,7 +14,7 @@
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/hardware/timestamp.hpp>
+#include <hpx/hardware/timestamp.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/unique_function.hpp>

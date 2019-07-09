@@ -15,12 +15,12 @@
    || defined(__X86__) || defined(_X86_) || defined(__THW_INTEL__)  \
    || defined(__I86__) || defined(__INTEL__)
 
-    #include <hpx/util/hardware/bit_manipulation.hpp>
+    #include <hpx/hardware/bit_manipulation.hpp>
 
     #if defined(HPX_MSVC)
-        #include <hpx/util/hardware/cpuid/msvc.hpp>
+        #include <hpx/hardware/cpuid/msvc.hpp>
     #else
-        #include <hpx/util/hardware/cpuid/linux_x86.hpp>
+        #include <hpx/hardware/cpuid/linux_x86.hpp>
     #endif
 
     #include <cstdint>

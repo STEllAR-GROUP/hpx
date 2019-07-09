@@ -7,7 +7,7 @@
 #define HPX_THREADS_SCOPED_BACKGROUND_TIMER_JUN_10_2019_0301PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/hardware/timestamp.hpp>
+#include <hpx/hardware/timestamp.hpp>
 
 #include <cstdint>
 

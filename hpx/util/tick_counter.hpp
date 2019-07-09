@@ -7,7 +7,7 @@
 #if !defined(HPX_UTIL_TICK_COUNTER_MAR_24_2008_1222PM)
 #define HPX_UTIL_TICK_COUNTER_MAR_24_2008_1222PM
 
-#include <hpx/util/hardware/timestamp.hpp>
+#include <hpx/hardware/timestamp.hpp>
 
 #include <cstdint>
 

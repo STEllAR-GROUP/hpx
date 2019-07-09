@@ -32,7 +32,7 @@
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/detail/yield_k.hpp>
-#include <hpx/util/hardware/timestamp.hpp>
+#include <hpx/hardware/timestamp.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>

@@ -15,7 +15,7 @@
 
 #include <boost/program_options.hpp>
 
-#include <hpx/util/hardware/cpuid.hpp>
+#include <hpx/hardware/cpuid.hpp>
 
 using hpx::util::hardware::cpuid;
 using hpx::util::hardware::cpu_info;

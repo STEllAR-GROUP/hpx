@@ -71,6 +71,8 @@ function(add_hpx_headers_compile_test subcategory name)
 endfunction(add_hpx_headers_compile_test)
 
 function(add_hpx_module_header_tests lib)
+  set(multi_value_args EXCLUDE)
+  cmake_parse_arguments(${lib} "" "" "${multi_value_args}" ${ARGN})
   file(GLOB_RECURSE headers ${DO_CONFIGURE_DEPENDS}
       "${PROJECT_SOURCE_DIR}/include/hpx/*hpp")
 
@@ -101,7 +103,11 @@ function(add_hpx_module_header_tests lib)
         "int main(int argc, char** argv) { return 0; }\n"
         "#endif\n")
 
-      set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
+      set(exclude_pos -1)
+      list(FIND ${lib}_EXCLUDE "${relpath}" exclude_pos)
+      if(${exclude_pos} EQUAL -1)
+        set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
+      endif()
 
       add_library(tests.headers.modules.${lib}.${test_name}
           EXCLUDE_FROM_ALL
