@@ -30,11 +30,9 @@ set(assertion_sources
 
 include(HPX_AddModule)
 add_hpx_module(assertion
-    DEPRECATION_WARNINGS
     COMPATIBILITY_HEADERS ON    # Added in 1.4.0
+    DEPRECATION_WARNINGS
     GLOBAL_HEADER_GEN OFF
-    INSTALL_BINARIES OFF
-    FORCE_LINKING_GEN OFF
     SOURCES ${assertion_sources}
     HEADERS ${assertion_headers}
     COMPAT_HEADERS ${assertion_compat_headers}
