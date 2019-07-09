@@ -5,11 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/lcos/local/once.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime/threads/resource_manager.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <algorithm>

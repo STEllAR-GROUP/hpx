@@ -43,10 +43,10 @@
 // This needs to be first for building on Macs
 #include <hpx/runtime/threads/coroutines/detail/context_impl.hpp>
 
-#include <hpx/runtime/threads/coroutines/detail/swap_context.hpp> //for swap hints
+#include <hpx/assertion.hpp>
+#include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>    //for swap hints
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #include <hpx/runtime/threads/thread_id_type.hpp>
-#include <hpx/util/assert.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif
@@ -322,7 +322,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 //             return ++m_allocation_counters.get(heap_num);
 //         }
 
-    protected:
+    public:
         // global coroutine state
         enum context_state
         {
@@ -331,6 +331,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             ctx_exited    // context is finished.
         };
 
+    protected:
         // exit request state
         enum context_exit_state
         {

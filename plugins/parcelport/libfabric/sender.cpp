@@ -10,7 +10,7 @@
 #include <plugins/parcelport/libfabric/sender.hpp>
 #include <plugins/parcelport/rma_memory_pool.hpp>
 //
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/unique_function.hpp>

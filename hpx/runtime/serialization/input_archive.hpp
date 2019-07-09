@@ -10,12 +10,12 @@
 #define HPX_SERIALIZATION_INPUT_ARCHIVE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/runtime/serialization/input_container.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/predef/other/endian.h>

@@ -31,7 +31,7 @@
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_POSIX_UTILITY_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 
 // include unist.d conditionally to check for POSIX version. Not all OSs have the
 // unistd header...

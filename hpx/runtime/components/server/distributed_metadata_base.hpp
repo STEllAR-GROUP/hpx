@@ -7,6 +7,7 @@
 #define HPX_COMPONENTS_DISTRIBUTED_METADATA_BASE_NOV_12_2014_0958AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/preprocessor/cat.hpp>
@@ -15,7 +16,6 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <type_traits>
 

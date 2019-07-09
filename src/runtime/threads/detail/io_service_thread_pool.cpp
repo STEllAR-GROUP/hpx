@@ -4,11 +4,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/detail/io_service_thread_pool.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -131,6 +131,7 @@ namespace hpx { namespace threads { namespace detail
     {
         HPX_ASSERT_MSG(false,
             "Suspending threads on io_service_thread_pool is not supported");
+        return hpx::future<void>();
     }
 
     void io_service_thread_pool::suspend_processing_unit_cb(
@@ -146,6 +147,7 @@ namespace hpx { namespace threads { namespace detail
     {
         HPX_ASSERT_MSG(false,
             "Suspending threads on io_service_thread_pool is not supported");
+        return hpx::future<void>();
     }
 
     void io_service_thread_pool::resume_processing_unit_cb(

@@ -142,18 +142,7 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER ${folder_name})
 
-  add_hpx_unit_test("components" ${test} ${${test}_PARAMETERS})
-
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.component.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.component
-                              tests.unit.component.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.component.${test}
-                              ${test}_test)
+  add_hpx_unit_test("component" ${test} ${${test}_PARAMETERS})
 
 endforeach()
 

@@ -5,12 +5,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/serialization/string.hpp>
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime/serialization/string.hpp>
 
 #include <string>
 

@@ -63,33 +63,34 @@ index_rst = f'''..
 root_cmakelists_template = cmake_header + f'''
 cmake_minimum_required(VERSION {cmake_version} FATAL_ERROR)
 
-project(HPX.{lib_name} CXX)
+set({lib_name}_headers)
 
-list(APPEND CMAKE_MODULE_PATH "${{CMAKE_CURRENT_SOURCE_DIR}}/cmake")
+set({lib_name}_compat_headers)
 
-include(HPX_AddDefinitions)
-include(HPX_Message)
-include(HPX_Option)
+set({lib_name}_sources)
 
-hpx_info("  {lib_name}")
-
-hpx_option(HPX_{lib_name_upper}_WITH_TESTS
-  BOOL
-  "Build HPX {lib_name} module tests. (default: ${HPX_WITH_TESTS})"
-  ${HPX_WITH_TESTS} ADVANCED
-  CATEGORY "Modules")
-
-add_subdirectory(examples)
-add_subdirectory(src)
-add_subdirectory(tests)
+include(HPX_AddModule)
+add_hpx_module(cache
+    DEPRECATION_WARNINGS
+    COMPATIBILITY_HEADERS OFF
+    INSTALL_BINARIES OFF
+    SOURCES ${{{lib_name}_sources}}
+    HEADERS ${{{lib_name}_headers}}
+    COMPAT_HEADERS ${{{lib_name}_compat_headers}}
+    DEPENDENCIES
+    CMAKE_SUBDIRS examples tests
+)
 '''
 
 examples_cmakelists_template = cmake_header + f'''
-if (HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-  add_hpx_pseudo_target(tests.examples.module.{lib_name})
-  add_hpx_pseudo_dependencies(tests.examples.module tests.examples.module.{lib_name})
+if (HPX_WITH_EXAMPLES)
+  add_hpx_pseudo_target(examples.modules.{lib_name})
+  add_hpx_pseudo_dependencies(examples.modules examples.modules.{lib_name})
+  if (HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND HPX_{lib_name_upper}_WITH_TESTS)
+    add_hpx_pseudo_target(tests.examples.modules.{lib_name})
+    add_hpx_pseudo_dependencies(tests.examples.modules tests.examples.modules.{lib_name})
+  endif()
 endif()
-
 '''
 
 tests_cmakelists_template = cmake_header + f'''
@@ -105,20 +106,20 @@ if (NOT HPX_{lib_name_upper}_WITH_TESTS)
 endif()
 
 if (HPX_WITH_TESTS_UNIT)
-  add_hpx_pseudo_target(tests.unit.module.{lib_name})
-  add_hpx_pseudo_dependencies(tests.unit.module tests.unit.module.{lib_name})
+  add_hpx_pseudo_target(tests.unit.modules.{lib_name})
+  add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.{lib_name})
   add_subdirectory(unit)
 endif()
 
 if (HPX_WITH_TESTS_REGRESSIONS)
-  add_hpx_pseudo_target(tests.regressions.module.{lib_name})
-  add_hpx_pseudo_dependencies(tests.regressions.module tests.regressions.module.{lib_name})
+  add_hpx_pseudo_target(tests.regressions.modules.{lib_name})
+  add_hpx_pseudo_dependencies(tests.regressions.modules tests.regressions.modules.{lib_name})
   add_subdirectory(regressions)
 endif()
 
 if (HPX_WITH_TESTS_BENCHMARKS)
-  add_hpx_pseudo_target(tests.performance.module.{lib_name})
-  add_hpx_pseudo_dependencies(tests.performance.module tests.performance.module.{lib_name})
+  add_hpx_pseudo_target(tests.performance.modules.{lib_name})
+  add_hpx_pseudo_dependencies(tests.performance.modules tests.performance.modules.{lib_name})
   add_subdirectory(performance)
 endif()
 
@@ -258,9 +259,22 @@ endif()
 libs_cmakelists += '''
 hpx_info("Configuring modules:")
 
+set(MODULE_FORCE_LINKING_INCLUDES)
+set(MODULE_FORCE_LINKING_CALLS)
 foreach(lib ${HPX_LIBS})
   add_subdirectory(${lib})
+
+  set(MODULE_FORCE_LINKING_INCLUDES
+    "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\n")
+
+  set(MODULE_FORCE_LINKING_CALLS
+    "${MODULE_FORCE_LINKING_CALLS}\n        ${lib}::force_linking();")
 endforeach()
+
+configure_file(
+    "${PROJECT_SOURCE_DIR}/cmake/templates/modules.cpp.in"
+    "${CMAKE_BINARY_DIR}/libs/modules.cpp"
+    @ONLY)
 '''
 
 f = open(os.path.join(cwd, 'CMakeLists.txt'), 'w')

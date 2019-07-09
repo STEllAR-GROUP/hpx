@@ -7,8 +7,8 @@
 #define HPX_UTIL_ASSERT_OWNS_LOCK_DEC_4_2013_0130PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <type_traits>
 

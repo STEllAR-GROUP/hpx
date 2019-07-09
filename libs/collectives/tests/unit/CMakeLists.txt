@@ -4,9 +4,11 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    all_reduce
     all_to_all
    )
 
+set(all_reduce_PARAMETERS LOCALITIES 2)
 set(all_to_all_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})

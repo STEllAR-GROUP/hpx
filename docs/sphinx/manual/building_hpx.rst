@@ -1003,7 +1003,7 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
   .. _win32_cmake_settings1:
 
-  .. figure:: /_static/images/cmake_settings1.png
+  .. figure:: ../_static/images/cmake_settings1.png
 
      Example CMake path settings.
 
@@ -1039,7 +1039,7 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
   .. _win32_cmake_settings2:
 
-  .. figure:: /_static/images/cmake_settings2.png
+  .. figure:: ../_static/images/cmake_settings2.png
 
      Example CMake adding entry.
 
@@ -1067,7 +1067,7 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
   .. _win32_vs_targets:
 
-  .. figure:: /_static/images/vs_targets_install.png
+  .. figure:: ../_static/images/vs_targets_install.png
 
      Visual Studio INSTALL target.
 
@@ -1076,7 +1076,7 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
   .. _win32_vs_build_output:
 
-  .. figure:: /_static/images/vs_build_output.png
+  .. figure:: ../_static/images/vs_build_output.png
 
      Visual Studio build output.
 

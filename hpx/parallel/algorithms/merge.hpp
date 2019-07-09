@@ -7,9 +7,9 @@
 #define HPX_PARALLEL_ALGORITHM_MERGE_AUG_08_2017_0819AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_tuple.hpp>
 

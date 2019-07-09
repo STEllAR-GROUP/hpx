@@ -17,7 +17,7 @@
 #define JT28092007_optimize_HPP_DEFINED
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 
 #include <cstddef>

@@ -36,19 +36,39 @@ function(add_hpx_compile_test category name)
     set_tests_properties("${category}.${name}" PROPERTIES WILL_FAIL TRUE)
   endif()
 
-endfunction()
+endfunction(add_hpx_compile_test)
 
-function(add_hpx_unit_compile_test category name)
-  add_hpx_compile_test("tests.unit.${category}" ${name} ${ARGN})
-endfunction()
+function(add_hpx_compile_test_target_dependencies category name)
+  # add a custom target for this example
+  add_hpx_pseudo_target(${category}.${name})
+  # make pseudo-targets depend on master pseudo-target
+  add_hpx_pseudo_dependencies(${category} ${category}.${name})
+endfunction(add_hpx_compile_test_target_dependencies)
 
-function(add_hpx_regression_compile_test category name)
-  add_hpx_compile_test("tests.regressions.${category}" ${name} ${ARGN})
-endfunction()
+# To add test to the category root as in tests/regressions/ with correct name
+function(add_test_and_deps_compile_test category subcategory name)
+  if ("${subcategory}" STREQUAL "")
+    add_hpx_compile_test(tests.${category} ${name} ${ARGN})
+    add_hpx_compile_test_target_dependencies(tests.${category} ${name})
+  else()
+    add_hpx_compile_test(tests.${category}.${subcategory} ${name} ${ARGN})
+    add_hpx_compile_test_target_dependencies(tests.${category}.${subcategory} ${name})
+  endif()
+endfunction(add_test_and_deps_compile_test)
 
-function(add_hpx_headers_compile_test category name)
-  add_hpx_compile_test("tests.headers.${category}" ${name} ${ARGN})
-endfunction()
+function(add_hpx_unit_compile_test subcategory name)
+  add_test_and_deps_compile_test("unit" "${subcategory}" ${name} ${ARGN})
+endfunction(add_hpx_unit_compile_test)
+
+function(add_hpx_regression_compile_test subcategory name)
+  add_test_and_deps_compile_test("regressions" "${subcategory}" ${name} ${ARGN})
+endfunction(add_hpx_regression_compile_test)
+
+function(add_hpx_headers_compile_test subcategory name)
+  # Important to keep the double quotes around subcategory otherwise
+  # don't consider empty argument but just remove it
+  add_test_and_deps_compile_test("headers" "${subcategory}" ${name} ${ARGN})
+endfunction(add_hpx_headers_compile_test)
 
 function(add_hpx_module_header_tests lib)
   file(GLOB_RECURSE headers ${DO_CONFIGURE_DEPENDS}
@@ -83,7 +103,9 @@ function(add_hpx_module_header_tests lib)
 
       set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
 
-      add_library(tests.headers.modules.${lib}.${test_name} ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file})
+      add_library(tests.headers.modules.${lib}.${test_name}
+          EXCLUDE_FROM_ALL
+          ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file})
       target_link_libraries(tests.headers.modules.${lib}.${test_name} hpx_${lib})
       add_dependencies(tests.headers.modules.${lib} tests.headers.modules.${lib}.${test_name})
 
@@ -104,7 +126,9 @@ function(add_hpx_module_header_tests lib)
     "int main(int argc, char** argv) { return 0; }\n"
     "#endif\n")
 
-  add_library(tests.headers.modules.${lib}.${test_name} "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
+  add_library(tests.headers.modules.${lib}.${test_name}
+    EXCLUDE_FROM_ALL
+    "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
   target_link_libraries(tests.headers.modules.${lib}.${test_name} hpx_${lib})
   add_dependencies(tests.headers.modules.${lib} tests.headers.modules.${lib}.${test_name})
 
@@ -115,3 +139,4 @@ function(add_hpx_module_header_tests lib)
       --config $<CONFIGURATION>
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 endfunction()
+

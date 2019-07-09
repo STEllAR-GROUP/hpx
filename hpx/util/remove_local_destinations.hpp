@@ -6,9 +6,9 @@
 #if !defined(HPX_UTIL_REMOVE_LOCAL_DESTINATIONS_JUL_16_2012_1119AM)
 #define HPX_UTIL_REMOVE_LOCAL_DESTINATIONS_JUL_16_2012_1119AM
 
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 

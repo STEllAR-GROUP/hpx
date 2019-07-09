@@ -17,7 +17,7 @@
 #ifndef JT28092007_time_format_holder_HPP_DEFINED
 #define JT28092007_time_format_holder_HPP_DEFINED
 
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 
 #include <algorithm>

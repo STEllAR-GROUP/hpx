@@ -24,7 +24,7 @@ temperature of the current segment in the next timestep as shown by
 
 .. _1d_stencil_program_flow:
 
-.. figure:: /_static/images/1d_stencil_program_flow.png
+.. figure:: ../_static/images/1d_stencil_program_flow.png
 
    Heat diffusion example program flow.
 

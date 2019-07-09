@@ -81,7 +81,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
              " the optional argument is one of:\n"
              "  preset - show available predefined events,\n"
              "  native - show available native events,\n"
-             "  all    - show all avilable events.")
+             "  all    - show all available events.")
             ;
         return papi_opts;
     }

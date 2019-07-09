@@ -350,6 +350,8 @@ namespace util {
             /// Specialization for a container with a single type T
             template <typename NewType, typename Container>
             auto rebind_container(Container const& container)
+            -> decltype(traits::pack_traversal_rebind_container<
+                    NewType, Container>::call(std::declval<Container>()))
             {
                 return traits::pack_traversal_rebind_container<
                     NewType, Container>::call(container);

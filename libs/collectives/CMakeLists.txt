@@ -9,6 +9,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/collectives/include
 set(collectives_headers
+  hpx/collectives/all_reduce.hpp
   hpx/collectives/all_to_all.hpp
 )
 
@@ -20,7 +21,7 @@ include(HPX_AddModule)
 add_hpx_module(collectives
     SOURCES ${collectives_sources}
     HEADERS ${collectives_headers}
-    DEPENDENCIES hpx_config hpx_preprocessor
+    DEPENDENCIES hpx_config hpx_preprocessor hpx_assertion
     FORCE_LINKING_GEN ON
     INSTALL_BINARIES OFF
     CMAKE_SUBDIRS examples tests

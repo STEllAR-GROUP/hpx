@@ -10,9 +10,9 @@
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_GENERIC_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
 // include unist.d conditionally to check for POSIX version. Not all OSs have the
