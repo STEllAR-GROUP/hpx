@@ -50,7 +50,7 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Returns the thread state
+    /// \brief Returns the name of the given state
     ///
     /// Get the readable string representing the name of the given
     /// thread_state constant.
