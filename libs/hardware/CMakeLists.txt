@@ -42,11 +42,9 @@ set(hardware_sources
 include(HPX_AddModule)
 
 add_hpx_module(hardware
-    DEPRECATION_WARNINGS
     COMPATIBILITY_HEADERS ON    # Added in 1.4.0
-    GLOBAL_HEADER_GEN ON
-    INSTALL_BINARIES OFF
-    FORCE_LINKING_GEN ON
+    DEPRECATION_WARNINGS
+    FORCE_LINKING_GEN
     EXCLUDE_FROM_GLOBAL_HEADER
       "hpx/hardware/cpuid/linux_x86.hpp"
       "hpx/hardware/cpuid/msvc.hpp"
