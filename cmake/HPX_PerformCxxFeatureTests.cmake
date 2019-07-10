@@ -17,20 +17,20 @@ function(hpx_perform_cxx_feature_tests)
     REQUIRED "HPX needs support for C++11 alias templates")
 
   hpx_check_for_cxx11_alignas(
-    DEFINITIONS HPX_HAVE_CXX11_ALIGNAS)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_ALIGNAS)
 
   hpx_check_for_cxx11_auto(
     REQUIRED "HPX needs support for C++11 auto")
 
   hpx_check_for_cxx11_constexpr(
-    DEFINITIONS HPX_HAVE_CXX11_CONSTEXPR)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_CONSTEXPR)
 
   hpx_check_for_cxx11_decltype(
     REQUIRED "HPX needs support for C++11 decltype")
   hpx_add_config_cond_define(BOOST_RESULT_OF_USE_DECLTYPE)
 
   hpx_check_for_cxx11_sfinae_expression(
-    DEFINITIONS HPX_HAVE_CXX11_SFINAE_EXPRESSION)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_SFINAE_EXPRESSION)
 
   hpx_check_for_cxx11_defaulted_functions(
     REQUIRED "HPX needs support for C++11 defaulted functions")
@@ -42,10 +42,10 @@ function(hpx_perform_cxx_feature_tests)
     REQUIRED "HPX needs support for C++11 explicit conversion operators")
 
   hpx_check_for_cxx11_explicit_variadic_templates(
-    DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_VARIADIC_TEMPLATES)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_VARIADIC_TEMPLATES)
 
   hpx_check_for_cxx11_extended_friend_declarations(
-    DEFINITIONS HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS)
 
   hpx_check_for_cxx11_function_template_default_args(
     REQUIRED "HPX needs support for C++11 defaulted function template arguments")
@@ -63,7 +63,7 @@ function(hpx_perform_cxx_feature_tests)
     REQUIRED "HPX needs support for C++11 nullptr")
 
   hpx_check_for_cxx11_nsdmi(
-    DEFINITIONS HPX_HAVE_CXX11_NSDMI)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_NSDMI)
 
   hpx_check_for_cxx11_range_based_for(
     REQUIRED "HPX needs support for C++11 range-based for-loop")
@@ -113,13 +113,13 @@ function(hpx_perform_cxx_feature_tests)
     REQUIRED "HPX needs support for C++11 std::initializer_list")
 
   hpx_check_for_cxx11_std_is_bind_expression(
-    DEFINITIONS HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION)
 
   hpx_check_for_cxx11_std_is_placeholder(
-    DEFINITIONS HPX_HAVE_CXX11_STD_IS_PLACEHOLDER)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_STD_IS_PLACEHOLDER)
 
   hpx_check_for_cxx11_std_is_trivially_copyable(
-    DEFINITIONS HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
 
   hpx_check_for_cxx11_std_lock_guard(
     REQUIRED "HPX needs support for C++11 std::lock_guard")
@@ -128,7 +128,7 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX11_STD_QUICK_EXIT)
 
   hpx_check_for_cxx11_std_random(
-    DEFINITIONS HPX_HAVE_CXX11_STD_RANDOM)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_STD_RANDOM)
 
   hpx_check_for_cxx11_std_range_access(
     REQUIRED "HPX needs support for C++11 std::begin/end")
@@ -146,10 +146,10 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX11_SHARED_PTR_LWG3018)
 
   hpx_check_for_cxx11_std_shuffle(
-    DEFINITIONS HPX_HAVE_CXX11_STD_SHUFFLE)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_STD_SHUFFLE)
 
   hpx_check_for_cxx11_std_thread(
-    DEFINITIONS HPX_HAVE_CXX11_STD_THREAD)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_STD_THREAD)
 
   hpx_check_for_cxx11_std_to_string(
     REQUIRED "HPX needs support for C++11 std::to_string")
@@ -167,40 +167,38 @@ function(hpx_perform_cxx_feature_tests)
     REQUIRED "HPX needs support for C++11 std::unordered_set")
 
   hpx_check_for_cxx11_thread_local(
-    DEFINITIONS HPX_HAVE_CXX11_THREAD_LOCAL)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_THREAD_LOCAL)
 
   hpx_check_for_cxx11_noreturn_attribute(
-    DEFINITIONS HPX_HAVE_CXX11_NORETURN_ATTRIBUTE)
+    REQUIRED DEFINITIONS HPX_HAVE_CXX11_NORETURN_ATTRIBUTE)
 
-  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14 OR HPX_WITH_CXX1Z OR HPX_WITH_CXX17 OR HPX_WITH_CXX2A)
-    # Check the availability of certain C++14 language features
-    hpx_check_for_cxx14_constexpr(
-      DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)
+  # Check the availability of certain C++14 language features
+  hpx_check_for_cxx14_constexpr(
+    REQUIRED DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)
 
-    hpx_check_for_cxx14_lambdas(
-      DEFINITIONS HPX_HAVE_CXX14_LAMBDAS)
+  hpx_check_for_cxx14_lambdas(
+    REQUIRED DEFINITIONS HPX_HAVE_CXX14_LAMBDAS)
 
-    # Check the availability of certain C++14 library features
-    hpx_check_for_cxx14_std_integer_sequence(
-      DEFINITIONS HPX_HAVE_CXX14_STD_INTEGER_SEQUENCE)
+  # Check the availability of certain C++14 library features
+  hpx_check_for_cxx14_std_integer_sequence(
+    REQUIRED DEFINITIONS HPX_HAVE_CXX14_STD_INTEGER_SEQUENCE)
 
-    hpx_check_for_cxx14_std_is_final(
-      DEFINITIONS HPX_HAVE_CXX14_STD_IS_FINAL)
+  hpx_check_for_cxx14_std_is_final(
+    REQUIRED DEFINITIONS HPX_HAVE_CXX14_STD_IS_FINAL)
 
-    hpx_check_for_cxx14_std_is_null_pointer(
-      DEFINITIONS HPX_HAVE_CXX14_STD_IS_NULL_POINTER)
+  hpx_check_for_cxx14_std_is_null_pointer(
+    REQUIRED DEFINITIONS HPX_HAVE_CXX14_STD_IS_NULL_POINTER)
 
-    hpx_check_for_cxx14_std_result_of_sfinae(
-      DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
+  hpx_check_for_cxx14_std_result_of_sfinae(
+    REQUIRED DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
 
-    hpx_check_for_cxx14_variable_templates(
-      DEFINITIONS HPX_HAVE_CXX14_VARIABLE_TEMPLATES)
+  hpx_check_for_cxx14_variable_templates(
+    REQUIRED DEFINITIONS HPX_HAVE_CXX14_VARIABLE_TEMPLATES)
 
-    hpx_check_for_cxx14_deprecated_attribute(
-      DEFINITIONS HPX_HAVE_CXX14_DEPRECATED_ATTRIBUTE)
+  hpx_check_for_cxx14_deprecated_attribute(
+    REQUIRED DEFINITIONS HPX_HAVE_CXX14_DEPRECATED_ATTRIBUTE)
 
-    hpx_check_for_cxx14_return_type_deduction()
-  endif()
+  hpx_check_for_cxx14_return_type_deduction()
 
   if(HPX_WITH_CXX1Z OR HPX_WITH_CXX17 OR HPX_WITH_CXX2A)
     # Check the availability of certain C++17 language features
