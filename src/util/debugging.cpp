@@ -9,6 +9,7 @@
 #include <hpx/util/debugging.hpp>
 
 #include <iostream>
+#include <string>
 
 #if defined(HPX_HAVE_UNISTD_H)
 #include <unistd.h>
