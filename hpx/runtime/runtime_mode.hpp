@@ -33,8 +33,14 @@ namespace hpx
     /// constant.
     HPX_API_EXPORT char const* get_runtime_mode_name(runtime_mode state);
 
-    /// Get the internal representation (runtime_mode constant) from the
-    /// readable string representing the name.
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Returns the internal representation (runtime_mode constant) from
+    /// the readable string representing the name.
+    ///
+    /// This represents the internal representation from the readable string
+    /// representing the name.
+    ///
+    /// \param mode this represents the runtime mode
     HPX_API_EXPORT runtime_mode get_runtime_mode_from_name(std::string const& mode);
 }
 

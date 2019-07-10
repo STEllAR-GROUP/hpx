@@ -36,12 +36,39 @@ namespace hpx {
             struct create_parcel;
         }
 
+        //////////////////////////////////////////////////////////////////////
+        /// \brief Return a pointer of type message handler between parcel
+        ///        deliveries.
+        ///
+        /// This function returns a pointer of type message_handler during parecel
+        /// exchange.
+        ///
+        /// \param ph this represents parcelhandle type.
+        ///
+        /// \param name this represents the name of the function.
+        ///
+        /// \param type this represents message type.
+        ///
+        /// \param num this represents the number of messages.
+        ///
+        /// \param interval this represents the intervals messages should be sent.
+        ///
+        /// \param locality this represents the locality type.
+        ///
+        /// \param ec[int, out] this represents the error code during exit.
+
         HPX_API_EXPORT policies::message_handler* get_message_handler(
             parcelhandler* ph, char const* name, char const* type,
             std::size_t num, std::size_t interval, locality const& l,
             error_code& ec = throws);
 
         ////////////////////////////////////////////////////////////////////////
+        /// \brief Return boolean value when thread processing is completed.
+        ///
+        /// This returns true/false based on the background work.
+        ///
+        /// \param num_thread this represents the number of threads.
+
         /// Type of background work to perform
         enum parcelport_background_mode
         {

@@ -49,8 +49,13 @@ namespace hpx { namespace threads
                                  without high priority rescheduling */
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Returns the name of the given state
+    ///
     /// Get the readable string representing the name of the given
     /// thread_state constant.
+    ///
+    /// \param state this represents the thread state.
     HPX_API_EXPORT char const* get_thread_state_name(thread_state_enum state);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -87,8 +92,13 @@ namespace hpx { namespace threads
         /// \endcond
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// \brief Return the thread priority name.
+    ///
     /// Get the readable string representing the name of the given thread_priority
     /// constant.
+    ///
+    /// \param this represents the thread priority.
     HPX_API_EXPORT char const* get_thread_priority_name(thread_priority priority);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -140,8 +150,13 @@ namespace hpx { namespace threads
         thread_stacksize_maximal = thread_stacksize_huge,   ///< use maximally stack size
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Returns the stack size name.
+    ///
     /// Get the readable string representing the given stack size
     /// constant.
+    ///
+    /// \param size this represents the stack size
     HPX_API_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
 
     ///////////////////////////////////////////////////////////////////////////
