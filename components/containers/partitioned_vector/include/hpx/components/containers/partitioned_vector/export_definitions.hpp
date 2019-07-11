@@ -9,11 +9,7 @@
 #include <hpx/config/export_definitions.hpp>
 
 #if defined(HPX_PARTITIONED_VECTOR_MODULE_EXPORTS)
-# if defined(HPX_MSVC) || defined(HPX_MINGW)
-#  define HPX_PARTITIONED_VECTOR_EXPORT HPX_SYMBOL_EXPORT
-# else
-#  define HPX_PARTITIONED_VECTOR_EXPORT
-# endif
+# define HPX_PARTITIONED_VECTOR_EXPORT HPX_SYMBOL_EXPORT
 #else
 # define HPX_PARTITIONED_VECTOR_EXPORT HPX_SYMBOL_IMPORT
 #endif

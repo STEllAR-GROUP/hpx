@@ -17,8 +17,6 @@
 
 // partitioned_vector<int> and partitioned_vector<double> are predefined in the
 // partitioned_vector module
-HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(int);
-HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(double);
 
 typedef unsigned long ulong;
 

@@ -17,7 +17,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // coarray<double> is predefined in the partitioned_vector module
-HPX_REGISTER_COARRAY_DECLARATION(double);
 
 void bulk_test( hpx::lcos::spmd_block block,
                 std::string values)
