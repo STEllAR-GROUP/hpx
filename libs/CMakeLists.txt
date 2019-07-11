@@ -24,6 +24,7 @@ set(HPX_LIBS
   iterator_support
   logging
   preprocessor
+  segmented_algorithms
   statistics
   testing
   thread_support
