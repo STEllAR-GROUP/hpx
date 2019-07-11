@@ -35,6 +35,16 @@ namespace hpx { namespace lcos { namespace local { namespace detail
           : max_difference_(max_difference), lower_limit_(lower_limit), cond_()
         {}
 
+        void set_max_difference(std::unique_lock<mutex_type> &l,
+                                std::int64_t max_difference,
+                                std::int64_t lower_limit)
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+
+            max_difference_ = max_difference;
+            lower_limit_    = lower_limit;
+        }
+
         void wait(std::unique_lock<mutex_type>& l, std::int64_t upper_limit)
         {
             HPX_ASSERT_OWNS_LOCK(l);
