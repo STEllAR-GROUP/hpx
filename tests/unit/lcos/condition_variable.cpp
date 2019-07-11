@@ -68,8 +68,6 @@ struct wait_for_flag
         {
             return flag;
         }
-    private:
-        void operator=(check_flag&);
     };
 
 
@@ -457,9 +455,6 @@ struct cond_predicate
 
     int& _var;
     int _val;
-private:
-    void operator=(cond_predicate&);
-
 };
 
 void condition_test_waits(condition_test_data* data)

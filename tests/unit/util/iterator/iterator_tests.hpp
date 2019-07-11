@@ -546,6 +546,12 @@ namespace tests
         typedef const T& reference;
         typedef const T* pointer;
         typedef std::ptrdiff_t difference_type;
+        input_iterator_archetype_no_proxy()
+        {
+        }
+        input_iterator_archetype_no_proxy(input_iterator_archetype_no_proxy const&)
+        {
+        }
         self& operator=(const self&)
         {
             return *this;
@@ -585,6 +591,9 @@ namespace tests
         typedef T const* pointer;
         typedef std::ptrdiff_t difference_type;
         forward_iterator_archetype()
+        {
+        }
+        forward_iterator_archetype(forward_iterator_archetype const&)
         {
         }
         self& operator=(const self&)
