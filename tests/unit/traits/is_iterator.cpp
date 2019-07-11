@@ -32,7 +32,7 @@ namespace test
 
     public:
         test_iterator() : base_type() {}
-        test_iterator(BaseIterator base) : base_type(base) {}
+        explicit test_iterator(BaseIterator base) : base_type(base) {}
     };
 }
 
