@@ -462,8 +462,7 @@ namespace hpx { namespace components
 #endif
 
     private:
-#if defined(HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
         // declare friends which are allowed to access get_base_gid()
         friend Component;
 

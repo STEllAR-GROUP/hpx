@@ -44,30 +44,14 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // handle [[noreturn]]
-#if defined(HPX_HAVE_CXX11_NORETURN_ATTRIBUTE)
-#   define HPX_NORETURN [[noreturn]]
-#else
-#  if defined(_MSC_VER)
-#    define HPX_NORETURN __declspec(noreturn)
-#  elif defined(__GNUC__)
-#    define HPX_NORETURN __attribute__ ((__noreturn__))
-#  else
-#    define HPX_NORETURN
-#  endif
-#endif
+#define HPX_NORETURN [[noreturn]]
 
 ///////////////////////////////////////////////////////////////////////////////
 // handle [[deprecated]]
 #if defined(HPX_HAVE_DEPRECATION_WARNINGS)
 #  define HPX_DEPRECATED_MSG \
    "This functionality is deprecated and will be removed in the future."
-#  if defined(HPX_HAVE_CXX14_DEPRECATED_ATTRIBUTE)
-#    define HPX_DEPRECATED(x) [[deprecated(x)]]
-#  elif defined(HPX_MSVC)
-#    define HPX_DEPRECATED(x) __declspec(deprecated(x))
-#  elif defined(__GNUC__)
-#    define HPX_DEPRECATED(x) __attribute__((__deprecated__(x)))
-#  endif
+#  define HPX_DEPRECATED(x) [[deprecated(x)]]
 #endif
 
 #if !defined(HPX_DEPRECATED)

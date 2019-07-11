@@ -57,9 +57,6 @@ namespace hpx {
 namespace util {
     template <typename Mapper, typename... T>
     auto map_pack(Mapper&& mapper, T&&... pack)
-        -> decltype(detail::apply_pack_transform(detail::strategy_remap_tag{},
-            std::forward<Mapper>(mapper),
-            std::forward<T>(pack)...))
     {
         return detail::apply_pack_transform(detail::strategy_remap_tag{},
             std::forward<Mapper>(mapper),

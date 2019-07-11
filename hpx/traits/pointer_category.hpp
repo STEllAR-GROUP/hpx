@@ -20,9 +20,7 @@ namespace hpx { namespace traits
 {
     struct general_pointer_tag {};
 
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
     struct trivially_copyable_pointer_tag : general_pointer_tag {};
-#endif
 
     template <typename Source, typename Dest, typename Enable = void>
     struct pointer_category
@@ -31,7 +29,6 @@ namespace hpx { namespace traits
     };
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
     namespace detail
     {
         template <typename Source, typename Dest>
@@ -86,7 +83,6 @@ namespace hpx { namespace traits
             >::type
             type;
     };
-#endif
 
     // Allow for matching of iterator<T const> to iterator<T> while calculating
     // pointer category.

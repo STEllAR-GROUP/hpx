@@ -24,8 +24,7 @@
 #else
 
 // clang-format off
-#if defined(HPX_HAVE_CXX11_CONSTEXPR) && !defined(HPX_MSVC_NVCC) &&            \
-    !(defined(__NVCC__) && defined(__clang__))
+#if !defined(HPX_MSVC_NVCC) && !(defined(__NVCC__) && defined(__clang__))
 #   define HPX_CONSTEXPR constexpr
 #   define HPX_CONSTEXPR_OR_CONST constexpr
 #else
@@ -33,11 +32,7 @@
 #   define HPX_CONSTEXPR_OR_CONST const
 #endif
 
-#ifdef HPX_HAVE_CXX14_CONSTEXPR
-#   define HPX_CXX14_CONSTEXPR constexpr
-#else
-#   define HPX_CXX14_CONSTEXPR
-#endif
+#define HPX_CXX14_CONSTEXPR constexpr
 // clang-format on
 
 #define HPX_STATIC_CONSTEXPR static HPX_CONSTEXPR_OR_CONST

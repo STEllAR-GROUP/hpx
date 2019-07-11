@@ -400,9 +400,6 @@ endif()
 # Native TLS configuration
 ################################################################################
 set(HPX_WITH_NATIVE_TLS_DEFAULT ON)
-if(APPLE)
-  set(HPX_WITH_NATIVE_TLS_DEFAULT ${HPX_WITH_CXX11_THREAD_LOCAL})
-endif()
 hpx_option(HPX_WITH_NATIVE_TLS BOOL
   "Use native TLS support if available (default: ${HPX_WITH_NATIVE_TLS_DEFAULT})"
   ${HPX_WITH_NATIVE_TLS_DEFAULT} ADVANCED)

@@ -149,11 +149,8 @@ namespace hpx { namespace util {
 
         template <std::size_t I, typename T>
         struct tuple_member<I, T,
-            typename std::enable_if<std::is_empty<T>::value
-#if defined(HPX_HAVE_CXX14_STD_IS_FINAL)
-                && !std::is_final<T>::value
-#endif
-                >::type> : T
+            typename std::enable_if<std::is_empty<T>::value &&
+                !std::is_final<T>::value>::type> : T
         {
         public:
             HPX_CONSTEXPR HPX_HOST_DEVICE tuple_member()
@@ -907,7 +904,6 @@ namespace hpx { namespace util {
             template <typename THead, typename... TTail>
             static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
                 THead&& head, TTail&&... /*tail*/) noexcept
-                -> decltype(hpx::util::get<I>(std::forward<THead>(head)))
             {
                 return hpx::util::get<I>(std::forward<THead>(head));
             }
@@ -924,7 +920,6 @@ namespace hpx { namespace util {
             template <typename THead, typename... TTail>
             static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
                 THead&& /*head*/, TTail&&... tail) noexcept
-                -> decltype(base_type::get(std::forward<TTail>(tail)...))
             {
                 return base_type::get(std::forward<TTail>(tail)...);
             }
@@ -949,7 +944,6 @@ namespace hpx { namespace util {
         HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat_impl(
             index_pack<Is...> is_pack, pack<Tuples...> tuple_pack,
             Tuples_&&... tuples)
-            -> tuple_cat_result_of_t<decltype(is_pack), decltype(tuple_pack)>
         {
             return tuple_cat_result_of_t<decltype(is_pack),
                 decltype(tuple_pack)>{
@@ -961,11 +955,6 @@ namespace hpx { namespace util {
     template <typename... Tuples>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(
         Tuples&&... tuples)
-        -> decltype(detail::tuple_cat_impl(
-            typename util::make_index_pack<detail::tuple_cat_size<
-                typename std::decay<Tuples>::type...>::value>::type{},
-            util::pack<typename std::decay<Tuples>::type...>{},
-            std::forward<Tuples>(tuples)...))
     {
         return detail::tuple_cat_impl(
             typename util::make_index_pack<detail::tuple_cat_size<

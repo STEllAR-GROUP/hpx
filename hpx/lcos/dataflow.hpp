@@ -64,15 +64,10 @@ namespace hpx { namespace lcos { namespace detail
     template <typename F, typename Args>
     struct dataflow_not_callable
     {
-#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         static auto error(F f, Args args)
         {
             hpx::util::invoke_fused(std::move(f), std::move(args));
         }
-#else
-        static auto error(F f, Args args)
-         -> decltype(hpx::util::invoke_fused(std::move(f), std::move(args)));
-#endif
 
         using type = decltype(
             error(std::declval<F>(), std::declval<Args>()));
@@ -297,7 +292,6 @@ namespace hpx { namespace lcos { namespace detail
         /// Check whether the current future is ready
         template <typename T>
         auto operator()(util::async_traverse_visit_tag, T&& current)
-            -> decltype(async_visit_future(std::forward<T>(current)))
         {
             return async_visit_future(std::forward<T>(current));
         }
@@ -306,8 +300,6 @@ namespace hpx { namespace lcos { namespace detail
         /// current future was set to be ready.
         template <typename T, typename N>
         auto operator()(util::async_traverse_detach_tag, T&& current, N&& next)
-            -> decltype(async_detach_future(
-                std::forward<T>(current), std::forward<N>(next)))
         {
             return async_detach_future(
                 std::forward<T>(current), std::forward<N>(next));
@@ -464,8 +456,6 @@ namespace hpx { namespace lcos { namespace detail
         call(Allocator const& alloc,
             hpx::actions::basic_action<Component, Signature, Derived> const& act,
             naming::id_type const& id, Ts &&... ts)
-        ->  decltype(dataflow_dispatch<launch>::call(
-                alloc, launch::async, act, id, std::forward<Ts>(ts)...))
         {
             return dataflow_dispatch<launch>::call(
                 alloc, launch::async, act, id, std::forward<Ts>(ts)...);
@@ -478,9 +468,6 @@ namespace hpx { namespace lcos { namespace detail
             >::type>
         HPX_FORCEINLINE static auto
         call(Allocator const& alloc, F && f, Ts &&... ts)
-        ->  decltype(dataflow_dispatch<launch>::call(
-                alloc, launch::async, std::forward<F>(f),
-                std::forward<Ts>(ts)...))
         {
             return dataflow_dispatch<launch>::call(
                 alloc, launch::async, std::forward<F>(f),
@@ -531,11 +518,6 @@ namespace hpx
     template <typename F, typename ...Ts>
     HPX_FORCEINLINE
     auto dataflow(F && f, Ts &&... ts)
-    ->  decltype(
-            lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::call(
-                hpx::util::internal_allocator<>{}, std::forward<F>(f),
-                std::forward<Ts>(ts)...
-        ))
     {
         return lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::
             call(hpx::util::internal_allocator<>{}, std::forward<F>(f),
@@ -545,10 +527,6 @@ namespace hpx
     template <typename Allocator, typename F, typename ...Ts>
     HPX_FORCEINLINE
     auto dataflow_alloc(Allocator const& alloc, F && f, Ts &&... ts)
-    ->  decltype(
-            lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::
-                call(alloc, std::forward<F>(f), std::forward<Ts>(ts)...
-        ))
     {
         return lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::
             call(alloc, std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -560,9 +538,6 @@ namespace hpx
             traits::is_action<Action>::value>::type>
     HPX_FORCEINLINE
     auto dataflow(T0 && t0, Ts &&... ts)
-    ->  decltype(lcos::detail::dataflow_action_dispatch<Action, T0>::call(
-            hpx::util::internal_allocator<>{}, std::forward<T0>(t0),
-            std::forward<Ts>(ts)...))
     {
         return lcos::detail::dataflow_action_dispatch<Action, T0>::call(
             hpx::util::internal_allocator<>{}, std::forward<T0>(t0),
@@ -575,8 +550,6 @@ namespace hpx
             traits::is_action<Action>::value>::type>
     HPX_FORCEINLINE
     auto dataflow_alloc(Allocator const& alloc, T0 && t0, Ts &&... ts)
-    ->  decltype(lcos::detail::dataflow_action_dispatch<Action, T0>::call(
-            alloc, std::forward<T0>(t0), std::forward<Ts>(ts)...))
     {
         return lcos::detail::dataflow_action_dispatch<Action, T0>::call(
             alloc, std::forward<T0>(t0), std::forward<Ts>(ts)...);

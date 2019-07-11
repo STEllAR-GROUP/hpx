@@ -262,9 +262,6 @@ namespace hpx { namespace compute { namespace util
 
         template <typename... Args>
         auto memcpy_apply(Args&&... args)
-#if !defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
-            -> decltype(apply(cudaMemcpyAsync, std::forward<Args>(args)...))
-#endif
         {
             return apply(cudaMemcpyAsync, std::forward<Args>(args)...);
         }
@@ -278,9 +275,6 @@ namespace hpx { namespace compute { namespace util
 
         template <typename... Args>
         auto memset_apply(Args&&... args)
-#if !defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
-            -> decltype(apply(cudaMemsetAsync, std::forward<Args>(args)...))
-#endif
         {
             return apply(cudaMemsetAsync, std::forward<Args>(args)...);
         }

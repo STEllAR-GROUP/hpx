@@ -203,7 +203,6 @@ namespace hpx { namespace lcos
 
             template <typename T>
             auto operator()(util::async_traverse_visit_tag, T&& current)
-                -> decltype(async_visit_future(std::forward<T>(current)))
             {
                 return async_visit_future(std::forward<T>(current));
             }
@@ -211,8 +210,6 @@ namespace hpx { namespace lcos
             template <typename T, typename N>
             auto operator()(
                 util::async_traverse_detach_tag, T&& current, N&& next)
-                -> decltype(async_detach_future(
-                    std::forward<T>(current), std::forward<N>(next)))
             {
                 return async_detach_future(
                     std::forward<T>(current), std::forward<N>(next));
@@ -255,8 +252,6 @@ namespace hpx { namespace lcos
 
     template <typename First, typename Second>
     auto when_all(First&& first, Second&& second)
-        -> decltype(detail::when_all_impl(
-            std::forward<First>(first), std::forward<Second>(second)))
     {
         return detail::when_all_impl(
             std::forward<First>(first), std::forward<Second>(second));
@@ -292,7 +287,6 @@ namespace hpx { namespace lcos
         typename std::enable_if<(sizeof...(Args) == 1U) ||
             (sizeof...(Args) > 2U)>::type* = nullptr>
     auto when_all(Args&&... args)
-        -> decltype(detail::when_all_impl(std::forward<Args>(args)...))
     {
         return detail::when_all_impl(std::forward<Args>(args)...);
     }

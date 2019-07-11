@@ -187,11 +187,7 @@ namespace hpx {
     {
         using ED = typename std::decay<E>::type;
         static_assert(
-#if defined(HPX_HAVE_CXX14_STD_IS_FINAL)
             std::is_class<ED>::value && !std::is_final<ED>::value,
-#else
-            std::is_class<ED>::value,
-#endif
             "E shall be a valid base class");
         static_assert(!std::is_base_of<exception_info, ED>::value,
             "E shall not derive from exception_info");
@@ -222,7 +218,6 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename E, typename F>
     auto invoke_with_exception_info(E const& e, F&& f)
-        -> decltype(std::forward<F>(f)(std::declval<exception_info const*>()))
     {
         return std::forward<F>(f)(
             dynamic_cast<exception_info const*>(std::addressof(e)));
@@ -230,7 +225,6 @@ namespace hpx {
 
     template <typename F>
     auto invoke_with_exception_info(std::exception_ptr const& p, F&& f)
-        -> decltype(std::forward<F>(f)(std::declval<exception_info const*>()))
     {
         try
         {
@@ -249,7 +243,6 @@ namespace hpx {
 
     template <typename F>
     auto invoke_with_exception_info(hpx::error_code const& ec, F&& f)
-        -> decltype(std::forward<F>(f)(std::declval<exception_info const*>()))
     {
         return invoke_with_exception_info(
             detail::access_exception(ec), std::forward<F>(f));

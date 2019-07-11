@@ -5,15 +5,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
-   )
+    rnd_future_reduce)
 
-if(HPX_HAVE_CXX11_STD_RANDOM)
-  set(example_programs
-      ${example_programs}
-      rnd_future_reduce)
-  set(rnd_future_reduce_FLAGS DEPENDENCIES iostreams_component)
-  set(rnd_future_reduce_PARAMETERS THREADS_PER_LOCALITY 4)
-endif()
+set(rnd_future_reduce_FLAGS DEPENDENCIES iostreams_component)
+set(rnd_future_reduce_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(example_program ${example_programs})
   set(sources

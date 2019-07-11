@@ -35,7 +35,6 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Category, typename Enable = void>
         struct move_n_helper;
 
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         ///////////////////////////////////////////////////////////////////////
         template <typename InIter, typename OutIter>
         HPX_FORCEINLINE static std::pair<InIter, OutIter> copy_memmove(
@@ -56,7 +55,6 @@ namespace hpx { namespace parallel { namespace util {
             std::advance(dest, count);
             return std::make_pair(first, dest);
         }
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         // Customization point for optimizing copy operations
@@ -73,7 +71,6 @@ namespace hpx { namespace parallel { namespace util {
             }
         };
 
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         template <typename Dummy>
         struct copy_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
@@ -84,7 +81,6 @@ namespace hpx { namespace parallel { namespace util {
                 return copy_memmove(first, std::distance(first, last), dest);
             }
         };
-#endif
     }    // namespace detail
 
     template <typename InIter, typename OutIter>
@@ -114,7 +110,6 @@ namespace hpx { namespace parallel { namespace util {
             }
         };
 
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         template <typename Dummy>
         struct copy_n_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
@@ -125,7 +120,6 @@ namespace hpx { namespace parallel { namespace util {
                 return copy_memmove(first, count, dest);
             }
         };
-#endif
     }    // namespace detail
 
     template <typename InIter, typename OutIter>
@@ -179,7 +173,6 @@ namespace hpx { namespace parallel { namespace util {
             }
         };
 
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         template <typename Dummy>
         struct move_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
@@ -190,7 +183,6 @@ namespace hpx { namespace parallel { namespace util {
                 return copy_memmove(first, std::distance(first, last), dest);
             }
         };
-#endif
     }    // namespace detail
 
     template <typename InIter, typename OutIter>
@@ -219,7 +211,6 @@ namespace hpx { namespace parallel { namespace util {
             }
         };
 
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         template <typename Dummy>
         struct move_n_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
@@ -230,7 +221,6 @@ namespace hpx { namespace parallel { namespace util {
                 return copy_memmove(first, count, dest);
             }
         };
-#endif
     }    // namespace detail
 
     template <typename InIter, typename OutIter>

@@ -752,7 +752,7 @@ static void test_strategic_tuple_like_traverse()
 struct duplicate_mapper
 {
     template <typename T>
-    auto operator()(T arg) -> decltype(hpx::util::spread_this(arg, arg))
+    auto operator()(T arg)
     {
         return hpx::util::spread_this(arg, arg);
     }
@@ -762,7 +762,7 @@ struct duplicate_mapper
 struct zero_mapper
 {
     template <typename T>
-    auto operator()(T arg) -> decltype(hpx::util::spread_this())
+    auto operator()(T arg)
     {
         return hpx::util::spread_this();
     }
