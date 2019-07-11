@@ -30,13 +30,7 @@ Implementing async functions should have input parameters as
 
 return value is ``hpx::future``.
 
-.. code-block:: text
-   #include <hpx/lcos/future.hpp>
-   using namespace hpx;
-   int main() {
-    future<int> f = async([]() -> int { return 91; });
-    int val = f.get();
-   }
+.. literalinclude:: ../../examples/async.cpp
 
 You can chain multiple async operations. For implementing chain async programming
 ``objFuture.then(...).then(...).then(...).then(...).then(...)``.
@@ -52,16 +46,7 @@ can have then chained implementations. With then the antecedent future is ready
 (has a value or exception stored) before the continuation starts as instructed
 by lambda function. Example implementation using hpx is
 
-.. code-block:: text
-
-   #include <hpx/lcos/future.hpp>
-
-   int main() {
-     future<int> f = async([]() -> int { return 91; });
-     future<string> fB = fA.then([](future<int> f)) {
-       return f.get().to_string();
-     });
-   }
+.. literalinclude:: ../../examples/then.cpp
 
 If implicit unwrapping takes place and the continuation returns an invalid future, then the shared state is made ready with an exception of type ``hpx::future_error`` with an error condition of ``hpx::future_errc::broken_promise``.
 
@@ -72,25 +57,7 @@ wait
 available. This function call can be checked using ``valid() == true``. Example
 implementation using hpx is
 
-.. code-block:: text
-
-   #include <hpx/lcos/future.hpp>
-   #include <thread>
-
-   int main(){
-     hpx::future<int> fA = hpx::async([])(){});{
-       func(valA);
-     });
-     hpx::future<string> fB = hpx::async(hpx::launch::async, [](){
-       func(valB);
-     });
-
-     fA.wait();
-     fB.wait();
-
-     hpx::cout << fA.get() << `\n`;
-     hpx::cout << fB.get() << `\n`;
-   }
+.. literalinclude:: ../../examples/wait.cpp
 
 wait_all
 ========
@@ -103,13 +70,4 @@ become ready. All input futures are still valid after wait all returns.
 .. literalinclude:: ../../hpx/lcos/wait_all.hpp
    :lines: 48-91
 
-.. code-block:: text
-
-   #include <hpx/lcos/future.hpp>
-   int main() {
-     hpx::vector<hpx::future<void>> results;
-     for (int i = 0; i != NUM; ++i)
-       results.push_back(hpx::async(...));
-       hpx::wait_all(results);
-     }
-   }
+.. literalinclude:: ../../examples/wait_all.cpp
