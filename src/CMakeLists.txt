@@ -347,7 +347,6 @@ set(hpx_targets ${hpx_targets} hpx)
 # libhpx_init
 
 if(NOT HPX_WITH_STATIC_LINKING)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
   if(HPX_WITH_DEFAULT_TARGETS)
     if(HPX_WITH_CUDA)
       cuda_add_library(hpx_init STATIC
@@ -366,6 +365,7 @@ if(NOT HPX_WITH_STATIC_LINKING)
     endif()
   endif()
   target_include_directories(hpx_init PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
+  set_target_properties(hpx_init PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
   foreach(_module ${HPX_LIBS})
     # add module include directories as PRIVATE to the hpx_init library to
