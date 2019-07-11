@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_TEST_TRANSFORM_REDUCE_BINARY_SEP_13_2016_1227PM
 
 #include <hpx/include/parallel_transform_reduce.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <algorithm>
 #include <cstddef>

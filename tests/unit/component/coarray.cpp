@@ -7,7 +7,7 @@
 #include <hpx/components/containers/coarray/coarray.hpp>
 #include <hpx/lcos/spmd_block.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <string>

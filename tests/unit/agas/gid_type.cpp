@@ -7,7 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstdint>
 

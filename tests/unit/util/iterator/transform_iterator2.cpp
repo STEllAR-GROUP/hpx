@@ -17,7 +17,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/transform_iterator.hpp>
 
 #include "iterator_tests.hpp"

@@ -7,7 +7,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include "action_invoke_no_more_than.hpp"
 

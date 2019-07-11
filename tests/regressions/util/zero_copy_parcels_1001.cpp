@@ -12,7 +12,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/serialization.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <algorithm>
 #include <cstddef>

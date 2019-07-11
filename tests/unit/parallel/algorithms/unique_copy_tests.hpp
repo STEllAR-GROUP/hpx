@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_TEST_UNIQUE_COPY_JUL_07_2017_1940PM
 
 #include <hpx/include/parallel_unique.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <algorithm>

@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_TEST_COUNTIF_SEP_08_2014_1214PM
 
 #include <hpx/include/parallel_count.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

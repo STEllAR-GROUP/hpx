@@ -8,7 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <algorithm>
 #include <cstddef>

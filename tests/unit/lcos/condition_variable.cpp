@@ -14,7 +14,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <chrono>
 #include <cstddef>

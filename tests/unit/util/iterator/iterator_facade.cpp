@@ -13,7 +13,7 @@
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/iterator_facade.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include "iterator_tests.hpp"
 

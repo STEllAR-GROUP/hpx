@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_test_is_heap_JUN_28_2017_1745PM
 
 #include <hpx/include/parallel_is_heap.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

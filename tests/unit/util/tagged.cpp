@@ -6,7 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/tagged_pair.hpp>
 #include <hpx/util/tagged_tuple.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <utility>
 #include <type_traits>

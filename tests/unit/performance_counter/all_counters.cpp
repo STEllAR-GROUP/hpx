@@ -7,7 +7,7 @@
 #include <hpx/include/naming.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

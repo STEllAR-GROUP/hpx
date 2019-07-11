@@ -6,7 +6,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/pack_traversal.hpp>
 
 #include <array>

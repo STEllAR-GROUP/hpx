@@ -17,7 +17,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/util/yield_while.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/annotated_function.hpp>
 
 #include <hpx/include/parallel_execution.hpp>

@@ -6,7 +6,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_count.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <random>

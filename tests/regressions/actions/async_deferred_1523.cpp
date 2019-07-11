@@ -9,7 +9,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <utility>
 
 bool null_action_executed = false;

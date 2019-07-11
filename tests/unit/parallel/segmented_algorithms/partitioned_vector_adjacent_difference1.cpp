@@ -9,7 +9,7 @@
 #include <hpx/include/parallel_scan.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <vector>

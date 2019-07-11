@@ -9,7 +9,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <memory>

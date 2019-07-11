@@ -6,7 +6,7 @@
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/threads/run_as_hpx_thread.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <functional>
 #include <mutex>

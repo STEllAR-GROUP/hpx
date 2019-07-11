@@ -10,7 +10,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_uninitialized_value_construct.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <atomic>
 #include <cstddef>

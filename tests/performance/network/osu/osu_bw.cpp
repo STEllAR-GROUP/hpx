@@ -11,7 +11,7 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <boost/range/irange.hpp>
 

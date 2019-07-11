@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_task_block.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <string>
 #include <vector>

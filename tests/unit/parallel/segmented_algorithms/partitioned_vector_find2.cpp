@@ -8,7 +8,7 @@
 #include <hpx/include/parallel_find.hpp>
 #include <hpx/include/parallel_scan.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <vector>

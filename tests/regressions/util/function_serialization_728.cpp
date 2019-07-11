@@ -13,7 +13,7 @@
 #include <hpx/include/compression_zlib.hpp>
 #include <hpx/include/parcel_coalescing.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <vector>

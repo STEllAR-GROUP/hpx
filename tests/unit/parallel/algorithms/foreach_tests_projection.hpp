@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_TEST_FOREACH_PROJECTION_JUL_29_2015_1100AM
 
 #include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <atomic>
 #include <cstddef>

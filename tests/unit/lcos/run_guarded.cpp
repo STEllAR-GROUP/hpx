@@ -5,7 +5,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/local/composable_guard.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/hpx_init.hpp>
 
 #include <atomic>

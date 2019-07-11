@@ -6,7 +6,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 void async_callback(uint64_t index, boost::system::error_code const& ec,
     hpx::parcelset::parcel const& p)

@@ -8,7 +8,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/throw_exception.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <exception>
 #include <thread>

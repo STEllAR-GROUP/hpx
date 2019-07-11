@@ -10,7 +10,7 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <chrono>
 #include <cstddef>

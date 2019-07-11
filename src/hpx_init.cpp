@@ -29,6 +29,7 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/format.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
@@ -315,10 +316,8 @@ namespace hpx
             hpx::assertion::source_location const& loc, const char* expr,
             std::string const& msg)
         {
-            if (get_config_entry("hpx.attach_debugger", "") == "exception")
-            {
-                util::attach_debugger();
-            }
+            hpx::util::may_attach_debugger("exception");
+
             std::ostringstream strm;
             strm << "Assertion '" << expr << "' failed";
             if (!msg.empty())
@@ -332,6 +331,11 @@ namespace hpx
                                  loc.file_name, loc.line_number))
                       << std::endl;
             std::abort();
+        }
+
+        void test_failure_handler()
+        {
+            hpx::util::may_attach_debugger("test-failure");
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -598,6 +602,7 @@ namespace hpx
             hpx::runtime_mode mode, bool blocking)
         {
             hpx::assertion::set_assertion_handler(&detail::assertion_handler);
+            hpx::util::set_test_failure_handler(&detail::test_failure_handler);
 #if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
             set_error_handlers();
 #endif

@@ -9,7 +9,7 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/transform_iterator.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>

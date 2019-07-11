@@ -11,7 +11,7 @@
 #include <hpx/lcos/spmd_block.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <string>

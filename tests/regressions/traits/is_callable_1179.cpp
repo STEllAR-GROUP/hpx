@@ -10,7 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 struct s {
     int f() const { return 42; }
