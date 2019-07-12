@@ -88,8 +88,12 @@ set(algorithms_headers
   hpx/parallel/container_algorithms/sort.hpp
   hpx/parallel/container_algorithms/transform.hpp
   hpx/parallel/container_algorithms/unique.hpp
+  hpx/parallel/exception_list.hpp
   hpx/parallel/memory.hpp
   hpx/parallel/numeric.hpp
+  hpx/parallel/tagspec.hpp
+  hpx/parallel/traits/projected.hpp
+  hpx/parallel/traits/projected_range.hpp
   hpx/parallel/util/cancellation_token.hpp
   hpx/parallel/util/compare_projected.hpp
   hpx/parallel/util/detail/algorithm_result.hpp
