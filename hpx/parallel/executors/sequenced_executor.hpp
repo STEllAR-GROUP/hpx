@@ -109,7 +109,7 @@ namespace hpx { namespace parallel { namespace execution
                 throw exception_list(std::current_exception());
             }
 
-            return std::move(results);
+            return results;
         }
 
         template <typename F, typename S, typename ... Ts>

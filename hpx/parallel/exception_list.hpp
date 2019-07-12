@@ -96,7 +96,11 @@ namespace hpx { namespace parallel { inline namespace v1
             {
                 HPX_ASSERT(f.has_exception());
                 // Intel complains if this is not explicitly moved
+#if defined(HPX_INTEL_VERSION)
                 return std::move(f);
+#else
+                return f;
+#endif
             }
 
             static future<Result> call(std::exception_ptr const& e)
