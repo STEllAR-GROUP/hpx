@@ -9,6 +9,13 @@ set(tests
     is_executor_1691
    )
 
+if(HPX_WITH_DATAPAR)
+  set(tests ${tests}
+      lambda_arguments_2403
+      lambda_return_type_2402
+     )
+endif()
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
@@ -23,8 +30,8 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Regressions/Parallel/Executors")
+		     FOLDER "Tests/Regressions/Modules/ParallelExecutors")
 
-  add_hpx_regression_test("parallel.executors" ${test} ${${test}_PARAMETERS})
+  add_hpx_regression_test("modules.parallel_executors" ${test} ${${test}_PARAMETERS})
 
 endforeach()

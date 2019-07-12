@@ -17,7 +17,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/exception_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/exception_list.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/throw_exception.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/parallel/execution_policy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/task_block.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"

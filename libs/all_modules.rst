@@ -26,6 +26,7 @@ All modules
    /libs/hashing/docs/index.rst
    /libs/iterator_support/docs/index.rst
    /libs/logging/docs/index.rst
+   /libs/parallel_executors/docs/index.rst
    /libs/preprocessor/docs/index.rst
    /libs/segmented_algorithms/docs/index.rst
    /libs/statistics/docs/index.rst

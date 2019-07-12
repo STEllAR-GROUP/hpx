@@ -468,7 +468,7 @@ jobs:
       - store_artifacts:
           path: tests.unit.lcos
 
-  tests.unit.parallel.block:
+  tests.unit.parallel_block:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -476,13 +476,13 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.parallel.block
+              ninja -j2 -k 0 tests.unit.parallel_block
       - run:
           name: Running Unit Tests
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.block
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel_block
       - run:
           <<: *convert_xml
       - run:
@@ -490,61 +490,9 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.unit.parallel.block
+          path: tests.unit.parallel_block
       - store_artifacts:
-          path: tests.unit.parallel.block
-
-  tests.unit.parallel.datapar_algorithms:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.parallel.datapar_algorithms
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.datapar_algorithms
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.parallel.datapar_algorithms
-      - store_artifacts:
-          path: tests.unit.parallel.datapar_algorithms
-
-  tests.unit.parallel.executors:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.parallel.executors
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.executors
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.parallel.executors
-      - store_artifacts:
-          path: tests.unit.parallel.executors
+          path: tests.unit.parallel_block
 
   tests.unit.parcelset:
     <<: *defaults
@@ -842,6 +790,32 @@ jobs:
       - store_artifacts:
           path: tests.unit.modules.algorithms
 
+  tests.unit.modules.parallel_executors:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 tests.unit.modules.parallel_executors
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.parallel_executors
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.modules.parallel_executors
+      - store_artifacts:
+          path: tests.unit.modules.parallel_executors
+
   tests.unit.modules.segmented_algorithms:
     <<: *defaults
     steps:
@@ -1059,11 +1033,7 @@ workflows:
           <<: *core_dependency
       - tests.unit.lcos:
           <<: *core_dependency
-      - tests.unit.parallel.block:
-          <<: *core_dependency
-      - tests.unit.parallel.datapar_algorithms:
-          <<: *core_dependency
-      - tests.unit.parallel.executors:
+      - tests.unit.parallel_block:
           <<: *core_dependency
       - tests.unit.parcelset:
           <<: *core_dependency
@@ -1084,6 +1054,8 @@ workflows:
       - tests.unit.modules:
           <<: *core_dependency
       - tests.unit.modules.algorithms:
+          <<: *core_dependency
+      - tests.unit.modules.parallel_executors:
           <<: *core_dependency
       - tests.unit.modules.segmented_algorithms:
           <<: *core_dependency
@@ -1113,9 +1085,7 @@ workflows:
             - tests.unit.computeapi
             - tests.unit.diagnostics
             - tests.unit.lcos
-            - tests.unit.parallel.block
-            - tests.unit.parallel.datapar_algorithms
-            - tests.unit.parallel.executors
+            - tests.unit.parallel_block
             - tests.unit.parcelset
             - tests.unit.performance_counter
             - tests.unit.resource
@@ -1126,6 +1096,7 @@ workflows:
             - tests.unit.util
             - tests.unit.modules
             - tests.unit.modules.algorithms
+            - tests.unit.modules.parallel_executors
             - tests.unit.modules.segmented_algorithms
             - tests.headers
             - tests.performance

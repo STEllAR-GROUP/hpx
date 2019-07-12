@@ -12,17 +12,12 @@ set(subdirs
     component
     computeapi
     lcos
-    parallel
     performance_counters
     serialization
     threads
     traits
     util
    )
-
-if(HPX_HAVE_CXX11_LAMBDAS)
-    set(subdirs ${subdirs} parallel)
-endif()
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.regressions.${subdir})
