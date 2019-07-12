@@ -126,7 +126,7 @@ jobs:
                 -DHPX_WITH_TESTS_HEADERS=On \
                 -DHPX_WITH_COMPILER_WARNINGS=On \
                 -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=On \
-                -DHPX_WITH_DEPRECATION_WARNINGS=Off \
+                -DHPX_WITH_DEPRECATION_WARNINGS=On \
                 -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
                 -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
                 -DHPX_WITH_TESTS_DEBUG_LOG=On \
