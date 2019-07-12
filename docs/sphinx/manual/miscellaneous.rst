@@ -257,7 +257,7 @@ The |hpx| I/O-streams component
 
 The |hpx| I/O-streams subsystem extends the standard C++ output streams
 ``std::cout`` and ``std::cerr`` to work in the distributed setting of an |hpx|
-application. All of the output streamed to``hpx::cout``will be dispatched to
+application. All of the output streamed to ``hpx::cout`` will be dispatched to
 ``std::cout`` on the console :term:`locality`. Likewise, all output generated
 from ``hpx::cerr`` will be dispatched to ``std::cerr`` on the console
 :term:`locality`.
