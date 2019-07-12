@@ -18,6 +18,8 @@ set(benchmarks
     transform_reduce_scaling
    )
 
+set(transform_reduce_scaling_FLAGS DEPENDENCIES iostreams_component)
+
 foreach(benchmark ${benchmarks})
   set(sources
       ${benchmark}.cpp)
