@@ -23,7 +23,7 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Modules/Unit/Collectives")
+                     FOLDER "Tests/Unit/Modules/Collectives")
 
   add_hpx_test("tests.unit.modules.collectives" ${test} ${${test}_PARAMETERS})
 
