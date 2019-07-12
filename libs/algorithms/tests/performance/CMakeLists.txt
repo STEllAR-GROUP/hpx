@@ -15,6 +15,7 @@ set(benchmarks
     benchmark_remove_if
     benchmark_unique
     benchmark_unique_copy
+    transform_reduce_scaling
    )
 
 foreach(benchmark ${benchmarks})
@@ -24,20 +25,11 @@ foreach(benchmark ${benchmarks})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${benchmark}
+  add_hpx_executable(${benchmark}_test
                      SOURCES ${sources}
                      EXCLUDE_FROM_ALL
                      ${${benchmark}_FLAGS}
                      FOLDER "Benchmarks/Modules/Algorithms")
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.performance.modules.algorithms.${benchmark})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.modules.algorithms
-                        tests.performance.modules.algorithms.${benchmark})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.modules.algorithms.${benchmark}
-                              ${benchmark})
+  add_hpx_performance_test("modules.algorithms" ${benchmark} ${${benchmark}_PARAMETERS})
 endforeach()

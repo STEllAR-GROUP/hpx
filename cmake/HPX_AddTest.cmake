@@ -176,6 +176,10 @@ function(add_hpx_regression_test subcategory name)
   add_test_and_deps_test("regressions" "${subcategory}" ${name} ${ARGN})
 endfunction(add_hpx_regression_test)
 
+function(add_hpx_performance_test subcategory name)
+  add_test_and_deps_test("performance" "${subcategory}" ${name} ${ARGN})
+endfunction(add_hpx_performance_test)
+
 function(add_hpx_example_test subcategory name)
   add_test_and_deps_test("examples" "${subcategory}" ${name} ${ARGN})
 endfunction(add_hpx_example_test)

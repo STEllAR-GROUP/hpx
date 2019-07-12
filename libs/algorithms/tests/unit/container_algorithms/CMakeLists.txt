@@ -62,7 +62,7 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/Modules/Algorithms/ContainerAlgorithms")
+                     FOLDER "Tests/Unit/Modules/Algorithms")
 
-  add_hpx_unit_test("modules.algorithms.container_algorithms" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
 endforeach()

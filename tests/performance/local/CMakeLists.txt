@@ -119,7 +119,6 @@ set(benchmarks ${benchmarks}
     spinlock_overhead2
     stencil3_iterators
     stream
-    transform_reduce_scaling
     partitioned_vector_foreach
    )
 
@@ -128,7 +127,6 @@ set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component)
 set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component)
 set(stencil3_iterators_FLAGS DEPENDENCIES iostreams_component)
 set(stream_FLAGS DEPENDENCIES iostreams_component)
-set(transform_reduce_scaling_FLAGS DEPENDENCIES iostreams_component)
 set(partitioned_vector_foreach_FLAGS
   DEPENDENCIES iostreams_component partitioned_vector_component)
 
@@ -174,19 +172,8 @@ foreach(benchmark ${benchmarks})
                      FOLDER "Benchmarks/Local")
 
   if(NOT "${${benchmark}_PARAMETERS}" MATCHES NO_HPX_MAIN)
-    add_hpx_test("tests.performance.local" ${benchmark} ${${benchmark}_PARAMETERS})
+    add_hpx_performance_test("local" ${benchmark} ${${benchmark}_PARAMETERS})
   endif()
-
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.performance.local.${benchmark})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.local
-                              tests.performance.local.${benchmark})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.local.${benchmark}
-                              ${benchmark}_test)
 
 endforeach()
 
