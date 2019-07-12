@@ -115,9 +115,7 @@ set(algorithms_headers
 
 include(HPX_AddModule)
 add_hpx_module(algorithms
-    DEPRECATION_WARNINGS
-    INSTALL_BINARIES OFF
-    FORCE_LINKING_GEN ON
+    FORCE_LINKING_GEN
     HEADERS ${algorithms_headers}
     # TODO: Really depends on main HPX library, but cannot add that as a
     # dependency yet. Need to have the parts that algorithms depends on in

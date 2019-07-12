@@ -73,7 +73,6 @@ include(HPX_AddModule)
 add_hpx_module({lib_name}
     DEPRECATION_WARNINGS
     COMPATIBILITY_HEADERS OFF
-    INSTALL_BINARIES OFF
     SOURCES ${{{lib_name}_sources}}
     HEADERS ${{{lib_name}_headers}}
     COMPAT_HEADERS ${{{lib_name}_compat_headers}}
