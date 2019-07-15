@@ -183,8 +183,18 @@ jobs:
   clang_tidy:
     <<: *defaults
     steps:
-      - attach_workspace:
-          at: /hpx
+      # The clang-tidy script is only applied to changed files. We need a full
+      # clone to find out which files have changed (to compare to master).
+      - checkout:
+          path: /hpx/source
+      - run:
+          name: Running CMake for clang-tidy
+          command: |
+            cmake \
+                /hpx/source \
+                -G "Ninja" \
+                -DCMAKE_BUILD_TYPE=Debug \
+                -DHPX_WITH_MALLOC=system
       - run:
           name: Running clang-tidy
           command: |
@@ -1027,6 +1037,8 @@ workflows:
     jobs:
       - checkout_code:
           <<: *gh_pages_filter
+      - clang_tidy:
+          <<: *gh_pages_filter
       - configure:
           requires:
             - checkout_code
@@ -1034,10 +1046,6 @@ workflows:
       - configure_test_combinations:
           requires:
             - checkout_code
-          <<: *gh_pages_filter
-      - clang_tidy:
-          requires:
-            - configure
           <<: *gh_pages_filter
       - inspect:
           requires:
