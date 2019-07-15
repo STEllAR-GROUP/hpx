@@ -88,7 +88,7 @@ int main(int argc, char** argv)
     if (vm.count("help"))
     {
         std::cout << desc_cmdline;
-        return boost::report_errors();
+        return hpx::util::report_errors();
     }
 
     if (vm.count("threads"))
@@ -125,6 +125,6 @@ int main(int argc, char** argv)
     for (std::uint64_t i = 0; i < threads; ++i)
         delete queues[i];
 
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 
