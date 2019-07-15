@@ -32,7 +32,6 @@ add_hpx_library_sources(hpx
   APPEND)
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/util/*.cpp"
-  EXCLUDE ".*lightweight_test.cpp"
   APPEND)
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/util/detail/*.cpp"
@@ -61,9 +60,6 @@ endif()
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/hpx_*.cpp"
   EXCLUDE "hpx_init[.]cpp|hpx_wrap.cpp")
-add_hpx_library_sources(hpx_init
-  GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/util/lightweight_test.cpp"
-  APPEND)
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/main.cpp" APPEND)
 
