@@ -27,7 +27,7 @@ if(HPX_WITH_PAPI)
   )
 
   add_hpx_component(papi_counters
-    FOLDER "Core/Components/IO"
+    FOLDER "Core/Components/Counters"
     INSTALL_HEADERS
     PLUGIN
     HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
