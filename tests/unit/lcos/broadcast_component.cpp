@@ -8,7 +8,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/lcos/broadcast.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>
