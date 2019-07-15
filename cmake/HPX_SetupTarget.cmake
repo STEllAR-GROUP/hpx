@@ -225,7 +225,9 @@ function(hpx_setup_target target)
 
   target_link_libraries(${target} ${__tll_public} ${hpx_libs} ${target_DEPENDENCIES})
 
-  target_link_libraries(${target} ${__tll_private} hpx_internal_flags)
+  if(TARGET hpx_internal_flags)
+    target_link_libraries(${target} ${__tll_private} hpx_internal_flags)
+  endif()
 
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)
 
