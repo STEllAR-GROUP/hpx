@@ -43,7 +43,7 @@ add_hpx_component(partitioned_vector
   PREPEND_HEADER_ROOT
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${partitioned_vector_headers}
-  PREPEND_SOURE_ROOT
+  PREPEND_SOURCE_ROOT
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
   SOURCES ${partitioned_vector_sources}
   ${_exclude_from_all_flag})
