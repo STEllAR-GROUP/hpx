@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/testing.hpp>

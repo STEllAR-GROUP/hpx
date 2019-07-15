@@ -5,8 +5,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-add_subdirectory(components)
-
 foreach(lib "hpx" "hpx_init")
   set(${lib}_SOURCES "" CACHE INTERNAL "Sources for lib${lib}." FORCE)
 
@@ -143,12 +141,6 @@ add_hpx_library_headers(hpx
 add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/compat/*.hpp"
   APPEND)
-
-if(HPX_WITH_STATIC_LINKING)
-  add_hpx_library_headers(hpx
-    GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/components/*.hpp"
-    APPEND)
-endif()
 
 # libhpx_init headers
 add_hpx_library_headers(hpx_init

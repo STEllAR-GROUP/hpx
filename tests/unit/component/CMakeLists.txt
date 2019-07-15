@@ -25,12 +25,6 @@ set(tests
     new_
     new_binpacking
     new_colocated
-    unordered_map
-    partitioned_vector_view
-    partitioned_vector_view_iterator
-    partitioned_vector_subview
-    coarray
-    coarray_all_reduce
    )
 
 if(HPX_WITH_NETWORKING)
@@ -98,33 +92,12 @@ set(inheritance_3_classes_2_abstract_FLAGS
 set(inheritance_3_classes_concrete_FLAGS
     DEPENDENCIES iostreams_component)
 
-set(unordered_map_FLAGS
-    DEPENDENCIES unordered_component)
-set(unordered_map_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
-
 set(migrate_component_to_storage_FLAGS
     DEPENDENCIES unordered_component component_storage_component)
 
 set(new__PARAMETERS LOCALITIES 2)
 set(new_binpacking_PARAMETERS LOCALITIES 2)
 set(new_colocated_PARAMETERS LOCALITIES 2)
-
-set(partitioned_vector_view_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_view_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(partitioned_vector_view_iterator_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_view_iterator_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(partitioned_vector_subview_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_subview_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(coarray_FLAGS DEPENDENCIES partitioned_vector_component)
-set(coarray_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(coarray_all_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
-set(coarray_all_reduce_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources

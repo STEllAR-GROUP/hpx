@@ -6,7 +6,7 @@
 
 function(add_hpx_component name)
   # retrieve arguments
-  set(options EXCLUDE_FROM_ALL NOEXPORT AUTOGLOB STATIC PLUGIN)
+  set(options EXCLUDE_FROM_ALL INSTALL_HEADERS NOEXPORT AUTOGLOB STATIC PLUGIN)
   set(one_value_args INI FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX LANGUAGE)
   set(multi_value_args SOURCES HEADERS AUXILIARY DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
@@ -68,6 +68,10 @@ function(add_hpx_component name)
       ROOT ${${name}_HEADER_ROOT}
       TARGETS ${${name}_component_HEADERS})
   else()
+    include(HPX_CMakeUtils)
+    prepend(${name}_SOURCES ${${name}_SOURCE_ROOT} ${${name}_SOURCES})
+    prepend(${name}_HEADERS ${${name}_HEADER_ROOT} ${${name}_HEADERS})
+
     add_hpx_library_sources_noglob(${name}_component
         SOURCES "${${name}_SOURCES}")
 
@@ -86,9 +90,6 @@ function(add_hpx_component name)
       ROOT ${${name}_HEADER_ROOT}
       TARGETS ${${name}_component_HEADERS})
   endif()
-
-  set(${name}_SOURCES ${${name}_component_SOURCES})
-  set(${name}_HEADERS ${${name}_component_HEADERS})
 
   hpx_print_list("DEBUG" "Add component ${name}: Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "Add component ${name}: Headers for ${name}" ${name}_HEADERS)
@@ -168,6 +169,19 @@ function(add_hpx_component name)
   else()
     add_library(${name}_component ${${name}_lib_linktype} ${exclude_from_all}
       ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY})
+  endif()
+
+  if(NOT ${${name}_HEADER_ROOT} STREQUAL ".")
+    target_include_directories(${name}_component
+        PUBLIC
+        $<BUILD_INTERFACE:${${name}_HEADER_ROOT}>
+        )
+    if(${name}_INSTALL_HEADERS)
+      set(_target_flags ${_target_flags}
+        INSTALL_HEADERS
+        HEADER_ROOT "${${name}_HEADER_ROOT}"
+      )
+    endif()
   endif()
 
   if(${name}_OUTPUT_SUFFIX)

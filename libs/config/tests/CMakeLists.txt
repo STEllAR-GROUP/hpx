@@ -35,5 +35,10 @@ if (HPX_WITH_TESTS_BENCHMARKS)
 endif()
 
 if (HPX_WITH_TESTS_HEADERS)
-  add_hpx_module_header_tests(config)
+  add_hpx_header_tests(
+    modules.config
+    HEADERS ${config_headers}
+    HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+    NOHPX_INIT NOLIBS
+    DEPENDENCIES hpx_config)
 endif()

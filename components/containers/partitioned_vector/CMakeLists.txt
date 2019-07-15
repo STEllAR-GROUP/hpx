@@ -1,0 +1,55 @@
+# Copyright (c) 2015-2017 Hartmut Kaiser
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+if(NOT HPX_WITH_DEFAULT_TARGETS)
+  set(_exclude_from_all_flag EXCLUDE_FROM_ALL)
+endif()
+
+set(partitioned_vector_headers
+  hpx/components/containers/coarray/coarray.hpp
+  hpx/components/containers/partitioned_vector/detail/view_element.hpp
+  hpx/components/containers/partitioned_vector/export_definitions.hpp
+  hpx/components/containers/partitioned_vector/partitioned_vector.hpp
+  hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp
+  hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp
+  hpx/components/containers/partitioned_vector/partitioned_vector_component_impl.hpp
+  hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp
+  hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp
+  hpx/components/containers/partitioned_vector/partitioned_vector_impl.hpp
+  hpx/components/containers/partitioned_vector/partitioned_vector_local_view.hpp
+  hpx/components/containers/partitioned_vector/partitioned_vector_local_view_iterator.hpp
+  hpx/components/containers/partitioned_vector/partitioned_vector_predef.hpp
+  hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp
+  hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp
+  hpx/components/containers/partitioned_vector/partitioned_vector_view_iterator.hpp
+  hpx/include/partitioned_vector.hpp
+  hpx/include/partitioned_vector_predef.hpp
+  hpx/include/partitioned_vector_view.hpp
+  hpx/runtime/serialization/partitioned_vector.hpp
+)
+
+set(partitioned_vector_sources
+  partitioned_vector_component.cpp
+  partitioned_vector_component_double.cpp
+  partitioned_vector_component_int.cpp
+  partitioned_vector_component_std_string.cpp
+)
+
+add_hpx_component(partitioned_vector
+  FOLDER "Core/Components/Containers"
+  INSTALL_HEADERS
+  HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
+  HEADERS ${partitioned_vector_headers}
+  SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
+  SOURCES ${partitioned_vector_sources}
+  ${_exclude_from_all_flag})
+
+target_compile_definitions(partitioned_vector_component
+  PRIVATE HPX_PARTITIONED_VECTOR_MODULE_EXPORTS)
+
+add_hpx_pseudo_dependencies(components.containers.partitioned_vector partitioned_vector_component)
+
+add_subdirectory(tests)
+add_subdirectory(examples)

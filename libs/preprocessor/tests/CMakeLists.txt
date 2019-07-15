@@ -33,5 +33,8 @@ if (HPX_WITH_TESTS_BENCHMARKS)
 endif()
 
 if (HPX_WITH_TESTS_HEADERS)
-  add_hpx_module_header_tests(preprocessor)
+  add_hpx_header_tests(
+    modules.preprocessor
+    HEADERS ${preprocessor_headers}
+    HEADER_ROOT ${PROJECT_SOURCE_DIR}/include)
 endif()

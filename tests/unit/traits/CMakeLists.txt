@@ -10,6 +10,8 @@ set(tests
     is_tuple_like
    )
 
+set(is_iterator_FLAGS COMPONENT_DEPENDENCIES partitioned_vector)
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
