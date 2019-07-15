@@ -10,7 +10,7 @@
 #include <hpx/config/asio.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>

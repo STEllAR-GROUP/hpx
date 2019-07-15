@@ -8,7 +8,7 @@
 #if defined(HPX_WINDOWS)
 
 #include <hpx/exception.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <cstdint>
 #include <cstring>

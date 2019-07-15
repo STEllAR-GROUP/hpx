@@ -16,7 +16,7 @@
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <string>
 

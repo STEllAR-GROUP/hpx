@@ -15,7 +15,7 @@
 #include <hpx/runtime/serialization/unique_ptr.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/unused.hpp>
 

@@ -9,8 +9,8 @@
 // depending on the rest of HPX.
 #define HPX_USE_BOOST_ASSERT
 
+#include <hpx/format.hpp>
 #include <hpx/util/barrier.hpp>
-#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/lockfree/stack.hpp>

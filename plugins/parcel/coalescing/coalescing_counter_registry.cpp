@@ -7,7 +7,7 @@
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/regex_from_pattern.hpp>
 
 #include <hpx/plugins/parcel/coalescing_counter_registry.hpp>

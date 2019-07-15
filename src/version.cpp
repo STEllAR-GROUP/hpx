@@ -21,7 +21,7 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/find_prefix.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/version.hpp>
 
 #include <boost/config.hpp>

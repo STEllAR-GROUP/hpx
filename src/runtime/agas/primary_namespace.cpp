@@ -17,7 +17,7 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <cstdint>
 #include <string>

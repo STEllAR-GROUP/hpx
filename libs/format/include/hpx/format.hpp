@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_FORMAT_HPP
-#define HPX_UTIL_FORMAT_HPP
+#ifndef HPX_FORMAT_HPP
+#define HPX_FORMAT_HPP
 
 #include <hpx/config.hpp>
 
@@ -20,11 +20,6 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace iostreams {
-    template <typename Char, typename Sink>
-    struct ostream;
-}}
-
 namespace hpx { namespace util
 {
     namespace detail
@@ -39,7 +34,6 @@ namespace hpx { namespace util
 #       define DECL_TYPE_SPECIFIER(Type, Spec)                                \
         template <> struct type_specifier<Type>                               \
         { static char const* value() noexcept { return #Spec; } }             \
-        /**/
 
         DECL_TYPE_SPECIFIER(char, c);
         DECL_TYPE_SPECIFIER(wchar_t, lc);
@@ -244,14 +238,6 @@ namespace hpx { namespace util
         detail::format_to(os, format_str, format_args, sizeof...(Args));
         return os;
     }
-
-    template <typename Char, typename Sink, typename ...Args>
-    hpx::iostreams::ostream<Char, Sink>& format_to(
-        hpx::iostreams::ostream<Char, Sink>& os,
-        std::string const& format_str, Args const&... args)
-    {
-        return os << format(format_str, args...);
-    }
 }}
 
-#endif /*HPX_UTIL_FORMAT_HPP*/
+#endif

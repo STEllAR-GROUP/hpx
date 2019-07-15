@@ -12,7 +12,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <hpx/testing.hpp>
 

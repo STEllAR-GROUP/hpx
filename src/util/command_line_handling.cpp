@@ -19,7 +19,7 @@
 #include <hpx/util/batch_environment.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/detail/reset_function.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>

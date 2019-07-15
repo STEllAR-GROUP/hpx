@@ -17,6 +17,7 @@ All modules
    /libs/cache/docs/index.rst
    /libs/collectives/docs/index.rst
    /libs/config/docs/index.rst
+   /libs/format/docs/index.rst
    /libs/hardware/docs/index.rst
    /libs/preprocessor/docs/index.rst
    /libs/testing/docs/index.rst

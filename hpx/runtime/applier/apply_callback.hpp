@@ -14,7 +14,7 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <hpx/runtime/applier/apply.hpp>

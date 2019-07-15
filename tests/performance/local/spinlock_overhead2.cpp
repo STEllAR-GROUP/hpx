@@ -10,7 +10,7 @@
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/include/async.hpp>

@@ -8,7 +8,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <boost/lockfree/queue.hpp>
 
 #include <cstddef>

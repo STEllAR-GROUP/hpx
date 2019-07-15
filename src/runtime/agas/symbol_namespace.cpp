@@ -14,7 +14,7 @@
 #include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 
 #include <cstdint>

@@ -20,7 +20,7 @@
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/function_ref.hpp>
 #include <hpx/util/get_and_reset_value.hpp>

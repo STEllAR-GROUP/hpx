@@ -13,7 +13,7 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/scoped_timer.hpp>
 
 #include <atomic>

@@ -33,7 +33,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/detail/yield_k.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/runtime_configuration.hpp>

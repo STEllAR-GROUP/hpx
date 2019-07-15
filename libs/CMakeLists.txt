@@ -14,6 +14,7 @@ set(HPX_LIBS
   cache
   collectives
   config
+  format
   hardware
   preprocessor
   testing
