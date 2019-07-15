@@ -38,7 +38,7 @@ if(HPX_WITH_PAPI)
     SOURCES ${papi_counters_sources}
     ${_exclude_from_all_flag})
 
-  add_hpx_pseudo_dependencies(components.performance_counters.papi_counters papi_counters_component)
+  add_hpx_pseudo_dependencies(components.performance_counters.papi papi_counters_component)
 
   add_subdirectory(tests)
   add_subdirectory(examples)

@@ -24,16 +24,5 @@ foreach(test ${tests})
                      FOLDER "Tests/Regressions/Components")
 
   add_hpx_regression_test("components.papi_counters" ${test} ${${test}_PARAMETERS})
-
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.components.papi_counters.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.components.papi_counters
-                              tests.regressions.components.papi_counters.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.components.papi_counters.${test}
-                              ${test}_test)
 endforeach()
 
