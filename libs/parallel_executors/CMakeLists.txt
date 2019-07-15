@@ -63,18 +63,10 @@ set(parallel_executors_headers
   hpx/parallel/traits/vector_pack_type.hpp
 )
 
-set(parallel_executors_compat_headers)
-
-set(parallel_executors_sources)
-
 include(HPX_AddModule)
 add_hpx_module(parallel_executors
     FORCE_LINKING_GEN
-    DEPRECATION_WARNINGS
-    COMPATIBILITY_HEADERS OFF
-    SOURCES ${parallel_executors_sources}
     HEADERS ${parallel_executors_headers}
-    COMPAT_HEADERS ${parallel_executors_compat_headers}
     DEPENDENCIES hpx_assertion hpx_config
     CMAKE_SUBDIRS examples tests
 )
