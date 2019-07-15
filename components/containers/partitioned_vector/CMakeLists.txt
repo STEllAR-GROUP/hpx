@@ -40,8 +40,10 @@ set(partitioned_vector_sources
 add_hpx_component(partitioned_vector
   FOLDER "Core/Components/Containers"
   INSTALL_HEADERS
+  PREPEND_HEADER_ROOT
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${partitioned_vector_headers}
+  PREPEND_SOURE_ROOT
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
   SOURCES ${partitioned_vector_sources}
   ${_exclude_from_all_flag})

@@ -30,8 +30,10 @@ if(HPX_WITH_PAPI)
     FOLDER "Core/Components/Counters"
     INSTALL_HEADERS
     PLUGIN
+    PREPEND_HEADER_ROOT
     HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
     HEADERS ${papi_counters_headers}
+    PREPEND_SOURCE_ROOT
     SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
     SOURCES ${papi_counters_sources}
     ${_exclude_from_all_flag})

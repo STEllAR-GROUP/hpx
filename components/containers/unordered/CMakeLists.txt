@@ -17,8 +17,10 @@ set(unordered_sources
 add_hpx_component(unordered
   FOLDER "Core/Components/Containers"
   INSTALL_HEADERS
+  PREPEND_HEADER_ROOT
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${unordered_headers}
+  PREPEND_SOURCE_ROOT
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
   SOURCES ${unordered_sources}
   ${_exclude_from_all_flag})

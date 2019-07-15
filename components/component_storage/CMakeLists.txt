@@ -27,8 +27,10 @@ set(component_storage_sources
 add_hpx_component(component_storage
   FOLDER "Core/Components/IO"
   INSTALL_HEADERS
+  PREPEND_HEADER_ROOT
   HEADER_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include
   HEADERS ${component_storage_headers}
+  PREPEND_SOURCE_ROOT
   SOURCE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src
   SOURCES ${component_storage_sources}
   DEPENDENCIES unordered_component
