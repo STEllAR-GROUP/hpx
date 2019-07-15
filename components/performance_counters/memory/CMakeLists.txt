@@ -22,8 +22,10 @@ add_hpx_component(memory
   FOLDER "Core/Components/Counters"
   INSTALL_HEADERS
   PLUGIN
+  PREPEND_HEADER_ROOT
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${memory_headers}
+  PREPEND_SOURCE_ROOT
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
   SOURCES ${memory_sources}
   ${_exclude_from_all_flag})

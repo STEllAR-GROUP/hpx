@@ -106,8 +106,10 @@ set(process_sources
 add_hpx_component(process
   FOLDER "Core/Components/Process"
   INSTALL_HEADERS
+  PREPEND_HEADER_ROOT
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${process_headers}
+  PREPEND_SOURCE_ROOT
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
   SOURCES ${process_sources}
   ${_exclude_from_all_flag})

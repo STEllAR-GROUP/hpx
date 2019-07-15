@@ -30,8 +30,10 @@ set(iostreams_sources
 add_hpx_component(iostreams
   FOLDER "Core/Components/IO"
   INSTALL_HEADERS
+  PREPEND_HEADER_ROOT
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${iostreams_headers}
+  PREPEND_SOURCE_ROOT
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
   SOURCES ${iostreams_sources}
   ${_exclude_from_all_flag})
