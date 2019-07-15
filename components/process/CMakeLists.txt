@@ -104,7 +104,7 @@ set(process_sources
 )
 
 add_hpx_component(process
-  FOLDER "Core/Components/IO"
+  FOLDER "Core/Components/Process"
   INSTALL_HEADERS
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${process_headers}
