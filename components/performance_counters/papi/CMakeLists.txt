@@ -22,6 +22,7 @@ if(HPX_WITH_PAPI)
   )
 
   set(papi_counters_sources
+    papi_startup.cpp
     server/papi.cpp
     util/papi.cpp
   )
