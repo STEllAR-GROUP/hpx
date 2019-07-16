@@ -953,6 +953,85 @@ namespace hpx { namespace components { namespace server
         return str;
     }
 
+    namespace detail {
+        void handle_print_bind(boost::program_options::variables_map const& vm_,
+            std::size_t num_threads)
+        {
+            threads::topology& top = threads::create_topology();
+            auto const& rp = hpx::resource::get_partitioner();
+            auto const& tm = get_runtime().get_thread_manager();
+            {
+                std::ostringstream
+                    strm;    // make sure all output is kept together
+
+                strm << std::string(79, '*') << '\n';
+                strm << "locality: " << hpx::get_locality_id() << '\n';
+                for (std::size_t i = 0; i != num_threads; ++i)
+                {
+                    // print the mask for the current PU
+                    threads::mask_cref_type pu_mask = rp.get_pu_mask(i);
+                    std::string pool_name = tm.get_pool(i).get_pool_name();
+
+                    if (!threads::any(pu_mask))
+                    {
+                        strm << std::setw(4) << i
+                             << ": thread binding disabled"    //-V112
+                             << std::endl;
+                    }
+                    else
+                    {
+                        top.print_affinity_mask(strm, i, pu_mask, pool_name);
+                    }
+
+                    // Make sure the mask does not contradict the CPU bindings
+                    // returned by the system (see #973: Would like option to
+                    // report HWLOC bindings).
+                    error_code ec(lightweight);
+                    std::thread& blob = tm.get_os_thread_handle(i);
+                    threads::mask_type boundcpu =
+                        top.get_cpubind_mask(blob, ec);
+
+                    /* threads::mask_type boundcpu = top.get_cpubind_mask(
+                    rt.get_thread_manager().get_os_thread_handle(i), ec);*/
+
+                    // The masks reported by HPX must be the same as the ones
+                    // reported from HWLOC.
+                    if (!ec && threads::any(boundcpu) &&
+                        !threads::equal(boundcpu, pu_mask, num_threads))
+                    {
+                        std::string boundcpu_str = threads::to_string(boundcpu);
+                        std::string pu_mask_str = threads::to_string(pu_mask);
+                        HPX_THROW_EXCEPTION(invalid_status,
+                            "handle_print_bind",
+                            hpx::util::format(
+                                "unexpected mismatch between locality {1}: "
+                                "binding "
+                                "reported from HWLOC({2}) and HPX({3}) on "
+                                "thread {4}",
+                                hpx::get_locality_id(), boundcpu_str,
+                                pu_mask_str, i));
+                    }
+                }
+
+                std::cout << strm.str();
+            }
+        }
+
+        void handle_list_parcelports()
+        {
+            {
+                std::ostringstream
+                    strm;    // make sure all output is kept together
+                strm << std::string(79, '*') << '\n';
+                strm << "locality: " << hpx::get_locality_id() << '\n';
+
+                get_runtime().get_parcel_handler().list_parcelports(strm);
+
+                std::cout << strm.str();
+            }
+        }
+    }
+
     int runtime_support::load_components()
     {
         // load components now that AGAS is up
@@ -1047,11 +1126,11 @@ namespace hpx { namespace components { namespace server
                 if (vm.count("hpx:print-bind")) {
                     std::size_t num_threads = boost::lexical_cast<std::size_t>(
                         ini.get_entry("hpx.os_threads", 1));
-                    util::handle_print_bind(vm, num_threads);
+                    detail::handle_print_bind(vm, num_threads);
                 }
 
                 if (vm.count("hpx:list-parcel-ports"))
-                    util::handle_list_parcelports();
+                    detail::handle_list_parcelports();
 
                 if (vm.count("hpx:exit"))
                     return 1;

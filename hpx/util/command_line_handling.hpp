@@ -88,11 +88,6 @@ namespace hpx { namespace util
         std::vector<std::string> preprocess_config_settings(
             int argc, char** argv);
     };
-
-    void handle_print_bind(boost::program_options::variables_map const& vm,
-        std::size_t num_threads);
-
-    void handle_list_parcelports();
 }}
 
 #endif /*HPX_UTIL_COMMAND_LINE_HANDLING_HPP*/
