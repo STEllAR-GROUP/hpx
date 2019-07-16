@@ -1013,12 +1013,6 @@ if(HPX_WITH_UNWRAPPED_COMPATIBILITY)
 endif()
 
 ################################################################################
-# Set basic search paths for HPX
-################################################################################
-include_directories("${PROJECT_SOURCE_DIR}")
-link_directories(${CMAKE_BINARY_DIR}/lib)
-
-################################################################################
 # Check for compiler compatibility
 #
 

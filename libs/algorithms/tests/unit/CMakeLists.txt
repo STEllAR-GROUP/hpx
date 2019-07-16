@@ -5,14 +5,12 @@
 
 # add subdirectories
 set(subdirs
-    block
-    datapar_algorithms
-    executors
-    segmented_algorithms
+    algorithms
+    container_algorithms
    )
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.parallel.${subdir})
+  add_hpx_pseudo_target(tests.unit.modules.algorithms.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.unit.parallel tests.unit.parallel.${subdir})
+  add_hpx_pseudo_dependencies(tests.unit.modules.algorithms tests.unit.modules.algorithms.${subdir})
 endforeach()

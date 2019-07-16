@@ -23,20 +23,9 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Modules/Unit/Collectives")
+                     FOLDER "Tests/Unit/Modules/Collectives")
 
-  add_hpx_test("tests.unit.modules.collectives" ${test} ${${test}_PARAMETERS})
-
-  # add a custom target for this test
-  add_hpx_pseudo_target(tests.unit.modules.collectives.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.modules.collectives
-                              tests.unit.modules.collectives.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.modules.collectives.${test}
-                              ${test}_test)
+  add_hpx_unit_test("modules.collectives" ${test} ${${test}_PARAMETERS})
 endforeach()
 
 

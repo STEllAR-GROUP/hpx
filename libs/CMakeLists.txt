@@ -10,6 +10,7 @@ include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
 
 set(HPX_LIBS
+  algorithms
   assertion
   cache
   collectives
@@ -20,6 +21,7 @@ set(HPX_LIBS
   testing
   CACHE INTERNAL "list of HPX modules" FORCE
 )
+
 
 # add example pseudo targets needed for modules
 if(HPX_WITH_EXAMPLES)
@@ -55,6 +57,7 @@ if(HPX_WITH_TESTS)
   endif()
 endif()
 
+
 hpx_info("Configuring modules:")
 
 set(MODULE_FORCE_LINKING_INCLUDES)
@@ -67,7 +70,6 @@ foreach(lib ${HPX_LIBS})
 
   set(MODULE_FORCE_LINKING_CALLS
     "${MODULE_FORCE_LINKING_CALLS}\n        ${lib}::force_linking();")
-
 endforeach()
 
 configure_file(

@@ -70,10 +70,9 @@ set({lib_name}_compat_headers)
 set({lib_name}_sources)
 
 include(HPX_AddModule)
-add_hpx_module(cache
+add_hpx_module({lib_name}
     DEPRECATION_WARNINGS
     COMPATIBILITY_HEADERS OFF
-    INSTALL_BINARIES OFF
     SOURCES ${{{lib_name}_sources}}
     HEADERS ${{{lib_name}_headers}}
     COMPAT_HEADERS ${{{lib_name}_compat_headers}}
@@ -270,10 +269,10 @@ foreach(lib ${HPX_LIBS})
   add_subdirectory(${lib})
 
   set(MODULE_FORCE_LINKING_INCLUDES
-    "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\n")
+    "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\\n")
 
   set(MODULE_FORCE_LINKING_CALLS
-    "${MODULE_FORCE_LINKING_CALLS}\n        ${lib}::force_linking();")
+    "${MODULE_FORCE_LINKING_CALLS}\\n        ${lib}::force_linking();")
 endforeach()
 
 configure_file(

@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "../algorithms/foreach_tests.hpp"
+#include "foreach_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_persistent_executitor_parameters()

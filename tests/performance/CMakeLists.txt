@@ -7,7 +7,6 @@ set(subdirs
     local
     network
     compute
-    parallel_algorithms
    )
 
 foreach(subdir ${subdirs})
