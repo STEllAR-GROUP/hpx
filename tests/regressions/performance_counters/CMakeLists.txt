@@ -9,13 +9,6 @@ set(tests
     statistics_2666
     uptime_1737)
 
-if(HPX_WITH_PAPI)
-  set(tests ${tests}
-    papi_counters_active_interface
-    papi_counters_basic_functions
-    papi_counters_segfault_1890)
-endif()
-
 foreach(test ${tests})
   set(sources
       ${test}.cpp)

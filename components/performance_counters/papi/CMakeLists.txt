@@ -22,6 +22,7 @@ if(HPX_WITH_PAPI)
   )
 
   set(papi_counters_sources
+    papi_startup.cpp
     server/papi.cpp
     util/papi.cpp
   )
@@ -36,9 +37,10 @@ if(HPX_WITH_PAPI)
     PREPEND_SOURCE_ROOT
     SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
     SOURCES ${papi_counters_sources}
+    DEPENDENCIES ${PAPI_LIBRARIES}
     ${_exclude_from_all_flag})
 
-  add_hpx_pseudo_dependencies(components.performance_counters.papi_counters papi_counters_component)
+  add_hpx_pseudo_dependencies(components.performance_counters.papi papi_counters_component)
 
   add_subdirectory(tests)
   add_subdirectory(examples)
