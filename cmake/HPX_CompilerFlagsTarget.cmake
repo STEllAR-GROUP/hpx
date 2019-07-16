@@ -1,3 +1,8 @@
+# Copyright (c) 2019 Mikael Simberg
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 # This is a dummy target that we add compile flags to all tests will depend on
 # this target and inherit the flags but user code linking against hpx will not
 add_library(hpx_internal_flags INTERFACE)
