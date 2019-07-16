@@ -127,6 +127,7 @@ jobs:
                 -DHPX_WITH_COMPILER_WARNINGS=On \
                 -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=On \
                 -DHPX_WITH_DEPRECATION_WARNINGS=Off \
+                -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
                 -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
                 -DHPX_WITH_TESTS_DEBUG_LOG=On \
                 -DHPX_WITH_TESTS_DEBUG_LOG_DESTINATION=/hpx/build/debug-log.txt \
@@ -179,27 +180,6 @@ jobs:
           root: /hpx
           paths:
             - ./build
-
-  clang_tidy:
-    <<: *defaults
-    steps:
-      # The clang-tidy script is only applied to changed files. We need a full
-      # clone to find out which files have changed (to compare to master).
-      - checkout:
-          path: /hpx/source
-      - run:
-          name: Running CMake for clang-tidy
-          command: |
-            cmake \
-                /hpx/source \
-                -G "Ninja" \
-                -DCMAKE_BUILD_TYPE=Debug \
-                -DHPX_WITH_MALLOC=system \
-                -DCMAKE_EXPORT_COMPILE_COMMANDS=On
-      - run:
-          name: Running clang-tidy
-          command: |
-              /hpx/source/tools/clang-tidy.sh -diff-master
 
   inspect:
     <<: *defaults
@@ -1038,8 +1018,6 @@ workflows:
     jobs:
       - checkout_code:
           <<: *gh_pages_filter
-      - clang_tidy:
-          <<: *gh_pages_filter
       - configure:
           requires:
             - checkout_code
@@ -1129,7 +1107,6 @@ workflows:
       - install:
           requires:
             - inspect
-            - clang_tidy
             - core
             - docs
             - tests.examples
