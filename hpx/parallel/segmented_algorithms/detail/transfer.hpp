@@ -235,6 +235,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         beg, end, traits::begin(sdest)));
                 }
             }
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             HPX_ASSERT(!segments.empty());
 
             return util::detail::algorithm_result<

@@ -421,15 +421,13 @@ int test(const std::string &message, Executor &exec)
     shared_future<double> fs2 = make_ready_future(2.178).share();
     //
     auto fds = dataflow(exec,
-        [](future<std::uint32_t> && f1, shared_future<double> && f2)
-        {
-            auto cmplx =
-                std::complex<std::uint64_t>(double(f1.get()), f2.get());
+        [](future<std::uint32_t>&& f1, shared_future<double>&& f2) {
+            auto cmplx = std::complex<std::uint64_t>(
+                std::uint64_t(f1.get()), std::uint64_t(f2.get()));
             std::cout << "Inside dataflow(shared) : " << cmplx << std::endl;
             return cmplx;
-        }
-        , fs1, fs2
-    );
+        },
+        fs1, fs2);
     fds.get();
 
     std::cout << "============================" << std::endl;

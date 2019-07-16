@@ -480,6 +480,7 @@ namespace hpx
         }
         else
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             HPX_ASSERT(!addr || components::get_base_type(addr.type_) ==
                     components::component_base_lco_with_value);
 

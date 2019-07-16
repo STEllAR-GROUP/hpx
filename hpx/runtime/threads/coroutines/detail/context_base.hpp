@@ -367,6 +367,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #if defined(HPX_HAVE_APEX)
             m_apex_data = rebind_base_apex(id);
 #endif
+            // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
             m_type_info = std::exception_ptr();
         }
 

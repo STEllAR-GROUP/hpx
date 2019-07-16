@@ -305,8 +305,8 @@ namespace hpx { namespace threads { namespace executors
             // the numa_hint_function will be evaluated on that thread and then
             // the real task will be spawned on a new task with hints - as intended
             return dataflow(launch::sync,
-                [f{std::move(f)}, this](Future && predecessor, Ts &&... ts)
-                {
+                [HPX_CAPTURE_FORWARD(f), this](
+                    Future&& predecessor, Ts&&... ts) {
                     pre_execution_then_domain_schedule<
                         pool_executor, pool_numa_hint<Tag>>
                             pre_exec { pool_executor_, hint_, hp_sync_};
@@ -316,8 +316,7 @@ namespace hpx { namespace threads { namespace executors
                         std::forward<Future>(predecessor));
                 },
                 std::forward<Future>(predecessor),
-                std::forward<Ts>(ts)...
-            );
+                std::forward<Ts>(ts)...);
         }
 
         // --------------------------------------------------------------------
@@ -370,9 +369,9 @@ namespace hpx { namespace threads { namespace executors
 
             // Please see notes for previous then_execute function above
             return dataflow(launch::sync,
-                [f{std::move(f)}, this]
-                (OuterFuture<util::tuple<InnerFutures...>> && predecessor, Ts &&... ts)
-                {
+                [HPX_CAPTURE_FORWARD(f), this](
+                    OuterFuture<util::tuple<InnerFutures...>>&& predecessor,
+                    Ts&&... ts) {
                     pre_execution_then_domain_schedule<pool_executor,
                         pool_numa_hint<Tag>>
                         pre_exec { pool_executor_, hint_, hp_sync_ };
@@ -382,9 +381,9 @@ namespace hpx { namespace threads { namespace executors
                         std::forward<OuterFuture<util::tuple<InnerFutures...>>>
                         (predecessor));
                 },
-                std::forward<OuterFuture<util::tuple<InnerFutures...>>>(predecessor),
-                std::forward<Ts>(ts)...
-            );
+                std::forward<OuterFuture<util::tuple<InnerFutures...>>>(
+                    predecessor),
+                std::forward<Ts>(ts)...);
         }
 
         // --------------------------------------------------------------------
