@@ -7,6 +7,8 @@
 #if !defined(HPX_EXPORT_DEFINITIONS_SEPTEMBER_25_2008_0214PM)
 #define HPX_EXPORT_DEFINITIONS_SEPTEMBER_25_2008_0214PM
 
+#include <hpx/config/defines.hpp>
+
 #if defined(DOXYGEN)
 /// Marks a class or function to be exported from HPX or imported if it is
 /// consumed.
