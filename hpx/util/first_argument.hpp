@@ -7,7 +7,7 @@
 #define FIRST_ARGUMENT_HPP
 
 #include <hpx/traits/is_action.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <type_traits>
 
 namespace hpx { namespace util

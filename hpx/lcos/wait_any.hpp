@@ -167,7 +167,7 @@ namespace hpx
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/type_support/always_void.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <boost/utility/swap.hpp>
 

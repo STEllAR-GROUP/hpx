@@ -37,6 +37,7 @@ set(lockfree_fifo_LIBRARIES
     hpx_assertion
     hpx_config
     hpx_testing
+    hpx_datastructures
     hpx_type_support)
 
 set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)

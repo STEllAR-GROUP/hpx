@@ -8,7 +8,9 @@
 #define HPX_THREADMANAGER_THREAD_QUEUE_AUG_25_2009_0132PM
 
 #include <hpx/config.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
@@ -19,9 +21,7 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/cache_aligned_data.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/internal_allocator.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/util_misc/get_and_reset_value.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
 #   include <hpx/util/tick_counter.hpp>

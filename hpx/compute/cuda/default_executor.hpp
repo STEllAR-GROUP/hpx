@@ -16,7 +16,7 @@
 #include <hpx/iterator_support/is_range.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/throw_exception.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>

@@ -9,7 +9,7 @@
 #include <hpx/type_support/static.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/spinlock.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 // This is needed to get rid of an undefined reference to

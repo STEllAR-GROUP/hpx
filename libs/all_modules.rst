@@ -19,6 +19,7 @@ All modules
    /libs/collectives/docs/index.rst
    /libs/concepts/docs/index.rst
    /libs/config/docs/index.rst
+   /libs/datastructures/docs/index.rst
    /libs/format/docs/index.rst
    /libs/hardware/docs/index.rst
    /libs/logging/docs/index.rst

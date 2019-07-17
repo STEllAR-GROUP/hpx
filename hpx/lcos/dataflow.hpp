@@ -40,7 +40,7 @@
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/parallel_executor.hpp>

@@ -9,7 +9,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/util/include
 set(util_headers
-  hpx/util/detail/pack.hpp
   hpx/util/allocator_deleter.hpp
   hpx/util/await_traits.hpp
   hpx/util/calculate_fanout.hpp
@@ -22,7 +21,6 @@ set(util_headers
   hpx/util/max.hpp
   hpx/util/memory_chunk.hpp
   hpx/util/min.hpp
-  hpx/util/optional.hpp
   hpx/util/safe_lexical_cast.hpp
   hpx/traits/detail/reserve.hpp
 )
@@ -40,7 +38,6 @@ add_hpx_module(util
     GLOBAL_HEADER_GEN ON
     EXCLUDE_FROM_GLOBAL_HEADER
       "traits/detail/reserve.hpp"
-      "util/detail/pack.hpp"
     SOURCES ${util_sources}
     HEADERS ${util_headers}
     COMPAT_HEADERS ${util_compat_headers}

@@ -23,7 +23,7 @@
 #include <hpx/util/functional/new.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <boost/range/irange.hpp>
 

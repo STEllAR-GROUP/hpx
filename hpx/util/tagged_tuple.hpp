@@ -14,7 +14,7 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/identity.hpp>
 #include <hpx/util/tagged.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <cstddef>
 #include <utility>

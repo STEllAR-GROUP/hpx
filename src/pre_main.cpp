@@ -24,7 +24,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <cstddef>
 #include <string>

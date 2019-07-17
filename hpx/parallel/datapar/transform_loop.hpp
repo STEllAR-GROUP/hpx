@@ -18,7 +18,7 @@
 #include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <algorithm>
 #include <cstddef>

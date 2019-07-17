@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_tuple_like.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 void tuple_like_true()
 {

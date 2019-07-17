@@ -14,7 +14,7 @@
 #include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/unwrap.hpp>
 #include <hpx/type_support/void_guard.hpp>

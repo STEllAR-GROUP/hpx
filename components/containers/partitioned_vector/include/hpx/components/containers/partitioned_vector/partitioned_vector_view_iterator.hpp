@@ -10,7 +10,7 @@
 
 #include <hpx/components/containers/partitioned_vector/detail/view_element.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 
 #include <boost/iterator/iterator_facade.hpp>
 

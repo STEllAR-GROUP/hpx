@@ -18,7 +18,7 @@
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/util/transform_iterator.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 //
 #include <cstdint>
 #include <functional>

@@ -22,7 +22,7 @@
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/util/internal_allocator.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <atomic>
 #include <cstddef>

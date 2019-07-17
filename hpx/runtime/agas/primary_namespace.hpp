@@ -14,7 +14,7 @@
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <cstdint>
 #include <memory>

@@ -12,11 +12,11 @@
 #include <hpx/traits/pack_traversal_rebind_container.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/util/detail/container_category.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <cstddef>
 #include <iterator>

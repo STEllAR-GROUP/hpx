@@ -17,7 +17,7 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/util/first_argument.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 

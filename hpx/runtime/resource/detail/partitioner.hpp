@@ -14,7 +14,7 @@
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/assertion.hpp>
 #include <boost/program_options.hpp>
 

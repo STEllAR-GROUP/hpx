@@ -185,8 +185,8 @@ namespace hpx
 #include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/detail/pack.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <algorithm>
 #include <array>

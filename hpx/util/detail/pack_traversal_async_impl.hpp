@@ -12,10 +12,10 @@
 #include <hpx/util/allocator_deleter.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/util/detail/container_category.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

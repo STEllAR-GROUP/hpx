@@ -9,7 +9,7 @@
 #include <type_traits>
 
 #include <hpx/type_support/always_void.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 namespace hpx { namespace traits
 {

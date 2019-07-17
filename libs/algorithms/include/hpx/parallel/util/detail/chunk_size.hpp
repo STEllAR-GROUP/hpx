@@ -11,7 +11,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>

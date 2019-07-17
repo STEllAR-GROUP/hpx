@@ -19,9 +19,9 @@
 #include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

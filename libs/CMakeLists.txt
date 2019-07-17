@@ -16,6 +16,7 @@ set(HPX_LIBS
   collectives
   concepts
   config
+  datastructures
   format
   hardware
   iterator_support

@@ -15,7 +15,7 @@
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/util/result_of.hpp>
 
 #include <iterator>

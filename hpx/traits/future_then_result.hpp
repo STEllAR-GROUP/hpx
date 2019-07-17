@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/type_support/always_void.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
 #include <hpx/util/result_of.hpp>
