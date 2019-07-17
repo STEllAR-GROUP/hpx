@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util_misc/safe_lexical_cast.hpp>
 #include <hpx/util/yield_while.hpp>
 #include <hpx/util_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)

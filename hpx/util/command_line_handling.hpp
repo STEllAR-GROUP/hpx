@@ -10,7 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/manage_config.hpp>
+#include <hpx/util_misc/manage_config.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/program_options/options_description.hpp>

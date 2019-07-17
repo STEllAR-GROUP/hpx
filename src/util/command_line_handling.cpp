@@ -21,10 +21,10 @@
 #include <hpx/util/detail/reset_function.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/init_logging.hpp>
-#include <hpx/util/manage_config.hpp>
+#include <hpx/util_misc/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/parse_command_line.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util_misc/safe_lexical_cast.hpp>
 #include <hpx/util/sed_transform.hpp>
 #include <hpx/version.hpp>
 

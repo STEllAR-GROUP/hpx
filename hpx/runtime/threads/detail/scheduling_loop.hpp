@@ -16,7 +16,7 @@
 #include <hpx/state.hpp>
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/util/itt_notify.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util_misc/safe_lexical_cast.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #if defined(HPX_HAVE_APEX)

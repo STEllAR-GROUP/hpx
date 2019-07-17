@@ -9,14 +9,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/util/include
 set(util_headers
-  hpx/util/await_traits.hpp
-  hpx/util/manage_config.hpp
-  hpx/util/safe_lexical_cast.hpp
 )
 
 # Default location is $HPX_ROOT/libs/util/src
 set(util_sources
-  manage_config.cpp
 )
 
 include(HPX_AddModule)

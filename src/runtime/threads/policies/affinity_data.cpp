@@ -5,14 +5,14 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/format.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/format.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util_misc/safe_lexical_cast.hpp>
 
 #include <algorithm>
 #include <atomic>

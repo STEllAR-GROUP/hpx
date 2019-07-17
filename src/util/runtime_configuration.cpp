@@ -17,7 +17,7 @@
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/register_locks_globally.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util_misc/safe_lexical_cast.hpp>
 #include <hpx/version.hpp>
 
 #include <boost/filesystem.hpp>

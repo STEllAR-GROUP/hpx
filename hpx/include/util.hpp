@@ -29,7 +29,7 @@
 #include <hpx/util/function_ref.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/util/parse_command_line.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util_misc/safe_lexical_cast.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unwrap.hpp>

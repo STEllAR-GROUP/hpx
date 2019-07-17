@@ -1099,7 +1099,7 @@ namespace hpx { namespace util { namespace detail
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/init_logging.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util_misc/safe_lexical_cast.hpp>
 
 #include <iostream>
 #include <string>
