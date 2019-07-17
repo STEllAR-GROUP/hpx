@@ -10,15 +10,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # Default location is $HPX_ROOT/libs/util/include
 set(util_headers
   hpx/util/await_traits.hpp
-  hpx/util/calculate_fanout.hpp
-  hpx/util/get_and_reset_value.hpp
-  hpx/util/insert_checked.hpp
   hpx/util/manage_config.hpp
   hpx/util/max.hpp
   hpx/util/memory_chunk.hpp
   hpx/util/min.hpp
   hpx/util/safe_lexical_cast.hpp
-  hpx/traits/detail/reserve.hpp
 )
 
 # Default location is $HPX_ROOT/libs/util/src
@@ -32,8 +28,6 @@ add_hpx_module(util
     DEPRECATION_WARNINGS
     FORCE_LINKING_GEN
     GLOBAL_HEADER_GEN ON
-    EXCLUDE_FROM_GLOBAL_HEADER
-      "traits/detail/reserve.hpp"
     SOURCES ${util_sources}
     HEADERS ${util_headers}
     COMPAT_HEADERS ${util_compat_headers}

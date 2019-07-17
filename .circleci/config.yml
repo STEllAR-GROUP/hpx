@@ -808,6 +808,7 @@ jobs:
               ninja -j2 -k 0 tests.unit.modules.thread_support
               ninja -j2 -k 0 tests.unit.modules.type_support
               ninja -j2 -k 0 tests.unit.modules.util
+              ninja -j2 -k 0 tests.unit.modules.util_misc
       - run:
           name: Running Unit Tests
           when: always
@@ -829,6 +830,7 @@ jobs:
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.type_support
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.util
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.util_misc
       - run:
           <<: *convert_xml
       - run:

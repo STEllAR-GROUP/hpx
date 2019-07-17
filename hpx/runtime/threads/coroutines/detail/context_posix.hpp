@@ -44,7 +44,7 @@
 #endif
 
 #include <hpx/assertion.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util_misc/get_and_reset_value.hpp>
 #include <hpx/type_support/unused.hpp>
 
 // include unist.d conditionally to check for POSIX version. Not all OSs have the

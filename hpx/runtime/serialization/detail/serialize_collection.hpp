@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
-#include <hpx/traits/detail/reserve.hpp>
+#include <hpx/util_misc/detail/reserve.hpp>
 
 #include <memory>
 #include <type_traits>

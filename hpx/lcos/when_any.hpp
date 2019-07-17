@@ -127,7 +127,7 @@ namespace hpx
 #include <hpx/lcos/when_any.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/traits/acquire_future.hpp>
-#include <hpx/traits/detail/reserve.hpp>
+#include <hpx/util_misc/detail/reserve.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>

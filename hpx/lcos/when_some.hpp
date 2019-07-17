@@ -232,7 +232,7 @@ namespace hpx
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
-#include <hpx/traits/detail/reserve.hpp>
+#include <hpx/util_misc/detail/reserve.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>

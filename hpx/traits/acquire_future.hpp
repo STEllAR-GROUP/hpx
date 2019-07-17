@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/traits/detail/reserve.hpp>
+#include <hpx/util_misc/detail/reserve.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>

@@ -12,7 +12,7 @@
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util_misc/get_and_reset_value.hpp>
 
 #include <cstdint>
 #include <mutex>
