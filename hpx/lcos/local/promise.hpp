@@ -12,7 +12,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/future_access.hpp>
-#include <hpx/util/allocator_deleter.hpp>
+#include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <boost/intrusive_ptr.hpp>

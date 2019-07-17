@@ -9,12 +9,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/util/include
 set(util_headers
-  hpx/util/allocator_deleter.hpp
   hpx/util/await_traits.hpp
   hpx/util/calculate_fanout.hpp
   hpx/util/get_and_reset_value.hpp
   hpx/util/insert_checked.hpp
-  hpx/util/internal_allocator.hpp
   hpx/util/manage_config.hpp
   hpx/util/max.hpp
   hpx/util/memory_chunk.hpp

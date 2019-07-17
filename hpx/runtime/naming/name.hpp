@@ -18,7 +18,7 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/detail/yield_k.hpp>
-#include <hpx/util/internal_allocator.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/spinlock_pool.hpp>

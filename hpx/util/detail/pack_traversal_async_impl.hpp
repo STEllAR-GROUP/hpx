@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/traits/future_access.hpp>
-#include <hpx/util/allocator_deleter.hpp>
+#include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/util/detail/container_category.hpp>
 #include <hpx/datastructures/detail/pack.hpp>

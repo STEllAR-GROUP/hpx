@@ -9,6 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/allocator_support/allocator_deleter.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/detail/future_traits.hpp>
@@ -32,11 +34,9 @@
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_enable_if.hpp>
 #include <hpx/type_support/void_guard.hpp>
-#include <hpx/util/allocator_deleter.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/serialize_exception.hpp>
 

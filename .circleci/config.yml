@@ -792,6 +792,7 @@ jobs:
       - run:
           name: Building Module Unit Tests
           command: |
+              ninja -j2 -k 0 tests.unit.modules.allocator_support
               ninja -j2 -k 0 tests.unit.modules.assertion
               ninja -j2 -k 0 tests.unit.modules.cache
               ninja -j2 -k 0 tests.unit.modules.collectives
@@ -812,6 +813,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.allocator_support
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.assertion
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives

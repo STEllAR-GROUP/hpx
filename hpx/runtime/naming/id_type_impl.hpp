@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/internal_allocator.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 
 #include <cstdint>
 

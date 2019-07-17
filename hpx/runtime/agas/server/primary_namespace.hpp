@@ -21,7 +21,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
-#include <hpx/util/internal_allocator.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/datastructures/tuple.hpp>
 
 #include <atomic>

@@ -144,7 +144,7 @@ namespace hpx
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-#include <hpx/util/internal_allocator.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/datastructures/tuple.hpp>
 

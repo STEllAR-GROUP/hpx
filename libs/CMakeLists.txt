@@ -11,6 +11,7 @@ include(HPX_AddPseudoTarget)
 
 set(HPX_LIBS
   algorithms
+  allocator_support
   assertion
   cache
   collectives
