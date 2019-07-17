@@ -33,7 +33,7 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/util/always_void.hpp>
+#include <hpx/type_support/always_void.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/internal_allocator.hpp>

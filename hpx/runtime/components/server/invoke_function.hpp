@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/result_of.hpp>
 

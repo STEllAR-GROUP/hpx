@@ -12,7 +12,7 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <hpx/parallel/execution_policy_fwd.hpp>
 

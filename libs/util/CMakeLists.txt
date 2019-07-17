@@ -11,24 +11,18 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(util_headers
   hpx/util/detail/pack.hpp
   hpx/util/allocator_deleter.hpp
-  hpx/util/always_void.hpp
   hpx/util/assert_owns_lock.hpp
   hpx/util/atomic_count.hpp
   hpx/util/await_traits.hpp
   hpx/util/calculate_fanout.hpp
-  hpx/util/decay.hpp
-  hpx/util/detected.hpp
   hpx/util/fibhash.hpp
   hpx/util/get_and_reset_value.hpp
-  hpx/util/identity.hpp
   hpx/util/insert_checked.hpp
   hpx/util/internal_allocator.hpp
   hpx/util/iterator_adaptor.hpp
   hpx/util/iterator_facade.hpp
   hpx/util/iterator_range.hpp
   hpx/util/jenkins_hash.hpp
-  hpx/util/lazy_conditional.hpp
-  hpx/util/lazy_enable_if.hpp
   hpx/util/manage_config.hpp
   hpx/util/max.hpp
   hpx/util/memory_chunk.hpp
@@ -37,14 +31,9 @@ set(util_headers
   hpx/util/range.hpp
   hpx/util/safe_lexical_cast.hpp
   hpx/util/set_thread_name.hpp
-  hpx/util/static.hpp
   hpx/util/thread_specific_ptr.hpp
   hpx/util/unlock_guard.hpp
-  hpx/util/unused.hpp
-  hpx/util/unwrap_ref.hpp
-  hpx/util/void_guard.hpp
   hpx/traits/detail/reserve.hpp
-  hpx/traits/detail/wrap_int.hpp
   hpx/traits/concepts.hpp
   hpx/traits/has_member_xxx.hpp
   hpx/traits/has_xxx.hpp
@@ -67,7 +56,6 @@ add_hpx_module(util
     EXCLUDE_FROM_GLOBAL_HEADER
       "traits/concepts.hpp"
       "traits/detail/reserve.hpp"
-      "traits/detail/wrap_int.hpp"
       "traits/has_member_xxx.hpp"
       "traits/has_xxx.hpp"
       "traits/is_iterator.hpp"
@@ -76,6 +64,6 @@ add_hpx_module(util
     SOURCES ${util_sources}
     HEADERS ${util_headers}
     COMPAT_HEADERS ${util_compat_headers}
-    DEPENDENCIES hpx_assertion hpx_config
+    DEPENDENCIES hpx_assertion hpx_config hpx_type_support
     CMAKE_SUBDIRS examples tests
 )

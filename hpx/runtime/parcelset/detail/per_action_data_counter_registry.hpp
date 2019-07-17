@@ -14,7 +14,7 @@
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/jenkins_hash.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/type_support/static.hpp>
 
 #include <cstdint>
 #include <string>

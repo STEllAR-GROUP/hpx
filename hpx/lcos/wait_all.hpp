@@ -111,11 +111,11 @@ namespace hpx
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/util/always_void.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/always_void.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/unwrap_ref.hpp>
 #include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/unwrap_ref.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/ref.hpp>

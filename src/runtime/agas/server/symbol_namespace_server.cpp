@@ -26,7 +26,7 @@
 #include <hpx/util/regex_from_pattern.hpp>
 #include <hpx/timing/scoped_timer.hpp>
 #include <hpx/util/unlock_guard.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <cstddef>

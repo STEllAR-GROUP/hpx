@@ -19,7 +19,7 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/atomic_count.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

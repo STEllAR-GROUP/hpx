@@ -12,7 +12,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/gather.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/shared_array.hpp>
 

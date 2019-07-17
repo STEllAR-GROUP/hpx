@@ -11,7 +11,7 @@
 #define HPX_TRAITS_IS_EXECUTOR_PARAMETERS_MAY_19_2017_0232PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/always_void.hpp>
+#include <hpx/type_support/always_void.hpp>
 
 #include <functional>
 #include <type_traits>

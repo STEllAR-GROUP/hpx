@@ -16,7 +16,7 @@
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/bind_back.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/type_support/static.hpp>
 
 #include <memory>
 #include <type_traits>

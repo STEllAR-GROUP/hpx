@@ -17,6 +17,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/future_access.hpp>
@@ -26,19 +27,18 @@
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/type_support/always_void.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/identity.hpp>
+#include <hpx/type_support/lazy_enable_if.hpp>
+#include <hpx/type_support/void_guard.hpp>
 #include <hpx/util/allocator_deleter.hpp>
-#include <hpx/util/always_void.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/decay.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/identity.hpp>
 #include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/lazy_enable_if.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/serialize_exception.hpp>
-#include <hpx/timing/steady_clock.hpp>
-#include <hpx/util/void_guard.hpp>
 
 #if defined(HPX_HAVE_AWAIT)
     #include <hpx/lcos/detail/future_await_traits.hpp>

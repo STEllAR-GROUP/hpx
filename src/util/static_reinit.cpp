@@ -6,7 +6,7 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/static_reinit.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/type_support/static.hpp>
 #include <hpx/util/spinlock.hpp>
 
 #include <mutex>

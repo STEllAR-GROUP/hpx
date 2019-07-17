@@ -28,7 +28,7 @@
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/concepts.hpp>
-#include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>

@@ -19,7 +19,7 @@
 #endif
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_then_result.hpp>

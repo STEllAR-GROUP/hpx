@@ -11,7 +11,7 @@
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>

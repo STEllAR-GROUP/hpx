@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/always_void.hpp>
+#include <hpx/type_support/always_void.hpp>
 #include <hpx/util/iterator_facade.hpp>
 #include <hpx/testing.hpp>
 

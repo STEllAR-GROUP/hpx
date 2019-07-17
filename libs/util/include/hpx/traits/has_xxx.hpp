@@ -7,7 +7,7 @@
 #ifndef HPX_TRAITS_HAS_XXX_HPP
 #define HPX_TRAITS_HAS_XXX_HPP
 
-#include <hpx/util/always_void.hpp>
+#include <hpx/type_support/always_void.hpp>
 
 #include <hpx/preprocessor/cat.hpp>
 

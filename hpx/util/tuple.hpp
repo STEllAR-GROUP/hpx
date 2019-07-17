@@ -9,7 +9,7 @@
 #define HPX_UTIL_TUPLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/array.hpp>

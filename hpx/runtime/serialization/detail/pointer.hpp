@@ -16,8 +16,8 @@
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
-#include <hpx/util/identity.hpp>
-#include <hpx/util/lazy_conditional.hpp>
+#include <hpx/type_support/identity.hpp>
+#include <hpx/type_support/lazy_conditional.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

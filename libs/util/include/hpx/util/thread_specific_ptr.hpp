@@ -66,7 +66,7 @@ namespace hpx { namespace util
 
 #else
 
-#include <hpx/util/static.hpp>
+#include <hpx/type_support/static.hpp>
 #include <pthread.h>
 
 namespace hpx { namespace util

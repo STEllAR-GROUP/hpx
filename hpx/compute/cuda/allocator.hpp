@@ -18,7 +18,7 @@
 #include <hpx/compute/cuda/value_proxy.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/min.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cuda_runtime.h>
 

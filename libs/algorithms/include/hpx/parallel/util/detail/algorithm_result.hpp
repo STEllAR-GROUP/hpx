@@ -11,7 +11,7 @@
 #include <hpx/parallel/execution_policy_fwd.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <type_traits>
 #include <utility>

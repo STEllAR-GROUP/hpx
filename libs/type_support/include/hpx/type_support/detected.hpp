@@ -7,7 +7,7 @@
 #define HPX_UTIL_DETECTED_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/always_void.hpp>
+#include <hpx/type_support/always_void.hpp>
 
 #include <type_traits>
 #include <utility>

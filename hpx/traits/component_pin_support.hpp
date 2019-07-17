@@ -7,7 +7,7 @@
 #define HPX_TRAITS_COMPONENT_PIN_SUPPORT_MAY_21_2018_1246PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/type_support/detail/wrap_int.hpp>
 
 #include <cstdint>
 

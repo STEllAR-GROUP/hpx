@@ -6,7 +6,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/register_locks_globally.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/type_support/static.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <map>

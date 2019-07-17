@@ -7,17 +7,17 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
+#include <hpx/logging.hpp>
+#include <hpx/logging/format/named_write.hpp>
+#include <hpx/logging/format/destination/defaults.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/type_support/static.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/static.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/logging/format/named_write.hpp>
-#include <hpx/logging/format/destination/defaults.hpp>
 #include <hpx/util/init_logging.hpp>
 
 #include <boost/version.hpp>

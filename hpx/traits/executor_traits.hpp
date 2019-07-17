@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
-#include <hpx/util/detected.hpp>
+#include <hpx/type_support/detected.hpp>
 
 #include <cstddef>
 #include <type_traits>

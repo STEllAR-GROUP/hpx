@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 

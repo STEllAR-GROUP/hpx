@@ -9,7 +9,7 @@
 #define HPX_LCOS_SYNC_FWD_JUL_21_2018_0919PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <utility>
 

@@ -13,7 +13,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/void_guard.hpp>
+#include <hpx/type_support/void_guard.hpp>
 
 #include <cstddef>
 #include <type_traits>

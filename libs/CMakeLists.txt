@@ -21,6 +21,7 @@ set(HPX_LIBS
   preprocessor
   testing
   timing
+  type_support
   util
   CACHE INTERNAL "list of HPX modules" FORCE
 )
@@ -69,7 +70,8 @@ foreach(lib ${HPX_LIBS})
   add_subdirectory(${lib})
 
   set(MODULE_FORCE_LINKING_INCLUDES
-    "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\n")
+    "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>
+")
 
   set(MODULE_FORCE_LINKING_CALLS
     "${MODULE_FORCE_LINKING_CALLS}\n        ${lib}::force_linking();")

@@ -10,7 +10,7 @@
 #include <hpx/traits/detail/reserve.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/pack_traversal_rebind_container.hpp>
-#include <hpx/util/always_void.hpp>
+#include <hpx/type_support/always_void.hpp>
 #include <hpx/util/detail/container_category.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>

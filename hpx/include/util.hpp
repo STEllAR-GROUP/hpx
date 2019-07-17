@@ -8,19 +8,19 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/format.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/util/activate_counters.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/format.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/function_ref.hpp>
 #include <hpx/util/get_and_reset_value.hpp>

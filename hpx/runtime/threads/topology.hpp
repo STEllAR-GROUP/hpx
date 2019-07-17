@@ -19,7 +19,7 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <hpx/util/spinlock.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/type_support/static.hpp>
 
 #include <cstddef>
 #include <iosfwd>
