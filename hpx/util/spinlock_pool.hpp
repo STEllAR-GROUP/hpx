@@ -19,7 +19,7 @@
 #endif
 
 #include <hpx/config.hpp>
-#include <hpx/util/fibhash.hpp>
+#include <hpx/hashing/fibhash.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/cache_aligned_data.hpp>
 #include <hpx/util/register_locks.hpp>

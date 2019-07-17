@@ -12,11 +12,9 @@ set(util_headers
   hpx/util/allocator_deleter.hpp
   hpx/util/await_traits.hpp
   hpx/util/calculate_fanout.hpp
-  hpx/util/fibhash.hpp
   hpx/util/get_and_reset_value.hpp
   hpx/util/insert_checked.hpp
   hpx/util/internal_allocator.hpp
-  hpx/util/jenkins_hash.hpp
   hpx/util/manage_config.hpp
   hpx/util/max.hpp
   hpx/util/memory_chunk.hpp

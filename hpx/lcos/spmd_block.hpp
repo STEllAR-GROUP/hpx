@@ -19,7 +19,7 @@
 #include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/util/first_argument.hpp>
-#include <hpx/util/jenkins_hash.hpp>
+#include <hpx/hashing/jenkins_hash.hpp>
 
 #include <boost/range/irange.hpp>
 

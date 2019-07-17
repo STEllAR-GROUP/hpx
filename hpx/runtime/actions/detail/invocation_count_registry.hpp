@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/preprocessor/cat.hpp>
-#include <hpx/util/jenkins_hash.hpp>
+#include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/type_support/static.hpp>
 
 #include <cstdint>

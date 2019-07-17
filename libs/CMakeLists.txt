@@ -19,6 +19,7 @@ set(HPX_LIBS
   datastructures
   format
   hardware
+  hashing
   iterator_support
   logging
   preprocessor
