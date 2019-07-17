@@ -24,6 +24,6 @@ add_hpx_module(collectives
     SOURCES ${collectives_sources}
     HEADERS ${collectives_headers}
     DEPENDENCIES hpx_assertion hpx_config hpx_format hpx_logging
-      hpx_preprocessor hpx_timing hpx_type_support hpx_util
+      hpx_preprocessor hpx_timing hpx_type_support
     CMAKE_SUBDIRS examples tests
 )
