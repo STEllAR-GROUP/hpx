@@ -27,8 +27,8 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/interval_timer.hpp>
-#include <hpx/util/iterator_adaptor.hpp>
-#include <hpx/util/iterator_facade.hpp>
+#include <hpx/iterator_support/iterator_adaptor.hpp>
+#include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/thread_aware_timer.hpp>

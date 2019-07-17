@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/min.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/iterator_facade.hpp>
+#include <hpx/iterator_support/iterator_facade.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 

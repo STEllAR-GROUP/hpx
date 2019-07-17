@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/testing.hpp>
 
 #include <vector>

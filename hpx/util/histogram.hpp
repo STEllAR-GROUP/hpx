@@ -7,7 +7,7 @@
 #define HISTOGRAM_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/iterator_range.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
 
 #include <boost/parameter/keyword.hpp>
 #include <boost/accumulators/framework/accumulator_base.hpp>

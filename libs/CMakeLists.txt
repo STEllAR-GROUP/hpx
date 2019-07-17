@@ -17,6 +17,7 @@ set(HPX_LIBS
   config
   format
   hardware
+  iterator_support
   logging
   preprocessor
   testing

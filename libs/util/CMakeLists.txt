@@ -17,23 +17,17 @@ set(util_headers
   hpx/util/get_and_reset_value.hpp
   hpx/util/insert_checked.hpp
   hpx/util/internal_allocator.hpp
-  hpx/util/iterator_adaptor.hpp
-  hpx/util/iterator_facade.hpp
-  hpx/util/iterator_range.hpp
   hpx/util/jenkins_hash.hpp
   hpx/util/manage_config.hpp
   hpx/util/max.hpp
   hpx/util/memory_chunk.hpp
   hpx/util/min.hpp
   hpx/util/optional.hpp
-  hpx/util/range.hpp
   hpx/util/safe_lexical_cast.hpp
   hpx/traits/detail/reserve.hpp
   hpx/traits/concepts.hpp
   hpx/traits/has_member_xxx.hpp
   hpx/traits/has_xxx.hpp
-  hpx/traits/is_iterator.hpp
-  hpx/traits/is_range.hpp
 )
 
 # Default location is $HPX_ROOT/libs/util/src
@@ -52,12 +46,14 @@ add_hpx_module(util
       "traits/detail/reserve.hpp"
       "traits/has_member_xxx.hpp"
       "traits/has_xxx.hpp"
-      "traits/is_iterator.hpp"
-      "traits/is_range.hpp"
       "util/detail/pack.hpp"
     SOURCES ${util_sources}
     HEADERS ${util_headers}
     COMPAT_HEADERS ${util_compat_headers}
-    DEPENDENCIES hpx_assertion hpx_config hpx_type_support
+    DEPENDENCIES
+      hpx_assertion
+      hpx_config
+      hpx_iterator_support
+      hpx_type_support
     CMAKE_SUBDIRS examples tests
 )

@@ -10,8 +10,8 @@
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/traits/is_range.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/is_range.hpp>
 
 #include <algorithm>
 #include <cstddef>

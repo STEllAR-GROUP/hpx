@@ -140,7 +140,7 @@ namespace hpx
 #include <hpx/type_support/unwrap_ref.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/intrusive_ptr.hpp>

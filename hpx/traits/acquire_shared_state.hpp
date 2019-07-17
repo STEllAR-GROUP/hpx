@@ -8,13 +8,13 @@
 #define HPX_TRAITS_ACQUIRE_SHARED_STATE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/traits/detail/reserve.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-#include <hpx/traits/is_range.hpp>
+#include <hpx/iterator_support/is_range.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

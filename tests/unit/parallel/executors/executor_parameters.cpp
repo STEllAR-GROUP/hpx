@@ -11,7 +11,7 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/iterator_range.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
 
 #include <algorithm>
 #include <chrono>

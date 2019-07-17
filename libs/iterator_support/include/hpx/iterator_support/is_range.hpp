@@ -7,7 +7,7 @@
 #ifndef HPX_TRAITS_IS_RANGE_HPP
 #define HPX_TRAITS_IS_RANGE_HPP
 
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/range.hpp>
 
 #include <iterator>
 #include <type_traits>

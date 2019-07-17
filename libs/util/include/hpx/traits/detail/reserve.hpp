@@ -9,8 +9,8 @@
 #define HPX_TRAITS_DETAIL_RESERVE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/range.hpp>
-#include <hpx/traits/is_range.hpp>
+#include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/is_range.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
 
 #include <cstddef>

@@ -13,7 +13,7 @@
 #endif
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/type_support/unused.hpp>
 

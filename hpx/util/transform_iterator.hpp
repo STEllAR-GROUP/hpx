@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/type_support/identity.hpp>
-#include <hpx/util/iterator_adaptor.hpp>
+#include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
 #include <hpx/util/result_of.hpp>
 

@@ -9,8 +9,8 @@
 #define HPX_PARALLEL_DETAIL_ALL_ANY_NONE_JUL_05_2014_0940PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

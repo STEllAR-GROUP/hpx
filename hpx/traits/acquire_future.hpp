@@ -8,12 +8,12 @@
 #define HPX_TRAITS_ACQUIRE_FUTURE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/traits/detail/reserve.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-#include <hpx/traits/is_range.hpp>
+#include <hpx/iterator_support/is_range.hpp>
 
 #include <algorithm>
 #include <array>

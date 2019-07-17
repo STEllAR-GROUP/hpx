@@ -17,7 +17,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/util/iterator_facade.hpp>
+#include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/type_support/unused.hpp>

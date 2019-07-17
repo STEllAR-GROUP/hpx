@@ -114,7 +114,7 @@ namespace hpx
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unwrap_ref.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/intrusive_ptr.hpp>

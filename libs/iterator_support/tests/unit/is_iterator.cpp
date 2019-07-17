@@ -5,9 +5,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/iterator_adaptor.hpp>
 
 #include <cstddef>
 #include <forward_list>

@@ -9,7 +9,7 @@
 #define HPX_COMPUTE_DETAIL_GET_PROXY_TYPE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/decay.hpp>
 

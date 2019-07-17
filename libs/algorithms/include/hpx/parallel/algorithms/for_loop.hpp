@@ -16,7 +16,7 @@
 #include <hpx/traits/get_function_annotation.hpp>
 #endif
 #include <hpx/assertion.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/detail/pack.hpp>

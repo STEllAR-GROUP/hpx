@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

@@ -12,7 +12,7 @@
 
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/zip_iterator.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/traits/vector_pack_alignment_size.hpp>

@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_DETAIL_UNINITIALIZED_VALUE_CONSTRUCT_JUN_01_2017_1049AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_ALGORITHM_SET_INTERSECTION_MAR_10_2015_0152PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/parallel/algorithms/copy.hpp>

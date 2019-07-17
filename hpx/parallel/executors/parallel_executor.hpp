@@ -29,7 +29,7 @@
 #include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/one_shot.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>

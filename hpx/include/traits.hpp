@@ -50,10 +50,10 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/is_placeholder.hpp>
-#include <hpx/traits/is_range.hpp>
+#include <hpx/iterator_support/is_range.hpp>
 #include <hpx/traits/is_timed_executor.hpp>
 #include <hpx/traits/is_tuple_like.hpp>
 #include <hpx/traits/is_valid_action.hpp>

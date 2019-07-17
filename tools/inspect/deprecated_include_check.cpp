@@ -42,7 +42,7 @@ namespace boost
       { "boost/cstdint\\.hpp", "cstdint" },
       { "boost/thread/barrier\\.hpp", "hpx/util/barrier.hpp" },
       { "boost/exception_ptr\\.hpp", "exception" },
-      { "boost/range/iterator_range\\.hpp", "hpx/util/iterator_range.hpp" },
+      { "boost/range/iterator_range\\.hpp", "hpx/iterator_support/iterator_range.hpp" },
       { "hpx/hpx_fwd\\.hpp", "nothing (remove unconditionally)" },
       { "boost/preprocessor/cat\\.hpp", "hpx/util/detail/pp/cat.hpp" },
       { "boost/preprocessor/stringize\\.hpp", "hpx/util/detail/pp/stringize.hpp" },
