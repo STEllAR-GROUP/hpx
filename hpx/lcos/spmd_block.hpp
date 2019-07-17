@@ -14,7 +14,7 @@
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/traits/concepts.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/detail/pack.hpp>

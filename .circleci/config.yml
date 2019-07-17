@@ -795,6 +795,7 @@ jobs:
               ninja -j2 -k 0 tests.unit.modules.assertion
               ninja -j2 -k 0 tests.unit.modules.cache
               ninja -j2 -k 0 tests.unit.modules.collectives
+              ninja -j2 -k 0 tests.unit.modules.concepts
               ninja -j2 -k 0 tests.unit.modules.config
               ninja -j2 -k 0 tests.unit.modules.format
               ninja -j2 -k 0 tests.unit.modules.hardware
@@ -812,6 +813,7 @@ jobs:
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.assertion
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.concepts
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.format
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.hardware

@@ -11,7 +11,7 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHMS_MINMAX_JAN_25_2016_1218PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/is_range.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/util/tagged_pair.hpp>

@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_ALGORITHM_REMOVE_DEC_24_2017_0644PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_pair.hpp>

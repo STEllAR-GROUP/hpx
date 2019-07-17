@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_DETAIL_REVERSE_JUL_29_2014_0432PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/tagged_pair.hpp>
 

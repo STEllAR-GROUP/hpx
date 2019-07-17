@@ -14,6 +14,7 @@ set(HPX_LIBS
   assertion
   cache
   collectives
+  concepts
   config
   format
   hardware

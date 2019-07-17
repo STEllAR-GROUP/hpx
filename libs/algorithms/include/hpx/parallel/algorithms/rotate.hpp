@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/dataflow.hpp>
-#include <hpx/traits/concepts.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/tagged_pair.hpp>
 #include <hpx/util/unwrap.hpp>

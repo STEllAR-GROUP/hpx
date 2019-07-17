@@ -16,7 +16,7 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
-#include <hpx/traits/has_member_xxx.hpp>
+#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/traits/is_launch_policy.hpp>

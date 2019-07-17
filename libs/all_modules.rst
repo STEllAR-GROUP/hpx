@@ -17,6 +17,7 @@ All modules
    /libs/assertion/docs/index.rst
    /libs/cache/docs/index.rst
    /libs/collectives/docs/index.rst
+   /libs/concepts/docs/index.rst
    /libs/config/docs/index.rst
    /libs/format/docs/index.rst
    /libs/hardware/docs/index.rst

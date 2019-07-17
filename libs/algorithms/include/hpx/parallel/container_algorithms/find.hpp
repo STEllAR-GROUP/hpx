@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHMS_FIND
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/iterator_support/is_range.hpp>
 #include <hpx/iterator_support/range.hpp>

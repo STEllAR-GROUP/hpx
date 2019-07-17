@@ -27,7 +27,7 @@
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
-#include <hpx/traits/concepts.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_access.hpp>
@@ -35,8 +35,8 @@
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/get_remote_result.hpp>
-#include <hpx/traits/has_member_xxx.hpp>
-#include <hpx/traits/has_xxx.hpp>
+#include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/concepts/has_xxx.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>

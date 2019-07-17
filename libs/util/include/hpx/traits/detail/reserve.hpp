@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/is_range.hpp>
-#include <hpx/traits/has_member_xxx.hpp>
+#include <hpx/concepts/has_member_xxx.hpp>
 
 #include <cstddef>
 #include <iterator>

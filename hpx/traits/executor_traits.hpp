@@ -7,7 +7,7 @@
 #define HPX_TRAITS_EXECUTOR_TRAITS_JAN_04_2017_0626PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/has_member_xxx.hpp>
+#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/type_support/detected.hpp>
 
 #include <cstddef>

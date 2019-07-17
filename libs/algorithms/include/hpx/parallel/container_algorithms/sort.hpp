@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_SORT_DEC_06_2015_1133AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/is_range.hpp>
 #include <hpx/iterator_support/range.hpp>
 

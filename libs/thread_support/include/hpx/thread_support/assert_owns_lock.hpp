@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/traits/has_member_xxx.hpp>
+#include <hpx/concepts/has_member_xxx.hpp>
 
 #include <type_traits>
 

@@ -25,9 +25,6 @@ set(util_headers
   hpx/util/optional.hpp
   hpx/util/safe_lexical_cast.hpp
   hpx/traits/detail/reserve.hpp
-  hpx/traits/concepts.hpp
-  hpx/traits/has_member_xxx.hpp
-  hpx/traits/has_xxx.hpp
 )
 
 # Default location is $HPX_ROOT/libs/util/src
@@ -42,10 +39,7 @@ add_hpx_module(util
     FORCE_LINKING_GEN
     GLOBAL_HEADER_GEN ON
     EXCLUDE_FROM_GLOBAL_HEADER
-      "traits/concepts.hpp"
       "traits/detail/reserve.hpp"
-      "traits/has_member_xxx.hpp"
-      "traits/has_xxx.hpp"
       "util/detail/pack.hpp"
     SOURCES ${util_sources}
     HEADERS ${util_headers}
@@ -53,6 +47,7 @@ add_hpx_module(util
     DEPENDENCIES
       hpx_assertion
       hpx_config
+      hpx_concepts
       hpx_iterator_support
       hpx_type_support
     CMAKE_SUBDIRS examples tests
