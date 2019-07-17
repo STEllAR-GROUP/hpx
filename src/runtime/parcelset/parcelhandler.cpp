@@ -37,7 +37,7 @@
 #include <hpx/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 

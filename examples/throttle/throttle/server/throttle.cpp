@@ -9,7 +9,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <thread>
 #include <chrono>

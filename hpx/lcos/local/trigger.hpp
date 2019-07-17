@@ -14,8 +14,8 @@
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <cstddef>
 #include <list>

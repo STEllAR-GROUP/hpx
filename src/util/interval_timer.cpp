@@ -12,7 +12,7 @@
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/interval_timer.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <chrono>
 #include <cstddef>

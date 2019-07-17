@@ -16,7 +16,7 @@
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/itt_notify.hpp>

@@ -14,7 +14,7 @@
 #if defined(HPX_DEBUG)
 #include <hpx/logging.hpp>
 #endif
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/util/wrapper_heap_base.hpp>
 
 #include <cstddef>

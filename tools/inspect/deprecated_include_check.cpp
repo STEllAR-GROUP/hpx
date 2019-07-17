@@ -31,7 +31,7 @@ namespace boost
       { "boost/unordered_map\\.hpp", "unordered_map" },
       { "boost/unordered_set\\.hpp", "unordered_set" },
       { "boost/utility/enable_if\\.hpp", "type_traits" },
-      { "boost/detail/atomic_count\\.hpp", "hpx/util/atomic_count.hpp" },
+      { "boost/detail/atomic_count\\.hpp", "hpx/thread_support/atomic_count.hpp" },
       { "boost/function\\.hpp", "hpx/util/function.hpp" },
       { "boost/shared_ptr\\.hpp", "memory" },
       { "boost/make_shared\\.hpp", "memory" },

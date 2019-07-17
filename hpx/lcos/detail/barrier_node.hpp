@@ -16,7 +16,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 
 #include <cstddef>
 #include <string>

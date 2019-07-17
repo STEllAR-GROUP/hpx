@@ -22,8 +22,8 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/unique_function.hpp>
 

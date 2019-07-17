@@ -20,6 +20,7 @@ set(HPX_LIBS
   logging
   preprocessor
   testing
+  thread_support
   timing
   type_support
   util

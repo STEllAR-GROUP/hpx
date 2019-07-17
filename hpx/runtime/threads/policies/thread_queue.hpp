@@ -14,6 +14,7 @@
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/cache_aligned_data.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/unlock_guard.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
 #   include <hpx/util/tick_counter.hpp>

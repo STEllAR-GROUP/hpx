@@ -19,7 +19,7 @@
 #include <hpx/util/apex.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/query_counters.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <cstddef>
 #include <cstdint>

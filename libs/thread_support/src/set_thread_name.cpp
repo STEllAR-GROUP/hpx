@@ -10,7 +10,7 @@
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 
-#include <hpx/util/set_thread_name.hpp>
+#include <hpx/thread_support/set_thread_name.hpp>
 
 namespace hpx { namespace util
 {

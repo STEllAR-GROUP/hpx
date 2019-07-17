@@ -16,7 +16,7 @@
 #include <hpx/state.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <cstddef>
 #include <mutex>

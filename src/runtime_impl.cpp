@@ -26,7 +26,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/util/set_thread_name.hpp>
+#include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/yield_while.hpp>
 

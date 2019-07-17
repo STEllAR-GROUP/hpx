@@ -11,8 +11,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(util_headers
   hpx/util/detail/pack.hpp
   hpx/util/allocator_deleter.hpp
-  hpx/util/assert_owns_lock.hpp
-  hpx/util/atomic_count.hpp
   hpx/util/await_traits.hpp
   hpx/util/calculate_fanout.hpp
   hpx/util/fibhash.hpp
@@ -30,9 +28,6 @@ set(util_headers
   hpx/util/optional.hpp
   hpx/util/range.hpp
   hpx/util/safe_lexical_cast.hpp
-  hpx/util/set_thread_name.hpp
-  hpx/util/thread_specific_ptr.hpp
-  hpx/util/unlock_guard.hpp
   hpx/traits/detail/reserve.hpp
   hpx/traits/concepts.hpp
   hpx/traits/has_member_xxx.hpp
@@ -44,7 +39,6 @@ set(util_headers
 # Default location is $HPX_ROOT/libs/util/src
 set(util_sources
   manage_config.cpp
-  set_thread_name.cpp
 )
 
 include(HPX_AddModule)

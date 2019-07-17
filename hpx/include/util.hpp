@@ -17,7 +17,7 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/activate_counters.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
