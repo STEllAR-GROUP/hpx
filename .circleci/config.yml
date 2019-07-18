@@ -806,6 +806,7 @@ jobs:
               ninja -j2 -k 0 tests.unit.modules.logging
               ninja -j2 -k 0 tests.unit.modules.preprocessor
               ninja -j2 -k 0 tests.unit.modules.statistics
+              ninja -j2 -k 0 tests.unit.modules.testing
               ninja -j2 -k 0 tests.unit.modules.thread_support
               ninja -j2 -k 0 tests.unit.modules.type_support
               ninja -j2 -k 0 tests.unit.modules.util_misc
@@ -828,6 +829,7 @@ jobs:
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.logging
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.statistics
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.testing
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.type_support
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.util_misc
