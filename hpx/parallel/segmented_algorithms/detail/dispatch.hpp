@@ -378,8 +378,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             std::list<std::exception_ptr> errors;
             parallel::util::detail::handle_remote_exceptions<
                     ExPolicy
-                >::call(f.get_exception_ptr(), errors);
+                >::call(f.get_exception_ptr(), errors); // NOLINT(bugprone-use-after-move)
 
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             HPX_ASSERT(errors.empty());
             throw exception_list(std::move(errors));
         }

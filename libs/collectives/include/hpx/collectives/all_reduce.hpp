@@ -444,7 +444,7 @@ namespace hpx { namespace lcos
 
         return all_reduce(
             hpx::find_from_basename(std::move(name), root_site),
-            std::move(local_result), std::forward<F>(op), this_site);
+            std::forward<T>(local_result), std::forward<F>(op), this_site);
     }
 }}
 

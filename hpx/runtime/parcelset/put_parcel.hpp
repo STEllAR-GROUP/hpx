@@ -124,6 +124,7 @@ namespace hpx { namespace parcelset
             {
                 naming::gid_type gid = dest.get_gid();
                 naming::detail::strip_credits_from_gid(gid);
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 HPX_ASSERT(gid);
 
                 pp(detail::create_parcel::call_with_action(
@@ -134,6 +135,7 @@ namespace hpx { namespace parcelset
             else if (dest.get_management_type() == naming::id_type::managed_move_credit)
             {
                 naming::gid_type gid = naming::detail::move_gid(dest.get_gid());
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 HPX_ASSERT(gid);
 
                 pp(detail::create_parcel::call_with_action(

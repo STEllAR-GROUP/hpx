@@ -371,7 +371,7 @@ namespace hpx { namespace lcos
         using arg_type = typename util::decay<T>::type;
 
         auto all_to_all_data_direct =
-            [HPX_CAPTURE_MOVE(local_result), this_site](
+            [HPX_CAPTURE_FORWARD(local_result), this_site](
                     hpx::future<hpx::id_type>&& f)
             -> hpx::future<std::vector<arg_type> >
             {
@@ -424,7 +424,7 @@ namespace hpx { namespace lcos
 
         return all_to_all(
             hpx::find_from_basename(std::move(name), root_site),
-            std::move(local_result), this_site);
+            std::forward<T>(local_result), this_site);
     }
 }}
 

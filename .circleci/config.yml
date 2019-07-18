@@ -127,6 +127,7 @@ jobs:
                 -DHPX_WITH_COMPILER_WARNINGS=On \
                 -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=On \
                 -DHPX_WITH_DEPRECATION_WARNINGS=Off \
+                -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
                 -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
                 -DHPX_WITH_TESTS_DEBUG_LOG=On \
                 -DHPX_WITH_TESTS_DEBUG_LOG_DESTINATION=/hpx/build/debug-log.txt \
@@ -179,16 +180,6 @@ jobs:
           root: /hpx
           paths:
             - ./build
-
-  clang_tidy:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Running clang-tidy
-          command: |
-              /hpx/source/tools/clang-tidy.sh -diff-master
 
   inspect:
     <<: *defaults
@@ -1011,10 +1002,6 @@ workflows:
           requires:
             - checkout_code
           <<: *gh_pages_filter
-      - clang_tidy:
-          requires:
-            - configure
-          <<: *gh_pages_filter
       - inspect:
           requires:
             - configure
@@ -1094,7 +1081,6 @@ workflows:
       - install:
           requires:
             - inspect
-            - clang_tidy
             - core
             - docs
             - tests.examples
