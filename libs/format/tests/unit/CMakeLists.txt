@@ -14,6 +14,7 @@ foreach(test ${tests})
 
   add_executable(${test}_test ${sources})
   target_link_libraries(${test}_test hpx_format hpx_testing)
+  set_target_properties(${test}_test PROPERTIES FOLDER "Tests/Unit/Modules/Format")
 
   add_hpx_unit_test("modules.format" ${test} ${${test}_PARAMETERS})
 
