@@ -114,7 +114,7 @@ namespace lcos {
         using base_type::valid;
 
         /// \returns A future<Result> object with the same shared state as *this.
-        /// \throw future_error if *this has no shared state or if get_future
+        /// \throws future_error if *this has no shared state or if get_future
         ///         or get_shared_future has already been called on a promise
         ///         with the same shared state as *this.
         /// Error conditions:
@@ -126,7 +126,7 @@ namespace lcos {
 
         /// \return A shared_future<Result> object with the same shared state
         ///          as *this.
-        /// \throw future_error if *this has no shared state or if
+        /// \throws future_error if *this has no shared state or if
         ///         get_shared_future has already been called on a promise
         ///         with the same shared state as *this.
         /// Error conditions:
@@ -137,7 +137,7 @@ namespace lcos {
 
         /// \brief Effects atomically stores the value r in the shared state and makes
         ///          that state ready (30.6.4).
-        /// \throw
+        /// \throws
         ///   - future_error if its shared state already has a stored value or
         /// \exception    exception.
         /// Error conditions:
@@ -148,7 +148,7 @@ namespace lcos {
 
         /// \brief Effects atomically stores the exception pointer p in the shared
         ///          state and makes that state ready (30.6.4).
-        /// \throw future_error if its shared state already has a stored value
+        /// \throws future_error if its shared state already has a stored value
         ///         or exception.
         /// Error conditions:
         //   - promise_already_satisfied if its shared state already has a
@@ -213,7 +213,7 @@ namespace lcos {
         using base_type::valid;
 
         /// \return A future<Result> object with the same shared state as *this.
-        /// \throw future_error if *this has no shared state or if get_future
+        /// \throws future_error if *this has no shared state or if get_future
         ///         or get_shared_future has already been called on a promise
         ///         with the same shared state as *this.
         /// Error conditions:
@@ -225,7 +225,7 @@ namespace lcos {
 
         /// \return A shared_future<Result> object with the same shared state
         ///          as *this.
-        /// \throw future_error if *this has no shared state or if
+        /// \throws future_error if *this has no shared state or if
         ///         get_shared_future has already been called on a promise
         ///         with the same shared state as *this.
         /// Error conditions:
@@ -236,7 +236,7 @@ namespace lcos {
 
         /// Effects: atomically stores the value r in the shared state and makes
         ///          that state ready (30.6.4).
-        /// \throw
+        /// \throws
         ///   - future_error if its shared state already has a stored value or
         ///     exception, or
         ///   - any exception thrown by the constructor selected to copy an
@@ -252,7 +252,7 @@ namespace lcos {
 
         /// \brief atomically stores the exception pointer p in the shared
         ///          state and makes that state ready (30.6.4).
-        /// \throw future_error if its shared state already has a stored value
+        /// \throws future_error if its shared state already has a stored value
         ///         or exception.
         /// Error conditions:
         ///   - promise_already_satisfied if its shared state already has a
