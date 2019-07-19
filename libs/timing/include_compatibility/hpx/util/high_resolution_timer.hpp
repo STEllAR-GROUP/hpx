@@ -9,12 +9,11 @@
 
 #if defined(HPX_TIMING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/util/high_resolution_timer.hpp is deprecated, \
     please include hpx/timing/high_resolution_timer.hpp instead")
 #else
-#warning \
-    "The header hpx/util/high_resolution_timer.hpp is deprecated, \
+#warning "The header hpx/util/high_resolution_timer.hpp is deprecated, \
     please include hpx/timing/high_resolution_timer.hpp instead"
 #endif
 #endif

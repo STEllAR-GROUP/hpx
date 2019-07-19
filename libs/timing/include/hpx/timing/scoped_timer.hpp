@@ -12,18 +12,18 @@
 
 #include <cstdint>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     template <typename T>
     struct scoped_timer
     {
         scoped_timer(T& t, bool enabled = true)
           : started_at_(enabled ? hpx::util::high_resolution_clock::now() : 0)
           , t_(enabled ? &t : nullptr)
-        {}
+        {
+        }
 
         scoped_timer(scoped_timer const&) = delete;
-        scoped_timer(scoped_timer && rhs) noexcept
+        scoped_timer(scoped_timer&& rhs) noexcept
           : started_at_(rhs.started_at_)
           , t_(rhs.t_)
         {
@@ -39,7 +39,7 @@ namespace hpx { namespace util
         }
 
         scoped_timer& operator=(scoped_timer const& rhs) = delete;
-        scoped_timer& operator=(scoped_timer && rhs) noexcept
+        scoped_timer& operator=(scoped_timer&& rhs) noexcept
         {
             started_at_ = rhs.started_at_;
             t_ = rhs.t_;

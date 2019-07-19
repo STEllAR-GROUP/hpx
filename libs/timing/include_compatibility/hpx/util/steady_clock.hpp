@@ -9,12 +9,10 @@
 
 #if defined(HPX_TIMING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/steady_clock.hpp is deprecated, \
+#pragma message("The header hpx/util/steady_clock.hpp is deprecated, \
     please include hpx/timing/steady_clock.hpp instead")
 #else
-#warning \
-    "The header hpx/util/steady_clock.hpp is deprecated, \
+#warning "The header hpx/util/steady_clock.hpp is deprecated, \
     please include hpx/timing/steady_clock.hpp instead"
 #endif
 #endif

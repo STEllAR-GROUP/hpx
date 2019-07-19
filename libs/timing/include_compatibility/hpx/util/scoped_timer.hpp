@@ -9,12 +9,10 @@
 
 #if defined(HPX_TIMING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/scoped_timer.hpp is deprecated, \
+#pragma message("The header hpx/util/scoped_timer.hpp is deprecated, \
     please include hpx/timing/scoped_timer.hpp instead")
 #else
-#warning \
-    "The header hpx/util/scoped_timer.hpp is deprecated, \
+#warning "The header hpx/util/scoped_timer.hpp is deprecated, \
     please include hpx/timing/scoped_timer.hpp instead"
 #endif
 #endif

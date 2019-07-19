@@ -11,8 +11,7 @@
 
 #include <cstdint>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     //
     //  high_resolution_timer
@@ -29,7 +28,8 @@ namespace hpx { namespace util
 
         high_resolution_timer(double t)
           : start_time_(static_cast<std::uint64_t>(t * 1e9))
-        {}
+        {
+        }
 
         static double now()
         {
@@ -40,7 +40,7 @@ namespace hpx { namespace util
         {
             start_time_ = take_time_stamp();
         }
-        double elapsed() const                  // return elapsed time in seconds
+        double elapsed() const    // return elapsed time in seconds
         {
             return double(take_time_stamp() - start_time_) * 1e-9;
         }
@@ -55,12 +55,13 @@ namespace hpx { namespace util
             return std::int64_t(take_time_stamp() - start_time_);
         }
 
-        double elapsed_max() const   // return estimated maximum value for elapsed()
+        double elapsed_max()
+            const    // return estimated maximum value for elapsed()
         {
             return (util::high_resolution_clock::max)() * 1e-9;
         }
 
-        double elapsed_min() const   // return minimum value for elapsed()
+        double elapsed_min() const    // return minimum value for elapsed()
         {
             return (util::high_resolution_clock::min)() * 1e-9;
         }
@@ -74,7 +75,6 @@ namespace hpx { namespace util
     private:
         std::uint64_t start_time_;
     };
-}} // namespace hpx::util
+}}    // namespace hpx::util
 
 #endif
-
