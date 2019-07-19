@@ -72,7 +72,7 @@ namespace lcos {
           : base_type()
         {}
 
-        /// \breif constructs a promise object and a shared state. The
+        /// \brief constructs a promise object and a shared state. The
         /// constructor uses the allocator a to allocate the memory for the
         /// shared state.
         template <typename Allocator>
