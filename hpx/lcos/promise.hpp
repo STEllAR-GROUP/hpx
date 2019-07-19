@@ -67,90 +67,90 @@ namespace lcos {
            > base_type;
 
     public:
-        // Effects: constructs a promise object and a shared state.
+        /// \brief constructs a promise object and a shared state.
         promise()
           : base_type()
         {}
 
-        // Effects: constructs a promise object and a shared state. The
-        // constructor uses the allocator a to allocate the memory for the
-        // shared state.
+        /// \breif constructs a promise object and a shared state. The
+        /// constructor uses the allocator a to allocate the memory for the
+        /// shared state.
         template <typename Allocator>
         promise(std::allocator_arg_t, Allocator const& a)
           : base_type(std::allocator_arg, a)
         {}
 
-        // Effects: constructs a new promise object and transfers ownership of
-        //          the shared state of other (if any) to the newly-
-        //          constructed object.
-        // Postcondition: other has no shared state.
+        /// \brief constructs a new promise object and transfers ownership of
+        ///          the shared state of other (if any) to the newly-
+        ///          constructed object.
+        /// \post other has no shared state.
         promise(promise&& other) noexcept : base_type(std::move(other))
         {}
 
-        // Effects: Abandons any shared state
+        /// \brief Abandons any shared state
         ~promise()
         {
         }
 
-        // Effects: Abandons any shared state (30.6.4) and then as if
-        //          promise(std::move(other)).swap(*this).
-        // Returns: *this.
+        /// \brief Abandons any shared state (30.6.4) and then as if
+        ///          promise(std::move(other)).swap(*this).
+        /// \return *this.
         promise& operator=(promise&& other) noexcept
         {
             base_type::operator=(std::move(other));
             return *this;
         }
 
-        // Effects: Exchanges the shared state of *this and other.
-        // Postcondition: *this has the shared state (if any) that other had
-        //                prior to the call to swap. other has the shared state
-        //                (if any) that *this had prior to the call to swap.
+        /// \brief Effects Exchanges the shared state of *this and other.
+        /// \post *this has the shared state (if any) that other had
+        ///                prior to the call to swap. other has the shared state
+        ///                (if any) that *this had prior to the call to swap.
         void swap(promise& other) noexcept
         {
             base_type::swap(other);
         }
 
-        // Returns: true only if *this refers to a shared state.
+        /// \returns true only if *this refers to a shared state.
         using base_type::valid;
 
-        // Returns: A future<Result> object with the same shared state as *this.
-        // Throws: future_error if *this has no shared state or if get_future
-        //         or get_shared_future has already been called on a promise
-        //         with the same shared state as *this.
-        // Error conditions:
-        //   - future_already_retrieved if get_future or get_shared_future has
-        //     already been called on a promise with the same shared state as
-        //     *this.
-        //   - no_state if *this has no shared state.
+        /// \returns A future<Result> object with the same shared state as *this.
+        /// \throw future_error if *this has no shared state or if get_future
+        ///         or get_shared_future has already been called on a promise
+        ///         with the same shared state as *this.
+        /// Error conditions:
+        ///   - future_already_retrieved if get_future or get_shared_future has
+        ///     already been called on a promise with the same shared state as
+        ///     *this.
+        ///   - no_state if *this has no shared state.
         using base_type::get_future;
 
-        // Returns: A shared_future<Result> object with the same shared state
-        //          as *this.
-        // Throws: future_error if *this has no shared state or if
-        //         get_shared_future has already been called on a promise
-        //         with the same shared state as *this.
-        // Error conditions:
-        //   - future_already_retrieved if get_shared_future has already been
-        //     called on a promise with the same shared state as *this.
-        //   - no_state if *this has no shared state.
+        /// \return A shared_future<Result> object with the same shared state
+        ///          as *this.
+        /// \throw future_error if *this has no shared state or if
+        ///         get_shared_future has already been called on a promise
+        ///         with the same shared state as *this.
+        /// Error conditions:
+        ///   - future_already_retrieved if get_shared_future has already been
+        ///     called on a promise with the same shared state as *this.
+        ///   - no_state if *this has no shared state.
         using base_type::get_shared_future;
 
-        // Effects: atomically stores the value r in the shared state and makes
-        //          that state ready (30.6.4).
-        // Throws:
-        //   - future_error if its shared state already has a stored value or
-        //     exception.
-        // Error conditions:
-        //   - promise_already_satisfied if its shared state already has a
-        //     stored value or exception.
-        //   - no_state if *this has no shared state.
+        /// \brief Effects atomically stores the value r in the shared state and makes
+        ///          that state ready (30.6.4).
+        /// \throw
+        ///   - future_error if its shared state already has a stored value or
+        /// \exception    exception.
+        /// Error conditions:
+        ///   - promise_already_satisfied if its shared state already has a
+        ///     stored value or exception.
+        ///   - no_state if *this has no shared state.
         using base_type::set_value;
 
-        // Effects: atomically stores the exception pointer p in the shared
-        //          state and makes that state ready (30.6.4).
-        // Throws: future_error if its shared state already has a stored value
-        //         or exception.
-        // Error conditions:
+        /// \brief Effects atomically stores the exception pointer p in the shared
+        ///          state and makes that state ready (30.6.4).
+        /// \throw future_error if its shared state already has a stored value
+        ///         or exception.
+        /// Error conditions:
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
@@ -167,97 +167,97 @@ namespace lcos {
             > base_type;
 
     public:
-        // Effects: constructs a promise object and a shared state.
+        /// \brief constructs a promise object and a shared state.
         promise()
           : base_type()
         {}
 
-        // Effects: constructs a promise object and a shared state. The
-        // constructor uses the allocator a to allocate the memory for the
-        // shared state.
+        /// \brief constructs a promise object and a shared state. The
+        /// constructor uses the allocator a to allocate the memory for the
+        /// shared state.
         template <typename Allocator>
         promise(std::allocator_arg_t, Allocator const& a)
           : base_type(std::allocator_arg, a)
         {}
 
-        // Effects: constructs a new promise object and transfers ownership of
-        //          the shared state of other (if any) to the newly-
-        //          constructed object.
-        // Postcondition: other has no shared state.
+        /// \brief constructs a new promise object and transfers ownership of
+        ///          the shared state of other (if any) to the newly-
+        ///          constructed object.
+        /// Postcondition: other has no shared state.
         promise(promise&& other) noexcept : base_type(std::move(other))
         {}
 
-        // Effects: Abandons any shared state
+        /// \brief Abandons any shared state
         ~promise()
         {}
 
-        // Effects: Abandons any shared state (30.6.4) and then as if
-        //          promise(std::move(other)).swap(*this).
-        // Returns: *this.
+        /// \brief Abandons any shared state (30.6.4) and then as if
+        ///          promise(std::move(other)).swap(*this).
+        /// \return *this.
         promise& operator=(promise&& other) noexcept
         {
             base_type::operator=(std::move(other));
             return *this;
         }
 
-        // Effects: Exchanges the shared state of *this and other.
-        // Postcondition: *this has the shared state (if any) that other had
-        //                prior to the call to swap. other has the shared state
-        //                (if any) that *this had prior to the call to swap.
+        /// \brief Effects Exchanges the shared state of *this and other.
+        /// \post *this has the shared state (if any) that other had
+        ///                prior to the call to swap. other has the shared state
+        ///                (if any) that *this had prior to the call to swap.
         void swap(promise& other) noexcept
         {
             base_type::swap(other);
         }
 
-        // Returns: true only if *this refers to a shared state.
+        /// \return true only if *this refers to a shared state.
         using base_type::valid;
 
-        // Returns: A future<Result> object with the same shared state as *this.
-        // Throws: future_error if *this has no shared state or if get_future
-        //         or get_shared_future has already been called on a promise
-        //         with the same shared state as *this.
-        // Error conditions:
-        //   - future_already_retrieved if get_future or get_shared_future has
-        //     already been called on a promise with the same shared state as
-        //     *this.
-        //   - no_state if *this has no shared state.
+        /// \return A future<Result> object with the same shared state as *this.
+        /// \throw future_error if *this has no shared state or if get_future
+        ///         or get_shared_future has already been called on a promise
+        ///         with the same shared state as *this.
+        /// Error conditions:
+        ///   - future_already_retrieved if get_future or get_shared_future has
+        ///     already been called on a promise with the same shared state as
+        ///     *this.
+        ///  - no_state if *this has no shared state.
         using base_type::get_future;
 
-        // Returns: A shared_future<Result> object with the same shared state
-        //          as *this.
-        // Throws: future_error if *this has no shared state or if
-        //         get_shared_future has already been called on a promise
-        //         with the same shared state as *this.
-        // Error conditions:
-        //   - future_already_retrieved if get_shared_future has already been
-        //     called on a promise with the same shared state as *this.
-        //   - no_state if *this has no shared state.
+        /// \return A shared_future<Result> object with the same shared state
+        ///          as *this.
+        /// \throw future_error if *this has no shared state or if
+        ///         get_shared_future has already been called on a promise
+        ///         with the same shared state as *this.
+        /// Error conditions:
+        ///   - future_already_retrieved if get_shared_future has already been
+        ///     called on a promise with the same shared state as *this.
+        ///   - no_state if *this has no shared state.
         using base_type::get_shared_future;
 
-        // Effects: atomically stores the value r in the shared state and makes
-        //          that state ready (30.6.4).
-        // Throws:
-        //   - future_error if its shared state already has a stored value or
-        //     exception, or
-        //   - any exception thrown by the constructor selected to copy an
-        //     object of R.
-        // Error conditions:
-        //   - promise_already_satisfied if its shared state already has a
-        //     stored value or exception.
-        //   - no_state if *this has no shared state.
+        /// Effects: atomically stores the value r in the shared state and makes
+        ///          that state ready (30.6.4).
+        /// \throw
+        ///   - future_error if its shared state already has a stored value or
+        ///     exception, or
+        ///   - any exception thrown by the constructor selected to copy an
+        ///     object of R.
+        /// Error conditions:
+        ///   - promise_already_satisfied if its shared state already has a
+        ///     stored value or exception.
+        ///   - no_state if *this has no shared state.
         void set_value()
         {
             base_type::set_value(hpx::util::unused);
         }
 
-        // Effects: atomically stores the exception pointer p in the shared
-        //          state and makes that state ready (30.6.4).
-        // Throws: future_error if its shared state already has a stored value
-        //         or exception.
-        // Error conditions:
-        //   - promise_already_satisfied if its shared state already has a
-        //     stored value or exception.
-        //   - no_state if *this has no shared state.
+        /// \brief atomically stores the exception pointer p in the shared
+        ///          state and makes that state ready (30.6.4).
+        /// \throw future_error if its shared state already has a stored value
+        ///         or exception.
+        /// Error conditions:
+        ///   - promise_already_satisfied if its shared state already has a
+        ///     stored value or exception.
+        ///   - no_state if *this has no shared state.
         using base_type::set_exception;
     };
 
@@ -271,7 +271,7 @@ namespace lcos {
 
 namespace std
 {
-    // Requires: Allocator shall be an allocator (17.6.3.5)
+    /// Requires: Allocator shall be an allocator (17.6.3.5)
     template <typename R, typename Allocator>
     struct uses_allocator<hpx::lcos::promise<R>, Allocator>
       : std::true_type
