@@ -191,9 +191,9 @@ namespace lcos {
         ~promise()
         {}
 
-        /// \brief Abandons any shared state (30.6.4) and then as if
+        /// \brief   Abandons any shared state (30.6.4) and then as if
         ///          promise(std::move(other)).swap(*this).
-        /// \return *this.
+        /// \returns *this.
         promise& operator=(promise&& other) noexcept
         {
             base_type::operator=(std::move(other));
