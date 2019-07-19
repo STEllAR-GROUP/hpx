@@ -135,11 +135,10 @@ namespace lcos {
         ///   - no_state if *this has no shared state.
         using base_type::get_shared_future;
 
-        /// \brief Effects atomically stores the value r in the shared state and makes
-        ///          that state ready (30.6.4).
-        /// \throws
-        ///   - future_error if its shared state already has a stored value or
-        /// \exception    exception.
+        /// \brief       Effects atomically stores the value r in the shared state and makes
+        ///              that state ready (30.6.4).
+        /// \throws      future_error if its shared state already has a stored value
+        /// \exception   if shared state has no stored value exception is raised.
         /// Error conditions:
         ///   - promise_already_satisfied if its shared state already has a
         ///     stored value or exception.
