@@ -72,18 +72,18 @@ namespace lcos {
           : base_type()
         {}
 
-        /// \brief constructs a promise object and a shared state. The
-        /// constructor uses the allocator a to allocate the memory for the
-        /// shared state.
+        /// \brief    constructs a promise object and a shared state. The
+        ///           constructor uses the allocator a to allocate the memory for the
+        ///           shared state.
         template <typename Allocator>
         promise(std::allocator_arg_t, Allocator const& a)
           : base_type(std::allocator_arg, a)
         {}
 
-        /// \brief constructs a new promise object and transfers ownership of
+        /// \brief   constructs a new promise object and transfers ownership of
         ///          the shared state of other (if any) to the newly-
         ///          constructed object.
-        /// \post other has no shared state.
+        /// \post    other has no shared state.
         promise(promise&& other) noexcept : base_type(std::move(other))
         {}
 
@@ -92,67 +92,65 @@ namespace lcos {
         {
         }
 
-        /// \brief Abandons any shared state (30.6.4) and then as if
+        /// \brief   Abandons any shared state (30.6.4) and then as if
         ///          promise(std::move(other)).swap(*this).
-        /// \return *this.
+        /// \returns *this.
         promise& operator=(promise&& other) noexcept
         {
             base_type::operator=(std::move(other));
             return *this;
         }
 
-        /// \brief Effects Exchanges the shared state of *this and other.
-        /// \post *this has the shared state (if any) that other had
-        ///                prior to the call to swap. other has the shared state
-        ///                (if any) that *this had prior to the call to swap.
+        /// \brief   Exchanges the shared state of *this and other.
+        /// \post    *this has the shared state (if any) that other had
+        ///          prior to the call to swap. other has the shared state
+        ///          (if any) that *this had prior to the call to swap.
         void swap(promise& other) noexcept
         {
             base_type::swap(other);
         }
 
-        /// \returns true only if *this refers to a shared state.
+        /// \returns  true only if *this refers to a shared state.
         using base_type::valid;
 
-        /// \returns A future<Result> object with the same shared state as *this.
-        /// \throws future_error if *this has no shared state or if get_future
-        ///         or get_shared_future has already been called on a promise
-        ///         with the same shared state as *this.
-        /// Error conditions:
-        ///   - future_already_retrieved if get_future or get_shared_future has
-        ///     already been called on a promise with the same shared state as
-        ///     *this.
-        ///   - no_state if *this has no shared state.
+        /// \returns   A future<Result> object with the same shared state as *this.
+        /// \throws    future_error if *this has no shared state or if get_future
+        ///            or get_shared_future has already been called on a promise
+        ///            with the same shared state as *this.
+        /// 
+        ///            - future_already_retrieved if get_future or get_shared_future has
+        ///            already been called on a promise with the same shared state as
+        ///            *this.
+        ///            no_state if *this has no shared state.
         using base_type::get_future;
 
-        /// \return A shared_future<Result> object with the same shared state
-        ///          as *this.
-        /// \throws future_error if *this has no shared state or if
-        ///         get_shared_future has already been called on a promise
-        ///         with the same shared state as *this.
-        /// Error conditions:
-        ///   - future_already_retrieved if get_shared_future has already been
-        ///     called on a promise with the same shared state as *this.
-        ///   - no_state if *this has no shared state.
+        /// \returns    A shared_future<Result> object with the same shared state
+        ///             as *this.
+        /// \throws     future_error if *this has no shared state or if
+        ///             get_shared_future has already been called on a promise
+        ///             with the same shared state as *this.
+        /// 
+        ///             future_already_retrieved if get_shared_future has already been
+        ///             called on a promise with the same shared state as *this.
+        ///             no_state if *this has no shared state.
         using base_type::get_shared_future;
 
         /// \brief       Effects atomically stores the value r in the shared state and makes
         ///              that state ready (30.6.4).
         /// \throws      future_error if its shared state already has a stored value
         /// \exception   if shared state has no stored value exception is raised.
-        /// Error conditions:
-        ///   - promise_already_satisfied if its shared state already has a
-        ///     stored value or exception.
-        ///   - no_state if *this has no shared state.
+        ///              promise_already_satisfied if its shared state already has a
+        ///              stored value or exception.
+        ///              no_state if *this has no shared state.
         using base_type::set_value;
 
-        /// \brief Effects atomically stores the exception pointer p in the shared
-        ///          state and makes that state ready (30.6.4).
-        /// \throws future_error if its shared state already has a stored value
-        ///         or exception.
-        /// Error conditions:
-        //   - promise_already_satisfied if its shared state already has a
-        //     stored value or exception.
-        //   - no_state if *this has no shared state.
+        /// \brief       Effects atomically stores the exception pointer p in the shared
+        ///              state and makes that state ready (30.6.4).
+        /// \throws      future_error if its shared state already has a stored value
+        ///              or exception.
+        //               promise_already_satisfied if its shared state already has a
+        //               stored value or exception.
+        //               no_state if *this has no shared state.
         using base_type::set_exception;
     };
 
@@ -171,22 +169,22 @@ namespace lcos {
           : base_type()
         {}
 
-        /// \brief constructs a promise object and a shared state. The
-        /// constructor uses the allocator a to allocate the memory for the
-        /// shared state.
+        /// \brief     constructs a promise object and a shared state. The
+        ///            constructor uses the allocator a to allocate the memory for the
+        ///            shared state.
         template <typename Allocator>
         promise(std::allocator_arg_t, Allocator const& a)
           : base_type(std::allocator_arg, a)
         {}
 
-        /// \brief constructs a new promise object and transfers ownership of
+        /// \brief   constructs a new promise object and transfers ownership of
         ///          the shared state of other (if any) to the newly-
         ///          constructed object.
-        /// Postcondition: other has no shared state.
+        /// \post    other has no shared state.
         promise(promise&& other) noexcept : base_type(std::move(other))
         {}
 
-        /// \brief Abandons any shared state
+        /// \brief   Abandons any shared state
         ~promise()
         {}
 
@@ -199,8 +197,8 @@ namespace lcos {
             return *this;
         }
 
-        /// \brief Effects Exchanges the shared state of *this and other.
-        /// \post *this has the shared state (if any) that other had
+        /// \brief         Exchanges the shared state of *this and other.
+        /// \post          *this has the shared state (if any) that other had
         ///                prior to the call to swap. other has the shared state
         ///                (if any) that *this had prior to the call to swap.
         void swap(promise& other) noexcept
@@ -208,55 +206,49 @@ namespace lcos {
             base_type::swap(other);
         }
 
-        /// \return true only if *this refers to a shared state.
+        /// \returns    true only if *this refers to a shared state.
         using base_type::valid;
 
-        /// \return A future<Result> object with the same shared state as *this.
-        /// \throws future_error if *this has no shared state or if get_future
-        ///         or get_shared_future has already been called on a promise
-        ///         with the same shared state as *this.
-        /// Error conditions:
-        ///   - future_already_retrieved if get_future or get_shared_future has
-        ///     already been called on a promise with the same shared state as
-        ///     *this.
-        ///  - no_state if *this has no shared state.
+        /// \returns    A future<Result> object with the same shared state as *this.
+        /// \throws     future_error if *this has no shared state or if get_future
+        ///             or get_shared_future has already been called on a promise
+        ///             with the same shared state as *this.
+        ///             future_already_retrieved if get_future or get_shared_future has
+        ///             already been called on a promise with the same shared state as
+        ///             *this.
+        ///             no_state if *this has no shared state.
         using base_type::get_future;
 
-        /// \return A shared_future<Result> object with the same shared state
-        ///          as *this.
-        /// \throws future_error if *this has no shared state or if
-        ///         get_shared_future has already been called on a promise
-        ///         with the same shared state as *this.
-        /// Error conditions:
-        ///   - future_already_retrieved if get_shared_future has already been
-        ///     called on a promise with the same shared state as *this.
-        ///   - no_state if *this has no shared state.
+        /// \returns   A shared_future<Result> object with the same shared state
+        ///            as *this.
+        /// \throws    future_error if *this has no shared state or if
+        ///            get_shared_future has already been called on a promise
+        ///            with the same shared state as *this.
+        ///            future_already_retrieved if get_shared_future has already been
+        ///            called on a promise with the same shared state as *this.
+        ///            no_state if *this has no shared state.
         using base_type::get_shared_future;
 
-        /// Effects: atomically stores the value r in the shared state and makes
-        ///          that state ready (30.6.4).
-        /// \throws
-        ///   - future_error if its shared state already has a stored value or
-        ///     exception, or
-        ///   - any exception thrown by the constructor selected to copy an
-        ///     object of R.
-        /// Error conditions:
-        ///   - promise_already_satisfied if its shared state already has a
-        ///     stored value or exception.
-        ///   - no_state if *this has no shared state.
+        /// \brief     atomically stores the value r in the shared state and makes
+        ///            that state ready (30.6.4).
+        /// \throws    future_error if its shared state already has a stored value or
+        ///            exception, or any exception thrown by the constructor
+				///            selected to copy an object of R.
+        ///            promise_already_satisfied if its shared state already has a
+        ///            stored value or exception.
+        ///            no_state if *this has no shared state.
         void set_value()
         {
             base_type::set_value(hpx::util::unused);
         }
 
-        /// \brief atomically stores the exception pointer p in the shared
-        ///          state and makes that state ready (30.6.4).
-        /// \throws future_error if its shared state already has a stored value
-        ///         or exception.
-        /// Error conditions:
-        ///   - promise_already_satisfied if its shared state already has a
-        ///     stored value or exception.
-        ///   - no_state if *this has no shared state.
+        /// \brief     atomically stores the exception pointer p in the shared
+        ///            state and makes that state ready (30.6.4).
+        /// \throws    future_error if its shared state already has a stored value
+        ///            or exception.
+        ///            promise_already_satisfied if its shared state already has a
+        ///            stored value or exception.
+        ///            no_state if *this has no shared state.
         using base_type::set_exception;
     };
 
