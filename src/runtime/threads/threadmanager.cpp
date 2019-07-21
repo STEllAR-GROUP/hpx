@@ -505,7 +505,7 @@ namespace hpx { namespace threads
 
             case resource::abp_priority_fifo:
             {
-#if defined(HPX_HAVE_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER) && defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
@@ -541,7 +541,7 @@ namespace hpx { namespace threads
 
             case resource::abp_priority_lifo:
             {
-#if defined(HPX_HAVE_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER) && defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
