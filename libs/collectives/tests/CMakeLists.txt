@@ -39,6 +39,6 @@ if (HPX_WITH_TESTS_HEADERS)
     modules.collectives
     HEADERS ${collectives_headers}
     HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-    NOHPX_INIT NOLIBS
+    NOLIBS
     DEPENDENCIES hpx_collectives)
 endif()

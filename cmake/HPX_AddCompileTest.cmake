@@ -4,16 +4,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 function(add_hpx_compile_test category name)
-  set(options FAILURE_EXPECTED NOHPX_INIT NOLIBS)
+  set(options FAILURE_EXPECTED NOLIBS)
   set(one_value_args SOURCE_ROOT FOLDER)
   set(multi_value_args SOURCES COMPONENT_DEPENDENCIES DEPENDENCIES)
 
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   set(_additional_flags)
-  if(${name}_NOHPX_INIT)
-    set(_additional_flags ${_additional_flags} NOHPX_INIT)
-  endif()
   if(${name}_NOLIBS)
     set(_additional_flags ${_additional_flags} NOLIBS)
   endif()
@@ -77,16 +74,13 @@ function(add_hpx_headers_compile_test subcategory name)
 endfunction(add_hpx_headers_compile_test)
 
 function(add_hpx_header_tests category)
-  set(options NOHPX_INIT NOLIBS)
+  set(options NOLIBS)
   set(one_value_args HEADER_ROOT)
   set(multi_value_args HEADERS EXCLUDE EXCLUDE_FROM_ALL COMPONENT_DEPENDENCIES DEPENDENCIES)
 
   cmake_parse_arguments(${category} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   set(_additional_flags)
-  if(${category}_NOHPX_INIT)
-    set(_additional_flags ${_additional_flags} NOHPX_INIT)
-  endif()
   if(${category}_NOLIBS)
     set(_additional_flags ${_additional_flags} NOLIBS)
   endif()
