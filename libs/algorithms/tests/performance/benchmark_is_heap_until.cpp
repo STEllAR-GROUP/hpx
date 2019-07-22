@@ -12,7 +12,6 @@
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/util/format.hpp>
 
 #include <boost/program_options.hpp>
 
