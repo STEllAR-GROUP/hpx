@@ -18,14 +18,18 @@
 // class type and has a nested type member x::name. The generated
 // trait ends up in a namespace where the macro itself has been
 // placed.
-#define HPX_HAS_XXX_TRAIT_DEF(Name)                                           \
-    template <typename T, typename Enable = void>                             \
-    struct HPX_PP_CAT(has_, Name) : std::false_type {};                       \
-                                                                              \
-    template <typename T>                                                     \
-    struct HPX_PP_CAT(has_, Name)<T,                                          \
-        typename hpx::util::always_void<typename T::Name>::type>              \
-      : std::true_type {}                                                     \
-/**/
+#define HPX_HAS_XXX_TRAIT_DEF(Name)                                            \
+    template <typename T, typename Enable = void>                              \
+    struct HPX_PP_CAT(has_, Name)                                              \
+      : std::false_type                                                        \
+    {                                                                          \
+    };                                                                         \
+                                                                               \
+    template <typename T>                                                      \
+    struct HPX_PP_CAT(has_,                                                    \
+        Name)<T, typename hpx::util::always_void<typename T::Name>::type>      \
+      : std::true_type                                                         \
+    {                                                                          \
+    } /**/
 
 #endif
