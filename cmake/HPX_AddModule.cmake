@@ -137,9 +137,12 @@ function(add_hpx_module name)
   endif()
 
   target_link_libraries(hpx_${name} PUBLIC ${${name}_DEPENDENCIES})
+  # CMAKE_BINARY_DIR necessary to get hpx/config/version.hpp
+  # FIXME: should we move it to the generated config module headers directly ?
   target_include_directories(hpx_${name} PUBLIC
     $<BUILD_INTERFACE:${HEADER_ROOT}>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)
 
   target_link_libraries(hpx_${name} PRIVATE hpx_internal_flags)
 

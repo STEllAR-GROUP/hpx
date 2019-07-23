@@ -6,8 +6,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_EXAMPLES_HDF5)
-  if(NOT HDF5_CXX_LIBRARIES)
-    hpx_error("The Interpolate1D example requires HDF C++ library")
+  if(NOT HDF5_CXX_LIBRARIES OR NOT HDF5_IS_PARALLEL)
+    hpx_error("The Interpolate1D example requires HDF C++ library enabled for thread-safety")
   endif()
 
   # just recurse into all components subdirectories and execute the scripts there

@@ -1610,11 +1610,6 @@ target_include_directories(hpx::hwloc SYSTEM INTERFACE ${HWLOC_INCLUDE_DIR})
 target_link_libraries(hpx::hwloc INTERFACE ${HWLOC_LIBRARIES})
 
 ################################################################################
-# Set search paths for generated headers.
-################################################################################
-include_directories("${CMAKE_BINARY_DIR}")
-
-################################################################################
 # Enable integration with Intel Amplifier
 ################################################################################
 if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
