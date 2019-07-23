@@ -24,8 +24,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
 #if defined(HPX_HAVE_INTERNAL_ALLOCATOR)
     ///////////////////////////////////////////////////////////////////////////
     template <typename T = int>
@@ -81,10 +80,10 @@ namespace hpx { namespace util
             return (std::numeric_limits<size_type>::max)() / sizeof(T);
         }
 
-        template <typename U, typename ... Args>
-        void construct(U* p, Args &&... args)
+        template <typename U, typename... Args>
+        void construct(U* p, Args&&... args)
         {
-            ::new((void *)p) U(std::forward<Args>(args)...);
+            ::new ((void*) p) U(std::forward<Args>(args)...);
         }
 
         template <typename U>
@@ -95,15 +94,15 @@ namespace hpx { namespace util
     };
 
     template <typename T>
-    HPX_CONSTEXPR
-    bool operator==(internal_allocator<T> const&, internal_allocator<T> const&)
+    HPX_CONSTEXPR bool operator==(
+        internal_allocator<T> const&, internal_allocator<T> const&)
     {
         return true;
     }
 
     template <typename T>
-    HPX_CONSTEXPR
-    bool operator!=(internal_allocator<T> const&, internal_allocator<T> const&)
+    HPX_CONSTEXPR bool operator!=(
+        internal_allocator<T> const&, internal_allocator<T> const&)
     {
         return false;
     }
@@ -112,9 +111,8 @@ namespace hpx { namespace util
     template <typename T = int>
     using internal_allocator = std::allocator<T>;
 #endif
-}}
+}}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-
