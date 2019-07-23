@@ -1823,7 +1823,7 @@ Here is a full grammar describing the possible format of mappings:
 
 .. productionlist::
    mappings: `distribution` | `mapping` (";" `mapping`)*
-   distribution: "compact" | "scatter" | "balanced" | "numa-balanced"
+   distribution: "compact" | "scatter" | "balanced" | "numa-balanced" | "process"
    mapping: `thread_spec` "=" `pu_specs`
    thread_spec: "thread:" `range_specs`
    pu_specs: `pu_spec` ("." `pu_spec`)*
@@ -1869,20 +1869,31 @@ only their first processing unit ``pu:0`` should be used.
    where each bit in the bitmasks corresponds to a processing unit the listed
    worker thread will be bound to run on.
 
-The difference between the four possible predefined distribution schemes
-(``compact``, ``scatter``, ``balanced`` and ``numa-balanced``) is best explained
-with an example. Imagine that we have a system with 4 cores and 4 hardware
-threads per core on 2 sockets. If we place 8 threads the assignments produced by
-the ``compact``, ``scatter``, ``balanced`` and ``numa-balanced`` types are shown
-in the figure below. Notice that ``compact`` does not fully utilize all the
-cores in the system. For this reason it is recommended that applications are run
-using the ``scatter`` or ``balanced``/``numa-balanced`` options in most cases.
+The difference between the predefined distribution schemes (``compact``,
+``scatter``, ``balanced`` and ``numa-balanced``) is best explained with an
+example. Imagine that we have a system with 4 cores and 4 hardware threads per
+core on 2 sockets. If we place 8 threads the assignments produced by the
+``compact``, ``scatter``, ``balanced`` and ``numa-balanced`` types are shown in
+the figure below. Notice that ``compact`` does not fully utilize all the cores
+in the system. For this reason it is recommended that applications are run using
+the ``scatter`` or ``balanced``/``numa-balanced`` options in most cases.
 
 .. _commandline_affinities:
 
 .. figure:: ../_static/images/affinities.png
 
    Schematic of thread affinity type distributions.
+
+The ``process`` option is different from the other distributions in that it does
+not define an explicit distribution, but instead uses the implicit distribution
+set by the process affinity mask. This is usually the case when running |hpx|
+applications through |mpi|_ or a batch environment. If no process mask is set it
+is equivalent to the ``compact`` distribution. The number of threads will
+automatically be set to the number of processing units in the process mask, and
+one thread will be bound to each processing unit in the mask. Currently this is
+complementary to the explicit support in |hpx| for batch environments. If you
+want to use the ``process`` binding option, it is recommended that you use the
+command line option :option:`--hpx:ignore-batch-env` as well.
 
 .. [#] The phase of a |hpx|-thread counts how often this thread has been
        activated.
