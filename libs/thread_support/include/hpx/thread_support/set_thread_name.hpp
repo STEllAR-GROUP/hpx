@@ -11,17 +11,15 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <windows.h>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     void set_thread_name(char const* threadName, DWORD dwThreadID = DWORD(-1));
-}}
+}}    // namespace hpx::util
 
 #else
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     inline void set_thread_name(char const* threadName) {}
-}}
+}}    // namespace hpx::util
 
 #endif
 

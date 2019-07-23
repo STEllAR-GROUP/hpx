@@ -12,17 +12,16 @@
 
 #include <hpx/thread_support/set_thread_name.hpp>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     DWORD const MS_VC_EXCEPTION = 0x406D1388;
 
-#pragma pack(push,8)
+#pragma pack(push, 8)
     typedef struct tagTHREADNAME_INFO
     {
-       DWORD dwType;      // Must be 0x1000.
-       LPCSTR szName;     // Pointer to name (in user addr space).
-       DWORD dwThreadID;  // Thread ID (-1=caller thread).
-       DWORD dwFlags;     // Reserved for future use, must be zero.
+        DWORD dwType;        // Must be 0x1000.
+        LPCSTR szName;       // Pointer to name (in user addr space).
+        DWORD dwThreadID;    // Thread ID (-1=caller thread).
+        DWORD dwFlags;       // Reserved for future use, must be zero.
     } THREADNAME_INFO;
 #pragma pack(pop)
 
@@ -37,13 +36,13 @@ namespace hpx { namespace util
 
         __try
         {
-            RaiseException(MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR),
-                (ULONG_PTR*)&info);
+            RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR),
+                (ULONG_PTR*) &info);
         }
-        __except(EXCEPTION_EXECUTE_HANDLER)
+        __except (EXCEPTION_EXECUTE_HANDLER)
         {
         }
     }
-}}
+}}    // namespace hpx::util
 
 #endif

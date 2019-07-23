@@ -9,12 +9,10 @@
 
 #if defined(HPX_THREAD_SUPPORT_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/thread_specific_ptr.hpp is deprecated, \
+#pragma message("The header hpx/util/thread_specific_ptr.hpp is deprecated, \
     please include hpx/thread_support/thread_specific_ptr.hpp instead")
 #else
-#warning \
-    "The header hpx/util/thread_specific_ptr.hpp is deprecated, \
+#warning "The header hpx/util/thread_specific_ptr.hpp is deprecated, \
     please include hpx/thread_support/thread_specific_ptr.hpp instead"
 #endif
 #endif

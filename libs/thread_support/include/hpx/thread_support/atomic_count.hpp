@@ -11,8 +11,7 @@
 
 #include <atomic>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     class atomic_count
     {
     public:
@@ -21,7 +20,8 @@ namespace hpx { namespace util
     public:
         explicit atomic_count(long value)
           : value_(value)
-        {}
+        {
+        }
 
         atomic_count& operator=(long value)
         {
@@ -59,6 +59,6 @@ namespace hpx { namespace util
     private:
         std::atomic<long> value_;
     };
-}}
+}}    // namespace hpx::util
 
 #endif /*HPX_UTIL_ATOMIC_COUNT_HPP*/

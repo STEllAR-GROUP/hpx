@@ -9,8 +9,7 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // This is a helper structure to make sure a lock gets unlocked and locked
     // again in a scope.
@@ -37,6 +36,6 @@ namespace hpx { namespace util
     private:
         Mutex& m_;
     };
-}}
+}}    // namespace hpx::util
 
 #endif /*HPX_UTIL_UNLOCK_GUARD_HPP*/

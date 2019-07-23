@@ -14,19 +14,20 @@
 // Needed to get potentially get _GLIBCXX_HAVE_TLS
 #include <cstdlib>
 
+// clang-format off
 #if !defined(HPX_WINDOWS)
 #  define HPX_EXPORT_THREAD_SPECIFIC_PTR HPX_EXPORT
 #else
 #  define HPX_EXPORT_THREAD_SPECIFIC_PTR
 #endif
+// clang-format on
 
 // native implementation
 #if defined(HPX_HAVE_NATIVE_TLS)
 
 #if (!defined(__ANDROID__) && !defined(ANDROID)) && !defined(__bgq__)
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     template <typename T, typename Tag>
     struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
     {
@@ -48,31 +49,27 @@ namespace hpx { namespace util
             return *ptr_;
         }
 
-        void reset(
-            T* new_value = nullptr
-            )
+        void reset(T* new_value = nullptr)
         {
             delete ptr_;
             ptr_ = new_value;
         }
 
-      private:
+    private:
         static HPX_NATIVE_TLS T* ptr_;
     };
 
     template <typename T, typename Tag>
     HPX_NATIVE_TLS T* thread_specific_ptr<T, Tag>::ptr_ = nullptr;
-}}
+}}    // namespace hpx::util
 
 #else
 
 #include <hpx/type_support/static.hpp>
 #include <pthread.h>
 
-namespace hpx { namespace util
-{
-    namespace detail
-    {
+namespace hpx { namespace util {
+    namespace detail {
         struct thread_specific_ptr_key
         {
             thread_specific_ptr_key()
@@ -83,7 +80,7 @@ namespace hpx { namespace util
 
             pthread_key_t key;
         };
-    }
+    }    // namespace detail
 
     template <typename T, typename Tag>
     struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
@@ -92,23 +89,22 @@ namespace hpx { namespace util
 
         static pthread_key_t get_key()
         {
-            static_<
-                detail::thread_specific_ptr_key,
-                thread_specific_ptr<T, Tag>
-            > key_holder;
+            static_<detail::thread_specific_ptr_key,
+                thread_specific_ptr<T, Tag>>
+                key_holder;
 
             return key_holder.get().key;
         }
 
         T* get() const
         {
-            return reinterpret_cast<T *>(
+            return reinterpret_cast<T*>(
                 pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
         }
 
         T* operator->() const
         {
-            return reinterpret_cast<T *>(
+            return reinterpret_cast<T*>(
                 pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
         }
 
@@ -116,19 +112,17 @@ namespace hpx { namespace util
         {
             T* ptr = nullptr;
 
-            ptr = reinterpret_cast<T *>(
+            ptr = reinterpret_cast<T*>(
                 pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
             HPX_ASSERT(nullptr != ptr);
             return *ptr;
         }
 
-        void reset(
-            T* new_value = nullptr
-            )
+        void reset(T* new_value = nullptr)
         {
             T* ptr = nullptr;
 
-            ptr = reinterpret_cast<T *>(
+            ptr = reinterpret_cast<T*>(
                 pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
             if (nullptr != ptr)
                 delete ptr;
@@ -137,7 +131,7 @@ namespace hpx { namespace util
             pthread_setspecific(thread_specific_ptr<T, Tag>::get_key(), ptr);
         }
     };
-}}
+}}    // namespace hpx::util
 
 #endif
 
@@ -146,13 +140,12 @@ namespace hpx { namespace util
 
 #include <boost/thread/tss.hpp>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     template <typename T, typename Tag>
     struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
     {
-        typedef typename boost::thread_specific_ptr<T>::element_type
-            element_type;
+        typedef
+            typename boost::thread_specific_ptr<T>::element_type element_type;
 
         T* get() const
         {
@@ -169,22 +162,19 @@ namespace hpx { namespace util
             return ptr_.operator*();
         }
 
-        void reset(
-            T* new_value = nullptr
-            )
+        void reset(T* new_value = nullptr)
         {
             ptr_.reset(new_value);
         }
 
-      private:
+    private:
         static boost::thread_specific_ptr<T> ptr_;
     };
 
     template <typename T, typename Tag>
     boost::thread_specific_ptr<T> thread_specific_ptr<T, Tag>::ptr_;
-}}
+}}    // namespace hpx::util
 
 #endif
 
-#endif // HPX_BABB0428_2085_4DCF_851A_8819D186835E
-
+#endif    // HPX_BABB0428_2085_4DCF_851A_8819D186835E

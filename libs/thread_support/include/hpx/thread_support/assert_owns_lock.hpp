@@ -13,26 +13,26 @@
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     HPX_HAS_MEMBER_XXX_TRAIT_DEF(owns_lock)
 
     template <typename Lock>
     void assert_owns_lock(Lock const&, int)
-    {}
+    {
+    }
 
-#if !defined(HPX_DISABLE_ASSERTS) && !defined(BOOST_DISABLE_ASSERTS) && !defined(NDEBUG)
+#if !defined(HPX_DISABLE_ASSERTS) && !defined(BOOST_DISABLE_ASSERTS) &&        \
+    !defined(NDEBUG)
 
     template <typename Lock>
-    typename std::enable_if<
-        has_owns_lock<Lock>::value
-    >::type assert_owns_lock(Lock const& l, long)
+    typename std::enable_if<has_owns_lock<Lock>::value>::type assert_owns_lock(
+        Lock const& l, long)
     {
         HPX_ASSERT(l.owns_lock());
     }
 
 #endif
-}}}
+}}}    // namespace hpx::util::detail
 
 #define HPX_ASSERT_OWNS_LOCK(l) ::hpx::util::detail::assert_owns_lock(l, 0L)
 
