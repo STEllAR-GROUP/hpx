@@ -10,10 +10,10 @@
 #include <cstdint>
 #include <vector>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     // helper function for counter evaluation
-    inline std::uint64_t get_and_reset_value(std::uint64_t& value, bool reset) noexcept
+    inline std::uint64_t get_and_reset_value(
+        std::uint64_t& value, bool reset) noexcept
     {
         std::uint64_t result = value;
         if (reset)
@@ -21,7 +21,8 @@ namespace hpx { namespace util
         return result;
     }
 
-    inline std::int64_t get_and_reset_value(std::int64_t& value, bool reset) noexcept
+    inline std::int64_t get_and_reset_value(
+        std::int64_t& value, bool reset) noexcept
     {
         std::int64_t result = value;
         if (reset)
@@ -46,6 +47,6 @@ namespace hpx { namespace util
 
         return result;
     }
-}}
+}}    // namespace hpx::util
 
 #endif

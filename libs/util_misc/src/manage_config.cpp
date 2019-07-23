@@ -9,11 +9,9 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
-    inline std::string
-    trim_whitespace (std::string const &s)
+    inline std::string trim_whitespace(std::string const& s)
     {
         typedef std::string::size_type size_type;
 
@@ -37,11 +35,11 @@ namespace hpx { namespace util
         {
             std::string::size_type p = s.find_first_of("=");
             std::string key(trim_whitespace(s.substr(0, p)));
-            if (key[key.size()-1] == '!')
-                key.erase(key.size()-1);
+            if (key[key.size() - 1] == '!')
+                key.erase(key.size() - 1);
 
-            std::string value(trim_whitespace(s.substr(p+1)));
+            std::string value(trim_whitespace(s.substr(p + 1)));
             config_.insert(map_type::value_type(key, value));
         }
     }
-}}
+}}    // namespace hpx::util

@@ -9,12 +9,10 @@
 
 #if defined(HPX_UTIL_MISC_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/manage_config.hpp is deprecated, \
+#pragma message("The header hpx/util/manage_config.hpp is deprecated, \
     please include hpx/util_misc/manage_config.hpp instead")
 #else
-#warning \
-    "The header hpx/util/manage_config.hpp is deprecated, \
+#warning "The header hpx/util/manage_config.hpp is deprecated, \
     please include hpx/util_misc/manage_config.hpp instead"
 #endif
 #endif

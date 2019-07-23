@@ -14,8 +14,7 @@
 #include <string>
 #include <type_traits>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     template <typename DestType, typename SrcType>
     DestType safe_lexical_cast(
         SrcType const& value, DestType const& dflt = DestType())
@@ -32,9 +31,8 @@ namespace hpx { namespace util
     }
 
     template <typename DestType, typename Config>
-    typename std::enable_if<
-        std::is_integral<DestType>::value, DestType
-    >::type get_entry_as(
+    typename std::enable_if<std::is_integral<DestType>::value, DestType>::type
+    get_entry_as(
         Config const& config, std::string const& key, DestType const& dflt)
     {
         return safe_lexical_cast(config.get_entry(key, dflt), dflt);
@@ -44,10 +42,10 @@ namespace hpx { namespace util
     DestType get_entry_as(
         Config const& config, std::string const& key, std::string const& dflt)
     {
-        return safe_lexical_cast(config.get_entry(key, dflt),
-            safe_lexical_cast<DestType>(dflt));
+        return safe_lexical_cast(
+            config.get_entry(key, dflt), safe_lexical_cast<DestType>(dflt));
     }
 
-}}
+}}    // namespace hpx::util
 
 #endif /*HPX_UTIL_SAFE_LEXICAL_CAST_HPP*/

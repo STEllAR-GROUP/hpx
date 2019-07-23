@@ -9,17 +9,16 @@
 #define HPX_TRAITS_DETAIL_RESERVE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/is_range.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/iterator_support/is_range.hpp>
+#include <hpx/iterator_support/range.hpp>
 
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <vector>
 
-namespace hpx { namespace traits { namespace detail
-{
+namespace hpx { namespace traits { namespace detail {
     ///////////////////////////////////////////////////////////////////////
     // not every random access sequence is reservable
     // so we need an explicit trait to determine this
@@ -27,21 +26,21 @@ namespace hpx { namespace traits { namespace detail
 
     template <typename Range>
     using is_reservable = std::integral_constant<bool,
-          is_range<typename std::decay<Range>::type>::value &&
-          has_reserve<typename std::decay<Range>::type>::value>;
+        is_range<typename std::decay<Range>::type>::value &&
+            has_reserve<typename std::decay<Range>::type>::value>;
 
     ///////////////////////////////////////////////////////////////////////
     template <typename Container>
     HPX_FORCEINLINE
-    typename std::enable_if<!is_reservable<Container>::value>::type
-    reserve_if_reservable(Container&, std::size_t) noexcept
+        typename std::enable_if<!is_reservable<Container>::value>::type
+        reserve_if_reservable(Container&, std::size_t) noexcept
     {
     }
 
     template <typename Container>
     HPX_FORCEINLINE
-    typename std::enable_if<is_reservable<Container>::value>::type
-    reserve_if_reservable(Container& v, std::size_t n)
+        typename std::enable_if<is_reservable<Container>::value>::type
+        reserve_if_reservable(Container& v, std::size_t n)
     {
         v.reserve(n);
     }
@@ -50,41 +49,37 @@ namespace hpx { namespace traits { namespace detail
     // Reserve sufficient space in the given vector if the underlying
     // iterator type of the given range allow calculating the size on O(1).
     template <typename Future, typename Range>
-    HPX_FORCEINLINE
-    void reserve_if_random_access_by_range(std::vector<Future>&,
-            Range const&, std::false_type) noexcept
+    HPX_FORCEINLINE void reserve_if_random_access_by_range(
+        std::vector<Future>&, Range const&, std::false_type) noexcept
     {
     }
 
     template <typename Future, typename Range>
-    HPX_FORCEINLINE
-    void reserve_if_random_access_by_range(std::vector<Future>& v,
-            Range const& r, std::true_type)
+    HPX_FORCEINLINE void reserve_if_random_access_by_range(
+        std::vector<Future>& v, Range const& r, std::true_type)
     {
         v.reserve(util::size(r));
     }
 
     template <typename Future, typename Range>
-    HPX_FORCEINLINE
-    void reserve_if_random_access_by_range(std::vector<Future>& v,
-            Range const& r)
+    HPX_FORCEINLINE void reserve_if_random_access_by_range(
+        std::vector<Future>& v, Range const& r)
     {
-        typedef typename range_traits<Range>::iterator_category
-            iterator_category;
+        typedef
+            typename range_traits<Range>::iterator_category iterator_category;
 
-        typedef typename std::is_base_of<
-                std::random_access_iterator_tag, iterator_category
-            >::type is_random_access;
+        typedef typename std::is_base_of<std::random_access_iterator_tag,
+            iterator_category>::type is_random_access;
 
         reserve_if_random_access_by_range(v, r, is_random_access());
     }
 
     template <typename Container, typename Range>
-    HPX_FORCEINLINE
-    void reserve_if_random_access_by_range(Container&, Range const&)
+    HPX_FORCEINLINE void reserve_if_random_access_by_range(
+        Container&, Range const&)
     {
         // do nothing if it's not a vector
     }
-}}}
+}}}    // namespace hpx::traits::detail
 
 #endif /*HPX_TRAITS_DETAIL_RESERVE_HPP*/

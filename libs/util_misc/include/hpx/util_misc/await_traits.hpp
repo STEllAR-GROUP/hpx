@@ -13,8 +13,7 @@
 
 #if defined(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
 
-namespace std { namespace experimental
-{
+namespace std { namespace experimental {
     template <typename R, typename...>
     struct coroutine_traits
     {
@@ -27,7 +26,7 @@ namespace std { namespace experimental
     template <>
     struct coroutine_handle<void>
     {
-        static coroutine_handle from_address(void *addr) noexcept
+        static coroutine_handle from_address(void* addr) noexcept
         {
             coroutine_handle me;
             me.ptr = addr;
@@ -37,7 +36,7 @@ namespace std { namespace experimental
         {
             resume();
         }
-        void *address() const
+        void* address() const
         {
             return ptr;
         }
@@ -53,7 +52,7 @@ namespace std { namespace experimental
         {
             return __builtin_coro_done(ptr);
         }
-        coroutine_handle &operator=(decltype(nullptr))
+        coroutine_handle& operator=(decltype(nullptr))
         {
             ptr = nullptr;
             return *this;
@@ -73,7 +72,7 @@ namespace std { namespace experimental
         }
 
     protected:
-        void *ptr;
+        void* ptr;
     };
 
     template <typename Promise>
@@ -81,19 +80,19 @@ namespace std { namespace experimental
     {
         using coroutine_handle<>::operator=;
 
-        static coroutine_handle from_address(void *addr) noexcept
+        static coroutine_handle from_address(void* addr) noexcept
         {
             coroutine_handle me;
             me.ptr = addr;
             return me;
         }
 
-        Promise &promise() const
+        Promise& promise() const
         {
-            return *reinterpret_cast<Promise *>(
+            return *reinterpret_cast<Promise*>(
                 __builtin_coro_promise(ptr, alignof(Promise), false));
         }
-        static coroutine_handle from_promise(Promise &promise)
+        static coroutine_handle from_promise(Promise& promise)
         {
             coroutine_handle p;
             p.ptr = __builtin_coro_promise(&promise, alignof(Promise), true);
@@ -102,15 +101,15 @@ namespace std { namespace experimental
     };
 
     template <typename Promise>
-    bool operator==(coroutine_handle<Promise> const &left,
-        coroutine_handle<Promise> const &right) noexcept
+    bool operator==(coroutine_handle<Promise> const& left,
+        coroutine_handle<Promise> const& right) noexcept
     {
         return left.address() == right.address();
     }
 
     template <typename Promise>
-    bool operator!=(coroutine_handle<Promise> const &left,
-        coroutine_handle<Promise> const &right) noexcept
+    bool operator!=(coroutine_handle<Promise> const& left,
+        coroutine_handle<Promise> const& right) noexcept
     {
         return !(left == right);
     }
@@ -121,12 +120,8 @@ namespace std { namespace experimental
         {
             return false;
         }
-        void await_suspend(coroutine_handle<>) const
-        {
-        }
-        void await_resume() const
-        {
-        }
+        void await_suspend(coroutine_handle<>) const {}
+        void await_resume() const {}
     };
 
     struct suspend_never
@@ -135,14 +130,10 @@ namespace std { namespace experimental
         {
             return true;
         }
-        void await_suspend(coroutine_handle<>) const
-        {
-        }
-        void await_resume() const
-        {
-        }
+        void await_suspend(coroutine_handle<>) const {}
+        void await_resume() const {}
     };
-}}
+}}    // namespace std::experimental
 
 #endif    // defined(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
 #endif    // HPX_UTIL_933DADE6_D0AB_46EB_98F3_9ECDAE31A4DA

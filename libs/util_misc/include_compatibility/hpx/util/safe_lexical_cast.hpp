@@ -9,12 +9,10 @@
 
 #if defined(HPX_UTIL_MISC_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/safe_lexical_cast.hpp is deprecated, \
+#pragma message("The header hpx/util/safe_lexical_cast.hpp is deprecated, \
     please include hpx/util_misc/safe_lexical_cast.hpp instead")
 #else
-#warning \
-    "The header hpx/util/safe_lexical_cast.hpp is deprecated, \
+#warning "The header hpx/util/safe_lexical_cast.hpp is deprecated, \
     please include hpx/util_misc/safe_lexical_cast.hpp instead"
 #endif
 #endif

@@ -8,10 +8,9 @@
 
 #include <cstddef>
 
-namespace hpx { namespace util
-{
-    inline std::size_t
-    calculate_fanout(std::size_t size, std::size_t local_fanout)
+namespace hpx { namespace util {
+    inline std::size_t calculate_fanout(
+        std::size_t size, std::size_t local_fanout)
     {
         if (size == 0 || local_fanout == 0)
             return 1;
@@ -26,6 +25,6 @@ namespace hpx { namespace util
         }
         return fanout;
     }
-}}
+}}    // namespace hpx::util
 
 #endif
