@@ -9,12 +9,10 @@
 
 #if defined(HPX_HASHING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/fibhash.hpp is deprecated, \
+#pragma message("The header hpx/util/fibhash.hpp is deprecated, \
     please include hpx/hashing/fibhash.hpp instead")
 #else
-#warning \
-    "The header hpx/util/fibhash.hpp is deprecated, \
+#warning "The header hpx/util/fibhash.hpp is deprecated, \
     please include hpx/hashing/fibhash.hpp instead"
 #endif
 #endif

@@ -11,13 +11,11 @@
 
 #include <hpx/config.hpp>
 
-#include <cstdlib>
 #include <cstddef>
+#include <cstdlib>
 
-namespace hpx { namespace util
-{
-    namespace detail
-    {
+namespace hpx { namespace util {
+    namespace detail {
         template <std::size_t N>
         struct hash_helper;
 
@@ -30,12 +28,13 @@ namespace hpx { namespace util
         template <std::size_t N>
         struct hash_helper
         {
-            HPX_STATIC_CONSTEXPR std::size_t log2 = hash_helper<(N >> 1)>::log2 + 1;
+            HPX_STATIC_CONSTEXPR std::size_t log2 =
+                hash_helper<(N >> 1)>::log2 + 1;
             HPX_STATIC_CONSTEXPR std::size_t shift_amount = 64 - log2;
         };
 
         HPX_STATIC_CONSTEXPR std::size_t golden_ratio = 11400714819323198485llu;
-    }
+    }    // namespace detail
 
     // This function calculates the hash based on a multiplicative Fibonacci
     // scheme
@@ -45,10 +44,9 @@ namespace hpx { namespace util
         using helper = detail::hash_helper<N>;
         static_assert(N != 0, "This algorithm only works with N != 0");
         static_assert((1 << helper::log2) == N, "N must be a power of two");
-        return
-            (detail::golden_ratio * (i ^ (i >> helper::shift_amount)))
-            >> helper::shift_amount;
+        return (detail::golden_ratio * (i ^ (i >> helper::shift_amount))) >>
+            helper::shift_amount;
     }
-}}
+}}    // namespace hpx::util
 
 #endif

@@ -12,19 +12,17 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #endif
 
-#include <cstdlib>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <random>
 #include <string>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
-    namespace detail
-    {
+namespace hpx { namespace util {
+    namespace detail {
         // ------------------------------------------------------------------------
         // mix -- mix 3 32-bit values reversibly.
         //
@@ -68,9 +66,9 @@ namespace hpx { namespace util
         // rotates.
         // ------------------------------------------------------------------------
         template <typename T>
-        inline
-            void mix(T& a, T& b, T& c)
+        inline void mix(T& a, T& b, T& c)
         {
+            // clang-format off
             a -= b; a -= c; a ^= (c >> 13);
             b -= c; b -= a; b ^= (a << 8);
             c -= a; c -= b; c ^= (b >> 13);
@@ -80,8 +78,9 @@ namespace hpx { namespace util
             a -= b; a -= c; a ^= (c >> 3);
             b -= c; b -= a; b ^= (a << 10);
             c -= a; c -= b; c ^= (b >> 15);
+            // clang-format on
         }
-    }
+    }    // namespace detail
 
     /////////////////////////////////////////////////////////////////////////////
     /// The jenkins_hash class encapsulates a hash calculation function published
@@ -94,20 +93,28 @@ namespace hpx { namespace util
 
         /// The seedenum is used as a dummy parameter to distinguish the different
         /// constructors
-        enum seedenum { seed = 1 };
+        enum seedenum
+        {
+            seed = 1
+        };
 
         /// constructors and destructor
-        jenkins_hash() : seed_(0) {}
+        jenkins_hash()
+          : seed_(0)
+        {
+        }
 
-        explicit jenkins_hash(size_type size){
-               unsigned int _seed = std::random_device{}();
-               std::mt19937 gen{_seed};
-               seed_ = std::uniform_int_distribution<>(0, size-1)(gen);
-           }
+        explicit jenkins_hash(size_type size)
+        {
+            unsigned int _seed = std::random_device{}();
+            std::mt19937 gen{_seed};
+            seed_ = std::uniform_int_distribution<>(0, size - 1)(gen);
+        }
 
         explicit jenkins_hash(size_type seedval, seedenum)
-            : seed_(seedval)
-        {}
+          : seed_(seedval)
+        {
+        }
 
         ~jenkins_hash() {}
 
@@ -164,66 +171,63 @@ namespace hpx { namespace util
         // See http://burtleburtle.net/bob/hash/evahash.html
         // Use for hash table lookup, or anything where one collision in 2^^32 is
         // acceptable.  Do NOT use for cryptographic purposes.
-        size_type hash (const char *k, std::size_t length) const
+        size_type hash(const char* k, std::size_t length) const
         {
             size_type a, b, c;
             std::size_t len = length;
 
             /* Set up the internal state */
-            a = b = 0x9e3779b9;  /* the golden ratio; an arbitrary value */
-            c = seed_;           /* the previous hash value - seed in our case */
+            a = b = 0x9e3779b9; /* the golden ratio; an arbitrary value */
+            c = seed_;          /* the previous hash value - seed in our case */
 
             /*---------------------------------------- handle most of the key */
             while (len >= 12)
             {
-                a += (k[0] + ((size_type)k[1] << 8)
-                    + ((size_type)k[2] << 16)
-                    + ((size_type)k[3] << 24));
-                b += (k[4] + ((size_type)k[5] << 8)
-                    + ((size_type)k[6] << 16)
-                    + ((size_type)k[7] << 24));
-                c += (k[8] + ((size_type)k[9] << 8)
-                    + ((size_type)k[10] << 16)
-                    + ((size_type)k[11] << 24));
+                a += (k[0] + ((size_type) k[1] << 8) +
+                    ((size_type) k[2] << 16) + ((size_type) k[3] << 24));
+                b += (k[4] + ((size_type) k[5] << 8) +
+                    ((size_type) k[6] << 16) + ((size_type) k[7] << 24));
+                c += (k[8] + ((size_type) k[9] << 8) +
+                    ((size_type) k[10] << 16) + ((size_type) k[11] << 24));
                 detail::mix(a, b, c);
                 k += 12;
                 len -= 12;
             }
 
             /*------------------------------------- handle the last 11 bytes */
-            c += (size_type)length;
-            switch(len)              /* all the case statements fall through */
+            c += (size_type) length;
+            switch (len) /* all the case statements fall through */
             {
             case 11:
-                c += ((size_type)k[10] << 24);
+                c += ((size_type) k[10] << 24);
                 HPX_FALLTHROUGH;
             case 10:
-                c += ((size_type)k[9] << 16);
+                c += ((size_type) k[9] << 16);
                 HPX_FALLTHROUGH;
             case 9:
-                c += ((size_type)k[8] << 8);
+                c += ((size_type) k[8] << 8);
                 HPX_FALLTHROUGH;
                 /* the first byte of c is reserved for the length */
             case 8:
-                b += ((size_type)k[7] << 24);
+                b += ((size_type) k[7] << 24);
                 HPX_FALLTHROUGH;
             case 7:
-                b += ((size_type)k[6] << 16);
+                b += ((size_type) k[6] << 16);
                 HPX_FALLTHROUGH;
             case 6:
-                b += ((size_type)k[5] << 8);
+                b += ((size_type) k[5] << 8);
                 HPX_FALLTHROUGH;
             case 5:
                 b += k[4];
                 HPX_FALLTHROUGH;
             case 4:
-                a += ((size_type)k[3] << 24);
+                a += ((size_type) k[3] << 24);
                 HPX_FALLTHROUGH;
             case 3:
-                a += ((size_type)k[2] << 16);
+                a += ((size_type) k[2] << 16);
                 HPX_FALLTHROUGH;
             case 2:
-                a += ((size_type)k[1] << 8);
+                a += ((size_type) k[1] << 8);
                 HPX_FALLTHROUGH;
             case 1:
                 a += k[0];
@@ -231,7 +235,7 @@ namespace hpx { namespace util
             }
 
             detail::mix(a, b, c);
-            return c;   /* report the result */
+            return c; /* report the result */
         }
 
     private:
@@ -241,13 +245,13 @@ namespace hpx { namespace util
         // serialization support
         friend class hpx::serialization::access;
 
-        template<class Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        template <class Archive>
+        void serialize(Archive& ar, const unsigned int version)
         {
-            ar & seed_;
+            ar& seed_;
         }
 #endif
     };
-}}
+}}    // namespace hpx::util
 
 #endif

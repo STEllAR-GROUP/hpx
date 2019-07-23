@@ -9,12 +9,10 @@
 
 #if defined(HPX_HASHING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/jenkins_hash.hpp is deprecated, \
+#pragma message("The header hpx/util/jenkins_hash.hpp is deprecated, \
     please include hpx/hashing/jenkins_hash.hpp instead")
 #else
-#warning \
-    "The header hpx/util/jenkins_hash.hpp is deprecated, \
+#warning "The header hpx/util/jenkins_hash.hpp is deprecated, \
     please include hpx/hashing/jenkins_hash.hpp instead"
 #endif
 #endif
