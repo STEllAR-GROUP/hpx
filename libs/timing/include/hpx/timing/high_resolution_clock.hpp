@@ -15,8 +15,7 @@
 #include <chrono>
 #include <cstdint>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     struct high_resolution_clock
     {
         // This function returns a tick count with a resolution (not
@@ -34,7 +33,7 @@ namespace hpx { namespace util
 
         // This function returns the smallest representable time unit as
         // returned by this clock.
-        static std::uint64_t (min)()
+        static std::uint64_t(min)()
         {
             typedef std::chrono::duration_values<std::chrono::nanoseconds>
                 duration_values;
@@ -43,7 +42,7 @@ namespace hpx { namespace util
 
         // This function returns the largest representable time unit as
         // returned by this clock.
-        static std::uint64_t (max)()
+        static std::uint64_t(max)()
         {
             typedef std::chrono::duration_values<std::chrono::nanoseconds>
                 duration_values;

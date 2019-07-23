@@ -24,8 +24,8 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/function_ref.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/util/iterator_adaptor.hpp>
 #include <hpx/util/iterator_facade.hpp>

@@ -14,7 +14,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/steady_clock.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/intrusive/slist.hpp>

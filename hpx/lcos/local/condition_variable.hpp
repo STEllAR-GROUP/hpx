@@ -13,10 +13,10 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/cache_aligned_data.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <mutex>

@@ -15,12 +15,12 @@
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/block_profiler.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/cache_aligned_data.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/internal_allocator.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
@@ -302,9 +302,6 @@ namespace hpx { namespace threads { namespace policies
                     ++addfrom->new_tasks_wait_count_;
                 }
 #endif
-                // measure thread creation time
-                util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
-
                 // create the new thread
                 threads::thread_init_data& data = util::get<0>(*task);
                 thread_state_enum state = util::get<1>(*task);
@@ -537,46 +534,45 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
         thread_queue(std::size_t queue_num = std::size_t(-1),
-                std::size_t max_count = max_thread_count)
-          : min_tasks_to_steal_pending(detail::get_min_tasks_to_steal_pending()),
-            min_tasks_to_steal_staged(detail::get_min_tasks_to_steal_staged()),
-            min_add_new_count(detail::get_min_add_new_count()),
-            max_add_new_count(detail::get_max_add_new_count()),
-            max_delete_count(detail::get_max_delete_count()),
-            max_terminated_threads(detail::get_max_terminated_threads()),
-            thread_map_count_(0),
-            work_items_(128, queue_num),
+            std::size_t max_count = max_thread_count)
+          : min_tasks_to_steal_pending(detail::get_min_tasks_to_steal_pending())
+          , min_tasks_to_steal_staged(detail::get_min_tasks_to_steal_staged())
+          , min_add_new_count(detail::get_min_add_new_count())
+          , max_add_new_count(detail::get_max_add_new_count())
+          , max_delete_count(detail::get_max_delete_count())
+          , max_terminated_threads(detail::get_max_terminated_threads())
+          , thread_map_count_(0)
+          , work_items_(128, queue_num)
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            work_items_wait_(0),
-            work_items_wait_count_(0),
+          , work_items_wait_(0)
+          , work_items_wait_count_(0)
 #endif
-            terminated_items_(128),
-            terminated_items_count_(0),
-            max_count_((0 == max_count)
-                      ? static_cast<std::size_t>(max_thread_count)
-                      : max_count),
-            new_tasks_(128),
+          , terminated_items_(128)
+          , terminated_items_count_(0)
+          , max_count_((0 == max_count) ?
+                    static_cast<std::size_t>(max_thread_count) :
+                    max_count)
+          , new_tasks_(128)
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            new_tasks_wait_(0),
-            new_tasks_wait_count_(0),
+          , new_tasks_wait_(0)
+          , new_tasks_wait_count_(0)
 #endif
-            thread_heap_small_(),
-            thread_heap_medium_(),
-            thread_heap_large_(),
-            thread_heap_huge_(),
+          , thread_heap_small_()
+          , thread_heap_medium_()
+          , thread_heap_large_()
+          , thread_heap_huge_()
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-            add_new_time_(0),
-            cleanup_terminated_time_(0),
+          , add_new_time_(0)
+          , cleanup_terminated_time_(0)
 #endif
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-            pending_misses_(0),
-            pending_accesses_(0),
-            stolen_from_pending_(0),
-            stolen_from_staged_(0),
-            stolen_to_pending_(0),
-            stolen_to_staged_(0),
+          , pending_misses_(0)
+          , pending_accesses_(0)
+          , stolen_from_pending_(0)
+          , stolen_from_staged_(0)
+          , stolen_to_pending_(0)
+          , stolen_to_staged_(0)
 #endif
-            add_new_logger_("thread_queue::add_new")
         {
             new_tasks_count_.data_ = 0;
             work_items_count_.data_ = 0;
@@ -1193,9 +1189,6 @@ namespace hpx { namespace threads { namespace policies
         // count of new_tasks stolen to this queue from other queues
         std::atomic<std::int64_t> stolen_to_staged_;
 #endif
-
-        util::block_profiler<add_new_tag> add_new_logger_;
-
         // count of new tasks to run, separate to new cache line to avoid false
         // sharing
         util::cache_line_data<std::atomic<std::int64_t>> new_tasks_count_;

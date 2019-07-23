@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server

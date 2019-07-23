@@ -14,7 +14,7 @@
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/util/steady_clock.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/timed_executors.hpp>

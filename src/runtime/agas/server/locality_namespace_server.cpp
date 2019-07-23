@@ -18,13 +18,13 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/timing/scoped_timer.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/scoped_timer.hpp>
 
 #include <atomic>
 #include <cstddef>

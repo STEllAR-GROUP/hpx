@@ -22,7 +22,7 @@ add_hpx_module(collectives
     DEPRECATION_WARNINGS
     SOURCES ${collectives_sources}
     HEADERS ${collectives_headers}
-    DEPENDENCIES hpx_assertion hpx_config hpx_format hpx_preprocessor
+    DEPENDENCIES hpx_assertion hpx_config hpx_format hpx_preprocessor hpx_timing
     FORCE_LINKING_GEN
     CMAKE_SUBDIRS examples tests
 )

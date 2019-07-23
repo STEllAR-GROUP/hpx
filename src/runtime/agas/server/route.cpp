@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/format.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -13,8 +14,7 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/format.hpp>
-#include <hpx/util/scoped_timer.hpp>
+#include <hpx/timing/scoped_timer.hpp>
 
 #include <atomic>
 #include <cstddef>

@@ -26,8 +26,8 @@
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/unique_function.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>
