@@ -9,12 +9,10 @@
 
 #if defined(HPX_STATISTICS_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/histogram.hpp is deprecated, \
+#pragma message("The header hpx/util/histogram.hpp is deprecated, \
     please include hpx/statistics/histogram.hpp instead")
 #else
-#warning \
-    "The header hpx/util/histogram.hpp is deprecated, \
+#warning "The header hpx/util/histogram.hpp is deprecated, \
     please include hpx/statistics/histogram.hpp instead"
 #endif
 #endif

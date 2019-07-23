@@ -9,12 +9,10 @@
 
 #if defined(HPX_STATISTICS_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/max.hpp is deprecated, \
+#pragma message("The header hpx/util/max.hpp is deprecated, \
     please include hpx/statistics/max.hpp instead")
 #else
-#warning \
-    "The header hpx/util/max.hpp is deprecated, \
+#warning "The header hpx/util/max.hpp is deprecated, \
     please include hpx/statistics/max.hpp instead"
 #endif
 #endif

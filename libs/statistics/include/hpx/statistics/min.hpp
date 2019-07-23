@@ -11,11 +11,11 @@
 namespace hpx { namespace util {
 
     template <typename T>
-    HPX_HOST_DEVICE HPX_CONSTEXPR inline T const& (min)(T const& a, T const& b)
+    HPX_HOST_DEVICE HPX_CONSTEXPR inline T const&(min)(T const& a, T const& b)
     {
         return a < b ? a : b;
     }
 
-}}
+}}    // namespace hpx::util
 
 #endif
