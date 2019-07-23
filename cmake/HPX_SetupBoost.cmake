@@ -119,7 +119,6 @@ if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
 endif()
 
 # Boost preprocessor definitions
-hpx_add_config_cond_define(BOOST_PARAMETER_MAX_ARITY 7)
 if(NOT Boost_USE_STATIC_LIBS)
   hpx_add_config_cond_define(BOOST_ALL_DYN_LINK)
 endif()
