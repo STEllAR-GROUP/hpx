@@ -67,6 +67,8 @@ namespace hpx { namespace threads { namespace detail
     //        compact
     //        scatter
     //        balanced
+    //        numa-balanced
+    //        process
     //
     //    mapping:
     //        thread-spec=pu-specs
@@ -117,6 +119,7 @@ namespace hpx { namespace threads { namespace detail
                 |   partlit("scatter") >> qi::attr(scatter)
                 |   partlit("balanced") >> qi::attr(balanced)
                 |   partlit("numa-balanced") >> qi::attr(numa_balanced)
+                |   partlit("process") >> qi::attr(process)
                 ;
 
             thread_spec =
@@ -924,6 +927,51 @@ namespace hpx { namespace threads { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    void decode_process_distribution(topology& t,
+        std::vector<mask_type>& affinities,
+        std::vector<std::size_t>& num_pus, error_code& ec)
+    {
+        threads::mask_type proc_mask = t.get_cpubind_mask();
+        std::size_t num_threads = affinities.size();
+        num_pus.resize(num_threads);
+        std::size_t num_cores = t.get_number_of_cores();
+
+        affinities.resize(num_threads);
+        num_pus.resize(num_threads);
+
+        for (std::size_t num_thread = 0; num_thread < num_threads; /**/)
+        {
+            for(std::size_t num_core = 0; num_core < num_cores; ++num_core)
+            {
+                std::size_t num_core_pus
+                    = t.get_number_of_core_pus(num_core);
+                for(std::size_t num_pu = 0; num_pu < num_core_pus; ++num_pu)
+                {
+                    threads::mask_type pu_mask = t.init_thread_affinity_mask(num_core, num_pu);
+                    if (!threads::bit_and(proc_mask, pu_mask)) continue;
+
+                    if (any(affinities[num_thread]))
+                    {
+                        HPX_THROWS_IF(ec, bad_parameter,
+                            "decode_process_distribution",
+                            hpx::util::format(
+                                "affinity mask for thread {1} has "
+                                "already been set",
+                                num_thread));
+                        return;
+                    }
+                    affinities[num_thread] =
+                        t.init_thread_affinity_mask(num_core, num_pu);
+                    num_pus[num_thread] = num_thread;
+
+                    if(++num_thread == num_threads)
+                        return;
+                }
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void decode_distribution(distribution_type d, topology& t,
         std::vector<mask_type>& affinities,
         std::size_t used_cores, std::size_t max_cores, std::size_t num_threads,
@@ -949,6 +997,10 @@ namespace hpx { namespace threads { namespace detail
         case numa_balanced:
             decode_numabalanced_distribution(t, affinities, used_cores, max_cores,
                 num_pus, ec);
+            break;
+
+        case process:
+            decode_process_distribution(t, affinities, num_pus, ec);
             break;
 
         default:

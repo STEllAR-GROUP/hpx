@@ -316,27 +316,62 @@ namespace hpx { namespace util
             boost::program_options::variables_map& vm,
             util::batch_environment& env, bool using_nodelist, bool initial)
         {
+            threads::topology& top = threads::create_topology();
+
+            // If using process binding we override "cores" and "all" options
+            // but keep explicit numeric values.
+            bool use_process_bind = false;
+            if (vm.count("hpx:bind"))
+            {
+                auto bind_vec = vm["hpx:bind"].as<std::vector<std::string>>();
+                if (bind_vec.size() == 1 && bind_vec[0] == "process")
+                {
+                    use_process_bind = true;
+                }
+            }
+            else if (rtcfg.get_entry("hpx.bind", "") == "process")
+            {
+                use_process_bind = true;
+            }
+
+            std::size_t process_threads = threads::count(top.get_cpubind_mask());
             std::size_t batch_threads = env.retrieve_number_of_threads();
-            std::size_t default_threads = thread::hardware_concurrency();
-            std::string threads_str = cfgmap.get_value<std::string>(
-                "hpx.os_threads", rtcfg.get_entry("hpx.os_threads",
-                    std::to_string(default_threads)));
+            std::size_t default_threads = threads::hardware_concurrency();
+            std::size_t default_cores = get_number_of_default_cores(env);
+
+            if (use_process_bind) {
+                default_threads = process_threads;
+                default_cores = process_threads;
+            }
+
+            std::string threads_str =
+                cfgmap.get_value<std::string>("hpx.os_threads",
+                    rtcfg.get_entry(
+                        "hpx.os_threads", std::to_string(default_threads)));
 
             if ("cores" == threads_str)
             {
-                std::size_t cores = get_number_of_default_cores(env);
+                std::size_t cores = default_cores;
                 default_threads = cores;
                 if (batch_threads == std::size_t(-1))
+                {
                     batch_threads = cores;
+                }
                 else
+                {
                     default_threads = batch_threads;
+                }
             }
             else if ("all" == threads_str)
             {
                 if (batch_threads == std::size_t(-1))
-                    batch_threads = thread::hardware_concurrency();
+                {
+                    batch_threads = default_threads;
+                }
                 else
+                {
                     default_threads = batch_threads;
+                }
             }
             else if (batch_threads != std::size_t(-1))
             {
@@ -356,19 +391,17 @@ namespace hpx { namespace util
                 threads_str = vm["hpx:threads"].as<std::string>();
                 if ("all" == threads_str)
                 {
-                    default_threads = thread::hardware_concurrency();
                     batch_threads = env.retrieve_number_of_threads();
                     if (batch_threads == std::size_t(-1))
                     {
-                        batch_threads = thread::hardware_concurrency();
+                        batch_threads = default_threads;
                     }
                     threads = batch_threads; //-V101
                 }
                 else if ("cores" == threads_str)
                 {
-                    std::size_t cores = get_number_of_default_cores(env);
-                    default_threads = cores;
-                    threads         = cores;
+                    default_threads = default_cores;
+                    threads         = default_cores;
                 }
                 else
                 {
@@ -611,11 +644,6 @@ namespace hpx { namespace util
             agas_host.empty() ? HPX_INITIAL_IP_ADDRESS : agas_host);
 #endif
 
-        // handle number of cores and threads
-        num_threads_ = detail::handle_num_threads(
-            cfgmap, rtcfg_, vm, env, using_nodelist, initial);
-        num_cores_ = detail::handle_num_cores(cfgmap, vm, num_threads_, env);
-
         bool run_agas_server = false;
         std::string hpx_host;
         std::uint16_t hpx_port = 0;
@@ -825,6 +853,11 @@ namespace hpx { namespace util
             affinity_bind_ = "balanced";
             ini_config += "hpx.bind!=" + affinity_bind_;
         }
+
+        // handle number of cores and threads
+        num_threads_ = detail::handle_num_threads(
+            cfgmap, rtcfg_, vm, env, using_nodelist, initial);
+        num_cores_ = detail::handle_num_cores(cfgmap, vm, num_threads_, env);
 
         // map host names to ip addresses, if requested
         hpx_host = mapnames.map(hpx_host, hpx_port);
