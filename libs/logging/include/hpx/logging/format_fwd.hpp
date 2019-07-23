@@ -13,20 +13,15 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-
 // this needs to be fixed!
 #ifndef JT28092007_format_fwd_HPP_DEFINED
 #define JT28092007_format_fwd_HPP_DEFINED
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace util { namespace logging {
-
-namespace writer {
-    struct named_write ;
-}
-
-}}}
+namespace hpx { namespace util { namespace logging { namespace writer {
+    struct named_write;
+}}}}    // namespace hpx::util::logging::writer
 
 #include <hpx/logging/format.hpp>
 

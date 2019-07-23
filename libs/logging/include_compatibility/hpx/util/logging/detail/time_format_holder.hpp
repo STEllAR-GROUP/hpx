@@ -9,12 +9,12 @@
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/logging/detail/time_format_holder.hpp is deprecated, \
+#pragma message(                                                               \
+    "The header hpx/util/logging/detail/time_format_holder.hpp is deprecated,  \
     please include hpx/logging/detail/time_format_holder.hpp instead")
 #else
-#warning \
-    "The header hpx/util/logging/detail/time_format_holder.hpp is deprecated, \
+#warning                                                                       \
+    "The header hpx/util/logging/detail/time_format_holder.hpp is deprecated,  \
     please include hpx/logging/detail/time_format_holder.hpp instead"
 #endif
 #endif

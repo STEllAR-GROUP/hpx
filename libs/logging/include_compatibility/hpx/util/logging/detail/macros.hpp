@@ -9,12 +9,11 @@
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/logging/detail/macros.hpp is deprecated, \
+#pragma message(                                                               \
+    "The header hpx/util/logging/detail/macros.hpp is deprecated,              \
     please include hpx/logging/detail/macros.hpp instead")
 #else
-#warning \
-    "The header hpx/util/logging/detail/macros.hpp is deprecated, \
+#warning "The header hpx/util/logging/detail/macros.hpp is deprecated,         \
     please include hpx/logging/detail/macros.hpp instead"
 #endif
 #endif

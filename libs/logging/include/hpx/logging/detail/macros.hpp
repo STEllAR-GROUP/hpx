@@ -25,7 +25,7 @@
 
 namespace hpx { namespace util { namespace logging {
 
-/**
+    /**
 @page macros Macros - how, what for?
 
 - @ref macros_if_else_strategy
@@ -126,29 +126,33 @@ HPX_DEFINE_LOG(g_l, logger_type)
 
 */
 
-///////////////////////////////////////////////////////////////////////////////
-// Defining Macros
+    ////////////////////////////////////////////////////////////////////////////
+    // Defining Macros
 
-#define HPX_DECLARE_LOG(NAME)                                                 \
-    ::hpx::util::logging::logger* NAME##_logger();                            \
-    namespace { void const* const ensure_creation_##NAME = NAME##_logger(); } \
-
-#define HPX_DEFINE_LOG(NAME, LEVEL)                                           \
-    ::hpx::util::logging::logger* NAME##_logger() {                           \
-        static ::hpx::util::logging::logger l(hpx::util::logging::level::LEVEL);\
-        return &l;                                                            \
+#define HPX_DECLARE_LOG(NAME)                                                  \
+    ::hpx::util::logging::logger* NAME##_logger();                             \
+    namespace {                                                                \
+        void const* const ensure_creation_##NAME = NAME##_logger();            \
     }
 
+#define HPX_DEFINE_LOG(NAME, LEVEL)                                            \
+    ::hpx::util::logging::logger* NAME##_logger()                              \
+    {                                                                          \
+        static ::hpx::util::logging::logger l(                                 \
+            hpx::util::logging::level::LEVEL);                                 \
+        return &l;                                                             \
+    }
 
-///////////////////////////////////////////////////////////////////////////////
-// Messages that were logged before initializing the log
-// - cache the message (and I'll write it even if the filter is turned off)
+    ////////////////////////////////////////////////////////////////////////////
+    // Messages that were logged before initializing the log
+    // - cache the message (and I'll write it even if the filter is turned off)
 
-#define HPX_LOG_USE_LOG(NAME, LEVEL)                                          \
-     if ( !(NAME##_logger()->is_enabled(LEVEL)) ) ;                           \
-     else NAME##_logger()->gather().out()
+#define HPX_LOG_USE_LOG(NAME, LEVEL)                                           \
+    if (!(NAME##_logger()->is_enabled(LEVEL)))                                 \
+        ;                                                                      \
+    else                                                                       \
+        NAME##_logger()->gather().out()
 
-
-}}}
+}}}    // namespace hpx::util::logging
 
 #endif

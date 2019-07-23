@@ -13,21 +13,20 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-
 #ifndef JT28092007_formatter_time_HPP_DEFINED
 #define JT28092007_formatter_time_HPP_DEFINED
 
 #include <hpx/logging/detail/fwd.hpp>
-#include <hpx/logging/format/formatter/convert_format.hpp>
-#include <hpx/logging/detail/manipulator.hpp> // is_generic
+#include <hpx/logging/detail/manipulator.hpp>    // is_generic
 #include <hpx/logging/detail/time_format_holder.hpp>
+#include <hpx/logging/format/formatter/convert_format.hpp>
 
 #include <string>
 #include <time.h>
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
 
-/**
+    /**
 @brief Prefixes the message with the time. You pass the format string at construction.
 
 It's friendlier than write_time_strf (which uses strftime).
@@ -50,56 +49,64 @@ std::(w)string and the string that holds your logged message. See convert_format
 For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
 "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
-template<class convert = do_convert_format::prepend> struct time_t
-    : is_generic, non_const_context<hpx::util::logging::detail::time_format_holder> {
-    typedef convert convert_type;
-    typedef non_const_context<hpx::util::logging::detail::time_format_holder>
-        non_const_context_base;
+    template <class convert = do_convert_format::prepend>
+    struct time_t
+      : is_generic
+      , non_const_context<hpx::util::logging::detail::time_format_holder>
+    {
+        typedef convert convert_type;
+        typedef non_const_context<
+            hpx::util::logging::detail::time_format_holder>
+            non_const_context_base;
 
-    /**
+        /**
         constructs a time object
     */
-    time_t(const std::string & format) : non_const_context_base(format) {}
+        time_t(const std::string& format)
+          : non_const_context_base(format)
+        {
+        }
 
-    void write_time(msg_type & msg, ::time_t val) const {
-        char buffer[64];
+        void write_time(msg_type& msg, ::time_t val) const
+        {
+            char buffer[64];
 
-        tm details = *localtime( &val);
-        non_const_context_base::context().write_time( buffer,
-            details.tm_mday, details.tm_mon + 1, details.tm_year + 1900,
-            details.tm_hour, details.tm_min, details.tm_sec);
+            tm details = *localtime(&val);
+            non_const_context_base::context().write_time(buffer,
+                details.tm_mday, details.tm_mon + 1, details.tm_year + 1900,
+                details.tm_hour, details.tm_min, details.tm_sec);
 
-        convert::write(buffer, msg);
-    }
+            convert::write(buffer, msg);
+        }
 
-    void operator()(msg_type & msg) const {
-        ::time_t val = ::time(nullptr);
-        write_time(msg, val);
-    }
+        void operator()(msg_type& msg) const
+        {
+            ::time_t val = ::time(nullptr);
+            write_time(msg, val);
+        }
 
-    bool operator==(const time_t & other) const {
-        return non_const_context_base::context() ==
-            other.non_const_context_base::context();
-    }
+        bool operator==(const time_t& other) const
+        {
+            return non_const_context_base::context() ==
+                other.non_const_context_base::context();
+        }
 
-    /** @brief configure through script
+        /** @brief configure through script
 
         the string = the time format
     */
-    void configure(const std::string & str) {
-        non_const_context_base::context().set_format(str);
-    }
+        void configure(const std::string& str)
+        {
+            non_const_context_base::context().set_format(str);
+        }
+    };
 
-};
-
-
-
-/** @brief time_t with default values. See time_t
+    /** @brief time_t with default values. See time_t
 
 @copydoc time_t
 */
-typedef time_t<> time;
+    typedef time_t<> time;
 
-}}}}
+}}}}    // namespace hpx::util::logging::formatter
 
 #endif

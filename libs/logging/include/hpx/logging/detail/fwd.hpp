@@ -13,15 +13,14 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-
 #ifndef JT28092007_fwd_HPP_DEFINED
 #define JT28092007_fwd_HPP_DEFINED
 
 #include <hpx/config.hpp>
 
-#include <time.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include <hpx/logging/detail/macros.hpp>
 
@@ -38,13 +37,13 @@
 
 namespace hpx { namespace util { namespace logging {
 
-namespace optimize {
-    struct cache_string_one_str ;
-}
+    namespace optimize {
+        struct cache_string_one_str;
+    }
 
-typedef optimize::cache_string_one_str msg_type;
+    typedef optimize::cache_string_one_str msg_type;
 
-/**
+    /**
 @page dealing_with_flags Dealing with flags.
 
 Some classes have extra settings. You can specify these settings in the
@@ -64,40 +63,58 @@ file f("out.txt", file_settings.initial_overwrite(true).do_append(false) );
 
 */
 
+    namespace detail {
+        template <class self_type, class type>
+        struct flag_with_self_type
+        {    //-V690
+            flag_with_self_type(self_type* self, const type& val = type())
+              : m_val(val)
+              , m_self(self)
+            {
+            }
+            flag_with_self_type(const flag_with_self_type& other)
+              : m_val(other.m_val)
+            {
+            }
 
-namespace detail {
-    template<class self_type, class type> struct flag_with_self_type { //-V690
-        flag_with_self_type(self_type * self, const type& val = type() )
-            : m_val(val), m_self(self) {}
-        flag_with_self_type(const flag_with_self_type & other) : m_val(other.m_val) {}
+            const type& operator()() const
+            {
+                return m_val;
+            }
+            self_type& operator()(const type& val)
+            {
+                m_val = val;
+                return *m_self;
+            }
 
-        const type & operator()() const { return m_val; }
-        self_type & operator()(const type & val) {
-            m_val = val; return *m_self;
-        }
+            void operator=(const self_type& other)
+            {
+                m_val = other.m_val;
+            }
 
-        void operator=(const self_type & other) {
-            m_val = other.m_val;
-        }
+        private:
+            type m_val;
+            self_type* m_self;
+        };
 
-    private:
-        type m_val;
-        self_type * m_self;
-    };
-
-    /**
+        /**
         @brief Can hold a flag. See dealing_with_flags
     */
-    template<class self_type> struct flag {
-        template<class val_type> struct t : flag_with_self_type<self_type,val_type> {
-            typedef flag_with_self_type<self_type,val_type> flag_base_type;
-            t(self_type * self, const val_type& val = val_type() )
-                : flag_base_type(self,val) {}
+        template <class self_type>
+        struct flag
+        {
+            template <class val_type>
+            struct t : flag_with_self_type<self_type, val_type>
+            {
+                typedef flag_with_self_type<self_type, val_type> flag_base_type;
+                t(self_type* self, const val_type& val = val_type())
+                  : flag_base_type(self, val)
+                {
+                }
+            };
         };
-    };
-}
+    }    // namespace detail
 
-}}}
-
+}}}    // namespace hpx::util::logging
 
 #endif

@@ -13,7 +13,6 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-
 #ifndef JT28092007_convert_destination_HPP_DEFINED
 #define JT28092007_convert_destination_HPP_DEFINED
 
@@ -23,9 +22,12 @@
 
 namespace hpx { namespace util { namespace logging { namespace destination {
 
-template<class t> struct into {};
+    template <class t>
+    struct into
+    {
+    };
 
-/**
+    /**
 @brief Allows writing messages to destinations
 
 It has 2 function overloads:
@@ -34,29 +36,35 @@ It has 2 function overloads:
 
 FIXME
 */
-namespace convert {
-    template<class obj> inline void write(const obj & m,
-        std::ostream & out) {
-        out << m;
-    }
+    namespace convert {
+        template <class obj>
+        inline void write(const obj& m, std::ostream& out)
+        {
+            out << m;
+        }
 
-    inline void write(const char* m,
-        std::ostream & out) {
-        out << m;
-    }
+        inline void write(const char* m, std::ostream& out)
+        {
+            out << m;
+        }
 
-    inline const char * do_convert(const char * c,
-        const into<const char*> &) { return c; }
-    inline const char * do_convert(const std::string & s,
-        const into<const char* > &) { return s.c_str(); }
+        inline const char* do_convert(const char* c, const into<const char*>&)
+        {
+            return c;
+        }
+        inline const char* do_convert(
+            const std::string& s, const into<const char*>&)
+        {
+            return s.c_str();
+        }
 
-    inline const std::string &
-        do_convert(const std::string & s,
-            const into< std::string > &) {
-        return s;
-    }
-}
+        inline const std::string& do_convert(
+            const std::string& s, const into<std::string>&)
+        {
+            return s;
+        }
+    }    // namespace convert
 
-}}}}
+}}}}    // namespace hpx::util::logging::destination
 
 #endif

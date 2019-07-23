@@ -13,14 +13,13 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-
 #ifndef JT28092007_manipulator_HPP_DEFINED
 #define JT28092007_manipulator_HPP_DEFINED
 
 #if defined(HPX_MSVC_WARNING_PRAGMA) && (HPX_MSVC >= 1020)
 #pragma warning(push)
 // 'class1' : inherits 'class2::member' via dominance
-#pragma warning(disable: 4250)
+#pragma warning(disable : 4250)
 #endif
 
 #include <hpx/logging/detail/fwd.hpp>
@@ -30,11 +29,9 @@
 #include <memory>
 #include <string>
 
-
 namespace hpx { namespace util { namespace logging {
 
-
-/**
+    /**
 @brief Manipulators = Formatters and/or destinations.
 
 
@@ -375,9 +372,9 @@ LERR_ << "third error " << i++;
 @endcode
 
 */
-namespace manipulator {
+    namespace manipulator {
 
-/**
+        /**
     @brief What to use as base class, for your manipulator classes
 
     When using formatters and destinations, formatters must share a %base class,
@@ -386,56 +383,55 @@ namespace manipulator {
     @note
     Don't use directly. Use formatter::base<> or destination::base<> instead.
 */
-template<
-        class raw_param_type,
-        class param_type >
-    struct base : hpx::util::logging::op_equal::same_type_op_equal_base {
+        template <class raw_param_type, class param_type>
+        struct base : hpx::util::logging::op_equal::same_type_op_equal_base
+        {
+            typedef base<raw_param_type, param_type> self_type;
 
-    typedef base<raw_param_type, param_type > self_type;
+            typedef self_type* ptr_type;
 
-    typedef self_type* ptr_type;
+            // used as msg_type in format_and_write classes
+            typedef raw_param_type raw_param;
+            typedef param_type param;
 
-    // used as msg_type in format_and_write classes
-    typedef raw_param_type raw_param;
-    typedef param_type param;
+            virtual void operator()(param val) const = 0;
 
-    virtual void operator()(param val) const = 0;
-
-    /** @brief Override this if you want to allow configuration through scripting
+            /** @brief Override this if you want to allow configuration through scripting
 
     That is, this allows configuration of your manipulator (formatter/destination)
     at run-time.
     */
-    virtual void configure(const std::string& ) {}
+            virtual void configure(const std::string&) {}
 
-protected:
-    // signify that we're only a base class - not to be used directly
-    base() {}
-    virtual ~base() {}
-};
+        protected:
+            // signify that we're only a base class - not to be used directly
+            base() {}
+            virtual ~base() {}
+        };
 
-
-/**
+        /**
     @brief Use this when implementing your own formatter or destination class.
     Don't use this directly. Use formatter::class_ or destination::class_
 */
-template<class type, class base_type> struct class_
-        : base_type,
-          hpx::util::logging::op_equal::same_type_op_equal<type> {
-
-    /** @brief Override this if you want to allow configuration through scripting
+        template <class type, class base_type>
+        struct class_
+          : base_type
+          , hpx::util::logging::op_equal::same_type_op_equal<type>
+        {
+            /** @brief Override this if you want to allow configuration through scripting
 
     That is, this allows configuration of your manipulator
     (formatter/destination) at run-time.
     */
-    virtual void configure(const std::string& ) {}
+            virtual void configure(const std::string&) {}
 
-    bool operator==(const class_& ) const { return true; }
-};
+            bool operator==(const class_&) const
+            {
+                return true;
+            }
+        };
 
-
-
-/** @brief In case your manipulator (formatter or destination)
+        /** @brief In case your manipulator (formatter or destination)
 needs to hold non-const context information, it can to derive from this.
 This automatically creates a shared pointer to the context information.
 
@@ -478,29 +474,39 @@ c.file_name("t3.txt");
 @remarks
 In case your manipulator has constant data, you don't need this
 */
-template<class context_type> struct non_const_context { //-V690
+        template <class context_type>
+        struct non_const_context
+        {    //-V690
 
-    // this can be used in the parent class, to forward data from its constructor
-    typedef non_const_context<context_type> non_const_context_base;
-private:
-    typedef non_const_context<context_type> self_type;
-    typedef std::shared_ptr<context_type> ptr_type;
+            // this can be used in the parent class, to forward data from its constructor
+            typedef non_const_context<context_type> non_const_context_base;
 
-protected:
-    non_const_context(const non_const_context& other) : m_context(other.m_context) {}
+        private:
+            typedef non_const_context<context_type> self_type;
+            typedef std::shared_ptr<context_type> ptr_type;
 
-    template <typename ...ps> non_const_context(const ps &... as)
-        : m_context(new context_type(as...)) {}
+        protected:
+            non_const_context(const non_const_context& other)
+              : m_context(other.m_context)
+            {
+            }
 
-    context_type & context() const    { return *(m_context.get()); }
+            template <typename... ps>
+            non_const_context(const ps&... as)
+              : m_context(new context_type(as...))
+            {
+            }
 
-private:
-    mutable ptr_type m_context;
-};
+            context_type& context() const
+            {
+                return *(m_context.get());
+            }
 
+        private:
+            mutable ptr_type m_context;
+        };
 
-
-/**
+        /**
 @brief Represents a generic manipulator (formatter or destination)
 
 A generic manipulator is one that does not derive from any formatter_base
@@ -547,58 +553,54 @@ g_l().add_formatter( my_cool_formatter() );
 
 @sa hpx::util::logging::destination::convert, hpx::util::logging::formatter::convert
 */
-struct is_generic {
-    virtual ~is_generic() {}
+        struct is_generic
+        {
+            virtual ~is_generic() {}
 
-    /** @brief Override this if you want to allow configuration through scripting
+            /** @brief Override this if you want to allow configuration through scripting
 
     That is, this allows configuration of your manipulator
     (formatter/destination) at run-time.
     */
-    virtual void configure(const std::string& ) {}
-};
+            virtual void configure(const std::string&) {}
+        };
 
-namespace detail {
+        namespace detail {
 
-    // holds the generic manipulator, and forwards to it
-    template<class generic_type, class manipulator_base> struct generic_holder
-            : class_<
-                    generic_holder<generic_type,manipulator_base>,
-                    manipulator_base > {
-        typedef typename manipulator_base::param param;
+            // holds the generic manipulator, and forwards to it
+            template <class generic_type, class manipulator_base>
+            struct generic_holder
+              : class_<generic_holder<generic_type, manipulator_base>,
+                    manipulator_base>
+            {
+                typedef typename manipulator_base::param param;
 
-        generic_type m_val;
-        generic_holder(const generic_type & val) : m_val(val) {}
+                generic_type m_val;
+                generic_holder(const generic_type& val)
+                  : m_val(val)
+                {
+                }
 
-        bool operator==(const generic_holder& other) const {
-            return m_val == other.m_val;
-        }
+                bool operator==(const generic_holder& other) const
+                {
+                    return m_val == other.m_val;
+                }
 
-        virtual void operator()(param val) const {
-            m_val.operator()(val);
-        }
+                virtual void operator()(param val) const
+                {
+                    m_val.operator()(val);
+                }
 
-        virtual void configure(const std::string& str) {
-            m_val.configure(str);
-        }
-    };
-}
+                virtual void configure(const std::string& str)
+                {
+                    m_val.configure(str);
+                }
+            };
+        }    // namespace detail
 
+    }    // namespace manipulator
 
-
-
-
-
-
-
-
-
-
-
-
-} // namespace manipulator
-
-/**
+    /**
 @brief Formatter is a manipulator.
 It allows you to format the message before writing it to the destination(s)
 
@@ -613,25 +615,29 @@ See:
 - @ref manipulator::non_const_context "formatter::non_const_context"
 
 */
-namespace formatter {
-    namespace detail {
-        struct format_base_finder {
-            typedef ::hpx::util::logging::optimize::cache_string_one_str arg_type;
-            typedef hpx::util::logging::manipulator::base< arg_type, arg_type &>
-                type;
-        };
-    }
+    namespace formatter {
+        namespace detail {
+            struct format_base_finder
+            {
+                typedef ::hpx::util::logging::optimize::cache_string_one_str
+                    arg_type;
+                typedef hpx::util::logging::manipulator::base<arg_type,
+                    arg_type&>
+                    type;
+            };
+        }    // namespace detail
 
-    /**
+        /**
     @brief What to use as base class, for your formatter classes
 
     When using formatters and destinations, formatters must share a %base class,
     and destinations must share a %base class - see manipulator namespace.
     */
-    struct base : detail::format_base_finder::type {
-    };
+        struct base : detail::format_base_finder::type
+        {
+        };
 
-    /**
+        /**
         @brief Use this when implementing your own formatter class
 
         @param type Your own class name
@@ -640,20 +646,21 @@ namespace formatter {
         Unless you've specified your own formatter class,
         you'll be happy with the default
     */
-    template<class type, class base_type = base > struct class_
-        : hpx::util::logging::manipulator::class_<type, base_type> {};
+        template <class type, class base_type = base>
+        struct class_ : hpx::util::logging::manipulator::class_<type, base_type>
+        {
+        };
 
+        using hpx::util::logging::manipulator::non_const_context;
 
-    using hpx::util::logging::manipulator::non_const_context;
-
-    /**
+        /**
         @sa hpx::util::logging::manipulator::is_generic
     */
-    typedef hpx::util::logging::manipulator::is_generic is_generic;
+        typedef hpx::util::logging::manipulator::is_generic is_generic;
 
-}
+    }    // namespace formatter
 
-/**
+    /**
 @brief Destination is a manipulator. It contains a place where the message,
 after being formatted, is to be written to.
 
@@ -667,27 +674,30 @@ See:
 
 
 */
-namespace destination {
-    namespace detail {
-        struct destination_base_finder {
-            typedef std::string arg_type;
-            typedef hpx::util::logging::manipulator::base< arg_type,
-                const arg_type &> type;
-        };
-    }
+    namespace destination {
+        namespace detail {
+            struct destination_base_finder
+            {
+                typedef std::string arg_type;
+                typedef hpx::util::logging::manipulator::base<arg_type,
+                    const arg_type&>
+                    type;
+            };
+        }    // namespace detail
 
-    /**
+        /**
     @brief What to use as base class, for your destination classes
 
     When using formatters and destinations, formatters must share a %base class,
     and destinations must share a %base class - see manipulator namespace.
     */
-    struct base : detail::destination_base_finder::type {
-    };
+        struct base : detail::destination_base_finder::type
+        {
+        };
 
-    using hpx::util::logging::manipulator::non_const_context;
+        using hpx::util::logging::manipulator::non_const_context;
 
-    /**
+        /**
         @brief Use this when implementing your own destination class
 
         @param type Your own class name
@@ -696,17 +706,19 @@ namespace destination {
         The destination base class. Unless you've specified your own destination class,
         you'll be happy with the default
     */
-    template<class type, class base_type = base > struct class_
-        : hpx::util::logging::manipulator::class_<type, base_type> {};
+        template <class type, class base_type = base>
+        struct class_ : hpx::util::logging::manipulator::class_<type, base_type>
+        {
+        };
 
-    /**
+        /**
         @sa hpx::util::logging::manipulator::is_generic
     */
-    typedef hpx::util::logging::manipulator::is_generic is_generic;
+        typedef hpx::util::logging::manipulator::is_generic is_generic;
 
-}
+    }    // namespace destination
 
-}}}
+}}}    // namespace hpx::util::logging
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)

@@ -9,12 +9,11 @@
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/util/logging/format/op_equal.hpp is deprecated, \
     please include hpx/logging/format/op_equal.hpp instead")
 #else
-#warning \
-    "The header hpx/util/logging/format/op_equal.hpp is deprecated, \
+#warning "The header hpx/util/logging/format/op_equal.hpp is deprecated, \
     please include hpx/logging/format/op_equal.hpp instead"
 #endif
 #endif

@@ -13,7 +13,6 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-
 #ifndef JT28092007_error_HPP_DEFINED
 #define JT28092007_error_HPP_DEFINED
 
@@ -21,6 +20,6 @@
 
 namespace hpx { namespace util { namespace logging {
 
-}}}
+}}}    // namespace hpx::util::logging
 
 #endif

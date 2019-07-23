@@ -9,12 +9,10 @@
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/logging/format_fwd.hpp is deprecated, \
+#pragma message("The header hpx/util/logging/format_fwd.hpp is deprecated, \
     please include hpx/logging/format_fwd.hpp instead")
 #else
-#warning \
-    "The header hpx/util/logging/format_fwd.hpp is deprecated, \
+#warning "The header hpx/util/logging/format_fwd.hpp is deprecated, \
     please include hpx/logging/format_fwd.hpp instead"
 #endif
 #endif

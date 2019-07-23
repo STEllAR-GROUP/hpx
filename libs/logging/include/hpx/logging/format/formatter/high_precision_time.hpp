@@ -13,22 +13,22 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-
 #ifndef JT28092007_high_precision_time_HPP_DEFINED
 #define JT28092007_high_precision_time_HPP_DEFINED
 
 #include <hpx/logging/detail/fwd.hpp>
 
-#include <hpx/logging/format/formatter/convert_format.hpp>
-#include <hpx/logging/detail/manipulator.hpp> // is_generic
+#include <hpx/logging/detail/manipulator.hpp>    // is_generic
 #include <hpx/logging/detail/time_format_holder.hpp>
+#include <hpx/logging/format/formatter/convert_format.hpp>
 
 #include <chrono>
 #include <cstdint>
 #include <ctime>
 #include <string>
 
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
+#if defined(__linux) || defined(linux) || defined(__linux__) ||                \
+    defined(__FreeBSD__)
 #elif defined(HPX_MSVC)
 #else
 #include <hpx/lcos/local/spinlock.hpp>
@@ -37,8 +37,7 @@
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
 
-
-/**
+    /**
 @brief Prefixes the message with a high-precision time (.
 You pass the format string at construction.
 
@@ -73,88 +72,94 @@ std::(w)string and the string that holds your logged message. See convert_format
 For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
 "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
-template<class convert = do_convert_format::prepend> struct high_precision_time_t
-    : is_generic, non_const_context<hpx::util::logging::detail::time_format_holder> {
-    typedef convert convert_type;
-    typedef non_const_context<hpx::util::logging::detail::time_format_holder>
-        non_const_context_base;
+    template <class convert = do_convert_format::prepend>
+    struct high_precision_time_t
+      : is_generic
+      , non_const_context<hpx::util::logging::detail::time_format_holder>
+    {
+        typedef convert convert_type;
+        typedef non_const_context<
+            hpx::util::logging::detail::time_format_holder>
+            non_const_context_base;
 
-    /**
+        /**
         constructs a high_precision_time object
     */
-    high_precision_time_t(const std::string & format)
-        : non_const_context_base(format) {}
-
-    void write_high_precision_time(msg_type & msg,
-        std::chrono::time_point<std::chrono::system_clock> val) const
-    {
-        std::time_t tt = std::chrono::system_clock::to_time_t(val);
-
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-        std::tm local_tm;
-        localtime_r(&tt, &local_tm);
-#elif defined(HPX_MSVC)
-        std::tm local_tm;
-        localtime_s(&local_tm, &tt);
-#else
-        // fall back to non-thread-safe version on other platforms
-        std::tm local_tm;
+        high_precision_time_t(const std::string& format)
+          : non_const_context_base(format)
         {
-            static hpx::lcos::local::spinlock mutex;
-            std::unique_lock<hpx::lcos::local::spinlock> ul(mutex);
-            local_tm = *std::localtime(&tt);
         }
+
+        void write_high_precision_time(msg_type& msg,
+            std::chrono::time_point<std::chrono::system_clock> val) const
+        {
+            std::time_t tt = std::chrono::system_clock::to_time_t(val);
+
+#if defined(__linux) || defined(linux) || defined(__linux__) ||                \
+    defined(__FreeBSD__)
+            std::tm local_tm;
+            localtime_r(&tt, &local_tm);
+#elif defined(HPX_MSVC)
+            std::tm local_tm;
+            localtime_s(&local_tm, &tt);
+#else
+            // fall back to non-thread-safe version on other platforms
+            std::tm local_tm;
+            {
+                static hpx::lcos::local::spinlock mutex;
+                std::unique_lock<hpx::lcos::local::spinlock> ul(mutex);
+                local_tm = *std::localtime(&tt);
+            }
 #endif
 
-        std::chrono::nanoseconds nanosecs = std::chrono::duration_cast<
-                std::chrono::nanoseconds
-            >(val.time_since_epoch());
-        std::chrono::microseconds microsecs = std::chrono::duration_cast<
-                std::chrono::microseconds
-            >(val.time_since_epoch());
-        std::chrono::milliseconds millisecs = std::chrono::duration_cast<
-                std::chrono::milliseconds
-            >(val.time_since_epoch());
+            std::chrono::nanoseconds nanosecs =
+                std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    val.time_since_epoch());
+            std::chrono::microseconds microsecs =
+                std::chrono::duration_cast<std::chrono::microseconds>(
+                    val.time_since_epoch());
+            std::chrono::milliseconds millisecs =
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    val.time_since_epoch());
 
-        char buffer[64];
+            char buffer[64];
 
-        non_const_context_base::context().write_time(buffer,
-            local_tm.tm_mday, local_tm.tm_mon + 1, local_tm.tm_year + 1900,
-            local_tm.tm_hour, local_tm.tm_min, local_tm.tm_sec,
-            millisecs.count() % 1000, microsecs.count() % 1000,
-            nanosecs.count() % 1000);
+            non_const_context_base::context().write_time(buffer,
+                local_tm.tm_mday, local_tm.tm_mon + 1, local_tm.tm_year + 1900,
+                local_tm.tm_hour, local_tm.tm_min, local_tm.tm_sec,
+                millisecs.count() % 1000, microsecs.count() % 1000,
+                nanosecs.count() % 1000);
 
-        convert::write(buffer, msg);
-    }
+            convert::write(buffer, msg);
+        }
 
-    void operator()(msg_type & msg) const {
-        write_high_precision_time(msg, std::chrono::system_clock::now());
-    }
+        void operator()(msg_type& msg) const
+        {
+            write_high_precision_time(msg, std::chrono::system_clock::now());
+        }
 
-    bool operator==(const high_precision_time_t & other) const {
-        return non_const_context_base::context() ==
-            other.non_const_context_base::context() ;
-    }
+        bool operator==(const high_precision_time_t& other) const
+        {
+            return non_const_context_base::context() ==
+                other.non_const_context_base::context();
+        }
 
-    /** @brief configure through script
+        /** @brief configure through script
 
         the string = the time format
     */
-    void configure(const std::string & str) {
-        non_const_context_base::context().set_format(str);
-    }
+        void configure(const std::string& str)
+        {
+            non_const_context_base::context().set_format(str);
+        }
+    };
 
-
-};
-
-
-
-/** @brief high_precision_time_t with default values. See high_precision_time_t
+    /** @brief high_precision_time_t with default values. See high_precision_time_t
 
 @copydoc high_precision_time_t
 */
-typedef high_precision_time_t<> high_precision_time;
+    typedef high_precision_time_t<> high_precision_time;
 
-}}}}
+}}}}    // namespace hpx::util::logging::formatter
 
 #endif

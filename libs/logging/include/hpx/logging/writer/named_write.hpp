@@ -13,7 +13,6 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-
 #ifndef JT28092007_named_writer_HPP_DEFINED
 #define JT28092007_named_writer_HPP_DEFINED
 
@@ -32,15 +31,15 @@
 #include <hpx/logging/format/formatter/thread_id.hpp>
 
 namespace hpx { namespace util { namespace logging { namespace detail {
-    typedef formatter::high_precision_time formatter_time_type ;
-    typedef formatter::high_precision_time_t<formatter::do_convert_format::append>
-        formatter_time_type_append ;
-}}}}
-
+    typedef formatter::high_precision_time formatter_time_type;
+    typedef formatter::high_precision_time_t<
+        formatter::do_convert_format::append>
+        formatter_time_type_append;
+}}}}    // namespace hpx::util::logging::detail
 
 namespace hpx { namespace util { namespace logging { namespace writer {
 
-/**
+    /**
 @brief Composed of a named formatter and a named destinations.
 Thus, you can specify the formatting and destinations as strings
 
@@ -125,16 +124,18 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
 
 
 */
-struct named_write {
-    named_write() {
-        m_writer.add_formatter( m_format_before);
-        m_writer.add_formatter( m_format_after);
-        m_writer.add_destination( m_destination);
+    struct named_write
+    {
+        named_write()
+        {
+            m_writer.add_formatter(m_format_before);
+            m_writer.add_formatter(m_format_after);
+            m_writer.add_destination(m_destination);
 
-        init();
-    }
+            init();
+        }
 
-    /** @brief sets the format string: what should be before,
+        /** @brief sets the format string: what should be before,
     and what after the original message, separated by "|"
 
     Example: \n
@@ -143,235 +144,285 @@ struct named_write {
 
     If "|" is not present, the whole message is prepended to the message
     */
-    void format(const std::string & format_str) {
-        m_format_str = format_str;
+        void format(const std::string& format_str)
+        {
+            m_format_str = format_str;
 
-        std::size_t idx = format_str.find('|');
-        std::string before, after;
-        if ( idx != std::string::npos) {
-            before = format_str.substr(0, idx);
-            after = format_str.substr(idx + 1);
-        }
-        else
-            before = format_str;
+            std::size_t idx = format_str.find('|');
+            std::string before, after;
+            if (idx != std::string::npos)
+            {
+                before = format_str.substr(0, idx);
+                after = format_str.substr(idx + 1);
+            }
+            else
+                before = format_str;
 
-        format( before, after);
-    };
+            format(before, after);
+        };
 
-    /** @brief sets the format strings (what should be before,
+        /** @brief sets the format strings (what should be before,
     and what after the original message)
     */
-    void format(const std::string & format_before_str,
-        const std::string & format_after_str) {
-        m_format_before_str = format_before_str;
-        m_format_after_str = format_after_str;
+        void format(const std::string& format_before_str,
+            const std::string& format_after_str)
+        {
+            m_format_before_str = format_before_str;
+            m_format_after_str = format_after_str;
 
-        set_and_configure( m_format_before, format_before_str, parse_formatter() );
-        set_and_configure( m_format_after, format_after_str, parse_formatter() );
-    };
+            set_and_configure(
+                m_format_before, format_before_str, parse_formatter());
+            set_and_configure(
+                m_format_after, format_after_str, parse_formatter());
+        };
 
-    /** @brief sets the destinations string - where should logged messages be outputted
+        /** @brief sets the destinations string - where should logged messages be outputted
     */
-    void destination(const std::string & destination_str) {
-        m_destination_str = destination_str;
-        set_and_configure( m_destination, destination_str, parse_destination() );
-    }
+        void destination(const std::string& destination_str)
+        {
+            m_destination_str = destination_str;
+            set_and_configure(
+                m_destination, destination_str, parse_destination());
+        }
 
-    /** @brief Specifies the formats and destinations in one step
+        /** @brief Specifies the formats and destinations in one step
     */
-    void write(const std::string & format_str, const std::string & destination_str) {
-        format( format_str);
-        destination( destination_str);
-    }
+        void write(
+            const std::string& format_str, const std::string& destination_str)
+        {
+            format(format_str);
+            destination(destination_str);
+        }
 
-    const std::string & format() const              { return m_format_str; }
-    const std::string & destination() const         { return m_destination_str; }
+        const std::string& format() const
+        {
+            return m_format_str;
+        }
+        const std::string& destination() const
+        {
+            return m_destination_str;
+        }
 
-    void operator()(msg_type & msg) const {
-        m_writer(msg);
-    }
+        void operator()(msg_type& msg) const
+        {
+            m_writer(msg);
+        }
 
-    /** @brief Replaces a destination from the named destination.
+        /** @brief Replaces a destination from the named destination.
 
     You can use this, for instance, when you want to share a
     destination between multiple named writers.
     */
-    template<class destination> void replace_destination(const std::string & name,
-        destination d) {
-        m_destination.del(name);
-        m_destination.add(name, d);
-    }
+        template <class destination>
+        void replace_destination(const std::string& name, destination d)
+        {
+            m_destination.del(name);
+            m_destination.add(name, d);
+        }
 
-    /** @brief Replaces a formatter from the named formatter.
+        /** @brief Replaces a formatter from the named formatter.
 
     You can use this, for instance, when you want to share
     a formatter between multiple named writers.
     */
-    template<class formatter> void replace_formatter(const std::string & name,
-        formatter d) {
-        if ( m_format_before_str.find(name) != std::string::npos) {
-            m_format_before.del(name);
+        template <class formatter>
+        void replace_formatter(const std::string& name, formatter d)
+        {
+            if (m_format_before_str.find(name) != std::string::npos)
+            {
+                m_format_before.del(name);
+            }
+            m_format_before.add(name, d);
+
+            if (m_format_after_str.find(name) != std::string::npos)
+            {
+                m_format_after.del(name);
+            }
+            m_format_after.add(name, d);
         }
-        m_format_before.add(name, d);
 
-        if ( m_format_after_str.find(name) != std::string::npos) {
-            m_format_after.del(name);
+        template <class formatter>
+        void add_formatter(formatter fmt)
+        {
+            m_writer.add_formatter(fmt);
         }
-        m_format_after.add(name, d);
-    }
 
-    template<class formatter> void add_formatter(formatter fmt) {
-        m_writer.add_formatter(fmt);
-    }
-
-    template<class destination> void add_destination(const std::string & name,
-        destination d) {
-        m_destination.add(name, d);
-    }
-
-private:
-    struct parse_destination {
-        bool has_manipulator_name() const { return !m_manipulator.empty(); }
-        std::string get_manipulator_name() const {
-            HPX_ASSERT( has_manipulator_name() );
-            if ( m_manipulator[0] == '-' || m_manipulator[0] == '+')
-                // + or - -> turning on or off a destination
-                return m_manipulator.substr(1);
-            else
-                return m_manipulator;
+        template <class destination>
+        void add_destination(const std::string& name, destination d)
+        {
+            m_destination.add(name, d);
         }
-        void clear() { m_manipulator.clear(); }
 
-        void add(char c) {
-            // destination always follows ' '
-            if ( c == ' ')
-                clear();
-            else
-                m_manipulator += c;
-        }
     private:
-        std::string m_manipulator;
-    };
+        struct parse_destination
+        {
+            bool has_manipulator_name() const
+            {
+                return !m_manipulator.empty();
+            }
+            std::string get_manipulator_name() const
+            {
+                HPX_ASSERT(has_manipulator_name());
+                if (m_manipulator[0] == '-' || m_manipulator[0] == '+')
+                    // + or - -> turning on or off a destination
+                    return m_manipulator.substr(1);
+                else
+                    return m_manipulator;
+            }
+            void clear()
+            {
+                m_manipulator.clear();
+            }
 
-    struct parse_formatter {
-        // formatter starts and ends with %
-        bool has_manipulator_name() const {
-            if ( m_manipulator.empty() )
+            void add(char c)
+            {
+                // destination always follows ' '
+                if (c == ' ')
+                    clear();
+                else
+                    m_manipulator += c;
+            }
+
+        private:
+            std::string m_manipulator;
+        };
+
+        struct parse_formatter
+        {
+            // formatter starts and ends with %
+            bool has_manipulator_name() const
+            {
+                if (m_manipulator.empty())
+                    return false;
+                if (m_manipulator.size() > 1)
+                    if (m_manipulator[0] == '%' &&
+                        (*m_manipulator.rbegin() == '%'))
+                        return true;
+
                 return false;
-            if ( m_manipulator.size() > 1)
-                if ( m_manipulator[0] == '%' && (*m_manipulator.rbegin() == '%') )
-                    return true;
-
-            return false;
-        }
-
-        std::string get_manipulator_name() const {
-            HPX_ASSERT( has_manipulator_name() );
-            // ignore starting and ending %
-            return m_manipulator.substr( 1, m_manipulator.size() - 2);
-        }
-        void clear() { m_manipulator.clear(); }
-
-        void add(char c) {
-            if ( has_manipulator_name() )
-                // was a manipulator until now
-                clear();
-
-            if ( c == '%') {
-                m_manipulator += c;
-                if ( !has_manipulator_name() )
-                    // it could be the start of a formatter
-                    m_manipulator = '%';
             }
-            else if ( m_manipulator.empty())
-                ; // ignore this char - not from a manipulator
-            else if ( m_manipulator[0] == '%')
-                m_manipulator += c;
-            else
-                // manipulator should always start with %
-                HPX_ASSERT(false);
+
+            std::string get_manipulator_name() const
+            {
+                HPX_ASSERT(has_manipulator_name());
+                // ignore starting and ending %
+                return m_manipulator.substr(1, m_manipulator.size() - 2);
+            }
+            void clear()
+            {
+                m_manipulator.clear();
+            }
+
+            void add(char c)
+            {
+                if (has_manipulator_name())
+                    // was a manipulator until now
+                    clear();
+
+                if (c == '%')
+                {
+                    m_manipulator += c;
+                    if (!has_manipulator_name())
+                        // it could be the start of a formatter
+                        m_manipulator = '%';
+                }
+                else if (m_manipulator.empty())
+                    ;    // ignore this char - not from a manipulator
+                else if (m_manipulator[0] == '%')
+                    m_manipulator += c;
+                else
+                    // manipulator should always start with %
+                    HPX_ASSERT(false);
+            }
+
+        private:
+            std::string m_manipulator;
+        };
+
+        template <class manipulator, class parser_type>
+        void set_and_configure(
+            manipulator& manip, const std::string& name, parser_type parser)
+        {
+            // need to parse string
+            bool parsing_params = false;
+            std::string params;
+            std::string stripped_str;
+            for (std::string::const_iterator b = name.begin(), e = name.end();
+                 b != e; ++b)
+            {
+                if ((*b == '(') && !parsing_params)
+                {
+                    if (parser.has_manipulator_name())
+                    {
+                        parsing_params = true;
+                        params.clear();
+                    }
+                    else
+                    {
+                        stripped_str += *b;
+                        parser.add(*b);
+                    }
+                }
+                else if ((*b == ')') && parsing_params)
+                {
+                    HPX_ASSERT(parser.has_manipulator_name());
+                    manip.configure_inner(
+                        parser.get_manipulator_name(), params);
+                    parser.clear();
+                    parsing_params = false;
+                }
+                else
+                {
+                    if (parsing_params)
+                        params += *b;
+                    else
+                    {
+                        stripped_str += *b;
+                        parser.add(*b);
+                    }
+                }
+            }
+            manip.string(stripped_str);
         }
+
     private:
-        std::string m_manipulator;
+        void init()
+        {
+            m_format_before.add("idx", formatter::idx())
+                .add("time",
+                    ::hpx::util::logging::detail::formatter_time_type(
+                        "$hh:$mm:$ss"))
+                .add("thread_id", formatter::thread_id());
+
+            m_format_after
+                .add("idx",
+                    formatter::idx_t<formatter::do_convert_format::append>())
+                .add("time",
+                    ::hpx::util::logging::detail::formatter_time_type_append(
+                        "$hh:$mm:$ss"))
+                .add("thread_id",
+                    formatter::thread_id_t<
+                        formatter::do_convert_format::append>());
+
+            m_destination.add("file", destination::file(""))
+                .add("cout", destination::cout())
+                .add("cerr", destination::cerr())
+                .add("debug", destination::dbg_window());
+        }
+
+    private:
+        formatter::named_spacer_t<formatter::do_convert_format::prepend>
+            m_format_before;
+        formatter::named_spacer_t<formatter::do_convert_format::append>
+            m_format_after;
+        destination::named m_destination;
+        format_write m_writer;
+
+        std::string m_format_str;
+        std::string m_format_before_str, m_format_after_str;
+        std::string m_destination_str;
     };
 
-
-    template<class manipulator, class parser_type>
-    void set_and_configure(manipulator & manip, const std::string & name,
-        parser_type parser) {
-        // need to parse string
-        bool parsing_params = false;
-        std::string params;
-        std::string stripped_str;
-        for ( std::string::const_iterator b = name.begin(),
-            e = name.end(); b != e; ++b) {
-            if ( (*b == '(') && !parsing_params) {
-                if ( parser.has_manipulator_name() ) {
-                    parsing_params = true;
-                    params.clear();
-                }
-                else {
-                    stripped_str += *b;
-                    parser.add( *b);
-                }
-            }
-            else if ( (*b == ')') && parsing_params) {
-                HPX_ASSERT ( parser.has_manipulator_name() );
-                manip.configure_inner( parser.get_manipulator_name(), params);
-                parser.clear();
-                parsing_params = false;
-            }
-            else {
-                if ( parsing_params)
-                    params += *b;
-                else {
-                    stripped_str += *b;
-                    parser.add( *b);
-                }
-            }
-        }
-        manip.string( stripped_str);
-    }
-
-private:
-    void init() {
-        m_format_before
-            .add( "idx",
-                formatter::idx() )
-            .add( "time",
-                ::hpx::util::logging::detail::formatter_time_type(
-                    "$hh:$mm:$ss" ) )
-            .add( "thread_id",
-                formatter::thread_id() );
-
-        m_format_after
-            .add( "idx",
-                formatter::idx_t<formatter::do_convert_format::append>() )
-            .add( "time",
-                ::hpx::util::logging::detail::formatter_time_type_append(
-                    "$hh:$mm:$ss") )
-            .add( "thread_id",
-                formatter::thread_id_t<formatter::do_convert_format::append>() );
-
-        m_destination
-            .add( "file", destination::file("") )
-            .add( "cout", destination::cout() )
-            .add( "cerr", destination::cerr() )
-            .add( "debug", destination::dbg_window() );
-    }
-
-private:
-    formatter::named_spacer_t<formatter::do_convert_format::prepend> m_format_before;
-    formatter::named_spacer_t<formatter::do_convert_format::append> m_format_after;
-    destination::named m_destination;
-    format_write m_writer;
-
-    std::string m_format_str;
-    std::string m_format_before_str, m_format_after_str;
-    std::string m_destination_str;
-};
-
-}}}}
-
+}}}}    // namespace hpx::util::logging::writer
 
 #endif

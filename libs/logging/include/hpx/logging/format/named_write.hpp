@@ -13,11 +13,9 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-
 #ifndef JT28092007_format_named_writer_HPP_DEFINED
 #define JT28092007_format_named_writer_HPP_DEFINED
 
 #include <hpx/logging/writer/named_write.hpp>
-
 
 #endif

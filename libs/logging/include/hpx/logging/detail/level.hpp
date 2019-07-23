@@ -13,7 +13,6 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-
 #ifndef JT28092007_level_HPP_DEFINED
 #define JT28092007_level_HPP_DEFINED
 
@@ -21,7 +20,7 @@
 
 namespace hpx { namespace util { namespace logging {
 
-/**
+    /**
     @brief Handling levels - classes that can hold and/or deal with levels
     - filters and level holders
 
@@ -42,22 +41,23 @@ namespace hpx { namespace util { namespace logging {
     error, fatal will be logged.
 
 */
-namespace level {
-    /** the higher the level, the more critical the error */
-    typedef unsigned int type;
+    namespace level {
+        /** the higher the level, the more critical the error */
+        typedef unsigned int type;
 
-    enum : type {
-        disable_all = (type)-1,
-        enable_all = 0,
-        debug = 1000,
-        info = 2000,
-        warning = 3000,
-        error = 4000,
-        fatal = 5000,
-        always = 6000
-    };
-} // namespace level
+        enum : type
+        {
+            disable_all = (type) -1,
+            enable_all = 0,
+            debug = 1000,
+            info = 2000,
+            warning = 3000,
+            error = 4000,
+            fatal = 5000,
+            always = 6000
+        };
+    }    // namespace level
 
-}}}
+}}}    // namespace hpx::util::logging
 
 #endif

@@ -28,10 +28,10 @@
 
 namespace hpx { namespace util { namespace logging { namespace detail {
 
-//////////////////////////////////////////////////////////////////
-// Messages that were logged before initializing the log - Caching them
+    ///////////////////////////////////////////////////////////////////////////
+    // Messages that were logged before initializing the log - Caching them
 
-/**
+    /**
     The library will make sure your logger derives from this in case you want to
     cache messages that are logged before logs are initialized.
 
@@ -40,31 +40,37 @@ namespace hpx { namespace util { namespace logging { namespace detail {
     - before logs are initialized
     - cache can be turned off ONLY ONCE
 */
-struct HPX_EXPORT cache_before_init {
-    HPX_NON_COPYABLE(cache_before_init);
+    struct HPX_EXPORT cache_before_init
+    {
+        HPX_NON_COPYABLE(cache_before_init);
 
-private:
-    typedef std::vector<msg_type> message_array;
+    private:
+        typedef std::vector<msg_type> message_array;
 
-public:
-    cache_before_init() : m_is_caching_off(false) {}
+    public:
+        cache_before_init()
+          : m_is_caching_off(false)
+        {
+        }
 
-    bool is_cache_turned_off() const noexcept {
-        return m_is_caching_off; // cache has been turned off
-    }
+        bool is_cache_turned_off() const noexcept
+        {
+            return m_is_caching_off;    // cache has been turned off
+        }
 
-    void turn_cache_off(writer::named_write const& writer_);
+        void turn_cache_off(writer::named_write const& writer_);
 
-    void add_msg(msg_type&& msg) {
-        m_cache.push_back( std::move( msg ) );
-    }
+        void add_msg(msg_type&& msg)
+        {
+            m_cache.push_back(std::move(msg));
+        }
 
-private:
-    message_array m_cache;
-    bool m_is_caching_off;
-};
+    private:
+        message_array m_cache;
+        bool m_is_caching_off;
+    };
 
-}}}}
+}}}}    // namespace hpx::util::logging::detail
 
 #include <hpx/config/warnings_suffix.hpp>
 

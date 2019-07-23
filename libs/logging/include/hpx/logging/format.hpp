@@ -33,7 +33,7 @@
 
 namespace hpx { namespace util { namespace logging {
 
-/**
+    /**
 @file hpx/logging/format.hpp
 
 Include this file when you're using @ref manipulator "formatters and destinations",
@@ -63,8 +63,7 @@ and you want to define the logger classes, in a source file
     */
     namespace format_and_write {
 
-
-    /**
+        /**
         @brief Formats the message, and writes it to destinations
         - calls @c operator() on the formatters , and @c operator() on the destinations.
         Ignores @c clear_format() commands.
@@ -100,23 +99,30 @@ and you want to define the logger classes, in a source file
 
         @endcode
     */
-    struct simple {
-        simple ( msg_type & msg) : m_msg(msg) {}
+        struct simple
+        {
+            simple(msg_type& msg)
+              : m_msg(msg)
+            {
+            }
 
-        template<class formatter_ptr> void format(const formatter_ptr & fmt) {
-            (*fmt)(m_msg);
-        }
-        template<class destination_ptr> void write(const destination_ptr & dest) {
-            (*dest)(m_msg);
-        }
-        void clear_format() {}
-    protected:
-        msg_type &m_msg;
-    };
+            template <class formatter_ptr>
+            void format(const formatter_ptr& fmt)
+            {
+                (*fmt)(m_msg);
+            }
+            template <class destination_ptr>
+            void write(const destination_ptr& dest)
+            {
+                (*dest)(m_msg);
+            }
+            void clear_format() {}
 
-    } // namespace format_and_write
+        protected:
+            msg_type& m_msg;
+        };
 
-
+    }    // namespace format_and_write
 
     ///////////////////////////////////////////////////////////////////////////
     // Message routing
@@ -132,26 +138,37 @@ and you want to define the logger classes, in a source file
     */
     namespace msg_route {
 
-    /**
+        /**
         @brief Recomended base class for message routers that
         need access to the underlying formatter and/or destination array.
     */
-    template<class formatter_array, class destination_array>
-    struct formatter_and_destination_array_holder {
-    protected:
-        formatter_and_destination_array_holder (const formatter_array & formats_,
-            const destination_array & destinations_)
-            : m_formats(formats_), m_destinations(destinations_) {}
+        template <class formatter_array, class destination_array>
+        struct formatter_and_destination_array_holder
+        {
+        protected:
+            formatter_and_destination_array_holder(
+                const formatter_array& formats_,
+                const destination_array& destinations_)
+              : m_formats(formats_)
+              , m_destinations(destinations_)
+            {
+            }
 
-        const formatter_array & formats() const             { return m_formats; }
-        const destination_array & destinations() const      { return m_destinations; }
+            const formatter_array& formats() const
+            {
+                return m_formats;
+            }
+            const destination_array& destinations() const
+            {
+                return m_destinations;
+            }
 
-    private:
-        const formatter_array & m_formats;
-        const destination_array & m_destinations;
-    };
+        private:
+            const formatter_array& m_formats;
+            const destination_array& m_destinations;
+        };
 
-/**
+        /**
 @brief Represents a simple router - first calls all formatters
 - in the order they were added, then all destinations - in the order they were added
 
@@ -190,65 +207,79 @@ See manipulator.
 @param destination_base The base class for all destination classes from your application.
 See manipulator.
 
-    */\
-    struct simple {
-        typedef typename formatter::base::ptr_type formatter_ptr;
-        typedef typename destination::base::ptr_type destination_ptr;
+    */
+        struct simple
+        {
+            typedef typename formatter::base::ptr_type formatter_ptr;
+            typedef typename destination::base::ptr_type destination_ptr;
 
-        typedef std::vector<formatter_ptr> f_array;
-        typedef std::vector<destination_ptr> d_array;
-        struct write_info {
-            f_array formats;
-            d_array destinations;
+            typedef std::vector<formatter_ptr> f_array;
+            typedef std::vector<destination_ptr> d_array;
+            struct write_info
+            {
+                f_array formats;
+                d_array destinations;
+            };
+
+            template <class formatter_array, class destination_array>
+            simple(const formatter_array&, const destination_array&)
+            {
+            }
+
+            void append_formatter(formatter_ptr fmt)
+            {
+                m_to_write.formats.push_back(fmt);
+            }
+            void del_formatter(formatter_ptr fmt)
+            {
+                typename f_array::iterator del = std::remove(
+                    m_to_write.formats.begin(), m_to_write.formats.end(), fmt);
+                m_to_write.formats.erase(del, m_to_write.formats.end());
+            }
+
+            void append_destination(destination_ptr dest)
+            {
+                m_to_write.destinations.push_back(dest);
+            }
+
+            void del_destination(destination_ptr dest)
+            {
+                typename d_array::iterator del =
+                    std::remove(m_to_write.destinations.begin(),
+                        m_to_write.destinations.end(), dest);
+                m_to_write.destinations.erase(
+                    del, m_to_write.destinations.end());
+            }
+
+            template <class format_and_write>
+            void write(msg_type& msg) const
+            {
+                format_and_write m(msg);
+
+                for (typename f_array::const_iterator
+                         b_f = m_to_write.formats.begin(),
+                         e_f = m_to_write.formats.end();
+                     b_f != e_f; ++b_f)
+                    m.format(*b_f);
+
+                for (typename d_array::const_iterator
+                         b_d = m_to_write.destinations.begin(),
+                         e_d = m_to_write.destinations.end();
+                     b_d != e_d; ++b_d)
+                    m.write(*b_d);
+            }
+
+        private:
+            write_info m_to_write;
         };
 
-        template<class formatter_array, class destination_array>
-        simple(const formatter_array&, const destination_array&) {}
+    }    // namespace msg_route
+}}}      // namespace hpx::util::logging
 
-        void append_formatter(formatter_ptr fmt) {
-            m_to_write.formats.push_back(fmt);
-        }
-        void del_formatter(formatter_ptr fmt) {
-            typename f_array::iterator del = std::remove(m_to_write.formats.begin(),
-                m_to_write.formats.end(), fmt);
-            m_to_write.formats.erase(del, m_to_write.formats.end());
-        }
-
-        void append_destination(destination_ptr dest) {
-            m_to_write.destinations.push_back(dest);
-        }
-
-        void del_destination(destination_ptr dest) {
-            typename d_array::iterator del =
-                std::remove(m_to_write.destinations.begin(),
-                    m_to_write.destinations.end(), dest);
-            m_to_write.destinations.erase(del, m_to_write.destinations.end());
-        }
-
-        template<class format_and_write> void write(msg_type & msg) const {
-            format_and_write m(msg);
-
-            for ( typename f_array::const_iterator b_f = m_to_write.formats.begin(),
-                e_f = m_to_write.formats.end(); b_f != e_f; ++b_f)
-                m.format(*b_f);
-
-            for ( typename d_array::const_iterator b_d = m_to_write.destinations.begin(),
-                e_d = m_to_write.destinations.end(); b_d != e_d; ++b_d)
-                m.write(*b_d);
-        }
-
-    private:
-        write_info m_to_write;
-    };
-
-
-    } // namespace msg_route
-}}}
-
-#include <hpx/logging/detail/manipulator.hpp>
 #include <hpx/logging/detail/format_write_detail.hpp>
+#include <hpx/logging/detail/manipulator.hpp>
 
-#include <hpx/logging/format/formatter/defaults.hpp>
 #include <hpx/logging/format/destination/defaults.hpp>
+#include <hpx/logging/format/formatter/defaults.hpp>
 
 #endif

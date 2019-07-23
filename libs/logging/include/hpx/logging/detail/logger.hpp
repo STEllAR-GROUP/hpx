@@ -18,8 +18,8 @@
 #ifndef JT28092007_logger_HPP_DEFINED
 #define JT28092007_logger_HPP_DEFINED
 
-#include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/cache_before_init.hpp>
+#include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/level.hpp>
 #include <hpx/logging/format/named_write.hpp>
 
@@ -80,20 +80,28 @@ namespace hpx { namespace util { namespace logging {
     - check out the writer namespace
 
     */
-    struct logger {
+    struct logger
+    {
         typedef writer::named_write write_type;
 
-        struct gather_holder { //-V690
+        struct gather_holder
+        {    //-V690
             HPX_NON_COPYABLE(gather_holder);
 
-            gather_holder(logger const & p_this)
-              : m_this(p_this) {}
+            gather_holder(logger const& p_this)
+              : m_this(p_this)
+            {
+            }
 
-            ~gather_holder() {
+            ~gather_holder()
+            {
                 m_this.do_write(m_out.str());
             }
 
-            std::ostringstream & out() { return m_out; }
+            std::ostringstream& out()
+            {
+                return m_out;
+            }
 
         private:
             logger const& m_this;
@@ -102,9 +110,11 @@ namespace hpx { namespace util { namespace logging {
 
         logger(level::type default_level = level::enable_all)
           : m_level(default_level)
-        {}
+        {
+        }
 
-        ~logger() {
+        ~logger()
+        {
             // force writing all messages from cache,
             // if cache hasn't been turned off yet
             turn_cache_off();
@@ -113,14 +123,27 @@ namespace hpx { namespace util { namespace logging {
         /**
             reads all data about a log message (gathers all the data about it)
         */
-        gather_holder gather() const { return {*this} ; }
+        gather_holder gather() const
+        {
+            return {*this};
+        }
 
-        write_type & writer()                    { return m_writer; }
-        const write_type & writer() const        { return m_writer; }
+        write_type& writer()
+        {
+            return m_writer;
+        }
+        const write_type& writer() const
+        {
+            return m_writer;
+        }
 
-        bool is_enabled(level::type level) const { return level >= m_level; }
+        bool is_enabled(level::type level) const
+        {
+            return level >= m_level;
+        }
 
-        void set_enabled(level::type level) {
+        void set_enabled(level::type level)
+        {
             m_level = level;
         }
 
@@ -140,19 +163,21 @@ namespace hpx { namespace util { namespace logging {
         g_l()->mark_as_initialized();
         @endcode
         */
-        void mark_as_initialized() {
+        void mark_as_initialized()
+        {
             turn_cache_off();
         }
 
     public:
-        void turn_cache_off() {
-            m_cache.turn_cache_off( m_writer );
+        void turn_cache_off()
+        {
+            m_cache.turn_cache_off(m_writer);
         }
 
         // called after all data has been gathered
         void do_write(msg_type msg) const
         {
-            if ( m_cache.is_cache_turned_off() )
+            if (m_cache.is_cache_turned_off())
                 m_writer(msg);
             else
                 m_cache.add_msg(std::move(msg));
@@ -163,6 +188,6 @@ namespace hpx { namespace util { namespace logging {
         write_type m_writer;
         level::type m_level;
     };
-}}}
+}}}    // namespace hpx::util::logging
 
 #endif

@@ -13,19 +13,17 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-
 #ifndef JT28092007_logging_HPP_DEFINED
 #define JT28092007_logging_HPP_DEFINED
 
 #include <hpx/logging/detail/fwd.hpp>
+#include <hpx/logging/detail/level.hpp>
 #include <hpx/logging/detail/logger.hpp>
 #include <hpx/logging/detail/macros.hpp>
-#include <hpx/logging/detail/level.hpp>
-
 
 namespace hpx { namespace util { namespace logging {
 
-/**
+    /**
 @file hpx/logging/logging.hpp
 
 Include this file when you're using the logging lib, but don't necessarily want to
@@ -39,6 +37,6 @@ then you can include this one instead:
 
 */
 
-}}}
+}}}    // namespace hpx::util::logging
 
 #endif
