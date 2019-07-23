@@ -12,8 +12,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     // hpx::util::nonesuch is a class type used by hpx::util::detected_t to
     // indicate detection failure.
     struct nonesuch
@@ -25,10 +24,9 @@ namespace hpx { namespace util
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <typename Default, typename AlwaysVoid,
-            template <typename...> class Op, typename ... Args>
+            template <typename...> class Op, typename... Args>
         struct detector
         {
             using value_t = std::false_type;
@@ -36,26 +34,26 @@ namespace hpx { namespace util
         };
 
         template <typename Default, template <typename...> class Op,
-            typename ... Args>
-        struct detector<Default, typename always_void<Op<Args...> >::type,
-            Op, Args...>
+            typename... Args>
+        struct detector<Default, typename always_void<Op<Args...>>::type, Op,
+            Args...>
         {
             using value_t = std::true_type;
             using type = Op<Args...>;
         };
-    }
+    }    // namespace detail
 
     // The alias template is_detected is an alias for std::true_type if the
     // template-id Op<Args...> is valid; otherwise it is an alias for
     // std::false_type.
-    template <template <typename...> class Op, typename ... Args>
+    template <template <typename...> class Op, typename... Args>
     using is_detected =
         typename detail::detector<nonesuch, void, Op, Args...>::value_t;
 
     // The alias template detected_t is an alias for Op<Args...> if that
     // template-id is valid; otherwise it is an alias for the class
     // hpx::util::nonesuch.
-    template <template <typename...> class Op, typename ... Args>
+    template <template <typename...> class Op, typename... Args>
     using detected_t =
         typename detail::detector<nonesuch, void, Op, Args...>::type;
 
@@ -68,25 +66,24 @@ namespace hpx { namespace util
     // - Otherwise, value_t is an alias for std::false_type and type is an
     //   alias for Default.
     template <typename Default, template <typename...> class Op,
-        typename ... Args>
-    using detected_or =
-        detail::detector<Default, void, Op, Args...>;
+        typename... Args>
+    using detected_or = detail::detector<Default, void, Op, Args...>;
 
-    template <typename Default, template <typename...> class Op, typename... Args>
+    template <typename Default, template <typename...> class Op,
+        typename... Args>
     using detected_or_t = typename detected_or<Default, Op, Args...>::type;
 
     // The alias template is_detected_exact checks whether
     // detected_t<Op, Args...> is Expected.
     template <typename Expected, template <typename...> class Op,
         typename... Args>
-    using is_detected_exact =
-        std::is_same<Expected, detected_t<Op, Args...> >;
+    using is_detected_exact = std::is_same<Expected, detected_t<Op, Args...>>;
 
     // The alias template is_detected_convertible checks whether
     // detected_t<Op, Args...> is convertible to To.
     template <typename To, template <typename...> class Op, typename... Args>
     using is_detected_convertible =
         std::is_convertible<detected_t<Op, Args...>, To>;
-}}
+}}    // namespace hpx::util
 
 #endif

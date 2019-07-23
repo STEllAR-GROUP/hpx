@@ -8,13 +8,11 @@
 
 #include <type_traits>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     template <bool Enable, typename C1, typename C2>
-    struct lazy_conditional
-      : std::conditional<Enable, C1, C2>::type
+    struct lazy_conditional : std::conditional<Enable, C1, C2>::type
     {
     };
-}}
+}}    // namespace hpx::util
 
 #endif

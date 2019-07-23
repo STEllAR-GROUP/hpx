@@ -12,6 +12,6 @@ namespace hpx { namespace util {
     {
         typedef T type;
     };
-}}
+}}    // namespace hpx::util
 
 #endif

@@ -15,8 +15,7 @@
 
 #include <functional>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     template <typename T>
     struct unwrap_reference
     {
@@ -24,7 +23,7 @@ namespace hpx { namespace util
     };
 
     template <typename T>
-    struct unwrap_reference<boost::reference_wrapper<T> >
+    struct unwrap_reference<boost::reference_wrapper<T>>
     {
         typedef T type;
     };
@@ -36,7 +35,7 @@ namespace hpx { namespace util
     };
 
     template <typename T>
-    struct unwrap_reference<std::reference_wrapper<T> >
+    struct unwrap_reference<std::reference_wrapper<T>>
     {
         typedef T type;
     };
@@ -48,13 +47,10 @@ namespace hpx { namespace util
     };
 
     template <typename T>
-    HPX_FORCEINLINE typename unwrap_reference<T>::type&
-    unwrap_ref(T& t)
+    HPX_FORCEINLINE typename unwrap_reference<T>::type& unwrap_ref(T& t)
     {
         return t;
     }
-}}
+}}    // namespace hpx::util
 
 #endif
-
-

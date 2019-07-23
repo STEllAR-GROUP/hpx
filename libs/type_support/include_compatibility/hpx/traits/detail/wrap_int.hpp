@@ -9,12 +9,11 @@
 
 #if defined(HPX_TYPE_SUPPORT_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/type_support/detail/wrap_int.hpp is deprecated, \
     please include hpx/type_support/detail/wrap_int.hpp instead")
 #else
-#warning \
-    "The header hpx/type_support/detail/wrap_int.hpp is deprecated, \
+#warning "The header hpx/type_support/detail/wrap_int.hpp is deprecated, \
     please include hpx/type_support/detail/wrap_int.hpp instead"
 #endif
 #endif

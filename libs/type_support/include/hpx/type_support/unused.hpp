@@ -8,14 +8,15 @@
 #if !defined(HPX_UNUSED_FEB_01_2009_1217PM)
 #define HPX_UNUSED_FEB_01_2009_1217PM
 
+// clang-format off
 #include <hpx/config.hpp>
 #if defined(HPX_MSVC)
 # pragma warning(push)
 # pragma warning(disable: 4522) // multiple assignment operators specified warning
 #endif
+// clang-format on
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // We do not import fusion::unused_type anymore to avoid boost::fusion
     // being turned into an associate namespace, as this interferes with ADL
@@ -47,8 +48,8 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE unused_type&
-        operator=(T const&) noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE unused_type& operator=(
+            T const&) noexcept
         {
             return *this;
         }
@@ -59,8 +60,8 @@ namespace hpx { namespace util
             return *this;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE unused_type&
-        operator=(unused_type const&) noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE unused_type& operator=(
+            unused_type const&) noexcept
         {
             return *this;
         }
@@ -71,8 +72,8 @@ namespace hpx { namespace util
             return *this;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE unused_type&
-        operator=(unused_type&&) noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE unused_type& operator=(
+            unused_type&&) noexcept
         {
             return *this;
         }
@@ -82,18 +83,18 @@ namespace hpx { namespace util
     HPX_CONSTANT
 #endif
     HPX_CONSTEXPR_OR_CONST unused_type unused = unused_type();
-}}
+}}    // namespace hpx::util
 
 //////////////////////////////////////////////////////////////////////////////
 // use this to silence compiler warnings related to unused function arguments.
 #if defined(__CUDA_ARCH__)
-#define HPX_UNUSED(x)  (void)x
+#define HPX_UNUSED(x) (void) x
 #else
-#define HPX_UNUSED(x)  ::hpx::util::unused = (x)
+#define HPX_UNUSED(x) ::hpx::util::unused = (x)
 #endif
 
 #if defined(HPX_MSVC)
-# pragma warning(pop)
+#pragma warning(pop)
 #endif
 
 #endif

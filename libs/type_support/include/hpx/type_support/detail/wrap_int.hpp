@@ -8,13 +8,12 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace traits { namespace detail
-{
+namespace hpx { namespace traits { namespace detail {
     // wraps int so that int argument is favored over wrap_int
     struct wrap_int
     {
         HPX_CONSTEXPR wrap_int(int) {}
     };
-}}}
+}}}    // namespace hpx::traits::detail
 
 #endif

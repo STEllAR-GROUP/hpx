@@ -18,15 +18,14 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     template <typename T>
     struct decay : std::decay<T>
-    {};
+    {
+    };
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <typename TD>
         struct decay_unwrap_impl
         {
@@ -34,22 +33,23 @@ namespace hpx { namespace util
         };
 
         template <typename X>
-        struct decay_unwrap_impl< ::boost::reference_wrapper<X> >
+        struct decay_unwrap_impl<::boost::reference_wrapper<X>>
         {
             typedef X& type;
         };
 
         template <typename X>
-        struct decay_unwrap_impl< ::std::reference_wrapper<X> >
+        struct decay_unwrap_impl<::std::reference_wrapper<X>>
         {
             typedef X& type;
         };
-    }
+    }    // namespace detail
 
     template <typename T>
     struct decay_unwrap
       : detail::decay_unwrap_impl<typename std::decay<T>::type>
-    {};
-}}
+    {
+    };
+}}    // namespace hpx::util
 
 #endif

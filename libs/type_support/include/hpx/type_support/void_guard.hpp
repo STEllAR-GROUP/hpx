@@ -8,8 +8,7 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // This utility simplifies templates returning compatible types
     //
@@ -18,16 +17,17 @@ namespace hpx { namespace util
     // - Result == void -> return (void)expr;
     template <typename Result>
     struct void_guard
-    {};
+    {
+    };
 
     template <>
     struct void_guard<void>
     {
         template <typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        void operator,(T const&) const noexcept
-        {}
+        HPX_HOST_DEVICE HPX_FORCEINLINE void operator,(T const&) const noexcept
+        {
+        }
     };
-}}
+}}    // namespace hpx::util
 
 #endif

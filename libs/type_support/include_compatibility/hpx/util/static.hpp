@@ -9,12 +9,10 @@
 
 #if defined(HPX_TYPE_SUPPORT_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/static.hpp is deprecated, \
+#pragma message("The header hpx/util/static.hpp is deprecated, \
     please include hpx/type_support/static.hpp instead")
 #else
-#warning \
-    "The header hpx/util/static.hpp is deprecated, \
+#warning "The header hpx/util/static.hpp is deprecated, \
     please include hpx/type_support/static.hpp instead"
 #endif
 #endif

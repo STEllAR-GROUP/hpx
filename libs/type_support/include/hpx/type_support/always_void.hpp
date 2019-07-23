@@ -6,13 +6,12 @@
 #if !defined(HPX_UTIL_ALWAYS_VOID_JUN_20_2013_0401AM)
 #define HPX_UTIL_ALWAYS_VOID_JUN_20_2013_0401AM
 
-namespace hpx { namespace util
-{
-    template <typename ... T>
+namespace hpx { namespace util {
+    template <typename... T>
     struct always_void
     {
         typedef void type;
     };
-}}
+}}    // namespace hpx::util
 
 #endif

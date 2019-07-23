@@ -10,23 +10,23 @@
 
 #include <type_traits>
 
-#if !defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION) && \
+#if !defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION) &&                \
     !(HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS))
 #include <memory>    // for placement new
 #include <mutex>
 #endif
 
+// clang-format off
 #if !defined(HPX_WINDOWS)
 #  define HPX_EXPORT_STATIC_ HPX_EXPORT
 #else
 #  define HPX_EXPORT_STATIC_
 #endif
+// clang-format on
 
-namespace hpx { namespace util
-{
-#if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION) || \
-    (HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS)) || \
-    defined(HPX_MSVC)
+namespace hpx { namespace util {
+#if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION) ||                  \
+    (HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS)) || defined(HPX_MSVC)
 
     //
     // C++11 requires thread-safe initialization of function-scope statics.
@@ -167,6 +167,6 @@ namespace hpx { namespace util
     template <typename T, typename Tag>
     std::once_flag static_<T, Tag>::constructed_;
 #endif
-}}
+}}    // namespace hpx::util
 
-#endif // include guard
+#endif    // include guard
