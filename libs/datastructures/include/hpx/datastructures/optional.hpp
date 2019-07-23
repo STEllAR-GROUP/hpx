@@ -10,13 +10,12 @@
 
 #include <cstddef>
 #include <exception>
-#include <string>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     struct nullopt_t
     {
         struct init
@@ -29,7 +28,9 @@ namespace hpx { namespace util
     struct in_place_t
     {
     };
-    HPX_CONSTEXPR struct in_place_t in_place{};
+    HPX_CONSTEXPR struct in_place_t in_place
+    {
+    };
 
     class bad_optional_access : public std::logic_error
     {
@@ -45,14 +46,13 @@ namespace hpx { namespace util
         }
     };
 
-    namespace _optional_swap
-    {
+    namespace _optional_swap {
         using std::swap;
 
         template <typename T>
-        void check_swap() noexcept(noexcept(
-            swap(std::declval<T&>(), std::declval<T&>())));
-    }
+        void check_swap() noexcept(
+            noexcept(swap(std::declval<T&>(), std::declval<T&>())));
+    }    // namespace _optional_swap
 
     template <typename T>
     class optional
@@ -79,8 +79,8 @@ namespace hpx { namespace util
                 empty_ = false;
             }
         }
-        optional(optional && other)
-                noexcept(std::is_nothrow_move_constructible<T>::value)
+        optional(optional&& other) noexcept(
+            std::is_nothrow_move_constructible<T>::value)
           : empty_(true)
         {
             if (!other.empty_)
@@ -96,24 +96,23 @@ namespace hpx { namespace util
             new (&storage_) T(val);
             empty_ = false;
         }
-        optional(T && val)
-                noexcept(std::is_nothrow_move_constructible<T>::value)
+        optional(T&& val) noexcept(std::is_nothrow_move_constructible<T>::value)
           : empty_(true)
         {
             new (&storage_) T(std::move(val));
             empty_ = false;
         }
 
-        template <typename ... Ts>
-        explicit optional(in_place_t, Ts &&... ts)
+        template <typename... Ts>
+        explicit optional(in_place_t, Ts&&... ts)
           : empty_(true)
         {
             new (&storage_) T(std::forward<Ts>(ts)...);
             empty_ = false;
         }
 
-        template <typename U, typename ... Ts>
-        explicit optional(in_place_t, std::initializer_list<U> il, Ts &&... ts)
+        template <typename U, typename... Ts>
+        explicit optional(in_place_t, std::initializer_list<U> il, Ts&&... ts)
           : empty_(true)
         {
             new (&storage_) T(il, std::forward<Ts>(ts)...);
@@ -125,15 +124,15 @@ namespace hpx { namespace util
             reset();
         }
 
-        optional &operator=(optional const& other)
+        optional& operator=(optional const& other)
         {
             optional tmp(other);
             swap(tmp);
 
             return *this;
         }
-        optional &operator=(optional && other)
-            noexcept(std::is_nothrow_move_assignable<T>::value &&
+        optional& operator=(optional&& other) noexcept(
+            std::is_nothrow_move_assignable<T>::value&&
                 std::is_nothrow_move_constructible<T>::value)
         {
             if (empty_)
@@ -159,14 +158,14 @@ namespace hpx { namespace util
             return *this;
         }
 
-        optional &operator=(T const& other)
+        optional& operator=(T const& other)
         {
             optional tmp(other);
             swap(tmp);
 
             return *this;
         }
-        optional &operator=(T && other)
+        optional& operator=(T&& other)
         {
             if (!empty_)
             {
@@ -180,7 +179,7 @@ namespace hpx { namespace util
             return *this;
         }
 
-        optional &operator=(nullopt_t) noexcept
+        optional& operator=(nullopt_t) noexcept
         {
             if (!empty_)
             {
@@ -191,7 +190,7 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CONSTEXPR T const * operator->() const noexcept
+        HPX_CONSTEXPR T const* operator->() const noexcept
         {
             return reinterpret_cast<T const*>(&storage_);
         }
@@ -242,15 +241,15 @@ namespace hpx { namespace util
         }
 
         template <typename U>
-        HPX_CXX14_CONSTEXPR T value_or(U && value) const
+        HPX_CXX14_CONSTEXPR T value_or(U&& value) const
         {
             if (empty_)
                 return std::forward<U>(value);
             return **this;
         }
 
-        template <typename ... Ts>
-        void emplace(Ts &&... ts)
+        template <typename... Ts>
+        void emplace(Ts&&... ts)
         {
             if (!empty_)
             {
@@ -262,8 +261,8 @@ namespace hpx { namespace util
         }
 
         void swap(optional& other) noexcept(
-            std::is_nothrow_move_constructible<T>::value &&
-            noexcept(_optional_swap::check_swap<T>()))
+            std::is_nothrow_move_constructible<T>::value&& noexcept(
+                _optional_swap::check_swap<T>()))
         {
             // do nothing if both are empty
             if (empty_ && other.empty_)
@@ -304,15 +303,17 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    HPX_CONSTEXPR bool operator==(optional<T> const& lhs, optional<T> const& rhs)
+    HPX_CONSTEXPR bool operator==(
+        optional<T> const& lhs, optional<T> const& rhs)
     {
-        return (bool(lhs) != bool(rhs)) ? false :
-            (!bool(lhs) && !bool(rhs)) ? true :
-            (*lhs == *rhs);
+        return (bool(lhs) != bool(rhs)) ?
+            false :
+            (!bool(lhs) && !bool(rhs)) ? true : (*lhs == *rhs);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator!=(optional<T> const& lhs, optional<T> const& rhs)
+    HPX_CONSTEXPR bool operator!=(
+        optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs == rhs);
     }
@@ -324,7 +325,8 @@ namespace hpx { namespace util
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator>=(optional<T> const& lhs, optional<T> const& rhs)
+    HPX_CONSTEXPR bool operator>=(
+        optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs < rhs);
     }
@@ -336,7 +338,8 @@ namespace hpx { namespace util
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator<=(optional<T> const& lhs, optional<T> const& rhs)
+    HPX_CONSTEXPR bool operator<=(
+        optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs > rhs);
     }
@@ -496,35 +499,36 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    HPX_CONSTEXPR optional<typename std::decay<T>::type> make_optional(T && v)
+    HPX_CONSTEXPR optional<typename std::decay<T>::type> make_optional(T&& v)
     {
         return optional<typename std::decay<T>::type>(std::forward<T>(v));
     }
 
-    template <typename T, typename ... Ts>
-    HPX_CONSTEXPR optional<T> make_optional(Ts &&... ts)
+    template <typename T, typename... Ts>
+    HPX_CONSTEXPR optional<T> make_optional(Ts&&... ts)
     {
         return optional<T>(in_place, std::forward<Ts>(ts)...);
     }
 
-    template <typename T, typename U, typename ... Ts>
-    HPX_CONSTEXPR optional<T> make_optional(std::initializer_list<U> il, Ts &&... ts)
+    template <typename T, typename U, typename... Ts>
+    HPX_CONSTEXPR optional<T> make_optional(
+        std::initializer_list<U> il, Ts&&... ts)
     {
         return optional<T>(in_place, il, std::forward<Ts>(ts)...);
     }
-}}
+}}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace std
-{
+namespace std {
     template <typename T>
     struct hash<hpx::util::optional<T>>
     {
-        HPX_CONSTEXPR std::size_t operator()(::hpx::util::optional<T> const& arg) const
+        HPX_CONSTEXPR std::size_t operator()(
+            ::hpx::util::optional<T> const& arg) const
         {
             return arg ? std::hash<T>{}(*arg) : std::size_t{};
         }
     };
-}
+}    // namespace std
 
 #endif

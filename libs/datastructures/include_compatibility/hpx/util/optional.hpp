@@ -9,12 +9,10 @@
 
 #if defined(HPX_DATASTRUCTURES_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/optional.hpp is deprecated, \
+#pragma message("The header hpx/util/optional.hpp is deprecated, \
     please include hpx/datastructures/optional.hpp instead")
 #else
-#warning \
-    "The header hpx/util/optional.hpp is deprecated, \
+#warning "The header hpx/util/optional.hpp is deprecated, \
     please include hpx/datastructures/optional.hpp instead"
 #endif
 #endif
