@@ -65,7 +65,8 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
                 {
                 }
                 std::string prefix;
-                // could be null - in case formatter not found by name, or it's the last step
+                // could be null - in case formatter not found by name, or it's
+                // the last step
                 format_base_type* fmt;
             };
 
@@ -153,9 +154,9 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
                 }
             }
 
-            // recomputes the write steps - note taht this takes place after each operation
-            // for instance, the user might have first set the string and
-            // later added the formatters
+            // recomputes the write steps - note taht this takes place after
+            // each operation for instance, the user might have first set the
+            // string and later added the formatters
             void HPX_EXPORT compute_write_steps();
 
         private:
@@ -177,8 +178,8 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
                     holder;
 
                 typedef typename formatter::convert_type formatter_convert_type;
-                // they must share the same type of conversion
-                // - otherwise when trying to prepend we could end up appending or vice versa
+                // they must share the same type of conversion - otherwise when
+                // trying to prepend we could end up appending or vice versa
                 static_assert(
                     (std::is_same<formatter_convert_type, convert>::value),
                     "std::is_same<formatter_convert_type, "

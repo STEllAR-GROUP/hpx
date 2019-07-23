@@ -120,9 +120,9 @@ namespace hpx { namespace util { namespace logging { namespace destination {
                 add_impl(name, holder(dest), std::false_type());
             }
 
-            // recomputes the write steps - note taht this takes place after each operation
-            // for instance, the user might have first set the string and
-            // later added the formatters
+            // recomputes the write steps - note taht this takes place after
+            // each operation for instance, the user might have first set the
+            // string and later added the formatters
             void HPX_EXPORT compute_write_steps();
         };
 

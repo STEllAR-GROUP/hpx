@@ -148,7 +148,8 @@ For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_
 */
     typedef append_newline_t<> append_newline;
 
-    /** @brief append_newline_if_needed_t with default values. See append_newline_if_needed_t
+    /** @brief append_newline_if_needed_t with default values. See
+     * append_newline_if_needed_t
 
 @copydoc append_newline_if_needed_t
 */

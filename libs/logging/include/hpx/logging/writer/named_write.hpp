@@ -176,7 +176,8 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
                 m_format_after, format_after_str, parse_formatter());
         };
 
-        /** @brief sets the destinations string - where should logged messages be outputted
+        /** @brief sets the destinations string - where should logged messages
+         * be outputted
     */
         void destination(const std::string& destination_str)
         {
