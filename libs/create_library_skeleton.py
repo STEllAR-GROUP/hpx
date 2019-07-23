@@ -127,7 +127,7 @@ if (HPX_WITH_TESTS_HEADERS)
     modules.{lib_name}
     HEADERS ${{{lib_name}_headers}}
     HEADER_ROOT ${{PROJECT_SOURCE_DIR}}/include
-    NOHPX_INIT NOLIBS
+    NOLIBS
     DEPENDENCIES hpx_{lib_name})
 endif()
 '''
