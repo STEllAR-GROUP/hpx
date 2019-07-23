@@ -12,11 +12,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 void array_range()
 {
-    int r[3] = { 0, 1, 2 };
+    int r[3] = {0, 1, 2};
     HPX_TEST_EQ(hpx::util::begin(r), &r[0]);
     HPX_TEST_EQ(hpx::util::end(r), &r[3]);
 
-    int const cr[3] = { 0, 1, 2 };
+    int const cr[3] = {0, 1, 2};
     HPX_TEST_EQ(hpx::util::begin(cr), &cr[0]);
     HPX_TEST_EQ(hpx::util::end(cr), &cr[3]);
     HPX_TEST_EQ(hpx::util::size(cr), 3u);
@@ -63,8 +63,7 @@ void member_range()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace adl
-{
+namespace adl {
     struct free
     {
         int x;
@@ -89,7 +88,7 @@ namespace adl
     {
         return &r.x + 1;
     }
-}
+}    // namespace adl
 
 void adl_range()
 {

@@ -22,8 +22,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // Helper class to gain access to the implementation functions in the
     // derived (user-defined) iterator classes.
@@ -31,51 +30,48 @@ namespace hpx { namespace util
     {
     public:
         template <typename Iterator1, typename Iterator2>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        static bool equal(Iterator1 const& lhs, Iterator2 const& rhs)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static bool equal(
+            Iterator1 const& lhs, Iterator2 const& rhs)
         {
             return lhs.equal(rhs);
         }
 
         template <typename Iterator>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        static void increment(Iterator& it)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void increment(Iterator& it)
         {
             it.increment();
         }
 
         template <typename Iterator>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        static void decrement(Iterator& it)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void decrement(Iterator& it)
         {
             it.decrement();
         }
 
         template <typename Reference, typename Iterator>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        static Reference dereference(Iterator const& it)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static Reference dereference(
+            Iterator const& it)
         {
             return it.dereference();
         }
 
         template <typename Iterator, typename Distance>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        static void advance(Iterator& it, Distance n)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void advance(
+            Iterator& it, Distance n)
         {
             it.advance(n);
         }
 
         template <typename Iterator1, typename Iterator2>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        static typename std::iterator_traits<Iterator1>::difference_type
-        distance_to(Iterator1 const& lhs, Iterator2 const& rhs)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static
+            typename std::iterator_traits<Iterator1>::difference_type
+            distance_to(Iterator1 const& lhs, Iterator2 const& rhs)
         {
             return lhs.distance_to(rhs);
         }
     };
 
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename Reference>
         struct arrow_dispatch    // proxy references
@@ -96,8 +92,7 @@ namespace hpx { namespace util
 
             typedef proxy type;
 
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            static type call(Reference const& x)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static type call(Reference const& x)
             {
                 return type(x);
             }
@@ -116,28 +111,20 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         // Implementation for input and forward iterators
-        template <typename Derived,
-            typename T,
-            typename Category,
-            typename Reference,
-            typename Distance,
-            typename Pointer>
+        template <typename Derived, typename T, typename Category,
+            typename Reference, typename Distance, typename Pointer>
         class iterator_facade_base
         {
         public:
             typedef Category iterator_category;
             typedef typename std::remove_const<T>::type value_type;
             typedef Distance difference_type;
-            typedef typename std::conditional<
-                    std::is_void<Pointer>::value,
-                    typename arrow_dispatch<Reference>::type,
-                    Pointer
-                >::type pointer;
+            typedef typename std::conditional<std::is_void<Pointer>::value,
+                typename arrow_dispatch<Reference>::type, Pointer>::type
+                pointer;
             typedef Reference reference;
 
-            HPX_HOST_DEVICE iterator_facade_base()
-            {
-            }
+            HPX_HOST_DEVICE iterator_facade_base() {}
 
         protected:
             HPX_HOST_DEVICE Derived& derived()
@@ -153,8 +140,8 @@ namespace hpx { namespace util
         public:
             HPX_HOST_DEVICE reference operator*() const
             {
-                return iterator_core_access::
-                    template dereference<reference>(this->derived());
+                return iterator_core_access::template dereference<reference>(
+                    this->derived());
             }
 
             HPX_HOST_DEVICE pointer operator->() const
@@ -171,41 +158,24 @@ namespace hpx { namespace util
         };
 
         // Implementation for bidirectional iterators
-        template <typename Derived,
-            typename T,
-            typename Reference,
-            typename Distance,
-            typename Pointer>
-        class iterator_facade_base<Derived,
-                T,
-                std::bidirectional_iterator_tag,
-                Reference,
-                Distance,
-                Pointer>
-          : public iterator_facade_base<Derived,
-                    T,
-                    std::forward_iterator_tag,
-                    Reference,
-                    Distance,
-                    Pointer>
+        template <typename Derived, typename T, typename Reference,
+            typename Distance, typename Pointer>
+        class iterator_facade_base<Derived, T, std::bidirectional_iterator_tag,
+            Reference, Distance, Pointer>
+          : public iterator_facade_base<Derived, T, std::forward_iterator_tag,
+                Reference, Distance, Pointer>
         {
-            typedef iterator_facade_base<Derived,
-                    T,
-                    std::forward_iterator_tag,
-                    Reference,
-                    Distance,
-                    Pointer
-                > base_type;
+            typedef iterator_facade_base<Derived, T, std::forward_iterator_tag,
+                Reference, Distance, Pointer>
+                base_type;
 
         public:
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef typename std::remove_const<T>::type value_type;
             typedef Distance difference_type;
-            typedef typename std::conditional<
-                    std::is_void<Pointer>::value,
-                    typename arrow_dispatch<Reference>::type,
-                    Pointer
-                >::type pointer;
+            typedef typename std::conditional<std::is_void<Pointer>::value,
+                typename arrow_dispatch<Reference>::type, Pointer>::type
+                pointer;
             typedef Reference reference;
 
             HPX_HOST_DEVICE iterator_facade_base()
@@ -229,41 +199,24 @@ namespace hpx { namespace util
         };
 
         // Implementation for random access iterators
-        template <typename Derived,
-            typename T,
-            typename Reference,
-            typename Distance,
-            typename Pointer>
-        class iterator_facade_base<Derived,
-                T,
-                std::random_access_iterator_tag,
-                Reference,
-                Distance,
-                Pointer>
-          : public iterator_facade_base<Derived,
-                    T,
-                    std::bidirectional_iterator_tag,
-                    Reference,
-                    Distance,
-                    Pointer>
+        template <typename Derived, typename T, typename Reference,
+            typename Distance, typename Pointer>
+        class iterator_facade_base<Derived, T, std::random_access_iterator_tag,
+            Reference, Distance, Pointer>
+          : public iterator_facade_base<Derived, T,
+                std::bidirectional_iterator_tag, Reference, Distance, Pointer>
         {
-            typedef iterator_facade_base<Derived,
-                    T,
-                    std::bidirectional_iterator_tag,
-                    Reference,
-                    Distance,
-                    Pointer
-                > base_type;
+            typedef iterator_facade_base<Derived, T,
+                std::bidirectional_iterator_tag, Reference, Distance, Pointer>
+                base_type;
 
         public:
             typedef std::random_access_iterator_tag iterator_category;
             typedef typename std::remove_const<T>::type value_type;
             typedef Distance difference_type;
-            typedef typename std::conditional<
-                    std::is_void<Pointer>::value,
-                    typename arrow_dispatch<Reference>::type,
-                    Pointer
-                >::type pointer;
+            typedef typename std::conditional<std::is_void<Pointer>::value,
+                typename arrow_dispatch<Reference>::type, Pointer>::type
+                pointer;
             typedef Reference reference;
 
             HPX_HOST_DEVICE iterator_facade_base()
@@ -302,29 +255,26 @@ namespace hpx { namespace util
                 return result -= n;
             }
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived,
-        typename T,
-        typename Category,
-        typename Reference = T&,
-        typename Distance = std::ptrdiff_t,
+    template <typename Derived, typename T, typename Category,
+        typename Reference = T&, typename Distance = std::ptrdiff_t,
         typename Pointer = void>
     struct iterator_facade
-      : detail::iterator_facade_base<
-            Derived, T, Category, Reference, Distance, Pointer>
+      : detail::iterator_facade_base<Derived, T, Category, Reference, Distance,
+            Pointer>
     {
     private:
-        typedef detail::iterator_facade_base<
-                Derived, T, Category, Reference, Distance, Pointer
-            > base_type;
+        typedef detail::iterator_facade_base<Derived, T, Category, Reference,
+            Distance, Pointer>
+            base_type;
 
     protected:
         // for convenience in derived classes
-        typedef iterator_facade<
-                Derived, T, Category, Reference, Distance, Pointer
-            > iterator_adaptor_;
+        typedef iterator_facade<Derived, T, Category, Reference, Distance,
+            Pointer>
+            iterator_adaptor_;
 
     public:
         HPX_HOST_DEVICE iterator_facade()
@@ -333,8 +283,7 @@ namespace hpx { namespace util
         }
     };
 
-    namespace detail
-    {
+    namespace detail {
         // Iterators whose dereference operators reference the same value for
         // all iterators into the same sequence (like many input iterators)
         // need help with their postfix ++: the referenced value must be read
@@ -427,10 +376,10 @@ namespace hpx { namespace util
         template <typename Reference, typename Value>
         struct is_non_proxy_reference
           : std::is_convertible<
-                typename std::remove_reference<Reference>::type const volatile*
-              , Value const volatile*
-            >
-        {};
+                typename std::remove_reference<Reference>::type const volatile*,
+                Value const volatile*>
+        {
+        };
 
         // Because the C++98 input iterator requirements say that *r++ has
         // type T (value_type), implementations of some standard algorithms
@@ -452,41 +401,34 @@ namespace hpx { namespace util
         };
 
         template <typename Iterator, typename Value, typename Reference>
-        struct postfix_increment_result<
-            Iterator, Value, Reference,
-            typename std::enable_if<
-                traits::has_category<Iterator, std::input_iterator_tag>::value &&
-                is_non_proxy_reference<Reference, Value>::value
-            >::type>
+        struct postfix_increment_result<Iterator, Value, Reference,
+            typename std::enable_if<traits::has_category<Iterator,
+                                        std::input_iterator_tag>::value &&
+                is_non_proxy_reference<Reference, Value>::value>::type>
         {
             typedef postfix_increment_proxy<Iterator> type;
         };
 
         template <typename Iterator, typename Value, typename Reference>
         struct postfix_increment_result<Iterator, Value, Reference,
-            typename std::enable_if<
-                traits::has_category<Iterator, std::input_iterator_tag>::value &&
-               !is_non_proxy_reference<Reference, Value>::value
-            >::type>
+            typename std::enable_if<traits::has_category<Iterator,
+                                        std::input_iterator_tag>::value &&
+                !is_non_proxy_reference<Reference, Value>::value>::type>
         {
             typedef writable_postfix_increment_proxy<Iterator> type;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived,
-        typename T,
-        typename Category,
-        typename Reference,
-        typename Distance,
-        typename Pointer>
+    template <typename Derived, typename T, typename Category,
+        typename Reference, typename Distance, typename Pointer>
     HPX_HOST_DEVICE inline
-    typename util::detail::postfix_increment_result<
-        Derived, typename Derived::value_type, typename Derived::reference
-    >::type
-    operator++(iterator_facade<
-            Derived, T, Category, Reference, Distance, Pointer
-        >& i, int)
+        typename util::detail::postfix_increment_result<Derived,
+            typename Derived::value_type, typename Derived::reference>::type
+        operator++(
+            iterator_facade<Derived, T, Category, Reference, Distance, Pointer>&
+                i,
+            int)
     {
         typedef typename util::detail::postfix_increment_result<Derived,
             typename Derived::value_type, typename Derived::reference>::type
@@ -497,99 +439,81 @@ namespace hpx { namespace util
         return tmp;
     }
 
-    namespace detail
-    {
+    namespace detail {
         template <typename Facade1, typename Facade2, typename Return>
         struct enable_operator_interoperable
-          : std::enable_if<
-                std::is_convertible<Facade1, Facade2>::value ||
+          : std::enable_if<std::is_convertible<Facade1, Facade2>::value ||
                     std::is_convertible<Facade2, Facade1>::value,
                 Return>
-        {};
-    }
+        {
+        };
+    }    // namespace detail
 
-#define HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(prefix, op, result_type)        \
-    template <                                                                \
-        typename Derived1, typename T1, typename Category1,                   \
-        typename Reference1, typename Distance1, typename Pointer1,           \
-        typename Derived2, typename T2, typename Category2,                   \
-        typename Reference2, typename Distance2, typename Pointer2>           \
-    HPX_HOST_DEVICE prefix                                                    \
-    typename hpx::util::detail::enable_operator_interoperable<                \
-        Derived1, Derived2, result_type                                       \
-    >::type                                                                   \
-    operator op(                                                              \
-        iterator_facade<                                                      \
-            Derived1, T1, Category1, Reference1, Distance1, Pointer1          \
-        > const& lhs,                                                         \
-        iterator_facade<                                                      \
-            Derived2, T2, Category2, Reference2, Distance2, Pointer2          \
-        > const& rhs)                                                         \
-/**/
+#define HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(prefix, op, result_type)         \
+    template <typename Derived1, typename T1, typename Category1,              \
+        typename Reference1, typename Distance1, typename Pointer1,            \
+        typename Derived2, typename T2, typename Category2,                    \
+        typename Reference2, typename Distance2, typename Pointer2>            \
+    HPX_HOST_DEVICE prefix                                                     \
+        typename hpx::util::detail::enable_operator_interoperable<Derived1,    \
+            Derived2, result_type>::type                                       \
+        operator op(iterator_facade<Derived1, T1, Category1, Reference1,       \
+                        Distance1, Pointer1> const& lhs,                       \
+            iterator_facade<Derived2, T2, Category2, Reference2, Distance2,    \
+                Pointer2> const& rhs) /**/
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, ==, bool)
     {
-        return iterator_core_access::equal(
-            static_cast<Derived1 const&>(lhs),
+        return iterator_core_access::equal(static_cast<Derived1 const&>(lhs),
             static_cast<Derived2 const&>(rhs));
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, !=, bool)
     {
-        return !iterator_core_access::equal(
-            static_cast<Derived1 const&>(lhs),
+        return !iterator_core_access::equal(static_cast<Derived1 const&>(lhs),
             static_cast<Derived2 const&>(rhs));
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, <, bool)
     {
-        static_assert(
-            hpx::traits::is_random_access_iterator<Derived1>::value,
+        static_assert(hpx::traits::is_random_access_iterator<Derived1>::value,
             "Iterator needs to be random access");
         return 0 <
-            iterator_core_access::distance_to(
-                static_cast<Derived1 const&>(lhs),
+            iterator_core_access::distance_to(static_cast<Derived1 const&>(lhs),
                 static_cast<Derived2 const&>(rhs));
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, >, bool)
     {
-        static_assert(
-            hpx::traits::is_random_access_iterator<Derived1>::value,
+        static_assert(hpx::traits::is_random_access_iterator<Derived1>::value,
             "Iterator needs to be random access");
         return 0 >
-            iterator_core_access::distance_to(
-                static_cast<Derived1 const&>(lhs),
+            iterator_core_access::distance_to(static_cast<Derived1 const&>(lhs),
                 static_cast<Derived2 const&>(rhs));
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, <=, bool)
     {
-        static_assert(
-            hpx::traits::is_random_access_iterator<Derived1>::value,
+        static_assert(hpx::traits::is_random_access_iterator<Derived1>::value,
             "Iterator needs to be random access");
         return 0 <=
-            iterator_core_access::distance_to(
-                static_cast<Derived1 const&>(lhs),
+            iterator_core_access::distance_to(static_cast<Derived1 const&>(lhs),
                 static_cast<Derived2 const&>(rhs));
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, >=, bool)
     {
-        static_assert(
-            hpx::traits::is_random_access_iterator<Derived1>::value,
+        static_assert(hpx::traits::is_random_access_iterator<Derived1>::value,
             "Iterator needs to be random access");
         return 0 >=
-            iterator_core_access::distance_to(
-                static_cast<Derived1 const&>(lhs),
+            iterator_core_access::distance_to(static_cast<Derived1 const&>(lhs),
                 static_cast<Derived2 const&>(rhs));
     }
 
-    HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, -,
-        typename std::iterator_traits<Derived2>::difference_type)
+    HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(
+        inline, -, typename std::iterator_traits<Derived2>::difference_type)
     {
-        static_assert(
-            hpx::traits::is_random_access_iterator<Derived1>::value,
+        static_assert(hpx::traits::is_random_access_iterator<Derived1>::value,
             "Iterator needs to be random access");
         return iterator_core_access::distance_to(
             static_cast<Derived1 const&>(rhs),
@@ -598,37 +522,27 @@ namespace hpx { namespace util
 
 #undef HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD
 
-    template <typename Derived,
-        typename T,
-        typename Category,
-        typename Reference,
-        typename Distance,
-        typename Pointer>
+    template <typename Derived, typename T, typename Category,
+        typename Reference, typename Distance, typename Pointer>
     HPX_HOST_DEVICE inline Derived operator+(
-        iterator_facade<
-            Derived, T, Category, Reference, Distance, Pointer
-        > const& it,
-         typename Derived::difference_type n)
+        iterator_facade<Derived, T, Category, Reference, Distance,
+            Pointer> const& it,
+        typename Derived::difference_type n)
     {
         Derived tmp(static_cast<Derived const&>(it));
         return tmp += n;
     }
 
-    template <typename Derived,
-        typename T,
-        typename Category,
-        typename Reference,
-        typename Distance,
-        typename Pointer>
+    template <typename Derived, typename T, typename Category,
+        typename Reference, typename Distance, typename Pointer>
     HPX_HOST_DEVICE inline Derived operator+(
         typename Derived::difference_type n,
-        iterator_facade<
-            Derived, T, Category, Reference, Distance, Pointer
-        > const& it)
+        iterator_facade<Derived, T, Category, Reference, Distance,
+            Pointer> const& it)
     {
         Derived tmp(static_cast<Derived const&>(it));
         return tmp += n;
     }
-}}
+}}    // namespace hpx::util
 
 #endif

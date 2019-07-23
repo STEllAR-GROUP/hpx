@@ -15,7 +15,8 @@ void array_range()
     typedef int range[3];
 
     HPX_TEST_MSG((hpx::traits::is_range<range>::value == true), "array");
-    HPX_TEST_MSG((hpx::traits::is_range<range const>::value == true), "array-const");
+    HPX_TEST_MSG(
+        (hpx::traits::is_range<range const>::value == true), "array-const");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -49,12 +50,12 @@ void member_range()
     typedef member range;
 
     HPX_TEST_MSG((hpx::traits::is_range<range>::value == true), "member-const");
-    HPX_TEST_MSG((hpx::traits::is_range<range const>::value == true), "member-const");
+    HPX_TEST_MSG(
+        (hpx::traits::is_range<range const>::value == true), "member-const");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace adl
-{
+namespace adl {
     struct free
     {
         int x;
@@ -79,14 +80,15 @@ namespace adl
     {
         return &r.x + 1;
     }
-}
+}    // namespace adl
 
 void adl_range()
 {
     typedef adl::free range;
 
     HPX_TEST_MSG((hpx::traits::is_range<range>::value == true), "adl-const");
-    HPX_TEST_MSG((hpx::traits::is_range<range const>::value == true), "adl-const");
+    HPX_TEST_MSG(
+        (hpx::traits::is_range<range const>::value == true), "adl-const");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,7 +97,8 @@ void vector_range()
     typedef std::vector<int> range;
 
     HPX_TEST_MSG((hpx::traits::is_range<range>::value == true), "vector");
-    HPX_TEST_MSG((hpx::traits::is_range<range const>::value == true), "vector-const");
+    HPX_TEST_MSG(
+        (hpx::traits::is_range<range const>::value == true), "vector-const");
 }
 
 ///////////////////////////////////////////////////////////////////////////////

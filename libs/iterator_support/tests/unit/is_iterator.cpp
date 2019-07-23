@@ -16,35 +16,40 @@
 #include <type_traits>
 #include <vector>
 
-namespace test
-{
+namespace test {
     template <typename BaseIterator, typename IteratorTag>
     struct test_iterator
-      : hpx::util::iterator_adaptor<
-            test_iterator<BaseIterator, IteratorTag>,
+      : hpx::util::iterator_adaptor<test_iterator<BaseIterator, IteratorTag>,
             BaseIterator, void, IteratorTag>
     {
     private:
         typedef hpx::util::iterator_adaptor<
-            test_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, void, IteratorTag>
-        base_type;
+            test_iterator<BaseIterator, IteratorTag>, BaseIterator, void,
+            IteratorTag>
+            base_type;
 
     public:
-        test_iterator() : base_type() {}
-        explicit test_iterator(BaseIterator base) : base_type(base) {}
+        test_iterator()
+          : base_type()
+        {
+        }
+        explicit test_iterator(BaseIterator base)
+          : base_type(base)
+        {
+        }
     };
-}
+}    // namespace test
 
-template<typename T, typename = void>
-struct has_nested_type
-  : std::integral_constant<bool, false>
-{};
+template <typename T, typename = void>
+struct has_nested_type : std::integral_constant<bool, false>
+{
+};
 
-template<typename T>
+template <typename T>
 struct has_nested_type<T, hpx::util::always_void<typename T::type>>
   : std::integral_constant<bool, true>
-{};
+{
+};
 
 struct bidirectional_traversal_iterator
 {
@@ -917,32 +922,28 @@ void is_input_iterator()
         using iterator =
             test::test_iterator<base_iterator, std::random_access_iterator_tag>;
 
-        HPX_TEST_MSG(
-            (is_input_iterator<iterator>::value), "hpx test iterator");
+        HPX_TEST_MSG((is_input_iterator<iterator>::value), "hpx test iterator");
     }
     {
         using base_iterator = std::vector<std::size_t>::iterator;
         using iterator =
             test::test_iterator<base_iterator, std::bidirectional_iterator_tag>;
 
-        HPX_TEST_MSG(
-            (is_input_iterator<iterator>::value), "hpx test iterator");
+        HPX_TEST_MSG((is_input_iterator<iterator>::value), "hpx test iterator");
     }
     {
         using base_iterator = std::vector<std::size_t>::iterator;
         using iterator =
             test::test_iterator<base_iterator, std::forward_iterator_tag>;
 
-        HPX_TEST_MSG(
-            (is_input_iterator<iterator>::value), "hpx test iterator");
+        HPX_TEST_MSG((is_input_iterator<iterator>::value), "hpx test iterator");
     }
     {
         using base_iterator = std::vector<std::size_t>::iterator;
         using iterator =
             test::test_iterator<base_iterator, std::input_iterator_tag>;
 
-        HPX_TEST_MSG(
-            (is_input_iterator<iterator>::value), "hpx test iterator");
+        HPX_TEST_MSG((is_input_iterator<iterator>::value), "hpx test iterator");
     }
 }
 

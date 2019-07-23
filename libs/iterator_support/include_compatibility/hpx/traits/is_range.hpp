@@ -9,12 +9,10 @@
 
 #if defined(HPX_ITERATOR_SUPPORT_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/traits/is_range.hpp is deprecated, \
+#pragma message("The header hpx/traits/is_range.hpp is deprecated, \
     please include hpx/iterator_support/is_range.hpp instead")
 #else
-#warning \
-    "The header hpx/traits/is_range.hpp is deprecated, \
+#warning "The header hpx/traits/is_range.hpp is deprecated, \
     please include hpx/iterator_support/is_range.hpp instead"
 #endif
 #endif

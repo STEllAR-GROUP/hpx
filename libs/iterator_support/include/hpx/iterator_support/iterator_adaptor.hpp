@@ -13,8 +13,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/type_support/identity.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
+#include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
 
 #include <iterator>
@@ -22,24 +22,20 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     // Default template argument handling for iterator_adaptor
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename Iterator>
         struct value_type_iterator_traits_helper
         {
-            using type =
-                typename std::iterator_traits<Iterator>::value_type;
+            using type = typename std::iterator_traits<Iterator>::value_type;
         };
 
         template <typename Iterator>
         struct reference_iterator_traits_helper
         {
-            using type =
-                typename std::iterator_traits<Iterator>::reference;
+            using type = typename std::iterator_traits<Iterator>::reference;
         };
 
         template <typename Iterator>
@@ -66,41 +62,33 @@ namespace hpx { namespace util
             // the following type calculations use lazy_conditional to avoid
             // premature instantiations
             using value_type = typename std::conditional<
-                    std::is_void<Value>::value,
-                    typename util::lazy_conditional<
-                        std::is_void<Reference>::value,
-                        value_type_iterator_traits_helper<Base>,
-                        std::remove_reference<Reference>
-                    >::type,
-                    Value
-                >::type;
+                std::is_void<Value>::value,
+                typename util::lazy_conditional<std::is_void<Reference>::value,
+                    value_type_iterator_traits_helper<Base>,
+                    std::remove_reference<Reference>>::type,
+                Value>::type;
 
-            using reference_type = typename std::conditional<
-                    std::is_void<Reference>::value,
-                    typename util::lazy_conditional<
-                        std::is_void<Value>::value,
+            using reference_type =
+                typename std::conditional<std::is_void<Reference>::value,
+                    typename util::lazy_conditional<std::is_void<Value>::value,
                         reference_iterator_traits_helper<Base>,
-                        std::add_lvalue_reference<Value>
-                    >::type,
-                    Reference
-                >::type;
+                        std::add_lvalue_reference<Value>>::type,
+                    Reference>::type;
 
-            using iterator_category = typename util::lazy_conditional<
-                    std::is_void<Category>::value,
+            using iterator_category =
+                typename util::lazy_conditional<std::is_void<Category>::value,
                     category_iterator_traits_helper<Base>,
-                    util::identity<Category>
-                >::type;
+                    util::identity<Category>>::type;
 
-            using difference_type = typename util::lazy_conditional<
-                    std::is_void<Difference>::value,
+            using difference_type =
+                typename util::lazy_conditional<std::is_void<Difference>::value,
                     difference_type_iterator_traits_helper<Base>,
-                    util::identity<Difference>
-                >::type;
+                    util::identity<Difference>>::type;
 
             using type = iterator_facade<Derived, value_type, iterator_category,
                 reference_type, difference_type, Pointer>;
         };
-    }
+    }    // namespace detail
 
     // Iterator adaptor
     //
@@ -125,26 +113,22 @@ namespace hpx { namespace util
     //   Difference - the difference_type of the resulting iterator. If not
     //      supplied, iterator_traits<Base>::difference_type is used.
     //
-    template <
-        typename Derived, typename Base, typename Value = void,
+    template <typename Derived, typename Base, typename Value = void,
         typename Category = void, typename Reference = void,
         typename Difference = void, typename Pointer = void>
     class iterator_adaptor
-      : public hpx::util::detail::iterator_adaptor_base<
-                Derived, Base, Value, Category, Reference, Difference, Pointer
-            >::type
+      : public hpx::util::detail::iterator_adaptor_base<Derived, Base, Value,
+            Category, Reference, Difference, Pointer>::type
     {
     protected:
-        typedef typename hpx::util::detail::iterator_adaptor_base<
-                Derived, Base, Value, Category, Reference, Difference, Pointer
-            >::type base_adaptor_type;
+        typedef typename hpx::util::detail::iterator_adaptor_base<Derived, Base,
+            Value, Category, Reference, Difference, Pointer>::type
+            base_adaptor_type;
 
         friend class hpx::util::iterator_core_access;
 
     public:
-        HPX_HOST_DEVICE iterator_adaptor()
-        {
-        }
+        HPX_HOST_DEVICE iterator_adaptor() {}
 
         HPX_HOST_DEVICE explicit iterator_adaptor(Base const& iter)
           : iterator_(iter)
@@ -153,27 +137,24 @@ namespace hpx { namespace util
 
         typedef Base base_type;
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        Base const& base() const
+        HPX_HOST_DEVICE HPX_FORCEINLINE Base const& base() const
         {
             return iterator_;
         }
 
     protected:
         // for convenience in derived classes
-        typedef iterator_adaptor<
-                Derived, Base, Value, Category, Reference, Difference, Pointer
-            > iterator_adaptor_;
+        typedef iterator_adaptor<Derived, Base, Value, Category, Reference,
+            Difference, Pointer>
+            iterator_adaptor_;
 
         // lvalue access to the Base object for Derived
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        Base const& base_reference() const
+        HPX_HOST_DEVICE HPX_FORCEINLINE Base const& base_reference() const
         {
             return iterator_;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        Base& base_reference()
+        HPX_HOST_DEVICE HPX_FORCEINLINE Base& base_reference()
         {
             return iterator_;
         }
@@ -183,18 +164,17 @@ namespace hpx { namespace util
         // to prevent temptation for Derived classes to use it, which
         // will often result in an error.  Derived classes should use
         // base_reference(), above, to get direct access to m_iterator.
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename base_adaptor_type::reference dereference() const
+        HPX_HOST_DEVICE HPX_FORCEINLINE typename base_adaptor_type::reference
+        dereference() const
         {
             return *iterator_;
         }
 
         template <typename OtherDerived, typename OtherIterator, typename V,
             typename C, typename R, typename D, typename P>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        bool equal(iterator_adaptor<
-                OtherDerived, OtherIterator, V, C, R, D, P
-            > const& x) const
+        HPX_HOST_DEVICE HPX_FORCEINLINE bool equal(
+            iterator_adaptor<OtherDerived, OtherIterator, V, C, R, D, P> const&
+                x) const
         {
             // Maybe re-add with same_distance
             //  static_assert(
@@ -205,14 +185,12 @@ namespace hpx { namespace util
 
         // prevent this function from being instantiated if not needed
         template <typename DifferenceType>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        void advance(DifferenceType n)
+        HPX_HOST_DEVICE HPX_FORCEINLINE void advance(DifferenceType n)
         {
             iterator_ += n;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        void increment()
+        HPX_HOST_DEVICE HPX_FORCEINLINE void increment()
         {
             ++iterator_;
         }
@@ -220,10 +198,8 @@ namespace hpx { namespace util
         // prevent this function from being instantiated if not needed
         template <typename Iterator = Base,
             typename Enable = typename std::enable_if<
-                traits::is_bidirectional_iterator<Iterator>::value
-            >::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        void decrement()
+                traits::is_bidirectional_iterator<Iterator>::value>::type>
+        HPX_HOST_DEVICE HPX_FORCEINLINE void decrement()
         {
             --iterator_;
         }
@@ -231,11 +207,9 @@ namespace hpx { namespace util
         template <typename OtherDerived, typename OtherIterator, typename V,
             typename C, typename R, typename D, typename P>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename base_adaptor_type::difference_type
-        distance_to(
-            iterator_adaptor<
-                OtherDerived, OtherIterator, V, C, R, D, P
-            > const& y) const
+            typename base_adaptor_type::difference_type
+            distance_to(iterator_adaptor<OtherDerived, OtherIterator, V, C, R,
+                D, P> const& y) const
         {
             // Maybe re-add with same_distance
             //  static_assert(
@@ -247,6 +221,6 @@ namespace hpx { namespace util
     private:    // data members
         Base iterator_;
     };
-}}
+}}    // namespace hpx::util
 
 #endif
