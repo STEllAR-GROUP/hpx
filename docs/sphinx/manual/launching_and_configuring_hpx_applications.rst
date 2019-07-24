@@ -1467,6 +1467,11 @@ The predefined command line options for any application using
    :option:`--hpx:affinity` options. Implies :option:`--hpx:numa-sensitive`
    (:option:`--hpx:bind`\ ``=none``) disables defining thread affinities).
 
+.. option:: --hpx:use-process-mask
+
+   use the process mask to restrict available hardware resources (implies
+   :option:`--hpx:ignore-batch-env`)
+
 .. option:: --hpx:print-bind
 
    print to the console the bit masks calculated from the arguments specified to
@@ -1823,7 +1828,7 @@ Here is a full grammar describing the possible format of mappings:
 
 .. productionlist::
    mappings: `distribution` | `mapping` (";" `mapping`)*
-   distribution: "compact" | "scatter" | "balanced" | "numa-balanced" | "process"
+   distribution: "compact" | "scatter" | "balanced" | "numa-balanced"
    mapping: `thread_spec` "=" `pu_specs`
    thread_spec: "thread:" `range_specs`
    pu_specs: `pu_spec` ("." `pu_spec`)*
@@ -1869,14 +1874,14 @@ only their first processing unit ``pu:0`` should be used.
    where each bit in the bitmasks corresponds to a processing unit the listed
    worker thread will be bound to run on.
 
-The difference between the predefined distribution schemes (``compact``,
-``scatter``, ``balanced`` and ``numa-balanced``) is best explained with an
-example. Imagine that we have a system with 4 cores and 4 hardware threads per
-core on 2 sockets. If we place 8 threads the assignments produced by the
-``compact``, ``scatter``, ``balanced`` and ``numa-balanced`` types are shown in
-the figure below. Notice that ``compact`` does not fully utilize all the cores
-in the system. For this reason it is recommended that applications are run using
-the ``scatter`` or ``balanced``/``numa-balanced`` options in most cases.
+The difference between the four possible predefined distribution schemes
+(``compact``, ``scatter``, ``balanced`` and ``numa-balanced``) is best explained
+with an example. Imagine that we have a system with 4 cores and 4 hardware
+threads per core on 2 sockets. If we place 8 threads the assignments produced by
+the ``compact``, ``scatter``, ``balanced`` and ``numa-balanced`` types are shown
+in the figure below. Notice that ``compact`` does not fully utilize all the
+cores in the system. For this reason it is recommended that applications are run
+using the ``scatter`` or ``balanced``/``numa-balanced`` options in most cases.
 
 .. _commandline_affinities:
 
@@ -1884,16 +1889,16 @@ the ``scatter`` or ``balanced``/``numa-balanced`` options in most cases.
 
    Schematic of thread affinity type distributions.
 
-The ``process`` option is different from the other distributions in that it does
-not define an explicit distribution, but instead uses the implicit distribution
-set by the process affinity mask. This is usually the case when running |hpx|
-applications through |mpi|_ or a batch environment. If no process mask is set it
-is equivalent to the ``compact`` distribution. The number of threads will
-automatically be set to the number of processing units in the process mask, and
-one thread will be bound to each processing unit in the mask. Currently this is
-complementary to the explicit support in |hpx| for batch environments. If you
-want to use the ``process`` binding option, it is recommended that you use the
-command line option :option:`--hpx:ignore-batch-env` as well.
+In addition to the predefined distributions it is possible to restrict the
+resources used by |hpx| to the process CPU mask. The CPU mask is typically set
+by e.g. |mpi|_ and batch environments. Using the command line option
+:option:`--hpx:use-process-mask` makes |hpx| act as if only the processing units
+in the CPU mask are available for use by |hpx|. The number of threads is
+automatically determined from the CPU mask. The number of threads can still be
+changed manually using this option, but only to a number less than or equal to
+the number of processing units in the CPU mask. The option
+:option:`--hpx:print-bind` is useful in conjunction with
+:option:`--hpx:use-process-mask` to make sure threads are placed as expected.
 
 .. [#] The phase of a |hpx|-thread counts how often this thread has been
        activated.
