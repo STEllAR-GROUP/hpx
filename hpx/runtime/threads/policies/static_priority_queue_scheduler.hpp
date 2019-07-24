@@ -27,6 +27,15 @@
 namespace hpx { namespace threads { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+    using default_static_priority_queue_scheduler_terminated_queue =
+        lockfree_lifo;
+#else
+    using default_static_priority_queue_scheduler_terminated_queue =
+        lockfree_fifo;
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
     /// The static_priority_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from. Additionally it maintains separate queues: several for high
@@ -38,10 +47,13 @@ namespace hpx { namespace threads { namespace policies
     template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
-        typename TerminatedQueuing = lockfree_lifo>
+        typename TerminatedQueuing =
+            default_static_priority_queue_scheduler_terminated_queue>
     class HPX_EXPORT static_priority_queue_scheduler
-        : public local_priority_queue_scheduler<
-            Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing>
+      : public local_priority_queue_scheduler<Mutex,
+            PendingQueuing,
+            StagedQueuing,
+            TerminatedQueuing>
     {
     public:
         using base_type = local_priority_queue_scheduler<Mutex, PendingQueuing,

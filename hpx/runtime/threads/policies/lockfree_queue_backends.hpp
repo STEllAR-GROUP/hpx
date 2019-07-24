@@ -24,18 +24,13 @@ namespace hpx { namespace threads { namespace policies
 {
 
 struct lockfree_fifo;
-struct lockfree_lifo;
 
 ///////////////////////////////////////////////////////////////////////////////
 // FIFO
 template <typename T>
 struct lockfree_fifo_backend
 {
-#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    typedef boost::lockfree::deque<T> container_type;
-#else
     typedef boost::lockfree::queue<T> container_type;
-#endif
 
     typedef T value_type;
     typedef T& reference;
@@ -51,20 +46,12 @@ struct lockfree_fifo_backend
 
     bool push(const_reference val, bool /*other_end*/ = false)
     {
-#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-        return queue_.push_left(val);
-#else
         return queue_.push(val);
-#endif
     }
 
     bool pop(reference val, bool steal = true)
     {
-#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-        return queue_.pop_right(val);
-#else
         return queue_.pop(val);
-#endif
     }
 
     bool empty()
@@ -87,14 +74,13 @@ struct lockfree_fifo
 
 ///////////////////////////////////////////////////////////////////////////////
 // LIFO
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+struct lockfree_lifo;
+
 template <typename T>
 struct lockfree_lifo_backend
 {
-#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
     typedef boost::lockfree::deque<T> container_type;
-#else
-    typedef boost::lockfree::queue<T> container_type;
-#endif
 
     typedef T value_type;
     typedef T& reference;
@@ -110,24 +96,14 @@ struct lockfree_lifo_backend
 
     bool push(const_reference val, bool other_end = false)
     {
-#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         if (other_end)
             return queue_.push_right(val);
         return queue_.push_left(val);
-#else
-        // without 128 atomics this turns into a fifo queue
-        return queue_.push(val);
-#endif
     }
 
     bool pop(reference val, bool steal = true)
     {
-#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         return queue_.pop_left(val);
-#else
-        // without 128 atomics this turns into a fifo queue
-        return queue_.pop(val);
-#endif
     }
 
     bool empty()
@@ -150,7 +126,7 @@ struct lockfree_lifo
 
 ///////////////////////////////////////////////////////////////////////////////
 // FIFO + stealing at opposite end.
-#if defined(HPX_HAVE_ABP_SCHEDULER) && defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+#if defined(HPX_HAVE_ABP_SCHEDULER)
 struct lockfree_abp_fifo;
 struct lockfree_abp_lifo;
 
@@ -253,6 +229,7 @@ struct lockfree_abp_lifo
 };
 
 #endif // HPX_HAVE_ABP_SCHEDULER
+#endif // HPX_HAVE_CXX11_STD_ATOMIC_128BIT
 
 }}}
 
