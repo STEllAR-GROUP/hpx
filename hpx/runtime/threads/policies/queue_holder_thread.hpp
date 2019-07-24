@@ -36,9 +36,67 @@
 #include <string>
 #include <utility>
 
-#define LOG_CUSTOM_MSG(x)
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+#if !defined(HPX_MSVC) && defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
+#include <plugins/parcelport/parcelport_logging.hpp>
 
-// ----------------------------------------------------------------
+static std::chrono::high_resolution_clock::time_point log_t_start =
+    std::chrono::high_resolution_clock::now();
+
+#define COMMA ,
+#define LOG_CUSTOM_VAR(x) x
+
+#define LOG_CUSTOM_WORKER(x)                                                   \
+    dummy << "<CUSTOM> " << THREAD_ID << " time " << decimal(16) << nowt       \
+          << ' ';                                                              \
+        dummy << "pool (unset) " << x << std::endl;                            \
+    std::cout << dummy.str().c_str();
+
+#define LOG_CUSTOM_MSG(x)                                                      \
+    std::stringstream dummy;                                                   \
+    auto now = std::chrono::high_resolution_clock::now();                      \
+    auto nowt = std::chrono::duration_cast<std::chrono::microseconds>(         \
+        now - log_t_start)                                                     \
+                    .count();                                                  \
+    LOG_CUSTOM_WORKER(x);
+
+#define LOG_CUSTOM_MSG2(x)                                                     \
+    dummy.str(std::string());                                                  \
+    LOG_CUSTOM_WORKER(x);
+
+#define THREAD_DESC(thrd)                                                      \
+    "Desc: \"" << (thrd ? thrd->get_description().get_description() : "") << "\" "
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#define THREAD_DESC2(data, thrd)                                               \
+    "Desc: \"" << data.description.get_description() << "\""
+#else
+#define THREAD_DESC2(data, thrd)                                               \
+    hexpointer(thrd ? thrd : 0)
+#endif
+
+#else
+#define LOG_CUSTOM_VAR(x)
+#define LOG_CUSTOM_MSG(x)
+#define LOG_CUSTOM_MSG2(x)
+#define LOG_ERROR_MSG(x)
+#define THREAD_DESC(x)
+#endif
+
+#if defined(HPX_MSVC)
+#undef SHARED_PRIORITY_SCHEDULER_DEBUG
+#undef LOG_CUSTOM_MSG
+#undef LOG_CUSTOM_MSG2
+#define LOG_CUSTOM_MSG(x)
+#define LOG_CUSTOM_MSG2(x)
+#endif
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
 namespace hpx { namespace threads { namespace policies
 {
     // apply the modulo operator only when needed
@@ -514,6 +572,8 @@ namespace hpx { namespace threads { namespace policies
 
             bool deleted = thread_map_.erase(tid) != 0;
             HPX_ASSERT(deleted);
+            (void)deleted;
+
             if (dealloc) {
                 deallocate(get_thread_id_data(tid));
             }

@@ -80,6 +80,7 @@ namespace hpx { namespace threads { namespace policies
             std::unique_lock<mutex_type>& lk, bool steal = false)
         {
             HPX_ASSERT(lk.owns_lock());
+            LOG_CUSTOM_MSG("thread_queue::add_new steal " << steal);
 
             if (HPX_UNLIKELY(0 == add_count))
                 return 0;
@@ -127,6 +128,7 @@ namespace hpx { namespace threads { namespace policies
             std::unique_lock<mutex_type>& lk, bool steal = false)
         {
             HPX_ASSERT(lk.owns_lock());
+            LOG_CUSTOM_MSG("thread_queue::add_new_always steal " << steal);
 
             // create new threads from pending tasks (if appropriate)
             std::int64_t add_count = -1;    // default is no constraint
@@ -237,6 +239,8 @@ namespace hpx { namespace threads { namespace policies
             if (id)
                 *id = invalid_thread_id;
 
+            LOG_CUSTOM_MSG("thread_queue::create_thread run_now " << run_now);
+
             if (run_now)
             {
                 threads::thread_id_type tid;
@@ -276,6 +280,8 @@ namespace hpx { namespace threads { namespace policies
         bool get_next_thread(threads::thread_data*& thrd,
             bool allow_stealing, bool other_end) HPX_HOT
         {
+            LOG_CUSTOM_MSG("thread_queue::get_next_thread allow_stealing " << allow_stealing);
+
             std::int64_t work_items_count_count =
                 work_items_count_.data_.load(std::memory_order_relaxed);
 
@@ -299,6 +305,8 @@ namespace hpx { namespace threads { namespace policies
         /// Schedule the passed thread (put it on the ready work queue)
         void schedule_thread(threads::thread_data* thrd, bool other_end)
         {
+            LOG_CUSTOM_MSG("thread_queue::schedule_thread other_end " << other_end);
+
             int t = ++work_items_count_.data_;
             holder_->debug("schedule  ", queue_index, new_tasks_count_.data_, t, thrd);
             work_items_.push(thrd, other_end);
@@ -315,6 +323,8 @@ namespace hpx { namespace threads { namespace policies
         inline bool wait_or_add_new(bool running,
             std::size_t& added, bool steal = false) HPX_HOT
         {
+            LOG_CUSTOM_MSG("thread_queue::wait_or_add_new steal " << steal);
+
             if (0 == new_tasks_count_.data_.load(std::memory_order_relaxed))
             {
                 return true;
@@ -352,13 +362,13 @@ namespace hpx { namespace threads { namespace policies
             int x = 0;
             thread_description *thrd;
             while (q.pop(thrd)) {
-                LOG_CUSTOM_MSG("\t" << x++ << " " << THREAD_DESC(thrd));
+                LOG_CUSTOM_MSG("thread_queue::\t" << x++ << " " << THREAD_DESC(thrd));
                 work_items_copy_.push(thrd);
             }
-            LOG_CUSTOM_MSG("\tPushing to old queue");
+            LOG_CUSTOM_MSG("thread_queue::\tPushing to old queue");
             while (work_items_copy_.pop(thrd)) {
                 q.push(thrd);
-                LOG_CUSTOM_MSG("\t" << --x << " " << THREAD_DESC(thrd));
+                LOG_CUSTOM_MSG("thread_queue::\t" << --x << " " << THREAD_DESC(thrd));
             }
         }
 #endif

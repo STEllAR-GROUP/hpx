@@ -7,6 +7,8 @@
 #if !defined(HPX_RUNTIME_THREADS_POLICIES_SHARED_PRIORITY_QUEUE_SCHEDULER)
 #define HPX_RUNTIME_THREADS_POLICIES_SHARED_PRIORITY_QUEUE_SCHEDULER
 
+//#define SHARED_PRIORITY_SCHEDULER_DEBUG 1
+
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
@@ -45,12 +47,6 @@ static_assert(false,
     "shared_priority_queue_scheduler by setting HPX_WITH_THREAD_SCHEDULERS to not "
     "include \"all\" or \"shared-priority\"");
 #else
-
-#undef LOG_CUSTOM_MSG
-#undef LOG_CUSTOM_MSG2
-#define LOG_CUSTOM_MSG(a)
-#define LOG_CUSTOM_MSG2(a)
-#define LOG_CUSTOM_VAR(a)
 
 #define SHARED_PRIORITY_QUEUE_SCHEDULER_API 2
 
@@ -209,7 +205,7 @@ namespace hpx { namespace threads { namespace policies {
         bool cleanup_terminated(bool delete_all) override
         {
             // just cleanup the thread we were called by rather than all threads
-//            LOG_CUSTOM_MSG("cleanup_terminated - global version");
+            LOG_CUSTOM_MSG("cleanup_terminated - global version");
             std::size_t thread_num =this->global_to_local_thread_index(get_worker_thread_num());
             std::size_t domain_num = d_lookup_[thread_num];
             std::size_t q_index    = q_lookup_[thread_num];
@@ -223,6 +219,7 @@ namespace hpx { namespace threads { namespace policies {
             HPX_ASSERT(thread_num ==
                 this->global_to_local_thread_index(get_worker_thread_num()));
 
+            LOG_CUSTOM_MSG("cleanup_terminated - thread version");
             // find the numa domain from the local thread index
             std::size_t domain_num = d_lookup_[thread_num];
             std::size_t q_index    = q_lookup_[thread_num];
@@ -261,6 +258,7 @@ namespace hpx { namespace threads { namespace policies {
                 thread_num =
                     this->global_to_local_thread_index(global_thread_num);
                 if (thread_num>=num_workers_) {
+                    LOG_ERROR_MSG("thread numbering overflow xPool injection " << thread_num);
                     // This is a task being injected from a thread on another pool.
                     // we can schedule on any thread available
                     thread_num = numa_holder_[0].thread_queue(0)->worker_next(num_workers_);
@@ -269,6 +267,7 @@ namespace hpx { namespace threads { namespace policies {
                     domain_num = d_lookup_[thread_num];
                     q_index    = q_lookup_[thread_num];
                     thread_num = numa_holder_[domain_num].thread_queue(q_index)->numa_next(num_workers_);
+                    LOG_CUSTOM_MSG("round robin assignment " << thread_num);
                 }
                 thread_num = select_active_pu(l, thread_num);
                 domain_num = d_lookup_[thread_num];
@@ -317,12 +316,18 @@ namespace hpx { namespace threads { namespace policies {
 
             numa_holder_[domain_num].thread_queue(q_index)->
                     create_thread(data, thrd, initial_state, run_now, ec);
+            LOG_CUSTOM_MSG("create_thread " << msg << " "
+                           << "queue " << decnumber(thread_num)
+                           << "domain " << decnumber(domain_num)
+                           << "qindex " << decnumber(q_index));
         }
 
         /// Return the next thread to be executed, return false if none available
         virtual bool get_next_thread(std::size_t thread_num, bool running,
-            threads::thread_data*& thrd, bool /*enable_stealing*/) override
+            threads::thread_data*& thrd, bool enable_stealing) override
         {
+            LOG_CUSTOM_MSG("get_next_thread " << decnumber(thread_num)
+                << "enable stealing" << enable_stealing);
             HPX_ASSERT(thread_num ==
                 this->global_to_local_thread_index(get_worker_thread_num()));
 
@@ -430,6 +435,11 @@ namespace hpx { namespace threads { namespace policies {
                     std::to_string(schedulehint.mode));
             }
 
+            LOG_CUSTOM_MSG("thread scheduled "
+                          << "queue " << decnumber(thread_num)
+                          << "domain " << decnumber(domain_num)
+                          << "qindex " << decnumber(q_index));
+
             numa_holder_[domain_num].thread_queue(q_index)->
                     schedule_thread(thrd, priority, false);
         }
@@ -536,6 +546,8 @@ namespace hpx { namespace threads { namespace policies {
                 this->global_to_local_thread_index(get_worker_thread_num()));
 
             added = 0;
+
+            LOG_CUSTOM_MSG("wait_or_add_new thread num " << decnumber(thread_num));
 
             // process this thread only if specified
             if (thread_num!=std::size_t(-1)) {

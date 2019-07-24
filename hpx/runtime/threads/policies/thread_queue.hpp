@@ -46,7 +46,6 @@
 #include <utility>
 #include <vector>
 
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
