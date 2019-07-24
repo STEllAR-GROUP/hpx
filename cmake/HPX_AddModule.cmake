@@ -142,7 +142,8 @@ function(add_hpx_module name)
   target_include_directories(hpx_${name} PUBLIC
     $<BUILD_INTERFACE:${HEADER_ROOT}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+    $<INSTALL_INTERFACE:include>)
 
   target_link_libraries(hpx_${name} PRIVATE hpx_internal_flags)
 
