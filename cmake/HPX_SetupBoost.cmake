@@ -118,6 +118,7 @@ if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
   target_include_directories(hpx::boost BEFORE INTERFACE ${PROJECT_SOURCE_DIR}/external/asio)
 endif()
 
+include(HPX_AddDefinitions)
 # Boost preprocessor definitions
 if(NOT Boost_USE_STATIC_LIBS)
   hpx_add_config_cond_define(BOOST_ALL_DYN_LINK)
