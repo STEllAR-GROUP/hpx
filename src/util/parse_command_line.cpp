@@ -403,7 +403,8 @@ namespace hpx { namespace util
                 ("hpx:node", value<std::size_t>(),
                   "number of the node this locality is run on "
                   "(must be unique, alternatively: -0, -1, ..., -9)")
-                ("hpx:ignore-batch-env", "ignore batch environment variables")
+                ("hpx:ignore-batch-env", "ignore batch environment variables "
+                 "(implied by --hpx:use-process-mask)")
                 ("hpx:expect-connecting-localities",
                   "this locality expects other localities to dynamically connect "
                   "(default: false if the number of localities is equal to one, "
@@ -432,6 +433,9 @@ namespace hpx { namespace util
                   "values. Do not use with --hpx:pu-step, --hpx:pu-offset, or "
                   "--hpx:affinity options. Implies --hpx:numa-sensitive=1"
                   "(--hpx:bind=none disables defining thread affinities).")
+                ("hpx:use-process-mask", "use the process mask to restrict"
+                 "available hardware resources (implies "
+                 "--hpx:ignore-batch-environment)")
                 ("hpx:print-bind",
                   "print to the console the bit masks calculated from the "
                   "arguments specified to all --hpx:bind options.")

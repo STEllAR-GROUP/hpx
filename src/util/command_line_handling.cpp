@@ -290,13 +290,48 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
-        std::size_t get_number_of_default_cores(util::batch_environment& env)
+        std::size_t get_number_of_default_threads(
+            bool use_process_mask)
+        {
+            if (use_process_mask)
+            {
+                threads::topology& top = threads::create_topology();
+                return threads::count(top.get_cpubind_mask());
+            }
+            else
+            {
+                return threads::hardware_concurrency();
+            }
+        }
+
+        std::size_t get_number_of_default_cores(
+            util::batch_environment& env, bool use_process_mask)
         {
             threads::topology& top = threads::create_topology();
 
             std::size_t batch_threads = env.retrieve_number_of_threads();
             std::size_t num_cores = top.get_number_of_cores();
-            if(batch_threads == std::size_t(-1))
+
+            if (use_process_mask)
+            {
+                threads::mask_type proc_mask = top.get_cpubind_mask();
+                std::size_t num_cores_proc_mask = 0;
+
+                for (std::size_t num_core = 0; num_core < num_cores; ++num_core)
+                {
+                    threads::mask_type core_mask =
+                        top.init_core_affinity_mask_from_core(num_core);
+                    if (threads::bit_and(core_mask, proc_mask))
+                    {
+                        ++num_cores_proc_mask;
+                    }
+                }
+
+                // Using the process mask implies no batch environment
+                return num_cores_proc_mask;
+            }
+
+            if (batch_threads == std::size_t(-1))
                 return num_cores;
 
             // assuming we assign the first N cores ...
@@ -314,35 +349,20 @@ namespace hpx { namespace util
         std::size_t handle_num_threads(util::manage_config& cfgmap,
             util::runtime_configuration const& rtcfg,
             boost::program_options::variables_map& vm,
-            util::batch_environment& env, bool using_nodelist, bool initial)
+            util::batch_environment& env, bool using_nodelist, bool initial,
+            bool use_process_mask)
         {
-            threads::topology& top = threads::create_topology();
+            // If using the process mask we override "cores" and "all" options but
+            // keep explicit numeric values.
+            const std::size_t init_threads =
+                get_number_of_default_threads(use_process_mask);
+            const std::size_t init_cores =
+                get_number_of_default_cores(env, use_process_mask);
+            const std::size_t batch_threads =
+                env.retrieve_number_of_threads();
 
-            // If using process binding we override "cores" and "all" options
-            // but keep explicit numeric values.
-            bool use_process_bind = false;
-            if (vm.count("hpx:bind"))
-            {
-                auto bind_vec = vm["hpx:bind"].as<std::vector<std::string>>();
-                if (bind_vec.size() == 1 && bind_vec[0] == "process")
-                {
-                    use_process_bind = true;
-                }
-            }
-            else if (rtcfg.get_entry("hpx.bind", "") == "process")
-            {
-                use_process_bind = true;
-            }
-
-            std::size_t process_threads = threads::count(top.get_cpubind_mask());
-            std::size_t batch_threads = env.retrieve_number_of_threads();
-            std::size_t default_threads = threads::hardware_concurrency();
-            std::size_t default_cores = get_number_of_default_cores(env);
-
-            if (use_process_bind) {
-                default_threads = process_threads;
-                default_cores = process_threads;
-            }
+            std::size_t default_threads = init_threads;
+            std::size_t default_cores = init_cores;
 
             std::string threads_str =
                 cfgmap.get_value<std::string>("hpx.os_threads",
@@ -351,24 +371,16 @@ namespace hpx { namespace util
 
             if ("cores" == threads_str)
             {
-                std::size_t cores = default_cores;
-                default_threads = cores;
-                if (batch_threads == std::size_t(-1))
-                {
-                    batch_threads = cores;
-                }
-                else
+                default_threads = init_cores;
+                if (batch_threads != std::size_t(-1))
                 {
                     default_threads = batch_threads;
                 }
             }
             else if ("all" == threads_str)
             {
-                if (batch_threads == std::size_t(-1))
-                {
-                    batch_threads = default_threads;
-                }
-                else
+                default_threads = init_threads;
+                if (batch_threads != std::size_t(-1))
                 {
                     default_threads = batch_threads;
                 }
@@ -391,17 +403,19 @@ namespace hpx { namespace util
                 threads_str = vm["hpx:threads"].as<std::string>();
                 if ("all" == threads_str)
                 {
-                    batch_threads = env.retrieve_number_of_threads();
-                    if (batch_threads == std::size_t(-1))
+                    threads = init_threads;
+                    if (batch_threads != std::size_t(-1))
                     {
-                        batch_threads = default_threads;
+                        threads = batch_threads;
                     }
-                    threads = batch_threads; //-V101
                 }
                 else if ("cores" == threads_str)
                 {
-                    default_threads = default_cores;
-                    threads         = default_cores;
+                    threads = init_cores;
+                    if (batch_threads != std::size_t(-1))
+                    {
+                        threads = batch_threads;
+                    }
                 }
                 else
                 {
@@ -461,22 +475,30 @@ namespace hpx { namespace util
 
         std::size_t handle_num_cores(util::manage_config& cfgmap,
             boost::program_options::variables_map& vm, std::size_t num_threads,
-            util::batch_environment& env)
+            util::batch_environment& env, bool use_process_mask)
         {
             std::string cores_str = cfgmap.get_value<std::string>("hpx.cores", "");
-            if ("all" == cores_str) {
+            if ("all" == cores_str)
+            {
                 cfgmap.config_["hpx.cores"] = std::to_string(
-                    get_number_of_default_cores(env));
+                    get_number_of_default_cores(env, use_process_mask));
             }
 
-            std::size_t num_cores = cfgmap.get_value<std::size_t>("hpx.cores",
-                num_threads);
-            if (vm.count("hpx:cores")) {
+            std::size_t num_cores =
+                cfgmap.get_value<std::size_t>("hpx.cores", num_threads);
+            if (vm.count("hpx:cores"))
+            {
                 cores_str = vm["hpx:cores"].as<std::string>();
                 if ("all" == cores_str)
-                    num_cores = get_number_of_default_cores(env);
+                {
+                    num_cores =
+                        get_number_of_default_cores(env, use_process_mask);
+                }
                 else
-                    num_cores = hpx::util::safe_lexical_cast<std::size_t>(cores_str);
+                {
+                    num_cores =
+                        hpx::util::safe_lexical_cast<std::size_t>(cores_str);
+                }
             }
 
             return num_cores;
@@ -511,7 +533,6 @@ namespace hpx { namespace util
             check_networking_option(vm, "hpx:iftransform");
             check_networking_option(vm, "hpx:localities");
             check_networking_option(vm, "hpx:node");
-            check_networking_option(vm, "hpx:ignore-batch-env");
             check_networking_option(vm, "hpx:expect-connecting-localities");
 #endif
         }
@@ -624,10 +645,14 @@ namespace hpx { namespace util
         else if (vm.count("hpx:nodes")) {
             nodelist = vm["hpx:nodes"].as<std::vector<std::string> >();
         }
-
-        enable_batch_env = (cfgmap.get_value<int>("hpx.ignore_batch_env", 0)
-            + vm.count("hpx:ignore-batch-env")) == 0;
 #endif
+        use_process_mask_ =
+            (cfgmap.get_value<int>("hpx.use_process_mask", 0) > 0) ||
+            (vm.count("hpx:use-process-mask") > 0);
+
+        enable_batch_env = ((cfgmap.get_value<int>("hpx.ignore_batch_env", 0) +
+                                vm.count("hpx:ignore-batch-env")) == 0) &&
+            !use_process_mask_;
 
         util::batch_environment env(nodelist, rtcfg_, debug_clp, enable_batch_env);
 
@@ -856,8 +881,15 @@ namespace hpx { namespace util
 
         // handle number of cores and threads
         num_threads_ = detail::handle_num_threads(
-            cfgmap, rtcfg_, vm, env, using_nodelist, initial);
-        num_cores_ = detail::handle_num_cores(cfgmap, vm, num_threads_, env);
+            cfgmap, rtcfg_, vm, env, using_nodelist, initial, use_process_mask_);
+        num_cores_ = detail::handle_num_cores(
+            cfgmap, vm, num_threads_, env, use_process_mask_);
+
+        // Set number of cores and OS threads in configuration.
+        ini_config += "hpx.os_threads=" +
+            std::to_string(num_threads_);
+        ini_config += "hpx.cores=" +
+            std::to_string(num_cores_);
 
         // map host names to ip addresses, if requested
         hpx_host = mapnames.map(hpx_host, hpx_port);
@@ -927,12 +959,6 @@ namespace hpx { namespace util
 #endif
 
         enable_logging_settings(vm, ini_config);
-
-        // Set number of cores and OS threads in configuration.
-        ini_config += "hpx.os_threads=" +
-            std::to_string(num_threads_);
-        ini_config += "hpx.cores=" +
-            std::to_string(num_cores_);
 
         // Set number of localities in configuration (do it everywhere,
         // even if this information is only used by the AGAS server).
