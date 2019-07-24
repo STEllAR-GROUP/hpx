@@ -1063,7 +1063,9 @@ namespace hpx { namespace threads { namespace detail
             std::vector<std::vector<std::size_t>> pu_indexes(num_cores_numa[n]);
 
             // iterate once and count pus/core
-            for (std::size_t num_thread_numa = 0; num_thread_numa < num_threads_numa[n]; /**/)
+            for (std::size_t num_thread_numa = 0;
+                 num_thread_numa < num_threads_numa[n];
+                /**/)
             {
                 for(std::size_t num_core = 0; num_core < num_cores_numa[n]; ++num_core)
                 {

@@ -362,7 +362,6 @@ namespace hpx { namespace util
                 env.retrieve_number_of_threads();
 
             std::size_t default_threads = init_threads;
-            std::size_t default_cores = init_cores;
 
             std::string threads_str =
                 cfgmap.get_value<std::string>("hpx.os_threads",
