@@ -14,13 +14,16 @@
 #include <hpx/lcos/latch.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/coroutines/detail/context_impl.hpp>
+#include <hpx/runtime/threads/scoped_background_timer.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/state.hpp>
@@ -64,6 +67,59 @@ namespace hpx
     namespace detail
     {
         extern std::string& runtime_thread_name();
+
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
+        bool network_background_callback(std::size_t num_thread,
+            std::int64_t& background_work_exec_time_send,
+            std::int64_t& background_work_exec_time_receive)
+        {
+            bool result = false;
+            // count background work duration
+            {
+                background_work_duration_counter bg_send_duration(
+                    background_work_exec_time_send);
+                background_exec_time_wrapper bg_exec_time(bg_send_duration);
+
+                if (hpx::parcelset::do_background_work(
+                        num_thread, parcelset::parcelport_background_mode_send))
+                {
+                    result = true;
+                }
+            }
+
+            {
+                background_work_duration_counter bg_receive_duration(
+                    background_work_exec_time_receive);
+                background_exec_time_wrapper bg_exec_time(bg_receive_duration);
+
+                if (hpx::parcelset::do_background_work(num_thread,
+                        parcelset::parcelport_background_mode_receive))
+                {
+                    result = true;
+                }
+            }
+
+            if (0 == num_thread)
+                hpx::agas::garbage_collect_non_blocking();
+            return result;
+        }
+#else
+        bool network_background_callback(std::size_t num_thread)
+        {
+            bool result = false;
+
+            if (hpx::parcelset::do_background_work(
+                    num_thread, parcelset::parcelport_background_mode_all))
+            {
+                result = true;
+            }
+
+            if (0 == num_thread)
+                hpx::agas::garbage_collect_non_blocking();
+            return result;
+        }
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -162,7 +218,12 @@ namespace hpx
 #ifdef HPX_HAVE_TIMER_POOL
             timer_pool_,
 #endif
-            notifier_))
+            notifier_
+#ifdef HPX_HAVE_NETWORKING
+            ,
+            &detail::network_background_callback
+#endif
+            ))
       , parcel_handler_(rtcfg, thread_manager_.get(),
             util::bind(&runtime_impl::init_tss, This(), "parcel-thread",
                 util::placeholders::_1, util::placeholders::_2, true),

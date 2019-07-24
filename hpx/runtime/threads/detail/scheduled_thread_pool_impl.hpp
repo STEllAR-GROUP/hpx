@@ -99,14 +99,16 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     scheduled_thread_pool<Scheduler>::scheduled_thread_pool(
-            std::unique_ptr<Scheduler> sched,
-            threads::policies::callback_notifier& notifier, std::size_t index,
-            std::string const& pool_name, policies::scheduler_mode m,
-            std::size_t thread_offset)
-        : thread_pool_base(notifier, index, pool_name, m, thread_offset)
-        , sched_(std::move(sched))
-        , thread_count_(0)
-        , tasks_scheduled_(0)
+        std::unique_ptr<Scheduler> sched,
+        threads::policies::callback_notifier& notifier, std::size_t index,
+        std::string const& pool_name, policies::scheduler_mode m,
+        std::size_t thread_offset,
+        network_background_callback_type network_background_callback)
+      : thread_pool_base(notifier, index, pool_name, m, thread_offset)
+      , sched_(std::move(sched))
+      , thread_count_(0)
+      , tasks_scheduled_(0)
+      , network_background_callback_(network_background_callback)
     {
         sched_->set_parent_pool(this);
     }
@@ -595,18 +597,19 @@ namespace hpx { namespace threads { namespace detail
                         sched_.get(), thread_num),
                     nullptr);
 
-                if (mode_ & policies::do_background_work)
+                if ((mode_ & policies::do_background_work) &&
+                    network_background_callback_)
                 {
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
                     callbacks.background_ = util::deferred_call(    //-V107
-                        &policies::scheduler_base::background_callback,
-                        sched_.get(), global_thread_num,
+                        network_background_callback_,
+                        global_thread_num,
                         std::ref(counter_data.background_send_duration_),
                         std::ref(counter_data.background_receive_duration_));
 #else
                     callbacks.background_ = util::deferred_call(    //-V107
-                        &policies::scheduler_base::background_callback,
-                        sched_.get(), global_thread_num);
+                        network_background_callback_,
+                        global_thread_num);
 #endif
                 }
 

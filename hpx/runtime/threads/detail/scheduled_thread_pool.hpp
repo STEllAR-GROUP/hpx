@@ -11,10 +11,12 @@
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/util/barrier.hpp>
+#include <hpx/util/function.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -36,6 +38,15 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     struct init_tss_helper;
 
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
+    using network_background_callback_type =
+        util::function_nonser<bool(std::size_t, std::int64_t&, std::int64_t&)>;
+#else
+    using network_background_callback_type =
+        util::function_nonser<bool(std::size_t)>;
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     class scheduled_thread_pool : public hpx::threads::thread_pool_base
@@ -44,9 +55,12 @@ namespace hpx { namespace threads { namespace detail
         ///////////////////////////////////////////////////////////////////
         scheduled_thread_pool(std::unique_ptr<Scheduler> sched,
             threads::policies::callback_notifier& notifier, std::size_t index,
-            std::string const& pool_name, policies::scheduler_mode m =
+            std::string const& pool_name,
+            policies::scheduler_mode m =
                 policies::scheduler_mode::nothing_special,
-            std::size_t thread_offset = 0);
+            std::size_t thread_offset = 0,
+            network_background_callback_type network_background_callback =
+                network_background_callback_type());
         virtual ~scheduled_thread_pool();
 
         void print_pool(std::ostream& os) override;
@@ -443,6 +457,7 @@ namespace hpx { namespace threads { namespace detail
         // support detail::manage_executor interface
         std::atomic<long> thread_count_;
         std::atomic<std::int64_t> tasks_scheduled_;
+        network_background_callback_type network_background_callback_;
     };
 }}}    // namespace hpx::threads::detail
 

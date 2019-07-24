@@ -13,6 +13,7 @@
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
@@ -57,9 +58,13 @@ namespace hpx { namespace threads
 
 #ifdef HPX_HAVE_TIMER_POOL
         threadmanager(util::io_service_pool& timer_pool,
-                notification_policy_type& notifier);
+            notification_policy_type& notifier,
+            detail::network_background_callback_type
+                network_background_callback);
 #else
-        threadmanager(notification_policy_type& notifier);
+        threadmanager(notification_policy_type& notifier,
+            detail::network_background_callback_type
+                network_background_callback);
 #endif
         ~threadmanager();
 
@@ -451,6 +456,7 @@ private:
         pool_vector pools_;
 
         notification_policy_type& notifier_;
+        detail::network_background_callback_type network_background_callback_;
     };
 }}
 

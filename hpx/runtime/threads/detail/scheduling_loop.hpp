@@ -12,6 +12,7 @@
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/state.hpp>
 #include <hpx/hardware/timestamp.hpp>

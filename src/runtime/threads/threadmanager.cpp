@@ -267,15 +267,18 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     threadmanager::threadmanager(
 #ifdef HPX_HAVE_TIMER_POOL
-            util::io_service_pool& timer_pool,
+        util::io_service_pool& timer_pool,
 #endif
-            notification_policy_type& notifier)
-      : num_threads_(hpx::resource::get_partitioner().get_num_distinct_pus()),
+        notification_policy_type& notifier,
+        detail::network_background_callback_type network_background_callback)
+      : num_threads_(hpx::resource::get_partitioner().get_num_distinct_pus())
 #ifdef HPX_HAVE_TIMER_POOL
-        timer_pool_(timer_pool),
+      , timer_pool_(timer_pool)
 #endif
-        notifier_(notifier)
-    {}
+      , notifier_(notifier)
+      , network_background_callback_(network_background_callback)
+    {
+    }
 
     void threadmanager::create_pools()
     {
@@ -342,10 +345,9 @@ namespace hpx { namespace threads
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                            local_sched_type
-                        >(std::move(sched),
-                        notifier_, i, name.c_str(), scheduler_mode,
-                        thread_offset));
+                        local_sched_type>(std::move(sched), notifier_, i,
+                        name.c_str(), scheduler_mode, thread_offset,
+                        network_background_callback_));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -380,10 +382,9 @@ namespace hpx { namespace threads
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                            local_sched_type
-                        >(std::move(sched),
-                        notifier_, i, name.c_str(), scheduler_mode,
-                        thread_offset));
+                        local_sched_type>(std::move(sched), notifier_, i,
+                        name.c_str(), scheduler_mode, thread_offset,
+                        network_background_callback_));
                 pools_.push_back(std::move(pool));
 
                 break;
@@ -414,10 +415,9 @@ namespace hpx { namespace threads
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                            local_sched_type
-                        >(std::move(sched),
-                        notifier_, i, name.c_str(), scheduler_mode,
-                        thread_offset));
+                        local_sched_type>(std::move(sched), notifier_, i,
+                        name.c_str(), scheduler_mode, thread_offset,
+                        network_background_callback_));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -453,10 +453,9 @@ namespace hpx { namespace threads
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                            local_sched_type
-                        >(std::move(sched),
-                        notifier_, i, name.c_str(), scheduler_mode,
-                        thread_offset));
+                        local_sched_type>(std::move(sched), notifier_, i,
+                        name.c_str(), scheduler_mode, thread_offset,
+                        network_background_callback_));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -493,10 +492,9 @@ namespace hpx { namespace threads
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                            local_sched_type
-                        >(std::move(sched),
-                        notifier_, i, name.c_str(), scheduler_mode,
-                        thread_offset));
+                        local_sched_type>(std::move(sched), notifier_, i,
+                        name.c_str(), scheduler_mode, thread_offset,
+                        network_background_callback_));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -529,10 +527,9 @@ namespace hpx { namespace threads
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                            local_sched_type
-                        >(std::move(sched),
-                        notifier_, i, name.c_str(), scheduler_mode,
-                        thread_offset));
+                        local_sched_type>(std::move(sched), notifier_, i,
+                        name.c_str(), scheduler_mode, thread_offset,
+                        network_background_callback_));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -567,10 +564,9 @@ namespace hpx { namespace threads
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                            local_sched_type
-                        >(std::move(sched),
-                        notifier_, i, name.c_str(), scheduler_mode,
-                        thread_offset));
+                        local_sched_type>(std::move(sched), notifier_, i,
+                        name.c_str(), scheduler_mode, thread_offset,
+                        network_background_callback_));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -595,10 +591,9 @@ namespace hpx { namespace threads
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                            local_sched_type
-                        >(std::move(sched),
-                        notifier_, i, name.c_str(), scheduler_mode,
-                        thread_offset));
+                        local_sched_type>(std::move(sched), notifier_, i,
+                        name.c_str(), scheduler_mode, thread_offset,
+                        network_background_callback_));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
