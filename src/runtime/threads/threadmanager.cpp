@@ -23,6 +23,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
@@ -1132,7 +1133,7 @@ namespace hpx { namespace threads
 
             for (auto& pool_iter : pools_)
             {
-                fs.push_back(pool_iter->suspend());
+                fs.push_back(suspend_pool(*pool_iter));
             }
 
             hpx::wait_all(fs);
@@ -1154,7 +1155,7 @@ namespace hpx { namespace threads
 
             for (auto& pool_iter : pools_)
             {
-                fs.push_back(pool_iter->resume());
+                fs.push_back(resume_pool(*pool_iter));
             }
             hpx::wait_all(fs);
         }

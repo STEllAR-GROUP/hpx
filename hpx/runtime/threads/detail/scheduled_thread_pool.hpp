@@ -8,9 +8,7 @@
 #define HPX_SCHEDULED_THREAD_POOL_HPP
 
 #include <hpx/assertion.hpp>
-#include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -174,15 +172,13 @@ namespace hpx { namespace threads { namespace detail
         void stop(
             std::unique_lock<std::mutex>& l, bool blocking = true) override;
 
-        hpx::future<void> suspend() override;
-        void suspend_cb(std::function<void(void)> callback,
-            error_code& ec = throws) override;
         void suspend_direct(error_code& ec = throws) override;
-
-        hpx::future<void> resume() override;
-        void resume_cb(std::function<void(void)> callback,
-            error_code& ec = throws) override;
         void resume_direct(error_code& ec = throws) override;
+
+        void suspend_processing_unit_direct(std::size_t virt_core,
+            error_code& = hpx::throws) override;
+        void resume_processing_unit_direct(std::size_t virt_core,
+            error_code& = hpx::throws) override;
 
         ///////////////////////////////////////////////////////////////////
         std::thread& get_os_thread_handle(
@@ -335,16 +331,6 @@ namespace hpx { namespace threads { namespace detail
         void remove_processing_unit(
             std::size_t virt_core, error_code& = hpx::throws) override;
 
-        // Suspend the given processing unit on the scheduler.
-        hpx::future<void> suspend_processing_unit(std::size_t virt_core) override;
-        void suspend_processing_unit_cb(std::function<void(void)> callback,
-            std::size_t virt_core, error_code& = hpx::throws) override;
-
-        // Resume the given processing unit on the scheduler.
-        hpx::future<void> resume_processing_unit(std::size_t virt_core) override;
-        void resume_processing_unit_cb(std::function<void(void)> callback,
-            std::size_t virt_core, error_code& = hpx::throws) override;
-
     protected:
         friend struct init_tss_helper<Scheduler>;
 
@@ -356,11 +342,6 @@ namespace hpx { namespace threads { namespace detail
         void add_processing_unit_internal(std::size_t virt_core,
             std::size_t thread_num, std::shared_ptr<util::barrier> startup,
             error_code& ec = hpx::throws);
-
-        void suspend_processing_unit_internal(std::size_t virt_core,
-            error_code& = hpx::throws);
-        void resume_processing_unit_internal(std::size_t virt_core,
-            error_code& = hpx::throws);
 
     private:
         std::vector<std::thread> threads_;           // vector of OS-threads

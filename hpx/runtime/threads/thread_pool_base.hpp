@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
@@ -86,27 +85,22 @@ namespace hpx { namespace threads
         }
         /// \endcond
 
-        /// Resumes the thread pool. When the all OS threads on the thread pool
-        /// have been resumed the returned future will be ready.
+        /// Suspends the given processing unit. Blocks until the processing unit
+        /// has been suspended.
         ///
-        /// \note Can only be called from an HPX thread. Use resume_cb or
-        ///       resume_direct to suspend the pool from outside HPX.
-        ///
-        /// \returns A `future<void>` which is ready when the thread pool has
-        ///          been resumed.
-        ///
-        /// \throws hpx::exception if called from outside the HPX runtime.
-        virtual hpx::future<void> resume() = 0;
+        /// \param virt_core [in] The processing unit on the the pool to be
+        ///                  suspended. The processing units are indexed
+        ///                  starting from 0.
+        virtual void suspend_processing_unit_direct(
+            std::size_t virt_core, error_code& ec = throws) = 0;
 
-        /// Resumes the thread pool. Takes a callback as a parameter which will
-        /// be called when all OS threads on the thread pool have been resumed.
+        /// Resumes the given processing unit. Blocks until the processing unit
+        /// has been resumed.
         ///
-        /// \param callback [in] called when the thread pool has been resumed.
-        /// \param ec       [in,out] this represents the error status on exit, if this
-        ///                 is pre-initialized to \a hpx#throws the function will throw
-        ///                 on error instead.
-        virtual void resume_cb(
-            std::function<void(void)> callback, error_code& ec = throws) = 0;
+        /// \param virt_core [in] The processing unit on the the pool to be resumed.
+        ///                  The processing units are indexed starting from 0.
+        virtual void resume_processing_unit_direct(
+            std::size_t virt_core, error_code& ec = throws) = 0;
 
         /// Resumes the thread pool. Blocks until all OS threads on the thread pool
         /// have been resumed.
@@ -115,36 +109,6 @@ namespace hpx { namespace threads
         ///           is pre-initialized to \a hpx#throws the function will
         ///           throw on error instead.
         virtual void resume_direct(error_code& ec = throws) = 0;
-
-        /// Suspends the thread pool. When the all OS threads on the thread pool
-        /// have been suspended the returned future will be ready.
-        ///
-        /// \note Can only be called from an HPX thread. Use suspend_cb or
-        ///       suspend_direct to suspend the pool from outside HPX. A thread
-        ///       pool cannot be suspended from an HPX thread running on the
-        ///       pool itself.
-        ///
-        /// \returns A `future<void>` which is ready when the thread pool has
-        ///          been suspended.
-        ///
-        /// \throws hpx::exception if called from outside the HPX runtime.
-        virtual hpx::future<void> suspend() = 0;
-
-        /// Suspends the thread pool. Takes a callback as a parameter which will
-        /// be called when all OS threads on the thread pool have been suspended.
-        ///
-        /// \note A thread pool cannot be suspended from an HPX thread running
-        ///       on the pool itself.
-        ///
-        /// \param callback [in] called when the thread pool has been suspended.
-        /// \param ec       [in,out] this represents the error status on exit, if this
-        ///                 is pre-initialized to \a hpx#throws the function will throw
-        ///                 on error instead.
-        ///
-        /// \throws hpx::exception if called from an HPX thread which is running
-        ///         on the pool itself.
-        virtual void suspend_cb(
-            std::function<void(void)> callback, error_code& ec = throws) = 0;
 
         /// Suspends the thread pool. Blocks until all OS threads on the thread pool
         /// have been suspended.
@@ -386,72 +350,6 @@ namespace hpx { namespace threads
         char const* get_description() const override;
 
         /// \endcond
-
-        /// Suspends the given processing unit. When the processing unit has
-        /// been suspended the returned future will be ready.
-        ///
-        /// \note Can only be called from an HPX thread. Use
-        ///       suspend_processing_unit_cb or to suspend the processing unit
-        ///       from outside HPX. Requires that the pool has
-        ///       threads::policies::enable_elasticity set.
-        ///
-        /// \param virt_core [in] The processing unit on the the pool to be
-        ///                  suspended. The processing units are indexed
-        ///                  starting from 0.
-        ///
-        /// \returns A `future<void>` which is ready when the given processing
-        ///          unit has been suspended.
-        ///
-        /// \throws hpx::exception if called from outside the HPX runtime.
-        virtual hpx::future<void> suspend_processing_unit(std::size_t virt_core) = 0;
-
-        /// Suspends the given processing unit. Takes a callback as a parameter
-        /// which will be called when the processing unit has been suspended.
-        ///
-        /// \note Requires that the pool has
-        ///       threads::policies::enable_elasticity set.
-        ///
-        /// \param callback  [in] Callback which is called when the processing
-        ///                  unit has been suspended.
-        /// \param virt_core [in] The processing unit to suspend.
-        /// \param ec        [in,out] this represents the error status on exit, if this
-        ///                  is pre-initialized to \a hpx#throws the function will throw
-        ///                  on error instead.
-        virtual void suspend_processing_unit_cb(
-            std::function<void(void)> callback, std::size_t virt_core,
-            error_code& ec = throws) = 0;
-
-        /// Resumes the given processing unit. When the processing unit has been
-        /// resumed the returned future will be ready.
-        ///
-        /// \note Can only be called from an HPX thread. Use
-        ///       resume_processing_unit_cb or to resume the processing unit
-        ///       from outside HPX. Requires that the pool has
-        ///       threads::policies::enable_elasticity set.
-        ///
-        /// \param virt_core [in] The processing unit on the the pool to be
-        ///                  resumed. The processing units are indexed starting
-        ///                  from 0.
-        ///
-        /// \returns A `future<void>` which is ready when the given processing
-        ///          unit has been resumed.
-        virtual hpx::future<void> resume_processing_unit(std::size_t virt_core) = 0;
-
-        /// Resumes the given processing unit. Takes a callback as a parameter
-        /// which will be called when the processing unit has been resumed.
-        ///
-        /// \note Requires that the pool has
-        ///       threads::policies::enable_elasticity set.
-        ///
-        /// \param callback  [in] Callback which is called when the processing
-        ///                  unit has been suspended.
-        /// \param virt_core [in] The processing unit to resume.
-        /// \param ec        [in,out] this represents the error status on exit, if this
-        ///                  is pre-initialized to \a hpx#throws the function will throw
-        ///                  on error instead.
-        virtual void resume_processing_unit_cb(
-            std::function<void(void)> callback, std::size_t virt_core,
-                error_code& ec = throws) = 0;
 
         /// \cond NOINTERNAL
         policies::scheduler_mode get_scheduler_mode() const
