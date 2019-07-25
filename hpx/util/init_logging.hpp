@@ -11,13 +11,18 @@
 #include <hpx/util_fwd.hpp>
 
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace detail
 {
-    // the init_logging type will be used for initialization purposes only as
-    // well
+    /// The init_logging type will be used for initialization purposes only as
+    /// well.
     HPX_API_EXPORT void init_logging(runtime_configuration& ini, bool isconsole);
+
+    /// Get the data to use to pre-fill the runtime_configuration instance with
+    /// logging specific data.
+    HPX_API_EXPORT std::vector<std::string> const& get_logging_data();
 }}}
 
 #endif

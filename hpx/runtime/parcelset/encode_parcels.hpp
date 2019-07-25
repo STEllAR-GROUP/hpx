@@ -23,7 +23,7 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/integer/endian.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 
 #include <boost/exception/exception.hpp>
 

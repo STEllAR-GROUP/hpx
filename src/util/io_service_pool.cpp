@@ -12,7 +12,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/barrier.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 
 #include <boost/asio/io_service.hpp>
 

@@ -19,7 +19,7 @@
 #include <hpx/util/bind_front.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/regex_from_pattern.hpp>
 #include <hpx/util/rolling_max.hpp>
 #include <hpx/util/rolling_min.hpp>

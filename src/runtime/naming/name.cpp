@@ -24,7 +24,7 @@
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/io/ios_state.hpp>

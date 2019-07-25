@@ -12,6 +12,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/bind_front.hpp>
-#include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>

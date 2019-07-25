@@ -14,7 +14,7 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/itt_notify.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <cstddef>

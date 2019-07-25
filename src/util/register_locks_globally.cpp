@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/exception.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
