@@ -6,10 +6,10 @@
 include(HPX_Option)
 
 if (NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
-  hpx_set_option(HPX_UTIL_MISC_WITH_TESTS VALUE OFF FORCE)
+  hpx_set_option(HPX_UTIL_WITH_TESTS VALUE OFF FORCE)
   return()
 endif()
-if (NOT HPX_UTIL_MISC_WITH_TESTS)
+if (NOT HPX_UTIL_WITH_TESTS)
   message(STATUS "Tests for util disabled")
   return()
 endif()
