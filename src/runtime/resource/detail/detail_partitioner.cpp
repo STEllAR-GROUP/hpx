@@ -13,6 +13,7 @@
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/format.hpp>
+#include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/type_support/static.hpp>
 
@@ -36,7 +37,7 @@ namespace hpx { namespace resource { namespace detail
         }
         else
         {
-            throw std::runtime_error(func + ": " +  message);
+            throw std::runtime_error(func + ": " + message);
         }
     }
 
@@ -49,7 +50,7 @@ namespace hpx { namespace resource { namespace detail
         }
         else
         {
-            throw std::invalid_argument(func + ": " +  message);
+            throw std::invalid_argument(func + ": " + message);
         }
     }
 
@@ -916,7 +917,15 @@ namespace hpx { namespace resource { namespace detail
         cfg_.parse_result_ = cfg_.call(desc_cmdline, argc, argv);
 
         // set all parameters related to affinity data
-        pus_needed_ = affinity_data_.init(cfg_);
+        std::string affinity_description;
+        get_affinity_description(cfg_, affinity_description);
+
+        pus_needed_ = affinity_data_.init(cfg_.num_threads_,
+            hpx::util::safe_lexical_cast<std::size_t>(
+                get_config_entry("hpx.cores", 0), 0),
+                get_pu_offset(cfg_),
+            get_pu_step(cfg_), cfg_.rtcfg_.get_first_used_core(),
+            get_affinity_domain(cfg_), affinity_description);
 
         if (fill_internal_topology)
         {

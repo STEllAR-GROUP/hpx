@@ -27,6 +27,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
+#include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/util/itt_notify.hpp>
@@ -59,9 +60,7 @@ namespace hpx { namespace threads { namespace policies
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
-
     namespace detail {
-
         // helper functions testing option compatibility
         void ensure_high_priority_compatibility(
             boost::program_options::variables_map const& vm)
@@ -95,69 +94,7 @@ namespace hpx {
             ensure_high_priority_compatibility(vm);
             ensure_numa_sensitivity_compatibility(vm);
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        std::size_t get_num_high_priority_queues(
-            util::command_line_handling const& cfg, std::size_t num_threads)
-        {
-            std::size_t num_high_priority_queues = num_threads;
-            if (cfg.vm_.count("hpx:high-priority-threads"))
-            {
-                num_high_priority_queues =
-                    cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
-                if (num_high_priority_queues > num_threads)
-                {
-                    throw hpx::detail::command_line_error(
-                        "Invalid command line option: "
-                        "number of high priority threads ("
-                        "--hpx:high-priority-threads), should not be larger "
-                        "than number of threads (--hpx:threads)");
-                }
-            }
-            return num_high_priority_queues;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        std::string get_affinity_domain(util::command_line_handling const& cfg)
-        {
-            std::string affinity_domain("pu");
-            if (cfg.affinity_domain_ != "pu")
-            {
-                affinity_domain = cfg.affinity_domain_;
-                if (0 != std::string("pu").find(affinity_domain) &&
-                    0 != std::string("core").find(affinity_domain) &&
-                    0 != std::string("numa").find(affinity_domain) &&
-                    0 != std::string("machine").find(affinity_domain))
-                {
-                    throw hpx::detail::command_line_error(
-                        "Invalid command line option "
-                        "--hpx:affinity, value must be one of: pu, core, numa, "
-                        "or machine.");
-                }
-            }
-            return affinity_domain;
-        }
-
-        std::size_t get_affinity_description(
-            util::command_line_handling const& cfg, std::string& affinity_desc)
-        {
-            if (cfg.affinity_bind_.empty())
-                return cfg.numa_sensitive_;
-
-            if (!(cfg.pu_offset_ == std::size_t(-1) ||
-                    cfg.pu_offset_ == std::size_t(0)) ||
-                cfg.pu_step_ != 1 || cfg.affinity_domain_ != "pu")
-            {
-                throw hpx::detail::command_line_error(
-                    "Command line option --hpx:bind "
-                    "should not be used with --hpx:pu-step, --hpx:pu-offset, "
-                    "or --hpx:affinity.");
-            }
-
-            affinity_desc = cfg.affinity_bind_;
-            return cfg.numa_sensitive_;
-        }
-    }    // namespace detail
+}    // namespace detail
 }
 
 namespace hpx { namespace threads
@@ -330,7 +267,7 @@ namespace hpx { namespace threads
                 hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
                 std::string affinity_desc;
                 std::size_t numa_sensitive =
-                    hpx::detail::get_affinity_description(cfg_, affinity_desc);
+                    hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
                 typedef hpx::threads::policies::local_queue_scheduler<>
@@ -361,11 +298,11 @@ namespace hpx { namespace threads
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
-                    hpx::detail::get_num_high_priority_queues(
+                    hpx::util::get_num_high_priority_queues(
                         cfg_, rp.get_num_threads(name));
                 std::string affinity_desc;
                 std::size_t numa_sensitive =
-                    hpx::detail::get_affinity_description(cfg_, affinity_desc);
+                    hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
                 typedef hpx::threads::policies::local_priority_queue_scheduler<
@@ -394,11 +331,11 @@ namespace hpx { namespace threads
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
-                    hpx::detail::get_num_high_priority_queues(
+                    hpx::util::get_num_high_priority_queues(
                         cfg_, rp.get_num_threads(name));
                 std::string affinity_desc;
                 std::size_t numa_sensitive =
-                    hpx::detail::get_affinity_description(cfg_, affinity_desc);
+                    hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
                 typedef hpx::threads::policies::local_priority_queue_scheduler<
@@ -435,10 +372,10 @@ namespace hpx { namespace threads
                 // perform compatibility checks
                 hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
                 std::string affinity_domain =
-                    hpx::detail::get_affinity_domain(cfg_);
+                    hpx::util::get_affinity_domain(cfg_);
                 std::string affinity_desc;
                 std::size_t numa_sensitive =
-                    hpx::detail::get_affinity_description(cfg_, affinity_desc);
+                    hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
                 typedef hpx::threads::policies::static_queue_scheduler<>
@@ -470,13 +407,13 @@ namespace hpx { namespace threads
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
-                    hpx::detail::get_num_high_priority_queues(
+                    hpx::util::get_num_high_priority_queues(
                         cfg_, rp.get_num_threads(name));
                 std::string affinity_domain =
-                    hpx::detail::get_affinity_domain(cfg_);
+                    hpx::util::get_affinity_domain(cfg_);
                 std::string affinity_desc;
                 std::size_t numa_sensitive =
-                    hpx::detail::get_affinity_description(cfg_, affinity_desc);
+                    hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
                 using local_sched_type =
@@ -509,7 +446,7 @@ namespace hpx { namespace threads
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
-                    hpx::detail::get_num_high_priority_queues(
+                    hpx::util::get_num_high_priority_queues(
                         cfg_, rp.get_num_threads(name));
 
                 // instantiate the scheduler
@@ -546,7 +483,7 @@ namespace hpx { namespace threads
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
-                    hpx::detail::get_num_high_priority_queues(
+                    hpx::util::get_num_high_priority_queues(
                         cfg_, rp.get_num_threads(name));
 
                 // instantiate the scheduler
