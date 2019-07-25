@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
@@ -248,11 +247,6 @@ namespace hpx { namespace threads
         }
 
     public:
-        /// The function register_counter_types() is called during startup to
-        /// allow the registration of all performance counter types for this
-        /// thread-manager instance.
-        void register_counter_types();
-
         /// Returns the mask identifying all processing units used by this
         /// thread manager.
         mask_type get_used_processing_units() const
@@ -331,34 +325,6 @@ namespace hpx { namespace threads
     public:
         std::size_t shrink_pool(std::string const& pool_name);
         std::size_t expand_pool(std::string const& pool_name);
-
-    private:
-        // counter creator functions
-        naming::gid_type thread_counts_counter_creator(
-            performance_counters::counter_info const& info, error_code& ec);
-        naming::gid_type scheduler_utilization_counter_creator(
-            performance_counters::counter_info const& info, error_code& ec);
-
-        typedef std::int64_t (threadmanager::*threadmanager_counter_func)(
-            bool reset);
-        typedef std::int64_t (thread_pool_base::*threadpool_counter_func)(
-            std::size_t num_thread, bool reset);
-
-        naming::gid_type locality_pool_thread_counter_creator(
-            threadmanager_counter_func total_func,
-            threadpool_counter_func pool_func,
-            performance_counters::counter_info const& info, error_code& ec);
-
-#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        naming::gid_type queue_wait_time_counter_creator(
-            threadmanager_counter_func total_func,
-            threadpool_counter_func pool_func,
-            performance_counters::counter_info const& info, error_code& ec);
-#endif
-
-        naming::gid_type locality_pool_thread_no_total_counter_creator(
-            threadpool_counter_func pool_func,
-            performance_counters::counter_info const& info, error_code& ec);
 
         // performance counters
         std::int64_t get_queue_length(bool reset);

@@ -77,9 +77,10 @@ namespace hpx
             bool result = false;
             // count background work duration
             {
-                background_work_duration_counter bg_send_duration(
+                threads::background_work_duration_counter bg_send_duration(
                     background_work_exec_time_send);
-                background_exec_time_wrapper bg_exec_time(bg_send_duration);
+                threads::background_exec_time_wrapper bg_exec_time(
+                    bg_send_duration);
 
                 if (hpx::parcelset::do_background_work(
                         num_thread, parcelset::parcelport_background_mode_send))
@@ -89,9 +90,10 @@ namespace hpx
             }
 
             {
-                background_work_duration_counter bg_receive_duration(
+                threads::background_work_duration_counter bg_receive_duration(
                     background_work_exec_time_receive);
-                background_exec_time_wrapper bg_exec_time(bg_receive_duration);
+                threads::background_exec_time_wrapper bg_exec_time(
+                    bg_receive_duration);
 
                 if (hpx::parcelset::do_background_work(num_thread,
                         parcelset::parcelport_background_mode_receive))
