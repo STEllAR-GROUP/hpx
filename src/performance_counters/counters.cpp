@@ -24,7 +24,7 @@
 #include <hpx/util/bind_front.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util_misc/safe_lexical_cast.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <cstddef>
 #include <cstdint>

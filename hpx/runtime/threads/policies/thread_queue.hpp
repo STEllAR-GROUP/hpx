@@ -21,7 +21,7 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/cache_aligned_data.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util_misc/get_and_reset_value.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
 #   include <hpx/util/tick_counter.hpp>

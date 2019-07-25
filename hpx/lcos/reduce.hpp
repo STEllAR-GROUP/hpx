@@ -90,7 +90,7 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/util_misc/calculate_fanout.hpp>
+#include <hpx/util/calculate_fanout.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>

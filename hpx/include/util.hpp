@@ -29,13 +29,13 @@
 #include <hpx/util/function_ref.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/util/parse_command_line.hpp>
-#include <hpx/util_misc/safe_lexical_cast.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unwrap.hpp>
 #include <hpx/util/yield_while.hpp>
 #include <hpx/util/zip_iterator.hpp>
-#include <hpx/util_misc/get_and_reset_value.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 #endif
 

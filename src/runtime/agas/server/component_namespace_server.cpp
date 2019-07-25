@@ -20,8 +20,8 @@
 #include <hpx/timing/scoped_timer.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
-#include <hpx/util_misc/get_and_reset_value.hpp>
-#include <hpx/util_misc/insert_checked.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/insert_checked.hpp>
 
 #include <atomic>
 #include <cstddef>

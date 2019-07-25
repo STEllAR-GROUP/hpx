@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/util/batch_environments/alps_environment.hpp>
-#include <hpx/util_misc/safe_lexical_cast.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <cstddef>
 #include <string>

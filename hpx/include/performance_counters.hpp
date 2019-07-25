@@ -15,7 +15,7 @@
 #include <hpx/performance_counters/base_performance_counter.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
-#include <hpx/util_misc/get_and_reset_value.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 #endif
 

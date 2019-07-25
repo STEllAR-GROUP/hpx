@@ -10,33 +10,33 @@ if (NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
   return()
 endif()
 if (NOT HPX_UTIL_MISC_WITH_TESTS)
-  message(STATUS "Tests for util_misc disabled")
+  message(STATUS "Tests for util disabled")
   return()
 endif()
 
 if (HPX_WITH_TESTS_UNIT)
-  add_hpx_pseudo_target(tests.unit.modules.util_misc)
-  add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.util_misc)
+  add_hpx_pseudo_target(tests.unit.modules.util)
+  add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.util)
   add_subdirectory(unit)
 endif()
 
 if (HPX_WITH_TESTS_REGRESSIONS)
-  add_hpx_pseudo_target(tests.regressions.modules.util_misc)
-  add_hpx_pseudo_dependencies(tests.regressions.modules tests.regressions.modules.util_misc)
+  add_hpx_pseudo_target(tests.regressions.modules.util)
+  add_hpx_pseudo_dependencies(tests.regressions.modules tests.regressions.modules.util)
   add_subdirectory(regressions)
 endif()
 
 if (HPX_WITH_TESTS_BENCHMARKS)
-  add_hpx_pseudo_target(tests.performance.modules.util_misc)
-  add_hpx_pseudo_dependencies(tests.performance.modules tests.performance.modules.util_misc)
+  add_hpx_pseudo_target(tests.performance.modules.util)
+  add_hpx_pseudo_dependencies(tests.performance.modules tests.performance.modules.util)
   add_subdirectory(performance)
 endif()
 
 if (HPX_WITH_TESTS_HEADERS)
   add_hpx_header_tests(
-    modules.util_misc
-    HEADERS ${util_misc_headers}
+    modules.util
+    HEADERS ${util_headers}
     HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
     NOHPX_INIT NOLIBS
-    DEPENDENCIES hpx_util_misc)
+    DEPENDENCIES hpx_util)
 endif()

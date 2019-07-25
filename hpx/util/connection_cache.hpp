@@ -21,7 +21,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util_misc/get_and_reset_value.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -29,7 +29,7 @@ set(HPX_LIBS
   thread_support
   timing
   type_support
-  util_misc
+  util
   CACHE INTERNAL "list of HPX modules" FORCE
 )
 

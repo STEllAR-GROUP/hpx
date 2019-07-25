@@ -6,10 +6,10 @@
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 =========
-util_misc
+util
 =========
 
 This library is part of HPX.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/libs/util_misc/docs/index.html>`__.
+<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/libs/util/docs/index.html>`__.

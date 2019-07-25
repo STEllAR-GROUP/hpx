@@ -4,10 +4,10 @@
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-.. _libs_util_misc:
+.. _libs_util:
 
 =========
-util_misc
+util
 =========
 
-The util_misc module provides miscellaneous standalone utilities.
+The util module provides miscellaneous standalone utilities.

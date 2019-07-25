@@ -7,7 +7,7 @@
 #include <hpx/util/batch_environments/pbs_environment.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util_misc/safe_lexical_cast.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/exception.hpp>
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>

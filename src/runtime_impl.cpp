@@ -26,9 +26,9 @@
 #include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/yield_while.hpp>
-#include <hpx/util_misc/safe_lexical_cast.hpp>
 
 #include <condition_variable>
 #include <cstddef>

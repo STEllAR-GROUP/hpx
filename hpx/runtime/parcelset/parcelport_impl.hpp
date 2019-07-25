@@ -27,7 +27,7 @@
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util_misc/safe_lexical_cast.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/predef/other/endian.h>
 

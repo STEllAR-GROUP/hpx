@@ -5,18 +5,8 @@
 
 cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
-set(util_misc_headers
-  hpx/util_misc/detail/reserve.hpp
-  hpx/util_misc/await_traits.hpp
-  hpx/util_misc/calculate_fanout.hpp
-  hpx/util_misc/get_and_reset_value.hpp
-  hpx/util_misc/insert_checked.hpp
-  hpx/util_misc/manage_config.hpp
-  hpx/util_misc/safe_lexical_cast.hpp
-)
-
-set(util_misc_compat_headers
-  hpx/traits/detail/reserve.hpp
+set(util_headers
+  hpx/util/detail/reserve.hpp
   hpx/util/await_traits.hpp
   hpx/util/calculate_fanout.hpp
   hpx/util/get_and_reset_value.hpp
@@ -25,21 +15,25 @@ set(util_misc_compat_headers
   hpx/util/safe_lexical_cast.hpp
 )
 
-set(util_misc_sources
+set(util_compat_headers
+  hpx/traits/detail/reserve.hpp
+)
+
+set(util_sources
   manage_config.cpp
 )
 
 include(HPX_AddModule)
-add_hpx_module(util_misc
+add_hpx_module(util
   COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/util_misc/detail/reserve.hpp"
-  SOURCES ${util_misc_sources}
-  HEADERS ${util_misc_headers}
-  COMPAT_HEADERS ${util_misc_compat_headers}
+    "hpx/util/detail/reserve.hpp"
+  SOURCES ${util_sources}
+  HEADERS ${util_headers}
+  COMPAT_HEADERS ${util_compat_headers}
   DEPENDENCIES hpx_config hpx_concepts hpx_iterator_support
   CMAKE_SUBDIRS examples tests
 )

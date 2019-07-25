@@ -13,7 +13,7 @@
 #include <hpx/traits/future_access.hpp>
 
 #if defined(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
-#include <hpx/util_misc/await_traits.hpp>
+#include <hpx/util/await_traits.hpp>
 #else
 #include <experimental/coroutine>
 #endif

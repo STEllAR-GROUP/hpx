@@ -32,4 +32,4 @@ All modules
    /libs/thread_support/docs/index.rst
    /libs/timing/docs/index.rst
    /libs/type_support/docs/index.rst
-   /libs/util_misc/docs/index.rst
+   /libs/util/docs/index.rst

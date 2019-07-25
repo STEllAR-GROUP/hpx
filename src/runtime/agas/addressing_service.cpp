@@ -47,8 +47,8 @@
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util_misc/insert_checked.hpp>
-#include <hpx/util_misc/safe_lexical_cast.hpp>
+#include <hpx/util/insert_checked.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/type_support/unused.hpp>
 

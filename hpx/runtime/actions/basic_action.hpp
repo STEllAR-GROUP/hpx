@@ -43,7 +43,7 @@
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
-#include <hpx/util_misc/get_and_reset_value.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>

@@ -25,8 +25,8 @@
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/regex_from_pattern.hpp>
-#include <hpx/util_misc/get_and_reset_value.hpp>
-#include <hpx/util_misc/insert_checked.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/insert_checked.hpp>
 
 #include <atomic>
 #include <cstddef>

@@ -150,7 +150,7 @@ namespace hpx { namespace lcos
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/util_misc/calculate_fanout.hpp>
+#include <hpx/util/calculate_fanout.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 

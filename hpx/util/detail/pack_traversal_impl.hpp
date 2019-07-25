@@ -7,7 +7,7 @@
 #define HPX_UTIL_DETAIL_PACK_TRAVERSAL_IMPL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util_misc/detail/reserve.hpp>
+#include <hpx/util/detail/reserve.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/pack_traversal_rebind_container.hpp>
 #include <hpx/type_support/always_void.hpp>
