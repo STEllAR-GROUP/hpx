@@ -21,7 +21,7 @@ set(datastructures_sources)
 
 include(HPX_AddModule)
 add_hpx_module(datastructures
-  COMPATIBILITY_HEADERS OFF
+  COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
