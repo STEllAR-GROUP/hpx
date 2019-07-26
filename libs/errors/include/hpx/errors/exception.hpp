@@ -27,8 +27,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// \brief A hpx::exception is the main exception type used by HPX to
     ///        report errors.
@@ -113,8 +112,7 @@ namespace hpx
     HPX_EXPORT void set_custom_exception_info_handler(
         custom_exception_info_handler_type f);
 
-    using pre_exception_handler_type =
-        std::function<void()>;
+    using pre_exception_handler_type = std::function<void()>;
 
     HPX_EXPORT void set_pre_exception_handler(pre_exception_handler_type f);
 
@@ -184,11 +182,12 @@ namespace hpx
     ///
     /// At any point, the interruption state for the current thread can be
     /// queried by calling \a hpx::this_thread::interruption_enabled().
-    struct HPX_EXCEPTION_EXPORT thread_interrupted : std::exception {};
+    struct HPX_EXCEPTION_EXPORT thread_interrupted : std::exception
+    {
+    };
 
     /// \cond NODETAIL
-    namespace detail
-    {
+    namespace detail {
         // Stores the information about the function name the exception has been
         // raised in. This information will show up in error messages under the
         // [function] tag.
@@ -206,13 +205,14 @@ namespace hpx
 
         struct HPX_EXCEPTION_EXPORT std_exception : std::exception
         {
-          private:
+        private:
             std::string what_;
 
-          public:
+        public:
             explicit std_exception(std::string const& w)
               : what_(w)
-            {}
+            {
+            }
 
             ~std_exception() noexcept {}
 
@@ -224,13 +224,14 @@ namespace hpx
 
         struct HPX_EXCEPTION_EXPORT bad_alloc : std::bad_alloc
         {
-          private:
+        private:
             std::string what_;
 
-          public:
+        public:
             explicit bad_alloc(std::string const& w)
               : what_(w)
-            {}
+            {
+            }
 
             ~bad_alloc() noexcept {}
 
@@ -242,13 +243,14 @@ namespace hpx
 
         struct HPX_EXCEPTION_EXPORT bad_exception : std::bad_exception
         {
-          private:
+        private:
             std::string what_;
 
-          public:
+        public:
             explicit bad_exception(std::string const& w)
               : what_(w)
-            {}
+            {
+            }
 
             ~bad_exception() noexcept {}
 
@@ -260,13 +262,14 @@ namespace hpx
 
         struct HPX_EXCEPTION_EXPORT bad_cast : std::bad_cast
         {
-          private:
+        private:
             std::string what_;
 
-          public:
+        public:
             explicit bad_cast(std::string const& w)
               : what_(w)
-            {}
+            {
+            }
 
             ~bad_cast() noexcept {}
 
@@ -278,13 +281,14 @@ namespace hpx
 
         struct HPX_EXCEPTION_EXPORT bad_typeid : std::bad_typeid
         {
-          private:
+        private:
             std::string what_;
 
-          public:
+        public:
             explicit bad_typeid(std::string const& w)
               : what_(w)
-            {}
+            {
+            }
 
             ~bad_typeid() noexcept {}
 
@@ -302,7 +306,7 @@ namespace hpx
         template <typename Exception>
         HPX_EXPORT std::exception_ptr construct_lightweight_exception(
             Exception const& e);
-    }
+    }    // namespace detail
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
@@ -428,7 +432,8 @@ namespace hpx
     ///             \a hpx::get_error_what(), \a hpx::get_error_config(),
     ///             \a hpx::get_error_state()
     ///
-    HPX_EXPORT std::string get_error_function_name(hpx::exception_info const& xi);
+    HPX_EXPORT std::string get_error_function_name(
+        hpx::exception_info const& xi);
 
     /// \cond NOINTERNAL
     template <typename E>
@@ -522,7 +527,7 @@ namespace hpx
         });
     }
     /// \endcond
-}
+}    // namespace hpx
 
 #include <hpx/errors/throw_exception.hpp>
 

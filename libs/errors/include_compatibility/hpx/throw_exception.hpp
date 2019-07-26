@@ -9,12 +9,10 @@
 
 #if defined(HPX_ERRORS_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/throw_exception.hpp is deprecated, \
+#pragma message("The header hpx/throw_exception.hpp is deprecated, \
     please include hpx/errors/throw_exception.hpp instead")
 #else
-#warning \
-    "The header hpx/throw_exception.hpp is deprecated, \
+#warning "The header hpx/throw_exception.hpp is deprecated, \
     please include hpx/errors/throw_exception.hpp instead"
 #endif
 #endif

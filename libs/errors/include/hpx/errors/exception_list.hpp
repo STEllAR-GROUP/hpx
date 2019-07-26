@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/errors/exception.hpp>
 
-#include <boost/system/error_code.hpp>
 #include <boost/smart_ptr/detail/spinlock.hpp>
+#include <boost/system/error_code.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -23,8 +23,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     /// The class exception_list is a container of exception_ptr objects
     /// parallel algorithms may use to communicate uncaught exceptions
     /// encountered during parallel execution to the caller of the algorithm
@@ -54,13 +53,13 @@ namespace hpx
 
         exception_list();
         explicit exception_list(std::exception_ptr const& e);
-        explicit exception_list(exception_list_type && l);
+        explicit exception_list(exception_list_type&& l);
 
         exception_list(exception_list const& l);
-        exception_list(exception_list && l);
+        exception_list(exception_list&& l);
 
         exception_list& operator=(exception_list const& l);
-        exception_list& operator=(exception_list && l);
+        exception_list& operator=(exception_list&& l);
 
         ///
         void add(std::exception_ptr const& e);
@@ -97,10 +96,8 @@ namespace hpx
         std::string get_message() const;
         /// \endcond
     };
-}
+}    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-
-

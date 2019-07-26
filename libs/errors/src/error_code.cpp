@@ -19,10 +19,8 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
-    namespace detail
-    {
+namespace hpx {
+    namespace detail {
         class hpx_category : public boost::system::error_category
         {
         public:
@@ -34,14 +32,17 @@ namespace hpx
             std::string message(int value) const
             {
                 if (value >= success && value < last_error)
-                    return std::string("HPX(") + error_names[value] + ")"; //-V108
+                    return std::string("HPX(") + error_names[value] +
+                        ")";    //-V108
                 if (value & system_error_flag)
                     return std::string("HPX(system_error)");
                 return "HPX(unknown_error)";
             }
         };
 
-        struct lightweight_hpx_category : hpx_category {};
+        struct lightweight_hpx_category : hpx_category
+        {
+        };
 
         // this doesn't add any text to the exception what() message
         class hpx_category_rethrow : public boost::system::error_category
@@ -58,8 +59,10 @@ namespace hpx
             }
         };
 
-        struct lightweight_hpx_category_rethrow : hpx_category_rethrow {};
-    } // namespace detail
+        struct lightweight_hpx_category_rethrow : hpx_category_rethrow
+        {
+        };
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     static detail::hpx_category hpx_category;
@@ -85,7 +88,8 @@ namespace hpx
 
     boost::system::error_category const& get_hpx_category(throwmode mode)
     {
-        switch(mode) {
+        switch (mode)
+        {
         case rethrow:
             return get_hpx_rethrow_category();
 
@@ -108,11 +112,12 @@ namespace hpx
             exception_ = detail::get_exception(e, "", mode);
     }
 
-    error_code::error_code(error e, char const* func,
-            char const* file, long line, throwmode mode)
+    error_code::error_code(
+        error e, char const* func, char const* file, long line, throwmode mode)
       : boost::system::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & lightweight)) {
+        if (e != success && e != no_success && !(mode & lightweight))
+        {
             exception_ = detail::get_exception(e, "", mode, func, file, line);
         }
     }
@@ -124,28 +129,29 @@ namespace hpx
             exception_ = detail::get_exception(e, msg, mode);
     }
 
-    error_code::error_code(error e, char const* msg,
-            char const* func, char const* file, long line, throwmode mode)
+    error_code::error_code(error e, char const* msg, char const* func,
+        char const* file, long line, throwmode mode)
       : boost::system::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & lightweight)) {
+        if (e != success && e != no_success && !(mode & lightweight))
+        {
             exception_ = detail::get_exception(e, msg, mode, func, file, line);
         }
     }
 
-    error_code::error_code(error e, std::string const& msg,
-            throwmode mode)
+    error_code::error_code(error e, std::string const& msg, throwmode mode)
       : boost::system::error_code(make_system_error_code(e, mode))
     {
         if (e != success && e != no_success && !(mode & lightweight))
             exception_ = detail::get_exception(e, msg, mode);
     }
 
-    error_code::error_code(error e, std::string const& msg,
-            char const* func, char const* file, long line, throwmode mode)
+    error_code::error_code(error e, std::string const& msg, char const* func,
+        char const* file, long line, throwmode mode)
       : boost::system::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & lightweight)) {
+        if (e != success && e != no_success && !(mode & lightweight))
+        {
             exception_ = detail::get_exception(e, msg, mode, func, file, line);
         }
     }
@@ -157,22 +163,26 @@ namespace hpx
     }
 
     error_code::error_code(std::exception_ptr const& e)
-      : boost::system::error_code(make_system_error_code(get_error(e), rethrow)),
-        exception_(e)
-    {}
+      : boost::system::error_code(make_system_error_code(get_error(e), rethrow))
+      , exception_(e)
+    {
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     std::string error_code::get_message() const
     {
-        if (exception_) {
-            try {
+        if (exception_)
+        {
+            try
+            {
                 std::rethrow_exception(exception_);
             }
-            catch (std::exception const& be) {
+            catch (std::exception const& be)
+            {
                 return be.what();
             }
         }
-        return get_error_what(*this);   // provide at least minimal error text
+        return get_error_what(*this);    // provide at least minimal error text
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -190,15 +200,18 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     error_code& error_code::operator=(error_code const& rhs)
     {
-        if (this != &rhs) {
-            if (rhs.value() == success) {
+        if (this != &rhs)
+        {
+            if (rhs.value() == success)
+            {
                 // if the rhs is a success code, we maintain our throw mode
-                this->boost::system::error_code::operator=(
-                    make_success_code(
-                        (category() == get_lightweight_hpx_category()) ?
-                            hpx::lightweight : hpx::plain));
+                this->boost::system::error_code::operator=(make_success_code(
+                    (category() == get_lightweight_hpx_category()) ?
+                        hpx::lightweight :
+                        hpx::plain));
             }
-            else {
+            else
+            {
                 this->boost::system::error_code::operator=(rhs);
             }
             exception_ = rhs.exception_;
@@ -206,4 +219,4 @@ namespace hpx
         return *this;
     }
     /// \endcond
-}
+}    // namespace hpx

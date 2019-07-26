@@ -20,11 +20,9 @@
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     /// \cond NODETAIL
-    namespace detail
-    {
+    namespace detail {
         HPX_EXPORT std::exception_ptr access_exception(error_code const&);
 
         ///////////////////////////////////////////////////////////////////////
@@ -32,13 +30,15 @@ namespace hpx
         {
             explicit command_line_error(char const* msg)
               : std::logic_error(msg)
-            {}
+            {
+            }
 
             explicit command_line_error(std::string const& msg)
               : std::logic_error(msg)
-            {}
+            {
+            }
         };
-    } // namespace detail
+    }    // namespace detail
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
@@ -50,20 +50,22 @@ namespace hpx
     HPX_EXPORT boost::system::error_category const& get_hpx_rethrow_category();
 
     /// \cond NOINTERNAL
-    HPX_EXPORT boost::system::error_category const& get_lightweight_hpx_category();
+    HPX_EXPORT boost::system::error_category const&
+    get_lightweight_hpx_category();
 
-    HPX_EXPORT boost::system::error_category const& get_hpx_category(throwmode mode);
+    HPX_EXPORT boost::system::error_category const& get_hpx_category(
+        throwmode mode);
 
-    inline boost::system::error_code
-    make_system_error_code(error e, throwmode mode = plain)
+    inline boost::system::error_code make_system_error_code(
+        error e, throwmode mode = plain)
     {
         return boost::system::error_code(
             static_cast<int>(e), get_hpx_category(mode));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline boost::system::error_condition
-    make_error_condition(error e, throwmode mode)
+    inline boost::system::error_condition make_error_condition(
+        error e, throwmode mode)
     {
         return boost::system::error_condition(
             static_cast<int>(e), get_hpx_category(mode));
@@ -80,7 +82,7 @@ namespace hpx
     /// \note Class hpx::error_code is an adjunct to error reporting by
     /// exception
     ///
-    class error_code : public boost::system::error_code //-V690
+    class error_code : public boost::system::error_code    //-V690
     {
     public:
         /// Construct an object of type error_code.
@@ -94,7 +96,8 @@ namespace hpx
         /// \throws nothing
         explicit error_code(throwmode mode = plain)
           : boost::system::error_code(make_system_error_code(success, mode))
-        {}
+        {
+        }
 
         /// Construct an object of type error_code.
         ///
@@ -162,7 +165,7 @@ namespace hpx
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
         HPX_EXPORT error_code(error e, char const* msg, char const* func,
-                char const* file, long line, throwmode mode = plain);
+            char const* file, long line, throwmode mode = plain);
 
         /// Construct an object of type error_code.
         ///
@@ -178,7 +181,8 @@ namespace hpx
         ///
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
-        HPX_EXPORT error_code(error e, std::string const& msg, throwmode mode = plain);
+        HPX_EXPORT error_code(
+            error e, std::string const& msg, throwmode mode = plain);
 
         /// Construct an object of type error_code.
         ///
@@ -199,7 +203,7 @@ namespace hpx
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
         HPX_EXPORT error_code(error e, std::string const& msg, char const* func,
-                char const* file, long line, throwmode mode = plain);
+            char const* file, long line, throwmode mode = plain);
 
         /// Return a reference to the error message stored in the hpx::error_code.
         ///
@@ -211,7 +215,8 @@ namespace hpx
         /// * value() == hpx::success and category() == hpx::get_hpx_category()
         void clear()
         {
-            this->boost::system::error_code::assign(success, get_hpx_category());
+            this->boost::system::error_code::assign(
+                success, get_hpx_category());
             exception_ = std::exception_ptr();
         }
 
@@ -240,57 +245,51 @@ namespace hpx
 
     /// @{
     /// \brief Returns a new error_code constructed from the given parameters.
-    inline error_code
-    make_error_code(error e, throwmode mode = plain)
+    inline error_code make_error_code(error e, throwmode mode = plain)
     {
         return error_code(e, mode);
     }
-    inline error_code
-    make_error_code(error e, char const* func, char const* file, long line,
-        throwmode mode = plain)
+    inline error_code make_error_code(error e, char const* func,
+        char const* file, long line, throwmode mode = plain)
     {
         return error_code(e, func, file, line, mode);
     }
 
     /// \brief Returns error_code(e, msg, mode).
-    inline error_code
-    make_error_code(error e, char const* msg, throwmode mode = plain)
+    inline error_code make_error_code(
+        error e, char const* msg, throwmode mode = plain)
     {
         return error_code(e, msg, mode);
     }
-    inline error_code
-    make_error_code(error e, char const* msg, char const* func,
-        char const* file, long line, throwmode mode = plain)
+    inline error_code make_error_code(error e, char const* msg,
+        char const* func, char const* file, long line, throwmode mode = plain)
     {
         return error_code(e, msg, func, file, line, mode);
     }
 
     /// \brief Returns error_code(e, msg, mode).
-    inline error_code
-    make_error_code(error e, std::string const& msg, throwmode mode = plain)
+    inline error_code make_error_code(
+        error e, std::string const& msg, throwmode mode = plain)
     {
         return error_code(e, msg, mode);
     }
-    inline error_code
-    make_error_code(error e, std::string const& msg, char const* func,
-        char const* file, long line, throwmode mode = plain)
+    inline error_code make_error_code(error e, std::string const& msg,
+        char const* func, char const* file, long line, throwmode mode = plain)
     {
         return error_code(e, msg, func, file, line, mode);
     }
-    inline error_code
-    make_error_code(std::exception_ptr const& e)
+    inline error_code make_error_code(std::exception_ptr const& e)
     {
         return error_code(e);
     }
     ///@}
 
     /// \brief Returns error_code(hpx::success, "success", mode).
-    inline error_code
-    make_success_code(throwmode mode = plain)
+    inline error_code make_success_code(throwmode mode = plain)
     {
         return error_code(mode);
     }
-}
+}    // namespace hpx
 
 #include <hpx/errors/throw_exception.hpp>
 

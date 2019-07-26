@@ -16,9 +16,9 @@
 #include <boost/filesystem/path.hpp>
 
 #if defined(HPX_WINDOWS)
-#  include <process.h>
+#include <process.h>
 #elif defined(HPX_HAVE_UNISTD_H)
-#  include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include <algorithm>
@@ -40,11 +40,10 @@
 #elif defined(__FreeBSD__)
 HPX_EXPORT char** freebsd_environ = nullptr;
 #elif !defined(HPX_WINDOWS)
-extern char **environ;
+extern char** environ;
 #endif
 
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// Construct a hpx::exception from a \a hpx::error.
     ///
@@ -120,9 +119,7 @@ namespace hpx
     /// Destruct a hpx::exception
     ///
     /// \throws nothing
-    exception::~exception() noexcept
-    {
-    }
+    exception::~exception() noexcept {}
 
     /// The function \a get_error() returns the hpx::error code stored
     /// in the referenced instance of a hpx::exception. It returns
@@ -146,9 +143,9 @@ namespace hpx
     ///               (if mode is \a rethrow).
     error_code exception::get_error_code(throwmode mode) const noexcept
     {
-        (void)mode;
-        return error_code(this->boost::system::system_error::code().value(),
-            *this);
+        (void) mode;
+        return error_code(
+            this->boost::system::system_error::code().value(), *this);
     }
 
     static custom_exception_info_handler_type custom_exception_info_handler;
@@ -161,15 +158,13 @@ namespace hpx
 
     static pre_exception_handler_type pre_exception_handler;
 
-    HPX_EXPORT void set_pre_exception_handler(
-        pre_exception_handler_type f)
+    HPX_EXPORT void set_pre_exception_handler(pre_exception_handler_type f)
     {
         pre_exception_handler = f;
     }
-}
+}    // namespace hpx
 
-namespace hpx { namespace detail
-{
+namespace hpx { namespace detail {
     template <typename Exception>
     HPX_EXPORT std::exception_ptr construct_lightweight_exception(
         Exception const& e, std::string const& func, std::string const& file,
@@ -177,14 +172,16 @@ namespace hpx { namespace detail
     {
         // create a std::exception_ptr object encapsulating the Exception to
         // be thrown and annotate it with all the local information we have
-        try {
+        try
+        {
             throw_with_info(e,
                 std::move(
                     hpx::exception_info().set(hpx::detail::throw_function(func),
                         hpx::detail::throw_file(file),
                         hpx::detail::throw_line(line))));
         }
-        catch (...) {
+        catch (...)
+        {
             return std::current_exception();
         }
 
@@ -194,14 +191,17 @@ namespace hpx { namespace detail
     }
 
     template <typename Exception>
-    HPX_EXPORT std::exception_ptr construct_lightweight_exception(Exception const& e)
+    HPX_EXPORT std::exception_ptr construct_lightweight_exception(
+        Exception const& e)
     {
         // create a std::exception_ptr object encapsulating the Exception to
         // be thrown and annotate it with all the local information we have
-        try {
+        try
+        {
             hpx::throw_with_info(e);
         }
-        catch (...) {
+        catch (...)
+        {
             return std::current_exception();
         }
 
@@ -210,13 +210,13 @@ namespace hpx { namespace detail
         return std::exception_ptr();
     }
 
-    template HPX_EXPORT std::exception_ptr
-        construct_lightweight_exception(hpx::thread_interrupted const&);
+    template HPX_EXPORT std::exception_ptr construct_lightweight_exception(
+        hpx::thread_interrupted const&);
 
     template <typename Exception>
-    HPX_EXPORT std::exception_ptr construct_custom_exception(
-        Exception const& e, std::string const& func, std::string const& file,
-        long line, std::string const& auxinfo)
+    HPX_EXPORT std::exception_ptr construct_custom_exception(Exception const& e,
+        std::string const& func, std::string const& file, long line,
+        std::string const& auxinfo)
     {
         if (!custom_exception_info_handler)
         {
@@ -225,11 +225,13 @@ namespace hpx { namespace detail
 
         // create a std::exception_ptr object encapsulating the Exception to
         // be thrown and annotate it with information provided by the hook
-        try {
-            throw_with_info(e,
-                custom_exception_info_handler(func, file, line, auxinfo));
+        try
+        {
+            throw_with_info(
+                e, custom_exception_info_handler(func, file, line, auxinfo));
         }
-        catch (...) {
+        catch (...)
+        {
             return std::current_exception();
         }
 
@@ -257,9 +259,9 @@ namespace hpx { namespace detail
     }
 
     template <typename Exception>
-    HPX_EXPORT std::exception_ptr
-    get_exception(Exception const& e, std::string const& func,
-        std::string const& file, long line, std::string const& auxinfo)
+    HPX_EXPORT std::exception_ptr get_exception(Exception const& e,
+        std::string const& func, std::string const& file, long line,
+        std::string const& auxinfo)
     {
         if (is_of_lightweight_hpx_category(e))
         {
@@ -282,65 +284,47 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template HPX_EXPORT std::exception_ptr
-    get_exception(hpx::exception const&, std::string const&,
-        std::string const&, long, std::string const&); 
+    template HPX_EXPORT std::exception_ptr get_exception(hpx::exception const&,
+        std::string const&, std::string const&, long, std::string const&);
 
-    template HPX_EXPORT void
-        throw_exception(hpx::exception const&,
-            std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(
+        hpx::exception const&, std::string const&, std::string const&, long);
 
-    template HPX_EXPORT void
-        throw_exception(boost::system::system_error const&,
-            std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(boost::system::system_error const&,
+        std::string const&, std::string const&, long);
 
-    template HPX_EXPORT void
-        throw_exception(std::exception const&,
-            std::string const&, std::string const&, long);
-    template HPX_EXPORT void
-        throw_exception(hpx::detail::std_exception const&,
-            std::string const&, std::string const&, long);
-    template HPX_EXPORT void
-        throw_exception(std::bad_exception const&,
-            std::string const&, std::string const&, long);
-    template HPX_EXPORT void
-        throw_exception(hpx::detail::bad_exception const&,
-            std::string const&, std::string const&, long);
-    template HPX_EXPORT void
-        throw_exception(std::bad_typeid const&,
-            std::string const&, std::string const&, long);
-    template HPX_EXPORT void
-        throw_exception(hpx::detail::bad_typeid const&,
-            std::string const&, std::string const&, long);
-    template HPX_EXPORT void
-        throw_exception(std::bad_cast const&,
-            std::string const&, std::string const&, long);
-    template HPX_EXPORT void
-        throw_exception(hpx::detail::bad_cast const&,
-            std::string const&, std::string const&, long);
-    template HPX_EXPORT void
-        throw_exception(std::bad_alloc const&,
-            std::string const&, std::string const&, long);
-    template HPX_EXPORT void
-        throw_exception(hpx::detail::bad_alloc const&,
-            std::string const&, std::string const&, long);
-    template HPX_EXPORT void
-        throw_exception(std::logic_error const&,
-            std::string const&, std::string const&, long);
-    template HPX_EXPORT void
-        throw_exception(std::runtime_error const&,
-            std::string const&, std::string const&, long);
-    template HPX_EXPORT void
-        throw_exception(std::out_of_range const&,
-            std::string const&, std::string const&, long);
-    template HPX_EXPORT void
-        throw_exception(std::invalid_argument const&,
-            std::string const&, std::string const&, long);
-}}
+    template HPX_EXPORT void throw_exception(
+        std::exception const&, std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(hpx::detail::std_exception const&,
+        std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(std::bad_exception const&,
+        std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(hpx::detail::bad_exception const&,
+        std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(
+        std::bad_typeid const&, std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(hpx::detail::bad_typeid const&,
+        std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(
+        std::bad_cast const&, std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(hpx::detail::bad_cast const&,
+        std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(
+        std::bad_alloc const&, std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(hpx::detail::bad_alloc const&,
+        std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(
+        std::logic_error const&, std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(std::runtime_error const&,
+        std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(
+        std::out_of_range const&, std::string const&, std::string const&, long);
+    template HPX_EXPORT void throw_exception(std::invalid_argument const&,
+        std::string const&, std::string const&, long);
+}}    // namespace hpx::detail
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Return the error message.
@@ -365,24 +349,28 @@ namespace hpx
 
     error get_error(std::exception_ptr const& e)
     {
-        try {
+        try
+        {
             std::rethrow_exception(e);
         }
-        catch (hpx::thread_interrupted const&) {
+        catch (hpx::thread_interrupted const&)
+        {
             return hpx::thread_cancelled;
         }
-        catch (hpx::exception const& he) {
+        catch (hpx::exception const& he)
+        {
             return he.get_error();
         }
-        catch (boost::system::system_error const& e) {
+        catch (boost::system::system_error const& e)
+        {
             int code = e.code().value();
             if (code < success || code >= last_error)
                 code |= system_error_flag;
             return static_cast<hpx::error>(code);
         }
-        catch (...) {
+        catch (...)
+        {
             return unknown_error;
         }
     }
-}
-
+}    // namespace hpx

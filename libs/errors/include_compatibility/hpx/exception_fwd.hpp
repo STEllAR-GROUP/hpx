@@ -9,12 +9,10 @@
 
 #if defined(HPX_ERRORS_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/exception_fwd.hpp is deprecated, \
+#pragma message("The header hpx/exception_fwd.hpp is deprecated, \
     please include hpx/errors/exception_fwd.hpp instead")
 #else
-#warning \
-    "The header hpx/exception_fwd.hpp is deprecated, \
+#warning "The header hpx/exception_fwd.hpp is deprecated, \
     please include hpx/errors/exception_fwd.hpp instead"
 #endif
 #endif
