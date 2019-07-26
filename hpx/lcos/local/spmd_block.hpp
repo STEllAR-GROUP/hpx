@@ -11,8 +11,8 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/util/first_argument.hpp>
 
 #include <boost/range/irange.hpp>

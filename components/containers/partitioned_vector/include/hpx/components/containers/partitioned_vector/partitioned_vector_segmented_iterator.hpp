@@ -19,8 +19,8 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/iterator_adaptor.hpp>
-#include <hpx/util/iterator_facade.hpp>
+#include <hpx/iterator_support/iterator_adaptor.hpp>
+#include <hpx/iterator_support/iterator_facade.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>

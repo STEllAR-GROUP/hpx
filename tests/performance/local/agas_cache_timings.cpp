@@ -15,7 +15,7 @@
 #include <hpx/cache/local_cache.hpp>
 #include <hpx/cache/statistics/local_full_statistics.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/util/histogram.hpp>
+#include <hpx/statistics/histogram.hpp>
 #include <hpx/testing.hpp>
 
 #include <boost/program_options.hpp>

@@ -9,7 +9,7 @@
 #define HPX_TRAITS_IS_EXECUTION_POLICY_SEP_07_2016_0805AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <type_traits>
 

@@ -25,7 +25,7 @@
 #include <hpx/include/parallel_container_algorithm.hpp>
 #include <hpx/format.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/iterator_range.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
 //
 #include "test_utils.hpp"
 

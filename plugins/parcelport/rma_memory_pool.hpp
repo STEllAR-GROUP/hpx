@@ -8,7 +8,7 @@
 
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 //
 #include <hpx/config/parcelport_defines.hpp>
 //

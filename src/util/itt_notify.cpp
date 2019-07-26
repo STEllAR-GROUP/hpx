@@ -7,7 +7,7 @@
 #include <hpx/runtime.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/thread_support/thread_specific_ptr.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0
 

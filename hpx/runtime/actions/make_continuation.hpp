@@ -12,7 +12,7 @@
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/actions/continuation2_impl.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <type_traits>
 #include <utility>

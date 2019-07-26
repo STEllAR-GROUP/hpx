@@ -15,12 +15,12 @@
 #include <hpx/lcos/local/receive_buffer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
-#include <hpx/util/atomic_count.hpp>
-#include <hpx/util/iterator_facade.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/util/unlock_guard.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

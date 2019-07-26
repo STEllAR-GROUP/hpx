@@ -17,7 +17,7 @@
 #include <hpx/parallel/traits/vector_pack_type.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <algorithm>
 #include <cstddef>

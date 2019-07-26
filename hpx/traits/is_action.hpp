@@ -7,8 +7,8 @@
 #define HPX_TRAITS_IS_ACTION_APR_15_2012_0601PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/always_void.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/always_void.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <type_traits>
 

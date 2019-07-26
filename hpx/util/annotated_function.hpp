@@ -13,7 +13,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/thread_description.hpp>
 

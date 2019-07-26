@@ -13,8 +13,10 @@
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/format.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
@@ -43,14 +45,12 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
-#include <hpx/format.hpp>
-#include <hpx/util/insert_checked.hpp>
-#include <hpx/logging.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/insert_checked.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/util/unlock_guard.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>

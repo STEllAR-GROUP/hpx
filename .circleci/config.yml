@@ -792,27 +792,47 @@ jobs:
       - run:
           name: Building Module Unit Tests
           command: |
+              ninja -j2 -k 0 tests.unit.modules.allocator_support
               ninja -j2 -k 0 tests.unit.modules.assertion
               ninja -j2 -k 0 tests.unit.modules.cache
               ninja -j2 -k 0 tests.unit.modules.collectives
+              ninja -j2 -k 0 tests.unit.modules.concepts
               ninja -j2 -k 0 tests.unit.modules.config
+              ninja -j2 -k 0 tests.unit.modules.datastructures
               ninja -j2 -k 0 tests.unit.modules.format
               ninja -j2 -k 0 tests.unit.modules.hardware
+              ninja -j2 -k 0 tests.unit.modules.hashing
+              ninja -j2 -k 0 tests.unit.modules.iterator_support
               ninja -j2 -k 0 tests.unit.modules.logging
               ninja -j2 -k 0 tests.unit.modules.preprocessor
+              ninja -j2 -k 0 tests.unit.modules.statistics
+              ninja -j2 -k 0 tests.unit.modules.testing
+              ninja -j2 -k 0 tests.unit.modules.thread_support
+              ninja -j2 -k 0 tests.unit.modules.type_support
+              ninja -j2 -k 0 tests.unit.modules.util
       - run:
           name: Running Unit Tests
           when: always
           command: |
               ulimit -c unlimited
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.allocator_support
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.assertion
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.concepts
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.datastructures
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.format
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.hardware
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.hashing
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.iterator_support
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.logging
               ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.statistics
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.testing
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.type_support
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.util
       - run:
           <<: *convert_xml
       - run:

@@ -18,7 +18,7 @@
 #include <hpx/throw_exception.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/logging.hpp>

@@ -10,7 +10,7 @@
 #include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <type_traits>
 

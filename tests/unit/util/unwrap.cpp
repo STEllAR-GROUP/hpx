@@ -10,7 +10,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <array>

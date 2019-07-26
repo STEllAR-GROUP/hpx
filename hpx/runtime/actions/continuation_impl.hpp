@@ -10,7 +10,7 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/serialization/access.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/util/result_of.hpp>
 
 #include <utility>

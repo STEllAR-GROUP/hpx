@@ -21,7 +21,7 @@
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_select_direct_execution.hpp>
 #include <hpx/traits/action_stacksize.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <thread>
 #include <chrono>

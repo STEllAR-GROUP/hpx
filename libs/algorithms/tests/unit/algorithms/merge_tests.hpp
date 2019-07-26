@@ -8,7 +8,7 @@
 
 #include <hpx/include/parallel_merge.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>

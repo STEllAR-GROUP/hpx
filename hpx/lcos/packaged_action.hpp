@@ -19,7 +19,7 @@
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
-#include <hpx/util/internal_allocator.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 
 #include <boost/asio/error.hpp>
 #include <boost/intrusive_ptr.hpp>

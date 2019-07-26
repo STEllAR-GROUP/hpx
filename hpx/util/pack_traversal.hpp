@@ -7,7 +7,7 @@
 #define HPX_UTIL_PACK_TRAVERSAL_HPP
 
 #include <hpx/util/detail/pack_traversal_impl.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <type_traits>
 #include <utility>

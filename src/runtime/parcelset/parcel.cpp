@@ -23,7 +23,7 @@
 #include <hpx/util/apex.hpp>
 #include <hpx/util/itt_notify.hpp>
 
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 
 #include <cstddef>
 #include <cstdint>

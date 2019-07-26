@@ -20,7 +20,7 @@
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/functional/hash.hpp>

@@ -11,10 +11,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/identity.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/identity.hpp>
 #include <hpx/util/tagged.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <cstddef>
 #include <utility>

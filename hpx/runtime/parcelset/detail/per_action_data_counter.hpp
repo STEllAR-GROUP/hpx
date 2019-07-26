@@ -13,7 +13,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
-#include <hpx/util/jenkins_hash.hpp>
+#include <hpx/hashing/jenkins_hash.hpp>
 
 #include <cstdint>
 #include <string>

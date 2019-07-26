@@ -14,7 +14,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/type_support/static.hpp>
 
 #include <atomic>
 #include <cstddef>

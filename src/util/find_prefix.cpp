@@ -27,7 +27,7 @@
 #endif
 
 #include <hpx/util/plugin/dll.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/algorithm/string/split.hpp>

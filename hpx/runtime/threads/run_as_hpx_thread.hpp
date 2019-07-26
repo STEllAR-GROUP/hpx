@@ -11,9 +11,9 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/optional.hpp>
+#include <hpx/datastructures/optional.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <chrono>
 #include <condition_variable>

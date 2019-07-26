@@ -11,7 +11,7 @@
 #include <plugins/parcelport/rma_memory_pool.hpp>
 //
 #include <hpx/assertion.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/yield_while.hpp>

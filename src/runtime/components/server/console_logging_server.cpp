@@ -5,11 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/util/ini.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/type_support/static.hpp>
+#include <hpx/util/ini.hpp>
 #include <hpx/util/spinlock.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 // This is needed to get rid of an undefined reference to

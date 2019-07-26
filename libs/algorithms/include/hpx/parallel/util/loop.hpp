@@ -16,7 +16,7 @@
 #include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <algorithm>
 #include <cstddef>
