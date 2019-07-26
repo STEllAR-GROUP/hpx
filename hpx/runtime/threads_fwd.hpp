@@ -19,6 +19,9 @@ namespace hpx
         {
             struct scheduler_base;
             class HPX_EXPORT callback_notifier;
+            namespace detail {
+                struct HPX_EXPORT affinity_data;
+            }
         }
 
         namespace executors

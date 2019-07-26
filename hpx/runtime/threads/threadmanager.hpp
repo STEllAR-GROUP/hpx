@@ -312,9 +312,9 @@ namespace hpx { namespace threads
             }
         }
 
-        void init_tss(std::size_t num)
+        void init_tss(std::size_t global_thread_num)
         {
-            detail::set_thread_num_tss(num);
+            detail::set_thread_num_tss(global_thread_num);
         }
 
         void deinit_tss()

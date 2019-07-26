@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
+#include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/util/barrier.hpp>
 #include <hpx/util/function.hpp>
 
@@ -34,9 +35,6 @@ namespace hpx { namespace util
         HPX_NON_COPYABLE(io_service_pool);
 
     public:
-        typedef util::function_nonser<void(std::size_t, char const*)>
-            on_startstop_func_type;
-
         /// \brief Construct the io_service pool.
         /// \param pool_size
         ///                 [in] The number of threads to run to serve incoming
@@ -44,25 +42,17 @@ namespace hpx { namespace util
         /// \param start_thread
         ///                 [in]
         explicit io_service_pool(std::size_t pool_size = 2,
-            on_startstop_func_type const& on_start_thread =
-                util::function_nonser<void(std::size_t, char const*)>(),
-            on_startstop_func_type const& on_stop_thread =
-                on_startstop_func_type(),
+            threads::policies::callback_notifier const& notifier =
+                threads::policies::callback_notifier(),
             char const* pool_name = "", char const* name_postfix = "");
 
         /// \brief Construct the io_service pool.
         /// \param start_thread
         ///                 [in]
-        explicit io_service_pool(on_startstop_func_type const& on_start_thread,
-            on_startstop_func_type const& on_stop_thread =
-                on_startstop_func_type(),
+        explicit io_service_pool(
+            threads::policies::callback_notifier const& notifier =
+                threads::policies::callback_notifier(),
             char const* pool_name = "", char const* name_postfix = "");
-
-        /// \brief Construct the io_service pool.
-        /// \param start_thread
-        ///                 [in]
-        explicit io_service_pool(std::size_t pool_size,
-            char const* pool_name, char const* name_postfix = "");
 
         ~io_service_pool();
 
@@ -103,16 +93,6 @@ namespace hpx { namespace util
 
         /// \brief Return name of this pool
         char const* get_name() const { return pool_name_; }
-
-        /// \brief return the thread registration functions
-        on_startstop_func_type const& get_on_start_thread() const
-        {
-            return on_start_thread_;
-        }
-        on_startstop_func_type const& get_on_stop_thread() const
-        {
-            return on_stop_thread_;
-        }
 
     protected:
         bool run_locked(std::size_t num_threads, bool join_threads,
@@ -162,8 +142,7 @@ namespace hpx { namespace util
         std::size_t pool_size_;
 
         /// call this for each thread start/stop
-        on_startstop_func_type on_start_thread_;
-        on_startstop_func_type on_stop_thread_;
+        threads::policies::callback_notifier const& notifier_;
 
         char const* pool_name_;
         char const* pool_name_postfix_;

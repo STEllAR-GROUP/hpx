@@ -65,7 +65,8 @@ namespace hpx { namespace threads
         /// \cond NOINTERNAL
         thread_pool_base(threads::policies::callback_notifier& notifier,
             std::size_t index, std::string const& pool_name,
-            policies::scheduler_mode m, std::size_t thread_offset);
+            policies::scheduler_mode m, std::size_t thread_offset,
+            policies::detail::affinity_data const& affinity_data);
 
         virtual ~thread_pool_base() = default;
 
@@ -322,9 +323,10 @@ namespace hpx { namespace threads
 
         virtual void do_some_work(std::size_t /*num_thread*/) {}
 
-        virtual void report_error(std::size_t num, std::exception_ptr const& e)
+        virtual void report_error(
+            std::size_t global_thread_num, std::exception_ptr const& e)
         {
-            notifier_.on_error(num, e);
+            notifier_.on_error(global_thread_num, e);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -376,6 +378,8 @@ namespace hpx { namespace threads
         // the global index of a thread it owns, the pool has to compute:
         // global index = thread_offset_ + local index.
         std::size_t thread_offset_;
+
+        policies::detail::affinity_data const& affinity_data_;
 
         // scale timestamps to nanoseconds
         double timestamp_scale_;

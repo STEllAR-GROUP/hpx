@@ -11,12 +11,12 @@
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
@@ -71,28 +71,26 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     struct init_tss_helper
     {
-        init_tss_helper(
-            scheduled_thread_pool<Scheduler>& pool,
-                std::size_t pool_thread_num, std::size_t offset)
+        init_tss_helper(scheduled_thread_pool<Scheduler>& pool,
+            std::size_t local_thread_num, std::size_t global_thread_num)
           : pool_(pool)
-          , thread_num_(pool_thread_num)
-          , thread_manager_(nullptr)
+          , local_thread_num_(local_thread_num)
+          , global_thread_num_(global_thread_num)
         {
-            pool.notifier_.on_start_thread(pool_thread_num);
-            thread_manager_ = &threads::get_thread_manager();
-            thread_manager_->init_tss(pool_thread_num + offset);
-            pool.sched_->Scheduler::on_start_thread(pool_thread_num);
+            pool.notifier_.on_start_thread(local_thread_num_,
+                global_thread_num_, pool_.get_pool_id().name().c_str(), "");
+            pool.sched_->Scheduler::on_start_thread(local_thread_num_);
         }
         ~init_tss_helper()
         {
-            pool_.sched_->Scheduler::on_stop_thread(thread_num_);
-            thread_manager_->deinit_tss();
-            pool_.notifier_.on_stop_thread(thread_num_);
+            pool_.sched_->Scheduler::on_stop_thread(local_thread_num_);
+            pool_.notifier_.on_stop_thread(local_thread_num_, global_thread_num_,
+                pool_.get_pool_id().name().c_str(), "");
         }
 
         scheduled_thread_pool<Scheduler>& pool_;
-        std::size_t thread_num_;
-        threadmanager* thread_manager_;
+        std::size_t local_thread_num_;
+        std::size_t global_thread_num_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -102,8 +100,10 @@ namespace hpx { namespace threads { namespace detail
         threads::policies::callback_notifier& notifier, std::size_t index,
         std::string const& pool_name, policies::scheduler_mode m,
         std::size_t thread_offset,
-        network_background_callback_type network_background_callback)
-      : thread_pool_base(notifier, index, pool_name, m, thread_offset)
+        network_background_callback_type network_background_callback,
+        policies::detail::affinity_data const& affinity_data)
+      : thread_pool_base(
+            notifier, index, pool_name, m, thread_offset, affinity_data)
       , sched_(std::move(sched))
       , thread_count_(0)
       , tasks_scheduled_(0)
@@ -142,11 +142,11 @@ namespace hpx { namespace threads { namespace detail
 
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::report_error(
-        std::size_t num, std::exception_ptr const& e)
+        std::size_t global_thread_num, std::exception_ptr const& e)
     {
         sched_->Scheduler::set_all_states_at_least(state_terminating);
-        this->thread_pool_base::report_error(num, e);
-        sched_->Scheduler::on_error(num, e);
+        this->thread_pool_base::report_error(global_thread_num, e);
+        sched_->Scheduler::on_error(global_thread_num, e);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -263,12 +263,13 @@ namespace hpx { namespace threads { namespace detail
             std::make_shared<util::barrier>(pool_threads + 1);
         try
         {
-            auto const& rp = resource::get_partitioner();
+            topology const& topo = create_topology();
 
             for (/**/; thread_num != pool_threads; ++thread_num)
             {
                 std::size_t global_thread_num = this->thread_offset_ + thread_num;
-                threads::mask_cref_type mask = rp.get_pu_mask(global_thread_num);
+                threads::mask_cref_type mask =
+                    affinity_data_.get_pu_mask(topo, global_thread_num);
 
                 // thread_num ordering: 1. threads of default pool
                 //                      2. threads of first special pool
@@ -285,15 +286,6 @@ namespace hpx { namespace threads { namespace detail
                 // create a new thread
                 add_processing_unit_internal(
                     thread_num, global_thread_num, startup);
-
-                // set the new threads affinity (on Windows systems)
-                if (!any(mask))
-                {
-                    LTM_(debug)    //-V128
-                        << "run: " << id_.name()
-                        << " setting thread affinity on OS thread "    //-V128
-                        << global_thread_num << " was explicitly disabled.";
-                }
             }
 
             // wait for all threads to have started up
@@ -400,11 +392,11 @@ namespace hpx { namespace threads { namespace detail
         std::size_t thread_num, std::size_t global_thread_num,
         std::shared_ptr<util::barrier> startup)
     {
-        auto const& rp = resource::get_partitioner();
-        topology const& topo = rp.get_topology();
+        topology const& topo = create_topology();
 
         // Set the affinity for the current thread.
-        threads::mask_cref_type mask = rp.get_pu_mask(global_thread_num);
+        threads::mask_cref_type mask =
+            affinity_data_.get_pu_mask(topo, global_thread_num);
 
         if (LHPX_ENABLED(debug))
             topo.write_to_log();
@@ -449,7 +441,7 @@ namespace hpx { namespace threads { namespace detail
 
         // manage the number of this thread in its TSS
         init_tss_helper<Scheduler> tss_helper(
-            *this, thread_num, this->thread_offset_);
+            *this, thread_num, global_thread_num);
 
         ++thread_count_;
 
@@ -1858,8 +1850,6 @@ namespace hpx { namespace threads { namespace detail
             return;
         }
 
-        resource::get_partitioner().assign_pu(id_.name(), virt_core);
-
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
         hpx::state oldstate = state.exchange(state_initialized);
@@ -1943,7 +1933,6 @@ namespace hpx { namespace threads { namespace detail
             oldstate == state_running || oldstate == state_stopping ||
             oldstate == state_stopped || oldstate == state_terminating);
 
-        resource::get_partitioner().unassign_pu(id_.name(), virt_core);
         std::thread t;
         std::swap(threads_[virt_core], t);
 

@@ -38,10 +38,7 @@ namespace hpx { namespace plugins
         ///        supported by this factory
         virtual parcelset::parcelport* create(
             hpx::util::runtime_configuration const& cfg,
-            util::function_nonser<void(std::size_t, char const*)> const&
-                on_start_thread,
-            util::function_nonser<void(std::size_t, char const*)> const&
-                on_stop_thread) = 0;
+            threads::policies::callback_notifier const& notifier) = 0;
     };
 }}
 

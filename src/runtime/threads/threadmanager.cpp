@@ -213,6 +213,21 @@ namespace hpx { namespace threads
       , notifier_(notifier)
       , network_background_callback_(network_background_callback)
     {
+        using util::placeholders::_1;
+        using util::placeholders::_2;
+        using util::placeholders::_3;
+
+        // Add callbacks local to threadmanager.
+        notifier.add_on_start_thread_callback(
+            util::bind(&threadmanager::init_tss, this, _1));
+        notifier.add_on_stop_thread_callback(
+            util::bind(&threadmanager::deinit_tss, this));
+
+        auto& rp = hpx::resource::get_partitioner();
+        notifier.add_on_start_thread_callback(util::bind(
+            &resource::detail::partitioner::assign_pu, std::ref(rp), _3, _2));
+        notifier.add_on_stop_thread_callback(util::bind(
+            &resource::detail::partitioner::unassign_pu, std::ref(rp), _3, _2));
     }
 
     void threadmanager::create_pools()
@@ -247,9 +262,9 @@ namespace hpx { namespace threads
             case resource::user_defined:
             {
                 auto pool_func = rp.get_pool_creator(i);
-                std::unique_ptr<thread_pool_base> pool(
-                    pool_func(notifier_, num_threads_in_pool,
-                        thread_offset, i, name));
+                std::unique_ptr<thread_pool_base> pool(pool_func(notifier_,
+                    num_threads_in_pool, thread_offset, i, name,
+                    network_background_callback_, rp.get_affinity_data()));
                 pools_.push_back(std::move(pool));
                 break;
             }
@@ -273,7 +288,8 @@ namespace hpx { namespace threads
                 typedef hpx::threads::policies::local_queue_scheduler<>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
-                    1000, numa_sensitive, "core-local_queue_scheduler");
+                    rp.get_affinity_data(), 1000, numa_sensitive,
+                    "core-local_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
 
@@ -282,7 +298,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_));
+                        network_background_callback_, rp.get_affinity_data()));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -309,8 +325,8 @@ namespace hpx { namespace threads
                     std::mutex, hpx::threads::policies::lockfree_fifo>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
-                    num_high_priority_queues, 1000, numa_sensitive,
-                    "core-local_priority_queue_scheduler");
+                    rp.get_affinity_data(), num_high_priority_queues, 1000,
+                    numa_sensitive, "core-local_priority_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
 
@@ -319,7 +335,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_));
+                        network_background_callback_, rp.get_affinity_data()));
                 pools_.push_back(std::move(pool));
 
                 break;
@@ -342,8 +358,8 @@ namespace hpx { namespace threads
                     std::mutex, hpx::threads::policies::lockfree_lifo>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
-                    num_high_priority_queues, 1000, numa_sensitive,
-                    "core-local_priority_queue_scheduler");
+                    rp.get_affinity_data(), num_high_priority_queues, 1000,
+                    numa_sensitive, "core-local_priority_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
 
@@ -381,7 +397,8 @@ namespace hpx { namespace threads
                 typedef hpx::threads::policies::static_queue_scheduler<>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
-                    1000, numa_sensitive, "core-static_queue_scheduler");
+                    rp.get_affinity_data(), 1000, numa_sensitive,
+                    "core-static_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
 
@@ -390,7 +407,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_));
+                        network_background_callback_, rp.get_affinity_data()));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -419,8 +436,8 @@ namespace hpx { namespace threads
                 using local_sched_type =
                     hpx::threads::policies::static_priority_queue_scheduler<>;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
-                    num_high_priority_queues, 1000, numa_sensitive,
-                    "core-static_priority_queue_scheduler");
+                    rp.get_affinity_data(), num_high_priority_queues, 1000,
+                    numa_sensitive, "core-static_priority_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
 
@@ -429,7 +446,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_));
+                        network_background_callback_, rp.get_affinity_data()));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -454,7 +471,8 @@ namespace hpx { namespace threads
                     std::mutex, hpx::threads::policies::lockfree_fifo>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
-                    num_high_priority_queues, 1000, cfg_.numa_sensitive_,
+                    rp.get_affinity_data(), num_high_priority_queues, 1000,
+                    cfg_.numa_sensitive_,
                     "core-abp_fifo_priority_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
@@ -464,7 +482,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_));
+                        network_background_callback_, rp.get_affinity_data()));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -491,7 +509,8 @@ namespace hpx { namespace threads
                     std::mutex, hpx::threads::policies::lockfree_lifo>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
-                    num_high_priority_queues, 1000, cfg_.numa_sensitive_,
+                    rp.get_affinity_data(), num_high_priority_queues, 1000,
+                    cfg_.numa_sensitive_,
                     "core-abp_fifo_priority_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
@@ -501,7 +520,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_));
+                        network_background_callback_, rp.get_affinity_data()));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -521,14 +540,15 @@ namespace hpx { namespace threads
                 hpx::threads::policies::core_ratios ratios(4, 4, 64);
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(num_threads_in_pool, ratios,
-                        "core-shared_priority_queue_scheduler"));
+                        "core-shared_priority_queue_scheduler",
+                        rp.get_affinity_data()));
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_));
+                        network_background_callback_, rp.get_affinity_data()));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(

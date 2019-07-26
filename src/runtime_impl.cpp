@@ -198,21 +198,18 @@ namespace hpx
       : runtime(rtcfg)
       , mode_(rtcfg.mode_)
       , result_(0)
-      , main_pool_(1, "main_pool")
+      , main_pool_notifier_()
+      , main_pool_(1, main_pool_notifier_, "main_pool")
 #ifdef HPX_HAVE_IO_POOL
-      , io_pool_(rtcfg.get_thread_pool_size("io_pool"),
-            util::bind(&runtime_impl::init_tss, This(), "io-thread",
-                util::placeholders::_1, util::placeholders::_2, true),
-            util::bind(&runtime_impl::deinit_tss, This(), "io-thread",
-                util::placeholders::_1),
-            "io_pool")
+      , io_pool_notifier_(runtime_impl::get_notification_policy("io-thread"))
+      , io_pool_(
+            rtcfg.get_thread_pool_size("io_pool"), io_pool_notifier_, "io_pool")
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
+      , timer_pool_notifier_(
+            runtime_impl::get_notification_policy("timer-thread"))
       , timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
-            util::bind(&runtime_impl::init_tss, This(), "timer-thread",
-                util::placeholders::_1, util::placeholders::_2, true),
-            util::bind(&runtime_impl::deinit_tss, This(), "timer-thread",
-                util::placeholders::_1),
+            timer_pool_notifier_,
             "timer_pool")
 #endif
       , notifier_(runtime_impl::get_notification_policy("worker-thread"))
@@ -226,11 +223,9 @@ namespace hpx
             &detail::network_background_callback
 #endif
             ))
-      , parcel_handler_(rtcfg, thread_manager_.get(),
-            util::bind(&runtime_impl::init_tss, This(), "parcel-thread",
-                util::placeholders::_1, util::placeholders::_2, true),
-            util::bind(&runtime_impl::deinit_tss, This(), "parcel-thread",
-                util::placeholders::_1))
+      , parcel_handler_notifier_(
+            runtime_impl::get_notification_policy("parcel-thread"))
+      , parcel_handler_(rtcfg, thread_manager_.get(), parcel_handler_notifier_)
       , agas_client_(ini_, rtcfg.mode_)
       , applier_(parcel_handler_, *thread_manager_)
     {
@@ -440,7 +435,7 @@ namespace hpx
 
         // Register this thread with the runtime system to allow calling certain
         // HPX functionality from the main thread.
-        init_tss("main-thread", 0, "", false);
+        init_tss("main-thread", 0, 0, "", "", false);
 
         return 0;   // return zero as we don't know the outcome of hpx_main yet
     }
@@ -815,33 +810,45 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    threads::policies::callback_notifier runtime_impl::
-        get_notification_policy(char const* prefix)
+    threads::policies::callback_notifier runtime_impl::get_notification_policy(
+        char const* prefix)
     {
         typedef bool (runtime_impl::*report_error_t)(
             std::size_t, std::exception_ptr const&);
 
         using util::placeholders::_1;
         using util::placeholders::_2;
-        return notification_policy_type(
-            util::bind(&runtime_impl::init_tss, This(), prefix, _1, _2, false),
-            util::bind(&runtime_impl::deinit_tss, This(), prefix, _1),
+        using util::placeholders::_3;
+        using util::placeholders::_4;
+
+        notification_policy_type notifier;
+
+        notifier.add_on_start_thread_callback(util::bind(
+            &runtime_impl::init_tss, This(), prefix, _1, _2, _3, _4, false));
+        notifier.add_on_stop_thread_callback(
+            util::bind(&runtime_impl::deinit_tss, This(), prefix, _1));
+        notifier.set_on_error_callback(
             util::bind(static_cast<report_error_t>(&runtime_impl::report_error),
                 This(), _1, _2));
+
+        return notifier;
     }
 
     void runtime_impl::init_tss(char const* context,
-        std::size_t num, char const* postfix, bool service_thread)
+        std::size_t local_thread_num, std::size_t global_thread_num,
+        char const* pool_name, char const* postfix, bool service_thread)
     {
         // prefix thread name with locality number, if needed
         std::string locality = locality_prefix(get_config());
 
         error_code ec(lightweight);
-        return init_tss_ex(locality, context, num, postfix, service_thread, ec);
+        return init_tss_ex(locality, context, local_thread_num,
+            global_thread_num, pool_name, postfix, service_thread, ec);
     }
 
-    void runtime_impl::init_tss_ex(
-        std::string const& locality, char const* context, std::size_t num,
+    void runtime_impl::init_tss_ex(std::string const& locality,
+        char const* context, std::size_t local_thread_num,
+        std::size_t global_thread_num, char const* pool_name,
         char const* postfix, bool service_thread, error_code& ec)
     {
         // initialize our TSS
@@ -856,7 +863,7 @@ namespace hpx
         fullname += context;
         if (postfix && *postfix)
             fullname += postfix;
-        fullname += "#" + std::to_string(num);
+        fullname += "#" + std::to_string(global_thread_num);
         detail::runtime_thread_name() = std::move(fullname);
 
         char const* name = detail::runtime_thread_name().c_str();
@@ -875,10 +882,11 @@ namespace hpx
             apex::register_thread(name);
 #endif
 
-        // call thread-specific user-supplied on_error handler
+        // call thread-specific user-supplied on_start handler
         if (on_start_func_)
         {
-            on_start_func_(num, context);
+            on_start_func_(
+                local_thread_num, global_thread_num, pool_name, context);
         }
 
         // if this is a service thread, set its service affinity
@@ -914,12 +922,14 @@ namespace hpx
         }
     }
 
-    void runtime_impl::deinit_tss(char const* context, std::size_t num)
+    void runtime_impl::deinit_tss(char const* context,
+        std::size_t global_thread_num)
     {
         // call thread-specific user-supplied on_stop handler
         if (on_stop_func_)
         {
-            on_stop_func_(num, context);
+            on_stop_func_(
+                global_thread_num, global_thread_num, "", context);
         }
 
         // reset our TSS
@@ -988,7 +998,7 @@ namespace hpx
 
     /// Register an external OS-thread with HPX
     bool runtime_impl::register_thread(
-        char const* name, std::size_t num, bool service_thread, error_code& ec)
+        char const* name, std::size_t global_thread_num, bool service_thread, error_code& ec)
     {
         if (nullptr != get_runtime_ptr())
             return false;       // already registered
@@ -999,8 +1009,8 @@ namespace hpx
         std::string thread_name(name);
         thread_name += "-thread";
 
-        init_tss_ex(locality, thread_name.c_str(), num, nullptr,
-            service_thread, ec);
+        init_tss_ex(locality, thread_name.c_str(), global_thread_num,
+            global_thread_num, "", nullptr, service_thread, ec);
 
         return !ec ? true : false;
     }

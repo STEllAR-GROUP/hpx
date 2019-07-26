@@ -6,6 +6,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/detail/io_service_thread_pool.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/util/barrier.hpp>
@@ -17,11 +18,12 @@
 namespace hpx { namespace threads { namespace detail
 {
     io_service_thread_pool::io_service_thread_pool(
-            threads::policies::callback_notifier& notifier, std::size_t index,
-            char const* pool_name, policies::scheduler_mode m,
-            std::size_t thread_offset)
-      : thread_pool_base(notifier, index, pool_name, m, thread_offset)
-      , threads_(notifier.on_start_thread_, notifier.on_stop_thread_, pool_name)
+        threads::policies::callback_notifier& notifier, std::size_t index,
+        char const* pool_name, policies::scheduler_mode m,
+        std::size_t thread_offset)
+      : thread_pool_base(notifier, index, pool_name, m, thread_offset,
+            policies::detail::affinity_data())
+      , threads_(notifier, pool_name)
     {
     }
 

@@ -58,12 +58,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     thread_pool_os_executor<Scheduler>::thread_pool_os_executor(
-            std::size_t num_punits, std::string const& affinity_desc)
-      : scheduler_(nullptr),
-        executor_name_(get_unique_name()),
-        notifier_(get_notification_policy(executor_name_.c_str())),
-        pool_(nullptr),
-        num_threads_(num_punits)
+        std::size_t num_punits,
+        policies::detail::affinity_data const& affinity_data)
+      : scheduler_(nullptr)
+      , executor_name_(get_unique_name())
+      , notifier_(get_notification_policy(executor_name_.c_str()))
+      , pool_(nullptr)
+      , num_threads_(num_punits)
+      , affinity_data_(affinity_data)
     {
         if (num_punits > hpx::threads::hardware_concurrency())
         {
@@ -74,7 +76,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             return;
         }
 
-        std::unique_ptr<Scheduler> scheduler(new Scheduler(num_punits));
+        typename Scheduler::init_parameter_type init(num_punits, affinity_data_);
+        std::unique_ptr<Scheduler> scheduler(new Scheduler(init));
         scheduler_ = scheduler.get();
 
         pool_.reset(new threads::detail::scheduled_thread_pool<Scheduler>(
@@ -257,9 +260,9 @@ namespace hpx { namespace threads { namespace executors
     {}
 
     local_queue_os_executor::local_queue_os_executor(
-            std::size_t num_threads, std::string const& affinity_desc)
+            std::size_t num_threads, policies::detail::affinity_data const& affinity_data)
       : scheduled_executor(new detail::thread_pool_os_executor<
-            policies::local_queue_scheduler<> >(num_threads, affinity_desc))
+            policies::local_queue_scheduler<> >(num_threads, affinity_data))
     {}
 #endif
 
@@ -267,41 +270,49 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     static_queue_os_executor::static_queue_os_executor()
       : scheduled_executor(new detail::thread_pool_os_executor<
-            policies::static_queue_scheduler<> >(get_os_thread_count()))
-    {}
+            policies::static_queue_scheduler<>>(get_os_thread_count()))
+    {
+    }
 
-    static_queue_os_executor::static_queue_os_executor(
-            std::size_t num_threads, std::string const& affinity_desc)
+    static_queue_os_executor::static_queue_os_executor(std::size_t num_threads,
+        policies::detail::affinity_data const& affinity_data)
       : scheduled_executor(new detail::thread_pool_os_executor<
-            policies::static_queue_scheduler<> >(num_threads, affinity_desc))
-    {}
+            policies::static_queue_scheduler<>>(num_threads, affinity_data))
+    {
+    }
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
     local_priority_queue_os_executor::local_priority_queue_os_executor()
       : scheduled_executor(new detail::thread_pool_os_executor<
-            policies::local_priority_queue_scheduler<> >(get_os_thread_count()))
-    {}
+            policies::local_priority_queue_scheduler<>>(get_os_thread_count()))
+    {
+    }
 
     local_priority_queue_os_executor::local_priority_queue_os_executor(
-            std::size_t num_threads, std::string const& affinity_desc)
+        std::size_t num_threads,
+        policies::detail::affinity_data const& affinity_data)
       : scheduled_executor(new detail::thread_pool_os_executor<
-            policies::local_priority_queue_scheduler<> >(
-                num_threads, affinity_desc))
-    {}
+            policies::local_priority_queue_scheduler<>>(
+            num_threads, affinity_data))
+    {
+    }
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
     static_priority_queue_os_executor::static_priority_queue_os_executor()
       : scheduled_executor(new detail::thread_pool_os_executor<
-            policies::static_priority_queue_scheduler<> >(get_os_thread_count()))
-    {}
+            policies::static_priority_queue_scheduler<>>(get_os_thread_count()))
+    {
+    }
 
     static_priority_queue_os_executor::static_priority_queue_os_executor(
-            std::size_t num_threads, std::string const& affinity_desc)
+        std::size_t num_threads,
+        policies::detail::affinity_data const& affinity_data)
       : scheduled_executor(new detail::thread_pool_os_executor<
-            policies::static_priority_queue_scheduler<> >(
-                num_threads, affinity_desc))
-    {}
+            policies::static_priority_queue_scheduler<>>(
+            num_threads, affinity_data))
+    {
+    }
 #endif
 }}}

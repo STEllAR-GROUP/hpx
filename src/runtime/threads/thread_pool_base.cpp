@@ -7,6 +7,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/runtime/threads/topology.hpp>
@@ -26,20 +27,23 @@ namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     thread_pool_base::thread_pool_base(
-            threads::policies::callback_notifier& notifier,
-            std::size_t index, std::string const& pool_name,
-            policies::scheduler_mode m, std::size_t thread_offset)
-      : id_(index, pool_name),
-        mode_(m),
-        thread_offset_(thread_offset),
-        timestamp_scale_(1.0),
-        notifier_(notifier)
-    {}
+        threads::policies::callback_notifier& notifier, std::size_t index,
+        std::string const& pool_name, policies::scheduler_mode m,
+        std::size_t thread_offset,
+        policies::detail::affinity_data const& affinity_data)
+      : id_(index, pool_name)
+      , mode_(m)
+      , thread_offset_(thread_offset)
+      , affinity_data_(affinity_data)
+      , timestamp_scale_(1.0)
+      , notifier_(notifier)
+    {
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     mask_type thread_pool_base::get_used_processing_units() const
     {
-        auto const& rp = resource::get_partitioner();
+        auto const& topo = create_topology();
         auto const sched = get_scheduler();
 
         mask_type used_processing_units = mask_type();
@@ -51,7 +55,7 @@ namespace hpx { namespace threads
             if (sched->get_state(thread_num).load() <= state_suspended)
             {
                 used_processing_units |=
-                    rp.get_pu_mask(thread_num + get_thread_offset());
+                    affinity_data_.get_pu_mask(topo, thread_num + get_thread_offset());
             }
         }
 
@@ -60,9 +64,9 @@ namespace hpx { namespace threads
 
     hwloc_bitmap_ptr thread_pool_base::get_numa_domain_bitmap() const
     {
-        auto const& rp = resource::get_partitioner();
+        auto const& topo = create_topology();
         mask_type used_processing_units = get_used_processing_units();
-        return rp.get_topology().cpuset_to_nodeset(used_processing_units);
+        return topo.cpuset_to_nodeset(used_processing_units);
     }
 
     std::size_t thread_pool_base::get_active_os_thread_count() const

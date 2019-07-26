@@ -8,6 +8,7 @@
 #include <hpx/format.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/parse_affinity_options.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
@@ -40,13 +41,6 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
       , no_affinity_()
       , use_process_mask_(false)
     {
-        // allow only one affinity-data instance
-        if (instance_number_counter_++ >= 0)
-        {
-            throw std::runtime_error(
-                "Cannot instantiate more than one affinity data instance");
-        }
-
         threads::resize(no_affinity_, hardware_concurrency());
     }
 

@@ -40,7 +40,9 @@ namespace hpx { namespace threads { namespace executors
         public:
             thread_pool_executor(std::size_t max_punits = 1,
                 std::size_t min_punits = 1,
-                char const* description = "thread_pool_executor");
+                char const* description = "thread_pool_executor",
+                policies::detail::affinity_data const& affinity_data =
+                    policies::detail::affinity_data());
             ~thread_pool_executor();
 
             // Schedule the specified function for execution in this executor.
@@ -143,6 +145,8 @@ namespace hpx { namespace threads { namespace executors
 
             // store the self reference to the HPX thread running this scheduler
             std::vector<threads::thread_self*> self_;
+
+            policies::detail::affinity_data const& affinity_data_;
 
             // protect scheduler initialization
             typedef lcos::local::spinlock mutex_type;

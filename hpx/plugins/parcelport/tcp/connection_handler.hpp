@@ -83,10 +83,7 @@ namespace hpx { namespace parcelset
             }
 
             connection_handler(util::runtime_configuration const& ini,
-                util::function_nonser<void(std::size_t, char const*)> const&
-                    on_start_thread,
-                util::function_nonser<void(std::size_t, char const*)> const&
-                    on_stop_thread);
+                threads::policies::callback_notifier const& notifier);
 
             ~connection_handler();
 

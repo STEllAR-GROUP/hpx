@@ -11,6 +11,7 @@
 
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/assertion.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -86,33 +87,32 @@ namespace hpx { namespace threads { namespace policies
         //    the maxcount per queue
         struct init_parameter
         {
-            init_parameter()
-              : num_queues_(1),
-                max_queue_thread_count_(max_thread_count),
-                numa_sensitive_(0),
-                description_("local_queue_scheduler")
+            init_parameter(std::size_t num_queues,
+                detail::affinity_data const& affinity_data,
+                std::size_t max_queue_thread_count = max_thread_count,
+                std::size_t numa_sensitive = 0,
+                char const* description = "local_queue_scheduler")
+              : num_queues_(num_queues)
+              , max_queue_thread_count_(max_queue_thread_count)
+              , numa_sensitive_(numa_sensitive)
+              , affinity_data_(affinity_data)
+              , description_(description)
             {}
 
             init_parameter(std::size_t num_queues,
-                    std::size_t max_queue_thread_count = max_thread_count,
-                    std::size_t numa_sensitive = 0,
-                    char const* description = "local_queue_scheduler")
-              : num_queues_(num_queues),
-                max_queue_thread_count_(max_queue_thread_count),
-                numa_sensitive_(numa_sensitive),
-                description_(description)
-            {}
-
-            init_parameter(std::size_t num_queues, char const* description)
-              : num_queues_(num_queues),
-                max_queue_thread_count_(max_thread_count),
-                numa_sensitive_(false),
-                description_(description)
+                detail::affinity_data const& affinity_data,
+                char const* description)
+              : num_queues_(num_queues)
+              , max_queue_thread_count_(max_thread_count)
+              , numa_sensitive_(false)
+              , affinity_data_(affinity_data)
+              , description_(description)
             {}
 
             std::size_t num_queues_;
             std::size_t max_queue_thread_count_;
             std::size_t numa_sensitive_;
+            detail::affinity_data const& affinity_data_;
             char const* description_;
         };
         typedef init_parameter init_parameter_type;
@@ -124,19 +124,16 @@ namespace hpx { namespace threads { namespace policies
           , queues_(init.num_queues_)
           , curr_queue_(0)
           , numa_sensitive_(init.numa_sensitive_)
+          , affinity_data_(init.affinity_data_)
           ,
 #ifndef HPX_NATIVE_MIC    // we know that the MIC has one NUMA domain only
           steals_in_numa_domain_()
           , steals_outside_numa_domain_()
 #endif
           , numa_domain_masks_(init.num_queues_,
-              resource::get_partitioner()
-                  .get_topology()
-                  .get_machine_affinity_mask())
+                create_topology().get_machine_affinity_mask())
           , outside_numa_domain_masks_(init.num_queues_,
-                resource::get_partitioner()
-                    .get_topology()
-                    .get_machine_affinity_mask())
+                create_topology().get_machine_affinity_mask())
         {
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
             resize(steals_in_numa_domain_, threads::hardware_concurrency());
@@ -383,12 +380,10 @@ namespace hpx { namespace threads { namespace policies
 
             if (numa_sensitive_ != 0)
             {
-                auto const& rp = resource::get_partitioner();
-
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
                 std::size_t pu_number =
-                    rp.get_affinity_data().get_pu_num(num_thread);
+                    affinity_data_.get_pu_num(num_thread);
 
 #if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only
                 if (test(steals_in_numa_domain_, pu_number)) //-V600 //-V111
@@ -405,7 +400,7 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        std::size_t pu_num = rp.get_affinity_data().get_pu_num(idx);
+                        std::size_t pu_num = affinity_data_.get_pu_num(idx);
                         if (!test(this_numa_domain, pu_num)) //-V560 //-V600 //-V111
                             continue;
 
@@ -434,7 +429,7 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        std::size_t pu_num = rp.get_affinity_data().get_pu_num(idx);
+                        std::size_t pu_num = affinity_data_.get_pu_num(idx);
                         if (!test(numa_domain, pu_num))    //-V560 //-V600 //-V111
                             continue;
 
@@ -725,12 +720,10 @@ namespace hpx { namespace threads { namespace policies
 
             if (numa_sensitive_ != 0)   // limited or no stealing across domains
             {
-                auto const& rp = resource::get_partitioner();
-
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
                 std::size_t pu_number =
-                    rp.get_affinity_data().get_pu_num(num_thread);
+                    affinity_data_.get_pu_num(num_thread);
 
 #if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only
                 if (test(steals_in_numa_domain_, pu_number)) //-V600 //-V111
@@ -746,7 +739,7 @@ namespace hpx { namespace threads { namespace policies
                         HPX_ASSERT(idx != num_thread);
 
                         if (!test(numa_domain_mask,
-                                rp.get_affinity_data().get_pu_num(idx))) //-V600
+                                affinity_data_.get_pu_num(idx))) //-V600
                         {
                             continue;
                         }
@@ -767,9 +760,6 @@ namespace hpx { namespace threads { namespace policies
                 // if nothing found, ask everybody else
                 if (test(steals_outside_numa_domain_, pu_number)) //-V600 //-V111
                 {
-                    threads::policies::detail::affinity_data const& affinity_data =
-                        rp.get_affinity_data();
-
                     mask_cref_type numa_domain_mask =
                         outside_numa_domain_masks_[num_thread];
                     for (std::size_t i = 1; i != queues_size; ++i)
@@ -780,7 +770,7 @@ namespace hpx { namespace threads { namespace policies
                         HPX_ASSERT(idx != num_thread);
 
                         if (!test(numa_domain_mask,
-                                affinity_data.get_pu_num(idx))) //-V600
+                                affinity_data_.get_pu_num(idx))) //-V600
                         {
                             continue;
                         }
@@ -860,11 +850,10 @@ namespace hpx { namespace threads { namespace policies
 
             queues_[num_thread]->on_start_thread(num_thread);
 
-            auto const& rp = resource::get_partitioner();
-            auto const& topo = rp.get_topology();
+            auto const& topo = create_topology();
 
             // pre-calculate certain constants for the given thread number
-            std::size_t num_pu = rp.get_affinity_data().get_pu_num(num_thread);
+            std::size_t num_pu = affinity_data_.get_pu_num(num_thread);
             mask_cref_type machine_mask = topo.get_machine_affinity_mask();
             mask_cref_type core_mask = topo.get_thread_affinity_mask(num_pu);
             mask_cref_type node_mask = topo.get_numa_node_affinity_mask(num_pu);
@@ -918,6 +907,8 @@ namespace hpx { namespace threads { namespace policies
         std::vector<thread_queue_type*> queues_;
         std::atomic<std::size_t> curr_queue_;
         std::size_t numa_sensitive_;
+
+        detail::affinity_data const& affinity_data_;
 
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
         mask_type steals_in_numa_domain_;

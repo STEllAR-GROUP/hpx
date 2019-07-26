@@ -10,6 +10,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
+#include <hpx/runtime/threads/detail/network_background_callback.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
@@ -36,15 +38,6 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     struct init_tss_helper;
 
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
-    defined(HPX_HAVE_THREAD_IDLE_RATES)
-    using network_background_callback_type =
-        util::function_nonser<bool(std::size_t, std::int64_t&, std::int64_t&)>;
-#else
-    using network_background_callback_type =
-        util::function_nonser<bool(std::size_t)>;
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     class scheduled_thread_pool : public hpx::threads::thread_pool_base
@@ -58,7 +51,9 @@ namespace hpx { namespace threads { namespace detail
                 policies::scheduler_mode::nothing_special,
             std::size_t thread_offset = 0,
             network_background_callback_type network_background_callback =
-                network_background_callback_type());
+                network_background_callback_type(),
+            policies::detail::affinity_data const& affinity_data =
+                policies::detail::affinity_data());
         virtual ~scheduled_thread_pool();
 
         void print_pool(std::ostream& os) override;

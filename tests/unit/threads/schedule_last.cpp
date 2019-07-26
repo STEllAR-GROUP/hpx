@@ -51,10 +51,13 @@ void test_scheduler(int argc, char* argv[])
     rp.create_thread_pool("default",
         [](hpx::threads::policies::callback_notifier& notifier,
             std::size_t num_threads, std::size_t thread_offset,
-            std::size_t pool_index, std::string const& pool_name)
-        -> std::unique_ptr<hpx::threads::thread_pool_base>
-        {
-            typename Scheduler::init_parameter_type init(num_threads);
+            std::size_t pool_index, std::string const& pool_name,
+            hpx::threads::detail::network_background_callback_type const&
+                network_background_callback,
+            hpx::threads::policies::detail::affinity_data const& affinity_data)
+            -> std::unique_ptr<hpx::threads::thread_pool_base> {
+            typename Scheduler::init_parameter_type init(
+                num_threads, affinity_data);
             std::unique_ptr<Scheduler> scheduler(new Scheduler(init));
 
             auto mode = hpx::threads::policies::scheduler_mode(
@@ -65,7 +68,7 @@ void test_scheduler(int argc, char* argv[])
             std::unique_ptr<hpx::threads::thread_pool_base> pool(
                 new hpx::threads::detail::scheduled_thread_pool<Scheduler>(
                     std::move(scheduler), notifier, pool_index, pool_name, mode,
-                    thread_offset));
+                    thread_offset, network_background_callback, affinity_data));
 
             return pool;
         });
