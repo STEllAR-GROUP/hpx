@@ -13,6 +13,7 @@
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/backtrace.hpp>
 
+#include <cstddef>
 #include <map>
 #include <string>
 #include <utility>

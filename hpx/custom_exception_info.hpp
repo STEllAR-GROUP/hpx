@@ -8,6 +8,7 @@
 #define HPX_EXCEPTION_GET_INFO_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 
@@ -19,15 +20,14 @@
 #include <exception>
 #include <functional>
 #include <string>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     /// \cond NODETAIL
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         // Stores the information about the locality id the exception has been
         // raised on. This information will show up in error messages under the
@@ -84,8 +84,8 @@ namespace hpx
         HPX_DEFINE_ERROR_INFO(throw_auxinfo, std::string);
 
         HPX_EXPORT hpx::exception_info custom_exception_info(
-            std::string const& func, std::string const& file,
-            long line, std::string const& auxinfo);
+            std::string const& func, std::string const& file, long line,
+            std::string const& auxinfo);
 
         // Portably extract the current execution environment
         HPX_EXPORT std::string get_execution_environment();
@@ -100,22 +100,23 @@ namespace hpx
         // Report an early or late exception and locally exit execution. There
         // isn't anything more we could do. The exception will be re-thrown
         // from hpx::init
-        HPX_EXPORT void report_exception_and_continue(std::exception_ptr const&);
+        HPX_EXPORT void report_exception_and_continue(
+            std::exception_ptr const&);
         HPX_EXPORT void report_exception_and_continue(hpx::exception const&);
 
         template <typename Exception>
-        HPX_EXPORT std::exception_ptr construct_exception(
-            Exception const& e, std::string const& func,
-            std::string const& file, long line, std::string const& back_trace,
-            std::uint32_t node, std::string const& hostname, std::int64_t pid,
-            std::size_t shepherd, std::size_t thread_id,
-            std::string const& thread_name, std::string const& env,
-            std::string const& config, std::string const& state_name,
-            std::string const& auxinfo)
+        HPX_EXPORT std::exception_ptr construct_exception(Exception const& e,
+            std::string const& func, std::string const& file, long line,
+            std::string const& back_trace, std::uint32_t node,
+            std::string const& hostname, std::int64_t pid, std::size_t shepherd,
+            std::size_t thread_id, std::string const& thread_name,
+            std::string const& env, std::string const& config,
+            std::string const& state_name, std::string const& auxinfo)
         {
             // create a std::exception_ptr object encapsulating the Exception to
             // be thrown and annotate it with all the local information we have
-            try {
+            try
+            {
                 throw_with_info(e,
                     std::move(hpx::exception_info().set(
                         hpx::detail::throw_stacktrace(back_trace),
@@ -133,7 +134,8 @@ namespace hpx
                         hpx::detail::throw_state(state_name),
                         hpx::detail::throw_auxinfo(auxinfo))));
             }
-            catch (...) {
+            catch (...)
+            {
                 return std::current_exception();
             }
 
@@ -143,7 +145,7 @@ namespace hpx
         }
 
         HPX_EXPORT void pre_exception_handler();
-    }
+    }    // namespace detail
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
@@ -226,14 +228,16 @@ namespace hpx
     ///             \a hpx::get_error_what(), \a hpx::get_error_config(),
     ///             \a hpx::get_error_state()
     ///
-    HPX_EXPORT std::uint32_t get_error_locality_id(hpx::exception_info const& xi);
+    HPX_EXPORT std::uint32_t get_error_locality_id(
+        hpx::exception_info const& xi);
 
     /// \cond NOINTERNAL
     template <typename E>
     std::uint32_t get_error_locality_id(E const& e)
     {
         return invoke_with_exception_info(e, [](exception_info const* xi) {
-            return xi ? get_error_locality_id(*xi) : naming::invalid_locality_id;
+            return xi ? get_error_locality_id(*xi) :
+                        naming::invalid_locality_id;
         });
     }
     /// \endcond
@@ -514,7 +518,8 @@ namespace hpx
     ///             \a hpx::get_error(), \a hpx::get_error_state(),
     ///             \a hpx::get_error_what(), \a hpx::get_error_config()
     ///
-    HPX_EXPORT std::string get_error_thread_description(hpx::exception_info const& xi);
+    HPX_EXPORT std::string get_error_thread_description(
+        hpx::exception_info const& xi);
 
     /// \cond NOINTERNAL
     template <typename E>
@@ -618,7 +623,7 @@ namespace hpx
     HPX_EXPORT bool expect_exception(bool flag = true);
     /// \endcond
 
-}
+}    // namespace hpx
 
 #include <hpx/errors.hpp>
 
