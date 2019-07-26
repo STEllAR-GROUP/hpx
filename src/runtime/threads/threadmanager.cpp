@@ -348,7 +348,6 @@ namespace hpx { namespace threads
                         notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
-
 #else
                 throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=local "
@@ -393,6 +392,7 @@ namespace hpx { namespace threads
 
             case resource::local_priority_lifo:
             {
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
@@ -420,7 +420,14 @@ namespace hpx { namespace threads
                         notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
-
+#else
+                throw hpx::detail::command_line_error(
+                    "Command line option --hpx:queuing=local-priority-lifo "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=local-priority-lifo'. "
+                    "Additionally, please make sure 128bit atomics are "
+                    "available.");
+#endif
                 break;
             }
 
@@ -452,7 +459,6 @@ namespace hpx { namespace threads
                         notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
-
 #else
                 throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=static "
@@ -504,7 +510,7 @@ namespace hpx { namespace threads
 
             case resource::abp_priority_fifo:
             {
-#if defined(HPX_HAVE_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER) && defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
@@ -533,14 +539,16 @@ namespace hpx { namespace threads
                 throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=abp-priority-fifo "
                     "is not configured in this build. Please rebuild with "
-                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=abp-priority'.");
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=abp-priority'. "
+                    "Additionally, please make sure 128bit atomics are "
+                    "available.");
 #endif
                 break;
             }
 
             case resource::abp_priority_lifo:
             {
-#if defined(HPX_HAVE_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER) && defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =

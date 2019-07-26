@@ -153,17 +153,24 @@ namespace hpx { namespace debug {
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx {
-namespace threads {
-namespace policies {
-namespace example {
+namespace hpx { namespace threads { namespace policies { namespace example {
 
-    inline void spin_for_time(std::size_t microseconds, const char *task) {
+    inline void spin_for_time(std::size_t microseconds, const char* task)
+    {
 #ifdef SHARED_PRIORITY_SCHEDULER_DEBUG
         hpx::util::annotate_function apex_profiler(task);
         std::this_thread::sleep_for(std::chrono::microseconds(microseconds));
 #endif
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+    using default_shared_priority_queue_scheduler_terminated_queue =
+        lockfree_lifo;
+#else
+    using default_shared_priority_queue_scheduler_terminated_queue =
+        lockfree_fifo;
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     /// The shared_priority_queue_scheduler maintains a set of high, normal, and
@@ -176,7 +183,8 @@ namespace example {
     template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
-        typename TerminatedQueuing = lockfree_lifo>
+        typename TerminatedQueuing =
+            default_shared_priority_queue_scheduler_terminated_queue>
     class shared_priority_queue_scheduler : public scheduler_base
     {
     protected:

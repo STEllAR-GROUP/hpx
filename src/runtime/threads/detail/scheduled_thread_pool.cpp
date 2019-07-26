@@ -35,13 +35,15 @@ template class HPX_EXPORT hpx::threads::policies::local_priority_queue_scheduler
 template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
     hpx::threads::policies::local_priority_queue_scheduler<std::mutex,
         hpx::threads::policies::lockfree_fifo>>;
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
 template class HPX_EXPORT hpx::threads::policies::local_priority_queue_scheduler<
     std::mutex, hpx::threads::policies::lockfree_lifo>;
 template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
     hpx::threads::policies::local_priority_queue_scheduler<std::mutex,
         hpx::threads::policies::lockfree_lifo>>;
+#endif
 
-#if defined(HPX_HAVE_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER) && defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
 template class HPX_EXPORT hpx::threads::policies::local_priority_queue_scheduler<
     std::mutex, hpx::threads::policies::lockfree_abp_fifo>;
 template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
