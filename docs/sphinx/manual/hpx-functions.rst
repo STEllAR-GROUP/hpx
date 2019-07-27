@@ -7,7 +7,7 @@
 .. _hpx_functions:
 
 =============
-HPX Functions
+|hpx| functions
 =============
 
 This document describes the prototypes, the allowable arguments of the listed
