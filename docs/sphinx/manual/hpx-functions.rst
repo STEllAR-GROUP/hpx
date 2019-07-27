@@ -44,7 +44,7 @@ then in asychronous programming is used in chained async implementations. Using
 then function will avoid blocking waits or wasting threads on polling. Future
 can have then chained implementations. With then the antecedent future is ready
 (has a value or exception stored) before the continuation starts as instructed
-by lambda function. Example implementation using hpx is
+by lambda function. Example implementation using |hpx| is
 
 .. literalinclude:: ../../examples/then.cpp
 
