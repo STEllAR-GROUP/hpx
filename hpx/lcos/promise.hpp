@@ -233,7 +233,7 @@ namespace lcos {
         ///            that state ready (30.6.4).
         /// \throws    future_error if its shared state already has a stored value or
         ///            exception, or any exception thrown by the constructor
-				///            selected to copy an object of R.
+        ///            selected to copy an object of R.
         ///            promise_already_satisfied if its shared state already has a
         ///            stored value or exception.
         ///            no_state if *this has no shared state.
