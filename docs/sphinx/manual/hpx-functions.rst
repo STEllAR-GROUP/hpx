@@ -55,7 +55,7 @@ wait
 
 ``hpx::future<T>::wait`` blocks the function implementation until the call is
 available. This function call can be checked using ``valid() == true``. Example
-implementation using hpx is
+implementation using |hpx| is
 
 .. literalinclude:: ../../examples/wait.cpp
 
