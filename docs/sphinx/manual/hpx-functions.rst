@@ -16,7 +16,7 @@ This document describes the prototypes, the allowable arguments of the listed
 async
 =====
 
-``async`` in C++ allows running the function f asynchronously and returns a
+``hpx::async`` allows running the function ``f`` asynchronously and returns a
 ``hpx::future`` having the result of that function call.
 
 ``async`` calls a function f with arguments args as per launch policy. You can
