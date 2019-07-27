@@ -11,7 +11,7 @@
 =============
 
 This document describes the prototypes, the allowable arguments of the listed
-HPX functions.
+|hpx| functions.
 
 async
 =====
