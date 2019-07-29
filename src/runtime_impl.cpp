@@ -11,6 +11,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/latch.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
@@ -22,11 +23,10 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/state.hpp>
+#include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/logging.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/util/set_thread_name.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/yield_while.hpp>
 

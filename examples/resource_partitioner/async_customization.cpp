@@ -20,9 +20,9 @@
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/pack_traversal.hpp>
 #include <hpx/util/debug/demangle_helper.hpp>

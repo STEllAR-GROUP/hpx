@@ -7,7 +7,6 @@
 
 #include <hpx/format.hpp>
 #include <hpx/util/barrier.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/config.hpp>
 #include <boost/thread/tss.hpp>

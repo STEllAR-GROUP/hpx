@@ -5,11 +5,11 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/transform_iterator.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/util/transform_iterator.hpp>
 
 #include <cstddef>
 #include <cstdint>

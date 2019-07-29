@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_DETAIL_MISMATCH_JUL_13_2014_0142PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

@@ -11,14 +11,14 @@
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <string>
 #include <type_traits>

@@ -10,8 +10,8 @@
 #define HPX_PARALLEL_DETAIL_GENERATE_JULY_15_2014_0224PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

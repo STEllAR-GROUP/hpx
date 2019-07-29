@@ -17,7 +17,7 @@
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/cache_aligned_data.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <atomic>
@@ -47,6 +47,15 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+    using default_local_priority_queue_scheduler_terminated_queue =
+        lockfree_lifo;
+#else
+    using default_local_priority_queue_scheduler_terminated_queue =
+        lockfree_fifo;
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
     /// The local_priority_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from. Additionally it maintains separate queues: several for high
@@ -57,7 +66,8 @@ namespace hpx { namespace threads { namespace policies
     template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
-        typename TerminatedQueuing = lockfree_lifo>
+        typename TerminatedQueuing =
+            default_local_priority_queue_scheduler_terminated_queue>
     class HPX_EXPORT local_priority_queue_scheduler : public scheduler_base
     {
     protected:

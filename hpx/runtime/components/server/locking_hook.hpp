@@ -13,7 +13,7 @@
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <mutex>
 #include <utility>

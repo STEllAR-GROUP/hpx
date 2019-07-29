@@ -8,7 +8,7 @@
 
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstdint>
 

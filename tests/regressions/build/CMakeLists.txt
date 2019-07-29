@@ -10,7 +10,7 @@ else()
 endif()
 
 if(NOT HPX_WITH_STATIC_LINKING)
-    add_library(test_server_1950 SHARED server_1950.cpp server_1950.hpp)
+    add_library(test_server_1950 SHARED EXCLUDE_FROM_ALL server_1950.cpp server_1950.hpp)
     target_link_libraries(test_server_1950 PUBLIC ${_libraries})
 
     set_target_properties(test_server_1950

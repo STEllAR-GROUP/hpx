@@ -13,7 +13,7 @@
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/rma_receiver.hpp>
 //
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 //
 #include <boost/container/small_vector.hpp>
 //

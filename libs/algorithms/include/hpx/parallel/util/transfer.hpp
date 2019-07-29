@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/pointer_category.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <algorithm>
 #include <cstddef>

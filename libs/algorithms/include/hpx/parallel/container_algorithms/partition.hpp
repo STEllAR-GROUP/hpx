@@ -9,10 +9,10 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_PARTITION_JUL_09_2017_0501PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/traits/is_range.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/is_range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/util/tagged_tuple.hpp>
 
 #include <hpx/parallel/algorithms/partition.hpp>

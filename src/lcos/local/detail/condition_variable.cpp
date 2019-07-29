@@ -10,12 +10,12 @@
 #include <hpx/error_code.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/steady_clock.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <boost/intrusive/slist.hpp>
 

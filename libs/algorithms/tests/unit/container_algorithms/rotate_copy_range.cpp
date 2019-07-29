@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_rotate.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/iterator_range.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
 
 #include <cstddef>
 #include <iostream>

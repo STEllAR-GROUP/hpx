@@ -8,10 +8,10 @@
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/logging.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/unlock_guard.hpp>
 
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>

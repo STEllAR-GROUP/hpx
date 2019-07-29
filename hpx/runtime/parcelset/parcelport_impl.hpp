@@ -20,7 +20,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/deferred_call.hpp>

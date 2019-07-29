@@ -11,8 +11,8 @@
 
 #include <hpx/runtime/serialization/detail/non_default_constructible.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/util/detail/pack.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <cstddef>
 #include <type_traits>

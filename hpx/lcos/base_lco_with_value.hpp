@@ -25,8 +25,8 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/unused.hpp>
-#include <hpx/util/void_guard.hpp>
+#include <hpx/type_support/unused.hpp>
+#include <hpx/type_support/void_guard.hpp>
 
 #include <cstddef>
 #include <cstdint>

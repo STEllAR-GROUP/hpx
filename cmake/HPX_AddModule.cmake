@@ -149,10 +149,12 @@ function(add_hpx_module name)
     ${headers} ${global_header} ${compat_headers}
     ${force_linking_header})
 
-  target_link_libraries(hpx_${name} ${${name}_DEPENDENCIES})
+  target_link_libraries(hpx_${name} PUBLIC ${${name}_DEPENDENCIES})
   target_include_directories(hpx_${name} PUBLIC
     $<BUILD_INTERFACE:${HEADER_ROOT}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
+
+  target_link_libraries(hpx_${name} PRIVATE hpx_internal_flags)
 
   if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
     target_include_directories(hpx_${name} PUBLIC

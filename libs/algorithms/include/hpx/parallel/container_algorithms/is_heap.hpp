@@ -9,9 +9,9 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_IS_HEAP_JUL_30_2017_0501PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
-#include <hpx/traits/is_range.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/iterator_support/is_range.hpp>
+#include <hpx/iterator_support/range.hpp>
 
 #include <hpx/parallel/algorithms/is_heap.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>

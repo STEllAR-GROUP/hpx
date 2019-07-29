@@ -26,10 +26,10 @@
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/internal_allocator.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/one_shot.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>

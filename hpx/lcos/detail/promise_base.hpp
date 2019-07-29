@@ -18,7 +18,7 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/future_access.hpp>
-#include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unique_function.hpp>
 

@@ -7,7 +7,7 @@
 #define HPX_UTIL_DETAIL_CONTAINER_CATEGORY_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_range.hpp>
+#include <hpx/iterator_support/is_range.hpp>
 #include <hpx/traits/is_tuple_like.hpp>
 
 namespace hpx {

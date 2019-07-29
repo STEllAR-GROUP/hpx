@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
-#include <hpx/traits/is_range.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/is_range.hpp>
+#include <hpx/iterator_support/range.hpp>
 
 #include <hpx/parallel/algorithms/fill.hpp>
 

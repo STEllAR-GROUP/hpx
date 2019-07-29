@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_ALGORITHM_FOR_LOOP_INDUCTION_MAR_05_2016_0305PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 

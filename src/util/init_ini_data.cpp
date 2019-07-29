@@ -13,7 +13,7 @@
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/init_ini_data.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/plugin.hpp>
 
 #include <boost/assign/std/vector.hpp>

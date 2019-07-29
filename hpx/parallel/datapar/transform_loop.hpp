@@ -15,10 +15,10 @@
 #include <hpx/parallel/util/transform_loop.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <algorithm>
 #include <cstddef>

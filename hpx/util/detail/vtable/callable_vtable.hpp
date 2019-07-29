@@ -13,7 +13,7 @@
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/void_guard.hpp>
+#include <hpx/type_support/void_guard.hpp>
 
 #include <cstddef>
 #include <utility>

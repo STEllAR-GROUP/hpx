@@ -9,8 +9,8 @@
 #define HPX_PARALLEL_DETAIL_REMOVE_COPY_FEB_25_2015_0137PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
@@ -20,7 +20,7 @@
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <iterator>

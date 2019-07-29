@@ -13,6 +13,7 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/init_ini_data.hpp>
+#include <hpx/util/init_logging.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/register_locks_globally.hpp>

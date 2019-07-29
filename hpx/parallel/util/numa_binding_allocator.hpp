@@ -566,8 +566,7 @@ namespace hpx { namespace compute { namespace host {
             const size_type num_pages =
                 (n * sizeof(T) + pagesize - 1) / pagesize;
             pointer page_ptr = p;
-            std::intptr_t memory = reinterpret_cast<std::intptr_t>(p);
-            HPX_ASSERT(memory % pagesize == 0);
+            HPX_ASSERT(reinterpret_cast<std::intptr_t>(p) % pagesize == 0);
 
             LOG_NUMA_MSG("touch pages for numa " << numa_domain);
             for (size_type i = 0; i < num_pages; ++i)
@@ -611,8 +610,7 @@ namespace hpx { namespace compute { namespace host {
             const size_type num_pages =
                 (n * sizeof(T) + pagesize - 1) / pagesize;
             pointer page_ptr = p;
-            std::intptr_t memory = reinterpret_cast<std::intptr_t>(p);
-            HPX_ASSERT(memory % pagesize == 0);
+            HPX_ASSERT(reinterpret_cast<std::intptr_t>(p) % pagesize == 0);
 
             LOG_NUMA_MSG("bind pages for numa " << numa_domain);
             for (size_type i = 0; i < num_pages; ++i)

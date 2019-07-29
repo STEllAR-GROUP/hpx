@@ -9,7 +9,7 @@
 #include <hpx/include/parallel_minmax.hpp>
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 
 #include <boost/program_options.hpp>
 
