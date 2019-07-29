@@ -10,7 +10,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 
-#include <cstdint>
+#include <cstddef>
 
 namespace hpx { namespace threads {
     /// Resumes the given processing unit. When the processing unit has been

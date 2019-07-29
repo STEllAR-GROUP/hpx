@@ -997,8 +997,8 @@ namespace hpx
 
 
     /// Register an external OS-thread with HPX
-    bool runtime_impl::register_thread(
-        char const* name, std::size_t global_thread_num, bool service_thread, error_code& ec)
+    bool runtime_impl::register_thread(char const* name,
+        std::size_t global_thread_num, bool service_thread, error_code& ec)
     {
         if (nullptr != get_runtime_ptr())
             return false;       // already registered
@@ -1019,9 +1019,10 @@ namespace hpx
     bool runtime_impl::unregister_thread()
     {
         if (nullptr != get_runtime_ptr())
-            return false;       // never registered
+            return false;    // never registered
 
-        deinit_tss(detail::runtime_thread_name().c_str(), hpx::get_worker_thread_num());
+        deinit_tss(detail::runtime_thread_name().c_str(),
+            hpx::get_worker_thread_num());
         return true;
     }
 

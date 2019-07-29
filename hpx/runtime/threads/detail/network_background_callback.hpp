@@ -10,6 +10,7 @@
 #include <hpx/util/function.hpp>
 
 #include <cstddef>
+#include <cstdint>
 
 namespace hpx { namespace threads { namespace detail {
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \

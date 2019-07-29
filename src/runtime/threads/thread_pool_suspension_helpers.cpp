@@ -11,6 +11,9 @@
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 
+#include <cstddef>
+#include <utility>
+
 namespace hpx { namespace threads {
     hpx::future<void> resume_processing_unit(
         thread_pool_base& pool, std::size_t virt_core)

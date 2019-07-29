@@ -21,6 +21,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <utility>
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
 ///////////////////////////////////////////////////////////////////////////////
