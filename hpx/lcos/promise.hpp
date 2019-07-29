@@ -231,12 +231,11 @@ namespace lcos {
 
         /// \brief     atomically stores the value r in the shared state and makes
         ///            that state ready (30.6.4).
-        /// \throws    future_error if its shared state already has a stored value or
-        ///            exception, or any exception thrown by the constructor
-				///            selected to copy an object of R.
-        ///            promise_already_satisfied if its shared state already has a
-        ///            stored value or exception.
-        ///            no_state if *this has no shared state.
+				///
+				/// \throws    future_error if [... as before ...] exception. The error code
+				///            is set to promise_already_satisfied if its shared state already
+				///            has a stored value or exception.
+        ///            The error code is set to no_state if *this has no shared state.
         void set_value()
         {
             base_type::set_value(hpx::util::unused);
