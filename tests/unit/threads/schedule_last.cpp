@@ -54,7 +54,9 @@ void test_scheduler(int argc, char* argv[])
             std::size_t pool_index, std::string const& pool_name,
             hpx::threads::detail::network_background_callback_type const&
                 network_background_callback,
-            hpx::threads::policies::detail::affinity_data const& affinity_data)
+            hpx::threads::policies::detail::affinity_data const& affinity_data,
+            std::size_t max_background_threads, std::size_t max_idle_loop_count,
+            std::size_t max_busy_loop_count)
             -> std::unique_ptr<hpx::threads::thread_pool_base> {
             typename Scheduler::init_parameter_type init(
                 num_threads, affinity_data);
@@ -68,7 +70,9 @@ void test_scheduler(int argc, char* argv[])
             std::unique_ptr<hpx::threads::thread_pool_base> pool(
                 new hpx::threads::detail::scheduled_thread_pool<Scheduler>(
                     std::move(scheduler), notifier, pool_index, pool_name, mode,
-                    thread_offset, network_background_callback, affinity_data));
+                    thread_offset, network_background_callback, affinity_data,
+                    max_background_threads, max_idle_loop_count,
+                    max_busy_loop_count));
 
             return pool;
         });

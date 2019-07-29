@@ -53,7 +53,11 @@ namespace hpx { namespace threads { namespace detail
             network_background_callback_type network_background_callback =
                 network_background_callback_type(),
             policies::detail::affinity_data const& affinity_data =
-                policies::detail::affinity_data());
+                policies::detail::affinity_data(),
+            std::size_t max_background_threads =
+                (std::numeric_limits<std::size_t>::max)(),
+            std::size_t max_idle_loop_count = HPX_IDLE_LOOP_COUNT_MAX,
+            std::size_t max_busy_loop_count = HPX_BUSY_LOOP_COUNT_MAX);
         virtual ~scheduled_thread_pool();
 
         void print_pool(std::ostream& os) override;
@@ -434,6 +438,10 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<long> thread_count_;
         std::atomic<std::int64_t> tasks_scheduled_;
         network_background_callback_type network_background_callback_;
+
+        std::size_t max_background_threads_;
+        std::size_t max_idle_loop_count_;
+        std::size_t max_busy_loop_count_;
     };
 }}}    // namespace hpx::threads::detail
 

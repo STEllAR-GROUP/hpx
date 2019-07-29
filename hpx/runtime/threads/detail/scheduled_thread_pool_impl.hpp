@@ -101,13 +101,18 @@ namespace hpx { namespace threads { namespace detail
         std::string const& pool_name, policies::scheduler_mode m,
         std::size_t thread_offset,
         network_background_callback_type network_background_callback,
-        policies::detail::affinity_data const& affinity_data)
+        policies::detail::affinity_data const& affinity_data,
+        std::size_t max_background_threads, std::size_t max_idle_loop_count,
+        std::size_t max_busy_loop_count)
       : thread_pool_base(
             notifier, index, pool_name, m, thread_offset, affinity_data)
       , sched_(std::move(sched))
       , thread_count_(0)
       , tasks_scheduled_(0)
       , network_background_callback_(network_background_callback)
+      , max_background_threads_(max_background_threads)
+      , max_idle_loop_count_(max_idle_loop_count)
+      , max_busy_loop_count_(max_busy_loop_count)
     {
         sched_->set_parent_pool(this);
     }
@@ -491,9 +496,10 @@ namespace hpx { namespace threads { namespace detail
 
                 detail::scheduling_callbacks callbacks(
                     util::deferred_call(    //-V107
-                        &policies::scheduler_base::idle_callback,
-                        sched_.get(), thread_num),
-                    nullptr);
+                        &policies::scheduler_base::idle_callback, sched_.get(),
+                        thread_num),
+                    nullptr, nullptr, max_background_threads_,
+                    max_idle_loop_count_, max_busy_loop_count_);
 
                 if ((mode_ & policies::do_background_work) &&
                     network_background_callback_)

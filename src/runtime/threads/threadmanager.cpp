@@ -237,6 +237,24 @@ namespace hpx { namespace threads
         util::command_line_handling const& cfg_ = rp.get_command_line_switches();
         std::size_t thread_offset = 0;
 
+        std::size_t max_background_threads =
+            hpx::util::safe_lexical_cast<std::size_t>(
+                hpx::get_config_entry("hpx.max_background_threads",
+                    (std::numeric_limits<std::size_t>::max)()));
+        std::size_t max_idle_loop_count =
+            hpx::util::safe_lexical_cast<std::int64_t>(
+                hpx::get_config_entry("hpx.max_idle_loop_count",
+                    HPX_IDLE_LOOP_COUNT_MAX));
+        std::size_t max_busy_loop_count =
+            hpx::util::safe_lexical_cast<std::int64_t>(
+                hpx::get_config_entry("hpx.max_busy_loop_count",
+                    HPX_BUSY_LOOP_COUNT_MAX));
+
+        if (!hpx::is_networking_enabled())
+        {
+            max_background_threads = 0;
+        }
+
         // instantiate the pools
         for (size_t i = 0; i != num_pools; i++)
         {
@@ -253,7 +271,8 @@ namespace hpx { namespace threads
                     throw std::invalid_argument("Trying to instantiate pool " +
                         name +
                         " as first thread pool, but first thread pool must be "
-                        "named " + rp.get_default_pool_name());
+                        "named " +
+                        rp.get_default_pool_name());
                 }
             }
 
@@ -262,9 +281,11 @@ namespace hpx { namespace threads
             case resource::user_defined:
             {
                 auto pool_func = rp.get_pool_creator(i);
-                std::unique_ptr<thread_pool_base> pool(pool_func(notifier_,
-                    num_threads_in_pool, thread_offset, i, name,
-                    network_background_callback_, rp.get_affinity_data()));
+                std::unique_ptr<thread_pool_base> pool(
+                    pool_func(notifier_, num_threads_in_pool, thread_offset, i,
+                        name, network_background_callback_,
+                        rp.get_affinity_data(), max_background_threads,
+                        max_idle_loop_count, max_busy_loop_count));
                 pools_.push_back(std::move(pool));
                 break;
             }
@@ -298,7 +319,9 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_, rp.get_affinity_data()));
+                        network_background_callback_, rp.get_affinity_data(),
+                        max_background_threads, max_idle_loop_count,
+                        max_busy_loop_count));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -335,7 +358,9 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_, rp.get_affinity_data()));
+                        network_background_callback_, rp.get_affinity_data(),
+                        max_background_threads, max_idle_loop_count,
+                        max_busy_loop_count));
                 pools_.push_back(std::move(pool));
 
                 break;
@@ -368,7 +393,9 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_));
+                        network_background_callback_, rp.get_affinity_data(),
+                        max_background_threads, max_idle_loop_count,
+                        max_busy_loop_count));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -407,7 +434,9 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_, rp.get_affinity_data()));
+                        network_background_callback_, rp.get_affinity_data(),
+                        max_background_threads, max_idle_loop_count,
+                        max_busy_loop_count));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -446,7 +475,9 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_, rp.get_affinity_data()));
+                        network_background_callback_, rp.get_affinity_data(),
+                        max_background_threads, max_idle_loop_count,
+                        max_busy_loop_count));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -482,7 +513,9 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_, rp.get_affinity_data()));
+                        network_background_callback_, rp.get_affinity_data(),
+                        max_background_threads, max_idle_loop_count,
+                        max_busy_loop_count));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -520,7 +553,9 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_, rp.get_affinity_data()));
+                        network_background_callback_, rp.get_affinity_data(),
+                        max_background_threads, max_idle_loop_count,
+                        max_busy_loop_count));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -548,7 +583,9 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                         local_sched_type>(std::move(sched), notifier_, i,
                         name.c_str(), scheduler_mode, thread_offset,
-                        network_background_callback_, rp.get_affinity_data()));
+                        network_background_callback_, rp.get_affinity_data(),
+                        max_background_threads, max_idle_loop_count,
+                        max_busy_loop_count));
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(

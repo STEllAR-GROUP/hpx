@@ -57,7 +57,8 @@ namespace hpx
                 hpx::threads::policies::callback_notifier&, std::size_t,
                 std::size_t, std::size_t, std::string const&,
                 hpx::threads::detail::network_background_callback_type const&,
-                hpx::threads::policies::detail::affinity_data const&)>;
+                hpx::threads::policies::detail::affinity_data const&,
+                std::size_t, std::size_t, std::size_t)>;
 
         // Choose same names as in command-line options except with _ instead of
         // -.

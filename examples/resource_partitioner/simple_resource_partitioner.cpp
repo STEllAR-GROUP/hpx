@@ -271,7 +271,9 @@ int main(int argc, char* argv[])
             std::size_t pool_index, std::string const& pool_name,
             hpx::threads::detail::network_background_callback_type const&
                 network_background_callback,
-            hpx::threads::policies::detail::affinity_data const& affinity_data)
+            hpx::threads::policies::detail::affinity_data const& affinity_data,
+            std::size_t max_background_threads, std::size_t max_idle_loop_count,
+            std::size_t max_busy_loop_count)
             -> std::unique_ptr<hpx::threads::thread_pool_base> {
             std::cout << "User defined scheduler creation callback "
                       << std::endl;
@@ -288,7 +290,9 @@ int main(int argc, char* argv[])
                 new hpx::threads::detail::scheduled_thread_pool<
                     high_priority_sched>(std::move(scheduler), notifier,
                     pool_index, pool_name, mode, thread_offset,
-                    network_background_callback, affinity_data));
+                    network_background_callback, affinity_data,
+                    max_background_threads, max_idle_loop_count,
+                    max_busy_loop_count));
             return pool;
         });
 
@@ -308,7 +312,10 @@ int main(int argc, char* argv[])
                 hpx::threads::detail::network_background_callback_type const&
                     network_background_callback,
                 hpx::threads::policies::detail::affinity_data const&
-                    affinity_data)
+                    affinity_data,
+                std::size_t max_background_threads,
+                std::size_t max_idle_loop_count,
+                std::size_t max_busy_loop_count)
                 -> std::unique_ptr<hpx::threads::thread_pool_base> {
                 std::cout << "User defined scheduler creation callback "
                           << std::endl;
@@ -324,7 +331,9 @@ int main(int argc, char* argv[])
                     new hpx::threads::detail::scheduled_thread_pool<
                         high_priority_sched>(std::move(scheduler), notifier,
                         pool_index, pool_name, mode, thread_offset,
-                        network_background_callback, affinity_data));
+                        network_background_callback, affinity_data,
+                        max_background_threads, max_idle_loop_count,
+                        max_busy_loop_count));
                 return pool;
             });
 
