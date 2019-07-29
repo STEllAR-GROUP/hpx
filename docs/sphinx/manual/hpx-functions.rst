@@ -4,19 +4,19 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-.. _HPX Functions:
+.. _hpx_functions:
 
 =============
-HPX Functions
+|hpx| functions
 =============
 
 This document describes the prototypes, the allowable arguments of the listed
-HPX functions.
+|hpx| functions.
 
 async
 =====
 
-``async`` in C++ allows running the function f asynchronously and returns a
+``hpx::async`` allows running the function ``f`` asynchronously and returns a
 ``hpx::future`` having the result of that function call.
 
 ``hpx::async`` calls a function f with arguments args as per launch policy. You can
@@ -51,7 +51,7 @@ You can chain multiple async operations. For implementing chain async programmin
 Using then function will avoid blocking waits or wasting threads on polling. Future
 can have then chained implementations. With then the antecedent future is ready
 (has a value or exception stored) before the continuation starts as instructed
-by lambda function. Example implementation using hpx is
+by lambda function. Example implementation using |hpx| is
 
 .. literalinclude:: ../../examples/then.cpp
 
@@ -64,7 +64,7 @@ wait
 
 ``hpx::future<T>::wait`` blocks the function implementation until the call is
 available. This function call can be checked using ``valid() == true``. Example
-implementation using hpx is
+implementation using |hpx| is
 
 .. literalinclude:: ../../examples/wait.cpp
 
