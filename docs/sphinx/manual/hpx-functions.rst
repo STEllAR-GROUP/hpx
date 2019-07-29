@@ -19,36 +19,45 @@ async
 ``async`` in C++ allows running the function f asynchronously and returns a
 ``hpx::future`` having the result of that function call.
 
-``async`` calls a function f with arguments args as per launch policy. You can
+``hpx::async`` calls a function f with arguments args as per launch policy. You can
 have async flag set or deferred flag set.
 
-Implementing async functions should have input parameters as
+Implementing ``hpx::async`` functions should have input parameters as
 
 - Function/Function Object/Lambda
 - Executor function
 - Launch policy
 
-return value is ``hpx::future``.
+``hpx::async`` functions return value is ``hpx::future``.
 
-.. literalinclude:: ../../examples/async.cpp
+.. literalinclude:: ../../examples/hpx_functions/async.cpp
 
-You can chain multiple async operations. For implementing chain async programming
-``objFuture.then(...).then(...).then(...).then(...).then(...)``.
-
-Throws ``hpx::system_error`` with error condition ``hpx::errc::resource_unavailable_try_again`` if the launch policy equals ``hpx::launch::async`` and the implementation is unable to start a new thread (if the policy is async|deferred or has additional bits set, it will fall back to deferred or the implementation-defined policies in this case), or ``hpx::bad_alloc`` if memory for the internal data structures could not be allocated.
+Throws ``hpx::system_error`` with error condition
+``hpx::errc::resource_unavailable_try_again`` if the launch policy equals
+``hpx::launch::async`` and the implementation is unable to start a new thread
+(if the policy is async|deferred or has additional bits set, it will fall back
+to deferred or the implementation-defined policies in this case), or
+``hpx::bad_alloc`` if memory for the internal data structures could not be
+allocated.
 
 then
 ====
 
-then in asychronous programming is used in chained async implementations. Using
-then function will avoid blocking waits or wasting threads on polling. Future
+``then`` in asychronous programming is used in chained async implementations.
+
+You can chain multiple async operations. For implementing chain async programming
+``objFuture.then(...).then(...).then(...).then(...).then(...)``.
+
+Using then function will avoid blocking waits or wasting threads on polling. Future
 can have then chained implementations. With then the antecedent future is ready
 (has a value or exception stored) before the continuation starts as instructed
 by lambda function. Example implementation using hpx is
 
 .. literalinclude:: ../../examples/then.cpp
 
-If implicit unwrapping takes place and the continuation returns an invalid future, then the shared state is made ready with an exception of type ``hpx::future_error`` with an error condition of ``hpx::future_errc::broken_promise``.
+If implicit unwrapping takes place and the continuation returns an invalid future,
+then the shared state is made ready with an exception of type ``hpx::future_error``
+with an error condition of ``hpx::future_errc::broken_promise``.
 
 wait
 ====
