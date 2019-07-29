@@ -14,7 +14,7 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view_iterator.hpp>
 #include <hpx/lcos/spmd_block.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 
 #include <array>
 #include <cstddef>

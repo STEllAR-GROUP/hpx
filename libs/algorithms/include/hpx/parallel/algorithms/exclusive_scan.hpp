@@ -10,7 +10,7 @@
 #define HPX_PARALLEL_ALGORITHM_EXCLUSIVE_SCAN_DEC_30_2014_1236PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unwrap.hpp>
 #include <hpx/util/zip_iterator.hpp>
@@ -23,7 +23,7 @@
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>

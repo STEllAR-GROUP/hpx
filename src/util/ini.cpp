@@ -30,7 +30,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>

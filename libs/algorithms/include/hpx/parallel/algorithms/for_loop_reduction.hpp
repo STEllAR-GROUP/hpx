@@ -12,7 +12,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/util/cache_aligned_data.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>

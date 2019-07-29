@@ -36,7 +36,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>

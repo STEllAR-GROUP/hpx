@@ -71,13 +71,15 @@ set({lib_name}_sources)
 
 include(HPX_AddModule)
 add_hpx_module({lib_name}
-    DEPRECATION_WARNINGS
-    COMPATIBILITY_HEADERS OFF
-    SOURCES ${{{lib_name}_sources}}
-    HEADERS ${{{lib_name}_headers}}
-    COMPAT_HEADERS ${{{lib_name}_compat_headers}}
-    DEPENDENCIES
-    CMAKE_SUBDIRS examples tests
+  COMPATIBILITY_HEADERS OFF
+  DEPRECATION_WARNINGS
+  FORCE_LINKING_GEN
+  GLOBAL_HEADER_GEN OFF
+  SOURCES ${{{lib_name}_sources}}
+  HEADERS ${{{lib_name}_headers}}
+  COMPAT_HEADERS ${{{lib_name}_compat_headers}}
+  DEPENDENCIES
+  CMAKE_SUBDIRS examples tests
 )
 '''
 
@@ -127,7 +129,7 @@ if (HPX_WITH_TESTS_HEADERS)
     modules.{lib_name}
     HEADERS ${{{lib_name}_headers}}
     HEADER_ROOT ${{PROJECT_SOURCE_DIR}}/include
-    NOHPX_INIT NOLIBS
+    NOLIBS
     DEPENDENCIES hpx_{lib_name})
 endif()
 '''

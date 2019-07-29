@@ -9,8 +9,8 @@
 #define HPX_PARALLEL_DETAIL_EQUAL_JUL_06_2014_0848PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/range.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -19,7 +19,7 @@
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -5,9 +5,9 @@
 
 #include "worker_timed.hpp"
 
-#include <hpx/util/barrier.hpp>
 #include <hpx/format.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/util/barrier.hpp>
 
 #include <chrono>
 #include <cstdint>

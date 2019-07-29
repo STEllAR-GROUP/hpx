@@ -11,9 +11,9 @@
 #define HPX_F0153C92_99B1_4F31_8FA9_4208DB2F26CE
 
 #include <hpx/config.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cmath>
 #include <cstddef>

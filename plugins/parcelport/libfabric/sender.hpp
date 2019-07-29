@@ -17,7 +17,7 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/container/small_vector.hpp>

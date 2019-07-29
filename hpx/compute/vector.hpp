@@ -15,7 +15,7 @@
 #include <hpx/compute/traits/allocator_traits.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/runtime/report_error.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 
 #include <cstddef>
 #include <initializer_list>

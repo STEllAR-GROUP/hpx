@@ -9,7 +9,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/config_entry.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/register_locks.hpp>
 
 #include <map>

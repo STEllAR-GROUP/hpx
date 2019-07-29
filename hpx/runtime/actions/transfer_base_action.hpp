@@ -29,7 +29,7 @@
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/serialize_exception.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif

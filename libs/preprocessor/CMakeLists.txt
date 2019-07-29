@@ -33,7 +33,7 @@ set(preprocessor_sources
 
 include(HPX_AddModule)
 add_hpx_module(preprocessor
-    COMPATIBILITY_HEADERS OFF
+    COMPATIBILITY_HEADERS ON
     DEPRECATION_WARNINGS
     FORCE_LINKING_GEN
     SOURCES ${preprocessor_sources}

@@ -10,7 +10,7 @@
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 
 #include <cstdint>
 

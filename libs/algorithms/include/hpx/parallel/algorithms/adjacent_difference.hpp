@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_ALGORITHM_ADJACENT_DIF_JUL_15
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -17,7 +17,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>

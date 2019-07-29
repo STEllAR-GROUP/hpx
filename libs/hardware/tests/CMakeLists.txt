@@ -39,6 +39,6 @@ if (HPX_WITH_TESTS_HEADERS)
     "hardware/timestamp/linux_x86_64.hpp"
     "hardware/timestamp/linux_generic.hpp"
     "hardware/timestamp/bgq.hpp"
-    NOHPX_INIT NOLIBS
+    NOLIBS
     DEPENDENCIES hpx_hardware)
 endif()

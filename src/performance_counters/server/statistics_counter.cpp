@@ -4,14 +4,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/format.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/bind_front.hpp>
-#include <hpx/format.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/unlock_guard.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
@@ -26,8 +26,8 @@
 #include <boost/accumulators/statistics/rolling_mean.hpp>
 #include <boost/accumulators/statistics/rolling_variance.hpp>
 
-#include <hpx/util/rolling_min.hpp>
-#include <hpx/util/rolling_max.hpp>
+#include <hpx/statistics/rolling_min.hpp>
+#include <hpx/statistics/rolling_max.hpp>
 
 #if defined(HPX_MSVC)
 #  pragma warning(push)

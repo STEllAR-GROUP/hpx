@@ -9,8 +9,8 @@
 #define HPX_PARALLEL_DETAIL_REDUCE_JUN_01_2014_0903AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <hpx/parallel/algorithms/detail/accumulate.hpp>

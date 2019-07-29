@@ -9,9 +9,9 @@
 #define HPX_PARALLEL_ALGORITHM_TRANSFORM_INCLUSIVE_SCAN_JAN_04_2015_0556PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/traits/is_callable.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
 
@@ -22,7 +22,7 @@
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>

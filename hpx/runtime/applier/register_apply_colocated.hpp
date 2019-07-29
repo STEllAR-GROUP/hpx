@@ -11,7 +11,7 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/util/unique_function.hpp>
 
 namespace hpx { namespace detail

@@ -13,7 +13,7 @@
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels

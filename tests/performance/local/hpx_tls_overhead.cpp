@@ -6,8 +6,8 @@
 #include <hpx/config.hpp>
 
 #include <hpx/format.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/thread_support/thread_specific_ptr.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 
 #include <boost/config.hpp>
 #include <boost/program_options.hpp>

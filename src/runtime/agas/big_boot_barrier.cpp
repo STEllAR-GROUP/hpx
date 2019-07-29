@@ -31,10 +31,10 @@
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/format.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>

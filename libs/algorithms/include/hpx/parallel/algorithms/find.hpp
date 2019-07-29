@@ -10,7 +10,7 @@
 #define HPX_PARALLEL_DETAIL_FIND_JULY_16_2014_0213PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

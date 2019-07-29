@@ -10,19 +10,19 @@
 #define HPX_PARALLEL_ALGORITHM_FOR_LOOP_MAR_02_2016_1256PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
+#include <hpx/concepts/concepts.hpp>
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
 #endif
 #include <hpx/assertion.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>

@@ -7,7 +7,7 @@
 #define HPX_TRAITS_IS_VALID_ACTION_JUN_28_2015_0133PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <type_traits>
 

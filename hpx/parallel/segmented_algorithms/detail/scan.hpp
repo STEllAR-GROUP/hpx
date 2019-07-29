@@ -11,13 +11,13 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/unwrap.hpp>
-#include <hpx/util/void_guard.hpp>
+#include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>

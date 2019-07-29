@@ -14,7 +14,7 @@
 #include <hpx/runtime/threads/run_as_hpx_thread.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

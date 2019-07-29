@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/void_guard.hpp>
+#include <hpx/type_support/void_guard.hpp>
 
 #include <boost/ref.hpp>
 

@@ -9,9 +9,9 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_FOR_EACH_JUL_18_2015_0959AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
-#include <hpx/traits/is_range.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/iterator_support/is_range.hpp>
+#include <hpx/iterator_support/range.hpp>
 
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>

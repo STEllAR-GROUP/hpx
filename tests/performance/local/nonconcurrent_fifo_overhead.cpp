@@ -12,8 +12,8 @@
 #define HPX_USE_BOOST_ASSERT
 
 #include <hpx/format.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/barrier.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/lockfree/queue.hpp>
 #include <boost/program_options.hpp>

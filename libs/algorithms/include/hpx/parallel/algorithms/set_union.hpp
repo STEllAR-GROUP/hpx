@@ -9,8 +9,8 @@
 #define HPX_PARALLEL_ALGORITHM_SET_UNION_MAR_06_2015_1028AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

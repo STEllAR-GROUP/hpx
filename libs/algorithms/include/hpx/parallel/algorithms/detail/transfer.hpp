@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_ALGORITHMS_TRANSFER)
 #define HPX_PARALLEL_ALGORITHMS_TRANSFER
 
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #endif

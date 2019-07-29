@@ -67,8 +67,8 @@ ConstructorInitializerIndentWidth: 2
 ContinuationIndentWidth: 4
 Cpp11BracedListStyle: true
 DerivePointerAlignment: false
-ExperimentalAutoDetectBinPacking: true
-FixNamespaceComments: false
+#ExperimentalAutoDetectBinPacking: true # Do weird reformatting
+FixNamespaceComments: true
 # ForEachMacros: ['']
 IncludeCategories:
   - Regex:           '^<hpx/config\.hpp>'

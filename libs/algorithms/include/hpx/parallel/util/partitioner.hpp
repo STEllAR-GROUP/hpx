@@ -13,9 +13,9 @@
 #endif
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/util/range.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/iterator_support/range.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>

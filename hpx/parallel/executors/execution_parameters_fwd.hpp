@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/traits/executor_traits.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <cstddef>
 #include <utility>

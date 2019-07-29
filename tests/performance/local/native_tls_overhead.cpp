@@ -6,8 +6,8 @@
 #include <hpx/config.hpp>
 
 #include <hpx/format.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/barrier.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/config.hpp>
 #include <boost/thread/tss.hpp>

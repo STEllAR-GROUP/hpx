@@ -9,17 +9,17 @@
 #define HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
+#include <hpx/concepts/concepts.hpp>
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
 #endif
 #include <hpx/traits/is_callable.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/identity.hpp>
+#include <hpx/type_support/identity.hpp>
 #include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

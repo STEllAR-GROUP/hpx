@@ -54,8 +54,8 @@ namespace hpx { namespace assertion {
 #define HPX_ASSERT_(expr, msg)                                                 \
     ::hpx::assertion::detail::evaluate_assert(                                 \
         [&]() -> bool { return !!(expr); },                                    \
-        ::hpx::assertion::source_location{                                     \
-            __FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION},                  \
+        ::hpx::assertion::source_location{__FILE__,                            \
+            static_cast<unsigned>(__LINE__), HPX_ASSERT_CURRENT_FUNCTION},     \
         HPX_PP_STRINGIZE(expr), [&]() { return msg; });                        \
 /**/
 

@@ -9,12 +9,12 @@
 #define HPX_PARALLEL_ALGORITHM_TRANSFORM_EXCLUSIVE_SCAN_JAN_04_2015_0354PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/traits/is_callable.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>

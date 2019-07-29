@@ -11,6 +11,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/exception_info.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -18,9 +19,8 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/logging.hpp>
 
 #include <boost/exception/exception.hpp>
 

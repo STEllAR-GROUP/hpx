@@ -9,8 +9,8 @@
 #define HPX_COMPUTE_ALLOCATOR_TRAITS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits/detail/wrap_int.hpp>
-#include <hpx/util/always_void.hpp>
+#include <hpx/type_support/detail/wrap_int.hpp>
+#include <hpx/type_support/always_void.hpp>
 
 #include <hpx/compute/host/target.hpp>
 #include <hpx/compute/host/traits/access_target.hpp>

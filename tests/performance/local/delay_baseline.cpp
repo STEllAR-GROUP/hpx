@@ -8,7 +8,7 @@
 #include "worker_timed.hpp"
 
 #include <hpx/format.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 
 #include <chrono>
 #include <cstdint>

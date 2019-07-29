@@ -7,7 +7,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/util/transform_iterator.hpp>
 #include <hpx/util/zip_iterator.hpp>
 

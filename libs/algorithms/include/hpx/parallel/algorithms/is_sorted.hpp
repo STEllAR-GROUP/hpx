@@ -9,9 +9,9 @@
 #define HPX_PARALLEL_ALGORITHMS_IS_SORTED_FEB_9_2015_0331PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/range.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -19,7 +19,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>

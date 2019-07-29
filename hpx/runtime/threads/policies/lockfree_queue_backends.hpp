@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
+//  Copyright (c) 2019 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +11,11 @@
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
 #include <hpx/util/lockfree/deque.hpp>
+#else
+#include <boost/lockfree/queue.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -19,13 +24,14 @@ namespace hpx { namespace threads { namespace policies
 {
 
 struct lockfree_fifo;
-struct lockfree_lifo;
 
+///////////////////////////////////////////////////////////////////////////////
 // FIFO
 template <typename T>
 struct lockfree_fifo_backend
 {
-    typedef boost::lockfree::deque<T> container_type;
+    typedef boost::lockfree::queue<T> container_type;
+
     typedef T value_type;
     typedef T& reference;
     typedef T const& const_reference;
@@ -40,12 +46,12 @@ struct lockfree_fifo_backend
 
     bool push(const_reference val, bool /*other_end*/ = false)
     {
-        return queue_.push_left(val);
+        return queue_.push(val);
     }
 
     bool pop(reference val, bool steal = true)
     {
-        return queue_.pop_right(val);
+        return queue_.pop(val);
     }
 
     bool empty()
@@ -66,11 +72,16 @@ struct lockfree_fifo
     };
 };
 
+///////////////////////////////////////////////////////////////////////////////
 // LIFO
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+struct lockfree_lifo;
+
 template <typename T>
 struct lockfree_lifo_backend
 {
     typedef boost::lockfree::deque<T> container_type;
+
     typedef T value_type;
     typedef T& reference;
     typedef T const& const_reference;
@@ -218,6 +229,7 @@ struct lockfree_abp_lifo
 };
 
 #endif // HPX_HAVE_ABP_SCHEDULER
+#endif // HPX_HAVE_CXX11_STD_ATOMIC_128BIT
 
 }}}
 

@@ -7,7 +7,7 @@
 #define HPX_TRAITS_PROMISE_LOCAL_RESULT_OCT_27_2011_0416PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 namespace hpx { namespace traits
 {

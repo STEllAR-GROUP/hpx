@@ -6,12 +6,12 @@
 
 // TODO: Update
 
+#include <hpx/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/format.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>

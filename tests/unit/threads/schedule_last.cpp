@@ -75,6 +75,7 @@ void test_scheduler(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
     {
         using scheduler_type =
             hpx::threads::policies::local_priority_queue_scheduler<
@@ -82,6 +83,7 @@ int main(int argc, char* argv[])
             >;
         test_scheduler<scheduler_type>(argc, argv);
     }
+#endif
 
     {
         using scheduler_type =
@@ -91,7 +93,7 @@ int main(int argc, char* argv[])
         test_scheduler<scheduler_type>(argc, argv);
     }
 
-#if defined(HPX_HAVE_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER) && defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
     {
         using scheduler_type =
             hpx::threads::policies::local_priority_queue_scheduler<

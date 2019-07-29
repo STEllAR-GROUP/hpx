@@ -22,7 +22,7 @@
 #include <hpx/traits/is_valid_action.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/bind_back.hpp>
-#include <hpx/util/lazy_enable_if.hpp>
+#include <hpx/type_support/lazy_enable_if.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -155,8 +155,8 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/util/bind_back.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <mutex>

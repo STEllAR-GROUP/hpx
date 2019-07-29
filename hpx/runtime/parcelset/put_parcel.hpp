@@ -24,7 +24,7 @@
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <memory>

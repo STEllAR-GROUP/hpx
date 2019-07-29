@@ -10,7 +10,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unique_function.hpp>
 

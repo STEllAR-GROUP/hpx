@@ -11,10 +11,10 @@
 #include <hpx/parallel/executors/timed_execution_fwd.hpp>
 
 #include <hpx/lcos/future.hpp>
-#include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/util/steady_clock.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/timed_executors.hpp>

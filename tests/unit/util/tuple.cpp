@@ -19,7 +19,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/testing.hpp>
 
 #if defined(__clang__)

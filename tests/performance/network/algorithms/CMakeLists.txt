@@ -5,6 +5,7 @@
 
 set(benchmarks
     minmax_element_performance)
+  set(minmax_element_performance_FLAGS DEPENDENCIES hpx_timing)
 
 foreach(benchmark ${benchmarks})
 
