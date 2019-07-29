@@ -37,6 +37,5 @@ if (HPX_WITH_TESTS_HEADERS)
     modules.segmented_algorithms
     HEADERS ${segmented_algorithms_headers}
     HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-    NOHPX_INIT NOLIBS
     DEPENDENCIES hpx_segmented_algorithms)
 endif()

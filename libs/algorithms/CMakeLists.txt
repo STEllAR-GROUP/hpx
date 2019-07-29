@@ -124,6 +124,6 @@ add_hpx_module(algorithms
     # TODO: Really depends on main HPX library, but cannot add that as a
     # dependency yet. Need to have the parts that algorithms depends on in
     # separate modules first.
-    DEPENDENCIES hpx_assertion hpx_config hpx_timing
+    DEPENDENCIES hpx_assertion hpx_config hpx_iterator_support hpx_timing
     CMAKE_SUBDIRS examples tests
 )
