@@ -231,10 +231,10 @@ namespace lcos {
 
         /// \brief     atomically stores the value r in the shared state and makes
         ///            that state ready (30.6.4).
-				///
-				/// \throws    future_error if [... as before ...] exception. The error code
-				///            is set to promise_already_satisfied if its shared state already
-				///            has a stored value or exception.
+        ///
+        /// \throws    future_error if [... as before ...] exception. The error code
+        ///            is set to promise_already_satisfied if its shared state already
+        ///            has a stored value or exception.
         ///            The error code is set to no_state if *this has no shared state.
         void set_value()
         {
