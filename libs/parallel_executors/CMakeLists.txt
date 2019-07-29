@@ -61,6 +61,11 @@ set(parallel_executors_headers
   hpx/parallel/traits/vector_pack_count_bits.hpp
   hpx/parallel/traits/vector_pack_load_store.hpp
   hpx/parallel/traits/vector_pack_type.hpp
+  hpx/traits/executor_traits.hpp
+  hpx/traits/is_execution_policy.hpp
+  hpx/traits/is_executor.hpp
+  hpx/traits/is_executor_parameters.hpp
+  hpx/traits/is_timed_executor.hpp
 )
 
 include(HPX_AddModule)
