@@ -266,7 +266,7 @@ jobs:
               # NOTE: transpose_block_numa is disabled because
               # hwloc_get_area_membind_nodeset (which is used by the
               # numa_allocator) fails with EPERM.
-              ctest -T test --no-compress-output --output-on-failure \
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure \
                   -R tests.examples \
                   -E tests.examples.transpose.transpose_block_numa
       - run:
@@ -294,7 +294,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.actions
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.actions
       - run:
           <<: *convert_xml
       - run:
@@ -320,7 +320,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.agas
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.agas
       - run:
           <<: *convert_xml
       - run:
@@ -352,7 +352,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.build
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.build
       - run:
           <<: *convert_xml
       - run:
@@ -378,7 +378,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.component
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.component
       - run:
           <<: *convert_xml
       - run:
@@ -404,7 +404,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.computeapi
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.computeapi
       - run:
           <<: *convert_xml
       - run:
@@ -430,7 +430,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.diagnostics
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.diagnostics
       - run:
           <<: *convert_xml
       - run:
@@ -456,7 +456,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.lcos
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.lcos
       - run:
           <<: *convert_xml
       - run:
@@ -482,7 +482,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel_block
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.parallel_block
       - run:
           <<: *convert_xml
       - run:
@@ -508,7 +508,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parcelset
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.parcelset
       - run:
           <<: *convert_xml
       - run:
@@ -534,7 +534,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.performance_counter
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.performance_counter
       - run:
           <<: *convert_xml
       - run:
@@ -560,7 +560,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.resource
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.resource
       - run:
           <<: *convert_xml
       - run:
@@ -586,7 +586,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.serialization
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.serialization
       - run:
           <<: *convert_xml
       - run:
@@ -612,7 +612,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.threads
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.threads
       - run:
           <<: *convert_xml
       - run:
@@ -638,7 +638,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure \
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure \
                   -R tests.unit.topology \
                   -E tests.unit.topology.numa_allocator
       - run:
@@ -666,7 +666,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.traits
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.traits
       - run:
           <<: *convert_xml
       - run:
@@ -692,7 +692,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.util
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.util
       - run:
           <<: *convert_xml
       - run:
@@ -735,24 +735,24 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.allocator_support
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.assertion
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.concepts
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.datastructures
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.format
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.hardware
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.hashing
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.iterator_support
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.logging
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.statistics
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.testing
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.type_support
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.util
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.allocator_support
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.assertion
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.concepts
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.datastructures
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.format
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.hardware
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.hashing
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.iterator_support
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.logging
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.statistics
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.testing
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.type_support
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.util
       - run:
           <<: *convert_xml
       - run:
@@ -778,7 +778,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.algorithms
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.algorithms
       - run:
           <<: *convert_xml
       - run:
@@ -804,7 +804,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.parallel_executors
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.parallel_executors
       - run:
           <<: *convert_xml
       - run:
@@ -832,7 +832,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.segmented_algorithms
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.segmented_algorithms
       - run:
           <<: *convert_xml
       - run:
@@ -857,7 +857,7 @@ jobs:
           name: Running Regressions Tests
           when: always
           command: |
-              ctest -T test --no-compress-output --output-on-failure -R tests.regressions
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.regressions
       - run:
           <<: *convert_xml
       - run:
@@ -877,7 +877,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers
+              ctest --timeout 60 -j2 -T test --no-compress-output --output-on-failure -R tests.headers
       - run:
           <<: *convert_xml
       - store_test_results:
