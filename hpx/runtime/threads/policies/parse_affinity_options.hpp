@@ -12,8 +12,8 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <boost/variant.hpp>
 

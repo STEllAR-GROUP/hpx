@@ -5,12 +5,12 @@
 
 #include <hpx/runtime/threads/policies/parse_affinity_options.hpp>
 
+#include <hpx/assertion.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/error_code.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/format.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/format.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/throw_exception.hpp>
 
 #include <hwloc.h>
 

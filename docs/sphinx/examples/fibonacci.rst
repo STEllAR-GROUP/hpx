@@ -92,7 +92,7 @@ send packets of work to different processing units. These vehicles allow users
 to calculate work now, later, or on certain nodes. The first argument to our
 :term:`action` is the location where the :term:`action` should be run. In this
 case, we just want to run the :term:`action` on the machine that we are
-currently on, so we use :cpp:func:`hpx::find_here` that we wish to calculate. To
+currently on, so we use :cpp:func:`hpx::find_here`. To
 further understand this we turn to the code to find where ``fibonacci_action``
 was defined:
 

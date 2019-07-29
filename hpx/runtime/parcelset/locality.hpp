@@ -10,12 +10,12 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/map.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 
 #include <map>
 #include <memory>

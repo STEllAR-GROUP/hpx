@@ -108,8 +108,8 @@ wrapped in the action above:
    :lines: 66-119
 
 Now, before we discuss ``hello_world_foreman()``, let's talk about the
-:cpp:func:`hpx::wait_each()` function. :cpp:func:`hpx::lcos::wait_each` for each
-one. The version of :cpp:func:`hpx::lcos::wait_each` invokes a callback function
+:cpp:func:`hpx::wait_each()` function.
+The version of :cpp:func:`hpx::lcos::wait_each` invokes a callback function
 provided by the user, supplying the callback function with the result of the
 future.
 

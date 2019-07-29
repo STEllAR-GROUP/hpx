@@ -8,10 +8,8 @@
 #define HPX_SCHEDULED_THREAD_POOL_IMPL_HPP
 
 #include <hpx/apply.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
-#include <hpx/compat/barrier.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/exception_info.hpp>
 #include <hpx/lcos/future.hpp>
@@ -28,26 +26,29 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/state.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/util/barrier.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <boost/system/system_error.hpp>
 
 #include <algorithm>
 #include <atomic>
-#include <numeric>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <functional>
 #include <iosfwd>
 #include <memory>
+#include <mutex>
+#include <numeric>
 #include <string>
+#include <thread>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -219,7 +220,7 @@ namespace hpx { namespace threads { namespace detail
 
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::stop(
-        std::unique_lock<compat::mutex>& l, bool blocking)
+        std::unique_lock<std::mutex>& l, bool blocking)
     {
         HPX_ASSERT(l.owns_lock());
         return stop_locked(l, blocking);
@@ -227,7 +228,7 @@ namespace hpx { namespace threads { namespace detail
 
     template <typename Scheduler>
     bool hpx::threads::detail::scheduled_thread_pool<Scheduler>::run(
-        std::unique_lock<compat::mutex>& l, std::size_t pool_threads)
+        std::unique_lock<std::mutex>& l, std::size_t pool_threads)
     {
         HPX_ASSERT(l.owns_lock());
 
@@ -259,8 +260,8 @@ namespace hpx { namespace threads { namespace detail
 
         // run threads and wait for initialization to complete
         std::size_t thread_num = 0;
-        std::shared_ptr<compat::barrier> startup =
-            std::make_shared<compat::barrier>(pool_threads + 1);
+        std::shared_ptr<util::barrier> startup =
+            std::make_shared<util::barrier>(pool_threads + 1);
         try
         {
             auto const& rp = resource::get_partitioner();
@@ -378,7 +379,7 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            compat::thread(std::move(resume_internal_wrapper)).detach();
+            std::thread(std::move(resume_internal_wrapper)).detach();
         }
     }
 
@@ -470,7 +471,7 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            compat::thread(std::move(suspend_internal_wrapper)).detach();
+            std::thread(std::move(suspend_internal_wrapper)).detach();
         }
     }
 
@@ -491,7 +492,7 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     void hpx::threads::detail::scheduled_thread_pool<Scheduler>::thread_func(
         std::size_t thread_num, std::size_t global_thread_num,
-        std::shared_ptr<compat::barrier> startup)
+        std::shared_ptr<util::barrier> startup)
     {
         auto const& rp = resource::get_partitioner();
         topology const& topo = rp.get_topology();
@@ -551,6 +552,7 @@ namespace hpx { namespace threads { namespace detail
             sched_->Scheduler::get_state(thread_num);
         hpx::state oldstate = state.exchange(state_running);
         HPX_ASSERT(oldstate <= state_running);
+        HPX_UNUSED(oldstate);
 
         // wait for all threads to start up before before starting HPX work
         startup->wait();
@@ -582,7 +584,9 @@ namespace hpx { namespace threads { namespace detail
                     counter_data.busy_loop_counts_,
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
                     counter_data.tasks_active_,
-                    counter_data.background_duration_);
+                    counter_data.background_duration_,
+                    counter_data.background_send_duration_,
+                    counter_data.background_receive_duration_);
 #else
                     counter_data.tasks_active_);
 #endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
@@ -595,9 +599,17 @@ namespace hpx { namespace threads { namespace detail
 
                 if (mode_ & policies::do_background_work)
                 {
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+                    callbacks.background_ = util::deferred_call(    //-V107
+                        &policies::scheduler_base::background_callback,
+                        sched_.get(), global_thread_num,
+                        std::ref(counter_data.background_send_duration_),
+                        std::ref(counter_data.background_receive_duration_));
+#else
                     callbacks.background_ = util::deferred_call(    //-V107
                         &policies::scheduler_base::background_callback,
                         sched_.get(), global_thread_num);
+#endif
                 }
 
                 sched_->Scheduler::set_scheduler_mode(mode_);
@@ -854,7 +866,6 @@ namespace hpx { namespace threads { namespace detail
 
         return executed_phases - reset_executed_phases;
     }
-#endif
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
     template <typename Scheduler>
@@ -1279,8 +1290,8 @@ namespace hpx { namespace threads { namespace detail
         return std::int64_t(
             (double(tfunc_total) - double(exec_total)) * timestamp_scale_);
     }
-#endif
-#endif
+#endif // HPX_HAVE_THREAD_IDLE_RATES
+#endif // HPX_HAVE_THREAD_CUMULATIVE_COUNTS
 
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
     ////////////////////////////////////////////////////////////
@@ -1381,6 +1392,224 @@ namespace hpx { namespace threads { namespace detail
                     counter_data_.begin(),
                     &scheduling_counter_data::background_duration_,
                     &scheduling_counter_data::reset_background_duration_);
+            }
+        }
+
+        HPX_ASSERT(bg_total >= reset_bg_total);
+        bg_total -= reset_bg_total;
+        return std::int64_t(double(bg_total) * timestamp_scale_);
+    }
+
+    ////////////////////////////////////////////////////////////
+    template <typename Scheduler>
+    std::int64_t scheduled_thread_pool<Scheduler>::get_background_send_overhead(
+        std::size_t num, bool reset)
+    {
+        std::int64_t bg_total = 0;
+        std::int64_t reset_bg_total = 0;
+        std::int64_t tfunc_total = 0;
+        std::int64_t reset_tfunc_total = 0;
+
+        if (num != std::size_t(-1))
+        {
+            tfunc_total = counter_data_[num].tfunc_times_;
+            reset_tfunc_total = counter_data_[num].reset_background_send_tfunc_times_;
+
+            bg_total = counter_data_[num].background_send_duration_;
+            reset_bg_total = counter_data_[num].reset_background_send_overhead_;
+
+            if (reset)
+            {
+                counter_data_[num].reset_background_send_overhead_ = bg_total;
+                counter_data_[num].reset_background_send_tfunc_times_ = tfunc_total;
+            }
+        }
+        else
+        {
+            tfunc_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::tfunc_times_);
+            reset_tfunc_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::reset_background_send_tfunc_times_);
+
+            bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::background_send_duration_);
+            reset_bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::reset_background_send_overhead_);
+
+            if (reset)
+            {
+                copy_projected(counter_data_.begin(), counter_data_.end(),
+                    counter_data_.begin(),
+                    &scheduling_counter_data::tfunc_times_,
+                    &scheduling_counter_data::reset_background_send_tfunc_times_);
+                copy_projected(counter_data_.begin(), counter_data_.end(),
+                    counter_data_.begin(),
+                    &scheduling_counter_data::background_send_duration_,
+                    &scheduling_counter_data::reset_background_send_overhead_);
+            }
+        }
+
+        HPX_ASSERT(bg_total >= reset_bg_total);
+        HPX_ASSERT(tfunc_total >= reset_tfunc_total);
+
+        if (tfunc_total == 0)    // avoid division by zero
+            return 1000LL;
+
+        tfunc_total -= reset_tfunc_total;
+        bg_total -= reset_bg_total;
+
+        // this is now a 0.1 %
+        return std::int64_t((double(bg_total) / tfunc_total) * 1000);
+    }
+
+    template <typename Scheduler>
+    std::int64_t scheduled_thread_pool<Scheduler>::get_background_send_duration(
+        std::size_t num, bool reset)
+    {
+        std::int64_t bg_total = 0;
+        std::int64_t reset_bg_total = 0;
+
+        if (num != std::size_t(-1))
+        {
+            bg_total = counter_data_[num].background_send_duration_;
+            reset_bg_total = counter_data_[num].reset_background_send_duration_;
+
+            if (reset)
+            {
+                counter_data_[num].reset_background_send_duration_ = bg_total;
+            }
+        }
+        else
+        {
+            bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::background_send_duration_);
+            reset_bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::reset_background_send_duration_);
+
+            if (reset)
+            {
+                copy_projected(counter_data_.begin(), counter_data_.end(),
+                    counter_data_.begin(),
+                    &scheduling_counter_data::background_send_duration_,
+                    &scheduling_counter_data::reset_background_send_duration_);
+            }
+        }
+
+        HPX_ASSERT(bg_total >= reset_bg_total);
+        bg_total -= reset_bg_total;
+        return std::int64_t(double(bg_total) * timestamp_scale_);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename Scheduler>
+    std::int64_t
+    scheduled_thread_pool<Scheduler>::get_background_receive_overhead(
+        std::size_t num, bool reset)
+    {
+        std::int64_t bg_total = 0;
+        std::int64_t reset_bg_total = 0;
+        std::int64_t tfunc_total = 0;
+        std::int64_t reset_tfunc_total = 0;
+
+        if (num != std::size_t(-1))
+        {
+            tfunc_total = counter_data_[num].tfunc_times_;
+            reset_tfunc_total =
+                counter_data_[num].reset_background_receive_tfunc_times_;
+
+            bg_total = counter_data_[num].background_receive_duration_;
+            reset_bg_total =
+                counter_data_[num].reset_background_receive_overhead_;
+
+            if (reset)
+            {
+                counter_data_[num].reset_background_receive_overhead_ =
+                    bg_total;
+                counter_data_[num].reset_background_receive_tfunc_times_ =
+                    tfunc_total;
+            }
+        }
+        else
+        {
+            tfunc_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::tfunc_times_);
+            reset_tfunc_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::reset_background_receive_tfunc_times_);
+
+            bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::background_receive_duration_);
+            reset_bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::reset_background_receive_overhead_);
+
+            if (reset)
+            {
+                copy_projected(counter_data_.begin(), counter_data_.end(),
+                    counter_data_.begin(),
+                    &scheduling_counter_data::tfunc_times_,
+                    &scheduling_counter_data::reset_background_receive_tfunc_times_);
+                copy_projected(counter_data_.begin(), counter_data_.end(),
+                    counter_data_.begin(),
+                    &scheduling_counter_data::background_receive_duration_,
+                    &scheduling_counter_data::reset_background_receive_overhead_);
+            }
+        }
+
+        HPX_ASSERT(bg_total >= reset_bg_total);
+        HPX_ASSERT(tfunc_total >= reset_tfunc_total);
+
+        if (tfunc_total == 0)    // avoid division by zero
+            return 1000LL;
+
+        tfunc_total -= reset_tfunc_total;
+        bg_total -= reset_bg_total;
+
+        // this is now a 0.1 %
+        return std::int64_t((double(bg_total) / tfunc_total) * 1000);
+    }
+
+    template <typename Scheduler>
+    std::int64_t
+    scheduled_thread_pool<Scheduler>::get_background_receive_duration(
+        std::size_t num, bool reset)
+    {
+        std::int64_t bg_total = 0;
+        std::int64_t reset_bg_total = 0;
+
+        if (num != std::size_t(-1))
+        {
+            bg_total = counter_data_[num].background_receive_duration_;
+            reset_bg_total = counter_data_[num].reset_background_receive_duration_;
+
+            if (reset)
+            {
+                counter_data_[num].reset_background_receive_duration_ = bg_total;
+            }
+        }
+        else
+        {
+            bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::background_receive_duration_);
+            reset_bg_total = accumulate_projected(counter_data_.begin(),
+                counter_data_.end(), std::int64_t(0),
+                &scheduling_counter_data::reset_background_receive_duration_);
+
+            if (reset)
+            {
+                copy_projected(counter_data_.begin(), counter_data_.end(),
+                    counter_data_.begin(),
+                    &scheduling_counter_data::background_receive_duration_,
+                    &scheduling_counter_data::reset_background_receive_duration_);
             }
         }
 
@@ -1530,7 +1759,7 @@ namespace hpx { namespace threads { namespace detail
             (cleanup_total / double(tfunc_total - exec_total));
         return std::int64_t(10000. * percent);    // 0.01 percent
     }
-#endif
+#endif // HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
 
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::avg_idle_rate_all(bool reset)
@@ -1612,7 +1841,7 @@ namespace hpx { namespace threads { namespace detail
             1. - (double(exec_time) / double(tfunc_time));
         return std::int64_t(10000. * percent);    // 0.01 percent
     }
-#endif
+#endif // HPX_HAVE_THREAD_IDLE_RATES
 
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::get_idle_loop_count(
@@ -1704,7 +1933,7 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::add_processing_unit_internal(
         std::size_t virt_core, std::size_t thread_num,
-        std::shared_ptr<compat::barrier> startup, error_code& ec)
+        std::shared_ptr<util::barrier> startup, error_code& ec)
     {
         std::unique_lock<typename Scheduler::pu_mutex_type>
             l(sched_->Scheduler::get_pu_mutex(virt_core));
@@ -1728,9 +1957,10 @@ namespace hpx { namespace threads { namespace detail
             sched_->Scheduler::get_state(virt_core);
         hpx::state oldstate = state.exchange(state_initialized);
         HPX_ASSERT(oldstate == state_stopped || oldstate == state_initialized);
+        HPX_UNUSED(oldstate);
 
         threads_[virt_core] =
-            compat::thread(&scheduled_thread_pool::thread_func, this,
+            std::thread(&scheduled_thread_pool::thread_func, this,
                 virt_core, thread_num, std::move(startup));
 
         if (&ec != &throws)
@@ -1749,8 +1979,8 @@ namespace hpx { namespace threads { namespace detail
                 "processing units");
         }
 
-        std::shared_ptr<compat::barrier> startup =
-            std::make_shared<compat::barrier>(2);
+        std::shared_ptr<util::barrier> startup =
+            std::make_shared<util::barrier>(2);
 
         add_processing_unit_internal(virt_core, thread_num, startup, ec);
 
@@ -1807,7 +2037,7 @@ namespace hpx { namespace threads { namespace detail
             oldstate == state_stopped || oldstate == state_terminating);
 
         resource::get_partitioner().unassign_pu(id_.name(), virt_core);
-        compat::thread t;
+        std::thread t;
         std::swap(threads_[virt_core], t);
 
         l.unlock();
@@ -1941,7 +2171,7 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            compat::thread(std::move(suspend_internal_wrapper)).detach();
+            std::thread(std::move(suspend_internal_wrapper)).detach();
         }
     }
 
@@ -2034,7 +2264,9 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            compat::thread(std::move(resume_internal_wrapper)).detach();
+            std::thread(std::move(resume_internal_wrapper)).detach();
         }
     }
 }}}
+
+#endif

@@ -35,15 +35,5 @@ foreach(test ${tests})
 
   add_hpx_unit_test("diagnostics" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.diagnostics.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.diagnostics
-                              tests.unit.diagnostics.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.diagnostics.${test}
-                              ${test}_test)
 endforeach()
 

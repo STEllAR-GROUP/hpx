@@ -17,3 +17,4 @@ collection of useful information related to |hpx| development.
    contributing/testing_hpx
    contributing/docker_image
    contributing/documentation
+   contributing/modules

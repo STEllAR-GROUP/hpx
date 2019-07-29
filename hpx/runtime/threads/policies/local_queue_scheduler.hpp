@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
-#include <hpx/compat/mutex.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -18,8 +18,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <atomic>
@@ -27,6 +26,7 @@
 #include <cstdint>
 #include <exception>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -47,13 +47,21 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+    using default_local_queue_scheduler_terminated_queue = lockfree_lifo;
+#else
+    using default_local_queue_scheduler_terminated_queue = lockfree_fifo;
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
     /// The local_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from.
-    template <typename Mutex = compat::mutex,
+    template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
-        typename TerminatedQueuing = lockfree_lifo>
+        typename TerminatedQueuing =
+            default_local_queue_scheduler_terminated_queue>
     class HPX_EXPORT local_queue_scheduler : public scheduler_base
     {
     protected:

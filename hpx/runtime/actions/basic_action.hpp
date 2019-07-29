@@ -11,8 +11,10 @@
 #define HPX_RUNTIME_ACTIONS_BASIC_ACTION_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/sync_fwd.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -29,6 +31,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
+#include <hpx/runtime/serialization/tuple.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -39,11 +42,9 @@
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/tuple.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif
@@ -556,10 +557,7 @@ namespace hpx { namespace actions
     // supported function pointer.
     template <typename TF, TF F, typename Derived = detail::this_type,
         typename Direct = std::false_type>
-    struct make_action;
-
-    template <typename TF, TF F, typename Derived>
-    struct make_action<TF, F, Derived, std::false_type>
+    struct make_action
       : action<TF, F, Derived>
     {
         typedef action<TF, F, Derived> type;

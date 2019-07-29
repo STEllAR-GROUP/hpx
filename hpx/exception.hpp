@@ -350,18 +350,13 @@ namespace hpx
                 std::string const& state = "", std::string const& auxinfo = "");
 
         template <typename Exception>
-        HPX_EXPORT std::exception_ptr
-            construct_lightweight_exception(Exception const& e);
+        HPX_EXPORT std::exception_ptr get_exception(Exception const& e,
+            std::string const& func, std::string const& file, long line,
+            std::string const& auxinfo);
 
-        // HPX_ASSERT handler
-        HPX_NORETURN HPX_EXPORT
-        void assertion_failed(char const* expr, char const* function,
-            char const* file, long line);
-
-        // HPX_ASSERT_MSG handler
-        HPX_NORETURN HPX_EXPORT
-        void assertion_failed_msg(char const* msg, char const* expr,
-            char const* function, char const* file, long line);
+        template <typename Exception>
+        HPX_EXPORT std::exception_ptr construct_lightweight_exception(
+            Exception const& e);
 
         // If backtrace support is enabled, this function returns the current
         // stack backtrace, otherwise it will return an empty string.
@@ -1065,16 +1060,6 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // \cond NOINTERNAL
-    // forwarder for HPX_ASSERT handler
-    HPX_NORETURN HPX_EXPORT
-    void assertion_failed(char const* expr, char const* function,
-        char const* file, long line);
-
-    // forwarder for HPX_ASSERT_MSG handler
-    HPX_NORETURN HPX_EXPORT
-    void assertion_failed_msg(char const* msg, char const* expr,
-        char const* function, char const* file, long line);
-
     // For testing purposes we sometime expect to see exceptions, allow those
     // to go through without attaching a debugger.
     //

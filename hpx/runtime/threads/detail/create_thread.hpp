@@ -11,7 +11,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 
 #include <cstddef>
 #include <sstream>

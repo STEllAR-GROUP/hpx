@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/state.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/detail/barrier_node.hpp>
 #include <hpx/lcos/when_all.hpp>
@@ -12,9 +12,9 @@
 #include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/run_as_hpx_thread.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/state.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

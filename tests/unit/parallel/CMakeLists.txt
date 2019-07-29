@@ -5,9 +5,7 @@
 
 # add subdirectories
 set(subdirs
-    algorithms
     block
-    container_algorithms
     datapar_algorithms
     executors
     segmented_algorithms

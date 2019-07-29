@@ -9,8 +9,8 @@
 #define HPX_COMPUTE_DETAIL_ITERATOR_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/iterator_adaptor.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/iterator_support/iterator_adaptor.hpp>
 
 #include <hpx/compute/detail/get_proxy_type.hpp>
 #include <hpx/compute/traits/allocator_traits.hpp>

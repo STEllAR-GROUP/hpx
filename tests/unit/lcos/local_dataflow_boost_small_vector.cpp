@@ -10,23 +10,46 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/local_lcos.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
+///////////////////////////////////////////////////////////////////////////////
 #include <boost/container/small_vector.hpp>
-// #include <boost/range/begin.hpp>
-// #include <boost/range/end.hpp>
 
-template <typename T> //, typename Allocator = std::allocator<T>>
-using small_vector = boost::container::small_vector<T, 3>;
+namespace hpx { namespace traits
+{
+    // support unwrapping of boost::container::small_vector
+    // Note: small_vector's allocator support is not 100% conforming
+    template <typename NewType, typename OldType, std::size_t Size,
+        typename OldAllocator>
+    struct pack_traversal_rebind_container<NewType,
+        boost::container::small_vector<OldType, Size, OldAllocator>>
+    {
+        using NewAllocator = typename std::allocator_traits<OldAllocator>::
+            template rebind_alloc<NewType>;
+
+        static boost::container::small_vector<NewType, Size, NewAllocator> call(
+            boost::container::small_vector<OldType, Size, OldAllocator> const&)
+        {
+            // Create a new version of the container with a new allocator
+            // instance
+            return boost::container::small_vector<NewType, Size, NewAllocator>();
+        }
+    };
+}}
+
+template <typename T>
+using small_vector =
+    boost::container::small_vector<T, 3, boost::container::new_allocator<T>>;
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<std::uint32_t> void_f_count;

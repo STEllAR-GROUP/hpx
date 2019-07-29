@@ -9,7 +9,7 @@
 #include <hpx/lcos/broadcast.hpp>
 #include <hpx/parallel/execution.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <atomic>
 #include <cstddef>

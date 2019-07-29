@@ -16,7 +16,6 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/pack_traversal.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
 
 #include <cstddef>
@@ -25,14 +24,14 @@
 #include <type_traits>
 #include <utility>
 
+//#define GUIDED_EXECUTOR_DEBUG 1
+//#define GUIDED_POOL_EXECUTOR_FAKE_NOOP
+
 #ifdef GUIDED_EXECUTOR_DEBUG
 #include <iostream>
 #endif
 
 #include <hpx/config/warnings_prefix.hpp>
-
-//#define GUIDED_EXECUTOR_DEBUG 1
-//#define GUIDED_POOL_EXECUTOR_FAKE_NOOP
 
 // --------------------------------------------------------------------
 // pool_numa_hint
@@ -306,8 +305,8 @@ namespace hpx { namespace threads { namespace executors
             // the numa_hint_function will be evaluated on that thread and then
             // the real task will be spawned on a new task with hints - as intended
             return dataflow(launch::sync,
-                [f{std::move(f)}, this](Future && predecessor, Ts &&... ts)
-                {
+                [HPX_CAPTURE_FORWARD(f), this](
+                    Future&& predecessor, Ts&&... ts) {
                     pre_execution_then_domain_schedule<
                         pool_executor, pool_numa_hint<Tag>>
                             pre_exec { pool_executor_, hint_, hp_sync_};
@@ -317,8 +316,7 @@ namespace hpx { namespace threads { namespace executors
                         std::forward<Future>(predecessor));
                 },
                 std::forward<Future>(predecessor),
-                std::forward<Ts>(ts)...
-            );
+                std::forward<Ts>(ts)...);
         }
 
         // --------------------------------------------------------------------
@@ -371,9 +369,9 @@ namespace hpx { namespace threads { namespace executors
 
             // Please see notes for previous then_execute function above
             return dataflow(launch::sync,
-                [f{std::move(f)}, this]
-                (OuterFuture<util::tuple<InnerFutures...>> && predecessor, Ts &&... ts)
-                {
+                [HPX_CAPTURE_FORWARD(f), this](
+                    OuterFuture<util::tuple<InnerFutures...>>&& predecessor,
+                    Ts&&... ts) {
                     pre_execution_then_domain_schedule<pool_executor,
                         pool_numa_hint<Tag>>
                         pre_exec { pool_executor_, hint_, hp_sync_ };
@@ -383,9 +381,9 @@ namespace hpx { namespace threads { namespace executors
                         std::forward<OuterFuture<util::tuple<InnerFutures...>>>
                         (predecessor));
                 },
-                std::forward<OuterFuture<util::tuple<InnerFutures...>>>(predecessor),
-                std::forward<Ts>(ts)...
-            );
+                std::forward<OuterFuture<util::tuple<InnerFutures...>>>(
+                    predecessor),
+                std::forward<Ts>(ts)...);
         }
 
         // --------------------------------------------------------------------
@@ -431,7 +429,7 @@ namespace hpx { namespace threads { namespace executors
 #else
                          decltype(unwrapped_futures_tuple)>(" | ")
 #endif
-                      << "\n"
+                      << "\n";
 
             std::cout << "dataflow hint returning " << domain << "\n";
 #endif

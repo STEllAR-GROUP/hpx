@@ -6,7 +6,7 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/static_reinit.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/type_support/static.hpp>
 #include <hpx/util/spinlock.hpp>
 
 #include <mutex>
@@ -20,7 +20,7 @@ namespace hpx { namespace util
     {
         // Use util::spinlock instead of lcos::local::spinlock to avoid possible
         // suspensions of HPX threads as this will cause a deadlock when the
-        // register_functions function is called from within compat::call_once
+        // register_functions function is called from within std::call_once
         typedef util::spinlock mutex_type;
 
         typedef util::function_nonser<void()> construct_type;

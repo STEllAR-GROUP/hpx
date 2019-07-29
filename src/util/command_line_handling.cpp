@@ -5,6 +5,7 @@
 
 #include <hpx/util/command_line_handling.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/preprocessor/stringize.hpp>
@@ -15,11 +16,10 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/asio_util.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/batch_environment.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/detail/reset_function.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
@@ -1143,83 +1143,6 @@ namespace hpx { namespace util
             }
         }
 #endif
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    void handle_print_bind(boost::program_options::variables_map const& vm_,
-        std::size_t num_threads)
-    {
-        threads::topology& top = threads::create_topology();
-        runtime& rt = get_runtime();
-        auto const& rp = hpx::resource::get_partitioner();
-        auto const& tm = rt.get_thread_manager();
-        {
-            std::ostringstream strm;    // make sure all output is kept together
-
-            strm << std::string(79, '*') << '\n';
-            strm << "locality: " << hpx::get_locality_id() << '\n';
-            for (std::size_t i = 0; i != num_threads; ++i)
-            {
-                // print the mask for the current PU
-                threads::mask_cref_type pu_mask = rp.get_pu_mask(i);
-                std::string pool_name = tm.get_pool(i).get_pool_name();
-
-                if (!threads::any(pu_mask))
-                {
-                    strm << std::setw(4) << i
-                         << ": thread binding disabled"    //-V112
-                         << std::endl;
-                }
-                else
-                {
-                    top.print_affinity_mask(strm, i, pu_mask, pool_name);
-                }
-
-                // Make sure the mask does not contradict the CPU bindings
-                // returned by the system (see #973: Would like option to
-                // report HWLOC bindings).
-                error_code ec(lightweight);
-                compat::thread& blob = tm.get_os_thread_handle(i);
-                threads::mask_type boundcpu = top.get_cpubind_mask(blob, ec);
-
-                /* threads::mask_type boundcpu = top.get_cpubind_mask(
-                    rt.get_thread_manager().get_os_thread_handle(i), ec);*/
-
-                // The masks reported by HPX must be the same as the ones
-                // reported from HWLOC.
-                if (!ec && threads::any(boundcpu) &&
-                    !threads::equal(boundcpu, pu_mask, num_threads))
-                {
-                    std::string boundcpu_str = threads::to_string(boundcpu);
-                    std::string pu_mask_str = threads::to_string(pu_mask);
-                    HPX_THROW_EXCEPTION(invalid_status,
-                        "handle_print_bind",
-                        hpx::util::format(
-                            "unexpected mismatch between locality {1}: "
-                            "binding "
-                            "reported from HWLOC({2}) and HPX({3}) on "
-                            "thread {4}",
-                            hpx::get_locality_id(), boundcpu_str,
-                            pu_mask_str, i));
-                }
-            }
-
-            std::cout << strm.str();
-        }
-    }
-
-    void handle_list_parcelports()
-    {
-        runtime & rt = get_runtime();
-        {
-            std::ostringstream strm;    // make sure all output is kept together
-            strm << std::string(79, '*') << '\n';
-            strm << "locality: " << hpx::get_locality_id() << '\n';
-
-            rt.get_parcel_handler().list_parcelports(strm);
-
-            std::cout << strm.str();
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -43,10 +43,10 @@
 // This needs to be first for building on Macs
 #include <hpx/runtime/threads/coroutines/detail/context_impl.hpp>
 
-#include <hpx/runtime/threads/coroutines/detail/swap_context.hpp> //for swap hints
+#include <hpx/assertion.hpp>
+#include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>    //for swap hints
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #include <hpx/runtime/threads/thread_id_type.hpp>
-#include <hpx/util/assert.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif
@@ -218,12 +218,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
             m_state = ctx_ready;
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
-            start_yield_fiber(&asan_fake_stack, m_caller);
+            this->start_yield_fiber(&this->asan_fake_stack, m_caller);
 #endif
             do_yield();
 
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
-            finish_switch_fiber(asan_fake_stack, m_caller);
+            this->finish_switch_fiber(this->asan_fake_stack, m_caller);
 #endif
 
             HPX_ASSERT(running());
@@ -322,7 +322,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 //             return ++m_allocation_counters.get(heap_num);
 //         }
 
-    protected:
+    public:
         // global coroutine state
         enum context_state
         {
@@ -331,6 +331,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             ctx_exited    // context is finished.
         };
 
+    protected:
         // exit request state
         enum context_exit_state
         {
@@ -366,6 +367,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #if defined(HPX_HAVE_APEX)
             m_apex_data = rebind_base_apex(id);
 #endif
+            // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
             m_type_info = std::exception_ptr();
         }
 
@@ -379,7 +381,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             m_state = ctx_exited;
             m_exit_status = status;
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
-            start_yield_fiber(&asan_fake_stack, m_caller);
+            this->start_yield_fiber(&this->asan_fake_stack, m_caller);
 #endif
             do_yield();
         }
@@ -402,13 +404,13 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             m_state = ctx_running;
 
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
-            start_switch_fiber(&asan_fake_stack);
+            this->start_switch_fiber(&this->asan_fake_stack);
 #endif
 
             swap_context(m_caller, *this, detail::invoke_hint());
 
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
-            finish_switch_fiber(asan_fake_stack, m_caller);
+            this->finish_switch_fiber(this->asan_fake_stack, m_caller);
 #endif
         }
 

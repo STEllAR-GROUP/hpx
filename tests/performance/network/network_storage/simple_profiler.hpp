@@ -6,7 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <algorithm>
 #include <iostream>

@@ -5,6 +5,7 @@
 
 set(benchmarks
     minmax_element_performance)
+  set(minmax_element_performance_FLAGS DEPENDENCIES hpx_timing)
 
 foreach(benchmark ${benchmarks})
 
@@ -17,7 +18,7 @@ foreach(benchmark ${benchmarks})
   add_hpx_executable(${benchmark}
                      SOURCES ${sources}
                      ${${benchmark}_FLAGS}
-                     COMPONENT_DEPENDENCIES iostreams
+                     COMPONENT_DEPENDENCIES iostreams partitioned_vector
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/Network/Algorithms/${benchmark}")

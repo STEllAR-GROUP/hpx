@@ -7,7 +7,7 @@
 #define HPX_RUNTIME_THREADS_POLICIES_SHARED_PRIORITY_QUEUE_SCHEDULER
 
 #include <hpx/config.hpp>
-#include <hpx/compat/mutex.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
@@ -17,8 +17,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <array>
@@ -26,6 +25,7 @@
 #include <cstdint>
 #include <exception>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <numeric>
 #include <type_traits>
@@ -42,9 +42,17 @@ static_assert(false,
     "include \"all\" or \"shared-priority\"");
 #else
 
-namespace hpx {
-namespace threads {
-namespace policies {
+namespace hpx { namespace threads { namespace policies {
+
+    ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+    using default_shared_priority_queue_scheduler_terminated_queue =
+        lockfree_lifo;
+#else
+    using default_shared_priority_queue_scheduler_terminated_queue =
+        lockfree_fifo;
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     /// The shared_priority_queue_scheduler maintains a set of high, normal, and
     /// low priority queues. For each priority level there is a core/queue ratio
@@ -53,10 +61,11 @@ namespace policies {
     /// high priority queue, the next 4 will share another one and so on. In
     /// addition, the shared_priority_queue_scheduler is NUMA-aware and takes
     /// NUMA scheduling hints into account when creating and scheduling work.
-    template <typename Mutex = compat::mutex,
+    template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
-        typename TerminatedQueuing = lockfree_lifo>
+        typename TerminatedQueuing =
+            default_shared_priority_queue_scheduler_terminated_queue>
     class shared_priority_queue_scheduler : public scheduler_base
     {
     protected:

@@ -9,7 +9,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/iterator_range.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/util/protect.hpp>
 
 #include <cstddef>

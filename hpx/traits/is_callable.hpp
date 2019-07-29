@@ -11,7 +11,7 @@
 #define HPX_TRAITS_IS_CALLABLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/always_void.hpp>
+#include <hpx/type_support/always_void.hpp>
 #include <hpx/util/result_of.hpp>
 
 #include <type_traits>

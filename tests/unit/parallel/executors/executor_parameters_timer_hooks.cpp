@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "../algorithms/foreach_tests.hpp"
+#include "foreach_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Parameters>

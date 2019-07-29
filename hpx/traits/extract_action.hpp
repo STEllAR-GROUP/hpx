@@ -7,7 +7,7 @@
 #define HPX_TRAITS_EXTRACT_ACTION_JUN_28_2015_0518PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/always_void.hpp>
+#include <hpx/type_support/always_void.hpp>
 
 namespace hpx { namespace traits
 {

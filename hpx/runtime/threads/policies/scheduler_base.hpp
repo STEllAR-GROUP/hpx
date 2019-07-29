@@ -7,14 +7,13 @@
 #define HPX_THREADMANAGER_SCHEDULING_SCHEDULER_BASE_JUL_14_2013_1132AM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/runtime/threads/scoped_background_timer.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/cache_aligned_data.hpp>
 #include <hpx/util_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
@@ -22,6 +21,7 @@
 #endif
 
 #include <atomic>
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -44,7 +44,7 @@ namespace hpx { namespace threads { namespace policies
         HPX_NON_COPYABLE(scheduler_base);
 
     public:
-        typedef compat::mutex pu_mutex_type;
+        typedef std::mutex pu_mutex_type;
 
         scheduler_base(std::size_t num_threads,
             char const* description = "",
@@ -78,7 +78,13 @@ namespace hpx { namespace threads { namespace policies
 
         void idle_callback(std::size_t num_thread);
 
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+        bool background_callback(std::size_t num_thread,
+            std::int64_t& background_work_exec_time_send,
+            std::int64_t& background_work_exec_time_receive);
+#else
         bool background_callback(std::size_t num_thread);
+#endif
 
         /// This function gets called by the thread-manager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
@@ -228,7 +234,7 @@ namespace hpx { namespace threads { namespace policies
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues
         pu_mutex_type mtx_;
-        compat::condition_variable cond_;
+        std::condition_variable cond_;
         struct idle_backoff_data
         {
             std::uint32_t wait_count_;
@@ -239,7 +245,7 @@ namespace hpx { namespace threads { namespace policies
 
         // support for suspension of pus
         std::vector<pu_mutex_type> suspend_mtxs_;
-        std::vector<compat::condition_variable> suspend_conds_;
+        std::vector<std::condition_variable> suspend_conds_;
 
         std::vector<pu_mutex_type> pu_mtxs_;
 

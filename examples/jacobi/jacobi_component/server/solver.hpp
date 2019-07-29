@@ -11,10 +11,10 @@
 #include "../stencil_iterator.hpp"
 #include "stencil_iterator.hpp"
 
+#include <hpx/assertion.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/lcos/future_wait.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 
 #include <cstddef>
 #include <vector>

@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/steady_clock.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <boost/system/error_code.hpp>
 

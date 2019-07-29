@@ -7,7 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "htts2.hpp"
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <qthread/qthread.h>
 #include <qthread/qloop.h>

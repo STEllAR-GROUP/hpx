@@ -14,7 +14,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <cstdint>
 #include <iostream>

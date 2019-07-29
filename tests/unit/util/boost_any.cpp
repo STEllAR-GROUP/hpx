@@ -7,7 +7,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/util/any.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include "small_big_object.hpp"
 

@@ -7,9 +7,11 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -21,11 +23,9 @@
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/io/ios_state.hpp>
 

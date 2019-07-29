@@ -8,10 +8,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -29,14 +28,12 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
-#include <hpx/util/block_profiler.hpp>
 #include <hpx/util/detail/yield_k.hpp>
-#include <hpx/util/hardware/timestamp.hpp>
+#include <hpx/hardware/timestamp.hpp>
 #include <hpx/util/itt_notify.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <cstddef>
@@ -351,7 +348,6 @@ namespace hpx { namespace threads
                         notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
-
 #else
                 throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=local "
@@ -374,7 +370,7 @@ namespace hpx { namespace threads
 
                 // instantiate the scheduler
                 typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    compat::mutex, hpx::threads::policies::lockfree_fifo>
+                    std::mutex, hpx::threads::policies::lockfree_fifo>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, numa_sensitive,
@@ -396,6 +392,7 @@ namespace hpx { namespace threads
 
             case resource::local_priority_lifo:
             {
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
@@ -407,7 +404,7 @@ namespace hpx { namespace threads
 
                 // instantiate the scheduler
                 typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    compat::mutex, hpx::threads::policies::lockfree_lifo>
+                    std::mutex, hpx::threads::policies::lockfree_lifo>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, numa_sensitive,
@@ -423,7 +420,14 @@ namespace hpx { namespace threads
                         notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
-
+#else
+                throw hpx::detail::command_line_error(
+                    "Command line option --hpx:queuing=local-priority-lifo "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=local-priority-lifo'. "
+                    "Additionally, please make sure 128bit atomics are "
+                    "available.");
+#endif
                 break;
             }
 
@@ -455,7 +459,6 @@ namespace hpx { namespace threads
                         notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
-
 #else
                 throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=static "
@@ -507,7 +510,7 @@ namespace hpx { namespace threads
 
             case resource::abp_priority_fifo:
             {
-#if defined(HPX_HAVE_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER) && defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
@@ -516,7 +519,7 @@ namespace hpx { namespace threads
 
                 // instantiate the scheduler
                 typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    compat::mutex, hpx::threads::policies::lockfree_fifo>
+                    std::mutex, hpx::threads::policies::lockfree_fifo>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, cfg_.numa_sensitive_,
@@ -536,14 +539,16 @@ namespace hpx { namespace threads
                 throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=abp-priority-fifo "
                     "is not configured in this build. Please rebuild with "
-                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=abp-priority'.");
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=abp-priority'. "
+                    "Additionally, please make sure 128bit atomics are "
+                    "available.");
 #endif
                 break;
             }
 
             case resource::abp_priority_lifo:
             {
-#if defined(HPX_HAVE_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER) && defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
@@ -552,7 +557,7 @@ namespace hpx { namespace threads
 
                 // instantiate the scheduler
                 typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    compat::mutex, hpx::threads::policies::lockfree_lifo>
+                    std::mutex, hpx::threads::policies::lockfree_lifo>
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, cfg_.numa_sensitive_,
@@ -864,6 +869,40 @@ namespace hpx { namespace threads
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)
             result += pool_iter->get_background_overhead(all_threads, reset);
+        return result;
+    }
+
+    std::int64_t threadmanager::get_background_send_duration(bool reset)
+    {
+        std::int64_t result = 0;
+        for (auto const& pool_iter : pools_)
+            result += pool_iter->get_background_send_duration(all_threads, reset);
+        return result;
+    }
+
+    std::int64_t threadmanager::get_background_send_overhead(bool reset)
+    {
+        std::int64_t result = 0;
+        for (auto const& pool_iter : pools_)
+            result += pool_iter->get_background_send_overhead(all_threads, reset);
+        return result;
+    }
+
+    std::int64_t threadmanager::get_background_receive_duration(bool reset)
+    {
+        std::int64_t result = 0;
+        for (auto const& pool_iter : pools_)
+            result +=
+                pool_iter->get_background_receive_duration(all_threads, reset);
+        return result;
+    }
+
+    std::int64_t threadmanager::get_background_receive_overhead(bool reset)
+    {
+        std::int64_t result = 0;
+        for (auto const& pool_iter : pools_)
+            result +=
+                pool_iter->get_background_receive_overhead(all_threads, reset);
         return result;
     }
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
@@ -1557,6 +1596,50 @@ namespace hpx { namespace threads
                     &threadmanager::locality_pool_thread_counter_creator, this,
                     &threadmanager::get_background_overhead,
                     &thread_pool_base::get_background_overhead),
+                &performance_counters::locality_pool_thread_counter_discoverer,
+                "0.1%"},
+            {"/threads/time/background-send-duration",
+                performance_counters::counter_raw,
+                "returns the overall time spent running background work "
+                    "related to sending parcels",
+                HPX_PERFORMANCE_COUNTER_V1,
+                util::bind_front(
+                    &threadmanager::locality_pool_thread_counter_creator, this,
+                    &threadmanager::get_background_send_duration,
+                    &thread_pool_base::get_background_send_duration),
+                &performance_counters::locality_pool_thread_counter_discoverer,
+                "ns"},
+            {"/threads/background-send-overhead",
+                performance_counters::counter_raw,
+                "returns the overall background overhead "
+                    "related to sending parcels",
+                HPX_PERFORMANCE_COUNTER_V1,
+                util::bind_front(
+                    &threadmanager::locality_pool_thread_counter_creator, this,
+                    &threadmanager::get_background_send_overhead,
+                    &thread_pool_base::get_background_send_overhead),
+                &performance_counters::locality_pool_thread_counter_discoverer,
+                "0.1%"},
+            {"/threads/time/background-receive-duration",
+                performance_counters::counter_raw,
+                "returns the overall time spent running background work "
+                    "related to receiving parcels",
+                HPX_PERFORMANCE_COUNTER_V1,
+                util::bind_front(
+                    &threadmanager::locality_pool_thread_counter_creator, this,
+                    &threadmanager::get_background_receive_duration,
+                    &thread_pool_base::get_background_receive_duration),
+                &performance_counters::locality_pool_thread_counter_discoverer,
+                "ns"},
+            {"/threads/background-receive-overhead",
+                performance_counters::counter_raw,
+                "returns the overall background overhead "
+                    "related to receiving parcels",
+                HPX_PERFORMANCE_COUNTER_V1,
+                util::bind_front(
+                    &threadmanager::locality_pool_thread_counter_creator, this,
+                    &threadmanager::get_background_receive_overhead,
+                    &thread_pool_base::get_background_receive_overhead),
                 &performance_counters::locality_pool_thread_counter_discoverer,
                 "0.1%"},
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS

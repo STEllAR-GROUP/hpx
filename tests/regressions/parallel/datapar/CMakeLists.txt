@@ -24,16 +24,6 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Regressions/Parallel/Datapar")
 
-  add_hpx_regression_test("parallel" ${test} ${${test}_PARAMETERS})
+  add_hpx_regression_test("parallel.datapar" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.parallel_dir.datapar_dir.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.parallel_dir.datapar_dir
-                              tests.regressions.parallel_dir.datapar_dir.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.parallel_dir.datapar_dir.${test}
-                              ${test}_test)
 endforeach()

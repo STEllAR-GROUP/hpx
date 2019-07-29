@@ -8,7 +8,7 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <algorithm>
 #include <functional>
@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "../algorithms/foreach_tests.hpp"
+#include "foreach_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_persistent_executitor_parameters()

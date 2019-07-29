@@ -27,7 +27,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/compute.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <iostream>

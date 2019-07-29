@@ -11,7 +11,7 @@
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include "htts2.hpp"
 

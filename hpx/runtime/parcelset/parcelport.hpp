@@ -19,7 +19,7 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <atomic>
@@ -172,7 +172,8 @@ namespace hpx { namespace parcelset
         };
 
         // invoke pending background work
-        virtual bool do_background_work(std::size_t num_thread) = 0;
+        virtual bool do_background_work(
+            std::size_t num_thread, parcelport_background_mode mode) = 0;
 
         // retrieve performance counter value for given statistics type
         virtual std::int64_t get_connection_cache_statistics(

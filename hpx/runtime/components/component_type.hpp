@@ -9,6 +9,7 @@
 #define HPX_RUNTIME_COMPONENTS_COMPONENT_TYPE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -16,9 +17,8 @@
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/traits/component_type_database.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/atomic_count.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <cstdint>

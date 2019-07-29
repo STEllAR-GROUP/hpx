@@ -6,7 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <algorithm>
 #include <cstdlib>
@@ -44,7 +44,7 @@ void test_async()
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id test_f(hpx::future<void> f, int passed_through)
 {
-    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 
@@ -116,7 +116,7 @@ void test_bulk_async()
 void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
     int passed_through) //-V813
 {
-    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 

@@ -7,14 +7,14 @@
 #define HPX_PARALLEL_ALGORITHM_REMOTE_DISPATCH_OCT_15_2014_0938PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/colocating_distribution_policy.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -378,8 +378,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             std::list<std::exception_ptr> errors;
             parallel::util::detail::handle_remote_exceptions<
                     ExPolicy
-                >::call(f.get_exception_ptr(), errors);
+                >::call(f.get_exception_ptr(), errors); // NOLINT(bugprone-use-after-move)
 
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             HPX_ASSERT(errors.empty());
             throw exception_list(std::move(errors));
         }

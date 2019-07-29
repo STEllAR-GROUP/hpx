@@ -9,7 +9,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/parallel_executors.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::id_type call() { return hpx::find_here(); }

@@ -5,10 +5,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/error.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/exception_info.hpp>
+#include <hpx/format.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
@@ -17,12 +20,9 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
-#include <hpx/util/format.hpp>
-#include <hpx/util/logging.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/version.hpp>
 
@@ -461,62 +461,6 @@ namespace hpx { namespace detail
             std::string const&, std::string const&, long);
 
     ///////////////////////////////////////////////////////////////////////////
-    void assertion_failed(char const* expr, char const* function,
-        char const* file, long line)
-    {
-        assertion_failed_msg(expr, expr, function, file, line);
-    }
-
-    void assertion_failed_msg(char const* msg, char const* expr,
-        char const* function, char const* file, long line)
-    {
-        if (!expect_exception_flag.load(std::memory_order_relaxed) &&
-            get_config_entry("hpx.attach_debugger", "") == "exception")
-        {
-            util::attach_debugger();
-        }
-
-        bool has_thrown = false;
-
-        std::string str("assertion '" + std::string(msg) + "' failed");
-        if (expr != msg)
-            str += " (" + std::string(expr) + ")";
-
-        try {
-            // ignore all acquired locks while handling assertions
-            util::ignore_all_while_checking il;
-
-            boost::filesystem::path p(file);
-            hpx::detail::throw_exception(
-                hpx::exception(hpx::assertion_failure, str),
-                function, p.string(), line);
-        }
-        catch (...) {
-            has_thrown = true;
-
-            // If the runtime pointer is available, we can safely get the prefix
-            // of this locality. If it's not available, then just terminate.
-            runtime* rt = get_runtime_ptr();
-            if (nullptr != rt)  {
-                rt->report_error(std::current_exception());
-            }
-            else {
-                std::cerr << "Runtime is not available, reporting error locally. "
-                    << hpx::diagnostic_information(std::current_exception())
-                    << std::flush;
-            }
-        }
-
-        // If the exception wasn't thrown, then print out the assertion message,
-        // so that the program doesn't abort without any diagnostics.
-        if (!has_thrown) {
-            std::cerr << "Runtime is not available, reporting error locally\n"
-                         "{what}: " << str << std::endl;
-        }
-        std::abort();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // report an early or late exception and abort
     void report_exception_and_continue(std::exception_ptr const& e)
     {
@@ -849,18 +793,6 @@ namespace hpx
         if (state_info && !state_info->empty())
             return *state_info;
         return std::string();
-    }
-
-    void assertion_failed(char const* expr, char const* function,
-        char const* file, long line)
-    {
-        hpx::detail::assertion_failed(expr, function, file, line);
-    }
-
-    void assertion_failed_msg(char const* msg, char const* expr,
-        char const* function, char const* file, long line)
-    {
-        hpx::detail::assertion_failed_msg(msg, expr, function, file, line);
     }
 }
 

@@ -29,10 +29,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/format.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/format.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/program_options.hpp>
 

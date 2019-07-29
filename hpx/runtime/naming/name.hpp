@@ -9,19 +9,19 @@
 #define HPX_RUNTIME_NAMING_NAME_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/detail/yield_k.hpp>
-#include <hpx/util/internal_allocator.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/spinlock_pool.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -263,7 +263,7 @@ cope with that limitation you can use the |sbatch| command.
 The ``sbatch`` command expects a script that it can run once the requested
 resources are available. In order to request resources you need to add
 ``#SBATCH`` comments in your script or provide the necessary parameters to
-``sbatc`` directly. The parameters are the same as with ``run``. The commands
+``sbatch`` directly. The parameters are the same as with ``run``. The commands
 you need to execute are the same you would need to start your application as if
 you were in an interactive shell.
 

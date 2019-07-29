@@ -10,11 +10,11 @@
 #define HPX_UTIL_DETAIL_BASIC_FUNCTION_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_callable.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/vtable/function_vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_function_vtable.hpp>

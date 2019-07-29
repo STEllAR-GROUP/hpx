@@ -18,7 +18,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/util/ini.hpp>
 
 #include <cstddef>

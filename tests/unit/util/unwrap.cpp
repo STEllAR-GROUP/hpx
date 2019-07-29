@@ -9,8 +9,8 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/lightweight_test.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/testing.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <array>

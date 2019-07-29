@@ -23,14 +23,8 @@ if(HPX_WITH_EXAMPLES_QT4)
         ${qt_FLAGS}
         FOLDER "Examples/Qt")
 
-    target_link_libraries(qt ${HPX_TLL_PUBLIC} ${QT_LIBRARIES})
+    target_link_libraries(qt PRIVATE ${QT_LIBRARIES})
 
-    # add a custom target for this example
-    add_hpx_pseudo_target(examples.qt.qt)
+    add_hpx_example_target_dependencies("qt" qt)
 
-    # make pseudo-targets depend on master pseudo-target
-    add_hpx_pseudo_dependencies(examples.qt examples.qt.qt)
-
-    # add dependencies to pseudo-target
-    add_hpx_pseudo_dependencies(examples.qt.qt qt)
 endif()

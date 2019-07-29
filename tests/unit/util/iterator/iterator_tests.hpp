@@ -11,9 +11,9 @@
 #define HPX_TESTS_UTIL_ITERATOR_TESTS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/always_void.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/type_support/always_void.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -546,6 +546,12 @@ namespace tests
         typedef const T& reference;
         typedef const T* pointer;
         typedef std::ptrdiff_t difference_type;
+        input_iterator_archetype_no_proxy()
+        {
+        }
+        input_iterator_archetype_no_proxy(input_iterator_archetype_no_proxy const&)
+        {
+        }
         self& operator=(const self&)
         {
             return *this;
@@ -585,6 +591,9 @@ namespace tests
         typedef T const* pointer;
         typedef std::ptrdiff_t difference_type;
         forward_iterator_archetype()
+        {
+        }
+        forward_iterator_archetype(forward_iterator_archetype const&)
         {
         }
         self& operator=(const self&)

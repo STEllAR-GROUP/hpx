@@ -11,6 +11,7 @@
 #define HPX_PARCELSET_PARCELPORT_IMPL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
@@ -19,8 +20,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -299,10 +299,11 @@ namespace hpx { namespace parcelset
             return nullptr;
         }
 
-        bool do_background_work(std::size_t num_thread) override
+        bool do_background_work(
+            std::size_t num_thread, parcelport_background_mode mode) override
         {
             trigger_pending_work();
-            return do_background_work_impl<ConnectionHandler>(num_thread);
+            return do_background_work_impl<ConnectionHandler>(num_thread, mode);
         }
 
         /// support enable_shared_from_this
@@ -445,9 +446,10 @@ namespace hpx { namespace parcelset
             >::do_background_work::value,
             bool
         >::type
-        do_background_work_impl(std::size_t num_thread)
+        do_background_work_impl(std::size_t num_thread,
+            parcelport_background_mode mode)
         {
-            return connection_handler().background_work(num_thread);
+            return connection_handler().background_work(num_thread, mode);
         }
 
         template <typename ConnectionHandler_>
@@ -457,7 +459,7 @@ namespace hpx { namespace parcelset
             >::do_background_work::value,
             bool
         >::type
-        do_background_work_impl(std::size_t)
+        do_background_work_impl(std::size_t, parcelport_background_mode)
         {
             return false;
         }
@@ -911,6 +913,7 @@ namespace hpx { namespace parcelset
             else
             {
                 ++operations_in_flight_;
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 HPX_ASSERT(num_parcels < parcels.size());
 
                 std::vector<write_handler_type> handled_handlers;

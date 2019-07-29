@@ -5,8 +5,6 @@
 
 set(tests
     is_callable
-    is_iterator
-    is_range
     is_tuple_like
    )
 
@@ -26,15 +24,5 @@ foreach(test ${tests})
 
   add_hpx_unit_test("traits" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.traits.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.traits
-                              tests.unit.traits.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.traits.${test}
-                              ${test}_test)
 endforeach()
 

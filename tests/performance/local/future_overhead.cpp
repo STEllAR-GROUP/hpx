@@ -6,18 +6,18 @@
 
 // TODO: Update
 
+#include <hpx/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/util/format.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/util/yield_while.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/annotated_function.hpp>
 
 #include <hpx/include/parallel_execution.hpp>

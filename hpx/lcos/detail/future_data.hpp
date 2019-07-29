@@ -7,6 +7,7 @@
 #define HPX_LCOS_DETAIL_FUTURE_DATA_MAR_06_2012_1055AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -15,17 +16,16 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/get_remote_result.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/util/unused.hpp>
 
 #include <boost/container/small_vector.hpp>
 #include <boost/intrusive_ptr.hpp>

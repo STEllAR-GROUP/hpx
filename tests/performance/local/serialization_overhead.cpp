@@ -6,9 +6,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/runtime/serialization/detail/preprocess.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/predef/other/endian.h>
@@ -66,7 +66,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     else if (endian_out == "big")
         out_archive_flags |= hpx::serialization::endian_big;
     else {
-        HPX_ASSERT(endian_out =="little" || endian_out == "big");
+        HPX_TEST(endian_out =="little" || endian_out == "big");
     }
 
     std::string array_optimization =

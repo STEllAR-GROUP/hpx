@@ -8,7 +8,7 @@
 #define HPX_UTIL_REGISTER_LOCKS_JUN_26_2012_1029AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/has_member_xxx.hpp>
+#include <hpx/concepts/has_member_xxx.hpp>
 
 #include <type_traits>
 #include <utility>

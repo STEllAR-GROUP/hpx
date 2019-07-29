@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_COMPONENTS_SERVER_COMPONENT_BASE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/components_fwd.hpp>
@@ -15,7 +16,6 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <cstddef>

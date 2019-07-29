@@ -3,50 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests
-    count_3646
-    for_each_annotated_function
-    for_loop_2281
-    minimal_findend
-    reduce_3641
-    scan_different_inits
-    scan_non_commutative
-    scan_shortlength
-    search_zerolength
-    set_operations_3442
-    stable_merge_2964
-    static_chunker_2282
-   )
-
-foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
-
-  set(${test}_PARAMETERS THREADS_PER_LOCALITY 4)
-
-  source_group("Source Files" FILES ${sources})
-
-  # add example executable
-  add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     EXCLUDE_FROM_ALL
-                     ${${test}_FLAGS}
-                     FOLDER "Tests/Regressions/Parallel/")
-
-  add_hpx_regression_test("parallel" ${test} ${${test}_PARAMETERS})
-
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.parallel_dir.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.parallel_dir
-                              tests.regressions.parallel_dir.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.parallel_dir.${test}
-                              ${test}_test)
-endforeach()
-
 # add subdirectories
 set(subdirs
     executors
@@ -59,9 +15,9 @@ if(HPX_WITH_DATAPAR)
 endif()
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.regressions.parallel_dir.${subdir}_dir)
+  add_hpx_pseudo_target(tests.regressions.parallel.${subdir})
   add_subdirectory(${subdir})
   add_hpx_pseudo_dependencies(
-    tests.regressions.parallel_dir tests.regressions.parallel_dir.${subdir}_dir)
+    tests.regressions.parallel tests.regressions.parallel.${subdir})
 endforeach()
 

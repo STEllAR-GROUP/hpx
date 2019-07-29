@@ -7,7 +7,7 @@
 #define HPX_OPTIONAL_SERIALIZATION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/optional.hpp>
+#include <hpx/datastructures/optional.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <utility>

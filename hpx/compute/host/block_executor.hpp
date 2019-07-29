@@ -16,8 +16,8 @@
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/iterator_range.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>

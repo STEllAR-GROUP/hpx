@@ -11,7 +11,15 @@ Checks: >
     -bugprone-forward-declaration-namespace,
     -bugprone-macro-parentheses,
     modernize-use-nullptr,
+    misc-assert-side-effect
+    misc-dangling-handle
+    misc-forwarding-reference-overload
+    misc-move-constructor-init
+    misc-move-forwarding-reference
+    misc-multiple-statement-macro
     misc-non-copyable-objects
+    misc-use-after-move
+    misc-virtual-near-miss
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*hpx.*'
 CheckOptions:

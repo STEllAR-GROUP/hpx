@@ -6,9 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/util/lightweight_test.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/iterator_adaptor.hpp>
+#include <hpx/testing.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/iterator_support/iterator_adaptor.hpp>
 
 #include "iterator_tests.hpp"
 

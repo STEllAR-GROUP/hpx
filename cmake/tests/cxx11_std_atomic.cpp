@@ -16,12 +16,6 @@ void test_atomic()
     T i = a.load();
 }
 
-struct uint128_type
-{
-    std::uint64_t left;
-    std::uint64_t right;
-};
-
 int main()
 {
     std::atomic_flag af = ATOMIC_FLAG_INIT;
@@ -33,7 +27,6 @@ int main()
     test_atomic<std::uint16_t>();
     test_atomic<std::uint32_t>();
     test_atomic<std::uint64_t>();
-    test_atomic<uint128_type>();
 
     std::memory_order mo;
     mo = std::memory_order_relaxed;

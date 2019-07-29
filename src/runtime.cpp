@@ -5,14 +5,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/compat/mutex.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/thread_hooks.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
@@ -21,17 +21,16 @@
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/thread_hooks.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/thread_mapper.hpp>
@@ -679,7 +678,7 @@ namespace hpx
     std::uint32_t runtime::assign_cores(std::string const& locality_basename,
         std::uint32_t cores_needed)
     {
-        std::lock_guard<compat::mutex> l(mtx_);
+        std::lock_guard<std::mutex> l(mtx_);
 
         used_cores_map_type::iterator it = used_cores_map_.find(locality_basename);
         if (it == used_cores_map_.end())
@@ -1368,9 +1367,11 @@ namespace hpx { namespace naming
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    bool do_background_work(std::size_t num_thread)
+    bool do_background_work(
+        std::size_t num_thread, parcelport_background_mode mode)
     {
-        return get_runtime().get_parcel_handler().do_background_work(num_thread);
+        return get_runtime().get_parcel_handler().do_background_work(
+            num_thread, mode);
     }
 }}
 

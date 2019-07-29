@@ -6,11 +6,11 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <hpx/format.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/serialization.hpp>
-#include <hpx/util/format.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <hpx/parallel/util/numa_allocator.hpp>
@@ -575,7 +575,7 @@ int main(int argc, char* argv[])
     std::size_t numa_nodes = get_num_numa_nodes(topo, vm);
     std::pair<std::size_t, std::size_t> pus =
         get_num_numa_pus(topo, numa_nodes, vm);
-    std::size_t num_cores = topo.get_number_of_numa_node_cores(0);
+    //std::size_t num_cores = topo.get_number_of_numa_node_cores(0);
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
@@ -583,8 +583,8 @@ int main(int argc, char* argv[])
         "hpx.run_hpx_main!=1",
         "hpx.numa_sensitive=2",  // no-cross NUMA stealing
         // block all cores of requested number of NUMA-domains
-        hpx::util::format("hpx.cores={}", numa_nodes * num_cores),
-        hpx::util::format("hpx.os_threads={}", numa_nodes * pus.second)
+//        hpx::util::format("hpx.cores={}", numa_nodes * num_cores),
+//        hpx::util::format("hpx.os_threads={}", numa_nodes * pus.second)
     };
 
     std::string node_name("numanode");
@@ -605,8 +605,9 @@ int main(int argc, char* argv[])
             pus.second-1                             // core:0-%d
         );
     }
-    cfg.push_back(bind_desc);
+//    cfg.push_back(bind_desc);
 
+//    return hpx::init();
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
 

@@ -10,11 +10,11 @@
 #define HPX_UTIL_TAGGED_PAIR_DEC_23_2015_1014AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/util/tagged.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <cstddef>
 #include <type_traits>

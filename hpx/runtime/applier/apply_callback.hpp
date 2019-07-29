@@ -7,15 +7,15 @@
 #define HPX_APPLIER_APPLY_CALLBACK_DEC_16_2012_1228PM
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/format.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/util/detail/pack.hpp>
-#include <hpx/util/format.hpp>
-#include <hpx/util/tuple.hpp>
 
 #include <hpx/runtime/applier/apply.hpp>
 

@@ -102,8 +102,8 @@ if(HPX_WITH_GIT_TAG)
     file(REMOVE_RECURSE "${DOCS_LATEST_DEST}")
     if("html" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
       file(
-        COPY "${DOCS_SOURCE}"
-        DESTINATION "${DOCS_LATEST_DEST}/html"
+        COPY "${DOCS_SOURCE}/html"
+        DESTINATION "${DOCS_LATEST_DEST}"
         PATTERN "*.buildinfo" EXCLUDE)
     endif()
     if("singlehtml" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)

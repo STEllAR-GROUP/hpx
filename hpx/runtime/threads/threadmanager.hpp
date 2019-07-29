@@ -9,9 +9,6 @@
 #define HPX_THREADMANAGER_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/barrier.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -21,7 +18,6 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/block_profiler.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/spinlock.hpp>
 
@@ -34,9 +30,10 @@
 #include <mutex>
 #include <numeric>
 #include <string>
+#include <thread>
 #include <type_traits>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -50,7 +47,7 @@ namespace hpx { namespace threads
     private:
         // we use a simple mutex to protect the data members of the
         // thread manager for now
-        typedef compat::mutex mutex_type;
+        typedef std::mutex mutex_type;
 
     public:
         typedef threads::policies::callback_notifier notification_policy_type;
@@ -220,7 +217,7 @@ namespace hpx { namespace threads
             return total;
         }
 
-        compat::thread& get_os_thread_handle(std::size_t num_thread) const
+        std::thread& get_os_thread_handle(std::size_t num_thread) const
         {
             std::lock_guard<mutex_type> lk(mtx_);
             pool_id_type id = threads_lookup_[num_thread];
@@ -367,6 +364,12 @@ namespace hpx { namespace threads
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
         std::int64_t get_background_work_duration(bool reset);
         std::int64_t get_background_overhead(bool reset);
+
+        std::int64_t get_background_send_duration(bool reset);
+        std::int64_t get_background_send_overhead(bool reset);
+
+        std::int64_t get_background_receive_duration(bool reset);
+        std::int64_t get_background_receive_overhead(bool reset);
 #endif    //HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
         std::int64_t get_cumulative_duration(bool reset);

@@ -95,6 +95,9 @@ endif()
 # Get the include directories we need ...
 get_directory_property(_INCLUDE_DIRS INCLUDE_DIRECTORIES)
 
+# Add core HPX library include directory
+set(_INCLUDE_DIRS ${_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR})
+
 # replace all characters with special regex meaning
 set(special_chars "^;+;*;?;$;.;-;|;(;);]")
 set(binarydir_escaped ${CMAKE_BINARY_DIR})
@@ -176,6 +179,10 @@ set(HPX_CONF_INCLUDE_DIRS
 foreach(lib ${HPX_LIBS})
   set(HPX_CONF_INCLUDE_DIRS
     "${HPX_CONF_INCLUDE_DIRS} -I${PROJECT_SOURCE_DIR}/libs/${lib}/include")
+endforeach()
+foreach(component ${HPX_COMPONENTS})
+  set(HPX_CONF_INCLUDE_DIRS
+    "${HPX_CONF_INCLUDE_DIRS} -I${PROJECT_SOURCE_DIR}/components/${component}/include")
 endforeach()
 set(HPX_CMAKE_CONF_INCLUDE_DIRS
   ${_NEEDED_CMAKE_BUILD_DIR_INCLUDE_DIRS}

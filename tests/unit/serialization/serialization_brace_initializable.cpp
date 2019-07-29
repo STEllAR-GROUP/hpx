@@ -7,7 +7,7 @@
 
 #if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS)
 #include <hpx/include/serialization.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <string>
 #include <tuple>

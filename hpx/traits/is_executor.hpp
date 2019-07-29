@@ -7,7 +7,7 @@
 #define HPX_TRAITS_IS_EXECUTOR_DEC_23_0759PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 
 #include <type_traits>
 

@@ -7,7 +7,7 @@
 
 #include <hpx/include/traits.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/util/iterator_range.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
 
 #include <vector>
 

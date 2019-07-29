@@ -7,20 +7,21 @@
 
 #include <hpx/runtime/threads/topology.hpp>
 
-#include <hpx/compat/thread.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/format.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/format.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
+#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/throw_exception.hpp>
+#include <hpx/util/spinlock.hpp>
 
 #include <boost/io/ios_state.hpp>
 
+#include <thread>
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
@@ -48,6 +49,10 @@
 #if defined(_POSIX_VERSION)
 #include <sys/syscall.h>
 #include <sys/resource.h>
+#endif
+
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
 #endif
 
 namespace hpx { namespace threads { namespace detail
@@ -124,7 +129,26 @@ namespace hpx { namespace threads { namespace detail
 #endif
         return node;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // abstract away memory page size
+    std::size_t get_memory_page_size_impl()
+    {
+#if defined(HPX_HAVE_UNISTD_H)
+        return sysconf(_SC_PAGE_SIZE);
+#elif defined(HPX_WINDOWS)
+        SYSTEM_INFO systemInfo;
+        GetSystemInfo(&systemInfo);
+        return systemInfo.dwPageSize;
+#else
+        return 4096;
+#endif
+    }
+
 }}}
+
+std::size_t hpx::threads::topology::memory_page_size_ =
+        hpx::threads::detail::get_memory_page_size_impl();
 
 namespace hpx { namespace threads
 {
@@ -551,6 +575,16 @@ namespace hpx { namespace threads
 
                 hwloc_bitmap_free(cpuset);
                 return mask;
+            }
+            else
+            {
+                std::string errstr = std::strerror(errno);
+
+                lk.unlock();
+                HPX_THROW_EXCEPTION(no_success,
+                    "topology::get_thread_affinity_mask_from_lva",
+                    "failed calling 'hwloc_get_area_membind_nodeset', "
+                    "reported error: " + errstr);
             }
         }
 
@@ -1214,7 +1248,7 @@ namespace hpx { namespace threads
         return mask;
     }
 
-    mask_type topology::get_cpubind_mask(compat::thread& handle,
+    mask_type topology::get_cpubind_mask(std::thread& handle,
         error_code& ec) const
     {
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();

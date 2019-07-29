@@ -7,8 +7,10 @@
 #define HPX_RUNTIME_THREADS_DETAIL_SET_THREAD_STATE_JAN_13_2013_0518PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
@@ -16,12 +18,10 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/steady_clock.hpp>
 
 #include <boost/asio/basic_waitable_timer.hpp>
 

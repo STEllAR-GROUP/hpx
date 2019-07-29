@@ -13,7 +13,7 @@
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
@@ -25,7 +25,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 //
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/util/debug/thread_stacktrace.hpp>
 //
 #include <boost/asio/ip/host_name.hpp>
@@ -142,7 +142,7 @@ namespace libfabric
     {
         while (hpx::is_starting())
         {
-            background_work(0);
+            background_work(0, parcelport_background_mode_all);
         }
         LOG_DEBUG_MSG("io service task completed");
     }
@@ -425,7 +425,9 @@ namespace libfabric
     // This is called whenever the main thread scheduler is idling,
     // is used to poll for events, messages on the libfabric connection
     // --------------------------------------------------------------------
-    bool parcelport::background_work(std::size_t num_thread) {
+    bool parcelport::background_work(
+        std::size_t num_thread, parcelport_background_mode mode)
+    {
         if (stopped_ || hpx::is_stopped()) {
             return false;
         }

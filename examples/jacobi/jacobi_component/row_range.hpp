@@ -7,8 +7,8 @@
 #ifndef JACOBI_ROW_RANGE_HPP
 #define JACOBI_ROW_RANGE_HPP
 
-#include <hpx/util/atomic_count.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/range/iterator.hpp>

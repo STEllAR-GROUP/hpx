@@ -7,7 +7,7 @@
 #define HPX_TRAITS_MANAGED_COMPONENT_POLICIES_JUN_02_2016_0710PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/always_void.hpp>
+#include <hpx/type_support/always_void.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits

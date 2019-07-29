@@ -14,7 +14,8 @@ namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     // special struct to ensure cache line alignment of a data type
-#if defined(HPX_HAVE_CXX11_ALIGNAS) && !defined(__NVCC__)
+#if defined(HPX_HAVE_CXX11_ALIGNAS) && defined(HPX_HAVE_CXX17_ALIGNED_NEW) &&  \
+    !defined(__NVCC__)
     template <typename Data>
     struct alignas(threads::get_cache_line_size()) cache_aligned_data
     {
@@ -24,38 +25,34 @@ namespace hpx { namespace util
     template <typename Data>
     struct cache_aligned_data
     {
-        static_assert(threads::get_cache_line_size() >= sizeof(Data),
-            "threads::get_cache_line_size() >= sizeof(Data)");
-
         // pad to cache line size bytes
         Data data_;
-        char cacheline_pad[threads::get_cache_line_size() - sizeof(Data)];
+        char cacheline_pad[threads::get_cache_line_size() -
+            (sizeof(Data) % threads::get_cache_line_size())];
     };
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
     // special struct to data type is cache line aligned and fully occupies a
     // cache line
-#if defined(HPX_HAVE_CXX11_ALIGNAS) && !defined(__NVCC__)
+#if defined(HPX_HAVE_CXX11_ALIGNAS) && defined(HPX_HAVE_CXX17_ALIGNED_NEW) &&  \
+    !defined(__NVCC__)
     template <typename Data>
     struct alignas(threads::get_cache_line_size()) cache_line_data
     {
-        static_assert(threads::get_cache_line_size() >= sizeof(Data),
-            "threads::get_cache_line_size() >= sizeof(Data)");
-
         Data data_;
-        char cacheline_pad[threads::get_cache_line_size() - sizeof(Data)];
+        char cacheline_pad[threads::get_cache_line_size() -
+            (sizeof(Data) % threads::get_cache_line_size())];
+
     };
 #else
     template <typename Data>
     struct cache_line_data
     {
-        static_assert(threads::get_cache_line_size() >= sizeof(Data),
-            "threads::get_cache_line_size() >= sizeof(Data)");
-
         // pad to cache line size bytes
         Data data_;
-        char cacheline_pad[threads::get_cache_line_size() - sizeof(Data)];
+        char cacheline_pad[threads::get_cache_line_size() -
+            (sizeof(Data) % threads::get_cache_line_size())];
     };
 #endif
 }}

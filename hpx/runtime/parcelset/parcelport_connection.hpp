@@ -7,8 +7,8 @@
 #ifndef HPX_PARCELSET_PARCELPORT_CONNECTION_HPP
 #define HPX_PARCELSET_PARCELPORT_CONNECTION_HPP
 
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstdint>
 #include <memory>

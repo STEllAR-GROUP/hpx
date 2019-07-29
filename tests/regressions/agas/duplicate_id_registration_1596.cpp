@@ -9,8 +9,8 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/serialization.hpp>
-#include <hpx/util/format.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/format.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 

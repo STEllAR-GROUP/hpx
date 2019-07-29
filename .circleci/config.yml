@@ -108,7 +108,6 @@ jobs:
             if [ -z "$CIRCLE_PR_NUMBER" ] && \
                 ( [ "$CIRCLE_BRANCH" == "master" ] || \
                   [ "$CIRCLE_BRANCH" == "release" ] || \
-                  [ "$CIRCLE_BRANCH" == "pdf-docs" ] || \
                   [ -n "$CIRCLE_TAG" ] ); then
                 DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf"
             else
@@ -127,7 +126,8 @@ jobs:
                 -DHPX_WITH_TESTS_HEADERS=On \
                 -DHPX_WITH_COMPILER_WARNINGS=On \
                 -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=On \
-                -DHPX_WITH_DEPRECATION_WARNINGS=Off \
+                -DHPX_WITH_DEPRECATION_WARNINGS=On \
+                -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
                 -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
                 -DHPX_WITH_TESTS_DEBUG_LOG=On \
                 -DHPX_WITH_TESTS_DEBUG_LOG_DESTINATION=/hpx/build/debug-log.txt \
@@ -140,15 +140,46 @@ jobs:
           paths:
             - ./build
 
-  clang_tidy:
+  configure_test_combinations:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Running clang-tidy
+          name: Running CMake with tests on and examples off
           command: |
-              /hpx/source/tools/clang-tidy.sh -diff-master
+            cmake \
+                /hpx/source \
+                -G "Ninja" \
+                -DHPX_WITH_MALLOC=system \
+                -DHPX_WITH_TESTS=On \
+                -DHPX_WITH_EXAMPLES=Off
+            rm -rf *
+      - run:
+          name: Running CMake with tests off and examples on
+          command: |
+            cmake \
+                /hpx/source \
+                -G "Ninja" \
+                -DHPX_WITH_MALLOC=system \
+                -DHPX_WITH_TESTS=Off \
+                -DHPX_WITH_EXAMPLES=On
+            rm -rf *
+      - run:
+          name: Running CMake with APEX on
+          command: |
+            cmake \
+                /hpx/source \
+                -G "Ninja" \
+                -DHPX_WITH_MALLOC=system \
+                -DHPX_WITH_APEX=On \
+                -DHPX_WITH_TESTS=On \
+                -DHPX_WITH_EXAMPLES=On
+            rm -rf *
+      - persist_to_workspace:
+          root: /hpx
+          paths:
+            - ./build
 
   inspect:
     <<: *defaults
@@ -232,7 +263,12 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.examples
+              # NOTE: transpose_block_numa is disabled because
+              # hwloc_get_area_membind_nodeset (which is used by the
+              # numa_allocator) fails with EPERM.
+              ctest -T test --no-compress-output --output-on-failure \
+                  -R tests.examples \
+                  -E tests.examples.transpose.transpose_block_numa
       - run:
           <<: *convert_xml
       - run:
@@ -336,7 +372,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.component
+              ninja -j2 -k 0 tests.unit.component tests.unit.components
       - run:
           name: Running Unit Tests
           when: always
@@ -432,32 +468,6 @@ jobs:
       - store_artifacts:
           path: tests.unit.lcos
 
-  tests.unit.parallel.algorithms:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.parallel.algorithms
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.algorithms
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.parallel.algorithms
-      - store_artifacts:
-          path: tests.unit.parallel.algorithms
-
   tests.unit.parallel.block:
     <<: *defaults
     steps:
@@ -483,32 +493,6 @@ jobs:
           path: tests.unit.parallel.block
       - store_artifacts:
           path: tests.unit.parallel.block
-
-  tests.unit.parallel.container_algorithms:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.parallel.container_algorithms
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.container_algorithms
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.parallel.container_algorithms
-      - store_artifacts:
-          path: tests.unit.parallel.container_algorithms
 
   tests.unit.parallel.datapar_algorithms:
     <<: *defaults
@@ -720,6 +704,34 @@ jobs:
       - store_artifacts:
           path: tests.unit.threads
 
+  tests.unit.topology:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 tests.unit.topology
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest -T test --no-compress-output --output-on-failure \
+                  -R tests.unit.topology \
+                  -E tests.unit.topology.numa_allocator
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.topology
+      - store_artifacts:
+          path: tests.unit.topology
+
   tests.unit.traits:
     <<: *defaults
     steps:
@@ -772,6 +784,92 @@ jobs:
       - store_artifacts:
           path: tests.unit.util
 
+  tests.unit.modules:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Module Unit Tests
+          command: |
+              ninja -j2 -k 0 tests.unit.modules.allocator_support
+              ninja -j2 -k 0 tests.unit.modules.assertion
+              ninja -j2 -k 0 tests.unit.modules.cache
+              ninja -j2 -k 0 tests.unit.modules.collectives
+              ninja -j2 -k 0 tests.unit.modules.concepts
+              ninja -j2 -k 0 tests.unit.modules.config
+              ninja -j2 -k 0 tests.unit.modules.datastructures
+              ninja -j2 -k 0 tests.unit.modules.format
+              ninja -j2 -k 0 tests.unit.modules.hardware
+              ninja -j2 -k 0 tests.unit.modules.hashing
+              ninja -j2 -k 0 tests.unit.modules.iterator_support
+              ninja -j2 -k 0 tests.unit.modules.logging
+              ninja -j2 -k 0 tests.unit.modules.preprocessor
+              ninja -j2 -k 0 tests.unit.modules.statistics
+              ninja -j2 -k 0 tests.unit.modules.testing
+              ninja -j2 -k 0 tests.unit.modules.thread_support
+              ninja -j2 -k 0 tests.unit.modules.type_support
+              ninja -j2 -k 0 tests.unit.modules.util
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.allocator_support
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.assertion
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.concepts
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.datastructures
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.format
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.hardware
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.hashing
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.iterator_support
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.logging
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.statistics
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.testing
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.type_support
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.util
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.modules
+      - store_artifacts:
+          path: tests.unit.modules
+
+  tests.unit.modules.algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 tests.unit.modules.algorithms
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.algorithms
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.modules.algorithms
+      - store_artifacts:
+          path: tests.unit.modules.algorithms
+
   tests.regressions:
     <<: *defaults
     steps:
@@ -797,7 +895,7 @@ jobs:
       - store_artifacts:
           path: tests.regressions
 
-  tests.headers.compat:
+  tests.headers:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -805,205 +903,13 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.compat
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: tests.headers.compat
+          path: tests.headers
       - store_artifacts:
-          path: tests.headers.compat
-
-  tests.headers.components:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Header Tests
-          command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.components
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: tests.headers.components
-      - store_artifacts:
-          path: tests.headers.components
-
-  tests.headers.compute:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Header Tests
-          command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.compute
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: tests.headers.compute
-      - store_artifacts:
-          path: tests.headers.compute
-
-  tests.headers.config:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Header Tests
-          command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.config
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: tests.headers.config
-      - store_artifacts:
-          path: tests.headers.config
-
-  tests.headers.include:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Header Tests
-          command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.include
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: tests.headers.include
-      - store_artifacts:
-          path: tests.headers.include
-
-  tests.headers.lcos:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Header Tests
-          command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.lcos
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: tests.headers.lcos
-      - store_artifacts:
-          path: tests.headers.lcos
-
-  tests.headers.parallel:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Header Tests
-          command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.parallel
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: tests.headers.parallel
-      - store_artifacts:
-          path: tests.headers.parallel
-
-  tests.headers.performance_counters:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Header Tests
-          command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.performance_counters
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: tests.headers.performance_counters
-      - store_artifacts:
-          path: tests.headers.performance_counters
-
-  tests.headers.plugins:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Header Tests
-          command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.plugins
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: tests.headers.plugins
-      - store_artifacts:
-          path: tests.headers.plugins
-
-  tests.headers.runtime:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Header Tests
-          command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.runtime
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: tests.headers.runtime
-      - store_artifacts:
-          path: tests.headers.runtime
-
-  tests.headers.traits:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Header Tests
-          command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.traits
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: tests.headers.traits
-      - store_artifacts:
-          path: tests.headers.traits
-
-  tests.headers.util:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Header Tests
-          command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.util
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: tests.headers.util
-      - store_artifacts:
-          path: tests.headers.util
-
-  tests.headers.libs:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Header Tests
-          command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.preprocessor
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: tests.headers.libs
-      - store_artifacts:
-          path: tests.headers.libs
+          path: tests.headers
 
   tests.performance:
     <<: *defaults
@@ -1072,7 +978,7 @@ jobs:
               docker create -v /hpx --name sources stellargroup/hpx:dev /bin/true
               docker cp ./source/examples/quickstart/hello_world_distributed.cpp sources:/hpx
               docker run --volumes-from sources -w /hpx ${TARGET_IMAGE_NAME} \
-                hpxcxx --exe=hello_world_distributed_test_build                          \
+                hpxcxx --exe=hello_world_distributed_test_build              \
                 hello_world_distributed.cpp -g -lhpx_iostreamsd
               docker run --volumes-from sources -w /hpx ${TARGET_IMAGE_NAME} \
                 ./hello_world_distributed_test_build --hpx:bind=none
@@ -1114,9 +1020,9 @@ workflows:
           requires:
             - checkout_code
           <<: *gh_pages_filter
-      - clang_tidy:
+      - configure_test_combinations:
           requires:
-            - configure
+            - checkout_code
           <<: *gh_pages_filter
       - inspect:
           requires:
@@ -1153,11 +1059,7 @@ workflows:
           <<: *core_dependency
       - tests.unit.lcos:
           <<: *core_dependency
-      - tests.unit.parallel.algorithms:
-          <<: *core_dependency
       - tests.unit.parallel.block:
-          <<: *core_dependency
-      - tests.unit.parallel.container_algorithms:
           <<: *core_dependency
       - tests.unit.parallel.datapar_algorithms:
           <<: *core_dependency
@@ -1175,37 +1077,21 @@ workflows:
           <<: *core_dependency
       - tests.unit.threads:
           <<: *core_dependency
+      - tests.unit.topology:
+          <<: *core_dependency
       - tests.unit.traits:
           <<: *core_dependency
       - tests.unit.util:
+          <<: *core_dependency
+      - tests.unit.modules:
+          <<: *core_dependency
+      - tests.unit.modules.algorithms:
           <<: *core_dependency
       - tests.regressions:
           <<: *core_dependency
       - tests.performance:
           <<: *core_dependency
-      - tests.headers.compat:
-          <<: *core_dependency
-      - tests.headers.components:
-          <<: *core_dependency
-      - tests.headers.compute:
-          <<: *core_dependency
-      - tests.headers.config:
-          <<: *core_dependency
-      - tests.headers.include:
-          <<: *core_dependency
-      - tests.headers.lcos:
-          <<: *core_dependency
-      - tests.headers.parallel:
-          <<: *core_dependency
-      - tests.headers.performance_counters:
-          <<: *core_dependency
-      - tests.headers.plugins:
-          <<: *core_dependency
-      - tests.headers.runtime:
-          <<: *core_dependency
-      - tests.headers.traits:
-          <<: *core_dependency
-      - tests.headers.util:
+      - tests.headers:
           <<: *core_dependency
       - examples:
           <<: *core_dependency
@@ -1217,7 +1103,6 @@ workflows:
       - install:
           requires:
             - inspect
-            - clang_tidy
             - core
             - docs
             - tests.examples
@@ -1228,9 +1113,7 @@ workflows:
             - tests.unit.computeapi
             - tests.unit.diagnostics
             - tests.unit.lcos
-            - tests.unit.parallel.algorithms
             - tests.unit.parallel.block
-            - tests.unit.parallel.container_algorithms
             - tests.unit.parallel.datapar_algorithms
             - tests.unit.parallel.executors
             - tests.unit.parallel.segmented_algorithms
@@ -1239,20 +1122,11 @@ workflows:
             - tests.unit.resource
             - tests.unit.serialization
             - tests.unit.threads
+            - tests.unit.topology
             - tests.unit.traits
             - tests.unit.util
-            - tests.headers.compat
-            - tests.headers.components
-            - tests.headers.compute
-            - tests.headers.config
-            - tests.headers.include
-            - tests.headers.lcos
-            - tests.headers.parallel
-            - tests.headers.performance_counters
-            - tests.headers.plugins
-            - tests.headers.runtime
-            - tests.headers.traits
-            - tests.headers.util
+            - tests.unit.modules
+            - tests.headers
             - tests.performance
             - tests.regressions
             - examples

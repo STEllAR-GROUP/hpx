@@ -10,7 +10,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/threads.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <boost/thread/locks.hpp>
 

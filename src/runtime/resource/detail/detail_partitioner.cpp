@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/resource/partitioner.hpp>
@@ -11,10 +12,9 @@
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/type_support/static.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -216,7 +216,7 @@ namespace hpx { namespace resource { namespace detail
     ////////////////////////////////////////////////////////////////////////
     partitioner::partitioner()
       : first_core_(std::size_t(-1))
-      , cores_needed_(std::size_t(-1))
+      , pus_needed_(std::size_t(-1))
       , mode_(mode_default)
       , topo_(threads::create_topology())
     {
@@ -361,8 +361,8 @@ namespace hpx { namespace resource { namespace detail
         }
 
         // should have been initialized by now
-        HPX_ASSERT(cores_needed_ != std::size_t(-1));
-        return cores_needed_;
+        HPX_ASSERT(pus_needed_ != std::size_t(-1));
+        return pus_needed_;
     }
 
     // This function is called in hpx_init, before the instantiation of the
@@ -916,7 +916,7 @@ namespace hpx { namespace resource { namespace detail
         cfg_.parse_result_ = cfg_.call(desc_cmdline, argc, argv);
 
         // set all parameters related to affinity data
-        cores_needed_ = affinity_data_.init(cfg_);
+        pus_needed_ = affinity_data_.init(cfg_);
 
         if (fill_internal_topology)
         {

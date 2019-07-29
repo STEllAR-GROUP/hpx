@@ -26,7 +26,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <boost/math/constants/constants.hpp>
 

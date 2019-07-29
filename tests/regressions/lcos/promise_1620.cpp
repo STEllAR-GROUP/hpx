@@ -6,7 +6,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <atomic>
 #include <chrono>

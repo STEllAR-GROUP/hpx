@@ -5,7 +5,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <boost/program_options.hpp>
 

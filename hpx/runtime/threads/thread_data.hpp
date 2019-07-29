@@ -17,11 +17,11 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/throw_exception.hpp>
 
-#include <hpx/util/assert.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)

@@ -18,7 +18,7 @@
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/is_continuation.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <type_traits>
 #include <utility>

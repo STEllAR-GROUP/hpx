@@ -14,7 +14,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <string>

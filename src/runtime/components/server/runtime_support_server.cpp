@@ -5,15 +5,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/config/defaults.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/logging.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/util/find_prefix.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/unlock_guard.hpp>
 
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -46,9 +44,9 @@
 #endif
 #include <hpx/lcos/local/packaged_task.hpp>
 
-#include <hpx/util/assert.hpp>
-#include <hpx/util/parse_command_line.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <hpx/plugins/message_handler_factory_base.hpp>
@@ -73,6 +71,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -269,7 +268,7 @@ namespace hpx { namespace components { namespace server
       : stop_called_(false)
       , stop_done_(false)
       , terminated_(false)
-      , main_thread_id_(compat::this_thread::get_id())
+      , main_thread_id_(std::this_thread::get_id())
       , dijkstra_color_(false)
       , shutdown_all_invoked_(false)
       , modules_(cfg.modules())
@@ -782,7 +781,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     void runtime_support::run()
     {
-        std::unique_lock<compat::mutex> l(mtx_);
+        std::unique_lock<std::mutex> l(mtx_);
         stop_called_ = false;
         stop_done_ = false;
         terminated_ = false;
@@ -791,7 +790,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::wait()
     {
-        std::unique_lock<compat::mutex> l(mtx_);
+        std::unique_lock<std::mutex> l(mtx_);
         while (!stop_done_) {
             LRT_(info) << "runtime_support: about to enter wait state";
             wait_condition_.wait(l);
@@ -802,7 +801,7 @@ namespace hpx { namespace components { namespace server
     void runtime_support::stop(double timeout,
         naming::id_type const& respond_to, bool remove_from_remote_caches)
     {
-        std::unique_lock<compat::mutex> l(mtx_);
+        std::unique_lock<std::mutex> l(mtx_);
         if (!stop_called_) {
             // push pending logs
             components::cleanup_logging();
@@ -821,7 +820,7 @@ namespace hpx { namespace components { namespace server
             stop_called_ = true;
 
             {
-                util::unlock_guard<compat::mutex> ul(mtx_);
+                util::unlock_guard<std::mutex> ul(mtx_);
 
                 util::yield_while(
                     [&tm, timeout, &t, start_time, &timed_out]()
@@ -904,7 +903,7 @@ namespace hpx { namespace components { namespace server
 
             // The main thread notifies stop_condition_, so don't wait if we're
             // on the main thread.
-            if (compat::this_thread::get_id() != main_thread_id_)
+            if (std::this_thread::get_id() != main_thread_id_)
             {
                 stop_condition_.wait(l);        // wait for termination
             }
@@ -913,7 +912,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::notify_waiting_main()
     {
-        std::unique_lock<compat::mutex> l(mtx_);
+        std::unique_lock<std::mutex> l(mtx_);
         if (!stop_called_) {
             stop_called_ = true;
             stop_done_ = true;
@@ -921,7 +920,7 @@ namespace hpx { namespace components { namespace server
 
             // The main thread notifies stop_condition_, so don't wait if we're
             // on the main thread.
-            if (compat::this_thread::get_id() != main_thread_id_)
+            if (std::this_thread::get_id() != main_thread_id_)
             {
                 stop_condition_.wait(l);        // wait for termination
             }
@@ -931,7 +930,7 @@ namespace hpx { namespace components { namespace server
     // this will be called after the thread manager has exited
     void runtime_support::stopped()
     {
-        std::lock_guard<compat::mutex> l(mtx_);
+        std::lock_guard<std::mutex> l(mtx_);
         if (!terminated_) {
             terminated_ = true;
             stop_condition_.notify_all();   // finished cleanup/termination
@@ -952,6 +951,85 @@ namespace hpx { namespace components { namespace server
     {
         decode(str, "\\n", "\n");
         return str;
+    }
+
+    namespace detail {
+        void handle_print_bind(boost::program_options::variables_map const& vm_,
+            std::size_t num_threads)
+        {
+            threads::topology& top = threads::create_topology();
+            auto const& rp = hpx::resource::get_partitioner();
+            auto const& tm = get_runtime().get_thread_manager();
+            {
+                std::ostringstream
+                    strm;    // make sure all output is kept together
+
+                strm << std::string(79, '*') << '\n';
+                strm << "locality: " << hpx::get_locality_id() << '\n';
+                for (std::size_t i = 0; i != num_threads; ++i)
+                {
+                    // print the mask for the current PU
+                    threads::mask_cref_type pu_mask = rp.get_pu_mask(i);
+                    std::string pool_name = tm.get_pool(i).get_pool_name();
+
+                    if (!threads::any(pu_mask))
+                    {
+                        strm << std::setw(4) << i
+                             << ": thread binding disabled"    //-V112
+                             << std::endl;
+                    }
+                    else
+                    {
+                        top.print_affinity_mask(strm, i, pu_mask, pool_name);
+                    }
+
+                    // Make sure the mask does not contradict the CPU bindings
+                    // returned by the system (see #973: Would like option to
+                    // report HWLOC bindings).
+                    error_code ec(lightweight);
+                    std::thread& blob = tm.get_os_thread_handle(i);
+                    threads::mask_type boundcpu =
+                        top.get_cpubind_mask(blob, ec);
+
+                    /* threads::mask_type boundcpu = top.get_cpubind_mask(
+                    rt.get_thread_manager().get_os_thread_handle(i), ec);*/
+
+                    // The masks reported by HPX must be the same as the ones
+                    // reported from HWLOC.
+                    if (!ec && threads::any(boundcpu) &&
+                        !threads::equal(boundcpu, pu_mask, num_threads))
+                    {
+                        std::string boundcpu_str = threads::to_string(boundcpu);
+                        std::string pu_mask_str = threads::to_string(pu_mask);
+                        HPX_THROW_EXCEPTION(invalid_status,
+                            "handle_print_bind",
+                            hpx::util::format(
+                                "unexpected mismatch between locality {1}: "
+                                "binding "
+                                "reported from HWLOC({2}) and HPX({3}) on "
+                                "thread {4}",
+                                hpx::get_locality_id(), boundcpu_str,
+                                pu_mask_str, i));
+                    }
+                }
+
+                std::cout << strm.str();
+            }
+        }
+
+        void handle_list_parcelports()
+        {
+            {
+                std::ostringstream
+                    strm;    // make sure all output is kept together
+                strm << std::string(79, '*') << '\n';
+                strm << "locality: " << hpx::get_locality_id() << '\n';
+
+                get_runtime().get_parcel_handler().list_parcelports(strm);
+
+                std::cout << strm.str();
+            }
+        }
     }
 
     int runtime_support::load_components()
@@ -1048,11 +1126,11 @@ namespace hpx { namespace components { namespace server
                 if (vm.count("hpx:print-bind")) {
                     std::size_t num_threads = boost::lexical_cast<std::size_t>(
                         ini.get_entry("hpx.os_threads", 1));
-                    util::handle_print_bind(vm, num_threads);
+                    detail::handle_print_bind(vm, num_threads);
                 }
 
                 if (vm.count("hpx:list-parcel-ports"))
-                    util::handle_list_parcelports();
+                    detail::handle_list_parcelports();
 
                 if (vm.count("hpx:exit"))
                     return 1;

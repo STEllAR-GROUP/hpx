@@ -5,15 +5,15 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/compat/barrier.hpp>
-#include <hpx/compat/thread.hpp>
-#include <hpx/util/format.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/format.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/util/barrier.hpp>
 
 #include <boost/config.hpp>
 #include <boost/thread/tss.hpp>
 #include <boost/program_options.hpp>
 
+#include <thread>
 #include <cstdint>
 #include <functional>
 #include <iostream>
@@ -46,7 +46,6 @@ using boost::program_options::store;
 using boost::program_options::command_line_parser;
 using boost::program_options::notify;
 
-namespace compat = hpx::compat;
 using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -55,7 +54,7 @@ static HPX_NATIVE_TLS double* global_scratch;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void worker(
-    hpx::compat::barrier& b
+    hpx::util::barrier& b
   , std::uint64_t updates
     )
 {
@@ -116,16 +115,16 @@ int main(
 
     ///////////////////////////////////////////////////////////////////////////
     // run the test
-    std::vector<compat::thread> workers;
+    std::vector<std::thread> workers;
 
-    hpx::compat::barrier b(threads);
+    hpx::util::barrier b(threads);
 
     high_resolution_timer t;
 
     for (std::uint32_t i = 0; i != threads; ++i)
-        workers.push_back(compat::thread(worker, std::ref(b), updates));
+        workers.push_back(std::thread(worker, std::ref(b), updates));
 
-    for (compat::thread& thread : workers)
+    for (std::thread& thread : workers)
     {
         if (thread.joinable())
             thread.join();

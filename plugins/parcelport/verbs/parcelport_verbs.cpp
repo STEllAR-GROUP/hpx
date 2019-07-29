@@ -8,17 +8,16 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 // util
-#include <hpx/assert.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/format.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
-#include <hpx/util/format.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
@@ -358,7 +357,7 @@ namespace verbs
             // We only execute work on the IO service while HPX is starting
             while (hpx::is_starting())
             {
-                background_work(0);
+                background_work(0, parcelport_background_mode_all);
             }
             LOG_DEBUG_MSG("io service task completed");
         }
@@ -1549,7 +1548,9 @@ namespace verbs
         // This is called whenever the main thread scheduler is idling,
         // is used to poll for events, messages on the verbs connection
         // --------------------------------------------------------------------
-        bool background_work(std::size_t num_thread) {
+        bool background_work(
+            std::size_t num_thread, parcelport_background_mode mode)
+        {
             if (stopped_ || hpx::is_stopped()) {
                 return false;
             }

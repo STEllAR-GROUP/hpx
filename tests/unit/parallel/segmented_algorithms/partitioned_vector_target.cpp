@@ -7,7 +7,7 @@
 #include <hpx/include/compute.hpp>
 #include <hpx/include/partitioned_vector.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <vector>

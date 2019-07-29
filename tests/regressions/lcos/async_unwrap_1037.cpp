@@ -10,7 +10,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/async.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 hpx::future<int> f(int i)
 {

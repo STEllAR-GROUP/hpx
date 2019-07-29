@@ -13,7 +13,7 @@
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -123,21 +123,22 @@ int main(int argc, char* argv[])
 
     {
         // These schedulers should succeed
-        std::vector<hpx::resource::scheduling_policy> schedulers =
-            {
+        std::vector<hpx::resource::scheduling_policy> schedulers = {
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
-                hpx::resource::scheduling_policy::local,
-                hpx::resource::scheduling_policy::local_priority_fifo,
-                hpx::resource::scheduling_policy::local_priority_lifo,
+            hpx::resource::scheduling_policy::local,
+            hpx::resource::scheduling_policy::local_priority_fifo,
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+            hpx::resource::scheduling_policy::local_priority_lifo,
 #endif
-#if defined(HPX_HAVE_ABP_SCHEDULER)
-                hpx::resource::scheduling_policy::abp_priority_fifo,
-                hpx::resource::scheduling_policy::abp_priority_lifo,
+#endif
+#if defined(HPX_HAVE_ABP_SCHEDULER) && defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+            hpx::resource::scheduling_policy::abp_priority_fifo,
+            hpx::resource::scheduling_policy::abp_priority_lifo,
 #endif
 #if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
-                hpx::resource::scheduling_policy::shared_priority,
+            hpx::resource::scheduling_policy::shared_priority,
 #endif
-            };
+        };
 
         for (auto const scheduler : schedulers)
         {

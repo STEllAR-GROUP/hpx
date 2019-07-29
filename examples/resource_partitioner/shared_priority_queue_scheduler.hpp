@@ -7,7 +7,8 @@
 #define EXAMPLES_RESOURCE_PARTITIONER_SHARED_PRIORITY_QUEUE_SCHEDULER
 
 #include <hpx/config.hpp>
-#include <hpx/compat/mutex.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -16,8 +17,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
 #if !defined(HPX_MSVC)
@@ -30,6 +30,7 @@
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <numeric>
 #include <sstream>
@@ -152,17 +153,24 @@ namespace hpx { namespace debug {
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx {
-namespace threads {
-namespace policies {
-namespace example {
+namespace hpx { namespace threads { namespace policies { namespace example {
 
-    inline void spin_for_time(std::size_t microseconds, const char *task) {
+    inline void spin_for_time(std::size_t microseconds, const char* task)
+    {
 #ifdef SHARED_PRIORITY_SCHEDULER_DEBUG
         hpx::util::annotate_function apex_profiler(task);
         std::this_thread::sleep_for(std::chrono::microseconds(microseconds));
 #endif
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+    using default_shared_priority_queue_scheduler_terminated_queue =
+        lockfree_lifo;
+#else
+    using default_shared_priority_queue_scheduler_terminated_queue =
+        lockfree_fifo;
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     /// The shared_priority_queue_scheduler maintains a set of high, normal, and
@@ -172,10 +180,11 @@ namespace example {
     /// high priority queue, the next 4 will share another one and so on. In
     /// addition, the shared_priority_queue_scheduler is NUMA-aware and takes
     /// NUMA scheduling hints into account when creating and scheduling work.
-    template <typename Mutex = compat::mutex,
+    template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
-        typename TerminatedQueuing = lockfree_lifo>
+        typename TerminatedQueuing =
+            default_shared_priority_queue_scheduler_terminated_queue>
     class shared_priority_queue_scheduler : public scheduler_base
     {
     protected:

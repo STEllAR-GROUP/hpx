@@ -8,7 +8,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;

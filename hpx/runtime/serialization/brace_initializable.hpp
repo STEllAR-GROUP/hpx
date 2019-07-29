@@ -12,7 +12,7 @@
 
 #include <hpx/runtime/serialization/brace_initializable_fwd.hpp>
 #include <hpx/traits/brace_initializable_traits.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 
 namespace hpx { namespace serialization

@@ -7,13 +7,12 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_OS_EXECUTORS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/util/steady_clock.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
@@ -22,6 +21,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -109,7 +109,7 @@ namespace hpx { namespace threads { namespace executors
             static std::string get_unique_name();
 
             // protect scheduler initialization
-            typedef compat::mutex mutex_type;
+            typedef std::mutex mutex_type;
             mutable mutex_type mtx_;
         };
     }

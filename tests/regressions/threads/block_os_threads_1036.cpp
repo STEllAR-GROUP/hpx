@@ -9,8 +9,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 

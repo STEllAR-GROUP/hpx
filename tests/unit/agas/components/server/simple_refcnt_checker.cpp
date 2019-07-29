@@ -7,7 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <cstdint>
 #include <sstream>

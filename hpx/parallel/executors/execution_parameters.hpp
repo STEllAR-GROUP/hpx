@@ -15,13 +15,13 @@
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/traits/detail/wrap_int.hpp>
-#include <hpx/traits/has_member_xxx.hpp>
+#include <hpx/type_support/detail/wrap_int.hpp>
+#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_parameters_fwd.hpp>

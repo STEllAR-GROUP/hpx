@@ -23,7 +23,7 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/iterator_support/range.hpp>
 
 #include <algorithm>
 #include <cstddef>

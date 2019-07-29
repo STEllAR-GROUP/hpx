@@ -5,11 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/util/atomic_count.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/pack_traversal_async.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -14,7 +14,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/util/checkpoint.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 using hpx::util::checkpoint;
 using hpx::util::restore_checkpoint;

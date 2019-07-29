@@ -23,7 +23,6 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/traits/action_remote_result.hpp>
 #include <hpx/util/debug/demangle_helper.hpp>
-#include <hpx/util/tuple.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif

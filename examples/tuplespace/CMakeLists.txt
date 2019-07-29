@@ -6,41 +6,28 @@
 
 add_subdirectory(central_tuplespace)
 
-set(examples
+set(example_programs
     simple_central_tuplespace
    )
 
 set(simple_central_tuplespace_PARAMETERS THREADS_PER_LOCALITY 4)
 
 # for all targets specified above
-foreach(example ${examples})
-  set(sources ${example}_client.cpp)
+foreach(example_program ${example_programs})
+  set(sources ${example_program}_client.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${example}_client
+  add_hpx_executable(${example_program}_client
     SOURCES ${sources}
-    COMPONENT_DEPENDENCIES ${example} iostreams
-    FOLDER "Examples/TupleSpace/${example}")
+    COMPONENT_DEPENDENCIES ${example_program} iostreams
+    FOLDER "Examples/TupleSpace/${example_program}")
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(examples.tuplespace.${example})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(examples.tuplespace
-                              examples.tuplespace.${example})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.tuplespace.${example}
-                              ${example}_client)
+  add_hpx_example_target_dependencies("tuplespace" ${example_program}_client)
 
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-    add_hpx_example_test("tuplespace" ${example}_client ${${example}_PARAMETERS})
-    add_hpx_pseudo_target(tests.examples.tuplespace.${example})
-    add_hpx_pseudo_dependencies(tests.examples.tuplespace
-                                tests.examples.tuplespace.${example})
-    add_hpx_pseudo_dependencies(tests.examples.tuplespace.${example}
-                                ${example}_client)
+    add_hpx_example_test("tuplespace" ${example_program}_client
+      ${${example_program}_PARAMETERS})
   endif()
 endforeach()

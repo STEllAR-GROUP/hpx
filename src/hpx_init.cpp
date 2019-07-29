@@ -9,8 +9,8 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/apply.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -24,14 +24,16 @@
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/util/apex.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/util/debugging.hpp>
+#include <hpx/format.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/query_counters.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -310,6 +312,32 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        HPX_NORETURN void assertion_handler(
+            hpx::assertion::source_location const& loc, const char* expr,
+            std::string const& msg)
+        {
+            hpx::util::may_attach_debugger("exception");
+
+            std::ostringstream strm;
+            strm << "Assertion '" << expr << "' failed";
+            if (!msg.empty())
+            {
+                strm << " (" << msg << ")";
+            }
+
+            hpx::exception e(hpx::assertion_failure, strm.str());
+            std::cerr << hpx::diagnostic_information(
+                             hpx::detail::get_exception(e, loc.function_name,
+                                 loc.file_name, loc.line_number))
+                      << std::endl;
+            std::abort();
+        }
+
+        void test_failure_handler()
+        {
+            hpx::util::may_attach_debugger("test-failure");
+        }
+
         ///////////////////////////////////////////////////////////////////////
         struct dump_config
         {
@@ -573,6 +601,8 @@ namespace hpx
             startup_function_type startup, shutdown_function_type shutdown,
             hpx::runtime_mode mode, bool blocking)
         {
+            hpx::assertion::set_assertion_handler(&detail::assertion_handler);
+            hpx::util::set_test_failure_handler(&detail::test_failure_handler);
 #if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
             set_error_handlers();
 #endif
@@ -618,15 +648,35 @@ namespace hpx
                     return -1;
                 }
 
-                // Construct resource partitioner if this has not been done yet
-                // and get a handle to it
-                // (if the command-line parsing has not yet been done, do it now)
-                auto& rp = hpx::resource::detail::create_partitioner(f,
-                    desc_cmdline, argc, argv, std::move(ini_config),
-                    resource::mode_default, mode, false);
+                // scope exception handling to resource partitioner initialization
+                // any exception thrown during run_or_start below are handled
+                // separately
+                try {
+                    // Construct resource partitioner if this has not been done yet
+                    // and get a handle to it
+                    // (if the command-line parsing has not yet been done, do it now)
+                    auto& rp = hpx::resource::detail::create_partitioner(f,
+                        desc_cmdline, argc, argv, std::move(ini_config),
+                        resource::mode_default, mode, false, &result);
 
-                // Setup all internal parameters of the resource_partitioner
-                rp.configure_pools();
+                    // check whether HPX should be exited at this point
+                    // (parse_result is returning a result > 0, if the program options
+                    // contain --hpx:help or --hpx:version, on error result is < 0)
+                    if (result != 0)
+                    {
+                        if (result > 0)
+                            result = 0;
+                        return result;
+                    }
+
+                    // Setup all internal parameters of the resource_partitioner
+                    rp.configure_pools();
+                }
+                catch (hpx::exception const& e) {
+                    std::cerr << "hpx::init: hpx::exception caught: "
+                              << hpx::get_error_what(e) << "\n";
+                    return -1;
+                }
 
                 util::apex_wrapper_init apex(argc, argv);
 
@@ -636,27 +686,16 @@ namespace hpx
                 // Build and configure this runtime instance.
                 typedef hpx::runtime_impl runtime_type;
 
-                util::command_line_handling& cms = rp.get_command_line_switches();
+                util::command_line_handling& cms =
+                    resource::get_partitioner().get_command_line_switches();
                 std::unique_ptr<hpx::runtime> rt(new runtime_type(cms.rtcfg_));
-
-                result = rp.parse_result();
-
-                // check whether HPX should be exited at this point
-                // (parse_result is returning a result > 0, if the program options
-                // contain --hpx:help or --hpx:version, on error result is < 0)
-                if (result != 0)
-                {
-                    if (result > 0)
-                        result = 0;
-                    return result;
-                }
 
                 result = run_or_start(blocking, std::move(rt),
                     cms, std::move(startup), std::move(shutdown));
             }
             catch (detail::command_line_error const& e) {
-                std::cerr << "{env}: " << hpx::detail::get_execution_environment();
-                std::cerr << "hpx::init: std::exception caught: " << e.what() << "\n";
+                std::cerr << "hpx::init: std::exception caught: " << e.what()
+                          << "\n";
                 return -1;
             }
             return result;

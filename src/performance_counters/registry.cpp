@@ -17,12 +17,12 @@
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_front.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/regex_from_pattern.hpp>
-#include <hpx/util/rolling_max.hpp>
-#include <hpx/util/rolling_min.hpp>
+#include <hpx/statistics/rolling_max.hpp>
+#include <hpx/statistics/rolling_min.hpp>
 
 #include <boost/accumulators/statistics_fwd.hpp>
 #include <boost/accumulators/statistics/rolling_variance.hpp>

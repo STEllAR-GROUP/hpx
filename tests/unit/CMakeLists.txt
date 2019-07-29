@@ -17,6 +17,7 @@ set(subdirs
     resource
     serialization
     threads
+    topology
     traits
     util
    )
@@ -28,7 +29,9 @@ endif()
 set(subdirs ${subdirs} computeapi)
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.${subdir})
+  if(NOT TARGET tests.unit.${subdir})
+    add_hpx_pseudo_target(tests.unit.${subdir})
+  endif()
   add_subdirectory(${subdir})
   add_hpx_pseudo_dependencies(tests.unit tests.unit.${subdir})
 endforeach()

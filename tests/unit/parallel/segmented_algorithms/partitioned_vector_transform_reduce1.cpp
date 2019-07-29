@@ -9,7 +9,7 @@
 #include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <iterator>
 

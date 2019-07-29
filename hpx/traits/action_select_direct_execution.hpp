@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/type_support/detail/wrap_int.hpp>
 
 namespace hpx { namespace traits
 {

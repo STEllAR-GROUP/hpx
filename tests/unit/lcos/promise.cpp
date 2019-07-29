@@ -7,7 +7,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <functional>
 #include <string>

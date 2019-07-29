@@ -11,21 +11,23 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
+
+#include <hpx/format.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/testing.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/integer/common_factor.hpp>
 
 #include <chrono>
+#include <condition_variable>
 #include <cstdint>
 #include <ctime>
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -427,7 +429,7 @@ int hpx_main(
                     boost::algorithm::is_any_of(","),
                     boost::algorithm::token_compress_on);
 
-                HPX_ASSERT(entry.size() == 2);
+                HPX_TEST(entry.size() == 2);
 
                 counter_shortnames.push_back(entry[0]);
                 counters.push_back(entry[1]);

@@ -9,8 +9,8 @@
 #define HPX_RUNTIME_COMPONENTS_SERVER_COMPONENT_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/internal_allocator.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/traits/component_heap_type.hpp>
 
 #include <cstddef>

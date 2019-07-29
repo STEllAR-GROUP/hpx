@@ -10,9 +10,9 @@
 #include <hpx/config.hpp>
 // util
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
@@ -204,7 +204,8 @@ namespace libfabric
         // This is called whenever the main thread scheduler is idling,
         // is used to poll for events, messages on the libfabric connection
         // --------------------------------------------------------------------
-        bool background_work(std::size_t num_thread);
+        bool background_work(
+            std::size_t num_thread, parcelport_background_mode mode);
         void io_service_work();
         bool background_work_OS_thread();
 

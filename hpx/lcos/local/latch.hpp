@@ -8,10 +8,11 @@
 #if !defined(HPX_LCOS_LATCH_APR_18_2015_0925PM)
 #define HPX_LCOS_LATCH_APR_18_2015_0925PM
 
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/cache_aligned_data.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -163,6 +164,7 @@ namespace hpx { namespace lcos { namespace local
                 counter_.fetch_add(n, std::memory_order_acq_rel);
 
             HPX_ASSERT(old_count > 0);
+            HPX_UNUSED(old_count);
         }
 
         /// Reset counter_ to n. Does not block.
@@ -178,13 +180,14 @@ namespace hpx { namespace lcos { namespace local
                 counter_.exchange(n, std::memory_order_acq_rel);
 
             HPX_ASSERT(old_count == 0);
+            HPX_UNUSED(old_count);
 
             std::unique_lock<mutex_type> l(mtx_.data_);
             HPX_ASSERT(notified_);
             notified_ = false;
         }
 
-    private:
+    protected:
         mutable util::cache_line_data<mutex_type> mtx_;
         mutable util::cache_line_data<local::detail::condition_variable> cond_;
         std::atomic<std::ptrdiff_t> counter_;

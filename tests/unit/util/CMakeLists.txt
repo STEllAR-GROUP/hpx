@@ -6,31 +6,20 @@
 set(tests
     any
     any_serialization
-    boost_any
     bind_action
+    boost_any
     checkpoint
     config_entry
-    format
-    function
-    function_ref
     pack_traversal
     pack_traversal_async
     parse_slurm_nodelist
-    range
     tagged
     tuple
     unwrap
    )
 
-if(HPX_WITH_CXX11_STD_INITIALIZER_LIST)
-  set(tests ${tests}
-    coordinate
-  )
-endif()
-
 set(subdirs
     bind
-    cache
     function
     iterator
     mem_fn
@@ -62,21 +51,11 @@ foreach(test ${tests})
 
   add_hpx_unit_test("util" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.util.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.util
-                              tests.unit.util.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.util.${test}
-                              ${test}_test)
 endforeach()
 
 # add sub directories
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.util.${subdir}dir)
+  add_hpx_pseudo_target(tests.unit.util.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.unit.util tests.unit.util.${subdir}dir)
+  add_hpx_pseudo_dependencies(tests.unit.util tests.unit.util.${subdir})
 endforeach()

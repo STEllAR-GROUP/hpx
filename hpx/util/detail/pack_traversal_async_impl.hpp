@@ -7,15 +7,15 @@
 #define HPX_UTIL_DETAIL_PACK_TRAVERSAL_ASYNC_IMPL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/traits/future_access.hpp>
-#include <hpx/util/allocator_deleter.hpp>
-#include <hpx/util/always_void.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/allocator_support/allocator_deleter.hpp>
+#include <hpx/type_support/always_void.hpp>
 #include <hpx/util/detail/container_category.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

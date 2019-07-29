@@ -91,7 +91,7 @@ namespace hpx { namespace lcos
             {
                 {
                     std::lock_guard<mutex_type> lk(mtx);
-                    bcast_future = bcast_gate.get_future(1);
+                    bcast_future = bcast_gate.get_future(lk, 1);
 
                     ready_promise.set_value();
                     ready_promise = hpx::lcos::local::promise<void>();

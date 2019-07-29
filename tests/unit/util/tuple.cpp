@@ -19,8 +19,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/testing.hpp>
 
 #if defined(__clang__)
 #  pragma clang diagnostic pop

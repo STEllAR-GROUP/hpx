@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/compat/thread.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/plugins/parcelport/tcp/connection_handler.hpp>
@@ -18,13 +18,13 @@
 #include <hpx/plugins/parcelport/tcp/sender.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/util/asio_util.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/io/ios_state.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
+#include <thread>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -188,7 +188,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         "connection_handler(tcp)::create_connection");
                 }
                 else {
-                    compat::this_thread::sleep_for(
+                    std::this_thread::sleep_for(
                         std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
             }

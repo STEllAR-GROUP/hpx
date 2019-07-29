@@ -7,11 +7,10 @@
 // (see: https://channel9.msdn.com/Shows/C9-GoingNative/GoingNative-40-Updated-STL-in-VS-2015-feat-STL)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/thread/locks.hpp>
 

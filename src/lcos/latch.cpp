@@ -5,16 +5,16 @@
 
 #include <hpx/lcos/latch.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/server/latch.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/components/new.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/detail/action_factory.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/server/latch.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
 #include <cstddef>

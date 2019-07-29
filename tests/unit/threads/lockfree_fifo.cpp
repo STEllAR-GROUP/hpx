@@ -7,20 +7,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/compat/thread.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/bind.hpp>
 
+#include <boost/lockfree/queue.hpp>
 #include <boost/program_options.hpp>
 
-#include <boost/detail/lightweight_test.hpp>
-
-#include <boost/lockfree/queue.hpp>
-
+#include <thread>
 #include <cstdint>
 #include <iostream>
 #include <vector>
-
-namespace compat = hpx::compat;
 
 std::vector<boost::lockfree::queue<std::uint64_t>*> queues;
 std::vector<std::uint64_t> stolen;
@@ -56,7 +52,7 @@ void worker_thread(std::uint64_t num_thread)
     for (std::uint64_t i = 0; i < items; ++i)
     {
         bool result = get_next_thread(num_thread);
-        BOOST_TEST(result);
+        HPX_TEST(result);
     }
 }
 
@@ -92,7 +88,7 @@ int main(int argc, char** argv)
     if (vm.count("help"))
     {
         std::cout << desc_cmdline;
-        return boost::report_errors();
+        return hpx::util::report_errors();
     }
 
     if (vm.count("threads"))
@@ -107,16 +103,16 @@ int main(int argc, char** argv)
         for (std::uint64_t j = 0; j < items; ++j)
             (*queues[i]).push(j);
 
-        BOOST_TEST(!(*queues[i]).empty());
+        HPX_TEST(!(*queues[i]).empty());
     }
 
     {
-        std::vector<compat::thread> tg;
+        std::vector<std::thread> tg;
 
         for (std::uint64_t i = 0; i != threads; ++i)
-            tg.push_back(compat::thread(hpx::util::bind(&worker_thread, i)));
+            tg.push_back(std::thread(hpx::util::bind(&worker_thread, i)));
 
-        for (compat::thread& t : tg)
+        for (std::thread& t : tg)
         {
             if (t.joinable())
                 t.join();
@@ -124,11 +120,11 @@ int main(int argc, char** argv)
     }
 
     for (std::uint64_t i = 0; i < threads; ++i)
-        BOOST_TEST(stolen[i] == 0);
+        HPX_TEST(stolen[i] == 0);
 
     for (std::uint64_t i = 0; i < threads; ++i)
         delete queues[i];
 
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 

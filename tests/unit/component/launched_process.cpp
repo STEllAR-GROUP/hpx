@@ -5,7 +5,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <tests/unit/component/components/launch_process_test_server.hpp>
 
@@ -75,7 +75,10 @@ int main(int argc, char* argv[])
 
         // This explicitly enables the component we depend on (it is disabled by
         // default to avoid being loaded outside of this test).
-        "hpx.components.launch_process_test_server.enabled!=1"
+        "hpx.components.launch_process_test_server.enabled!=1",
+
+        // Make sure networking will not be disabled
+        "hpx.expect_connecting_localities!=1"
     };
 
     // Note: this uses runtime_mode_connect to instruct this locality to

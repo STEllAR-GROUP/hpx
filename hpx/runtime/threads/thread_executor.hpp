@@ -12,8 +12,8 @@
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/atomic_count.hpp>
-#include <hpx/util/steady_clock.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 

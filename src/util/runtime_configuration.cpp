@@ -6,14 +6,14 @@
 
 #include <hpx/util/runtime_configuration.hpp>
 
-#include <hpx/config/defaults.hpp>
 // TODO: move parcel ports into plugins
+#include <hpx/assertion.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/init_ini_data.hpp>
+#include <hpx/util/init_logging.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/register_locks_globally.hpp>
@@ -200,13 +200,14 @@ namespace hpx { namespace util
             "max_idle_backoff_time = ${HPX_MAX_IDLE_BACKOFF_TIME:"
             HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_IDLE_BACKOFF_TIME_MAX)) "}",
 #endif
+            "default_scheduler_mode = ${HPX_DEFAULT_SCHEDULER_MODE}",
 
             /// If HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE is set,
             /// then apply the test-failure value as default.
 #if defined(HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE)
-            "attach-debugger = ${HPX_ATTACH_DEBUGGER:test-failure}",
+            "attach_debugger = ${HPX_ATTACH_DEBUGGER:test-failure}",
 #else
-            "attach-debugger = ${HPX_ATTACH_DEBUGGER}",
+            "attach_debugger = ${HPX_ATTACH_DEBUGGER}",
 #endif
 
             // arity for collective operations implemented in a tree fashion
