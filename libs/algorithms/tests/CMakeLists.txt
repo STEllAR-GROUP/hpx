@@ -37,6 +37,5 @@ if (HPX_WITH_TESTS_HEADERS)
     modules.algorithms
     HEADERS ${algorithms_headers}
     HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-    NOHPX_INIT NOLIBS
     DEPENDENCIES hpx_algorithms)
 endif()

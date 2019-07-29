@@ -40,6 +40,5 @@ if (HPX_WITH_TESTS_HEADERS)
     EXCLUDE
     "hpx/parallel/executors/timed_execution_fwd.hpp"
     "hpx/parallel/executors/parallel_executor.hpp"
-    NOHPX_INIT NOLIBS
     DEPENDENCIES hpx_parallel_executors)
 endif()
