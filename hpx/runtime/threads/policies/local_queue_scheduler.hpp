@@ -47,13 +47,21 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+    using default_local_queue_scheduler_terminated_queue = lockfree_lifo;
+#else
+    using default_local_queue_scheduler_terminated_queue = lockfree_fifo;
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
     /// The local_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from.
     template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
-        typename TerminatedQueuing = lockfree_lifo>
+        typename TerminatedQueuing =
+            default_local_queue_scheduler_terminated_queue>
     class HPX_EXPORT local_queue_scheduler : public scheduler_base
     {
     protected:
