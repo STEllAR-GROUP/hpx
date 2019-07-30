@@ -37,7 +37,7 @@ int hpx_main(int argc, char* argv[])
     }
 
     // Schedule some dummy work
-    for (std::size_t i = 0; i < 100000; ++i)
+    for (std::size_t i = 0; i < 10000; ++i)
     {
         hpx::apply([](){});
     }

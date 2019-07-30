@@ -560,7 +560,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.resource
+              ctest --timeout 120 -T test --no-compress-output --output-on-failure -R tests.unit.resource
       - run:
           <<: *convert_xml
       - run:

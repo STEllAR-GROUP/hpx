@@ -11,6 +11,7 @@
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <cstddef>
@@ -39,7 +40,9 @@ void test_scheduler(int argc, char* argv[],
 
     hpx::suspend();
 
-    for (std::size_t i = 0; i < 100; ++i)
+    hpx::util::high_resolution_timer t;
+
+    while (t.elapsed() < 2)
     {
         hpx::resume();
 
