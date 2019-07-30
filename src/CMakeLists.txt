@@ -526,7 +526,7 @@ foreach(target ${hpx_targets})
   add_hpx_pseudo_dependencies(core ${target})
 endforeach()
 
-# Add particular targets for the pkgconfig / bazel setup
+# Add particular targets for the pkgconfig setup
 add_library(hpx_application INTERFACE)
 target_link_libraries(hpx_application INTERFACE hpx_wrap)
 target_compile_definitions(hpx_application INTERFACE HPX_APPLICATION_EXPORTS)
