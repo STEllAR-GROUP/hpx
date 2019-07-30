@@ -169,6 +169,7 @@ namespace hpx { namespace components { namespace server
         // 'migration' to same locality as before is a no-op
         if (policy.get_next_target() == hpx::find_here())
         {
+            agas::unmark_as_migrated(to_migrate.get_gid());
             return make_ready_future(to_migrate);
         }
 

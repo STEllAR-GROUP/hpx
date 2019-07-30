@@ -335,6 +335,25 @@ namespace hpx { namespace lcos
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
+        hpx::future<std::vector<typename std::decay<T>::type> >
+        gather_data_direct(hpx::future<hpx::id_type> f, T&& result,
+            std::size_t site)
+        {
+            typedef typename std::decay<T>::type result_type;
+            typedef typename gather_server<result_type>::get_result_action
+                action_type;
+
+            // make sure id is kept alive as long as the returned future
+            hpx::id_type id = f.get();
+            return async(action_type(), id, site, std::forward<T>(result)).then(
+                [id](hpx::future<std::vector<result_type> > && f)
+                {
+                    HPX_UNUSED(id);
+                    return f.get();
+                });
+        }
+
+        template <typename T>
         hpx::future<std::vector<T> >
         gather_data(hpx::future<hpx::id_type> f, hpx::future<T> result,
             std::size_t site)
@@ -349,6 +368,17 @@ namespace hpx { namespace lcos
                     HPX_UNUSED(id);
                     return f.get();
                 });
+        }
+
+        template <typename T>
+        hpx::future<void> set_data_direct(
+            hpx::future<hpx::id_type> f, T&& result, std::size_t which)
+        {
+            typedef typename std::decay<T>::type result_type;
+            typedef typename gather_server<result_type>::set_result_action
+                action_type;
+
+            return async(action_type(), f.get(), which, std::forward<T>(result));
         }
 
         template <typename T>
@@ -433,11 +463,9 @@ namespace hpx { namespace lcos
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
-        typedef typename util::decay<T>::type result_type;
         return dataflow(
-                util::bind_back(&detail::gather_data<result_type>, this_site),
-                std::move(f), std::forward<T>(result)
-            );
+            util::bind_back(&detail::gather_data_direct<T>, this_site),
+            std::move(f), std::forward<T>(result));
     }
 
     template <typename T>
@@ -466,10 +494,8 @@ namespace hpx { namespace lcos
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
-        return dataflow(
-                util::bind_back(&detail::set_data<T>, this_site),
-                std::move(id), std::move(result)
-            );
+        return dataflow(util::bind_back(&detail::set_data<T>, this_site),
+            std::move(id), std::move(result));
     }
 
     template <typename T>
@@ -494,17 +520,14 @@ namespace hpx { namespace lcos
     // gather plain values
     template <typename T>
     hpx::future<void>
-    gather_there(hpx::future<hpx::id_type> id, T && result,
+    gather_there(hpx::future<hpx::id_type> id, T&& result,
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
-        typedef typename util::decay<T>::type result_type;
-        return dataflow(
-                util::bind_back(&detail::set_data<result_type>, this_site),
-                std::move(id), std::forward<T>(result)
-            );
+        return dataflow(util::bind_back(&detail::set_data_direct<T>, this_site),
+            std::move(id), std::forward<T>(result));
     }
 
     template <typename T>
