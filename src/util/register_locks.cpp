@@ -28,19 +28,19 @@ namespace hpx { namespace util
             lock_data()
               : ignore_(false)
               , user_data_(nullptr)
-            {
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
-                backtrace_ = hpx::util::trace();
+              , backtrace_(hpx::util::trace())
 #endif
+            {
             }
 
             lock_data(register_lock_data* data)
               : ignore_(false)
               , user_data_(data)
-            {
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
-                backtrace_ = hpx::detail::trace();
+              , backtrace_(hpx::detail::trace())
 #endif
+            {
             }
 
             ~lock_data()
