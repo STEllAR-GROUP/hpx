@@ -605,7 +605,6 @@ namespace hpx { namespace util
         }
 
         bool using_nodelist = false;
-        bool enable_batch_env = false;
 
         std::vector<std::string> nodelist;
 
@@ -649,8 +648,9 @@ namespace hpx { namespace util
             (cfgmap.get_value<int>("hpx.use_process_mask", 0) > 0) ||
             (vm.count("hpx:use-process-mask") > 0);
 
-        enable_batch_env = ((cfgmap.get_value<int>("hpx.ignore_batch_env", 0) +
-                                vm.count("hpx:ignore-batch-env")) == 0) &&
+        bool enable_batch_env =
+            ((cfgmap.get_value<int>("hpx.ignore_batch_env", 0) +
+                 vm.count("hpx:ignore-batch-env")) == 0) &&
             !use_process_mask_;
 
         util::batch_environment env(nodelist, rtcfg_, debug_clp, enable_batch_env);
