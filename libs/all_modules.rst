@@ -27,6 +27,7 @@ All modules
    /libs/iterator_support/docs/index.rst
    /libs/logging/docs/index.rst
    /libs/preprocessor/docs/index.rst
+   /libs/segmented_algorithms/docs/index.rst
    /libs/statistics/docs/index.rst
    /libs/testing/docs/index.rst
    /libs/thread_support/docs/index.rst

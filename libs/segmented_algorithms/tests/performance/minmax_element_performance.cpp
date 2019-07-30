@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
     // initialize program
     std::vector<std::string> const cfg = {
         "hpx.os_threads=all",
-        "hpx.run_hpx_main=1"
+        "hpx.run_hpx_main!=1"
     };
 
     boost::program_options::options_description cmdline(

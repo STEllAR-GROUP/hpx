@@ -546,34 +546,6 @@ jobs:
       - store_artifacts:
           path: tests.unit.parallel.executors
 
-  tests.unit.parallel.segmented_algorithms:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          # We need to compile some tests serially because they eat too much
-          # memory
-          command: |
-              ninja -j1 -k 0 tests.unit.parallel.segmented_algorithms
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.segmented_algorithms
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.parallel.segmented_algorithms
-      - store_artifacts:
-          path: tests.unit.parallel.segmented_algorithms
-
   tests.unit.parcelset:
     <<: *defaults
     steps:
@@ -870,6 +842,34 @@ jobs:
       - store_artifacts:
           path: tests.unit.modules.algorithms
 
+  tests.unit.modules.segmented_algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests
+          # We need to compile some tests serially because they eat too much
+          # memory
+          command: |
+              ninja -j1 -k 0 tests.unit.modules.segmented_algorithms
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.segmented_algorithms
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.modules.segmented_algorithms
+      - store_artifacts:
+          path: tests.unit.modules.segmented_algorithms
+
   tests.regressions:
     <<: *defaults
     steps:
@@ -1065,8 +1065,6 @@ workflows:
           <<: *core_dependency
       - tests.unit.parallel.executors:
           <<: *core_dependency
-      - tests.unit.parallel.segmented_algorithms:
-          <<: *core_dependency
       - tests.unit.parcelset:
           <<: *core_dependency
       - tests.unit.performance_counter:
@@ -1086,6 +1084,8 @@ workflows:
       - tests.unit.modules:
           <<: *core_dependency
       - tests.unit.modules.algorithms:
+          <<: *core_dependency
+      - tests.unit.modules.segmented_algorithms:
           <<: *core_dependency
       - tests.regressions:
           <<: *core_dependency
@@ -1116,7 +1116,6 @@ workflows:
             - tests.unit.parallel.block
             - tests.unit.parallel.datapar_algorithms
             - tests.unit.parallel.executors
-            - tests.unit.parallel.segmented_algorithms
             - tests.unit.parcelset
             - tests.unit.performance_counter
             - tests.unit.resource
@@ -1126,6 +1125,8 @@ workflows:
             - tests.unit.traits
             - tests.unit.util
             - tests.unit.modules
+            - tests.unit.modules.algorithms
+            - tests.unit.modules.segmented_algorithms
             - tests.headers
             - tests.performance
             - tests.regressions

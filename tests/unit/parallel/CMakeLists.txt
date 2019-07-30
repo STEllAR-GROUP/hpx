@@ -8,7 +8,6 @@ set(subdirs
     block
     datapar_algorithms
     executors
-    segmented_algorithms
    )
 
 foreach(subdir ${subdirs})
