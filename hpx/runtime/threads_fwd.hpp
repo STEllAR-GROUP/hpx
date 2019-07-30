@@ -30,6 +30,7 @@ namespace hpx
         }
 
         class HPX_EXPORT thread_pool_base;
+        struct HPX_EXPORT thread_pool_init_parameters;
     }
 }
 

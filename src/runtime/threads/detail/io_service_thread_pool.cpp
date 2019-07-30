@@ -18,12 +18,9 @@
 namespace hpx { namespace threads { namespace detail
 {
     io_service_thread_pool::io_service_thread_pool(
-        threads::policies::callback_notifier& notifier, std::size_t index,
-        char const* pool_name, policies::scheduler_mode m,
-        std::size_t thread_offset)
-      : thread_pool_base(notifier, index, pool_name, m, thread_offset,
-            policies::detail::affinity_data())
-      , threads_(notifier, pool_name)
+        hpx::threads::thread_pool_init_parameters const& init)
+      : thread_pool_base(init)
+      , threads_(init.notifier_, init.name_.c_str())
     {
     }
 

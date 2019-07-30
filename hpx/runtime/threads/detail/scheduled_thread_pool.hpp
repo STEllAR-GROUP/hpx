@@ -45,19 +45,7 @@ namespace hpx { namespace threads { namespace detail
     public:
         ///////////////////////////////////////////////////////////////////
         scheduled_thread_pool(std::unique_ptr<Scheduler> sched,
-            threads::policies::callback_notifier& notifier, std::size_t index,
-            std::string const& pool_name,
-            policies::scheduler_mode m =
-                policies::scheduler_mode::nothing_special,
-            std::size_t thread_offset = 0,
-            network_background_callback_type network_background_callback =
-                network_background_callback_type(),
-            policies::detail::affinity_data const& affinity_data =
-                policies::detail::affinity_data(),
-            std::size_t max_background_threads =
-                (std::numeric_limits<std::size_t>::max)(),
-            std::size_t max_idle_loop_count = HPX_IDLE_LOOP_COUNT_MAX,
-            std::size_t max_busy_loop_count = HPX_BUSY_LOOP_COUNT_MAX);
+            thread_pool_init_parameters const& init);
         virtual ~scheduled_thread_pool();
 
         void print_pool(std::ostream& os) override;

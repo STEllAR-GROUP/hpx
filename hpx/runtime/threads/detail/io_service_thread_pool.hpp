@@ -28,10 +28,7 @@ namespace hpx { namespace threads { namespace detail
     class HPX_EXPORT io_service_thread_pool : public thread_pool_base
     {
     public:
-        io_service_thread_pool(threads::policies::callback_notifier& notifier,
-            std::size_t index, char const* pool_name,
-            policies::scheduler_mode m = policies::scheduler_mode::nothing_special,
-            std::size_t thread_offset = 0);
+        io_service_thread_pool(threads::thread_pool_init_parameters const& init);
 
         void print_pool(std::ostream& os) {}
 

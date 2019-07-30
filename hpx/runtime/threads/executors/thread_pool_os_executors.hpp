@@ -105,8 +105,7 @@ namespace hpx { namespace threads { namespace executors
             threads::policies::callback_notifier notifier_;
             std::unique_ptr<threads::detail::scheduled_thread_pool<Scheduler>> pool_;
 
-            std::size_t num_threads_;
-            policies::detail::affinity_data const& affinity_data_;
+            threads::thread_pool_init_parameters thread_pool_init_;
 
             static std::atomic<std::size_t> os_executor_count_;
             static std::string get_unique_name();

@@ -54,11 +54,7 @@ namespace hpx
 
         using scheduler_function = util::function_nonser<
             std::unique_ptr<hpx::threads::thread_pool_base>(
-                hpx::threads::policies::callback_notifier&, std::size_t,
-                std::size_t, std::size_t, std::string const&,
-                hpx::threads::detail::network_background_callback_type const&,
-                hpx::threads::policies::detail::affinity_data const&,
-                std::size_t, std::size_t, std::size_t)>;
+                hpx::threads::thread_pool_init_parameters)>;
 
         // Choose same names as in command-line options except with _ instead of
         // -.

@@ -96,23 +96,17 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     scheduled_thread_pool<Scheduler>::scheduled_thread_pool(
-        std::unique_ptr<Scheduler> sched,
-        threads::policies::callback_notifier& notifier, std::size_t index,
-        std::string const& pool_name, policies::scheduler_mode m,
-        std::size_t thread_offset,
-        network_background_callback_type network_background_callback,
-        policies::detail::affinity_data const& affinity_data,
-        std::size_t max_background_threads, std::size_t max_idle_loop_count,
-        std::size_t max_busy_loop_count)
-      : thread_pool_base(
-            notifier, index, pool_name, m, thread_offset, affinity_data)
+        std::unique_ptr<Scheduler>
+            sched,
+        thread_pool_init_parameters const& init)
+      : thread_pool_base(init)
       , sched_(std::move(sched))
       , thread_count_(0)
       , tasks_scheduled_(0)
-      , network_background_callback_(network_background_callback)
-      , max_background_threads_(max_background_threads)
-      , max_idle_loop_count_(max_idle_loop_count)
-      , max_busy_loop_count_(max_busy_loop_count)
+      , network_background_callback_(init.network_background_callback_)
+      , max_background_threads_(init.max_background_threads_)
+      , max_idle_loop_count_(init.max_idle_loop_count_)
+      , max_busy_loop_count_(init.max_busy_loop_count_)
     {
         sched_->set_parent_pool(this);
     }
@@ -1944,7 +1938,7 @@ namespace hpx { namespace threads { namespace detail
 
         l.unlock();
 
-        if (threads::get_self_ptr())
+        if (threads::get_self_ptr() && this == hpx::this_thread::get_pool())
         {
             std::size_t thread_num = thread_offset_ + virt_core;
 

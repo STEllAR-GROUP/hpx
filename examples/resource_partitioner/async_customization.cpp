@@ -503,18 +503,12 @@ int main(int argc, char** argv)
     using hpx::threads::policies::scheduler_mode;
     // setup the default pool with our custom priority scheduler
     rp.create_thread_pool("custom",
-        [](hpx::threads::policies::callback_notifier& notifier,
-            std::size_t num_threads, std::size_t thread_offset,
-            std::size_t pool_index, std::string const& pool_name,
-            hpx::threads::detail::network_background_callback_type const&
-                network_background_callback,
-            hpx::threads::policies::detail::affinity_data const& affinity_data,
-            std::size_t max_background_threads, std::size_t max_idle_loop_count,
-            std::size_t max_busy_loop_count)
+        [](hpx::threads::thread_pool_init_parameters const& init)
             -> std::unique_ptr<hpx::threads::thread_pool_base> {
             std::cout << "User defined scheduler creation callback " << std::endl;
-            std::unique_ptr<high_priority_sched> scheduler(new high_priority_sched(
-                num_threads, {6, 6, 64}, "shared-priority-scheduler", affinity_data));
+            std::unique_ptr<high_priority_sched> scheduler(
+                new high_priority_sched(init.num_threads_, {6, 6, 64},
+                    "shared-priority-scheduler", init.affinity_data_));
 
             scheduler_mode mode = scheduler_mode(
                 scheduler_mode::do_background_work |
@@ -522,11 +516,7 @@ int main(int argc, char** argv)
 
             std::unique_ptr<hpx::threads::thread_pool_base> pool(
                 new hpx::threads::detail::scheduled_thread_pool<
-                    high_priority_sched>(std::move(scheduler), notifier,
-                    pool_index, pool_name, mode, thread_offset,
-                    network_background_callback, affinity_data,
-                    max_background_threads, max_idle_loop_count,
-                    max_busy_loop_count));
+                    high_priority_sched>(std::move(scheduler), init));
             return pool;
         });
 

@@ -13,6 +13,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
+#include <hpx/runtime/threads/detail/network_background_callback.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
@@ -55,6 +56,47 @@ namespace hpx { namespace threads
     };
     /// \endcond
 
+    struct thread_pool_init_parameters
+    {
+        std::string const& name_;
+        std::size_t index_;
+        policies::scheduler_mode mode_;
+        std::size_t num_threads_;
+        std::size_t thread_offset_;
+        hpx::threads::policies::callback_notifier& notifier_;
+        hpx::threads::policies::detail::affinity_data const& affinity_data_;
+        hpx::threads::detail::network_background_callback_type const&
+            network_background_callback_;
+        std::size_t max_background_threads_;
+        std::size_t max_idle_loop_count_;
+        std::size_t max_busy_loop_count_;
+
+        thread_pool_init_parameters(std::string const& name, std::size_t index,
+            policies::scheduler_mode mode, std::size_t num_threads,
+            std::size_t thread_offset,
+            hpx::threads::policies::callback_notifier& notifier,
+            hpx::threads::policies::detail::affinity_data const& affinity_data,
+            hpx::threads::detail::network_background_callback_type const&
+                network_background_callback =
+                    hpx::threads::detail::network_background_callback_type(),
+            std::size_t max_background_threads = std::size_t(-1),
+            std::size_t max_idle_loop_count = HPX_IDLE_LOOP_COUNT_MAX,
+            std::size_t max_busy_loop_count = HPX_BUSY_LOOP_COUNT_MAX)
+          : name_(name)
+          , index_(index)
+          , mode_(mode)
+          , num_threads_(num_threads)
+          , thread_offset_(thread_offset)
+          , notifier_(notifier)
+          , affinity_data_(affinity_data)
+          , network_background_callback_(network_background_callback)
+          , max_background_threads_(max_background_threads)
+          , max_idle_loop_count_(max_idle_loop_count)
+          , max_busy_loop_count_(max_busy_loop_count)
+        {
+        }
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     // note: this data structure has to be protected from races from the outside
 
@@ -63,10 +105,7 @@ namespace hpx { namespace threads
     {
     public:
         /// \cond NOINTERNAL
-        thread_pool_base(threads::policies::callback_notifier& notifier,
-            std::size_t index, std::string const& pool_name,
-            policies::scheduler_mode m, std::size_t thread_offset,
-            policies::detail::affinity_data const& affinity_data);
+        thread_pool_base(thread_pool_init_parameters const& init);
 
         virtual ~thread_pool_base() = default;
 

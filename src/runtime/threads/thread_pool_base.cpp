@@ -27,16 +27,13 @@ namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     thread_pool_base::thread_pool_base(
-        threads::policies::callback_notifier& notifier, std::size_t index,
-        std::string const& pool_name, policies::scheduler_mode m,
-        std::size_t thread_offset,
-        policies::detail::affinity_data const& affinity_data)
-      : id_(index, pool_name)
-      , mode_(m)
-      , thread_offset_(thread_offset)
-      , affinity_data_(affinity_data)
+        thread_pool_init_parameters const& init)
+      : id_(init.index_, init.name_)
+      , mode_(init.mode_)
+      , thread_offset_(init.thread_offset_)
+      , affinity_data_(init.affinity_data_)
       , timestamp_scale_(1.0)
-      , notifier_(notifier)
+      , notifier_(init.notifier_)
     {
     }
 
