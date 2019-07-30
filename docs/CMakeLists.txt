@@ -71,7 +71,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_some.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_each.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/traits/is_execution_policy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/checkpoint.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/debugging.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/invoke.hpp"
