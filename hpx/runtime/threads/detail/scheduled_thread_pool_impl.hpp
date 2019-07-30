@@ -1922,10 +1922,10 @@ namespace hpx { namespace threads { namespace detail
         // inform the scheduler to stop the virtual core
         hpx::state oldstate = state.exchange(state_stopping);
 
-        if (oldstate == state_terminating)
+        if (oldstate > state_stopping)
         {
-            // If thread was terminating we change the state back. A clean
-            // shutdown may not be possible in this case.
+            // If thread was terminating or already stopped we don't want to
+            // change the value back to stopping, so we restore the old state.
             state.store(oldstate);
         }
 
