@@ -33,8 +33,7 @@ namespace hpx { namespace threads { namespace detail
         compact       = 0x01,
         scatter       = 0x02,
         balanced      = 0x04,
-        numa_balanced = 0x08,
-        process       = 0x10
+        numa_balanced = 0x08
     };
 
     struct spec_type
