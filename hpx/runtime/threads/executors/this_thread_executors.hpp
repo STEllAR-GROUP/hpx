@@ -41,7 +41,7 @@ namespace hpx { namespace threads { namespace executors
           : public threads::detail::scheduled_executor_base
         {
         public:
-            this_thread_executor(
+            explicit this_thread_executor(
                 char const* description = "this_thread_executor",
                 policies::detail::affinity_data const& affinity_data =
                     policies::detail::affinity_data());

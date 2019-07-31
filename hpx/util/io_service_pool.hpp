@@ -50,8 +50,7 @@ namespace hpx { namespace util
         /// \param start_thread
         ///                 [in]
         explicit io_service_pool(
-            threads::policies::callback_notifier const& notifier =
-                threads::policies::callback_notifier(),
+            threads::policies::callback_notifier const& notifier,
             char const* pool_name = "", char const* name_postfix = "");
 
         ~io_service_pool();
