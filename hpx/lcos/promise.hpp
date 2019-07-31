@@ -148,7 +148,7 @@ namespace lcos {
         ///              state and makes that state ready (30.6.4).
         /// \throws      future_error if its shared state already has a stored value
         /// \exception   if shared state has no stored value exception is raised.
-				///              promise_already_satisfied if its shared state already has a
+        ///              promise_already_satisfied if its shared state already has a
         ///              stored value or exception.
         ///              no_state if *this has no shared state.
         using base_type::set_exception;
