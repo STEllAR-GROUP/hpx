@@ -14,7 +14,6 @@
 #include <hpx/errors.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
-#include <hpx/runtime/resource/partitioner_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <hpx/util/spinlock.hpp>
@@ -423,24 +422,6 @@ namespace hpx { namespace threads
     HPX_API_EXPORT std::size_t hardware_concurrency();
 
     HPX_API_EXPORT topology const& get_topology();
-
-    HPX_API_EXPORT void parse_affinity_options(std::string const& spec,
-        std::vector<mask_type>& affinities,
-        std::size_t used_cores,
-        std::size_t max_cores,
-        std::size_t num_threads,
-        std::vector<std::size_t>& num_pus,
-        bool use_process_mask,
-        error_code& ec = throws);
-
-    // backwards compatibility helper
-    inline void parse_affinity_options(std::string const& spec,
-        std::vector<mask_type>& affinities, error_code& ec = throws)
-    {
-        std::vector<std::size_t> num_pus;
-        parse_affinity_options(spec, affinities, 1, 1, affinities.size(),
-            num_pus, false, ec);
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     // abstract away cache-line size
