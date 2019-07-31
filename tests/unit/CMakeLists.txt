@@ -11,7 +11,7 @@ set(subdirs
     component
     diagnostics
     lcos
-    parallel
+    parallel_block
     parcelset
     performance_counter
     resource

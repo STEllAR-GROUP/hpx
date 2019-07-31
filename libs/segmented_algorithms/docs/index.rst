@@ -7,7 +7,7 @@
 .. _libs_segmented_algorithms:
 
 ====================
-Segmented algorithms
+segmented_algorithms
 ====================
 
 Segmented algorithms extend the usual parallel algorithms

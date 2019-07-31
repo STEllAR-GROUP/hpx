@@ -28,6 +28,21 @@ set(tests
     timed_thread_pool_executors
    )
 
+if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD)
+  set(tests
+      ${tests}
+      count_datapar
+      countif_datapar
+      foreach_datapar
+      foreach_datapar_zipiter
+      foreachn_datapar
+      transform_datapar
+      transform_binary_datapar
+      transform_binary2_datapar
+      transform_reduce_binary_datapar
+     )
+endif()
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
@@ -36,7 +51,7 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  set(folder_name "Tests/Unit/Parallel/Executors")
+  set(folder_name "Tests/Unit/Modules/ParallelExecutors")
 
   # add example executable
   add_hpx_executable(${test}_test
@@ -46,6 +61,6 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER ${folder_name})
 
-  add_hpx_unit_test("parallel.executors" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test("modules.parallel_executors" ${test} ${${test}_PARAMETERS})
 
 endforeach()

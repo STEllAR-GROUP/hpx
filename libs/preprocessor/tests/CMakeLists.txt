@@ -36,5 +36,7 @@ if (HPX_WITH_TESTS_HEADERS)
   add_hpx_header_tests(
     modules.preprocessor
     HEADERS ${preprocessor_headers}
-    HEADER_ROOT ${PROJECT_SOURCE_DIR}/include)
+    HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+    NOHPX_INIT NOLIBS
+    DEPENDENCIES hpx_preprocessor)
 endif()
