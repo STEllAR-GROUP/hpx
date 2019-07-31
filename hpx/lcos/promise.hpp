@@ -117,8 +117,7 @@ namespace lcos {
         /// \throws    future_error if *this has no shared state or if get_future
         ///            or get_shared_future has already been called on a promise
         ///            with the same shared state as *this.
-        /// 
-        ///            - future_already_retrieved if get_future or get_shared_future has
+        /// \exception future_already_retrieved if get_future or get_shared_future has
         ///            already been called on a promise with the same shared state as
         ///            *this.
         ///            no_state if *this has no shared state.
