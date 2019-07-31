@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <cstddef>
 
 namespace hpx { namespace util
 {
@@ -79,11 +80,16 @@ namespace hpx { namespace util
             return std::get<I>(data_);
         }
 
-        // pad to cache line size bytes
-        // todo remove wasted line if size is multiple of line size
+        // the storage of the data in tuple form
         std::tuple<Data...> data_;
-        char cacheline_pad[threads::get_cache_line_size() - 
-            ((0 + ... + sizeof(Data)) % threads::get_cache_line_size())];
+
+        // pad to multiple of cache line size bytes
+        // use zero padding if multiple of line size already
+        static constexpr unsigned int padding1 =
+            (0 + ... + sizeof(Data)) % threads::get_cache_line_size();
+        static constexpr unsigned int padding2 =
+            (padding1==0) ? 0 : threads::get_cache_line_size() - padding1;
+        char cacheline_pad[padding2];
     };
 
 #elif defined(HPX_HAVE_CXX14_STD_INTEGER_SEQUENCE)
@@ -127,10 +133,16 @@ namespace hpx { namespace util
             return std::get<I>(data_);
         }
 
-        // pad to multiple of cache line size bytes
+        // the storage of the data in tuple form
         std::tuple<Data...> data_;
-        char cacheline_pad[threads::get_cache_line_size() -
-            (detail::PackSizeInBytes<Data...>() % threads::get_cache_line_size())];
+
+        // pad to multiple of cache line size bytes
+        // use zero padding if multiple of line size already
+        static constexpr unsigned int padding1 =
+            (detail::PackSizeInBytes<Data...>() % threads::get_cache_line_size();
+        static constexpr unsigned int padding2 =
+            (padding1==0) ? 0 : threads::get_cache_line_size() - padding1;
+        char cacheline_pad[padding2];
     };
 #else
     // not supported pre C++14
