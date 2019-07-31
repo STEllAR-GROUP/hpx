@@ -16,10 +16,8 @@ namespace hpx { namespace assertion
 {
     struct force_linking_helper
     {
-#if defined(HPX_DEBUG)
         void (*handle_assert)(
             source_location const&, const char*, std::string const&);
-#endif
     };
 
     force_linking_helper& force_linking();

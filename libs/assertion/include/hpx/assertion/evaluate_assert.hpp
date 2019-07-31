@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_DEBUG)
 #include <hpx/assertion/source_location.hpp>
 
 #include <string>
@@ -32,5 +31,4 @@ namespace hpx { namespace assertion { namespace detail
     /// \endcond
 }}}
 
-#endif
 #endif
