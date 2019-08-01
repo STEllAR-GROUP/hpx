@@ -157,9 +157,13 @@ namespace hpx { namespace actions
             basic_action<Component const, R(Ps...), derived_type>::
                 increment_invocation_count();
 
-            using is_future = typename traits::is_future<R>::type;
-            return detail::component_invoke<Component const, R>(is_future{},
-                lva, comptype, F, std::forward<Ts>(vs)...);
+            using is_future_or_client = typename std::integral_constant<bool,
+                traits::is_future<R>::value ||
+                    traits::is_client<R>::value>::type;
+
+            return detail::component_invoke<Component const, R>(
+                is_future_or_client{}, lva, comptype, F,
+                std::forward<Ts>(vs)...);
         }
     };
 
