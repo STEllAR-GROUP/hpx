@@ -211,7 +211,7 @@ namespace lcos {
         /// \throws     future_error if *this has no shared state or if get_future
         ///             or get_shared_future has already been called on a promise
         ///             with the same shared state as *this.
-        ///             future_already_retrieved if get_future or get_shared_future has
+        ///\exception   future_already_retrieved if get_future or get_shared_future has
         ///             already been called on a promise with the same shared state as
         ///             *this.
         ///             no_state if *this has no shared state.
@@ -222,7 +222,7 @@ namespace lcos {
         /// \throws    future_error if *this has no shared state or if
         ///            get_shared_future has already been called on a promise
         ///            with the same shared state as *this.
-        ///            future_already_retrieved if get_shared_future has already been
+        /// \exception future_already_retrieved if get_shared_future has already been
         ///            called on a promise with the same shared state as *this.
         ///            no_state if *this has no shared state.
         using base_type::get_shared_future;
@@ -241,8 +241,8 @@ namespace lcos {
 
         /// \brief     atomically stores the exception pointer p in the shared
         ///            state and makes that state ready (30.6.4).
-        /// \throws    future_error if its shared state already has a stored value
-        ///            or exception.
+        /// \throws    future_error if its shared state already has a stored value.
+				/// \exception if shared state has no stored value exception is raised.
         ///            promise_already_satisfied if its shared state already has a
         ///            stored value or exception.
         ///            no_state if *this has no shared state.
