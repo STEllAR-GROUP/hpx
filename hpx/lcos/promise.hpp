@@ -13,11 +13,10 @@
 
 #include <exception>
 #include <memory>
-#include <utility>
 #include <type_traits>
+#include <utility>
 
-namespace hpx {
-namespace lcos {
+namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     /// A promise can be used by a single \a thread to invoke a
     /// (remote) action and wait for the result. The result is expected to be
@@ -59,18 +58,19 @@ namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult>
     class promise
-      : public detail::promise_base<
-            Result, RemoteResult, detail::promise_data<Result> >
+      : public detail::promise_base<Result, RemoteResult,
+            detail::promise_data<Result>>
     {
-        typedef detail::promise_base<
-                Result, RemoteResult, detail::promise_data<Result>
-           > base_type;
+        typedef detail::promise_base<Result, RemoteResult,
+            detail::promise_data<Result>>
+            base_type;
 
     public:
         /// \brief constructs a promise object and a shared state.
         promise()
           : base_type()
-        {}
+        {
+        }
 
         /// \brief    constructs a promise object and a shared state. The
         ///           constructor uses the allocator a to allocate the memory for the
@@ -78,19 +78,20 @@ namespace lcos {
         template <typename Allocator>
         promise(std::allocator_arg_t, Allocator const& a)
           : base_type(std::allocator_arg, a)
-        {}
+        {
+        }
 
         /// \brief   constructs a new promise object and transfers ownership of
         ///          the shared state of other (if any) to the newly-
         ///          constructed object.
         /// \post    other has no shared state.
-        promise(promise&& other) noexcept : base_type(std::move(other))
-        {}
-
-        /// \brief Abandons any shared state
-        ~promise()
+        promise(promise&& other) noexcept
+          : base_type(std::move(other))
         {
         }
+
+        /// \brief Abandons any shared state
+        ~promise() {}
 
         /// \brief   Abandons any shared state (30.6.4) and then as if
         ///          promise(std::move(other)).swap(*this).
@@ -154,18 +155,19 @@ namespace lcos {
 
     template <>
     class promise<void, hpx::util::unused_type>
-      : public detail::promise_base<
-            void, hpx::util::unused_type, detail::promise_data<void> >
+      : public detail::promise_base<void, hpx::util::unused_type,
+            detail::promise_data<void>>
     {
-        typedef detail::promise_base<
-                void, hpx::util::unused_type, detail::promise_data<void>
-            > base_type;
+        typedef detail::promise_base<void, hpx::util::unused_type,
+            detail::promise_data<void>>
+            base_type;
 
     public:
         /// \brief constructs a promise object and a shared state.
         promise()
           : base_type()
-        {}
+        {
+        }
 
         /// \brief     constructs a promise object and a shared state. The
         ///            constructor uses the allocator a to allocate the memory for the
@@ -173,18 +175,20 @@ namespace lcos {
         template <typename Allocator>
         promise(std::allocator_arg_t, Allocator const& a)
           : base_type(std::allocator_arg, a)
-        {}
+        {
+        }
 
         /// \brief   constructs a new promise object and transfers ownership of
         ///          the shared state of other (if any) to the newly-
         ///          constructed object.
         /// \post    other has no shared state.
-        promise(promise&& other) noexcept : base_type(std::move(other))
-        {}
+        promise(promise&& other) noexcept
+          : base_type(std::move(other))
+        {
+        }
 
         /// \brief   Abandons any shared state
-        ~promise()
-        {}
+        ~promise() {}
 
         /// \brief   Abandons any shared state (30.6.4) and then as if
         ///          promise(std::move(other)).swap(*this).
@@ -231,7 +235,7 @@ namespace lcos {
         ///            that state ready (30.6.4).
         ///
         /// \throws    future_error if its shared state already has a stored value.
-				/// \exception if shared state has no stored value exception is raised.
+        /// \exception if shared state has no stored value exception is raised.
         ///            promise_already_satisfied if its shared state already
         ///            has a stored value or exception.
         ///            no_state if *this has no shared state.
@@ -243,7 +247,7 @@ namespace lcos {
         /// \brief     atomically stores the exception pointer p in the shared
         ///            state and makes that state ready (30.6.4).
         /// \throws    future_error if its shared state already has a stored value.
-				/// \exception if shared state has no stored value exception is raised.
+        /// \exception if shared state has no stored value exception is raised.
         ///            promise_already_satisfied if its shared state already has a
         ///            stored value or exception.
         ///            no_state if *this has no shared state.
@@ -252,19 +256,18 @@ namespace lcos {
 
     template <typename Result, typename RemoteResult>
     void swap(promise<Result, RemoteResult>& x,
-        promise<Result, RemoteResult>&       y) noexcept
+        promise<Result, RemoteResult>& y) noexcept
     {
         x.swap(y);
     }
-}}
+}}    // namespace hpx::lcos
 
-namespace std
-{
+namespace std {
     /// Requires: Allocator shall be an allocator (17.6.3.5)
     template <typename R, typename Allocator>
-    struct uses_allocator<hpx::lcos::promise<R>, Allocator>
-      : std::true_type
-    {};
-}
+    struct uses_allocator<hpx::lcos::promise<R>, Allocator> : std::true_type
+    {
+    };
+}    // namespace std
 
 #endif /*HPX_LCOS_PROMISE_HPP*/
