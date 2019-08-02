@@ -38,7 +38,7 @@ gh_pages_filter: &gh_pages_filter
       branches:
         ignore: gh-pages
       tags:
-        only: /.*/
+        ignore: stable
 
 docs_push_filter: &docs_push_filter
     filters:
@@ -47,7 +47,7 @@ docs_push_filter: &docs_push_filter
           - master
           - release
       tags:
-        only: /.*/
+        ignore: stable
 
 core_dependency: &core_dependency
     requires:
