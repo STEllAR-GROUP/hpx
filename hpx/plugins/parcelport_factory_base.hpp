@@ -8,6 +8,7 @@
 #define HPX_PLUGINS_PARCELPORT_FACTORY_BASE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <cstddef>

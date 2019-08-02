@@ -268,7 +268,7 @@ int main(int argc, char* argv[])
                 new high_priority_sched(init.num_threads_, {6, 6, 64},
                     "shared-priority-scheduler", init.affinity_data_));
 
-            auto mode = scheduler_mode(scheduler_mode::delay_exit);
+            init.mode_ = scheduler_mode(scheduler_mode::delay_exit);
 
             std::unique_ptr<hpx::threads::thread_pool_base> pool(
                 new hpx::threads::detail::scheduled_thread_pool<

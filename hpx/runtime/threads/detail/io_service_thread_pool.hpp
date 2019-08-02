@@ -28,7 +28,8 @@ namespace hpx { namespace threads { namespace detail
     class HPX_EXPORT io_service_thread_pool : public thread_pool_base
     {
     public:
-        io_service_thread_pool(threads::thread_pool_init_parameters const& init);
+        explicit io_service_thread_pool(
+            threads::thread_pool_init_parameters const& init);
 
         void print_pool(std::ostream& os) {}
 
