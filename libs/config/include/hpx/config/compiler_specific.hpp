@@ -96,6 +96,7 @@
 // Detecting CUDA compilation mode
 // Detecting NVCC
 #if defined(__NVCC__) || defined(__CUDACC__)
+#define HPX_COMPUTE_CODE
 # if defined(__CUDA_ARCH__)
 // nvcc compiling CUDA code, device mode.
 #  define HPX_COMPUTE_DEVICE_CODE
@@ -105,6 +106,7 @@
 # endif
 // Detecting NVCC
 #elif defined(__clang__) && defined(__CUDA__)
+#define HPX_COMPUTE_CODE
 # if defined(__CUDA_ARCH__)
 // clang compiling CUDA code, device mode.
 #   define HPX_COMPUTE_DEVICE_CODE
