@@ -63,63 +63,15 @@ namespace hpx { namespace util
     // The tuple is cache aligned and fully occupies 1 or more cache lines
     // use get<0>, get<1>, ... get<N> to access the internal elements
 #if defined(HPX_HAVE_CXX11_ALIGNAS) && defined(HPX_HAVE_CXX17_ALIGNED_NEW) &&  \
-    defined(HPX_HAVE_CXX17_FOLD_EXPRESSIONS) && !defined(__NVCC__)
+    !defined(__NVCC__)
     template <typename ... Data>
     struct alignas(threads::get_cache_line_size()) cache_line_multidata
     {
-        template <typename ... T>
-        cache_line_multidata(T...ts) : data_(ts...) {};
-
-        template <std::size_t I>
-        auto &get() {
-            return std::get<I>(data_);
-        }
-
-        template <std::size_t I>
-        auto const &get() const {
-            return std::get<I>(data_);
-        }
-
-        // the storage of the data in tuple form
-        std::tuple<Data...> data_;
-
-        // pad to multiple of cache line size bytes
-        // use zero padding if multiple of line size already
-        static constexpr unsigned int padding1 =
-            (0 + ... + sizeof(Data)) % threads::get_cache_line_size();
-        static constexpr unsigned int padding2 =
-            (padding1==0) ? 0 : threads::get_cache_line_size() - padding1;
-        char cacheline_pad[padding2];
-    };
-
-#elif defined(HPX_HAVE_CXX14_STD_INTEGER_SEQUENCE)
-    namespace detail
-    {
-        // helpers to get tuple pack size
-
-        template<typename... Args>
-        constexpr size_t add(Args... args);
-
-        template<typename T, typename... Args>
-        constexpr size_t add(T t, Args... args)
-        {
-          return t + add(args...);
-        }
-        template<>
-        constexpr size_t add() {
-          return 0;
-        }
-
-        template <typename... Args>
-        static constexpr size_t PackSizeInBytes()
-        {
-            return add(sizeof(Args)...);
-        }
-    }
-
+#else
     template <typename ... Data>
     struct cache_line_multidata
     {
+#endif
         template <typename ... T>
         cache_line_multidata(T...ts) : data_(ts...) {};
 
@@ -138,16 +90,11 @@ namespace hpx { namespace util
 
         // pad to multiple of cache line size bytes
         // use zero padding if multiple of line size already
-        static constexpr unsigned int padding1 =
-            (detail::PackSizeInBytes<Data...>() % threads::get_cache_line_size();
+        static constexpr unsigned int padding1 = sizeof(std::tuple<Data...>);
         static constexpr unsigned int padding2 =
             (padding1==0) ? 0 : threads::get_cache_line_size() - padding1;
         char cacheline_pad[padding2];
     };
-#else
-    // not supported pre C++14
-#endif
-
 }}
 
 #endif
