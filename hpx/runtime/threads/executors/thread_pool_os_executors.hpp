@@ -38,8 +38,7 @@ namespace hpx { namespace threads { namespace executors
         {
         public:
             thread_pool_os_executor(std::size_t num_threads,
-                policies::detail::affinity_data const& affinity_data =
-                    policies::detail::affinity_data());
+                policies::detail::affinity_data const& affinity_data);
             ~thread_pool_os_executor();
 
             // Schedule the specified function for execution in this executor.
@@ -120,40 +119,32 @@ namespace hpx { namespace threads { namespace executors
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
     struct HPX_EXPORT local_queue_os_executor : public scheduled_executor
     {
-        local_queue_os_executor();
-
-        explicit local_queue_os_executor(std::size_t num_threads,
-            policies::detail::affinity_data const& affinity_data = {});
+        local_queue_os_executor(std::size_t num_threads,
+            policies::detail::affinity_data const& affinity_data);
     };
 #endif
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
     struct HPX_EXPORT static_queue_os_executor : public scheduled_executor
     {
-        static_queue_os_executor();
-
-        explicit static_queue_os_executor(std::size_t num_threads,
-            policies::detail::affinity_data const& affinity_data = {});
+        static_queue_os_executor(std::size_t num_threads,
+            policies::detail::affinity_data const& affinity_data);
     };
 #endif
 
     struct HPX_EXPORT local_priority_queue_os_executor
       : public scheduled_executor
     {
-        local_priority_queue_os_executor();
-
-        explicit local_priority_queue_os_executor(std::size_t num_threads,
-            policies::detail::affinity_data const& affinity_data = {});
+        local_priority_queue_os_executor(std::size_t num_threads,
+            policies::detail::affinity_data const& affinity_data);
     };
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     struct HPX_EXPORT static_priority_queue_os_executor
       : public scheduled_executor
     {
-        static_priority_queue_os_executor();
-
-        explicit static_priority_queue_os_executor(std::size_t num_threads,
-            policies::detail::affinity_data const& affinity_data = {});
+        static_priority_queue_os_executor(std::size_t num_threads,
+            policies::detail::affinity_data const& affinity_data);
     };
 #endif
 }}}

@@ -250,30 +250,19 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 }}}}
 
-namespace hpx { namespace threads { namespace executors
-{
+namespace hpx { namespace threads { namespace executors {
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
-    local_queue_os_executor::local_queue_os_executor()
+    local_queue_os_executor::local_queue_os_executor(std::size_t num_threads,
+        policies::detail::affinity_data const& affinity_data)
       : scheduled_executor(new detail::thread_pool_os_executor<
-            policies::local_queue_scheduler<> >(get_os_thread_count()))
-    {}
-
-    local_queue_os_executor::local_queue_os_executor(
-            std::size_t num_threads, policies::detail::affinity_data const& affinity_data)
-      : scheduled_executor(new detail::thread_pool_os_executor<
-            policies::local_queue_scheduler<> >(num_threads, affinity_data))
-    {}
+            policies::local_queue_scheduler<>>(num_threads, affinity_data))
+    {
+    }
 #endif
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
-    static_queue_os_executor::static_queue_os_executor()
-      : scheduled_executor(new detail::thread_pool_os_executor<
-            policies::static_queue_scheduler<>>(get_os_thread_count()))
-    {
-    }
-
     static_queue_os_executor::static_queue_os_executor(std::size_t num_threads,
         policies::detail::affinity_data const& affinity_data)
       : scheduled_executor(new detail::thread_pool_os_executor<
@@ -283,12 +272,6 @@ namespace hpx { namespace threads { namespace executors
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    local_priority_queue_os_executor::local_priority_queue_os_executor()
-      : scheduled_executor(new detail::thread_pool_os_executor<
-            policies::local_priority_queue_scheduler<>>(get_os_thread_count()))
-    {
-    }
-
     local_priority_queue_os_executor::local_priority_queue_os_executor(
         std::size_t num_threads,
         policies::detail::affinity_data const& affinity_data)
@@ -300,12 +283,6 @@ namespace hpx { namespace threads { namespace executors
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
-    static_priority_queue_os_executor::static_priority_queue_os_executor()
-      : scheduled_executor(new detail::thread_pool_os_executor<
-            policies::static_priority_queue_scheduler<>>(get_os_thread_count()))
-    {
-    }
-
     static_priority_queue_os_executor::static_priority_queue_os_executor(
         std::size_t num_threads,
         policies::detail::affinity_data const& affinity_data)
@@ -315,4 +292,4 @@ namespace hpx { namespace threads { namespace executors
     {
     }
 #endif
-}}}
+}}}    // namespace hpx::threads::executors
