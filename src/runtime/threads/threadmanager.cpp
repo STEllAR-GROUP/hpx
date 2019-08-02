@@ -214,7 +214,6 @@ namespace hpx { namespace threads
       , network_background_callback_(network_background_callback)
     {
         using util::placeholders::_1;
-        using util::placeholders::_2;
         using util::placeholders::_3;
 
         // Add callbacks local to threadmanager.
@@ -225,9 +224,9 @@ namespace hpx { namespace threads
 
         auto& rp = hpx::resource::get_partitioner();
         notifier.add_on_start_thread_callback(util::bind(
-            &resource::detail::partitioner::assign_pu, std::ref(rp), _3, _2));
+            &resource::detail::partitioner::assign_pu, std::ref(rp), _3, _1));
         notifier.add_on_stop_thread_callback(util::bind(
-            &resource::detail::partitioner::unassign_pu, std::ref(rp), _3, _2));
+            &resource::detail::partitioner::unassign_pu, std::ref(rp), _3, _1));
     }
 
     void threadmanager::create_pools()
