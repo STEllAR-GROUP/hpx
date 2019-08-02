@@ -376,7 +376,9 @@ namespace hpx { namespace parallel { inline namespace v1
                 // Maybe 'std::int64_t' is enough to avoid overflow.
                 std::int64_t block_no;
 
-                block() = default;
+                block() : first(), last(), block_no(-1)
+                {}
+
                 block(FwdIter first, FwdIter last, std::int64_t block_no = -1)
                     : first(first), last(last), block_no(block_no)
                 {}
