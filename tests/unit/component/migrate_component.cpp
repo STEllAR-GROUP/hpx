@@ -829,7 +829,7 @@ bool test_migrate_lazy_busy_component_client2(
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    std::vector<hpx::id_type> localities = hpx::find_remote_localities();
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
     for (hpx::id_type const& id : localities)
     {
