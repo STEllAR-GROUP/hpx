@@ -6,13 +6,11 @@
 cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
 set(parallel_executors_headers
+  hpx/parallel/algorithms/detail/is_negative.hpp
+  hpx/parallel/algorithms/detail/predicates.hpp
   hpx/parallel/datapar/execution_policy_fwd.hpp
   hpx/parallel/datapar/execution_policy.hpp
-  hpx/parallel/datapar.hpp
-  hpx/parallel/datapar/iterator_helpers.hpp
-  hpx/parallel/datapar/loop.hpp
-  hpx/parallel/datapar/transform_loop.hpp
-  hpx/parallel/datapar/zip_iterator.hpp
+  hpx/parallel/exception_list.hpp
   hpx/parallel/execution.hpp
   hpx/parallel/execution_policy_fwd.hpp
   hpx/parallel/execution_policy.hpp
