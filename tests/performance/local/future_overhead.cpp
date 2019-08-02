@@ -19,6 +19,7 @@
 #include <hpx/util/yield_while.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/util/annotated_function.hpp>
+#include <hpx/include/parallel_for_loop.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/lcos/local/sliding_semaphore.hpp>
@@ -53,9 +54,10 @@ using hpx::cout;
 using hpx::flush;
 
 // global vars we stick here to make printouts easy for plotting
-std::string queuing = "";
-std::size_t numa_sensitive = 0;
-std::uint64_t num_threads = 1;
+static std::string queuing = "";
+static std::size_t numa_sensitive = 0;
+static std::uint64_t num_threads = 1;
+static std::string info_string = "";
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_stats(const char* title, const char* wait, const char* exec,
@@ -64,12 +66,12 @@ void print_stats(const char* title, const char* wait, const char* exec,
     double us = 1e6*duration/count;
     if (csv)
         hpx::util::format_to(cout,
-            "{1}, {:10}, {:15}, {:20}, {:10}, {:10}, {:20}, {:4}, {:4}\n",
-           count, title, wait, exec, duration, us, queuing, numa_sensitive, num_threads) << flush;
+            "{1}, {:10}, {:15}, {:20}, {:10}, {:10}, {:20}, {:4}, {:4}, {:20}\n",
+           count, title, wait, exec, duration, us, queuing, numa_sensitive, num_threads, info_string) << flush;
     else
         hpx::util::format_to(cout,
-            "invoked {1}, futures {:10} {:15} {:20} in \t{5} seconds \t: {6} us/future, queue {7} numa {8}, threads {9}\n",
-            count, title, wait, exec, duration, us, queuing, numa_sensitive, num_threads) << flush;
+            "invoked {1}, futures {:10} {:15} {:20} in \t{5} seconds \t: {6} us/future, queue {7} numa {8}, threads {9}, info {10}\n",
+            count, title, wait, exec, duration, us, queuing, numa_sensitive, num_threads, info_string) << flush;
     // CDash graph plotting
     //hpx::util::print_cdash_timing(title, duration);
 }
@@ -247,12 +249,15 @@ void measure_function_futures_limiting_executor(
     {
         hpx::threads::executors::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
-        for (std::uint64_t i = 0; i < count; ++i) {
+        hpx::parallel::for_loop(
+            hpx::parallel::execution::par, 0, count,
+            [&](int)
+        {
             hpx::apply(signal_exec, [&](){
                 null_function();
                 sanity_check--;
             });
-        }
+        });
     }
 
     if (sanity_check!=0) {
@@ -303,6 +308,9 @@ int hpx_main(variables_map& vm)
             numa_sensitive = 0;
 
         bool test_all = (vm.count("test-all")>0);
+
+        if (vm.count("info"))
+            info_string = vm["info"].as<std::string>();
 
         num_threads = hpx::get_num_worker_threads();
 
@@ -358,6 +366,10 @@ int main(
 
         ( "csv"
         , "output results as csv (format: count,duration)")
+
+        ( "info"
+        , value<std::string>()->default_value("none")
+        , "extra info for plot output (e.g. branch name)")
         ;
 
     // Initialize and run HPX.
