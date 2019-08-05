@@ -107,6 +107,7 @@ jobs:
           name: Check circular dependencies with cpp-dependencies
           command: |
               cpp-dependencies --dir /hpx/source/libs --graph-cycles /hpx/tools/cpp-dependencies/circular_deps.dot
+              dot /hpx/tools/cpp-dependencies/circular_deps.dot -Tsvg -o /hpx/tools/cpp-dependencies/circular_deps.svg
               if [[ $(wc -l /hpx/tools/cpp-dependencies/circular_deps.dot | awk '{print $1}') -gt 2 ]]; then exit 1; fi
 
   configure:
