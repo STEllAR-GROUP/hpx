@@ -111,38 +111,7 @@ namespace hpx {
             std::string const& hostname, std::int64_t pid, std::size_t shepherd,
             std::size_t thread_id, std::string const& thread_name,
             std::string const& env, std::string const& config,
-            std::string const& state_name, std::string const& auxinfo)
-        {
-            // create a std::exception_ptr object encapsulating the Exception to
-            // be thrown and annotate it with all the local information we have
-            try
-            {
-                throw_with_info(e,
-                    std::move(hpx::exception_info().set(
-                        hpx::detail::throw_stacktrace(back_trace),
-                        hpx::detail::throw_locality(node),
-                        hpx::detail::throw_hostname(hostname),
-                        hpx::detail::throw_pid(pid),
-                        hpx::detail::throw_shepherd(shepherd),
-                        hpx::detail::throw_thread_id(thread_id),
-                        hpx::detail::throw_thread_name(thread_name),
-                        hpx::detail::throw_function(func),
-                        hpx::detail::throw_file(file),
-                        hpx::detail::throw_line(line),
-                        hpx::detail::throw_env(env),
-                        hpx::detail::throw_config(config),
-                        hpx::detail::throw_state(state_name),
-                        hpx::detail::throw_auxinfo(auxinfo))));
-            }
-            catch (...)
-            {
-                return std::current_exception();
-            }
-
-            // need this return to silence a warning with icc
-            HPX_ASSERT(false);
-            return std::exception_ptr();
-        }
+            std::string const& state_name, std::string const& auxinfo);
 
         HPX_EXPORT void pre_exception_handler();
     }    // namespace detail
