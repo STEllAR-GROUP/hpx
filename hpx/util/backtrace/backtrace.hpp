@@ -33,7 +33,7 @@ namespace hpx { namespace util
     class backtrace {
     public:
 
-        backtrace(std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
+        explicit backtrace(std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
         {
             if(frames_no == 0)
                 return;
