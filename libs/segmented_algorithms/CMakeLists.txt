@@ -27,7 +27,6 @@ set(segmented_algorithms_headers
   hpx/parallel/segmented_algorithms/transform.hpp
   hpx/parallel/segmented_algorithms/transform_inclusive_scan.hpp
   hpx/parallel/segmented_algorithms/transform_reduce.hpp
-  hpx/traits/segmented_iterator_traits.hpp
 )
 
 include(HPX_AddModule)

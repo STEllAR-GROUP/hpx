@@ -7,6 +7,7 @@
 #include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/parallel_move.hpp>
 #include <hpx/include/parallel_for_each.hpp>
+#include <hpx/parallel/segmented_algorithms/detail/transfer.hpp>
 
 #include <hpx/testing.hpp>
 

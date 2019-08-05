@@ -34,26 +34,6 @@ namespace hpx { namespace parallel { inline namespace v1
         ///////////////////////////////////////////////////////////////////////
         /// \cond NOINTERNAL
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename FwdIter, typename OutIter>
-        struct iterators_are_segmented
-          : std::integral_constant<bool,
-                hpx::traits::segmented_iterator_traits<FwdIter>
-                    ::is_segmented_iterator::value &&
-                hpx::traits::segmented_iterator_traits<OutIter>
-                    ::is_segmented_iterator::value>
-        {};
-
-        template <typename FwdIter, typename OutIter>
-        struct iterators_are_not_segmented
-          : std::integral_constant<bool,
-                !hpx::traits::segmented_iterator_traits<FwdIter>
-                    ::is_segmented_iterator::value &&
-                !hpx::traits::segmented_iterator_traits<OutIter>
-                    ::is_segmented_iterator::value>
-        {};
-
-        ///////////////////////////////////////////////////////////////////////
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename SegOutIter>

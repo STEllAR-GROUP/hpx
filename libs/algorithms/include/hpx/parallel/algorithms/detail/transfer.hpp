@@ -12,9 +12,6 @@
 #endif
 #include <hpx/util/tagged_pair.hpp>
 
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/parallel/segmented_algorithms/detail/transfer.hpp>
-#endif
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -30,6 +27,26 @@ namespace hpx { namespace parallel { inline namespace v1
     // transfer
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename FwdIter, typename OutIter>
+        struct iterators_are_segmented
+          : std::integral_constant<bool,
+                hpx::traits::segmented_iterator_traits<FwdIter>
+                    ::is_segmented_iterator::value &&
+                hpx::traits::segmented_iterator_traits<OutIter>
+                    ::is_segmented_iterator::value>
+        {};
+
+        template <typename FwdIter, typename OutIter>
+        struct iterators_are_not_segmented
+          : std::integral_constant<bool,
+                !hpx::traits::segmented_iterator_traits<FwdIter>
+                    ::is_segmented_iterator::value &&
+                !hpx::traits::segmented_iterator_traits<OutIter>
+                    ::is_segmented_iterator::value>
+        {};
+
+        ///////////////////////////////////////////////////////////////////////
         // parallel version
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename FwdIter2>
@@ -131,4 +148,5 @@ namespace hpx { namespace parallel { inline namespace v1
         }
     }
 }}}
+
 #endif
