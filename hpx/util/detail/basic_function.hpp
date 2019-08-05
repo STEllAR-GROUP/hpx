@@ -38,7 +38,7 @@ namespace hpx { namespace util { namespace detail
         using vtable = function_base_vtable;
 
     public:
-        HPX_CONSTEXPR function_base(
+        HPX_CONSTEXPR explicit function_base(
             function_base_vtable const* empty_vptr) noexcept
           : vptr(empty_vptr)
           , object(nullptr)
