@@ -366,8 +366,7 @@ namespace hpx {
     }
     /// \endcond
 
-    // TODO: These docs are wrong.
-    /// \brief Return the locality id where the exception was thrown.
+    /// \brief Return the error code value of the exception thrown.
     ///
     /// The function \a hpx::get_error can be used to extract the
     /// diagnostic information element representing the error value code as
