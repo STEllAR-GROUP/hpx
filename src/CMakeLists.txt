@@ -249,6 +249,7 @@ endif()
 # Default unnamed config (not Debug/Release/etc) are in this var
 get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_)
 target_compile_options(hpx PRIVATE ${_temp_flags})
+target_compile_definitions(hpx PUBLIC $<$<CONFIG:Debug>:HPX_DEBUG>)
 
 # message("Adding ${_temp_flags}")
 
