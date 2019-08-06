@@ -55,16 +55,14 @@ namespace hpx { namespace threads
         typedef threads::policies::scheduler_base scheduler_type;
         typedef std::vector<pool_type> pool_vector;
 
+        threadmanager(
 #ifdef HPX_HAVE_TIMER_POOL
-        threadmanager(util::io_service_pool& timer_pool,
+            util::io_service_pool& timer_pool,
+#endif
             notification_policy_type& notifier,
             detail::network_background_callback_type
-                network_background_callback);
-#else
-        threadmanager(notification_policy_type& notifier,
-            detail::network_background_callback_type
-                network_background_callback);
-#endif
+                network_background_callback =
+                    detail::network_background_callback_type());
         ~threadmanager();
 
         void init();
