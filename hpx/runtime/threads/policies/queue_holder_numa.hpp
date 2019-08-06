@@ -48,7 +48,7 @@ namespace hpx { namespace threads { namespace policies
         using ThreadQueue = queue_holder_thread<QueueType>;
 
         // ----------------------------------------------------------------
-        queue_holder_numa() {}
+        queue_holder_numa() : num_queues_(0) {}
 
         // ----------------------------------------------------------------
         ~queue_holder_numa() {
@@ -157,13 +157,12 @@ namespace hpx { namespace threads { namespace policies
             return result;
         }
 
+
         // ----------------------------------------------------------------
         // ----------------------------------------------------------------
         // ----------------------------------------------------------------
-        std::size_t               num_cores_;
-        std::size_t               num_queues_;
-        float                     scale_;
-        std::vector<ThreadQueue*> queues_;
+        std::size_t                         num_queues_;
+        std::vector<ThreadQueue*>           queues_;
 
     public:
 

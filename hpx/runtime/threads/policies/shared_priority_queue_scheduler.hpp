@@ -7,7 +7,9 @@
 #if !defined(HPX_RUNTIME_THREADS_POLICIES_SHARED_PRIORITY_QUEUE_SCHEDULER)
 #define HPX_RUNTIME_THREADS_POLICIES_SHARED_PRIORITY_QUEUE_SCHEDULER
 
-//#define SHARED_PRIORITY_SCHEDULER_DEBUG 1
+#ifndef NDEBUG
+//# define SHARED_PRIORITY_SCHEDULER_DEBUG 1
+#endif
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -327,7 +329,7 @@ namespace hpx { namespace threads { namespace policies {
             threads::thread_data*& thrd, bool enable_stealing) override
         {
             LOG_CUSTOM_MSG("get_next_thread " << decnumber(thread_num)
-                << "enable stealing" << enable_stealing);
+                << "enable stealing " << enable_stealing);
             HPX_ASSERT(thread_num ==
                 this->global_to_local_thread_index(get_worker_thread_num()));
 
@@ -580,62 +582,87 @@ namespace hpx { namespace threads { namespace policies {
             std::unique_lock<std::mutex> lock(init_mutex);
             if (!initialized_)
             {
+                // make sure no other threads enter when mutex is unlocked
                 initialized_ = true;
 
                 auto const& topo = create_topology();
 
-                // For each worker thread, count which each numa domain they
-                // belong to and build lists of useful indexes/refs
+                // just to reduce line lengths
+                static const int NUMA_COUNT = HPX_HAVE_MAX_NUMA_DOMAIN_COUNT;
+                static const int CPU_COUNT  = HPX_HAVE_MAX_CPU_COUNT;
+
+                // For each worker thread, count which numa domain each
+                // belongs to and build lists of useful indexes/refs
                 num_domains_ = 1;
-                std::array<std::size_t, HPX_HAVE_MAX_NUMA_DOMAIN_COUNT> q_counts_;
+                std::array<std::size_t, NUMA_COUNT>           q_counts_;
+                std::array<std::size_t, CPU_COUNT>            c_lookup_;
+                std::array<std::size_t, CPU_COUNT>            p_lookup_;
+                std::array<std::set<std::size_t>, NUMA_COUNT> c_counts_;
                 std::fill(d_lookup_.begin(), d_lookup_.end(), 0);
                 std::fill(q_lookup_.begin(), q_lookup_.end(), 0);
                 std::fill(q_counts_.begin(), q_counts_.end(), 0);
+                std::fill(c_lookup_.begin(), c_lookup_.end(), 0);
+                std::fill(p_lookup_.begin(), p_lookup_.end(), 0);
+                std::fill(c_shared_.begin(), c_shared_.end(), 0);
 
+                std::array<std::map<std::size_t, std::size_t>, NUMA_COUNT> core_use_;
+                std::map<std::size_t, std::size_t> domain_map;
                 for (std::size_t local_id=0; local_id!=num_workers_; ++local_id)
                 {
                     std::size_t global_id = local_to_global_thread_index(local_id);
                     std::size_t pu_num = affinity_data_.get_pu_num(global_id);
                     std::size_t domain = topo.get_numa_node_number(pu_num);
                     d_lookup_[local_id] = domain;
-                    num_domains_ = (std::max)(num_domains_, domain+1);
+                    // each time a _new_ domain is added increment the offset
+                    domain_map.insert({domain, domain_map.size()});
+                }
+                num_domains_ = domain_map.size();
+                HPX_ASSERT(num_domains_ <= NUMA_COUNT);
+
+                // if we have zero threads on a numa domain, reindex the domains to be
+                // sequential otherwise it messes up counting as an indexing operation
+                // this can happen on nodes that have unusual numa topologies with
+                // (e.g.) High Bandwidth Memory on numa nodes with no processors
+                for (std::size_t local_id=0; local_id<d_lookup_.size(); ++local_id) {
+                    d_lookup_[local_id] = domain_map[d_lookup_[local_id]];
                 }
 
-                HPX_ASSERT(num_domains_ <= HPX_HAVE_MAX_NUMA_DOMAIN_COUNT);
-
-                // if we have zero cores on a numa domain, then reindex the domains to be
-                // sequential otherwise it messes up counting as an indexing operation
+                // ...for each domain, count up the pus assigned, by core
+                // (because pus on the same core will always share queues)
+                // NB. we do this _after_ remapping domains (above)
+                for (std::size_t local_id=0; local_id!=num_workers_; ++local_id)
                 {
-                    std::vector<std::size_t> d_inx(d_lookup_.begin(), d_lookup_.end());
-                    // reduce list of all used domains to simple unique sort list
-                    std::sort(d_inx.begin(), d_inx.end(), std::less<std::size_t>());
-                    auto last = std::unique(d_inx.begin(), d_inx.end());
-                    d_inx.erase(last, d_inx.end());
-                    num_domains_ = d_inx.size();
-                    // turn list into a map
-                    std::map<std::size_t, std::size_t> domain_map;
-                    std::size_t index = 0;
-                    for (auto d : d_inx) domain_map.emplace(d, index++);
-                    // replace old domain number with new one
-                    for (std::size_t d=0; d<d_lookup_.size(); ++d) {
-                        d_lookup_[d] = domain_map[d_lookup_[d]];
+                    std::size_t global_id = local_to_global_thread_index(local_id);
+                    std::size_t pu_num    = affinity_data_.get_pu_num(global_id);
+                    std::size_t core      = topo.get_core_number(pu_num);
+                    std::size_t domain    = d_lookup_[local_id];
+                    // initially, assign cores sequentially (size increments as we add)
+                    p_lookup_[local_id]   = core;
+                    c_lookup_[local_id]   = core_use_[domain].size();
+                    // if this core is already in the map, use the previous value
+                    if (!core_use_[domain].insert({core, c_lookup_[local_id]}).second) {
+                        c_lookup_[local_id] = core_use_[domain][core];
+                        c_shared_[local_id] = 1;
                     }
                 }
 
-                // count cores per domain and assign queues accordingly
-                for (std::size_t local_id=0; local_id<num_workers_; ++local_id)
+                for (std::size_t local_id=0; local_id!=num_workers_; ++local_id)
                 {
-                    q_lookup_[local_id] = q_counts_[d_lookup_[local_id]]++;
+                    std::size_t domain  = d_lookup_[local_id];
+                    q_lookup_[local_id] = core_use_[domain][p_lookup_[local_id]];
                 }
 
                 // init the numa_holder for each domain
-                for (std::size_t dom=0; dom<num_domains_; ++dom)
+                for (std::size_t d=0; d<num_domains_; ++d)
                 {
+                    q_counts_[d] = core_use_[d].size();
                     // init with {cores, queues} on this domain
-                    numa_holder_[dom].init(q_counts_[dom], thread_queue_init_);
+                    numa_holder_[d].init(q_counts_[d], thread_queue_init_);
                 }
 
-
+                debug::output("p_lookup_  ", &p_lookup_[0],  &p_lookup_[num_workers_]);
+                debug::output("c_lookup_  ", &c_lookup_[0],  &c_lookup_[num_workers_]);
+                debug::output("c_shared_  ", &c_shared_[0],  &c_shared_[num_workers_]);
                 debug::output("d_lookup_  ", &d_lookup_[0],  &d_lookup_[num_workers_]);
                 debug::output("q_lookup_  ", &q_lookup_[0],  &q_lookup_[num_workers_]);
                 debug::output("q_counts_  ", &q_counts_[0],  &q_counts_[num_domains_]);
@@ -659,8 +686,11 @@ namespace hpx { namespace threads { namespace policies {
             }
 
             // this is the index of out thread in the local numa domain
-            int local_id   = q_lookup_[thread_num];
+            int local_q    = q_lookup_[thread_num];
             int domain_num = d_lookup_[thread_num];
+
+            // one thread holder per core (shared by PUs)
+            queue_holder_thread<thread_queue_type> *thread_holder = nullptr;
 
             // queue pointers we will assign to each thread
             thread_queue_type *hp_queue = nullptr;
@@ -669,49 +699,57 @@ namespace hpx { namespace threads { namespace policies {
 
             std::int16_t owner_mask = 0;
 
-            // High priority
-            if (cores_per_queue_.high_priority>0) {
-                if (local_id % cores_per_queue_.high_priority == 0) {
-                    // if we will own the queue, create it
-                    hp_queue = new thread_queue_type(queue_parameters_, nullptr, local_id);
-                    owner_mask |= 1;
-                }
-                else {
-                    // share the queue with our next lowest thread num neighbour
-                    hp_queue = numa_holder_[domain_num].thread_queue(local_id-1)->hp_queue_;
-                }
-            }
-
-            // Normal priority
-            if (local_id % cores_per_queue_.normal_priority == 0) {
-                // if we will own the queue, create it
-                np_queue = new thread_queue_type(queue_parameters_, nullptr, local_id);
-                owner_mask |= 2;
+            if (c_shared_[thread_num]) {
+                hp_queue = numa_holder_[domain_num].thread_queue(local_q)->hp_queue_;
+                np_queue = numa_holder_[domain_num].thread_queue(local_q)->np_queue_;
+                lp_queue = numa_holder_[domain_num].thread_queue(local_q)->lp_queue_;
+                thread_holder = numa_holder_[domain_num].queues_[local_q];
             }
             else {
-                // share the queue with our next lowest thread num neighbour
-                np_queue = numa_holder_[domain_num].thread_queue(local_id-1)->np_queue_;
-            }
+                // High priority
+                if (cores_per_queue_.high_priority>0) {
+                    if (local_q % cores_per_queue_.high_priority == 0)
+                    {
+                        // if we will own the queue, create it
+                        hp_queue = new thread_queue_type(queue_parameters_, nullptr, local_q);
+                        owner_mask |= 1;
+                    }
+                    else {
+                        // share the queue with our next lowest thread num neighbour
+                        hp_queue = numa_holder_[domain_num].thread_queue(local_q-1)->hp_queue_;
+                    }
+                }
 
-            // Low priority
-            if (cores_per_queue_.low_priority>0) {
-                if (local_id % cores_per_queue_.low_priority == 0) {
+                // Normal priority
+                if (local_q % cores_per_queue_.normal_priority == 0) {
                     // if we will own the queue, create it
-                    lp_queue = new thread_queue_type(queue_parameters_, nullptr, local_id);
-                    owner_mask |= 4;
+                    np_queue = new thread_queue_type(queue_parameters_, nullptr, local_q);
+                    owner_mask |= 2;
                 }
                 else {
                     // share the queue with our next lowest thread num neighbour
-                    lp_queue = numa_holder_[domain_num].thread_queue(local_id-1)->lp_queue_;
+                    np_queue = numa_holder_[domain_num].thread_queue(local_q-1)->np_queue_;
                 }
+
+                // Low priority
+                if (cores_per_queue_.low_priority>0) {
+                    if (local_q % cores_per_queue_.low_priority == 0) {
+                        // if we will own the queue, create it
+                        lp_queue = new thread_queue_type(queue_parameters_, nullptr, local_q);
+                        owner_mask |= 4;
+                    }
+                    else {
+                        // share the queue with our next lowest thread num neighbour
+                        lp_queue = numa_holder_[domain_num].thread_queue(local_q-1)->lp_queue_;
+                    }
+                }
+
+                thread_holder = new queue_holder_thread<thread_queue_type>(
+                             hp_queue, np_queue, lp_queue,
+                             owner_mask, thread_counter, queue_parameters_);
             }
 
-            queue_holder_thread<thread_queue_type> *thread_holder =
-                    new queue_holder_thread<thread_queue_type>(
-                        hp_queue, np_queue, lp_queue,
-                        owner_mask, thread_counter, queue_parameters_);
-
-            numa_holder_[domain_num].queues_[local_id] = thread_holder;
+            numa_holder_[domain_num].queues_[local_q] = thread_holder;
 
             // we can now increment the thread counter and allow the next thread to init
             thread_counter++;
@@ -776,6 +814,7 @@ namespace hpx { namespace threads { namespace policies {
         // lookup domain from local worker index
         std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> d_lookup_;
         std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> q_lookup_;
+        std::array<bool,        HPX_HAVE_MAX_CPU_COUNT> c_shared_;
 
         // index of queue on domain from local worker index
         std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> hp_lookup_;
