@@ -88,7 +88,8 @@ jobs:
           name: Downloading CTest XML to Junit XML
           command: |
               curl \
-                https://raw.githubusercontent.com/Kitware/CDash/master/tests/circle/conv.xsl \
+                https://raw.githubusercontent.com/Kitware/CDash/master/app/cdash/tests/circle/conv.xsl \
+                --fail \
                 -o /hpx/conv.xsl
       - persist_to_workspace:
           root: /hpx
