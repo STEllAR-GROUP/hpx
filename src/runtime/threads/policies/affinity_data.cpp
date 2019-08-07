@@ -87,6 +87,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
       , affinity_masks_()
       , pu_nums_()
       , no_affinity_()
+      , use_process_mask_(false)
     {
         // allow only one affinity-data instance
         if (instance_number_counter_++ >= 0)
@@ -106,6 +107,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     std::size_t affinity_data::init(util::command_line_handling const& cfg_)
     {
         num_threads_ = cfg_.num_threads_;
+        use_process_mask_ = cfg_.use_process_mask_;
         std::size_t num_system_pus = hardware_concurrency();
 
         // initialize from command line
@@ -151,8 +153,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::resize(affinity_masks_[i], num_system_pus);
 
-            parse_affinity_options(affinity_desc, affinity_masks_,
-                used_cores, max_cores, num_threads_, pu_nums_);
+            parse_affinity_options(affinity_desc, affinity_masks_, used_cores,
+                max_cores, num_threads_, pu_nums_, use_process_mask_);
 
             std::size_t num_initialized = count_initialized(affinity_masks_);
             if (num_initialized != num_threads_) {

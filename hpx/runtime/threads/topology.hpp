@@ -431,6 +431,7 @@ namespace hpx { namespace threads
         std::size_t max_cores,
         std::size_t num_threads,
         std::vector<std::size_t>& num_pus,
+        bool use_process_mask,
         error_code& ec = throws);
 
     // backwards compatibility helper
@@ -439,7 +440,7 @@ namespace hpx { namespace threads
     {
         std::vector<std::size_t> num_pus;
         parse_affinity_options(spec, affinities, 1, 1, affinities.size(),
-            num_pus, ec);
+            num_pus, false, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////

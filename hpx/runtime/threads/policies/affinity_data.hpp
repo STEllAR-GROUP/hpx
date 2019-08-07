@@ -89,6 +89,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         std::vector<mask_type> affinity_masks_;
         std::vector<std::size_t> pu_nums_;
         mask_type no_affinity_;                             ///< mask of processing units which have no affinity
+        bool use_process_mask_; ///< use the process CPU mask to limit available PUs
         static std::atomic<int> instance_number_counter_;   ///< counter for instance numbers
     };
 }}}}
