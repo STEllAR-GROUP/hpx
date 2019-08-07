@@ -97,6 +97,25 @@ jobs:
             - ./source
             - ./conv.xsl
 
+  # Check circular dependencies with cpp-dependencies tool
+  check_circular_deps:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Check circular dependencies with cpp-dependencies
+          command: |
+              cpp-dependencies --dir /hpx/source/libs --graph-cycles /tmp/circular_deps.dot
+              dot /tmp/circular_deps.dot -Tsvg -o /tmp/circular_deps.svg
+              if [[ $(wc -l /tmp/circular_deps.dot | awk '{print $1}') -gt 2 ]]; then exit 1; fi
+      - store_artifacts:
+          path: /tmp/circular_deps.dot
+          destination: /hpx/artifacts
+      - store_artifacts:
+          path: /tmp/circular_deps.svg
+          destination: /hpx/artifacts
+
   configure:
     <<: *defaults
     steps:
@@ -990,6 +1009,10 @@ workflows:
   build-and-test:
     jobs:
       - checkout_code:
+          <<: *gh_pages_filter
+      - check_circular_deps:
+          requires:
+            - checkout_code
           <<: *gh_pages_filter
       - configure:
           requires:
