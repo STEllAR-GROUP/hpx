@@ -278,12 +278,6 @@ target_link_libraries(hpx PUBLIC hpx::allocator)
 
 target_link_libraries(hpx PRIVATE hpx::hwloc)
 
-# Enable SIMD via Boost.SIMD if it is available
-if (TARGET hpx::boost::simd)
-  # Private because the headers are in details
-  target_link_libraries(hpx PRIVATE hpx::boost::simd)
-endif()
-
 # Enable SIMD via VC if it is available
 if (TARGET hpx::vc)
   target_link_libraries(hpx PRIVATE hpx::vc)

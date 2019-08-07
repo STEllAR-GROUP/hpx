@@ -383,8 +383,6 @@ rst_prolog += '''
 .. _lgd: https://www.libgeodecomp.org/
 .. |conan| replace:: Conan
 .. _conan: https://www.conan.io/
-.. |boost_simd| replace:: Boost.SIMD
-.. _boost_simd: https://github.com/NumScale/boost.simd
 .. |vc| replace:: Vc Library
 .. _vc: https://github.com/VcDevel/Vc
 

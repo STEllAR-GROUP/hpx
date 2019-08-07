@@ -50,10 +50,6 @@ set(execution_headers
   hpx/parallel/executors/timed_execution_fwd.hpp
   hpx/parallel/executors/timed_execution.hpp
   hpx/parallel/executors/timed_executors.hpp
-  hpx/parallel/traits/detail/boost_simd/vector_pack_alignment_size.hpp
-  hpx/parallel/traits/detail/boost_simd/vector_pack_count_bits.hpp
-  hpx/parallel/traits/detail/boost_simd/vector_pack_load_store.hpp
-  hpx/parallel/traits/detail/boost_simd/vector_pack_type.hpp
   hpx/parallel/traits/detail/vc/vector_pack_alignment_size.hpp
   hpx/parallel/traits/detail/vc/vector_pack_count_bits.hpp
   hpx/parallel/traits/detail/vc/vector_pack_load_store.hpp
