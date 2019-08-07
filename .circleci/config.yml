@@ -111,10 +111,10 @@ jobs:
               if [[ $(wc -l /tmp/circular_deps.dot | awk '{print $1}') -gt 2 ]]; then exit 1; fi
       - store_artifacts:
           path: /tmp/circular_deps.dot
-          destination: /hpx/artifacts
+          destination: /hpx/artifacts/circular_deps.dot
       - store_artifacts:
           path: /tmp/circular_deps.svg
-          destination: /hpx/artifacts
+          destination: /hpx/artifacts/circular_deps.svg
 
   configure:
     <<: *defaults
