@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if (HPX_WITH_SHARED_PRIORITY_SCHEDULER AND HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
+if (HPX_WITH_SHARED_PRIORITY_SCHEDULER)
   set(tests ${tests}
     numa_allocator
   )

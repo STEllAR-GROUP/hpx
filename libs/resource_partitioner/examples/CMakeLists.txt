@@ -22,21 +22,16 @@ set(example_programs
 
 if(HPX_WITH_MAX_CPU_COUNT AND HPX_WITH_SHARED_PRIORITY_SCHEDULER)
   set(example_programs ${example_programs}
+    async_customization
     oversubscribing_resource_partitioner
     simple_resource_partitioner
   )
 
-  if (HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
+  # Intel compilers have trouble compiling this example
+  if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     set(example_programs ${example_programs}
-      async_customization
+      guided_pool_test
     )
-
-    # Intel compilers have trouble compiling this example
-    if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-      set(example_programs ${example_programs}
-        guided_pool_test
-      )
-    endif()
   endif()
 endif()
 
