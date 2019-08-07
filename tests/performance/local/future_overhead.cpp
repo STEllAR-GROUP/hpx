@@ -8,18 +8,18 @@
 
 #include <hpx/format.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/lcos/wait_each.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/threads.hpp>
-#include <hpx/util/yield_while.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/util/annotated_function.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
+#include <hpx/include/threads.hpp>
+#include <hpx/lcos/wait_each.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/testing.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/util/annotated_function.hpp>
+#include <hpx/util/yield_while.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/lcos/local/sliding_semaphore.hpp>
@@ -31,21 +31,22 @@
 #include <cstddef>
 #include <cstdint>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
-using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
+using boost::program_options::variables_map;
 
-using hpx::init;
 using hpx::finalize;
+using hpx::init;
 
 using hpx::find_here;
 using hpx::naming::id_type;
 
-using hpx::future;
-using hpx::async;
 using hpx::apply;
+using hpx::async;
+using hpx::future;
 using hpx::lcos::wait_each;
 
 using hpx::util::high_resolution_timer;
@@ -63,15 +64,21 @@ static std::string info_string = "";
 void print_stats(const char* title, const char* wait, const char* exec,
     std::int64_t count, double duration, bool csv)
 {
-    double us = 1e6*duration/count;
+    double us = 1e6 * duration / count;
     if (csv)
         hpx::util::format_to(cout,
-            "{1}, {:10}, {:15}, {:20}, {:10}, {:10}, {:20}, {:4}, {:4}, {:20}\n",
-           count, title, wait, exec, duration, us, queuing, numa_sensitive, num_threads, info_string) << flush;
+            "{1}, {:10}, {:15}, {:20}, {:10}, {:10}, {:20}, {:4}, {:4}, "
+            "{:20}\n",
+            count, title, wait, exec, duration, us, queuing, numa_sensitive,
+            num_threads, info_string)
+            << flush;
     else
         hpx::util::format_to(cout,
-            "invoked {1}, futures {:10} {:15} {:20} in \t{5} seconds \t: {6} us/future, queue {7} numa {8}, threads {9}, info {10}\n",
-            count, title, wait, exec, duration, us, queuing, numa_sensitive, num_threads, info_string) << flush;
+            "invoked {1}, futures {:10} {:15} {:20} in \t{5} seconds \t: {6} "
+            "us/future, queue {7} numa {8}, threads {9}, info {10}\n",
+            count, title, wait, exec, duration, us, queuing, numa_sensitive,
+            num_threads, info_string)
+            << flush;
     // CDash graph plotting
     //hpx::util::print_cdash_timing(title, duration);
 }
@@ -123,7 +130,7 @@ struct scratcher
 void measure_action_futures_wait_each(std::uint64_t count, bool csv)
 {
     const id_type here = find_here();
-    std::vector<future<double> > futures;
+    std::vector<future<double>> futures;
     futures.reserve(count);
 
     // start the clock
@@ -141,7 +148,7 @@ void measure_action_futures_wait_each(std::uint64_t count, bool csv)
 void measure_action_futures_wait_all(std::uint64_t count, bool csv)
 {
     const id_type here = find_here();
-    std::vector<future<double> > futures;
+    std::vector<future<double>> futures;
     futures.reserve(count);
 
     // start the clock
@@ -160,7 +167,7 @@ template <typename Executor>
 void measure_function_futures_wait_each(
     std::uint64_t count, bool csv, Executor& exec)
 {
-    std::vector<future<double> > futures;
+    std::vector<future<double>> futures;
     futures.reserve(count);
 
     // start the clock
@@ -178,7 +185,7 @@ template <typename Executor>
 void measure_function_futures_wait_all(
     std::uint64_t count, bool csv, Executor& exec)
 {
-    std::vector<future<double> > futures;
+    std::vector<future<double>> futures;
     futures.reserve(count);
 
     // start the clock
@@ -195,7 +202,7 @@ template <typename Executor>
 void measure_function_futures_thread_count(
     std::uint64_t count, bool csv, Executor& exec)
 {
-    std::vector<future<double> > futures;
+    std::vector<future<double>> futures;
     futures.reserve(count);
 
     std::atomic<std::uint64_t> sanity_check(count);
@@ -203,24 +210,20 @@ void measure_function_futures_thread_count(
 
     // start the clock
     high_resolution_timer walltime;
-    for (std::uint64_t i = 0; i < count; ++i) {
-        hpx::apply(exec,
-            [&sanity_check]() {
-               null_function();
-               sanity_check--;
-            }
-        );
+    for (std::uint64_t i = 0; i < count; ++i)
+    {
+        hpx::apply(exec, [&sanity_check]() {
+            null_function();
+            sanity_check--;
+        });
     }
 
     // Yield until there is only this and background threads left.
-    hpx::util::yield_while([this_pool, &sanity_check]()
-        {
+    hpx::util::yield_while([this_pool]() {
         auto u = this_pool->get_thread_count_unknown(std::size_t(-1), false);
         auto b = this_pool->get_background_thread_count() + 1;
-        return u>b;
-//            return this_pool->get_thread_count_unknown(std::size_t(-1), false) >
-//                this_pool->get_background_thread_count() + 1;
-        });
+        return u > b;
+    });
 
     // stop the clock
     const double duration = walltime.elapsed();
@@ -241,7 +244,7 @@ void measure_function_futures_limiting_executor(
 {
     using namespace hpx::parallel::execution;
     std::uint64_t const num_threads = hpx::get_num_worker_threads();
-    std::uint64_t const tasks = num_threads*2000;
+    std::uint64_t const tasks = num_threads * 2000;
     std::atomic<std::uint64_t> sanity_check(count);
 
     // start the clock
@@ -250,17 +253,16 @@ void measure_function_futures_limiting_executor(
         hpx::threads::executors::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
         hpx::parallel::for_loop(
-            hpx::parallel::execution::par, 0, count,
-            [&](int)
-        {
-            hpx::apply(signal_exec, [&](){
-                null_function();
-                sanity_check--;
+            hpx::parallel::execution::par, 0, count, [&](int) {
+                hpx::apply(signal_exec, [&]() {
+                    null_function();
+                    sanity_check--;
+                });
             });
-        });
     }
 
-    if (sanity_check!=0) {
+    if (sanity_check != 0)
+    {
         throw std::runtime_error(
             "This test is faulty " + std::to_string(sanity_check));
     }
@@ -274,15 +276,16 @@ template <typename Executor>
 void measure_function_futures_sliding_semaphore(
     std::uint64_t count, bool csv, Executor& exec)
 {
-    std::vector<future<double> > futures;
+    std::vector<future<double>> futures;
     futures.reserve(count);
 
     // start the clock
     high_resolution_timer walltime;
     const int sem_count = 5000;
     hpx::lcos::local::sliding_semaphore sem(sem_count);
-    for (std::uint64_t i = 0; i < count; ++i) {
-        hpx::async(exec, [i,&sem](){
+    for (std::uint64_t i = 0; i < count; ++i)
+    {
+        hpx::async(exec, [i, &sem]() {
             null_function();
             sem.signal(i);
         });
@@ -307,7 +310,7 @@ int hpx_main(variables_map& vm)
         else
             numa_sensitive = 0;
 
-        bool test_all = (vm.count("test-all")>0);
+        bool test_all = (vm.count("test-all") > 0);
 
         if (vm.count("info"))
             info_string = vm["info"].as<std::string>();
@@ -325,8 +328,10 @@ int hpx_main(variables_map& vm)
         hpx::parallel::execution::default_executor def;
         hpx::parallel::execution::parallel_executor par;
 
-        for (int i=0; i<nl; i++) {
-            if (test_all) {
+        for (int i = 0; i < nl; i++)
+        {
+            if (test_all)
+            {
                 measure_action_futures_wait_each(count, csv);
                 measure_action_futures_wait_all(count, csv);
                 measure_function_futures_wait_each(count, csv, def);
@@ -347,30 +352,24 @@ int hpx_main(variables_map& vm)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(
-    int argc
-  , char* argv[]
-    )
+int main(int argc, char* argv[])
 {
     // Configure application-specific options.
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()
-        ( "futures"
-        , value<std::uint64_t>()->default_value(500000)
-        , "number of futures to invoke")
+    // clang-format off
+    cmdline.add_options()("futures",
+        value<std::uint64_t>()->default_value(500000),
+        "number of futures to invoke")
 
-        ( "delay-iterations"
-        , value<std::uint64_t>()->default_value(0)
-        , "number of iterations in the delay loop")
+        ("delay-iterations", value<std::uint64_t>()->default_value(0),
+         "number of iterations in the delay loop")
 
-        ( "csv"
-        , "output results as csv (format: count,duration)")
+        ("csv", "output results as csv (format: count,duration)")
 
-        ( "info"
-        , value<std::string>()->default_value("none")
-        , "extra info for plot output (e.g. branch name)")
-        ;
+        ("info", value<std::string>()->default_value("none"),
+         "extra info for plot output (e.g. branch name)");
+    // clang-format on
 
     // Initialize and run HPX.
     return init(cmdline, argc, argv);
