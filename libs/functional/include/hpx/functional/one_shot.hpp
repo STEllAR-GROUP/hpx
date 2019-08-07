@@ -42,7 +42,7 @@ namespace hpx { namespace util {
             {
             }
 
-            HPX_CXX14_CONSTEXPR one_shot_wrapper(one_shot_wrapper&& other)
+            constexpr one_shot_wrapper(one_shot_wrapper&& other)
               : _f(std::move(other._f))
               , _called(other._called)
             {
@@ -76,7 +76,7 @@ namespace hpx { namespace util {
 #endif
 
             template <typename... Ts>
-            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
+            constexpr HPX_HOST_DEVICE
                 typename util::invoke_result<F, Ts...>::type
                 operator()(Ts&&... vs)
             {

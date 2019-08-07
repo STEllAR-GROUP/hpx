@@ -72,7 +72,7 @@ namespace hpx { namespace util {
             bound_front& operator=(bound_front const&) = delete;
 
             template <typename... Us>
-            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
+            constexpr HPX_HOST_DEVICE
                 typename invoke_bound_front_result<F&, util::pack<Ts&...>,
                     Us&&...>::type
                 operator()(Us&&... vs) &
@@ -92,7 +92,7 @@ namespace hpx { namespace util {
             }
 
             template <typename... Us>
-            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
+            constexpr HPX_HOST_DEVICE
                 typename invoke_bound_front_result<F&&, util::pack<Ts&&...>,
                     Us&&...>::type
                 operator()(Us&&... vs) &&

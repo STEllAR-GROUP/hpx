@@ -44,7 +44,7 @@ namespace hpx { namespace components { namespace server
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
-        HPX_CXX14_CONSTEXPR static void finalize() {}
+        constexpr static void finalize() {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component

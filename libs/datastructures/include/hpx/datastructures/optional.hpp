@@ -247,7 +247,7 @@ namespace hpx { namespace util {
         }
 
         template <typename U>
-        HPX_CXX14_CONSTEXPR T value_or(U&& value) const
+        constexpr T value_or(U&& value) const
         {
             if (empty_)
                 return std::forward<U>(value);

@@ -105,7 +105,7 @@ namespace hpx { namespace components { namespace server
         /// \param self [in] The HPX \a thread used to execute this function.
         /// \param appl [in] The applier to be used for finalization of the
         ///             component instance.
-        HPX_CXX14_CONSTEXPR static void finalize() {}
+        constexpr static void finalize() {}
 
         void delete_function_lists();
         void tidy();

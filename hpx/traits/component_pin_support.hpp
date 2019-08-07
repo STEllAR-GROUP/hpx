@@ -21,13 +21,13 @@ namespace hpx { namespace traits
         struct pin_helper
         {
             template <typename Component>
-            HPX_CXX14_CONSTEXPR static void call(wrap_int, Component* p)
+            constexpr static void call(wrap_int, Component* p)
             {
             }
 
             // forward the call if the component implements the function
             template <typename Component>
-            HPX_CXX14_CONSTEXPR static auto call(int, Component* p)
+            constexpr static auto call(int, Component* p)
             ->  decltype(p->pin())
             {
                 p->pin();
@@ -72,7 +72,7 @@ namespace hpx { namespace traits
     template <typename Component, typename Enable = void>
     struct component_pin_support
     {
-        HPX_CXX14_CONSTEXPR static void pin(Component* p)
+        constexpr static void pin(Component* p)
         {
             detail::pin_helper::call(0, p);
         }

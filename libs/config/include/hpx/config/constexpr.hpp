@@ -18,8 +18,6 @@
 #define HPX_CONSTEXPR_OR_CONST
 /// This macro evaluates to ``constexpr`` if the compiler supports C++14
 /// constexpr.
-#define HPX_CXX14_CONSTEXPR
-/// This macro evaluates to ``static :c:macro:HPX_CONSTEXPR_OR_CONST``.
 #define HPX_STATIC_CONSTEXPR
 #else
 
@@ -31,8 +29,6 @@
 #   define HPX_CONSTEXPR
 #   define HPX_CONSTEXPR_OR_CONST const
 #endif
-
-#define HPX_CXX14_CONSTEXPR constexpr
 // clang-format on
 
 #define HPX_STATIC_CONSTEXPR static HPX_CONSTEXPR_OR_CONST

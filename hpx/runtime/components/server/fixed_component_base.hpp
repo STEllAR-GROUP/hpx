@@ -165,10 +165,10 @@ public:
     }
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-    HPX_CXX14_CONSTEXPR static void mark_as_migrated()
+    constexpr static void mark_as_migrated()
     {
     }
-    HPX_CXX14_CONSTEXPR static void on_migrated()
+    constexpr static void on_migrated()
     {
     }
 #else
@@ -205,7 +205,7 @@ namespace detail
         {
             return nullptr;
         }
-        HPX_CXX14_CONSTEXPR static void free(void* p, std::size_t count)
+        constexpr static void free(void* p, std::size_t count)
         {
         }
 #else
@@ -238,7 +238,7 @@ class fixed_component : public Component
         return nullptr;
     }
 
-    HPX_CXX14_CONSTEXPR static void destroy(Component* p, std::size_t count = 1)
+    constexpr static void destroy(Component* p, std::size_t count = 1)
     {
     }
 #else

@@ -69,7 +69,7 @@ namespace hpx { namespace components
 
             /// \brief finalize() will be called just before the instance gets
             ///        destructed
-            HPX_CXX14_CONSTEXPR static void finalize()
+            constexpr static void finalize()
             {
             }
 
@@ -78,10 +78,10 @@ namespace hpx { namespace components
                 naming::gid_type const& gid) const;
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-            HPX_CXX14_CONSTEXPR static void mark_as_migrated()
+            constexpr static void mark_as_migrated()
             {
             }
-            HPX_CXX14_CONSTEXPR static void on_migrated()
+            constexpr static void on_migrated()
             {
             }
 #else

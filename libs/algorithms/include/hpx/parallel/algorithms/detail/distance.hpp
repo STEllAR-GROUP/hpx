@@ -14,9 +14,8 @@
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     // provide implementation of std::distance supporting iterators/sentinels
     template <typename InIterB, typename InIterE>
-    HPX_CXX14_CONSTEXPR inline
-        typename std::iterator_traits<InIterB>::difference_type
-        distance(InIterB first, InIterE last, std::input_iterator_tag)
+    typename std::iterator_traits<InIterB>::difference_type
+    distance(InIterB first, InIterE last, std::input_iterator_tag)
     {
         typename std::iterator_traits<InIterB>::difference_type offset = 0;
         for (/**/; first != last; ++first)

@@ -444,39 +444,39 @@ namespace hpx { namespace debug {
         }
 
         template <typename... Args>
-        HPX_CXX14_CONSTEXPR void debug(Args... args) const
+        void debug(Args... args) const
         {
         }
 
         template <typename... Args>
-        HPX_CXX14_CONSTEXPR void warning(Args... args) const
+        void warning(Args... args) const
         {
         }
 
         template <typename... Args>
-        HPX_CXX14_CONSTEXPR void error(Args... args) const
+        void error(Args... args) const
         {
         }
 
         template <typename... Args>
-        HPX_CXX14_CONSTEXPR void timed(Args... args) const
+        void timed(Args... args) const
         {
         }
 
         template <typename T>
-        HPX_CXX14_CONSTEXPR void array(
+        void array(
             const std::string& name, const std::vector<T>& v) const
         {
         }
 
         template <typename T, std::size_t N>
-        HPX_CXX14_CONSTEXPR void array(
+        void array(
             const std::string& name, const std::array<T, N>& v) const
         {
         }
 
         template <typename Iter>
-        HPX_CXX14_CONSTEXPR void array(
+        void array(
             const std::string& name, Iter begin, Iter end) const
         {
         }
@@ -529,17 +529,17 @@ namespace hpx { namespace debug {
         }
 
         template <typename... Args>
-        HPX_CXX14_CONSTEXPR void debug(Args... args)
+        void debug(Args... args)
         {
             detail::debug(prefix_, std::forward<Args>(args)...);
         }
         template <typename... Args>
-        HPX_CXX14_CONSTEXPR void warning(Args... args)
+        void warning(Args... args)
         {
             detail::warning(prefix_, std::forward<Args>(args)...);
         }
         template <typename... Args>
-        HPX_CXX14_CONSTEXPR void error(Args... args)
+        void error(Args... args)
         {
             detail::error(prefix_, std::forward<Args>(args)...);
         }

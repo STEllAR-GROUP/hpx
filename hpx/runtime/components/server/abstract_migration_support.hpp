@@ -104,7 +104,7 @@ namespace hpx { namespace components
 
         ~abstract_migration_support() = default;
 
-        HPX_CXX14_CONSTEXPR void finalize() {}
+        constexpr void finalize() {}
 
         hpx::future<void> mark_as_migrated(
             hpx::id_type const& to_migrate) override

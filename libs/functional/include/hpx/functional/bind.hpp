@@ -151,7 +151,7 @@ namespace hpx { namespace util {
             bound& operator=(bound const&) = delete;
 
             template <typename... Us>
-            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE typename invoke_bound_result<F&,
+            constexpr HPX_HOST_DEVICE typename invoke_bound_result<F&,
                 util::pack<Ts&...>, Us&&...>::type
             operator()(Us&&... vs) &
             {
@@ -171,7 +171,7 @@ namespace hpx { namespace util {
             }
 
             template <typename... Us>
-            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
+            constexpr HPX_HOST_DEVICE
                 typename invoke_bound_result<F&&, util::pack<Ts&&...>,
                     Us&&...>::type
                 operator()(Us&&... vs) &&

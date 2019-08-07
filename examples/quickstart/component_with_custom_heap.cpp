@@ -215,13 +215,13 @@ namespace allocator
     };
 
     template <typename T>
-    HPX_CXX14_CONSTEXPR HPX_FORCEINLINE T& get(
+    constexpr HPX_FORCEINLINE T& get(
         alloc_page* page, std::size_t i) noexcept
     {
         return page->template get<T>(i);
     }
     template <typename T>
-    HPX_CXX14_CONSTEXPR HPX_FORCEINLINE T const& get(
+    constexpr HPX_FORCEINLINE T const& get(
         alloc_page const* page, std::size_t i) noexcept
     {
         return page->template get<T>(i);
