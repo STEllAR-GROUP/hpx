@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads/detail/combined_tagged_state.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 
 #include <hpx/assertion.hpp>
 #include <hpx/thread_support/atomic_count.hpp>

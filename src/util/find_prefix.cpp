@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/util/find_prefix.hpp>
 
 #if defined(HPX_WINDOWS)

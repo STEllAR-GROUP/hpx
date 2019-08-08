@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>

@@ -16,7 +16,7 @@
 #include <hpx/plugins/parcelport/mpi/mpi.hpp>
 #endif
 
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/command_line_handling.hpp>

@@ -9,7 +9,7 @@
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
 #include <hpx/dataflow.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/runtime.hpp>

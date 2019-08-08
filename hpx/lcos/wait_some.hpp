@@ -179,7 +179,7 @@ namespace hpx
 #include <hpx/lcos/future.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>

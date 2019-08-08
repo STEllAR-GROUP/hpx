@@ -8,7 +8,7 @@
 #if defined(HPX_HAVE_PAPI)
 
 #include <hpx/config/asio.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/parse_command_line.hpp>

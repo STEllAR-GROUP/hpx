@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/sync_fwd.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/preprocessor/cat.hpp>

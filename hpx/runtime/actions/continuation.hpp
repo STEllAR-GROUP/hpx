@@ -20,7 +20,7 @@
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/action_remote_result.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_continuation.hpp>

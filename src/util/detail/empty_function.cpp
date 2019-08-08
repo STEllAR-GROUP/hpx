@@ -7,7 +7,7 @@
 
 #include <hpx/util/detail/empty_function.hpp>
 
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 
 namespace hpx { namespace util { namespace detail
 {

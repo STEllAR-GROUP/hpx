@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/util/cache_aligned_data.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util_fwd.hpp>

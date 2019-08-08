@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/ini.hpp>
 

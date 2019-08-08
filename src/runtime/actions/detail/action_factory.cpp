@@ -5,7 +5,7 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 
 #include <cstdint>
 #include <string>

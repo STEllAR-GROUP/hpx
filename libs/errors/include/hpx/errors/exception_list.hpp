@@ -9,9 +9,9 @@
 #define HPX_EXCEPTION_LIST_OCT_06_2008_0942AM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/errors/exception.hpp>
 
+#include <boost/smart_ptr/detail/spinlock.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <cstddef>
@@ -23,8 +23,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     /// The class exception_list is a container of exception_ptr objects
     /// parallel algorithms may use to communicate uncaught exceptions
     /// encountered during parallel execution to the caller of the algorithm
@@ -35,7 +34,10 @@ namespace hpx
     class HPX_EXCEPTION_EXPORT exception_list : public hpx::exception
     {
     private:
-        typedef hpx::lcos::local::spinlock mutex_type;
+        // TODO: Does this need to be hpx::lcos::local::spinlock?
+        // typedef hpx::lcos::local::spinlock mutex_type;
+        // TODO: Add correct initialization of boost spinlock.
+        typedef boost::detail::spinlock mutex_type;
 
         typedef std::list<std::exception_ptr> exception_list_type;
         exception_list_type exceptions_;
@@ -51,13 +53,13 @@ namespace hpx
 
         exception_list();
         explicit exception_list(std::exception_ptr const& e);
-        explicit exception_list(exception_list_type && l);
+        explicit exception_list(exception_list_type&& l);
 
         exception_list(exception_list const& l);
-        exception_list(exception_list && l);
+        exception_list(exception_list&& l);
 
         exception_list& operator=(exception_list const& l);
-        exception_list& operator=(exception_list && l);
+        exception_list& operator=(exception_list&& l);
 
         ///
         void add(std::exception_ptr const& e);
@@ -94,10 +96,8 @@ namespace hpx
         std::string get_message() const;
         /// \endcond
     };
-}
+}    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-
-

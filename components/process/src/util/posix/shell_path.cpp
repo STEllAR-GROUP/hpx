@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_WINDOWS)
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/components/process/util/shell_path.hpp>
 
 #include <boost/filesystem/path.hpp>

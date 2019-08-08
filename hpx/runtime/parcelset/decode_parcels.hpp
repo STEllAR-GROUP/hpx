@@ -9,8 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/exception_info.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/runtime/naming/name.hpp>

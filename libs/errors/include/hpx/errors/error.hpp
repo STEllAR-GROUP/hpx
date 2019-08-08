@@ -17,8 +17,7 @@
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Possible error conditions
     ///
@@ -139,20 +138,20 @@ namespace hpx
         length_error = 55,
         ///< Equivalent to std::length_error
 
-        migration_needs_retry = 56,     ///< migration failed because of global
-                                        ///< race, retry
+        migration_needs_retry = 56,    ///< migration failed because of global
+                                       ///< race, retry
 
         /// \cond NOINTERNAL
         last_error,
 
         system_error_flag = 0x4000L,
-        error_upper_bound = 0x7fffL   // force this enum type to be at least 16 bits.
+        error_upper_bound =
+            0x7fffL    // force this enum type to be at least 16 bits.
         /// \endcond
     };
 
     /// \cond NOINTERNAL
-    char const* const error_names[] =
-    {
+    char const* const error_names[] = {
         /*  0 */ "success",
         /*  1 */ "no_success",
         /*  2 */ "not_implemented",
@@ -211,28 +210,25 @@ namespace hpx
         /* 55 */ "length_error",
         /* 56 */ "migration_needs_retry",
 
-        /*    */ ""
-    };
+        /*    */ ""};
     /// \endcond
-}
+}    // namespace hpx
 
 /// \cond NOEXTERNAL
-namespace boost
-{
-    namespace system
+namespace boost { namespace system {
+    // make sure our errors get recognized by the Boost.System library
+    template <>
+    struct is_error_code_enum<hpx::error>
     {
-        // make sure our errors get recognized by the Boost.System library
-        template<> struct is_error_code_enum<hpx::error>
-        {
-            static const bool value = true;
-        };
+        static const bool value = true;
+    };
 
-        template<> struct is_error_condition_enum<hpx::error>
-        {
-            static const bool value = true;
-        };
-    }
-}
+    template <>
+    struct is_error_condition_enum<hpx::error>
+    {
+        static const bool value = true;
+    };
+}}    // namespace boost::system
 /// \endcond
 
 #endif

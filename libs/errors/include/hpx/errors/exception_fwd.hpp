@@ -10,10 +10,9 @@
 #define HPX_EXCEPTION_FWD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/error.hpp>
+#include <hpx/errors/error.hpp>
 
-namespace hpx
-{
+namespace hpx {
     /// \cond NOINTERNAL
     // forward declaration
     class error_code;
@@ -29,7 +28,8 @@ namespace hpx
     {
         plain = 0,
         rethrow = 1,
-        lightweight = 0x80, // do not generate an exception for this error_code
+        lightweight =
+            0x80,    // do not generate an exception for this error_code
         /// \cond NODETAIL
         lightweight_rethrow = lightweight | rethrow
         /// \endcond
@@ -57,8 +57,8 @@ namespace hpx
     /// \a hpx::error_code object with the behavior as specified above.
     ///
     HPX_EXCEPTION_EXPORT extern error_code throws;
-}
+}    // namespace hpx
 
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors/throw_exception.hpp>
 
 #endif

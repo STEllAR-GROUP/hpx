@@ -8,7 +8,7 @@
 #include <hpx/format.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #endif

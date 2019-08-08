@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/format.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/extract_action.hpp>

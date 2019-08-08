@@ -7,7 +7,7 @@
 
 #if defined(HPX_WINDOWS)
 
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 
 #include <cstdint>

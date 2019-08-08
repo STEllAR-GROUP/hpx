@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/error.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors/error.hpp>
+#include <hpx/errors/exception.hpp>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/system/error_code.hpp>
@@ -14,72 +14,72 @@
 #include <exception>
 #include <string>
 
-namespace hpx { namespace detail
-{
-    HPX_NORETURN void throw_exception(
-        error errcode, std::string const& msg,
+namespace hpx { namespace detail {
+    HPX_NORETURN void throw_exception(error errcode, std::string const& msg,
         std::string const& func, std::string const& file, long line)
     {
         boost::filesystem::path p(file);
         hpx::detail::throw_exception(
-            hpx::exception(errcode, msg, hpx::plain),
-            func, p.string(), line);
+            hpx::exception(errcode, msg, hpx::plain), func, p.string(), line);
     }
 
     HPX_NORETURN void rethrow_exception(
         exception const& e, std::string const& func)
     {
         hpx::detail::throw_exception(
-            hpx::exception(e.get_error(), e.what(), hpx::rethrow),
-            func, hpx::get_error_file_name(e), hpx::get_error_line_number(e));
+            hpx::exception(e.get_error(), e.what(), hpx::rethrow), func,
+            hpx::get_error_file_name(e), hpx::get_error_line_number(e));
     }
 
-    std::exception_ptr get_exception(
-        error errcode, std::string const& msg, throwmode mode,
-        std::string const& func, std::string const& file, long line,
-        std::string const& auxinfo)
+    std::exception_ptr get_exception(error errcode, std::string const& msg,
+        throwmode mode, std::string const& func, std::string const& file,
+        long line, std::string const& auxinfo)
     {
         boost::filesystem::path p(file);
-        return hpx::detail::get_exception(
-            hpx::exception(errcode, msg, mode),
+        return hpx::detail::get_exception(hpx::exception(errcode, msg, mode),
             p.string(), file, line, auxinfo);
     }
 
-    std::exception_ptr get_exception(
-        boost::system::error_code ec, std::string const& msg, throwmode mode,
-        std::string const& func, std::string const& file, long line,
-        std::string const& auxinfo)
+    std::exception_ptr get_exception(boost::system::error_code ec,
+        std::string const& msg, throwmode mode, std::string const& func,
+        std::string const& file, long line, std::string const& auxinfo)
     {
         return hpx::detail::get_exception(
-            hpx::exception(ec),
-            func, file, line, auxinfo);
+            hpx::exception(ec), func, file, line, auxinfo);
     }
 
-    void throws_if(
-        hpx::error_code& ec, error errcode, std::string const& msg,
+    void throws_if(hpx::error_code& ec, error errcode, std::string const& msg,
         std::string const& func, std::string const& file, long line)
     {
-        if (&ec == &hpx::throws) {
+        if (&ec == &hpx::throws)
+        {
             hpx::detail::throw_exception(errcode, msg, func, file, line);
-        } else {
+        }
+        else
+        {
             ec = make_error_code(static_cast<hpx::error>(errcode), msg,
                 func.c_str(), file.c_str(), line,
                 (ec.category() == hpx::get_lightweight_hpx_category()) ?
-                    hpx::lightweight : hpx::plain);
+                    hpx::lightweight :
+                    hpx::plain);
         }
     }
 
     void rethrows_if(
         hpx::error_code& ec, exception const& e, std::string const& func)
     {
-        if (&ec == &hpx::throws) {
+        if (&ec == &hpx::throws)
+        {
             hpx::detail::rethrow_exception(e, func);
-        } else {
-            ec = make_error_code(e.get_error(), e.what(),
-                func.c_str(), hpx::get_error_file_name(e).c_str(),
+        }
+        else
+        {
+            ec = make_error_code(e.get_error(), e.what(), func.c_str(),
+                hpx::get_error_file_name(e).c_str(),
                 hpx::get_error_line_number(e),
                 (ec.category() == hpx::get_lightweight_hpx_category()) ?
-                    hpx::lightweight_rethrow : hpx::rethrow);
+                    hpx::lightweight_rethrow :
+                    hpx::rethrow);
         }
     }
 
@@ -87,4 +87,4 @@ namespace hpx { namespace detail
     {
         throw hpx::thread_interrupted();
     }
-}}
+}}    // namespace hpx::detail

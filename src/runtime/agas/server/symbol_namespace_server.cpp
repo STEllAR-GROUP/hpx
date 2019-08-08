@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/timing/scoped_timer.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/bind_back.hpp>

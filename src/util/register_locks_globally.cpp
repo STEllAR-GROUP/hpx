@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #include <hpx/type_support/static.hpp>

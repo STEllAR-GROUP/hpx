@@ -7,6 +7,7 @@
 #define HPX_UTIL_DETAIL_COLOCATED_HELPERS_FEB_04_2014_0828PM
 
 #include <hpx/config.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -14,7 +15,6 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/unique_ptr.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/type_support/unused.hpp>

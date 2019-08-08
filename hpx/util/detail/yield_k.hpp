@@ -14,7 +14,7 @@
 
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #endif
 
 #include <chrono>

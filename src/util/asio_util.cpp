@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/exception_list.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/util/asio_util.hpp>
 
 #include <boost/asio/io_service.hpp>

@@ -7,7 +7,7 @@
 
 #if defined(HPX_HAVE_CUDA)
 
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/async.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime_fwd.hpp>

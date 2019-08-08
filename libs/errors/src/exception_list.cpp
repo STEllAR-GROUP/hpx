@@ -4,8 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/exception_list.hpp>
+#include <hpx/errors/exception.hpp>
+#include <hpx/errors/exception_list.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
 #include <boost/system/system_error.hpp>
@@ -16,10 +16,8 @@
 #include <string>
 #include <utility>
 
-namespace hpx
-{
-    namespace detail
-    {
+namespace hpx {
+    namespace detail {
         std::string indent_message(std::string const& msg_)
         {
             std::string result;
@@ -28,65 +26,73 @@ namespace hpx
             std::string::size_type first_non_ws = msg.find_first_not_of(" \n");
             std::string::size_type pos1 = 0;
 
-            while (std::string::npos != pos) {
-                if (pos > first_non_ws) {   // skip leading newline
-                    result += msg.substr(pos1, pos-pos1+1);
-                    pos = msg.find_first_of("\n", pos1 = pos+1);
+            while (std::string::npos != pos)
+            {
+                if (pos > first_non_ws)
+                {    // skip leading newline
+                    result += msg.substr(pos1, pos - pos1 + 1);
+                    pos = msg.find_first_of("\n", pos1 = pos + 1);
                     if (std::string::npos != pos)
                         result += "  ";
                 }
-                else {
-                    pos = msg.find_first_of("\n", pos1 = pos+1);
+                else
+                {
+                    pos = msg.find_first_of("\n", pos1 = pos + 1);
                 }
             }
 
             result += msg.substr(pos1);
             return result;
         }
-    }
+    }    // namespace detail
 
-    error_code throws;        // "throw on error" special error_code;
-                              //
-                              // Note that it doesn't matter if this isn't
-                              // initialized before use since the only use is
-                              // to take its address for comparison purposes.
+    error_code throws;    // "throw on error" special error_code;
+                          //
+                          // Note that it doesn't matter if this isn't
+                          // initialized before use since the only use is
+                          // to take its address for comparison purposes.
 
     exception_list::exception_list()
-      : hpx::exception(hpx::success)
-    {}
+      : hpx::exception(hpx::success), mtx_()
+    {
+    }
 
     exception_list::exception_list(std::exception_ptr const& e)
-      : hpx::exception(hpx::get_error(e), hpx::get_error_what(e))
+      : hpx::exception(hpx::get_error(e), hpx::get_error_what(e)), mtx_()
     {
         add(e);
     }
 
-    exception_list::exception_list(exception_list_type && l)
+    exception_list::exception_list(exception_list_type&& l)
       : hpx::exception(l.size() ? hpx::get_error(l.front()) : success)
-      , exceptions_(std::move(l))
-    {}
+      , exceptions_(std::move(l)), mtx_()
+    {
+    }
 
     exception_list::exception_list(exception_list const& l)
       : hpx::exception(static_cast<hpx::exception const&>(l))
-      , exceptions_(l.exceptions_)
-    {}
+      , exceptions_(l.exceptions_), mtx_()
+    {
+    }
 
-    exception_list::exception_list(exception_list && l)
+    exception_list::exception_list(exception_list&& l)
       : hpx::exception(std::move(static_cast<hpx::exception&>(l)))
-      , exceptions_(std::move(l.exceptions_))
-    {}
+      , exceptions_(std::move(l.exceptions_)), mtx_()
+    {
+    }
 
     exception_list& exception_list::operator=(exception_list const& l)
     {
         if (this != &l)
         {
-            *static_cast<hpx::exception*>(this) = static_cast<hpx::exception const&>(l);
+            *static_cast<hpx::exception*>(this) =
+                static_cast<hpx::exception const&>(l);
             exceptions_ = l.exceptions_;
         }
         return *this;
     }
 
-    exception_list& exception_list::operator=(exception_list && l)
+    exception_list& exception_list::operator=(exception_list&& l)
     {
         if (this != &l)
         {
@@ -119,10 +125,11 @@ namespace hpx
 
         exception_list_type::const_iterator end = exceptions_.end();
         exception_list_type::const_iterator it = exceptions_.begin();
-        for (/**/; it != end; ++it) {
+        for (/**/; it != end; ++it)
+        {
             result += "  ";
             result += detail::indent_message(hpx::get_error_what(*it));
-            if (result.find_last_of("\n") < result.size()-1)
+            if (result.find_last_of("\n") < result.size() - 1)
                 result += "\n";
         }
         return result;
@@ -135,7 +142,7 @@ namespace hpx
         {
             hpx::exception ex;
             {
-                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 ex = hpx::exception(hpx::get_error(e));
             }
 
@@ -144,4 +151,4 @@ namespace hpx
         }
         exceptions_.push_back(e);
     }
-}
+}    // namespace hpx

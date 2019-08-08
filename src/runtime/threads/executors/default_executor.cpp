@@ -6,7 +6,7 @@
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/timing/steady_clock.hpp>

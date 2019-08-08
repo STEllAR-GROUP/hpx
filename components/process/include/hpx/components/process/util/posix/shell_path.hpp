@@ -15,7 +15,7 @@
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/export_definitions.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 
 #include <boost/filesystem/path.hpp>
 

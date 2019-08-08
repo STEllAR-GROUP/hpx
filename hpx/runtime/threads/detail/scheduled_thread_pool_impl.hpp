@@ -10,8 +10,7 @@
 #include <hpx/apply.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/exception_info.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
@@ -28,7 +27,6 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/util/barrier.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>

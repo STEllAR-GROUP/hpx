@@ -7,7 +7,7 @@
 
 #if defined(__APPLE__)
 
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 
 #include <cstdint>
 

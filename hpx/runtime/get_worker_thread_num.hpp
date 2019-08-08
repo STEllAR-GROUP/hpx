@@ -9,7 +9,7 @@
 #define HPX_RUNTIME_GET_WORKER_THREAD_NUM_AUG_15_2015_1120AM
 
 #include <hpx/config.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 
 #include <cstddef>
 

@@ -13,7 +13,7 @@
     !defined(HPX_PARCEL_COALESCING_MODULE_EXPORTS) &&                          \
     !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>

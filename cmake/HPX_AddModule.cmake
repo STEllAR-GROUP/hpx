@@ -243,7 +243,7 @@ function(add_hpx_module name)
   # Installing the generated header files from the build dir
   install(
     DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/hpx
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT ${name}
   )
 

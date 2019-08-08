@@ -7,9 +7,9 @@
 #if !defined(HPX_SCHEDULED_THREAD_POOL_HPP)
 #define HPX_SCHEDULED_THREAD_POOL_HPP
 
-#include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/config.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>

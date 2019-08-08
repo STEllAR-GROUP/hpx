@@ -10,8 +10,8 @@
 #define HPX_THROW_EXCEPTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/error.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors/error.hpp>
+#include <hpx/errors/exception_fwd.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -25,123 +25,106 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 /// \cond NODETAIL
-namespace hpx { namespace detail
-{
+namespace hpx { namespace detail {
     template <typename Exception>
-    HPX_NORETURN HPX_EXPORT
-    void throw_exception(Exception const& e,
+    HPX_NORETURN HPX_EXPORT void throw_exception(Exception const& e,
         std::string const& func, std::string const& file, long line);
 
-    HPX_NORETURN HPX_EXPORT void throw_exception(
-        error errcode, std::string const& msg,
-        std::string const& func, std::string const& file, long line);
+    HPX_NORETURN HPX_EXPORT void throw_exception(error errcode,
+        std::string const& msg, std::string const& func,
+        std::string const& file, long line);
 
     HPX_NORETURN HPX_EXPORT void rethrow_exception(
         exception const& e, std::string const& func);
 
     template <typename Exception>
     HPX_EXPORT std::exception_ptr get_exception(Exception const& e,
-            std::string const& func = "<unknown>",
-            std::string const& file = "<unknown>",
-            long line = -1,
-            std::string const& auxinfo = "");
+        std::string const& func = "<unknown>",
+        std::string const& file = "<unknown>", long line = -1,
+        std::string const& auxinfo = "");
 
-    HPX_EXPORT std::exception_ptr get_exception(
-            error errcode, std::string const& msg, throwmode mode,
-            std::string const& func = "<unknown>",
-            std::string const& file = "<unknown>",
-            long line = -1,
-            std::string const& auxinfo = "");
+    HPX_EXPORT std::exception_ptr get_exception(error errcode,
+        std::string const& msg, throwmode mode,
+        std::string const& func = "<unknown>",
+        std::string const& file = "<unknown>", long line = -1,
+        std::string const& auxinfo = "");
 
-    HPX_EXPORT std::exception_ptr get_exception(
-            boost::system::error_code ec, std::string const& msg, throwmode mode,
-            std::string const& func = "<unknown>",
-            std::string const& file = "<unknown>",
-            long line = -1,
-            std::string const& auxinfo = "");
+    HPX_EXPORT std::exception_ptr get_exception(boost::system::error_code ec,
+        std::string const& msg, throwmode mode,
+        std::string const& func = "<unknown>",
+        std::string const& file = "<unknown>", long line = -1,
+        std::string const& auxinfo = "");
 
-    HPX_EXPORT void throws_if(
-        hpx::error_code& ec, error errcode, std::string const& msg,
-        std::string const& func, std::string const& file, long line);
+    HPX_EXPORT void throws_if(hpx::error_code& ec, error errcode,
+        std::string const& msg, std::string const& func,
+        std::string const& file, long line);
 
     HPX_EXPORT void rethrows_if(
         hpx::error_code& ec, exception const& e, std::string const& func);
 
-    HPX_NORETURN HPX_EXPORT
-    void throw_thread_interrupted_exception();
-}}
+    HPX_NORETURN HPX_EXPORT void throw_thread_interrupted_exception();
+}}    // namespace hpx::detail
 /// \endcond
 
-namespace hpx
-{
+namespace hpx {
     /// \cond NOINTERNAL
 
     /// \brief throw an hpx::exception initialized from the given arguments
-    HPX_NORETURN inline
-    void throw_exception(error e, std::string const& msg,
+    HPX_NORETURN inline void throw_exception(error e, std::string const& msg,
         std::string const& func, std::string const& file = "", long line = -1)
     {
         detail::throw_exception(e, msg, func, file, line);
     }
     /// \endcond
-}
+}    // namespace hpx
 
 /// \cond NOINTERNAL
 ///////////////////////////////////////////////////////////////////////////////
 // helper macro allowing to prepend file name and line number to a generated
 // exception
-#define HPX_THROW_STD_EXCEPTION(except, func)                                 \
-    hpx::detail::throw_exception(except, func, __FILE__, __LINE__)            \
+#define HPX_THROW_STD_EXCEPTION(except, func)                                  \
+    hpx::detail::throw_exception(except, func, __FILE__, __LINE__) /**/
+
+#define HPX_RETHROW_EXCEPTION(e, f) hpx::detail::rethrow_exception(e, f) /**/
+
+#define HPX_RETHROWS_IF(ec, e, f) hpx::detail::rethrows_if(ec, e, f) /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_GET_EXCEPTION(...)                                                 \
+    HPX_GET_EXCEPTION_(__VA_ARGS__)                                            \
     /**/
 
-#define HPX_RETHROW_EXCEPTION(e, f)                                           \
-    hpx::detail::rethrow_exception(e, f)                                      \
+#define HPX_GET_EXCEPTION_(...)                                                \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_GET_EXCEPTION_, HPX_PP_NARGS(__VA_ARGS__))(   \
+        __VA_ARGS__))                                                          \
+/**/
+#define HPX_GET_EXCEPTION_3(errcode, f, msg)                                   \
+    HPX_GET_EXCEPTION_4(errcode, hpx::plain, f, msg)                           \
+/**/
+#define HPX_GET_EXCEPTION_4(errcode, mode, f, msg)                             \
+    hpx::detail::get_exception(errcode, msg, mode, f, __FILE__, __LINE__) /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_THROW_IN_CURRENT_FUNC(errcode, msg)                                \
+    HPX_THROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg)                  \
     /**/
 
-#define HPX_RETHROWS_IF(ec, e, f)                                             \
-    hpx::detail::rethrows_if(ec, e, f)                                        \
+#define HPX_RETHROW_IN_CURRENT_FUNC(errcode, msg)                              \
+    HPX_RETHROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg)                \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_GET_EXCEPTION(...)                                                \
-    HPX_GET_EXCEPTION_(__VA_ARGS__)                                           \
-/**/
-
-#define HPX_GET_EXCEPTION_(...)                                               \
-    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
-        HPX_GET_EXCEPTION_, HPX_PP_NARGS(__VA_ARGS__)                         \
-    )(__VA_ARGS__))                                                           \
-/**/
-#define HPX_GET_EXCEPTION_3(errcode, f, msg)                                  \
-    HPX_GET_EXCEPTION_4(errcode, hpx::plain, f, msg)                          \
-/**/
-#define HPX_GET_EXCEPTION_4(errcode, mode, f, msg)                            \
-    hpx::detail::get_exception(errcode, msg, mode, f,                         \
-        __FILE__, __LINE__)                                                   \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_THROW_IN_CURRENT_FUNC(errcode, msg)                               \
-    HPX_THROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg)                 \
+#define HPX_THROWS_IN_CURRENT_FUNC_IF(ec, errcode, msg)                        \
+    HPX_THROWS_IF(ec, errcode, BOOST_CURRENT_FUNCTION, msg)                    \
     /**/
 
-#define HPX_RETHROW_IN_CURRENT_FUNC(errcode, msg)                             \
-    HPX_RETHROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg)               \
+#define HPX_RETHROWS_IN_CURRENT_FUNC_IF(ec, errcode, msg)                      \
+    HPX_RETHROWS_IF(ec, errcode, BOOST_CURRENT_FUNCTION, msg)                  \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_THROWS_IN_CURRENT_FUNC_IF(ec, errcode, msg)                       \
-    HPX_THROWS_IF(ec, errcode, BOOST_CURRENT_FUNCTION, msg)                   \
-    /**/
-
-#define HPX_RETHROWS_IN_CURRENT_FUNC_IF(ec, errcode, msg)                     \
-    HPX_RETHROWS_IF(ec, errcode, BOOST_CURRENT_FUNCTION, msg)                 \
-    /**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_THROW_THREAD_INTERRUPTED_EXCEPTION()                              \
-    hpx::detail::throw_thread_interrupted_exception()                         \
-    /**/
+#define HPX_THROW_THREAD_INTERRUPTED_EXCEPTION()                               \
+    hpx::detail::throw_thread_interrupted_exception() /**/
 /// \endcond
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -172,9 +155,8 @@ namespace hpx
 ///      }
 /// \endcode
 ///
-#define HPX_THROW_EXCEPTION(errcode, f, msg)                                  \
-    hpx::detail::throw_exception(errcode, msg, f, __FILE__, __LINE__)         \
-    /**/
+#define HPX_THROW_EXCEPTION(errcode, f, msg)                                   \
+    hpx::detail::throw_exception(errcode, msg, f, __FILE__, __LINE__) /**/
 
 /// \def HPX_THROWS_IF(ec, errcode, f, msg)
 /// \brief Either throw a hpx::exception or initialize \a hpx::error_code from
@@ -191,9 +173,8 @@ namespace hpx
 /// name of the function exception is thrown from and the parameter \p msg
 /// holds the error message the new exception should encapsulate.
 ///
-#define HPX_THROWS_IF(ec, errcode, f, msg)                                    \
-    hpx::detail::throws_if(ec, errcode, msg, f, __FILE__, __LINE__)           \
-    /**/
+#define HPX_THROWS_IF(ec, errcode, f, msg)                                     \
+    hpx::detail::throws_if(ec, errcode, msg, f, __FILE__, __LINE__) /**/
 
 #include <hpx/config/warnings_suffix.hpp>
 
