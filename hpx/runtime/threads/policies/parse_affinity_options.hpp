@@ -124,7 +124,7 @@ namespace hpx { namespace threads {
     {
         std::vector<std::size_t> num_pus;
         parse_affinity_options(
-            spec, affinities, 1, 1, affinities.size(), num_pus, ec);
+            spec, affinities, 1, 1, affinities.size(), num_pus, false, ec);
     }
 }}
 

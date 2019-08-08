@@ -9,7 +9,7 @@
 #define HPX_THREADMANAGER_COUNTERS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 
