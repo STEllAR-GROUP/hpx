@@ -338,7 +338,7 @@ namespace hpx { namespace threads
       , error_code& ec
         ) const
     { // {{{
-        std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+        std::unique_lock<mutex_type> lk(topo_mtx);
 
         int num_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
 
@@ -494,7 +494,7 @@ namespace hpx { namespace threads
         }
 
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             if (hwloc_set_cpubind(topo, cpuset,
                   HWLOC_CPUBIND_STRICT | HWLOC_CPUBIND_THREAD))
             {
@@ -539,7 +539,7 @@ namespace hpx { namespace threads
         hwloc_nodeset_t nodeset = hwloc_bitmap_alloc();
 
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             int ret =
 #if HWLOC_API_VERSION >= 0x00010b06
                 hwloc_get_area_membind(topo, reinterpret_cast<void const*>(lva),
@@ -600,7 +600,7 @@ namespace hpx { namespace threads
 
         hwloc_obj_t obj;
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU,
                 static_cast<unsigned>(num_pu));
             HPX_ASSERT(num_pu == detail::get_index(obj));
@@ -633,7 +633,7 @@ namespace hpx { namespace threads
             hwloc_obj_t obj;
 
             {
-                std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+                std::unique_lock<mutex_type> lk(topo_mtx);
                 obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU,
                     static_cast<unsigned>(num_pu));
                 HPX_ASSERT(num_pu == detail::get_index(obj));
@@ -660,7 +660,7 @@ namespace hpx { namespace threads
         hwloc_obj_t obj;
 
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             obj = hwloc_get_next_child(topo, parent, nullptr);
         }
 
@@ -671,7 +671,7 @@ namespace hpx { namespace threads
                 do {
                     set(mask, detail::get_index(obj)); //-V106
                     {
-                        std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+                        std::unique_lock<mutex_type> lk(topo_mtx);
                         obj = hwloc_get_next_child(topo, parent, obj);
                     }
                 } while (obj != nullptr &&
@@ -681,7 +681,7 @@ namespace hpx { namespace threads
 
             extract_node_mask(obj, mask);
 
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             obj = hwloc_get_next_child(topo, parent, obj);
         }
     } // }}}
@@ -697,7 +697,7 @@ namespace hpx { namespace threads
         if(parent == nullptr) return count;
 
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             obj = hwloc_get_next_child(topo, parent, nullptr);
         }
 
@@ -709,7 +709,7 @@ namespace hpx { namespace threads
                 do {
                     ++count;
                     {
-                        std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+                        std::unique_lock<mutex_type> lk(topo_mtx);
                         obj = hwloc_get_next_child(topo, parent, obj);
                     }
                 } while (obj != nullptr && hwloc_compare_types(type, obj->type) == 0);
@@ -720,7 +720,7 @@ namespace hpx { namespace threads
 
             count = extract_node_count(obj, type, count);
 
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             obj = hwloc_get_next_child(topo, parent, obj);
         }
 
@@ -798,7 +798,7 @@ namespace hpx { namespace threads
         hwloc_obj_t socket_obj = nullptr;
 
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             socket_obj = hwloc_get_obj_by_type(topo,
                 HWLOC_OBJ_SOCKET, static_cast<unsigned>(num_socket));
         }
@@ -820,7 +820,7 @@ namespace hpx { namespace threads
         hwloc_obj_t node_obj = nullptr;
 
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             node_obj = hwloc_get_obj_by_type(topo,
                 HWLOC_OBJ_NODE, static_cast<unsigned>(numa_node));
         }
@@ -843,7 +843,7 @@ namespace hpx { namespace threads
         hwloc_obj_t core_obj = nullptr;
 
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             core_obj = hwloc_get_obj_by_type(topo,
                 HWLOC_OBJ_CORE, static_cast<unsigned>(core));
         }
@@ -865,7 +865,7 @@ namespace hpx { namespace threads
         hwloc_obj_t socket_obj = nullptr;
 
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             socket_obj = hwloc_get_obj_by_type(topo,
                 HWLOC_OBJ_SOCKET, static_cast<unsigned>(num_socket));
         }
@@ -886,7 +886,7 @@ namespace hpx { namespace threads
     {
         hwloc_obj_t node_obj = nullptr;
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             node_obj = hwloc_get_obj_by_type(topo,
                 HWLOC_OBJ_NODE, static_cast<unsigned>(numa_node));
         }
@@ -1006,7 +1006,7 @@ namespace hpx { namespace threads
 
         hwloc_obj_t machine_obj;
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             machine_obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_MACHINE, 0);
         }
         if (machine_obj)
@@ -1032,7 +1032,7 @@ namespace hpx { namespace threads
 
         hwloc_obj_t socket_obj = nullptr;
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             socket_obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_SOCKET,
                 static_cast<unsigned>(num_socket));
         }
@@ -1064,7 +1064,7 @@ namespace hpx { namespace threads
 
         hwloc_obj_t numa_node_obj = nullptr;
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             numa_node_obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_NODE,
                 static_cast<unsigned>(numa_node));
         }
@@ -1097,7 +1097,7 @@ namespace hpx { namespace threads
         std::size_t num_core = (core + core_offset) % get_number_of_cores();
 
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             core_obj = hwloc_get_obj_by_type(topo,
                 HWLOC_OBJ_CORE, static_cast<unsigned>(num_core));
         }
@@ -1130,7 +1130,7 @@ namespace hpx { namespace threads
         hwloc_obj_t obj = nullptr;
 
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU,
                     static_cast<unsigned>(num_pu));
         }
@@ -1157,7 +1157,7 @@ namespace hpx { namespace threads
         hwloc_obj_t obj = nullptr;
 
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             int num_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
             // If num_cores is smaller 0, we have an error, it should never be zero
             // either to avoid division by zero, we should always have at least one
@@ -1194,7 +1194,7 @@ namespace hpx { namespace threads
     {
         num_of_pus_ = 1;
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             int num_of_pus = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
 
             if (num_of_pus > 0)
@@ -1218,7 +1218,7 @@ namespace hpx { namespace threads
         resize(mask, get_number_of_pus());
 
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
             if (hwloc_get_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
             {
                 hwloc_bitmap_free(cpuset);
@@ -1255,7 +1255,7 @@ namespace hpx { namespace threads
         resize(mask, get_number_of_pus());
 
         {
-            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            std::unique_lock<mutex_type> lk(topo_mtx);
 #if defined(HPX_MINGW)
             if (hwloc_get_thread_cpubind(topo,
                     pthread_gethandle(handle.native_handle()), cpuset,

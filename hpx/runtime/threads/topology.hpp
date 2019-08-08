@@ -381,7 +381,8 @@ namespace hpx { namespace threads
 
         std::size_t num_of_pus_;
 
-        mutable hpx::util::spinlock topo_mtx;
+        using mutex_type = hpx::util::spinlock;
+        mutable mutex_type topo_mtx;
 
         // Number masks:
         // Vectors of non-negative integers
