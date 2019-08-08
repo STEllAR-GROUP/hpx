@@ -1574,193 +1574,24 @@ set(HPX_WITH_TARGET_ARCHITECTURE ${__target_arch} CACHE INTERNAL "" FORCE)
 # When a package is found, the necessary include paths are set, and the libraries
 # are added to the HPX_LIBRARIES variables
 
-# Setting up our required Boost libraries. This will find all required boost
-# libraries and add possibly needed boost headers shipped with the hpx source
+# Setup our required Boost libraries.
 include(HPX_SetupBoost)
-
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
-
-# convey selected allocator type to the build configuration
-hpx_add_config_define(HPX_HAVE_MALLOC "\"${HPX_WITH_MALLOC}\"")
-if(${HPX_WITH_MALLOC} STREQUAL "jemalloc")
-  if(NOT ("${HPX_WITH_JEMALLOC_PREFIX}" STREQUAL "<none>") AND
-     NOT ("${HPX_WITH_JEMALLOC_PREFIX}x" STREQUAL "x"))
-    hpx_add_config_define(HPX_HAVE_JEMALLOC_PREFIX ${HPX_WITH_JEMALLOC_PREFIX})
-    hpx_add_config_define(HPX_HAVE_INTERNAL_ALLOCATOR)
-  endif()
-endif()
-
-find_package(Hwloc)
-if(NOT HWLOC_FOUND)
-  hpx_error("Hwloc could not be found, please specify HWLOC_ROOT to point to the correct location")
-endif()
-
-add_library(hpx::hwloc INTERFACE IMPORTED)
-target_include_directories(hpx::hwloc SYSTEM INTERFACE ${HWLOC_INCLUDE_DIR})
-target_link_libraries(hpx::hwloc INTERFACE ${HWLOC_LIBRARIES})
-
-################################################################################
-# Enable integration with Intel Amplifier
-################################################################################
-if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
-  find_package(Amplifier)
-  if(NOT AMPLIFIER_FOUND)
-    hpx_error("Intel Amplifier could not be found and HPX_WITH_ITTNOTIFY=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
-  endif()
-
-  add_library(hpx::amplifier INTERFACE IMPORTED)
-  target_include_directories(hpx::amplifier SYSTEM INTERFACE ${AMPLIFIER_INCLUDE_DIR})
-  target_link_libraries(hpx::amplifier INTERFACE ${AMPLIFIER_LIBRARIES})
-
-  hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
-  hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
-endif()
-
-################################################################################
-# Enable integration with Apex event counters
-################################################################################
+include(HPX_SetupHwloc)
+# Setup Intel amplifier
+include(HPX_SetupAmplifier)
 
 # reset external source lists
 add_hpx_library_sources_noglob(hpx_external)
 add_hpx_library_headers_noglob(hpx_external)
 
-if(HPX_WITH_APEX)
-  set(_hpx_apex_no_update)
-  if(HPX_WITH_APEX_NO_UPDATE)
-    set(_hpx_apex_no_update NO_UPDATE)
-  endif()
-
-  # We want to track parent dependencies
-  hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
-
-  # If APEX_ROOT not specified, local clone into hpx source dir
-  if (NOT APEX_ROOT)
-    # handle APEX library
-    include(GitExternal)
-    git_external(apex
-      https://github.com/khuck/xpress-apex.git
-      ${HPX_WITH_APEX_TAG}
-      ${_hpx_apex_no_update}
-      VERBOSE)
-    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/apex)
-      set(APEX_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/apex)
-    else()
-      hpx_error("Apex could not be found and HPX_WITH_APEX=On")
-    endif()
-  endif(NOT APEX_ROOT)
-
-  LIST(APPEND CMAKE_MODULE_PATH "${APEX_ROOT}/cmake/Modules")
-  add_subdirectory(${APEX_ROOT}/src/apex ${CMAKE_BINARY_DIR}/apex/src/apex)
-  if(AMPLIFIER_FOUND)
-    hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
-  endif()
-
-  add_library(hpx::apex INTERFACE IMPORTED)
-  target_include_directories(hpx::apex SYSTEM INTERFACE
-    $<BUILD_INTERFACE:${APEX_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include>)
-  target_link_libraries(hpx::apex INTERFACE apex)
-
-  if(APEX_WITH_MSR)
-    add_library(hpx::msr INTERFACE IMPORTED)
-    # TODO: Use an absolute path.
-    target_link_libraries(hpx::msr INTERFACE -L${MSR_ROOT}/lib -lmsr)
-    target_link_libraries(hpx::apex INTERFACE hpx::msr)
-  endif()
-  if(APEX_WITH_ACTIVEHARMONY)
-    add_library(hpx::activeharmony INTERFACE IMPORTED)
-    # TODO: Use an absolute path.
-    target_link_libraries(hpx::activeharmony INTERFACE -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
-    target_link_libraries(hpx::apex INTERFACE hpx::activeharmony)
-  endif()
-  if(APEX_WITH_OTF2)
-    add_library(hpx::otf2 INTERFACE IMPORTED)
-    # TODO: Use an absolute path.
-    target_link_libraries(hpx::otf2 INTERFACE -L${OTF2_ROOT}/lib -lotf2)
-    target_link_libraries(hpx::apex INTERFACE hpx::otf2)
-  endif()
-
-  # handle optional ITTNotify library
-  if(HPX_WITH_ITTNOTIFY)
-    add_subdirectory(${APEX_ROOT}/src/ITTNotify)
-    if(NOT ITTNOTIFY_FOUND)
-      hpx_error("ITTNotify could not be found and HPX_WITH_ITTNOTIFY=On")
-    endif()
-
-    add_library(hpx::ittnotify INTERFACE IMPORTED)
-    target_include_directories(hpx::ittnotify SYSTEM INTERFACE ${ITTNOTIFY_SOURCE_DIR})
-    target_link_libraries(hpx::apex INTERFACE hpx::ittnotify)
-    hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
-  endif()
-endif()
-
-# Setup PAPI library
-if(HPX_WITH_PAPI)
-  find_package(PAPI)
-  if(NOT PAPI_FOUND)
-    hpx_error("PAPI could not be found and HPX_WITH_PAPI=On, please specify \
-    PAPI_ROOT to point to the root of your PAPI installation")
-  endif()
-  add_library(hpx::papi INTERFACE IMPORTED)
-  target_include_directories(hpx::papi INTERFACE ${PAPI_INCLUDE_DIR})
-  target_link_libraries(hpx::papi INTERFACE ${PAPI_LIBRARY})
-endif()
-
-if(HPX_WITH_HPXMP)
-
-  # hpxMP requires ASM support
-  enable_language(ASM)
-  set(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
-
-  set(_hpxmp_no_update)
-  if(HPX_WITH_HPXMP_NO_UPDATE)
-    set(_hpxmp_no_update NO_UPDATE)
-  endif()
-
-  if (NOT HPXMP_ROOT)
-    # handle hpxMP library
-    include(GitExternal)
-    git_external(hpxmp
-      https://github.com/STEllAR-GROUP/hpxMP.git
-      ${HPX_WITH_HPXMP_TAG}
-      ${_hpxmp_no_update}
-      VERBOSE)
-    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/hpxmp)
-      set(HPXMP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/hpxmp)
-    else()
-      hpx_error("hpxMP could not be found and HPX_WITH_HPXMP=On")
-    endif()
-  endif(NOT HPXMP_ROOT)
-
-  add_subdirectory(${HPXMP_ROOT})
-
-  # make sure thread-local storage is supported
-  hpx_add_config_define(HPX_HAVE_THREAD_LOCAL_STORAGE)
-endif()
-
-if(HPX_WITH_GOOGLE_PERFTOOLS)
-  find_package(GooglePerftools)
-  if(NOT GOOGLE_PERFTOOLS_FOUND)
-    hpx_error("Google Perftools could not be found and HPX_WITH_GOOGLE_PERFTOOLS=On, please specify GOOGLE_PERFTOOLS to point to the root of your Google Perftools installation")
-  endif()
-
-  add_library(hpx::gperftools INTERFACE IMPORTED)
-  target_include_directories(hpx::gperftool SYSTEM INTERFACE ${GOOGLE_PERFTOOLS_INCLUDE_DIR})
-  target_link_libraries(hpx::gperftools INTERFACE ${GOOGLE_PERFTOOLS_LIBRARIES})
-endif()
-
-if(HPX_WITH_VALGRIND)
-  find_package(Valgrind)
-  if(NOT VALGRIND_FOUND)
-    hpx_error("Valgrind could not be found and HPX_WITH_VALGRIND=On, please specify VALGRIND_ROOT to point to the root of your Valgrind installation")
-  endif()
-
-  add_library(hpx::valgrind INTERFACE IMPORTED)
-  target_include_directories(hpx::valgrind SYSTEM INTERFACE ${VALGRIND_INCLUDE_DIR})
-
-  hpx_add_config_define(HPX_HAVE_VALGRIND)
-endif()
+# Setup packages and subprojects
+include(HPX_SetupApex)
+include(HPX_SetupPapi)
+include(HPX_SetupHpxmp)
+include(HPX_SetupGooglePerfTools)
+include(HPX_SetupValgrind)
 
 if(HPX_WITH_SANITIZERS)
   hpx_add_config_define(HPX_HAVE_SANITIZERS)
@@ -1789,7 +1620,10 @@ endif()
 if(WIN32)
   if(HPX_WITH_SWAP_CONTEXT_EMULATION)
     if(NOT CMAKE_ASM_MASM_COMPILER)
-      hpx_error("SwitchToFiber emulation can not be enabled. The masm compiler could not be found. Try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe) or disable the emulation by setting HPX_WITH_SWAP_CONTEXT_EMULATION to Off")
+      hpx_error("SwitchToFiber emulation can not be enabled. The masm compiler \
+      could not be found. Try setting the ASM_MASM environment variable to the \
+      assembler executable (ml.exe/ml64.exe) or disable the emulation by setting \
+      HPX_WITH_SWAP_CONTEXT_EMULATION to Off")
     else()
       hpx_info("SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'")
       hpx_add_config_define(HPX_HAVE_SWAP_CONTEXT_EMULATION)

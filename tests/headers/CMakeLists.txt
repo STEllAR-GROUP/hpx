@@ -36,13 +36,6 @@ if(HPX_WITH_PARCELPORT_MPI)
   set(test_deps hpx::mpi)
 endif()
 
-# If we compile with PAPI performance counters, we need to additionally
-# add the PAPI include path here
-include(HPX_SetupPapi)
-if (HPX_WITH_PAPI)
-  set(test_deps ${test_deps} hpx::papi)
-endif()
-
 add_hpx_header_tests(
   "core"
   HEADER_ROOT ${PROJECT_SOURCE_DIR}

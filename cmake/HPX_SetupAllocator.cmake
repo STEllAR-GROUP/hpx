@@ -34,7 +34,7 @@ if(NOT HPX_WITH_MALLOC_DEFAULT)
       hpx_error(${allocator_error})
     endif()
 
-    set_property(TARGET hpx::allocator PROPERTY INTERFACE_LINK_LIBRARIES ${TCMALLOC_LIBRARIES})
+    target_link_libraries(hpx::allocator INTERFACE ${TCMALLOC_LIBRARIES})
 
     if(MSVC)
       hpx_add_link_flag_if_available(/INCLUDE:__tcmalloc)
@@ -47,10 +47,9 @@ if(NOT HPX_WITH_MALLOC_DEFAULT)
     if(NOT JEMALLOC_LIBRARIES)
       hpx_error(${allocator_error})
     endif()
-
-    set_property(TARGET hpx::allocator PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${JEMALLOC_INCLUDE_DIR}
-                                                                              ${JEMALLOC_ADDITIONAL_INCLUDE_DIR})
-    set_property(TARGET hpx::allocator PROPERTY INTERFACE_LINK_LIBRARIES ${JEMALLOC_LIBRARIES})
+    target_include_directories(hpx::allocator INTERFACE ${JEMALLOC_INCLUDE_DIR}
+      ${JEMALLOC_ADDITIONAL_INCLUDE_DIR})
+    target_link_libraries(hpx::allocator INTERFACE ${JEMALLOC_LIBRARIES})
   endif()
 
   if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "MIMALLOC")
@@ -76,9 +75,7 @@ if(NOT HPX_WITH_MALLOC_DEFAULT)
     if(MSVC)
       hpx_add_link_flag_if_available(/INCLUDE:__TBB_malloc_proxy)
     endif()
-
-    set_property(TARGET hpx::allocator PROPERTY INTERFACE_LINK_LIBRARIES ${TBBMALLOC_LIBRARY}
-                                                                         ${TBBMALLOC_PROXY_LIBRARY})
+    target_link_libraries(hpx::allocator INTERFACE ${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
   endif()
 
   if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "CUSTOM")
