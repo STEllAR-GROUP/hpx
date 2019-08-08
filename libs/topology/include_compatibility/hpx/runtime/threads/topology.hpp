@@ -9,12 +9,10 @@
 
 #if defined(HPX_TOPOLOGY_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/runtime/threads/topology.hpp is deprecated, \
+#pragma message("The header hpx/runtime/threads/topology.hpp is deprecated, \
     please include hpx/topology/topology.hpp instead")
 #else
-#warning \
-    "The header hpx/runtime/threads/topology.hpp is deprecated, \
+#warning "The header hpx/runtime/threads/topology.hpp is deprecated, \
     please include hpx/topology/topology.hpp instead"
 #endif
 #endif

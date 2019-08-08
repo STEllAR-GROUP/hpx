@@ -28,8 +28,7 @@
 #error On Intel Xeon/Phi coprocessors HPX cannot be use with a HWLOC version earlier than V1.6.
 #endif
 
-namespace hpx { namespace threads
-{
+namespace hpx { namespace threads {
 
     struct hpx_hwloc_bitmap_wrapper
     {
@@ -53,7 +52,8 @@ namespace hpx { namespace threads
 
         void reset(hwloc_bitmap_t bmp)
         {
-            if (bmp_) hwloc_bitmap_free(bmp_);
+            if (bmp_)
+                hwloc_bitmap_free(bmp_);
             bmp_ = bmp;
         }
 
@@ -62,13 +62,14 @@ namespace hpx { namespace threads
             return bmp_ != nullptr;
         }
 
-        hwloc_bitmap_t get_bmp() const {
+        hwloc_bitmap_t get_bmp() const
+        {
             return bmp_;
         }
 
         // stringify the bitmp using hwloc
-        friend HPX_EXPORT std::ostream& operator<<(std::ostream& os,
-            hpx_hwloc_bitmap_wrapper const* bmp);
+        friend HPX_EXPORT std::ostream& operator<<(
+            std::ostream& os, hpx_hwloc_bitmap_wrapper const* bmp);
 
     private:
         // the raw bitmap object
@@ -79,18 +80,19 @@ namespace hpx { namespace threads
 
     /// \brief Please see hwloc documentation for the corresponding
     /// enums HWLOC_MEMBIND_XXX
-    enum hpx_hwloc_membind_policy : int {
-        membind_default    = HWLOC_MEMBIND_DEFAULT,
+    enum hpx_hwloc_membind_policy : int
+    {
+        membind_default = HWLOC_MEMBIND_DEFAULT,
         membind_firsttouch = HWLOC_MEMBIND_FIRSTTOUCH,
-        membind_bind       = HWLOC_MEMBIND_BIND,
+        membind_bind = HWLOC_MEMBIND_BIND,
         membind_interleave = HWLOC_MEMBIND_INTERLEAVE,
 #if HWLOC_API_VERSION < 0x00020000
-        membind_replicate  = HWLOC_MEMBIND_REPLICATE,
+        membind_replicate = HWLOC_MEMBIND_REPLICATE,
 #endif
-        membind_nexttouch  = HWLOC_MEMBIND_NEXTTOUCH,
-        membind_mixed      = HWLOC_MEMBIND_MIXED,
+        membind_nexttouch = HWLOC_MEMBIND_NEXTTOUCH,
+        membind_mixed = HWLOC_MEMBIND_MIXED,
         // special HPX addition
-        membind_user       = HWLOC_MEMBIND_MIXED + 256
+        membind_user = HWLOC_MEMBIND_MIXED + 256
     };
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -106,8 +108,8 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        std::size_t get_socket_number(std::size_t num_thread,
-            error_code& /*ec*/ = throws) const
+        std::size_t get_socket_number(
+            std::size_t num_thread, error_code& /*ec*/ = throws) const
         {
             return socket_numbers_[num_thread % num_of_pus_];
         }
@@ -118,8 +120,8 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        std::size_t get_numa_node_number(std::size_t num_thread,
-            error_code& /*ec*/ = throws) const
+        std::size_t get_numa_node_number(
+            std::size_t num_thread, error_code& /*ec*/ = throws) const
         {
             return numa_node_numbers_[num_thread % num_of_pus_];
         }
@@ -141,7 +143,8 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        mask_type get_service_affinity_mask(mask_cref_type used_processing_units,
+        mask_type get_service_affinity_mask(
+            mask_cref_type used_processing_units,
             error_code& ec = throws) const;
 
         /// \brief Return a bit mask where each set bit corresponds to a
@@ -151,8 +154,8 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        mask_cref_type get_socket_affinity_mask(std::size_t num_thread,
-            error_code& ec = throws) const;
+        mask_cref_type get_socket_affinity_mask(
+            std::size_t num_thread, error_code& ec = throws) const;
 
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the given thread inside
@@ -161,8 +164,8 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        mask_cref_type get_numa_node_affinity_mask(std::size_t num_thread,
-            error_code& ec = throws) const;
+        mask_cref_type get_numa_node_affinity_mask(
+            std::size_t num_thread, error_code& ec = throws) const;
 
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit associated with the given NUMA node.
@@ -180,8 +183,8 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        mask_cref_type get_core_affinity_mask(std::size_t num_thread,
-            error_code& ec = throws) const;
+        mask_cref_type get_core_affinity_mask(
+            std::size_t num_thread, error_code& ec = throws) const;
 
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the given thread.
@@ -189,8 +192,8 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        mask_cref_type get_thread_affinity_mask(std::size_t num_thread,
-            error_code& ec = throws) const;
+        mask_cref_type get_thread_affinity_mask(
+            std::size_t num_thread, error_code& ec = throws) const;
 
         /// \brief Use the given bit mask to set the affinity of the given
         ///        thread. Each set bit corresponds to a processing unit the
@@ -202,8 +205,8 @@ namespace hpx { namespace threads
         ///
         /// \note  Use this function on systems where the affinity must be
         ///        set from inside the thread itself.
-        void set_thread_affinity_mask(mask_cref_type mask,
-            error_code& ec = throws) const;
+        void set_thread_affinity_mask(
+            mask_cref_type mask, error_code& ec = throws) const;
 
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit co-located with the memory the given
@@ -212,12 +215,12 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        mask_type get_thread_affinity_mask_from_lva(void const* lva,
-            error_code& ec = throws) const;
+        mask_type get_thread_affinity_mask_from_lva(
+            void const* lva, error_code& ec = throws) const;
 
         /// \brief Prints the \param m to os in a human readable form
         void print_affinity_mask(std::ostream& os, std::size_t num_thread,
-            mask_cref_type m, const std::string &pool_name) const;
+            mask_cref_type m, const std::string& pool_name) const;
 
         /// \brief Reduce thread priority of the current thread.
         ///
@@ -253,8 +256,8 @@ namespace hpx { namespace threads
         /// \brief Return number of cores units in given socket
         std::size_t get_number_of_socket_cores(std::size_t socket) const;
 
-        std::size_t get_core_number(std::size_t num_thread,
-            error_code& /*ec*/ = throws) const
+        std::size_t get_core_number(
+            std::size_t num_thread, error_code& /*ec*/ = throws) const
         {
             return core_numbers_[num_thread % num_of_pus_];
         }
@@ -263,12 +266,11 @@ namespace hpx { namespace threads
             error_code& ec = throws) const;
 
         mask_type get_cpubind_mask(error_code& ec = throws) const;
-        mask_type get_cpubind_mask(std::thread & handle,
-            error_code& ec = throws) const;
+        mask_type get_cpubind_mask(
+            std::thread& handle, error_code& ec = throws) const;
 
         /// convert a cpu mask into a numa node mask in hwloc bitmap form
-        hwloc_bitmap_ptr cpuset_to_nodeset(
-            mask_cref_type cpuset) const;
+        hwloc_bitmap_ptr cpuset_to_nodeset(mask_cref_type cpuset) const;
 
         void write_to_log() const;
 
@@ -278,17 +280,16 @@ namespace hpx { namespace threads
 
         /// allocate memory with binding to a numa node set as
         /// specified by the policy and flags (see hwloc docs)
-        void* allocate_membind(std::size_t len,
-            hwloc_bitmap_ptr bitmap,
+        void* allocate_membind(std::size_t len, hwloc_bitmap_ptr bitmap,
             hpx_hwloc_membind_policy policy, int flags) const;
 
         threads::mask_type get_area_membind_nodeset(
-            const void *addr, std::size_t len) const;
+            const void* addr, std::size_t len) const;
 
         bool set_area_membind_nodeset(
-            const void *addr, std::size_t len, void *nodeset) const;
+            const void* addr, std::size_t len, void* nodeset) const;
 
-        int get_numa_domain(const void *addr) const;
+        int get_numa_domain(const void* addr) const;
 
         /// Free memory that was previously allocated by allocate
         void deallocate(void* addr, std::size_t len) const;
@@ -300,22 +301,19 @@ namespace hpx { namespace threads
         void print_hwloc(std::ostream&) const;
 
         mask_type init_socket_affinity_mask_from_socket(
-            std::size_t num_socket
-            ) const;
+            std::size_t num_socket) const;
         mask_type init_numa_node_affinity_mask_from_numa_node(
-            std::size_t num_numa_node
-            ) const;
-        mask_type init_core_affinity_mask_from_core(
-            std::size_t num_core, mask_cref_type default_mask = empty_mask
-            ) const;
+            std::size_t num_numa_node) const;
+        mask_type init_core_affinity_mask_from_core(std::size_t num_core,
+            mask_cref_type default_mask = empty_mask) const;
         mask_type init_thread_affinity_mask(std::size_t num_thread) const;
         mask_type init_thread_affinity_mask(
-            std::size_t num_core
-            , std::size_t num_pu
-            ) const;
+            std::size_t num_core, std::size_t num_pu) const;
 
-        hwloc_bitmap_t mask_to_bitmap(mask_cref_type mask, hwloc_obj_type_t htype) const;
-        mask_type bitmap_to_mask(hwloc_bitmap_t bitmap, hwloc_obj_type_t htype) const;
+        hwloc_bitmap_t mask_to_bitmap(
+            mask_cref_type mask, hwloc_obj_type_t htype) const;
+        mask_type bitmap_to_mask(
+            hwloc_bitmap_t bitmap, hwloc_obj_type_t htype) const;
 
     private:
         static mask_type empty_mask;
@@ -323,8 +321,7 @@ namespace hpx { namespace threads
         friend std::size_t get_memory_page_size();
 
         std::size_t init_node_number(
-            std::size_t num_thread, hwloc_obj_type_t type
-            );
+            std::size_t num_thread, hwloc_obj_type_t type);
 
         std::size_t init_socket_number(std::size_t num_thread)
         {
@@ -340,8 +337,8 @@ namespace hpx { namespace threads
 
         void extract_node_mask(hwloc_obj_t parent, mask_type& mask) const;
 
-        std::size_t extract_node_count(hwloc_obj_t parent, hwloc_obj_type_t type,
-            std::size_t count) const;
+        std::size_t extract_node_count(
+            hwloc_obj_t parent, hwloc_obj_type_t type, std::size_t count) const;
 
         mask_type init_machine_affinity_mask() const;
         mask_type init_socket_affinity_mask(std::size_t num_thread) const
@@ -410,7 +407,9 @@ namespace hpx { namespace threads
 #include <hpx/config/warnings_suffix.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
-    struct topology_tag {};
+    struct topology_tag
+    {
+    };
 
     inline topology& create_topology()
     {
@@ -427,6 +426,6 @@ namespace hpx { namespace threads
     {
         return hpx::threads::topology::memory_page_size_;
     }
-}}
+}}    // namespace hpx::threads
 
 #endif /*HPX_RUNTIME_THREADS_TOPOLOGY_HPP*/

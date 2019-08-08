@@ -18,8 +18,8 @@
 #include <cstdint>
 #include <string>
 
-#if defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
-            && HPX_HAVE_MAX_CPU_COUNT > 64)
+#if defined(HPX_HAVE_MORE_THAN_64_THREADS) ||                                  \
+    (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT > 64)
 #  if defined(HPX_HAVE_MAX_CPU_COUNT)
 #    include <bitset>
 #  else
@@ -27,18 +27,17 @@
 #  endif
 #endif
 
-namespace hpx { namespace threads
-{
+namespace hpx { namespace threads {
     /// \cond NOINTERNAL
-#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
-             && HPX_HAVE_MAX_CPU_COUNT <= 64)
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) ||                                 \
+    (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
     typedef std::uint64_t mask_type;
     typedef std::uint64_t mask_cref_type;
 
     inline std::uint64_t bits(std::size_t idx)
     {
-       HPX_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
-       return std::uint64_t(1) << idx;
+        HPX_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
+        return std::uint64_t(1) << idx;
     }
 
     inline bool any(mask_cref_type mask)
@@ -81,7 +80,8 @@ namespace hpx { namespace threads
 
     inline std::size_t find_first(mask_cref_type mask)
     {
-        if (mask) {
+        if (mask)
+        {
             std::size_t c = 0;    // Will count mask's trailing zero bits.
 
             // Set mask's trailing 0s to 1s and zero rest.
@@ -115,10 +115,10 @@ namespace hpx { namespace threads
     // taken from https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetKernighan
     inline std::size_t count(mask_cref_type mask)
     {
-        std::size_t c; // c accumulates the total bits set in v
+        std::size_t c;    // c accumulates the total bits set in v
         for (c = 0; mask; c++)
         {
-              mask &= mask - 1; // clear the least significant bit set
+            mask &= mask - 1;    // clear the least significant bit set
         }
         return c;
     }
@@ -131,13 +131,13 @@ namespace hpx { namespace threads
 #define HPX_CPU_MASK_PREFIX "0x"
 
 #else
-# if defined(HPX_HAVE_MAX_CPU_COUNT)
+#  if defined(HPX_HAVE_MAX_CPU_COUNT)
     typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> mask_type;
     typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> const& mask_cref_type;
-# else
+#  else
     typedef boost::dynamic_bitset<std::uint64_t> mask_type;
     typedef boost::dynamic_bitset<std::uint64_t> const& mask_cref_type;
-# endif
+#  endif
 
     inline bool any(mask_cref_type mask)
     {
@@ -171,16 +171,16 @@ namespace hpx { namespace threads
 
     inline void resize(mask_type& mask, std::size_t s)
     {
-# if defined(HPX_HAVE_MAX_CPU_COUNT)
+#  if defined(HPX_HAVE_MAX_CPU_COUNT)
         HPX_ASSERT(s <= mask.size());
-# else
+#  else
         return mask.resize(s);
-# endif
+#  endif
     }
 
     inline std::size_t find_first(mask_cref_type mask)
     {
-# if defined(HPX_HAVE_MAX_CPU_COUNT)
+#  if defined(HPX_HAVE_MAX_CPU_COUNT)
         if (mask.any())
         {
             for (std::size_t i = 0; i != HPX_HAVE_MAX_CPU_COUNT; ++i)
@@ -190,16 +190,16 @@ namespace hpx { namespace threads
             }
         }
         return ~std::size_t(0);
-# else
+#  else
         return mask.find_first();
-# endif
+#  endif
     }
 
-# if defined(HPX_HAVE_MAX_CPU_COUNT)
-#define HPX_CPU_MASK_PREFIX "0b"
-#else
-#define HPX_CPU_MASK_PREFIX "0x"
-#endif
+#  if defined(HPX_HAVE_MAX_CPU_COUNT)
+#    define HPX_CPU_MASK_PREFIX "0b"
+#  else
+#    define HPX_CPU_MASK_PREFIX "0x"
+#  endif
 
     inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
@@ -233,6 +233,6 @@ namespace hpx { namespace threads
 
     HPX_API_EXPORT std::string to_string(mask_cref_type);
     /// \endcond
-}}
+}}    // namespace hpx::threads
 
 #endif /*HPX_RUNTIME_THREADS_CPU_MASK_HPP*/
