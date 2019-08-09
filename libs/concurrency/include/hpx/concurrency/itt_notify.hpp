@@ -20,75 +20,66 @@ typedef void* __itt_heap_function;
 struct ___itt_counter;
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_ITT_SYNC_CREATE(obj, type, name)  itt_sync_create(obj, type, name)
-#define HPX_ITT_SYNC_RENAME(obj, name)        itt_sync_rename(obj, name)
-#define HPX_ITT_SYNC_PREPARE(obj)             itt_sync_prepare(obj)
-#define HPX_ITT_SYNC_CANCEL(obj)              itt_sync_cancel(obj)
-#define HPX_ITT_SYNC_ACQUIRED(obj)            itt_sync_acquired(obj)
-#define HPX_ITT_SYNC_RELEASING(obj)           itt_sync_releasing(obj)
-#define HPX_ITT_SYNC_RELEASED(obj)            itt_sync_released(obj)
-#define HPX_ITT_SYNC_DESTROY(obj)             itt_sync_destroy(obj)
+#define HPX_ITT_SYNC_CREATE(obj, type, name) itt_sync_create(obj, type, name)
+#define HPX_ITT_SYNC_RENAME(obj, name) itt_sync_rename(obj, name)
+#define HPX_ITT_SYNC_PREPARE(obj) itt_sync_prepare(obj)
+#define HPX_ITT_SYNC_CANCEL(obj) itt_sync_cancel(obj)
+#define HPX_ITT_SYNC_ACQUIRED(obj) itt_sync_acquired(obj)
+#define HPX_ITT_SYNC_RELEASING(obj) itt_sync_releasing(obj)
+#define HPX_ITT_SYNC_RELEASED(obj) itt_sync_released(obj)
+#define HPX_ITT_SYNC_DESTROY(obj) itt_sync_destroy(obj)
 
-#define HPX_ITT_STACK_CREATE(ctx)             ctx = itt_stack_create()
-#define HPX_ITT_STACK_CALLEE_ENTER(ctx)       itt_stack_enter(ctx)
-#define HPX_ITT_STACK_CALLEE_LEAVE(ctx)       itt_stack_leave(ctx)
-#define HPX_ITT_STACK_DESTROY(ctx)            itt_stack_destroy(ctx)
+#define HPX_ITT_STACK_CREATE(ctx) ctx = itt_stack_create()
+#define HPX_ITT_STACK_CALLEE_ENTER(ctx) itt_stack_enter(ctx)
+#define HPX_ITT_STACK_CALLEE_LEAVE(ctx) itt_stack_leave(ctx)
+#define HPX_ITT_STACK_DESTROY(ctx) itt_stack_destroy(ctx)
 
-#define HPX_ITT_FRAME_BEGIN(frame, id)        itt_frame_begin(frame, id)
-#define HPX_ITT_FRAME_END(frame, id)          itt_frame_end(frame, id)
+#define HPX_ITT_FRAME_BEGIN(frame, id) itt_frame_begin(frame, id)
+#define HPX_ITT_FRAME_END(frame, id) itt_frame_end(frame, id)
 
-#define HPX_ITT_MARK_CREATE(mark, name)       mark = itt_mark_create(name)
-#define HPX_ITT_MARK_OFF(mark)                itt_mark_off(mark)
-#define HPX_ITT_MARK(mark, parameter)         itt_mark(mark, parameter)
+#define HPX_ITT_MARK_CREATE(mark, name) mark = itt_mark_create(name)
+#define HPX_ITT_MARK_OFF(mark) itt_mark_off(mark)
+#define HPX_ITT_MARK(mark, parameter) itt_mark(mark, parameter)
 
-#define HPX_ITT_THREAD_SET_NAME(name)         itt_thread_set_name(name)
-#define HPX_ITT_THREAD_IGNORE()               itt_thread_ignore()
+#define HPX_ITT_THREAD_SET_NAME(name) itt_thread_set_name(name)
+#define HPX_ITT_THREAD_IGNORE() itt_thread_ignore()
 
-#define HPX_ITT_TASK_BEGIN(domain, name)      itt_task_begin(domain, name)
+#define HPX_ITT_TASK_BEGIN(domain, name) itt_task_begin(domain, name)
 #define HPX_ITT_TASK_BEGIN_ID(domain, id, name) itt_task_begin(domain, id, name)
-#define HPX_ITT_TASK_END(domain)              itt_task_end(domain)
+#define HPX_ITT_TASK_END(domain) itt_task_end(domain)
 
-#define HPX_ITT_DOMAIN_CREATE(name)           itt_domain_create(name)
-#define HPX_ITT_STRING_HANDLE_CREATE(name)    itt_string_handle_create(name)
+#define HPX_ITT_DOMAIN_CREATE(name) itt_domain_create(name)
+#define HPX_ITT_STRING_HANDLE_CREATE(name) itt_string_handle_create(name)
 
-#define HPX_ITT_MAKE_ID(addr, extra)          itt_make_id(addr, extra)
-#define HPX_ITT_ID_CREATE(domain, id)         itt_id_create(domain, id)
-#define HPX_ITT_ID_DESTROY(id)                itt_id_destroy(id)
+#define HPX_ITT_MAKE_ID(addr, extra) itt_make_id(addr, extra)
+#define HPX_ITT_ID_CREATE(domain, id) itt_id_create(domain, id)
+#define HPX_ITT_ID_DESTROY(id) itt_id_destroy(id)
 
-#define HPX_ITT_HEAP_FUNCTION_CREATE(name, domain)                            \
-    itt_heap_function_create(name, domain)                                    \
-/**/
-#define HPX_ITT_HEAP_ALLOCATE_BEGIN(f, size, initialized)                     \
-    itt_heap_allocate_begin(f, size, initialized)                             \
-/**/
-#define HPX_ITT_HEAP_ALLOCATE_END(f, addr, size, initialized)                 \
-    itt_heap_allocate_end(f, addr, size, initialized)                         \
-/**/
-#define HPX_ITT_HEAP_FREE_BEGIN(f, addr)      itt_heap_free_begin(f, addr)
-#define HPX_ITT_HEAP_FREE_END(f, addr)        itt_heap_free_end(f, addr)
-#define HPX_ITT_HEAP_REALLOCATE_BEGIN(f, addr, new_size, initialized)         \
-    itt_heap_reallocate_begin(f, addr, new_size, initialized)                 \
-/**/
-#define HPX_ITT_HEAP_REALLOCATE_END(f, addr, new_addr, new_size, initialized) \
-    itt_heap_reallocate_end(f, addr, new_addr, new_size, initialized)         \
-/**/
-#define HPX_ITT_HEAP_INTERNAL_ACCESS_BEGIN()  itt_heap_internal_access_begin()
-#define HPX_ITT_HEAP_INTERNAL_ACCESS_END()    itt_heap_internal_access_end()
+#define HPX_ITT_HEAP_FUNCTION_CREATE(name, domain)                             \
+    itt_heap_function_create(name, domain) /**/
+#define HPX_ITT_HEAP_ALLOCATE_BEGIN(f, size, initialized)                      \
+    itt_heap_allocate_begin(f, size, initialized) /**/
+#define HPX_ITT_HEAP_ALLOCATE_END(f, addr, size, initialized)                  \
+    itt_heap_allocate_end(f, addr, size, initialized) /**/
+#define HPX_ITT_HEAP_FREE_BEGIN(f, addr) itt_heap_free_begin(f, addr)
+#define HPX_ITT_HEAP_FREE_END(f, addr) itt_heap_free_end(f, addr)
+#define HPX_ITT_HEAP_REALLOCATE_BEGIN(f, addr, new_size, initialized)          \
+    itt_heap_reallocate_begin(f, addr, new_size, initialized) /**/
+#define HPX_ITT_HEAP_REALLOCATE_END(f, addr, new_addr, new_size, initialized)  \
+    itt_heap_reallocate_end(f, addr, new_addr, new_size, initialized) /**/
+#define HPX_ITT_HEAP_INTERNAL_ACCESS_BEGIN() itt_heap_internal_access_begin()
+#define HPX_ITT_HEAP_INTERNAL_ACCESS_END() itt_heap_internal_access_end()
 
-#define HPX_ITT_COUNTER_CREATE(name, domain)                                  \
-    itt_counter_create(name, domain)                                          \
-/**/
-#define HPX_ITT_COUNTER_CREATE_TYPED(name, domain, type)                      \
-    itt_counter_create_typed(name, domain, type)                              \
-/**/
-#define HPX_ITT_COUNTER_SET_VALUE(id, value_ptr)                              \
-    itt_counter_set_value(id, value_ptr)                                      \
-/**/
-#define HPX_ITT_COUNTER_DESTROY(id)             itt_counter_destroy(id)
+#define HPX_ITT_COUNTER_CREATE(name, domain)                                   \
+    itt_counter_create(name, domain) /**/
+#define HPX_ITT_COUNTER_CREATE_TYPED(name, domain, type)                       \
+    itt_counter_create_typed(name, domain, type) /**/
+#define HPX_ITT_COUNTER_SET_VALUE(id, value_ptr)                               \
+    itt_counter_set_value(id, value_ptr) /**/
+#define HPX_ITT_COUNTER_DESTROY(id) itt_counter_destroy(id)
 
-#define HPX_ITT_METADATA_ADD(domain, id, key, data)                           \
-    itt_metadata_add(domain, id, key, data)                                   \
-/**/
+#define HPX_ITT_METADATA_ADD(domain, id, key, data)                            \
+    itt_metadata_add(domain, id, key, data) /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 // decide whether to use the ITT notify API if it's available
@@ -97,7 +88,8 @@ struct ___itt_counter;
 extern bool use_ittnotify_api;
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_EXPORT void itt_sync_create(void* addr, const char* objtype, const char* objname);
+HPX_EXPORT void itt_sync_create(
+    void* addr, const char* objtype, const char* objname);
 HPX_EXPORT void itt_sync_rename(void* addr, const char* name);
 HPX_EXPORT void itt_sync_prepare(void* addr);
 HPX_EXPORT void itt_sync_acquired(void* addr);
@@ -122,8 +114,8 @@ HPX_EXPORT void itt_thread_set_name(char const*);
 HPX_EXPORT void itt_thread_ignore();
 
 HPX_EXPORT void itt_task_begin(___itt_domain const*, ___itt_string_handle*);
-HPX_EXPORT void itt_task_begin(___itt_domain const*, ___itt_id*,
-    ___itt_string_handle*);
+HPX_EXPORT void itt_task_begin(
+    ___itt_domain const*, ___itt_id*, ___itt_string_handle*);
 HPX_EXPORT void itt_task_end(___itt_domain const*);
 
 HPX_EXPORT ___itt_domain* itt_domain_create(char const*);
@@ -133,23 +125,27 @@ HPX_EXPORT ___itt_id* itt_make_id(void*, std::size_t);
 HPX_EXPORT void itt_id_create(___itt_domain const*, ___itt_id* id);
 HPX_EXPORT void itt_id_destroy(___itt_id* id);
 
-HPX_EXPORT __itt_heap_function itt_heap_function_create(const char*, const char*);
+HPX_EXPORT __itt_heap_function itt_heap_function_create(
+    const char*, const char*);
 HPX_EXPORT void itt_heap_allocate_begin(__itt_heap_function, std::size_t, int);
-HPX_EXPORT void itt_heap_allocate_end(__itt_heap_function, void**, std::size_t, int);
+HPX_EXPORT void itt_heap_allocate_end(
+    __itt_heap_function, void**, std::size_t, int);
 HPX_EXPORT void itt_heap_free_begin(__itt_heap_function, void*);
 HPX_EXPORT void itt_heap_free_end(__itt_heap_function, void*);
-HPX_EXPORT void itt_heap_reallocate_begin(__itt_heap_function, void*, std::size_t, int);
-HPX_EXPORT void itt_heap_reallocate_end(__itt_heap_function, void*, void**,
-           std::size_t, int);
+HPX_EXPORT void itt_heap_reallocate_begin(
+    __itt_heap_function, void*, std::size_t, int);
+HPX_EXPORT void itt_heap_reallocate_end(
+    __itt_heap_function, void*, void**, std::size_t, int);
 HPX_EXPORT void itt_heap_internal_access_begin();
 HPX_EXPORT void itt_heap_internal_access_end();
 
 HPX_EXPORT ___itt_counter* itt_counter_create(char const*, char const*);
-HPX_EXPORT ___itt_counter* itt_counter_create_typed(char const*, char const*, int);
+HPX_EXPORT ___itt_counter* itt_counter_create_typed(
+    char const*, char const*, int);
 HPX_EXPORT void itt_counter_destroy(___itt_counter*);
-HPX_EXPORT void itt_counter_set_value(___itt_counter*, void *);
+HPX_EXPORT void itt_counter_set_value(___itt_counter*, void*);
 
-HPX_EXPORT int itt_event_create(char const *name, int namelen);
+HPX_EXPORT int itt_event_create(char const* name, int namelen);
 HPX_EXPORT int itt_event_start(int evnt);
 HPX_EXPORT int itt_event_end(int evnt);
 
@@ -163,13 +159,11 @@ HPX_EXPORT void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
     ___itt_string_handle* key, void const* data);
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     struct thread_description;
-}}
+}}    // namespace hpx::util
 
-namespace hpx { namespace util { namespace itt
-{
+namespace hpx { namespace util { namespace itt {
     struct stack_context
     {
         stack_context()
@@ -179,18 +173,19 @@ namespace hpx { namespace util { namespace itt
         }
         ~stack_context()
         {
-            if (itt_context_) HPX_ITT_STACK_DESTROY(itt_context_);
+            if (itt_context_)
+                HPX_ITT_STACK_DESTROY(itt_context_);
         }
 
         stack_context(stack_context const& rhs) = delete;
-        stack_context(stack_context && rhs)
+        stack_context(stack_context&& rhs)
           : itt_context_(rhs.itt_context_)
         {
             rhs.itt_context_ = nullptr;
         }
 
         stack_context& operator=(stack_context const& rhs) = delete;
-        stack_context& operator=(stack_context && rhs)
+        stack_context& operator=(stack_context&& rhs)
         {
             if (this != &rhs)
             {
@@ -238,7 +233,7 @@ namespace hpx { namespace util { namespace itt
 
     struct id
     {
-        id (domain const& domain, void* addr, unsigned long extra = 0)
+        id(domain const& domain, void* addr, unsigned long extra = 0)
         {
             id_ = HPX_ITT_MAKE_ID(addr, extra);
             HPX_ITT_ID_CREATE(domain.domain_, id_);
@@ -249,14 +244,14 @@ namespace hpx { namespace util { namespace itt
         }
 
         id(id const& rhs) = delete;
-        id(id && rhs)
+        id(id&& rhs)
           : id_(rhs.id_)
         {
             rhs.id_ = nullptr;
         }
 
         id& operator=(id const& rhs) = delete;
-        id& operator=(id && rhs)
+        id& operator=(id&& rhs)
         {
             if (this != &rhs)
             {
@@ -273,9 +268,10 @@ namespace hpx { namespace util { namespace itt
     struct frame_context
     {
         frame_context(domain const& domain, id* ident = nullptr)
-          : domain_(domain), ident_(ident)
+          : domain_(domain)
+          , ident_(ident)
         {
-            HPX_ITT_FRAME_BEGIN(domain_.domain_, ident_? ident_->id_ : 0);
+            HPX_ITT_FRAME_BEGIN(domain_.domain_, ident_ ? ident_->id_ : 0);
         }
         ~frame_context()
         {
@@ -305,7 +301,8 @@ namespace hpx { namespace util { namespace itt
     struct mark_context
     {
         mark_context(char const* name)
-          : itt_mark_(0), name_(name)
+          : itt_mark_(0)
+          , name_(name)
         {
             HPX_ITT_MARK_CREATE(itt_mark_, name);
         }
@@ -338,13 +335,16 @@ namespace hpx { namespace util { namespace itt
     {
         string_handle() noexcept
           : handle_(0)
-        {}
+        {
+        }
         string_handle(char const* s)
           : handle_(s == nullptr ? 0 : HPX_ITT_STRING_HANDLE_CREATE(s))
-        {}
+        {
+        }
         string_handle(___itt_string_handle* h) noexcept
           : handle_(h)
-        {}
+        {
+        }
 
         string_handle& operator=(___itt_string_handle* h) noexcept
         {
@@ -397,7 +397,8 @@ namespace hpx { namespace util { namespace itt
     {
         heap_function(char const* name, char const* domain)
           : heap_function_(HPX_ITT_HEAP_FUNCTION_CREATE(name, domain))
-        {}
+        {
+        }
 
         __itt_heap_function heap_function_;
     };
@@ -418,18 +419,21 @@ namespace hpx { namespace util { namespace itt
     struct heap_allocate
     {
         template <typename T>
-        heap_allocate(heap_function& heap_function, T**& addr, std::size_t size,
-                      int init)
-          : heap_function_(heap_function),
-            addr_(reinterpret_cast<void**&>(addr)), size_(size), init_(init)
+        heap_allocate(
+            heap_function& heap_function, T**& addr, std::size_t size, int init)
+          : heap_function_(heap_function)
+          , addr_(reinterpret_cast<void**&>(addr))
+          , size_(size)
+          , init_(init)
         {
-            HPX_ITT_HEAP_ALLOCATE_BEGIN(heap_function_.heap_function_, size_, init_);
+            HPX_ITT_HEAP_ALLOCATE_BEGIN(
+                heap_function_.heap_function_, size_, init_);
         }
 
         ~heap_allocate()
         {
-            HPX_ITT_HEAP_ALLOCATE_END(heap_function_.heap_function_, addr_,
-                size_, init_);
+            HPX_ITT_HEAP_ALLOCATE_END(
+                heap_function_.heap_function_, addr_, size_, init_);
         }
 
     private:
@@ -442,7 +446,8 @@ namespace hpx { namespace util { namespace itt
     struct heap_free
     {
         heap_free(heap_function& heap_function, void* addr)
-          : heap_function_(heap_function), addr_(addr)
+          : heap_function_(heap_function)
+          , addr_(addr)
         {
             HPX_ITT_HEAP_FREE_BEGIN(heap_function_.heap_function_, addr_);
         }
@@ -470,7 +475,8 @@ namespace hpx { namespace util { namespace itt
         }
         ~counter()
         {
-            if (id_) HPX_ITT_COUNTER_DESTROY(id_);
+            if (id_)
+                HPX_ITT_COUNTER_DESTROY(id_);
         }
 
         template <typename T>
@@ -478,20 +484,20 @@ namespace hpx { namespace util { namespace itt
         {
             if (id_)
             {
-                HPX_ITT_COUNTER_SET_VALUE(id_,
-                    const_cast<void*>(static_cast<const void*>(&value)));
+                HPX_ITT_COUNTER_SET_VALUE(
+                    id_, const_cast<void*>(static_cast<const void*>(&value)));
             }
         }
 
         counter(counter const& rhs) = delete;
-        counter(counter && rhs)
+        counter(counter&& rhs)
           : id_(rhs.id_)
         {
             rhs.id_ = nullptr;
         }
 
         counter& operator=(counter const& rhs) = delete;
-        counter& operator=(counter && rhs)
+        counter& operator=(counter&& rhs)
         {
             if (this != &rhs)
             {
@@ -509,8 +515,9 @@ namespace hpx { namespace util { namespace itt
     struct event
     {
         event(char const* name)
-          : event_(itt_event_create(name, (int)strnlen(name, 256)))
-        {}
+          : event_(itt_event_create(name, (int) strnlen(name, 256)))
+        {
+        }
 
         void start() const
         {
@@ -546,7 +553,7 @@ namespace hpx { namespace util { namespace itt
     {
         e.start();
     }
-}}}
+}}}    // namespace hpx::util::itt
 
 #else
 
@@ -559,7 +566,10 @@ inline void itt_sync_releasing(void*) {}
 inline void itt_sync_released(void*) {}
 inline void itt_sync_destroy(void*) {}
 
-inline ___itt_caller* itt_stack_create() { return nullptr; }
+inline ___itt_caller* itt_stack_create()
+{
+    return nullptr;
+}
 inline void itt_stack_enter(___itt_caller*) {}
 inline void itt_stack_leave(___itt_caller*) {}
 inline void itt_stack_destroy(___itt_caller*) {}
@@ -567,7 +577,10 @@ inline void itt_stack_destroy(___itt_caller*) {}
 inline void itt_frame_begin(___itt_domain const*, ___itt_id*) {}
 inline void itt_frame_end(___itt_domain const*, ___itt_id*) {}
 
-inline int itt_mark_create(char const*) { return 0; }
+inline int itt_mark_create(char const*)
+{
+    return 0;
+}
 inline void itt_mark_off(int) {}
 inline void itt_mark(int, char const*) {}
 
@@ -575,56 +588,96 @@ inline void itt_thread_set_name(char const*) {}
 inline void itt_thread_ignore() {}
 
 inline void itt_task_begin(___itt_domain const*, ___itt_string_handle*) {}
-inline void itt_task_begin(___itt_domain const*, ___itt_id*,
-    ___itt_string_handle*) {}
+inline void itt_task_begin(
+    ___itt_domain const*, ___itt_id*, ___itt_string_handle*)
+{
+}
 inline void itt_task_end(___itt_domain const*) {}
 
-inline ___itt_domain* itt_domain_create(char const*) { return nullptr; }
-inline ___itt_string_handle* itt_string_handle_create(char const*) { return nullptr; }
+inline ___itt_domain* itt_domain_create(char const*)
+{
+    return nullptr;
+}
+inline ___itt_string_handle* itt_string_handle_create(char const*)
+{
+    return nullptr;
+}
 
-inline ___itt_id* itt_make_id(void*, unsigned long) { return nullptr; }
+inline ___itt_id* itt_make_id(void*, unsigned long)
+{
+    return nullptr;
+}
 inline void itt_id_create(___itt_domain const*, ___itt_id*) {}
 inline void itt_id_destroy(___itt_id*) {}
 
-inline __itt_heap_function itt_heap_function_create(const char*,
-            const char*) { return nullptr; }
+inline __itt_heap_function itt_heap_function_create(const char*, const char*)
+{
+    return nullptr;
+}
 inline void itt_heap_allocate_begin(__itt_heap_function, std::size_t, int) {}
-inline void itt_heap_allocate_end(__itt_heap_function, void**, std::size_t, int) {}
+inline void itt_heap_allocate_end(__itt_heap_function, void**, std::size_t, int)
+{
+}
 inline void itt_heap_free_begin(__itt_heap_function, void*) {}
 inline void itt_heap_free_end(__itt_heap_function, void*) {}
-inline void itt_heap_reallocate_begin(__itt_heap_function, void*, std::size_t, int) {}
-inline void itt_heap_reallocate_end(__itt_heap_function, void*, void**,
-            std::size_t, int) {}
+inline void itt_heap_reallocate_begin(
+    __itt_heap_function, void*, std::size_t, int)
+{
+}
+inline void itt_heap_reallocate_end(
+    __itt_heap_function, void*, void**, std::size_t, int)
+{
+}
 inline void itt_heap_internal_access_begin() {}
 inline void itt_heap_internal_access_end() {}
 
-inline ___itt_counter* itt_counter_create(char const*, char const*) { return nullptr; }
+inline ___itt_counter* itt_counter_create(char const*, char const*)
+{
+    return nullptr;
+}
 inline ___itt_counter* itt_counter_create_typed(char const*, char const*, int)
-    { return nullptr; }
+{
+    return nullptr;
+}
 inline void itt_counter_destroy(___itt_counter*) {}
-inline void itt_counter_set_value(___itt_counter*, void *) {}
+inline void itt_counter_set_value(___itt_counter*, void*) {}
 
-inline int itt_event_create(char const *, int)  { return 0; }
-inline int itt_event_start(int ) { return 0; }
-inline int itt_event_end(int) { return 0; }
+inline int itt_event_create(char const*, int)
+{
+    return 0;
+}
+inline int itt_event_start(int)
+{
+    return 0;
+}
+inline int itt_event_end(int)
+{
+    return 0;
+}
 
-inline void itt_metadata_add(___itt_domain*, ___itt_id*,
-    ___itt_string_handle*, std::uint64_t const&) {}
-inline void itt_metadata_add(___itt_domain*, ___itt_id*,
-    ___itt_string_handle*, double const&) {}
-inline void itt_metadata_add(___itt_domain*, ___itt_id*,
-    ___itt_string_handle*, char const*) {}
-inline void itt_metadata_add(___itt_domain*, ___itt_id*,
-    ___itt_string_handle*, void const*) {}
+inline void itt_metadata_add(
+    ___itt_domain*, ___itt_id*, ___itt_string_handle*, std::uint64_t const&)
+{
+}
+inline void itt_metadata_add(
+    ___itt_domain*, ___itt_id*, ___itt_string_handle*, double const&)
+{
+}
+inline void itt_metadata_add(
+    ___itt_domain*, ___itt_id*, ___itt_string_handle*, char const*)
+{
+}
+inline void itt_metadata_add(
+    ___itt_domain*, ___itt_id*, ___itt_string_handle*, void const*)
+{
+}
 
 //////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     struct thread_description;
-}}
+}}    // namespace hpx::util
 
-namespace hpx { namespace util { namespace itt
-{
+namespace hpx { namespace util { namespace itt {
     struct stack_context
     {
         stack_context() {}
@@ -650,12 +703,16 @@ namespace hpx { namespace util { namespace itt
     {
         HPX_NON_COPYABLE(thread_domain);
 
-        thread_domain() : domain() {};
+        thread_domain()
+          : domain(){};
     };
 
     struct id
     {
-        id (domain const& /*domain*/, void* /*addr*/, unsigned long /*extra*/ = 0) {}
+        id(domain const& /*domain*/, void* /*addr*/,
+            unsigned long /*extra*/ = 0)
+        {
+        }
         ~id() {}
     };
 
@@ -710,7 +767,9 @@ namespace hpx { namespace util { namespace itt
     struct heap_allocate
     {
         template <typename T>
-        heap_allocate(heap_function& /*heap_function*/, T**, std::size_t, int) {}
+        heap_allocate(heap_function& /*heap_function*/, T**, std::size_t, int)
+        {
+        }
         ~heap_allocate() {}
     };
 
@@ -744,8 +803,8 @@ namespace hpx { namespace util { namespace itt
     };
 
     inline void event_tick(event const&) {}
-}}}
+}}}    // namespace hpx::util::itt
 
-#endif // HPX_HAVE_ITTNOTIFY
+#endif    // HPX_HAVE_ITTNOTIFY
 
 #endif

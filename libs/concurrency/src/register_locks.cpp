@@ -6,8 +6,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/concurrency/register_locks.hpp>
+#include <hpx/errors.hpp>
 
 #include <cstddef>
 #include <map>
@@ -15,11 +15,9 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
 #ifdef HPX_HAVE_VERIFY_LOCKS
-    namespace detail
-    {
+    namespace detail {
         struct lock_data
         {
             lock_data()
@@ -61,7 +59,8 @@ namespace hpx { namespace util
                 held_locks_data()
                   : enabled_(true)
                   , ignore_all_locks_(false)
-                {}
+                {
+                }
 
                 held_locks_map data_;
                 bool enabled_;
@@ -98,7 +97,8 @@ namespace hpx { namespace util
             }
         };
 
-        HPX_NATIVE_TLS register_locks::held_locks_data register_locks::held_locks_;
+        HPX_NATIVE_TLS register_locks::held_locks_data
+            register_locks::held_locks_;
         bool register_locks::lock_detection_enabled_ = false;
 
         struct reset_lock_enabled_on_exit
@@ -115,7 +115,7 @@ namespace hpx { namespace util
 
             bool old_value_;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     void enable_lock_detection()
@@ -151,14 +151,18 @@ namespace hpx { namespace util
 
             register_locks::held_locks_map::iterator it = held_locks.find(lock);
             if (it != held_locks.end())
-                return false;     // this lock is already registered
+                return false;    // this lock is already registered
 
             std::pair<register_locks::held_locks_map::iterator, bool> p;
-            if (!data) {
-                p = held_locks.insert(std::make_pair(lock, detail::lock_data()));
+            if (!data)
+            {
+                p = held_locks.insert(
+                    std::make_pair(lock, detail::lock_data()));
             }
-            else {
-                p = held_locks.insert(std::make_pair(lock, detail::lock_data(data)));
+            else
+            {
+                p = held_locks.insert(
+                    std::make_pair(lock, detail::lock_data(data)));
             }
             return p.second;
         }
@@ -178,7 +182,7 @@ namespace hpx { namespace util
 
             register_locks::held_locks_map::iterator it = held_locks.find(lock);
             if (it == held_locks.end())
-                return false;     // this lock is not registered
+                return false;    // this lock is not registered
 
             held_locks.erase(lock);
         }
@@ -186,8 +190,7 @@ namespace hpx { namespace util
     }
 
     // verify that no locks are held by this HPX-thread
-    namespace detail
-    {
+    namespace detail {
         inline bool some_locks_are_not_ignored(
             register_locks::held_locks_map const& held_locks)
         {
@@ -203,14 +206,13 @@ namespace hpx { namespace util
 
             return false;
         }
-    }
+    }    // namespace detail
 
     void verify_no_locks()
     {
         using detail::register_locks;
 
-        bool enabled =
-            register_locks::get_ignore_all_locks() &&
+        bool enabled = register_locks::get_ignore_all_locks() &&
             register_locks::get_lock_enabled();
 
         if (enabled && register_locks::lock_detection_enabled_ &&
@@ -251,22 +253,21 @@ namespace hpx { namespace util
         // acquired in a different OS thread.
         verify_no_locks();
 
-//        {
-//            register_locks::held_locks_map const& held_locks =
-//               register_locks::get_lock_map();
-//
-//            // we throw an error if there are still registered locks for
-//            // this OS-thread
-//            if (!held_locks.empty()) {
-//                HPX_THROW_EXCEPTION(invalid_status, "force_error_on_lock",
-//                    "At least one lock is held while thread is being terminated "
-//                    "or interrupted.");
-//            }
-//        }
+        //{
+        //    register_locks::held_locks_map const& held_locks =
+        //       register_locks::get_lock_map();
+        //
+        //    // we throw an error if there are still registered locks for
+        //    // this OS-thread
+        //    if (!held_locks.empty()) {
+        //        HPX_THROW_EXCEPTION(invalid_status, "force_error_on_lock",
+        //            "At least one lock is held while thread is being "
+        //            terminated or interrupted.");
+        //    }
+        //}
     }
 
-    namespace detail
-    {
+    namespace detail {
         void set_ignore_status(void const* lock, bool status)
         {
             if (register_locks::lock_detection_enabled_ &&
@@ -275,21 +276,22 @@ namespace hpx { namespace util
                 register_locks::held_locks_map& held_locks =
                     register_locks::get_lock_map();
 
-                register_locks::held_locks_map::iterator it = held_locks.find(lock);
+                register_locks::held_locks_map::iterator it =
+                    held_locks.find(lock);
                 if (it == held_locks.end())
                 {
                     // this can happen if the lock was registered to be ignore
                     // on a different OS thread
-//                     HPX_THROW_EXCEPTION(
-//                         invalid_status, "set_ignore_status",
-//                         "The given lock has not been registered.");
+                    // HPX_THROW_EXCEPTION(
+                    //     invalid_status, "set_ignore_status",
+                    //     "The given lock has not been registered.");
                     return;
                 }
 
                 it->second.ignore_ = status;
             }
         }
-    }
+    }    // namespace detail
 
     void ignore_lock(void const* lock)
     {
@@ -311,4 +313,4 @@ namespace hpx { namespace util
         detail::register_locks::set_ignore_all_locks(false);
     }
 #endif
-}}
+}}    // namespace hpx::util

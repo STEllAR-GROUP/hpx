@@ -9,11 +9,11 @@
 
 #if defined(HPX_CONCURRENCY_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/util/lockfree/detail/tagged_ptr_pair.hpp is deprecated, \
     please include hpx/concurrency/detail/tagged_ptr_pair.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/util/lockfree/detail/tagged_ptr_pair.hpp is deprecated, \
     please include hpx/concurrency/detail/tagged_ptr_pair.hpp instead"
 #endif

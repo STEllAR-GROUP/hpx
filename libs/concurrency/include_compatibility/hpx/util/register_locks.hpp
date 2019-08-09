@@ -9,12 +9,10 @@
 
 #if defined(HPX_CONCURRENCY_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/register_locks.hpp is deprecated, \
+#pragma message("The header hpx/util/register_locks.hpp is deprecated, \
     please include hpx/concurrency/register_locks.hpp instead")
 #else
-#warning \
-    "The header hpx/util/register_locks.hpp is deprecated, \
+#warning "The header hpx/util/register_locks.hpp is deprecated, \
     please include hpx/concurrency/register_locks.hpp instead"
 #endif
 #endif

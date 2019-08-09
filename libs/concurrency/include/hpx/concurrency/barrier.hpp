@@ -17,8 +17,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     class HPX_EXPORT barrier
     {
     private:
@@ -40,7 +39,7 @@ namespace hpx { namespace util
         mutable mutex_type mtx_;
         std::condition_variable cond_;
     };
-}}
+}}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>
 

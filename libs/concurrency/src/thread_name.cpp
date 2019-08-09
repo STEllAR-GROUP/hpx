@@ -14,4 +14,4 @@ namespace hpx { namespace detail {
         static HPX_NATIVE_TLS std::string thread_name_;
         return thread_name_;
     }
-}}
+}}    // namespace hpx::detail

@@ -15,9 +15,10 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
-    struct register_lock_data {};
+namespace hpx { namespace util {
+    struct register_lock_data
+    {
+    };
 
     // Always provide function exports, which guarantees ABI compatibility of
     // Debug and Release builds.
@@ -28,8 +29,8 @@ namespace hpx { namespace util
 #if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_EXPORTS)
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT bool register_lock(void const* lock,
-        register_lock_data* data = nullptr);
+    HPX_API_EXPORT bool register_lock(
+        void const* lock, register_lock_data* data = nullptr);
     HPX_API_EXPORT bool unregister_lock(void const* lock);
     HPX_API_EXPORT void verify_no_locks();
     HPX_API_EXPORT void force_error_on_lock();
@@ -73,16 +74,13 @@ namespace hpx { namespace util
         }
     };
 
-    namespace detail
-    {
+    namespace detail {
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(mutex)
     }
 
     template <typename Lock>
     struct ignore_while_checking<Lock,
-        typename std::enable_if<
-            detail::has_mutex<Lock>::value
-        >::type>
+        typename std::enable_if<detail::has_mutex<Lock>::value>::type>
     {
         ignore_while_checking(Lock const* lock)
           : mtx_(lock->mutex())
@@ -119,30 +117,15 @@ namespace hpx { namespace util
     {
         return true;
     }
-    inline void verify_no_locks()
-    {
-    }
-    inline void force_error_on_lock()
-    {
-    }
-    inline void enable_lock_detection()
-    {
-    }
-    inline void ignore_lock(void const* /*lock*/)
-    {
-    }
-    inline void reset_ignored(void const* /*lock*/)
-    {
-    }
+    inline void verify_no_locks() {}
+    inline void force_error_on_lock() {}
+    inline void enable_lock_detection() {}
+    inline void ignore_lock(void const* /*lock*/) {}
+    inline void reset_ignored(void const* /*lock*/) {}
 
-    inline void ignore_all_locks()
-    {
-    }
-    inline void reset_ignored_all()
-    {
-    }
+    inline void ignore_all_locks() {}
+    inline void reset_ignored_all() {}
 #endif
-}}
+}}    // namespace hpx::util
 
 #endif
-

@@ -8,14 +8,14 @@
 
 #include <cstddef>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     barrier::barrier(std::size_t number_of_threads)
-      : number_of_threads_(number_of_threads),
-        total_(barrier_flag),
-        mtx_(),
-        cond_()
-    {}
+      : number_of_threads_(number_of_threads)
+      , total_(barrier_flag)
+      , mtx_()
+      , cond_()
+    {
+    }
 
     barrier::~barrier()
     {
@@ -65,4 +65,4 @@ namespace hpx { namespace util
             }
         }
     }
-}}
+}}    // namespace hpx::util

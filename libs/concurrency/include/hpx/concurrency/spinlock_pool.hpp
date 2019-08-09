@@ -15,7 +15,7 @@
 // MS compatible compilers support #pragma once
 
 #if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
+#pragma once
 #endif
 
 #include <hpx/config.hpp>
@@ -29,10 +29,8 @@
 
 #include <cstddef>
 
-namespace hpx { namespace util
-{
-    namespace detail
-    {
+namespace hpx { namespace util {
+    namespace detail {
 #if HPX_HAVE_ITTNOTIFY != 0
         template <typename Tag, std::size_t N>
         struct itt_spinlock_init
@@ -41,7 +39,7 @@ namespace hpx { namespace util
             ~itt_spinlock_init();
         };
 #endif
-    }
+    }    // namespace detail
 
     template <typename Tag, std::size_t N = HPX_HAVE_SPINLOCK_POOL_NUM>
     class spinlock_pool
@@ -53,23 +51,23 @@ namespace hpx { namespace util
 #endif
 
     public:
-
-        static boost::detail::spinlock & spinlock_for( void const * pv )
+        static boost::detail::spinlock& spinlock_for(void const* pv)
         {
-            std::size_t i = fibhash<N>(reinterpret_cast< std::size_t >(pv));
-            return pool_[ i ].data_;
+            std::size_t i = fibhash<N>(reinterpret_cast<std::size_t>(pv));
+            return pool_[i].data_;
         }
 
         class scoped_lock
         {
         private:
-            boost::detail::spinlock & sp_;
+            boost::detail::spinlock& sp_;
 
         public:
             HPX_NON_COPYABLE(scoped_lock);
 
         public:
-            explicit scoped_lock( void const * pv ): sp_( spinlock_for( pv ) )
+            explicit scoped_lock(void const* pv)
+              : sp_(spinlock_for(pv))
             {
                 lock();
             }
@@ -102,8 +100,7 @@ namespace hpx { namespace util
         spinlock_pool<Tag, N>::pool_[N];
 
 #if HPX_HAVE_ITTNOTIFY != 0
-    namespace detail
-    {
+    namespace detail {
         template <typename Tag, std::size_t N>
         itt_spinlock_init<Tag, N>::itt_spinlock_init()
         {
@@ -124,12 +121,12 @@ namespace hpx { namespace util
                 HPX_ITT_SYNC_DESTROY((&spinlock_pool<Tag, N>::pool_[i].data_));
             }
         }
-    }
+    }    // namespace detail
 
     template <typename Tag, std::size_t N>
     util::detail::itt_spinlock_init<Tag, N> spinlock_pool<Tag, N>::init_;
 #endif
 
-}} // namespace hpx::util
+}}    // namespace hpx::util
 
 #endif
