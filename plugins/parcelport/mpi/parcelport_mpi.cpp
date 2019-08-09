@@ -116,9 +116,8 @@ namespace hpx { namespace parcelset
             }
         public:
             parcelport(util::runtime_configuration const& ini,
-                util::function_nonser<void(std::size_t, char const*)> const& on_start,
-                util::function_nonser<void(std::size_t, char const*)> const& on_stop)
-              : base_type(ini, here(), on_start, on_stop)
+                threads::policies::callback_notifier const& notifier)
+              : base_type(ini, here(), notifier)
               , stopped_(false)
               , receiver_(*this)
             {}

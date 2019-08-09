@@ -266,27 +266,22 @@ int main(int argc, char* argv[])
     // create a thread pool and supply a lambda that returns a new pool with
     // the a user supplied scheduler attached
     rp.create_thread_pool("default",
-        [](hpx::threads::policies::callback_notifier& notifier,
-            std::size_t num_threads, std::size_t thread_offset,
-            std::size_t pool_index, std::string const& pool_name)
-        -> std::unique_ptr<hpx::threads::thread_pool_base>
-        {
+        [](hpx::threads::thread_pool_init_parameters init)
+            -> std::unique_ptr<hpx::threads::thread_pool_base> {
             std::cout << "User defined scheduler creation callback "
                       << std::endl;
 
             std::unique_ptr<high_priority_sched> scheduler(
-                new high_priority_sched(
-                    num_threads, hpx::threads::policies::core_ratios(4, 4, 64),
-                    "shared-priority-scheduler"));
+                new high_priority_sched(init.num_threads_,
+                    hpx::threads::policies::core_ratios(4, 4, 64),
+                    "shared-priority-scheduler", init.affinity_data_));
 
-            auto mode = scheduler_mode(scheduler_mode::do_background_work |
+            init.mode_ = scheduler_mode(scheduler_mode::do_background_work |
                 scheduler_mode::delay_exit);
 
             std::unique_ptr<hpx::threads::thread_pool_base> pool(
                 new hpx::threads::detail::scheduled_thread_pool<
-                        high_priority_sched
-                    >(std::move(scheduler), notifier,
-                        pool_index, pool_name, mode, thread_offset));
+                    high_priority_sched>(std::move(scheduler), init));
             return pool;
         });
 
@@ -300,26 +295,20 @@ int main(int argc, char* argv[])
         // create a thread pool and supply a lambda that returns a new pool with
         // the a user supplied scheduler attached
         rp.create_thread_pool("mpi",
-            [](hpx::threads::policies::callback_notifier& notifier,
-                std::size_t num_threads, std::size_t thread_offset,
-                std::size_t pool_index, std::string const& pool_name)
-            -> std::unique_ptr<hpx::threads::thread_pool_base>
-            {
+            [](hpx::threads::thread_pool_init_parameters init)
+                -> std::unique_ptr<hpx::threads::thread_pool_base> {
                 std::cout << "User defined scheduler creation callback "
                           << std::endl;
                 std::unique_ptr<high_priority_sched> scheduler(
-                    new high_priority_sched(
-                        num_threads,
+                    new high_priority_sched(init.num_threads_,
                         hpx::threads::policies::core_ratios(4, 4, 64),
-                        "shared-priority-scheduler"));
+                        "shared-priority-scheduler", init.affinity_data_));
 
-                auto mode = scheduler_mode(scheduler_mode::delay_exit);
+                init.mode_ = scheduler_mode(scheduler_mode::delay_exit);
 
                 std::unique_ptr<hpx::threads::thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                            high_priority_sched
-                        >(std::move(scheduler), notifier,
-                            pool_index, pool_name, mode, thread_offset));
+                        high_priority_sched>(std::move(scheduler), init));
                 return pool;
             });
 

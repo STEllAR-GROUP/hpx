@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -92,40 +93,38 @@ namespace hpx { namespace threads { namespace policies
         //    the maxcount per queue
         struct init_parameter
         {
-            init_parameter()
-              : num_queues_(1),
-                num_high_priority_queues_(1),
-                max_queue_thread_count_(max_thread_count),
-                numa_sensitive_(0),
-                description_("local_priority_queue_scheduler")
+            init_parameter(std::size_t num_queues,
+                detail::affinity_data const& affinity_data,
+                std::size_t num_high_priority_queues = std::size_t(-1),
+                std::size_t max_queue_thread_count = max_thread_count,
+                std::size_t numa_sensitive = 0,
+                char const* description = "local_priority_queue_scheduler")
+              : num_queues_(num_queues)
+              , num_high_priority_queues_(
+                    num_high_priority_queues == std::size_t(-1) ?
+                        num_queues :
+                        num_high_priority_queues)
+              , max_queue_thread_count_(max_queue_thread_count)
+              , numa_sensitive_(numa_sensitive)
+              , affinity_data_(affinity_data)
+              , description_(description)
             {}
 
             init_parameter(std::size_t num_queues,
-                    std::size_t num_high_priority_queues = std::size_t(-1),
-                    std::size_t max_queue_thread_count = max_thread_count,
-                    std::size_t numa_sensitive = 0,
-                    char const* description = "local_priority_queue_scheduler")
-              : num_queues_(num_queues),
-                num_high_priority_queues_(
-                    num_high_priority_queues == std::size_t(-1) ?
-                        num_queues : num_high_priority_queues),
-                max_queue_thread_count_(max_queue_thread_count),
-                numa_sensitive_(numa_sensitive),
-                description_(description)
-            {}
-
-            init_parameter(std::size_t num_queues, char const* description)
-              : num_queues_(num_queues),
-                num_high_priority_queues_(num_queues),
-                max_queue_thread_count_(max_thread_count),
-                numa_sensitive_(false),
-                description_(description)
+                detail::affinity_data const& affinity_data, char const* description)
+              : num_queues_(num_queues)
+              , num_high_priority_queues_(num_queues)
+              , max_queue_thread_count_(max_thread_count)
+              , numa_sensitive_(false)
+              , affinity_data_(affinity_data)
+              , description_(description)
             {}
 
             std::size_t num_queues_;
             std::size_t num_high_priority_queues_;
             std::size_t max_queue_thread_count_;
             std::size_t numa_sensitive_;
+            detail::affinity_data const& affinity_data_;
             char const* description_;
         };
         typedef init_parameter init_parameter_type;
@@ -136,7 +135,7 @@ namespace hpx { namespace threads { namespace policies
             max_queue_thread_count_(init.max_queue_thread_count_),
             curr_queue_(0),
             numa_sensitive_(init.numa_sensitive_),
-            rp_(resource::get_partitioner()),
+            affinity_data_(init.affinity_data_),
             num_queues_(init.num_queues_),
             num_high_priority_queues_(init.num_high_priority_queues_),
             low_priority_queue_(init.max_queue_thread_count_),
@@ -1158,14 +1157,14 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread].data_->on_start_thread(num_thread);
 
             std::size_t num_threads = num_queues_;
-            auto const& topo = rp_.get_topology();
+            auto const& topo = create_topology();
 
             // get NUMA domain masks of all queues...
             std::vector<mask_type> numa_masks(num_threads);
             std::vector<mask_type> core_masks(num_threads);
             for (std::size_t i = 0; i != num_threads; ++i)
             {
-                std::size_t num_pu = rp_.get_affinity_data().get_pu_num(i);
+                std::size_t num_pu = affinity_data_.get_pu_num(i);
                 numa_masks[i] = topo.get_numa_node_affinity_mask(num_pu);
                 core_masks[i] = topo.get_core_affinity_mask(num_pu);
             }
@@ -1175,7 +1174,7 @@ namespace hpx { namespace threads { namespace policies
             std::ptrdiff_t radius = std::lround(num_threads / 2.0);
             victim_threads_[num_thread].data_.reserve(num_threads);
 
-            std::size_t num_pu = rp_.get_affinity_data().get_pu_num(num_thread);
+            std::size_t num_pu = affinity_data_.get_pu_num(num_thread);
             mask_cref_type pu_mask = topo.get_thread_affinity_mask(num_pu);
             mask_cref_type numa_mask = numa_masks[num_thread];
             mask_cref_type core_mask = core_masks[num_thread];
@@ -1290,7 +1289,7 @@ namespace hpx { namespace threads { namespace policies
         std::atomic<std::size_t> curr_queue_;
         std::size_t numa_sensitive_;
 
-        resource::detail::partitioner& rp_;
+        detail::affinity_data const& affinity_data_;
 
         std::size_t const num_queues_;
         std::size_t const num_high_priority_queues_;

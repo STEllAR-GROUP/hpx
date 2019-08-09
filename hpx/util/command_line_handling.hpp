@@ -25,6 +25,21 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
+    // Helper functions for retrieving command line options (with error
+    // checking)
+    std::size_t get_num_high_priority_queues(
+        util::command_line_handling const& cfg, std::size_t num_threads);
+
+    std::string get_affinity_domain(util::command_line_handling const& cfg);
+
+    std::size_t get_affinity_description(
+        util::command_line_handling const& cfg, std::string& affinity_desc);
+
+    std::size_t get_pu_offset(util::command_line_handling const& cfg);
+
+    std::size_t get_pu_step(util::command_line_handling const& cfg);
+
+    ///////////////////////////////////////////////////////////////////////////
     struct command_line_handling
     {
         command_line_handling()

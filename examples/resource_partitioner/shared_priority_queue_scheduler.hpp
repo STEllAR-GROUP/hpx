@@ -206,16 +206,17 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             TerminatedQueuing>
             thread_queue_type;
 
-        shared_priority_queue_scheduler(
-            std::size_t num_worker_threads,
+        shared_priority_queue_scheduler(std::size_t num_worker_threads,
             core_ratios cores_per_queue,
             char const* description,
+            detail::affinity_data const& affinity_data,
             int max_tasks = max_thread_count)
           : scheduler_base(num_worker_threads, description)
           , cores_per_queue_(cores_per_queue)
           , max_queue_thread_count_(max_tasks)
           , num_workers_(num_worker_threads)
           , num_domains_(1)
+          , affinity_data_(affinity_data)
           , initialized_(false)
         {
             LOG_CUSTOM_MSG(
@@ -1558,6 +1559,8 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
         // number of numa domains that the threads are occupying
         std::size_t num_domains_;
+
+        detail::affinity_data const& affinity_data_;
 
         // used to make sure the scheduler is only initialized once on a thread
         bool initialized_;

@@ -11,51 +11,88 @@
 #include <hpx/util/function.hpp>
 
 #include <cstddef>
+#include <deque>
 #include <exception>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies
-{
+namespace hpx { namespace threads { namespace policies {
     class callback_notifier
     {
     public:
-        typedef util::function_nonser<
-            void(std::size_t, char const*)> on_startstop_type;
-        typedef util::function_nonser<
-            bool(std::size_t, std::exception_ptr const&)> on_error_type;
+        typedef util::function_nonser<void(
+            std::size_t, std::size_t, char const*, char const*)>
+            on_startstop_type;
+        typedef util::function_nonser<bool(
+            std::size_t, std::exception_ptr const&)>
+            on_error_type;
 
-        callback_notifier(on_startstop_type const& start = on_startstop_type(),
-            on_startstop_type const& stop = on_startstop_type(),
-            on_error_type const& on_err = on_error_type())
-          : on_start_thread_(start), on_stop_thread_(stop), on_error_(on_err)
-        {}
+        callback_notifier()
+          : on_start_thread_callbacks_()
+          , on_stop_thread_callbacks_()
+          , on_error_()
+        {
+        }
 
-        void on_start_thread(std::size_t num_thread)
+        void on_start_thread(std::size_t local_thread_num,
+            std::size_t global_thread_num, char const* pool_name,
+            char const* postfix) const
         {
-            if (on_start_thread_)
-                on_start_thread_(num_thread, "");
+            for (auto& callback : on_start_thread_callbacks_)
+            {
+                if (callback)
+                {
+                    callback(local_thread_num, global_thread_num, pool_name,
+                        postfix);
+                }
+            }
         }
-        void on_stop_thread(std::size_t num_thread)
+
+        void on_stop_thread(std::size_t local_thread_num,
+            std::size_t global_thread_num, char const* pool_name,
+            char const* postfix) const
         {
-            if (on_stop_thread_)
-                on_stop_thread_(num_thread, "");
+            for (auto& callback : on_stop_thread_callbacks_)
+            {
+                if (callback)
+                {
+                    callback(
+                        local_thread_num, global_thread_num, pool_name, postfix);
+                }
+            }
         }
-        bool on_error(std::size_t num_thread, std::exception_ptr const& e)
+
+        bool on_error(
+            std::size_t global_thread_num, std::exception_ptr const& e) const
         {
             if (on_error_)
             {
-                return on_error_(num_thread, e);
+                return on_error_(global_thread_num, e);
             }
             return true;
         }
 
-        // function to call for each created thread
-        on_startstop_type on_start_thread_;
-        // function to call in case of unexpected stop
-        on_startstop_type on_stop_thread_;
-        // function to call in case of error
+        void add_on_start_thread_callback(on_startstop_type const& callback)
+        {
+            on_start_thread_callbacks_.push_back(callback);
+        }
+
+        void add_on_stop_thread_callback(on_startstop_type const& callback)
+        {
+            on_stop_thread_callbacks_.push_front(callback);
+        }
+
+        void set_on_error_callback(on_error_type const& callback)
+        {
+            on_error_ = callback;
+        }
+
+        // functions to call for each created thread
+        std::deque<on_startstop_type> on_start_thread_callbacks_;
+        // functions to call in case of unexpected stop
+        std::deque<on_startstop_type> on_stop_thread_callbacks_;
+        // functions to call in case of error
         on_error_type on_error_;
     };
 

@@ -21,6 +21,7 @@
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/bind.hpp>
@@ -47,16 +48,20 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    this_thread_executor<Scheduler>::this_thread_executor(char const* description)
-      : scheduler_(
-            typename Scheduler::init_parameter_type(1, description),
-            false
-        ),
-        shutdown_sem_(0),
-        thread_num_(std::size_t(-1)),
-        parent_thread_num_(std::size_t(-1)), orig_thread_num_(std::size_t(-1)),
-        tasks_scheduled_(0), tasks_completed_(0), cookie_(0),
-        self_(nullptr)
+    this_thread_executor<Scheduler>::this_thread_executor(
+        char const* description,
+        policies::detail::affinity_data const& affinity_data)
+      : scheduler_(typename Scheduler::init_parameter_type(
+                       1, affinity_data, description),
+            false)
+      , shutdown_sem_(0)
+      , thread_num_(std::size_t(-1))
+      , parent_thread_num_(std::size_t(-1))
+      , orig_thread_num_(std::size_t(-1))
+      , tasks_scheduled_(0)
+      , tasks_completed_(0)
+      , cookie_(0)
+      , self_(nullptr)
     {
         scheduler_.set_parent_pool(this_thread::get_pool());
         // Inform the resource manager about this new executor. This causes the
@@ -329,13 +334,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         hpx::state expected = state_starting;
         if (state.compare_exchange_strong(expected, state_stopping))
         {
-//             {
-//                 std::unique_lock<mutex_type> l(mtx_);
-//                 resource::get_partitioner().get_affinity_data().add_punit(
-//                     0, thread_num_);
-//                 scheduler_.on_start_thread(0);
-//             }
-
             self_ = threads::get_self_ptr();
 
             this_thread_on_run_exit on_exit(shutdown_sem_, self_);

@@ -100,10 +100,7 @@ namespace hpx { namespace parcelset
 
     parcelhandler::parcelhandler(util::runtime_configuration& cfg,
         threads::threadmanager* tm,
-        util::function_nonser<void(std::size_t, char const*)> const&
-            on_start_thread,
-        util::function_nonser<void(std::size_t, char const*)> const&
-            on_stop_thread)
+        threads::policies::callback_notifier const& notifier)
       : tm_(tm)
       , use_alternative_parcelports_(false)
       , enable_parcel_handling_(true)
@@ -122,13 +119,7 @@ namespace hpx { namespace parcelset
             for (plugins::parcelport_factory_base* factory :
                     get_parcelport_factories())
             {
-                std::shared_ptr<parcelport> pp(
-                    factory->create(
-                        cfg
-                      , on_start_thread
-                      , on_stop_thread
-                    )
-                );
+                std::shared_ptr<parcelport> pp(factory->create(cfg, notifier));
                 attach_parcelport(pp);
             }
         }

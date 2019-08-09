@@ -1,0 +1,216 @@
+//  Copyright (c) 2019 Mikael Simberg
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <hpx/apply.hpp>
+#include <hpx/async.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
+
+#include <cstddef>
+#include <utility>
+
+namespace hpx { namespace threads {
+    hpx::future<void> resume_processing_unit(
+        thread_pool_base& pool, std::size_t virt_core)
+    {
+        if (!threads::get_self_ptr())
+        {
+            HPX_THROW_EXCEPTION(invalid_status, "resume_processing_unit",
+                "cannot call resume_processing_unit from outside HPX, use"
+                "resume_processing_unit_cb instead");
+        }
+        else if (!(pool.get_scheduler_mode() &
+                     threads::policies::enable_elasticity))
+        {
+            return hpx::make_exceptional_future<void>(
+                HPX_GET_EXCEPTION(invalid_status, "resume_processing_unit",
+                    "this thread pool does not support suspending "
+                    "processing units"));
+        }
+
+        return hpx::async([&pool, virt_core]() -> void {
+            return pool.resume_processing_unit_direct(virt_core, throws);
+        });
+    }
+
+    void resume_processing_unit_cb(thread_pool_base& pool,
+        std::function<void(void)> callback, std::size_t virt_core,
+        error_code& ec)
+    {
+        if (!(pool.get_scheduler_mode() & threads::policies::enable_elasticity))
+        {
+            HPX_THROWS_IF(ec, invalid_status, "resume_processing_unit",
+                "this thread pool does not support suspending "
+                "processing units");
+            return;
+        }
+
+        auto resume_direct_wrapper = [&pool, virt_core,
+                                         HPX_CAPTURE_MOVE(callback)]() {
+            pool.resume_processing_unit_direct(virt_core, throws);
+            callback();
+        };
+
+        if (threads::get_self_ptr())
+        {
+            hpx::apply(std::move(resume_direct_wrapper));
+        }
+        else
+        {
+            std::thread(std::move(resume_direct_wrapper)).detach();
+        }
+    }
+
+    hpx::future<void> suspend_processing_unit(
+        thread_pool_base& pool, std::size_t virt_core)
+    {
+        if (!threads::get_self_ptr())
+        {
+            HPX_THROW_EXCEPTION(invalid_status, "suspend_processing_unit",
+                "cannot call suspend_processing_unit from outside HPX, use"
+                "suspend_processing_unit_cb instead");
+        }
+        else if (!(pool.get_scheduler_mode() &
+                     threads::policies::enable_elasticity))
+        {
+            return hpx::make_exceptional_future<void>(
+                HPX_GET_EXCEPTION(invalid_status, "suspend_processing_unit",
+                    "this thread pool does not support suspending "
+                    "processing units"));
+        }
+        else if (!pool.get_scheduler()->has_thread_stealing(virt_core) &&
+            hpx::this_thread::get_pool() == &pool)
+        {
+            return hpx::make_exceptional_future<void>(
+                HPX_GET_EXCEPTION(invalid_status, "suspend_processing_unit",
+                    "this thread pool does not support suspending "
+                    "processing units from itself (no thread stealing)"));
+        }
+
+        return hpx::async([&pool, virt_core]() -> void {
+            return pool.suspend_processing_unit_direct(virt_core, throws);
+        });
+    }
+
+    void suspend_processing_unit_cb(thread_pool_base& pool,
+        std::function<void(void)> callback, std::size_t virt_core,
+        error_code& ec)
+    {
+        if (!(pool.get_scheduler_mode() & threads::policies::enable_elasticity))
+        {
+            HPX_THROWS_IF(ec, invalid_status, "suspend_processing_unit_cb",
+                "this thread pool does not support suspending "
+                "processing units");
+            return;
+        }
+
+        auto suspend_direct_wrapper = [&pool, virt_core,
+                                          HPX_CAPTURE_MOVE(callback)]() {
+            pool.suspend_processing_unit_direct(virt_core, throws);
+            callback();
+        };
+
+        if (threads::get_self_ptr())
+        {
+            if (!pool.get_scheduler()->has_thread_stealing(virt_core) &&
+                hpx::this_thread::get_pool() == &pool)
+            {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "suspend_processing_unit_"
+                    "cb",
+                    "this thread pool does not support suspending "
+                    "processing units from itself (no thread stealing)");
+            }
+
+            hpx::apply(std::move(suspend_direct_wrapper));
+        }
+        else
+        {
+            std::thread(std::move(suspend_direct_wrapper)).detach();
+        }
+    }
+
+    future<void> resume_pool(thread_pool_base& pool)
+    {
+        if (!threads::get_self_ptr())
+        {
+            HPX_THROW_EXCEPTION(invalid_status, "resume",
+                "cannot call resume from outside HPX, use resume_cb or"
+                "resume_direct instead");
+            return hpx::make_ready_future();
+        }
+
+        return hpx::async(
+            [&pool]() -> void { return pool.resume_direct(throws); });
+    }
+
+    void resume_pool_cb(thread_pool_base& pool,
+        std::function<void(void)> callback, error_code& ec)
+    {
+        auto resume_direct_wrapper = [&pool,
+                                         HPX_CAPTURE_MOVE(callback)]() -> void {
+            pool.resume_direct(throws);
+            callback();
+        };
+
+        if (threads::get_self_ptr())
+        {
+            hpx::apply(std::move(resume_direct_wrapper));
+        }
+        else
+        {
+            std::thread(std::move(resume_direct_wrapper)).detach();
+        }
+    }
+
+    future<void> suspend_pool(thread_pool_base& pool)
+    {
+        if (!threads::get_self_ptr())
+        {
+            HPX_THROW_EXCEPTION(invalid_status, "suspend",
+                "cannot call suspend from outside HPX, use suspend_cb or"
+                "suspend_direct instead");
+            return hpx::make_ready_future();
+        }
+        else if (threads::get_self_ptr() &&
+            hpx::this_thread::get_pool() == &pool)
+        {
+            return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
+                bad_parameter, "suspend", "cannot suspend a pool from itself"));
+        }
+
+        return hpx::async(
+            [&pool]() -> void { return pool.suspend_direct(throws); });
+    }
+
+    void suspend_pool_cb(thread_pool_base& pool,
+        std::function<void(void)> callback, error_code& ec)
+    {
+        if (threads::get_self_ptr() && hpx::this_thread::get_pool() == &pool)
+        {
+            HPX_THROWS_IF(ec, bad_parameter, "suspend_cb",
+                "cannot suspend a pool from itself");
+            return;
+        }
+
+        auto suspend_direct_wrapper = [&pool, HPX_CAPTURE_MOVE(callback)]() {
+            pool.suspend_direct(throws);
+            callback();
+        };
+
+        if (threads::get_self_ptr())
+        {
+            hpx::apply(std::move(suspend_direct_wrapper));
+        }
+        else
+        {
+            std::thread(std::move(suspend_direct_wrapper)).detach();
+        }
+    }
+
+}}

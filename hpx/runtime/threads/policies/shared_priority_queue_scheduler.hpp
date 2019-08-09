@@ -85,16 +85,17 @@ namespace hpx { namespace threads { namespace policies {
         typedef thread_queue_mc<Mutex, PendingQueuing, TerminatedQueuing>
             thread_queue_type;
 
-        shared_priority_queue_scheduler(
-            std::size_t num_worker_threads,
+        shared_priority_queue_scheduler(std::size_t num_worker_threads,
             core_ratios cores_per_queue,
             char const* description,
+            detail::affinity_data const& affinity_data,
             int max_tasks = max_thread_count)
           : scheduler_base(num_worker_threads, description)
           , cores_per_queue_(cores_per_queue)
           , max_queue_thread_count_(max_tasks)
           , num_workers_(num_worker_threads)
           , num_domains_(1)
+          , affinity_data_(affinity_data)
           , initialized_(false)
         {
             HPX_ASSERT(num_worker_threads != 0);
@@ -1159,8 +1160,7 @@ namespace hpx { namespace threads { namespace policies {
             {
                 initialized_ = true;
 
-                auto &rp = resource::get_partitioner();
-                auto const& topo = rp.get_topology();
+                auto const& topo = create_topology();
 
                 // For each worker thread, count which each numa domain they
                 // belong to and build lists of useful indexes/refs
@@ -1174,7 +1174,7 @@ namespace hpx { namespace threads { namespace policies {
                 for (std::size_t local_id=0; local_id!=num_workers_; ++local_id)
                 {
                     std::size_t global_id = local_to_global_thread_index(local_id);
-                    std::size_t pu_num = rp.get_pu_num(global_id);
+                    std::size_t pu_num = affinity_data_.get_pu_num(global_id);
                     std::size_t domain = topo.get_numa_node_number(pu_num);
                     d_lookup_[local_id] = domain;
                     num_domains_ = (std::max)(num_domains_, domain+1);
@@ -1317,6 +1317,8 @@ namespace hpx { namespace threads { namespace policies {
 
         // number of numa domains that the threads are occupying
         std::size_t num_domains_;
+
+        detail::affinity_data const& affinity_data_;
 
         // used to make sure the scheduler is only initialized once on a thread
         bool initialized_;

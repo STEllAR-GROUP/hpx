@@ -22,7 +22,7 @@ set(tests
     this_thread_executors
     thread_pool_attached_executors
     thread_pool_executors
-#    thread_pool_os_executors
+    thread_pool_os_executors
     timed_parallel_executor
     timed_this_thread_executors
     timed_thread_pool_executors

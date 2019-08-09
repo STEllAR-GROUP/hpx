@@ -9,10 +9,14 @@
 
 int main()
 {
+    auto const& partitioner = hpx::resource::get_partitioner();
+
     bool caught_exception = false;
     try
     {
-        hpx::threads::executors::local_priority_queue_os_executor exec(1);
+        // Passing 0 as the number of threads throws an exception.
+        hpx::threads::executors::local_priority_queue_os_executor exec(
+            0, partitioner.get_affinity_data());
     }
     catch (...)
     {
