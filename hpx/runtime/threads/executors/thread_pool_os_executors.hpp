@@ -102,7 +102,10 @@ namespace hpx { namespace threads { namespace executors
             Scheduler *scheduler_;
             std::string executor_name_;
             threads::policies::callback_notifier notifier_;
-            std::unique_ptr<threads::detail::scheduled_thread_pool<Scheduler>> pool_;
+            std::unique_ptr<threads::detail::scheduled_thread_pool<Scheduler>>
+                pool_;
+            threads::detail::network_background_callback_type
+                network_background_callback_;
 
             threads::thread_pool_init_parameters thread_pool_init_;
 

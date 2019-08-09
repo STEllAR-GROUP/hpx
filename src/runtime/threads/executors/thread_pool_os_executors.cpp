@@ -64,9 +64,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
       , executor_name_(get_unique_name())
       , notifier_(get_notification_policy(executor_name_.c_str()))
       , pool_(nullptr)
+      , network_background_callback_()
       , thread_pool_init_(executor_name_, 0,
             policies::scheduler_mode::nothing_special, num_threads, 0,
-            notifier_, affinity_data)
+            notifier_, affinity_data, network_background_callback_)
     {
         if (num_threads > hpx::threads::hardware_concurrency())
         {
