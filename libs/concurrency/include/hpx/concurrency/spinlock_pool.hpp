@@ -19,10 +19,10 @@
 #endif
 
 #include <hpx/config.hpp>
+#include <hpx/concurrency/cache_aligned_data.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/concurrency/register_locks.hpp>
 #include <hpx/hashing/fibhash.hpp>
-#include <hpx/util/cache_aligned_data.hpp>
 
 #include <boost/smart_ptr/detail/spinlock.hpp>
 #include <boost/version.hpp>
@@ -30,6 +30,7 @@
 #include <cstddef>
 
 namespace hpx { namespace util {
+
     namespace detail {
 #if HPX_HAVE_ITTNOTIFY != 0
         template <typename Tag, std::size_t N>
@@ -45,7 +46,7 @@ namespace hpx { namespace util {
     class spinlock_pool
     {
     private:
-        static util::cache_aligned_data<boost::detail::spinlock> pool_[N];
+        static cache_aligned_data<boost::detail::spinlock> pool_[N];
 #if HPX_HAVE_ITTNOTIFY != 0
         static detail::itt_spinlock_init<Tag, N> init_;
 #endif
@@ -96,7 +97,7 @@ namespace hpx { namespace util {
     };
 
     template <typename Tag, std::size_t N>
-    util::cache_aligned_data<boost::detail::spinlock>
+    cache_aligned_data<boost::detail::spinlock>
         spinlock_pool<Tag, N>::pool_[N];
 
 #if HPX_HAVE_ITTNOTIFY != 0

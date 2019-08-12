@@ -424,17 +424,6 @@ namespace hpx { namespace threads
     HPX_API_EXPORT topology const& get_topology();
 
     ///////////////////////////////////////////////////////////////////////////
-    // abstract away cache-line size
-    constexpr std::size_t get_cache_line_size()
-    {
-#if defined(HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE)
-        return std::hardware_destructive_interference_size;
-#else
-        return 64;      // assume 64 byte cache-line size
-#endif
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // abstract away memory page size, calls to system functions are
     // expensive, so return a value initializaed at startup
     inline std::size_t get_memory_page_size()

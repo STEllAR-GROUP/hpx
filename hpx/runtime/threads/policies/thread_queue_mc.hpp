@@ -19,7 +19,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/util/cache_aligned_data.hpp>
+#include <hpx/util/cache_line_data.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
