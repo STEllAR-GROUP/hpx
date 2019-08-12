@@ -86,6 +86,8 @@ namespace util {
     ///
     template <typename Visitor, typename... T>
     auto traverse_pack_async(Visitor&& visitor, T&&... pack)
+        -> decltype(detail::apply_pack_transform_async(
+            std::forward<Visitor>(visitor), std::forward<T>(pack)...))
     {
         return detail::apply_pack_transform_async(
             std::forward<Visitor>(visitor), std::forward<T>(pack)...);
@@ -153,6 +155,8 @@ namespace util {
     template <typename Allocator, typename Visitor, typename... T>
     auto traverse_pack_async_allocator(Allocator const& alloc,
             Visitor&& visitor, T&&... pack)
+    -> decltype(detail::apply_pack_transform_async_allocator(
+            alloc, std::forward<Visitor>(visitor), std::forward<T>(pack)...))
     {
         return detail::apply_pack_transform_async_allocator(
             alloc, std::forward<Visitor>(visitor), std::forward<T>(pack)...);

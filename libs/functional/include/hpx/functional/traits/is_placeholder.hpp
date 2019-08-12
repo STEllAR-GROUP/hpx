@@ -14,6 +14,7 @@
 #include <boost/bind/arg.hpp>
 
 #include <functional>
+#include <type_traits>
 
 namespace hpx { namespace traits {
     template <typename T>

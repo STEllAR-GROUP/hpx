@@ -64,6 +64,7 @@ namespace util {
     ///
     template <typename... Args>
     auto unwrap(Args&&... args)
+        -> decltype(detail::unwrap_depth_impl<1U>(std::forward<Args>(args)...))
     {
         return detail::unwrap_depth_impl<1U>(std::forward<Args>(args)...);
     }
@@ -78,6 +79,7 @@ namespace util {
             /// \cond NOINTERNAL
             template <typename... Args>
             auto operator()(Args&&... args)
+                -> decltype(util::unwrap(std::forward<Args>(args)...))
             {
                 return util::unwrap(std::forward<Args>(args)...);
             }
@@ -94,7 +96,8 @@ namespace util {
     /// See unwrap for a detailed description.
     ///
     template <std::size_t Depth, typename... Args>
-    auto unwrap_n(Args&&... args)
+    auto unwrap_n(Args&&... args) -> decltype(
+        detail::unwrap_depth_impl<Depth>(std::forward<Args>(args)...))
     {
         static_assert(Depth > 0U, "The unwrapping depth must be >= 1!");
         return detail::unwrap_depth_impl<Depth>(std::forward<Args>(args)...);
@@ -111,6 +114,7 @@ namespace util {
             /// \cond NOINTERNAL
             template <typename... Args>
             auto operator()(Args&&... args)
+                -> decltype(util::unwrap_n<Depth>(std::forward<Args>(args)...))
             {
                 return util::unwrap_n<Depth>(std::forward<Args>(args)...);
             }
@@ -126,6 +130,7 @@ namespace util {
     ///
     template <typename... Args>
     auto unwrap_all(Args&&... args)
+        -> decltype(detail::unwrap_depth_impl<0U>(std::forward<Args>(args)...))
     {
         return detail::unwrap_depth_impl<0U>(std::forward<Args>(args)...);
     }
@@ -140,6 +145,7 @@ namespace util {
             /// \cond NOINTERNAL
             template <typename... Args>
             auto operator()(Args&&... args)
+                -> decltype(util::unwrap_all(std::forward<Args>(args)...))
             {
                 return util::unwrap_all(std::forward<Args>(args)...);
             }
@@ -166,7 +172,8 @@ namespace util {
     ///        the result of the corresponding unwrap function.
     ///
     template <typename T>
-    auto unwrapping(T&& callable)
+    auto unwrapping(T&& callable) -> decltype(
+        detail::functional_unwrap_depth_impl<1U>(std::forward<T>(callable)))
     {
         return detail::functional_unwrap_depth_impl<1U>(
             std::forward<T>(callable));
@@ -179,7 +186,8 @@ namespace util {
     /// See hpx::util::unwrapping() for a detailed description.
     ///
     template <std::size_t Depth, typename T>
-    auto unwrapping_n(T&& callable)
+    auto unwrapping_n(T&& callable) -> decltype(
+        detail::functional_unwrap_depth_impl<Depth>(std::forward<T>(callable)))
     {
         static_assert(Depth > 0U, "The unwrapping depth must be >= 1!");
         return detail::functional_unwrap_depth_impl<Depth>(
@@ -193,7 +201,8 @@ namespace util {
     /// See hpx::util::unwrapping() for a detailed description.
     ///
     template <typename T>
-    auto unwrapping_all(T&& callable)
+    auto unwrapping_all(T&& callable) -> decltype(
+        detail::functional_unwrap_depth_impl<0U>(std::forward<T>(callable)))
     {
         return detail::functional_unwrap_depth_impl<0U>(
             std::forward<T>(callable));

@@ -63,7 +63,7 @@ namespace hpx { namespace threads { namespace executors {
     // --------------------------------------------------------------------
     struct future_extract_value
     {
-        template <typename T, template <typename> class Future>
+        template<typename T, template <typename> class Future>
         const T& operator()(const Future<T>& el) const
         {
             const auto& state = traits::detail::get_shared_state(el);

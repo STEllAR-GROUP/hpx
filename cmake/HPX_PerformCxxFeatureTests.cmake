@@ -11,6 +11,7 @@
 # C++ feature tests
 ################################################################################
 function(hpx_perform_cxx_feature_tests)
+  hpx_add_config_cond_define(BOOST_RESULT_OF_USE_DECLTYPE)
   hpx_check_for_cxx11_std_atomic(
     REQUIRED "HPX needs support for C++11 std::atomic")
 
