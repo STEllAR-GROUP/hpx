@@ -292,6 +292,7 @@ namespace hpx { namespace lcos { namespace detail
         /// Check whether the current future is ready
         template <typename T>
         auto operator()(util::async_traverse_visit_tag, T&& current)
+            -> decltype(async_visit_future(std::forward<T>(current)))
         {
             return async_visit_future(std::forward<T>(current));
         }
