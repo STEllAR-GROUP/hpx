@@ -217,7 +217,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename E, typename F>
-    auto invoke_with_exception_info(E const& e, F&& f)
+    decltype(auto) invoke_with_exception_info(E const& e, F&& f)
     {
         return std::forward<F>(f)(
             dynamic_cast<exception_info const*>(std::addressof(e)));
