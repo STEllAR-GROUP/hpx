@@ -70,6 +70,9 @@ function(hpx_detect_cpp_dialect_non_msvc)
 endfunction()
 
 function(hpx_detect_cpp_dialect)
+  if(HPX_WITH_CXX0X OR HPX_WITH_CXX1X OR HPX_WITH_CXX11)
+        hpx_error("HPX requires C++14 or newer")
+  endif()
 
   if(MSVC)
     set(CXX_FLAG)
