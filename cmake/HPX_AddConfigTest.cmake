@@ -215,6 +215,34 @@ function(hpx_check_for_libfun_std_experimental_optional)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx11_std_atomic)
+  # Make sure HPX_HAVE_LIBATOMIC is removed from the cache if necessary
+  if(NOT HPX_WITH_CXX11_ATOMIC)
+    unset(HPX_HAVE_LIBATOMIC CACHE)
+  endif()
+
+  # Sometimes linking against libatomic is required for atomic ops, if
+  # the platform doesn't support lock-free atomics.
+  check_library_exists(atomic __atomic_fetch_add_4 "" HPX_HAVE_LIBATOMIC)
+  if(HPX_HAVE_LIBATOMIC)
+    set(HPX_CXX11_STD_ATOMIC_LIBRARIES atomic CACHE BOOL "std::atomics need separate library" FORCE)
+  endif()
+
+  add_hpx_config_test(HPX_WITH_CXX11_ATOMIC
+    SOURCE cmake/tests/cxx11_std_atomic.cpp
+    LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
+    FILE ${ARGN})
+endfunction()
+
+# Separately check for 128 bit atomics
+function(hpx_check_for_cxx11_std_atomic_128bit)
+  add_hpx_config_test(HPX_WITH_CXX11_ATOMIC_128BIT
+    SOURCE cmake/tests/cxx11_std_atomic_128bit.cpp
+    LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_cxx17_aligned_new)
   add_hpx_config_test(HPX_WITH_CXX17_ALIGNED_NEW
     SOURCE cmake/tests/cxx17_aligned_new.cpp

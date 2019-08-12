@@ -11,6 +11,13 @@
 # C++ feature tests
 ################################################################################
 function(hpx_perform_cxx_feature_tests)
+  hpx_check_for_cxx11_std_atomic(
+    REQUIRED "HPX needs support for C++11 std::atomic")
+
+  # Separately check for 128 bit atomics
+  hpx_check_for_cxx11_std_atomic_128bit(
+    DEFINITIONS HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+
   if(HPX_WITH_CXX1Z OR HPX_WITH_CXX17 OR HPX_WITH_CXX2A)
     # Check the availability of certain C++17 language features
     hpx_check_for_cxx17_filesystem(
