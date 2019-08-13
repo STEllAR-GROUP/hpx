@@ -62,7 +62,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_init_data data(util::one_shot(util::bind(
             &current_executor::thread_function_nullary,
             std::move(f))), desc);
-        data.stacksize = threads::get_stack_size(stacksize);
+        data.stacksize = scheduler_base_->get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread(scheduler_base_, data, id, //-V601
@@ -82,7 +82,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_init_data data(util::one_shot(util::bind(
             &current_executor::thread_function_nullary,
             std::move(f))), desc);
-        data.stacksize = threads::get_stack_size(stacksize);
+        data.stacksize = scheduler_base_->get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread( //-V601

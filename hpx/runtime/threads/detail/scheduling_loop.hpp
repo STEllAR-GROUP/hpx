@@ -390,9 +390,9 @@ namespace hpx { namespace threads { namespace detail
         thread_id_type background_thread;
         background_running.reset(new bool(true));
         thread_init_data background_init(
-            [&, background_running](thread_state_ex_enum) -> thread_result_type
-            {
-                while(*background_running)
+            [&, background_running](
+                thread_state_ex_enum) -> thread_result_type {
+                while (*background_running)
                 {
                     if (callbacks.background_())
                     {
@@ -402,17 +402,15 @@ namespace hpx { namespace threads { namespace detail
                         if (*background_running)
                             idle_loop_count = callbacks.max_idle_loop_count_;
                     }
-                    hpx::this_thread::suspend(hpx::threads::pending,
-                        "background_work");
+                    hpx::this_thread::suspend(
+                        hpx::threads::pending, "background_work");
                 }
 
                 return thread_result_type(terminated, invalid_thread_id);
             },
             hpx::util::thread_description("background_work"),
-            thread_priority_high_recursive,
-            schedulehint,
-            get_stack_size(thread_stacksize_large),
-            &scheduler);
+            thread_priority_high_recursive, schedulehint,
+            scheduler.get_stack_size(thread_stacksize_large), &scheduler);
 
         // Create in suspended to prevent the thread from being scheduled
         // directly...
