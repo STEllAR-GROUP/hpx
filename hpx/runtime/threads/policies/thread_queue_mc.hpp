@@ -480,12 +480,13 @@ namespace hpx { namespace threads { namespace policies
 
         thread_queue_mc(std::size_t queue_num = std::size_t(-1),
                 std::size_t max_count = max_thread_count)
-          : min_tasks_to_steal_pending(detail::get_min_tasks_to_steal_pending()),
-            min_tasks_to_steal_staged(detail::get_min_tasks_to_steal_staged()),
-            min_add_new_count(detail::get_min_add_new_count()),
-            max_add_new_count(detail::get_max_add_new_count()),
-            max_delete_count(detail::get_max_delete_count()),
-            max_terminated_threads(detail::get_max_terminated_threads()),
+            // TODO
+          : min_tasks_to_steal_pending(10),
+            min_tasks_to_steal_staged(10),
+            min_add_new_count(10),
+            max_add_new_count(10),
+            max_delete_count(10),
+            max_terminated_threads(10),
             thread_map_count_(0),
             work_items_(128, queue_num)
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME

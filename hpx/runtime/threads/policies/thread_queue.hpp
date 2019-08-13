@@ -12,7 +12,6 @@
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
@@ -62,54 +61,54 @@ namespace hpx { namespace threads { namespace policies
 
     namespace detail
     {
-        inline int get_min_tasks_to_steal_pending()
-        {
-            static int min_tasks_to_steal_pending =
-                boost::lexical_cast<int>(hpx::get_config_entry(
-                    "hpx.thread_queue.min_tasks_to_steal_pending", "0"));
-            return min_tasks_to_steal_pending;
-        }
+        // inline int get_min_tasks_to_steal_pending()
+        // {
+        //     static int min_tasks_to_steal_pending =
+        //         boost::lexical_cast<int>(hpx::get_config_entry(
+        //             "hpx.thread_queue.min_tasks_to_steal_pending", "0"));
+        //     return min_tasks_to_steal_pending;
+        // }
 
-        inline int get_min_tasks_to_steal_staged()
-        {
-            static int min_tasks_to_steal_staged =
-                boost::lexical_cast<int>(hpx::get_config_entry(
-                    "hpx.thread_queue.min_tasks_to_steal_staged", "10"));
-            return min_tasks_to_steal_staged;
-        }
+        // inline int get_min_tasks_to_steal_staged()
+        // {
+        //     static int min_tasks_to_steal_staged =
+        //         boost::lexical_cast<int>(hpx::get_config_entry(
+        //             "hpx.thread_queue.min_tasks_to_steal_staged", "10"));
+        //     return min_tasks_to_steal_staged;
+        // }
 
-        inline int get_min_add_new_count()
-        {
-            static int min_add_new_count =
-                boost::lexical_cast<int>(hpx::get_config_entry(
-                    "hpx.thread_queue.min_add_new_count", "10"));
-            return min_add_new_count;
-        }
+        // inline int get_min_add_new_count()
+        // {
+        //     static int min_add_new_count =
+        //         boost::lexical_cast<int>(hpx::get_config_entry(
+        //             "hpx.thread_queue.min_add_new_count", "10"));
+        //     return min_add_new_count;
+        // }
 
-        inline int get_max_add_new_count()
-        {
-            static int max_add_new_count =
-                boost::lexical_cast<int>(hpx::get_config_entry(
-                    "hpx.thread_queue.max_add_new_count", "10"));
-            return max_add_new_count;
-        }
+        // inline int get_max_add_new_count()
+        // {
+        //     static int max_add_new_count =
+        //         boost::lexical_cast<int>(hpx::get_config_entry(
+        //             "hpx.thread_queue.max_add_new_count", "10"));
+        //     return max_add_new_count;
+        // }
 
-        inline int get_max_delete_count()
-        {
-            static int max_delete_count =
-                boost::lexical_cast<int>(hpx::get_config_entry(
-                    "hpx.thread_queue.max_delete_count", "1000"));
-            return max_delete_count;
-        }
+        // inline int get_max_delete_count()
+        // {
+        //     static int max_delete_count =
+        //         boost::lexical_cast<int>(hpx::get_config_entry(
+        //             "hpx.thread_queue.max_delete_count", "1000"));
+        //     return max_delete_count;
+        // }
 
-        inline int get_max_terminated_threads()
-        {
-            static int max_terminated_threads =
-                boost::lexical_cast<int>(hpx::get_config_entry(
-                    "hpx.thread_queue.max_terminated_threads",
-                    std::to_string(HPX_SCHEDULER_MAX_TERMINATED_THREADS)));
-            return max_terminated_threads;
-        }
+        // inline int get_max_terminated_threads()
+        // {
+        //     static int max_terminated_threads =
+        //         boost::lexical_cast<int>(hpx::get_config_entry(
+        //             "hpx.thread_queue.max_terminated_threads",
+        //             std::to_string(HPX_SCHEDULER_MAX_TERMINATED_THREADS)));
+        //     return max_terminated_threads;
+        // }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -205,49 +204,27 @@ namespace hpx { namespace threads { namespace policies
             threads::thread_init_data& data, thread_state_enum state, Lock& lk)
         {
             HPX_ASSERT(lk.owns_lock());
-            HPX_ASSERT(data.stacksize != 0);
+            HPX_ASSERT(data.stacksize > 0);
 
             std::ptrdiff_t stacksize = data.stacksize;
 
             thread_heap_type* heap = nullptr;
 
-            if (stacksize == get_stack_size(thread_stacksize_small))
+            if (stacksize == thread_heap_small_stacksize_)
             {
                 heap = &thread_heap_small_;
             }
-            else if (stacksize == get_stack_size(thread_stacksize_medium))
+            else if (stacksize == thread_heap_medium_stacksize_)
             {
                 heap = &thread_heap_medium_;
             }
-            else if (stacksize == get_stack_size(thread_stacksize_large))
+            else if (stacksize == thread_heap_large_stacksize_)
             {
                 heap = &thread_heap_large_;
             }
-            else if (stacksize == get_stack_size(thread_stacksize_huge))
+            else if (stacksize == thread_heap_huge_stacksize_)
             {
                 heap = &thread_heap_huge_;
-            }
-            else {
-                switch(stacksize) {
-                case thread_stacksize_small:
-                    heap = &thread_heap_small_;
-                    break;
-
-                case thread_stacksize_medium:
-                    heap = &thread_heap_medium_;
-                    break;
-
-                case thread_stacksize_large:
-                    heap = &thread_heap_large_;
-                    break;
-
-                case thread_stacksize_huge:
-                    heap = &thread_heap_huge_;
-                    break;
-
-                default:
-                    break;
-                }
             }
             HPX_ASSERT(heap);
 
@@ -393,45 +370,25 @@ namespace hpx { namespace threads { namespace policies
         {
             std::ptrdiff_t stacksize = thrd->get_stack_size();
 
-            if (stacksize == get_stack_size(thread_stacksize_small))
+            if (stacksize == thread_heap_small_stacksize_)
             {
                 thread_heap_small_.push_front(thrd);
             }
-            else if (stacksize == get_stack_size(thread_stacksize_medium))
+            else if (stacksize == thread_heap_medium_stacksize_)
             {
                 thread_heap_medium_.push_front(thrd);
             }
-            else if (stacksize == get_stack_size(thread_stacksize_large))
+            else if (stacksize == thread_heap_large_stacksize_)
             {
                 thread_heap_large_.push_front(thrd);
             }
-            else if (stacksize == get_stack_size(thread_stacksize_huge))
+            else if (stacksize == thread_heap_huge_stacksize_)
             {
                 thread_heap_huge_.push_front(thrd);
             }
             else
             {
-                switch(stacksize) {
-                case thread_stacksize_small:
-                    thread_heap_small_.push_front(thrd);
-                    break;
-
-                case thread_stacksize_medium:
-                    thread_heap_medium_.push_front(thrd);
-                    break;
-
-                case thread_stacksize_large:
-                    thread_heap_large_.push_front(thrd);
-                    break;
-
-                case thread_stacksize_huge:
-                    thread_heap_huge_.push_front(thrd);
-                    break;
-
-                default:
-                    HPX_ASSERT(false);
-                    break;
-                }
+                HPX_ASSERT_MSG(false, "Invalid stack size");
             }
         }
 
@@ -531,13 +488,23 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
         thread_queue(std::size_t queue_num = std::size_t(-1),
-            std::size_t max_count = max_thread_count)
-          : min_tasks_to_steal_pending(detail::get_min_tasks_to_steal_pending())
-          , min_tasks_to_steal_staged(detail::get_min_tasks_to_steal_staged())
-          , min_add_new_count(detail::get_min_add_new_count())
-          , max_add_new_count(detail::get_max_add_new_count())
-          , max_delete_count(detail::get_max_delete_count())
-          , max_terminated_threads(detail::get_max_terminated_threads())
+                     std::size_t max_count = max_thread_count,
+                     std::size_t min_tasks_to_steal_pending = std::size_t(0),
+                     std::size_t min_tasks_to_steal_staged = std::size_t(10),
+                     std::size_t min_add_new_count = std::size_t(10),
+                     std::size_t max_add_new_count = std::size_t(10),
+                     std::size_t max_delete_count = std::size_t(1000),
+                     std::size_t max_terminated_threads = std::size_t(100),
+                     std::ptrdiff_t thread_heap_small_stacksize = HPX_SMALL_STACK_SIZE,
+                     std::ptrdiff_t thread_heap_medium_stacksize = HPX_MEDIUM_STACK_SIZE,
+                     std::ptrdiff_t thread_heap_large_stacksize = HPX_LARGE_STACK_SIZE,
+                     std::ptrdiff_t thread_heap_huge_stacksize = HPX_HUGE_STACK_SIZE)
+          : min_tasks_to_steal_pending(min_tasks_to_steal_pending)
+          , min_tasks_to_steal_staged(min_tasks_to_steal_staged)
+          , min_add_new_count(min_add_new_count)
+          , max_add_new_count(max_add_new_count)
+          , max_delete_count(max_delete_count)
+          , max_terminated_threads(max_terminated_threads)
           , thread_map_count_(0)
           , work_items_(128, queue_num)
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
@@ -554,6 +521,10 @@ namespace hpx { namespace threads { namespace policies
           , new_tasks_wait_(0)
           , new_tasks_wait_count_(0)
 #endif
+          , thread_heap_small_stacksize_(thread_heap_small_stacksize)
+          , thread_heap_medium_stacksize_(thread_heap_medium_stacksize)
+          , thread_heap_large_stacksize_(thread_heap_large_stacksize)
+          , thread_heap_huge_stacksize_(thread_heap_huge_stacksize)
           , thread_heap_small_()
           , thread_heap_medium_()
           , thread_heap_large_()
@@ -1159,6 +1130,11 @@ namespace hpx { namespace threads { namespace policies
         std::atomic<std::int64_t> new_tasks_wait_;  // overall wait time of new tasks
         std::atomic<std::int64_t> new_tasks_wait_count_; // overall number tasks waited
 #endif
+
+        std::ptrdiff_t thread_heap_small_stacksize_;
+        std::ptrdiff_t thread_heap_medium_stacksize_;
+        std::ptrdiff_t thread_heap_large_stacksize_;
+        std::ptrdiff_t thread_heap_huge_stacksize_;
 
         thread_heap_type thread_heap_small_;
         thread_heap_type thread_heap_medium_;

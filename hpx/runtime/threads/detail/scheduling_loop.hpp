@@ -825,12 +825,11 @@ namespace hpx { namespace threads { namespace detail
                     else
                     {
                         can_exit = can_exit &&
-                            scheduler.SchedulingPolicy::get_thread_count(
-                                suspended, thread_priority_default,
-                                num_thread) == 0;
+                            scheduler.SchedulingPolicy::get_thread_count() == 0;
 
                         if (can_exit)
                         {
+                            std::cout << "thread " << num_thread << " exiting" << std::endl;
                             if (!(scheduler.SchedulingPolicy::get_scheduler_mode(
                                             num_thread) & policies::delay_exit))
                             {

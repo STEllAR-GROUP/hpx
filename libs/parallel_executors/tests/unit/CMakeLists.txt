@@ -26,6 +26,7 @@ set(tests
     timed_parallel_executor
     timed_this_thread_executors
     timed_thread_pool_executors
+    standalone_thread_pool_os_executors
    )
 
 if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD)

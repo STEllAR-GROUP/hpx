@@ -46,7 +46,7 @@ namespace hpx { namespace threads
 #endif
             priority(thread_priority_normal),
             schedulehint(),
-            stacksize(get_default_stack_size()),
+            stacksize(HPX_SMALL_STACK_SIZE),
             scheduler_base(nullptr)
         {}
 
@@ -98,7 +98,7 @@ namespace hpx { namespace threads
             scheduler_base(rhs.scheduler_base)
         {
             if (stacksize == 0)
-                stacksize = get_default_stack_size();
+                stacksize = HPX_SMALL_STACK_SIZE;
         }
 
         template <typename F>
@@ -106,7 +106,7 @@ namespace hpx { namespace threads
                 naming::address_type lva_ = 0,
                 thread_priority priority_ = thread_priority_normal,
                 thread_schedule_hint os_thread = thread_schedule_hint(),
-                std::ptrdiff_t stacksize_ = std::ptrdiff_t(-1),
+                std::ptrdiff_t stacksize_ = HPX_SMALL_STACK_SIZE,
                 policies::scheduler_base* scheduler_base_ = nullptr)
           : func(std::forward<F>(f)),
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
@@ -124,12 +124,11 @@ namespace hpx { namespace threads
             apex_data(apex_new_task(description,parent_locality_id,parent_id)),
 #endif
             priority(priority_), schedulehint(os_thread),
-            stacksize(stacksize_ == std::ptrdiff_t(-1) ?
-                get_default_stack_size() : stacksize_),
+            stacksize(stacksize_),
             scheduler_base(scheduler_base_)
         {
             if (stacksize == 0)
-                stacksize = get_default_stack_size();
+                stacksize = HPX_SMALL_STACK_SIZE;
         }
 
         threads::thread_function_type func;
