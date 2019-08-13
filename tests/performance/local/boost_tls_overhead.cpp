@@ -61,8 +61,8 @@ int main(
 
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    unsigned threads;
-    std::uint64_t updates;
+    unsigned threads = 1;
+    std::uint64_t updates = 1 << 22;
 
     cmdline.add_options()
         ( "help,h"

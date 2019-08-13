@@ -6,7 +6,7 @@
 FROM stellargroup/build_env:ubuntu
 
 # docker build needs to be run in /usr/local
-ADD . /usr/local
+COPY . /usr/local
 RUN ldconfig
 WORKDIR /
 CMD bash

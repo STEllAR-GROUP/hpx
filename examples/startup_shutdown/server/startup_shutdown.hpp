@@ -15,9 +15,7 @@ namespace startup_shutdown { namespace server
     {
     public:
         // constructor: initialize accumulator value
-        startup_shutdown_component()
-          : arg_(nullptr)
-        {}
+        startup_shutdown_component() = default;
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -33,8 +31,9 @@ namespace startup_shutdown { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         HPX_DEFINE_COMPONENT_ACTION(startup_shutdown_component, init);
+
     private:
-      std::string arg_;
+        std::string arg_;
     };
 }}
 
