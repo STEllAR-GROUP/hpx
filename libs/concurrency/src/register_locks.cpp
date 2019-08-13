@@ -312,5 +312,29 @@ namespace hpx { namespace util {
     {
         detail::register_locks::set_ignore_all_locks(false);
     }
+
+#else
+
+    bool register_lock(void const*, util::register_lock_data*)
+    {
+        return true;
+    }
+
+    bool unregister_lock(void const*)
+    {
+        return true;
+    }
+
+    void verify_no_locks() {}
+
+    void force_error_on_lock() {}
+
+    void ignore_lock(void const* lock) {}
+
+    void reset_ignored(void const* lock) {}
+
+    void ignore_all_locks() {}
+
+    void reset_ignored_all() {}
 #endif
 }}    // namespace hpx::util

@@ -26,7 +26,7 @@ namespace hpx { namespace util {
     template <typename Lock, typename Enable = void>
     struct ignore_while_checking;
 
-#if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_EXPORTS)
+#if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_EXPORTS) || defined(HPX_MODULE_EXPORTS)
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool register_lock(
