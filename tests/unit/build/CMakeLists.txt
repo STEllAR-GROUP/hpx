@@ -84,7 +84,8 @@ function(create_pkgconfig_test name hpx_dir)
       CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       PKG_CONFIG=${PKG_CONFIG_EXECUTABLE}
       BUILD_TYPE=$<CONFIGURATION> VERBATIM)
-  add_dependencies(${name}.make_compile ${name}.make_build_dir hpx iostreams_component)
+  add_dependencies(${name}.make_compile ${name}.make_build_dir hpx_wrap
+    iostreams_component)
   if(NOT HPX_WITH_STATIC_LINKING)
     add_dependencies(${name}.make_compile hpx_init)
   endif()
