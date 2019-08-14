@@ -12,7 +12,6 @@ set(subdirs
     diagnostics
     lcos
     parallel_block
-    parcelset
     performance_counter
     resource
     serialization
@@ -21,6 +20,10 @@ set(subdirs
     traits
     util
    )
+
+if(HPX_WITH_NETWORKING)
+  set(subdirs ${subdirs} parcelset)
+endif()
 
 if(HPX_WITH_APEX)
   set(subdirs ${subdirs} apex)
