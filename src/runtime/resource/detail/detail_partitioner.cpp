@@ -924,9 +924,9 @@ namespace hpx { namespace resource { namespace detail
         pus_needed_ = affinity_data_.init(cfg_.num_threads_,
             hpx::util::safe_lexical_cast<std::size_t>(
                 get_config_entry("hpx.cores", 0), 0),
-                get_pu_offset(cfg_),
-            get_pu_step(cfg_), cfg_.rtcfg_.get_first_used_core(),
-            get_affinity_domain(cfg_), affinity_description);
+            get_pu_offset(cfg_), get_pu_step(cfg_),
+            cfg_.rtcfg_.get_first_used_core(), get_affinity_domain(cfg_),
+            affinity_description, cfg_.use_process_mask_);
 
         if (fill_internal_topology)
         {
