@@ -21,7 +21,7 @@ eval(char const* expr, sheneos::interpolator& shen, double ye,
 {
     std::vector<double> results = shen.interpolate(ye, temp, rho);
     std::cout << expr << std::endl;
-    std::cout << std::string(std::strlen(expr), '-') << std::endl;
+    std::cout << std::string(strnlen(expr, 256), '-') << std::endl;
 
     if (results.size() != expected.size()) {
         std::cout << "Result size mismatch, got: " << results.size()

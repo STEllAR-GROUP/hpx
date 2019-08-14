@@ -145,7 +145,7 @@ struct backup
     std::vector<hpx::util::checkpoint> bin;
     std::string file_name_;
 
-    backup(std::string file_name, size_t np)
+    backup(std::string const& file_name, std::size_t np)
       : bin(np)
       , file_name_(file_name)
     {

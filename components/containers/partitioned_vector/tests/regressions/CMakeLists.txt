@@ -21,7 +21,7 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Regressions/Components")
+                     FOLDER "Tests/Regressions/Components/Containers")
 
   add_hpx_regression_test("components.partitioned_vector" ${test} ${${test}_PARAMETERS})
 endforeach()

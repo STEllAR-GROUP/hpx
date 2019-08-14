@@ -100,8 +100,9 @@ namespace hpx { namespace threads { namespace coroutines
         {
         public:
             x86_linux_context_impl_base()
+              : m_sp(nullptr)
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
-              : asan_fake_stack(nullptr)
+              , asan_fake_stack(nullptr)
               , asan_stack_bottom(nullptr)
               , asan_stack_size(0)
 #endif

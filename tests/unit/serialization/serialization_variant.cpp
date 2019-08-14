@@ -20,7 +20,7 @@ struct A
 {
     A() {}
 
-    A(T t) : t_(t) {}
+    explicit A(T t) : t_(t) {}
     T t_;
 
     A & operator=(T t) { t_ = t; return *this; }

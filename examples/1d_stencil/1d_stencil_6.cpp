@@ -56,6 +56,7 @@ private:
 public:
     partition_data()
       : size_(0)
+      , min_index_(0)
     {}
 
     // Create a new (uninitialized) partition of the given size.

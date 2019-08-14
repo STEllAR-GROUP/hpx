@@ -39,12 +39,16 @@ namespace hpx { namespace lcos
 
     public:
         channel_iterator()
-          : channel_(nullptr), data_(T(), false)
+          : channel_(nullptr)
+          , data_(T(), false)
         {}
 
         explicit channel_iterator(Channel const& c)
-          : channel_(&c), data_(get_checked())
-        {}
+          : channel_(&c)
+          , data_(T(), false)
+        {
+            data_ = get_checked();
+        }
 
     private:
         std::pair<T, bool> get_checked() const

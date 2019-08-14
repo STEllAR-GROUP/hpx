@@ -445,7 +445,6 @@ bool BMP::WriteToFile( const char* FileName )
    cout << "EasyBMP Error: Cannot open file "
         << FileName << " for output." << endl;
   }
-  fclose( fp );
   return false;
  }
 

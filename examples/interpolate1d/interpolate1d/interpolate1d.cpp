@@ -27,7 +27,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(partition_client_type);
 namespace interpolate1d
 {
     // create one partition on each of the localities, initialize the partitions
-    interpolate1d::interpolate1d(std::string datafilename,
+    interpolate1d::interpolate1d(std::string const& datafilename,
             std::size_t num_instances)
       : num_elements_(0), minval_(0), delta_(0)
     {

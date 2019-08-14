@@ -24,12 +24,14 @@
 namespace hpx { namespace performance_counters
 {
     ///////////////////////////////////////////////////////////////////////////
-    char const counter_prefix[] = "/counters";
+    constexpr char const counter_prefix[] = "/counters";
+    constexpr std::size_t counter_prefix_len =
+        (sizeof(counter_prefix) / sizeof(counter_prefix[0])) - 1;
 
     ///////////////////////////////////////////////////////////////////////////
     inline std::string& ensure_counter_prefix(std::string& name)
     {
-        if (name.find(counter_prefix) != 0)
+        if (name.compare(0, counter_prefix_len, counter_prefix) != 0)
             name = counter_prefix + name;
         return name;
     }
@@ -42,8 +44,8 @@ namespace hpx { namespace performance_counters
 
     inline std::string& remove_counter_prefix(std::string& name)
     {
-        if (name.find(counter_prefix) == 0)
-            name = name.substr(sizeof(counter_prefix)-1);
+        if (name.compare(0, counter_prefix_len, counter_prefix) != 0)
+            name = name.substr(counter_prefix_len-1);
         return name;
     }
 

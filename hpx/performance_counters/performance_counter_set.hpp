@@ -34,7 +34,8 @@ namespace hpx { namespace performance_counters
     public:
         /// Create an empty set of performance counters
         performance_counter_set(bool print_counters_locally = false)
-          : print_counters_locally_(print_counters_locally)
+          : invocation_count_(0)
+          , print_counters_locally_(print_counters_locally)
         {}
 
         /// Create a set of performance counters from a name, possibly

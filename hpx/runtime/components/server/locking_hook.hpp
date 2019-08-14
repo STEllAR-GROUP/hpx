@@ -40,9 +40,11 @@ namespace hpx { namespace components
 
         locking_hook(locking_hook const& rhs)
           : base_type(rhs)
+          , mtx_()
         {}
         locking_hook(locking_hook && rhs)
           : base_type(std::move(rhs))
+          , mtx_()
         {}
 
         typedef void decorates_action;

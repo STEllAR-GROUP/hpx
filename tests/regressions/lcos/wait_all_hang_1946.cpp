@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void out(std::vector<unsigned int> vec)
+void out(std::vector<unsigned int> const& vec)
 {
      hpx::cout << "out called " << hpx::find_here() << std::endl;
 }

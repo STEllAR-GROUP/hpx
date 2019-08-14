@@ -70,6 +70,17 @@ namespace sheneos
         std::memset(num_values_, 0, sizeof(num_values_));
     }
 
+    interpolator::interpolator(hpx::future<hpx::id_type>&& id)
+      : base_type(std::move(id))
+      , num_partitions_per_dim_(0)
+      , was_created_(false)
+    {
+        std::memset(minval_, 0, sizeof(minval_));
+        std::memset(maxval_, 0, sizeof(maxval_));
+        std::memset(delta_, 0, sizeof(delta_));
+        std::memset(num_values_, 0, sizeof(num_values_));
+    }
+
     interpolator::~interpolator()
     {
         if (was_created_) {

@@ -71,7 +71,7 @@ std::uint64_t suspend_step = 0;
 std::uint64_t no_suspend_step = 1;
 
 ///////////////////////////////////////////////////////////////////////////////
-std::string format_build_date(std::string timestamp)
+std::string format_build_date()
 {
     std::chrono::time_point<std::chrono::system_clock> now =
         std::chrono::system_clock::now();
@@ -118,7 +118,7 @@ void print_results(
                  << distribution << " distribution)\n";
 
         cout << "# VERSION: " << HPX_HAVE_GIT_COMMIT << " "
-                 << format_build_date(__DATE__) << "\n"
+                 << format_build_date() << "\n"
              << "#\n";
 
         // Note that if we change the number of fields above, we have to

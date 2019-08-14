@@ -46,9 +46,12 @@ namespace hpx { namespace util
             std::pair<std::string, std::string>& opt)
         {
             // any option not starting with --hpx: will be handled elsewhere
-            char hpx_prefix[] = "--hpx:";
-            std::string::size_type const hpx_prefix_len = sizeof(hpx_prefix)-1;
-            if (s.size() < hpx_prefix_len || s.find(hpx_prefix) != 0 ||
+            constexpr char const hpx_prefix[] = "--hpx:";
+            constexpr std::string::size_type const hpx_prefix_len =
+                sizeof(hpx_prefix) - 1;
+
+            if (s.size() < hpx_prefix_len ||
+                s.compare(0, hpx_prefix_len, hpx_prefix) != 0 ||
                 !std::isdigit(s[hpx_prefix_len]))
             {
                 return false;

@@ -508,7 +508,7 @@ namespace hpx { namespace util { namespace itt
     struct event
     {
         event(char const* name)
-          : event_(itt_event_create(name, (int)std::strlen(name)))
+          : event_(itt_event_create(name, (int)strnlen(name, 256)))
         {}
 
         void start() const

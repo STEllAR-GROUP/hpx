@@ -40,7 +40,8 @@ namespace hpx { namespace lcos { namespace local
         }
 
         base_trigger(base_trigger && rhs)
-          : promise_(std::move(rhs.promise_)),
+          : mtx_(),
+            promise_(std::move(rhs.promise_)),
             generation_(rhs.generation_),
             conditions_(std::move(rhs.conditions_))
         {
@@ -52,6 +53,7 @@ namespace hpx { namespace lcos { namespace local
             if (this != &rhs)
             {
                 std::lock_guard<mutex_type> l(rhs.mtx_);
+                mtx_ = mutex_type();
                 promise_ = std::move(rhs.promise_);
                 generation_ = rhs.generation_;
                 rhs.generation_ = std::size_t(-1);

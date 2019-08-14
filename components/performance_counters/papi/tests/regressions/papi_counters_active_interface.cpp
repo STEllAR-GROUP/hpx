@@ -65,7 +65,7 @@ int check_(int fd)
     while (true)
     {
         char buf[1024];
-        ssize_t n = read(fd, buf, 1024);
+        ssize_t n = read(fd, buf, sizeof(buf));
         if (n > 0)
         {
             out += std::string(buf, buf + n);

@@ -43,8 +43,9 @@ namespace hpx { namespace lcos { namespace local
         {
         }
 
-        base_and_gate(base_and_gate && rhs)
-          : received_segments_(std::move(rhs.received_segments_)),
+        base_and_gate(base_and_gate && rhs) noexcept
+          : mtx_(),
+            received_segments_(std::move(rhs.received_segments_)),
             promise_(std::move(rhs.promise_)),
             generation_(rhs.generation_),
             conditions_(std::move(rhs.conditions_))
@@ -52,11 +53,12 @@ namespace hpx { namespace lcos { namespace local
             rhs.generation_ = std::size_t(-1);
         }
 
-        base_and_gate& operator=(base_and_gate && rhs)
+        base_and_gate& operator=(base_and_gate && rhs) noexcept
         {
             if (this != &rhs)
             {
                 std::lock_guard<mutex_type> l(rhs.mtx_);
+                mtx_ = mutex_type();
                 received_segments_ = std::move(rhs.received_segments_);
                 promise_ = std::move(rhs.promise_);
                 generation_ = rhs.generation_;
