@@ -43,10 +43,13 @@ void test_scheduler(int argc, char* argv[])
     hpx::resource::partitioner rp(argc, argv, std::move(cfg));
 
     rp.create_thread_pool("default",
-        [](hpx::threads::thread_pool_init_parameters thread_pool_init)
+        [](hpx::threads::thread_pool_init_parameters thread_pool_init,
+            hpx::threads::policies::thread_queue_init_parameters
+                thread_queue_init)
             -> std::unique_ptr<hpx::threads::thread_pool_base> {
             typename Scheduler::init_parameter_type init(
-                thread_pool_init.num_threads_, thread_pool_init.affinity_data_);
+                thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
+                std::size_t(-1), 0, thread_queue_init);
             std::unique_ptr<Scheduler> scheduler(new Scheduler(init));
 
             thread_pool_init.mode_ = hpx::threads::policies::scheduler_mode(

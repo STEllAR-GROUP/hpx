@@ -503,12 +503,15 @@ int main(int argc, char** argv)
     using hpx::threads::policies::scheduler_mode;
     // setup the default pool with our custom priority scheduler
     rp.create_thread_pool("custom",
-        [](hpx::threads::thread_pool_init_parameters init)
+        [](hpx::threads::thread_pool_init_parameters init,
+            hpx::threads::policies::thread_queue_init_parameters
+                thread_queue_init)
             -> std::unique_ptr<hpx::threads::thread_pool_base> {
-            std::cout << "User defined scheduler creation callback " << std::endl;
+            high_priority_sched::init_parameter_type scheduler_init(
+                init.num_threads_, {6, 6, 64}, init.affinity_data_,
+                thread_queue_init, "shared-priority-scheduler");
             std::unique_ptr<high_priority_sched> scheduler(
-                new high_priority_sched(init.num_threads_, {6, 6, 64},
-                    "shared-priority-scheduler", init.affinity_data_));
+                new high_priority_sched(scheduler_init));
 
             init.mode_ = scheduler_mode(scheduler_mode::do_background_work |
                 scheduler_mode::delay_exit);

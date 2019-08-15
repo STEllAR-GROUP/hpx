@@ -88,7 +88,6 @@ namespace hpx { namespace threads
         return id ? id->get_priority() : thread_priority_unknown;
     }
 
-    /// The get_stack_size function is part of the thread related API. It
     std::ptrdiff_t get_stack_size(thread_id_type const& id, error_code& ec)
     {
         return id ? id->get_stack_size() :

@@ -10,11 +10,12 @@
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/scoped_background_timer.hpp>
+#include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/cache_aligned_data.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
@@ -46,8 +47,8 @@ namespace hpx { namespace threads { namespace policies
     public:
         typedef std::mutex pu_mutex_type;
 
-        scheduler_base(std::size_t num_threads,
-            char const* description = "",
+        scheduler_base(std::size_t num_threads, char const* description = "",
+            thread_queue_init_parameters thread_queue_init = {},
             scheduler_mode mode = nothing_special);
 
         virtual ~scheduler_base() = default;
@@ -217,6 +218,32 @@ namespace hpx { namespace threads { namespace policies
 
         virtual void reset_thread_distribution() {}
 
+        std::ptrdiff_t get_stack_size(threads::thread_stacksize stacksize) const
+        {
+            switch (stacksize)
+            {
+            case thread_stacksize_small:
+                return thread_queue_init_.small_stacksize_;
+                break;
+
+            case thread_stacksize_medium:
+                return thread_queue_init_.medium_stacksize_;
+
+            case thread_stacksize_large:
+                return thread_queue_init_.large_stacksize_;
+
+            case thread_stacksize_huge:
+                return thread_queue_init_.huge_stacksize_;
+
+            default:
+                HPX_ASSERT_MSG(
+                    false, util::format("Invalid stack size {1}", stacksize));
+                break;
+            }
+
+            return thread_queue_init_.small_stacksize_;
+        }
+
     protected:
         // the scheduler mode is simply replicated across the cores to
         // avoid false sharing, we ignore benign data races related to this
@@ -243,6 +270,8 @@ namespace hpx { namespace threads { namespace policies
 
         std::vector<std::atomic<hpx::state> > states_;
         char const* description_;
+
+        thread_queue_init_parameters thread_queue_init_;
 
         // the pool that owns this scheduler
         threads::thread_pool_base *parent_pool_;
