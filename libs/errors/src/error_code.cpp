@@ -65,24 +65,21 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    static detail::hpx_category hpx_category;
-
     boost::system::error_category const& get_hpx_category()
     {
+        static detail::hpx_category hpx_category;
         return hpx_category;
     }
 
-    static detail::hpx_category_rethrow hpx_category_rethrow;
-
     boost::system::error_category const& get_hpx_rethrow_category()
     {
+        static detail::hpx_category_rethrow hpx_category_rethrow;
         return hpx_category_rethrow;
     }
 
-    static detail::lightweight_hpx_category lightweight_hpx_category;
-
     boost::system::error_category const& get_lightweight_hpx_category()
     {
+        static detail::lightweight_hpx_category lightweight_hpx_category;
         return lightweight_hpx_category;
     }
 
