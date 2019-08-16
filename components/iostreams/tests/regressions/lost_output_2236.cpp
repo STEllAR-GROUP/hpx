@@ -317,7 +317,7 @@ namespace gc { namespace server {
         if (strong_count > 0)
         {
             // we can build
-            HPX_TEST("build not handled" == nullptr);
+            HPX_TEST_MSG(false, "build not handled");
         }
         else
         {
@@ -329,7 +329,7 @@ namespace gc { namespace server {
     {
         if (cid > cd->cid)
         {
-            HPX_TEST("change of owner during recovery not handled" == nullptr);
+            HPX_TEST_MSG(false, "change of owner during recovery not handled");
         }
         if (!cd->recovered)
         {

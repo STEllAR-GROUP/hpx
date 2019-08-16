@@ -44,8 +44,8 @@ namespace hpx { namespace performance_counters
 
     inline std::string& remove_counter_prefix(std::string& name)
     {
-        if (name.compare(0, counter_prefix_len, counter_prefix) != 0)
-            name = name.substr(counter_prefix_len-1);
+        if (name.compare(0, counter_prefix_len, counter_prefix) == 0)
+            name = name.substr(counter_prefix_len);
         return name;
     }
 
