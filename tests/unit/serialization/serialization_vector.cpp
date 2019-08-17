@@ -86,10 +86,10 @@ void test_bool()
         hpx::serialization::output_archive oarchive(buffer);
 
         std::vector<bool> os;
-        os.emplace_back(true);
-        os.emplace_back(false);
-        os.emplace_back(false);
-        os.emplace_back(true);
+        os.push_back(true);
+        os.push_back(false);
+        os.push_back(false);
+        os.push_back(true);
         oarchive << os;
 
         hpx::serialization::input_archive iarchive(buffer);
