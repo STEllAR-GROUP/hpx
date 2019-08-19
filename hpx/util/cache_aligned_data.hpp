@@ -10,8 +10,21 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
-namespace hpx { namespace util
-{
+#include <cstddef>
+
+namespace hpx { namespace util {
+    namespace detail {
+        // Computes the padding required to fill up a full cache line after
+        // data_size bytes.
+        constexpr std::size_t get_cache_line_padding_size(
+            std::size_t data_size)
+        {
+            return (threads::get_cache_line_size() -
+                       (data_size % threads::get_cache_line_size())) %
+                threads::get_cache_line_size();
+        }
+    }    // namespace detail
+
     ///////////////////////////////////////////////////////////////////////////
     // special struct to ensure cache line alignment of a data type
 #if defined(HPX_HAVE_CXX11_ALIGNAS) && defined(HPX_HAVE_CXX17_ALIGNED_NEW) &&  \
@@ -27,8 +40,9 @@ namespace hpx { namespace util
     {
         // pad to cache line size bytes
         Data data_;
-        char cacheline_pad[threads::get_cache_line_size() -
-            (sizeof(Data) % threads::get_cache_line_size())];
+
+        //  cppcheck-suppress unusedVariable
+        char cacheline_pad[detail::get_cache_line_padding_size(sizeof(Data))];
     };
 #endif
 
@@ -41,9 +55,9 @@ namespace hpx { namespace util
     struct alignas(threads::get_cache_line_size()) cache_line_data
     {
         Data data_;
-        char cacheline_pad[threads::get_cache_line_size() -
-            (sizeof(Data) % threads::get_cache_line_size())];
 
+        //  cppcheck-suppress unusedVariable
+        char cacheline_pad[detail::get_cache_line_padding_size(sizeof(Data))];
     };
 #else
     template <typename Data>
@@ -51,10 +65,11 @@ namespace hpx { namespace util
     {
         // pad to cache line size bytes
         Data data_;
-        char cacheline_pad[threads::get_cache_line_size() -
-            (sizeof(Data) % threads::get_cache_line_size())];
+
+        // cppcheck-suppress unusedVariable
+        char cacheline_pad[detail::get_cache_line_padding_size(sizeof(Data))];
     };
 #endif
-}}
+}}    // namespace hpx::util
 
 #endif

@@ -425,7 +425,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     // abstract away cache-line size
-    HPX_STATIC_CONSTEXPR std::size_t get_cache_line_size()
+    constexpr std::size_t get_cache_line_size()
     {
 #if defined(HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE)
         return std::hardware_destructive_interference_size;
