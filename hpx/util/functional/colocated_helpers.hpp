@@ -57,8 +57,7 @@ namespace hpx { namespace util { namespace functional
             typedef typename util::decay<Bound>::type bound_type;
             typedef typename util::decay<Continuation>::type continuation_type;
 
-            apply_continuation_impl()
-              : bound_(), cont_() {}
+            apply_continuation_impl() = default;
 
             template <typename Bound_, typename Continuation_>
             explicit apply_continuation_impl(
@@ -67,17 +66,10 @@ namespace hpx { namespace util { namespace functional
                 cont_(std::forward<Continuation_>(c))
             {}
 
-            apply_continuation_impl(apply_continuation_impl && o)
-              : bound_(std::move(o.bound_))
-              , cont_(std::move(o.cont_))
-            {}
+            apply_continuation_impl(apply_continuation_impl&& o) = default;
 
-            apply_continuation_impl &operator=(apply_continuation_impl && o)
-            {
-                bound_ = std::move(o.bound_);
-                cont_ = std::move(o.cont_);
-                return *this;
-            }
+            apply_continuation_impl& operator=(
+                apply_continuation_impl&& o) = default;
 
             template <typename T>
             typename util::invoke_result<bound_type, naming::id_type, T>::type
@@ -119,8 +111,7 @@ namespace hpx { namespace util { namespace functional
 
             typedef typename util::decay<Bound>::type bound_type;
 
-            apply_continuation_impl()
-              : bound_() {}
+            apply_continuation_impl() = default;
 
             template <typename Bound_, typename Enable = typename
                 std::enable_if<!std::is_same<typename hpx::util::decay<Bound_>::type,
@@ -129,15 +120,10 @@ namespace hpx { namespace util { namespace functional
               : bound_(std::forward<Bound_>(bound))
             {}
 
-            apply_continuation_impl(apply_continuation_impl && o)
-              : bound_(std::move(o.bound_))
-            {}
+            apply_continuation_impl(apply_continuation_impl && o) = default;
 
-            apply_continuation_impl &operator=(apply_continuation_impl && o)
-            {
-                bound_ = std::move(o.bound_);
-                return *this;
-            }
+            apply_continuation_impl& operator=(
+                apply_continuation_impl&& o) = default;
 
             template <typename T>
             typename util::invoke_result<bound_type, naming::id_type, T>::type

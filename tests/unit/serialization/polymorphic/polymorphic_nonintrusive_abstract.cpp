@@ -19,10 +19,10 @@
 template <typename T>
 struct Base
 {
-    Base()
-    {}
+    Base() = default;
 
-    Base(std::string prefix) : prefix_(prefix)
+    explicit Base(std::string const& prefix)
+      : prefix_(prefix)
     {}
 
     virtual ~Base()
@@ -45,14 +45,14 @@ void serialize(Archive & ar, Base<T> & b, unsigned)
 template <typename T>
 struct Derived1 : Base<T>
 {
-    Derived1() {}
+    Derived1() : size_(0) {}
 
-    Derived1(std::string prefix, std::size_t size)
+    Derived1(std::string const& prefix, std::size_t size)
       : Base<T>(prefix)
       , size_(size)
     {}
 
-    std::size_t size()
+    std::size_t size() override
     {
         return size_;
     }
@@ -73,12 +73,12 @@ struct Derived2 : Derived1<double>
 {
     Derived2() {}
 
-    Derived2(std::string message, std::string prefix, std::size_t size)
+    Derived2(std::string const& message, std::string const& prefix, std::size_t size)
       : Derived1<double>(prefix, size)
       , message_(message)
     {}
 
-    std::string print()
+    std::string print() override
     {
         return message_;
     }

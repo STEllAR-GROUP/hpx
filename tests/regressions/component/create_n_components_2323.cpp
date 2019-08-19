@@ -30,7 +30,7 @@ struct component_server : hpx::components::component_base<component_server>
         HPX_TEST(false);    // shouldn't be called
     }
 
-    component_server(std::vector<double> const& a)
+    explicit component_server(std::vector<double> const& a)
     {
         HPX_TEST_EQ(a.size(), test_array_size);
         ++count;

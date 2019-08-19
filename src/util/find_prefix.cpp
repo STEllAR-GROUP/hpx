@@ -23,6 +23,8 @@
 #elif defined(__FreeBSD__)
 #  include <sys/types.h>
 #  include <sys/sysctl.h>
+#  include <algorithm>
+#  include <iterator>
 #  include <vector>
 #endif
 
@@ -235,7 +237,7 @@ namespace hpx { namespace util
         {
             std::vector<char> buf(cb);
             sysctl(mib, 4, &buf[0], &cb, nullptr, 0);
-            r = &buf[0];
+            std::copy(&buf[0], &buf[cb], std::back_inserter(r));
         }
 
 #else

@@ -19,7 +19,7 @@ namespace jacobi_smp {
     void jacobi(
         std::size_t n
       , std::size_t iterations, std::size_t block_size
-      , std::string output_filename)
+      , std::string const& output_filename)
     {
         typedef std::vector<double> vector;
 

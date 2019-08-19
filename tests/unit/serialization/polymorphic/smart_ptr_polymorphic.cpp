@@ -3,10 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/shared_ptr.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -23,73 +23,82 @@
 // =========================shared_ptr test==============================
 struct A
 {
-  int a;
+    int a;
 
-  A(int a = 1): a(a) {}
-  virtual ~A(){}
+    explicit A(int a = 1)
+      : a(a)
+    {
+    }
+    virtual ~A() {}
 
-  virtual const char* foo() = 0;
+    virtual const char* foo() = 0;
 
-  template <class Archive>
-  void serialize(Archive& ar, unsigned)
-  {
-    ar & a;
-  }
-  HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(A);
+    template <class Archive>
+    void serialize(Archive& ar, unsigned)
+    {
+        ar& a;
+    }
+    HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(A);
 };
 
-struct B: A
+struct B : A
 {
-  int b;
+    int b;
 
-  B(int b = 2): b(b) {}
+    explicit B(int b = 2)
+      : b(b)
+    {
+    }
 
-  virtual const char* foo()
-  {
-    return "B::foo";
-  }
+    const char* foo()
+    {
+        return "B::foo";
+    }
 
-  template <class Archive>
-  void load(Archive& ar, unsigned)
-  {
-    ar & hpx::serialization::base_object<A>(*this);
-    ar & b;
-  }
-  template <class Archive>
-  void save(Archive& ar, unsigned) const
-  {
-    ar & hpx::serialization::base_object<A>(*this);
-    ar & b;
-  }
-  HPX_SERIALIZATION_SPLIT_MEMBER();
-  HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(B);
+    template <class Archive>
+    void load(Archive& ar, unsigned)
+    {
+        ar & hpx::serialization::base_object<A>(*this);
+        ar & b;
+    }
+    template <class Archive>
+    void save(Archive& ar, unsigned) const
+    {
+        ar & hpx::serialization::base_object<A>(*this);
+        ar & b;
+    }
+    HPX_SERIALIZATION_SPLIT_MEMBER();
+    HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(B);
 };
 
-class C: public B
+class C : public B
 {
-  friend class hpx::serialization::access;
-  int c;
+    friend class hpx::serialization::access;
+    int c;
 
-  template <class Archive>
-  void serialize(Archive& ar, unsigned)
-  {
-    ar & hpx::serialization::base_object<B>(*this);
-    ar & c;
-  }
-  HPX_SERIALIZATION_POLYMORPHIC(C)
+    template <class Archive>
+    void serialize(Archive& ar, unsigned)
+    {
+        ar & hpx::serialization::base_object<B>(*this);
+        ar & c;
+    }
+    HPX_SERIALIZATION_POLYMORPHIC(C)
 
 public:
-  C(int c = 3): c(c) {}
+    explicit C(int c = 3)
+      : c(c)
+    {
+    }
 
-  virtual const char* foo()
-  {
-    return "C::foo";
-  }
+    const char* foo()
+    {
+        return "C::foo";
+    }
 
-  int get_c() const
-  {
-    return c;
-  }
+    int get_c() const
+    {
+        return c;
+    }
 };
 
 void test_shared()
@@ -124,29 +133,33 @@ void test_shared()
 // =========================intrusive_ptr test==============================
 struct D
 {
-  int a;
-  int count;
+    int a;
+    int count;
 
-  D(int a = 1): a(a), count(0) {}
-  virtual ~D(){}
+    explicit D(int a = 1)
+      : a(a)
+      , count(0)
+    {
+    }
+    virtual ~D() {}
 
-  virtual const char* foo() = 0;
+    virtual const char* foo() = 0;
 
 private:
-  friend class hpx::serialization::access;
+    friend class hpx::serialization::access;
 
-  template <class Archive>
-  void load(Archive& ar, unsigned)
-  {
-    ar & a;
-  }
-  template <class Archive>
-  void save(Archive& ar, unsigned) const
-  {
-    ar & a;
-  }
-  HPX_SERIALIZATION_SPLIT_MEMBER();
-  HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT_SPLITTED(D);
+    template <class Archive>
+    void load(Archive& ar, unsigned)
+    {
+        ar & a;
+    }
+    template <class Archive>
+    void save(Archive& ar, unsigned) const
+    {
+        ar & a;
+    }
+    HPX_SERIALIZATION_SPLIT_MEMBER();
+    HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT_SPLITTED(D);
 };
 
 void intrusive_ptr_add_ref(D* d)
@@ -156,64 +169,70 @@ void intrusive_ptr_add_ref(D* d)
 
 void intrusive_ptr_release(D* d)
 {
-    if(--d->count == 0)
+    if (--d->count == 0)
     {
         delete d;
     }
 }
 
-struct E: D
+struct E : D
 {
-  int b;
+    int b;
 
-  E(int b = 2): b(b) {}
+    explicit E(int b = 2)
+      : b(b)
+    {
+    }
 
-  virtual const char* foo()
-  {
-    return "E::foo";
-  }
+    const char* foo()
+    {
+        return "E::foo";
+    }
 
-  template <class Archive>
-  void load(Archive& ar, unsigned)
-  {
-    ar & hpx::serialization::base_object<D>(*this);
-    ar & b;
-  }
-  template <class Archive>
-  void save(Archive& ar, unsigned) const
-  {
-    ar & hpx::serialization::base_object<D>(*this);
-    ar & b;
-  }
-  HPX_SERIALIZATION_SPLIT_MEMBER();
-  HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(E);
+    template <class Archive>
+    void load(Archive& ar, unsigned)
+    {
+        ar & hpx::serialization::base_object<D>(*this);
+        ar & b;
+    }
+    template <class Archive>
+    void save(Archive& ar, unsigned) const
+    {
+        ar & hpx::serialization::base_object<D>(*this);
+        ar & b;
+    }
+    HPX_SERIALIZATION_SPLIT_MEMBER();
+    HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(E);
 };
 
-class F: public E
+class F : public E
 {
-  friend class hpx::serialization::access;
-  int c;
+    friend class hpx::serialization::access;
+    int c;
 
-  template <class Archive>
-  void serialize(Archive& ar, unsigned)
-  {
-    ar & hpx::serialization::base_object<E>(*this);
-    ar & c;
-  }
-  HPX_SERIALIZATION_POLYMORPHIC(F)
+    template <class Archive>
+    void serialize(Archive& ar, unsigned)
+    {
+        ar & hpx::serialization::base_object<E>(*this);
+        ar & c;
+    }
+    HPX_SERIALIZATION_POLYMORPHIC(F)
 
 public:
-  F(int c = 3): c(c) {}
+    explicit F(int c = 3)
+      : c(c)
+    {
+    }
 
-  virtual const char* foo()
-  {
-    return "F::foo";
-  }
+    const char* foo()
+    {
+        return "F::foo";
+    }
 
-  int get_c() const
-  {
-    return c;
-  }
+    int get_c() const
+    {
+        return c;
+    }
 };
 
 void test_intrusive()

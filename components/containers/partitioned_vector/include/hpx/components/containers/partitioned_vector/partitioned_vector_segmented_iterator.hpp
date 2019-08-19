@@ -390,7 +390,7 @@ namespace hpx
             data_(data)
         {}
 
-        const_local_vector_iterator(local_vector_iterator<T, Data> it)
+        const_local_vector_iterator(local_vector_iterator<T, Data> const& it)
           : partition_(it.get_partition()),
             local_index_(it.get_local_index()),
             data_(it.get_data())

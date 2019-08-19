@@ -20,7 +20,7 @@ struct A
 {
     A() {}
 
-    A(T t) : t_(t) {}
+    explicit A(T t) : t_(t) {}
     T t_;
 
     A & operator=(T t) { t_ = t; return *this; }
@@ -85,10 +85,10 @@ void test_bool()
         hpx::serialization::output_archive oarchive(buffer);
 
         std::list<bool> os;
-        os.push_back(true);
-        os.push_back(false);
-        os.push_back(false);
-        os.push_back(true);
+        os.emplace_back(true);
+        os.emplace_back(false);
+        os.emplace_back(false);
+        os.emplace_back(true);
         oarchive << os;
 
         hpx::serialization::input_archive iarchive(buffer);
@@ -106,10 +106,10 @@ void test_bool()
         hpx::serialization::output_archive oarchive(buffer);
 
         std::list<A<bool> > os;
-        os.push_back(true);
-        os.push_back(false);
-        os.push_back(false);
-        os.push_back(true);
+        os.emplace_back(true);
+        os.emplace_back(false);
+        os.emplace_back(false);
+        os.emplace_back(true);
         oarchive << os;
 
         hpx::serialization::input_archive iarchive(buffer);
@@ -133,7 +133,7 @@ void test(T min, T max)
         std::list<T> os;
         for (T c = min; c < max; ++c)
         {
-            os.push_back(c);
+            os.emplace_back(c);
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
@@ -152,7 +152,7 @@ void test(T min, T max)
         std::list<A<T> > os;
         for (T c = min; c < max; ++c)
         {
-            os.push_back(c);
+            os.emplace_back(c);
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
@@ -176,7 +176,7 @@ void test_fp(T min, T max)
         std::list<T> os;
         for (T c = min; c < max; c += static_cast<T>(0.5))
         {
-            os.push_back(c);
+            os.emplace_back(c);
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
@@ -195,7 +195,7 @@ void test_fp(T min, T max)
         std::list<A<T> > os;
         for (T c = min; c < max; c += static_cast<T>(0.5))
         {
-            os.push_back(c);
+            os.emplace_back(c);
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
@@ -216,10 +216,10 @@ void test_non_default_constructible()
     hpx::serialization::output_archive oarchive(buffer);
 
     std::list<B> os;
-    os.push_back(1);
-    os.push_back(2);
-    os.push_back(3);
-    os.push_back(4);
+    os.emplace_back(1);
+    os.emplace_back(2);
+    os.emplace_back(3);
+    os.emplace_back(4);
 
     short b = 1;
     for (auto& i: os) {

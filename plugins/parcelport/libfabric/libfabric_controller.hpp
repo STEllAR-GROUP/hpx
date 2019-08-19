@@ -140,9 +140,9 @@ namespace libfabric
         // constructor gets info from device and sets up all necessary
         // maps, queues and server endpoint etc
         libfabric_controller(
-            std::string provider,
-            std::string domain,
-            std::string endpoint, int port=7910)
+            std::string const& provider,
+            std::string const& domain,
+            std::string const& endpoint, int port=7910)
           : fabric_info_(nullptr)
           , fabric_(nullptr)
           , fabric_domain_(nullptr)
@@ -312,8 +312,8 @@ namespace libfabric
 
         // --------------------------------------------------------------------
         // initialize the basic fabric/domain/name
-        void open_fabric(
-            std::string provider, std::string domain, std::string endpoint_type)
+        void open_fabric(std::string const& provider, std::string const& domain,
+            std::string const& endpoint_type)
         {
             FUNC_START_DEBUG_MSG;
             struct fi_info *fabric_hints_ = fi_allocinfo();
@@ -352,14 +352,20 @@ namespace libfabric
             // we will use a shared receive context for active endpoints
             fabric_hints_->ep_attr->rx_ctx_cnt = FI_SHARED_CONTEXT;
 
-            if (endpoint_type=="msg") {
+            if (endpoint_type == "msg")
+            {
                 fabric_hints_->ep_attr->type = FI_EP_MSG;
-            } else if (endpoint_type=="rdm") {
+            }
+            else if (endpoint_type == "rdm")
+            {
                 fabric_hints_->ep_attr->type = FI_EP_RDM;
-            } else if (endpoint_type=="dgram") {
+            }
+            else if (endpoint_type == "dgram")
+            {
                 fabric_hints_->ep_attr->type = FI_EP_DGRAM;
             }
-            else {
+            else
+            {
                 LOG_DEBUG_MSG("endpoint type not set, using RDM");
                 fabric_hints_->ep_attr->type = FI_EP_RDM;
             }

@@ -17,7 +17,7 @@
 struct test_server : hpx::components::simple_component_base<test_server>
 {
     test_server() = delete;
-    test_server(int i) : i_(i) {}
+    explicit test_server(int i) : i_(i) {}
 
     hpx::id_type call() const { return hpx::find_here(); }
 
@@ -39,7 +39,7 @@ struct test_client : hpx::components::client_base<test_client, test_server>
     test_client(hpx::id_type const& id)
       : base_type(id)
     {}
-    test_client(hpx::future<hpx::id_type> && id)
+    explicit test_client(hpx::future<hpx::id_type> && id)
       : base_type(std::move(id))
     {}
 

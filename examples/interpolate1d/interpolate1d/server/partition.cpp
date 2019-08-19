@@ -17,10 +17,10 @@ namespace interpolate1d { namespace server
     partition::mutex_type partition::mtx_{};
 
     partition::partition()
-      : min_value_(0), max_value_(0), delta_(0)
+      : dim_(), min_value_(0), max_value_(0), delta_(0)
     {}
 
-    void partition::init(std::string datafilename, dimension const& dim,
+    void partition::init(std::string const& datafilename, dimension const& dim,
         std::size_t num_nodes)
     {
         std::lock_guard<mutex_type> l(mtx_);

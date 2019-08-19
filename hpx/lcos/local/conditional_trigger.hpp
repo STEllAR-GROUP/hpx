@@ -21,24 +21,12 @@ namespace hpx { namespace lcos { namespace local
     struct conditional_trigger
     {
     public:
-        conditional_trigger()
-        {
-        }
+        conditional_trigger() = default;
 
-        conditional_trigger(conditional_trigger && rhs)
-          : cond_(std::move(rhs.cond_))
-        {
-        }
+        conditional_trigger(conditional_trigger && rhs) noexcept = default;
 
-        conditional_trigger& operator=(conditional_trigger && rhs)
-        {
-            if (this != &rhs)
-            {
-                promise_ = std::move(rhs.promise_);
-                cond_ = std::move(rhs.cond_);
-            }
-            return *this;
-        }
+        conditional_trigger& operator=(
+            conditional_trigger&& rhs) noexcept = default;
 
         /// \brief get a future allowing to wait for the trigger to fire
         template <typename Condition>

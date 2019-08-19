@@ -41,7 +41,7 @@ std::uint64_t delay = 5;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
-std::string format_build_date(std::string timestamp)
+std::string format_build_date()
 {
     std::chrono::time_point<std::chrono::system_clock> now =
         std::chrono::system_clock::now();
@@ -64,7 +64,7 @@ void print_results(
     {
         cout << "# BENCHMARK: " << benchmark_name << "\n";
 
-        cout << "# VERSION: " << format_build_date(__DATE__) << "\n"
+        cout << "# VERSION: " << format_build_date() << "\n"
              << "#\n";
 
         // Note that if we change the number of fields above, we have to

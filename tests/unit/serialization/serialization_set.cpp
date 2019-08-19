@@ -15,13 +15,12 @@
 #include <set>
 #include <vector>
 
-template <typename CARGO>
+template <typename Cargo>
 struct DummyContainer
 {
-    DummyContainer()
-    {}
+    DummyContainer() = default;
 
-    DummyContainer(CARGO cargo) :
+    explicit DummyContainer(Cargo cargo) :
         cargo(cargo)
     {}
 
@@ -31,12 +30,12 @@ struct DummyContainer
         archive & cargo;
     }
 
-    bool operator<(const DummyContainer<CARGO> other) const
+    bool operator<(const DummyContainer<Cargo> other) const
     {
         return cargo < other.cargo;
     }
 
-    CARGO cargo;
+    Cargo cargo;
 };
 
 void test_int()
@@ -97,7 +96,7 @@ void test(T min, T max)
         std::set<DummyContainer<T> > os;
         for(T c = min; c < max; ++c)
         {
-            os.insert(c);
+            os.emplace(c);
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
@@ -145,7 +144,7 @@ void test_fp(T min, T max)
         std::set<DummyContainer<T> > os;
         for(T c = min; c < max; c += static_cast<T>(0.5))
         {
-            os.insert(c);
+            os.emplace(c);
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);

@@ -31,7 +31,7 @@ template <typename T>
 struct data_buffer
 {
     data_buffer() : flag_(false) {}
-    data_buffer(std::size_t size) : data_(size, 0), flag_(false) {}
+    explicit data_buffer(std::size_t size) : data_(size, 0), flag_(false) {}
 
     std::vector<T> data_;
     bool flag_;

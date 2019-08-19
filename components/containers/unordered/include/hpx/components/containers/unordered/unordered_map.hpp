@@ -139,7 +139,7 @@ namespace hpx
         {
             unordered_hasher() : hasher_() {}
 
-            unordered_hasher(Hash const& hasher)
+            explicit unordered_hasher(Hash const& hasher)
               : hasher_(hasher)
             {}
 
@@ -155,8 +155,9 @@ namespace hpx
         template <typename Hash>
         struct unordered_hasher<Hash, std::true_type>
         {
-            unordered_hasher() {}
-            unordered_hasher(Hash const&) {}
+            unordered_hasher() = default;
+
+            explicit unordered_hasher(Hash const&) {}
 
             template <typename Key>
             std::size_t operator()(Key const& key) const
@@ -170,7 +171,8 @@ namespace hpx
         struct unordered_comparator
         {
             unordered_comparator() : equal_() {}
-            unordered_comparator(KeyEqual const& equal)
+
+            explicit unordered_comparator(KeyEqual const& equal)
               : equal_(equal)
             {}
 
@@ -186,8 +188,9 @@ namespace hpx
         template <typename KeyEqual>
         struct unordered_comparator<KeyEqual, std::true_type>
         {
-            unordered_comparator() {}
-            unordered_comparator(KeyEqual const&) {}
+            unordered_comparator() = default;
+
+            explicit unordered_comparator(KeyEqual const&) {}
 
             template <typename Key>
             bool operator()(Key const& lhs, Key const& rhs) const
@@ -566,8 +569,10 @@ namespace hpx
         {
             if (this != &rhs)
             {
-                this->base_type::operator=(std::move(rhs));
-                this->hash_base_type::operator=(std::move(rhs));
+                this->base_type::operator=(
+                    std::move(static_cast<base_type&&>(rhs)));
+                this->hash_base_type::operator=(
+                    std::move(static_cast<hash_base_type&&>(rhs)));
 
                 partitions_ = std::move(rhs.partitions_);
             }

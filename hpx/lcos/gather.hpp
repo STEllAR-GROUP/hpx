@@ -250,6 +250,7 @@ namespace hpx { namespace lcos
 
         public:
             gather_server() //-V730
+              : num_sites_(0), site_(0)
             {
                 HPX_ASSERT(false);  // shouldn't ever be called
             }

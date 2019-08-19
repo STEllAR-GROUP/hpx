@@ -359,8 +359,10 @@ namespace hpx { namespace plugins { namespace parcel
         performance_counters::counter_info cinfo = info;
         cinfo.fullname_ = fullname;
 
-        if (!f(cinfo, ec) || ec)
+        if (!f(cinfo, ec))
             return false;
+
+        if (ec) return false;
 
         if (&ec != &throws)
             ec = make_success_code();

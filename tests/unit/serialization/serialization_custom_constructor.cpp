@@ -23,7 +23,7 @@
  */
 struct A
 {
-    A(int a) : a(a) {}
+    explicit A(int a) : a(a) {}
     virtual ~A() {}
 
     int a;

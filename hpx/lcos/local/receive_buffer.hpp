@@ -39,7 +39,8 @@ namespace hpx { namespace lcos { namespace local
 
         public:
             entry_data()
-              : can_be_deleted_(false), value_set_(false)
+              : can_be_deleted_(false)
+              , value_set_(false)
             {}
 
             hpx::future<T> get_future()
@@ -77,7 +78,8 @@ namespace hpx { namespace lcos { namespace local
         struct erase_on_exit
         {
             erase_on_exit(buffer_map_type& buffer_map, iterator it)
-              : buffer_map_(buffer_map), it_(it)
+              : buffer_map_(buffer_map)
+              , it_(it)
             {}
 
             ~erase_on_exit()
@@ -90,10 +92,11 @@ namespace hpx { namespace lcos { namespace local
         };
 
     public:
-        receive_buffer() {}
+        receive_buffer() = default;
 
-        receive_buffer(receive_buffer && other)
-          : buffer_map_(std::move(other.buffer_map_))
+        receive_buffer(receive_buffer&& other) noexcept
+          : mtx_()
+          , buffer_map_(std::move(other.buffer_map_))
         {}
 
         ~receive_buffer()
@@ -101,10 +104,11 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(buffer_map_.empty());
         }
 
-        receive_buffer& operator=(receive_buffer && other)
+        receive_buffer& operator=(receive_buffer && other) noexcept
         {
-            if(this != &other)
+            if (this != &other)
             {
+                mtx_ = mutex_type();
                 buffer_map_ = std::move(other.buffer_map_);
             }
             return *this;

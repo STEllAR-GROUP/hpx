@@ -47,16 +47,19 @@ namespace hpx { namespace lcos
     private:
         using barrier_type = hpx::lcos::barrier;
         using table_type =
-            std::map<std::set<std::size_t>,std::shared_ptr<barrier_type>>;
-    public:
-        spmd_block(){}
+            std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
 
-        explicit spmd_block(std::string name, std::size_t images_per_locality,
-            std::size_t num_images, std::size_t image_id)
-        : name_(name), images_per_locality_(images_per_locality)
-        , num_images_(num_images), image_id_(image_id)
-        , barrier_(
-            std::make_shared<hpx::lcos::barrier>(
+    public:
+        spmd_block() = default;
+
+        explicit spmd_block(std::string const& name,
+            std::size_t images_per_locality, std::size_t num_images,
+            std::size_t image_id)
+          : name_(name)
+          , images_per_locality_(images_per_locality)
+          , num_images_(num_images)
+          , image_id_(image_id)
+          , barrier_(std::make_shared<hpx::lcos::barrier>(
                 name_ + "_barrier", num_images_, image_id_))
         {}
 
@@ -136,11 +139,9 @@ namespace hpx { namespace lcos
             sync_images(images);
         }
 
-        template<typename ... I>
-        typename std::enable_if<
-            util::detail::all_of<
-                typename std::is_integral<I>::type ... >::value
-        >::type
+        template <typename... I>
+        typename std::enable_if<util::detail::all_of<
+            typename std::is_integral<I>::type...>::value>::type
         sync_images(I... i)
         {
             std::set<std::size_t> images = {(std::size_t)i...};
@@ -204,14 +205,11 @@ namespace hpx { namespace lcos
             return sync_images(policy,images);
         }
 
-        template<typename ... I>
+        template <typename... I>
         typename std::enable_if<
-            util::detail::all_of<
-                typename std::is_integral<I>::type ... >::value,
-            hpx::future<void>
-        >::type
-        sync_images(hpx::launch::async_policy const & policy,
-            I ... i) const
+            util::detail::all_of<typename std::is_integral<I>::type...>::value,
+            hpx::future<void>>::type
+        sync_images(hpx::launch::async_policy const& policy, I... i) const
         {
             std::set<std::size_t> images = {(std::size_t)i...};
             return sync_images(policy,images);

@@ -109,7 +109,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             std::vector<std::string> names =
                 vm["hpx:print-counter"].as<std::vector<std::string> >();
             std::vector<std::string>::iterator it;
-            for (it = names.begin(); it != names.end(); it++)
+            for (it = names.begin(); it != names.end(); ++it)
                 if (it->substr(0, 5) == "/papi")
                     return true;
         }
@@ -118,7 +118,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             std::vector<std::string> names =
                 vm["hpx:print-counter-reset"].as<std::vector<std::string> >();
             std::vector<std::string>::iterator it;
-            for (it = names.begin(); it != names.end(); it++)
+            for (it = names.begin(); it != names.end(); ++it)
                 if (it->substr(0, 5) == "/papi")
                     return true;
         }
@@ -216,8 +216,9 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
                 dependencies(**it),
                 (*it)->long_descr);
 
-            if (strlen((*it)->note) > 0)
-            { // is this actually provided anywhere??
+            if (strnlen((*it)->note, PAPI_HUGE_STR_LEN) > 0)
+            {
+                // is this actually provided anywhere??
                 std::cout << "Note:\n" << (*it)->note << "\n";
             }
 
@@ -255,7 +256,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             registers(info),
             info.long_descr);
 
-        if (strlen(info.note) > 0)
+        if (strnlen(info.note, PAPI_HUGE_STR_LEN) > 0)
         {
             std::cout << "Note:\n" << info.note << "\n";
         }

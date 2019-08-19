@@ -25,8 +25,8 @@ namespace hpx { namespace util
         {
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
             global_lock_data()
+              : backtrace_(hpx::detail::backtrace_direct(75))
             {
-                backtrace_ = hpx::detail::backtrace_direct(75);
             }
 
             std::string backtrace_;

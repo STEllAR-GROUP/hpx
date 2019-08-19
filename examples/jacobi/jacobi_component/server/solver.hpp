@@ -32,6 +32,8 @@ namespace jacobi
             typedef hpx::components::component<solver> component_type;
 
             solver()
+              : ny(0)
+              , nx(0)
             {
                 HPX_ASSERT(false);
             }

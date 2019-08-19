@@ -120,7 +120,7 @@ namespace hpx
         {
             basis[0] = 1;
 
-            std::size_t  tmp = 1;
+            std::size_t tmp = 1;
             auto in  = sizes.begin();
 
             (void)std::initializer_list<int>{

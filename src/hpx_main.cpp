@@ -28,19 +28,30 @@ HPX_WEAK_SYMBOL int hpx_main()
     std::vector<std::string> args = split_unix(cmdline);
 #endif
 
+    constexpr char const hpx_prefix[] = "--hpx:";
+    constexpr char const hpx_prefix_len =
+        (sizeof(hpx_prefix) / sizeof(hpx_prefix[0])) - 1;
+
+    constexpr char const hpx_positional[] = "positional";
+    constexpr char const hpx_positional_len =
+        (sizeof(hpx_positional) / sizeof(hpx_positional[0])) - 1;
+
     // Copy all arguments which are not hpx related to a temporary array
     std::vector<char*> argv(args.size()+1);
     std::size_t argcount = 0;
-    for (std::size_t i = 0; i < args.size(); ++i)
+    for (auto& arg : args)
     {
-        if (0 != args[i].find("--hpx:")) {
-            argv[argcount++] = const_cast<char*>(args[i].data());
+        if (0 != arg.compare(0, hpx_prefix_len, hpx_prefix))
+        {
+            argv[argcount++] = const_cast<char*>(arg.data());
         }
-        else if (6 == args[i].find("positional", 6)) {
-            std::string::size_type p = args[i].find_first_of("=");
+        else if (0 ==
+            arg.compare(hpx_prefix_len, hpx_positional_len, hpx_positional))
+        {
+            std::string::size_type p = arg.find_first_of("=");
             if (p != std::string::npos) {
-                args[i] = args[i].substr(p+1);
-                argv[argcount++] = const_cast<char*>(args[i].data());
+                arg = arg.substr(p+1);
+                argv[argcount++] = const_cast<char*>(arg.data());
             }
         }
     }

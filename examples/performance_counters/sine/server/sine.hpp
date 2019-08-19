@@ -22,7 +22,7 @@ namespace performance_counters { namespace sine { namespace server
     //]
     {
     public:
-        sine_counter() : current_value_(0) {}
+        sine_counter() : current_value_(0), evaluated_at_(0) {}
         sine_counter(hpx::performance_counters::counter_info const& info);
 
         /// This function will be called in order to query the current value of
