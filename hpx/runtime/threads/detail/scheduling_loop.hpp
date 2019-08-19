@@ -822,7 +822,9 @@ namespace hpx { namespace threads { namespace detail
                     else
                     {
                         can_exit = can_exit &&
-                            scheduler.SchedulingPolicy::get_thread_count() == 0;
+                            scheduler.SchedulingPolicy::get_thread_count(
+                                suspended, thread_priority_default,
+                                num_thread) == 0;
 
                         if (can_exit)
                         {

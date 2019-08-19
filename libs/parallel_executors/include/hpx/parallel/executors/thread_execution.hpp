@@ -19,7 +19,9 @@
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/fused_bulk_execute.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/bind.hpp>
@@ -174,41 +176,43 @@ namespace hpx { namespace threads {
     bulk_then_execute(Executor&& exec, F&& f, Shape const& shape,
         Future&& predecessor, Ts&&... ts)
     {
-        using func_result_type =
-            typename parallel::execution::detail::then_bulk_function_result<F,
-                Shape, Future, Ts...>::type;
+        typedef typename parallel::execution::detail::then_bulk_function_result<
+                F, Shape, Future, Ts...
+            >::type func_result_type;
 
-        // std::vector<future<func_result_type>>
-        using result_type = std::vector<hpx::future<func_result_type>>;
+        typedef std::vector<hpx::lcos::future<func_result_type> > result_type;
 
-        auto&& func =
+        auto func =
             parallel::execution::detail::make_fused_bulk_async_execute_helper<
-                result_type>(exec, std::forward<F>(f), shape,
+                result_type
+            >(exec, std::forward<F>(f), shape,
                 hpx::util::make_tuple(std::forward<Ts>(ts)...));
 
         // void or std::vector<func_result_type>
-        using vector_result_type =
-            typename parallel::execution::detail::bulk_then_execute_result<F,
-                Shape, Future, Ts...>::type;
+        typedef typename parallel::execution::detail::bulk_then_execute_result<
+                F, Shape, Future, Ts...
+            >::type vector_result_type;
 
-        // future<vector_result_type>
-        using result_future_type = hpx::future<vector_result_type>;
+        typedef hpx::future<vector_result_type> result_future_type;
 
-        using shared_state_type =
-            typename hpx::traits::detail::shared_state_ptr<
-                vector_result_type>::type;
+        typedef typename hpx::traits::detail::shared_state_ptr<
+                result_future_type
+            >::type shared_state_type;
 
-        using future_type = typename std::decay<Future>::type;
+        typedef typename std::decay<Future>::type future_type;
 
-        // vector<future<func_result_type>> -> vector<func_result_type>
+        thread_id_type id = hpx::threads::get_self_id();
+        executors::current_executor exec_current =
+            hpx::threads::get_executor(id);
+
         shared_state_type p =
-            lcos::detail::make_continuation_exec<vector_result_type>(
+            lcos::detail::make_continuation_exec<result_future_type>(
                 std::forward<Future>(predecessor), std::forward<Executor>(exec),
-                [HPX_CAPTURE_MOVE(func)](
-                    future_type&& predecessor) mutable -> vector_result_type {
-                    // use unwrap directly (instead of lazily) to avoid
-                    // having to pull in dataflow
-                    return hpx::util::unwrap(func(std::move(predecessor)));
+                [HPX_CAPTURE_MOVE(func), HPX_CAPTURE_MOVE(exec_current)](
+                    future_type&& predecessor) mutable -> result_future_type {
+                    return hpx::dataflow(exec_current,
+                        hpx::util::functional::unwrap{},
+                        func(std::move(predecessor)));
                 });
 
         return hpx::traits::future_access<result_future_type>::create(
