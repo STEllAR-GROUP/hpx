@@ -97,8 +97,7 @@ namespace hpx { namespace util {
     };
 
     template <typename Tag, std::size_t N>
-    cache_aligned_data<boost::detail::spinlock>
-        spinlock_pool<Tag, N>::pool_[N];
+    cache_aligned_data<boost::detail::spinlock> spinlock_pool<Tag, N>::pool_[N];
 
 #if HPX_HAVE_ITTNOTIFY != 0
     namespace detail {

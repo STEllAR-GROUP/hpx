@@ -21,10 +21,10 @@ namespace hpx {
 #if defined(HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE)
             return std::hardware_destructive_interference_size;
 #else
-            return 64;      // assume 64 byte cache-line size
+            return 64;    // assume 64 byte cache-line size
 #endif
         }
-    } // namespace threads
+    }    // namespace threads
 
     namespace util {
 
@@ -57,11 +57,12 @@ namespace hpx {
             Data data_;
 
             //  cppcheck-suppress unusedVariable
-            char cacheline_pad[detail::get_cache_line_padding_size(sizeof(Data))];
+            char cacheline_pad[detail::get_cache_line_padding_size(
+                sizeof(Data))];
         };
 #endif
 
-    } // namesace util
+    }    // namespace util
 
 }    // namespace hpx
 
