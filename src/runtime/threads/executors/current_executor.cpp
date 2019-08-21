@@ -9,7 +9,7 @@
 #include <hpx/concurrency/register_locks.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -147,7 +147,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     hpx::state current_executor::get_state() const
     {
-        return scheduler_base_->get_state(hpx::get_worker_thread_num());
+        return scheduler_base_->get_state(
+            threads::detail::get_thread_num_tss());
     }
 
     void current_executor::set_scheduler_mode(
