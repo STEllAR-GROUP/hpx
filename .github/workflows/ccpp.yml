@@ -1,0 +1,19 @@
+name: C/C++ CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: dependencies
+      run: apt update && apt install -y g++ cmake make libboost-all-dev libhwloc-dev
+    - name: configure
+      run: mkdir build && cd build && cmake -DHPX_WITH_MALLOC=system ..
+    - name: make
+      run: cd build && make tests
+    - name: make test
+      run: cd build && make test
