@@ -657,6 +657,8 @@ namespace hpx
             hpx::util::set_test_failure_handler(&detail::test_failure_handler);
             hpx::set_custom_exception_info_handler(&detail::custom_exception_info);
             hpx::set_pre_exception_handler(&detail::pre_exception_handler);
+            hpx::set_thread_termination_handler(
+                [](std::exception_ptr const& e) { report_error(e); });
 #if defined(HPX_HAVE_VERIFY_LOCKS)
             hpx::util::set_registered_locks_error_handler(
                 &detail::registered_locks_error_handler);
