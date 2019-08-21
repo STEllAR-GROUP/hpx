@@ -25,6 +25,7 @@ add_hpx_module(collectives
     HEADERS ${collectives_headers}
     DEPENDENCIES
       hpx_assertion
+      hpx_concurrency
       hpx_config
       hpx_errors
       hpx_format

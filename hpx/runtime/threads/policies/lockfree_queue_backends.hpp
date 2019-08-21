@@ -12,13 +12,13 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-#include <hpx/util/lockfree/deque.hpp>
+#include <hpx/concurrency/deque.hpp>
 #else
 #include <boost/lockfree/queue.hpp>
 #endif
 
 // Does not rely on CXX11_STD_ATOMIC_128BIT
-#include <hpx/util/lockfree/concurrentqueue.hpp>
+#include <hpx/concurrency/concurrentqueue.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -22,7 +22,7 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/util/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>

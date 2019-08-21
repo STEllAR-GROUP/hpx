@@ -46,7 +46,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <hpx/util/itt_notify.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #endif
 
 #include <boost/utility/string_ref.hpp>

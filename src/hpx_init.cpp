@@ -340,6 +340,53 @@ namespace hpx
             hpx::util::may_attach_debugger("test-failure");
         }
 
+#if defined(HPX_HAVE_VERIFY_LOCKS)
+        void registered_locks_error_handler()
+        {
+            std::string back_trace = hpx::util::trace(std::size_t(128));
+
+            // throw or log, depending on config options
+            if (get_config_entry("hpx.throw_on_held_lock", "1") == "0")
+            {
+                if (back_trace.empty())
+                {
+                    LERR_(debug)
+                        << "suspending thread while at least one lock is "
+                           "being held (stack backtrace was disabled at "
+                           "compile time)";
+                }
+                else
+                {
+                    LERR_(debug)
+                        << "suspending thread while at least one lock is "
+                        << "being held, stack backtrace: " << back_trace;
+                }
+            }
+            else
+            {
+                if (back_trace.empty())
+                {
+                    HPX_THROW_EXCEPTION(invalid_status, "verify_no_locks",
+                        "suspending thread while at least one lock is "
+                        "being held (stack backtrace was disabled at "
+                        "compile time)");
+                }
+                else
+                {
+                    HPX_THROW_EXCEPTION(invalid_status, "verify_no_locks",
+                        "suspending thread while at least one lock is "
+                        "being held, stack backtrace: " +
+                            back_trace);
+                }
+            }
+        }
+
+        bool register_locks_predicate()
+        {
+            return threads::get_self_ptr() != nullptr;
+        }
+#endif
+
         ///////////////////////////////////////////////////////////////////////
         struct dump_config
         {
@@ -607,6 +654,12 @@ namespace hpx
             hpx::util::set_test_failure_handler(&detail::test_failure_handler);
             hpx::set_custom_exception_info_handler(&detail::custom_exception_info);
             hpx::set_pre_exception_handler(&detail::pre_exception_handler);
+#if defined(HPX_HAVE_VERIFY_LOCKS)
+            hpx::util::set_registered_locks_error_handler(
+                &detail::registered_locks_error_handler);
+            hpx::util::set_register_locks_predicate(
+                &detail::register_locks_predicate);
+#endif
 #if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
             set_error_handlers();
 #endif

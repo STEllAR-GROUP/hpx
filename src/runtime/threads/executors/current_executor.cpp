@@ -6,6 +6,7 @@
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 
 #include <hpx/assertion.hpp>
+#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
@@ -16,7 +17,6 @@
 #include <hpx/state.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/register_locks.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

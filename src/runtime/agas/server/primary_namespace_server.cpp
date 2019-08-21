@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
+#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -30,7 +31,6 @@
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
-#include <hpx/util/register_locks.hpp>
 
 #include <atomic>
 #include <cstddef>

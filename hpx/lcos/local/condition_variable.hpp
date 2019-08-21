@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -16,8 +17,7 @@
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util/cache_aligned_data.hpp>
-#include <hpx/util/register_locks.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
 
 #include <mutex>
 #include <utility>

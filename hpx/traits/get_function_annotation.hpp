@@ -7,7 +7,7 @@
 #define HPX_TRAITS_GET_FUNCTION_ANNOTATION_JAN_31_2017_1201PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/itt_notify.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 
 #include <cstddef>
 #include <memory>

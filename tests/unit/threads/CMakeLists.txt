@@ -36,6 +36,7 @@ set(lockfree_fifo_LIBRARIES
     ${Boost_LIBRARIES}
     hpx_assertion
     hpx_config
+    hpx_concurrency
     hpx_testing
     hpx_datastructures
     hpx_type_support)

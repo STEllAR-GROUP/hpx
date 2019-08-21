@@ -19,6 +19,7 @@ All modules
    /libs/cache/docs/index.rst
    /libs/collectives/docs/index.rst
    /libs/concepts/docs/index.rst
+   /libs/concurrency/docs/index.rst
    /libs/config/docs/index.rst
    /libs/datastructures/docs/index.rst
    /libs/errors/docs/index.rst

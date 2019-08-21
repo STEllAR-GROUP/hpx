@@ -16,6 +16,7 @@ set(HPX_LIBS
   cache
   collectives
   concepts
+  concurrency
   config
   datastructures
   errors

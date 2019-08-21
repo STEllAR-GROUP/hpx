@@ -14,8 +14,8 @@
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/init_logging.hpp>
-#include <hpx/util/itt_notify.hpp>
-#include <hpx/util/register_locks.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/version.hpp>

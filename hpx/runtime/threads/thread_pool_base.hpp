@@ -8,6 +8,7 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_POOL_JUN_11_2015_1137AM
 
 #include <hpx/config.hpp>
+#include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -19,9 +20,9 @@
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <thread>

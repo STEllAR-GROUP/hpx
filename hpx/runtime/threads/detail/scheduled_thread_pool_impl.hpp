@@ -10,6 +10,7 @@
 #include <hpx/apply.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
+#include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
@@ -26,7 +27,6 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/barrier.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>

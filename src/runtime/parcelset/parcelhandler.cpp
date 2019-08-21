@@ -33,7 +33,7 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/itt_notify.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>

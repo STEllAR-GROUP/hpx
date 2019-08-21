@@ -9,12 +9,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/util/itt_notify.hpp>
 #include <hpx/util/wrapper_heap_base.hpp>
 
 #include <cstddef>

@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/concurrency/thread_name.hpp>
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
@@ -292,15 +293,6 @@ namespace hpx
         {
             static HPX_NATIVE_TLS std::uint64_t uptime;
             return uptime;
-        }
-    }
-
-    namespace detail
-    {
-        std::string& runtime_thread_name()
-        {
-            static HPX_NATIVE_TLS std::string thread_name_;
-            return thread_name_;
         }
     }
 
@@ -865,7 +857,7 @@ namespace hpx
 
     std::string get_thread_name()
     {
-        std::string& thread_name = detail::runtime_thread_name();
+        std::string& thread_name = detail::thread_name();
         if (thread_name.empty()) return "<unkown>";
         return thread_name;
     }

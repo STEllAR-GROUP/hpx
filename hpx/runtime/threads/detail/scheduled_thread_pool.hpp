@@ -7,7 +7,9 @@
 #if !defined(HPX_SCHEDULED_THREAD_POOL_HPP)
 #define HPX_SCHEDULED_THREAD_POOL_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/network_background_callback.hpp>
@@ -15,7 +17,6 @@
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/util/barrier.hpp>
 #include <hpx/util/function.hpp>
 
 #include <atomic>

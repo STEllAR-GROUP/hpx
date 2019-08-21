@@ -7,9 +7,6 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
@@ -23,7 +20,7 @@
 #include <hpx/util/debugging.hpp>
 #include <hpx/format.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/util/register_locks.hpp>
+#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/version.hpp>
 #include <hpx/custom_exception_info.hpp>
 
@@ -536,17 +533,6 @@ namespace hpx
         return "<unknown>";
     }
 
-    /// Return the function name from which the exception was thrown.
-    std::string get_error_function_name(hpx::exception_info const& xi)
-    {
-        std::string const* function =
-            xi.get<hpx::detail::throw_function>();
-        if (function)
-            return *function;
-
-        return std::string();
-    }
-
     /// Return the stack backtrace at the point the exception was thrown.
     std::string get_error_backtrace(hpx::exception_info const& xi)
     {
@@ -556,29 +542,6 @@ namespace hpx
             return *back_trace;
 
         return std::string();
-    }
-
-    /// Return the (source code) file name of the function from which the
-    /// exception was thrown.
-    std::string get_error_file_name(hpx::exception_info const& xi)
-    {
-        std::string const* file =
-            xi.get<hpx::detail::throw_file>();
-        if (file)
-            return *file;
-
-        return "<unknown>";
-    }
-
-    /// Return the line number in the (source code) file of the function from
-    /// which the exception was thrown.
-    long get_error_line_number(hpx::exception_info const& xi)
-    {
-        long const* line =
-            xi.get<hpx::detail::throw_line>();
-        if (line)
-            return *line;
-        return -1;
     }
 
     /// Return the sequence number of the OS-thread used to execute HPX-threads

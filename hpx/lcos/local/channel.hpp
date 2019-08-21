@@ -8,7 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
@@ -17,8 +19,6 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/iterator_support/iterator_facade.hpp>
-#include <hpx/util/register_locks.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/type_support/unused.hpp>
 

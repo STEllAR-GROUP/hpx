@@ -16,7 +16,7 @@
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 
-#include <hpx/util/spinlock.hpp>
+#include <hpx/concurrency/spinlock.hpp>
 #include <hpx/type_support/static.hpp>
 
 #include <cstddef>
@@ -422,17 +422,6 @@ namespace hpx { namespace threads
     HPX_API_EXPORT std::size_t hardware_concurrency();
 
     HPX_API_EXPORT topology const& get_topology();
-
-    ///////////////////////////////////////////////////////////////////////////
-    // abstract away cache-line size
-    constexpr std::size_t get_cache_line_size()
-    {
-#if defined(HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE)
-        return std::hardware_destructive_interference_size;
-#else
-        return 64;      // assume 64 byte cache-line size
-#endif
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     // abstract away memory page size, calls to system functions are

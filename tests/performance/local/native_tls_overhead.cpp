@@ -5,18 +5,18 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/concurrency/barrier.hpp>
 #include <hpx/format.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/util/barrier.hpp>
 
 #include <boost/config.hpp>
 #include <boost/thread/tss.hpp>
 #include <boost/program_options.hpp>
 
-#include <thread>
 #include <cstdint>
 #include <functional>
 #include <iostream>
+#include <thread>
 #include <vector>
 
 #if defined(__has_feature)
