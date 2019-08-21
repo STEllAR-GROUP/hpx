@@ -13,7 +13,7 @@
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util/cache_line_data.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 

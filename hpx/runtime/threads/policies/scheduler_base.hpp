@@ -14,7 +14,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/cache_line_data.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/util_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>

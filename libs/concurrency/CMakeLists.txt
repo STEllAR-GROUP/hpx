@@ -10,7 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # Default location is $HPX_ROOT/libs/concurrency/include
 set(concurrency_headers
   hpx/concurrency/barrier.hpp
-  hpx/concurrency/cache_aligned_data.hpp
+  hpx/concurrency/cache_line_data.hpp
   hpx/concurrency/concurrentqueue.hpp
   hpx/concurrency/deque.hpp
   hpx/concurrency/detail/freelist.hpp
