@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v1
+    - uses: stellargroup/build_env:ubuntu
     - name: dependencies
       run: apt update && apt install -y g++ cmake make libboost-all-dev libhwloc-dev
     - name: configure
