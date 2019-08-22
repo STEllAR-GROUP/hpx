@@ -1579,8 +1579,6 @@ include(HPX_SetupBoost)
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
 include(HPX_SetupHwloc)
-# Setup Intel amplifier
-include(HPX_SetupAmplifier)
 
 # reset external source lists
 add_hpx_library_sources_noglob(hpx_external)
@@ -1660,19 +1658,6 @@ include(HPX_GitCommit)
 hpx_add_config_define(HPX_HAVE_GIT_COMMIT "\"${HPX_WITH_GIT_COMMIT}\"")
 
 hpx_include(SetOutputPaths)
-##############################################################################
-
-################################################################################
-# Provide a function for generating config headers
-################################################################################
-function(generate_config_defines_header TARGET_DIRECTORY)
-  # Generate a defines.hpp to be used in the build directory ...
-  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-  write_config_defines_file(
-    TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
-    NAMESPACE default
-    FILENAME "${TARGET_DIRECTORY}/hpx/config/defines.hpp")
-endfunction()
 
 ################################################################################
 # Add custom targets for tests
@@ -1791,29 +1776,6 @@ endif()
 # Activate plugins
 ###############################################################################
 add_plugin_modules()
-
-################################################################################
-# Generate config headers and helpers
-################################################################################
-generate_config_defines_header(${CMAKE_BINARY_DIR})
-
-# Generate a defines.hpp to be used in the install directory ...
-set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
-write_config_defines_file(
-  TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
-  NAMESPACE default
-  FILENAME "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
-
-# Configure version.hpp for build tree and install directory
-configure_file(
-    "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
-    "${CMAKE_BINARY_DIR}/hpx/config/version.hpp"
-    @ONLY)
-
-configure_file(
-    "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
-    "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/version.hpp"
-    @ONLY)
 
 # Configure hpxrun.py
 configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"

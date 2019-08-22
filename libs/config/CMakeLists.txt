@@ -40,6 +40,7 @@ set(config_sources
 
 include(HPX_AddModule)
 add_hpx_module(config
+  CONFIG_FILES
   COMPATIBILITY_HEADERS OFF
   GLOBAL_HEADER_GEN OFF
   SOURCES ${config_sources}
