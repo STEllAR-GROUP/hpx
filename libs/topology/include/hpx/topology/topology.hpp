@@ -98,7 +98,7 @@ namespace hpx { namespace threads {
 
 #include <hpx/config/warnings_prefix.hpp>
 
-    struct topology
+    struct HPX_EXPORT topology
     {
         topology();
         ~topology();
