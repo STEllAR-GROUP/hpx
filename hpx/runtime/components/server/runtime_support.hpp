@@ -271,14 +271,14 @@ namespace hpx { namespace components { namespace server
 #if !defined(HPX_HAVE_STATIC_LINKING)
         bool load_component(hpx::util::plugin::dll& d,
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path const& lib,
+            std::string const& component, filesystem::path const& lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled,
             boost::program_options::options_description& options,
             std::set<std::string>& startup_handled);
         bool load_component_dynamic(
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path lib,
+            std::string const& component, filesystem::path lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled,
             boost::program_options::options_description& options,
@@ -293,7 +293,7 @@ namespace hpx { namespace components { namespace server
 
         bool load_component_static(
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path const& lib,
+            std::string const& component, filesystem::path const& lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled,
             boost::program_options::options_description& options,
@@ -313,13 +313,13 @@ namespace hpx { namespace components { namespace server
 #if !defined(HPX_HAVE_STATIC_LINKING)
         bool load_plugin(hpx::util::plugin::dll& d,
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path const& lib,
+            std::string const& component, filesystem::path const& lib,
             bool isenabled,
             boost::program_options::options_description& options,
             std::set<std::string>& startup_handled);
         bool load_plugin_dynamic(
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path lib,
+            std::string const& component, filesystem::path lib,
             bool isenabled,
             boost::program_options::options_description& options,
             std::set<std::string>& startup_handled);

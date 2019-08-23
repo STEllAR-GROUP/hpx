@@ -8,6 +8,7 @@
 
 // TODO: move parcel ports into plugins
 #include <hpx/assertion.hpp>
+#include <hpx/filesystem.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/filesystem.hpp>
 #include <boost/predef/other/endian.h>
 #include <boost/spirit/include/qi_alternative.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
@@ -415,9 +415,9 @@ namespace hpx { namespace util
             plugin_registries,
         std::string const& path,
         std::set<std::string>& component_paths,
-        std::map<std::string, boost::filesystem::path>& basenames)
+        std::map<std::string, filesystem::path>& basenames)
     {
-        namespace fs = boost::filesystem;
+        namespace fs = filesystem;
 
         using plugin_list_type =
             std::vector<std::shared_ptr<plugins::plugin_registry_base>>;
@@ -425,7 +425,7 @@ namespace hpx { namespace util
         if (!path.empty())
         {
             fs::path this_p(path);
-            boost::system::error_code fsec;
+            fs::error_code fsec;
             fs::path canonical_p =
                 fs::canonical(this_p, fs::initial_path(), fsec);
             if (fsec)
@@ -457,9 +457,9 @@ namespace hpx { namespace util
         std::string const& component_base_paths,
         std::string const& component_path_suffixes,
         std::set<std::string>& component_paths,
-        std::map<std::string, boost::filesystem::path>& basenames)
+        std::map<std::string, filesystem::path>& basenames)
     {
-        namespace fs = boost::filesystem;
+        namespace fs = filesystem;
 
         // try to build default ini structure from shared libraries in default
         // installation location, this allows to install simple components
@@ -507,7 +507,7 @@ namespace hpx { namespace util
         std::set<std::string> component_paths;
 
         // list of base names avoiding to load a module more than once
-        std::map<std::string, boost::filesystem::path> basenames;
+        std::map<std::string, filesystem::path> basenames;
 
         // plugin registry object
         plugin_list_type plugin_registries;

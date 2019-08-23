@@ -197,8 +197,11 @@ function(hpx_perform_cxx_feature_tests)
 
   if(HPX_WITH_CXX1Z OR HPX_WITH_CXX17 OR HPX_WITH_CXX2A)
     # Check the availability of certain C++17 language features
+    hpx_check_for_cxx17_filesystem(
+      DEFINITIONS HPX_HAVE_CXX17_FILESYSTEM)
+
     hpx_check_for_cxx17_fold_expressions(
-        DEFINITIONS HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
+      DEFINITIONS HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
 
     hpx_check_for_cxx17_fallthrough_attribute(
       DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)

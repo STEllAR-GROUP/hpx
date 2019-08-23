@@ -3,6 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/filesystem.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -16,8 +17,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <boost/filesystem.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -267,20 +266,31 @@ namespace hpx { namespace util
             if (appname.empty())
                 return;
 
-            boost::filesystem::path dir (boost::filesystem::initial_path());
-            boost::filesystem::path app (appname);
-            appname = boost::filesystem::basename(app.filename());
+            filesystem::path dir (filesystem::initial_path());
+            filesystem::path app (appname);
+            appname = filesystem::basename(app.filename());
 
             // walk up the hierarchy, trying to find a file <appname>.cfg
             while (!dir.empty()) {
-                boost::filesystem::path filename = dir / (appname + ".cfg");
+                filesystem::path filename = dir / (appname + ".cfg");
                 bool result = read_config_file_options(filename.string(),
                     desc_cfgfile, vm, ini, node,
                     error_mode & ~util::report_missing_config_file);
                 if (result)
                     break;    // break on the first options file found
 
+                // Boost filesystem and C++17 filesystem behave differently
+                // here. Boost filesystem returns an empty path for
+                // "/".parent_path() whereas C++17 filesystem will keep
+                // returning "/".
+#if defined(HPX_HAVE_CXX17_FILESYSTEM)
+                auto dir_prev = dir;
+#endif
                 dir = dir.parent_path();    // chop off last directory part
+#if defined(HPX_HAVE_CXX17_FILESYSTEM)
+                if (dir_prev == dir)
+                    break;
+#endif
             }
         }
 

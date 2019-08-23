@@ -5,10 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/filesystem.hpp>
 #include <hpx/logging.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/ini.hpp>
@@ -54,8 +55,6 @@
 
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
@@ -1441,7 +1440,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_component_static(
         util::section& ini, std::string const& instance,
-        std::string const& component, boost::filesystem::path const& lib,
+        std::string const& component, filesystem::path const& lib,
         naming::gid_type const& prefix, naming::resolver_client& agas_client,
         bool isdefault, bool isenabled,
         boost::program_options::options_description& options,
@@ -1539,7 +1538,7 @@ namespace hpx { namespace components { namespace server
         iterator end = s.end();
         for (iterator i = s.begin (); i != end; ++i)
         {
-            namespace fs = boost::filesystem;
+            namespace fs = filesystem;
 
             // the section name is the instance name of the component
             util::section const& sect = i->second;
@@ -1581,7 +1580,7 @@ namespace hpx { namespace components { namespace server
                 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
                 boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
                 tokenizer tokens(component_path, sep);
-                boost::system::error_code fsec;
+                fs::error_code fsec;
                 for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
                 {
                     lib = fs::path(*it);
@@ -1755,7 +1754,7 @@ namespace hpx { namespace components { namespace server
 #if !defined(HPX_HAVE_STATIC_LINKING)
     bool runtime_support::load_component_dynamic(
         util::section& ini, std::string const& instance,
-        std::string const& component, boost::filesystem::path lib,
+        std::string const& component, filesystem::path lib,
         naming::gid_type const& prefix, naming::resolver_client& agas_client,
         bool isdefault, bool isenabled,
         boost::program_options::options_description& options,
@@ -1777,7 +1776,7 @@ namespace hpx { namespace components { namespace server
         if (ec) {
             // build path to component to load
             std::string libname(HPX_MAKE_DLL_STRING(component));
-            lib /= boost::filesystem::path(libname);
+            lib /= filesystem::path(libname);
             d.load_library(ec);
             if (ec) {
                 LRT_(warning) << "dynamic loading failed: " << lib.string()
@@ -1890,7 +1889,7 @@ namespace hpx { namespace components { namespace server
     bool runtime_support::load_component(
         hpx::util::plugin::dll& d, util::section& ini,
         std::string const& instance, std::string const& component,
-        boost::filesystem::path const& lib, naming::gid_type const& prefix,
+        filesystem::path const& lib, naming::gid_type const& prefix,
         naming::resolver_client& agas_client, bool isdefault, bool isenabled,
         boost::program_options::options_description& options,
         std::set<std::string>& startup_handled)
@@ -1982,7 +1981,7 @@ namespace hpx { namespace components { namespace server
         iterator end = s.end();
         for (iterator i = s.begin (); i != end; ++i)
         {
-            namespace fs = boost::filesystem;
+            namespace fs = filesystem;
 
             // the section name is the instance name of the component
             util::section const& sect = i->second;
@@ -2015,7 +2014,7 @@ namespace hpx { namespace components { namespace server
                 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
                 boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
                 tokenizer tokens(component_path, sep);
-                boost::system::error_code fsec;
+                fs::error_code fsec;
                 for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
                 {
                     lib = fs::path(*it);
@@ -2068,7 +2067,7 @@ namespace hpx { namespace components { namespace server
     bool runtime_support::load_plugin(hpx::util::plugin::dll& d,
         util::section& ini,
         std::string const& instance, std::string const& plugin,
-        boost::filesystem::path const& lib, bool isenabled,
+        filesystem::path const& lib, bool isenabled,
         boost::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
@@ -2145,7 +2144,7 @@ namespace hpx { namespace components { namespace server
 
     bool runtime_support::load_plugin_dynamic(util::section& ini,
         std::string const& instance, std::string const& plugin,
-        boost::filesystem::path lib, bool isenabled,
+        filesystem::path lib, bool isenabled,
         boost::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
@@ -2164,7 +2163,7 @@ namespace hpx { namespace components { namespace server
         if (ec) {
             // build path to component to load
             std::string libname(HPX_MAKE_DLL_STRING(plugin));
-            lib /= boost::filesystem::path(libname);
+            lib /= filesystem::path(libname);
             d.load_library(ec);
             if (ec) {
                 LRT_(warning) << "dynamic loading failed: " << lib.string()

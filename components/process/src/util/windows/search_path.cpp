@@ -11,18 +11,19 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <hpx/errors.hpp>
 #include <hpx/components/process/util/windows/search_path.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/filesystem.hpp>
 
-#include <boost/filesystem.hpp>
-#include <boost/tokenizer.hpp>
 #include <boost/system/error_code.hpp>
+#include <boost/tokenizer.hpp>
+
+#include <shellapi.h>
 
 #include <array>
 #include <cstdlib>
 #include <stdexcept>
 #include <string>
-#include <shellapi.h>
 
 namespace hpx { namespace components { namespace process { namespace windows
 {
@@ -46,17 +47,17 @@ namespace hpx { namespace components { namespace process { namespace windows
         tokenizer tok(path, sep);
         for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)
         {
-            boost::filesystem::path p = *it;
+            filesystem::path p = *it;
             p /= filename;
             std::array<std::wstring, 4> extensions =
                 { L"", L".exe", L".com", L".bat" };
             for (std::array<std::wstring, 4>::iterator it2 = extensions.begin();
                 it2 != extensions.end(); ++it2)
             {
-                boost::filesystem::path p2 = p;
+                filesystem::path p2 = p;
                 p2 += *it2;
                 boost::system::error_code ec;
-                bool file = boost::filesystem::is_regular_file(p2, ec);
+                bool file = filesystem::is_regular_file(p2, ec);
                 if (!ec && file &&
                     SHGetFileInfoW(p2.c_str(), 0, 0, 0, SHGFI_EXETYPE))
                 {

@@ -13,8 +13,6 @@
 #include <hpx/format.hpp>
 #include <hpx/logging.hpp>
 
-#include <boost/filesystem/path.hpp>
-
 #if defined(HPX_WINDOWS)
 #include <process.h>
 #elif defined(HPX_HAVE_UNISTD_H)

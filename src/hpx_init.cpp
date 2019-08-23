@@ -11,7 +11,13 @@
 #include <hpx/apply.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
+#include <hpx/custom_exception_info.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/filesystem.hpp>
+#include <hpx/format.hpp>
 #include <hpx/hpx_user_main_config.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -23,19 +29,14 @@
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime_impl.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/custom_exception_info.hpp>
-#include <hpx/format.hpp>
-#include <hpx/testing.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/logging.hpp>
 #include <hpx/util/query_counters.hpp>
-#include <hpx/datastructures/tuple.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -650,6 +651,8 @@ namespace hpx
             startup_function_type startup, shutdown_function_type shutdown,
             hpx::runtime_mode mode, bool blocking)
         {
+            HPX_UNUSED(hpx::filesystem::initial_path());
+
             hpx::assertion::set_assertion_handler(&detail::assertion_handler);
             hpx::util::set_test_failure_handler(&detail::test_failure_handler);
             hpx::set_custom_exception_info_handler(&detail::custom_exception_info);

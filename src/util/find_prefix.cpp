@@ -10,6 +10,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/filesystem.hpp>
 
 #if defined(HPX_WINDOWS)
 #  include <windows.h>
@@ -31,7 +32,6 @@
 #include <hpx/util/plugin/dll.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <boost/filesystem/path.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/tokenizer.hpp>
@@ -65,7 +65,7 @@ namespace hpx { namespace util
             dll.load_library(ec);
             if (ec) return hpx_prefix();
 
-            using boost::filesystem::path;
+            using hpx::filesystem::path;
 
             std::string const prefix =
                 path(dll.get_directory(ec)).parent_path().string();
@@ -117,7 +117,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////////
     std::string get_executable_prefix(char const* argv0)
     {
-        using boost::filesystem::path;
+        using hpx::filesystem::path;
         path p(get_executable_filename(argv0));
 
         return p.parent_path().parent_path().string();

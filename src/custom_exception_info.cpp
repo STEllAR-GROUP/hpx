@@ -24,8 +24,6 @@
 #include <hpx/version.hpp>
 #include <hpx/custom_exception_info.hpp>
 
-#include <boost/filesystem/path.hpp>
-
 #if defined(HPX_WINDOWS)
 #  include <process.h>
 #elif defined(HPX_HAVE_UNISTD_H)
