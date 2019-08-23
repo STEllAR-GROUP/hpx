@@ -7,6 +7,8 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
+#include <hpx/format.hpp>
+#include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime.hpp>
@@ -19,7 +21,6 @@
 #include <hpx/util/batch_environment.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/detail/reset_function.hpp>
-#include <hpx/format.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
@@ -29,7 +30,6 @@
 #include <hpx/version.hpp>
 
 #include <boost/asio/ip/host_name.hpp>
-#include <boost/assign/std/vector.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <boost/tokenizer.hpp>
@@ -647,8 +647,6 @@ namespace hpx { namespace util
         // disabled
         detail::check_networking_options(vm);
 
-        using namespace boost::assign;
-
         bool debug_clp = node != std::size_t(-1) && vm.count("hpx:debug-clp");
 
         if (vm.count("hpx:ini")) {
@@ -719,7 +717,7 @@ namespace hpx { namespace util
                     "--hpx:nodes options at the same time.");
             }
             std::string node_file = vm["hpx:nodefile"].as<std::string>();
-            ini_config += "hpx.nodefile!=" + node_file;
+            ini_config.emplace_back("hpx.nodefile!=" + node_file);
             std::ifstream ifs(node_file.c_str());
             if (ifs.is_open())
             {
@@ -760,8 +758,8 @@ namespace hpx { namespace util
         if(!nodelist.empty())
         {
             using_nodelist = true;
-            ini_config += "hpx.nodes!=" + env.init_from_nodelist(
-                nodelist, agas_host);
+            ini_config.emplace_back("hpx.nodes!=" + env.init_from_nodelist(
+                nodelist, agas_host));
         }
 
         // let the batch environment decide about the AGAS host
@@ -800,8 +798,8 @@ namespace hpx { namespace util
         if (vm.count("hpx:expect-connecting-localities"))
             expect_connections = true;
 
-        ini_config += std::string("hpx.expect_connecting_localities=") +
-            (expect_connections ? "1" : "0");
+        ini_config.emplace_back(std::string("hpx.expect_connecting_localities=") +
+            (expect_connections ? "1" : "0"));
 
         if (num_localities_ != 1 || expect_connections)
         {
@@ -922,8 +920,7 @@ namespace hpx { namespace util
             // worker and the node number is zero
             if (!vm.count("hpx:worker") || node != 0)
             {
-                ini_config += "hpx.locality!=" +
-                    std::to_string(node);
+                ini_config.emplace_back("hpx.locality!=" + std::to_string(node));
             }
         }
 
@@ -944,39 +941,40 @@ namespace hpx { namespace util
             hpx_host = hpx::util::resolve_public_ip_address();
         }
 
-        ini_config += "hpx.node!=" + std::to_string(node);
+        ini_config.emplace_back("hpx.node!=" + std::to_string(node));
 #endif
 
         // handle setting related to schedulers
         queuing_ = detail::handle_queuing(cfgmap, vm, "local-priority-fifo");
-        ini_config += "hpx.scheduler=" + queuing_;
+        ini_config.emplace_back("hpx.scheduler=" + queuing_);
 
         affinity_domain_ = detail::handle_affinity(cfgmap, vm, "pu");
-        ini_config += "hpx.affinity=" + affinity_domain_;
+        ini_config.emplace_back("hpx.affinity=" + affinity_domain_);
 
         affinity_bind_ = detail::handle_affinity_bind(cfgmap, vm, "");
         if (!affinity_bind_.empty())
-            ini_config += "hpx.bind!=" + affinity_bind_;
+            ini_config.emplace_back("hpx.bind!=" + affinity_bind_);
 
         pu_step_ = detail::handle_pu_step(cfgmap, vm, 1);
-        ini_config += "hpx.pu_step=" + std::to_string(pu_step_);
+        ini_config.emplace_back("hpx.pu_step=" + std::to_string(pu_step_));
 
         pu_offset_ = detail::handle_pu_offset(cfgmap, vm, std::size_t(-1));
         if (pu_offset_ != std::size_t(-1))
-            ini_config += "hpx.pu_offset=" + std::to_string(pu_offset_);
+            ini_config.emplace_back("hpx.pu_offset=" + std::to_string(pu_offset_));
         else
-            ini_config += "hpx.pu_offset=0";
+            ini_config.emplace_back("hpx.pu_offset=0");
 
         numa_sensitive_ = detail::handle_numa_sensitive(cfgmap, vm,
             affinity_bind_.empty() ? 0 : 1);
-        ini_config += "hpx.numa_sensitive=" + std::to_string(numa_sensitive_);
+        ini_config.emplace_back(
+            "hpx.numa_sensitive=" + std::to_string(numa_sensitive_));
 
         // default affinity mode is now 'balanced' (only if no pu-step or
         // pu-offset is given)
         if (pu_step_ == 1 && pu_offset_ == std::size_t(-1) && affinity_bind_.empty())
         {
             affinity_bind_ = "balanced";
-            ini_config += "hpx.bind!=" + affinity_bind_;
+            ini_config.emplace_back("hpx.bind!=" + affinity_bind_);
         }
 
         // handle number of cores and threads
@@ -986,10 +984,8 @@ namespace hpx { namespace util
             cfgmap, vm, num_threads_, env, use_process_mask_);
 
         // Set number of cores and OS threads in configuration.
-        ini_config += "hpx.os_threads=" +
-            std::to_string(num_threads_);
-        ini_config += "hpx.cores=" +
-            std::to_string(num_cores_);
+        ini_config.emplace_back("hpx.os_threads=" + std::to_string(num_threads_));
+        ini_config.emplace_back("hpx.cores=" + std::to_string(num_cores_));
 
         // map host names to ip addresses, if requested
         hpx_host = mapnames.map(hpx_host, hpx_port);
@@ -1038,13 +1034,13 @@ namespace hpx { namespace util
         }
 
         // write HPX and AGAS network parameters to the proper ini-file entries
-        ini_config += "hpx.parcel.address=" + hpx_host;
-        ini_config += "hpx.parcel.port=" + std::to_string(hpx_port);
-        ini_config += "hpx.agas.address=" + agas_host;
-        ini_config += "hpx.agas.port=" + std::to_string(agas_port);
+        ini_config.emplace_back("hpx.parcel.address=" + hpx_host);
+        ini_config.emplace_back("hpx.parcel.port=" + std::to_string(hpx_port));
+        ini_config.emplace_back("hpx.agas.address=" + agas_host);
+        ini_config.emplace_back("hpx.agas.port=" + std::to_string(agas_port));
 
         if (run_agas_server) {
-            ini_config += "hpx.agas.service_mode=bootstrap";
+            ini_config.emplace_back("hpx.agas.service_mode=bootstrap");
         }
 
         // we can't run the AGAS server while connecting
@@ -1055,20 +1051,21 @@ namespace hpx { namespace util
         }
 
 #else
-        ini_config += "hpx.agas.service_mode=bootstrap";
+        ini_config.emplace_back("hpx.agas.service_mode=bootstrap");
 #endif
 
         enable_logging_settings(vm, ini_config);
 
         // Set number of localities in configuration (do it everywhere,
         // even if this information is only used by the AGAS server).
-        ini_config += "hpx.localities!=" + std::to_string(num_localities_);
+        ini_config.emplace_back(
+            "hpx.localities!=" + std::to_string(num_localities_));
 
         // FIXME: AGAS V2: if a locality is supposed to run the AGAS
         //        service only and requests to use 'priority_local' as the
         //        scheduler, switch to the 'local' scheduler instead.
-        ini_config += std::string("hpx.runtime_mode=") +
-            get_runtime_mode_name(rtcfg_.mode_);
+        ini_config.emplace_back(std::string("hpx.runtime_mode=") +
+            get_runtime_mode_name(rtcfg_.mode_));
 
         bool noshutdown_evaluate = false;
         if (vm.count("hpx:print-counter-at")) {
@@ -1079,17 +1076,17 @@ namespace hpx { namespace util
             {
                 if (0 == std::string("startup").find(s))
                 {
-                    ini_config += "hpx.print_counter.startup!=1";
+                    ini_config.emplace_back("hpx.print_counter.startup!=1");
                     continue;
                 }
                 if (0 == std::string("shutdown").find(s))
                 {
-                    ini_config += "hpx.print_counter.shutdown!=1";
+                    ini_config.emplace_back("hpx.print_counter.shutdown!=1");
                     continue;
                 }
                 if (0 == std::string("noshutdown").find(s))
                 {
-                    ini_config += "hpx.print_counter.shutdown!=0";
+                    ini_config.emplace_back("hpx.print_counter.shutdown!=0");
                     noshutdown_evaluate = true;
                     continue;
                 }
@@ -1105,9 +1102,9 @@ namespace hpx { namespace util
         if (vm.count("hpx:print-counter") || vm.count("hpx:print-counter-reset"))
         {
             if (!noshutdown_evaluate)
-                ini_config += "hpx.print_counter.shutdown!=1";
+                ini_config.emplace_back("hpx.print_counter.shutdown!=1");
             if (vm.count("hpx:reset-counters"))
-                ini_config += "hpx.print_counter.reset!=1";
+                ini_config.emplace_back("hpx.print_counter.reset!=1");
         }
 
         if (debug_clp) {
@@ -1128,61 +1125,59 @@ namespace hpx { namespace util
         std::vector<std::string>& ini_config)
     {
 #if defined(HPX_HAVE_LOGGING)
-        using namespace boost::assign;
-
         if (vm.count("hpx:debug-hpx-log")) {
-            ini_config += "hpx.logging.console.destination=" +
+            ini_config.emplace_back("hpx.logging.console.destination=" +
                 detail::convert_to_log_file(
-                    vm["hpx:debug-hpx-log"].as<std::string>());
-            ini_config += "hpx.logging.destination=" +
+                    vm["hpx:debug-hpx-log"].as<std::string>()));
+            ini_config.emplace_back("hpx.logging.destination=" +
                 detail::convert_to_log_file(
-                    vm["hpx:debug-hpx-log"].as<std::string>());
-            ini_config += "hpx.logging.console.level=5";
-            ini_config += "hpx.logging.level=5";
+                    vm["hpx:debug-hpx-log"].as<std::string>()));
+            ini_config.emplace_back("hpx.logging.console.level=5");
+            ini_config.emplace_back("hpx.logging.level=5");
         }
 
         if (vm.count("hpx:debug-agas-log")) {
-            ini_config += "hpx.logging.console.agas.destination=" +
+            ini_config.emplace_back("hpx.logging.console.agas.destination=" +
                 detail::convert_to_log_file(
-                    vm["hpx:debug-agas-log"].as<std::string>());
-            ini_config += "hpx.logging.agas.destination=" +
+                    vm["hpx:debug-agas-log"].as<std::string>()));
+            ini_config.emplace_back("hpx.logging.agas.destination=" +
                 detail::convert_to_log_file(
-                    vm["hpx:debug-agas-log"].as<std::string>());
-            ini_config += "hpx.logging.console.agas.level=5";
-            ini_config += "hpx.logging.agas.level=5";
+                    vm["hpx:debug-agas-log"].as<std::string>()));
+            ini_config.emplace_back("hpx.logging.console.agas.level=5");
+            ini_config.emplace_back("hpx.logging.agas.level=5");
         }
 
         if (vm.count("hpx:debug-parcel-log")) {
-            ini_config += "hpx.logging.console.parcel.destination=" +
+            ini_config.emplace_back("hpx.logging.console.parcel.destination=" +
                 detail::convert_to_log_file(
-                    vm["hpx:debug-parcel-log"].as<std::string>());
-            ini_config += "hpx.logging.parcel.destination=" +
+                    vm["hpx:debug-parcel-log"].as<std::string>()));
+            ini_config.emplace_back("hpx.logging.parcel.destination=" +
                 detail::convert_to_log_file(
-                    vm["hpx:debug-parcel-log"].as<std::string>());
-            ini_config += "hpx.logging.console.parcel.level=5";
-            ini_config += "hpx.logging.parcel.level=5";
+                    vm["hpx:debug-parcel-log"].as<std::string>()));
+            ini_config.emplace_back("hpx.logging.console.parcel.level=5");
+            ini_config.emplace_back("hpx.logging.parcel.level=5");
         }
 
         if (vm.count("hpx:debug-timing-log")) {
-            ini_config += "hpx.logging.console.timing.destination=" +
+            ini_config.emplace_back("hpx.logging.console.timing.destination=" +
                 detail::convert_to_log_file(
-                    vm["hpx:debug-timing-log"].as<std::string>());
-            ini_config += "hpx.logging.timing.destination=" +
+                    vm["hpx:debug-timing-log"].as<std::string>()));
+            ini_config.emplace_back("hpx.logging.timing.destination=" +
                 detail::convert_to_log_file(
-                    vm["hpx:debug-timing-log"].as<std::string>());
-            ini_config += "hpx.logging.console.timing.level=1";
-            ini_config += "hpx.logging.timing.level=1";
+                    vm["hpx:debug-timing-log"].as<std::string>()));
+            ini_config.emplace_back("hpx.logging.console.timing.level=1");
+            ini_config.emplace_back("hpx.logging.timing.level=1");
         }
 
         if (vm.count("hpx:debug-app-log")) {
-            ini_config += "hpx.logging.console.application.destination=" +
+            ini_config.emplace_back("hpx.logging.console.application.destination=" +
                 detail::convert_to_log_file(
-                    vm["hpx:debug-app-log"].as<std::string>());
-            ini_config += "hpx.logging.application.destination=" +
+                    vm["hpx:debug-app-log"].as<std::string>()));
+            ini_config.emplace_back("hpx.logging.application.destination=" +
                 detail::convert_to_log_file(
-                    vm["hpx:debug-app-log"].as<std::string>());
-            ini_config += "hpx.logging.console.application.level=5";
-            ini_config += "hpx.logging.application.level=5";
+                    vm["hpx:debug-app-log"].as<std::string>()));
+            ini_config.emplace_back("hpx.logging.console.application.level=5");
+            ini_config.emplace_back("hpx.logging.application.level=5");
         }
 #else
         if (vm.count("hpx:debug-hpx-log") ||
@@ -1202,8 +1197,6 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     void command_line_handling::store_command_line(int argc, char** argv)
     {
-        using namespace boost::assign;
-
         // Collect the command line for diagnostic purposes.
         std::string cmd_line;
         for (int i = 0; i < argc; ++i)
@@ -1217,7 +1210,7 @@ namespace hpx { namespace util
         }
 
         // Store the program name and the command line.
-        ini_config_ += "hpx.cmd_line!=" + cmd_line;
+        ini_config_.emplace_back("hpx.cmd_line!=" + cmd_line);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1225,8 +1218,6 @@ namespace hpx { namespace util
         std::string const& cmd_name,
         std::vector<std::string> const& unregistered_options)
     {
-        using namespace boost::assign;
-
         std::string unregistered_options_cmd_line;
 
         if (!unregistered_options.empty()) {
@@ -1237,24 +1228,22 @@ namespace hpx { namespace util
                 unregistered_options_cmd_line +=
                     " " + detail::encode_and_enquote(*it);
 
-            ini_config_ += "hpx.unknown_cmd_line!=" +
+            ini_config_.emplace_back("hpx.unknown_cmd_line!=" +
                 detail::encode_and_enquote(cmd_name) +
-                unregistered_options_cmd_line;
+                unregistered_options_cmd_line);
         }
 
-        ini_config_ += "hpx.program_name!=" + cmd_name;
-        ini_config_ += "hpx.reconstructed_cmd_line!=" +
+        ini_config_.emplace_back("hpx.program_name!=" + cmd_name);
+        ini_config_.emplace_back("hpx.reconstructed_cmd_line!=" +
             detail::encode_and_enquote(cmd_name) + " " +
             util::reconstruct_command_line(vm_) + " " +
-            unregistered_options_cmd_line;
+            unregistered_options_cmd_line);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     bool command_line_handling::handle_help_options(
         boost::program_options::options_description const& help)
     {
-        using namespace boost::assign;
-
         if (vm_.count("hpx:help")) {
             std::string help_option(vm_["hpx:help"].as<std::string>());
             if (0 == std::string("minimal").find(help_option)) {
@@ -1267,9 +1256,10 @@ namespace hpx { namespace util
                 // acquired
                 std::ostringstream strm;
                 strm << help << std::endl;
-                ini_config_ += "hpx.cmd_line_help!=" +
-                    detail::encode_string(strm.str());
-                ini_config_ += "hpx.cmd_line_help_option!=" + help_option;
+                ini_config_.emplace_back("hpx.cmd_line_help!=" +
+                    detail::encode_string(strm.str()));
+                ini_config_.emplace_back(
+                    "hpx.cmd_line_help_option!=" + help_option);
             }
             else {
                 throw hpx::detail::command_line_error(hpx::util::format(
@@ -1297,8 +1287,7 @@ namespace hpx { namespace util
                 if (option == "startup")
                     attach_debugger();
 
-                using namespace boost::assign;
-                ini_config_ += "hpx.attach_debugger!=" + option;
+                ini_config_.emplace_back("hpx.attach_debugger!=" + option);
             }
         }
 #endif
@@ -1449,6 +1438,15 @@ namespace hpx { namespace util
             node_ = 0;
 
 #if defined(HPX_HAVE_NETWORKING)
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        // getting localities from MPI environment (support mpirun)
+        if (util::mpi_environment::check_mpi_environment(rtcfg_))
+        {
+            mpi_environment::init(&argc, &argv, *this);
+            num_localities_ = mpi_environment::size();
+        }
+#endif
+
         if (num_localities_ != 1 || node_ != 0 || rtcfg_.enable_networking())
         {
             parcelset::parcelhandler::init(&argc, &argv, *this);

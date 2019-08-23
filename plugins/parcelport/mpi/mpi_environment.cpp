@@ -15,7 +15,6 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 
-#include <boost/assign/std/vector.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 
@@ -104,7 +103,7 @@ namespace hpx { namespace util
 
     void mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
     {
-        using namespace boost::assign;
+        if (enabled_) return;    // don't call twice
 
         int this_rank = -1;
         has_called_init_ = false;
@@ -113,11 +112,11 @@ namespace hpx { namespace util
         enabled_ = check_mpi_environment(cfg.rtcfg_);
         if (!enabled_)
         {
-            cfg.ini_config_.push_back("hpx.parcel.mpi.enable = 0");
+            cfg.ini_config_.emplace_back("hpx.parcel.mpi.enable = 0");
             return;
         }
 
-        cfg.ini_config_ += "hpx.parcel.bootstrap!=mpi";
+        cfg.ini_config_.emplace_back("hpx.parcel.bootstrap!=mpi");
 
 #if defined(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
         int flag = (detail::get_cfg_entry(
@@ -140,7 +139,7 @@ namespace hpx { namespace util
             if (MPI_ERR_OTHER != retval)
             {
                 // explicitly disable mpi if not run by mpirun
-                cfg.ini_config_.push_back("hpx.parcel.mpi.enable = 0");
+                cfg.ini_config_.emplace_back("hpx.parcel.mpi.enable = 0");
 
                 enabled_ = false;
 
@@ -167,10 +166,10 @@ namespace hpx { namespace util
         if (provided_threading_flag_ < MPI_THREAD_SERIALIZED)
         {
             // explicitly disable mpi if not run by mpirun
-            cfg.ini_config_.push_back("hpx.parcel.mpi.multithreaded = 0");
+            cfg.ini_config_.emplace_back("hpx.parcel.mpi.multithreaded = 0");
         }
 
-        if(provided_threading_flag_ == MPI_THREAD_FUNNELED)
+        if (provided_threading_flag_ == MPI_THREAD_FUNNELED)
         {
             enabled_ = false;
             has_called_init_ = false;
@@ -193,10 +192,10 @@ namespace hpx { namespace util
             cfg.rtcfg_.mode_ = hpx::runtime_mode_worker;
         }
 
-        cfg.ini_config_ += std::string("hpx.parcel.mpi.rank!=") +
-            std::to_string(this_rank);
-        cfg.ini_config_ += std::string("hpx.parcel.mpi.processorname!=") +
-            get_processor_name();
+        cfg.ini_config_.emplace_back("hpx.parcel.mpi.rank!=" +
+            std::to_string(this_rank));
+        cfg.ini_config_.emplace_back("hpx.parcel.mpi.processorname!=" +
+            get_processor_name());
 
         cfg.node_ = std::size_t(this_rank);
     }
