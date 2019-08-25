@@ -6,6 +6,7 @@
 set(tests
     serialization_array
     serialization_valarray
+    serialization_boost_variant
     serialization_builtins
     serialization_complex
     serialization_custom_constructor

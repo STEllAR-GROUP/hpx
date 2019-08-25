@@ -8,7 +8,9 @@ cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 set(datastructures_headers
   hpx/datastructures/tuple.hpp
   hpx/datastructures/optional.hpp
+  hpx/datastructures/variant.hpp
   hpx/datastructures/detail/pack.hpp
+  hpx/datastructures/detail/variant.hpp
 )
 
 set(datastructures_compat_headers
@@ -27,6 +29,7 @@ add_hpx_module(datastructures
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER
     "hpx/datastructures/detail/pack.hpp"
+    "hpx/datastructures/detail/variant.hpp"
   SOURCES ${datastructures_sources}
   HEADERS ${datastructures_headers}
   COMPAT_HEADERS ${datastructures_compat_headers}

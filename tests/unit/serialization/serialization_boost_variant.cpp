@@ -5,7 +5,7 @@
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/string.hpp>
-#include <hpx/runtime/serialization/variant.hpp>
+#include <hpx/runtime/serialization/boost_variant.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -49,43 +49,42 @@ int main()
     hpx::serialization::output_archive oar(buf);
     hpx::serialization::input_archive iar(buf);
 
-    hpx::util::variant<int, std::string, double, A<int>> ovar =
-        std::string("dfsdf");
-    hpx::util::variant<int, std::string, double, A<int>> ivar;
+    boost::variant<int, std::string, double, A<int> > ovar = std::string("dfsdf");
+    boost::variant<int, std::string, double, A<int> > ivar;
     oar << ovar;
     iar >> ivar;
 
-    HPX_TEST_EQ(ivar.index(), ovar.index());
-    HPX_TEST(ivar == ovar);
+    HPX_TEST_EQ(ivar.which(), ovar.which());
+    HPX_TEST_EQ(ivar, ovar);
 
     ovar = 2.5;
     oar << ovar;
     iar >> ivar;
 
-    HPX_TEST_EQ(ivar.index(), ovar.index());
-    HPX_TEST(ivar == ovar);
+    HPX_TEST_EQ(ivar.which(), ovar.which());
+    HPX_TEST_EQ(ivar, ovar);
 
     ovar = 1;
     oar << ovar;
     iar >> ivar;
 
-    HPX_TEST_EQ(ivar.index(), ovar.index());
-    HPX_TEST(ivar == ovar);
+    HPX_TEST_EQ(ivar.which(), ovar.which());
+    HPX_TEST_EQ(ivar, ovar);
 
     ovar = A<int>(2);
     oar << ovar;
     iar >> ivar;
 
-    HPX_TEST_EQ(ivar.index(), ovar.index());
-    HPX_TEST(ivar == ovar);
+    HPX_TEST_EQ(ivar.which(), ovar.which());
+    HPX_TEST_EQ(ivar, ovar);
 
-    const hpx::util::variant<std::string> sovar = std::string("string");
-    hpx::util::variant<std::string> sivar;
+    const boost::variant<std::string> sovar = std::string("string");
+    boost::variant<std::string> sivar;
     oar << sovar;
     iar >> sivar;
 
-    HPX_TEST_EQ(sivar.index(), sovar.index());
-    HPX_TEST(sivar == sovar);
+    HPX_TEST_EQ(sivar.which(), sovar.which());
+    HPX_TEST_EQ(sivar, sovar);
 
     return hpx::util::report_errors();
 }

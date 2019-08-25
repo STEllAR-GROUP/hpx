@@ -16,7 +16,8 @@
 
 //  See http://www.boost.org/tools/inspect/ for more information.
 
-const char* hpx_no_inspect = "hpx-" "no-inspect";
+constexpr const char* hpx_no_inspect = "hpx-" "no-inspect";
+constexpr const char* hpx_no_inspect_files = "hpx-" "no-inspect-files";
 
 //  Directories with a file name of the hpx_no_inspect value are not inspected.
 //  Files that contain the hpx_no_inspect value are not inspected.
@@ -31,6 +32,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include <limits>
 #include <list>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -338,6 +340,18 @@ namespace
     static DirectoryIterator end_itr;
     ++directory_count;
 
+    fs::path no_inspect_file(dir_path / hpx_no_inspect_files);
+    bool no_inspect_exists = boost::filesystem::exists(no_inspect_file);
+
+    std::set<std::string> excluded_files;
+    if (no_inspect_exists)
+    {
+        std::string line;
+        fs::fstream no_inspect(no_inspect_file, std::ios_base::in);
+        while(std::getline(no_inspect, line))
+            excluded_files.insert(line);
+    }
+
     for ( DirectoryIterator itr( dir_path ); itr != end_itr; ++itr )
     {
       if ( fs::is_directory( *itr ) )
@@ -352,8 +366,14 @@ namespace
       else if (itr->path().leaf().string()[0] != '.') // ignore if hidden
       {
         ++file_count;
+
+        fs::path this_file(*itr);
+
+        if (excluded_files.find(this_file.leaf().string()) != excluded_files.end())
+            continue;
+
         string content;
-        load_content( *itr, content );
+        load_content( this_file, content );
         if (content.find(hpx_no_inspect) == string::npos)
           check_( lib.empty() ? library_from_content( content ) : lib,
                  *itr, content, insps );
