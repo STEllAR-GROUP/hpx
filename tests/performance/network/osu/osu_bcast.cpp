@@ -11,7 +11,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/lcos/local/and_gate.hpp>
-#include <hpx/util/any.hpp>
+#include <hpx/util/serializable_any.hpp>
 
 #include <boost/assert.hpp>
 

@@ -8,7 +8,7 @@
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/util/any.hpp>
+#include <hpx/util/serializable_any.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <type_traits>

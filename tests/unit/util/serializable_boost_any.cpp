@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/util/any.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/util/serializable_any.hpp>
 
 #include "small_big_object.hpp"
 
@@ -16,7 +16,7 @@
 #include <string>
 #include <utility>
 
-namespace any_tests // test suite
+namespace any_tests    // test suite
 {
     void test_default_ctor();
     void test_converting_ctor();
@@ -35,21 +35,19 @@ namespace any_tests // test suite
         void (*test_func)();
     };
 
-    const test_case test_cases[] =
-    {
-        { "default construction",           test_default_ctor      },
-        { "single argument construction",   test_converting_ctor   },
-        { "copy construction",              test_copy_ctor         },
-        { "copy assignment operator",       test_copy_assign       },
-        { "converting assignment operator", test_converting_assign },
-        { "failed custom keyword cast",     test_bad_cast          },
-        { "swap member function, small",    test_swap_small        },
-        { "swap member function, big",      test_swap_big          },
-        { "copying operations on a null",   test_null_copying      },
-        { "cast to reference types",        test_cast_to_reference }
-    };
+    const test_case test_cases[] = {
+        {"default construction", test_default_ctor},
+        {"single argument construction", test_converting_ctor},
+        {"copy construction", test_copy_ctor},
+        {"copy assignment operator", test_copy_assign},
+        {"converting assignment operator", test_converting_assign},
+        {"failed custom keyword cast", test_bad_cast},
+        {"swap member function, small", test_swap_small},
+        {"swap member function, big", test_swap_big},
+        {"copying operations on a null", test_null_copying},
+        {"cast to reference types", test_cast_to_reference}};
 
-    typedef test_case const* test_case_iterator;
+    using test_case_iterator = test_case const*;
 
     test_case_iterator begin_tests = test_cases;
     const test_case_iterator end_tests =
@@ -58,11 +56,20 @@ namespace any_tests // test suite
     struct copy_counter
     {
     public:
-
         copy_counter() {}
-        copy_counter(const copy_counter&) { ++count; }
-        copy_counter& operator=(const copy_counter&) { ++count; return *this; }
-        static int get_count() { return count; }
+        copy_counter(const copy_counter&)
+        {
+            ++count;
+        }
+        copy_counter& operator=(const copy_counter&)
+        {
+            ++count;
+            return *this;
+        }
+        static int get_count()
+        {
+            return count;
+        }
 
     private:
         static int count;
@@ -74,16 +81,18 @@ namespace any_tests // test suite
     }
 
     int copy_counter::count = 0;
-}
+}    // namespace any_tests
 
-namespace std
-{
-    std::ostream& operator<<(std::ostream& os, boost::detail::sp_typeinfo const& ti)
+namespace std {
+
+    std::ostream& operator<<(
+        std::ostream& os, boost::detail::sp_typeinfo const& ti)
     {
         return os;
     }
 
-    std::ostream& operator<<(std::ostream& os, any_tests::copy_counter const& cc)
+    std::ostream& operator<<(
+        std::ostream& os, any_tests::copy_counter const& cc)
     {
         return os;
     }
@@ -92,9 +101,9 @@ namespace std
     {
         return is;
     }
-}
+}    // namespace std
 
-namespace any_tests // test definitions
+namespace any_tests    // test definitions
 {
     using hpx::util::any;
     using hpx::util::any_cast;
@@ -104,10 +113,10 @@ namespace any_tests // test definitions
         const any value;
 
         HPX_TEST_MSG(value.empty(), "empty");
-        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr),
-            any_cast<int>(&value), "any_cast<int>");
-        HPX_TEST_EQ_MSG(value.type(), BOOST_SP_TYPEID(hpx::util::detail::any::empty),
-            "type");
+        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
+            "any_cast<int>");
+        HPX_TEST_EQ_MSG(value.type(),
+            BOOST_SP_TYPEID(hpx::util::detail::any::empty), "type");
     }
 
     void test_converting_ctor()
@@ -117,15 +126,13 @@ namespace any_tests // test definitions
 
         HPX_TEST_EQ_MSG(false, value.empty(), "empty");
         HPX_TEST_EQ_MSG(value.type(), typeid(std::string), "type");
-        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr),
-            any_cast<int>(&value), "any_cast<int>");
-        HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr), any_cast<std::string>(&value),
-            "any_cast<std::string>");
-        HPX_TEST_EQ_MSG(
-            any_cast<std::string>(value), text,
+        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
+            "any_cast<int>");
+        HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr),
+            any_cast<std::string>(&value), "any_cast<std::string>");
+        HPX_TEST_EQ_MSG(any_cast<std::string>(value), text,
             "comparing cast copy against original text");
-        HPX_TEST_NEQ_MSG(
-            any_cast<std::string>(&value), &text,
+        HPX_TEST_NEQ_MSG(any_cast<std::string>(&value), &text,
             "comparing address in copy against original text");
     }
 
@@ -136,14 +143,12 @@ namespace any_tests // test definitions
 
         HPX_TEST_EQ_MSG(false, copy.empty(), "empty");
         HPX_TEST_EQ_MSG(original.type(), copy.type(), "type");
-        HPX_TEST_EQ_MSG(
-            any_cast<std::string>(original), any_cast<std::string>(copy),
+        HPX_TEST_EQ_MSG(any_cast<std::string>(original),
+            any_cast<std::string>(copy),
             "comparing cast copy against original");
-        HPX_TEST_EQ_MSG(
-            text, any_cast<std::string>(copy),
+        HPX_TEST_EQ_MSG(text, any_cast<std::string>(copy),
             "comparing cast copy against original text");
-        HPX_TEST_NEQ_MSG(
-            any_cast<std::string>(&original),
+        HPX_TEST_NEQ_MSG(any_cast<std::string>(&original),
             any_cast<std::string>(&copy),
             "comparing address in copy against original");
     }
@@ -152,18 +157,16 @@ namespace any_tests // test definitions
     {
         std::string text = "test message";
         any original = any(text), copy;
-        any * assign_result = &(copy = original);
+        any* assign_result = &(copy = original);
 
         HPX_TEST_EQ_MSG(false, copy.empty(), "empty");
         HPX_TEST_EQ_MSG(original.type(), copy.type(), "type");
-        HPX_TEST_EQ_MSG(
-            any_cast<std::string>(original), any_cast<std::string>(copy),
+        HPX_TEST_EQ_MSG(any_cast<std::string>(original),
+            any_cast<std::string>(copy),
             "comparing cast copy against cast original");
-        HPX_TEST_EQ_MSG(
-            text, any_cast<std::string>(copy),
+        HPX_TEST_EQ_MSG(text, any_cast<std::string>(copy),
             "comparing cast copy against original text");
-        HPX_TEST_NEQ_MSG(
-            any_cast<std::string>(&original),
+        HPX_TEST_NEQ_MSG(any_cast<std::string>(&original),
             any_cast<std::string>(&copy),
             "comparing address in copy against original");
         HPX_TEST_EQ_MSG(assign_result, &copy, "address of assignment result");
@@ -173,20 +176,17 @@ namespace any_tests // test definitions
     {
         std::string text = "test message";
         any value;
-        any * assign_result = &(value = text);
+        any* assign_result = &(value = text);
 
         HPX_TEST_EQ_MSG(false, value.empty(), "type");
         HPX_TEST_EQ_MSG(value.type(), typeid(std::string), "type");
-        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr),
-            any_cast<int>(&value), "any_cast<int>");
-        HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr), any_cast<std::string>(&value),
-            "any_cast<std::string>");
-        HPX_TEST_EQ_MSG(
-            any_cast<std::string>(value), text,
+        HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
+            "any_cast<int>");
+        HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr),
+            any_cast<std::string>(&value), "any_cast<std::string>");
+        HPX_TEST_EQ_MSG(any_cast<std::string>(value), text,
             "comparing cast copy against original text");
-        HPX_TEST_NEQ_MSG(
-            any_cast<std::string>(&value),
-            &text,
+        HPX_TEST_NEQ_MSG(any_cast<std::string>(&value), &text,
             "comparing address in copy against original text");
         HPX_TEST_EQ_MSG(assign_result, &value, "address of assignment result");
     }
@@ -198,13 +198,16 @@ namespace any_tests // test definitions
 
         {
             bool caught_exception = false;
-            try {
-                any_cast<const char *>(value);
+            try
+            {
+                any_cast<const char*>(value);
             }
-            catch(hpx::util::bad_any_cast const&) {
+            catch (hpx::util::bad_any_cast const&)
+            {
                 caught_exception = true;
             }
-            catch(...) {
+            catch (...)
+            {
                 HPX_TEST_MSG(false, "caught wrong exception");
             }
             HPX_TEST(caught_exception);
@@ -220,20 +223,17 @@ namespace any_tests // test definitions
 
         small_object text = 17;
         any original = any(text), swapped;
-        small_object * original_ptr = any_cast<small_object>(&original);
-        any * swap_result = &original.swap(swapped);
+        small_object* original_ptr = any_cast<small_object>(&original);
+        any* swap_result = &original.swap(swapped);
 
         HPX_TEST_MSG(original.empty(), "empty on original");
         HPX_TEST_EQ_MSG(false, swapped.empty(), "empty on swapped");
         HPX_TEST_EQ_MSG(swapped.type(), typeid(small_object), "type");
-        HPX_TEST_EQ_MSG(
-            text, any_cast<small_object>(swapped),
+        HPX_TEST_EQ_MSG(text, any_cast<small_object>(swapped),
             "comparing swapped copy against original text");
-        HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr),
-            original_ptr, "address in pre-swapped original");
-        HPX_TEST_NEQ_MSG(
-            original_ptr,
-            any_cast<small_object>(&swapped),
+        HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr), original_ptr,
+            "address in pre-swapped original");
+        HPX_TEST_NEQ_MSG(original_ptr, any_cast<small_object>(&swapped),
             "comparing address in swapped against original");
         HPX_TEST_EQ_MSG(swap_result, &original, "address of swap result");
 
@@ -254,20 +254,17 @@ namespace any_tests // test definitions
 
         big_object text(5, 12);
         any original = any(text), swapped;
-        big_object * original_ptr = any_cast<big_object>(&original);
-        any * swap_result = &original.swap(swapped);
+        big_object* original_ptr = any_cast<big_object>(&original);
+        any* swap_result = &original.swap(swapped);
 
         HPX_TEST_MSG(original.empty(), "empty on original");
         HPX_TEST_EQ_MSG(false, swapped.empty(), "empty on swapped");
         HPX_TEST_EQ_MSG(swapped.type(), typeid(big_object), "type");
-        HPX_TEST_EQ_MSG(
-            text, any_cast<big_object>(swapped),
+        HPX_TEST_EQ_MSG(text, any_cast<big_object>(swapped),
             "comparing swapped copy against original text");
-        HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr),
-            original_ptr, "address in pre-swapped original");
-        HPX_TEST_EQ_MSG(
-            original_ptr,
-            any_cast<big_object>(&swapped),
+        HPX_TEST_NEQ_MSG(static_cast<void*>(nullptr), original_ptr,
+            "address in pre-swapped original");
+        HPX_TEST_EQ_MSG(original_ptr, any_cast<big_object>(&swapped),
             "comparing address in swapped against original");
         HPX_TEST_EQ_MSG(swap_result, &original, "address of swap result");
 
@@ -295,34 +292,37 @@ namespace any_tests // test definitions
         any a(137);
         const any b(a);
 
-        int &                ra    = any_cast<int &>(a);
-        int const &          ra_c  = any_cast<int const &>(a);
-        int volatile &       ra_v  = any_cast<int volatile &>(a);
-        int const volatile & ra_cv = any_cast<int const volatile&>(a);
+        int& ra = any_cast<int&>(a);
+        int const& ra_c = any_cast<int const&>(a);
+        int volatile& ra_v = any_cast<int volatile&>(a);
+        int const volatile& ra_cv = any_cast<int const volatile&>(a);
 
-        HPX_TEST_MSG(
-            &ra == &ra_c && &ra == &ra_v && &ra == &ra_cv,
+        HPX_TEST_MSG(&ra == &ra_c && &ra == &ra_v && &ra == &ra_cv,
             "cv references to same obj");
 
-        int const &          rb_c  = any_cast<int const &>(b);
-        int const volatile & rb_cv = any_cast<int const volatile &>(b);
+        int const& rb_c = any_cast<int const&>(b);
+        int const volatile& rb_cv = any_cast<int const volatile&>(b);
 
         HPX_TEST_MSG(&rb_c == &rb_cv, "cv references to copied const obj");
         HPX_TEST_MSG(&ra != &rb_c, "copies hold different objects");
 
         ++ra;
         int incremented = any_cast<int>(a);
-        HPX_TEST_MSG(incremented == 138, "increment by reference changes value");
+        HPX_TEST_MSG(
+            incremented == 138, "increment by reference changes value");
 
         {
             bool caught_exception = false;
-            try {
-                any_cast<char &>(a);
+            try
+            {
+                any_cast<char&>(a);
             }
-            catch(hpx::util::bad_any_cast const&) {
+            catch (hpx::util::bad_any_cast const&)
+            {
                 caught_exception = true;
             }
-            catch(...) {
+            catch (...)
+            {
                 HPX_TEST_MSG(false, "caught wrong exception");
             }
             HPX_TEST(caught_exception);
@@ -330,19 +330,22 @@ namespace any_tests // test definitions
 
         {
             bool caught_exception = false;
-            try {
-                any_cast<const char &>(b);
+            try
+            {
+                any_cast<const char&>(b);
             }
-            catch(hpx::util::bad_any_cast const&) {
+            catch (hpx::util::bad_any_cast const&)
+            {
                 caught_exception = true;
             }
-            catch(...) {
+            catch (...)
+            {
                 HPX_TEST_MSG(false, "caught wrong exception");
             }
             HPX_TEST(caught_exception);
         }
     }
-}
+}    // namespace any_tests
 
 int main()
 {
@@ -354,5 +357,3 @@ int main()
     }
     return hpx::util::report_errors();
 }
-
-

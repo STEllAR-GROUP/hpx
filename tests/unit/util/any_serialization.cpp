@@ -21,7 +21,7 @@ namespace std
 #endif
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/any.hpp>
+#include <hpx/util/serializable_any.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
