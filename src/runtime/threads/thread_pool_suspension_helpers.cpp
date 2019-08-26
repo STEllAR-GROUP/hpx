@@ -44,7 +44,7 @@ namespace hpx { namespace threads {
     {
         if (!(pool.get_scheduler_mode() & threads::policies::enable_elasticity))
         {
-            HPX_THROWS_IF(ec, invalid_status, "resume_processing_unit",
+            HPX_THROWS_IF(ec, invalid_status, "resume_processing_unit_cb",
                 "this thread pool does not support suspending "
                 "processing units");
             return;
@@ -104,8 +104,8 @@ namespace hpx { namespace threads {
         if (!(pool.get_scheduler_mode() & threads::policies::enable_elasticity))
         {
             HPX_THROWS_IF(ec, invalid_status, "suspend_processing_unit_cb",
-                "this thread pool does not support suspending "
-                "processing units");
+                "this thread pool does not support suspending processing "
+                "units");
             return;
         }
 
@@ -139,9 +139,9 @@ namespace hpx { namespace threads {
     {
         if (!threads::get_self_ptr())
         {
-            HPX_THROW_EXCEPTION(invalid_status, "resume",
-                "cannot call resume from outside HPX, use resume_cb or"
-                "resume_direct instead");
+            HPX_THROW_EXCEPTION(invalid_status, "resume_pool",
+                "cannot call resume_pool from outside HPX, use resume_pool_cb "
+                "or the member function resume_direct instead");
             return hpx::make_ready_future();
         }
 
@@ -172,16 +172,18 @@ namespace hpx { namespace threads {
     {
         if (!threads::get_self_ptr())
         {
-            HPX_THROW_EXCEPTION(invalid_status, "suspend",
-                "cannot call suspend from outside HPX, use suspend_cb or"
-                "suspend_direct instead");
+            HPX_THROW_EXCEPTION(invalid_status, "suspend_pool",
+                "cannot call suspend_pool from outside HPX, use "
+                "suspend_pool_cb or the member function suspend_direct "
+                "instead");
             return hpx::make_ready_future();
         }
         else if (threads::get_self_ptr() &&
             hpx::this_thread::get_pool() == &pool)
         {
-            return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
-                bad_parameter, "suspend", "cannot suspend a pool from itself"));
+            return hpx::make_exceptional_future<void>(
+                HPX_GET_EXCEPTION(bad_parameter, "suspend_pool",
+                    "cannot suspend a pool from itself"));
         }
 
         return hpx::async(
@@ -193,7 +195,7 @@ namespace hpx { namespace threads {
     {
         if (threads::get_self_ptr() && hpx::this_thread::get_pool() == &pool)
         {
-            HPX_THROWS_IF(ec, bad_parameter, "suspend_cb",
+            HPX_THROWS_IF(ec, bad_parameter, "suspend_pool_cb",
                 "cannot suspend a pool from itself");
             return;
         }
@@ -213,4 +215,4 @@ namespace hpx { namespace threads {
         }
     }
 
-}}
+}}    // namespace hpx::threads
