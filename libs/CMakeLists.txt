@@ -28,6 +28,7 @@ set(HPX_LIBS
   logging
   parallel_executors
   preprocessor
+  program_options
   segmented_algorithms
   statistics
   testing
