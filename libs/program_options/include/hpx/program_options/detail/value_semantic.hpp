@@ -6,8 +6,16 @@
 // This file defines template functions that are declared in
 // ../value_semantic.hpp.
 
+#include <hpx/assertion.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/optional.hpp>
+#include <hpx/program_options/errors.hpp>
+
+#include <boost/lexical_cast.hpp>
+
+#include <string>
+#include <type_traits>
+#include <vector>
 
 namespace hpx { namespace program_options {
 
@@ -96,9 +104,9 @@ namespace hpx { namespace program_options {
         std::basic_string<Char> s(validators::get_single_string(xs));
         try
         {
-            v = any(lexical_cast<T>(s));
+            v = hpx::util::any_nonser(boost::lexical_cast<T>(s));
         }
-        catch (const bad_lexical_cast&)
+        catch (const boost::bad_lexical_cast&)
         {
             throw invalid_option_value(s);
         }
@@ -128,8 +136,8 @@ namespace hpx { namespace program_options {
         {
             v = hpx::util::any_nonser(std::vector<T>());
         }
-        std::vector<T>* tv = hpx::util::any_nonser_cast<std::vector<T>>(&v);
-        assert(NULL != tv);
+        std::vector<T>* tv = hpx::util::any_cast<std::vector<T>>(&v);
+        HPX_ASSERT(nullptr != tv);
         for (unsigned i = 0; i < s.size(); ++i)
         {
             try
@@ -140,12 +148,12 @@ namespace hpx { namespace program_options {
                 hpx::util::any_nonser a;
                 std::vector<std::basic_string<Char>> cv;
                 cv.push_back(s[i]);
-                validate(a, cv, (T*) 0, 0);
-                tv->push_back(hpx::util::any_nonser_cast<T>(a));
+                validate(a, cv, (T*) nullptr, 0);
+                tv->push_back(hpx::util::any_cast<T>(a));
             }
-            catch (const bad_lexical_cast& /*e*/)
+            catch (const boost::bad_lexical_cast& /*e*/)
             {
-                invalid_option_value(s[i]);
+                throw invalid_option_value(s[i]);
             }
         }
     }
@@ -159,9 +167,9 @@ namespace hpx { namespace program_options {
         validators::check_first_occurrence(v);
         validators::get_single_string(s);
         hpx::util::any_nonser a;
-        validate(a, s, (T*) 0, 0);
+        validate(a, s, (T*) nullptr, 0);
         v = hpx::util::any_nonser(
-            hpx::util::optional<T>(hpx::util::any_nonser_cast<T>(a)));
+            hpx::util::optional<T>(hpx::util::any_cast<T>(a)));
     }
 
     template <class T, class Char>
@@ -174,14 +182,14 @@ namespace hpx { namespace program_options {
         if (new_tokens.empty() && !m_implicit_value.empty())
             value_store = m_implicit_value;
         else
-            validate(value_store, new_tokens, (T*) 0, 0);
+            validate(value_store, new_tokens, (T*) nullptr, 0);
     }
 
     template <class T>
     typed_value<T>* value()
     {
         // Explicit qualification is vc6 workaround.
-        return boost::program_options::value<T>(0);
+        return hpx::program_options::value<T>(nullptr);
     }
 
     template <class T>
@@ -195,7 +203,7 @@ namespace hpx { namespace program_options {
     template <class T>
     typed_value<T, wchar_t>* wvalue()
     {
-        return wvalue<T>(0);
+        return wvalue<T>(nullptr);
     }
 
     template <class T>

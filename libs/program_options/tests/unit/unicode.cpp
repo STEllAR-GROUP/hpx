@@ -3,22 +3,21 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/hpx_main.hpp>
+#include <hpx/testing.hpp>
 
-#include <boost/program_options/variables_map.hpp>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/detail/utf8_codecvt_facet.hpp>
-using namespace boost::program_options;
-// We'll use po::value everywhere to workaround vc6 bug.
-namespace po = boost::program_options;
+#include <hpx/program_options/variables_map.hpp>
+#include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options/parsers.hpp>
+#include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
 
-#include <boost/function.hpp>
-using namespace boost;
-
+#include <locale>
 #include <sstream>
-using namespace std;
+#include <string>
+#include <vector>
 
-#include "minitest.hpp"
+using namespace hpx::program_options;
+using namespace std;
 
 // Test that unicode input is forwarded to unicode option without
 // problems.
@@ -27,20 +26,20 @@ void test_unicode_to_unicode()
     options_description desc;
 
     desc.add_options()
-        ("foo", po::wvalue<wstring>(), "unicode option")
+        ("foo", wvalue<wstring>(), "unicode option")
         ;
 
     vector<wstring> args;
     args.push_back(L"--foo=\x044F");
 
     variables_map vm;
-    basic_parsed_options<wchar_t> parsed = 
+    basic_parsed_options<wchar_t> parsed =
         wcommand_line_parser(args).options(desc).run();
     store(parsed, vm);
 
-    BOOST_CHECK(vm["foo"].as<wstring>() == L"\x044F");
-    BOOST_CHECK(parsed.options[0].original_tokens.size() == 1);
-    BOOST_CHECK(parsed.options[0].original_tokens[0] == L"--foo=\x044F");
+    HPX_TEST(vm["foo"].as<wstring>() == L"\x044F");
+    HPX_TEST(parsed.options[0].original_tokens.size() == 1);
+    HPX_TEST(parsed.options[0].original_tokens[0] == L"--foo=\x044F");
 }
 
 // Test that unicode input is property converted into
@@ -48,14 +47,14 @@ void test_unicode_to_unicode()
 // be utf8.
 void test_unicode_to_native()
 {
-    std::codecvt<wchar_t, char, mbstate_t>* facet = 
-        new boost::program_options::detail::utf8_codecvt_facet;
+    std::codecvt<wchar_t, char, mbstate_t>* facet =
+        new hpx::program_options::detail::utf8_codecvt_facet;
     locale::global(locale(locale(), facet));
 
     options_description desc;
 
     desc.add_options()
-        ("foo", po::value<string>(), "unicode option")
+        ("foo", value<string>(), "unicode option")
         ;
 
     vector<wstring> args;
@@ -64,19 +63,19 @@ void test_unicode_to_native()
     variables_map vm;
     store(wcommand_line_parser(args).options(desc).run(), vm);
 
-    BOOST_CHECK(vm["foo"].as<string>() == "\xD1\x8F");    
+    HPX_TEST(vm["foo"].as<string>() == "\xD1\x8F");
 }
 
 void test_native_to_unicode()
 {
-    std::codecvt<wchar_t, char, mbstate_t>* facet = 
-        new boost::program_options::detail::utf8_codecvt_facet;
+    std::codecvt<wchar_t, char, mbstate_t>* facet =
+        new hpx::program_options::detail::utf8_codecvt_facet;
     locale::global(locale(locale(), facet));
 
     options_description desc;
 
     desc.add_options()
-        ("foo", po::wvalue<wstring>(), "unicode option")
+        ("foo", wvalue<wstring>(), "unicode option")
         ;
 
     vector<string> args;
@@ -85,22 +84,22 @@ void test_native_to_unicode()
     variables_map vm;
     store(command_line_parser(args).options(desc).run(), vm);
 
-    BOOST_CHECK(vm["foo"].as<wstring>() == L"\x044F");    
+    HPX_TEST(vm["foo"].as<wstring>() == L"\x044F");
 }
 
 vector<wstring> sv(const wchar_t* array[], unsigned size)
 {
     vector<wstring> r;
     for (unsigned i = 0; i < size; ++i)
-        r.push_back(array[i]);
+        r.emplace_back(array[i]);
     return r;
 }
 
 void check_value(const woption& option, const char* name, const wchar_t* value)
 {
-    BOOST_CHECK(option.string_key == name);
-    BOOST_REQUIRE(option.value.size() == 1);
-    BOOST_CHECK(option.value.front() == value);
+    HPX_TEST(option.string_key == name);
+    HPX_TEST(option.value.size() == 1);
+    HPX_TEST(option.value.front() == value);
 }
 
 void test_command_line()
@@ -109,7 +108,7 @@ void test_command_line()
     desc.add_options()
         ("foo,f", new untyped_value(), "")
         // Explicit qualification is a workaround for vc6
-        ("bar,b", po::value<std::string>(), "")
+        ("bar,b", value<std::string>(), "")
         ("baz", new untyped_value())
         ("qux,plug*", new untyped_value())
         ;
@@ -118,10 +117,10 @@ void test_command_line()
                              L"-b4", L"--plug3=10"};
     vector<wstring> cmdline4 = sv(cmdline4_,
                                   sizeof(cmdline4_)/sizeof(cmdline4_[0]));
-    vector<woption> a4 = 
+    vector<woption> a4 =
         wcommand_line_parser(cmdline4).options(desc).run().options;
 
-    BOOST_REQUIRE(a4.size() == 5);
+    HPX_TEST(a4.size() == 5);
 
     check_value(a4[0], "foo", L"1\u0FF52");
     check_value(a4[1], "foo", L"4");
@@ -134,14 +133,14 @@ void test_command_line()
 // when reading wistream, it generates proper UTF8 data.
 void test_config_file()
 {
-    std::codecvt<wchar_t, char, mbstate_t>* facet = 
-        new boost::program_options::detail::utf8_codecvt_facet;
+    std::codecvt<wchar_t, char, mbstate_t>* facet =
+        new hpx::program_options::detail::utf8_codecvt_facet;
     locale::global(locale(locale(), facet));
 
     options_description desc;
 
     desc.add_options()
-        ("foo", po::value<string>(), "unicode option")
+        ("foo", value<string>(), "unicode option")
         ;
 
     std::wstringstream stream(L"foo = \x044F");
@@ -149,7 +148,7 @@ void test_config_file()
     variables_map vm;
     store(parse_config_file(stream, desc), vm);
 
-    BOOST_CHECK(vm["foo"].as<string>() == "\xD1\x8F");    
+    HPX_TEST(vm["foo"].as<string>() == "\xD1\x8F");
 }
 
 int main(int, char* [])
@@ -159,6 +158,7 @@ int main(int, char* [])
     test_native_to_unicode();
     test_command_line();
     test_config_file();
-    return 0;
+
+    return hpx::util::report_errors();
 }
 

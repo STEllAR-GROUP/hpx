@@ -15,7 +15,8 @@
 #define HPX_EXPORT
 #else
 
-#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+#if (defined(_WIN32) || defined(__WIN32__) || defined(WIN32)) &&               \
+    !defined(HPX_MODULE_STATIC_LINKING)
 # define HPX_SYMBOL_EXPORT      __declspec(dllexport)
 # define HPX_SYMBOL_IMPORT      __declspec(dllimport)
 # define HPX_SYMBOL_INTERNAL    /* empty */

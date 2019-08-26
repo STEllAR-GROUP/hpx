@@ -11,6 +11,7 @@
 #include <hpx/program_options/errors.hpp>
 #include <hpx/program_options/value_semantic.hpp>
 
+#include <cstddef>
 #include <iosfwd>
 #include <map>
 #include <memory>

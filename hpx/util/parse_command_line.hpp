@@ -10,7 +10,7 @@
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/util/ini.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstddef>
 #include <string>
@@ -30,36 +30,36 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // parse the command line
     HPX_API_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
-        boost::program_options::options_description const& app_options,
-        std::string const& cmdline, boost::program_options::variables_map& vm,
+        hpx::program_options::options_description const& app_options,
+        std::string const& cmdline, hpx::program_options::variables_map& vm,
         std::size_t node, int error_mode = return_on_error,
         hpx::runtime_mode mode = runtime_mode_default,
-        boost::program_options::options_description* visible = nullptr,
+        hpx::program_options::options_description* visible = nullptr,
         std::vector<std::string>* unregistered_options = nullptr);
 
     HPX_API_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
-        boost::program_options::options_description const& app_options,
+        hpx::program_options::options_description const& app_options,
         std::string const& arg0, std::vector<std::string> const& args,
-        boost::program_options::variables_map& vm, std::size_t node,
+        hpx::program_options::variables_map& vm, std::size_t node,
         int error_mode = return_on_error,
         hpx::runtime_mode mode = runtime_mode_default,
-        boost::program_options::options_description* visible = nullptr,
+        hpx::program_options::options_description* visible = nullptr,
         std::vector<std::string>* unregistered_options = nullptr);
 
     ///////////////////////////////////////////////////////////////////////////
     // retrieve the command line arguments for the current locality
     HPX_API_EXPORT bool retrieve_commandline_arguments(
-        boost::program_options::options_description const& app_options,
-        boost::program_options::variables_map& vm);
+        hpx::program_options::options_description const& app_options,
+        hpx::program_options::variables_map& vm);
 
     ///////////////////////////////////////////////////////////////////////////
     // retrieve the command line arguments for the current locality
     HPX_API_EXPORT bool retrieve_commandline_arguments(
-        std::string const& appname, boost::program_options::variables_map& vm);
+        std::string const& appname, hpx::program_options::variables_map& vm);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT std::string reconstruct_command_line(
-        boost::program_options::variables_map const &vm);
+        hpx::program_options::variables_map const &vm);
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail

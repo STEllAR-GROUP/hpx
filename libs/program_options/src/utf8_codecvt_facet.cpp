@@ -13,7 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
 
-#include <cassert>
+#include <cstddef>
 #include <cstdlib>    // for multi-byte conversion routines
 #include <limits>
 

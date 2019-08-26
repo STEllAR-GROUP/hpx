@@ -140,7 +140,7 @@ void thread_affinity_foreman()
 HPX_PLAIN_ACTION(thread_affinity_foreman, thread_affinity_foreman_action)
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& /*vm*/)
+int hpx_main(hpx::program_options::variables_map& /*vm*/)
 {
     {
         // Get a list of all available localities.
@@ -175,7 +175,7 @@ int hpx_main(boost::program_options::variables_map& /*vm*/)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    boost::program_options::options_description
+    hpx::program_options::options_description
        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX.

@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-using namespace boost::program_options;
+using namespace hpx::program_options;
 
 int hpx_main(variables_map& vm)
 {

@@ -19,7 +19,7 @@ struct test
 
 int test::count = 0;
 
-int hpx_main(boost::program_options::variables_map & vm)
+int hpx_main(hpx::program_options::variables_map & vm)
 {
     {
         HPX_TEST_EQ(test::count, 0);
@@ -42,7 +42,7 @@ int hpx_main(boost::program_options::variables_map & vm)
 
 int main(int argc, char **argv)
 {
-    boost::program_options::options_description desc(
+    hpx::program_options::options_description desc(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
     return hpx::init(desc, argc, argv);

@@ -513,7 +513,7 @@ std::uint64_t bench_stencil3_iterator_explicit()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
 //     bool csvoutput = vm.count("csv_output") != 0;
 
@@ -574,16 +574,16 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // initialize program
-    boost::program_options::options_description cmdline(
+    hpx::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
         ("test_count",
-          boost::program_options::value<int>()->default_value(100),
+          hpx::program_options::value<int>()->default_value(100),
           "number of tests to be averaged (default: 100)")
 
         ("partition_size",
-          boost::program_options::value<int>()->default_value(10000),
+          hpx::program_options::value<int>()->default_value(10000),
           "number of elements to iterate over (default: 10000)")
         ;
 

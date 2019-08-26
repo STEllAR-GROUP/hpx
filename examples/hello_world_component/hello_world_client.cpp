@@ -7,7 +7,7 @@
 #include "hello_world_component.hpp"
 #include <hpx/hpx_init.hpp>
 
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main(hpx::program_options::variables_map&)
 {
     {
         // Create a single instance of the component on this locality.

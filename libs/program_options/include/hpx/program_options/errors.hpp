@@ -11,16 +11,10 @@
 #include <map>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
-#if defined(HPX_MSVC)
-#pragma warning(push)
-// non dll-interface class 'std::logic_error' used as base for dll-interface
-// class 'hpx::program_options::error'
-#pragma warning(disable : 4275)
-// class 'std::vector<_Ty>' needs to have dll-interface to be used by clients of class 'hpx::program_options::ambiguous_option'
-#pragma warning(disable : 4251)
-#endif
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -135,23 +129,6 @@ namespace hpx { namespace program_options {
          *  without this line
          *  */
         ~error_with_option_name() noexcept {}
-
-        //void dump() const
-        //{
-        //  std::cerr << "m_substitution_defaults:\n";
-        //  for (std::map<std::string, string_pair>::const_iterator iter = m_substitution_defaults.begin();
-        //        iter != m_substitution_defaults.end(); ++iter)
-        //      std::cerr << "\t" << iter->first << ":" << iter->second.first << "=" << iter->second.second << "\n";
-        //  std::cerr << "m_substitutions:\n";
-        //  for (std::map<std::string, std::string>::const_iterator iter = m_substitutions.begin();
-        //        iter != m_substitutions.end(); ++iter)
-        //      std::cerr << "\t" << iter->first << "=" << iter->second << "\n";
-        //  std::cerr << "m_error_template:\n";
-        //  std::cerr << "\t" << m_error_template << "\n";
-        //  std::cerr << "canonical_option_prefix:[" << get_canonical_option_prefix() << "]\n";
-        //  std::cerr << "canonical_option_name:[" << get_canonical_option_name() <<"]\n";
-        //  std::cerr << "what:[" << what() << "]\n";
-        //}
 
         /** Substitute
          *      parameter_name->value to create the error message from
@@ -269,15 +246,16 @@ namespace hpx { namespace program_options {
         ~required_option() noexcept {}
     };
 
-    /** Base class of unparsable options,
+    /** Base class of un-parsable options,
      *  when the desired option cannot be identified.
      *
      *
      *  It makes no sense to have an option name, when we can't match an option to the
      *      parameter
      *
-     *  Having this a part of the error_with_option_name hierachy makes error handling
-     *      a lot easier, even if the name indicates some sort of conceptual dissonance!
+     *  Having this a part of the error_with_option_name hierarchy makes error
+     *      handling a lot easier, even if the name indicates some sort of
+     *      conceptual dissonance!
      *
      *   */
     class HPX_ALWAYS_EXPORT error_with_no_option_name
@@ -291,7 +269,7 @@ namespace hpx { namespace program_options {
         }
 
         /** Does NOT set option name, because no option name makes sense */
-        virtual void set_option_name(const std::string&) {}
+        void set_option_name(const std::string&) override {}
 
         ~error_with_no_option_name() noexcept {}
     };
@@ -470,8 +448,6 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#if defined(HPX_MSVC)
-#pragma warning(pop)
-#endif
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

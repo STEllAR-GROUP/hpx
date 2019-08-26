@@ -318,7 +318,7 @@ namespace hpx { namespace program_options {
             return m_composing;
         }
 
-        unsigned min_tokens() const
+        unsigned min_tokens() const override
         {
             if (m_zero_tokens || !m_implicit_value.empty())
             {
@@ -330,7 +330,7 @@ namespace hpx { namespace program_options {
             }
         }
 
-        unsigned max_tokens() const
+        unsigned max_tokens() const override
         {
             if (m_multitoken)
             {

@@ -11,6 +11,8 @@
 
 #include <fstream>
 #include <iostream>
+#include <set>
+#include <string>
 
 namespace hpx { namespace program_options { namespace detail {
 
@@ -21,10 +23,9 @@ namespace hpx { namespace program_options { namespace detail {
       : allowed_options(allowed_options)
       , m_allow_unregistered(allow_unregistered)
     {
-        for (std::set<std::string>::const_iterator i = allowed_options.begin();
-             i != allowed_options.end(); ++i)
+        for (const auto & allowed_option : allowed_options)
         {
-            add_option(i->c_str());
+            add_option(allowed_option.c_str());
         }
     }
 
@@ -141,9 +142,8 @@ namespace hpx { namespace program_options { namespace detail {
         return false;
     }
 
-#if BOOST_WORKAROUND(__COMO_VERSION__, BOOST_TESTED_AT(4303)) ||               \
-    (defined(__sgi) &&                                                         \
-        BOOST_WORKAROUND(_COMPILER_VERSION, BOOST_TESTED_AT(741)))
+#if defined(__COMO_VERSION__) && __COMO_VERSION__ >= 4303 ||                   \
+    (defined(__sgi) && defined(_COMPILER_VERSION) && _COMPILER_VERSION >= 741)
     template <>
     bool basic_config_file_iterator<wchar_t>::getline(std::string& s)
     {

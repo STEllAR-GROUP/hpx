@@ -17,11 +17,7 @@
 #include <set>
 #include <string>
 
-#ifdef HPX_MSVC
-#pragma warning(push)
-// class XYZ needs to have dll-interface to be used by clients of class XYZ
-#pragma warning(disable : 4251)
-#endif
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options { namespace detail {
 
@@ -169,8 +165,6 @@ namespace hpx { namespace program_options { namespace detail {
 
 }}}    // namespace hpx::program_options::detail
 
-#ifdef HPX_MSVC
-#pragma warning(pop)
-#endif
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

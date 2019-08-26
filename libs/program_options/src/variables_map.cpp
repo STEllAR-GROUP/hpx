@@ -3,6 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/assertion.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/program_options/config.hpp>
 #include <hpx/program_options/options_description.hpp>
@@ -42,9 +43,7 @@ namespace hpx { namespace program_options {
         string option_name;
         string original_token;
 
-#ifndef BOOST_NO_EXCEPTIONS
         try
-#endif
         {
             // First, convert/store all given options
             for (i = 0; i < options.options.size(); ++i)
@@ -142,14 +141,12 @@ namespace hpx { namespace program_options {
         }
     }
 
-    HPX_EXPORT
-    void store(const wparsed_options& options, variables_map& m)
+    HPX_EXPORT void store(const wparsed_options& options, variables_map& m)
     {
         store(options.utf8_encoded_options, m, true);
     }
 
-    HPX_EXPORT
-    void notify(variables_map& vm)
+    HPX_EXPORT void notify(variables_map& vm)
     {
         vm.notify();
     }

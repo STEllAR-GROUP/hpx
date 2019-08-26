@@ -18,23 +18,27 @@
 
 */
 
+#include <hpx/hpx_main.hpp>
+#include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options/parsers.hpp>
+#include <hpx/program_options/variables_map.hpp>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include <exception>
+#include <fstream>
+#include <iostream>
+#include <string>
+
 #include <boost/tokenizer.hpp>
 #include <boost/token_functions.hpp>
-using namespace boost;
-using namespace boost::program_options;
 
-#include <iostream>
-#include <fstream>
-#include <exception>
+using namespace boost;
+using namespace hpx::program_options;
 using namespace std;
 
 int main(int ac, char* av[])
 {
-    try {
+    try
+    {
         // Declare three groups of options.
         options_description general("General options");
         general.add_options()
@@ -53,7 +57,7 @@ int main(int ac, char* av[])
         backend.add_options()
             ("num-threads", value<int>(), "the initial number of threads")
             ;
-            
+
         // Declare an options description instance which will include
         // all the options
         options_description all("Allowed options");
@@ -63,35 +67,43 @@ int main(int ac, char* av[])
         // to the user
         options_description visible("Allowed options");
         visible.add(general).add(gui);
-           
 
         variables_map vm;
         store(parse_command_line(ac, av, all), vm);
 
-        if (vm.count("help")) 
+        if (vm.count("help"))
         {
             cout << visible;
             return 0;
         }
-        if (vm.count("help-module")) {
-            const string& s = vm["help-module"].as<string>();
-            if (s == "gui") {
+        if (vm.count("help-module"))
+        {
+            const auto& s = vm["help-module"].as<string>();
+            if (s == "gui")
+            {
                 cout << gui;
-            } else if (s == "backend") {
+            }
+            else if (s == "backend")
+            {
                 cout << backend;
-            } else {
-                cout << "Unknown module '" 
-                     << s << "' in the --help-module option\n";
+            }
+            else
+            {
+                cout << "Unknown module '" << s
+                     << "' in the --help-module option\n";
                 return 1;
             }
             return 0;
         }
-        if (vm.count("num-threads")) {
+        if (vm.count("num-threads"))
+        {
             cout << "The 'num-threads' options was set to "
-                 << vm["num-threads"].as<int>() << "\n";            
-        }                           
+                 << vm["num-threads"].as<int>() << "\n";
+        }
     }
-    catch(std::exception& e) {
+    catch(std::exception const& e)
+    {
         cout << e.what() << "\n";
     }
+    return 0;
 }

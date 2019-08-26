@@ -15,17 +15,24 @@
     and discussed the possible approach.
 */
 
+#include <hpx/hpx_main.hpp>
+#include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options/parsers.hpp>
+#include <hpx/program_options/variables_map.hpp>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/token_functions.hpp>
-using namespace boost;
-using namespace boost::program_options;
 
-#include <iostream>
+#include <algorithm>
 #include <fstream>
+#include <iostream>
+#include <iterator>
+#include <string>
+#include <utility>
+#include <vector>
+
+using namespace boost;
+using namespace hpx::program_options;
 using namespace std;
 
 // Additional command line parser which interprets '@something' as a
@@ -44,10 +51,10 @@ int main(int ac, char* av[])
         options_description desc("Allowed options");
         desc.add_options()
             ("help", "produce a help message")
-            ("include-path,I", value< vector<string> >()->composing(), 
+            ("include-path,I", value< vector<string> >()->composing(),
                  "include path")
             ("magic", value<int>(), "magic value")
-            ("response-file", value<string>(), 
+            ("response-file", value<string>(),
                  "can be specified with '@name', too")
         ;
 
@@ -55,40 +62,52 @@ int main(int ac, char* av[])
         store(command_line_parser(ac, av).options(desc)
               .extra_parser(at_option_parser).run(), vm);
 
-        if (vm.count("help")) {
-            cout << desc;            
+        if (vm.count("help"))
+        {
+            cout << desc;
         }
-        if (vm.count("response-file")) {
+        if (vm.count("response-file"))
+        {
             // Load the file and tokenize it
             ifstream ifs(vm["response-file"].as<string>().c_str());
-            if (!ifs) {
-                cout << "Could not open the response file\n";
+            if (!ifs)
+            {
+                cout << "Could not open the response file: "
+                     << vm["response-file"].as<string>() << "\n";
                 return 1;
             }
+
             // Read the whole file into a string
             stringstream ss;
             ss << ifs.rdbuf();
+
             // Split the file content
-            char_separator<char> sep(" \n\r");
             string sstr = ss.str();
+            char_separator<char> sep(" \n\r");
             tokenizer<char_separator<char> > tok(sstr, sep);
+
             vector<string> args;
             copy(tok.begin(), tok.end(), back_inserter(args));
+
             // Parse the file and store the options
-            store(command_line_parser(args).options(desc).run(), vm);            
+            store(command_line_parser(args).options(desc).run(), vm);
         }
 
-        if (vm.count("include-path")) {
+        if (vm.count("include-path"))
+        {
             const vector<string>& s = vm["include-path"].as<vector< string> >();
             cout << "Include paths: ";
             copy(s.begin(), s.end(), ostream_iterator<string>(cout, " "));
             cout << "\n";
-        }        
-        if (vm.count("magic")) {
+        }
+        if (vm.count("magic"))
+        {
             cout << "Magic value: " << vm["magic"].as<int>() << "\n";
         }
     }
-    catch (std::exception& e) {
+    catch (std::exception& e)
+    {
         cout << e.what() << "\n";
     }
+    return 0;
 }

@@ -192,7 +192,7 @@ void test_async_one(std::vector<int> a)
     HPX_TEST(std::equal(g.begin(), g.end(), g_ans.begin()));
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     unsigned int seed = (unsigned int) std::random_device{}();
     if (vm.count("seed"))
@@ -225,7 +225,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     return hpx::finalize();
 }
 #else
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     return hpx::finalize();
 }
@@ -234,7 +234,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // add command line option which controls the random number generator seed
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 

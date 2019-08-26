@@ -21,7 +21,7 @@
 
 #include "nqueen.hpp"
 
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main(hpx::program_options::variables_map&)
 {
     const std::size_t default_size = 8;
 

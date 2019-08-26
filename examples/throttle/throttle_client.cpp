@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-using boost::program_options::variables_map;
+using hpx::program_options::variables_map;
 
 using boost::algorithm::is_space;
 using boost::algorithm::split;
@@ -84,7 +84,7 @@ int hpx_main(variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    namespace po = boost::program_options;
+    namespace po = hpx::program_options;
 
     // Configure application-specific options
     po::options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");

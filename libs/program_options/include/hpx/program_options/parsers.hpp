@@ -12,14 +12,11 @@
 
 #include <functional>
 #include <iosfwd>
+#include <string>
 #include <utility>
 #include <vector>
 
-#if defined(HPX_MSVC)
-#pragma warning(push)
-// class 'std::vector<_Ty>' needs to have dll-interface to be used by clients of class 'boost::program_options::basic_parsed_options<wchar_t>'
-#pragma warning(disable : 4251)
-#endif
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -275,9 +272,7 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#if defined(HPX_MSVC)
-#pragma warning(pop)
-#endif
+#include <hpx/config/warnings_suffix.hpp>
 
 #include <hpx/program_options/detail/parsers.hpp>
 

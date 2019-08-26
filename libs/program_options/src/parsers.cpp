@@ -18,6 +18,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <string>
 
 #ifdef _WIN32
 #include <stdlib.h>
@@ -40,7 +41,7 @@
 // available on iOS. The right replacement is not known. See
 // https://svn.boost.org/trac/boost/ticket/5053
 extern "C" {
-extern char*** _NSGetEnviron(void);
+    extern char*** _NSGetEnviron(void);
 }
 #define environ (*_NSGetEnviron())
 #else

@@ -60,7 +60,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     // return options_description object for PAPI counters
     options_description get_options_description()
     {
-        using boost::program_options::value;
+        using hpx::program_options::value;
 
         // description of PAPI counter specific options
         options_description papi_opts("PAPI counter options");

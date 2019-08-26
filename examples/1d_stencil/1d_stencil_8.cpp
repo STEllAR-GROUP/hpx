@@ -693,7 +693,7 @@ void do_all_work(std::uint64_t nt, std::uint64_t nx, std::uint64_t np,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
     std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
@@ -712,7 +712,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     options_description desc_commandline;
     desc_commandline.add_options()

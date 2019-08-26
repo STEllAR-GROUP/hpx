@@ -346,7 +346,7 @@ void test_sheneos_bulk(std::size_t num_ye_points,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::string const datafilename = vm["file"].as<std::string>();
 
@@ -467,8 +467,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    using boost::program_options::options_description;
-    using boost::program_options::value;
+    using hpx::program_options::options_description;
+    using hpx::program_options::value;
 
     // Configure application-specific options.
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");

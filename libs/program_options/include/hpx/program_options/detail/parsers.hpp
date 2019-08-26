@@ -8,7 +8,11 @@
 
 #include <hpx/program_options/detail/convert.hpp>
 
+#include <algorithm>
 #include <iterator>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace hpx { namespace program_options {
 
@@ -83,7 +87,7 @@ namespace hpx { namespace program_options {
     {
         // save the canonical prefixes which were used by this cmdline parser
         //    eventually inside the parsed results
-        //    This will be handy to format recognisable options
+        //    This will be handy to format recognizable options
         //    for diagnostic messages if everything blows up much later on
         parsed_options result(
             m_desc, detail::cmdline::get_canonical_option_prefix());
@@ -118,8 +122,9 @@ namespace hpx { namespace program_options {
             if (options[i].unregistered ||
                 (mode == include_positional && options[i].position_key != -1))
             {
-                copy(options[i].original_tokens.begin(),
-                    options[i].original_tokens.end(), back_inserter(result));
+                std::copy(options[i].original_tokens.begin(),
+                    options[i].original_tokens.end(),
+                    std::back_inserter(result));
             }
         }
         return result;

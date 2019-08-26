@@ -150,7 +150,7 @@ hpx::future<std::uint64_t> fibonacci(std::uint64_t n)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     // extract command line argument, i.e. fib(N)
     std::uint64_t n = vm["n-value"].as<std::uint64_t>();
@@ -229,10 +229,10 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    boost::program_options::options_description
+    hpx::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    using boost::program_options::value;
+    using hpx::program_options::value;
     desc_commandline.add_options()
         ( "n-value", value<std::uint64_t>()->default_value(10),
           "n value for the Fibonacci function")

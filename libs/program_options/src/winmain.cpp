@@ -74,13 +74,13 @@ namespace hpx { namespace program_options {
                         current.append(backslash_count, '\\');
                         backslash_count = 0;
                     }
-                    if (isspace((unsigned char) *i) && !inside_quoted)
+                    if (std::isspace((unsigned char) *i) && !inside_quoted)
                     {
                         // Space outside quoted section terminate the current argument
                         result.push_back(current);
                         current.resize(0);
                         empty_quote = false;
-                        for (; i != e && isspace((unsigned char) *i); ++i)
+                        for (; i != e && std::isspace((unsigned char) *i); ++i)
                             ;
                         --i;
                     }
@@ -108,8 +108,8 @@ namespace hpx { namespace program_options {
     {
         std::vector<std::wstring> result;
         std::vector<std::string> aux = split_winmain(to_internal(cmdline));
-        for (size_t i = 0, e = aux.size(); i < e; ++i)
-            result.push_back(from_utf8(aux[i]));
+        for (const auto & i : aux)
+            result.push_back(from_utf8(i));
         return result;
     }
 

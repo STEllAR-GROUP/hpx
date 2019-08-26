@@ -911,8 +911,8 @@ namespace hpx { namespace resource { namespace detail {
 
     int partitioner::parse(
         util::function_nonser<int(
-            boost::program_options::variables_map& vm)> const& f,
-        boost::program_options::options_description desc_cmdline, int argc,
+            hpx::program_options::variables_map& vm)> const& f,
+        hpx::program_options::options_description desc_cmdline, int argc,
         char** argv, std::vector<std::string> ini_config,
         resource::partitioner_mode rpmode, runtime_mode mode,
         bool fill_internal_topology)

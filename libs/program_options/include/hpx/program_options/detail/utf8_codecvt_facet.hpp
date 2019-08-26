@@ -150,7 +150,7 @@ namespace hpx { namespace program_options { namespace detail {
             return ok;
         }
 
-        virtual int do_encoding() const noexcept
+        int do_encoding() const noexcept override
         {
             const int variable_byte_external_encoding = 0;
             return variable_byte_external_encoding;
@@ -158,8 +158,8 @@ namespace hpx { namespace program_options { namespace detail {
 
         // How many char objects can I process to get <= max_limit
         // wchar_t objects?
-        virtual int do_length(std::mbstate_t&, const char* from,
-            const char* from_end, std::size_t max_limit) const noexcept;
+        int do_length(std::mbstate_t&, const char* from, const char* from_end,
+            std::size_t max_limit) const noexcept override;
 
         // Nonstandard override
         virtual int do_length(const std::mbstate_t& s, const char* from,

@@ -11,12 +11,7 @@
 #include <string>
 #include <vector>
 
-#if defined(HPX_MSVC)
-#pragma warning(push)
-// class 'std::vector<_Ty>' needs to have dll-interface to be used by clients of
-// class 'boost::program_options::positional_options_description'
-#pragma warning(disable : 4251)
-#endif
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -68,8 +63,6 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#if defined(HPX_MSVC)
-#pragma warning(pop)
-#endif
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

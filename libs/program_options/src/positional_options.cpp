@@ -3,11 +3,12 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/assertion.hpp>
 #include <hpx/program_options/config.hpp>
 #include <hpx/program_options/positional_options.hpp>
 
-#include <cassert>
 #include <limits>
+#include <string>
 
 namespace hpx { namespace program_options {
 
@@ -16,7 +17,7 @@ namespace hpx { namespace program_options {
     positional_options_description& positional_options_description::add(
         const char* name, int max_count)
     {
-        assert(max_count != -1 || m_trailing.empty());
+        HPX_ASSERT(max_count != -1 || m_trailing.empty());
 
         if (max_count == -1)
             m_trailing = name;
@@ -36,7 +37,7 @@ namespace hpx { namespace program_options {
     const std::string& positional_options_description::name_for_position(
         unsigned position) const
     {
-        assert(position < max_total_count());
+        HPX_ASSERT(position < max_total_count());
 
         if (position < m_names.size())
             return m_names[position];

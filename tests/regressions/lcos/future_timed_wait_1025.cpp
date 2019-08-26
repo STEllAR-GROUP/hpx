@@ -88,8 +88,8 @@ void test_wait_until()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
 
 int hpx_main(variables_map&)
 {

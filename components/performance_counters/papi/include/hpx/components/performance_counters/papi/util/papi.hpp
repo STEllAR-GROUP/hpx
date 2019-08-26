@@ -20,8 +20,8 @@
 #include <vector>
 
 #include <boost/generator_iterator.hpp>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options/variables_map.hpp>
 
 #include <papi.h>
 
@@ -31,8 +31,8 @@
 
 namespace hpx { namespace performance_counters { namespace papi { namespace util
 {
-    using boost::program_options::options_description;
-    using boost::program_options::variables_map;
+    using hpx::program_options::options_description;
+    using hpx::program_options::variables_map;
 
     ///////////////////////////////////////////////////////////////////////////
     // PAPI call wrapper

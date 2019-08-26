@@ -7,7 +7,7 @@
 #define PROGRAM_OPTIONS_CONVERT_HPP_VP_2004_04_28
 
 #include <hpx/program_options/config.hpp>
-#include <boost/program_options/detail/convert.hpp>
+#include <hpx/program_options/detail/convert.hpp>
 
 #include <cwchar>
 #include <locale>

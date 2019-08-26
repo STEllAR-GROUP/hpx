@@ -12,6 +12,7 @@ endif()
 # Add additional version to recognize
 set(Boost_ADDITIONAL_VERSIONS
     ${Boost_ADDITIONAL_VERSIONS}
+    "1.71.0" "1.71"
     "1.70.0" "1.70"
     "1.69.0" "1.69"
     "1.68.0" "1.68"
@@ -61,7 +62,6 @@ endif()
 
 set(__boost_libraries
   ${__boost_libraries}
-  program_options
   system)
 
 set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake

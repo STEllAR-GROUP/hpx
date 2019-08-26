@@ -10,13 +10,13 @@
     The value will be incremented whenever a change is made which might
     cause compilation errors for existing code.
 */
-#ifdef PROGRAM_OPTIONS_VERSION
-#error PROGRAM_OPTIONS_VERSION already defined
+#ifdef HPX_PROGRAM_OPTIONS_VERSION
+#error HPX_PROGRAM_OPTIONS_VERSION already defined
 #endif
-#define PROGRAM_OPTIONS_VERSION 2
+#define HPX_PROGRAM_OPTIONS_VERSION 2
 
 // Signal that implicit options will use values from next
 // token, if available.
-#define PROGRAM_OPTIONS_IMPLICIT_VALUE_NEXT_TOKEN 1
+#define HPX_PROGRAM_OPTIONS_IMPLICIT_VALUE_NEXT_TOKEN 1
 
 #endif

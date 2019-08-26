@@ -189,7 +189,7 @@ namespace hpx { namespace program_options { namespace detail {
         // of unparsed tokens and can consume some of them (by
         // removing elements on front) and return a vector of options.
         //
-        // We try each style parser in turn, untill some input
+        // We try each style parser in turn, until some input
         // is consumed. The returned vector of option may contain the
         // result of just syntactic parsing of token, say --foo will
         // be parsed as option with name 'foo', and the style parser
@@ -204,28 +204,28 @@ namespace hpx { namespace program_options { namespace detail {
             style_parsers.push_back(m_style_parser);
 
         if (m_additional_parser)
-            style_parsers.push_back(
+            style_parsers.emplace_back(
                 std::bind(&cmdline::handle_additional_parser, this,
                     std::placeholders::_1));
 
         if (m_style & allow_long)
-            style_parsers.push_back(std::bind(
+            style_parsers.emplace_back(std::bind(
                 &cmdline::parse_long_option, this, std::placeholders::_1));
 
         if ((m_style & allow_long_disguise))
-            style_parsers.push_back(
+            style_parsers.emplace_back(
                 std::bind(&cmdline::parse_disguised_long_option, this,
                     std::placeholders::_1));
 
         if ((m_style & allow_short) && (m_style & allow_dash_for_short))
-            style_parsers.push_back(std::bind(
+            style_parsers.emplace_back(std::bind(
                 &cmdline::parse_short_option, this, std::placeholders::_1));
 
         if ((m_style & allow_short) && (m_style & allow_slash_for_short))
-            style_parsers.push_back(std::bind(
+            style_parsers.emplace_back(std::bind(
                 &cmdline::parse_dos_option, this, std::placeholders::_1));
 
-        style_parsers.push_back(
+        style_parsers.emplace_back(
             std::bind(&cmdline::parse_terminator, this, std::placeholders::_1));
 
         vector<option> result;
@@ -251,8 +251,8 @@ namespace hpx { namespace program_options { namespace detail {
                     // so that they can be added to next.back()'s values
                     // if appropriate.
                     finish_option(next.back(), args, style_parsers);
-                    for (unsigned j = 0; j < next.size(); ++j)
-                        result.push_back(next[j]);
+                    for (const auto & j : next)
+                        result.push_back(j);
                 }
 
                 if (args.size() != current_size)
@@ -328,11 +328,11 @@ namespace hpx { namespace program_options { namespace detail {
                         break;
                     }
 
-                    assert(opt2.value.size() == 1);
+                    HPX_ASSERT(opt2.value.size() == 1);
 
                     opt.value.push_back(opt2.value[0]);
 
-                    assert(opt2.original_tokens.size() == 1);
+                    HPX_ASSERT(opt2.original_tokens.size() == 1);
 
                     opt.original_tokens.push_back(opt2.original_tokens[0]);
                 }
@@ -343,18 +343,17 @@ namespace hpx { namespace program_options { namespace detail {
 
         // Assign position keys to positional options.
         int position_key = 0;
-        for (unsigned i = 0; i < result.size(); ++i)
+        for (auto & i : result)
         {
-            if (result[i].string_key.empty())
-                result[i].position_key = position_key++;
+            if (i.string_key.empty())
+                i.position_key = position_key++;
         }
 
         if (m_positional)
         {
             unsigned position = 0;
-            for (unsigned i = 0; i < result.size(); ++i)
+            for (option& opt : result)
             {
-                option& opt = result[i];
                 if (opt.position_key != -1)
                 {
                     if (position >= m_positional->max_total_count())
@@ -368,20 +367,20 @@ namespace hpx { namespace program_options { namespace detail {
         }
 
         // set case sensitive flag
-        for (unsigned i = 0; i < result.size(); ++i)
+        for (auto & i : result)
         {
-            if (result[i].string_key.size() > 2 ||
-                (result[i].string_key.size() > 1 &&
-                    result[i].string_key[0] != '-'))
+            if (i.string_key.size() > 2 ||
+                (i.string_key.size() > 1 &&
+                    i.string_key[0] != '-'))
             {
                 // it is a long option
-                result[i].case_insensitive =
+                i.case_insensitive =
                     is_style_active(long_case_insensitive);
             }
             else
             {
                 // it is a short option
-                result[i].case_insensitive =
+                i.case_insensitive =
                     is_style_active(short_case_insensitive);
             }
         }
@@ -399,7 +398,7 @@ namespace hpx { namespace program_options { namespace detail {
         // Be defensive:
         // will have no original token if option created by handle_additional_parser()
         std::string original_token_for_exceptions = opt.string_key;
-        if (opt.original_tokens.size())
+        if (!opt.original_tokens.empty())
             original_token_for_exceptions = opt.original_tokens[0];
 
         try

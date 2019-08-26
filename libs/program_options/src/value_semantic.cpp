@@ -8,24 +8,13 @@
 #include <hpx/program_options/detail/cmdline.hpp>
 #include <hpx/program_options/detail/convert.hpp>
 #include <hpx/program_options/value_semantic.hpp>
-#include <hpx/traits/supports_streaming_with_any.hpp>
 
 #include <cctype>
+#include <cstddef>
+#include <map>
 #include <set>
 #include <string>
-#include <type_traits>
 #include <vector>
-
-namespace hpx { namespace traits {
-
-    // wstrings can't be streamed with an any_nonser
-    template <>
-    struct supports_streaming_with_any<std::wstring>
-      : std::false_type
-    {};
-
-}}
-
 
 namespace hpx { namespace program_options {
 
@@ -127,21 +116,21 @@ namespace hpx { namespace program_options {
 
     HPX_EXPORT typed_value<bool>* bool_switch()
     {
-        return bool_switch(0);
+        return bool_switch(nullptr);
     }
 
     HPX_EXPORT typed_value<bool>* bool_switch(bool* v)
     {
         typed_value<bool>* r = new typed_value<bool>(v);
-        r->default_value(0);
+        r->default_value(false);
         r->zero_tokens();
 
         return r;
     }
 
     /* Validates bool value.
-        hpx::util::any_nonser of "1", "true", "yes", "on" will be converted to "1".<br>
-        hpx::util::any_nonser of "0", "false", "no", "off" will be converted to "0".<br>
+        util::any_nonser of "1", "true", "yes", "on" will be converted to "1".
+        util::any_nonser of "0", "false", "no", "off" will be converted to "0".
         Case is ignored. The 'xs' vector can either be empty, in which
         case the value is 'true', or can contain explicit value.
     */
@@ -151,8 +140,8 @@ namespace hpx { namespace program_options {
         check_first_occurrence(v);
         string s(get_single_string(xs, true));
 
-        for (size_t i = 0; i < s.size(); ++i)
-            s[i] = char(tolower(s[i]));
+        for (char & i : s)
+            i = char(std::tolower(i));
 
         if (s.empty() || s == "on" || s == "yes" || s == "1" || s == "true")
             v = hpx::util::any_nonser(true);
@@ -237,8 +226,8 @@ namespace hpx { namespace program_options {
       , m_option_style(option_style)
       , m_error_template(template_)
     {
-        //                     parameter            |     placeholder               |   value
-        //                     ---------            |     -----------               |   -----
+        //     parameter            |     placeholder               |   value
+        //     ---------            |     -----------               |   -----
         set_substitute_default(
             "canonical_option", "option '%canonical_option%'", "option");
         set_substitute_default("value", "argument ('%value%')", "argument");
@@ -323,23 +312,23 @@ namespace hpx { namespace program_options {
         //
         //  replace placeholder with defaults if values are missing
         //
-        for (map<string, string_pair>::const_iterator iter =
-                 m_substitution_defaults.begin();
-             iter != m_substitution_defaults.end(); ++iter)
+        for (const auto& substitution_default : m_substitution_defaults)
         {
             // missing parameter: use default
-            if (substitutions.count(iter->first) == 0 ||
-                substitutions[iter->first].length() == 0)
-                replace_token(iter->second.first, iter->second.second);
+            if (substitutions.count(substitution_default.first) == 0 ||
+                substitutions[substitution_default.first].length() == 0)
+            {
+                replace_token(substitution_default.second.first,
+                    substitution_default.second.second);
+            }
         }
 
         //
         //  replace placeholder with values
         //  placeholder are denoted by surrounding '%'
         //
-        for (map<string, string>::iterator iter = substitutions.begin();
-             iter != substitutions.end(); ++iter)
-            replace_token('%' + iter->first + '%', iter->second);
+        for (auto & substitution : substitutions)
+            replace_token('%' + substitution.first + '%', substitution.second);
     }
 
     void ambiguous_option::substitute_placeholders(

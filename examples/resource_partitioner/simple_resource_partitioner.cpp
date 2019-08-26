@@ -59,7 +59,7 @@ void do_stuff(std::size_t n, bool printout)
 
 // ------------------------------------------------------------------------
 // this is called on an hpx thread after the runtime starts up
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (vm.count("use-pools"))
         use_pools = true;
@@ -227,20 +227,20 @@ int hpx_main(boost::program_options::variables_map& vm)
 // on an hpx thread
 int main(int argc, char* argv[])
 {
-    boost::program_options::options_description desc_cmdline("Test options");
+    hpx::program_options::options_description desc_cmdline("Test options");
     desc_cmdline.add_options()
         ( "use-pools,u", "Enable advanced HPX thread pools and executors")
         ( "use-scheduler,s", "Enable custom priority scheduler")
         ( "pool-threads,m",
-          boost::program_options::value<int>()->default_value(1),
+          hpx::program_options::value<int>()->default_value(1),
           "Number of threads to assign to custom pool")
     ;
 
     // HPX uses a boost program options variable map, but we need it before
     // hpx-main, so we will create another one here and throw it away after use
-    boost::program_options::variables_map vm;
-    boost::program_options::store(
-        boost::program_options::command_line_parser(argc, argv)
+    hpx::program_options::variables_map vm;
+    hpx::program_options::store(
+        hpx::program_options::command_line_parser(argc, argv)
             .allow_unregistered()
             .options(desc_cmdline)
             .run(),

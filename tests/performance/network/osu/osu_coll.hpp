@@ -28,27 +28,27 @@ struct params
     }
 };
 
-boost::program_options::options_description params_desc()
+hpx::program_options::options_description params_desc()
 {
-    boost::program_options::options_description
+    hpx::program_options::options_description
         desc("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc.add_options()
         ("max-msg-size",
-         boost::program_options::value<std::size_t>()->default_value(1048576),
+         hpx::program_options::value<std::size_t>()->default_value(1048576),
          "Set maximum message size in bytes.")
         ("iter",
-         boost::program_options::value<std::size_t>()->default_value(1000),
+         hpx::program_options::value<std::size_t>()->default_value(1000),
          "Set number of iterations per message size.")
         ("fan-out",
-         boost::program_options::value<std::size_t>()->default_value(2),
+         hpx::program_options::value<std::size_t>()->default_value(2),
          "Set number of iterations per message size.")
         ;
 
     return desc;
 }
 
-params process_args(boost::program_options::variables_map & vm)
+params process_args(hpx::program_options::variables_map & vm)
 {
     params p
         = {

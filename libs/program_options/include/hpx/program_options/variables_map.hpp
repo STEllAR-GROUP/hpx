@@ -15,10 +15,7 @@
 #include <set>
 #include <string>
 
-#if defined(HPX_MSVC)
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -70,13 +67,13 @@ namespace hpx { namespace program_options {
         template <class T>
         const T& as() const
         {
-            return hpx::util::any_nonser_cast<const T&>(v);
+            return hpx::util::any_cast<const T&>(v);
         }
         /** @overload */
         template <class T>
         T& as()
         {
-            return hpx::util::any_nonser_cast<T&>(v);
+            return hpx::util::any_cast<T&>(v);
         }
 
         /// Returns true if no value is stored.
@@ -171,7 +168,7 @@ namespace hpx { namespace program_options {
     private:
         /** Implementation of abstract_variables_map::get
             which does 'find' in *this. */
-        const variable_value& get(const std::string& name) const;
+        const variable_value& get(const std::string& name) const override;
 
         /** Names of option with 'final' values \-- which should not
             be changed by subsequence assignments. */
@@ -213,8 +210,6 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#if defined(HPX_MSVC)
-#pragma warning(pop)
-#endif
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

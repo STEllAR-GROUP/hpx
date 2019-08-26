@@ -19,10 +19,9 @@ namespace hpx { namespace program_options { namespace detail {
         const std::basic_string<Char>& quote,
         const std::basic_string<Char>& escape)
     {
-        typedef boost::tokenizer<boost::escaped_list_separator<Char>,
+        using tokenizerT = boost::tokenizer<boost::escaped_list_separator<Char>,
             typename std::basic_string<Char>::const_iterator,
-            std::basic_string<Char>>
-            tokenizerT;
+            std::basic_string<Char>>;
 
         tokenizerT tok(cmdline.begin(), cmdline.end(),
             boost::escaped_list_separator<Char>(escape, seperator, quote));

@@ -953,7 +953,7 @@ namespace hpx { namespace components { namespace server
     }
 
     namespace detail {
-        void handle_print_bind(boost::program_options::variables_map const& vm_,
+        void handle_print_bind(hpx::program_options::variables_map const& vm_,
             std::size_t num_threads)
         {
             threads::topology& top = threads::create_topology();
@@ -1047,7 +1047,7 @@ namespace hpx { namespace components { namespace server
         std::set<std::string> startup_handled;
 
         // collect additional command-line options
-        boost::program_options::options_description options;
+        hpx::program_options::options_description options;
 
         // then dynamic ones
         naming::resolver_client& client = get_runtime().get_agas_client();
@@ -1062,7 +1062,7 @@ namespace hpx { namespace components { namespace server
             std::string unknown_cmd_line(ini.get_entry("hpx.unknown_cmd_line", ""));
             if (!unknown_cmd_line.empty()) {
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
-                boost::program_options::variables_map vm;
+                hpx::program_options::variables_map vm;
 
                 util::commandline_error_mode mode = util::rethrow_on_error;
                 std::string allow_unknown(
@@ -1116,7 +1116,7 @@ namespace hpx { namespace components { namespace server
             std::string cmd_line(ini.get_entry("hpx.cmd_line", ""));
             if (!cmd_line.empty()) {
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
-                boost::program_options::variables_map vm;
+                hpx::program_options::variables_map vm;
 
                 util::parse_commandline(ini, options, cmd_line, vm, std::size_t(-1),
                     util::allow_unregistered | util::report_missing_config_file,
@@ -1443,7 +1443,7 @@ namespace hpx { namespace components { namespace server
         std::string const& component, filesystem::path const& lib,
         naming::gid_type const& prefix, naming::resolver_client& agas_client,
         bool isdefault, bool isenabled,
-        boost::program_options::options_description& options,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         try {
@@ -1503,7 +1503,7 @@ namespace hpx { namespace components { namespace server
     // Load all components from the ini files found in the configuration
     int runtime_support::load_components(util::section& ini,
         naming::gid_type const& prefix, naming::resolver_client& agas_client,
-        boost::program_options::options_description& options,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         // load all components as described in the configuration information
@@ -1708,7 +1708,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_commandline_options_static(
         std::string const& module,
-        boost::program_options::options_description& options, error_code& ec)
+        hpx::program_options::options_description& options, error_code& ec)
     {
         try {
             util::plugin::get_plugins_list_type f;
@@ -1757,7 +1757,7 @@ namespace hpx { namespace components { namespace server
         std::string const& component, filesystem::path lib,
         naming::gid_type const& prefix, naming::resolver_client& agas_client,
         bool isdefault, bool isenabled,
-        boost::program_options::options_description& options,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         modules_map_type::iterator it = modules_.find(HPX_MANGLE_STRING(component));
@@ -1851,7 +1851,7 @@ namespace hpx { namespace components { namespace server
     }
 
     bool runtime_support::load_commandline_options(hpx::util::plugin::dll& d,
-        boost::program_options::options_description& options, error_code& ec)
+        hpx::program_options::options_description& options, error_code& ec)
     {
         try {
             // get the factory, may fail
@@ -1891,7 +1891,7 @@ namespace hpx { namespace components { namespace server
         std::string const& instance, std::string const& component,
         filesystem::path const& lib, naming::gid_type const& prefix,
         naming::resolver_client& agas_client, bool isdefault, bool isenabled,
-        boost::program_options::options_description& options,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         try {
@@ -1947,7 +1947,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
     bool runtime_support::load_plugins(util::section& ini,
-        boost::program_options::options_description& options,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         // load all components as described in the configuration information
@@ -2068,7 +2068,7 @@ namespace hpx { namespace components { namespace server
         util::section& ini,
         std::string const& instance, std::string const& plugin,
         filesystem::path const& lib, bool isenabled,
-        boost::program_options::options_description& options,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         try {
@@ -2145,7 +2145,7 @@ namespace hpx { namespace components { namespace server
     bool runtime_support::load_plugin_dynamic(util::section& ini,
         std::string const& instance, std::string const& plugin,
         filesystem::path lib, bool isenabled,
-        boost::program_options::options_description& options,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         modules_map_type::iterator it = modules_.find(HPX_MANGLE_STRING(plugin));

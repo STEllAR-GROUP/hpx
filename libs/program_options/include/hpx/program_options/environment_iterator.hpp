@@ -6,6 +6,7 @@
 #ifndef PROGRAM_OPTIONS_ENVIRONMENT_ITERATOR_VP_2004_05_14
 #define PROGRAM_OPTIONS_ENVIRONMENT_ITERATOR_VP_2004_05_14
 
+#include <hpx/assertion.hpp>
 #include <hpx/program_options/eof_iterator.hpp>
 
 #include <string>
@@ -31,13 +32,13 @@ namespace hpx { namespace program_options {
 
         void get()
         {
-            if (*m_environment == 0)
+            if (*m_environment == nullptr)
                 found_eof();
             else
             {
                 std::string s(*m_environment);
                 std::string::size_type n = s.find('=');
-                assert(n != s.npos);
+                HPX_ASSERT(n != s.npos);
                 value().first = s.substr(0, n);
                 value().second = s.substr(n + 1);
 

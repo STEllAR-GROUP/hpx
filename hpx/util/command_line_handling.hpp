@@ -13,8 +13,8 @@
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options/variables_map.hpp>
 
 #include <cstddef>
 #include <string>
@@ -58,15 +58,15 @@ namespace hpx { namespace util
             parse_result_(0)
         {}
 
-        int call(boost::program_options::options_description const& desc_cmdline,
+        int call(hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv);
 
-        boost::program_options::variables_map vm_;
+        hpx::program_options::variables_map vm_;
         util::runtime_configuration rtcfg_;
 
         std::vector<std::string> ini_config_;
         util::function_nonser<
-            int(boost::program_options::variables_map& vm)
+            int(hpx::program_options::variables_map& vm)
         > hpx_main_f_;
 
         std::size_t node_;
@@ -87,18 +87,18 @@ namespace hpx { namespace util
 
     protected:
         bool handle_arguments(util::manage_config& cfgmap,
-            boost::program_options::variables_map& vm,
+            hpx::program_options::variables_map& vm,
             std::vector<std::string>& ini_config, std::size_t& node,
             bool initial = false);
 
-        void enable_logging_settings(boost::program_options::variables_map& vm,
+        void enable_logging_settings(hpx::program_options::variables_map& vm,
             std::vector<std::string>& ini_config);
 
         void store_command_line(int argc, char** argv);
         void store_unregistered_options(std::string const& cmd_name,
             std::vector<std::string> const& unregistered_options);
         bool handle_help_options(
-            boost::program_options::options_description const& help);
+            hpx::program_options::options_description const& help);
 
         void handle_attach_debugger();
 

@@ -6,46 +6,51 @@
 /* The simplest usage of the library.
  */
 
-#include <boost/program_options.hpp>
-namespace po = boost::program_options;
+#include <hpx/hpx_main.hpp>
+#include <hpx/program_options.hpp>
 
 #include <iostream>
-#include <iterator>
+
+namespace po = hpx::program_options;
 using namespace std;
 
 int main(int ac, char* av[])
 {
     try {
-
         po::options_description desc("Allowed options");
         desc.add_options()
             ("help", "produce help message")
             ("compression", po::value<double>(), "set compression level")
         ;
 
-        po::variables_map vm;        
+        po::variables_map vm;
         po::store(po::parse_command_line(ac, av, desc), vm);
-        po::notify(vm);    
+        po::notify(vm);
 
-        if (vm.count("help")) {
+        if (vm.count("help"))
+        {
             cout << desc << "\n";
             return 0;
         }
 
-        if (vm.count("compression")) {
-            cout << "Compression level was set to " 
+        if (vm.count("compression"))
+        {
+            cout << "Compression level was set to "
                  << vm["compression"].as<double>() << ".\n";
-        } else {
+        }
+        else
+        {
             cout << "Compression level was not set.\n";
         }
     }
-    catch(exception& e) {
+    catch (exception const& e)
+    {
         cerr << "error: " << e.what() << "\n";
         return 1;
     }
-    catch(...) {
+    catch (...)
+    {
         cerr << "Exception of unknown type!\n";
     }
-
     return 0;
 }

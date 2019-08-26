@@ -4,6 +4,7 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/assertion.hpp>
 #include <hpx/program_options/config.hpp>
 #include <hpx/program_options/options_description.hpp>
 // FIXME: this is only to get multiple_occurrences class
@@ -13,13 +14,16 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 
-#include <cassert>
 #include <climits>
 #include <cstdarg>
+#include <cstddef>
 #include <cstring>
 #include <iterator>
 #include <memory>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace std;
 
@@ -186,7 +190,7 @@ namespace hpx { namespace program_options {
         {
             m_long_names.push_back(name);
         }
-        assert(!m_long_names.empty() && "No option names were specified");
+        HPX_ASSERT(!m_long_names.empty() && "No option names were specified");
 
         bool try_interpreting_last_name_as_a_switch = m_long_names.size() > 1;
         if (try_interpreting_last_name_as_a_switch)
@@ -250,7 +254,7 @@ namespace hpx { namespace program_options {
     options_description_easy_init& options_description_easy_init::operator()(
         const char* name, const char* description)
     {
-        // Create untypes semantic which accepts zero tokens: i.e.
+        // Create untyped semantic which accepts zero tokens: i.e.
         // no value can be specified on command line.
         // FIXME: does not look exception-safe
         std::shared_ptr<option_description> d(
@@ -286,7 +290,7 @@ namespace hpx { namespace program_options {
       , m_min_description_length(min_description_length)
     {
         // we require a space between the option and description parts, so add 1.
-        assert(m_min_description_length < m_line_length - 1);
+        HPX_ASSERT(m_min_description_length < m_line_length - 1);
     }
 
     options_description::options_description(const std::string& caption,
@@ -296,7 +300,7 @@ namespace hpx { namespace program_options {
       , m_min_description_length(min_description_length)
     {
         // we require a space between the option and description parts, so add 1.
-        assert(m_min_description_length < m_line_length - 1);
+        HPX_ASSERT(m_min_description_length < m_line_length - 1);
     }
 
     void options_description::add(std::shared_ptr<option_description> desc)
@@ -414,7 +418,7 @@ namespace hpx { namespace program_options {
             // Through reminder of this function, 'line_length' will
             // be the length available for characters, not including
             // indent.
-            assert(indent < line_length);
+            HPX_ASSERT(indent < line_length);
             line_length -= indent;
 
             // index of tab (if present) is used as additional indent relative
@@ -439,9 +443,9 @@ namespace hpx { namespace program_options {
                 // erase tab from string
                 par.erase(par_indent, 1);
 
-                // this assert may fail due to user error or
+                // this HPX_ASSERT may fail due to user error or
                 // environment conditions!
-                assert(par_indent < line_length);
+                HPX_ASSERT(par_indent < line_length);
 
                 // ignore tab if not on first line
                 if (par_indent >= line_length)
@@ -543,15 +547,16 @@ namespace hpx { namespace program_options {
         {
             // we need to use one char less per line to work correctly if actual
             // console has longer lines
-            assert(line_length > 1);
+            HPX_ASSERT(line_length > 1);
             if (line_length > 1)
             {
                 --line_length;
             }
 
             // line_length must be larger than first_column_width
-            // this assert may fail due to user error or environment conditions!
-            assert(line_length > first_column_width);
+            // this HPX_ASSERT may fail due to user error or environment
+            // conditions!
+            HPX_ASSERT(line_length > first_column_width);
 
             // Note: can't use 'tokenizer' as name of typedef -- borland
             // will consider uses of 'tokenizer' below as uses of
@@ -631,19 +636,19 @@ namespace hpx { namespace program_options {
             const option_description& opt = *m_options[i];
             stringstream ss;
             ss << "  " << opt.format_name() << ' ' << opt.format_parameter();
-            width = (max)(width, static_cast<unsigned>(ss.str().size()));
+            width = (std::max)(width, static_cast<unsigned>(ss.str().size()));
         }
 
         /* Get width of groups as well*/
         for (const auto & group : groups)
-            width = max(width, group->get_option_column_width());
+            width = (std::max)(width, group->get_option_column_width());
 
         /* this is the column were description should start, if first
            column is longer, we go to a new line */
         const unsigned start_of_description_column =
             m_line_length - m_min_description_length;
 
-        width = (min)(width, start_of_description_column - 1);
+        width = (std::min)(width, start_of_description_column - 1);
 
         /* add an additional space to improve readability */
         ++width;

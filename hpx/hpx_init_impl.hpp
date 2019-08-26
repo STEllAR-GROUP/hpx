@@ -18,8 +18,8 @@
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options/variables_map.hpp>
 
 #include <cstddef>
 #include <string>
@@ -38,9 +38,9 @@ namespace hpx
     {
         HPX_EXPORT int run_or_start(
             util::function_nonser<
-                int(boost::program_options::variables_map& vm)
+                int(hpx::program_options::variables_map& vm)
             > const& f,
-            boost::program_options::options_description const& desc_cmdline,
+            hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string>&& ini_config,
             startup_function_type startup, shutdown_function_type shutdown,
             hpx::runtime_mode mode, bool blocking);
@@ -59,9 +59,9 @@ namespace hpx
     /// function given by \p f as a HPX thread.
     inline int init(
         util::function_nonser<
-            int(boost::program_options::variables_map& vm)
+            int(hpx::program_options::variables_map& vm)
         > const& f,
-        boost::program_options::options_description const& desc_cmdline,
+        hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
         startup_function_type startup, shutdown_function_type shutdown,
         hpx::runtime_mode mode)
@@ -85,8 +85,8 @@ namespace hpx
     /// function. It will set up the HPX runtime environment and schedule the
     /// function given by \p f as a HPX thread.
     inline int
-    init(int (*f)(boost::program_options::variables_map& vm),
-        boost::program_options::options_description const& desc_cmdline,
+    init(int (*f)(hpx::program_options::variables_map& vm),
+        hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv, startup_function_type startup,
         shutdown_function_type shutdown, hpx::runtime_mode mode)
     {
@@ -104,7 +104,7 @@ namespace hpx
     /// In console mode it will execute the user supplied function `hpx_main`,
     /// in worker mode it will execute an empty `hpx_main`.
     inline int
-    init(boost::program_options::options_description const& desc_cmdline,
+    init(hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv, startup_function_type startup,
         shutdown_function_type shutdown, hpx::runtime_mode mode)
     {
@@ -121,7 +121,7 @@ namespace hpx
     /// In console mode it will execute the user supplied function `hpx_main`,
     /// in worker mode it will execute an empty `hpx_main`.
     inline int
-    init(boost::program_options::options_description const& desc_cmdline,
+    init(hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
         startup_function_type startup, shutdown_function_type shutdown,
         hpx::runtime_mode mode)
@@ -142,7 +142,7 @@ namespace hpx
     init(int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
-        using boost::program_options::options_description;
+        using hpx::program_options::options_description;
 
         options_description desc_commandline(
             "Usage: " HPX_APPLICATION_STRING " [options]");
@@ -160,7 +160,7 @@ namespace hpx
     /// In console mode it will execute the user supplied function `hpx_main`,
     /// in worker mode it will execute an empty `hpx_main`.
     inline int
-    init(boost::program_options::options_description const& desc_cmdline,
+    init(hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv, hpx::runtime_mode mode)
     {
         return init(static_cast<hpx_main_type>(::hpx_main), desc_cmdline,
@@ -177,7 +177,7 @@ namespace hpx
     /// In console mode it will execute the user supplied function `hpx_main`,
     /// in worker mode it will execute an empty `hpx_main`.
     inline int
-    init(boost::program_options::options_description const& desc_cmdline,
+    init(hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
@@ -220,7 +220,7 @@ namespace hpx
     inline int init(std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
-        using boost::program_options::options_description;
+        using hpx::program_options::options_description;
 
         options_description desc_commandline(
             std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
@@ -237,11 +237,11 @@ namespace hpx
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
-    inline int init(int (*f)(boost::program_options::variables_map&),
+    inline int init(int (*f)(hpx::program_options::variables_map&),
         std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
-        using boost::program_options::options_description;
+        using hpx::program_options::options_description;
 
         options_description desc_commandline(
             "Usage: " + app_name +  " [options]");
@@ -257,7 +257,7 @@ namespace hpx
     }
 
     // Main entry point for launching the HPX runtime system.
-    inline int init(int (*f)(boost::program_options::variables_map&),
+    inline int init(int (*f)(hpx::program_options::variables_map&),
         int argc, char** argv, hpx::runtime_mode mode)
     {
         std::string app_name(HPX_APPLICATION_STRING);
@@ -268,7 +268,7 @@ namespace hpx
     namespace detail
     {
         HPX_EXPORT int init_helper(
-            boost::program_options::variables_map&,
+            hpx::program_options::variables_map&,
             util::function_nonser<int(int, char**)> const&);
     }
     /// \endcond
@@ -283,11 +283,11 @@ namespace hpx
         std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
-        using boost::program_options::options_description;
+        using hpx::program_options::options_description;
         options_description desc_commandline(
             std::string("Usage: ") + app_name +  " [options]");
 
-        util::function_nonser<int(boost::program_options::variables_map& vm)>
+        util::function_nonser<int(hpx::program_options::variables_map& vm)>
             main_f = util::bind_back(detail::init_helper, f);
         std::vector<std::string> cfg;
         util::function_nonser<void()> const empty;
@@ -313,12 +313,12 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         std::string app_name(HPX_APPLICATION_STRING);
-        using boost::program_options::options_description;
+        using hpx::program_options::options_description;
 
         options_description desc_commandline(
             "Usage: " + app_name +  " [options]");
 
-        util::function_nonser<int(boost::program_options::variables_map& vm)>
+        util::function_nonser<int(hpx::program_options::variables_map& vm)>
             main_f = util::bind_back(detail::init_helper, f);
 
         HPX_ASSERT(argc != 0 && argv != nullptr);
@@ -331,11 +331,11 @@ namespace hpx
     init(std::nullptr_t, std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
-        using boost::program_options::options_description;
+        using hpx::program_options::options_description;
         options_description desc_commandline(
             std::string("Usage: ") + app_name +  " [options]");
 
-        util::function_nonser<int(boost::program_options::variables_map& vm)>
+        util::function_nonser<int(hpx::program_options::variables_map& vm)>
             main_f;
         std::vector<std::string> cfg;
         util::function_nonser<void()> const empty;
@@ -360,12 +360,12 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         std::string app_name(HPX_APPLICATION_STRING);
-        using boost::program_options::options_description;
+        using hpx::program_options::options_description;
 
         options_description desc_commandline(
             "Usage: " + app_name +  " [options]");
 
-        util::function_nonser<int(boost::program_options::variables_map& vm)>
+        util::function_nonser<int(hpx::program_options::variables_map& vm)>
             main_f;
 
         HPX_ASSERT(argc != 0 && argv != nullptr);
