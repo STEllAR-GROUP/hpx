@@ -16,12 +16,6 @@ if(HPX_WITH_PARCELPORT_MPI)
   if(NOT MPI_CXX_FOUND)
     hpx_error("MPI could not be found and HPX_WITH_PARCELPORT_MPI=On, please specify MPI_CXX_COMPILER to point to a working MPI C++ compiler for your platform")
   endif()
-  hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI)
-  if(MSVC)
-    # FIXME: add OpenMPI specific flag here for now as the hpx_add_compile_flag()
-    # below does not add the extra options to the top level directory
-    hpx_add_config_define(OMPI_IMPORTS)
-  endif()
   if(MPI_CXX_COMPILE_FLAGS)
     hpx_add_compile_flag(${MPI_CXX_COMPILE_FLAGS})
   endif()
@@ -33,19 +27,6 @@ if(HPX_WITH_PARCELPORT_MPI)
     # Emulate add_compile_definitions.
     # This command was only introduced as part of CMake 3.11, but we already require it for versions >= 3.10.
     set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ${MPI_CXX_COMPILE_DEFINITIONS})
-  endif()
-
-  # This list is to detect whether we run inside an mpi environment.
-  # If one of those environment variables is set, the MPI parcelport
-  # is enabled by default.
-  # PMI_RANK: Intel MPI and MVAPICH2
-  # OMPI_COMM_WORLD_SIZE: OpenMPI starting at version 1.3
-  if(HPX_WITH_PARCELPORT_MPI_ENV)
-    string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${HPX_WITH_PARCELPORT_MPI_ENV}")
-    hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI_ENV "\"${hpx_parcelport_mpi_env_}\"")
-  endif()
-  if(HPX_WITH_PARCELPORT_MPI_MULTITHREADED)
-    hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
   endif()
 
   macro(add_parcelport_mpi_module)

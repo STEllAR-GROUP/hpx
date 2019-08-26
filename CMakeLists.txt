@@ -748,6 +748,7 @@ endif()
 hpx_option(HPX_WITH_NETWORKING BOOL
   "Enable support for networking and multi-node runs (default: ON)"
   ON CATEGORY "Parcelport")
+
 if(HPX_WITH_NETWORKING)
   hpx_add_config_define(HPX_HAVE_NETWORKING)
 
@@ -765,19 +766,39 @@ if(HPX_WITH_NETWORKING)
     hpx_add_config_define(HPX_HAVE_PARCEL_PROFILING)
   endif()
 
-  ## Parcelport related build options
+  ## Parcelport related build options and #define in global defines.hpp
   hpx_option(HPX_WITH_PARCELPORT_LIBFABRIC BOOL
     "Enable the libfabric based parcelport. This is currently an experimental feature"
     OFF CATEGORY "Parcelport" ADVANCED)
+  if (HPX_WITH_PARCELPORT_LIBFABRIC)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_LIBFABRIC)
+  endif()
+
   hpx_option(HPX_WITH_PARCELPORT_VERBS BOOL
     "Enable the ibverbs based parcelport. This is currently an experimental feature"
     OFF CATEGORY "Parcelport" ADVANCED)
+  if (NOT HPX_WITH_PARCELPORT_VERBS)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS)
+  endif()
+
   hpx_option(HPX_WITH_PARCELPORT_MPI BOOL
     "Enable the MPI based parcelport."
     OFF CATEGORY "Parcelport")
+  if(HPX_WITH_PARCELPORT_MPI)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI)
+    if(MSVC)
+      # FIXME: add OpenMPI specific flag here for now as the hpx_add_compile_flag()
+      # below does not add the extra options to the top level directory
+      hpx_add_config_define(OMPI_IMPORTS)
+    endif()
+  endif()
+
   hpx_option(HPX_WITH_PARCELPORT_TCP BOOL
     "Enable the TCP based parcelport."
     ON CATEGORY "Parcelport")
+  if(HPX_WITH_PARCELPORT_TCP)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_TCP)
+  endif()
   hpx_option(HPX_WITH_PARCELPORT_ACTION_COUNTERS BOOL
     "Enable performance counters reporting parcelport statistics on a per-action basis."
     OFF CATEGORY "Parcelport")
@@ -789,10 +810,28 @@ if(HPX_WITH_NETWORKING)
   hpx_option(HPX_WITH_PARCELPORT_MPI_ENV STRING
     "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK)."
     "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK" CATEGORY "Parcelport" ADVANCED)
+  if(HPX_WITH_PARCELPORT_MPI)
+    # This list is to detect whether we run inside an mpi environment.
+    # If one of those environment variables is set, the MPI parcelport
+    # is enabled by default.
+    # PMI_RANK: Intel MPI and MVAPICH2
+    # OMPI_COMM_WORLD_SIZE: OpenMPI starting at version 1.3
+    if(HPX_WITH_PARCELPORT_MPI_ENV)
+      string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${HPX_WITH_PARCELPORT_MPI_ENV}")
+      hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI_ENV "\"${hpx_parcelport_mpi_env_}\"")
+    endif()
+  endif()
+
   hpx_option(HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
     "Turn on MPI multithreading support (default: ON)."
     ON CATEGORY "Parcelport" ADVANCED)
-endif()
+  if(HPX_WITH_PARCELPORT_MPI)
+    if(HPX_WITH_PARCELPORT_MPI_MULTITHREADED)
+      hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
+    endif()
+  endif()
+
+endif(HPX_WITH_NETWORKING)
 
 ## External libraries/frameworks used by sme of the examples and benchmarks
 hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL

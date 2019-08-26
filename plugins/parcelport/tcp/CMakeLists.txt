@@ -8,8 +8,6 @@
 include(HPX_AddLibrary)
 
 if(HPX_WITH_PARCELPORT_TCP)
-  hpx_add_config_define(HPX_HAVE_PARCELPORT_TCP)
-
   macro(add_parcelport_tcp_module)
     hpx_debug("add_parcelport_tcp_module")
     add_parcelport(
