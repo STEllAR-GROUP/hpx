@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <typeinfo>
 #include <utility>
 
 namespace any_tests    // test suite
@@ -85,8 +86,7 @@ namespace any_tests    // test suite
 
 namespace std {
 
-    std::ostream& operator<<(
-        std::ostream& os, boost::detail::sp_typeinfo const& ti)
+    std::ostream& operator<<(std::ostream& os, std::type_info const& ti)
     {
         return os;
     }
@@ -116,7 +116,7 @@ namespace any_tests    // test definitions
         HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
             "any_cast<int>");
         HPX_TEST_EQ_MSG(value.type(),
-            BOOST_SP_TYPEID(hpx::util::detail::any::empty), "type");
+            typeid(hpx::util::detail::any::empty), "type");
     }
 
     void test_converting_ctor()

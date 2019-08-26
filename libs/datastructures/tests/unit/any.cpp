@@ -20,6 +20,7 @@
 #include "small_big_object.hpp"
 
 using hpx::util::any_nonser;
+using hpx::util::streamable_any_nonser;
 using hpx::util::any_cast;
 
 using hpx::init;
@@ -29,7 +30,7 @@ using hpx::finalize;
 int hpx_main()
 {
     {
-        any_nonser any1(big_object(30, 40));
+        streamable_any_nonser any1(big_object(30, 40));
         std::stringstream buffer;
 
         buffer << any1;
@@ -44,13 +45,13 @@ int hpx_main()
             any_nonser any1_nonser(7), any2_nonser(7), any3_nonser(10),
                 any4_nonser(std::string("seven"));
 
-            HPX_TEST_EQ(any1_nonser, 7);
-            HPX_TEST_NEQ(any1_nonser, 10);
-            HPX_TEST_NEQ(any1_nonser, 10.0f);
-            HPX_TEST_EQ(any1_nonser, any1_nonser);
-            HPX_TEST_EQ(any1_nonser, any2_nonser);
-            HPX_TEST_NEQ(any1_nonser, any3_nonser);
-            HPX_TEST_NEQ(any1_nonser, any4_nonser);
+            HPX_TEST(any1_nonser == 7);
+            HPX_TEST(any1_nonser != 10);
+            HPX_TEST(any1_nonser != 10.0f);
+            HPX_TEST(any1_nonser == any1_nonser);
+            HPX_TEST(any1_nonser == any2_nonser);
+            HPX_TEST(any1_nonser != any3_nonser);
+            HPX_TEST(any1_nonser != any4_nonser);
 
             std::string long_str =
                 std::string("This is a looooooooooooooooooooooooooong string");
@@ -60,13 +61,13 @@ int hpx_main()
             any3_nonser = other_str;
             any4_nonser = 10.0f;
 
-            HPX_TEST_EQ(any1_nonser, long_str);
-            HPX_TEST_NEQ(any1_nonser, other_str);
-            HPX_TEST_NEQ(any1_nonser, 10.0f);
-            HPX_TEST_EQ(any1_nonser, any1_nonser);
-            HPX_TEST_EQ(any1_nonser, any2_nonser);
-            HPX_TEST_NEQ(any1_nonser, any3_nonser);
-            HPX_TEST_NEQ(any1_nonser, any4_nonser);
+            HPX_TEST(any1_nonser == long_str);
+            HPX_TEST(any1_nonser != other_str);
+            HPX_TEST(any1_nonser != 10.0f);
+            HPX_TEST(any1_nonser == any1_nonser);
+            HPX_TEST(any1_nonser == any2_nonser);
+            HPX_TEST(any1_nonser != any3_nonser);
+            HPX_TEST(any1_nonser != any4_nonser);
         }
 
         {

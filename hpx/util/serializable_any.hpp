@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2013 Shuangyang Yang
-    Copyright (c) 2007-2013 Hartmut Kaiser
+    Copyright (c) 2007-2019 Hartmut Kaiser
     Copyright (c) Christopher Diggins 2005
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
@@ -74,7 +74,7 @@ namespace hpx { namespace util { namespace detail { namespace any {
     template <typename IArch, typename OArch, typename Vtable, typename Char>
     struct fxn_ptr : fxn_ptr_table<IArch, OArch, Char>
     {
-        typedef fxn_ptr_table<IArch, OArch, Char> base_type;
+        using base_type = fxn_ptr_table<IArch, OArch, Char>;
 
         fxn_ptr()
         {
@@ -142,7 +142,7 @@ namespace hpx { namespace util {
                     template get<IArch, OArch, Char>())
           , object(nullptr)
         {
-            typedef typename util::decay<T>::type value_type;
+            using value_type = typename util::decay<T>::type;
             new_object(object, x,
                 typename detail::any::get_table<value_type>::is_small());
         }
@@ -315,9 +315,7 @@ namespace hpx { namespace util {
 
         bool empty() const noexcept
         {
-            return table ==
-                detail::any::get_table<detail::any::empty>::template get<
-                    IArch, OArch, Char>();
+            return type() == typeid(detail::any::empty);
         }
 
         void reset()
@@ -398,64 +396,14 @@ namespace hpx { namespace util {
     using wany = basic_any<serialization::input_archive,
         serialization::output_archive, wchar_t>;
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
-
-        struct hash_binary_filter : serialization::binary_filter
-        {
-            explicit hash_binary_filter(std::size_t seed = 0)
-              : hash(seed)
-            {
-            }
-
-            // compression API
-            void set_max_length(std::size_t size) {}
-            void save(void const* src, std::size_t src_count)
-            {
-                char const* data = static_cast<char const*>(src);
-                boost::hash_range(hash, data, data + src_count);
-            }
-            bool flush(void* dst, std::size_t dst_count, std::size_t& written)
-            {
-                written = dst_count;
-                return true;
-            }
-
-            // decompression API
-            std::size_t init_data(
-                char const* buffer, std::size_t size, std::size_t buffer_size)
-            {
-                return 0;
-            }
-            void load(void* dst, std::size_t dst_count) {}
-
-            template <class T>
-            void serialize(T&, unsigned)
-            {
-            }
-            HPX_SERIALIZATION_POLYMORPHIC(hash_binary_filter);
-
-            std::size_t hash;
-        };
-    }    // namespace detail
-
+    ////////////////////////////////////////////////////////////////////////////
+    // support for hashing any
     struct hash_any
     {
         template <typename Char>
-        size_t operator()(const basic_any<serialization::input_archive,
-            serialization::output_archive, Char>& elem) const
-        {
-            detail::hash_binary_filter hasher;
-
-            {
-                std::vector<char> data;
-                serialization::output_archive ar(
-                    data, 0U, nullptr, &hasher);
-                ar << elem;
-            }    // let archive go out of scope
-
-            return hasher.hash;
-        }
+        HPX_EXPORT std::size_t operator()(
+            const basic_any<serialization::input_archive,
+                serialization::output_archive, Char>& elem) const;
     };
 }}    // namespace hpx::util
 
