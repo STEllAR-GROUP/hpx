@@ -8,12 +8,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/functional/detail/empty_function.hpp>
 #include <hpx/functional/detail/vtable/callable_vtable.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
+#include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/traits/is_callable.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -22,23 +22,23 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Sig>
     class function_ref;
 
-    namespace detail
-    {
+    namespace detail {
         template <typename Sig>
         struct function_ref_vtable
-          : callable_vtable<Sig>, callable_info_vtable
+          : callable_vtable<Sig>
+          , callable_info_vtable
         {
             template <typename T>
             HPX_CONSTEXPR function_ref_vtable(construct_vtable<T>) noexcept
               : callable_vtable<Sig>(construct_vtable<T>())
               , callable_info_vtable(construct_vtable<T>())
-            {}
+            {
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -59,10 +59,10 @@ namespace hpx { namespace util
         {
             return false;
         }
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename R, typename ...Ts>
+    template <typename R, typename... Ts>
     class function_ref<R(Ts...)>
     {
         using VTable = detail::function_ref_vtable<R(Ts...)>;
@@ -70,9 +70,8 @@ namespace hpx { namespace util
     public:
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
-                !std::is_same<FD, function_ref>::value
-             && traits::is_invocable_r<R, F&, Ts...>::value
-            >::type>
+                !std::is_same<FD, function_ref>::value &&
+                traits::is_invocable_r<R, F&, Ts...>::value>::type>
         function_ref(F&& f)
           : object(nullptr)
         {
@@ -82,13 +81,13 @@ namespace hpx { namespace util
         function_ref(function_ref const& other) noexcept
           : vptr(other.vptr)
           , object(other.object)
-        {}
+        {
+        }
 
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
-                !std::is_same<FD, function_ref>::value
-             && traits::is_invocable_r<R, F&, Ts...>::value
-            >::type>
+                !std::is_same<FD, function_ref>::value &&
+                traits::is_invocable_r<R, F&, Ts...>::value>::type>
         function_ref& operator=(F&& f)
         {
             assign(std::forward<F>(f));
@@ -102,10 +101,10 @@ namespace hpx { namespace util
             return *this;
         }
 
-        template <typename F, typename T = typename std::remove_reference<F>::type,
-            typename Enable = typename std::enable_if<
-                !std::is_pointer<T>::value
-            >::type>
+        template <typename F,
+            typename T = typename std::remove_reference<F>::type,
+            typename Enable =
+                typename std::enable_if<!std::is_pointer<T>::value>::type>
         void assign(F&& f)
         {
             HPX_ASSERT(!detail::is_empty_function_ptr(f));
@@ -132,7 +131,7 @@ namespace hpx { namespace util
         void swap(function_ref& f) noexcept
         {
             std::swap(vptr, f.vptr);
-            std::swap(object, f.object); // swap
+            std::swap(object, f.object);    // swap
         }
 
         HPX_FORCEINLINE R operator()(Ts... vs) const
@@ -181,23 +180,21 @@ namespace hpx { namespace util
 
     protected:
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        VTable const *vptr;
+        VTable const* vptr;
 #else
         R (*vptr)(void*, Ts&&...);
 #endif
         void* object;
     };
-}}
+}}    // namespace hpx::util
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <typename Sig>
     struct get_function_address<util::function_ref<Sig>>
     {
-        static std::size_t
-            call(util::function_ref<Sig> const& f) noexcept
+        static std::size_t call(util::function_ref<Sig> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -206,8 +203,7 @@ namespace hpx { namespace traits
     template <typename Sig>
     struct get_function_annotation<util::function_ref<Sig>>
     {
-        static char const*
-            call(util::function_ref<Sig> const& f) noexcept
+        static char const* call(util::function_ref<Sig> const& f) noexcept
         {
             return f.get_function_annotation();
         }
@@ -217,14 +213,14 @@ namespace hpx { namespace traits
     template <typename Sig>
     struct get_function_annotation_itt<util::function_ref<Sig>>
     {
-        static util::itt::string_handle
-            call(util::function_ref<Sig> const& f) noexcept
+        static util::itt::string_handle call(
+            util::function_ref<Sig> const& f) noexcept
         {
             return f.get_function_annotation_itt();
         }
     };
 #endif
-}}
+}}    // namespace hpx::traits
 #endif
 
 #endif

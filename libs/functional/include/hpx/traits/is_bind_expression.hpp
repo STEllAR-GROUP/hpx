@@ -13,8 +13,7 @@
 #endif
 #include <type_traits>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <typename T>
     struct is_bind_expression
 #ifdef HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION
@@ -22,12 +21,13 @@ namespace hpx { namespace traits
 #else
       : std::false_type
 #endif
-    {};
+    {
+    };
 
     template <typename T>
-    struct is_bind_expression<T const>
-      : is_bind_expression<T>
-    {};
-}}
+    struct is_bind_expression<T const> : is_bind_expression<T>
+    {
+    };
+}}    // namespace hpx::traits
 
 #endif /*HPX_TRAITS_IS_BIND_EXPRESSION_HPP*/

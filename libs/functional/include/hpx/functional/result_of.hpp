@@ -16,44 +16,44 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util
-{
-    namespace detail
-    {
+namespace hpx { namespace util {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         // f(t0, t1, ..., tN)
 #if HPX_HAS_CXX14_LIB_RESULT_OF_SFINAE
         template <typename T>
-        struct result_of_function_object
-          : std::result_of<T>
-        {};
-#else
-        namespace result_of_function_object_impl
+        struct result_of_function_object : std::result_of<T>
         {
+        };
+#else
+        namespace result_of_function_object_impl {
             struct fallback
             {
                 template <typename T>
-                fallback(T const&){}
+                fallback(T const&)
+                {
+                }
             };
 
-            template <typename ...Ts>
+            template <typename... Ts>
             fallback invoke(fallback, Ts&&...);
 
-            template <typename F, typename ...Ts>
-            decltype(std::declval<F>()(std::declval<Ts>()...))
-            invoke(F&&, Ts&&...);
+            template <typename F, typename... Ts>
+            decltype(std::declval<F>()(std::declval<Ts>()...)) invoke(
+                F&&, Ts&&...);
 
             template <typename T>
             struct result_of_invoke;
 
-            template <typename F, typename ...Ts>
+            template <typename F, typename... Ts>
             struct result_of_invoke<F(Ts...)>
             {
                 typedef decltype(result_of_function_object_impl::invoke(
                     std::declval<F>(), std::declval<Ts>()...)) type;
             };
 
-            template <typename T, typename R = typename result_of_invoke<T>::type>
+            template <typename T,
+                typename R = typename result_of_invoke<T>::type>
             struct result_of_function_object
             {
                 typedef R type;
@@ -61,8 +61,9 @@ namespace hpx { namespace util
 
             template <typename T>
             struct result_of_function_object<T, fallback>
-            {};
-        }
+            {
+            };
+        }    // namespace result_of_function_object_impl
         using result_of_function_object_impl::result_of_function_object;
 #endif
 
@@ -81,14 +82,14 @@ namespace hpx { namespace util
         };
 
         // (t0.*f)(t1, ..., tN)
-        template <typename R, typename C, typename ...Ps>
+        template <typename R, typename C, typename... Ps>
         struct result_of_member_pointer_impl<R (C::*)(Ps...)>
         {
             R operator()(C&, Ps...);
             R operator()(C&&, Ps...);
         };
 
-        template <typename R, typename C, typename ...Ps>
+        template <typename R, typename C, typename... Ps>
         struct result_of_member_pointer_impl<R (C::*)(Ps...) const>
         {
             R operator()(C const&, Ps...);
@@ -96,12 +97,13 @@ namespace hpx { namespace util
         };
 
         ///////////////////////////////////////////////////////////////////////
-        namespace has_dereference_impl
-        {
+        namespace has_dereference_impl {
             struct fallback
             {
                 template <typename T>
-                fallback(T const&){}
+                fallback(T const&)
+                {
+                }
             };
 
             fallback operator*(fallback);
@@ -110,84 +112,89 @@ namespace hpx { namespace util
             struct has_dereference
             {
                 static bool const value =
-                    !std::is_same<decltype(*std::declval<T>()), fallback>::value;
+                    !std::is_same<decltype(*std::declval<T>()),
+                        fallback>::value;
             };
-        }
+        }    // namespace has_dereference_impl
         using has_dereference_impl::has_dereference;
 
         template <typename C, typename T, typename Enable = void>
         struct result_of_member_pointer
-        {};
+        {
+        };
 
         // t0.*f, (t0.*f)(t1, ..., tN)
-        template <typename C, typename F, typename T0, typename ...Ts>
+        template <typename C, typename F, typename T0, typename... Ts>
         struct result_of_member_pointer<C, F(T0, Ts...),
             typename std::enable_if<
-                std::is_base_of<C, typename std::decay<T0>::type>::value
-            >::type
-        > : result_of_function_object<
-                result_of_member_pointer_impl<typename std::decay<F>::type>(
-                    T0, Ts...)
-            >
-        {};
+                std::is_base_of<C, typename std::decay<T0>::type>::value>::type>
+          : result_of_function_object<result_of_member_pointer_impl<
+                typename std::decay<F>::type>(T0, Ts...)>
+        {
+        };
 
         // (*t0).*f, ((*t0).*f)(t1, ..., tN)
-        template <typename C, typename F, typename T0, typename ...Ts>
+        template <typename C, typename F, typename T0, typename... Ts>
         struct result_of_member_pointer<C, F(T0, Ts...),
-            typename std::enable_if<
-                std::enable_if<
-                    !std::is_base_of<C, typename std::decay<T0>::type>::value
-                  , has_dereference<T0>
-                >::type::value
-            >::type
-        > : result_of_function_object<
+            typename std::enable_if<std::enable_if<
+                !std::is_base_of<C, typename std::decay<T0>::type>::value,
+                has_dereference<T0>>::type::value>::type>
+          : result_of_function_object<
                 result_of_member_pointer_impl<typename std::decay<F>::type>(
-                    decltype(*std::declval<T0>()), Ts...)
-            >
-        {};
+                    decltype(*std::declval<T0>()), Ts...)>
+        {
+        };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename FD, typename T>
-        struct result_of_impl
-          : result_of_function_object<T>
-        {};
+        struct result_of_impl : result_of_function_object<T>
+        {
+        };
 
-        template <typename M, typename C, typename F, typename ...Ts>
+        template <typename M, typename C, typename F, typename... Ts>
         struct result_of_impl<M C::*, F(Ts...)>
           : result_of_member_pointer<C, M C::*(Ts...)>
-        {};
+        {
+        };
 
-        template <typename R, typename C, typename ...Ps, typename F, typename ...Ts>
+        template <typename R, typename C, typename... Ps, typename F,
+            typename... Ts>
         struct result_of_impl<R (C::*)(Ps...), F(Ts...)>
           : result_of_member_pointer<C, R (C::*(Ts...))(Ps...)>
-        {};
+        {
+        };
 
-        template <typename R, typename C, typename ...Ps, typename F, typename ...Ts>
+        template <typename R, typename C, typename... Ps, typename F,
+            typename... Ts>
         struct result_of_impl<R (C::*)(Ps...) const, F(Ts...)>
           : result_of_member_pointer<C, R (C::*(Ts...))(Ps...) const>
-        {};
+        {
+        };
 
         // support boost::[c]ref, which is not callable as std::[c]ref
-        template <typename X, typename F, typename ...Ts>
-        struct result_of_impl< ::boost::reference_wrapper<X>, F(Ts...)>
+        template <typename X, typename F, typename... Ts>
+        struct result_of_impl<::boost::reference_wrapper<X>, F(Ts...)>
           : result_of_impl<X, X&(Ts...)>
-        {};
-    }
+        {
+        };
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct result_of;
 
-    template <typename F, typename ...Ts>
+    template <typename F, typename... Ts>
     struct result_of<F(Ts...)>
       : detail::result_of_impl<typename std::decay<F>::type, F(Ts...)>
-    {};
+    {
+    };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename ...Ts>
+    template <typename F, typename... Ts>
     struct invoke_result
-      : detail::result_of_impl<typename std::decay<F>::type, F&&(Ts&&...)>
-    {};
-}}
+      : detail::result_of_impl<typename std::decay<F>::type, F && (Ts && ...)>
+    {
+    };
+}}    // namespace hpx::util
 
 #endif

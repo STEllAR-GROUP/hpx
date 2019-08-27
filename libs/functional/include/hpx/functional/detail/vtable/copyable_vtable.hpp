@@ -14,13 +14,12 @@
 #include <cstddef>
 #include <new>
 
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     struct copyable_vtable
     {
         template <typename T>
-        static void* _copy(
-            void* storage, std::size_t storage_size, void const* src, bool destroy)
+        static void* _copy(void* storage, std::size_t storage_size,
+            void const* src, bool destroy)
         {
             if (destroy)
                 vtable::get<T>(storage).~T();
@@ -32,13 +31,15 @@ namespace hpx { namespace util { namespace detail
 
         HPX_CONSTEXPR copyable_vtable(std::nullptr_t) noexcept
           : copy(nullptr)
-        {}
+        {
+        }
 
         template <typename T>
         HPX_CONSTEXPR copyable_vtable(construct_vtable<T>) noexcept
           : copy(&copyable_vtable::template _copy<T>)
-        {}
+        {
+        }
     };
-}}}
+}}}    // namespace hpx::util::detail
 
 #endif

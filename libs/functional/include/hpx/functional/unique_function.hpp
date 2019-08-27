@@ -19,13 +19,12 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Sig, bool Serializable = true>
     class unique_function;
 
-    template <typename R, typename ...Ts, bool Serializable>
+    template <typename R, typename... Ts, bool Serializable>
     class unique_function<R(Ts...), Serializable>
       : public detail::basic_function<R(Ts...), false, Serializable>
     {
@@ -34,8 +33,7 @@ namespace hpx { namespace util
     public:
         typedef R result_type;
 
-        HPX_CONSTEXPR unique_function(std::nullptr_t = nullptr) noexcept
-        {}
+        HPX_CONSTEXPR unique_function(std::nullptr_t = nullptr) noexcept {}
 
         unique_function(unique_function&&) noexcept = default;
         unique_function& operator=(unique_function&&) noexcept = default;
@@ -43,11 +41,9 @@ namespace hpx { namespace util
         // the split SFINAE prevents MSVC from eagerly instantiating things
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable1 = typename std::enable_if<
-                !std::is_same<FD, unique_function>::value
-            >::type,
+                !std::is_same<FD, unique_function>::value>::type,
             typename Enable2 = typename std::enable_if<
-                traits::is_invocable_r<R, FD&, Ts...>::value
-            >::type>
+                traits::is_invocable_r<R, FD&, Ts...>::value>::type>
         unique_function(F&& f)
         {
             assign(std::forward<F>(f));
@@ -56,11 +52,9 @@ namespace hpx { namespace util
         // the split SFINAE prevents MSVC from eagerly instantiating things
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable1 = typename std::enable_if<
-                !std::is_same<FD, unique_function>::value
-            >::type,
+                !std::is_same<FD, unique_function>::value>::type,
             typename Enable2 = typename std::enable_if<
-                traits::is_invocable_r<R, FD&, Ts...>::value
-            >::type>
+                traits::is_invocable_r<R, FD&, Ts...>::value>::type>
         unique_function& operator=(F&& f)
         {
             assign(std::forward<F>(f));
@@ -69,34 +63,33 @@ namespace hpx { namespace util
 
         using base_type::operator();
         using base_type::assign;
-        using base_type::reset;
         using base_type::empty;
+        using base_type::reset;
         using base_type::target;
     };
 
     template <typename Sig>
     using unique_function_nonser = unique_function<Sig, false>;
-}}
+}}    // namespace hpx::util
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <typename Sig, bool Serializable>
-    struct get_function_address<util::unique_function<Sig, Serializable> >
+    struct get_function_address<util::unique_function<Sig, Serializable>>
     {
-        static std::size_t
-            call(util::unique_function<Sig, Serializable> const& f) noexcept
+        static std::size_t call(
+            util::unique_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_address();
         }
     };
 
     template <typename Sig, bool Serializable>
-    struct get_function_annotation<util::unique_function<Sig, Serializable> >
+    struct get_function_annotation<util::unique_function<Sig, Serializable>>
     {
-        static char const*
-            call(util::unique_function<Sig, Serializable> const& f) noexcept
+        static char const* call(
+            util::unique_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation();
         }
@@ -104,25 +97,25 @@ namespace hpx { namespace traits
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
     template <typename Sig, bool Serializable>
-    struct get_function_annotation_itt<util::unique_function<Sig, Serializable> >
+    struct get_function_annotation_itt<util::unique_function<Sig, Serializable>>
     {
-        static util::itt::string_handle
-            call(util::unique_function<Sig, Serializable> const& f) noexcept
+        static util::itt::string_handle call(
+            util::unique_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation_itt();
         }
     };
 #endif
-}}
+}}    // namespace hpx::traits
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(Sig, F, Name)           \
-    HPX_DECLARE_GET_FUNCTION_NAME(unique_function_vtable<Sig>, F, Name)       \
-/**/
+#define HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(Sig, F, Name)            \
+    HPX_DECLARE_GET_FUNCTION_NAME(unique_function_vtable<Sig>, F, Name)        \
+    /**/
 
-#define HPX_UTIL_REGISTER_UNIQUE_FUNCTION(Sig, F, Name)                       \
-    HPX_DEFINE_GET_FUNCTION_NAME(unique_function_vtable<Sig>, F, Name)        \
-/**/
+#define HPX_UTIL_REGISTER_UNIQUE_FUNCTION(Sig, F, Name)                        \
+    HPX_DEFINE_GET_FUNCTION_NAME(unique_function_vtable<Sig>, F, Name)         \
+    /**/
 
 #endif

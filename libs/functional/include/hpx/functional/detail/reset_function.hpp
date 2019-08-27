@@ -9,8 +9,7 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/unique_function.hpp>
 
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     template <typename Sig, bool Serializable>
     inline void reset_function(hpx::util::function<Sig, Serializable>& f)
     {
@@ -40,6 +39,6 @@ namespace hpx { namespace util { namespace detail
     {
         f = Function();
     }
-}}}
+}}}    // namespace hpx::util::detail
 
 #endif /*HPX_UTIL_DETAIL_RESET_FUNCTION_HPP*/

@@ -11,12 +11,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/functional/detail/empty_function.hpp>
 #include <hpx/functional/detail/vtable/function_vtable.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
+#include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/traits/is_callable.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -25,8 +25,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     static const std::size_t function_storage_size = 3 * sizeof(void*);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -40,22 +39,16 @@ namespace hpx { namespace util { namespace detail
           : vptr(empty_vptr)
           , object(nullptr)
           , storage_init()
-        {}
+        {
+        }
 
-        function_base(
-            function_base const& other,
-            vtable const* empty_vtable);
-        function_base(
-            function_base&& other,
-            vtable const* empty_vptr) noexcept;
+        function_base(function_base const& other, vtable const* empty_vtable);
+        function_base(function_base&& other, vtable const* empty_vptr) noexcept;
         ~function_base();
 
+        void op_assign(function_base const& other, vtable const* empty_vtable);
         void op_assign(
-            function_base const& other,
-            vtable const* empty_vtable);
-        void op_assign(
-            function_base&& other,
-            vtable const* empty_vtable) noexcept;
+            function_base&& other, vtable const* empty_vtable) noexcept;
 
         void destroy() noexcept;
         void reset(vtable const* empty_vptr) noexcept;
@@ -78,7 +71,8 @@ namespace hpx { namespace util { namespace detail
     protected:
         vtable const* vptr;
         void* object;
-        union {
+        union
+        {
             char storage_init;
             mutable unsigned char storage[function_storage_size];
         };
@@ -117,8 +111,8 @@ namespace hpx { namespace util { namespace detail
     template <typename Sig, bool Copyable, bool Serializable>
     class basic_function;
 
-    template <bool Copyable, typename R, typename ...Ts>
-    class basic_function<R(Ts...), Copyable, /*Serializable*/false>
+    template <bool Copyable, typename R, typename... Ts>
+    class basic_function<R(Ts...), Copyable, /*Serializable*/ false>
       : public function_base
     {
         using base_type = function_base;
@@ -127,15 +121,18 @@ namespace hpx { namespace util { namespace detail
     public:
         HPX_CONSTEXPR basic_function() noexcept
           : base_type(get_empty_vtable())
-        {}
+        {
+        }
 
         basic_function(basic_function const& other)
           : base_type(other, get_empty_vtable())
-        {}
+        {
+        }
 
         basic_function(basic_function&& other) noexcept
           : base_type(std::move(other), get_empty_vtable())
-        {}
+        {
+        }
 
         basic_function& operator=(basic_function const& other)
         {
@@ -158,13 +155,13 @@ namespace hpx { namespace util { namespace detail
         void assign(F&& f)
         {
             using T = typename std::decay<F>::type;
-            static_assert(!Copyable ||
-                std::is_constructible<T, T const&>::value,
+            static_assert(
+                !Copyable || std::is_constructible<T, T const&>::value,
                 "F shall be CopyConstructible");
 
             if (!detail::is_empty_function(f))
             {
-                vtable const* f_vptr =  get_vtable<T>();
+                vtable const* f_vptr = get_vtable<T>();
                 void* buffer = nullptr;
                 if (vptr == f_vptr)
                 {
@@ -172,14 +169,18 @@ namespace hpx { namespace util { namespace detail
                     // reuse object storage
                     buffer = object;
                     vtable::template get<T>(object).~T();
-                } else {
+                }
+                else
+                {
                     destroy();
                     vptr = f_vptr;
                     buffer = vtable::template allocate<T>(
                         storage, function_storage_size);
                 }
                 object = ::new (buffer) T(std::forward<F>(f));
-            } else {
+            }
+            else
+            {
                 base_type::reset(get_empty_vtable());
             }
         }
@@ -189,19 +190,18 @@ namespace hpx { namespace util { namespace detail
             base_type::reset(get_empty_vtable());
         }
 
-        using base_type::swap;
         using base_type::empty;
+        using base_type::swap;
         using base_type::operator bool;
 
         template <typename T>
         T* target() noexcept
         {
             using TD = typename std::remove_cv<T>::type;
-            static_assert(
-                traits::is_invocable_r<R, TD&, Ts...>::value
-              , "T shall be Callable with the function signature");
+            static_assert(traits::is_invocable_r<R, TD&, Ts...>::value,
+                "T shall be Callable with the function signature");
 
-            vtable const* f_vptr =  get_vtable<TD>();
+            vtable const* f_vptr = get_vtable<TD>();
             if (vptr != f_vptr || empty())
                 return nullptr;
 
@@ -212,11 +212,10 @@ namespace hpx { namespace util { namespace detail
         T const* target() const noexcept
         {
             using TD = typename std::remove_cv<T>::type;
-            static_assert(
-                traits::is_invocable_r<R, TD&, Ts...>::value
-              , "T shall be Callable with the function signature");
+            static_assert(traits::is_invocable_r<R, TD&, Ts...>::value,
+                "T shall be Callable with the function signature");
 
-            vtable const* f_vptr =  get_vtable<TD>();
+            vtable const* f_vptr = get_vtable<TD>();
             if (vptr != f_vptr || empty())
                 return nullptr;
 
@@ -246,10 +245,10 @@ namespace hpx { namespace util { namespace detail
         }
 
     protected:
-        using base_type::vptr;
         using base_type::object;
         using base_type::storage;
+        using base_type::vptr;
     };
-}}}
+}}}    // namespace hpx::util::detail
 
 #endif

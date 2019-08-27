@@ -9,12 +9,10 @@
 
 #if defined(HPX_FUNCTIONAL_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/function.hpp is deprecated, \
+#pragma message("The header hpx/util/function.hpp is deprecated, \
     please include hpx/functional/function.hpp instead")
 #else
-#warning \
-    "The header hpx/util/function.hpp is deprecated, \
+#warning "The header hpx/util/function.hpp is deprecated, \
     please include hpx/functional/function.hpp instead"
 #endif
 #endif

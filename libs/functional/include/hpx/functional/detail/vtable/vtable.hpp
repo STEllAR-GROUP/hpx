@@ -13,11 +13,12 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct construct_vtable {};
+    struct construct_vtable
+    {
+    };
 
     template <typename VTable, typename T>
     struct vtables
@@ -33,8 +34,7 @@ namespace hpx { namespace util { namespace detail
     HPX_CONSTEXPR VTable const* get_vtable() noexcept
     {
         static_assert(
-            !std::is_reference<T>::value,
-            "T shall have no ref-qualifiers");
+            !std::is_reference<T>::value, "T shall have no ref-qualifiers");
 
         return &vtables<VTable, T>::instance;
     }
@@ -60,23 +60,27 @@ namespace hpx { namespace util { namespace detail
             using storage_t =
                 typename std::aligned_storage<sizeof(T), alignof(T)>::type;
 
-            if (sizeof(T) > storage_size) {
+            if (sizeof(T) > storage_size)
+            {
                 return new storage_t;
             }
             return storage;
         }
 
         template <typename T>
-        static void _deallocate(void* obj, std::size_t storage_size, bool destroy)
+        static void _deallocate(
+            void* obj, std::size_t storage_size, bool destroy)
         {
             using storage_t =
                 typename std::aligned_storage<sizeof(T), alignof(T)>::type;
 
-            if (destroy) {
+            if (destroy)
+            {
                 get<T>(obj).~T();
             }
 
-            if (sizeof(T) > storage_size) {
+            if (sizeof(T) > storage_size)
+            {
                 delete static_cast<storage_t*>(obj);
             }
         }
@@ -85,8 +89,9 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         HPX_CONSTEXPR vtable(construct_vtable<T>) noexcept
           : deallocate(&vtable::template _deallocate<T>)
-        {}
+        {
+        }
     };
-}}}
+}}}    // namespace hpx::util::detail
 
 #endif

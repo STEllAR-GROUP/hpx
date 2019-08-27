@@ -7,14 +7,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/traits/is_callable.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/functional/detail/basic_function.hpp>
 #include <hpx/functional/detail/empty_function.hpp>
 #include <hpx/functional/detail/vtable/function_vtable.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/traits/is_callable.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -23,26 +23,22 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     function_base::function_base(
-        function_base const& other,
-        vtable const* empty_vtable)
+        function_base const& other, vtable const* empty_vtable)
       : vptr(other.vptr)
       , object(other.object)
     {
         if (other.object != nullptr)
         {
-            object = vptr->copy(
-                storage, detail::function_storage_size,
-                other.object, /*destroy*/false);
+            object = vptr->copy(storage, detail::function_storage_size,
+                other.object, /*destroy*/ false);
         }
     }
 
     function_base::function_base(
-        function_base&& other,
-        vtable const* empty_vptr) noexcept
+        function_base&& other, vtable const* empty_vptr) noexcept
       : vptr(other.vptr)
       , object(other.object)
     {
@@ -61,8 +57,7 @@ namespace hpx { namespace util { namespace detail
     }
 
     void function_base::op_assign(
-        function_base const& other,
-        vtable const* empty_vtable)
+        function_base const& other, vtable const* empty_vtable)
     {
         if (vptr == other.vptr)
         {
@@ -70,27 +65,27 @@ namespace hpx { namespace util { namespace detail
             {
                 HPX_ASSERT(other.object != nullptr);
                 // reuse object storage
-                object = vptr->copy(
-                    object, -1,
-                    other.object, /*destroy*/true);
+                object = vptr->copy(object, -1, other.object, /*destroy*/ true);
             }
-        } else {
+        }
+        else
+        {
             destroy();
             vptr = other.vptr;
             if (other.object != nullptr)
             {
-                object = vptr->copy(
-                    storage, detail::function_storage_size,
-                    other.object, /*destroy*/false);
-            } else {
+                object = vptr->copy(storage, detail::function_storage_size,
+                    other.object, /*destroy*/ false);
+            }
+            else
+            {
                 object = nullptr;
             }
         }
     }
 
     void function_base::op_assign(
-        function_base&& other,
-        vtable const* empty_vtable) noexcept
+        function_base&& other, vtable const* empty_vtable) noexcept
     {
         if (this != &other)
         {
@@ -103,9 +98,8 @@ namespace hpx { namespace util { namespace detail
     {
         if (object != nullptr)
         {
-            vptr->deallocate(
-                object, function_storage_size,
-                /*destroy*/true);
+            vptr->deallocate(object, function_storage_size,
+                /*destroy*/ true);
         }
     }
 
@@ -153,4 +147,4 @@ namespace hpx { namespace util { namespace detail
         return util::itt::string_handle{};
 #endif
     }
-}}}
+}}}    // namespace hpx::util::detail

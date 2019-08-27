@@ -11,10 +11,11 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
 
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
-    struct empty_function {}; // must be trivial and empty
+    struct empty_function
+    {
+    };    // must be trivial and empty
 
     HPX_NORETURN HPX_EXPORT void throw_bad_function_call();
 
@@ -34,22 +35,23 @@ namespace hpx { namespace util { namespace detail
 // ("there was an error in verifying the lgenfe output!") with this enabled, so
 // we explicitly use the fallback.
 #if defined(HPX_HAVE_CXX11_CONSTEXPR) && !defined(HPX_HAVE_CUDA)
-    template <typename Sig>
-    HPX_CONSTEXPR function_vtable<Sig, true> const*
-    get_empty_function_vtable() noexcept
-    {
-        return &vtables<function_vtable<Sig, true>, empty_function>::instance;
-    }
+            template <typename Sig>
+            HPX_CONSTEXPR function_vtable<Sig, true> const*
+            get_empty_function_vtable() noexcept
+            {
+                return &vtables<function_vtable<Sig, true>,
+                    empty_function>::instance;
+            }
 #else
-    template <typename Sig>
-    function_vtable<Sig, true> const*
-    get_empty_function_vtable() noexcept
-    {
-        static function_vtable<Sig, true> const empty_vtable =
-            detail::construct_vtable<empty_function>();
-        return &empty_vtable;
-    }
+            template <typename Sig>
+            function_vtable<Sig, true> const*
+            get_empty_function_vtable() noexcept
+            {
+                static function_vtable<Sig, true> const empty_vtable =
+                    detail::construct_vtable<empty_function>();
+                return &empty_vtable;
+            }
 #endif
-}}}
+}}}    // namespace hpx::util::detail
 
 #endif

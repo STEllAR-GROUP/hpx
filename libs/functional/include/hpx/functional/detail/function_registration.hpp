@@ -15,13 +15,12 @@
 
 #include <type_traits>
 
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename VTable, typename T>
-    struct get_function_name_declared
-      : std::false_type
-    {};
+    struct get_function_name_declared : std::false_type
+    {
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename VTable, typename F>
@@ -33,7 +32,7 @@ namespace hpx { namespace util { namespace detail
             return debug::type_id<F>::typeid_.type_id();
         }
 #else
-        = delete;
+            = delete;
 #endif
     };
 
@@ -43,41 +42,43 @@ namespace hpx { namespace util { namespace detail
     {
         return get_function_name_impl<VTable, F>::call();
     }
-}}}
+}}}    // namespace hpx::util::detail
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_DECLARE_GET_FUNCTION_NAME(VTable, F, Name)                        \
-    namespace hpx { namespace util { namespace detail {                       \
-        template<> HPX_ALWAYS_EXPORT                                          \
-        char const* get_function_name<                                        \
-            VTable, std::decay<HPX_PP_STRIP_PARENS(F)>::type>();              \
-                                                                              \
-        template <>                                                           \
-        struct get_function_name_declared<                                    \
-            VTable, std::decay<HPX_PP_STRIP_PARENS(F)>::type                  \
-        > : std::true_type                                                    \
-        {};                                                                   \
-    }}}                                                                       \
-/**/
+// clang-format off
+#define HPX_DECLARE_GET_FUNCTION_NAME(VTable, F, Name)                         \
+    namespace hpx { namespace util { namespace detail {                        \
+         template <>                                                           \
+         HPX_ALWAYS_EXPORT char const* get_function_name<VTable,               \
+             std::decay<HPX_PP_STRIP_PARENS(F)>::type>();                      \
+                                                                               \
+         template <>                                                           \
+         struct get_function_name_declared<VTable,                             \
+             std::decay<HPX_PP_STRIP_PARENS(F)>::type> : std::true_type        \
+         {                                                                     \
+         };                                                                    \
+    }}}                                                                        \
+    /**/
 
-#define HPX_DEFINE_GET_FUNCTION_NAME(VTable, F, Name)                         \
-    namespace hpx { namespace util { namespace detail {                       \
-        template<> HPX_ALWAYS_EXPORT                                          \
-        char const* get_function_name<                                        \
-            VTable, std::decay<HPX_PP_STRIP_PARENS(F)>::type>()               \
-        {                                                                     \
-            /*If you encounter this assert while compiling code, that means   \
-            that you have a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION macro         \
-            somewhere in a source file, but the header in which the function  \
-            is defined misses a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION_DECLARATION*/\
-            static_assert(                                                    \
-                get_function_name_declared<                                   \
-                    VTable, std::decay<HPX_PP_STRIP_PARENS(F)>::type>::value, \
-                "HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION_DECLARATION missing for "\
-                HPX_PP_STRINGIZE(Name));                                      \
-            return HPX_PP_STRINGIZE(Name);                                    \
-        }                                                                     \
-    }}}                                                                       \
-/**/
+#define HPX_DEFINE_GET_FUNCTION_NAME(VTable, F, Name)                          \
+    namespace hpx { namespace util { namespace detail {                        \
+        template <>                                                            \
+        HPX_ALWAYS_EXPORT char const* get_function_name<VTable,                \
+            std::decay<HPX_PP_STRIP_PARENS(F)>::type>()                        \
+        {                                                                      \
+            /*If you encounter this assert while compiling code, that means    \
+         that you have a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION macro             \
+         somewhere in a source file, but the header in which the function      \
+         is defined misses a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION_DECLARATION*/ \
+             static_assert(                                                    \
+                 get_function_name_declared<VTable,                            \
+                     std::decay<HPX_PP_STRIP_PARENS(F)>::type>::value,         \
+                 "HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION_DECLARATION "            \
+                 "missing for " HPX_PP_STRINGIZE(Name));                       \
+             return HPX_PP_STRINGIZE(Name);                                    \
+        }                                                                      \
+    }}}                                                                        \
+    /**/
 
+// clang-format on
 #endif

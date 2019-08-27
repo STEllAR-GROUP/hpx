@@ -12,8 +12,7 @@
 #include <cstddef>
 #include <memory>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     // By default we don't know anything about the function's name
     template <typename F, typename Enable = void>
     struct get_function_annotation
@@ -30,11 +29,12 @@ namespace hpx { namespace traits
     {
         static util::itt::string_handle call(F const& f)
         {
-            static util::itt::string_handle sh(get_function_annotation<F>::call(f));
+            static util::itt::string_handle sh(
+                get_function_annotation<F>::call(f));
             return sh;
         }
     };
 #endif
-}}
+}}    // namespace hpx::traits
 
 #endif

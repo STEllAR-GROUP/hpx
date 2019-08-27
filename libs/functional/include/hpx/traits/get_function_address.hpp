@@ -11,8 +11,7 @@
 #include <cstddef>
 #include <memory>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     // By default we return the address of the object which is used to invoke
     // the trait.
     template <typename F, typename Enable = void>
@@ -25,7 +24,7 @@ namespace hpx { namespace traits
     };
 
     // For global (and static) functions we return the function address itself
-    template <typename R, typename ... Ts>
+    template <typename R, typename... Ts>
     struct get_function_address<R (*)(Ts...)>
     {
         static std::size_t call(R (*f)(Ts...)) noexcept
@@ -50,7 +49,8 @@ namespace hpx { namespace traits
     //         pointers this might even give the correct value
     //         representing the symbol corresponding to the function.
     //
-    template <typename R, typename Obj, typename ... Ts>
+    // clang-format off
+    template <typename R, typename Obj, typename... Ts>
     struct get_function_address<R (Obj::*)(Ts...)>
     {
         static std::size_t call(R (Obj::*f)(Ts...)) noexcept
@@ -60,7 +60,7 @@ namespace hpx { namespace traits
 #  pragma clang diagnostic ignored "-Wstrict-aliasing"
 #endif
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER) &&  \
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER) &&                         \
     (!defined(__NVCC__) || (__CUDACC_VER_MAJOR__ >= 8))
 #  if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #    pragma GCC diagnostic push
@@ -70,11 +70,11 @@ namespace hpx { namespace traits
 
             return reinterpret_cast<std::size_t>(*reinterpret_cast<void**>(&f));
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER) &&  \
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER) &&                         \
     (!defined(__NVCC__) || (__CUDACC_VER_MAJOR__ >= 8))
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
+#  if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#    pragma GCC diagnostic pop
+#  endif
 #endif
 
 #if defined(__clang__)
@@ -83,7 +83,7 @@ namespace hpx { namespace traits
         }
     };
 
-    template <typename R, typename Obj, typename ... Ts>
+    template <typename R, typename Obj, typename... Ts>
     struct get_function_address<R (Obj::*)(Ts...) const>
     {
         static std::size_t call(R (Obj::*f)(Ts...) const) noexcept
@@ -93,7 +93,7 @@ namespace hpx { namespace traits
 #  pragma clang diagnostic ignored "-Wstrict-aliasing"
 #endif
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER) &&  \
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER) &&                         \
     (!defined(__NVCC__) || (__CUDACC_VER_MAJOR__ >= 8))
 #  if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #    pragma GCC diagnostic push
@@ -103,11 +103,11 @@ namespace hpx { namespace traits
 
             return reinterpret_cast<std::size_t>(*reinterpret_cast<void**>(&f));
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER) &&  \
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER) &&                         \
     (!defined(__NVCC__) || (__CUDACC_VER_MAJOR__ >= 8))
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
+#  if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#    pragma GCC diagnostic pop
+#  endif
 #endif
 
 #if defined(__clang__)
@@ -115,6 +115,7 @@ namespace hpx { namespace traits
 #endif
         }
     };
-}}
+    // clang-format on
+}}    // namespace hpx::traits
 
 #endif

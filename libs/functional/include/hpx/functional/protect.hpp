@@ -16,21 +16,21 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util
-{
-    namespace detail
-    {
+namespace hpx { namespace util {
+    namespace detail {
         template <typename F>
         class protected_bind : public F
         {
         public:
             explicit protected_bind(F const& f)
               : F(f)
-            {}
+            {
+            }
 
             explicit protected_bind(F&& f)
               : F(std::move(f))
-            {}
+            {
+            }
 
 #if !defined(__NVCC__) && !defined(__CUDACC__)
             protected_bind(protected_bind const&) = default;
@@ -38,42 +38,39 @@ namespace hpx { namespace util
 #else
             HPX_HOST_DEVICE protected_bind(protected_bind const& other)
               : F(other)
-            {}
+            {
+            }
 
             HPX_HOST_DEVICE protected_bind(protected_bind&& other)
               : F(std::move(other))
-            {}
+            {
+            }
 #endif
 
             protected_bind& operator=(protected_bind const&) = delete;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    HPX_HOST_DEVICE
-    typename std::enable_if<
-        traits::is_bind_expression<typename std::decay<T>::type>::value
-      , detail::protected_bind<typename std::decay<T>::type>
-    >::type
+    HPX_HOST_DEVICE typename std::enable_if<
+        traits::is_bind_expression<typename std::decay<T>::type>::value,
+        detail::protected_bind<typename std::decay<T>::type>>::type
     protect(T&& f)
     {
-        return detail::protected_bind<
-            typename std::decay<T>::type
-        >(std::forward<T>(f));
+        return detail::protected_bind<typename std::decay<T>::type>(
+            std::forward<T>(f));
     }
 
     // leave everything that is not a bind expression as is
     template <typename T>
-    HPX_HOST_DEVICE
-    typename std::enable_if<
-        !traits::is_bind_expression<typename std::decay<T>::type>::value
-      , T
-    >::type
-    protect(T&& v) //-V659
+    HPX_HOST_DEVICE typename std::enable_if<
+        !traits::is_bind_expression<typename std::decay<T>::type>::value,
+        T>::type
+    protect(T&& v)    //-V659
     {
         return std::forward<T>(v);
     }
-}}
+}}    // namespace hpx::util
 
 #endif /*HPX_UTIL_PROTECT_HPP*/

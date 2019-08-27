@@ -26,11 +26,9 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <std::size_t I>
         struct placeholder
         {
@@ -38,11 +36,10 @@ namespace hpx { namespace util
         };
 
         template <>
-        struct placeholder<0>; // not a valid placeholder
-    }
+        struct placeholder<0>;    // not a valid placeholder
+    }                             // namespace detail
 
-    namespace placeholders
-    {
+    namespace placeholders {
         HPX_STATIC_CONSTEXPR detail::placeholder<1> _1 = {};
         HPX_STATIC_CONSTEXPR detail::placeholder<2> _2 = {};
         HPX_STATIC_CONSTEXPR detail::placeholder<3> _3 = {};
@@ -52,32 +49,29 @@ namespace hpx { namespace util
         HPX_STATIC_CONSTEXPR detail::placeholder<7> _7 = {};
         HPX_STATIC_CONSTEXPR detail::placeholder<8> _8 = {};
         HPX_STATIC_CONSTEXPR detail::placeholder<9> _9 = {};
-    }
+    }    // namespace placeholders
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <std::size_t I>
         struct bind_eval_placeholder
         {
             template <typename T, typename Us>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE
-            typename util::tuple_element<
-                I, typename std::remove_reference<Us>::type
-            >::type&& call(T&& /*t*/, Us&& unbound)
+            static HPX_CONSTEXPR HPX_HOST_DEVICE typename util::tuple_element<I,
+                typename std::remove_reference<Us>::type>::type&&
+            call(T&& /*t*/, Us&& unbound)
             {
                 return util::get<I>(std::forward<Us>(unbound));
             }
         };
 
-        template <
-            typename T, typename TD = typename std::decay<T>::type,
+        template <typename T, typename TD = typename std::decay<T>::type,
             typename Enable = void>
         struct bind_eval
         {
             template <typename Us>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE
-            T&& call(T&& t, Us&& /*unbound*/)
+            static HPX_CONSTEXPR HPX_HOST_DEVICE T&& call(
+                T&& t, Us&& /*unbound*/)
             {
                 return std::forward<T>(t);
             }
@@ -85,24 +79,22 @@ namespace hpx { namespace util
 
         template <typename T, typename TD>
         struct bind_eval<T, TD,
-            typename std::enable_if<
-                traits::is_placeholder<TD>::value != 0
-            >::type
-        > : bind_eval_placeholder<
-                (std::size_t)traits::is_placeholder<TD>::value - 1>
-        {};
+            typename std::enable_if<traits::is_placeholder<TD>::value !=
+                0>::type>
+          : bind_eval_placeholder<
+                (std::size_t) traits::is_placeholder<TD>::value - 1>
+        {
+        };
 
         template <typename T, typename TD>
         struct bind_eval<T, TD,
             typename std::enable_if<
-                traits::is_bind_expression<TD>::value
-            >::type
-        >
+                traits::is_bind_expression<TD>::value>::type>
         {
             template <typename Us>
             static HPX_CONSTEXPR HPX_HOST_DEVICE
-            typename util::detail::invoke_fused_result<T, Us>::type
-            call(T&& t, Us&& unbound)
+                typename util::detail::invoke_fused_result<T, Us>::type
+                call(T&& t, Us&& unbound)
             {
                 return util::invoke_fused(
                     std::forward<T>(t), std::forward<Us>(unbound));
@@ -113,99 +105,89 @@ namespace hpx { namespace util
         template <typename F, typename Ts, typename Us>
         struct invoke_bound_result;
 
-        template <typename F, typename ...Ts, typename Us>
+        template <typename F, typename... Ts, typename Us>
         struct invoke_bound_result<F, util::tuple<Ts...>, Us>
-          : util::invoke_result<F, decltype(bind_eval<Ts>::call(
-                std::declval<Ts>(), std::declval<Us>()))...>
-        {};
+          : util::invoke_result<F,
+                decltype(bind_eval<Ts>::call(
+                    std::declval<Ts>(), std::declval<Us>()))...>
+        {
+        };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Ts, typename Is>
         struct bound_impl;
 
-        template <typename F, typename ...Ts, std::size_t ...Is>
+        template <typename F, typename... Ts, std::size_t... Is>
         struct bound_impl<F, util::tuple<Ts...>, pack_c<std::size_t, Is...>>
         {
-            template <typename ...Us>
+            template <typename... Us>
+            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE typename invoke_bound_result<F&,
+                util::tuple<Ts&...>, util::tuple<Us&&...>>::type
+            operator()(Us&&... vs) &
+            {
+                return HPX_INVOKE(_f,
+                    detail::bind_eval<Ts&>::call(util::get<Is>(_args),
+                        util::forward_as_tuple(std::forward<Us>(vs)...))...);
+            }
+
+            template <typename... Us>
+            HPX_CONSTEXPR HPX_HOST_DEVICE typename invoke_bound_result<F const&,
+                util::tuple<Ts const&...>, util::tuple<Us&&...>>::type
+            operator()(Us&&... vs) const&
+            {
+                return HPX_INVOKE(_f,
+                    detail::bind_eval<Ts const&>::call(util::get<Is>(_args),
+                        util::forward_as_tuple(std::forward<Us>(vs)...))...);
+            }
+
+            template <typename... Us>
             HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
-            typename invoke_bound_result<
-                F&,
-                util::tuple<Ts&...>,
-                util::tuple<Us&&...>
-            >::type operator()(Us&&... vs) &
+                typename invoke_bound_result<F&&, util::tuple<Ts&&...>,
+                    util::tuple<Us&&...>>::type
+                operator()(Us&&... vs) &&
             {
-                return HPX_INVOKE(_f, detail::bind_eval<Ts&>::call(
-                    util::get<Is>(_args),
-                    util::forward_as_tuple(std::forward<Us>(vs)...))...);
+                return HPX_INVOKE(std::move(_f),
+                    detail::bind_eval<Ts>::call(util::get<Is>(std::move(_args)),
+                        util::forward_as_tuple(std::forward<Us>(vs)...))...);
             }
 
-            template <typename ...Us>
+            template <typename... Us>
             HPX_CONSTEXPR HPX_HOST_DEVICE
-            typename invoke_bound_result<
-                F const&,
-                util::tuple<Ts const&...>,
-                util::tuple<Us&&...>
-            >::type operator()(Us&&... vs) const&
+                typename invoke_bound_result<F const&&,
+                    util::tuple<Ts const&&...>, util::tuple<Us&&...>>::type
+                operator()(Us&&... vs) const&&
             {
-                return HPX_INVOKE(_f, detail::bind_eval<Ts const&>::call(
-                    util::get<Is>(_args),
-                    util::forward_as_tuple(std::forward<Us>(vs)...))...);
-            }
-
-            template <typename ...Us>
-            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
-            typename invoke_bound_result<
-                F&&,
-                util::tuple<Ts&&...>,
-                util::tuple<Us&&...>
-            >::type operator()(Us&&... vs) &&
-            {
-                return HPX_INVOKE(std::move(_f), detail::bind_eval<Ts>::call(
-                    util::get<Is>(std::move(_args)),
-                    util::forward_as_tuple(std::forward<Us>(vs)...))...);
-            }
-
-            template <typename ...Us>
-            HPX_CONSTEXPR HPX_HOST_DEVICE
-            typename invoke_bound_result<
-                F const&&,
-                util::tuple<Ts const&&...>,
-                util::tuple<Us&&...>
-            >::type operator()(Us&&... vs) const&&
-            {
-                return HPX_INVOKE(std::move(_f), detail::bind_eval<Ts const>::call(
-                    util::get<Is>(std::move(_args)),
-                    util::forward_as_tuple(std::forward<Us>(vs)...))...);
+                return HPX_INVOKE(std::move(_f),
+                    detail::bind_eval<Ts const>::call(
+                        util::get<Is>(std::move(_args)),
+                        util::forward_as_tuple(std::forward<Us>(vs)...))...);
             }
 
             F _f;
             util::tuple<Ts...> _args;
         };
 
-        template <typename F, typename ...Ts>
+        template <typename F, typename... Ts>
         class bound
-          : private bound_impl<
-                F, util::tuple<typename util::decay_unwrap<Ts>::type...>,
-                typename detail::make_index_pack<sizeof...(Ts)>::type
-            >
+          : private bound_impl<F,
+                util::tuple<typename util::decay_unwrap<Ts>::type...>,
+                typename detail::make_index_pack<sizeof...(Ts)>::type>
         {
-            using base_type = detail::bound_impl<
-                F, util::tuple<typename util::decay_unwrap<Ts>::type...>,
-                typename detail::make_index_pack<sizeof...(Ts)>::type
-            >;
+            using base_type = detail::bound_impl<F,
+                util::tuple<typename util::decay_unwrap<Ts>::type...>,
+                typename detail::make_index_pack<sizeof...(Ts)>::type>;
 
         public:
-            bound() {} // needed for serialization
+            bound() {}    // needed for serialization
 
-            template <typename F_, typename ...Ts_, typename =
-                typename std::enable_if<
-                    std::is_constructible<F, F_>::value
-                >::type>
+            template <typename F_, typename... Ts_,
+                typename = typename std::enable_if<
+                    std::is_constructible<F, F_>::value>::type>
             HPX_CONSTEXPR explicit bound(F_&& f, Ts_&&... vs)
-              : base_type{
-                    std::forward<F_>(f),
+              : base_type{std::forward<F_>(f),
                     util::forward_as_tuple(std::forward<Ts_>(vs)...)}
-            {}
+            {
+            }
 
 #if !defined(__NVCC__) && !defined(__CUDACC__)
             bound(bound const&) = default;
@@ -213,11 +195,13 @@ namespace hpx { namespace util
 #else
             HPX_HOST_DEVICE bound(bound const& other)
               : base_type{other}
-            {}
+            {
+            }
 
             HPX_HOST_DEVICE bound(bound&& other)
               : base_type{std::move(other)}
-            {}
+            {
+            }
 #endif
 
             bound& operator=(bound const&) = delete;
@@ -227,8 +211,8 @@ namespace hpx { namespace util
             template <typename Archive>
             void serialize(Archive& ar, unsigned int const /*version*/)
             {
-                ar & _f;
-                ar & _args;
+                ar& _f;
+                ar& _args;
             }
 
             std::size_t get_function_address() const
@@ -258,101 +242,95 @@ namespace hpx { namespace util
 #endif
 
         private:
-            using base_type::_f;
             using base_type::_args;
+            using base_type::_f;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename ...Ts>
+    template <typename F, typename... Ts>
     HPX_CONSTEXPR typename std::enable_if<
-        !traits::is_action<typename std::decay<F>::type>::value
-      , detail::bound<
-            typename std::decay<F>::type,
-            typename std::decay<Ts>::type...>
-    >::type bind(F&& f, Ts&&... vs)
+        !traits::is_action<typename std::decay<F>::type>::value,
+        detail::bound<typename std::decay<F>::type,
+            typename std::decay<Ts>::type...>>::type
+    bind(F&& f, Ts&&... vs)
     {
-        typedef detail::bound<
-            typename std::decay<F>::type,
-            typename std::decay<Ts>::type...
-        > result_type;
+        typedef detail::bound<typename std::decay<F>::type,
+            typename std::decay<Ts>::type...>
+            result_type;
 
         return result_type(std::forward<F>(f), std::forward<Ts>(vs)...);
     }
-}}
+}}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename ...Ts>
-    struct is_bind_expression<util::detail::bound<F, Ts...> >
-      : std::true_type
-    {};
+    template <typename F, typename... Ts>
+    struct is_bind_expression<util::detail::bound<F, Ts...>> : std::true_type
+    {
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <std::size_t I>
-    struct is_placeholder<util::detail::placeholder<I> >
+    struct is_placeholder<util::detail::placeholder<I>>
       : std::integral_constant<int, I>
-    {};
+    {
+    };
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-    template <typename F, typename ...Ts>
-    struct get_function_address<util::detail::bound<F, Ts...> >
+    template <typename F, typename... Ts>
+    struct get_function_address<util::detail::bound<F, Ts...>>
     {
-        static std::size_t
-            call(util::detail::bound<F, Ts...> const& f) noexcept
+        static std::size_t call(util::detail::bound<F, Ts...> const& f) noexcept
         {
             return f.get_function_address();
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename ...Ts>
-    struct get_function_annotation<util::detail::bound<F, Ts...> >
+    template <typename F, typename... Ts>
+    struct get_function_annotation<util::detail::bound<F, Ts...>>
     {
-        static char const*
-            call(util::detail::bound<F, Ts...> const& f) noexcept
+        static char const* call(util::detail::bound<F, Ts...> const& f) noexcept
         {
             return f.get_function_annotation();
         }
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename F, typename ...Ts>
-    struct get_function_annotation_itt<util::detail::bound<F, Ts...> >
+    template <typename F, typename... Ts>
+    struct get_function_annotation_itt<util::detail::bound<F, Ts...>>
     {
-        static util::itt::string_handle
-            call(util::detail::bound<F, Ts...> const& f) noexcept
+        static util::itt::string_handle call(
+            util::detail::bound<F, Ts...> const& f) noexcept
         {
             return f.get_function_annotation_itt();
         }
     };
 #endif
 #endif
-}}
+}}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     // serialization of the bound object
-    template <typename Archive, typename F, typename ...Ts>
-    void serialize(
-        Archive& ar
-      , ::hpx::util::detail::bound<F, Ts...>& bound
-      , unsigned int const version = 0)
+    template <typename Archive, typename F, typename... Ts>
+    void serialize(Archive& ar, ::hpx::util::detail::bound<F, Ts...>& bound,
+        unsigned int const version = 0)
     {
         bound.serialize(ar, version);
     }
 
     // serialization of placeholders is trivial, just provide empty functions
     template <typename Archive, std::size_t I>
-    void serialize(
-        Archive& ar
-      , ::hpx::util::detail::placeholder<I>& /*placeholder*/
-      , unsigned int const /*version*/ = 0)
-    {}
-}}
+    void serialize(Archive& ar,
+        ::hpx::util::detail::placeholder<I>& /*placeholder*/
+        ,
+        unsigned int const /*version*/ = 0)
+    {
+    }
+}}    // namespace hpx::serialization
 
 #endif
