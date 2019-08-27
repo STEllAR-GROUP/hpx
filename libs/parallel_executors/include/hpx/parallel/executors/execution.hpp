@@ -10,6 +10,9 @@
 #define HPX_PARALLEL_EXECUTORS_EXECUTION_DEC_23_0712PM
 
 #include <hpx/config.hpp>
+// Necessary to avoid circular include
+#include <hpx/parallel/executors/execution_fwd.hpp>
+
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
@@ -21,7 +24,6 @@
 #endif
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/parallel/executors/fused_bulk_execute.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/future_access.hpp>
