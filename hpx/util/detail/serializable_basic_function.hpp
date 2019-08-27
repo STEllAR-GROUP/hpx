@@ -19,6 +19,7 @@
 #include <hpx/functional/detail/vtable/vtable.hpp>
 
 #include <string>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace util { namespace detail
