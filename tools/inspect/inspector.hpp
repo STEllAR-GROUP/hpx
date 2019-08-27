@@ -11,16 +11,17 @@
 #ifndef BOOST_INSPECTOR_HPP
 #define BOOST_INSPECTOR_HPP
 
+#include <hpx/filesystem.hpp>
+
 #include <cstddef>
 #include <iostream>
 #include <ostream>
 #include <set>
 #include <string>
 
-#include "boost/filesystem/path.hpp"
 
 using std::string;
-using boost::filesystem::path;
+using hpx::filesystem::path;
 
 namespace boost
 {
@@ -96,7 +97,7 @@ namespace boost
     inline string relative_to( const path & src_arg, const path & base_arg )
     {
       path base( base_arg );
-      base.normalize();
+      base.lexically_normal();
       string::size_type pos( base.string().size() );
       string src_arg_s(src_arg.string());
       path src;
@@ -104,7 +105,7 @@ namespace boost
         src = path(src_arg.string().substr(pos));
       else
         src = path(src_arg_s);
-      src.normalize();
+      src.lexically_normal();
       return src.string();
     }
 

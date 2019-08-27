@@ -13,10 +13,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/filesystem.hpp>
 #include <hpx/util/plugin/config.hpp>
 
-#include <boost/filesystem/convenience.hpp>
-#include <boost/filesystem/path.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <iostream>
@@ -68,13 +67,9 @@ namespace hpx { namespace util { namespace plugin {
         :   dll_name(libname), map_name(""), dll_handle(nullptr)
         {
             // map_name defaults to dll base name
-            namespace fs = boost::filesystem;
+            namespace fs = filesystem;
 
-#if BOOST_FILESYSTEM_VERSION == 2
-            fs::path dll_path(dll_name, fs::native);
-#else
             fs::path dll_path(dll_name);
-#endif
             map_name = fs::basename(dll_path);
         }
 

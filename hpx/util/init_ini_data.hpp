@@ -7,13 +7,12 @@
 #if!defined(HPX_INIT_INI_DATA_SEP_26_2008_0344PM)
 #define HPX_INIT_INI_DATA_SEP_26_2008_0344PM
 
+#include <hpx/filesystem.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/plugin/dll.hpp>
 #include <hpx/util/plugin/virtual_constructor.hpp>
-
-#include <boost/filesystem/path.hpp>
 
 #include <map>
 #include <memory>
@@ -51,7 +50,7 @@ namespace hpx { namespace util
     // default ini settings assuming all of those are components
     std::vector<std::shared_ptr<plugins::plugin_registry_base> >
     init_ini_data_default(std::string const& libs, section& ini,
-        std::map<std::string, boost::filesystem::path>& basenames,
+        std::map<std::string, filesystem::path>& basenames,
         std::map<std::string, hpx::util::plugin::dll>& modules);
 
 }}

@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/filesystem.hpp>
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/exception.hpp>
 
-#include <boost/filesystem/path.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <exception>
@@ -18,7 +18,7 @@ namespace hpx { namespace detail {
     HPX_NORETURN void throw_exception(error errcode, std::string const& msg,
         std::string const& func, std::string const& file, long line)
     {
-        boost::filesystem::path p(file);
+        filesystem::path p(file);
         hpx::detail::throw_exception(
             hpx::exception(errcode, msg, hpx::plain), func, p.string(), line);
     }
@@ -35,7 +35,7 @@ namespace hpx { namespace detail {
         throwmode mode, std::string const& func, std::string const& file,
         long line, std::string const& auxinfo)
     {
-        boost::filesystem::path p(file);
+        filesystem::path p(file);
         return hpx::detail::get_exception(hpx::exception(errcode, msg, mode),
             p.string(), file, line, auxinfo);
     }

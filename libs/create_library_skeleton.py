@@ -180,10 +180,6 @@ if lib_name != '--recreate-index':
     f = open(os.path.join(lib_name, 'examples', 'CMakeLists.txt'), 'w')
     f.write(examples_cmakelists_template)
 
-    # Generate src/CMakeLists.txt
-    f = open(os.path.join(lib_name, 'src', 'CMakeLists.txt'), 'w')
-    f.write(cmake_header)
-
     # Generate tests/CMakeLists.txt
     f = open(os.path.join(lib_name, 'tests', 'CMakeLists.txt'), 'w')
     f.write(tests_cmakelists_template)

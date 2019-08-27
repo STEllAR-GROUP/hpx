@@ -23,7 +23,6 @@
 #include <boost/version.hpp>
 #include <boost/config.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/filesystem/operations.hpp>
 
 #include <cstddef>
 #include <cstdint>

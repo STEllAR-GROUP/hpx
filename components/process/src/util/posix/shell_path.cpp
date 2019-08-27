@@ -11,19 +11,18 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_WINDOWS)
-#include <hpx/errors.hpp>
 #include <hpx/components/process/util/shell_path.hpp>
-
-#include <boost/filesystem/path.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/filesystem.hpp>
 
 namespace hpx { namespace components { namespace process { namespace posix
 {
-    boost::filesystem::path shell_path()
+    filesystem::path shell_path()
     {
         return "/bin/sh";
     }
 
-    boost::filesystem::path shell_path(hpx::error_code &ec)
+    filesystem::path shell_path(hpx::error_code &ec)
     {
         ec = hpx::make_success_code();
         return "/bin/sh";

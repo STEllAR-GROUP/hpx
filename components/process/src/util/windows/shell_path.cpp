@@ -11,14 +11,13 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <hpx/errors.hpp>
 #include <hpx/components/process/util/windows/shell_path.hpp>
-
-#include <boost/filesystem/path.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/filesystem.hpp>
 
 namespace hpx { namespace components { namespace process { namespace windows
 {
-    boost::filesystem::path shell_path()
+    filesystem::path shell_path()
     {
         TCHAR sysdir[MAX_PATH];
         UINT size = ::GetSystemDirectory(sysdir, sizeof(sysdir));
@@ -28,15 +27,15 @@ namespace hpx { namespace components { namespace process { namespace windows
                 "process::shell_path",
                 "GetSystemDirectory() failed");
         }
-        boost::filesystem::path p = sysdir;
+        filesystem::path p = sysdir;
         return p / "cmd.exe";
     }
 
-    boost::filesystem::path shell_path(hpx::error_code &ec)
+    filesystem::path shell_path(hpx::error_code &ec)
     {
         TCHAR sysdir[MAX_PATH];
         UINT size = ::GetSystemDirectory(sysdir, sizeof(sysdir));
-        boost::filesystem::path p;
+        filesystem::path p;
         if (!size)
         {
             HPX_THROWS_IF(ec, invalid_status,

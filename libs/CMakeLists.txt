@@ -20,6 +20,7 @@ set(HPX_LIBS
   config
   datastructures
   errors
+  filesystem
   format
   hardware
   hashing

@@ -7,12 +7,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
+#include <hpx/filesystem.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/logging/format/destination/defaults.hpp>
 #include <hpx/logging/format/named_write.hpp>
 
 #include <boost/config.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/version.hpp>
 

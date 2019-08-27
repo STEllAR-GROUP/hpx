@@ -23,6 +23,7 @@ All modules
    /libs/config/docs/index.rst
    /libs/datastructures/docs/index.rst
    /libs/errors/docs/index.rst
+   /libs/filesystem/docs/index.rst
    /libs/format/docs/index.rst
    /libs/hardware/docs/index.rst
    /libs/hashing/docs/index.rst
