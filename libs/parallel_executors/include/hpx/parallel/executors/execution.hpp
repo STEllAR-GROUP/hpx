@@ -31,7 +31,7 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <cstddef>

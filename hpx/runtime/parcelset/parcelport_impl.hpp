@@ -22,7 +22,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/connection_cache.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>

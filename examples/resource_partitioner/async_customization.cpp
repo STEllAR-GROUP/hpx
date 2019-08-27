@@ -23,7 +23,7 @@
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/pack_traversal.hpp>
 #include <hpx/debugging/demangle_helper.hpp>
 //

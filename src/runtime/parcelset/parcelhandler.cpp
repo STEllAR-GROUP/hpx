@@ -30,7 +30,7 @@
 #include <hpx/util/apex.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/concurrency/itt_notify.hpp>

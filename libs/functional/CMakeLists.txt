@@ -9,6 +9,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/functional/include
 set(functional_headers
+  hpx/functional/deferred_call.hpp
   hpx/functional/detail/vtable/callable_vtable.hpp
   hpx/functional/detail/vtable/copyable_vtable.hpp
   hpx/functional/detail/vtable/function_vtable.hpp
@@ -42,6 +43,7 @@ set(functional_compat_headers
   hpx/util/bind.hpp
   hpx/util/bind_back.hpp
   hpx/util/bind_front.hpp
+  hpx/util/deferred_call.hpp
   hpx/util/function.hpp
   hpx/util/function_ref.hpp
   hpx/util/invoke.hpp

@@ -83,7 +83,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/util_fwd.hpp>
 

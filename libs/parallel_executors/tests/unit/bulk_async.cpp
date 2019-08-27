@@ -8,7 +8,7 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 
 #include <algorithm>
 #include <iterator>

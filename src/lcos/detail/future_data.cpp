@@ -15,7 +15,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/functional/unique_function.hpp>
 

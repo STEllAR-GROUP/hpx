@@ -37,7 +37,7 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/datastructures/tuple.hpp>

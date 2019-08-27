@@ -25,7 +25,7 @@
 #include <hpx/state.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/functional/unique_function.hpp>
 

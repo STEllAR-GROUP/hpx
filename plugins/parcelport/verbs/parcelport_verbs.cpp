@@ -16,7 +16,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 

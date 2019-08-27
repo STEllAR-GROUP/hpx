@@ -14,7 +14,7 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/pool_timer.hpp>
 

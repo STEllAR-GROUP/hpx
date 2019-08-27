@@ -30,7 +30,7 @@
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <boost/system/system_error.hpp>
