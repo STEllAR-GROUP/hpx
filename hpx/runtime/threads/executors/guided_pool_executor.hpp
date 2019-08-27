@@ -12,7 +12,7 @@
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/util/debug/demangle_helper.hpp>
+#include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/util/pack_traversal.hpp>
 #include <hpx/util/thread_description.hpp>

@@ -19,6 +19,7 @@ set(HPX_LIBS
   concurrency
   config
   datastructures
+  debugging
   errors
   filesystem
   format

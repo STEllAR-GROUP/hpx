@@ -22,6 +22,7 @@ All modules
    /libs/concurrency/docs/index.rst
    /libs/config/docs/index.rst
    /libs/datastructures/docs/index.rst
+   /libs/debugging/docs/index.rst
    /libs/errors/docs/index.rst
    /libs/filesystem/docs/index.rst
    /libs/format/docs/index.rst

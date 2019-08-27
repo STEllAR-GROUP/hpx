@@ -75,6 +75,6 @@ add_hpx_module(functional
     SOURCES ${functional_sources}
     HEADERS ${functional_headers}
     COMPAT_HEADERS ${functional_compat_headers}
-    DEPENDENCIES hpx_assertion hpx_concurrency hpx_config hpx_errors
+    DEPENDENCIES hpx_assertion hpx_concurrency hpx_config hpx_debugging hpx_errors
     CMAKE_SUBDIRS examples tests
 )
