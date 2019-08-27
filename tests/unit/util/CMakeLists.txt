@@ -4,15 +4,15 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    any
     any_serialization
     bind_action
-    boost_any
     checkpoint
     config_entry
     pack_traversal
     pack_traversal_async
     parse_slurm_nodelist
+    serializable_any
+    serializable_boost_any
     tagged
     tuple
     unwrap
