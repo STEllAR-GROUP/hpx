@@ -13,16 +13,16 @@
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
-#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/detail/network_background_callback.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/state.hpp>
+#include <hpx/topology/cpu_mask.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/state.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <thread>

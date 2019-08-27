@@ -10,7 +10,7 @@
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/hardware/timestamp.hpp>

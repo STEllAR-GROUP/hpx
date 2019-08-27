@@ -10,9 +10,9 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/resource/partitioner.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/runtime/threads/cpu_mask.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/assertion.hpp>

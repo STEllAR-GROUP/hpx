@@ -14,7 +14,7 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/threads/cpu_mask.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 
 #include <boost/variant.hpp>
 

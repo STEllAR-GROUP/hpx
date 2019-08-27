@@ -27,7 +27,7 @@
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/backtrace.hpp>
@@ -1418,6 +1418,17 @@ namespace hpx { namespace threads
     HPX_API_EXPORT void remove_scheduler_mode(threads::policies::scheduler_mode m)
     {
         get_runtime().get_thread_manager().remove_scheduler_mode(m);
+    }
+
+    HPX_API_EXPORT topology const& get_topology()
+    {
+        hpx::runtime* rt = hpx::get_runtime_ptr();
+        if (rt == nullptr)
+        {
+            HPX_THROW_EXCEPTION(invalid_status, "hpx::threads::get_topology",
+                "the hpx runtime system has not been initialized yet");
+        }
+        return rt->get_topology();
     }
 }}
 

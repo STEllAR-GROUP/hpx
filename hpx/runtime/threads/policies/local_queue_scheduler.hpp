@@ -16,7 +16,7 @@
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
@@ -317,16 +317,6 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread =
                 data.schedulehint.mode == thread_schedule_hint_mode_thread ?
                 data.schedulehint.hint : std::size_t(-1);
-#ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
-//             // try to figure out the NUMA node where the data lives
-//             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
-//                 mask_cref_type mask =
-//                     topology_.get_thread_affinity_mask_from_lva(data.lva);
-//                 if (any(mask)) {
-//                     num_thread = find_first(mask);
-//                 }
-//             }
-#endif
 
             std::size_t queue_size = queues_.size();
 

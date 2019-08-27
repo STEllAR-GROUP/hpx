@@ -8,7 +8,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 

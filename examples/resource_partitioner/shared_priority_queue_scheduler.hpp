@@ -14,7 +14,7 @@
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/errors/throw_exception.hpp>
 #include <hpx/logging.hpp>

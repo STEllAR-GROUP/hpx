@@ -14,7 +14,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <utility>

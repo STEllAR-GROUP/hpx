@@ -32,6 +32,7 @@ add_hpx_module(collectives
       hpx_logging
       hpx_preprocessor
       hpx_timing
+      hpx_topology
       hpx_type_support
       hpx_util
     CMAKE_SUBDIRS examples tests

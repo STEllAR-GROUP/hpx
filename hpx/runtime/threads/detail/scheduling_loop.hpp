@@ -409,7 +409,6 @@ namespace hpx { namespace threads { namespace detail
                 return thread_result_type(terminated, invalid_thread_id);
             },
             hpx::util::thread_description("background_work"),
-            0,
             thread_priority_high_recursive,
             schedulehint,
             get_stack_size(thread_stacksize_large),

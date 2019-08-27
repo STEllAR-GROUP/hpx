@@ -8,12 +8,12 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/runtime/threads/executors/guided_pool_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/threads/topology.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/topology/topology.hpp>
 
 #include <sstream>
 #include <string>
