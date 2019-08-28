@@ -4,6 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// The thread_pool_os_executor is an executor that creates a new thread pool for
+// itself. This checks that the usual functions of an executor work with this
+// executor when used *without the HPX runtime*. This test fails if thread
+// pools, schedulers etc. assume that the global runtime (configuration, thread
+// manager, etc.) always exists.
+
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
