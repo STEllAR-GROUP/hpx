@@ -338,14 +338,6 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::resume_direct(error_code& ec)
     {
-        if (threads::get_self_ptr() && hpx::this_thread::get_pool() == this)
-        {
-            HPX_THROWS_IF(ec, bad_parameter,
-                "scheduled_thread_pool<Scheduler>::resume_direct",
-                "cannot suspend a pool from itself");
-            return;
-        }
-
         this->resume_internal(true, ec);
     }
 
