@@ -10,49 +10,9 @@ include(HPX_AddLibrary)
 ################################################################################
 # Decide whether to use the MPI based parcelport
 ################################################################################
-if(HPX_WITH_PARCELPORT_MPI)
-  find_package(MPI)
-
-  if(NOT MPI_CXX_FOUND)
-    hpx_error("MPI could not be found and HPX_WITH_PARCELPORT_MPI=On, please specify MPI_CXX_COMPILER to point to a working MPI C++ compiler for your platform")
-  endif()
-  if(MPI_CXX_COMPILE_FLAGS)
-    hpx_add_compile_flag(${MPI_CXX_COMPILE_FLAGS})
-  endif()
-  if(MPI_CXX_LINK_FLAGS)
-    #    hpx_add_link_flag_if_available(${MPI_CXX_LINK_FLAGS})
-  endif()
-
-  if(MPI_CXX_COMPILE_DEFINITIONS)
-    # Emulate add_compile_definitions.
-    # This command was only introduced as part of CMake 3.11, but we already require it for versions >= 3.10.
-    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ${MPI_CXX_COMPILE_DEFINITIONS})
-  endif()
-
-  macro(add_parcelport_mpi_module)
+macro(add_parcelport_mpi_module)
+  if(HPX_WITH_PARCELPORT_MPI)
     hpx_debug("add_parcelport_mpi_module")
-    if(MPI_CXX_INCLUDE_PATH)
-      include_directories(${MPI_CXX_INCLUDE_PATH})
-    elseif(MPI_CXX_HEADER_DIR)
-      # cmake V3.10.2 has changed the name for the MPI include directory
-      include_directories(${MPI_CXX_HEADER_DIR})
-    endif()
-
-    set(_mpi_libraries)
-    if(MPI_CXX_LIBRARIES)
-      set(_mpi_libraries ${_mpi_libraries} ${MPI_CXX_LIBRARIES})
-    elseif(MPI_CXX_LIB_NAMES)
-      # cmake V3.10.2 has changed the way MPI libraries are being discovered
-      foreach(lib ${MPI_CXX_LIB_NAMES})
-        set(_mpi_libraries ${_mpi_libraries} ${MPI_${lib}_LIBRARY})
-      endforeach()
-    endif()
-    if(MPI_LIBRARY)
-      set(_mpi_libraries ${_mpi_libraries} ${MPI_LIBRARY})
-    endif()
-    if(MPI_EXTRA_LIBRARY)
-      set(_mpi_libraries ${_mpi_libraries} ${MPI_EXTRA_LIBRARY})
-    endif()
     add_parcelport(mpi
       STATIC
       SOURCES
@@ -68,10 +28,7 @@ if(HPX_WITH_PARCELPORT_MPI)
         "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender_connection.hpp"
         "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/tag_provider.hpp"
       DEPENDENCIES
-        ${_mpi_libraries}
+        hpx::mpi
       FOLDER "Core/Plugins/Parcelport/MPI")
-  endmacro()
-else()
-  macro(add_parcelport_mpi_module)
-  endmacro()
-endif()
+  endif()
+endmacro()

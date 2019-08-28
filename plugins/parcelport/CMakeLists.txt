@@ -68,19 +68,6 @@ macro(add_parcelport name)
 
     hpx_libraries(${${name}_DEPENDENCIES})
 
-  else()
-    hpx_debug("adding parcelport plugin: ${name}")
-    add_hpx_library(${name}
-        PLUGIN
-        SOURCES ${${name}_SOURCES}
-        HEADERS ${${name}_HEADERS}
-        FOLDER ${${name}_FOLDER}
-        COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
-        LINK_FLAGS ${${name}_LINK_FLAGS}
-        DEPENDENCIES ${${name}_DEPENDENCIES})
-
-    add_hpx_pseudo_dependencies(plugins.parcelport.${name_short} ${name})
-    add_hpx_pseudo_dependencies(core plugins.parcelport.${name_short})
   endif()
 
 endmacro()

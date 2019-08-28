@@ -15,6 +15,8 @@ foreach(category ${plugin_categories})
   add_hpx_pseudo_dependencies(plugins plugins.${category})
 endforeach()
 
+# Use of macros in order to call after we configured the plugins in the main
+# CMakeLists.txt
 macro(add_plugin_modules)
   add_binary_filter_modules()
   add_parcel_modules()
