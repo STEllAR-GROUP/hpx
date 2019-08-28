@@ -6,10 +6,10 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/hpx_init.hpp>
 #include <hpx/concurrency/register_locks.hpp>
 #include <hpx/format.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/hpx_init.hpp>
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>

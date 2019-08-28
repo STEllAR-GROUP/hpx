@@ -27,7 +27,7 @@ set(Boost_ADDITIONAL_VERSIONS
     "1.59.0" "1.59"
     "1.58.0" "1.58"
     "1.57.0" "1.57")
-set(__boost_minimum_version "1.61")
+set(Boost_MINIMUM_VERSION "1.61" CACHE  INTERNAL "1.61" FORCE)
 
 set(__boost_libraries)
 if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
@@ -65,7 +65,7 @@ set(__boost_libraries
   system)
 
 set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
-find_package(Boost ${__boost_minimum_version}
+find_package(Boost ${Boost_MINIMUM_VERSION}
   MODULE REQUIRED
   COMPONENTS ${__boost_libraries})
 
@@ -85,7 +85,7 @@ endif()
 set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 
 if(NOT HPX_WITH_CXX17_FILESYSTEM)
-  find_package(Boost ${__boost_minimum_version}
+  find_package(Boost ${Boost_MINIMUM_VERSION}
     QUIET MODULE
     COMPONENTS filesystem)
   if(Boost_FILESYSTEM_FOUND)

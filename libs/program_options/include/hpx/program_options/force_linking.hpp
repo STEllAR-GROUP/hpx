@@ -6,6 +6,19 @@
 #if !defined(HPX_PROGRAM_OPTIONS_FORCE_LINKING_HPP)
 #define HPX_PROGRAM_OPTIONS_FORCE_LINKING_HPP
 
+#include <hpx/program_options/config.hpp>
+
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+namespace hpx { namespace program_options {
+
+    struct force_linking_helper
+    {
+    };
+
+    force_linking_helper& force_linking();
+}}
+#else
+
 #include <hpx/program_options.hpp>
 
 #include <functional>
@@ -13,8 +26,8 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace program_options
-{
+namespace hpx { namespace program_options {
+
     using parse_environment1_type = basic_parsed_options<char> (*)(
         options_description const&, char const*);
     using parse_environment2_type = basic_parsed_options<char> (*)(
@@ -50,6 +63,7 @@ namespace hpx { namespace program_options
     };
 
     force_linking_helper& force_linking();
-}}
+}}    // namespace hpx::program_options
 
+#endif
 #endif

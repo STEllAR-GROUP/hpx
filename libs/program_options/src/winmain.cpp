@@ -3,9 +3,10 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifdef _WIN32
+#include <hpx/program_options/config.hpp>
 
-#include <hpx/config.hpp>
+#if defined(HPX_WINDOWS) &&                                                    \
+    !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 #include <hpx/program_options/parsers.hpp>
 
 #include <cctype>
@@ -114,4 +115,5 @@ namespace hpx { namespace program_options {
     }
 
 }}    // namespace hpx::program_options
+
 #endif

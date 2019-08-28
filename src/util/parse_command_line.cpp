@@ -793,28 +793,29 @@ namespace hpx { namespace util
         std::string command_line;
         for (value_type const& v : vm)
         {
-            hpx::util::any_nonser const& value = v.second.value();
-            if (hpx::util::any_cast<std::string>(&value)) {
+            hpx::program_options::any const& value = v.second.value();
+            if (hpx::program_options::any_cast<std::string>(&value)) {
                 add_as_option(command_line, v.first,
                     embed_in_quotes(v.second.as<std::string>()));
                 if (!command_line.empty())
                     command_line += " ";
             }
-            else if (hpx::util::any_cast<double>(&value)) {
+            else if (hpx::program_options::any_cast<double>(&value)) {
                 add_as_option(command_line, v.first,
                     std::to_string(v.second.as<double>()));
                 if (!command_line.empty())
                     command_line += " ";
             }
-            else if (hpx::util::any_cast<int>(&value)) {
+            else if (hpx::program_options::any_cast<int>(&value)) {
                 add_as_option(command_line, v.first,
                     std::to_string(v.second.as<int>()));
                 if (!command_line.empty())
                     command_line += " ";
             }
-            else if (hpx::util::any_cast<std::vector<std::string> >(&value)) {
-                std::vector<std::string> const& vec =
-                    v.second.as<std::vector<std::string> >();
+            else if (hpx::program_options::any_cast<std::vector<std::string>>(
+                         &value))
+            {
+                auto const& vec = v.second.as<std::vector<std::string>>();
                 for (std::string const& e : vec)
                 {
                     add_as_option(command_line, v.first, embed_in_quotes(e));

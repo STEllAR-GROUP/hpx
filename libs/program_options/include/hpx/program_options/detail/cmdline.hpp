@@ -6,8 +6,22 @@
 #ifndef PROGRAM_OPTIONS_CMDLINE_VP_2003_05_19
 #define PROGRAM_OPTIONS_CMDLINE_VP_2003_05_19
 
-#include <hpx/program_options/cmdline.hpp>
 #include <hpx/program_options/config.hpp>
+
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/detail/cmdline.hpp
+
+#include <boost/program_options/detail/cmdline.hpp>
+
+namespace hpx { namespace program_options { namespace detail {
+
+    using boost::program_options::detail::cmdline;
+    using boost::program_options::detail::test_cmdline_detail;
+
+}}}    // namespace hpx::program_options::detail
+
+#else
+#include <hpx/program_options/cmdline.hpp>
 #include <hpx/program_options/errors.hpp>
 #include <hpx/program_options/option.hpp>
 #include <hpx/program_options/options_description.hpp>
@@ -142,4 +156,5 @@ namespace hpx { namespace program_options { namespace detail {
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif

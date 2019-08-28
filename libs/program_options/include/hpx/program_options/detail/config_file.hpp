@@ -7,6 +7,26 @@
 #define PROGRAM_OPTIONS_CONFIG_FILE_VP_2003_01_02
 
 #include <hpx/program_options/config.hpp>
+
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/detail/config_file.hpp
+
+#include <boost/program_options/detail/config_file.hpp>
+
+namespace hpx { namespace program_options { namespace detail {
+
+    using boost::program_options::detail::common_config_file_iterator;
+
+    template <typename Char>
+    using basic_config_file_iterator =
+        boost::program_options::detail::basic_config_file_iterator<Char>;
+    using boost::program_options::detail::config_file_iterator;
+    using boost::program_options::detail::wconfig_file_iterator;
+
+}}}    // namespace hpx::program_options::detail
+
+#else
+
 #include <hpx/program_options/detail/convert.hpp>
 #include <hpx/program_options/eof_iterator.hpp>
 #include <hpx/program_options/option.hpp>
@@ -167,4 +187,5 @@ namespace hpx { namespace program_options { namespace detail {
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif

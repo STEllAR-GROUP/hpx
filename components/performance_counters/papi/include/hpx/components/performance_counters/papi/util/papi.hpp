@@ -10,9 +10,10 @@
 
 #if defined(HPX_HAVE_PAPI)
 
-#include <hpx/performance_counters/counters.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstdint>
 #include <cstring>
@@ -20,8 +21,6 @@
 #include <vector>
 
 #include <boost/generator_iterator.hpp>
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/variables_map.hpp>
 
 #include <papi.h>
 

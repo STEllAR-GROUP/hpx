@@ -3,8 +3,36 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef PROGRAM_OPTIONS_DETAIL_VALUE_SEMANTIC
+#define PROGRAM_OPTIONS_DETAIL_VALUE_SEMANTIC
+
 // This file defines template functions that are declared in
 // ../value_semantic.hpp.
+
+#include <hpx/program_options/config.hpp>
+
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/detail/value_semantic.hpp
+
+#include <boost/program_options/detail/value_semantic.hpp>
+
+namespace hpx { namespace program_options {
+
+    using boost::program_options::arg;
+
+    namespace validators {
+
+        using boost::program_options::validators::get_single_string;
+        using boost::program_options::validators::check_first_occurrence;
+    }
+
+    using namespace validators;
+
+    using boost::program_options::validate;
+
+}}    // namespace hpx::program_options
+
+#else
 
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures/any.hpp>
@@ -215,3 +243,6 @@ namespace hpx { namespace program_options {
     }
 
 }}    // namespace hpx::program_options
+
+#endif
+#endif

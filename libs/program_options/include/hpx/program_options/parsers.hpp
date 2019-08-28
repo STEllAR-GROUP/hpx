@@ -7,6 +7,44 @@
 #define PROGRAM_OPTIONS_PARSERS_VP_2003_05_19
 
 #include <hpx/program_options/config.hpp>
+
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/parsers.hpp
+// hpxinspect:nodeprecatedinclude:boost/program_options/options_description.hpp
+
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/options_description.hpp>
+
+namespace hpx { namespace program_options {
+
+    template <typename Char>
+    using basic_parsed_options =
+        boost::program_options::basic_parsed_options<Char>;
+    using boost::program_options::parsed_options;
+    using boost::program_options::wparsed_options;
+
+    using boost::program_options::ext_parser;
+    template <typename Char>
+    using basic_command_line_parser =
+        boost::program_options::basic_command_line_parser<Char>;
+    using boost::program_options::command_line_parser;
+    using boost::program_options::wcommand_line_parser;
+
+    using boost::program_options::parse_command_line;
+    using boost::program_options::parse_config_file;
+    using boost::program_options::include_positional;
+    using boost::program_options::exclude_positional;
+    using boost::program_options::collect_unrecognized;
+    using boost::program_options::parse_environment;
+    using boost::program_options::split_unix;
+#ifdef HPX_WINDOWS
+    using boost::program_options::split_winmain;
+#endif
+
+}}    // namespace hpx::program_options
+
+#else
+
 #include <hpx/program_options/detail/cmdline.hpp>
 #include <hpx/program_options/option.hpp>
 
@@ -273,6 +311,8 @@ namespace hpx { namespace program_options {
 }}    // namespace hpx::program_options
 
 #include <hpx/config/warnings_suffix.hpp>
+
+#endif
 
 #include <hpx/program_options/detail/parsers.hpp>
 

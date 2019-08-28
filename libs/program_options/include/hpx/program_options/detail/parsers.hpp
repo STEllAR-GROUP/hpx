@@ -6,6 +6,23 @@
 #ifndef PROGRAM_OPTIONS_PARSERS_HPP_VP_2004_05_06
 #define PROGRAM_OPTIONS_PARSERS_HPP_VP_2004_05_06
 
+#include <hpx/program_options/config.hpp>
+
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/detail/parsers.hpp
+
+#include <boost/program_options/detail/parsers.hpp>
+
+namespace hpx { namespace program_options {
+
+    using boost::program_options::parse_command_line;
+    using boost::program_options::collect_unrecognized;
+
+}}    // namespace hpx::program_options
+
+#else
+
+#include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/detail/convert.hpp>
 
 #include <algorithm>
@@ -132,4 +149,5 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
+#endif
 #endif

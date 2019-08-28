@@ -8,6 +8,22 @@
 
 #include <hpx/program_options/config.hpp>
 
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/option.hpp
+
+#include <boost/program_options/option.hpp>
+
+namespace hpx { namespace program_options {
+
+    template <typename Char>
+    using basic_option = boost::program_options::basic_option<Char>;
+    using boost::program_options::option;
+    using boost::program_options::woption;
+
+}}    // namespace hpx::program_options
+
+#else
+
 #include <string>
 #include <vector>
 
@@ -72,4 +88,5 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
+#endif
 #endif

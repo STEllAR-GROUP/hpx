@@ -10,7 +10,9 @@
 // Please see the comments in <boost/detail/utf8_codecvt_facet.hpp> to
 // learn how this file should be used.
 
-#include <hpx/config.hpp>
+#include <hpx/program_options/config.hpp>
+
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 #include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
 
 #include <cstddef>
@@ -288,3 +290,4 @@ namespace hpx { namespace program_options { namespace detail {
 
 }}}    // namespace hpx::program_options::detail
 
+#endif

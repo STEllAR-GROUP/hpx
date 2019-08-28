@@ -8,6 +8,51 @@
 #define PROGRAM_OPTIONS_OPTION_DESCRIPTION_VP_2003_05_19
 
 #include <hpx/program_options/config.hpp>
+
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/options_description.hpp
+
+#include <boost/program_options/options_description.hpp>
+
+#include <utility>
+
+namespace hpx { namespace program_options {
+
+    using boost::program_options::option_description;
+    using boost::program_options::options_description_easy_init;
+    using boost::program_options::duplicate_option_error;
+
+    class options_description
+      : public boost::program_options::options_description
+    {
+        using base_type = boost::program_options::options_description;
+
+    public:
+        options_description(unsigned line_length = m_default_line_length,
+            unsigned min_description_length = m_default_line_length / 2)
+          : base_type(line_length, min_description_length)
+        {}
+
+        options_description(const std::string& caption,
+            unsigned line_length = m_default_line_length,
+            unsigned min_description_length = m_default_line_length / 2)
+          : base_type(caption, line_length, min_description_length)
+        {}
+
+        HPX_DEPRECATED(PROGRAM_OPTIONS_DEPRECATED_MESSAGE)
+        options_description(base_type const& rhs)
+          : base_type(rhs)
+        {}
+
+        HPX_DEPRECATED(PROGRAM_OPTIONS_DEPRECATED_MESSAGE)
+        options_description(base_type&& rhs) noexcept
+          : base_type(std::move(rhs))
+        {}
+    };
+}}    // namespace hpx::program_options
+
+#else
+
 #include <hpx/program_options/errors.hpp>
 #include <hpx/program_options/value_semantic.hpp>
 
@@ -280,4 +325,5 @@ namespace hpx { namespace program_options {
 
 #include<hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif

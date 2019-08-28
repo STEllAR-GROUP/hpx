@@ -16,9 +16,7 @@
 */
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/variables_map.hpp>
+#include <hpx/program_options.hpp>
 
 #include <boost/tokenizer.hpp>
 #include <boost/token_functions.hpp>

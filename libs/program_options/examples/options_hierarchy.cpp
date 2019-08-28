@@ -182,7 +182,8 @@ private:
 
         // Run a parser here (with no command line options) to add these defaults into
         // results, this way they will be enabled even if no config files are parsed.
-        store(po::command_line_parser(0, nullptr)
+        char const* argv[] = {"options_hierarchy", nullptr};
+        store(po::command_line_parser(1, argv)
                   .options(config_only_options)
                   .run(),
             results);

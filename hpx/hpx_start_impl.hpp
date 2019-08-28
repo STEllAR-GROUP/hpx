@@ -10,15 +10,13 @@
 #include <hpx/assertion.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_user_main_config.hpp>
+#include <hpx/program_options.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/function.hpp>
-
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/variables_map.hpp>
 
 #include <cstddef>
 #include <string>

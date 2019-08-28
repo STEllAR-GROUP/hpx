@@ -8,9 +8,11 @@
 
 #include <hpx/program_options/cmdline.hpp>
 #include <hpx/program_options/detail/cmdline.hpp>
+#include <hpx/program_options/option.hpp>
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
 
+#include <cstddef>
 #include <iostream>
 #include <sstream>
 #include <string>

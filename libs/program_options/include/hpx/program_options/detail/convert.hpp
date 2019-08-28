@@ -7,7 +7,25 @@
 #define PROGRAM_OPTIONS_CONVERT_HPP_VP_2004_04_28
 
 #include <hpx/program_options/config.hpp>
-#include <hpx/program_options/detail/convert.hpp>
+
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/detail/convert.hpp
+
+#include <boost/program_options/detail/convert.hpp>
+
+namespace hpx { namespace program_options {
+
+    using boost::from_8_bit;
+    using boost::to_8_bit;
+    using boost::from_utf8;
+    using boost::to_utf8;
+    using boost::to_local_8_bit;
+    using boost::from_local_8_bit;
+    using boost::program_options::to_internal;
+
+}}    // namespace hpx::program_options
+
+#else
 
 #include <cwchar>
 #include <locale>
@@ -61,4 +79,5 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
+#endif
 #endif

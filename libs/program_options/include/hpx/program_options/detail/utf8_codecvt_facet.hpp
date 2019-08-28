@@ -79,7 +79,20 @@
 // of types other than <wchar_t,char_t> is used, then std::codecvt must be
 // specialized on those types for this to work.
 
-#include <hpx/config.hpp>
+#include <hpx/program_options/config.hpp>
+
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/detail/utf8_codecvt_facet.hpp
+
+#include <boost/program_options/detail/utf8_codecvt_facet.hpp>
+
+namespace hpx { namespace program_options { namespace detail {
+
+    using boost::program_options::detail::utf8_codecvt_facet;
+
+}}}
+
+#else
 
 #include <cstddef>    // for std::size_t
 #include <cwchar>     // for mbstate_t
@@ -96,7 +109,6 @@
 //----------------------------------------------------------------------------//
 
 namespace hpx { namespace program_options { namespace detail {
-
 
     struct HPX_EXPORT utf8_codecvt_facet
       : public std::codecvt<wchar_t, char, std::mbstate_t>
@@ -178,4 +190,5 @@ namespace hpx { namespace program_options { namespace detail {
 
 }}}    // namespace hpx::program_options::detail
 
+#endif
 #endif    // PROGRAM_OPTIONS_UTF8_CODECVT_FACET_HPP

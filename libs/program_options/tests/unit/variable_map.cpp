@@ -6,10 +6,13 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>
 
-#include <hpx/program_options/variables_map.hpp>
+#include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
+#include <hpx/program_options/errors.hpp>
+#include <hpx/program_options/option.hpp>
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
+#include <hpx/program_options/value_semantic.hpp>
+#include <hpx/program_options/variables_map.hpp>
 
 #include <sstream>
 #include <string>

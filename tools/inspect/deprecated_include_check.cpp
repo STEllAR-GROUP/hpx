@@ -51,33 +51,8 @@ namespace boost
       { "boost/random/([^\\s]*)\\.hpp", "random" },
       { "boost/format\\.hpp", "hpx/util/format.hpp" },
       { "boost/regex.hpp", "regex" },
-      { "boost/program_options.hpp", "hpx/program_options.hpp" },
-      { "boost/program_options/cmdline.hpp", "hpx/program_options/cmdline.hpp" },
-      { "boost/program_options/config.hpp", "hpx/program_options/config.hpp" },
-      { "boost/program_options/environment_iterator.hpp",
-        "hpx/program_options/environment_iterator.hpp" },
-      { "boost/program_options/eof_iterator\\.hpp",
-        "hpx/program_options/eof_iterator\\.hpp" },
-      { "boost/program_options/errors\\.hpp", "hpx/program_options/errors.hpp" },
-      { "boost/program_options/option\\.hpp", "hpx/program_options/option.hpp" },
-      { "boost/program_options/options_description\\.hpp",
-        "hpx/program_options/options_description.hpp" },
-      { "boost/program_options/parsers\\.hpp", "hpx/program_options/parsers.hpp" },
-      { "boost/program_options/positional_options\\.hpp",
-        "hpx/program_options/positional_options.hpp" },
-      { "boost/program_options/value_semantic\\.hpp",
-        "hpx/program_options/value_semantic.hpp" },
-      { "boost/program_options/variables_map\\.hpp",
-        "hpx/program_options/variables_map.hpp" },
-      { "boost/filesystem.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/config.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/convenience.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/exception.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/fstream.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/operations.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/path.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/path_traits.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/string_file.hpp", "hpx/filesystem.hpp" },
+      { "boost/program_options([^\\s]*)\\.hpp", "hpx/program_options\\2.hpp" },
+      { "boost/filesystem([^\\s]*)\\.hpp", "hpx/filesystem.hpp" },
       { nullptr, nullptr }
     };
 
@@ -101,11 +76,11 @@ namespace boost
            ++includes_it)
       {
         std::string rx =
-            std::string("^\\s*#\\s*include\\s*<(")
+            std::string(R"(^\s*#\s*include\s*<()")
           +   includes_it->include_regex
           + ")>\\s*$"
           + "|"
-          + "^\\s*#\\s*include\\s*\"("
+          + R"(^\s*#\s*include\s*"()"
           +   includes_it->include_regex
           + ")\"\\s*$";
 

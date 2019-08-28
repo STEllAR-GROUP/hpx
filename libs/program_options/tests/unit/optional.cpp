@@ -25,7 +25,7 @@ std::vector<std::string> sv(const char* array[], unsigned size)
 
 void test_optional()
 {
-    hpx::util::optional<int> foo, bar, baz;
+    po::optional<int> foo, bar, baz;
 
     po::options_description desc;
     desc.add_options()

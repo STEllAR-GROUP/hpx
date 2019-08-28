@@ -9,7 +9,10 @@
 
 #include <hpx/program_options/cmdline.hpp>
 #include <hpx/program_options/detail/cmdline.hpp>
+#include <hpx/program_options/errors.hpp>
+#include <hpx/program_options/option.hpp>
 #include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options/value_semantic.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -28,13 +31,13 @@ using namespace std;
 const int s_success = 0;
 const int s_unknown_option = 1;
 const int s_ambiguous_option = 2;
-const int s_long_not_allowed = 3;
-const int s_long_adjacent_not_allowed = 4;
-const int s_short_adjacent_not_allowed = 5;
+// const int s_long_not_allowed = 3;
+// const int s_long_adjacent_not_allowed = 4;
+// const int s_short_adjacent_not_allowed = 5;
 const int s_empty_adjacent_parameter = 6;
 const int s_missing_parameter = 7;
 const int s_extra_parameter = 8;
-const int s_unrecognized_line = 9;
+// const int s_unrecognized_line = 9;
 
 int translate_syntax_error_kind(invalid_command_line_syntax::kind_t k)
 {

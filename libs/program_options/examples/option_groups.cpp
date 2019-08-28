@@ -19,9 +19,7 @@
 */
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/variables_map.hpp>
+#include <hpx/program_options.hpp>
 
 #include <exception>
 #include <fstream>

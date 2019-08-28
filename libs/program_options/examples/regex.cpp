@@ -55,7 +55,7 @@ bool operator==(magic_number const& lhs, magic_number const& rhs)
    This has no practical meaning, meant only to show how
    regex can be used to validate values.
 */
-void validate(hpx::util::any_nonser& v, const std::vector<std::string>& values,
+void validate(any& v, const std::vector<std::string>& values,
     magic_number*, int)
 {
     static regex r(R"(\d\d\d-(\d\d\d))");
@@ -72,8 +72,7 @@ void validate(hpx::util::any_nonser& v, const std::vector<std::string>& values,
     smatch match;
     if (regex_match(s, match, r))
     {
-        v = hpx::util::any_nonser(
-                magic_number(boost::lexical_cast<int>(match[1])));
+        v = any(magic_number(boost::lexical_cast<int>(match[1])));
     }
     else
     {

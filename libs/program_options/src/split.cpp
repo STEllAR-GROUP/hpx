@@ -3,6 +3,9 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/program_options/config.hpp>
+
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 #include <hpx/program_options/parsers.hpp>
 
 #include <boost/tokenizer.hpp>
@@ -58,3 +61,5 @@ namespace hpx { namespace program_options {
     }
 
 }}    // namespace hpx::program_options
+
+#endif

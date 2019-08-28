@@ -8,6 +8,27 @@
 
 #include <hpx/program_options/config.hpp>
 
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/parsers.hpp
+// hpxinspect:nodeprecatedinclude:boost/program_options/variables_map.hpp
+// hpxinspect:nodeprecatedinclude:boost/program_options/value_semantic.hpp
+
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
+#include <boost/program_options/value_semantic.hpp>
+
+namespace hpx { namespace program_options {
+
+    using boost::program_options::store;
+    using boost::program_options::notify;
+    using boost::program_options::variable_value;
+    using boost::program_options::abstract_variables_map;
+    using boost::program_options::variables_map;
+
+}}    // namespace hpx::program_options
+
+#else
+
 #include <hpx/datastructures/any.hpp>
 
 #include <map>
@@ -212,4 +233,5 @@ namespace hpx { namespace program_options {
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif

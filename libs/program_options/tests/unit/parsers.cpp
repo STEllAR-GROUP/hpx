@@ -7,8 +7,11 @@
 #include <hpx/filesystem.hpp>
 #include <hpx/testing.hpp>
 
+#include <hpx/program_options/option.hpp>
 #include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options/positional_options.hpp>
 #include <hpx/program_options/parsers.hpp>
+#include <hpx/program_options/value_semantic.hpp>
 #include <hpx/program_options/variables_map.hpp>
 
 #include <cstdlib>    // for putenv

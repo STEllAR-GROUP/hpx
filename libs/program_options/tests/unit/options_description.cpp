@@ -7,7 +7,9 @@
 #include <hpx/testing.hpp>
 
 #include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options/value_semantic.hpp>
 
+#include <cstddef>
 #include <functional>
 #include <utility>
 #include <string>
@@ -82,23 +84,35 @@ void test_approximation_with_multiname_options()
     HPX_TEST_EQ(desc.find("all", true).long_name(), "everything");
     HPX_TEST_EQ(desc.find("all-ch", true).long_name(), "chroots");
 
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+    // the long_names() API function was introduced in Boost V1.68
     HPX_TEST_EQ(desc.find("foo", false, false, false).long_names().second,
         std::size_t(1));
-    HPX_TEST_EQ(desc.find("foo", false, false, false).long_names().first[0], "foo");
+    HPX_TEST_EQ(
+        desc.find("foo", false, false, false).long_names().first[0], "foo");
 
     HPX_TEST_EQ(desc.find("fe", false, false, false).long_names().second,
         std::size_t(2));
-    HPX_TEST_EQ(desc.find("fe", false, false, false).long_names().first[0], "fe");
-    HPX_TEST_EQ(desc.find("baz", false, false, false).long_names().first[1], "baz");
+    HPX_TEST_EQ(
+        desc.find("fe", false, false, false).long_names().first[0], "fe");
+    HPX_TEST_EQ(
+        desc.find("baz", false, false, false).long_names().first[1], "baz");
 
     HPX_TEST_EQ(desc.find("baz", false, false, false).long_names().second,
         std::size_t(2));
-    HPX_TEST_EQ(desc.find("baz", false, false, false).long_names().first[0], "fizbaz");
-    HPX_TEST_EQ(desc.find("baz", false, false, false).long_names().first[1], "baz");
+    HPX_TEST_EQ(
+        desc.find("baz", false, false, false).long_names().first[0], "fizbaz");
+    HPX_TEST_EQ(
+        desc.find("baz", false, false, false).long_names().first[1], "baz");
+#endif
 }
 
 void test_long_names_for_option_description()
 {
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+    // the long_names() API function was introduced in Boost V1.68
     options_description desc;
     desc.add_options()
         ("foo", new untyped_value())
@@ -127,6 +141,7 @@ void test_long_names_for_option_description()
         desc.find("qux", false, false, false).long_names().first[0], "qux");
     HPX_TEST_EQ(
         desc.find("qux", false, false, false).long_names().first[1], "fo");
+#endif
 }
 
 void test_formatting()

@@ -6,6 +6,23 @@
 #ifndef PROGRAM_OPTIONS_CMDLINE_HPP_VP_2004_03_13
 #define PROGRAM_OPTIONS_CMDLINE_HPP_VP_2004_03_13
 
+#include <hpx/program_options/config.hpp>
+
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/cmdline.hpp
+// hpxinspect:nodeprecatedinclude:boost/program_options/detail/cmdline.hpp
+
+#include <boost/program_options/cmdline.hpp>
+#include <boost/program_options/detail/cmdline.hpp>
+
+namespace hpx { namespace program_options { namespace command_line_style {
+
+    using namespace boost::program_options::command_line_style;
+
+}}}    // namespace hpx::program_options::command_line_style
+
+#else
+
 namespace hpx { namespace program_options { namespace command_line_style {
 
     /** Various possible styles of options.
@@ -86,4 +103,7 @@ namespace hpx { namespace program_options { namespace command_line_style {
     };
 }}}    // namespace hpx::program_options::command_line_style
 
+#include <hpx/program_options/detail/cmdline.hpp>
+
+#endif
 #endif

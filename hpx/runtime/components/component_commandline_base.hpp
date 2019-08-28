@@ -9,8 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
-
-#include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

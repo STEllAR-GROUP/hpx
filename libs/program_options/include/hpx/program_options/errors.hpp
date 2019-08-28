@@ -8,6 +8,35 @@
 
 #include <hpx/program_options/config.hpp>
 
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/errors.hpp
+
+#include <boost/program_options/errors.hpp>
+
+namespace hpx { namespace program_options {
+
+    using boost::program_options::error;
+    using boost::program_options::too_many_positional_options_error;
+    using boost::program_options::invalid_command_line_style;
+    using boost::program_options::reading_file;
+    using boost::program_options::error_with_option_name;
+    using boost::program_options::multiple_values;
+    using boost::program_options::multiple_occurrences;
+    using boost::program_options::required_option;
+    using boost::program_options::error_with_no_option_name;
+    using boost::program_options::unknown_option;
+    using boost::program_options::ambiguous_option;
+    using boost::program_options::invalid_syntax;
+    using boost::program_options::invalid_config_file_syntax;
+    using boost::program_options::invalid_command_line_syntax;
+    using boost::program_options::validation_error;
+    using boost::program_options::invalid_option_value;
+}}
+
+#else
+
+#include <hpx/program_options/config.hpp>
+
 #include <map>
 #include <stdexcept>
 #include <string>
@@ -450,4 +479,5 @@ namespace hpx { namespace program_options {
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif

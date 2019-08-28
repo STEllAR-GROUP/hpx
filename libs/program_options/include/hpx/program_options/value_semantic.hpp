@@ -7,9 +7,48 @@
 #define PROGRAM_OPTIONS_VALUE_SEMANTIC_HPP_VP_2004_02_24
 
 #include <hpx/program_options/config.hpp>
-#include <hpx/program_options/errors.hpp>
+
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/value_semantic.hpp
+
+#include <boost/program_options/value_semantic.hpp>
+
+namespace hpx { namespace program_options {
+
+    using boost::program_options::value_semantic;
+    template <typename Char>
+    using value_semantic_codecvt_helper =
+        boost::program_options::value_semantic_codecvt_helper<Char>;
+
+    using boost::program_options::untyped_value;
+    using boost::program_options::typed_value_base;
+
+    template <typename T, typename Char = char>
+    using typed_value = boost::program_options::typed_value<T, Char>;
+
+    using boost::program_options::value;
+    using boost::program_options::wvalue;
+    using boost::program_options::bool_switch;
+
+    using boost::program_options::arg;
+
+    namespace validators {
+
+        using boost::program_options::validators::get_single_string;
+        using boost::program_options::validators::check_first_occurrence;
+
+    }    // namespace validators
+
+    using namespace validators;
+
+    using boost::program_options::validate;
+
+}}    // namespace hpx::program_options
+
+#else
 
 #include <hpx/datastructures/any.hpp>
+#include <hpx/program_options/errors.hpp>
 
 #include <boost/lexical_cast.hpp>
 
@@ -168,7 +207,6 @@ namespace hpx { namespace program_options {
         bool m_zero_tokens;
     };
 
-#ifndef BOOST_NO_RTTI
     /** Base class for all option that have a fixed type, and are
         willing to announce this type to the outside world.
         Any 'value_semantics' for which you want to find out the
@@ -185,7 +223,6 @@ namespace hpx { namespace program_options {
         // class is silly, but just in case.
         virtual ~typed_value_base() {}
     };
-#endif
 
     /** Class which handles value of a specific type. */
     template <class T, class Char = char>
@@ -440,4 +477,5 @@ namespace hpx { namespace program_options {
 
 #include <hpx/program_options/detail/value_semantic.hpp>
 
+#endif
 #endif

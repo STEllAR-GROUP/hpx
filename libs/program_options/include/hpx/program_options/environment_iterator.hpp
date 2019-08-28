@@ -6,6 +6,21 @@
 #ifndef PROGRAM_OPTIONS_ENVIRONMENT_ITERATOR_VP_2004_05_14
 #define PROGRAM_OPTIONS_ENVIRONMENT_ITERATOR_VP_2004_05_14
 
+#include <hpx/program_options/config.hpp>
+
+#if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+// hpxinspect:nodeprecatedinclude:boost/program_options/environment_iterator.hpp
+
+#include <boost/program_options/environment_iterator.hpp>
+
+namespace hpx { namespace program_options {
+
+    using boost::environment_iterator;
+
+}}    // namespace hpx::program_options
+
+#else
+
 #include <hpx/assertion.hpp>
 #include <hpx/program_options/eof_iterator.hpp>
 
@@ -19,13 +34,14 @@ namespace hpx { namespace program_options {
             std::pair<std::string, std::string>>
     {
     public:
-        environment_iterator(char** environment)
+        explicit environment_iterator(char** environment)
           : m_environment(environment)
         {
             get();
         }
 
         environment_iterator()
+          : m_environment(nullptr)
         {
             found_eof();
         }
@@ -51,4 +67,5 @@ namespace hpx { namespace program_options {
     };
 }}    // namespace hpx::util
 
+#endif
 #endif

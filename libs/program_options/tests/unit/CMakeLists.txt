@@ -18,6 +18,10 @@ set(tests
   winmain
 )
 
+if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+  set(tests ${tests} boost_program_options)
+endif()
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)

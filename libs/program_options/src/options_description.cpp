@@ -4,8 +4,10 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/assertion.hpp>
 #include <hpx/program_options/config.hpp>
+
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+#include <hpx/assertion.hpp>
 #include <hpx/program_options/options_description.hpp>
 // FIXME: this is only to get multiple_occurrences class
 // should move that to a separate headers.
@@ -684,3 +686,5 @@ namespace hpx { namespace program_options {
     }
 
 }}    // namespace hpx::program_options
+
+#endif

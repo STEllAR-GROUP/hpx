@@ -10,11 +10,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
+#include <hpx/program_options.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -22,13 +24,10 @@
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util_fwd.hpp>
-
-#include <hpx/program_options/options_description.hpp>
 
 #include <atomic>
 #include <condition_variable>

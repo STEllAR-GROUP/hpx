@@ -12,14 +12,17 @@
 #pragma once
 #endif
 
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/positional_options.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/variables_map.hpp>
+#include <hpx/program_options/config.hpp>
 #include <hpx/program_options/cmdline.hpp>
+#include <hpx/program_options/detail/config_file.hpp>
+#include <hpx/program_options/detail/convert.hpp>
 #include <hpx/program_options/errors.hpp>
 #include <hpx/program_options/option.hpp>
+#include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options/parsers.hpp>
+#include <hpx/program_options/positional_options.hpp>
 #include <hpx/program_options/value_semantic.hpp>
+#include <hpx/program_options/variables_map.hpp>
 #include <hpx/program_options/version.hpp>
 
 #endif

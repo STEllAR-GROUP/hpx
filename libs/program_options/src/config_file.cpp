@@ -3,8 +3,10 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/assertion.hpp>
 #include <hpx/program_options/config.hpp>
+
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+#include <hpx/assertion.hpp>
 #include <hpx/program_options/detail/config_file.hpp>
 #include <hpx/program_options/detail/convert.hpp>
 #include <hpx/program_options/errors.hpp>
@@ -166,3 +168,4 @@ namespace hpx { namespace program_options { namespace detail {
 
 }}}    // namespace hpx::program_options::detail
 
+#endif
