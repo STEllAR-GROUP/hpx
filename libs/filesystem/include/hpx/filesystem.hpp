@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+//  hpxinspect:nodeprecatedinclude:boost/filesystem.hpp
+
 /// \file
 /// This file provides a compatibility layer using Boost.Filesystem for the
 /// C++17 filesystem library. It is *not* intended to be a complete
