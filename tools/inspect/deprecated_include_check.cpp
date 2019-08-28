@@ -51,6 +51,15 @@ namespace boost
       { "boost/random/([^\\s]*)\\.hpp", "random" },
       { "boost/format\\.hpp", "hpx/util/format.hpp" },
       { "boost/regex.hpp", "regex" },
+      { "boost/filesystem.hpp", "hpx/filesystem.hpp" },
+      { "boost/filesystem/config.hpp", "hpx/filesystem.hpp" },
+      { "boost/filesystem/convenience.hpp", "hpx/filesystem.hpp" },
+      { "boost/filesystem/exception.hpp", "hpx/filesystem.hpp" },
+      { "boost/filesystem/fstream.hpp", "hpx/filesystem.hpp" },
+      { "boost/filesystem/operations.hpp", "hpx/filesystem.hpp" },
+      { "boost/filesystem/path.hpp", "hpx/filesystem.hpp" },
+      { "boost/filesystem/path_traits.hpp", "hpx/filesystem.hpp" },
+      { "boost/filesystem/string_file.hpp", "hpx/filesystem.hpp" },
       { nullptr, nullptr }
     };
 
