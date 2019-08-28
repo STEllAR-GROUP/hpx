@@ -9,10 +9,11 @@
 #define HPX_COMPONENTS_STATIC_FACTORY_DATA_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/any.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/util/plugin/export_plugin.hpp>
-#include <hpx/util/plugin/virtual_constructor.hpp>
+#include <hpx/plugin/export_plugin.hpp>
+#include <hpx/plugin/virtual_constructor.hpp>
 
 #include <map>
 #include <string>
@@ -33,10 +34,10 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_DECLARE_FACTORY_STATIC(name, base)                                \
-    extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string, boost::any>*       \
-        HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME(name, base)()                     \
-/**/
+#define HPX_DECLARE_FACTORY_STATIC(name, base)                                 \
+    extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string,                     \
+        hpx::util::any_nonser>* HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME(name,      \
+        base)() /**/
 
 #define HPX_DEFINE_FACTORY_STATIC(module, name, base)                         \
     {                                                                         \

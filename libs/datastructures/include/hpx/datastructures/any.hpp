@@ -597,7 +597,7 @@ namespace hpx { namespace util {
                 *reinterpret_cast<T const*>(object);
         }
 
-// implicit casting is disabled by default for compatibility with boost::any
+// implicit casting is disabled by default for compatibility with hpx::util::any
 #ifdef HPX_ANY_IMPLICIT_CASTING
         // automatic casting operator
         template <typename T>
@@ -819,7 +819,7 @@ namespace hpx { namespace util {
                 *reinterpret_cast<T const*>(object);
         }
 
-// implicit casting is disabled by default for compatibility with boost::any
+// implicit casting is disabled by default for compatibility with hpx:util::any
 #ifdef HPX_ANY_IMPLICIT_CASTING
         // automatic casting operator
         template <typename T>

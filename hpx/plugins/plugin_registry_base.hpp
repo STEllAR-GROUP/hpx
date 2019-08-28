@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/util/plugin.hpp>
-#include <hpx/util/plugin/export_plugin.hpp>
+#include <hpx/plugin.hpp>
+#include <hpx/plugin/export_plugin.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <string>

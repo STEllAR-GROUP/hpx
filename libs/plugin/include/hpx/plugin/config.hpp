@@ -8,32 +8,33 @@
 
 #include <hpx/config.hpp>
 #include <hpx/preprocessor/stringize.hpp>
+#include <hpx/plugin/config/defines.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_NO_EXPORT_API)
 
 #define HPX_PLUGIN_EXPORT_API HPX_SYMBOL_EXPORT
 
-# if defined(HPX_WINDOWS)
+#if defined(HPX_WINDOWS)
 
-#   define HPX_PLUGIN_API             __cdecl
+#define HPX_PLUGIN_API __cdecl
 
-# else // HPX_WINDOWS
+#else    // HPX_WINDOWS
 
-#   if defined(__GNUC__) && defined(__i386)
-#     define HPX_PLUGIN_API           __attribute__((cdecl))
-#   endif
+#if defined(__GNUC__) && defined(__i386)
+#define HPX_PLUGIN_API __attribute__((cdecl))
+#endif
 
-#endif // HPX_WINDOWS
+#endif    // HPX_WINDOWS
 
-#endif // !HPX_PLUGIN_NO_EXPORT_API
+#endif    // !HPX_PLUGIN_NO_EXPORT_API
 
-# if !defined(HPX_PLUGIN_EXPORT_API)
-#   define HPX_PLUGIN_EXPORT_API      /* empty */
-# endif
-# if !defined(HPX_PLUGIN_API)
-#   define HPX_PLUGIN_API             /* empty */
-# endif
+#if !defined(HPX_PLUGIN_EXPORT_API)
+#define HPX_PLUGIN_EXPORT_API /* empty */
+#endif
+#if !defined(HPX_PLUGIN_API)
+#define HPX_PLUGIN_API /* empty */
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -52,21 +53,21 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_SYMBOLS_PREFIX)
-# if defined(HPX_DEBUG)
-#   define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC hpxd
-#   define HPX_PLUGIN_SYMBOLS_PREFIX         hpxd
-# else
-#   define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC hpx
-#   define HPX_PLUGIN_SYMBOLS_PREFIX         hpx
-# endif
+#if defined(HPX_DEBUG)
+#define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC hpxd
+#define HPX_PLUGIN_SYMBOLS_PREFIX hpxd
+#else
+#define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC hpx
+#define HPX_PLUGIN_SYMBOLS_PREFIX hpx
+#endif
 #endif
 
-#define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR                                 \
-    HPX_PP_STRINGIZE(HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC)                       \
-/**/
+#define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR                                  \
+    HPX_PP_STRINGIZE(HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC)                        \
+    /**/
 
-#define HPX_PLUGIN_SYMBOLS_PREFIX_STR                                         \
-    HPX_PP_STRINGIZE(HPX_PLUGIN_SYMBOLS_PREFIX)                               \
-/**/
+#define HPX_PLUGIN_SYMBOLS_PREFIX_STR                                          \
+    HPX_PP_STRINGIZE(HPX_PLUGIN_SYMBOLS_PREFIX)                                \
+    /**/
 
 #endif /*HPX_UTIL_PLUGIN_CONFIG_HPP*/

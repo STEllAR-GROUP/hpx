@@ -4,9 +4,6 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/shared_ptr.hpp
-// hpxinspect:nodeprecatedname:boost::shared_ptr
-
 #ifndef HPX_DLL_WINDOWS_HPP_HK_2005_11_06
 #define HPX_DLL_WINDOWS_HPP_HK_2005_11_06
 
@@ -14,9 +11,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
-#include <hpx/util/plugin/config.hpp>
-
-#include <boost/shared_ptr.hpp>
+#include <hpx/plugin/config.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -29,18 +24,22 @@
 #include <windows.h>
 
 #if !defined(HPX_MSVC) && !defined(HPX_MINGW)
-#error "This file shouldn't be included directly, use the file hpx/util/plugin/dll.hpp only."
+#error                                                                         \
+    "This file shouldn't be included directly, use the file hpx/plugin/dll.hpp only."
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace plugin {
 
-    namespace detail
-    {
-        template<typename T>
+    namespace detail {
+
+        template <typename T>
         struct free_dll
         {
-            free_dll(HMODULE h) : h(h) {}
+            free_dll(HMODULE h)
+              : h(h)
+            {
+            }
 
             void operator()(T)
             {
@@ -50,21 +49,27 @@ namespace hpx { namespace util { namespace plugin {
 
             HMODULE h;
         };
-    }
+    }    // namespace detail
 
     class dll
     {
     public:
         dll()
-        :   dll_handle(nullptr)
-        {}
+          : dll_handle(nullptr)
+        {
+        }
 
         dll(dll const& rhs)
-        :   dll_name(rhs.dll_name), map_name(rhs.map_name), dll_handle(nullptr)
-        {}
+          : dll_name(rhs.dll_name)
+          , map_name(rhs.map_name)
+          , dll_handle(nullptr)
+        {
+        }
 
         dll(std::string const& libname)
-        :   dll_name(libname), map_name(""), dll_handle(nullptr)
+          : dll_name(libname)
+          , map_name("")
+          , dll_handle(nullptr)
         {
             // map_name defaults to dll base name
             namespace fs = filesystem;
@@ -79,10 +84,13 @@ namespace hpx { namespace util { namespace plugin {
         }
 
         dll(std::string const& libname, std::string const& mapname)
-        :   dll_name(libname), map_name(mapname), dll_handle(nullptr)
-        {}
+          : dll_name(libname)
+          , map_name(mapname)
+          , dll_handle(nullptr)
+        {
+        }
 
-        dll(dll && rhs)
+        dll(dll&& rhs) noexcept
           : dll_name(std::move(rhs.dll_name))
           , map_name(std::move(rhs.map_name))
           , dll_handle(rhs.dll_handle)
@@ -90,13 +98,14 @@ namespace hpx { namespace util { namespace plugin {
             rhs.dll_handle = nullptr;
         }
 
-        dll &operator=(dll const & rhs)
+        dll& operator=(dll const& rhs)
         {
-            if (this != &rhs) {
-            //  free any existing dll_handle
+            if (this != &rhs)
+            {
+                //  free any existing dll_handle
                 FreeLibrary();
 
-            //  load the library for this instance of the dll class
+                //  load the library for this instance of the dll class
                 dll_name = rhs.dll_name;
                 map_name = rhs.map_name;
                 LoadLibrary();
@@ -104,9 +113,10 @@ namespace hpx { namespace util { namespace plugin {
             return *this;
         }
 
-        dll &operator=(dll && rhs)
+        dll& operator=(dll&& rhs) noexcept
         {
-            if (&rhs != this) {
+            if (&rhs != this)
+            {
                 dll_name = std::move(rhs.dll_name);
                 map_name = std::move(rhs.map_name);
                 dll_handle = rhs.dll_handle;
@@ -120,34 +130,40 @@ namespace hpx { namespace util { namespace plugin {
             FreeLibrary();
         }
 
-        std::string get_name() const { return dll_name; }
-        std::string get_mapname() const { return map_name; }
+        std::string const& get_name() const
+        {
+            return dll_name;
+        }
+        std::string const& get_mapname() const
+        {
+            return map_name;
+        }
 
-        template<typename SymbolType, typename Deleter>
-        std::pair<SymbolType, Deleter>
-        get(std::string const& symbol_name, error_code& ec = throws) const
+        template <typename SymbolType, typename Deleter>
+        std::pair<SymbolType, Deleter> get(
+            std::string const& symbol_name, error_code& ec = throws) const
         {
             const_cast<dll&>(*this).LoadLibrary(ec);
             // make sure everything is initialized
-            if (ec) return std::pair<SymbolType, Deleter>();
+            if (ec)
+                return std::pair<SymbolType, Deleter>();
 
-            static_assert(
-                std::is_pointer<SymbolType>::value,
+            static_assert(std::is_pointer<SymbolType>::value,
                 "std::is_pointer<SymbolType>::value");
 
             // Cast the to right type.
-            SymbolType address = (SymbolType)GetProcAddress
-                (dll_handle, symbol_name.c_str());
+            SymbolType address =
+                (SymbolType) GetProcAddress(dll_handle, symbol_name.c_str());
             if (nullptr == address)
             {
                 std::ostringstream str;
                 str << "Hpx.Plugin: Unable to locate the exported symbol name '"
-                    << symbol_name << "' in the shared library '"
-                    << dll_name << "'";
+                    << symbol_name << "' in the shared library '" << dll_name
+                    << "'";
 
                 // report error
-                HPX_THROWS_IF(ec, dynamic_link_failure,
-                    "plugin::get", str.str());
+                HPX_THROWS_IF(
+                    ec, dynamic_link_failure, "plugin::get", str.str());
                 return std::pair<SymbolType, Deleter>();
             }
 
@@ -156,19 +172,20 @@ namespace hpx { namespace util { namespace plugin {
             // so in the end the dll class holds one refcnt and so does every
             // symbol.
             HMODULE handle = ::LoadLibraryA(dll_name.c_str());
-            if (!handle) {
+            if (!handle)
+            {
                 std::ostringstream str;
-                str << "Hpx.Plugin: Could not open shared library '"
-                    << dll_name << "'";
+                str << "Hpx.Plugin: Could not open shared library '" << dll_name
+                    << "'";
 
                 // report error
-                HPX_THROWS_IF(ec, filesystem_error,
-                    "plugin::get", str.str());
+                HPX_THROWS_IF(ec, filesystem_error, "plugin::get", str.str());
                 return std::pair<SymbolType, Deleter>();
             }
             HPX_ASSERT(handle == dll_handle);
 
-            return std::make_pair(address, detail::free_dll<SymbolType>(handle));
+            return std::make_pair(
+                address, detail::free_dll<SymbolType>(handle));
         }
 
         void keep_alive(error_code& ec = throws)
@@ -181,22 +198,23 @@ namespace hpx { namespace util { namespace plugin {
         {
             if (!dll_handle || force)
             {
-                if (dll_name.empty()) {
-                // load main module
+                if (dll_name.empty())
+                {
+                    // load main module
                     char buffer[_MAX_PATH];
                     ::GetModuleFileNameA(nullptr, buffer, sizeof(buffer));
                     dll_name = buffer;
                 }
 
                 dll_handle = ::LoadLibraryA(dll_name.c_str());
-                if (!dll_handle) {
+                if (!dll_handle)
+                {
                     std::ostringstream str;
                     str << "Hpx.Plugin: Could not open shared library '"
                         << dll_name << "'";
 
-                    HPX_THROWS_IF(ec, filesystem_error,
-                        "plugin::LoadLibrary",
-                        str.str());
+                    HPX_THROWS_IF(
+                        ec, filesystem_error, "plugin::LoadLibrary", str.str());
                     return;
                 }
             }
@@ -208,22 +226,25 @@ namespace hpx { namespace util { namespace plugin {
     public:
         std::string get_directory(error_code& ec = throws) const
         {
-            char buffer[_MAX_PATH] = { '\0' };
+            char buffer[_MAX_PATH] = {'\0'};
 
             const_cast<dll&>(*this).LoadLibrary(ec);
             // make sure everything is initialized
-            if (ec) return buffer;
+            if (ec)
+                return buffer;
 
             DWORD name_length =
                 GetModuleFileNameA(dll_handle, buffer, sizeof(buffer));
 
-            if (name_length <= 0) {
+            if (name_length <= 0)
+            {
                 std::ostringstream str;
                 str << "Hpx.Plugin: Could not extract path the shared "
-                       "library '" << dll_name << "' has been loaded from.";
+                       "library '"
+                    << dll_name << "' has been loaded from.";
 
-                HPX_THROWS_IF(ec, filesystem_error,
-                    "plugin::get_directory", str.str());
+                HPX_THROWS_IF(
+                    ec, filesystem_error, "plugin::get_directory", str.str());
                 return buffer;
             }
 
@@ -249,8 +270,6 @@ namespace hpx { namespace util { namespace plugin {
         HMODULE dll_handle;
     };
 
-///////////////////////////////////////////////////////////////////////////////
-}}}
+}}}    // namespace hpx::util::plugin
 
 #endif
-

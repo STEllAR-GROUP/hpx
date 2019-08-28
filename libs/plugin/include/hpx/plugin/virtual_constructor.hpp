@@ -4,39 +4,34 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/shared_ptr.hpp
-// hpxinspect:nodeprecatedname:boost::shared_ptr
-
 #ifndef HPX_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
 #define HPX_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
-#include <hpx/util/plugin/config.hpp>
-
-#include <boost/any.hpp>
-#include <boost/shared_ptr.hpp>
+#include <hpx/plugin/config.hpp>
 
 #include <map>
+#include <memory>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace plugin {
 
     ///////////////////////////////////////////////////////////////////////////
-    typedef std::map<std::string, boost::any> exported_plugins_type;
+    using exported_plugins_type = std::map<std::string, hpx::util::any_nonser>;
     typedef exported_plugins_type* (HPX_PLUGIN_API *get_plugins_list_type)();
     typedef exported_plugins_type* (HPX_PLUGIN_API get_plugins_list_np)();
-    typedef boost::shared_ptr<get_plugins_list_np> dll_handle;
+    using dll_handle = std::shared_ptr<get_plugins_list_np>;
 
     ///////////////////////////////////////////////////////////////////////////
-    template<typename BasePlugin>
+    template <typename BasePlugin>
     struct virtual_constructor
     {
-        typedef hpx::util::detail::pack<> type;
+        using type = hpx::util::detail::pack<>;
     };
 
-///////////////////////////////////////////////////////////////////////////////
-}}}  // namespace hpx::util::plugin
+}}}    // namespace hpx::util::plugin
 
 #endif

@@ -10,8 +10,8 @@
 #include <hpx/plugins/plugin_factory_base.hpp>
 
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
-#include <hpx/util/plugin.hpp>
-#include <hpx/util/plugin/export_plugin.hpp>
+#include <hpx/plugin.hpp>
+#include <hpx/plugin/export_plugin.hpp>
 
 #include <cstddef>
 

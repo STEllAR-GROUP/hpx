@@ -29,7 +29,7 @@
 #  include <vector>
 #endif
 
-#include <hpx/util/plugin/dll.hpp>
+#include <hpx/plugin/dll.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <boost/algorithm/string/split.hpp>
