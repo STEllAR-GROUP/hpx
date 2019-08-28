@@ -4,6 +4,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
+set(HPX_COMPONENTS ${HPX_COMPONENTS} partitioned_vector CACHE INTERNAL "list of HPX components")
+
 if(NOT HPX_WITH_DEFAULT_TARGETS)
   set(_exclude_from_all_flag EXCLUDE_FROM_ALL)
 endif()

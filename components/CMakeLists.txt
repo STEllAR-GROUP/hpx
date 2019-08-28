@@ -12,23 +12,7 @@ include(HPX_AddPseudoTarget)
 
 # Variable used to add the components to the pkgconfig
 # linking step
-set(HPX_COMPONENTS
-  component_storage
-  iostreams
-  partitioned_vector
-  process
-  unordered
-  CACHE INTERNAL "list of HPX components" FORCE
-  )
-
-if (HPX_WITH_PAPI)
-  set(HPX_COMPONENTS
-    ${HPX_COMPONENTS}
-    papi_counters
-    CACHE INTERNAL "list of HPX components" FORCE
-    )
-endif()
-
+set(HPX_COMPONENTS "" CACHE INTERNAL "list of HPX components" FORCE)
 
 set(component_dirs
   component_storage
@@ -37,7 +21,6 @@ set(component_dirs
   performance_counters
   process
 )
-
 
 # add example pseudo targets needed for components
 if(HPX_WITH_EXAMPLES)

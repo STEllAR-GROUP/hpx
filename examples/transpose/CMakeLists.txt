@@ -10,10 +10,15 @@ set(example_programs
   transpose_serial_block
   transpose_smp
   transpose_smp_block
-  transpose_block
-  transpose_block_numa
-  transpose_serial_vector
 )
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(example_programs
+    ${example_programs}
+    transpose_block
+    transpose_block_numa
+    transpose_serial_vector)
+endif()
 
 if(HPX_WITH_AWAIT)
   set(example_programs

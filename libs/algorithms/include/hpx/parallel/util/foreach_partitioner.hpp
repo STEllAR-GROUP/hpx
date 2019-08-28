@@ -8,12 +8,12 @@
 #define HPX_PARALLEL_UTIL_FOREACH_PARTITIONER_OCT_03_2014_0112PM
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/async/dataflow.hpp>
-#endif
 #include <hpx/assertion.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/errors.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/local_async/dataflow.hpp>
+#endif
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>

@@ -74,7 +74,7 @@ namespace hpx { namespace actions
         virtual threads::thread_function_type
             get_thread_function(naming::id_type&& target,
                 naming::address_type lva,
-                naming::address::component_type comptype) = 0;
+                naming::component_type comptype) = 0;
 
         /// return the id of the locality of the parent thread
         virtual std::uint32_t get_parent_locality_id() const = 0;

@@ -48,6 +48,7 @@ add_hpx_module(schedulers
   DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN OFF
+  SOURCES ${schedulers_sources}
   HEADERS ${schedulers_headers}
   COMPAT_HEADERS ${schedulers_compat_headers}
   SOURCES ${schedulers_sources}

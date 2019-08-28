@@ -11,6 +11,8 @@
 #define HPX_PARALLEL_EXECUTORS_DISTRIBUTION_POLICY_EXECUTOR_JUL_21_2015_0404PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/functional/result_of.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/lcos/future.hpp>
@@ -199,4 +201,5 @@ namespace hpx { namespace parallel { namespace execution {
     /// \endcond
 }}}    // namespace hpx::parallel::execution
 
+#endif
 #endif

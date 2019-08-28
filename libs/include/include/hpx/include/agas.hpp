@@ -7,6 +7,10 @@
 #if !defined(HPX_AGAS_DEC_11_2017_0530PM)
 #define HPX_AGAS_DEC_11_2017_0530PM
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/agas/interface.hpp>
+#endif
 
 #endif

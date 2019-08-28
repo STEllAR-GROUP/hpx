@@ -7,10 +7,15 @@
 
 set(tests
     spmd_block
-    task_block
-    task_block_executor
-    task_block_par
    )
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(tests ${tests}
+      task_block
+      task_block_executor
+      task_block_par
+     )
+endif()
 
 set(task_block_FLAGS DEPENDENCIES iostreams_component)
 set(task_block_executor_FLAGS DEPENDENCIES iostreams_component)

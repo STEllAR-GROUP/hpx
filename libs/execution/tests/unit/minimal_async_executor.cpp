@@ -6,6 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/testing.hpp>
 

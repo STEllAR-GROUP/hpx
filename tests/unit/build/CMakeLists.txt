@@ -10,6 +10,10 @@ if(NOT HPX_WITH_TESTS_EXTERNAL_BUILD)
   return()
 endif()
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 # Try building an external cmake based project ...
 function(create_cmake_test name hpx_dir setup_type)
   set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/${name}")

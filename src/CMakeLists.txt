@@ -6,33 +6,115 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-foreach(lib "hpx" "hpx_external" "hpx_generated")
-  set(${lib}_SOURCES "" CACHE INTERNAL "Sources for lib${lib}." FORCE)
-
-  if(MSVC)
-    set(${lib}_HEADERS "" CACHE INTERNAL "Headers for lib${lib}." FORCE)
-  endif()
-endforeach()
-
 ################################################################################
 # gather sources
 
-# libhpx sources
-add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/*.cpp"
-  APPEND)
+set(hpx_SOURCES
+  custom_exception_info.cpp
+  lcos/detail/future_data.cpp
+  lcos/future.cpp
+  hpx_init.cpp
+  runtime.cpp
+  runtime_handlers.cpp
+  runtime/launch_policy.cpp
+  runtime/thread_pool_helpers.cpp
+  runtime/threads/thread_pool_suspension_helpers.cpp
+  state.cpp
+  util/debugging.cpp
+  util/debug/thread_stacktrace.cpp
+  util/interval_timer.cpp
+  util/pool_timer.cpp
+  util/register_locks_globally.cpp
+  util/serialize_exception.cpp
+  util/thread_aware_timer.cpp
+  util/thread_mapper.cpp
+)
 
-add_hpx_library_sources(hpx_generated
-  GLOB GLOBS "${PROJECT_BINARY_DIR}/libs/modules.cpp"
-  APPEND)
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  list(APPEND hpx_SOURCES
+    lcos/base_lco.cpp
+    lcos/base_lco_with_value_1.cpp
+    lcos/base_lco_with_value_2.cpp
+    lcos/base_lco_with_value_3.cpp
+    lcos/base_lco_with_value.cpp
+    lcos/promise.cpp
+    runtime/actions/base_action.cpp
+    runtime/actions/continuation.cpp
+    runtime/actions/detail/action_factory.cpp
+    runtime/actions/detail/invocation_count_registry.cpp
+    runtime/agas/addressing_service.cpp
+    runtime/agas/big_boot_barrier.cpp
+    runtime/agas/component_namespace.cpp
+    runtime/agas/detail/bootstrap_component_namespace.cpp
+    runtime/agas/detail/bootstrap_locality_namespace.cpp
+    runtime/agas/detail/hosted_component_namespace.cpp
+    runtime/agas/detail/hosted_locality_namespace.cpp
+    runtime/agas/interface.cpp
+    runtime/agas/locality_namespace.cpp
+    runtime/agas/primary_namespace.cpp
+    runtime/agas/server/component_namespace_server.cpp
+    runtime/agas/server/locality_namespace_server.cpp
+    runtime/agas/server/primary_namespace_server.cpp
+    runtime/agas/server/route.cpp
+    runtime/agas/server/symbol_namespace_server.cpp
+    runtime/agas/symbol_namespace.cpp
+    runtime/applier/applier.cpp
+    runtime/applier/bind_naming_wrappers.cpp
+    runtime/components/binpacking_distribution_policy.cpp
+    runtime/components/component_registry.cpp
+    runtime/components/component_type.cpp
+    runtime/components/console_error_sink.cpp
+    runtime/components/console_logging.cpp
+    runtime/components/memory.cpp
+    runtime/components/runtime_support.cpp
+    runtime/components/server/component_base.cpp
+    runtime/components/server/console_error_sink_server.cpp
+    runtime/components/server/console_error_sink_singleton.cpp
+    runtime/components/server/console_logging_server.cpp
+    runtime/components/server/destroy_component.cpp
+    runtime/components/server/runtime_support_server.cpp
+    runtime/components/server/wrapper_heap.cpp
+    runtime/components/stubs/memory_stub.cpp
+    runtime/components/stubs/runtime_support_stubs.cpp
+    runtime/get_locality_name.cpp
+    runtime/naming/address.cpp
+    runtime/naming/name.cpp
+    runtime/parcelset/detail/parcel_await.cpp
+    runtime/parcelset/detail/parcel_route_handler.cpp
+    runtime/parcelset/detail/per_action_data_counter.cpp
+    runtime/parcelset/detail/per_action_data_counter_registry.cpp
+    runtime/parcelset/locality.cpp
+    runtime/parcelset/parcel.cpp
+    runtime/parcelset/parcelhandler.cpp
+    runtime/parcelset/parcelport.cpp
+    runtime/parcelset/put_parcel.cpp
+    runtime/set_parcel_write_handler.cpp
+    runtime/threads/threadmanager_counters.cpp
+    runtime/trigger_lco.cpp
+    runtime_distributed.cpp
+    util/activate_counters.cpp
+    util/generate_unique_ids.cpp
+    util/init_logging.cpp
+    util/integer/int128.cpp
+    util/integer/uint128.cpp
+    util/one_size_heap_list.cpp
+    util/query_counters.cpp
+  )
+endif()
 
-add_hpx_library_sources(hpx_external GLOB APPEND)
+list(TRANSFORM hpx_SOURCES PREPEND ${PROJECT_SOURCE_DIR}/src/)
 
+set(hpx_generated_SOURCES
+  ${PROJECT_BINARY_DIR}/libs/modules.cpp
+)
+
+set(hpx_external_objects_SOURCES)
 if(MSVC)
   if(HPX_WITH_SWAP_CONTEXT_EMULATION)
     enable_language(ASM)
     set(switch_to_fiber_source
       "${PROJECT_SOURCE_DIR}/libs/coroutines/src/switch_to_fiber.asm")
+    list(APPEND hpx_external_objects_SOURCES "${switch_to_fiber_source}")
     add_hpx_library_sources(hpx_external_objects
       GLOB GLOBS "${switch_to_fiber_source}")
     add_custom_command(
@@ -48,25 +130,310 @@ if(MSVC)
   if(MSVC14)
     add_hpx_library_sources(hpx_natvis_files
       GLOB GLOBS "${PROJECT_SOURCE_DIR}/tools/VS/*.natvis")
-    set(hpx_external_OBJECTS ${hpx_external_OBJECTS} ${hpx_natvis_files_SOURCES})
+    list(APPEND hpx_external_OBJECTS ${hpx_natvis_files_SOURCES})
     source_group("Natvis Files" FILES ${hpx_natvis_files_SOURCES})
   endif()
 
 endif()
 
+set(hpx_external_SOURCES)
 if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
-  add_hpx_library_sources(hpx_external GLOB GLOBS "${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c")
+  list(APPEND hpx_external_SOURCES ${hpx_external_objects_SOURCES}
+    "${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c")
 endif()
 
 ################################################################################
 # gather headers
 
-# libhpx headers
-add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/*.hpp"
-  APPEND)
+# List all headers (local and distributed)
+set(hpx_HEADERS
+  hpx/custom_exception_info.hpp
+  hpx/hpx_finalize.hpp
+  hpx/hpx_init.hpp
+  hpx/hpx_init_impl.hpp
+  hpx/hpx_init_params.hpp
+  hpx/hpx_start.hpp
+  hpx/hpx_start_impl.hpp
+  hpx/hpx_suspend.hpp
+  hpx/hpx_user_main_config.hpp
+  hpx/lcos/future.hpp
+  hpx/lcos/future_wait.hpp
+  hpx/lcos_fwd.hpp
+  hpx/lcos/local/futures_factory.hpp
+  hpx/lcos/local/packaged_continuation.hpp
+  hpx/runtime/config_entry.hpp
+  hpx/runtime_fwd.hpp
+  hpx/runtime/get_num_localities.hpp
+  hpx/runtime/get_os_thread_count.hpp
+  hpx/runtime/get_thread_name.hpp
+  hpx/runtime/get_worker_thread_num.hpp
+  hpx/runtime_handlers.hpp
+  hpx/runtime.hpp
+  hpx/runtime/launch_policy.hpp
+  hpx/runtime/report_error.hpp
+  hpx/runtime/runtime_fwd.hpp
+  hpx/runtime/serialization/detail/preprocess_container.hpp
+  hpx/runtime/serialization/detail/preprocess_futures.hpp
+  hpx/runtime/serialization/detail/preprocess_gid_types.hpp
+  hpx/runtime/shutdown_function.hpp
+  hpx/runtime/startup_function.hpp
+  hpx/runtime/thread_hooks.hpp
+  hpx/runtime/thread_pool_helpers.hpp
+  hpx/runtime/threads_fwd.hpp
+  hpx/runtime/threads/run_as_hpx_thread.hpp
+  hpx/runtime/threads/run_as_os_thread.hpp
+  hpx/runtime/threads/thread_pool_suspension_helpers.hpp
+  hpx/state.hpp
+  hpx/traits/acquire_future.hpp
+  hpx/traits/acquire_shared_state.hpp
+  hpx/traits/future_access.hpp
+  hpx/traits/future_then_result.hpp
+  hpx/traits/future_traits.hpp
+  hpx/traits/is_future.hpp
+  hpx/traits/is_future_range.hpp
+  hpx/traits/is_future_tuple.hpp
+  hpx/traits/is_launch_policy.hpp
+  hpx/traits/managed_component_policies.hpp
+  hpx/traits/pointer_category.hpp
+  hpx/traits/promise_local_result.hpp
+  hpx/traits/promise_remote_result.hpp
+  hpx/traits/rma_memory_region_traits.hpp
+  hpx/util/debugging.hpp
+  hpx/util/debug/thread_stacktrace.hpp
+  hpx/util_fwd.hpp
+  hpx/util/interval_timer.hpp
+  hpx/util/pool_timer.hpp
+  hpx/util/register_locks_globally.hpp
+  hpx/util/serialize_exception.hpp
+  hpx/util/thread_aware_timer.hpp
+  hpx/util/thread_mapper.hpp
+)
 
-add_hpx_library_headers(hpx_external GLOB APPEND)
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  list(APPEND hpx_HEADERS
+    hpx/components/containers/container_distribution_policy.hpp
+    hpx/components_fwd.hpp
+    hpx/lcos/base_lco.hpp
+    hpx/lcos/base_lco_with_value.hpp
+    hpx/lcos/channel.hpp
+    hpx/lcos/detail/future_await_traits.hpp
+    hpx/lcos/detail/future_data.hpp
+    hpx/lcos/detail/future_traits.hpp
+    hpx/lcos/detail/future_transforms.hpp
+    hpx/lcos/detail/promise_base.hpp
+    hpx/lcos/detail/promise_lco.hpp
+    hpx/lcos/object_semaphore.hpp
+    hpx/lcos/packaged_action.hpp
+    hpx/lcos/promise.hpp
+    hpx/lcos/server/channel.hpp
+    hpx/lcos/server/object_semaphore.hpp
+    hpx/plugins/binary_filter_factory_base.hpp
+    hpx/plugins/binary_filter_factory.hpp
+    hpx/plugins/message_handler_factory_base.hpp
+    hpx/plugins/message_handler_factory.hpp
+    hpx/plugins/parcel/coalescing_counter_registry.hpp
+    hpx/plugins/parcel/coalescing_message_handler.hpp
+    hpx/plugins/parcel/coalescing_message_handler_registration.hpp
+    hpx/plugins/parcel/message_buffer.hpp
+    hpx/plugins/parcelport_factory_base.hpp
+    hpx/plugins/parcelport_factory.hpp
+    hpx/plugins/parcelport/mpi/header.hpp
+    hpx/plugins/parcelport/mpi/locality.hpp
+    hpx/plugins/parcelport/mpi/receiver_connection.hpp
+    hpx/plugins/parcelport/mpi/receiver.hpp
+    hpx/plugins/parcelport/mpi/sender_connection.hpp
+    hpx/plugins/parcelport/mpi/sender.hpp
+    hpx/plugins/parcelport/mpi/tag_provider.hpp
+    hpx/plugins/parcelport/tcp/connection_handler.hpp
+    hpx/plugins/parcelport/tcp/locality.hpp
+    hpx/plugins/parcelport/tcp/receiver.hpp
+    hpx/plugins/parcelport/tcp/sender.hpp
+    hpx/plugins/plugin_factory_base.hpp
+    hpx/plugins/plugin_registry.hpp
+    hpx/plugins/unique_plugin_name.hpp
+    hpx/runtime/actions/action_priority.hpp
+    hpx/runtime/actions/action_support.hpp
+    hpx/runtime/actions/base_action.hpp
+    hpx/runtime/actions/basic_action_fwd.hpp
+    hpx/runtime/actions/basic_action.hpp
+    hpx/runtime/actions/component_action.hpp
+    hpx/runtime/actions/continuation2_impl.hpp
+    hpx/runtime/actions/continuation_fwd.hpp
+    hpx/runtime/actions/continuation.hpp
+    hpx/runtime/actions/continuation_impl.hpp
+    hpx/runtime/actions/detail/action_factory.hpp
+    hpx/runtime/actions/detail/invocation_count_registry.hpp
+    hpx/runtime/actions_fwd.hpp
+    hpx/runtime/actions/lambda_to_action.hpp
+    hpx/runtime/actions/make_continuation.hpp
+    hpx/runtime/actions/manage_object_action.hpp
+    hpx/runtime/actions/plain_action.hpp
+    hpx/runtime/actions/preassigned_action_id.hpp
+    hpx/runtime/actions/set_lco_value_continuation.hpp
+    hpx/runtime/actions/transfer_action.hpp
+    hpx/runtime/actions/transfer_base_action.hpp
+    hpx/runtime/actions/transfer_continuation_action.hpp
+    hpx/runtime/actions/trigger.hpp
+    hpx/runtime/agas/addressing_service.hpp
+    hpx/runtime/agas/big_boot_barrier.hpp
+    hpx/runtime/agas/component_namespace.hpp
+    hpx/runtime/agas/detail/bootstrap_component_namespace.hpp
+    hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp
+    hpx/runtime/agas/detail/hosted_component_namespace.hpp
+    hpx/runtime/agas/detail/hosted_locality_namespace.hpp
+    hpx/runtime/agas_fwd.hpp
+    hpx/runtime/agas/gva.hpp
+    hpx/runtime/agas/interface.hpp
+    hpx/runtime/agas/locality_namespace.hpp
+    hpx/runtime/agas/namespace_action_code.hpp
+    hpx/runtime/agas/primary_namespace.hpp
+    hpx/runtime/agas/server/component_namespace.hpp
+    hpx/runtime/agas/server/locality_namespace.hpp
+    hpx/runtime/agas/server/primary_namespace.hpp
+    hpx/runtime/agas/server/symbol_namespace.hpp
+    hpx/runtime/agas/symbol_namespace.hpp
+    hpx/runtime/basename_registration_fwd.hpp
+    hpx/runtime/basename_registration.hpp
+    hpx/runtime/components/binpacking_distribution_policy.hpp
+    hpx/runtime/components/client_base.hpp
+    hpx/runtime/components/client.hpp
+    hpx/runtime/components/colocating_distribution_policy.hpp
+    hpx/runtime/components/component_commandline_base.hpp
+    hpx/runtime/components/component_commandline.hpp
+    hpx/runtime/components/component_factory_base.hpp
+    hpx/runtime/components/component_factory.hpp
+    hpx/runtime/components/component_registry.hpp
+    hpx/runtime/components/component_startup_shutdown_base.hpp
+    hpx/runtime/components/component_startup_shutdown.hpp
+    hpx/runtime/components/component_type.hpp
+    hpx/runtime/components/console_error_sink.hpp
+    hpx/runtime/components/console_logging.hpp
+    hpx/runtime/components/copy_component.hpp
+    hpx/runtime/components/default_distribution_policy.hpp
+    hpx/runtime/components/derived_component_factory.hpp
+    hpx/runtime/components_fwd.hpp
+    hpx/runtime/components/make_client.hpp
+    hpx/runtime/components/migrate_component.hpp
+    hpx/runtime/components/pinned_ptr.hpp
+    hpx/runtime/components/runtime_support.hpp
+    hpx/runtime/components/server/abstract_component_base.hpp
+    hpx/runtime/components/server/abstract_migration_support.hpp
+    hpx/runtime/components/server/component_base.hpp
+    hpx/runtime/components/server/component_database.hpp
+    hpx/runtime/components/server/component_heap.hpp
+    hpx/runtime/components/server/component.hpp
+    hpx/runtime/components/server/console_error_sink.hpp
+    hpx/runtime/components/server/console_error_sink_singleton.hpp
+    hpx/runtime/components/server/console_logging.hpp
+    hpx/runtime/components/server/copy_component.hpp
+    hpx/runtime/components/server/create_component_fwd.hpp
+    hpx/runtime/components/server/create_component.hpp
+    hpx/runtime/components/server/destroy_component.hpp
+    hpx/runtime/components/server/distributed_metadata_base.hpp
+    hpx/runtime/components/server/executor_component.hpp
+    hpx/runtime/components/server/fixed_component_base.hpp
+    hpx/runtime/components/server/invoke_function.hpp
+    hpx/runtime/components/server/locking_hook.hpp
+    hpx/runtime/components/server/managed_component_base.hpp
+    hpx/runtime/components/server/memory.hpp
+    hpx/runtime/components/server/migrate_component.hpp
+    hpx/runtime/components/server/migration_support.hpp
+    hpx/runtime/components/server/runtime_support.hpp
+    hpx/runtime/components/server/simple_component_base.hpp
+    hpx/runtime/components/server/wrapper_heap.hpp
+    hpx/runtime/components/server/wrapper_heap_list.hpp
+    hpx/runtime/components/stubs/memory.hpp
+    hpx/runtime/components/stubs/runtime_support.hpp
+    hpx/runtime/components/stubs/stub_base.hpp
+    hpx/runtime/components/target_distribution_policy.hpp
+    hpx/runtime/components/unwrapping_result_policy.hpp
+    hpx/runtime_distributed.hpp
+    hpx/runtime/find_here.hpp
+    hpx/runtime/find_localities.hpp
+    hpx/runtime/get_colocation_id.hpp
+    hpx/runtime/get_locality_id.hpp
+    hpx/runtime/get_locality_name.hpp
+    hpx/runtime/get_lva.hpp
+    hpx/runtime/get_ptr.hpp
+    hpx/runtime/message_handler_fwd.hpp
+    hpx/runtime/naming/address.hpp
+    hpx/runtime/naming_fwd.hpp
+    hpx/runtime/naming/id_type.hpp
+    hpx/runtime/naming/id_type_impl.hpp
+    hpx/runtime/naming/name.hpp
+    hpx/runtime/naming/resolver_client.hpp
+    hpx/runtime/naming/split_gid.hpp
+    hpx/runtime/naming/unmanaged.hpp
+    hpx/runtime/parcelset/decode_parcels.hpp
+    hpx/runtime/parcelset/detail/call_for_each.hpp
+    hpx/runtime/parcelset/detail/parcel_await.hpp
+    hpx/runtime/parcelset/detail/parcel_route_handler.hpp
+    hpx/runtime/parcelset/detail/per_action_data_counter.hpp
+    hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp
+    hpx/runtime/parcelset/encode_parcels.hpp
+    hpx/runtime/parcelset_fwd.hpp
+    hpx/runtime/parcelset/locality.hpp
+    hpx/runtime/parcelset/parcel_buffer.hpp
+    hpx/runtime/parcelset/parcelhandler.hpp
+    hpx/runtime/parcelset/parcel.hpp
+    hpx/runtime/parcelset/parcelport_connection.hpp
+    hpx/runtime/parcelset/parcelport.hpp
+    hpx/runtime/parcelset/parcelport_impl.hpp
+    hpx/runtime/parcelset/policies/message_handler.hpp
+    hpx/runtime/parcelset/put_parcel.hpp
+    hpx/runtime/set_parcel_write_handler.hpp
+    hpx/runtime/threads/threadmanager_counters.hpp
+    hpx/runtime/trigger_lco.hpp
+    hpx/traits/action_continuation.hpp
+    hpx/traits/action_decorate_continuation.hpp
+    hpx/traits/action_decorate_function.hpp
+    hpx/traits/action_does_termination_detection.hpp
+    hpx/traits/action_is_target_valid.hpp
+    hpx/traits/action_message_handler.hpp
+    hpx/traits/action_priority.hpp
+    hpx/traits/action_remote_result.hpp
+    hpx/traits/action_schedule_thread.hpp
+    hpx/traits/action_select_direct_execution.hpp
+    hpx/traits/action_serialization_filter.hpp
+    hpx/traits/action_stacksize.hpp
+    hpx/traits/action_was_object_migrated.hpp
+    hpx/traits/component_config_data.hpp
+    hpx/traits/component_heap_type.hpp
+    hpx/traits/component_pin_support.hpp
+    hpx/traits/component_supports_migration.hpp
+    hpx/traits/component_type_database.hpp
+    hpx/traits/component_type_is_compatible.hpp
+    hpx/traits/extract_action.hpp
+    hpx/traits/get_remote_result.hpp
+    hpx/traits/is_client.hpp
+    hpx/traits/is_component.hpp
+    hpx/traits/is_continuation.hpp
+    hpx/traits/is_distribution_policy.hpp
+    hpx/traits/is_valid_action.hpp
+    hpx/util/activate_counters.hpp
+    hpx/util/bind_action.hpp
+    hpx/util/connection_cache.hpp
+    hpx/util/functional/colocated_helpers.hpp
+    hpx/util/functional/segmented_iterator_helpers.hpp
+    hpx/util/generate_unique_ids.hpp
+    hpx/util/init_logging.hpp
+    hpx/util/integer/cover_operators.hpp
+    hpx/util/integer/endian.hpp
+    hpx/util/integer/int128.hpp
+    hpx/util/integer/uint128.hpp
+    hpx/util/one_size_heap_list.hpp
+    hpx/util/query_counters.hpp
+    hpx/util/remove_local_destinations.hpp
+    hpx/util/storage/tuple.hpp
+    hpx/util/wrapper_heap_base.hpp)
+endif()
+
+list(TRANSFORM hpx_HEADERS PREPEND ${PROJECT_SOURCE_DIR}/)
+
+foreach(lib "hpx" "hpx_external" "hpx_generated")
+  set(${lib}_SOURCES ${${lib}_SOURCES} CACHE INTERNAL "Sources for lib${lib}." FORCE)
+  set(${lib}_HEADERS ${${lib}_HEADERS} CACHE INTERNAL "Headers for lib${lib}." FORCE)
+endforeach()
 
 ################################################################################
 # make source groups

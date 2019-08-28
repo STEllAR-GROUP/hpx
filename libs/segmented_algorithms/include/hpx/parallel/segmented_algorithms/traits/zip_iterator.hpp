@@ -9,6 +9,8 @@
 #define HPX_UTIL_ZIP_ITERATOR_MAY_29_2014_0852PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
@@ -180,4 +182,5 @@ namespace hpx { namespace traits {
     };
 }}    // namespace hpx::traits
 
+#endif
 #endif

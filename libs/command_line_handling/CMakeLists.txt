@@ -53,6 +53,7 @@ add_hpx_module(command_line_handling
     hpx_prefix
     hpx_program_options
     hpx_runtime_configuration
+    hpx_threading
     hpx_topology
     hpx_util
     hpx_version

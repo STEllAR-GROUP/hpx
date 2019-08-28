@@ -11,11 +11,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/async/dataflow.hpp>
-#endif
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/errors.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/local_async/dataflow.hpp>
+#endif
 
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/execution/executors/execution.hpp>

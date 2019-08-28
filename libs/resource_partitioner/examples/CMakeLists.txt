@@ -20,7 +20,9 @@ set(example_programs
   simplest_resource_partitioner_2
 )
 
-if(HPX_WITH_MAX_CPU_COUNT AND HPX_WITH_SHARED_PRIORITY_SCHEDULER)
+if(HPX_WITH_DISTRIBUTED_RUNTIME AND
+   HPX_WITH_MAX_CPU_COUNT AND
+   HPX_WITH_SHARED_PRIORITY_SCHEDULER)
   set(example_programs ${example_programs}
     async_customization
     oversubscribing_resource_partitioner

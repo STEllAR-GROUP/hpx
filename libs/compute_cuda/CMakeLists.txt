@@ -49,7 +49,6 @@ add_hpx_module(compute_cuda
   DEPENDENCIES
     hpx_allocator_support
     hpx_assertion
-    hpx_async
     hpx_compute
     hpx_config
     hpx_errors
@@ -64,3 +63,8 @@ add_hpx_module(compute_cuda
     hpx_serialization
   CMAKE_SUBDIRS examples tests
 )
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  target_link_libraries(hpx_compute_cuda
+    PUBLIC hpx_async)
+endif()

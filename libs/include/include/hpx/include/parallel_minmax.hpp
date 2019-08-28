@@ -8,8 +8,12 @@
 #if !defined(HPX_PARALLEL_MINMAX_AUG_20_2014_0454PM)
 #define HPX_PARALLEL_MINMAX_AUG_20_2014_0454PM
 
+#include <hpx/config.hpp>
 #include <hpx/parallel/algorithms/minmax.hpp>
 #include <hpx/parallel/container_algorithms/minmax.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/minmax.hpp>
+#endif
 
 #endif

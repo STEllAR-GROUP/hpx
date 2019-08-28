@@ -8,13 +8,18 @@
 #if !defined(HPX_RUNTIME_JUN_210_2008_1018AM)
 #define HPX_RUNTIME_JUN_210_2008_1018AM
 
+#include <hpx/config.hpp>
+#include <hpx/include/resource_partitioner.hpp>
+#include <hpx/include/threadmanager.hpp>
+#include <hpx/runtime.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/include/actions.hpp>
 #include <hpx/include/applier.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/naming.hpp>
 #include <hpx/include/parcelset.hpp>
-#include <hpx/include/resource_partitioner.hpp>
-#include <hpx/include/threadmanager.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_distributed.hpp>
+#endif
 
 #endif

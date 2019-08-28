@@ -56,7 +56,7 @@ namespace hpx { namespace components
         /// action.
         template <typename F>
         static threads::thread_function_type
-        decorate_action(naming::address::address_type lva, F && f)
+        decorate_action(naming::address_type lva, F && f)
         {
             // Make sure we pin the component at construction of the bound object
             // which will also unpin it once the thread runs to completion (the

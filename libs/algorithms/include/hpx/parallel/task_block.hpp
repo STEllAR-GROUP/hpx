@@ -10,12 +10,12 @@
 #define HPX_PARALLEL_TASK_BLOCK_JUL_09_2014_1250PM
 
 #include <hpx/config.hpp>
-#include <hpx/async/dataflow.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/local_async/dataflow.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/decay.hpp>

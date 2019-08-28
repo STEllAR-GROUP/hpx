@@ -10,6 +10,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/errors.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 
@@ -25,7 +26,7 @@ namespace hpx { namespace parcelset { namespace detail
         boost::system::error_code const& ec,
         parcelset::parcel const& p)
     {
-        parcelhandler& ph = hpx::get_runtime().get_parcel_handler();
+        parcelhandler& ph = hpx::get_runtime_distributed().get_parcel_handler();
         // invoke the original handler
         ph.invoke_write_handler(ec, p);
 

@@ -8,12 +8,12 @@
 #define HPX_PARALLEL_ALGORITHM_IS_HEAP_JUN_22_2017_1705PM
 
 #include <hpx/config.hpp>
-#include <hpx/async.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/local_async.hpp>
 
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/execution/executors/execution.hpp>

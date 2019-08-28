@@ -102,16 +102,15 @@ add_hpx_module(include
   DEPENDENCIES
     hpx_algorithms
     hpx_assertion
-    hpx_async
+    hpx_async_combinators
     hpx_config
     hpx_errors
     hpx_format
+    hpx_local_async
     hpx_local_lcos
     hpx_naming_base
     hpx_pack_traversal
-    hpx_performance_counters
     hpx_resource_partitioner
-    hpx_segmented_algorithms
     hpx_serialization
     hpx_synchronization
     hpx_thread_executors
@@ -121,3 +120,10 @@ add_hpx_module(include
     hpx_util
   CMAKE_SUBDIRS tests
 )
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  target_link_libraries(hpx_include PUBLIC
+    hpx_async
+    hpx_performance_counters
+    hpx_segmented_algorithms)
+endif()

@@ -55,14 +55,12 @@ add_hpx_module(compute
     hpx_affinity
     hpx_algorithms
     hpx_assertion
-    hpx_async
     hpx_config
     hpx_coroutines
     hpx_execution
     hpx_hardware
     hpx_memory
     hpx_pack_traversal
-    hpx_performance_counters
     hpx_plugin
     hpx_program_options
     hpx_resource_partitioner
@@ -76,6 +74,12 @@ add_hpx_module(compute
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  target_link_libraries(hpx_compute
+    PUBLIC hpx_performance_counters
+           hpx_async)
+endif()
 
 # Temporary since the module still depends on some runtime files
 target_link_libraries(hpx_compute PUBLIC

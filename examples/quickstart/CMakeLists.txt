@@ -6,61 +6,65 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
-    1d_wave_equation
-    allow_unknown_options
-    channel_docs
-    command_line_handling
-    component_ctors
-    component_in_executable
-    component_inheritance
-    component_with_custom_heap
-    component_with_executor
     composable_guard
-    customize_async
-    data_actions
-    enumerate_threads
-    error_handling
-    event_synchronization
     executor_with_thread_hooks
-    factorial
-    fibonacci
     fibonacci_await
     fibonacci_dataflow
-    fibonacci_one
     fibonacci_futures
-    fibonacci_futures_distributed
     fibonacci_local
     file_serialization
-    fractals
-    fractals_struct
-    hello_world_1
-    hello_world_2
-    hello_world_distributed
     init_globally
-    interest_calculator
-    interval_timer
     latch_local
-    latch_remote
-    local_channel
-    local_channel_docs
-    partitioned_vector_spmd_foreach
-    pingpong
     pipeline1
-    print_to_console
-    potpourri
-    receive_buffer
     safe_object
-    shared_mutex
-    sierpinski
-    simple_future_continuation
-    timed_futures
     timed_wake
     use_main_thread
-    vector_counting_dotproduct
-    vector_zip_dotproduct
     wait_composition
-    zerocopy_rdma
    )
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(example_programs ${example_programs}
+      1d_wave_equation
+      allow_unknown_options
+      channel_docs
+      command_line_handling
+      component_ctors
+      component_in_executable
+      component_inheritance
+      component_with_custom_heap
+      component_with_executor
+      customize_async
+      data_actions
+      enumerate_threads
+      error_handling
+      event_synchronization
+      factorial
+      fibonacci
+      fibonacci_futures_distributed
+      fibonacci_one
+      fractals
+      fractals_struct
+      hello_world_1
+      hello_world_2
+      hello_world_distributed
+      interest_calculator
+      interval_timer
+      latch_remote
+      local_channel_docs
+      local_channel
+      partitioned_vector_spmd_foreach
+      pingpong
+      potpourri
+      print_to_console
+      receive_buffer
+      sierpinski
+      simple_future_continuation
+      timed_futures
+      vector_counting_dotproduct
+      vector_zip_dotproduct
+      zerocopy_rdma
+     )
+endif()
 
 # TODO: These examples currently fail. Disabled until they are fixed.
 set(disabled_tests
@@ -133,7 +137,8 @@ set(vector_counting_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_zip_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
 
 if((HPX_WITH_LOCAL_SCHEDULER OR HPX_WITH_ALL_SCHEDULERS)
-    AND HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
+    AND HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY
+    AND HPX_WITH_DISTRIBUTED_RUNTIME)
   set(example_programs ${example_programs}
       fractals_executor
      )
@@ -142,7 +147,7 @@ set(fractals_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 endif()
 
 # the following example fails compiling on someversions of MSVC
-if(HPX_WITH_TUPLE_RVALUE_SWAP AND (NOT MSVC))
+if(HPX_WITH_TUPLE_RVALUE_SWAP AND (NOT MSVC) AND HPX_WITH_DISTRIBUTED_RUNTIME)
   set(example_programs ${example_programs}
       sort_by_key_demo
      )

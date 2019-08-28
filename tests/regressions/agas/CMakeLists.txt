@@ -5,11 +5,15 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests
-    duplicate_id_registration_1596
-    pass_by_value_id_type_action
-    send_gid_keep_component_1624
-   )
+set(tests)
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(tests ${tests}
+      duplicate_id_registration_1596
+      pass_by_value_id_type_action
+      send_gid_keep_component_1624
+     )
+endif()
 
 if(HPX_WITH_NETWORKING)
   set(tests ${tests}

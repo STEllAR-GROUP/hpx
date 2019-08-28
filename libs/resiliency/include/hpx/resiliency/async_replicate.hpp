@@ -13,8 +13,8 @@
 
 #include <hpx/resiliency/config.hpp>
 
-#include <hpx/async.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/local_async.hpp>
 
 #include <cstddef>
 #include <exception>

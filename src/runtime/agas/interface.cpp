@@ -9,6 +9,7 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
@@ -413,8 +414,8 @@ naming::gid_type get_next_id(
   , error_code& ec
     )
 {
-    runtime* rt = get_runtime_ptr();
-    if (rt == nullptr)
+    runtime_distributed* rtd = get_runtime_distributed_ptr();
+    if (rtd == nullptr)
     {
         HPX_THROWS_IF(ec, invalid_status,
             "get_next_id", "the runtime system has not been started yet.");
@@ -422,9 +423,9 @@ naming::gid_type get_next_id(
     }
 
     // during bootstrap we use the id pool
-    if (rt->get_state() == state_invalid)
+    if (rtd->get_state() == state_invalid)
     {
-        return rt->get_id_pool().get_id(count);
+        return rtd->get_id_pool().get_id(count);
     }
 
     naming::resolver_client& agas_ = naming::get_agas_client();

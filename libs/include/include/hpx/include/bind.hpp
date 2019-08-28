@@ -9,6 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/bind.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/util/bind_action.hpp>
+#endif
 
 #endif

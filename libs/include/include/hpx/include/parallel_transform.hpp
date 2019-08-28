@@ -8,7 +8,12 @@
 #if !defined(HPX_PARALLEL_TRANSFORM_JUN_28_2014_0827AM)
 #define HPX_PARALLEL_TRANSFORM_JUN_28_2014_0827AM
 
+#include <hpx/config.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>
 #include <hpx/parallel/container_algorithms/transform.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/transform.hpp>
+#endif
+
 #endif

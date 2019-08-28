@@ -7,10 +7,15 @@
 #if !defined(HPX_ASYNC_APR_15_2012_0442PM)
 #define HPX_ASYNC_APR_15_2012_0442PM
 
-#include <hpx/async.hpp>
+#include <hpx/config.hpp>
+#include <hpx/local_async/async.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/async/async.hpp>
 #include <hpx/async/async_callback.hpp>
 #include <hpx/async/async_continue_callback.hpp>
 #include <hpx/async/detail/async_colocated.hpp>
 #include <hpx/async/detail/async_colocated_callback.hpp>
+#endif
 
 #endif

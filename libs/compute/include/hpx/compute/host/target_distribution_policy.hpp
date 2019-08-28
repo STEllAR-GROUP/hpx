@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/assertion.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/local_async/dataflow.hpp>
@@ -247,4 +248,5 @@ namespace hpx { namespace traits {
 }}    // namespace hpx::traits
 /// \endcond
 
+#endif
 #endif

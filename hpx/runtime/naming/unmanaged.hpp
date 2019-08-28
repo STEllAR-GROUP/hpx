@@ -9,6 +9,7 @@
 #if !defined(HPX_NAMING_UNMANAGED_NOV_12_2013_0210PM)
 #define HPX_NAMING_UNMANAGED_NOV_12_2013_0210PM
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
 namespace hpx { namespace naming
@@ -44,5 +45,3 @@ namespace hpx
 }
 
 #endif
-
-

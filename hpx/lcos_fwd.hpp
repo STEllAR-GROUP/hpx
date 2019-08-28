@@ -35,6 +35,7 @@ namespace hpx
             class promise_base;
         }}
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         class HPX_EXPORT base_lco;
 
         template <typename Result, typename RemoteResult =
@@ -55,12 +56,6 @@ namespace hpx
             bool DirectExecute = Action::direct_execution::value>
         class packaged_action;
 
-        template <typename R>
-        class future;
-
-        template <typename R>
-        class shared_future;
-
         template <typename ValueType>
         struct object_semaphore;
 
@@ -69,6 +64,13 @@ namespace hpx
             template <typename ValueType>
             struct object_semaphore;
         }
+#endif
+
+        template <typename R>
+        class future;
+
+        template <typename R>
+        class shared_future;
 
         namespace local
         {
@@ -85,7 +87,9 @@ namespace hpx
 
     using lcos::future;
     using lcos::shared_future;
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
     using lcos::promise;
+#endif
 }
 
 #endif

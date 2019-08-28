@@ -9,6 +9,7 @@
 #ifndef HPX_NAMING_SPLIT_GID_HPP
 #define HPX_NAMING_SPLIT_GID_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/synchronization/spinlock.hpp>

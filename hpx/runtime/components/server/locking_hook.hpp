@@ -67,7 +67,7 @@ namespace hpx { namespace components
         /// for this component instance.
         template <typename F>
         static threads::thread_function_type
-        decorate_action(naming::address::address_type lva, F && f)
+        decorate_action(naming::address_type lva, F && f)
         {
             return util::one_shot(util::bind_front(
                 &locking_hook::thread_function,

@@ -7,8 +7,12 @@
 #if !defined(HPX_INCLUDE_CLIENT_OCT_11_2012_1034AM)
 #define HPX_INCLUDE_CLIENT_OCT_11_2012_1034AM
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#endif
 
 #endif

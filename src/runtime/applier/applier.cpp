@@ -7,10 +7,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/util/thread_description.hpp>
+
+#include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/async/applier/applier.hpp>
@@ -18,9 +24,6 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/threading_base/thread_description.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -154,11 +157,11 @@ namespace hpx { namespace applier {
 
     applier& get_applier()
     {
-        return hpx::get_runtime().get_applier();
+        return hpx::get_runtime_distributed().get_applier();
     }
 
     applier* get_applier_ptr()
     {
-        return &hpx::get_runtime().get_applier();
+        return &hpx::get_runtime_distributed().get_applier();
     }
 }}    // namespace hpx::applier

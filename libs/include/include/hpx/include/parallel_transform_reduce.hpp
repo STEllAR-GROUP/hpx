@@ -8,8 +8,12 @@
 #if !defined(HPX_PARALLEL_TRANSFORM_REDUCE_JUL_14_2014_0849PM)
 #define HPX_PARALLEL_TRANSFORM_REDUCE_JUL_14_2014_0849PM
 
+#include <hpx/config.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
 #include <hpx/parallel/algorithms/transform_reduce_binary.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/transform_reduce.hpp>
+#endif
 
 #endif

@@ -6,7 +6,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/async/apply.hpp>
+#include <hpx/async.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/runtime_distributed.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/mpi_base.hpp>
@@ -769,7 +772,7 @@ namespace hpx { namespace components { namespace server
     void runtime_support::remove_from_connection_cache(
         naming::gid_type const& gid, parcelset::endpoints_type const& eps)
     {
-        runtime* rt = get_runtime_ptr();
+        runtime_distributed* rt = get_runtime_distributed_ptr();
         if (rt == nullptr) return;
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -1027,7 +1030,8 @@ namespace hpx { namespace components { namespace server
                 strm << std::string(79, '*') << '\n';
                 strm << "locality: " << hpx::get_locality_id() << '\n';
 
-                get_runtime().get_parcel_handler().list_parcelports(strm);
+                get_runtime_distributed().get_parcel_handler().list_parcelports(
+                    strm);
 
                 std::cout << strm.str();
             }
@@ -1054,9 +1058,10 @@ namespace hpx { namespace components { namespace server
         hpx::program_options::options_description options;
 
         // then dynamic ones
-        naming::resolver_client& client = get_runtime().get_agas_client();
-        int result = load_components(ini, client.get_local_locality(), client,
-            options, startup_handled);
+        naming::resolver_client& client =
+            get_runtime_distributed().get_agas_client();
+        int result = load_components(
+            ini, client.get_local_locality(), client, options, startup_handled);
 
         if (!load_plugins(ini, options, startup_handled))
             result = -2;
@@ -1225,8 +1230,8 @@ namespace hpx { namespace components { namespace server
     void runtime_support::remove_here_from_connection_cache()
     {
 #if defined(HPX_HAVE_NETWORKING)
-        runtime* rt = get_runtime_ptr();
-        if (rt == nullptr)
+        runtime_distributed* rtd = get_runtime_distributed_ptr();
+        if (rtd == nullptr)
             return;
 
         std::vector<naming::id_type> locality_ids = find_remote_localities();
@@ -1246,8 +1251,8 @@ namespace hpx { namespace components { namespace server
 
             indirect_packaged_task ipt;
             callbacks.push_back(ipt.get_future());
-
-            apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
+            apply_cb(
+                act, id, std::move(ipt), hpx::get_locality(), rtd->endpoints());
         }
 
         wait_all(callbacks);
@@ -1257,8 +1262,8 @@ namespace hpx { namespace components { namespace server
     void runtime_support::remove_here_from_console_connection_cache()
     {
 #if defined(HPX_HAVE_NETWORKING)
-        runtime* rt = get_runtime_ptr();
-        if (rt == nullptr)
+        runtime_distributed* rtd = get_runtime_distributed_ptr();
+        if (rtd == nullptr)
             return;
 
         typedef server::runtime_support::remove_from_connection_cache_action
@@ -1270,7 +1275,8 @@ namespace hpx { namespace components { namespace server
 
         // handle console separately
         id_type id = naming::get_id_from_locality_id(0);
-        apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
+        apply_cb(
+            act, id, std::move(ipt), hpx::get_locality(), rtd->endpoints());
 
         callback.wait();
 #endif

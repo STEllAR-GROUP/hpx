@@ -5,6 +5,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_IO_COUNTERS)
+  set(HPX_COMPONENTS ${HPX_COMPONENTS} io_counters CACHE INTERNAL "list of HPX components")
+
   if(NOT HPX_WITH_DEFAULT_TARGETS)
     set(_exclude_from_all_flag EXCLUDE_FROM_ALL)
   endif()

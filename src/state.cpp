@@ -10,7 +10,11 @@
 #include <hpx/state.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -38,12 +42,13 @@ namespace hpx
         }
     }
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
     namespace agas
     {
         // return whether resolver client is in state described by st
         bool router_is(state st)
         {
-            runtime* rt = get_runtime_ptr();
+            runtime_distributed* rt = get_runtime_distributed_ptr();
             if (nullptr == rt) {
                 // we're probably either starting or stopping
                 return st == state_starting || st == state_stopping;
@@ -51,5 +56,6 @@ namespace hpx
             return (rt->get_agas_client().get_status() == st);
         }
     }
+#endif
 }
 

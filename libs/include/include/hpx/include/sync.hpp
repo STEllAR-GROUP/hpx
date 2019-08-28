@@ -7,6 +7,11 @@
 #if !defined(HPX_SYNC_JUL_21_2018_0945PM)
 #define HPX_SYNC_JUL_21_2018_0945PM
 
+#include <hpx/config.hpp>
+#include <hpx/local_async/sync.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/async/sync.hpp>
+#endif
 
 #endif

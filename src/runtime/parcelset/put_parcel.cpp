@@ -7,6 +7,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
 
@@ -19,7 +20,7 @@ namespace hpx { namespace parcelset
         void put_parcel_handler::operator()(parcel&& p) const
         {
             parcelset::parcelhandler& ph =
-                hpx::get_runtime().get_parcel_handler();
+                hpx::get_runtime_distributed().get_parcel_handler();
             ph.put_parcel(std::move(p));
         }
     }
@@ -27,14 +28,14 @@ namespace hpx { namespace parcelset
     void put_parcel(parcel&& p, write_handler_type&& f)
     {
         parcelset::parcelhandler& ph =
-            hpx::get_runtime().get_parcel_handler();
+            hpx::get_runtime_distributed().get_parcel_handler();
         ph.put_parcel(std::move(p), std::move(f));
     }
 
     void sync_put_parcel(parcel&& p)
     {
         parcelset::parcelhandler& ph =
-            hpx::get_runtime().get_parcel_handler();
+            hpx::get_runtime_distributed().get_parcel_handler();
         ph.sync_put_parcel(std::move(p));
     }
 }}

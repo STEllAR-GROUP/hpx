@@ -26,6 +26,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
@@ -237,18 +238,18 @@ void addressing_service::launch_bootstrap(
     locality_ns_.reset(new detail::bootstrap_locality_namespace(
         reinterpret_cast<server::primary_namespace *>(primary_ns_.ptr())));
 
-    runtime& rt = get_runtime();
+    runtime_distributed& rtd = get_runtime_distributed();
 
     naming::gid_type const here =
         naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
     set_local_locality(here);
 
     // store number of cores used by other processes
-    std::uint32_t cores_needed = rt.assign_cores();
-    std::uint32_t first_used_core = rt.assign_cores(
+    std::uint32_t cores_needed = rtd.assign_cores();
+    std::uint32_t first_used_core = rtd.assign_cores(
         pp ? pp->get_locality_name() : "<console>", cores_needed);
 
-    util::runtime_configuration& cfg = rt.get_config();
+    util::runtime_configuration& cfg = rtd.get_config();
     cfg.set_first_used_core(first_used_core);
     HPX_ASSERT(pp ? pp->here() == pp->agas_locality(cfg) : true);
 
@@ -272,7 +273,7 @@ void addressing_service::launch_bootstrap(
         hpx::components::component_agas_symbol_namespace, 1U,
             symbol_ns_.ptr());
 
-    rt.get_config().parse("assigned locality",
+    rtd.get_config().parse("assigned locality",
         hpx::util::format("hpx.locality!={1}",
             naming::get_locality_id_from_gid(here)));
 
@@ -281,17 +282,17 @@ void addressing_service::launch_bootstrap(
     locality_ns_->allocate(endpoints, 0, num_threads, naming::invalid_gid);
 
     naming::gid_type runtime_support_gid1(here);
-    runtime_support_gid1.set_lsb(rt.get_runtime_support_lva());
+    runtime_support_gid1.set_lsb(rtd.get_runtime_support_lva());
     naming::gid_type runtime_support_gid2(here);
     runtime_support_gid2.set_lsb(std::uint64_t(0));
 
     gva runtime_support_address(here
       , components::get_component_type<components::server::runtime_support>()
-      , 1U, rt.get_runtime_support_lva());
+      , 1U, rtd.get_runtime_support_lva());
 
     naming::gid_type lower, upper;
     get_id_range(HPX_INITIAL_GID_RANGE, lower, upper);
-    rt.get_id_pool().set_range(lower, upper);
+    rtd.get_id_pool().set_range(lower, upper);
 
     register_name("/0/agas/locality#0", here);
     if (is_console())
@@ -309,17 +310,17 @@ void addressing_service::launch_bootstrap(
     locality_ns_.reset(new detail::bootstrap_locality_namespace(
         reinterpret_cast<server::primary_namespace *>(primary_ns_.ptr())));
 
-    runtime& rt = get_runtime();
+    runtime_distributed& rtd = get_runtime_distributed();
 
     naming::gid_type const here =
         naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
     set_local_locality(here);
 
     // store number of cores used by other processes
-    std::uint32_t cores_needed = rt.assign_cores();
-    std::uint32_t first_used_core = rt.assign_cores("<console>", cores_needed);
+    std::uint32_t cores_needed = rtd.assign_cores();
+    std::uint32_t first_used_core = rtd.assign_cores("<console>", cores_needed);
 
-    util::runtime_configuration& cfg = rt.get_config();
+    util::runtime_configuration& cfg = rtd.get_config();
     cfg.set_first_used_core(first_used_core);
 
     naming::id_type const locality_gid = locality_ns_->gid();
@@ -342,7 +343,7 @@ void addressing_service::launch_bootstrap(
         hpx::components::component_agas_symbol_namespace, 1U,
             symbol_ns_.ptr());
 
-    rt.get_config().parse("assigned locality",
+    rtd.get_config().parse("assigned locality",
         hpx::util::format("hpx.locality!={1}",
             naming::get_locality_id_from_gid(here)));
 
@@ -351,17 +352,17 @@ void addressing_service::launch_bootstrap(
     locality_ns_->allocate(endpoints, 0, num_threads, naming::invalid_gid);
 
     naming::gid_type runtime_support_gid1(here);
-    runtime_support_gid1.set_lsb(rt.get_runtime_support_lva());
+    runtime_support_gid1.set_lsb(rtd.get_runtime_support_lva());
     naming::gid_type runtime_support_gid2(here);
     runtime_support_gid2.set_lsb(std::uint64_t(0));
 
     gva runtime_support_address(here
       , components::get_component_type<components::server::runtime_support>()
-      , 1U, rt.get_runtime_support_lva());
+      , 1U, rtd.get_runtime_support_lva());
 
     naming::gid_type lower, upper;
     get_id_range(HPX_INITIAL_GID_RANGE, lower, upper);
-    rt.get_id_pool().set_range(lower, upper);
+    rtd.get_id_pool().set_range(lower, upper);
 
     register_name("/0/agas/locality#0", here);
     register_name("/0/locality#console", here);
@@ -664,7 +665,7 @@ bool addressing_service::get_localities(
 std::uint32_t addressing_service::get_num_localities(
     components::component_type type
   , error_code& ec
-    )
+    ) const
 { // {{{ get_num_localities implementation
     try {
         if (type == components::component_invalid)
@@ -682,7 +683,7 @@ std::uint32_t addressing_service::get_num_localities(
 
 lcos::future<std::uint32_t> addressing_service::get_num_localities_async(
     components::component_type type
-    )
+    ) const
 { // {{{ get_num_localities implementation
     if (type == components::component_invalid)
     {
@@ -695,7 +696,7 @@ lcos::future<std::uint32_t> addressing_service::get_num_localities_async(
 ///////////////////////////////////////////////////////////////////////////////
 std::uint32_t addressing_service::get_num_overall_threads(
     error_code& ec
-    )
+    ) const
 { // {{{ get_num_overall_threads implementation
     try {
         return locality_ns_->get_num_overall_threads();
@@ -707,13 +708,14 @@ std::uint32_t addressing_service::get_num_overall_threads(
 } // }}}
 
 lcos::future<std::uint32_t> addressing_service::get_num_overall_threads_async()
+    const
 { // {{{
     return locality_ns_->get_num_overall_threads_async();
 } // }}}
 
 std::vector<std::uint32_t> addressing_service::get_num_threads(
     error_code& ec
-    )
+    ) const
 { // {{{ get_num_threads implementation
     try {
         return locality_ns_->get_num_threads();
@@ -724,7 +726,8 @@ std::vector<std::uint32_t> addressing_service::get_num_threads(
     return std::vector<std::uint32_t>();
 } // }}}
 
-lcos::future<std::vector<std::uint32_t> > addressing_service::get_num_threads_async()
+lcos::future<std::vector<std::uint32_t>>
+addressing_service::get_num_threads_async() const
 { // {{{
     return locality_ns_->get_num_threads_async();
 } // }}}

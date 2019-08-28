@@ -6,16 +6,20 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    configuration_1572
-    iarchive_1237
     protect_with_nullary_pfo
-    serialize_buffer_1069
     set_config_entry_deadlock
     use_all_cores_2262
    )
 
-set(iarchive_1237_FLAGS DEPENDENCIES iostreams_component)
-set(serialize_buffer_1069_FLAGS DEPENDENCIES iostreams_component)
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(tests ${tests}
+      configuration_1572
+      iarchive_1237
+      serialize_buffer_1069
+     )
+  set(iarchive_1237_FLAGS DEPENDENCIES iostreams_component)
+  set(serialize_buffer_1069_FLAGS DEPENDENCIES iostreams_component)
+endif()
 
 if(HPX_WITH_NETWORKING)
     set(tests ${tests}

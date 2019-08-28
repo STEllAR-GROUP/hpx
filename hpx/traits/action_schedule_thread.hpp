@@ -9,6 +9,7 @@
 
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/naming_base.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
@@ -24,8 +25,8 @@ namespace hpx { namespace traits
             // by default we return an empty value
             template <typename Action>
             static void
-            call(wrap_int, naming::address::address_type,
-                    naming::address::component_type,
+            call(wrap_int, naming::address_type,
+                    naming::component_type,
                     threads::thread_init_data& data,
                     threads::thread_state_enum initial_state)
             {
@@ -35,8 +36,8 @@ namespace hpx { namespace traits
             // forward the call if the component implements the function
             template <typename Action>
             static auto
-            call(int, naming::address::address_type lva,
-                    naming::address::component_type comptype,
+            call(int, naming::address_type lva,
+                    naming::component_type comptype,
                     threads::thread_init_data& data,
                     threads::thread_state_enum initial_state)
             ->  decltype(
@@ -51,8 +52,8 @@ namespace hpx { namespace traits
         };
 
         template <typename Action>
-        void call_schedule_thread(naming::address::address_type lva,
-            naming::address::component_type comptype,
+        void call_schedule_thread(naming::address_type lva,
+            naming::component_type comptype,
             threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {
@@ -66,8 +67,8 @@ namespace hpx { namespace traits
     {
         // returns whether target was migrated to another locality
         static void
-        call(naming::address::address_type lva,
-            naming::address::component_type comptype,
+        call(naming::address_type lva,
+            naming::component_type comptype,
             threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {

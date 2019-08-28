@@ -11,7 +11,6 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/async/applier/applier.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
