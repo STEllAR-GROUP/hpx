@@ -512,7 +512,8 @@ int main(int argc, char* argv[])
 
         ("csv", "output results as csv (format: count,duration)")
         ("test-all", "run all benchmarks")
-        ("repetitions", value<int>()->default_value(1), "number of repetitions of the full benchmark")
+        ("repetitions", value<int>()->default_value(1),
+         "number of repetitions of the full benchmark")
 
         ("info", value<std::string>()->default_value("none"),
          "extra info for plot output (e.g. branch name)");
