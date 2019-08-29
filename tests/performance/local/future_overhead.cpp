@@ -291,11 +291,158 @@ void measure_function_futures_sliding_semaphore(
         });
         sem.wait(i);
     }
-    sem.wait(count);
+    sem.wait(count + sem_count - 1);
 
     // stop the clock
     const double duration = walltime.elapsed();
     print_stats("apply", "Sliding-Sem", ExecName(exec), count, duration, csv);
+}
+
+void measure_function_futures_register_work(std::uint64_t count, bool csv)
+{
+    hpx::lcos::local::latch l(count);
+
+    // start the clock
+    high_resolution_timer walltime;
+    for (std::uint64_t i = 0; i < count; ++i)
+    {
+        hpx::applier::register_work_nullary([&l]() {
+            null_function();
+            l.count_down(1);
+        });
+    }
+    l.wait();
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats("register_work", "latch", "none", count, duration, csv);
+}
+
+void measure_function_futures_create_thread(std::uint64_t count, bool csv)
+{
+    hpx::lcos::local::latch l(count);
+
+    auto const sched = hpx::threads::get_self_id()->get_scheduler_base();
+    auto func = [&l]() {
+        null_function();
+        l.count_down(1);
+    };
+    auto const thread_func =
+        hpx::applier::detail::thread_function_nullary<decltype(func)>{func};
+    auto const desc = hpx::util::thread_description();
+    auto const prio = hpx::threads::thread_priority_normal;
+    auto const hint = hpx::threads::thread_schedule_hint();
+    auto const stack_size =
+        hpx::threads::get_stack_size(hpx::threads::thread_stacksize_small);
+    hpx::error_code ec;
+
+    // start the clock
+    high_resolution_timer walltime;
+    for (std::uint64_t i = 0; i < count; ++i)
+    {
+        auto init = hpx::threads::thread_init_data(
+            hpx::threads::thread_function_type(thread_func), desc, prio, hint,
+            stack_size, sched);
+        sched->create_thread(init, nullptr, hpx::threads::pending, false, ec);
+    }
+    l.wait();
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats("create_thread", "latch", "none", count, duration, csv);
+}
+
+void measure_function_futures_create_thread_hierarchical_placement(
+    std::uint64_t count, bool csv)
+{
+    hpx::lcos::local::latch l(count);
+
+    auto sched = hpx::threads::get_self_id()->get_scheduler_base();
+    auto const func = [&l]() {
+        null_function();
+        l.count_down(1);
+    };
+    auto const thread_func =
+        hpx::applier::detail::thread_function_nullary<decltype(func)>{func};
+    auto const desc = hpx::util::thread_description();
+    auto const prio = hpx::threads::thread_priority_normal;
+    auto const stack_size =
+        hpx::threads::get_stack_size(hpx::threads::thread_stacksize_small);
+    auto const num_threads = hpx::get_num_worker_threads();
+    hpx::error_code ec;
+
+    // start the clock
+    high_resolution_timer walltime;
+    for (std::size_t t = 0; t < num_threads; ++t)
+    {
+        auto const hint = hpx::threads::thread_schedule_hint(t);
+        auto spawn_func = [&thread_func, sched, hint, t, count, num_threads,
+                              desc, prio, stack_size]() {
+            std::uint64_t const count_start = t * count / num_threads;
+            std::uint64_t const count_end = (t + 1) * count / num_threads;
+            hpx::error_code ec;
+            for (std::uint64_t i = count_start; i < count_end; ++i)
+            {
+                hpx::threads::thread_init_data init(
+                    hpx::threads::thread_function_type(thread_func), desc, prio,
+                    hint, stack_size, sched);
+                sched->create_thread(
+                    init, nullptr, hpx::threads::pending, false, ec);
+            }
+        };
+        auto const thread_spawn_func =
+            hpx::applier::detail::thread_function_nullary<decltype(spawn_func)>{
+                spawn_func};
+
+        hpx::threads::thread_init_data init(
+            hpx::threads::thread_function_type(thread_spawn_func), desc, prio,
+            hint, stack_size, sched);
+        sched->create_thread(init, nullptr, hpx::threads::pending, false, ec);
+    }
+    l.wait();
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats(
+        "create_thread_hierarchical", "latch", "none", count, duration, csv);
+}
+
+void measure_function_futures_apply_hierarchical_placement(
+    std::uint64_t count, bool csv)
+{
+    hpx::lcos::local::latch l(count);
+
+    auto const func = [&l]() {
+        null_function();
+        l.count_down(1);
+    };
+    auto const num_threads = hpx::get_num_worker_threads();
+
+    // start the clock
+    high_resolution_timer walltime;
+    for (std::size_t t = 0; t < num_threads; ++t)
+    {
+        auto const hint = hpx::threads::thread_schedule_hint(t);
+        auto spawn_func = [&func, hint, t, count, num_threads]() {
+            auto exec = hpx::threads::executors::default_executor(hint);
+            std::uint64_t const count_start = t * count / num_threads;
+            std::uint64_t const count_end = (t + 1) * count / num_threads;
+
+            for (std::uint64_t i = count_start; i < count_end; ++i)
+            {
+                hpx::apply(exec, func);
+            }
+        };
+
+        auto exec = hpx::threads::executors::default_executor(hint);
+        hpx::apply(exec, spawn_func);
+    }
+    l.wait();
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats("apply_hierarchical", "latch", "default_executor", count,
+        duration, csv);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -342,6 +489,12 @@ int hpx_main(variables_map& vm)
                 measure_function_futures_thread_count(count, csv, par);
                 measure_function_futures_sliding_semaphore(count, csv, def);
                 measure_function_futures_sliding_semaphore(count, csv, par);
+                measure_function_futures_register_work(count, csv);
+                measure_function_futures_create_thread(count, csv);
+                measure_function_futures_create_thread_hierarchical_placement(
+                    count, csv);
+                measure_function_futures_apply_hierarchical_placement(
+                    count, csv);
             }
             measure_function_futures_limiting_executor(count, csv, def);
             measure_function_futures_limiting_executor(count, csv, par);
