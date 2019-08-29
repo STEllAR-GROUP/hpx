@@ -21,7 +21,8 @@ if(HPX_WITH_VALGRIND)
   endif()
 
   add_library(hpx::valgrind INTERFACE IMPORTED)
-  target_include_directories(hpx::valgrind SYSTEM INTERFACE ${VALGRIND_INCLUDE_DIR})
+  # FIXME : specify the SYSTEM flag when passing to target_include_directories
+  set_property(TARGET hpx::valgrind PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${VALGRIND_INCLUDE_DIR})
 
   hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()

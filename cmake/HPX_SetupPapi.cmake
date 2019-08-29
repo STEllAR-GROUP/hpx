@@ -19,6 +19,8 @@ if(HPX_WITH_PAPI)
     PAPI_ROOT to point to the root of your PAPI installation")
   endif()
   add_library(hpx::papi INTERFACE IMPORTED)
-  target_include_directories(hpx::papi INTERFACE ${PAPI_INCLUDE_DIR})
-  target_link_libraries(hpx::papi INTERFACE ${PAPI_LIBRARY})
+  set_property(TARGET hpx::papi PROPERTY
+    INTERFACE_INCLUDE_DIRECTORIES ${PAPI_INCLUDE_DIR})
+  set_property(TARGET hpx::papi PROPERTY
+    INTERFACE_LINK_LIBRARIES ${PAPI_LIBRARY})
 endif()
