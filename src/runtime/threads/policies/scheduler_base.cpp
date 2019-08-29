@@ -5,17 +5,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/config_entry.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/scoped_background_timer.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/yield_while.hpp>
 #include <hpx/util_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
@@ -42,35 +37,22 @@
 namespace hpx { namespace threads { namespace policies
 {
     scheduler_base::scheduler_base(std::size_t num_threads,
-            char const* description, scheduler_mode mode)
+        char const* description, thread_queue_init_parameters thread_queue_init,
+        scheduler_mode mode)
       : modes_(num_threads)
       , suspend_mtxs_(num_threads)
       , suspend_conds_(num_threads)
       , pu_mtxs_(num_threads)
       , states_(num_threads)
       , description_(description)
+      , thread_queue_init_(thread_queue_init)
       , parent_pool_(nullptr)
       , background_thread_count_(0)
     {
-        // if there is a cfg setting for the default_scheduler_mode, use that
-        // instead of the built-in default
-        std::string default_scheduler_mode = hpx::get_config_entry(
-            "hpx.default_scheduler_mode", std::string());
-
-        if (!default_scheduler_mode.empty())
-        {
-            mode = scheduler_mode(hpx::util::safe_lexical_cast<std::size_t>(
-                default_scheduler_mode));
-            HPX_ASSERT_MSG((mode & ~scheduler_mode::all_flags) == 0,
-                "hpx.default_scheduler_mode contains unknown scheduler modes");
-        }
-
         set_scheduler_mode(mode);
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-        double max_time =
-            hpx::util::safe_lexical_cast<double>(hpx::get_config_entry(
-                "hpx.max_idle_backoff_time", HPX_IDLE_BACKOFF_TIME_MAX));
+        double max_time = thread_queue_init.max_idle_backoff_time_;
 
         wait_counts_.resize(num_threads);
         for (auto && data : wait_counts_)

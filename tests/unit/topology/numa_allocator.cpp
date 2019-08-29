@@ -252,11 +252,15 @@ int main(int argc, char* argv[])
     using hpx::threads::policies::scheduler_mode;
     // setup the default pool with a numa aware scheduler
     rp.create_thread_pool("default",
-        [](hpx::threads::thread_pool_init_parameters init)
+        [](hpx::threads::thread_pool_init_parameters init,
+            hpx::threads::policies::thread_queue_init_parameters
+                thread_queue_init)
             -> std::unique_ptr<hpx::threads::thread_pool_base> {
+            numa_scheduler::init_parameter_type scheduler_init(
+                init.num_threads_, {2, 3, 64}, init.affinity_data_,
+                thread_queue_init, "shared-priority-scheduler");
             std::unique_ptr<numa_scheduler> scheduler(
-                new numa_scheduler(init.num_threads_, {2, 3, 64},
-                    "shared-priority-scheduler", init.affinity_data_));
+                new numa_scheduler(scheduler_init));
 
             scheduler_mode mode =
                 scheduler_mode(scheduler_mode::do_background_work |
