@@ -7,7 +7,7 @@
 #ifndef HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 #define HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 
-#include <hpx/config.hpp>
+#include <hpx/plugin/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
@@ -58,21 +58,6 @@ using HMODULE = struct HINSTANCE__*;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace plugin {
-
-    namespace very_detail {
-
-        template <typename TO, typename FROM>
-        TO nasty_cast(FROM f)
-        {
-            union
-            {
-                FROM f;
-                TO t;
-            } u;
-            u.f = f;
-            return u.t;
-        }
-    }    // namespace very_detail
 
     ///////////////////////////////////////////////////////////////////////////
     class dll
@@ -238,8 +223,8 @@ namespace hpx { namespace util { namespace plugin {
             static_assert(std::is_pointer<SymbolType>::value,
                 "std::is_pointer<SymbolType>::value");
 
-            SymbolType address = very_detail::nasty_cast<SymbolType>(
-                MyGetProcAddress(dll_handle, symbol_name.c_str()));
+            SymbolType address =
+                (SymbolType) MyGetProcAddress(dll_handle, symbol_name.c_str());
             if (nullptr == address)
             {
                 std::ostringstream str;

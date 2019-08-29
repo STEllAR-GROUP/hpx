@@ -7,11 +7,9 @@
 #define HPX_MESSAGE_HANDLER_FACTORY_BASE_MAR_24_2013_0339PM
 
 #include <hpx/config.hpp>
-#include <hpx/plugins/plugin_factory_base.hpp>
-
-#include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/plugin.hpp>
-#include <hpx/plugin/export_plugin.hpp>
+#include <hpx/plugins/plugin_factory_base.hpp>
+#include <hpx/runtime/parcelset/policies/message_handler.hpp>
 
 #include <cstddef>
 

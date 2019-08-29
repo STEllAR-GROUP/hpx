@@ -7,7 +7,7 @@
 #ifndef HPX_DLL_WINDOWS_HPP_HK_2005_11_06
 #define HPX_DLL_WINDOWS_HPP_HK_2005_11_06
 
-#include <hpx/config.hpp>
+#include <hpx/plugin/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>

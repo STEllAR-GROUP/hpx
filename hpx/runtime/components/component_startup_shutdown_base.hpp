@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/plugin.hpp>
-#include <hpx/plugin/export_plugin.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 

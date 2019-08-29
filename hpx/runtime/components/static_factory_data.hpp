@@ -12,8 +12,7 @@
 #include <hpx/datastructures/any.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/plugin/export_plugin.hpp>
-#include <hpx/plugin/virtual_constructor.hpp>
+#include <hpx/plugin.hpp>
 
 #include <map>
 #include <string>

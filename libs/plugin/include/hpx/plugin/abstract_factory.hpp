@@ -6,7 +6,7 @@
 #ifndef HPX_ABSTRACT_FACTORY_VP_2004_08_25
 #define HPX_ABSTRACT_FACTORY_VP_2004_08_25
 
-#include <hpx/config.hpp>
+#include <hpx/plugin/config.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/plugin/virtual_constructor.hpp>
 

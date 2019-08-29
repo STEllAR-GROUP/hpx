@@ -6,7 +6,7 @@
 #ifndef HPX_UTIL_PLUGIN_DLL_HPP
 #define HPX_UTIL_PLUGIN_DLL_HPP
 
-#include <hpx/config.hpp>
+#include <hpx/plugin/config.hpp>
 
 #ifndef HPX_MSVC
 #ifndef HPX_HAS_DLOPEN

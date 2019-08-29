@@ -18,7 +18,6 @@
 
 #include <algorithm>
 #include <cctype>
-#include <memory>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -62,7 +61,7 @@ namespace hpx { namespace util { namespace plugin {
                 }
 
                 abstract_factory<BasePlugin>* w = *xw;
-                return std::make_pair(w, std::shared_ptr<PointedType>(f, d));
+                return std::make_pair(w, shared_ptr<PointedType>(f, d));
             }
             else
             {

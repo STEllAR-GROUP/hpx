@@ -7,8 +7,38 @@
 #define HPX_UTIL_PLUGIN_CONFIG_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/plugin/config/defines.hpp>
+#include <hpx/preprocessor/stringize.hpp>
+
+////////////////////////////////////////////////////////////////////////////////
+// Older implementations of std::shared_ptr do not support binding function
+// pointers (see http//wg21.link/lwg3018)
+#if defined(HPX_HAVE_CXX11_SHARED_PTR_LWG3018)
+
+#include <memory>
+
+namespace hpx { namespace util { namespace plugin {
+
+    template <typename T>
+    using shared_ptr = std::shared_ptr<T>;
+
+}}}    // namespace hpx::util::plugin
+
+#else
+
+// hpxinspect:nodeprecatedinclude:boost/shared_ptr.hpp
+// hpxinspect:nodeprecatedname:boost::shared_ptr
+
+#include <boost/shared_ptr.hpp>
+
+namespace hpx { namespace util { namespace plugin {
+
+    template <typename T>
+    using shared_ptr = boost::shared_ptr<T>;
+
+}}}
+
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_NO_EXPORT_API)

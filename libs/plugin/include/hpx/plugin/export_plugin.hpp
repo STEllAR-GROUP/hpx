@@ -9,7 +9,7 @@
 #ifndef HPX_EXPORT_PLUGIN_VP_2004_08_25
 #define HPX_EXPORT_PLUGIN_VP_2004_08_25
 
-#include <hpx/config.hpp>
+#include <hpx/plugin/config.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>

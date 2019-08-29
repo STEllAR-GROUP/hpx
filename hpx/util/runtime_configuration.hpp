@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/filesystem.hpp>
-#include <hpx/plugin/dll.hpp>
+#include <hpx/plugin.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>

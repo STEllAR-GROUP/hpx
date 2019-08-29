@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/plugin.hpp>
-#include <hpx/plugin/export_plugin.hpp>
 
 #include <boost/program_options/options_description.hpp>
 

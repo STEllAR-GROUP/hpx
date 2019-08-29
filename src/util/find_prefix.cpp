@@ -9,8 +9,10 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/util/find_prefix.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/plugin.hpp>
+#include <hpx/type_support/unused.hpp>
+#include <hpx/util/find_prefix.hpp>
 
 #if defined(HPX_WINDOWS)
 #  include <windows.h>
@@ -28,9 +30,6 @@
 #  include <iterator>
 #  include <vector>
 #endif
-
-#include <hpx/plugin/dll.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>

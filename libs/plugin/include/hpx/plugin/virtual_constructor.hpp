@@ -7,10 +7,9 @@
 #ifndef HPX_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
 #define HPX_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
 
-#include <hpx/config.hpp>
+#include <hpx/plugin/config.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
-#include <hpx/plugin/config.hpp>
 
 #include <map>
 #include <memory>
@@ -23,7 +22,7 @@ namespace hpx { namespace util { namespace plugin {
     using exported_plugins_type = std::map<std::string, hpx::util::any_nonser>;
     typedef exported_plugins_type* (HPX_PLUGIN_API *get_plugins_list_type)();
     typedef exported_plugins_type* (HPX_PLUGIN_API get_plugins_list_np)();
-    using dll_handle = std::shared_ptr<get_plugins_list_np>;
+    using dll_handle = shared_ptr<get_plugins_list_np>;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename BasePlugin>
