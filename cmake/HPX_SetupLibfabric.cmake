@@ -294,7 +294,9 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC)
 
   # Setup an imported target to link to
   add_library(hpx::libfabric INTERFACE IMPORTED)
-  target_include_directories(hpx::libfabric INTERFACE ${_libfabric_include_dirs})
-  target_link_libraries(hpx::libfabric INTERFACE ${_libfabric_libraries})
+  set_property(TARGET hpx::libfabric PROPERTY
+    INTERFACE_INCLUDE_DIRECTORIES ${_libfabric_include_dirs})
+  set_property(TARGET hpx::libfabric PROPERTY
+    INTERFACE_LINK_LIBRARIES ${_libfabric_libraries})
 
 endif()

@@ -18,18 +18,24 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
     MPI_ROOT to point to the root of your MPI installation")
   endif()
   add_library(hpx::mpi INTERFACE IMPORTED)
-  target_include_directories(hpx::mpi INTERFACE ${MPI_INCLUDE_PATH} ${MPI_CXX_INCLUDE_DIRS})
+  set_property(TARGET hpx::mpi PROPERTY
+    INTERFACE_INCLUDE_DIRECTORIES ${MPI_INCLUDE_PATH} ${MPI_CXX_INCLUDE_DIRS})
   # MPI_LIBRARY and EXTRA is deprecated but still linked for older MPI versions
-  target_link_libraries(hpx::mpi INTERFACE ${MPI_CXX_LIBRARIES})
+  if (MPI_CXX_LIBRARIES)
+    set_property(TARGET hpx::mpi APPEND PROPERTY
+      INTERFACE_LINK_LIBRARIES ${MPI_CXX_LIBRARIES})
+  endif()
   # Insure compatibility with older versions
   if (MPI_LIBRARY)
-    target_link_libraries(hpx::mpi INTERFACE ${MPI_LIBRARY})
+    set_property(TARGET hpx::mpi APPEND PROPERTY
+      INTERFACE_LINK_LIBRARIES ${MPI_LIBRARY})
   endif()
   if (MPI_EXTRA_LIBRARY)
-    target_link_libraries(hpx::mpi INTERFACE ${MPI_EXTRA_LIBRARY})
+    set_property(TARGET hpx::mpi APPEND PROPERTY
+      INTERFACE_LINK_LIBRARIES ${MPI_EXTRA_LIBRARY})
   endif()
-  target_compile_options(hpx::mpi INTERFACE ${MPI_CXX_COMPILE_FLAGS})
-  target_compile_definitions(hpx::mpi INTERFACE ${MPI_CXX_COMPILE_DEFINITIONS})
+  set_property(TARGET hpx::mpi PROPERTY INTERFACE_COMPILE_OPTIONS ${MPI_CXX_COMPILE_FLAGS})
+  set_property(TARGET hpx::mpi PROPERTY INTERFACE_COMPILE_DEFINITIONS ${MPI_CXX_COMPILE_DEFINITIONS})
   if(MPI_CXX_LINK_FLAGS)
     #hpx_add_link_flag_if_available(${MPI_CXX_LINK_FLAGS})
   endif()
