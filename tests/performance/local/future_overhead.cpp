@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// TODO: Update
-
 #include <hpx/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/apply.hpp>
@@ -202,9 +200,6 @@ template <typename Executor>
 void measure_function_futures_thread_count(
     std::uint64_t count, bool csv, Executor& exec)
 {
-    std::vector<future<double>> futures;
-    futures.reserve(count);
-
     std::atomic<std::uint64_t> sanity_check(count);
     auto this_pool = hpx::this_thread::get_pool();
 
@@ -276,9 +271,6 @@ template <typename Executor>
 void measure_function_futures_sliding_semaphore(
     std::uint64_t count, bool csv, Executor& exec)
 {
-    std::vector<future<double>> futures;
-    futures.reserve(count);
-
     // start the clock
     high_resolution_timer walltime;
     const int sem_count = 5000;
@@ -458,6 +450,7 @@ int hpx_main(variables_map& vm)
             numa_sensitive = 0;
 
         bool test_all = (vm.count("test-all") > 0);
+        const int repetitions = vm["repetitions"].as<int>();
 
         if (vm.count("info"))
             info_string = vm["info"].as<std::string>();
@@ -470,13 +463,14 @@ int hpx_main(variables_map& vm)
         bool csv = vm.count("csv") != 0;
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
-        const int nl = 1;
 
         hpx::parallel::execution::default_executor def;
         hpx::parallel::execution::parallel_executor par;
 
-        for (int i = 0; i < nl; i++)
+        for (int i = 0; i < repetitions; i++)
         {
+            measure_function_futures_limiting_executor(count, csv, def);
+            measure_function_futures_limiting_executor(count, csv, par);
             if (test_all)
             {
                 measure_action_futures_wait_each(count, csv);
@@ -496,8 +490,6 @@ int hpx_main(variables_map& vm)
                 measure_function_futures_apply_hierarchical_placement(
                     count, csv);
             }
-            measure_function_futures_limiting_executor(count, csv, def);
-            measure_function_futures_limiting_executor(count, csv, par);
         }
     }
 
@@ -519,6 +511,8 @@ int main(int argc, char* argv[])
          "number of iterations in the delay loop")
 
         ("csv", "output results as csv (format: count,duration)")
+        ("test-all", "run all benchmarks")
+        ("repetitions", value<int>()->default_value(1), "number of repetitions of the full benchmark")
 
         ("info", value<std::string>()->default_value("none"),
          "extra info for plot output (e.g. branch name)");
