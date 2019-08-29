@@ -8,7 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/detail/network_background_callback.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/util/function.hpp>
 
 #include <cstddef>
@@ -54,7 +55,8 @@ namespace hpx
 
         using scheduler_function = util::function_nonser<
             std::unique_ptr<hpx::threads::thread_pool_base>(
-                hpx::threads::thread_pool_init_parameters)>;
+                hpx::threads::thread_pool_init_parameters,
+                hpx::threads::policies::thread_queue_init_parameters)>;
 
         // Choose same names as in command-line options except with _ instead of
         // -.

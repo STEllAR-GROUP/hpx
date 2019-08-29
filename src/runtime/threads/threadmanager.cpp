@@ -9,9 +9,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/hardware/timestamp.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
@@ -19,19 +22,17 @@
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
+#include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/detail/yield_k.hpp>
-#include <hpx/hardware/timestamp.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <cstddef>
@@ -48,72 +49,58 @@
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies
-{
+namespace hpx { namespace threads { namespace policies {
     ///////////////////////////////////////////////////////////////////////////
     // We control whether to collect queue wait times using this global bool.
     // It will be set by any of the related performance counters. Once set it
     // stays set, thus no race conditions will occur.
     HPX_EXPORT bool maintain_queue_wait_times = false;
-}}}
+}}}    // namespace hpx::threads::policies
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx {
-    namespace detail {
-        // helper functions testing option compatibility
-        void ensure_high_priority_compatibility(
-            boost::program_options::variables_map const& vm)
-        {
-            if (vm.count("hpx:high-priority-threads"))
-            {
-                throw detail::command_line_error(
-                    "Invalid command line option "
-                    "--hpx:high-priority-threads, valid for "
-                    "--hpx:queuing=local-priority and "
-                    "--hpx:queuing=abp-priority only");
-            }
-        }
-
-        void ensure_numa_sensitivity_compatibility(
-            boost::program_options::variables_map const& vm)
-        {
-            if (vm.count("hpx:numa-sensitive"))
-            {
-                throw detail::command_line_error(
-                    "Invalid command line option "
-                    "--hpx:numa-sensitive, valid for "
-                    "--hpx:queuing=local, --hpx:queuing=local-priority, or "
-                    "--hpx:queuing=abp-priority only");
-            }
-        }
-
-        void ensure_queuing_option_compatibility(
-            boost::program_options::variables_map const& vm)
-        {
-            ensure_high_priority_compatibility(vm);
-            ensure_numa_sensitivity_compatibility(vm);
-        }
-}    // namespace detail
-}
-
-namespace hpx { namespace threads
-{
-    ///////////////////////////////////////////////////////////////////////
-    namespace strings
+namespace hpx { namespace detail {
+    // helper functions testing option compatibility
+    void ensure_high_priority_compatibility(
+        boost::program_options::variables_map const& vm)
     {
-        char const* const thread_state_names[] =
+        if (vm.count("hpx:high-priority-threads"))
         {
-        "unknown",
-        "active",
-        "pending",
-        "suspended",
-        "depleted",
-        "terminated",
-        "staged",
-        "pending_do_not_schedule",
-        "pending_boost"
-        };
+            throw detail::command_line_error(
+                "Invalid command line option "
+                "--hpx:high-priority-threads, valid for "
+                "--hpx:queuing=local-priority and "
+                "--hpx:queuing=abp-priority only");
+        }
+    }
+
+    void ensure_numa_sensitivity_compatibility(
+        boost::program_options::variables_map const& vm)
+    {
+        if (vm.count("hpx:numa-sensitive"))
+        {
+            throw detail::command_line_error(
+                "Invalid command line option "
+                "--hpx:numa-sensitive, valid for "
+                "--hpx:queuing=local, --hpx:queuing=local-priority, or "
+                "--hpx:queuing=abp-priority only");
+        }
+    }
+
+    void ensure_queuing_option_compatibility(
+        boost::program_options::variables_map const& vm)
+    {
+        ensure_high_priority_compatibility(vm);
+        ensure_numa_sensitivity_compatibility(vm);
+    }
+}}    // namespace hpx::detail
+
+namespace hpx { namespace threads {
+    ///////////////////////////////////////////////////////////////////////
+    namespace strings {
+        char const* const thread_state_names[] = {"unknown", "active",
+            "pending", "suspended", "depleted", "terminated", "staged",
+            "pending_do_not_schedule", "pending_boost"};
     }
 
     char const* get_thread_state_name(thread_state_enum state)
@@ -129,17 +116,10 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////
-    namespace strings
-    {
-        char const* const thread_state_ex_names[] =
-        {
-            "wait_unknown",
-            "wait_signaled",
-            "wait_timeout",
-            "wait_terminate",
-            "wait_abort"
-        };
-    } // samespace strings
+    namespace strings {
+        char const* const thread_state_ex_names[] = {"wait_unknown",
+            "wait_signaled", "wait_timeout", "wait_terminate", "wait_abort"};
+    }    // namespace strings
 
     char const* get_thread_state_ex_name(thread_state_ex_enum state_ex)
     {
@@ -149,10 +129,8 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////
-    namespace strings
-    {
-        char const* const thread_priority_names[] =
-        {
+    namespace strings {
+        char const* const thread_priority_names[] = {
             "default",
             "low",
             "normal",
@@ -174,7 +152,10 @@ namespace hpx { namespace threads
 
     namespace strings {
         char const* const stack_size_names[] = {
-            "small", "medium", "large", "huge",
+            "small",
+            "medium",
+            "large",
+            "huge",
         };
     }
 
@@ -233,21 +214,70 @@ namespace hpx { namespace threads
     {
         auto& rp = hpx::resource::get_partitioner();
         size_t num_pools = rp.get_num_pools();
-        util::command_line_handling const& cfg_ = rp.get_command_line_switches();
+        util::command_line_handling const& cfg_ =
+            rp.get_command_line_switches();
         std::size_t thread_offset = 0;
 
         std::size_t max_background_threads =
             hpx::util::safe_lexical_cast<std::size_t>(
                 hpx::get_config_entry("hpx.max_background_threads",
                     (std::numeric_limits<std::size_t>::max)()));
-        std::size_t max_idle_loop_count =
+        std::size_t const max_idle_loop_count =
+            hpx::util::safe_lexical_cast<std::int64_t>(hpx::get_config_entry(
+                "hpx.max_idle_loop_count", HPX_IDLE_LOOP_COUNT_MAX));
+        std::size_t const max_busy_loop_count =
+            hpx::util::safe_lexical_cast<std::int64_t>(hpx::get_config_entry(
+                "hpx.max_busy_loop_count", HPX_BUSY_LOOP_COUNT_MAX));
+
+        std::int64_t const max_thread_count =
             hpx::util::safe_lexical_cast<std::int64_t>(
-                hpx::get_config_entry("hpx.max_idle_loop_count",
-                    HPX_IDLE_LOOP_COUNT_MAX));
-        std::size_t max_busy_loop_count =
+                hpx::get_config_entry("hpx.thread_queue.max_thread_count",
+                    std::to_string(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)));
+        std::int64_t const min_tasks_to_steal_pending =
+            hpx::util::safe_lexical_cast<std::int64_t>(hpx::get_config_entry(
+                "hpx.thread_queue.min_tasks_to_steal_pending",
+                std::to_string(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING)));
+        std::int64_t const min_tasks_to_steal_staged =
+            hpx::util::safe_lexical_cast<std::int64_t>(hpx::get_config_entry(
+                "hpx.thread_queue.min_tasks_to_steal_staged",
+                std::to_string(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED)));
+        std::int64_t const min_add_new_count =
             hpx::util::safe_lexical_cast<std::int64_t>(
-                hpx::get_config_entry("hpx.max_busy_loop_count",
-                    HPX_BUSY_LOOP_COUNT_MAX));
+                hpx::get_config_entry("hpx.thread_queue.min_add_new_count",
+                    std::to_string(HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT)));
+        std::int64_t const max_add_new_count =
+            hpx::util::safe_lexical_cast<std::int64_t>(
+                hpx::get_config_entry("hpx.thread_queue.max_add_new_count",
+                    std::to_string(HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT)));
+        std::int64_t const min_delete_count =
+            hpx::util::safe_lexical_cast<std::int64_t>(
+                hpx::get_config_entry("hpx.thread_queue.min_delete_count",
+                    std::to_string(HPX_THREAD_QUEUE_MIN_DELETE_COUNT)));
+        std::int64_t const max_delete_count =
+            hpx::util::safe_lexical_cast<std::int64_t>(
+                hpx::get_config_entry("hpx.thread_queue.max_delete_count",
+                    std::to_string(HPX_THREAD_QUEUE_MAX_DELETE_COUNT)));
+        std::int64_t const max_terminated_threads =
+            hpx::util::safe_lexical_cast<std::int64_t>(
+                hpx::get_config_entry("hpx.thread_queue.max_terminated_threads",
+                    std::to_string(HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS)));
+        double const max_idle_backoff_time =
+            hpx::util::safe_lexical_cast<double>(
+                hpx::get_config_entry("hpx.max_idle_backoff_time",
+                    std::to_string(HPX_IDLE_BACKOFF_TIME_MAX)));
+
+        std::ptrdiff_t small_stacksize = get_stack_size(thread_stacksize_small);
+        std::ptrdiff_t medium_stacksize =
+            get_stack_size(thread_stacksize_medium);
+        std::ptrdiff_t large_stacksize = get_stack_size(thread_stacksize_large);
+        std::ptrdiff_t huge_stacksize = get_stack_size(thread_stacksize_huge);
+
+        policies::thread_queue_init_parameters thread_queue_init(
+            max_thread_count, min_tasks_to_steal_pending,
+            min_tasks_to_steal_staged, min_add_new_count, max_add_new_count,
+            min_delete_count, max_delete_count, max_terminated_threads,
+            max_idle_backoff_time, small_stacksize, medium_stacksize,
+            large_stacksize, huge_stacksize);
 
         if (!hpx::is_networking_enabled())
         {
@@ -287,7 +317,7 @@ namespace hpx { namespace threads
             {
                 auto pool_func = rp.get_pool_creator(i);
                 std::unique_ptr<thread_pool_base> pool(
-                    pool_func(thread_pool_init));
+                    pool_func(thread_pool_init, thread_queue_init));
                 pools_.push_back(std::move(pool));
                 break;
             }
@@ -312,8 +342,8 @@ namespace hpx { namespace threads
                     local_sched_type;
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
-                    thread_pool_init.affinity_data_, 1000, numa_sensitive,
-                    "core-local_queue_scheduler");
+                    thread_pool_init.affinity_data_, numa_sensitive,
+                    thread_queue_init, "core-local_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
 
@@ -349,7 +379,7 @@ namespace hpx { namespace threads
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
-                    1000, numa_sensitive,
+                    numa_sensitive, thread_queue_init,
                     "core-local_priority_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
@@ -382,7 +412,7 @@ namespace hpx { namespace threads
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
-                    1000, numa_sensitive,
+                    numa_sensitive, thread_queue_init,
                     "core-local_priority_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
@@ -420,8 +450,8 @@ namespace hpx { namespace threads
                     local_sched_type;
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
-                    thread_pool_init.affinity_data_, 1000, numa_sensitive,
-                    "core-static_queue_scheduler");
+                    thread_pool_init.affinity_data_, numa_sensitive,
+                    thread_queue_init, "core-static_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
 
@@ -459,7 +489,7 @@ namespace hpx { namespace threads
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
-                    1000, numa_sensitive,
+                    numa_sensitive, thread_queue_init,
                     "core-static_priority_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
@@ -494,7 +524,7 @@ namespace hpx { namespace threads
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
-                    1000, cfg_.numa_sensitive_,
+                    cfg_.numa_sensitive_, thread_queue_init,
                     "core-abp_fifo_priority_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
@@ -531,7 +561,7 @@ namespace hpx { namespace threads
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
-                    1000, cfg_.numa_sensitive_,
+                    cfg_.numa_sensitive_, thread_queue_init,
                     "core-abp_fifo_priority_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
@@ -554,13 +584,15 @@ namespace hpx { namespace threads
             {
 #if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
                 // instantiate the scheduler
-                typedef hpx::threads::policies::shared_priority_queue_scheduler<>
-                    local_sched_type;
-                hpx::threads::policies::core_ratios ratios(4, 4, 64);
+                typedef hpx::threads::policies::
+                    shared_priority_queue_scheduler<>
+                        local_sched_type;
+                local_sched_type::init_parameter_type init(
+                    thread_pool_init.num_threads_, {4, 4, 64},
+                    thread_pool_init.affinity_data_, thread_queue_init,
+                    "core-shared_priority_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
-                    new local_sched_type(thread_pool_init.num_threads_, ratios,
-                        "core-shared_priority_queue_scheduler",
-                        thread_pool_init.affinity_data_));
+                    new local_sched_type(init));
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -592,9 +624,7 @@ namespace hpx { namespace threads
         }
     }
 
-    threadmanager::~threadmanager()
-    {
-    }
+    threadmanager::~threadmanager() {}
 
     void threadmanager::init()
     {
@@ -602,7 +632,7 @@ namespace hpx { namespace threads
         std::size_t threads_offset = 0;
 
         // initialize all pools
-        for (auto && pool_iter : pools_)
+        for (auto&& pool_iter : pools_)
         {
             std::size_t num_threads_in_pool =
                 rp.get_num_threads(pool_iter->get_pool_index());
@@ -613,10 +643,9 @@ namespace hpx { namespace threads
 
     void threadmanager::print_pools(std::ostream& os)
     {
-        os << "The thread-manager owns "
-           << pools_.size() << " pool(s) : \n";
+        os << "The thread-manager owns " << pools_.size() << " pool(s) : \n";
 
-        for (auto && pool_iter : pools_)
+        for (auto&& pool_iter : pools_)
         {
             pool_iter->print_pool(os);
         }
@@ -640,10 +669,8 @@ namespace hpx { namespace threads
         }
 
         // now check the other pools - no need to check pool 0 again, so ++begin
-        auto pool = std::find_if(
-            ++pools_.begin(), pools_.end(),
-            [&pool_name](pool_type const& itp) -> bool
-            {
+        auto pool = std::find_if(++pools_.begin(), pools_.end(),
+            [&pool_name](pool_type const& itp) -> bool {
                 return (itp->get_pool_name() == pool_name);
             });
 
@@ -655,17 +682,15 @@ namespace hpx { namespace threads
         //! FIXME Add names of available pools?
         HPX_THROW_EXCEPTION(bad_parameter, "threadmanager::get_pool",
             "the resource partitioner does not own a thread pool named '" +
-            pool_name + "'. \n");
+                pool_name + "'. \n");
     }
 
-    thread_pool_base& threadmanager::get_pool(
-        pool_id_type pool_id) const
+    thread_pool_base& threadmanager::get_pool(pool_id_type pool_id) const
     {
         return get_pool(pool_id.name());
     }
 
-    thread_pool_base& threadmanager::get_pool(
-        std::size_t thread_index) const
+    thread_pool_base& threadmanager::get_pool(std::size_t thread_index) const
     {
         return get_pool(threads_lookup_[thread_index]);
     }
@@ -693,8 +718,7 @@ namespace hpx { namespace threads
 
         for (auto& pool_iter : pools_)
         {
-            total_count +=
-                pool_iter->get_background_thread_count();
+            total_count += pool_iter->get_background_thread_count();
         }
 
         return total_count;
@@ -753,7 +777,7 @@ namespace hpx { namespace threads
         thread_id_type& id, thread_state_enum initial_state, bool run_now,
         error_code& ec)
     {
-        thread_pool_base *pool = nullptr;
+        thread_pool_base* pool = nullptr;
         if (get_self_ptr())
         {
             auto tid = get_self_id();
@@ -770,7 +794,7 @@ namespace hpx { namespace threads
     void threadmanager::register_work(
         thread_init_data& data, thread_state_enum initial_state, error_code& ec)
     {
-        thread_pool_base *pool = nullptr;
+        thread_pool_base* pool = nullptr;
         if (get_self_ptr())
         {
             auto tid = get_self_id();
@@ -821,12 +845,14 @@ namespace hpx { namespace threads
         return result;
     }
 
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
     std::int64_t threadmanager::get_background_work_duration(bool reset)
     {
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)
-            result += pool_iter->get_background_work_duration(all_threads, reset);
+            result +=
+                pool_iter->get_background_work_duration(all_threads, reset);
         return result;
     }
 
@@ -842,7 +868,8 @@ namespace hpx { namespace threads
     {
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)
-            result += pool_iter->get_background_send_duration(all_threads, reset);
+            result +=
+                pool_iter->get_background_send_duration(all_threads, reset);
         return result;
     }
 
@@ -850,7 +877,8 @@ namespace hpx { namespace threads
     {
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)
-            result += pool_iter->get_background_send_overhead(all_threads, reset);
+            result +=
+                pool_iter->get_background_send_overhead(all_threads, reset);
         return result;
     }
 
@@ -992,7 +1020,8 @@ namespace hpx { namespace threads
     {
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)
-            result += pool_iter->get_num_stolen_from_pending(all_threads, reset);
+            result +=
+                pool_iter->get_num_stolen_from_pending(all_threads, reset);
         return result;
     }
 
@@ -1025,9 +1054,7 @@ namespace hpx { namespace threads
     std::size_t threadmanager::shrink_pool(std::string const& pool_name)
     {
         return resource::get_partitioner().shrink_pool(
-            pool_name,
-            [this, &pool_name](std::size_t virt_core)
-            {
+            pool_name, [this, &pool_name](std::size_t virt_core) {
                 get_pool(pool_name).remove_processing_unit(virt_core);
             });
     }
@@ -1035,12 +1062,10 @@ namespace hpx { namespace threads
     std::size_t threadmanager::expand_pool(std::string const& pool_name)
     {
         return resource::get_partitioner().expand_pool(
-            pool_name,
-            [this, &pool_name](std::size_t virt_core)
-            {
+            pool_name, [this, &pool_name](std::size_t virt_core) {
                 thread_pool_base& pool = get_pool(pool_name);
-                pool.add_processing_unit(virt_core,
-                    pool.get_thread_offset() + virt_core);
+                pool.add_processing_unit(
+                    virt_core, pool.get_thread_offset() + virt_core);
             });
     }
 
@@ -1080,7 +1105,8 @@ namespace hpx { namespace threads
 
             // set all states of all schedulers to "running"
             policies::scheduler_base* sched = pool_iter->get_scheduler();
-            if (sched) sched->set_all_states(state_running);
+            if (sched)
+                sched->set_all_states(state_running);
         }
 
         LTM_(info) << "run: running";
@@ -1148,8 +1174,8 @@ namespace hpx { namespace threads
         return get_thread_manager().get_thread_count(state);
     }
 
-    std::int64_t get_thread_count(thread_priority priority,
-        thread_state_enum state)
+    std::int64_t get_thread_count(
+        thread_priority priority, thread_state_enum state)
     {
         return get_thread_manager().get_thread_count(state, priority);
     }
@@ -1160,5 +1186,4 @@ namespace hpx { namespace threads
     {
         return get_thread_manager().enumerate_threads(f, state);
     }
-} // namespace threads
-} // namespace hpx
+}}    // namespace hpx::threads

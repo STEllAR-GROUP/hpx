@@ -39,14 +39,14 @@ void test_async(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::thread::id test_f(hpx::future<void> f, int passed_through)
+std::thread::id test_f(hpx::future<void> f, int passed_through)
 {
     HPX_TEST(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 
     HPX_TEST_EQ(passed_through, 42);
-    return hpx::this_thread::get_id();
+    return std::this_thread::get_id();
 }
 
 template <typename Executor>
@@ -55,7 +55,7 @@ void test_then(Executor& exec)
     hpx::future<void> f = hpx::make_ready_future();
 
     HPX_TEST(
-        hpx::parallel::execution::async_execute(exec, &test, 42).get() !=
+        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() !=
         std::this_thread::get_id());
 }
 

@@ -624,16 +624,16 @@ hpx_option(HPX_WITH_SPINLOCK_POOL_NUM STRING
 
 hpx_add_config_define(HPX_HAVE_SPINLOCK_POOL_NUM ${HPX_WITH_SPINLOCK_POOL_NUM})
 
-# Count number of terminated threads before forcefully cleaning up all of
-# them. Note: terminated threads are cleaned up either when this number is
-# reached for a particular thread queue or if the HPX_BUSY_LOOP_COUNT_MAX is
-# reached, which will clean up the terminated threads for _all_ thread queues.
+# Deprecated in 1.4.0
 hpx_option(HPX_SCHEDULER_MAX_TERMINATED_THREADS STRING
-  "Maximum number of terminated threads collected before those are cleaned up (default: 100)"
-  "100" CATEGORY "Thread Manager" ADVANCED)
+  "[Deprecated] Maximum number of terminated threads collected before those are cleaned up (default: 100)"
+  "0" CATEGORY "Thread Manager" ADVANCED)
 
-hpx_add_config_define(HPX_SCHEDULER_MAX_TERMINATED_THREADS
-  ${HPX_SCHEDULER_MAX_TERMINATED_THREADS})
+if(HPX_SCHEDULER_MAX_TERMINATED_THREADS GREATER 0)
+  hpx_warn("HPX_SCHEDULER_MAX_TERMINATED_THREADS is deprecated and will be removed in a future release. Use the configuration option hpx.thread_queue.max_terminated_threads instead to set the value.")
+  hpx_add_config_define(HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS
+    ${HPX_SCHEDULER_MAX_TERMINATED_THREADS})
+endif()
 
 hpx_option(HPX_WITH_SWAP_CONTEXT_EMULATION BOOL
   "Emulate SwapContext API for coroutines (default: OFF)"
