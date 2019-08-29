@@ -4,12 +4,74 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# Configuring options
 include(HPX_SetupLibfabric)
+
+if (HPX_WITH_PARCELPORT_LIBFABRIC)
+  #------------------------------------------------------------------------------
+  # Define the ParcelPort registration macro
+  #------------------------------------------------------------------------------
+  # make these variables cache ones so that the macro definition picks them up correctly
+  # it is executed from a different source dir, so vars lose their scope
+
+  set(_parcelport_CXX_srcs
+    "${PROJECT_SOURCE_DIR}/plugins/parcelport/libfabric/parcelport_libfabric.cpp"
+    "${PROJECT_SOURCE_DIR}/plugins/parcelport/libfabric/receiver.cpp"
+    "${PROJECT_SOURCE_DIR}/plugins/parcelport/libfabric/rma_receiver.cpp"
+    "${PROJECT_SOURCE_DIR}/plugins/parcelport/libfabric/sender.cpp"
+    CACHE INTERNAL "" FORCE)
+
+  set(_hpxc_CXX_srcs          "" CACHE INTERNAL "" FORCE)
+  set(_libfabric_C_srcs       "" CACHE INTERNAL "" FORCE)
+  set(_libfabric_libraries    "" CACHE INTERNAL "" FORCE)
+  set(_libfabric_include_dirs "" CACHE INTERNAL "" FORCE)
+
+  if(NOT HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
+    set(_libfabric_libraries
+      "${LIBFABRIC_LIBRARIES}"
+      "${PMI_LIBRARY}"
+      CACHE INTERNAL "" FORCE)
+
+    set(_libfabric_include_dirs
+      "${LIBFABRIC_INCLUDE_DIRS}"
+      CACHE INTERNAL "" FORCE)
+  else()
+    set(_libfabric_libraries
+      "${PMI_LIBRARY}"
+      "${GNI_LIB}"
+      CACHE INTERNAL "" FORCE)
+
+    set(_libfabric_C_srcs
+      ${libfabric_SRCS}
+      ${libfabric_util_SRCS}
+      ${libfabric_gni_SRCS}
+      CACHE INTERNAL "" FORCE)
+
+    set(_hpxc_CXX_srcs ${_parcelport_CXX_srcs}
+      "${PROJECT_SOURCE_DIR}/plugins/parcelport/libfabric/hpxc/src/threads/thread.cpp"
+      CACHE INTERNAL "" FORCE)
+
+    set(_parcelport_CXX_srcs ${_parcelport_CXX_srcs} ${_hpxc_CXX_srcs}
+      CACHE INTERNAL "" FORCE)
+
+    set(_libfabric_include_dirs
+      ${CMAKE_CURRENT_SOURCE_DIR}
+      ${CMAKE_CURRENT_SOURCE_DIR}/hpxc
+      ${CMAKE_CURRENT_SOURCE_DIR}/libfabric
+      ${CMAKE_CURRENT_SOURCE_DIR}/libfabric/prov/gni
+      ${CMAKE_CURRENT_SOURCE_DIR}/libfabric/prov/gni/include
+      ${CMAKE_CURRENT_SOURCE_DIR}/libfabric/include
+      ${GNI_INCLUDE}
+      CACHE INTERNAL "" FORCE)
+  endif()
+
+endif()
 
 macro(add_parcelport_libfabric_module)
   if (HPX_WITH_PARCELPORT_LIBFABRIC)
     hpx_debug("add_parcelport_libfabric_module")
 
+    include(HPX_AddParcelport)
     add_parcelport(libfabric
       STATIC
       SOURCES
@@ -18,12 +80,27 @@ macro(add_parcelport_libfabric_module)
       # do we need to declare any headers?
       #HEADERS
       DEPENDENCIES
-        hpx::libfabric
+        ${_libfabric_libraries}
+        hpx_config
+        hpx_allocator_support
+        hpx_assertion
+        hpx_cache
+        hpx_concurrency
+        hpx_coroutines
+        hpx_errors
+        hpx_execution
+        hpx_hardware
+        hpx_plugin
+        hpx_program_options
+        hpx_serialization
+        hpx_timing
+        hpx_topology
+      INCLUDE_DIRS
+        ${_libfabric_include_dirs}
+        ${PROJECT_SOURCE_DIR}
+        ${CMAKE_BINARY_DIR}
       FOLDER
         "Core/Plugins/Parcelport/libfabric")
-
-    # FIXME : Could this be private
-    target_include_directories(libfabric PUBLIC ${_libfabric_include_dirs})
 
     if(HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
       set_source_files_properties(

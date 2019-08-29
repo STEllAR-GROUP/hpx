@@ -10,6 +10,7 @@ macro(add_parcelport_verbs_module)
   if (HPX_WITH_PARCELPORT_VERBS)
     hpx_debug("add_parcelport_verbs_module")
 
+    include(HPX_AddParcelport)
     add_parcelport(verbs
       STATIC
       SOURCES
@@ -21,7 +22,17 @@ macro(add_parcelport_verbs_module)
           "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/locality.hpp"
           "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/pinned_memory_vector.hpp"
       DEPENDENCIES
-          hpx::verbs
+        hpx_config
+        hpx_assertion
+        hpx_format
+        hpx_preprocessor
+        hpx_plugin
+        hpx_timing
+        hpx::verbs
+        hpx::boost
+      INCLUDE_DIRS
+        ${CMAKE_BINARY_DIR}
+        ${PROJECT_SOURCE_DIR}
       FOLDER
         "Core/Plugins/Parcelport/verbs")
   endif()

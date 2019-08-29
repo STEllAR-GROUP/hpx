@@ -22,56 +22,6 @@ set(HPX_STATIC_PARCELPORT_PLUGINS_HEADERS "" CACHE INTERNAL "" FORCE)
 set(HPX_STATIC_PARCELPORT_PLUGINS_SOURCES "" CACHE INTERNAL "" FORCE)
 set(HPX_STATIC_PARCELPORT_PLUGINS_PROPERTIES "" CACHE INTERNAL "" FORCE)
 
-macro(add_parcelport name)
-  set(name_short ${name})
-  set(name "parcelport_${name}")
-  set(options STATIC)
-  set(one_value_args FOLDER)
-  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
-  cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
-
-  if(${${name}_STATIC})
-    hpx_debug("adding static parcelport: ${name}")
-
-    add_hpx_source_group(
-      NAME hpx
-      CLASS "Header Files"
-      ROOT "${PROJECT_SOURCE_DIR}/hpx"
-      TARGETS ${${name}_HEADERS})
-    add_hpx_source_group(
-      NAME hpx
-      CLASS "Source Files"
-      ROOT "${PROJECT_SOURCE_DIR}"
-      TARGETS ${${name}_SOURCES})
-
-    set(HPX_STATIC_PARCELPORT_PLUGINS
-      ${HPX_STATIC_PARCELPORT_PLUGINS} ${name}
-      CACHE INTERNAL "" FORCE)
-
-    set(HPX_STATIC_PARCELPORT_PLUGINS_HEADERS
-      ${HPX_STATIC_PARCELPORT_PLUGINS_HEADERS}
-      ${${name}_HEADERS})
-    list(SORT HPX_STATIC_PARCELPORT_PLUGINS_HEADERS)
-    list(REMOVE_DUPLICATES HPX_STATIC_PARCELPORT_PLUGINS_HEADERS)
-    set(HPX_STATIC_PARCELPORT_PLUGINS_HEADERS
-      ${HPX_STATIC_PARCELPORT_PLUGINS_HEADERS}
-      CACHE INTERNAL "" FORCE)
-
-    set(HPX_STATIC_PARCELPORT_PLUGINS_SOURCES
-      ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES}
-      ${${name}_SOURCES})
-    list(SORT HPX_STATIC_PARCELPORT_PLUGINS_SOURCES)
-    list(REMOVE_DUPLICATES HPX_STATIC_PARCELPORT_PLUGINS_SOURCES)
-    set(HPX_STATIC_PARCELPORT_PLUGINS_SOURCES
-      ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES}
-      CACHE INTERNAL "" FORCE)
-
-    hpx_libraries(${${name}_DEPENDENCIES})
-
-  endif()
-
-endmacro()
-
 foreach(type ${parcelport_plugins})
   add_hpx_pseudo_target(plugins.parcelport.${type})
   add_subdirectory(${type})

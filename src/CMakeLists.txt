@@ -264,6 +264,16 @@ endforeach()
 #  add_dependencies(hpx static_component_data_hpp)
 #endif()
 
+# Link to each parcelport plugin
+# FIXME: when all plugins refactored, put a for loop on the plugins cache
+# variable
+if (TARGET tcp)
+  target_link_libraries(hpx PRIVATE tcp)
+endif()
+if (TARGET mpi)
+  target_link_libraries(hpx PRIVATE mpi)
+endif()
+
 target_link_libraries(hpx PUBLIC hpx::boost)
 target_include_directories(hpx PUBLIC ${Boost_INCLUDE_DIRS})
 
