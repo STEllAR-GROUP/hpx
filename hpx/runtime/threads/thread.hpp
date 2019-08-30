@@ -19,6 +19,7 @@
 #include <hpx/util_fwd.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <iosfwd>
 #include <mutex>
 #include <utility>
