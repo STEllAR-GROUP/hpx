@@ -47,8 +47,8 @@ void test_wait_for_all_from_array()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
 
 using hpx::lcos::future;
 

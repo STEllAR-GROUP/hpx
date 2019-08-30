@@ -23,6 +23,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 
 #include <hpx/config.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/program_options.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -789,7 +790,7 @@ int main( int argc_param, char * argv_param[] )
 int cpp_main( int argc_param, char * argv_param[] )
 #endif
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: inspect [dir [dir ...]] [options]");
 

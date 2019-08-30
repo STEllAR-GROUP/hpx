@@ -158,7 +158,7 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator& allocator)
 // ------------------------------------------------------------------------
 // this is called on an hpx thread after the runtime starts up
 // ------------------------------------------------------------------------
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     int Nc = vm["size"].as<int>();
     int Nr = vm["size"].as<int>();
@@ -211,23 +211,23 @@ using hpx::threads::policies::scheduler_mode;
 // on an hpx thread
 int main(int argc, char* argv[])
 {
-    boost::program_options::options_description desc_cmdline("Test options");
+    hpx::program_options::options_description desc_cmdline("Test options");
     // clang-format off
     desc_cmdline.add_options()
         ("size,n",
-         boost::program_options::value<int>()->default_value(1024),
+         hpx::program_options::value<int>()->default_value(1024),
          "Matrix size.")
         ("tiles-per-domain,t",
-         boost::program_options::value<int>()->default_value(1),
+         hpx::program_options::value<int>()->default_value(1),
         "Number of Tiles per numa domain.")
         ("nb",
-         boost::program_options::value<int>()->default_value(128),
+         hpx::program_options::value<int>()->default_value(128),
         "Block cyclic distribution size.")
         ("row-proc,p",
-         boost::program_options::value<int>()->default_value(1),
+         hpx::program_options::value<int>()->default_value(1),
         "Number of row processes in the 2D communicator.")
         ("col-proc,q",
-         boost::program_options::value<int>()->default_value(1),
+         hpx::program_options::value<int>()->default_value(1),
         "Number of column processes in the 2D communicator.")
         ("no-check",
          "Disable result checking")
@@ -236,9 +236,9 @@ int main(int argc, char* argv[])
 
     // HPX uses a boost program options variable map, but we need it before
     // hpx-main, so we will create another one here and throw it away after use
-    boost::program_options::variables_map vm;
-    boost::program_options::store(
-        boost::program_options::command_line_parser(argc, argv)
+    hpx::program_options::variables_map vm;
+    hpx::program_options::store(
+        hpx::program_options::command_line_parser(argc, argv)
             .allow_unregistered()
             .options(desc_cmdline)
             .run(),

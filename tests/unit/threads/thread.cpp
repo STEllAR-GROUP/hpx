@@ -13,8 +13,8 @@
 #include <chrono>
 #include <functional>
 
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void set_description(char const* test_name)

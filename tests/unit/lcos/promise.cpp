@@ -69,7 +69,7 @@ int future_callback(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main(hpx::program_options::variables_map&)
 {
     {
         hpx::lcos::future<int> p = hpx::async<test_action>(hpx::find_here());
@@ -228,7 +228,7 @@ int hpx_main(boost::program_options::variables_map&)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    boost::program_options::options_description cmdline(
+    hpx::program_options::options_description cmdline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.

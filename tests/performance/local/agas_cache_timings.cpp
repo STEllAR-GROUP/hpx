@@ -18,7 +18,7 @@
 #include <hpx/statistics/histogram.hpp>
 #include <hpx/testing.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 #include <boost/accumulators/accumulators.hpp>
 
 #include <algorithm>
@@ -228,7 +228,7 @@ void test_update(gva_cache_type& cache, hpx::naming::gid_type first_key)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t cache_size = HPX_AGAS_LOCAL_CACHE_SIZE;
     if (vm.count("cache_size"))
@@ -257,7 +257,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 

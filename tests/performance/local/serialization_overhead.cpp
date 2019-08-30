@@ -156,7 +156,7 @@ std::size_t data_size = 1;
 std::size_t iterations = 1000;
 std::size_t concurrency = 1;
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     bool print_header = vm.count("no-header") == 0;
     bool continuation = vm.count("continuation") != 0;
@@ -187,20 +187,20 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    boost::program_options::options_description cmdline(
+    hpx::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
         ( "concurrency"
-        , boost::program_options::value<std::size_t>(&concurrency)->default_value(1)
+        , hpx::program_options::value<std::size_t>(&concurrency)->default_value(1)
         , "number of concurrent serialization operations (default: 1)")
 
         ( "data_size"
-        , boost::program_options::value<std::size_t>(&data_size)->default_value(1)
+        , hpx::program_options::value<std::size_t>(&data_size)->default_value(1)
         , "size of data buffer to serialize in bytes (default: 1)")
 
         ( "iterations"
-        , boost::program_options::value<std::size_t>(&iterations)->default_value(1000)
+        , hpx::program_options::value<std::size_t>(&iterations)->default_value(1000)
         , "number of iterations while measuring serialization overhead (default: 1000)")
 
         ( "continuation"

@@ -513,7 +513,7 @@ namespace test
     }
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     {
         test::good();

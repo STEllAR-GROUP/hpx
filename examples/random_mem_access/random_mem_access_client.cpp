@@ -12,12 +12,12 @@
 #include <ctime>
 #include <vector>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include "random_mem_access/random_mem_access.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t array_size = 0;
     std::size_t iterations = 0;
@@ -69,10 +69,10 @@ int hpx_main(boost::program_options::variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    using boost::program_options::value;
+    using hpx::program_options::value;
 
     // Configure application-specific options
-    boost::program_options::options_description
+    hpx::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()

@@ -94,7 +94,7 @@ void uninitialized_default_construct_bad_alloc_test()
     test_uninitialized_default_construct_bad_alloc<std::forward_iterator_tag>();
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
@@ -112,7 +112,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // add command line option which controls the random number generator seed
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 

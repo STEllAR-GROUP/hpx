@@ -101,7 +101,7 @@ void print_header()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void run_benchmark(boost::program_options::variables_map & vm)
+void run_benchmark(hpx::program_options::variables_map & vm)
 {
     // use the first remote locality to bounce messages, if possible
     hpx::id_type here = hpx::find_here();
