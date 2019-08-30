@@ -923,8 +923,7 @@ namespace hpx { namespace util {
         return static_cast<T>(*result);
     }
 
-    template <typename T, typename IArch, typename OArch,
-        typename Char>
+    template <typename T, typename IArch, typename OArch, typename Char>
     T const& any_cast(basic_any<IArch, OArch, Char> const& operand)
     {
         using nonref = typename std::remove_reference<T>::type;

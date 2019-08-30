@@ -290,7 +290,7 @@ void test_direct_actions()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main(hpx::program_options::variables_map&)
 {
     test_actions();
     test_direct_actions();
@@ -303,7 +303,7 @@ int hpx_main(boost::program_options::variables_map&)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    boost::program_options::options_description desc_commandline(
+    hpx::program_options::options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // we need to explicitly enable the test components used by this test

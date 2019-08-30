@@ -10,7 +10,7 @@
 #include <hpx/testing.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -82,7 +82,7 @@ double wait_tasks(std::size_t num_samples, std::size_t num_tasks,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t num_samples = 1000;
     std::size_t num_tasks = 100;
@@ -143,7 +143,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    namespace po = boost::program_options;
+    namespace po = hpx::program_options;
 
     // Configure application-specific options.
     po::options_description opts("usage: " HPX_APPLICATION_STRING " [options]");

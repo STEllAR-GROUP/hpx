@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
      return hpx::init(argc, argv);
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
      // find locality info
      std::vector<hpx::naming::id_type> locs = hpx::find_all_localities();

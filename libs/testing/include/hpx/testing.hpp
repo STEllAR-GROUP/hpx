@@ -288,4 +288,24 @@ namespace hpx { namespace util
         HPX_ASSERT_CURRENT_FUNCTION, ::hpx::util::counter_sanity, expr1,       \
         expr2)
 
+#define HPX_TEST_THROW(expression, exception)                                  \
+    {                                                                          \
+        bool caught_exception = false;                                         \
+        try                                                                    \
+        {                                                                      \
+            expression;                                                        \
+            HPX_TEST_MSG(false, "expected exception not thrown");              \
+        }                                                                      \
+        catch (exception&)                                                     \
+        {                                                                      \
+            caught_exception = true;                                           \
+        }                                                                      \
+        catch (...)                                                            \
+        {                                                                      \
+            HPX_TEST_MSG(false, "unexpected exception caught");                \
+        }                                                                      \
+        HPX_TEST(caught_exception);                                            \
+    }                                                                          \
+    /**/
+
 #endif    // HPX_F646702C_6556_48FA_BF9D_3E7959983122

@@ -16,7 +16,7 @@
 #include <hpx/timing/high_resolution_timer.hpp>
 
 #include <boost/lockfree/queue.hpp>
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <chrono>
 #include <cstdint>
@@ -33,12 +33,12 @@
 
 char const* benchmark_name = "Serial FIFO Overhead";
 
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
-using boost::program_options::value;
-using boost::program_options::store;
-using boost::program_options::command_line_parser;
-using boost::program_options::notify;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
+using hpx::program_options::value;
+using hpx::program_options::store;
+using hpx::program_options::command_line_parser;
+using hpx::program_options::notify;
 
 namespace compat = hpx::compat;
 using hpx::util::high_resolution_timer;

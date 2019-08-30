@@ -6,12 +6,12 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <string>
 #include <vector>
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     // extract value of application specific command line option
     int test = vm["test"].as<int>();
@@ -39,11 +39,11 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    boost::program_options::options_description desc_commandline;
+    hpx::program_options::options_description desc_commandline;
 
     desc_commandline.add_options()
         ("test",
-         boost::program_options::value<int>()->default_value(42),
+         hpx::program_options::value<int>()->default_value(42),
          "additional, application-specific option")
     ;
 

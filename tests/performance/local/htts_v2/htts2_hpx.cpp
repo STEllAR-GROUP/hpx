@@ -39,8 +39,8 @@ struct hpx_driver : htts2::driver
             "hpx.commandline.allow_unknown!=1"
         };
 
-        hpx::util::function_nonser<int(boost::program_options::variables_map& vm)> f;
-        boost::program_options::options_description desc;
+        hpx::util::function_nonser<int(hpx::program_options::variables_map& vm)> f;
+        hpx::program_options::options_description desc;
 
         using hpx::util::placeholders::_1;
         hpx::init(hpx::util::bind(&hpx_driver::run_impl, std::ref(*this), _1),
@@ -48,7 +48,7 @@ struct hpx_driver : htts2::driver
     }
 
   private:
-    int run_impl(boost::program_options::variables_map&)
+    int run_impl(hpx::program_options::variables_map&)
     {
         // Cold run
         //kernel();

@@ -54,8 +54,8 @@ void test_wait_for_either_of_two_futures_list()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
 
 using hpx::lcos::future;
 

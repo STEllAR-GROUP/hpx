@@ -7,7 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/config_entry.hpp>
 
-#include <boost/program_options/parsers.hpp>
+#include <hpx/program_options/parsers.hpp>
 
 #include <cstddef>
 #include <string>
@@ -21,7 +21,7 @@ HPX_WEAK_SYMBOL int hpx_main()
 {
     std::string cmdline(hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
 
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 #if defined(HPX_WINDOWS)
     std::vector<std::string> args = split_winmain(cmdline);
 #else

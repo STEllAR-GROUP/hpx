@@ -116,7 +116,7 @@ void print_header()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void run_benchmark(boost::program_options::variables_map & vm)
+void run_benchmark(hpx::program_options::variables_map & vm)
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     std::size_t window_size = vm["window-size"].as<std::size_t>();

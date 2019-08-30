@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     unsigned int seed = std::random_device{}();
     if (vm.count("seed"))
@@ -91,7 +91,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // add command line option which controls the random number generator seed
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 

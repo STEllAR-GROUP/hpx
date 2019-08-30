@@ -44,7 +44,7 @@ void output_hpx_info()
 HPX_PLAIN_ACTION(test_dense);
 HPX_PLAIN_ACTION(test_blocked);
 
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main(hpx::program_options::variables_map&)
 {
   std::cout << "Block-structured DGEMM with HPX" << std::endl
             << "2013-09-11 Erik Schnetter <eschnetter@perimeterinstitute.ca>" << std::endl
@@ -93,7 +93,7 @@ int hpx_main(boost::program_options::variables_map&)
 int main(int argc, char** argv)
 {
   // Configure application-specific options
-  boost::program_options::options_description
+  hpx::program_options::options_description
     desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
   
   return hpx::init(desc_commandline, argc, argv);

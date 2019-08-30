@@ -98,7 +98,7 @@ runtime system. It is important to note that application-specific command line
 options are defined here. |hpx| uses |boost_program_options|_ for command line
 processing. You can see that our programs ``--n-value`` option is set by calling
 the ``add_options()`` method on an instance of
-``boost::program_options::options_description``. The default value of the
+``hpx::program_options::options_description``. The default value of the
 variable is set to 10. This is why when we ran the program for the first time
 without using the ``--n-value`` option the program returned the 10th value of
 the Fibonacci sequence. The constructor argument of the description is the text

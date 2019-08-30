@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <hpx/hardware/cpuid.hpp>
 
@@ -23,13 +23,13 @@ using hpx::util::hardware::cpuid_table;
 using hpx::util::hardware::cpuid_table_type;
 using hpx::util::hardware::has_bit_set;
 
-using boost::program_options::variables_map;
-using boost::program_options::positional_options_description;
-using boost::program_options::options_description;
-using boost::program_options::command_line_parser;
-using boost::program_options::value;
-using boost::program_options::notify;
-using boost::program_options::store;
+using hpx::program_options::variables_map;
+using hpx::program_options::positional_options_description;
+using hpx::program_options::options_description;
+using hpx::program_options::command_line_parser;
+using hpx::program_options::value;
+using hpx::program_options::notify;
+using hpx::program_options::store;
 
 namespace {
 
