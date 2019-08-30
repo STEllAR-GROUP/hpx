@@ -6,34 +6,32 @@
 
 include(HPX_SetupVerbs)
 
-macro(add_parcelport_verbs_module)
-  if (HPX_WITH_PARCELPORT_VERBS)
-    hpx_debug("add_parcelport_verbs_module")
+if (HPX_WITH_PARCELPORT_VERBS)
+  hpx_debug("add_parcelport_verbs_module")
 
-    include(HPX_AddParcelport)
-    add_parcelport(verbs
-      STATIC
-      SOURCES
-          "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
-          "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/rdma/rdma_controller.cpp"
-      # do we need to declare any of these headers?
-      HEADERS
-          "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/header.hpp"
-          "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/locality.hpp"
-          "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/pinned_memory_vector.hpp"
-      DEPENDENCIES
-        hpx_config
-        hpx_assertion
-        hpx_format
-        hpx_preprocessor
-        hpx_plugin
-        hpx_timing
-        hpx::verbs
-        hpx::boost
-      INCLUDE_DIRS
-        ${CMAKE_BINARY_DIR}
-        ${PROJECT_SOURCE_DIR}
-      FOLDER
-        "Core/Plugins/Parcelport/verbs")
-  endif()
-endmacro()
+  include(HPX_AddParcelport)
+  add_parcelport(verbs
+    STATIC
+    SOURCES
+        "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
+        "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/rdma/rdma_controller.cpp"
+    # do we need to declare any of these headers?
+    HEADERS
+        "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/header.hpp"
+        "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/locality.hpp"
+        "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/pinned_memory_vector.hpp"
+    DEPENDENCIES
+      hpx_config
+      hpx_assertion
+      hpx_format
+      hpx_preprocessor
+      hpx_plugin
+      hpx_timing
+      hpx::verbs
+      hpx::boost
+    INCLUDE_DIRS
+      ${CMAKE_BINARY_DIR}
+      ${PROJECT_SOURCE_DIR}
+    FOLDER
+      "Core/Plugins/Parcelport/verbs")
+endif()

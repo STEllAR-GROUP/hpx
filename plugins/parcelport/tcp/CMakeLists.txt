@@ -5,46 +5,42 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-include(HPX_AddLibrary)
-
-macro(add_parcelport_tcp_module)
-  if(HPX_WITH_PARCELPORT_TCP)
-    hpx_debug("add_parcelport_tcp_module")
-    include(HPX_AddParcelport)
-    add_parcelport(tcp
-      STATIC
-      SOURCES
-        "${PROJECT_SOURCE_DIR}/plugins/parcelport/tcp/connection_handler_tcp.cpp"
-        "${PROJECT_SOURCE_DIR}/plugins/parcelport/tcp/parcelport_tcp.cpp"
-      HEADERS
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/connection_handler.hpp"
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/locality.hpp"
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/receiver.hpp"
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/sender.hpp"
-      DEPENDENCIES
-        hpx_config
-        hpx_allocator_support
-        hpx_assertion
-        hpx_cache
-        hpx_concurrency
-        hpx_coroutines
-        hpx_errors
-        hpx_execution
-        hpx_functional
-        hpx_hardware
-        hpx_plugin
-        hpx_program_options
-        hpx_serialization
-        hpx_timing
-        hpx_topology
-        hpx_util
-      INCLUDE_DIRS
-        "${PROJECT_SOURCE_DIR}"
-      FOLDER
-        "Core/Plugins/Parcelport/Tcp"
-      )
-    if (TARGET hpx::apex)
-      set_property(TARGET parcelport_tcp PROPERTY LINK_LIBRARIES hpx::apex)
-    endif()
+if(HPX_WITH_PARCELPORT_TCP)
+  hpx_debug("add_parcelport_tcp_module")
+  include(HPX_AddParcelport)
+  add_parcelport(tcp
+    STATIC
+    SOURCES
+      "${PROJECT_SOURCE_DIR}/plugins/parcelport/tcp/connection_handler_tcp.cpp"
+      "${PROJECT_SOURCE_DIR}/plugins/parcelport/tcp/parcelport_tcp.cpp"
+    HEADERS
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/connection_handler.hpp"
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/locality.hpp"
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/receiver.hpp"
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/sender.hpp"
+    DEPENDENCIES
+      hpx_config
+      hpx_allocator_support
+      hpx_assertion
+      hpx_cache
+      hpx_concurrency
+      hpx_coroutines
+      hpx_errors
+      hpx_execution
+      hpx_functional
+      hpx_hardware
+      hpx_plugin
+      hpx_program_options
+      hpx_serialization
+      hpx_timing
+      hpx_topology
+      hpx_util
+    INCLUDE_DIRS
+      "${PROJECT_SOURCE_DIR}"
+    FOLDER
+      "Core/Plugins/Parcelport/Tcp"
+    )
+  if (TARGET hpx::apex)
+    set_property(TARGET parcelport_tcp PROPERTY LINK_LIBRARIES hpx::apex)
   endif()
-endmacro()
+endif()

@@ -28,35 +28,24 @@ foreach(type ${parcelport_plugins})
   add_hpx_pseudo_dependencies(plugins.parcelport plugins.parcelport.${type})
 endforeach()
 
-macro(add_static_parcelports)
-  if(HPX_WITH_NETWORKING)
-    add_parcelport_tcp_module()
-    add_parcelport_mpi_module()
-    add_parcelport_verbs_module()
-    add_parcelport_libfabric_module()
-  endif()
-endmacro()
+hpx_debug("creating static_parcelports.hpp: " ${HPX_STATIC_PARCELPORT_PLUGINS})
 
-function(add_parcelport_modules)
-  if(HPX_WITH_NETWORKING)
-    hpx_debug("creating static_parcelports.hpp: " ${HPX_STATIC_PARCELPORT_PLUGINS})
+# add_subdirectory is called before to insure HPX_STATIC_PARCELPORT_PLUGINS
+# cache variable is filled
+set(_parcelport_export)
+set(_parcelport_init)
+foreach(parcelport ${HPX_STATIC_PARCELPORT_PLUGINS})
+  set(_parcelport_export
+    "${_parcelport_export}HPX_EXPORT hpx::plugins::parcelport_factory_base *parcelport_${parcelport}_factory_init(\n")
+  set(_parcelport_export
+    "${_parcelport_export}    std::vector<hpx::plugins::parcelport_factory_base *>& factories);\n")
+  set(_parcelport_init
+    "${_parcelport_init}        parcelport_${parcelport}_factory_init(factories);\n")
+endforeach()
 
-    set(_parcelport_export)
-    set(_parcelport_init)
-    foreach(parcelport ${HPX_STATIC_PARCELPORT_PLUGINS})
-      set(_parcelport_export
-        "${_parcelport_export}HPX_EXPORT hpx::plugins::parcelport_factory_base *parcelport_${parcelport}_factory_init(\n")
-      set(_parcelport_export
-        "${_parcelport_export}    std::vector<hpx::plugins::parcelport_factory_base *>& factories);\n")
-      set(_parcelport_init
-        "${_parcelport_init}        parcelport_${parcelport}_factory_init(factories);\n")
-    endforeach()
-  endif()
-
-  configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/static_parcelports.hpp.in"
-                 "${CMAKE_BINARY_DIR}/hpx/runtime/parcelset/static_parcelports.hpp"
-                 @ONLY)
-endfunction()
+configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/static_parcelports.hpp.in"
+  "${CMAKE_BINARY_DIR}/hpx/runtime/parcelset/static_parcelports.hpp"
+  @ONLY)
 
 #------------------------------------------------------------------------------
 # Write parcelport_defines.hpp

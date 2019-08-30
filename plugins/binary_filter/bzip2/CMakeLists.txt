@@ -16,28 +16,25 @@ if(HPX_WITH_COMPRESSION_BZIP2)
       hpx_error("BZip2 could not be found and HPX_WITH_COMPRESSION_BZIP2=ON, please specify BZIP2_ROOT to point to the correct location or set HPX_WITH_COMPRESSION_BZIP2 to OFF")
     endif()
   endif()
-endif()
 
-function(add_bzip2_module)
   hpx_debug("add_bzip2_module" "BZIP2_FOUND: ${BZIP2_FOUND}")
-  if(HPX_WITH_COMPRESSION_BZIP2)
-    add_hpx_library(compress_bzip2
-      PLUGIN
-      SOURCES
-        "${PROJECT_SOURCE_DIR}/plugins/binary_filter/bzip2/bzip2_serialization_filter.cpp"
-      HEADERS
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter.hpp"
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter_registration.hpp"
-      FOLDER "Core/Plugins/Compression"
-      DEPENDENCIES ${BZIP2_LIBRARIES})
 
-    if(NOT MSVC)
-      target_include_directories(compress_bzip2 SYSTEM PRIVATE ${BZIP2_INCLUDE_DIR})
-    endif()
+  add_hpx_library(compress_bzip2
+    PLUGIN
+    SOURCES
+      "${PROJECT_SOURCE_DIR}/plugins/binary_filter/bzip2/bzip2_serialization_filter.cpp"
+    HEADERS
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter.hpp"
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter_registration.hpp"
+    FOLDER "Core/Plugins/Compression"
+    DEPENDENCIES ${BZIP2_LIBRARIES})
 
-    target_link_libraries(compress_bzip2 PRIVATE hpx::boost)
-
-    add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2)
-    add_hpx_pseudo_dependencies(core plugins.binary_filter.bzip2)
+  if(NOT MSVC)
+    target_include_directories(compress_bzip2 SYSTEM PRIVATE ${BZIP2_INCLUDE_DIR})
   endif()
-endfunction()
+
+  target_link_libraries(compress_bzip2 PRIVATE hpx::boost)
+
+  add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2)
+  add_hpx_pseudo_dependencies(core plugins.binary_filter.bzip2)
+endif()

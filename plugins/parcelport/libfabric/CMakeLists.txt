@@ -65,65 +65,61 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC)
       CACHE INTERNAL "" FORCE)
   endif()
 
-endif()
+  hpx_debug("add_parcelport_libfabric_module")
 
-macro(add_parcelport_libfabric_module)
-  if (HPX_WITH_PARCELPORT_LIBFABRIC)
-    hpx_debug("add_parcelport_libfabric_module")
-
-    include(HPX_AddParcelport)
-    add_parcelport(libfabric
-      STATIC
-      SOURCES
-          ${_parcelport_CXX_srcs}
-          ${_libfabric_C_srcs}
-      # do we need to declare any headers?
-      #HEADERS
-      DEPENDENCIES
-        ${_libfabric_libraries}
-        hpx_config
-        hpx_allocator_support
-        hpx_assertion
-        hpx_cache
-        hpx_concurrency
-        hpx_coroutines
-        hpx_errors
-        hpx_execution
-        hpx_hardware
-        hpx_plugin
-        hpx_program_options
-        hpx_serialization
-        hpx_timing
-        hpx_topology
-      INCLUDE_DIRS
-        ${_libfabric_include_dirs}
-        ${PROJECT_SOURCE_DIR}
-        ${CMAKE_BINARY_DIR}
-      FOLDER
-        "Core/Plugins/Parcelport/libfabric")
-
-    if(HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
-      set_source_files_properties(
+  include(HPX_AddParcelport)
+  add_parcelport(libfabric
+    STATIC
+    SOURCES
+        ${_parcelport_CXX_srcs}
         ${_libfabric_C_srcs}
-        PROPERTIES
-          COMPILE_FLAGS
-              "-include \"hpxc/hpxc/pthread_compatibility.h\" \
-              -include \"libfabric/config.h\"                 \
-              -Wsign-compare -Wunused-parameter"
-          LANGUAGE C)
+    # do we need to declare any headers?
+    #HEADERS
+    # FIXME : Could this be private
+    DEPENDENCIES
+      ${_libfabric_libraries}
+      hpx_config
+      hpx_allocator_support
+      hpx_assertion
+      hpx_cache
+      hpx_concurrency
+      hpx_coroutines
+      hpx_errors
+      hpx_execution
+      hpx_hardware
+      hpx_plugin
+      hpx_program_options
+      hpx_serialization
+      hpx_timing
+      hpx_topology
+    INCLUDE_DIRS
+      ${_libfabric_include_dirs}
+      ${PROJECT_SOURCE_DIR}
+      ${CMAKE_BINARY_DIR}
+    FOLDER
+      "Core/Plugins/Parcelport/libfabric")
 
-      set_source_files_properties(
-        ${_parcelport_CXX_srcs}
-        PROPERTIES
-          COMPILE_FLAGS "-include \"libfabric/config.h\" -Wno-missing-field-initializers"
-          LANGUAGE CXX)
-    else()
-      set_source_files_properties(
-        ${_parcelport_CXX_srcs}
-        PROPERTIES
-          COMPILE_FLAGS "-Wno-missing-field-initializers"
-          LANGUAGE CXX)
-    endif()
+  if(HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
+    set_source_files_properties(
+      ${_libfabric_C_srcs}
+      PROPERTIES
+        COMPILE_FLAGS
+            "-include \"hpxc/hpxc/pthread_compatibility.h\" \
+            -include \"libfabric/config.h\"                 \
+            -Wsign-compare -Wunused-parameter"
+        LANGUAGE C)
+
+    set_source_files_properties(
+      ${_parcelport_CXX_srcs}
+      PROPERTIES
+        COMPILE_FLAGS "-include \"libfabric/config.h\" -Wno-missing-field-initializers"
+        LANGUAGE CXX)
+  else()
+    set_source_files_properties(
+      ${_parcelport_CXX_srcs}
+      PROPERTIES
+        COMPILE_FLAGS "-Wno-missing-field-initializers"
+        LANGUAGE CXX)
   endif()
-endmacro()
 
+endif()
