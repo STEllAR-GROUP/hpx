@@ -292,6 +292,39 @@ void measure_function_futures_sliding_semaphore(
     print_stats("apply", "Sliding-Sem", ExecName(exec), count, duration, csv);
 }
 
+struct unlimited_number_of_chunks
+{
+    template <typename Executor>
+    std::size_t maximal_number_of_chunks(
+        Executor&& executor, std::size_t cores, std::size_t num_tasks)
+    {
+        return num_tasks;
+    }
+};
+
+namespace hpx { namespace parallel { namespace execution {
+    template <>
+    struct is_executor_parameters<unlimited_number_of_chunks> : std::true_type
+    {
+    };
+}}}    // namespace hpx::parallel::execution
+
+void measure_function_futures_for_loop(std::uint64_t count, bool csv)
+{
+    // start the clock
+    high_resolution_timer walltime;
+    hpx::parallel::for_loop(hpx::parallel::execution::par.with(
+                                hpx::parallel::execution::static_chunk_size(1),
+                                unlimited_number_of_chunks()),
+        0, count, [](std::uint64_t) {
+            null_function();
+        });
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats("for_loop", "par", "parallel_executor", count, duration, csv);
+}
+
 void measure_function_futures_register_work(std::uint64_t count, bool csv)
 {
     hpx::lcos::local::latch l(count);
@@ -485,6 +518,7 @@ int hpx_main(variables_map& vm)
                 measure_function_futures_thread_count(count, csv, par);
                 measure_function_futures_sliding_semaphore(count, csv, def);
                 measure_function_futures_sliding_semaphore(count, csv, par);
+                measure_function_futures_for_loop(count, csv);
                 measure_function_futures_register_work(count, csv);
                 measure_function_futures_create_thread(count, csv);
                 measure_function_futures_create_thread_hierarchical_placement(
