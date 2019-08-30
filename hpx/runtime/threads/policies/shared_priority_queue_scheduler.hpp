@@ -194,6 +194,16 @@ namespace hpx { namespace threads { namespace policies {
             return "shared_priority_queue_scheduler";
         }
 
+        // get/set scheduler mode
+        void set_scheduler_mode(scheduler_mode mode) override
+        {
+            scheduler_base::set_scheduler_mode(mode);
+            round_robin_    = mode & policies::assign_work_round_robin;
+            steal_hp_first_ = mode & policies::steal_after_local;
+            core_stealing_  = mode & policies::enable_stealing;
+            numa_stealing_  = mode & policies::enable_stealing_numa;
+        }
+
         // ------------------------------------------------------------
         void abort_all_suspended_threads() override
         {
@@ -242,7 +252,6 @@ namespace hpx { namespace threads { namespace policies {
             std::size_t thread_num = 0;
             std::size_t domain_num = 0;
             std::size_t q_index = std::size_t(-1);
-            bool round_robin = get_scheduler_mode() & policies::assign_work_round_robin;
 
             LOG_CUSTOM_VAR(const char* const msgs[] =
                 {"HINT_NONE" COMMA "HINT....." COMMA "ERROR...." COMMA  "NORMAL..."});
@@ -254,6 +263,7 @@ namespace hpx { namespace threads { namespace policies {
             switch (data.schedulehint.mode) {
             case thread_schedule_hint_mode::thread_schedule_hint_mode_none:
             {
+                LOG_CUSTOM_VAR(msg = msgs[0]);
                 // Create thread on this worker thread if possible
                 std::size_t global_thread_num =
                     threads::detail::get_thread_num_tss();
@@ -265,7 +275,7 @@ namespace hpx { namespace threads { namespace policies {
                     // we can schedule on any thread available
                     thread_num = numa_holder_[0].thread_queue(0)->worker_next(num_workers_);
                 }
-                else if (round_robin) {
+                else if (round_robin_) {
                     domain_num = d_lookup_[thread_num];
                     q_index    = q_lookup_[thread_num];
                     thread_num = numa_holder_[domain_num].thread_queue(q_index)->numa_next(num_workers_);
@@ -279,6 +289,7 @@ namespace hpx { namespace threads { namespace policies {
             }
             case thread_schedule_hint_mode::thread_schedule_hint_mode_thread:
             {
+                LOG_CUSTOM_VAR(msg = msgs[3]);
                 // @TODO. We should check that the thread num is valid
                 // Create thread on requested worker thread
                 thread_num = select_active_pu(l, data.schedulehint.hint);
@@ -291,6 +302,7 @@ namespace hpx { namespace threads { namespace policies {
             {
                 // Create thread on requested NUMA domain
 
+                LOG_CUSTOM_VAR(msg = msgs[1]);
                 // TODO: This case does not handle suspended PUs.
                 domain_num = fast_mod(data.schedulehint.hint, num_domains_);
                 // if the thread creating the new task is on the domain
@@ -337,13 +349,32 @@ namespace hpx { namespace threads { namespace policies {
             std::size_t domain_num = d_lookup_[thread_num];
             std::size_t q_index    = q_lookup_[thread_num];
 
-            bool result = false;
-            for (std::size_t d=0; d<num_domains_; ++d) {
-                std::size_t dom = fast_mod((domain_num+d), num_domains_);
-                result = numa_holder_[dom].get_next_thread(q_index, thrd, core_stealing_);
+            if (!core_stealing_) {
+                // try local queues only
+                bool result = numa_holder_[domain_num].get_next_thread(q_index, thrd, false);
                 if (result) return result;
-                // if no numa stealing - this thread should only check it's own numa
-                if (!numa_stealing_) break;
+            }
+            else if (steal_hp_first_) {
+                for (std::size_t d=0; d<num_domains_; ++d) {
+                    std::size_t dom = fast_mod((domain_num+d), num_domains_);
+                    bool result = numa_holder_[dom].get_next_thread(q_index, thrd, true);
+                    if (result) return result;
+                    // if no numa stealing - this thread should only check it's own numa
+                    if (!numa_stealing_) break;
+                }
+            }
+            else /*if (steal_after_local)*/ {
+                // do this core
+                bool result = numa_holder_[domain_num].get_next_thread(q_index, thrd, false);
+                if (result) return result;
+                // try others
+                for (std::size_t d=0; d<num_domains_; ++d) {
+                    std::size_t dom = fast_mod((domain_num+d), num_domains_);
+                    bool result = numa_holder_[dom].get_next_thread(q_index, thrd, true);
+                    if (result) return result;
+                    // if no numa stealing - this thread should only check it's own numa
+                    if (!numa_stealing_) break;
+                }
             }
             return false;
         }
@@ -359,7 +390,6 @@ namespace hpx { namespace threads { namespace policies {
             std::size_t thread_num = 0;
             std::size_t domain_num = 0;
             std::size_t q_index = std::size_t(-1);
-            bool round_robin = get_scheduler_mode() & policies::assign_work_round_robin;
 
             LOG_CUSTOM_VAR(const char* const msgs[] =
                 {"HINT_NONE" COMMA "HINT....." COMMA "ERROR...." COMMA  "NORMAL..."});
@@ -384,7 +414,7 @@ namespace hpx { namespace threads { namespace policies {
                     thread_num = numa_holder_[0].thread_queue(0)->
                             worker_next(num_workers_);
                 }
-                else if (round_robin) {
+                else if (round_robin_) {
                     domain_num = d_lookup_[thread_num];
                     q_index    = q_lookup_[thread_num];
                     thread_num = numa_holder_[domain_num].thread_queue(q_index)->
@@ -547,29 +577,31 @@ namespace hpx { namespace threads { namespace policies {
             HPX_ASSERT(thread_num ==
                 this->global_to_local_thread_index(get_worker_thread_num()));
 
+            bool result = true;
             added = 0;
 
             LOG_CUSTOM_MSG("wait_or_add_new thread num " << decnumber(thread_num));
 
-            // process this thread only if specified
+            // if our thread num is specified, only handle this thread
             if (thread_num!=std::size_t(-1)) {
                 // find the numa domain from the local thread index
                 std::size_t domain_num = d_lookup_[thread_num];
                 std::size_t q_index    = q_lookup_[thread_num];
-                return numa_holder_[domain_num].thread_queue(q_index)->
-                    wait_or_add_new(running, idle_loop_count, added, core_stealing_);
+
+                result = numa_holder_[domain_num].thread_queue(q_index)->
+                    wait_or_add_new(running, idle_loop_count, added, false);
+                /*if (0 != added) */return result;
             }
 
             // find the numa domain from the local thread index
             std::size_t domain_num = d_lookup_[thread_num];
             std::size_t q_index    = q_lookup_[thread_num];
-            bool result = false;
             // process all cores if -1 was sent in
             for (std::size_t d=0; d<num_domains_; ++d) {
                 std::size_t dom = fast_mod((domain_num+d), num_domains_);
                 // get next task, steal if from another domain
                 result = numa_holder_[dom].thread_queue(q_index)->wait_or_add_new(running,
-                    idle_loop_count, added, core_stealing_);
+                    idle_loop_count, added, core_stealing_) && result;
                 if (0 != added) return result;
                 if (!numa_stealing_) break;
             }
@@ -823,6 +855,12 @@ namespace hpx { namespace threads { namespace policies {
 
         // number of cores per queue for HP, NP, LP queues
         core_ratios cores_per_queue_;
+
+        // when true, new tasks are added round robing to thread queues
+        bool round_robin_;
+
+        // when true, tasks are
+        bool steal_hp_first_;
 
         // when true, numa_stealing permits stealing across numa domains,
         // when false, no stealing takes place across numa domains,
