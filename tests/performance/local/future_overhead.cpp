@@ -30,6 +30,7 @@
 #include <cstdint>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 using boost::program_options::options_description;
