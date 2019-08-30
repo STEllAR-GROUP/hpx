@@ -23,36 +23,27 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC)
 
   set(_hpxc_CXX_srcs          "" CACHE INTERNAL "" FORCE)
   set(_libfabric_C_srcs       "" CACHE INTERNAL "" FORCE)
-  set(_libfabric_libraries    "" CACHE INTERNAL "" FORCE)
-  set(_libfabric_include_dirs "" CACHE INTERNAL "" FORCE)
 
   if(NOT HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
-    set(_libfabric_libraries
-      "${LIBFABRIC_LIBRARIES}"
-      "${PMI_LIBRARY}"
-      CACHE INTERNAL "" FORCE)
-
-    set(_libfabric_include_dirs
-      "${LIBFABRIC_INCLUDE_DIRS}"
-      CACHE INTERNAL "" FORCE)
+    set(_libfabric_libraries hpx::libfabric hpx::pmi)
   else()
-    set(_libfabric_libraries
-      "${PMI_LIBRARY}"
-      "${GNI_LIB}"
-      CACHE INTERNAL "" FORCE)
+    add_library(hpx::gni INTERFACE IMPORTED)
+    set_property(TARGET hpx::gni PROPERTY
+      INTERFACE_INCLUDE_DIRECTORIES ${LIBFABRIC_INCLUDE_DIR})
+    set_property(TARGET hpx::gni PROPERTY
+      INTERFACE_LINK_LIBRARIES ${GNI_LIB})
+    set(_deps hpx::gni hpx::pmi)
 
     set(_libfabric_C_srcs
       ${libfabric_SRCS}
       ${libfabric_util_SRCS}
       ${libfabric_gni_SRCS}
-      CACHE INTERNAL "" FORCE)
+      )
 
     set(_hpxc_CXX_srcs ${_parcelport_CXX_srcs}
-      "${PROJECT_SOURCE_DIR}/plugins/parcelport/libfabric/hpxc/src/threads/thread.cpp"
-      CACHE INTERNAL "" FORCE)
+      "${PROJECT_SOURCE_DIR}/plugins/parcelport/libfabric/hpxc/src/threads/thread.cpp")
 
-    set(_parcelport_CXX_srcs ${_parcelport_CXX_srcs} ${_hpxc_CXX_srcs}
-      CACHE INTERNAL "" FORCE)
+    set(_parcelport_CXX_srcs ${_parcelport_CXX_srcs} ${_hpxc_CXX_srcs})
 
     set(_libfabric_include_dirs
       ${CMAKE_CURRENT_SOURCE_DIR}
@@ -62,7 +53,7 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC)
       ${CMAKE_CURRENT_SOURCE_DIR}/libfabric/prov/gni/include
       ${CMAKE_CURRENT_SOURCE_DIR}/libfabric/include
       ${GNI_INCLUDE}
-      CACHE INTERNAL "" FORCE)
+      )
   endif()
 
   hpx_debug("add_parcelport_libfabric_module")

@@ -20,16 +20,28 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC)
   else()
     find_package(Libfabric REQUIRED)
   endif()
+  # Setup Libfabric imported target
+  add_library(hpx::libfabric INTERFACE IMPORTED)
+  set_property(TARGET hpx::libfabric PROPERTY
+    INTERFACE_INCLUDE_DIRECTORIES ${LIBFABRIC_INCLUDE_DIR})
+  set_property(TARGET hpx::libfabric PROPERTY
+    INTERFACE_LINK_LIBRARIES ${LIBFABRIC_LIBRARY})
 
+
+  # Setup PMI imported target
   find_package(PMI)
-
   if (PMI_FOUND)
     hpx_add_config_define_namespace(
       DEFINE HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
       NAMESPACE parcelport)
-  else()
-      set(PMI_LIBRARY "" CACHE INTERNAL "" FORCE)
   endif()
+
+  add_library(hpx::pmi INTERFACE IMPORTED)
+  set_property(TARGET hpx::pmi PROPERTY
+    INTERFACE_INCLUDE_DIRECTORIES ${PMI_INCLUDE_DIR})
+  set_property(TARGET hpx::pmi PROPERTY
+    INTERFACE_LINK_LIBRARIES ${PMI_LIBRARY})
+
   #------------------------------------------------------------------------------
   # Logging
   #------------------------------------------------------------------------------
