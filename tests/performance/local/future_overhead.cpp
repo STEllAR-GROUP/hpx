@@ -53,7 +53,7 @@ using hpx::cout;
 using hpx::flush;
 
 // global vars we stick here to make printouts easy for plotting
-static std::string queuing = "";
+static std::string queuing = "default";
 static std::size_t numa_sensitive = 0;
 static std::uint64_t num_threads = 1;
 static std::string info_string = "";
@@ -63,20 +63,22 @@ void print_stats(const char* title, const char* wait, const char* exec,
     std::int64_t count, double duration, bool csv)
 {
     double us = 1e6 * duration / count;
-    if (csv)
+    if (csv) {
         hpx::util::format_to(cout,
-            "{1}, {:10}, {:15}, {:20}, {:10}, {:10}, {:20}, {:4}, {:4}, "
+            "{1}, {:27}, {:15}, {:18}, {:8}, {:8}, {:20}, {:4}, {:4}, "
             "{:20}\n",
             count, title, wait, exec, duration, us, queuing, numa_sensitive,
             num_threads, info_string)
             << flush;
-    else
+    }
+    else {
         hpx::util::format_to(cout,
-            "invoked {1}, futures {:10} {:15} {:20} in \t{5} seconds \t: {6} "
-            "us/future, queue {7} numa {8}, threads {9}, info {10}\n",
+            "invoked {:1}, futures {:27} {:15} {:18} in {:8} seconds : {:8} "
+            "us/future, queue {:20}, numa {:4}, threads {:4}, info {:20}\n",
             count, title, wait, exec, duration, us, queuing, numa_sensitive,
             num_threads, info_string)
             << flush;
+    }
     // CDash graph plotting
     //hpx::util::print_cdash_timing(title, duration);
 }
