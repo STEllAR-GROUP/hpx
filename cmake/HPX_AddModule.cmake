@@ -218,7 +218,6 @@ function(add_hpx_module name)
     CLASS "Generated Files"
     TARGETS ${config_header})
 
-
   set_target_properties(hpx_${name} PROPERTIES
     FOLDER "Core/Modules"
     POSITION_INDEPENDENT_CODE ON)

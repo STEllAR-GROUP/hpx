@@ -51,7 +51,7 @@ size_t next_locality( const std::vector<double> & probs) {
     return 0;
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     // extract command line argument, i.e. fib(N)
     std::uint64_t n = vm["n-value"].as<std::uint64_t>();
@@ -101,24 +101,24 @@ void register_policy(void) {
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    boost::program_options::options_description
+    hpx::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
         ( "n-value",
-          boost::program_options::value<std::uint64_t>()->default_value(1000000),
+          hpx::program_options::value<std::uint64_t>()->default_value(1000000),
           "n value for do_work")
         ;
 
     desc_commandline.add_options()
         ( "units",
-          boost::program_options::value<std::uint64_t>()->default_value(100),
+          hpx::program_options::value<std::uint64_t>()->default_value(100),
           "units of work per block")
         ;
 
     desc_commandline.add_options()
         ( "blocks",
-          boost::program_options::value<std::uint64_t>()->default_value(10),
+          hpx::program_options::value<std::uint64_t>()->default_value(10),
           "blocks before program completion")
         ;
     hpx::register_startup_function(register_policy);

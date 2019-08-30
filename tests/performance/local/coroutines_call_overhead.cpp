@@ -24,7 +24,7 @@
 
 char const* benchmark_name = "Context Switching Overhead - HPX";
 
-using namespace boost::program_options;
+using namespace hpx::program_options;
 using namespace hpx::threads;
 
 using hpx::threads::coroutine_type;

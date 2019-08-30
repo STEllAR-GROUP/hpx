@@ -331,8 +331,8 @@ void test_wait_for_either_of_five_futures_1_from_list_iterators()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
 
 using hpx::lcos::future;
 

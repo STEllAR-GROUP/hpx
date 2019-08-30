@@ -13,7 +13,7 @@
 #include <hpx/testing.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -161,7 +161,7 @@ std::string correct_iterator_tag_str(std::string iterator_tag)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
@@ -196,21 +196,21 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
         ("vector_size",
-            boost::program_options::value<std::size_t>()->default_value(1000000),
+            hpx::program_options::value<std::size_t>()->default_value(1000000),
             "size of vector (default: 1000000)")
         ("iterator_tag",
-            boost::program_options::value<std::string>()->default_value("random"),
+            hpx::program_options::value<std::string>()->default_value("random"),
             "the kind of iterator tag (random/bidirectional/forward)")
         ("test_count",
-            boost::program_options::value<int>()->default_value(10),
+            hpx::program_options::value<int>()->default_value(10),
             "number of tests to be averaged (default: 10)")
-        ("seed,s", boost::program_options::value<unsigned int>(),
+        ("seed,s", hpx::program_options::value<unsigned int>(),
             "the random number generator seed to use for this run")
         ;
 

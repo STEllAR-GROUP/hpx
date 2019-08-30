@@ -32,6 +32,7 @@ All modules
    /libs/parallel_executors/docs/index.rst
    /libs/plugin/docs/index.rst
    /libs/preprocessor/docs/index.rst
+   /libs/program_options/docs/index.rst
    /libs/segmented_algorithms/docs/index.rst
    /libs/statistics/docs/index.rst
    /libs/testing/docs/index.rst

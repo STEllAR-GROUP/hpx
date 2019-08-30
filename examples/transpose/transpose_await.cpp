@@ -211,7 +211,7 @@ hpx::future<sub_block> transpose_phase(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     {
         hpx::id_type here = hpx::find_here();
@@ -369,7 +369,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     options_description desc_commandline;
     desc_commandline.add_options()

@@ -27,7 +27,7 @@ void barrier_test(std::size_t num, std::size_t rank, std::atomic<std::size_t>& c
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void local_tests(boost::program_options::variables_map& vm)
+void local_tests(hpx::program_options::variables_map& vm)
 {
     std::size_t pxthreads = 0;
     if (vm.count("pxthreads"))
@@ -53,7 +53,7 @@ void local_tests(boost::program_options::variables_map& vm)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void remote_test_multiple(boost::program_options::variables_map& vm)
+void remote_test_multiple(hpx::program_options::variables_map& vm)
 {
     std::size_t iterations = 0;
     if (vm.count("iterations"))
@@ -66,7 +66,7 @@ void remote_test_multiple(boost::program_options::variables_map& vm)
         b.wait();
 }
 
-void remote_test_single(boost::program_options::variables_map& vm)
+void remote_test_single(hpx::program_options::variables_map& vm)
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     if (localities.size() == 1)
@@ -90,7 +90,7 @@ void remote_test_single(boost::program_options::variables_map& vm)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     local_tests(vm);
 
@@ -103,7 +103,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     // Configure application-specific options
     options_description desc_commandline(

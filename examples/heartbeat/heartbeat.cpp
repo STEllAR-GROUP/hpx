@@ -105,7 +105,7 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::cout << "starting monitor" << std::endl;
 
@@ -120,10 +120,10 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    boost::program_options::options_description
+    hpx::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    using boost::program_options::value;
+    using hpx::program_options::value;
     desc_commandline.add_options()
         ( "name", value<std::string>()->default_value(
               "/threadqueue{locality#0/total}/length")

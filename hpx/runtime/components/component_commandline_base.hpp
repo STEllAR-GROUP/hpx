@@ -8,8 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/plugin.hpp>
-
-#include <boost/program_options/options_description.hpp>
+#include <hpx/program_options.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -30,7 +29,7 @@ namespace hpx { namespace components
         ///
         /// \note   This function will be executed by the runtime system
         ///         during system startup.
-        virtual boost::program_options::options_description
+        virtual hpx::program_options::options_description
             add_commandline_options() = 0;
     };
 }}

@@ -11,7 +11,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -101,7 +101,7 @@ double run_minmax_element_benchmark(int test_count,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (hpx::get_locality_id() == 0)
     {
@@ -146,19 +146,19 @@ int main(int argc, char* argv[])
         "hpx.run_hpx_main!=1"
     };
 
-    boost::program_options::options_description cmdline(
+    hpx::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
         ( "vector_size",
-            boost::program_options::value<std::size_t>()->default_value(1000),
+            hpx::program_options::value<std::size_t>()->default_value(1000),
             "size of vector (default: 1000)")
         ("test_count",
-            boost::program_options::value<int>()->default_value(100),
+            hpx::program_options::value<int>()->default_value(100),
             "number of tests to be averaged (default: 100)")
         ("csv_output",
             "print results in csv format")
-        ("seed,s", boost::program_options::value<unsigned int>(),
+        ("seed,s", hpx::program_options::value<unsigned int>(),
             "the random number generator seed to use for this run")
         ;
 

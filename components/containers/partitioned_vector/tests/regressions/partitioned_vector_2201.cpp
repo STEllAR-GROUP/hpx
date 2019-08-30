@@ -39,7 +39,7 @@ struct random_fill
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (hpx::get_locality_id() == 0)
     {

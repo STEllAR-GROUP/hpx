@@ -27,7 +27,7 @@
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/parse_command_line.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <iostream>
 
@@ -44,8 +44,8 @@ namespace startup_shutdown
     // after the runtime has been initialized and started.
     void startup()
     {
-        using boost::program_options::options_description;
-        using boost::program_options::variables_map;
+        using hpx::program_options::options_description;
+        using hpx::program_options::variables_map;
 
         options_description desc_commandline("startup_shutdown_component");
         desc_commandline.add_options()

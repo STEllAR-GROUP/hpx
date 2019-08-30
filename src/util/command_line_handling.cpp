@@ -30,8 +30,8 @@
 #include <hpx/version.hpp>
 
 #include <boost/asio/ip/host_name.hpp>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options/variables_map.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
@@ -159,7 +159,7 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         std::size_t handle_num_localities(util::manage_config& cfgmap,
-            boost::program_options::variables_map& vm,
+            hpx::program_options::variables_map& vm,
             util::batch_environment& env, bool using_nodelist,
             std::size_t num_localities, bool initial)
         {
@@ -202,7 +202,7 @@ namespace hpx { namespace util
         }
 
         std::string handle_queuing(util::manage_config& cfgmap,
-            boost::program_options::variables_map& vm, std::string default_)
+            hpx::program_options::variables_map& vm, std::string default_)
         {
             // command line options is used preferred
             if (vm.count("hpx:queuing"))
@@ -213,7 +213,7 @@ namespace hpx { namespace util
         }
 
         std::string handle_affinity(util::manage_config& cfgmap,
-            boost::program_options::variables_map& vm, std::string default_)
+            hpx::program_options::variables_map& vm, std::string default_)
         {
             // command line options is used preferred
             if (vm.count("hpx:affinity"))
@@ -224,7 +224,7 @@ namespace hpx { namespace util
         }
 
         std::string handle_affinity_bind(util::manage_config& cfgmap,
-            boost::program_options::variables_map& vm, std::string default_)
+            hpx::program_options::variables_map& vm, std::string default_)
         {
             // command line options is used preferred
             if (vm.count("hpx:bind"))
@@ -248,7 +248,7 @@ namespace hpx { namespace util
         }
 
         std::size_t handle_pu_step(util::manage_config& cfgmap,
-            boost::program_options::variables_map& vm, std::size_t default_)
+            hpx::program_options::variables_map& vm, std::size_t default_)
         {
             // command line options is used preferred
             if (vm.count("hpx:pu-step"))
@@ -259,7 +259,7 @@ namespace hpx { namespace util
         }
 
         std::size_t handle_pu_offset(util::manage_config& cfgmap,
-            boost::program_options::variables_map& vm, std::size_t default_)
+            hpx::program_options::variables_map& vm, std::size_t default_)
         {
             // command line options is used preferred
             if (vm.count("hpx:pu-offset"))
@@ -270,7 +270,7 @@ namespace hpx { namespace util
         }
 
         std::size_t handle_numa_sensitive(util::manage_config& cfgmap,
-            boost::program_options::variables_map& vm, std::size_t default_)
+            hpx::program_options::variables_map& vm, std::size_t default_)
         {
             if (vm.count("hpx:numa-sensitive") != 0)
             {
@@ -348,7 +348,7 @@ namespace hpx { namespace util
         ///////////////////////////////////////////////////////////////////////
         std::size_t handle_num_threads(util::manage_config& cfgmap,
             util::runtime_configuration const& rtcfg,
-            boost::program_options::variables_map& vm,
+            hpx::program_options::variables_map& vm,
             util::batch_environment& env, bool using_nodelist, bool initial,
             bool use_process_mask)
         {
@@ -473,7 +473,7 @@ namespace hpx { namespace util
         }
 
         std::size_t handle_num_cores(util::manage_config& cfgmap,
-            boost::program_options::variables_map& vm, std::size_t num_threads,
+            hpx::program_options::variables_map& vm, std::size_t num_threads,
             util::batch_environment& env, bool use_process_mask)
         {
             std::string cores_str = cfgmap.get_value<std::string>("hpx.cores", "");
@@ -505,7 +505,7 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
 #if !defined(HPX_HAVE_NETWORKING)
-        void check_networking_option(boost::program_options::variables_map& vm,
+        void check_networking_option(hpx::program_options::variables_map& vm,
             char const* option)
         {
             if (vm.count(option) != 0)
@@ -518,7 +518,7 @@ namespace hpx { namespace util
         }
 #endif
 
-        void check_networking_options(boost::program_options::variables_map& vm)
+        void check_networking_options(hpx::program_options::variables_map& vm)
         {
 #if !defined(HPX_HAVE_NETWORKING)
             check_networking_option(vm, "hpx:agas");
@@ -640,7 +640,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     bool command_line_handling::handle_arguments(util::manage_config& cfgmap,
-        boost::program_options::variables_map& vm,
+        hpx::program_options::variables_map& vm,
         std::vector<std::string>& ini_config, std::size_t& node, bool initial)
     {
         // verify that no networking options were used if networking was
@@ -1121,7 +1121,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     void command_line_handling::enable_logging_settings(
-        boost::program_options::variables_map& vm,
+        hpx::program_options::variables_map& vm,
         std::vector<std::string>& ini_config)
     {
 #if defined(HPX_HAVE_LOGGING)
@@ -1242,7 +1242,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     bool command_line_handling::handle_help_options(
-        boost::program_options::options_description const& help)
+        hpx::program_options::options_description const& help)
     {
         if (vm_.count("hpx:help")) {
             std::string help_option(vm_["hpx:help"].as<std::string>());
@@ -1342,7 +1342,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     int command_line_handling::call(
-        boost::program_options::options_description const& desc_cmdline,
+        hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv)
     {
         // set the flag signaling that command line parsing has been done
@@ -1380,7 +1380,7 @@ namespace hpx { namespace util
             // when calling vm.clear(). We work around that problems by
             // creating a separate instance just for the preliminary
             // command line handling.
-            boost::program_options::variables_map prevm;
+            hpx::program_options::variables_map prevm;
             if (!util::parse_commandline(rtcfg_, desc_cmdline, argv[0], args,
                     prevm, std::size_t(-1), error_mode,
                     rtcfg_.mode_))
@@ -1461,7 +1461,7 @@ namespace hpx { namespace util
 
         // Now re-parse the command line using the node number (if given).
         // This will additionally detect any --hpx:N:foo options.
-        boost::program_options::options_description help;
+        hpx::program_options::options_description help;
         std::vector<std::string> unregistered_options;
 
         if (!util::parse_commandline(rtcfg_, desc_cmdline,

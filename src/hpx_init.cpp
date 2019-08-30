@@ -42,9 +42,9 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options/parsers.hpp>
+#include <hpx/program_options/variables_map.hpp>
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
 #  include <cstdlib>
@@ -406,7 +406,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         void handle_list_and_print_options(hpx::runtime& rt,
-            boost::program_options::variables_map& vm,
+            hpx::program_options::variables_map& vm,
             bool print_counters_locally)
         {
             if (vm.count("hpx:list-counters")) {
@@ -549,7 +549,7 @@ namespace hpx
         }
 
         void add_startup_functions(hpx::runtime& rt,
-            boost::program_options::variables_map& vm, runtime_mode mode,
+            hpx::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type startup, shutdown_function_type shutdown)
         {
             if (vm.count("hpx:app-config"))
@@ -586,9 +586,9 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         int run(hpx::runtime& rt,
-            util::function_nonser<int(boost::program_options::variables_map& vm)>
+            util::function_nonser<int(hpx::program_options::variables_map& vm)>
                 const& f,
-            boost::program_options::variables_map& vm, runtime_mode mode,
+            hpx::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type startup, shutdown_function_type shutdown)
         {
             LPROGRESS_;
@@ -605,9 +605,9 @@ namespace hpx
         }
 
         int start(hpx::runtime& rt,
-            util::function_nonser<int(boost::program_options::variables_map& vm)>
+            util::function_nonser<int(hpx::program_options::variables_map& vm)>
                 const& f,
-            boost::program_options::variables_map& vm, runtime_mode mode,
+            hpx::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type startup, shutdown_function_type shutdown)
         {
             LPROGRESS_;
@@ -644,9 +644,9 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT int run_or_start(
             util::function_nonser<
-                int(boost::program_options::variables_map& vm)
+                int(hpx::program_options::variables_map& vm)
             > const& f,
-            boost::program_options::options_description const& desc_cmdline,
+            hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> && ini_config,
             startup_function_type startup, shutdown_function_type shutdown,
             hpx::runtime_mode mode, bool blocking)
@@ -964,12 +964,12 @@ namespace hpx
     namespace detail
     {
         HPX_EXPORT int init_helper(
-            boost::program_options::variables_map& /*vm*/,
+            hpx::program_options::variables_map& /*vm*/,
             util::function_nonser<int(int, char**)> const& f)
         {
             std::string cmdline(hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
 
-            using namespace boost::program_options;
+            using namespace hpx::program_options;
 #if defined(HPX_WINDOWS)
             std::vector<std::string> args = split_winmain(cmdline);
 #else

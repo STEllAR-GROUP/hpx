@@ -51,15 +51,8 @@ namespace boost
       { "boost/random/([^\\s]*)\\.hpp", "random" },
       { "boost/format\\.hpp", "hpx/util/format.hpp" },
       { "boost/regex.hpp", "regex" },
-      { "boost/filesystem.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/config.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/convenience.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/exception.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/fstream.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/operations.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/path.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/path_traits.hpp", "hpx/filesystem.hpp" },
-      { "boost/filesystem/string_file.hpp", "hpx/filesystem.hpp" },
+      { "boost/program_options([^\\s]*)\\.hpp", "hpx/program_options\\2.hpp" },
+      { "boost/filesystem([^\\s]*)\\.hpp", "hpx/filesystem.hpp" },
       { nullptr, nullptr }
     };
 
@@ -83,11 +76,11 @@ namespace boost
            ++includes_it)
       {
         std::string rx =
-            std::string("^\\s*#\\s*include\\s*<(")
+            std::string(R"(^\s*#\s*include\s*<()")
           +   includes_it->include_regex
           + ")>\\s*$"
           + "|"
-          + "^\\s*#\\s*include\\s*\"("
+          + R"(^\s*#\s*include\s*"()"
           +   includes_it->include_regex
           + ")\"\\s*$";
 

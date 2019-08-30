@@ -11,25 +11,29 @@ set(benchmarks
     htts2_hpx
    )
 
-set(htts2_payload_precision_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} hpx_assertion hpx_config hpx_format)
+set(htts2_payload_precision_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies}
+  hpx_assertion hpx_config hpx_format hpx_program_options)
 
 if(HPX_WITH_EXAMPLES_OPENMP)
   set(benchmarks ${benchmarks} htts2_omp)
-  set(htts2_omp_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} hpx_assertion hpx_config hpx_format)
+  set(htts2_omp_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies}
+    hpx_assertion hpx_config hpx_format hpx_program_options)
 endif()
 
 if(HPX_WITH_EXAMPLES_QTHREADS)
   include_directories(${QTHREADS_INCLUDE_DIR})
 
   set(benchmarks ${benchmarks} htts2_qthreads)
-  set(htts2_qthreads_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARY} hpx_assertion hpx_config hpx_format)
+  set(htts2_qthreads_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARY}
+    hpx_assertion hpx_config hpx_format hpx_program_options)
 endif()
 
 if(HPX_WITH_EXAMPLES_TBB)
   include_directories(${TBB_INCLUDE_DIR})
 
   set(benchmarks ${benchmarks} htts2_tbb)
-  set(htts2_tbb_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${TBB_LIBRARY} hpx_assertion hpx_config hpx_format)
+  set(htts2_tbb_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${TBB_LIBRARY}
+    hpx_assertion hpx_config hpx_format hpx_program_options)
 endif()
 
 foreach(benchmark ${benchmarks})
@@ -44,6 +48,8 @@ foreach(benchmark ${benchmarks})
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/HTTS v2/${benchmark}")
+
+  target_compile_definitions(${benchmark} PRIVATE HPX_MODULE_STATIC_LINKING)
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.performance.local.htts_v2.${benchmark})

@@ -348,7 +348,7 @@ void run_local_tests()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main(hpx::program_options::variables_map&)
 {
     // run the test on all localities
     std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
@@ -366,7 +366,7 @@ int hpx_main(boost::program_options::variables_map&)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    boost::program_options::options_description cmdline(
+    hpx::program_options::options_description cmdline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX

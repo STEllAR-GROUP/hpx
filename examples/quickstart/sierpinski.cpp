@@ -96,7 +96,7 @@ sierpinski get_sierpinski(std::uint64_t n, double len)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::uint64_t n = vm["n-value"].as<std::uint64_t>();
     std::uint64_t len = vm["side-length"].as<std::uint64_t>();
@@ -118,17 +118,17 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    boost::program_options::options_description
+    hpx::program_options::options_description
         desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
         ( "n-value",
-          boost::program_options::value<std::uint64_t>()->default_value(5),
+          hpx::program_options::value<std::uint64_t>()->default_value(5),
           "n value for the Sierpinski function")
         ;
     desc_commandline.add_options()
         ( "side-length",
-          boost::program_options::value<std::uint64_t>()->default_value(100),
+          hpx::program_options::value<std::uint64_t>()->default_value(100),
           "side-length of the original triangle")
         ;
 

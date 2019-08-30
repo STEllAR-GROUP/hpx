@@ -140,7 +140,7 @@ void run_benchmark(params const & p)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map & vm)
+int hpx_main(hpx::program_options::variables_map & vm)
 {
     params p(process_args(vm));
     print_header("OSU HPX Broadcast Latency Test");
@@ -150,7 +150,7 @@ int hpx_main(boost::program_options::variables_map & vm)
 
 int main(int argc, char* argv[])
 {
-    boost::program_options::options_description
+    hpx::program_options::options_description
         desc(params_desc());
 
     return hpx::init(desc, argc, argv);

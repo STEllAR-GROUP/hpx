@@ -60,9 +60,10 @@ namespace hpx { namespace threads { namespace policies {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail {
+
     // helper functions testing option compatibility
     void ensure_high_priority_compatibility(
-        boost::program_options::variables_map const& vm)
+        hpx::program_options::variables_map const& vm)
     {
         if (vm.count("hpx:high-priority-threads"))
         {
@@ -75,7 +76,7 @@ namespace hpx { namespace detail {
     }
 
     void ensure_numa_sensitivity_compatibility(
-        boost::program_options::variables_map const& vm)
+        hpx::program_options::variables_map const& vm)
     {
         if (vm.count("hpx:numa-sensitive"))
         {
@@ -88,7 +89,7 @@ namespace hpx { namespace detail {
     }
 
     void ensure_queuing_option_compatibility(
-        boost::program_options::variables_map const& vm)
+        hpx::program_options::variables_map const& vm)
     {
         ensure_high_priority_compatibility(vm);
         ensure_numa_sensitivity_compatibility(vm);
