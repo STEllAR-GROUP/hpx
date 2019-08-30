@@ -306,20 +306,9 @@ if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
 endif()
 
 # Link to each parcelport plugin
-# FIXME: when all plugins refactored, put a for loop on the plugins cache
-# variable
-if (TARGET tcp)
-  target_link_libraries(hpx PRIVATE tcp)
-endif()
-if (TARGET mpi)
-  target_link_libraries(hpx PRIVATE mpi)
-endif()
-if (TARGET libfabric)
-  target_link_libraries(hpx PRIVATE libfabric)
-endif()
-if (TARGET verbs)
-  target_link_libraries(hpx PRIVATE verbs)
-endif()
+foreach(_parcelport_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
+  target_link_libraries(hpx PRIVATE ${_parcelport_plugin})
+endforeach()
 
 # integrate the hpx modules with the main library
 foreach(_module ${HPX_LIBS})
