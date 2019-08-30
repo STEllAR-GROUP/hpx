@@ -23,11 +23,11 @@ This section gives an introduction on how to use our build system to build
 CMake basics
 ============
 
-|cmake|_ is a cross-platform build-generator tool. cmake does not build the
+|cmake|_ is a cross-platform build-generator tool. CMake does not build the
 project, it generates the files needed by your build tool (gnu make, visual
 studio, etc.) for building |hpx|.
 
-in general, the hpx |cmake|_ scripts try to adhere to the general cmake policies
+In general, the |HPX| |cmake|_ scripts try to adhere to the general CMake policies
 on how to write |cmake|_ based projects.
 
 Basic CMake usage
