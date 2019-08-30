@@ -248,13 +248,18 @@ void measure_function_futures_limiting_executor(
     std::uint64_t const tasks = num_threads * 2000;
     std::atomic<std::uint64_t> sanity_check(count);
 
+    // test a parallel algorithm on custom pool with high priority
+    auto const chunk_size = count/num_threads;
+    hpx::parallel::execution::static_chunk_size fixed(chunk_size);
+
     // start the clock
     high_resolution_timer walltime;
     {
         hpx::threads::executors::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
         hpx::parallel::for_loop(
-            hpx::parallel::execution::par, 0, count, [&](int) {
+            hpx::parallel::execution::par.with(fixed)
+            , 0, count, [&](int) {
                 hpx::apply(signal_exec, [&]() {
                     null_function();
                     sanity_check--;
@@ -508,10 +513,12 @@ int hpx_main(variables_map& vm)
 
         for (int i = 0; i < repetitions; i++)
         {
-            measure_function_futures_limiting_executor(count, csv, def);
             measure_function_futures_limiting_executor(count, csv, par);
+            measure_function_futures_create_thread_hierarchical_placement(
+                count, csv);
             if (test_all)
             {
+                measure_function_futures_limiting_executor(count, csv, def);
                 measure_action_futures_wait_each(count, csv);
                 measure_action_futures_wait_all(count, csv);
                 measure_function_futures_wait_each(count, csv, def);
@@ -525,8 +532,6 @@ int hpx_main(variables_map& vm)
                 measure_function_futures_for_loop(count, csv);
                 measure_function_futures_register_work(count, csv);
                 measure_function_futures_create_thread(count, csv);
-                measure_function_futures_create_thread_hierarchical_placement(
-                    count, csv);
                 measure_function_futures_apply_hierarchical_placement(
                     count, csv);
             }
