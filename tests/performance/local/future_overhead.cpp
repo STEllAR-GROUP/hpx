@@ -63,7 +63,8 @@ void print_stats(const char* title, const char* wait, const char* exec,
     std::int64_t count, double duration, bool csv)
 {
     double us = 1e6 * duration / count;
-    if (csv) {
+    if (csv)
+    {
         hpx::util::format_to(cout,
             "{1}, {:27}, {:15}, {:18}, {:8}, {:8}, {:20}, {:4}, {:4}, "
             "{:20}\n",
@@ -71,7 +72,8 @@ void print_stats(const char* title, const char* wait, const char* exec,
             num_threads, info_string)
             << flush;
     }
-    else {
+    else
+    {
         hpx::util::format_to(cout,
             "invoked {:1}, futures {:27} {:15} {:18} in {:8} seconds : {:8} "
             "us/future, queue {:20}, numa {:4}, threads {:4}, info {:20}\n",
