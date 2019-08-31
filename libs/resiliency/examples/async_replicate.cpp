@@ -46,7 +46,7 @@ int deep_thought()
         throw vogon_exception();
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t sr = vm["sr-value"].as<std::size_t>();
     std::size_t usr = vm["usr-value"].as<std::size_t>();
@@ -122,8 +122,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using boost::program_options::options_description;
-    using boost::program_options::value;
+    using hpx::program_options::options_description;
+    using hpx::program_options::value;
 
     // Configure application specific options
     options_description desc_commandline(

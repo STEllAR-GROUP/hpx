@@ -73,7 +73,7 @@ int universal_ans(std::uint64_t delay_ns, double error)
     return 42;
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     double error = vm["error-rate"].as<double>();
     std::uint64_t delay = vm["exec-time"].as<std::uint64_t>();
@@ -121,8 +121,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using boost::program_options::options_description;
-    using boost::program_options::value;
+    using hpx::program_options::options_description;
+    using hpx::program_options::value;
 
     // Configure application-specific options
     options_description desc_commandline(

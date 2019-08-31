@@ -33,5 +33,6 @@ add_hpx_module(resiliency
   DEPENDENCIES
     hpx_assertion
     hpx_config
+    hpx_datastructures
   CMAKE_SUBDIRS examples tests
 )

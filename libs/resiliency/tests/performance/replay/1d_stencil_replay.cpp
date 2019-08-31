@@ -245,7 +245,7 @@ struct stepper
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::uint64_t n_value =
         vm["n-value"].as<std::uint64_t>();    // Number of partitions.
@@ -295,7 +295,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     // Configure application-specific options.
     options_description desc_commandline;

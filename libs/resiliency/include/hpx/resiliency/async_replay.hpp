@@ -15,6 +15,7 @@
 #include <hpx/async.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -28,19 +29,24 @@
 namespace hpx { namespace resiliency {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct abort_replay_exception : std::exception
+    struct HPX_ALWAYS_EXPORT abort_replay_exception : std::exception
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename T>
-        bool validate_(T result)
+        ///////////////////////////////////////////////////////////////////////
+        struct replay_validator
         {
-            return true;
-        }
+            template <typename T>
+            bool operator()(T&& result) const
+            {
+                return true;
+            }
+        };
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename Future>
         std::exception_ptr rethrow_on_abort_replay(Future& f)
         {
@@ -75,7 +81,8 @@ namespace hpx { namespace resiliency {
             }
 
             template <std::size_t... Is>
-            hpx::future<Result> invoke(hpx::util::detail::pack<Is...>)
+            hpx::future<Result> invoke(
+                hpx::util::detail::pack_c<std::size_t, Is...>)
             {
                 return hpx::async(f_, std::get<Is>(t_)...);
             }
@@ -83,8 +90,9 @@ namespace hpx { namespace resiliency {
             hpx::future<Result> call(std::size_t n)
             {
                 // launch given function asynchronously
-                hpx::future<Result> f = invoke(
-                    hpx::util::detail::make_index_pack<std::tuple_size<Tuple>::value>{});
+                hpx::future<Result> f =
+                    invoke(hpx::util::detail::make_index_pack<
+                        std::tuple_size<Tuple>::value>{});
 
                 // attach a continuation that will relaunch the task, if
                 // necessary
@@ -185,12 +193,8 @@ namespace hpx { namespace resiliency {
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
     async_replay(std::size_t n, F&& f, Ts&&... ts)
     {
-        using result_type =
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
-
-        return async_replay_validate(
-            n, detail::validate_<result_type>, std::forward<F>(f),
-            std::forward<Ts>(ts)...);
+        return async_replay_validate(n, detail::replay_validator{},
+            std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -200,9 +204,8 @@ namespace hpx { namespace resiliency {
         struct async_replay_validate
         {
             template <typename Pred, typename F, typename... Ts>
-            auto operator()(std::size_t n, Pred&& pred, F&& f, Ts&&... ts) 
-            ->
-            decltype(hpx::resiliency::async_replay_validate(n,
+            auto operator()(std::size_t n, Pred&& pred, F&& f, Ts&&... ts) const
+                -> decltype(hpx::resiliency::async_replay_validate(n,
                     std::forward<Pred>(pred), std::forward<F>(f),
                     std::forward<Ts>(ts)...))
             {
@@ -216,8 +219,7 @@ namespace hpx { namespace resiliency {
         {
             template <typename F, typename... Ts>
             auto operator()(std::size_t n, F&& f, Ts&&... ts) const
-            ->
-            decltype(hpx::resiliency::async_replay(
+                -> decltype(hpx::resiliency::async_replay(
                     n, std::forward<F>(f), std::forward<Ts>(ts)...))
             {
                 return hpx::resiliency::async_replay(
