@@ -52,7 +52,7 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  set(folder_name "Tests/Unit/Modules/ParallelExecutors")
+  set(folder_name "Tests/Unit/Modules/Executors")
 
   # add example executable
   add_hpx_executable(${test}_test
@@ -62,6 +62,6 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER ${folder_name})
 
-  add_hpx_unit_test("modules.parallel_executors" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test("modules.executors" ${test} ${${test}_PARAMETERS})
 
 endforeach()
