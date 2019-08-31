@@ -58,6 +58,12 @@ namespace hpx { namespace resiliency {
         return std::move(vect.at(0));
     }
 
+    template <typename T>
+    bool validate_(T result)
+    {
+        return true;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// Asynchronously launch given function \a f exactly \a n times. Verify the result of
     /// those invocations using the given predicate \a pred. Run all the valid results
@@ -84,7 +90,7 @@ namespace hpx { namespace resiliency {
         // that passes the predicate, properly handle exceptions
         return hpx::dataflow(
             hpx::launch::sync,    // do not schedule new thread for the lambda
-            [pred = std::forward<Pred>(pred), vote = std::forward<Vote>(vote),
+            [HPX_CAPTURE_FORWARD(pred), HPX_CAPTURE_FORWARD(vote),
                 n](std::vector<hpx::future<result_type>>&& results)
                 -> result_type {
                 // Store all valid results
@@ -128,8 +134,11 @@ namespace hpx { namespace resiliency {
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
     async_replicate_vote(std::size_t n, Vote&& vote, F&& f, Ts&&... ts)
     {
+        using result_type =
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
+
         return async_replicate_vote_validate(
-            n, std::forward<Vote>(vote), [](auto&&) { return true; },
+            n, std::forward<Vote>(vote), validate_<result_type>,
             std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 
@@ -163,7 +172,7 @@ namespace hpx { namespace resiliency {
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
 
         return async_replicate_vote_validate(
-            n, vote_<result_type>, [](auto&&) { return true; },
+            n, vote_<result_type>, validate_<result_type>,
             std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 
@@ -177,6 +186,10 @@ namespace hpx { namespace resiliency {
             template <typename Vote, typename Pred, typename F, typename... Ts>
             auto operator()(std::size_t n, Vote&& vote, Pred&& pred, F&& f,
                 Ts&&... ts) const
+            ->
+            decltype(hpx::resiliency::async_replicate_vote_validate(n,
+                    std::forward<Vote>(vote), std::forward<Pred>(pred),
+                    std::forward<F>(f), std::forward<Ts>(ts)...))
             {
                 return hpx::resiliency::async_replicate_vote_validate(n,
                     std::forward<Vote>(vote), std::forward<Pred>(pred),
@@ -188,6 +201,10 @@ namespace hpx { namespace resiliency {
         {
             template <typename Vote, typename F, typename... Ts>
             auto operator()(std::size_t n, Vote&& vote, F&& f, Ts&&... ts) const
+            ->
+            decltype(hpx::resiliency::async_replicate_vote(n,
+                    std::forward<Vote>(vote), std::forward<F>(f),
+                    std::forward<Ts>(ts)...))
             {
                 return hpx::resiliency::async_replicate_vote(n,
                     std::forward<Vote>(vote), std::forward<F>(f),
@@ -199,6 +216,10 @@ namespace hpx { namespace resiliency {
         {
             template <typename Pred, typename F, typename... Ts>
             auto operator()(std::size_t n, Pred&& pred, F&& f, Ts&&... ts) const
+            ->
+            decltype(hpx::resiliency::async_replicate_validate(n,
+                    std::forward<Pred>(pred), std::forward<F>(f),
+                    std::forward<Ts>(ts)...))
             {
                 return hpx::resiliency::async_replicate_validate(n,
                     std::forward<Pred>(pred), std::forward<F>(f),
@@ -210,6 +231,9 @@ namespace hpx { namespace resiliency {
         {
             template <typename F, typename... Ts>
             auto operator()(std::size_t n, F&& f, Ts&&... ts) const
+            ->
+            decltype(hpx::resiliency::async_replicate(
+                    n, std::forward<F>(f), std::forward<Ts>(ts)...))
             {
                 return hpx::resiliency::async_replicate(
                     n, std::forward<F>(f), std::forward<Ts>(ts)...);

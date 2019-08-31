@@ -2,6 +2,7 @@
 //                     LLC (NTESS).
 //  Copyright (c) 2018-2019 Hartmut Kaiser
 //  Copyright (c) 2018-2019 Adrian Serio
+//  Copyright (c) 2019 Nikunj Gupta
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -33,6 +34,12 @@ namespace hpx { namespace resiliency {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
+        template <typename T>
+        bool validate_(T result)
+        {
+            return true;
+        }
 
         template <typename Future>
         std::exception_ptr rethrow_on_abort_replay(Future& f)
@@ -68,7 +75,7 @@ namespace hpx { namespace resiliency {
             }
 
             template <std::size_t... Is>
-            hpx::future<Result> invoke(std::index_sequence<Is...>)
+            hpx::future<Result> invoke(hpx::util::detail::pack<Is...>)
             {
                 return hpx::async(f_, std::get<Is>(t_)...);
             }
@@ -77,13 +84,13 @@ namespace hpx { namespace resiliency {
             {
                 // launch given function asynchronously
                 hpx::future<Result> f = invoke(
-                    std::make_index_sequence<std::tuple_size<Tuple>::value>{});
+                    hpx::util::detail::make_index_pack<std::tuple_size<Tuple>::value>{});
 
                 // attach a continuation that will relaunch the task, if
                 // necessary
                 auto this_ = this->shared_from_this();
                 return f.then(hpx::launch::sync,
-                    [this_ = std::move(this_), n](hpx::future<Result>&& f) {
+                    [HPX_CAPTURE_MOVE(this_), n](hpx::future<Result>&& f) {
                         if (f.has_exception())
                         {
                             // rethrow abort_replay_exception, if caught
@@ -178,8 +185,11 @@ namespace hpx { namespace resiliency {
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
     async_replay(std::size_t n, F&& f, Ts&&... ts)
     {
+        using result_type =
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
+
         return async_replay_validate(
-            n, [](auto&&) { return true; }, std::forward<F>(f),
+            n, detail::validate_<result_type>, std::forward<F>(f),
             std::forward<Ts>(ts)...);
     }
 
@@ -190,7 +200,11 @@ namespace hpx { namespace resiliency {
         struct async_replay_validate
         {
             template <typename Pred, typename F, typename... Ts>
-            auto operator()(std::size_t n, Pred&& pred, F&& f, Ts&&... ts) const
+            auto operator()(std::size_t n, Pred&& pred, F&& f, Ts&&... ts) 
+            ->
+            decltype(hpx::resiliency::async_replay_validate(n,
+                    std::forward<Pred>(pred), std::forward<F>(f),
+                    std::forward<Ts>(ts)...))
             {
                 return hpx::resiliency::async_replay_validate(n,
                     std::forward<Pred>(pred), std::forward<F>(f),
@@ -202,6 +216,9 @@ namespace hpx { namespace resiliency {
         {
             template <typename F, typename... Ts>
             auto operator()(std::size_t n, F&& f, Ts&&... ts) const
+            ->
+            decltype(hpx::resiliency::async_replay(
+                    n, std::forward<F>(f), std::forward<Ts>(ts)...))
             {
                 return hpx::resiliency::async_replay(
                     n, std::forward<F>(f), std::forward<Ts>(ts)...);
