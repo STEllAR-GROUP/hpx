@@ -232,7 +232,7 @@ namespace hpx { namespace threads { namespace policies {
                     --addfrom->new_tasks_count_.data_;
                     lk.unlock();
                     HPX_THROW_EXCEPTION(hpx::out_of_memory,
-                        "threadmanager::add_new",
+                        "thread_queue::add_new",
                         "Couldn't add new thread to the thread map");
                     return 0;
                 }
@@ -664,7 +664,7 @@ namespace hpx { namespace threads { namespace policies {
                     {
                         lk.unlock();
                         HPX_THROWS_IF(ec, hpx::out_of_memory,
-                            "threadmanager::register_thread",
+                            "thread_queue::create_thread",
                             "Couldn't add new thread to the map of threads");
                         return;
                     }
