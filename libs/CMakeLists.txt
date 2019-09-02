@@ -29,6 +29,7 @@ set(HPX_LIBS
   parallel_executors
   preprocessor
   program_options
+  resiliency
   segmented_algorithms
   statistics
   testing
