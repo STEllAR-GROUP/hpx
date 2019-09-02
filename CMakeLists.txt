@@ -1437,7 +1437,7 @@ if(MSVC)
   if(CMAKE_CL_64)
     set(__target_arch "x86_64")
   else()
-    set(__target_arch "x84")
+    set(__target_arch "x86")
   endif()
   hpx_info("Architecture detected: ${__target_arch}")
 else()
@@ -1560,6 +1560,9 @@ else()
     hpx_warn("No timestamp support is available; some performance counters may report incorrect results")
   endif()
 endif()
+
+# store target architecture for later use
+set(HPX_WITH_TARGET_ARCHITECTURE ${__target_arch} CACHE INTERNAL "" FORCE)
 
 ################################################################################
 
