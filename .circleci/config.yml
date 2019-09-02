@@ -116,6 +116,22 @@ jobs:
           path: /tmp/circular_deps.svg
           destination: /hpx/artifacts/circular_deps.svg
 
+  # Insure that the modules stay clang-formatted
+  clang_format:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Check that the modules are well clang-formatted
+          command: |
+              cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
+              clang-format-8 -i **/*.{cpp,hpp}
+              git diff --exit-code --name-status > /tmp/modified_format_files.txt
+      - store_artifacts:
+          path: /tmp/modified_format_files.txt
+          destination: /hpx/artifacts/modified_format_files.txt
+
   configure:
     <<: *defaults
     steps:
@@ -1013,6 +1029,10 @@ workflows:
       - checkout_code:
           <<: *gh_pages_filter
       - check_circular_deps:
+          requires:
+            - checkout_code
+          <<: *gh_pages_filter
+      - clang_format:
           requires:
             - checkout_code
           <<: *gh_pages_filter
