@@ -9,9 +9,9 @@
 #define HPX_UTIL_DETAIL_FUNCTION_REGISTRATION_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
-#include <hpx/debugging/demangle_helper.hpp>
 
 #include <type_traits>
 
