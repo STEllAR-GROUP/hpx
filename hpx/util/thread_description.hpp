@@ -10,9 +10,9 @@
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/traits/is_action.hpp>
+#include <hpx/functional/traits/get_function_address.hpp>
+#include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/concurrency/itt_notify.hpp>
 #endif

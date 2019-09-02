@@ -11,8 +11,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/result_of.hpp>
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/functional/traits/get_function_address.hpp>
+#include <hpx/functional/traits/get_function_annotation.hpp>
 
 #include <cstddef>
 #include <type_traits>

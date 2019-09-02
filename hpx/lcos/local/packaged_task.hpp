@@ -11,7 +11,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/functional/unique_function.hpp>

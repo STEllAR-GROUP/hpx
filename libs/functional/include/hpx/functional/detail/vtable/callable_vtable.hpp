@@ -12,8 +12,8 @@
 #include <hpx/functional/detail/empty_function.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/functional/traits/get_function_address.hpp>
+#include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
 #include <cstddef>

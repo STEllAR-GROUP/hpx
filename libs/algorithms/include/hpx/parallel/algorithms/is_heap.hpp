@@ -12,7 +12,7 @@
 #include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>

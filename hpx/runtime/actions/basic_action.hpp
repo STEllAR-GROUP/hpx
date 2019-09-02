@@ -40,7 +40,7 @@
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_remote_result.hpp>
 #include <hpx/traits/action_stacksize.hpp>
-#include <hpx/traits/is_action.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/datastructures/detail/pack.hpp>

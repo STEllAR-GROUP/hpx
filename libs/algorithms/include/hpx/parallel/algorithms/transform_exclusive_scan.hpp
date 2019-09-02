@@ -13,7 +13,7 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/result_of.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

@@ -15,11 +15,11 @@
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/one_shot.hpp>
 #include <hpx/functional/result_of.hpp>
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_bind_expression.hpp>
-#include <hpx/traits/is_placeholder.hpp>
+#include <hpx/functional/traits/get_function_address.hpp>
+#include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/functional/traits/is_action.hpp>
+#include <hpx/functional/traits/is_bind_expression.hpp>
+#include <hpx/functional/traits/is_placeholder.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <cstddef>

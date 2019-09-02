@@ -14,7 +14,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/traits/is_action.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/bind_action.hpp>

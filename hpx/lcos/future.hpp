@@ -28,7 +28,7 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>

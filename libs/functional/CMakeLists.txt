@@ -29,12 +29,12 @@ set(functional_headers
   hpx/functional/protect.hpp
   hpx/functional/result_of.hpp
   hpx/functional/unique_function.hpp
-  hpx/traits/get_function_address.hpp
-  hpx/traits/get_function_annotation.hpp
-  hpx/traits/is_action.hpp
-  hpx/traits/is_bind_expression.hpp
-  hpx/traits/is_callable.hpp
-  hpx/traits/is_placeholder.hpp
+  hpx/functional/traits/get_function_address.hpp
+  hpx/functional/traits/get_function_annotation.hpp
+  hpx/functional/traits/is_action.hpp
+  hpx/functional/traits/is_bind_expression.hpp
+  hpx/functional/traits/is_callable.hpp
+  hpx/functional/traits/is_placeholder.hpp
 )
 
 
@@ -68,12 +68,12 @@ add_hpx_module(functional
     FORCE_LINKING_GEN
     GLOBAL_HEADER_GEN ON
     EXCLUDE
-      "hpx/traits/get_function_address.hpp"
-      "hpx/traits/get_function_annotation.hpp"
-      "hpx/traits/is_action.hpp"
-      "hpx/traits/is_bind_expression.hpp"
-      "hpx/traits/is_callable.hpp"
-      "hpx/traits/is_placeholder.hpp"
+      "hpx/functional/traits/get_function_address.hpp"
+      "hpx/functional/traits/get_function_annotation.hpp"
+      "hpx/functional/traits/is_action.hpp"
+      "hpx/functional/traits/is_bind_expression.hpp"
+      "hpx/functional/traits/is_callable.hpp"
+      "hpx/functional/traits/is_placeholder.hpp"
     SOURCES ${functional_sources}
     HEADERS ${functional_headers}
     COMPAT_HEADERS ${functional_compat_headers}

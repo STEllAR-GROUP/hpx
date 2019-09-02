@@ -13,7 +13,7 @@
 #include <hpx/functional/result_of.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/server/invoke_function.hpp>
-#include <hpx/traits/is_action.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/type_support/decay.hpp>
 

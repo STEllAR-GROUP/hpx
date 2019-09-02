@@ -6,7 +6,7 @@
 // hpxinspect:nodeprecatedname:hpx::traits::is_callable
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/testing.hpp>
 
 struct X { void operator()(int); };

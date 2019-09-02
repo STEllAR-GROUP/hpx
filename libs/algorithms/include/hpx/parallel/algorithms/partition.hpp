@@ -16,7 +16,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/util/tagged_tuple.hpp>
 #include <hpx/type_support/unused.hpp>
 

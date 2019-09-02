@@ -12,10 +12,10 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/functional/traits/get_function_address.hpp>
+#include <hpx/functional/traits/get_function_annotation.hpp>
 #endif
-#include <hpx/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>

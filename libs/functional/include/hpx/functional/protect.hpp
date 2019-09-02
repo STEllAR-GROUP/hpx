@@ -11,7 +11,7 @@
 #define HPX_UTIL_PROTECT_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_bind_expression.hpp>
+#include <hpx/functional/traits/is_bind_expression.hpp>
 
 #include <type_traits>
 #include <utility>
