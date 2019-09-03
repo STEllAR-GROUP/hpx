@@ -3,8 +3,8 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_main.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>
 
 #include <hpx/program_options.hpp>
@@ -20,9 +20,12 @@ using namespace std;
 void required_throw_test()
 {
     options_description opts;
-    opts.add_options()(
-        "cfgfile,c", value<string>()->required(), "the configfile")(
-        "fritz,f", value<string>()->required(), "the output file");
+    // clang-format off
+    opts.add_options()
+        ("cfgfile,c", value<string>()->required(), "the configfile")
+        ("fritz,f", value<string>()->required(), "the output file")
+        ;
+    // clang-format on
 
     variables_map vm;
     bool thrown = false;
@@ -66,10 +69,12 @@ void required_throw_test()
 void simple_required_test(const char* config_file)
 {
     options_description opts;
+    // clang-format off
     opts.add_options()
         ("cfgfile,c", value<string>()->required(), "the configfile")
         ("fritz,f", value<string>()->required(), "the output file")
         ;
+    // clang-format on
 
     variables_map vm;
     bool thrown = false;

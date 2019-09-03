@@ -252,7 +252,7 @@ namespace hpx { namespace program_options { namespace detail {
                     // so that they can be added to next.back()'s values
                     // if appropriate.
                     finish_option(next.back(), args, style_parsers);
-                    for (const auto & j : next)
+                    for (const auto& j : next)
                         result.push_back(j);
                 }
 
@@ -344,7 +344,7 @@ namespace hpx { namespace program_options { namespace detail {
 
         // Assign position keys to positional options.
         int position_key = 0;
-        for (auto & i : result)
+        for (auto& i : result)
         {
             if (i.string_key.empty())
                 i.position_key = position_key++;
@@ -368,21 +368,18 @@ namespace hpx { namespace program_options { namespace detail {
         }
 
         // set case sensitive flag
-        for (auto & i : result)
+        for (auto& i : result)
         {
             if (i.string_key.size() > 2 ||
-                (i.string_key.size() > 1 &&
-                    i.string_key[0] != '-'))
+                (i.string_key.size() > 1 && i.string_key[0] != '-'))
             {
                 // it is a long option
-                i.case_insensitive =
-                    is_style_active(long_case_insensitive);
+                i.case_insensitive = is_style_active(long_case_insensitive);
             }
             else
             {
                 // it is a short option
-                i.case_insensitive =
-                    is_style_active(short_case_insensitive);
+                i.case_insensitive = is_style_active(short_case_insensitive);
             }
         }
 

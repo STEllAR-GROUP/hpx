@@ -27,9 +27,7 @@ void test_unicode_to_unicode()
 {
     options_description desc;
 
-    desc.add_options()
-        ("foo", wvalue<wstring>(), "unicode option")
-        ;
+    desc.add_options()("foo", wvalue<wstring>(), "unicode option");
 
     vector<wstring> args;
     args.push_back(L"--foo=\x044F");
@@ -55,9 +53,7 @@ void test_unicode_to_native()
 
     options_description desc;
 
-    desc.add_options()
-        ("foo", value<string>(), "unicode option")
-        ;
+    desc.add_options()("foo", value<string>(), "unicode option");
 
     vector<wstring> args;
     args.push_back(L"--foo=\x044F");
@@ -76,9 +72,7 @@ void test_native_to_unicode()
 
     options_description desc;
 
-    desc.add_options()
-        ("foo", wvalue<wstring>(), "unicode option")
-        ;
+    desc.add_options()("foo", wvalue<wstring>(), "unicode option");
 
     vector<string> args;
     args.push_back("--foo=\xD1\x8F");
@@ -142,9 +136,7 @@ void test_config_file()
 
     options_description desc;
 
-    desc.add_options()
-        ("foo", value<string>(), "unicode option")
-        ;
+    desc.add_options()("foo", value<string>(), "unicode option");
 
     std::wstringstream stream(L"foo = \x044F");
 
@@ -154,7 +146,7 @@ void test_config_file()
     HPX_TEST(vm["foo"].as<string>() == "\xD1\x8F");
 }
 
-int main(int, char* [])
+int main(int, char*[])
 {
     test_unicode_to_unicode();
     test_unicode_to_native();
@@ -164,4 +156,3 @@ int main(int, char* [])
 
     return hpx::util::report_errors();
 }
-

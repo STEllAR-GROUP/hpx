@@ -26,16 +26,18 @@ std::vector<std::string> sv(const char* array[], unsigned size)
 void test_optional()
 {
 // Support for storing into optionals was added in 1.65.0
-#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) || \
-   (defined(BOOST_VERSION) && BOOST_VERSION > 106500)
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION > 106500)
     po::optional<int> foo, bar, baz;
 
     po::options_description desc;
+    // clang-format off
     desc.add_options()
         ("foo,f", po::value(&foo), "")
         ("bar,b", po::value(&bar), "")
         ("baz,z", po::value(&baz), "")
         ;
+    // clang-format on
 
     const char* cmdline1_[] = {"--foo=12", "--bar", "1"};
     std::vector<std::string> cmdline1 =

@@ -9,7 +9,7 @@
 // We use boost::program_options here, so surpress the deprecation warning.
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined (__GNUC__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
@@ -26,10 +26,12 @@ int hpx_main(po::variables_map& vm)
 int main(int argc, char* argv[])
 {
     po::options_description desc("Allowed options");
+    // clang-format off
     desc.add_options()
         ("help", "produce help message")
         ("compression", po::value<double>(), "set compression level")
     ;
+    // clang-format on
 
     return hpx::init(desc, argc, argv);
 }

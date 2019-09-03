@@ -3,8 +3,8 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_main.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>
 
 #include <hpx/program_options/cmdline.hpp>
@@ -404,8 +404,11 @@ pair<string, string> at_option_parser_broken(string const& s)
 void test_additional_parser()
 {
     options_description desc;
-    desc.add_options()("response-file", value<string>(), "response file")(
-        "foo", value<int>(), "foo");
+    // clang-format off
+    desc.add_options()
+        ("response-file", value<string>(), "response file")
+        ("foo", value<int>(), "foo");
+    // clang-format on
 #if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
     (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
     desc.add_options()("bar,baz", value<int>(), "bar");
@@ -455,7 +458,7 @@ void test_additional_parser()
     {
         cmd2.run();
     }
-    catch(unknown_option const&)
+    catch (unknown_option const&)
     {
         caught_exception = true;
     }

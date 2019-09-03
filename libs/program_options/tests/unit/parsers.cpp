@@ -3,14 +3,14 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_main.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>
 
 #include <hpx/program_options/option.hpp>
 #include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/positional_options.hpp>
 #include <hpx/program_options/parsers.hpp>
+#include <hpx/program_options/positional_options.hpp>
 #include <hpx/program_options/value_semantic.hpp>
 #include <hpx/program_options/variables_map.hpp>
 
@@ -114,7 +114,7 @@ namespace command_line {
         desc2.add_options()("open", value<string>());
         variables_map vm;
         store(parse_command_line(sizeof(cmdline4) / sizeof(const char*),
-                      const_cast<char**>(cmdline4), desc2),
+                  const_cast<char**>(cmdline4), desc2),
             vm);
     }
 
@@ -146,9 +146,8 @@ namespace command_line {
         const char* cmdline[] = {"program", "-fone", "-b", "two", "--foo",
             "three", "four", "-zfive", "--fee", "six"};
         options_description desc;
-        desc.add_options()("bar,b", value<string>())(
-            "foo,fee,f", value<string>()->multitoken())(
-            "fizbaz,baz,z", value<string>());
+        desc.add_options()("bar,b", value<string>())("foo,fee,f",
+            value<string>()->multitoken())("fizbaz,baz,z", value<string>());
 
         vector<option> parsed_options =
             parse_command_line(sizeof(cmdline) / sizeof(const char*),
@@ -235,10 +234,9 @@ void test_config_file(const char* config_file)
     // the long_names() API function was introduced in Boost V1.68
     options_description desc;
     desc.add_options()("gv1", new untyped_value)("gv2", new untyped_value)(
-            "empty_value", new untyped_value)("plug*", new untyped_value)(
-            "m1.v1", new untyped_value)(
-            "m1.v2", new untyped_value) desc.add_options()("m1.v3,alias3",
-        new untyped_value)("b", bool_switch());
+        "empty_value", new untyped_value)("plug*", new untyped_value)(
+        "m1.v1", new untyped_value)("m1.v2", new untyped_value)(
+        "m1.v3,alias3", new untyped_value)("b", bool_switch());
 
     const char content1[] = " gv1 = 0#asd\n"
                             "empty_value = \n"

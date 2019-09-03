@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 
 #include <iostream>
 #include <string>
@@ -25,9 +25,7 @@ int hpx_main(variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg = {
-        "hpx.commandline.rethrow_errors!=1"
-    };
+    std::vector<std::string> cfg = {"hpx.commandline.rethrow_errors!=1"};
 
     char help_option[] = "--hpx:help";
 
@@ -41,10 +39,12 @@ int main(int argc, char* argv[])
 
     options_description op("Issue #2990\n\nUsage: issue2990 [options]");
 
+    // clang-format off
     op.add_options()
         ("reqopt1", value<int>()->required(), "Required option 1")
         ("reqopt2", value<double>()->required(), "Required option 2")
         ("reqopt3", value<std::string>()->required(), "Required option 3");
+    // clang-format on
 
     return hpx::init(op, argc + 1, newargv.data(), cfg);
 }

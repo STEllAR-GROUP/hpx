@@ -31,6 +31,7 @@ int main(int ac, char* av[])
         int opt;
         int portnum;
         po::options_description desc("Allowed options");
+        // clang-format off
         desc.add_options()
             ("help", "produce help message")
             ("optimization", po::value<int>(&opt)->default_value(10),
@@ -44,6 +45,7 @@ int main(int ac, char* av[])
                   "include path")
             ("input-file", po::value< vector<string> >(), "input file")
         ;
+        // clang-format on
 
         po::positional_options_description p;
         p.add("input-file", -1);

@@ -317,7 +317,7 @@ namespace hpx { namespace program_options {
         std::shared_ptr<options_description> d(new options_description(desc));
         groups.push_back(d);
 
-        for (const auto & option : desc.m_options)
+        for (const auto& option : desc.m_options)
         {
             add(option);
             belong_to_group.back() = true;
@@ -359,7 +359,7 @@ namespace hpx { namespace program_options {
         // We use linear search because matching specified option
         // name with the declared option name need to take care about
         // case sensitivity and trailing '*' and so we can't use simple map.
-        for (const auto & option : m_options)
+        for (const auto& option : m_options)
         {
             option_description::match_result r = option->match(
                 name, approx, long_ignore_case, short_ignore_case);
@@ -642,7 +642,7 @@ namespace hpx { namespace program_options {
         }
 
         /* Get width of groups as well*/
-        for (const auto & group : groups)
+        for (const auto& group : groups)
             width = (std::max)(width, group->get_option_column_width());
 
         /* this is the column were description should start, if first
@@ -678,7 +678,7 @@ namespace hpx { namespace program_options {
             os << "\n";
         }
 
-        for (const auto & group : groups)
+        for (const auto& group : groups)
         {
             os << "\n";
             group->print(os, width);

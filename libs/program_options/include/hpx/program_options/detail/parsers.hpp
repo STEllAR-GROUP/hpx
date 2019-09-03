@@ -15,15 +15,15 @@
 
 namespace hpx { namespace program_options {
 
-    using boost::program_options::parse_command_line;
     using boost::program_options::collect_unrecognized;
+    using boost::program_options::parse_command_line;
 
 }}    // namespace hpx::program_options
 
 #else
 
-#include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/detail/convert.hpp>
+#include <hpx/program_options/parsers.hpp>
 
 #include <algorithm>
 #include <iterator>
