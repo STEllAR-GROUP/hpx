@@ -29,12 +29,14 @@ install(
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
 )
 
-# Generate the pkconfig files for HPX_APPLICATION (both for build and install)
-hpx_generate_pkgconfig_from_target(hpx::application hpx_application TRUE)
-hpx_generate_pkgconfig_from_target(hpx::application hpx_application FALSE)
-# Generate the pkconfig files for HPX_COMPONENT (both for build and install)
-hpx_generate_pkgconfig_from_target(hpx::component hpx_component TRUE)
-hpx_generate_pkgconfig_from_target(hpx::component hpx_component FALSE)
+if (NOT MSVC)
+  # Generate the pkconfig files for HPX_APPLICATION (both for build and install)
+  hpx_generate_pkgconfig_from_target(hpx::application hpx_application TRUE)
+  hpx_generate_pkgconfig_from_target(hpx::application hpx_application FALSE)
+  # Generate the pkconfig files for HPX_COMPONENT (both for build and install)
+  hpx_generate_pkgconfig_from_target(hpx::component hpx_component TRUE)
+  hpx_generate_pkgconfig_from_target(hpx::component hpx_component FALSE)
+endif()
 
 # Install dir
 configure_file(cmake/templates/${HPX_PACKAGE_NAME}Config.cmake.in
@@ -72,23 +74,24 @@ install(
 )
 
 string(TOLOWER ${CMAKE_BUILD_TYPE} build_type)
-install(
-  FILES
-    ${OUTPUT_DIR_PC}/hpx_application_${build_type}.pc
-    ${OUTPUT_DIR_PC}/hpx_component_${build_type}.pc
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-  COMPONENT pkgconfig
-)
-
-# Temporary (to deprecate gradually)
-install(
-  FILES
-    ${OUTPUT_DIR_PC}/hpx_application.pc
-    ${OUTPUT_DIR_PC}/hpx_component.pc
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-  CONFIGURATIONS Release
-  COMPONENT pkgconfig
-)
+if (NOT MSVC)
+  install(
+    FILES
+      ${OUTPUT_DIR_PC}/hpx_application_${build_type}.pc
+      ${OUTPUT_DIR_PC}/hpx_component_${build_type}.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    COMPONENT pkgconfig
+  )
+  # Temporary (to deprecate gradually)
+  install(
+    FILES
+      ${OUTPUT_DIR_PC}/hpx_application.pc
+      ${OUTPUT_DIR_PC}/hpx_component.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    CONFIGURATIONS Release
+    COMPONENT pkgconfig
+  )
+endif()
 
 install(
   FILES
