@@ -44,12 +44,10 @@ namespace hpx { namespace lcos {
     ///             ready once the all_to_all operation has been completed.
     ///
     template <typename T>
-    hpx::future<std::vector<T> >
-    all_to_all(char const* basename, hpx::future<T> result,
-        std::size_t num_sites = std::size_t(-1),
+    hpx::future<std::vector<T>> all_to_all(char const* basename,
+        hpx::future<T> result, std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0);
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
 
     /// AllToAll a set of values from different call sites
     ///
@@ -82,53 +80,52 @@ namespace hpx { namespace lcos {
     ///             ready once the all_to_all operation has been completed.
     ///
     template <typename T>
-    hpx::future<std::vector<typename std::decay<T>::type> >
-    all_to_all(char const* basename, T && result,
+    hpx::future<std::vector<typename std::decay<T>::type>> all_to_all(
+        char const* basename, T&& result,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0);
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
 
-    /// \def HPX_REGISTER_ALLTOALL_DECLARATION(type, name)
-    ///
-    /// \brief Declare a all_to_all object named \a name for a given data type \a type.
-    ///
-    /// The macro \a HPX_REGISTER_ALLTOALL_DECLARATION can be used to declare
-    /// all facilities necessary for a (possibly remote) all_to_all operation.
-    ///
-    /// The parameter \a type specifies for which data type the all_to_all
-    /// operations should be enabled.
-    ///
-    /// The (optional) parameter \a name should be a unique C-style identifier
-    /// that will be internally used to identify a particular all_to_all operation.
-    /// If this defaults to \a \<type\>_all_to_all if not specified.
-    ///
-    /// \note The macro \a HPX_REGISTER_ALLTOALL_DECLARATION can be used with 1
-    ///       or 2 arguments. The second argument is optional and defaults to
-    ///       \a \<type\>_all_to_all.
-    ///
-    #define HPX_REGISTER_ALLTOALL_DECLARATION(type, name)
+/// \def HPX_REGISTER_ALLTOALL_DECLARATION(type, name)
+///
+/// \brief Declare a all_to_all object named \a name for a given data type \a type.
+///
+/// The macro \a HPX_REGISTER_ALLTOALL_DECLARATION can be used to declare
+/// all facilities necessary for a (possibly remote) all_to_all operation.
+///
+/// The parameter \a type specifies for which data type the all_to_all
+/// operations should be enabled.
+///
+/// The (optional) parameter \a name should be a unique C-style identifier
+/// that will be internally used to identify a particular all_to_all operation.
+/// If this defaults to \a \<type\>_all_to_all if not specified.
+///
+/// \note The macro \a HPX_REGISTER_ALLTOALL_DECLARATION can be used with 1
+///       or 2 arguments. The second argument is optional and defaults to
+///       \a \<type\>_all_to_all.
+///
+#define HPX_REGISTER_ALLTOALL_DECLARATION(type, name)
 
-    /// \def HPX_REGISTER_ALLTOALL(type, name)
-    ///
-    /// \brief Define a all_to_all object named \a name for a given data type \a type.
-    ///
-    /// The macro \a HPX_REGISTER_ALLTOALL can be used to define
-    /// all facilities necessary for a (possibly remote) all_to_all operation.
-    ///
-    /// The parameter \a type specifies for which data type the all_to_all
-    /// operations should be enabled.
-    ///
-    /// The (optional) parameter \a name should be a unique C-style identifier
-    /// that will be internally used to identify a particular all_to_all operation.
-    /// If this defaults to \a \<type\>_all_to_all if not specified.
-    ///
-    /// \note The macro \a HPX_REGISTER_ALLTOALL can be used with 1
-    ///       or 2 arguments. The second argument is optional and defaults to
-    ///       \a \<type\>_all_to_all.
-    ///
-    #define HPX_REGISTER_ALLTOALL(type, name)
-}}
+/// \def HPX_REGISTER_ALLTOALL(type, name)
+///
+/// \brief Define a all_to_all object named \a name for a given data type \a type.
+///
+/// The macro \a HPX_REGISTER_ALLTOALL can be used to define
+/// all facilities necessary for a (possibly remote) all_to_all operation.
+///
+/// The parameter \a type specifies for which data type the all_to_all
+/// operations should be enabled.
+///
+/// The (optional) parameter \a name should be a unique C-style identifier
+/// that will be internally used to identify a particular all_to_all operation.
+/// If this defaults to \a \<type\>_all_to_all if not specified.
+///
+/// \note The macro \a HPX_REGISTER_ALLTOALL can be used with 1
+///       or 2 arguments. The second argument is optional and defaults to
+///       \a \<type\>_all_to_all.
+///
+#define HPX_REGISTER_ALLTOALL(type, name)
+}}    // namespace hpx::lcos
 // clang-format on
 #else
 
@@ -155,6 +152,7 @@ namespace hpx { namespace lcos {
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/util/bind_back.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -164,7 +162,9 @@ namespace hpx { namespace lcos {
 #include <vector>
 
 namespace hpx { namespace lcos {
+
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         class all_to_all_server

@@ -10,12 +10,11 @@
 #include <hpx/performance_counters/counters.hpp>
 
 #include <hpx/assertion.hpp>
+#include <hpx/collectives.hpp>
 #include <hpx/concurrency/thread_name.hpp>
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/lcos/barrier.hpp>
-#include <hpx/lcos/latch.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/interface.hpp>

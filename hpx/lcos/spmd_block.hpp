@@ -7,20 +7,20 @@
 #if !defined(HPX_LCOS_SPMD_BLOCK_HPP)
 #define HPX_LCOS_SPMD_BLOCK_HPP
 
+#include <hpx/collectives/barrier.hpp>
+#include <hpx/collectives/broadcast.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/include/plain_actions.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/barrier.hpp>
-#include <hpx/lcos/broadcast.hpp>
 #include <hpx/parallel/execution.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/traits/is_action.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/util/first_argument.hpp>
-#include <hpx/hashing/jenkins_hash.hpp>
 
 #include <boost/range/irange.hpp>
 

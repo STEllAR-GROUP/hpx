@@ -90,25 +90,25 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
 
-    /// \def HPX_REGISTER_ALLREDUCE_DECLARATION(type, name)
-    ///
-    /// \brief Declare a all_reduce object named \a name for a given data type \a type.
-    ///
-    /// The macro \a HPX_REGISTER_ALLREDUCE_DECLARATION can be used to declare
-    /// all facilities necessary for a (possibly remote) all_reduce operation.
-    ///
-    /// The parameter \a type specifies for which data type the all_reduce
-    /// operations should be enabled.
-    ///
-    /// The (optional) parameter \a name should be a unique C-style identifier
-    /// that will be internally used to identify a particular all_reduce operation.
-    /// If this defaults to \a \<type\>_all_reduce if not specified.
-    ///
-    /// \note The macro \a HPX_REGISTER_ALLREDUCE_DECLARATION can be used with 1
-    ///       or 2 arguments. The second argument is optional and defaults to
-    ///       \a \<type\>_all_reduce.
-    ///
-    #define HPX_REGISTER_ALLREDUCE_DECLARATION(type, name)
+/// \def HPX_REGISTER_ALLREDUCE_DECLARATION(type, name)
+///
+/// \brief Declare a all_reduce object named \a name for a given data type \a type.
+///
+/// The macro \a HPX_REGISTER_ALLREDUCE_DECLARATION can be used to declare
+/// all facilities necessary for a (possibly remote) all_reduce operation.
+///
+/// The parameter \a type specifies for which data type the all_reduce
+/// operations should be enabled.
+///
+/// The (optional) parameter \a name should be a unique C-style identifier
+/// that will be internally used to identify a particular all_reduce operation.
+/// If this defaults to \a \<type\>_all_reduce if not specified.
+///
+/// \note The macro \a HPX_REGISTER_ALLREDUCE_DECLARATION can be used with 1
+///       or 2 arguments. The second argument is optional and defaults to
+///       \a \<type\>_all_reduce.
+///
+#define HPX_REGISTER_ALLREDUCE_DECLARATION(type, name)
 
     /// \def HPX_REGISTER_ALLREDUCE(type, name)
     ///
@@ -156,6 +156,7 @@ namespace hpx { namespace lcos {
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/util/bind_back.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -165,7 +166,9 @@ namespace hpx { namespace lcos {
 #include <vector>
 
 namespace hpx { namespace lcos {
+
     namespace detail {
+
         ////////////////////////////////////////////////////////////////////////
         template <typename T>
         class all_reduce_server
