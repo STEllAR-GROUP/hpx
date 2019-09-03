@@ -68,25 +68,20 @@ void test_approximation()
 
 void test_approximation_with_multiname_options()
 {
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+    // the long_names() API function was introduced in Boost V1.68
     options_description desc;
-    desc.add_options()
-        ("foo", new untyped_value())
-        ("fee", new untyped_value())
-        ("fe,baz", new untyped_value())
-        ("chroots,all-chroots", new untyped_value())
-        ("sessions,all-sessions", new untyped_value())
-        ("everything,all", new untyped_value())
-        ("qux,fo", new untyped_value())
-        ;
+    desc.add_options()("foo", new untyped_value())("fee", new untyped_value())(
+        "fe,baz", new untyped_value())("chroots,all-chroots",
+        new untyped_value())("sessions,all-sessions", new untyped_value())(
+        "everything,all", new untyped_value())("qux,fo", new untyped_value());
 
     HPX_TEST_EQ(desc.find("fo", true).long_name(), "qux");
 
     HPX_TEST_EQ(desc.find("all", true).long_name(), "everything");
     HPX_TEST_EQ(desc.find("all-ch", true).long_name(), "chroots");
 
-#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
-    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
-    // the long_names() API function was introduced in Boost V1.68
     HPX_TEST_EQ(desc.find("foo", false, false, false).long_names().second,
         std::size_t(1));
     HPX_TEST_EQ(
@@ -197,14 +192,17 @@ void test_formatting()
 
 void test_multiname_option_formatting()
 {
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+    // the long_names() API function was introduced in Boost V1.68
     options_description desc;
-    desc.add_options()
-      ("foo,bar", new untyped_value(), "a multiple-name option")
-    ;
+    desc.add_options()(
+        "foo,bar", new untyped_value(), "a multiple-name option");
 
     stringstream ss;
     ss << desc;
     HPX_TEST_EQ(ss.str(), "  --foo arg             a multiple-name option\n");
+#endif
 }
 
 

@@ -63,6 +63,9 @@ namespace command_line {
 
     void test_many_different_options()
     {
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+        // the long_names() API function was introduced in Boost V1.68
         options_description desc;
         desc.add_options()("foo,f", new untyped_value(), "")("bar,b",
             value<std::string>(), "")("car,voiture", new untyped_value())(
@@ -100,6 +103,7 @@ namespace command_line {
         check_value(a4[4], "dog", "16");
         check_value(a4[5], "dog", "17");
         check_value(a4[6], "plug3", "10");
+#endif
     }
 
     void test_not_crashing_with_empty_string_values()
@@ -136,6 +140,9 @@ namespace command_line {
 
     void test_multitoken_and_multiname()
     {
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+        // the long_names() API function was introduced in Boost V1.68
         const char* cmdline[] = {"program", "-fone", "-b", "two", "--foo",
             "three", "four", "-zfive", "--fee", "six"};
         options_description desc;
@@ -175,10 +182,14 @@ namespace command_line {
         HPX_TEST_EQ(parsed_options[2].value[1], "four");
         check_value(parsed_options[3], "fizbaz", "five");
         check_value(parsed_options[4], "foo", "six");
+#endif
     }
 
     void test_multitoken_vector_option()
     {
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+        // the long_names() API function was introduced in Boost V1.68
         options_description desc4("");
         desc4.add_options()("multitoken,multi-token,m",
             value<std::vector<std::string>>()->multitoken(),
@@ -202,6 +213,7 @@ namespace command_line {
         HPX_TEST_EQ(a6[1].string_key, "file");
         HPX_TEST(a6[1].value.size() == 1);
         HPX_TEST_EQ(a6[1].value[0], "some_file");
+#endif
     }
 
 }    // namespace command_line
@@ -218,11 +230,15 @@ void test_command_line()
 
 void test_config_file(const char* config_file)
 {
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+    // the long_names() API function was introduced in Boost V1.68
     options_description desc;
     desc.add_options()("gv1", new untyped_value)("gv2", new untyped_value)(
-        "empty_value", new untyped_value)("plug*", new untyped_value)(
-        "m1.v1", new untyped_value)("m1.v2", new untyped_value)(
-        "m1.v3,alias3", new untyped_value)("b", bool_switch());
+            "empty_value", new untyped_value)("plug*", new untyped_value)(
+            "m1.v1", new untyped_value)(
+            "m1.v2", new untyped_value) desc.add_options()("m1.v3,alias3",
+        new untyped_value)("b", bool_switch());
 
     const char content1[] = " gv1 = 0#asd\n"
                             "empty_value = \n"
@@ -255,6 +271,7 @@ void test_config_file(const char* config_file)
     check_value(a2[4], "m1.v1", "1");
     check_value(a2[5], "m1.v2", "2");
     check_value(a2[6], "m1.v3", "3");
+#endif
 }
 
 void test_environment()

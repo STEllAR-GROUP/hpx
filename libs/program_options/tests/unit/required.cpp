@@ -95,6 +95,9 @@ void simple_required_test(const char* config_file)
 
 void multiname_required_test()
 {
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+    // the long_names() API function was introduced in Boost V1.68
     options_description opts;
     opts.add_options()("foo,bar", value<string>()->required(), "the foo");
 
@@ -117,6 +120,7 @@ void multiname_required_test()
         }
         HPX_TEST(!thrown);
     }
+#endif
 }
 
 constexpr char const* const config_file = "required_test.cfg";
