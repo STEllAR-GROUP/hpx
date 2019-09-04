@@ -46,16 +46,16 @@ namespace hpx { namespace program_options {
 
     // Take a command line string and splits in into tokens, according
     // to the given collection of separators chars.
-    HPX_EXPORT std::vector<std::string> split_unix(
-        const std::string& cmdline, const std::string& seperator,
-        const std::string& quote, const std::string& escape)
+    HPX_EXPORT std::vector<std::string> split_unix(const std::string& cmdline,
+        const std::string& seperator, const std::string& quote,
+        const std::string& escape)
     {
         return detail::split_unix<char>(cmdline, seperator, quote, escape);
     }
 
-    HPX_EXPORT std::vector<std::wstring> split_unix(
-        const std::wstring& cmdline, const std::wstring& seperator,
-        const std::wstring& quote, const std::wstring& escape)
+    HPX_EXPORT std::vector<std::wstring> split_unix(const std::wstring& cmdline,
+        const std::wstring& seperator, const std::wstring& quote,
+        const std::wstring& escape)
     {
         return detail::split_unix<wchar_t>(cmdline, seperator, quote, escape);
     }

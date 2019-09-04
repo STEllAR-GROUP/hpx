@@ -173,11 +173,13 @@ void split_defaults(const options_description& description)
 int main(int /*ac*/, char** /*av*/)
 {
     options_description desc;
+    // clang-format off
     desc.add_options()
         ("input,i", value<string>(),"the input file")
         ("optimization,O", value<unsigned>(), "optimization level")
         ("opt,o", value<string>(), "misc option")
         ;
+    // clang-format on
 
     split_whitespace(desc);
     split_equalsign(desc);

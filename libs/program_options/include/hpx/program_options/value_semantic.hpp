@@ -20,22 +20,22 @@ namespace hpx { namespace program_options {
     using value_semantic_codecvt_helper =
         boost::program_options::value_semantic_codecvt_helper<Char>;
 
-    using boost::program_options::untyped_value;
     using boost::program_options::typed_value_base;
+    using boost::program_options::untyped_value;
 
     template <typename T, typename Char = char>
     using typed_value = boost::program_options::typed_value<T, Char>;
 
+    using boost::program_options::bool_switch;
     using boost::program_options::value;
     using boost::program_options::wvalue;
-    using boost::program_options::bool_switch;
 
     using boost::program_options::arg;
 
     namespace validators {
 
-        using boost::program_options::validators::get_single_string;
         using boost::program_options::validators::check_first_occurrence;
+        using boost::program_options::validators::get_single_string;
 
     }    // namespace validators
 

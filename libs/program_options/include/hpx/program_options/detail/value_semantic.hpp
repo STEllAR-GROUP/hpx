@@ -22,9 +22,9 @@ namespace hpx { namespace program_options {
 
     namespace validators {
 
-        using boost::program_options::validators::get_single_string;
         using boost::program_options::validators::check_first_occurrence;
-    }
+        using boost::program_options::validators::get_single_string;
+    }    // namespace validators
 
     using namespace validators;
 

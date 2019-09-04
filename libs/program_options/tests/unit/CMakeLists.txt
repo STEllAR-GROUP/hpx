@@ -34,6 +34,7 @@ foreach(test ${tests})
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
+                     EXCLUDE_FROM_ALL
                      FOLDER ${folder_name})
 
   add_hpx_unit_test("modules.program_options" ${test} ${${test}_PARAMETERS})

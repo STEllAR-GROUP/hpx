@@ -65,7 +65,7 @@ namespace hpx { namespace program_options {
     private:
         char** m_environment;
     };
-}}    // namespace hpx::util
+}}    // namespace hpx::program_options
 
 #endif
 #endif

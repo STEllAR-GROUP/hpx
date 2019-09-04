@@ -17,15 +17,16 @@
 // hpxinspect:nodeprecatedname:boost::optional
 // hpxinspect:nodeprecatedinclude:boost/program_options/config.hpp
 
-#include <boost/program_options/config.hpp>
 #include <boost/any.hpp>
 #include <boost/optional.hpp>
+#include <boost/program_options/config.hpp>
 
 namespace hpx { namespace program_options {
 
     using any = boost::any;
     using boost::any_cast;
-    template <typename T> using optional = boost::optional<T>;
+    template <typename T>
+    using optional = boost::optional<T>;
 
 #define PROGRAM_OPTIONS_DEPRECATED_MESSAGE                                     \
     "The Boost.ProgramOptions was replaced by an equivalent "                  \
@@ -35,7 +36,7 @@ namespace hpx { namespace program_options {
     "to #include <hpx/program_options/*> and the related types to the "        \
     "namespace hpx::program_options."
 
-}}
+}}    // namespace hpx::program_options
 #else
 #include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/optional.hpp>
@@ -44,9 +45,9 @@ namespace hpx { namespace program_options {
 
     using any = hpx::util::any_nonser;
     using hpx::util::any_cast;
-    template <typename T> using optional = hpx::util::optional<T>;
-}}
+    template <typename T>
+    using optional = hpx::util::optional<T>;
+}}    // namespace hpx::program_options
 #endif
 
-#endif // PROGRAM_OPTIONS_CONFIG_HK_2004_01_11
-
+#endif    // PROGRAM_OPTIONS_CONFIG_HK_2004_01_11

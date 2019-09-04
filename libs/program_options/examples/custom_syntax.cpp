@@ -44,10 +44,12 @@ int main(int ac, char* av[])
     try
     {
         options_description desc("Allowed options");
+        // clang-format off
         desc.add_options()
             ("help","produce a help message")
             ("foo", value<string>(), "just an option")
             ;
+        // clang-format on
 
         variables_map vm;
         store(command_line_parser(ac, av)

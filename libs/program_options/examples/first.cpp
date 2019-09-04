@@ -16,12 +16,15 @@ using namespace std;
 
 int main(int ac, char* av[])
 {
-    try {
+    try
+    {
         po::options_description desc("Allowed options");
+        // clang-format off
         desc.add_options()
             ("help", "produce help message")
             ("compression", po::value<double>(), "set compression level")
         ;
+        // clang-format on
 
         po::variables_map vm;
         po::store(po::parse_command_line(ac, av, desc), vm);
