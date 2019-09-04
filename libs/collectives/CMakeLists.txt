@@ -18,6 +18,7 @@ set(collectives_headers
   hpx/collectives/gather.hpp
   hpx/collectives/latch.hpp
   hpx/collectives/reduce.hpp
+  hpx/collectives/spmd_block.hpp
   hpx/collectives/detail/barrier_node.hpp
   hpx/collectives/detail/latch.hpp
 )
@@ -30,6 +31,7 @@ set(collectives_compat_headers
   hpx/lcos/gather.hpp
   hpx/lcos/latch.hpp
   hpx/lcos/reduce.hpp
+  hpx/lcos/spmd_block.hpp
 )
 
 # Default location is $HPX_ROOT/libs/collectives/src
@@ -56,9 +58,11 @@ add_hpx_module(collectives
       hpx_cache
       hpx_concurrency
       hpx_config
+      hpx_datastructures
       hpx_errors
       hpx_format
       hpx_functional
+      hpx_hashing
       hpx_iterator_support
       hpx_logging
       hpx_parallel_executors
