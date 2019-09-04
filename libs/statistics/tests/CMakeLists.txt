@@ -11,7 +11,7 @@ if (NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
   return()
 endif()
 if (NOT HPX_STATISTICS_WITH_TESTS)
-  hpxInfo("    Tests for statistics disabled")
+  hpx_info("    Tests for statistics disabled")
   return()
 endif()
 
