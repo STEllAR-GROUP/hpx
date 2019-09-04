@@ -18,11 +18,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/HPXMacros.cmake")
 
 get_filename_component(_hpx_root_dir "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
 
-set(HPX_INCLUDE_DIRS "@HPX_CMAKE_CONF_INCLUDE_DIRS@")
-
-set(HPX_LIBRARIES "@HPX_CONF_LIBRARIES@")
-set(HPX_LIBRARY_DIR "@HPX_CONF_LIBRARY_DIR@")
-
 set(HPX_VERSION_STRING "@HPX_VERSION@")
 set(HPX_VERSION_MAJOR @HPX_VERSION_MAJOR@)
 set(HPX_VERSION_MINOR @HPX_VERSION_MINOR@)
@@ -81,8 +76,6 @@ if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
 
-set(HPX_LINK_LIBRARIES "@HPX_LINK_LIBRARIES@")
-
 enable_language(C)
 
 hpx_check_compiler_compatibility()
@@ -119,10 +112,4 @@ if(HPX_WITH_CUDA)
     else()
       set(CUDA_LINK_LIBRARIES_KEYWORD PUBLIC)
     endif()
-    cuda_include_directories("@HPX_CMAKE_CONF_INCLUDE_DIRS@")
-endif()
-
-# Add HPX linker flag to CMAKE_EXE_LINKER_FLAGS
-if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
-    set(HPX_LINKER_FLAGS "@HPX_LINKER_FLAGS@")
 endif()
