@@ -140,6 +140,12 @@ function(add_hpx_module name)
       )
   endif()
 
+  set(config_header
+    "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}/config/defines.hpp")
+  write_config_defines_file(
+    NAMESPACE ${name_upper}
+    FILENAME ${config_header})
+
   foreach(header_file ${headers})
     hpx_debug(${header_file})
   endforeach(header_file)
@@ -147,7 +153,7 @@ function(add_hpx_module name)
   add_library(hpx_${name} STATIC
     ${sources} ${force_linking_source}
     ${headers} ${global_header} ${compat_headers}
-    ${force_linking_header})
+    ${force_linking_header} ${config_header})
 
   target_link_libraries(hpx_${name} PUBLIC ${${name}_DEPENDENCIES})
   target_include_directories(hpx_${name} PUBLIC
@@ -165,6 +171,12 @@ function(add_hpx_module name)
     $<$<CONFIG:Debug>:DEBUG>
     $<$<CONFIG:Debug>:_DEBUG>
     HPX_MODULE_EXPORTS
+  )
+
+  # This is a temporary solution until all of HPX has been modularized as it
+  # enables using header files from HPX for compiling this module.
+  target_include_directories(hpx_${name} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
   )
 
   add_hpx_source_group(
@@ -204,6 +216,11 @@ function(add_hpx_module name)
       CLASS "Generated Files"
       TARGETS ${force_linking_source})
   endif()
+  add_hpx_source_group(
+    NAME hpx_{name}
+    ROOT ${CMAKE_CURRENT_BINARY_DIR}/include/hpx
+    CLASS "Generated Files"
+    TARGETS ${config_header})
 
   set_target_properties(hpx_${name} PROPERTIES
     FOLDER "Core/Modules"
@@ -236,14 +253,10 @@ function(add_hpx_module name)
       COMPONENT ${name})
   endif()
 
-  write_config_defines_file(
-    NAMESPACE ${name_upper}
-    FILENAME "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}/config/defines.hpp")
-
   # Installing the generated header files from the build dir
   install(
     DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/hpx
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT ${name}
   )
 

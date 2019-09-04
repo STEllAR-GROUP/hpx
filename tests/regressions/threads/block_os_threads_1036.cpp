@@ -12,7 +12,7 @@
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -117,7 +117,7 @@ int main(
   , char* argv[]
     )
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     // Configure application-specific options.
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");

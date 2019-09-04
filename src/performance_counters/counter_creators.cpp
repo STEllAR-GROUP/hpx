@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>

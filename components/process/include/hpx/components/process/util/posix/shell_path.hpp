@@ -15,14 +15,13 @@
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/export_definitions.hpp>
-#include <hpx/exception_fwd.hpp>
-
-#include <boost/filesystem/path.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/filesystem.hpp>
 
 namespace hpx { namespace components { namespace process { namespace posix
 {
-    HPX_PROCESS_EXPORT boost::filesystem::path shell_path();
-    HPX_PROCESS_EXPORT boost::filesystem::path shell_path(hpx::error_code &ec);
+    HPX_PROCESS_EXPORT filesystem::path shell_path();
+    HPX_PROCESS_EXPORT filesystem::path shell_path(hpx::error_code &ec);
 }}}}
 
 #endif

@@ -8,7 +8,7 @@
 #define HPX_PARCELSET_DETAIL_PARCEL_ROUTE_HANDLER_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 
 namespace hpx { namespace parcelset { namespace detail

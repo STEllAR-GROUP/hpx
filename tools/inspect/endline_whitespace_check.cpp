@@ -6,7 +6,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+#include <hpx/filesystem.hpp>
 
 #include "endline_whitespace_check.hpp"
 #include "function_hyper.hpp"
@@ -16,11 +17,10 @@
 #include <boost/foreach.hpp>
 #include <boost/tokenizer.hpp>
 #include "boost/regex.hpp"
-#include "boost/filesystem/operations.hpp"
 
 
 using namespace std;
-namespace fs = boost::filesystem;
+namespace fs = hpx::filesystem;
 
 namespace boost
 {

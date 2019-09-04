@@ -15,8 +15,9 @@
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
+#include <hpx/filesystem.hpp>
 #include <hpx/runtime/serialization/string.hpp>
-#include <boost/filesystem.hpp>
+
 #include <string>
 
 namespace hpx { namespace components { namespace process { namespace windows {
@@ -59,7 +60,7 @@ inline run_exe_<std::wstring> run_exe(const std::wstring &ws)
     return run_exe_<std::wstring>(ws);
 }
 
-inline run_exe_<std::wstring> run_exe(const boost::filesystem::path &p)
+inline run_exe_<std::wstring> run_exe(const filesystem::path &p)
 {
     return run_exe_<std::wstring>(p.wstring());
 }
@@ -74,7 +75,7 @@ inline run_exe_<std::string> run_exe(const std::string &s)
     return run_exe_<std::string>(s);
 }
 
-inline run_exe_<std::string> run_exe(const boost::filesystem::path &p)
+inline run_exe_<std::string> run_exe(const filesystem::path &p)
 {
     return run_exe_<std::string>(p.string());
 }

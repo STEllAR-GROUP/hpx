@@ -16,18 +16,26 @@ set(HPX_LIBS
   cache
   collectives
   concepts
+  concurrency
   config
   datastructures
+  errors
+  filesystem
   format
   hardware
   hashing
   iterator_support
   logging
+  parallel_executors
   preprocessor
+  program_options
+  resiliency
+  segmented_algorithms
   statistics
   testing
   thread_support
   timing
+  topology
   type_support
   util
   CACHE INTERNAL "list of HPX modules" FORCE
@@ -77,8 +85,7 @@ foreach(lib ${HPX_LIBS})
   add_subdirectory(${lib})
 
   set(MODULE_FORCE_LINKING_INCLUDES
-    "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>
-")
+    "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\n")
 
   set(MODULE_FORCE_LINKING_CALLS
     "${MODULE_FORCE_LINKING_CALLS}\n        ${lib}::force_linking();")

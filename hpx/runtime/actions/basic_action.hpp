@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/sync_fwd.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/preprocessor/cat.hpp>
@@ -46,7 +46,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <hpx/util/itt_notify.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #endif
 
 #include <boost/utility/string_ref.hpp>
@@ -558,14 +558,18 @@ namespace hpx { namespace actions
     template <typename TF, TF F, typename Derived = detail::this_type,
         typename Direct = std::false_type>
     struct make_action
+#if defined(HPX_HAVE_ACTION_BASE_COMPATIBILITY)
       : action<TF, F, Derived>
+#endif
     {
         typedef action<TF, F, Derived> type;
     };
 
     template <typename TF, TF F, typename Derived>
     struct make_action<TF, F, Derived, std::true_type>
+#if defined(HPX_HAVE_ACTION_BASE_COMPATIBILITY)
       : direct_action<TF, F, Derived>
+#endif
     {
         typedef direct_action<TF, F, Derived> type;
     };

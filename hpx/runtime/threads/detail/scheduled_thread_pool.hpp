@@ -9,12 +9,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/concurrency/barrier.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
+#include <hpx/runtime/threads/detail/network_background_callback.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/util/barrier.hpp>
+#include <hpx/util/function.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -43,10 +46,7 @@ namespace hpx { namespace threads { namespace detail
     public:
         ///////////////////////////////////////////////////////////////////
         scheduled_thread_pool(std::unique_ptr<Scheduler> sched,
-            threads::policies::callback_notifier& notifier, std::size_t index,
-            std::string const& pool_name, policies::scheduler_mode m =
-                policies::scheduler_mode::nothing_special,
-            std::size_t thread_offset = 0);
+            thread_pool_init_parameters const& init);
         virtual ~scheduled_thread_pool();
 
         void print_pool(std::ostream& os) override;
@@ -160,15 +160,13 @@ namespace hpx { namespace threads { namespace detail
         void stop(
             std::unique_lock<std::mutex>& l, bool blocking = true) override;
 
-        hpx::future<void> suspend() override;
-        void suspend_cb(std::function<void(void)> callback,
-            error_code& ec = throws) override;
         void suspend_direct(error_code& ec = throws) override;
-
-        hpx::future<void> resume() override;
-        void resume_cb(std::function<void(void)> callback,
-            error_code& ec = throws) override;
         void resume_direct(error_code& ec = throws) override;
+
+        void suspend_processing_unit_direct(std::size_t virt_core,
+            error_code& = hpx::throws) override;
+        void resume_processing_unit_direct(std::size_t virt_core,
+            error_code& = hpx::throws) override;
 
         ///////////////////////////////////////////////////////////////////
         std::thread& get_os_thread_handle(
@@ -321,16 +319,6 @@ namespace hpx { namespace threads { namespace detail
         void remove_processing_unit(
             std::size_t virt_core, error_code& = hpx::throws) override;
 
-        // Suspend the given processing unit on the scheduler.
-        hpx::future<void> suspend_processing_unit(std::size_t virt_core) override;
-        void suspend_processing_unit_cb(std::function<void(void)> callback,
-            std::size_t virt_core, error_code& = hpx::throws) override;
-
-        // Resume the given processing unit on the scheduler.
-        hpx::future<void> resume_processing_unit(std::size_t virt_core) override;
-        void resume_processing_unit_cb(std::function<void(void)> callback,
-            std::size_t virt_core, error_code& = hpx::throws) override;
-
     protected:
         friend struct init_tss_helper<Scheduler>;
 
@@ -342,11 +330,6 @@ namespace hpx { namespace threads { namespace detail
         void add_processing_unit_internal(std::size_t virt_core,
             std::size_t thread_num, std::shared_ptr<util::barrier> startup,
             error_code& ec = hpx::throws);
-
-        void suspend_processing_unit_internal(std::size_t virt_core,
-            error_code& = hpx::throws);
-        void resume_processing_unit_internal(std::size_t virt_core,
-            error_code& = hpx::throws);
 
     private:
         std::vector<std::thread> threads_;           // vector of OS-threads
@@ -443,6 +426,11 @@ namespace hpx { namespace threads { namespace detail
         // support detail::manage_executor interface
         std::atomic<long> thread_count_;
         std::atomic<std::int64_t> tasks_scheduled_;
+        network_background_callback_type network_background_callback_;
+
+        std::size_t max_background_threads_;
+        std::size_t max_idle_loop_count_;
+        std::size_t max_busy_loop_count_;
     };
 }}}    // namespace hpx::threads::detail
 

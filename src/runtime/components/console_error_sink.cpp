@@ -8,7 +8,7 @@
 #include <hpx/async.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime/applier/apply.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>

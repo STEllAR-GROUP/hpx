@@ -10,10 +10,10 @@
 #include <hpx/parallel/executors.hpp>
 //
 #include <hpx/runtime/resource/partitioner.hpp>
-#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
 #include <hpx/runtime/threads/executors/guided_pool_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 //
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/runtime.hpp>
@@ -32,8 +32,6 @@
 // Example binder functions for different page binding mappings
 #include "allocator_binder_linear.hpp"
 #include "allocator_binder_matrix.hpp"
-// Scheduler that honours numa placement hints for tasks
-#include "examples/resource_partitioner/shared_priority_queue_scheduler.hpp"
 
 // ------------------------------------------------------------------------
 // allocator maker for this test
@@ -160,7 +158,7 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator& allocator)
 // ------------------------------------------------------------------------
 // this is called on an hpx thread after the runtime starts up
 // ------------------------------------------------------------------------
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     int Nc = vm["size"].as<int>();
     int Nr = vm["size"].as<int>();
@@ -205,7 +203,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 // scheduler type needed for numa bound tasks
 // ------------------------------------------------------------------------
 using high_priority_sched =
-    hpx::threads::policies::example::shared_priority_queue_scheduler<>;
+    hpx::threads::policies::shared_priority_queue_scheduler<>;
 using hpx::threads::policies::scheduler_mode;
 
 // the normal int main function that is called at startup and runs on an OS thread
@@ -213,23 +211,23 @@ using hpx::threads::policies::scheduler_mode;
 // on an hpx thread
 int main(int argc, char* argv[])
 {
-    boost::program_options::options_description desc_cmdline("Test options");
+    hpx::program_options::options_description desc_cmdline("Test options");
     // clang-format off
     desc_cmdline.add_options()
         ("size,n",
-         boost::program_options::value<int>()->default_value(1024),
+         hpx::program_options::value<int>()->default_value(1024),
          "Matrix size.")
         ("tiles-per-domain,t",
-         boost::program_options::value<int>()->default_value(1),
+         hpx::program_options::value<int>()->default_value(1),
         "Number of Tiles per numa domain.")
         ("nb",
-         boost::program_options::value<int>()->default_value(128),
+         hpx::program_options::value<int>()->default_value(128),
         "Block cyclic distribution size.")
         ("row-proc,p",
-         boost::program_options::value<int>()->default_value(1),
+         hpx::program_options::value<int>()->default_value(1),
         "Number of row processes in the 2D communicator.")
         ("col-proc,q",
-         boost::program_options::value<int>()->default_value(1),
+         hpx::program_options::value<int>()->default_value(1),
         "Number of column processes in the 2D communicator.")
         ("no-check",
          "Disable result checking")
@@ -238,9 +236,9 @@ int main(int argc, char* argv[])
 
     // HPX uses a boost program options variable map, but we need it before
     // hpx-main, so we will create another one here and throw it away after use
-    boost::program_options::variables_map vm;
-    boost::program_options::store(
-        boost::program_options::command_line_parser(argc, argv)
+    hpx::program_options::variables_map vm;
+    hpx::program_options::store(
+        hpx::program_options::command_line_parser(argc, argv)
             .allow_unregistered()
             .options(desc_cmdline)
             .run(),
@@ -250,25 +248,28 @@ int main(int argc, char* argv[])
     hpx::resource::partitioner rp(desc_cmdline, argc, argv);
 
     using numa_scheduler =
-        hpx::threads::policies::example::shared_priority_queue_scheduler<>;
+        hpx::threads::policies::shared_priority_queue_scheduler<>;
     using hpx::threads::policies::scheduler_mode;
     // setup the default pool with a numa aware scheduler
     rp.create_thread_pool("default",
-        [](hpx::threads::policies::callback_notifier& notifier,
-            std::size_t num_threads, std::size_t thread_offset,
-            std::size_t pool_index, std::string const& pool_name)
+        [](hpx::threads::thread_pool_init_parameters init,
+            hpx::threads::policies::thread_queue_init_parameters
+                thread_queue_init)
             -> std::unique_ptr<hpx::threads::thread_pool_base> {
-            std::unique_ptr<numa_scheduler> scheduler(new numa_scheduler(
-                num_threads, {2, 3, 64}, "shared-priority-scheduler"));
+            numa_scheduler::init_parameter_type scheduler_init(
+                init.num_threads_, {2, 3, 64}, init.affinity_data_,
+                thread_queue_init, "shared-priority-scheduler");
+            std::unique_ptr<numa_scheduler> scheduler(
+                new numa_scheduler(scheduler_init));
 
             scheduler_mode mode =
                 scheduler_mode(scheduler_mode::do_background_work |
                     scheduler_mode::delay_exit);
+            init.mode_ = mode;
 
             std::unique_ptr<hpx::threads::thread_pool_base> pool(
                 new hpx::threads::detail::scheduled_thread_pool<
-                    high_priority_sched>(std::move(scheduler), notifier,
-                    pool_index, pool_name, mode, thread_offset));
+                    high_priority_sched>(std::move(scheduler), init));
             return pool;
         });
 

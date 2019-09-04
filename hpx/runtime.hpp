@@ -19,7 +19,7 @@
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/thread_hooks.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/runtime_configuration.hpp>

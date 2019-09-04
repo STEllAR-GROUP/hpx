@@ -15,14 +15,14 @@
 #include <hpx/runtime/threads/detail/combined_tagged_state.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 
 #include <hpx/assertion.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/util/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
@@ -266,11 +266,7 @@ namespace hpx { namespace threads
         /// Return the id of the component this thread is running in
         naming::address_type get_component_id() const
         {
-#ifndef HPX_HAVE_THREAD_TARGET_ADDRESS
             return 0;
-#else
-            return component_id_;
-#endif
         }
 
 #ifndef HPX_HAVE_THREAD_DESCRIPTION
@@ -572,9 +568,6 @@ namespace hpx { namespace threads
         thread_data(thread_init_data& init_data,
             void* queue, thread_state_enum newstate)
           : current_state_(thread_state(newstate, wait_signaled)),
-#ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
-            component_id_(init_data.lva),
-#endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             description_(init_data.description),
             lco_description_(),
@@ -631,9 +624,6 @@ namespace hpx { namespace threads
 
             current_state_.store(thread_state(newstate, wait_signaled));
 
-#ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
-            component_id_ = init_data.lva;
-#endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             description_ = (init_data.description);
             lco_description_ = util::thread_description();
@@ -684,10 +674,6 @@ namespace hpx { namespace threads
 
         ///////////////////////////////////////////////////////////////////////
         // Debugging/logging information
-#ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
-        naming::address_type component_id_;
-#endif
-
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
         util::thread_description description_;
         util::thread_description lco_description_;

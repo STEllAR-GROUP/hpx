@@ -14,9 +14,9 @@
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors/throw_exception.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
@@ -187,18 +187,6 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             default_shared_priority_queue_scheduler_terminated_queue>
     class shared_priority_queue_scheduler : public scheduler_base
     {
-    protected:
-        // The maximum number of active threads this thread manager should
-        // create. This number will be a constraint only as long as the work
-        // items queue is not empty. Otherwise the number of active threads
-        // will be incremented in steps equal to the \a min_add_new_count
-        // specified above.
-        // FIXME: this is specified both here, and in thread_queue.
-        enum
-        {
-            max_thread_count = 1000
-        };
-
     public:
         typedef std::false_type has_periodic_maintenance;
 
@@ -206,23 +194,55 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             TerminatedQueuing>
             thread_queue_type;
 
-        shared_priority_queue_scheduler(
-            std::size_t num_worker_threads,
-            core_ratios cores_per_queue,
-            char const* description,
-            int max_tasks = max_thread_count)
-          : scheduler_base(num_worker_threads, description)
-          , cores_per_queue_(cores_per_queue)
-          , max_queue_thread_count_(max_tasks)
-          , num_workers_(num_worker_threads)
+        struct init_parameter
+        {
+            init_parameter(std::size_t num_worker_threads,
+                core_ratios cores_per_queue,
+                detail::affinity_data const& affinity_data,
+                thread_queue_init_parameters thread_queue_init = {},
+                char const* description = "shared_priority_queue_scheduler")
+              : num_worker_threads_(num_worker_threads)
+              , cores_per_queue_(cores_per_queue)
+              , thread_queue_init_(thread_queue_init)
+              , affinity_data_(affinity_data)
+              , description_(description)
+            {
+            }
+
+            init_parameter(std::size_t num_worker_threads,
+                core_ratios cores_per_queue,
+                detail::affinity_data const& affinity_data,
+                char const* description)
+              : num_worker_threads_(num_worker_threads)
+              , cores_per_queue_(cores_per_queue)
+              , thread_queue_init_()
+              , affinity_data_(affinity_data)
+              , description_(description)
+            {
+            }
+
+            std::size_t num_worker_threads_;
+            core_ratios cores_per_queue_;
+            thread_queue_init_parameters thread_queue_init_;
+            detail::affinity_data const& affinity_data_;
+            char const* description_;
+        };
+        typedef init_parameter init_parameter_type;
+
+        explicit shared_priority_queue_scheduler(init_parameter const& init)
+          : scheduler_base(init.num_worker_threads_, init.description_,
+                init.thread_queue_init_)
+          , cores_per_queue_(init.cores_per_queue_)
+          , num_workers_(init.num_worker_threads_)
           , num_domains_(1)
+          , affinity_data_(init.affinity_data_)
           , initialized_(false)
         {
             LOG_CUSTOM_MSG(
                 "Constructing shared_priority_queue_scheduler with num threads "
                 << decnumber(num_worker_threads));
             //
-            HPX_ASSERT(num_worker_threads != 0);
+            HPX_ASSERT(num_workers_ != 0);
         }
 
         virtual ~shared_priority_queue_scheduler()
@@ -1414,7 +1434,7 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                         q_counts_[i] / cores_per_queue_.high_priority,
                         std::size_t(1));
                     hp_queues_[i].init(
-                        q_counts_[i], queues, max_queue_thread_count_);
+                        q_counts_[i], queues, thread_queue_init_);
                     LOG_CUSTOM_MSG2("Created HP queue for numa " << i
                                     << " cores " << q_counts_[i]
                                     << " queues " << queues);
@@ -1422,7 +1442,7 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                     queues = (std::max)(q_counts_[i] / cores_per_queue_.normal_priority,
                         std::size_t(1));
                     np_queues_[i].init(
-                        q_counts_[i], queues, max_queue_thread_count_);
+                        q_counts_[i], queues, thread_queue_init_);
                     LOG_CUSTOM_MSG2("Created NP queue for numa " << i
                                     << " cores " << q_counts_[i]
                                     << " queues " << queues);
@@ -1430,7 +1450,7 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                     queues = (std::max)(q_counts_[i] / cores_per_queue_.low_priority,
                         std::size_t(1));
                     lp_queues_[i].init(
-                        q_counts_[i], queues, max_queue_thread_count_);
+                        q_counts_[i], queues, thread_queue_init_);
                     LOG_CUSTOM_MSG2("Created LP queue for numa " << i
                                     << " cores " << q_counts_[i]
                                     << " queues " << queues);
@@ -1550,14 +1570,13 @@ namespace hpx { namespace threads { namespace policies { namespace example {
         // number of cores per queue for HP, NP, LP queues
         core_ratios cores_per_queue_;
 
-        // max storage size of any queue
-        std::size_t max_queue_thread_count_;
-
         // number of worker threads assigned to this pool
         std::size_t num_workers_;
 
         // number of numa domains that the threads are occupying
         std::size_t num_domains_;
+
+        detail::affinity_data const& affinity_data_;
 
         // used to make sure the scheduler is only initialized once on a thread
         bool initialized_;

@@ -12,7 +12,7 @@
 #include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/runtime/serialization/container.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/serialization_access_data.hpp>
 
 #include <cstddef> // for size_t

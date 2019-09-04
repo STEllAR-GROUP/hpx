@@ -21,14 +21,14 @@ namespace std
 #endif
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/any.hpp>
+#include <hpx/util/serializable_any.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include "small_big_object.hpp"
 
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
 
 using hpx::util::basic_any;
 

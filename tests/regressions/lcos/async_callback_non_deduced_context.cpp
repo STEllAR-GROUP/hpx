@@ -51,7 +51,7 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    boost::program_options::options_description cmdline(
+    hpx::program_options::options_description cmdline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX

@@ -23,7 +23,7 @@ void wait_for_latch(hpx::lcos::local::latch& l)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     num_threads = vm["num-threads"].as<std::ptrdiff_t>();
 
@@ -43,8 +43,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using boost::program_options::options_description;
-    using boost::program_options::value;
+    using hpx::program_options::options_description;
+    using hpx::program_options::value;
 
     // Configure application-specific options
     options_description

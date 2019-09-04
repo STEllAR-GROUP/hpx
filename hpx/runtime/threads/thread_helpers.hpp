@@ -10,7 +10,8 @@
 #define HPX_RUNTIME_THREADS_THREAD_HELPERS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util_fwd.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/util/register_locks.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <atomic>
@@ -496,6 +496,9 @@ namespace hpx { namespace threads
     /// Remove the given flags from the scheduler mode
     HPX_API_EXPORT void remove_scheduler_mode(
         threads::policies::scheduler_mode to_remove);
+
+    /// Get the global topology instance
+    HPX_API_EXPORT topology const& get_topology();
     /// \endcond
 }}
 
@@ -963,9 +966,9 @@ namespace hpx { namespace applier
     /// \throws invalid_status if the runtime system has not been started yet.
     ///
     HPX_API_EXPORT void register_work_plain(
-        threads::thread_function_type && func,
-        util::thread_description const& description = util::thread_description(),
-        std::uint64_t /*naming::address_type*/ lva = 0,
+        threads::thread_function_type&& func,
+        util::thread_description const& description =
+            util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
         threads::thread_schedule_hint = threads::thread_schedule_hint(),
@@ -1012,9 +1015,8 @@ namespace hpx { namespace applier
         threads::thread_function_type thread_func(
             detail::thread_function<typename std::decay<F>::type>{
                 std::forward<F>(func)});
-        return register_work_plain(std::move(thread_func),
-            description, 0, initial_state, priority, os_thread, stacksize,
-            ec);
+        return register_work_plain(std::move(thread_func), description,
+            initial_state, priority, os_thread, stacksize, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1042,9 +1044,8 @@ namespace hpx { namespace applier
         threads::thread_function_type thread_func(
             detail::thread_function_nullary<typename std::decay<F>::type>{
                 std::forward<F>(func)});
-        return register_work_plain(std::move(thread_func),
-            description, 0, initial_state, priority, os_thread, stacksize,
-            ec);
+        return register_work_plain(std::move(thread_func), description,
+            initial_state, priority, os_thread, stacksize, ec);
     }
 }}
 

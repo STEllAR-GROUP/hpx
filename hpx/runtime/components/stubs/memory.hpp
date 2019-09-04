@@ -7,7 +7,7 @@
 #define HPX_COMPONENTS_STUBS_MEMORY_MAR_06_2014_0831PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/launch_policy.hpp>

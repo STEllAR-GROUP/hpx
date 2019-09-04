@@ -8,6 +8,7 @@
 #define HPX_UTIL_RUNTIME_CONFIGURATION_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/filesystem.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
@@ -15,8 +16,6 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/plugin/dll.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
-
-#include <boost/filesystem.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -159,14 +158,14 @@ namespace hpx { namespace util
             std::string const& component_base_paths,
             std::string const& component_path_suffixes,
             std::set<std::string>& component_paths,
-            std::map<std::string, boost::filesystem::path>& basenames);
+            std::map<std::string, filesystem::path>& basenames);
 
         void load_component_path(
             std::vector<std::shared_ptr<plugins::plugin_registry_base>>&
                 plugin_registries,
             std::string const& path,
             std::set<std::string>& component_paths,
-            std::map<std::string, boost::filesystem::path>& basenames);
+            std::map<std::string, filesystem::path>& basenames);
 
     public:
         runtime_mode mode_;

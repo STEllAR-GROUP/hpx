@@ -31,7 +31,7 @@ template <typename T>
 struct data_buffer
 {
     data_buffer() : flag_(false) {}
-    data_buffer(std::size_t size) : data_(size, 0), flag_(false) {}
+    explicit data_buffer(std::size_t size) : data_(size, 0), flag_(false) {}
 
     std::vector<T> data_;
     bool flag_;
@@ -350,7 +350,7 @@ void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t size = 1;
     for (std::size_t i = 0; i != 20; ++i) {

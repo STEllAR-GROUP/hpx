@@ -74,6 +74,7 @@ namespace hpx { namespace util
              && traits::is_invocable_r<R, F&, Ts...>::value
             >::type>
         function_ref(F&& f)
+          : object(nullptr)
         {
             assign(std::forward<F>(f));
         }

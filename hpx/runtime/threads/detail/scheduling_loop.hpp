@@ -8,14 +8,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_thread_name.hpp>
-#include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/state.hpp>
 #include <hpx/hardware/timestamp.hpp>
-#include <hpx/util/itt_notify.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/unique_function.hpp>
 
@@ -361,29 +359,19 @@ namespace hpx { namespace threads { namespace detail
         typedef util::unique_function_nonser<void()> callback_type;
         typedef util::unique_function_nonser<bool()> background_callback_type;
 
-        explicit scheduling_callbacks(
-                callback_type && outer,
-                callback_type && inner = callback_type(),
-                background_callback_type && background =
-                    background_callback_type(),
-                std::size_t max_background_threads =
-                    hpx::util::safe_lexical_cast<std::size_t>(
-                        hpx::get_config_entry("hpx.max_background_threads",
-                            (std::numeric_limits<std::size_t>::max)())),
-                std::size_t max_idle_loop_count =
-                    hpx::util::safe_lexical_cast<std::int64_t>(
-                        hpx::get_config_entry("hpx.max_idle_loop_count",
-                            HPX_IDLE_LOOP_COUNT_MAX)),
-                std::size_t max_busy_loop_count =
-                    hpx::util::safe_lexical_cast<std::int64_t>(
-                        hpx::get_config_entry("hpx.max_busy_loop_count",
-                            HPX_BUSY_LOOP_COUNT_MAX)))
-          : outer_(std::move(outer)),
-            inner_(std::move(inner)),
-            background_(std::move(background)),
-            max_background_threads_(max_background_threads),
-            max_idle_loop_count_(max_idle_loop_count),
-            max_busy_loop_count_(max_busy_loop_count)
+        explicit scheduling_callbacks(callback_type&& outer,
+            callback_type&& inner = callback_type(),
+            background_callback_type&& background = background_callback_type(),
+            std::size_t max_background_threads =
+                (std::numeric_limits<std::size_t>::max)(),
+            std::size_t max_idle_loop_count = HPX_IDLE_LOOP_COUNT_MAX,
+            std::size_t max_busy_loop_count = HPX_BUSY_LOOP_COUNT_MAX)
+          : outer_(std::move(outer))
+          , inner_(std::move(inner))
+          , background_(std::move(background))
+          , max_background_threads_(max_background_threads)
+          , max_idle_loop_count_(max_idle_loop_count)
+          , max_busy_loop_count_(max_busy_loop_count)
         {}
 
         callback_type outer_;
@@ -402,9 +390,9 @@ namespace hpx { namespace threads { namespace detail
         thread_id_type background_thread;
         background_running.reset(new bool(true));
         thread_init_data background_init(
-            [&, background_running](thread_state_ex_enum) -> thread_result_type
-            {
-                while(*background_running)
+            [&, background_running](
+                thread_state_ex_enum) -> thread_result_type {
+                while (*background_running)
                 {
                     if (callbacks.background_())
                     {
@@ -414,18 +402,15 @@ namespace hpx { namespace threads { namespace detail
                         if (*background_running)
                             idle_loop_count = callbacks.max_idle_loop_count_;
                     }
-                    hpx::this_thread::suspend(hpx::threads::pending,
-                        "background_work");
+                    hpx::this_thread::suspend(
+                        hpx::threads::pending, "background_work");
                 }
 
                 return thread_result_type(terminated, invalid_thread_id);
             },
             hpx::util::thread_description("background_work"),
-            0,
-            thread_priority_high_recursive,
-            schedulehint,
-            get_stack_size(thread_stacksize_large),
-            &scheduler);
+            thread_priority_high_recursive, schedulehint,
+            scheduler.get_stack_size(thread_stacksize_large), &scheduler);
 
         // Create in suspended to prevent the thread from being scheduled
         // directly...
@@ -559,23 +544,18 @@ namespace hpx { namespace threads { namespace detail
         bool may_exit = false;
 
 #if defined(HPX_HAVE_NETWORKING)
-        bool networking_is_enabled = hpx::is_networking_enabled();
-
         std::shared_ptr<bool> background_running = nullptr;
         thread_id_type background_thread;
 
-        if (networking_is_enabled)
+        if ((scheduler.SchedulingPolicy::get_scheduler_mode(num_thread) &
+                policies::do_background_work) &&
+            num_thread < params.max_background_threads_ &&
+            !params.background_.empty())
         {
-            if ((scheduler.SchedulingPolicy::get_scheduler_mode(num_thread) &
-                    policies::do_background_work) &&
-                num_thread < params.max_background_threads_ &&
-                !params.background_.empty())
-            {
-                background_thread = create_background_thread(
-                    scheduler, params, background_running,
+            background_thread =
+                create_background_thread(scheduler, params, background_running,
                     thread_schedule_hint(static_cast<std::int16_t>(num_thread)),
                     idle_loop_count);
-            }
         }
 #endif
 
@@ -645,8 +625,8 @@ namespace hpx { namespace threads { namespace detail
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
                                 util::itt::caller_context cctx(ctx);
 //                                 util::itt::undo_frame_context undoframe(fctx);
-                                util::itt::task task(thread_domain,
-                                     thrd->get_description());
+                                util::itt::task task = thrd->get_description()
+                                    .get_task_itt(thread_domain);
                                 task.add_metadata(task_id, thrd);
                                 task.add_metadata(task_phase, thrd->get_thread_phase());
 #endif
@@ -853,8 +833,7 @@ namespace hpx { namespace threads { namespace detail
                             {
                                 // If this is an inner scheduler, try to exit immediately
 #if defined(HPX_HAVE_NETWORKING)
-                                if (networking_is_enabled &&
-                                    background_thread != nullptr)
+                                if (background_thread != nullptr)
                                 {
                                     HPX_ASSERT(background_running);
                                     *background_running = false;
@@ -900,35 +879,32 @@ namespace hpx { namespace threads { namespace detail
                 }
 
 #if defined(HPX_HAVE_NETWORKING)
-                if (networking_is_enabled)
-                {
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
-                    // do background work in parcel layer and in agas
-                    if (!call_background_thread(background_thread, next_thrd,
-                            scheduler, num_thread, running,
-                            bg_work_exec_time_init))
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
+                // do background work in parcel layer and in agas
+                if (!call_background_thread(background_thread, next_thrd,
+                        scheduler, num_thread, running, bg_work_exec_time_init))
 #else
-                    if (!call_background_thread(background_thread, next_thrd,
-                            scheduler, num_thread, running))
-#endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
-                    {
-                        // Let the current background thread terminate as soon as
-                        // possible. No need to reschedule, as another LCO will
-                        // set it to pending and schedule it back eventually
-                        HPX_ASSERT(background_thread);
-                        HPX_ASSERT(background_running);
-                        *background_running = false;
-                        scheduler.SchedulingPolicy::
-                            decrement_background_thread_count();
-                        // Create a new one which will replace the current such we
-                        // avoid deadlock situations, if all background threads are
-                        // blocked.
-                        background_thread = create_background_thread(scheduler,
-                            params, background_running,
-                            thread_schedule_hint(
-                                static_cast<std::int16_t>(num_thread)),
-                            idle_loop_count);
-                    }
+                if (!call_background_thread(background_thread, next_thrd,
+                        scheduler, num_thread, running))
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
+                {
+                    // Let the current background thread terminate as soon as
+                    // possible. No need to reschedule, as another LCO will
+                    // set it to pending and schedule it back eventually
+                    HPX_ASSERT(background_thread);
+                    HPX_ASSERT(background_running);
+                    *background_running = false;
+                    scheduler
+                        .SchedulingPolicy::decrement_background_thread_count();
+                    // Create a new one which will replace the current such we
+                    // avoid deadlock situations, if all background threads are
+                    // blocked.
+                    background_thread = create_background_thread(scheduler,
+                        params, background_running,
+                        thread_schedule_hint(
+                            static_cast<std::int16_t>(num_thread)),
+                        idle_loop_count);
                 }
 #endif
                 // call back into invoking context
@@ -945,36 +921,33 @@ namespace hpx { namespace threads { namespace detail
                 busy_loop_count = 0;
 
 #if defined(HPX_HAVE_NETWORKING)
-                if (networking_is_enabled)
-                {
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
-                    // do background work in parcel layer and in agas
-                    if (!call_background_thread(background_thread, next_thrd,
-                            scheduler, num_thread, running,
-                            bg_work_exec_time_init))
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
+                // do background work in parcel layer and in agas
+                if (!call_background_thread(background_thread, next_thrd,
+                        scheduler, num_thread, running, bg_work_exec_time_init))
 #else
-                    // do background work in parcel layer and in agas
-                    if (!call_background_thread(background_thread, next_thrd,
-                            scheduler, num_thread, running))
-#endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
-                    {
-                        // Let the current background thread terminate as soon
-                        // as possible. No need to reschedule, as another LCO
-                        // will set it to pending and schedule it back eventually
-                        HPX_ASSERT(background_thread);
-                        HPX_ASSERT(background_running);
-                        *background_running = false;
-                        scheduler.SchedulingPolicy::
-                            decrement_background_thread_count();
-                        // Create a new one which will replace the current such
-                        // we avoid deadlock situations, if all background
-                        // threads are blocked.
-                        background_thread = create_background_thread(scheduler,
-                            params, background_running,
-                            thread_schedule_hint(
-                                static_cast<std::int16_t>(num_thread)),
-                            idle_loop_count);
-                    }
+                // do background work in parcel layer and in agas
+                if (!call_background_thread(background_thread, next_thrd,
+                        scheduler, num_thread, running))
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
+                {
+                    // Let the current background thread terminate as soon
+                    // as possible. No need to reschedule, as another LCO
+                    // will set it to pending and schedule it back eventually
+                    HPX_ASSERT(background_thread);
+                    HPX_ASSERT(background_running);
+                    *background_running = false;
+                    scheduler
+                        .SchedulingPolicy::decrement_background_thread_count();
+                    // Create a new one which will replace the current such
+                    // we avoid deadlock situations, if all background
+                    // threads are blocked.
+                    background_thread = create_background_thread(scheduler,
+                        params, background_running,
+                        thread_schedule_hint(
+                            static_cast<std::int16_t>(num_thread)),
+                        idle_loop_count);
                 }
 #endif
             }
@@ -993,7 +966,7 @@ namespace hpx { namespace threads { namespace detail
                     HPX_ASSERT(this_state.load() != state_pre_sleep);
 
 #if defined(HPX_HAVE_NETWORKING)
-                    if (networking_is_enabled && background_thread)
+                    if (background_thread)
                     {
                         HPX_ASSERT(background_running);
                         *background_running = false;

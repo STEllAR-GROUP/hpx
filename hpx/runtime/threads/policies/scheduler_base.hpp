@@ -8,13 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/format.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/scoped_background_timer.hpp>
+#include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/cache_aligned_data.hpp>
 #include <hpx/util_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
@@ -33,8 +34,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies
-{
+namespace hpx { namespace threads { namespace policies {
     ///////////////////////////////////////////////////////////////////////////
     /// The scheduler_base defines the interface to be implemented by all
     /// scheduler policies
@@ -46,19 +46,19 @@ namespace hpx { namespace threads { namespace policies
     public:
         typedef std::mutex pu_mutex_type;
 
-        scheduler_base(std::size_t num_threads,
-            char const* description = "",
+        scheduler_base(std::size_t num_threads, char const* description = "",
+            thread_queue_init_parameters thread_queue_init = {},
             scheduler_mode mode = nothing_special);
 
         virtual ~scheduler_base() = default;
 
-        threads::thread_pool_base *get_parent_pool()
+        threads::thread_pool_base* get_parent_pool()
         {
             HPX_ASSERT(parent_pool_ != nullptr);
             return parent_pool_;
         }
 
-        void set_parent_pool(threads::thread_pool_base *p)
+        void set_parent_pool(threads::thread_pool_base* p)
         {
             HPX_ASSERT(parent_pool_ == nullptr);
             parent_pool_ = p;
@@ -74,17 +74,12 @@ namespace hpx { namespace threads { namespace policies
             return n + parent_pool_->get_thread_offset();
         }
 
-        char const* get_description() const { return description_; }
+        char const* get_description() const
+        {
+            return description_;
+        }
 
         void idle_callback(std::size_t num_thread);
-
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
-        bool background_callback(std::size_t num_thread,
-            std::int64_t& background_work_exec_time_send,
-            std::int64_t& background_work_exec_time_receive);
-#else
-        bool background_callback(std::size_t num_thread);
-#endif
 
         /// This function gets called by the thread-manager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
@@ -127,7 +122,10 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        virtual bool numa_sensitive() const { return false; }
+        virtual bool numa_sensitive() const
+        {
+            return false;
+        }
 
         virtual bool has_thread_stealing(std::size_t num_thread) const;
 
@@ -139,8 +137,8 @@ namespace hpx { namespace threads { namespace policies
 
         // either threads in same domain, or not in same domain
         // depending on the predicate
-        std::vector<std::size_t> domain_threads(
-            std::size_t local_id, const std::vector<std::size_t> &ts,
+        std::vector<std::size_t> domain_threads(std::size_t local_id,
+            const std::vector<std::size_t>& ts,
             std::function<bool(std::size_t, std::size_t)> pred);
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
@@ -149,26 +147,25 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-        virtual std::int64_t get_num_pending_misses(std::size_t num_thread,
-            bool reset) = 0;
-        virtual std::int64_t get_num_pending_accesses(std::size_t num_thread,
-            bool reset) = 0;
+        virtual std::int64_t get_num_pending_misses(
+            std::size_t num_thread, bool reset) = 0;
+        virtual std::int64_t get_num_pending_accesses(
+            std::size_t num_thread, bool reset) = 0;
 
-        virtual std::int64_t get_num_stolen_from_pending(std::size_t num_thread,
-            bool reset) = 0;
-        virtual std::int64_t get_num_stolen_to_pending(std::size_t num_thread,
-            bool reset) = 0;
-        virtual std::int64_t get_num_stolen_from_staged(std::size_t num_thread,
-            bool reset) = 0;
-        virtual std::int64_t get_num_stolen_to_staged(std::size_t num_thread,
-            bool reset) = 0;
+        virtual std::int64_t get_num_stolen_from_pending(
+            std::size_t num_thread, bool reset) = 0;
+        virtual std::int64_t get_num_stolen_to_pending(
+            std::size_t num_thread, bool reset) = 0;
+        virtual std::int64_t get_num_stolen_from_staged(
+            std::size_t num_thread, bool reset) = 0;
+        virtual std::int64_t get_num_stolen_to_staged(
+            std::size_t num_thread, bool reset) = 0;
 #endif
 
         virtual std::int64_t get_queue_length(
             std::size_t num_thread = std::size_t(-1)) const = 0;
 
-        virtual std::int64_t get_thread_count(
-            thread_state_enum state = unknown,
+        virtual std::int64_t get_thread_count(thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const = 0;
@@ -186,7 +183,8 @@ namespace hpx { namespace threads { namespace policies
         virtual void abort_all_suspended_threads() = 0;
 
         virtual bool cleanup_terminated(bool delete_all) = 0;
-        virtual bool cleanup_terminated(std::size_t num_thread, bool delete_all) = 0;
+        virtual bool cleanup_terminated(
+            std::size_t num_thread, bool delete_all) = 0;
 
         virtual void create_thread(thread_init_data& data, thread_id_type* id,
             thread_state_enum initial_state, bool run_now, error_code& ec) = 0;
@@ -204,8 +202,8 @@ namespace hpx { namespace threads { namespace policies
             bool allow_fallback = false,
             thread_priority priority = thread_priority_normal) = 0;
 
-        virtual void destroy_thread(threads::thread_data* thrd,
-            std::int64_t& busy_count) = 0;
+        virtual void destroy_thread(
+            threads::thread_data* thrd, std::int64_t& busy_count) = 0;
 
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, bool enable_stealing,
@@ -213,8 +211,8 @@ namespace hpx { namespace threads { namespace policies
 
         virtual void on_start_thread(std::size_t num_thread) = 0;
         virtual void on_stop_thread(std::size_t num_thread) = 0;
-        virtual void on_error(std::size_t num_thread,
-            std::exception_ptr const& e) = 0;
+        virtual void on_error(
+            std::size_t num_thread, std::exception_ptr const& e) = 0;
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         virtual std::int64_t get_average_thread_wait_time(
@@ -224,6 +222,32 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
         virtual void reset_thread_distribution() {}
+
+        std::ptrdiff_t get_stack_size(threads::thread_stacksize stacksize) const
+        {
+            switch (stacksize)
+            {
+            case thread_stacksize_small:
+                return thread_queue_init_.small_stacksize_;
+                break;
+
+            case thread_stacksize_medium:
+                return thread_queue_init_.medium_stacksize_;
+
+            case thread_stacksize_large:
+                return thread_queue_init_.large_stacksize_;
+
+            case thread_stacksize_huge:
+                return thread_queue_init_.huge_stacksize_;
+
+            default:
+                HPX_ASSERT_MSG(
+                    false, util::format("Invalid stack size {1}", stacksize));
+                break;
+            }
+
+            return thread_queue_init_.small_stacksize_;
+        }
 
     protected:
         // the scheduler mode is simply replicated across the cores to
@@ -249,11 +273,13 @@ namespace hpx { namespace threads { namespace policies
 
         std::vector<pu_mutex_type> pu_mtxs_;
 
-        std::vector<std::atomic<hpx::state> > states_;
+        std::vector<std::atomic<hpx::state>> states_;
         char const* description_;
 
+        thread_queue_init_parameters thread_queue_init_;
+
         // the pool that owns this scheduler
-        threads::thread_pool_base *parent_pool_;
+        threads::thread_pool_base* parent_pool_;
 
         std::atomic<std::int64_t> background_thread_count_;
 
@@ -262,19 +288,21 @@ namespace hpx { namespace threads { namespace policies
         // manage scheduler-local data
         coroutines::detail::tss_data_node* find_tss_data(void const* key);
         void add_new_tss_node(void const* key,
-            std::shared_ptr<coroutines::detail::tss_cleanup_function>
-            const& func, void* tss_data);
+            std::shared_ptr<coroutines::detail::tss_cleanup_function> const&
+                func,
+            void* tss_data);
         void erase_tss_node(void const* key, bool cleanup_existing);
         void* get_tss_data(void const* key);
         void set_tss_data(void const* key,
-            std::shared_ptr<coroutines::detail::tss_cleanup_function>
-            const& func, void* tss_data, bool cleanup_existing);
+            std::shared_ptr<coroutines::detail::tss_cleanup_function> const&
+                func,
+            void* tss_data, bool cleanup_existing);
 
     protected:
         std::shared_ptr<coroutines::detail::tss_storage> thread_data_;
 #endif
     };
-}}}
+}}}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>
 

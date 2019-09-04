@@ -386,7 +386,7 @@ run_benchmark(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
     std::size_t offset = vm["offset"].as<std::size_t>();
@@ -520,26 +520,26 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
         (   "vector_size",
-            boost::program_options::value<std::size_t>()->default_value(1024),
+            hpx::program_options::value<std::size_t>()->default_value(1024),
             "size of vector (default: 1024)")
         (   "offset",
-            boost::program_options::value<std::size_t>()->default_value(0),
+            hpx::program_options::value<std::size_t>()->default_value(0),
             "offset (default: 0)")
         (   "iterations",
-            boost::program_options::value<std::size_t>()->default_value(10),
+            hpx::program_options::value<std::size_t>()->default_value(10),
             "number of iterations to repeat each test. (default: 10)")
         (   "chunker",
-            boost::program_options::value<std::string>()->default_value("default"),
+            hpx::program_options::value<std::string>()->default_value("default"),
             "Which chunker to use for the parallel algorithms. "
             "possible values: dynamic, auto, guided. (default: default)")
         (   "chunk_size",
-             boost::program_options::value<std::size_t>()->default_value(0),
+             hpx::program_options::value<std::size_t>()->default_value(0),
             "size of vector (default: 1024)")
 
 #if defined(HPX_HAVE_COMPUTE)

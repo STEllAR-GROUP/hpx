@@ -25,7 +25,7 @@
 const int max_threads = 4;
 
 // dummy function we will call using async
-void dummy_task(std::size_t n, std::string text)
+void dummy_task(std::size_t n, std::string const& text)
 {
     for (std::size_t i(0); i < n; ++i)
     {

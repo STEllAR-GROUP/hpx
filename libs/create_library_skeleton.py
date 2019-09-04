@@ -63,6 +63,8 @@ index_rst = f'''..
 root_cmakelists_template = cmake_header + f'''
 cmake_minimum_required(VERSION {cmake_version} FATAL_ERROR)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 set({lib_name}_headers)
 
 set({lib_name}_compat_headers)
@@ -180,10 +182,6 @@ if lib_name != '--recreate-index':
     f = open(os.path.join(lib_name, 'examples', 'CMakeLists.txt'), 'w')
     f.write(examples_cmakelists_template)
 
-    # Generate src/CMakeLists.txt
-    f = open(os.path.join(lib_name, 'src', 'CMakeLists.txt'), 'w')
-    f.write(cmake_header)
-
     # Generate tests/CMakeLists.txt
     f = open(os.path.join(lib_name, 'tests', 'CMakeLists.txt'), 'w')
     f.write(tests_cmakelists_template)
@@ -271,7 +269,7 @@ foreach(lib ${HPX_LIBS})
   add_subdirectory(${lib})
 
   set(MODULE_FORCE_LINKING_INCLUDES
-    "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\\n")
+    "${MODULE_FORCE_LINKING_INCLUDES}\\n#include <hpx/${lib}/force_linking.hpp>\\n")
 
   set(MODULE_FORCE_LINKING_CALLS
     "${MODULE_FORCE_LINKING_CALLS}\\n        ${lib}::force_linking();")

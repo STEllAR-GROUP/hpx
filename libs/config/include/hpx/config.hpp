@@ -9,9 +9,9 @@
 
 // We need to detect if user code include boost/config.hpp before
 // including hpx/config.hpp
-// Everything else might lead to hard compile errors and possible very subtile bugs.
+// Everything else might lead to hard compile errors and possible very subtle bugs.
 #if defined(BOOST_CONFIG_HPP)
-#error Boost.Config was included before the hpx config header. This might lead to subtile failures and compile errors. Please include <hpx/config.hpp> before any other boost header
+#error Boost.Config was included before the hpx config header. This might lead to subtle failures and compile errors. Please include <hpx/config.hpp> before any other boost header
 #endif
 
 #include <hpx/config/attributes.hpp>
@@ -371,11 +371,60 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Maximum sleep time for idle backoff in milliseconds.
-#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-#  if !defined(HPX_IDLE_BACKOFF_TIME_MAX)
-#    define HPX_IDLE_BACKOFF_TIME_MAX 1000
-#  endif
+// Maximum number of threads to create in the thread queue, except when there is
+// no work to do, in which case the count will be increased in steps of
+// HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT.
+#if !defined(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)
+#  define HPX_THREAD_QUEUE_MAX_THREAD_COUNT 1000
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Minimum number of pending tasks required to steal tasks.
+#if !defined(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING)
+#  define HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING 0
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Minimum number of staged tasks required to steal tasks.
+#if !defined(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED)
+#  define HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED 10
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Minimum number of staged tasks to add to work items queue.
+#if !defined(HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT)
+#  define HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT 10
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Maximum number of staged tasks to add to work items queue.
+#if !defined(HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT)
+#  define HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT 10
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Minimum number of terminated threads to delete in one go.
+#if !defined(HPX_THREAD_QUEUE_MIN_DELETE_COUNT)
+#  define HPX_THREAD_QUEUE_MIN_DELETE_COUNT 10
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Maximum number of terminated threads to delete in one go.
+#if !defined(HPX_THREAD_QUEUE_MAX_DELETE_COUNT)
+#  define HPX_THREAD_QUEUE_MAX_DELETE_COUNT 1000
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Maximum number of terminated threads to keep before cleaning them up.
+#if !defined(HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS)
+#  define HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS 100
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Maximum sleep time for idle backoff in milliseconds (used only if
+// HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF is defined).
+#if !defined(HPX_IDLE_BACKOFF_TIME_MAX)
+#  define HPX_IDLE_BACKOFF_TIME_MAX 1000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

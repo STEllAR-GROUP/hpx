@@ -9,9 +9,9 @@
 #define HPX_LCOS_LATCH_APR_18_2015_0925PM
 
 #include <hpx/assertion.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/cache_aligned_data.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <atomic>

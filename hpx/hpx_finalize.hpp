@@ -9,7 +9,7 @@
 #define HPX_HPX_FINALIZE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 
 /// \namespace hpx
 namespace hpx

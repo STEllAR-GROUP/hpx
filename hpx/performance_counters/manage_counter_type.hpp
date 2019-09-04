@@ -12,7 +12,7 @@
 #define HPX_F26CC3F9_3E30_4C54_90E0_0CD02146320F
 
 #include <hpx/config.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/util/function.hpp>
 

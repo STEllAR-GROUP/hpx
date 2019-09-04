@@ -14,9 +14,9 @@
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
+#include <hpx/filesystem.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 
-#include <boost/filesystem.hpp>
 #include <boost/shared_array.hpp>
 
 #include <string>
@@ -82,7 +82,7 @@ inline run_exe_ run_exe(const std::string &s)
     return run_exe_(s);
 }
 
-inline run_exe_ run_exe(const boost::filesystem::path &p)
+inline run_exe_ run_exe(const filesystem::path &p)
 {
     return run_exe_(p.string());
 }

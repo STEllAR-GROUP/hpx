@@ -56,9 +56,7 @@ namespace sheneos
             std::string const& symbolic_name_base = "/sheneos/interpolator",
             std::size_t num_instances = std::size_t(-1));
 
-        interpolator(hpx::future<hpx::id_type> && id)
-          : base_type(std::move(id))
-        {}
+        explicit interpolator(hpx::future<hpx::id_type> && id);
 
         /// Destroy the interpolator. If this instance was initialized using
         /// create(), this will unregister the symbolic name of the associated

@@ -6,7 +6,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
 #include <hpx/apply.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime.hpp>

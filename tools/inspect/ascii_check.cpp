@@ -8,10 +8,12 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //  √ -- this is a test.
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
 
 #include "ascii_check.hpp"
 #include "function_hyper.hpp"
+
+#include <algorithm>
 #include <cstddef>
 
 namespace boost

@@ -33,12 +33,14 @@ endif()
 if (HPX_WITH_TESTS_HEADERS)
   add_hpx_header_tests(
     modules.hardware
-    EXCLUDE
-    "hardware/timestamp/msvc.hpp"
-    "hardware/timestamp/linux_x86_32.hpp"
-    "hardware/timestamp/linux_x86_64.hpp"
-    "hardware/timestamp/linux_generic.hpp"
-    "hardware/timestamp/bgq.hpp"
+    HEADERS ${hardware_headers}
+    HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+    EXCLUDE_FROM_ALL
+    "hpx/hardware/timestamp/msvc.hpp"
+    "hpx/hardware/timestamp/linux_x86_32.hpp"
+    "hpx/hardware/timestamp/linux_x86_64.hpp"
+    "hpx/hardware/timestamp/linux_generic.hpp"
+    "hpx/hardware/timestamp/bgq.hpp"
     NOLIBS
     DEPENDENCIES hpx_hardware)
 endif()

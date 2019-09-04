@@ -172,9 +172,8 @@ namespace hpx
 
     public:
         explicit coarray(hpx::lcos::spmd_block const& block,
-            std::string name,
-            hpx::detail::coarray_sizes<N>
-                cosizes,
+            std::string const& name,
+            hpx::detail::coarray_sizes<N> cosizes,
             std::size_t segment_size)
           : base_type(block)
           , vector_()
@@ -205,7 +204,9 @@ namespace hpx
                 vector_.register_as(hpx::launch::sync, name + "_hpx_coarray");
             }
             else
+            {
                 vector_.connect_to(hpx::launch::sync, name + "_hpx_coarray");
+            }
 
             view = update_view(cosizes, num_images, indices(), block,
                 vector_.begin(), vector_.end());

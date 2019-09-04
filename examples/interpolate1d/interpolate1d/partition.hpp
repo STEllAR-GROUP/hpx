@@ -26,14 +26,14 @@ namespace interpolate1d
 
     public:
         // create a new partition instance and initialize it synchronously
-        partition(std::string datafilename, dimension const& dim,
+        partition(std::string const& datafilename, dimension const& dim,
                 std::size_t num_nodes)
           : base_type(hpx::new_<server::partition>(hpx::find_here()))
         {
             init(datafilename, dim, num_nodes);
         }
 
-        partition(hpx::id_type id, std::string datafilename,
+        partition(hpx::id_type id, std::string const& datafilename,
                 dimension const& dim, std::size_t num_nodes)
           : base_type(hpx::new_<server::partition>(id))
         {
@@ -45,7 +45,7 @@ namespace interpolate1d
 
         // initialize this partition
         hpx::lcos::future<void>
-        init_async(std::string datafilename, dimension const& dim,
+        init_async(std::string const& datafilename, dimension const& dim,
             std::size_t num_nodes)
         {
             typedef server::partition::init_action init_action;
@@ -53,7 +53,7 @@ namespace interpolate1d
                 dim, num_nodes);
         }
 
-        void init(std::string datafilename, dimension const& dim,
+        void init(std::string const& datafilename, dimension const& dim,
             std::size_t num_nodes)
         {
             init_async(datafilename, dim, num_nodes).get();

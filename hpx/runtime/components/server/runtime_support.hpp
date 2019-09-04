@@ -10,11 +10,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
+#include <hpx/program_options.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -22,13 +24,10 @@
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util_fwd.hpp>
-
-#include <boost/program_options/options_description.hpp>
 
 #include <atomic>
 #include <condition_variable>
@@ -265,63 +264,63 @@ namespace hpx { namespace components { namespace server
         // Load all components from the ini files found in the configuration
         int load_components(util::section& ini, naming::gid_type const& prefix,
             naming::resolver_client& agas_client,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 
 #if !defined(HPX_HAVE_STATIC_LINKING)
         bool load_component(hpx::util::plugin::dll& d,
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path const& lib,
+            std::string const& component, filesystem::path const& lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
         bool load_component_dynamic(
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path lib,
+            std::string const& component, filesystem::path lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 
         bool load_startup_shutdown_functions(hpx::util::plugin::dll& d,
             error_code& ec);
         bool load_commandline_options(hpx::util::plugin::dll& d,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             error_code& ec);
 #endif
 
         bool load_component_static(
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path const& lib,
+            std::string const& component, filesystem::path const& lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
         bool load_startup_shutdown_functions_static(std::string const& module,
             error_code& ec);
         bool load_commandline_options_static(
             std::string const& module,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             error_code& ec);
 
         // Load all plugins from the ini files found in the configuration
         bool load_plugins(util::section& ini,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 
 #if !defined(HPX_HAVE_STATIC_LINKING)
         bool load_plugin(hpx::util::plugin::dll& d,
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path const& lib,
+            std::string const& component, filesystem::path const& lib,
             bool isenabled,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
         bool load_plugin_dynamic(
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path lib,
+            std::string const& component, filesystem::path lib,
             bool isenabled,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 #endif
 

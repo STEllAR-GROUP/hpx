@@ -12,14 +12,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/connection_cache.hpp>
@@ -106,13 +105,10 @@ namespace hpx { namespace parcelset
         /// Construct the parcelport on the given locality.
         parcelport_impl(util::runtime_configuration const& ini,
             locality const& here,
-            util::function_nonser<void(std::size_t, char const*)> const&
-                on_start_thread,
-            util::function_nonser<void(std::size_t, char const*)> const&
-                on_stop_thread)
+            threads::policies::callback_notifier const& notifier)
           : parcelport(ini, here, connection_handler_type())
-          , io_service_pool_(thread_pool_size(ini), on_start_thread,
-                on_stop_thread, pool_name(), pool_name_postfix())
+          , io_service_pool_(thread_pool_size(ini), notifier, pool_name(),
+                pool_name_postfix())
           , connection_cache_(
                 max_connections(ini), max_connections_per_loc(ini))
           , archive_flags_(0)

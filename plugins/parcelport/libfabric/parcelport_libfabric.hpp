@@ -149,8 +149,7 @@ namespace libfabric
         // Constructor : mostly just initializes the superclass with 'here'
         // --------------------------------------------------------------------
         parcelport(util::runtime_configuration const& ini,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void(std::size_t, char const*)> const& on_stop_thread);
+            threads::policies::callback_notifier const& notifier);
 
         // Start the handling of connections.
         bool do_run();

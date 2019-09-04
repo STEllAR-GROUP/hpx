@@ -7,7 +7,7 @@
 #define HPX_RUNTIME_SET_PARCEL_WRITE_HANDLER_FEB_25_2015_0806PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/util/function.hpp>
 

@@ -184,10 +184,9 @@ namespace hpx { namespace compute { namespace cuda
 
                         std::array<shape_type, 1> cuda_shape{{s}};
                         parallel::execution::bulk_sync_execute(
-                            cuda_executors_[current], std::forward<F>(f),
-                            cuda_shape, std::forward<Ts>(ts)...);
+                            cuda_executors_[current], f, cuda_shape, ts...);
                     },
-                    std::forward<F>(f), std::forward<Ts>(ts)...));
+                    f, ts...));
             }
             return result;
         }

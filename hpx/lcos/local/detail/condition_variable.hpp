@@ -8,7 +8,7 @@
 #define HPX_LCOS_LOCAL_DETAIL_CONDITION_VARIABLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>

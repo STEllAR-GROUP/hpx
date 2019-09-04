@@ -10,13 +10,14 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/resource/partitioner.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/runtime/threads/cpu_mask.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/assertion.hpp>
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -52,12 +53,11 @@ namespace hpx { namespace resource { namespace detail
         static std::size_t num_threads_overall;
 
     private:
-        init_pool_data(const std::string &name,
-            scheduling_policy = scheduling_policy::unspecified,
-            hpx::threads::policies::scheduler_mode =
-                hpx::threads::policies::scheduler_mode::default_mode);
+        init_pool_data(const std::string& name, scheduling_policy policy,
+            hpx::threads::policies::scheduler_mode mode);
 
-        init_pool_data(std::string const& name, scheduler_function create_func);
+        init_pool_data(std::string const& name, scheduler_function create_func,
+            hpx::threads::policies::scheduler_mode mode);
 
         std::string pool_name_;
         scheduling_policy scheduling_policy_;
@@ -161,9 +161,9 @@ namespace hpx { namespace resource { namespace detail
         bool cmd_line_parsed() const;
         int parse(
             util::function_nonser<
-                int(boost::program_options::variables_map& vm)
+                int(hpx::program_options::variables_map& vm)
             > const& f,
-            boost::program_options::options_description desc_cmdline,
+            hpx::program_options::options_description desc_cmdline,
             int argc, char **argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode,
             runtime_mode mode, bool fill_internal_topology = true);
@@ -253,6 +253,8 @@ namespace hpx { namespace resource { namespace detail
 
         // topology information
         threads::topology& topo_;
+
+        threads::policies::scheduler_mode default_scheduler_mode_;
     };
 }}}
 

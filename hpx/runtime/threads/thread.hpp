@@ -7,7 +7,7 @@
 #define HPX_RUNTIME_THREADS_THREAD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>

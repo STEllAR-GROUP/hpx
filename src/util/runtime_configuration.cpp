@@ -8,19 +8,19 @@
 
 // TODO: move parcel ports into plugins
 #include <hpx/assertion.hpp>
+#include <hpx/filesystem.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/init_logging.hpp>
-#include <hpx/util/itt_notify.hpp>
-#include <hpx/util/register_locks.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/filesystem.hpp>
 #include <boost/predef/other/endian.h>
 #include <boost/spirit/include/qi_alternative.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
@@ -132,12 +132,12 @@ namespace hpx { namespace util
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
             "component_paths = ${HPX_COMPONENT_PATHS}",
-            "component_base_paths = $[hpx.location]" // NOLINT
-                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]",
+            "component_base_paths = $[hpx.location]"    // NOLINT
+            HPX_INI_PATH_DELIMITER "$[system.executable_prefix]",
             "component_path_suffixes = /lib/hpx" HPX_INI_PATH_DELIMITER
-                                      "/bin/hpx",
+            "/bin/hpx",
             "master_ini_path = $[hpx.location]" HPX_INI_PATH_DELIMITER
-                              "$[system.executable_prefix]/",
+            "$[system.executable_prefix]/",
             "master_ini_path_suffixes = /share/" HPX_BASE_DIR_NAME
                 HPX_INI_PATH_DELIMITER "/../share/" HPX_BASE_DIR_NAME,
 #ifdef HPX_HAVE_ITTNOTIFY
@@ -169,14 +169,17 @@ namespace hpx { namespace util
 #endif
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
 #ifdef HPX_DEBUG
-            "spinlock_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:1}",
+            "spinlock_deadlock_detection = "
+            "${HPX_SPINLOCK_DEADLOCK_DETECTION:1}",
 #else
-            "spinlock_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:0}",
+            "spinlock_deadlock_detection = "
+            "${HPX_SPINLOCK_DEADLOCK_DETECTION:0}",
 #endif
             "spinlock_deadlock_detection_limit = "
-                "${HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT:1000000}",
+            "${HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT:1000000}",
 #endif
-            "expect_connecting_localities = ${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
+            "expect_connecting_localities = "
+            "${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
 
             // add placeholders for keys to be added by command line handling
             "os_threads = cores",
@@ -190,15 +193,16 @@ namespace hpx { namespace util
             "pu_offset = 0",
             "numa_sensitive = 0",
             "max_background_threads = "
-                "${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
+            "${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
 
-            "max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:"
-                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_IDLE_LOOP_COUNT_MAX)) "}",
-            "max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:"
-                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_BUSY_LOOP_COUNT_MAX)) "}",
+            "max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_IDLE_LOOP_COUNT_MAX)) "}",
+            "max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_BUSY_LOOP_COUNT_MAX)) "}",
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-            "max_idle_backoff_time = ${HPX_MAX_IDLE_BACKOFF_TIME:"
-            HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_IDLE_BACKOFF_TIME_MAX)) "}",
+            "max_idle_backoff_time = "
+            "${HPX_MAX_IDLE_BACKOFF_TIME:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_IDLE_BACKOFF_TIME_MAX)) "}",
 #endif
             "default_scheduler_mode = ${HPX_DEFAULT_SCHEDULER_MODE}",
 
@@ -226,42 +230,59 @@ namespace hpx { namespace util
 #endif
 
             "[hpx.stacks]",
-            "small_size = ${HPX_SMALL_STACK_SIZE:"
-                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_SMALL_STACK_SIZE)) "}",
-            "medium_size = ${HPX_MEDIUM_STACK_SIZE:"
-                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_MEDIUM_STACK_SIZE)) "}",
-            "large_size = ${HPX_LARGE_STACK_SIZE:"
-                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_LARGE_STACK_SIZE)) "}",
-            "huge_size = ${HPX_HUGE_STACK_SIZE:"
-                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_HUGE_STACK_SIZE)) "}",
+            "small_size = ${HPX_SMALL_STACK_SIZE:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_SMALL_STACK_SIZE)) "}",
+            "medium_size = ${HPX_MEDIUM_STACK_SIZE:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_MEDIUM_STACK_SIZE)) "}",
+            "large_size = ${HPX_LARGE_STACK_SIZE:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_LARGE_STACK_SIZE)) "}",
+            "huge_size = ${HPX_HUGE_STACK_SIZE:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_HUGE_STACK_SIZE)) "}",
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
             "use_guard_pages = ${HPX_USE_GUARD_PAGES:1}",
 #endif
 
             "[hpx.threadpools]",
 #if defined(HPX_HAVE_IO_POOL)
-            "io_pool_size = ${HPX_NUM_IO_POOL_SIZE:"
-                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_IO_POOL_SIZE)) "}",
+            "io_pool_size = ${HPX_NUM_IO_POOL_SIZE:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_NUM_IO_POOL_SIZE)) "}",
 #endif
 #if defined(HPX_HAVE_NETWORKING)
-            "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_SIZE:"
-                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_PARCEL_POOL_SIZE)) "}",
+            "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_SIZE:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_NUM_PARCEL_POOL_SIZE)) "}",
 #endif
 #if defined(HPX_HAVE_TIMER_POOL)
-            "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:"
-                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_TIMER_POOL_SIZE)) "}",
+            "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_NUM_TIMER_POOL_SIZE)) "}",
 #endif
 
             "[hpx.thread_queue]",
+            "max_count = ${HPX_THREAD_QUEUE_MAX_THREAD_COUNT:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
             "min_tasks_to_steal_pending = "
-                "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING:0}",
+            "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
+            "max_tasks_to_steal_pending = "
+            "${HPX_THREAD_QUEUE_MAX_TASKS_TO_STEAL_PENDING:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
+            "min_tasks_to_steal_pending = "
+            "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
             "min_tasks_to_steal_staged = "
-                "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED:10}",
-            "min_add_new_count = ${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:10}",
-            "max_add_new_count = ${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:10}",
-            "max_delete_count = ${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:1000}",
-            "max_terminated_threads = ${HPX_SCHEDULER_MAX_TERMINATED_THREADS:"
-              HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_SCHEDULER_MAX_TERMINATED_THREADS)) "}",
+            "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
+            "min_add_new_count = "
+            "${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
+            "max_add_new_count = "
+            "${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
+            "max_delete_count = "
+            "${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
+            "max_terminated_threads = "
+            "${HPX_SCHEDULER_MAX_TERMINATED_THREADS:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS)) "}",
 
             "[hpx.commandline]",
             // enable aliasing
@@ -303,16 +324,15 @@ namespace hpx { namespace util
             // 'address' has deliberately no default, see
             // command_line_handling.cpp
             "address = ${HPX_AGAS_SERVER_ADDRESS}",
-            "port = ${HPX_AGAS_SERVER_PORT:"
-                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_INITIAL_IP_PORT)) "}",
+            "port = ${HPX_AGAS_SERVER_PORT:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_INITIAL_IP_PORT)) "}",
             "max_pending_refcnt_requests = "
-                "${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:"
-                HPX_PP_STRINGIZE(HPX_PP_EXPAND(
-                    HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS))
-                "}",
+            "${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(
+                    HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS)) "}",
             "service_mode = hosted",
-            "local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:"
-                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_AGAS_LOCAL_CACHE_SIZE)) "}",
+            "local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_AGAS_LOCAL_CACHE_SIZE)) "}",
             "use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}",
             "use_caching = ${HPX_AGAS_USE_CACHING:1}",
 
@@ -415,9 +435,9 @@ namespace hpx { namespace util
             plugin_registries,
         std::string const& path,
         std::set<std::string>& component_paths,
-        std::map<std::string, boost::filesystem::path>& basenames)
+        std::map<std::string, filesystem::path>& basenames)
     {
-        namespace fs = boost::filesystem;
+        namespace fs = filesystem;
 
         using plugin_list_type =
             std::vector<std::shared_ptr<plugins::plugin_registry_base>>;
@@ -425,7 +445,7 @@ namespace hpx { namespace util
         if (!path.empty())
         {
             fs::path this_p(path);
-            boost::system::error_code fsec;
+            fs::error_code fsec;
             fs::path canonical_p =
                 fs::canonical(this_p, fs::initial_path(), fsec);
             if (fsec)
@@ -457,9 +477,9 @@ namespace hpx { namespace util
         std::string const& component_base_paths,
         std::string const& component_path_suffixes,
         std::set<std::string>& component_paths,
-        std::map<std::string, boost::filesystem::path>& basenames)
+        std::map<std::string, filesystem::path>& basenames)
     {
-        namespace fs = boost::filesystem;
+        namespace fs = filesystem;
 
         // try to build default ini structure from shared libraries in default
         // installation location, this allows to install simple components
@@ -507,7 +527,7 @@ namespace hpx { namespace util
         std::set<std::string> component_paths;
 
         // list of base names avoiding to load a module more than once
-        std::map<std::string, boost::filesystem::path> basenames;
+        std::map<std::string, filesystem::path> basenames;
 
         // plugin registry object
         plugin_list_type plugin_registries;

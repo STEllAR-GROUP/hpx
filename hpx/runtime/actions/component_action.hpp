@@ -15,6 +15,7 @@
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_future.hpp>
 
 #include <boost/utility/string_ref.hpp>
@@ -157,9 +158,13 @@ namespace hpx { namespace actions
             basic_action<Component const, R(Ps...), derived_type>::
                 increment_invocation_count();
 
-            using is_future = typename traits::is_future<R>::type;
-            return detail::component_invoke<Component const, R>(is_future{},
-                lva, comptype, F, std::forward<Ts>(vs)...);
+            using is_future_or_client = typename std::integral_constant<bool,
+                traits::is_future<R>::value ||
+                    traits::is_client<R>::value>::type;
+
+            return detail::component_invoke<Component const, R>(
+                is_future_or_client{}, lva, comptype, F,
+                std::forward<Ts>(vs)...);
         }
     };
 

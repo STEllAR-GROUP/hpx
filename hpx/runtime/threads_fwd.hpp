@@ -18,7 +18,9 @@ namespace hpx
         namespace policies
         {
             struct scheduler_base;
-            class HPX_EXPORT callback_notifier;
+            namespace detail {
+                struct HPX_EXPORT affinity_data;
+            }
         }
 
         namespace executors
@@ -27,6 +29,7 @@ namespace hpx
         }
 
         class HPX_EXPORT thread_pool_base;
+        struct HPX_EXPORT thread_pool_init_parameters;
     }
 }
 

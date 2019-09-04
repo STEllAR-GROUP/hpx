@@ -9,7 +9,7 @@
 #define HPX_THREAD_GROUP_AUG_03_2015_0908PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors/exception.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/local/shared_mutex.hpp>
 #include <hpx/lcos/local/mutex.hpp>

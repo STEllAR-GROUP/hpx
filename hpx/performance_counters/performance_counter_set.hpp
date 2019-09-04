@@ -7,7 +7,7 @@
 #define HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_SET_DEC_19_2016_1055AM
 
 #include <hpx/config.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -34,7 +34,8 @@ namespace hpx { namespace performance_counters
     public:
         /// Create an empty set of performance counters
         performance_counter_set(bool print_counters_locally = false)
-          : print_counters_locally_(print_counters_locally)
+          : invocation_count_(0)
+          , print_counters_locally_(print_counters_locally)
         {}
 
         /// Create a set of performance counters from a name, possibly

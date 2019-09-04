@@ -79,7 +79,7 @@ std::uint64_t average_out_transform_reduce_old(std::size_t vector_size)
     return std::uint64_t(1);
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
     bool csvoutput = vm["csv_output"].as<int>() ?true : false;
@@ -110,20 +110,20 @@ int main(int argc, char* argv[])
         "hpx.os_threads=all"
     };
 
-    boost::program_options::options_description cmdline(
+    hpx::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
         ("vector_size"
-        , boost::program_options::value<std::size_t>()->default_value(1000)
+        , hpx::program_options::value<std::size_t>()->default_value(1000)
         , "size of vector")
 
         ("csv_output"
-        , boost::program_options::value<int>()->default_value(0)
+        , hpx::program_options::value<int>()->default_value(0)
         , "print results in csv format")
 
         ("test_count"
-        , boost::program_options::value<int>()->default_value(100)
+        , hpx::program_options::value<int>()->default_value(100)
         , "number of tests to take average from")
         ;
 

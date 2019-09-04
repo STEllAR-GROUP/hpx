@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
@@ -17,7 +17,6 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_front.hpp>
@@ -148,7 +147,7 @@ namespace hpx { namespace threads { namespace detail
                         thread_init_data data(
                             util::bind(&set_active_state, thrd, new_state,
                                 new_state_ex, priority, previous_state),
-                            "set state for active thread", 0, priority);
+                            "set state for active thread", priority);
 
                         create_work(
                             thrd->get_scheduler_base(), data, pending, ec);
@@ -331,7 +330,7 @@ namespace hpx { namespace threads { namespace detail
             util::bind_front(&wake_timer_thread,
                 thrd, newstate, newstate_ex, priority,
                 self_id, triggered, retry_on_active),
-            "wake_timer", 0, priority);
+            "wake_timer", priority);
 
         thread_id_type wake_id = invalid_thread_id;
         create_thread(&scheduler, data, wake_id, suspended);
@@ -405,7 +404,7 @@ namespace hpx { namespace threads { namespace detail
             util::bind(&at_timer<SchedulingPolicy>,
                 std::ref(scheduler), abs_time.value(), thrd, newstate, newstate_ex,
                 priority, started, retry_on_active),
-                "at_timer (expire at)", 0, priority, schedulehint);
+                "at_timer (expire at)", priority, schedulehint);
 
         thread_id_type newid = invalid_thread_id;
         create_thread(&scheduler, data, newid, pending, true, ec); //-V601

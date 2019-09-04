@@ -60,7 +60,7 @@ void on_recv_ind(hpx::naming::id_type to,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map &b_arg)
+int hpx_main(hpx::program_options::variables_map &b_arg)
 {
     std::size_t const vsize = b_arg["vsize"].as<std::size_t>();
     std::size_t const numiter = b_arg["numiter"].as<std::size_t>() * 2;
@@ -145,7 +145,7 @@ int hpx_main(boost::program_options::variables_map &b_arg)
 
 int main(int argc, char* argv[])
 {
-    namespace po = boost::program_options;
+    namespace po = hpx::program_options;
     po::options_description description("HPX pingpong example");
 
     description.add_options()

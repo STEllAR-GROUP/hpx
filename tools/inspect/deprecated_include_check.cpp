@@ -8,7 +8,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
 
 #include <algorithm>
 
@@ -51,6 +51,8 @@ namespace boost
       { "boost/random/([^\\s]*)\\.hpp", "random" },
       { "boost/format\\.hpp", "hpx/util/format.hpp" },
       { "boost/regex.hpp", "regex" },
+      { "boost/program_options([^\\s]*)\\.hpp", "hpx/program_options\\2.hpp" },
+      { "boost/filesystem([^\\s]*)\\.hpp", "hpx/filesystem.hpp" },
       { nullptr, nullptr }
     };
 
@@ -74,11 +76,11 @@ namespace boost
            ++includes_it)
       {
         std::string rx =
-            std::string("^\\s*#\\s*include\\s*<(")
+            std::string(R"(^\s*#\s*include\s*<()")
           +   includes_it->include_regex
           + ")>\\s*$"
           + "|"
-          + "^\\s*#\\s*include\\s*\"("
+          + R"(^\s*#\s*include\s*"()"
           +   includes_it->include_regex
           + ")\"\\s*$";
 

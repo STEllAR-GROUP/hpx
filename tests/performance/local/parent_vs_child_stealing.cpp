@@ -9,7 +9,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -63,7 +63,7 @@ double measure(Policy policy)
     return std::accumulate(times.begin(), times.end(), 0.0);
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     bool print_header = vm.count("no-header") == 0;
     bool do_child = vm.count("no-child") == 0;      // fork only
@@ -102,7 +102,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    namespace po = boost::program_options;
+    namespace po = hpx::program_options;
     po::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 

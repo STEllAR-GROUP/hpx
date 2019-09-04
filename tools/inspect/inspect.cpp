@@ -21,7 +21,9 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 //  Directories with a file name of the hpx_no_inspect value are not inspected.
 //  Files that contain the hpx_no_inspect value are not inspected.
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+#include <hpx/filesystem.hpp>
+#include <hpx/program_options.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -34,8 +36,6 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include <string>
 #include <vector>
 
-#include "boost/filesystem/operations.hpp"
-#include "boost/filesystem/fstream.hpp"
 #include "boost/program_options.hpp"
 #include "function_hyper.hpp"
 
@@ -82,7 +82,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include "boost/test/included/prg_exec_monitor.hpp"
 #endif
 
-namespace fs = boost::filesystem;
+namespace fs = hpx::filesystem;
 
 using namespace boost::inspect;
 
@@ -237,7 +237,7 @@ namespace
   bool visit_predicate( const path & pth )
   {
     string local( boost::inspect::relative_to( pth, search_root_path() ) );
-    string leaf( pth.leaf().string() );
+    string leaf( pth.filename().string() );
     if (leaf[0] == '.')  // ignore hidden by convention directories such as
       return false;      //  .htaccess, .git, .svn, .bzr, .DS_Store, etc.
 
@@ -252,7 +252,7 @@ namespace
       && local.find("doc/xml") != 0
       && local.find("doc\\xml") != 0
       // ignore if tag file present
-      && !boost::filesystem::exists(pth / hpx_no_inspect)
+      && !hpx::filesystem::exists(pth / hpx_no_inspect)
       ;
   }
 
@@ -287,7 +287,7 @@ namespace
   bool find_signature( const path & file_path,
     const boost::inspect::string_set & signatures )
   {
-    string name( file_path.leaf().string() );
+    string name( file_path.filename().string() );
     if ( signatures.find( name ) == signatures.end() )
     {
       string::size_type pos( name.rfind( '.' ) );
@@ -306,7 +306,8 @@ namespace
 
     if ( !find_signature( file_path, content_signatures ) ) return;
 
-    fs::ifstream fin( file_path, std::ios_base::in|std::ios_base::binary );
+    std::ifstream fin( file_path.string(),
+        std::ios_base::in|std::ios_base::binary );
     if ( !fin )
       throw string( "could not open input file: " ) + file_path.string();
     std::getline( fin, target, '\0' ); // read the whole file
@@ -349,7 +350,7 @@ namespace
           visit_all<DirectoryIterator>( cur_lib, *itr, insps );
         }
       }
-      else if (itr->path().leaf().string()[0] != '.') // ignore if hidden
+      else if (itr->path().filename().string()[0] != '.') // ignore if hidden
       {
         ++file_count;
         string content;
@@ -467,7 +468,7 @@ namespace
             {
               out << "\n  " << this_rel_path.parent_path().string() << '/';
             }
-            out << "\n    " << this_rel_path.leaf() << ':';
+            out << "\n    " << this_rel_path.filename() << ':';
           }
         }
         if ( current.library != itr->library
@@ -789,7 +790,7 @@ int main( int argc_param, char * argv_param[] )
 int cpp_main( int argc_param, char * argv_param[] )
 #endif
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: inspect [dir [dir ...]] [options]");
 
@@ -905,13 +906,11 @@ int cpp_main( int argc_param, char * argv_param[] )
     if (vm.count("hpx:positional"))
     {
         for (auto const& s: vm["hpx:positional"].as<std::vector<std::string> >())
-            search_roots.push_back(fs::canonical(fs::absolute(s,
-                fs::initial_path())));
+            search_roots.push_back(fs::canonical(s, fs::initial_path()));
     }
     else
     {
-        search_roots.push_back(fs::canonical(fs::absolute(".",
-            fs::initial_path())));
+        search_roots.push_back(fs::canonical(fs::initial_path()));
     }
 
     if (vm.count("text"))
@@ -1010,7 +1009,7 @@ int cpp_main( int argc_param, char * argv_param[] )
     for(auto const& search_root: search_roots)
     {
         ::search_root = search_root;
-        visit_all<fs::directory_iterator>( search_root.leaf().string(),
+        visit_all<fs::directory_iterator>( search_root.filename().string(),
             search_root, inspectors );
     }
 

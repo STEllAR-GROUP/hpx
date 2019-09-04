@@ -8,15 +8,17 @@
 #ifndef FUNCTION_HYPER_HPP
 #define FUNCTION_HYPER_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/filesystem.hpp>
+
 #include "inspector.hpp"
-#include "boost/filesystem/path.hpp"
-#include <hpx/config/defines.hpp>
+
 #include <string>
 
-using boost::filesystem::path;
+using hpx::filesystem::path;
 
-//When you have a specific line and the line is the location of the link
-inline std::string linelink(const path & full_path, std::string linenumb)
+// When you have a specific line and the line is the location of the link
+inline std::string linelink(path const& full_path, std::string const& linenumb)
 {
     std::string commit = HPX_HAVE_GIT_COMMIT;
     std::string location = boost::inspect::relative_to(
@@ -30,9 +32,10 @@ inline std::string linelink(const path & full_path, std::string linenumb)
     total = total + "</a>";
     return total;
 }
-//When you have a specific line, but a word is the location of the link
-inline std::string wordlink(const path & full_path,
-    std::string linenumb, std::string word)
+
+// When you have a specific line, but a word is the location of the link
+inline std::string wordlink(
+    path const& full_path, std::string const& linenumb, std::string const& word)
 {
     std::string commit = HPX_HAVE_GIT_COMMIT;
     std::string location = boost::inspect::relative_to(
@@ -43,8 +46,9 @@ inline std::string wordlink(const path & full_path,
     total = total + "</a>";
     return total;
 }
-//When you don't have a specific line
-inline std::string loclink(const path & full_path, std::string word)
+
+// When you don't have a specific line
+inline std::string loclink(path const& full_path, std::string const& word)
 {
     std::string commit = HPX_HAVE_GIT_COMMIT;
     std::string location = boost::inspect::relative_to(
@@ -55,4 +59,5 @@ inline std::string loclink(const path & full_path, std::string word)
     total = total + "</a>";
     return total;
 }
+
 #endif

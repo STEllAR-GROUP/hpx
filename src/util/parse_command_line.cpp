@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/datastructures/any.hpp>
+#include <hpx/filesystem.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -17,8 +19,6 @@
 #include <utility>
 #include <vector>
 
-#include <boost/filesystem.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
@@ -28,7 +28,7 @@ namespace hpx { namespace util
         inline std::string
         trim_whitespace (std::string const &s)
         {
-            typedef std::string::size_type size_type;
+            using size_type = std::string::size_type;
 
             size_type first = s.find_first_not_of(" \t");
             if (std::string::npos == first)
@@ -46,9 +46,12 @@ namespace hpx { namespace util
             std::pair<std::string, std::string>& opt)
         {
             // any option not starting with --hpx: will be handled elsewhere
-            char hpx_prefix[] = "--hpx:";
-            std::string::size_type const hpx_prefix_len = sizeof(hpx_prefix)-1;
-            if (s.size() < hpx_prefix_len || s.find(hpx_prefix) != 0 ||
+            constexpr char const hpx_prefix[] = "--hpx:";
+            constexpr std::string::size_type const hpx_prefix_len =
+                sizeof(hpx_prefix) - 1;
+
+            if (s.size() < hpx_prefix_len ||
+                s.compare(0, hpx_prefix_len, hpx_prefix) != 0 ||
                 !std::isdigit(s[hpx_prefix_len]))
             {
                 return false;
@@ -182,9 +185,9 @@ namespace hpx { namespace util
         };
 
         ///////////////////////////////////////////////////////////////////////
-        boost::program_options::basic_command_line_parser<char>&
+        hpx::program_options::basic_command_line_parser<char>&
         get_commandline_parser(
-            boost::program_options::basic_command_line_parser<char>& p,
+            hpx::program_options::basic_command_line_parser<char>& p,
             int mode)
         {
             if ((mode & ~util::report_missing_config_file) == util::allow_unregistered)
@@ -196,8 +199,8 @@ namespace hpx { namespace util
         // Read all options from a given config file, parse and add them to the
         // given variables_map
         bool read_config_file_options(std::string const &filename,
-            boost::program_options::options_description const &desc,
-            boost::program_options::variables_map &vm,
+            hpx::program_options::options_description const &desc,
+            hpx::program_options::variables_map &vm,
             util::section const& rtcfg, std::size_t node, int error_mode)
         {
             std::ifstream ifs(filename.c_str());
@@ -234,12 +237,13 @@ namespace hpx { namespace util
             }
 
             // add options to parsed settings
-            if (options.size() > 0) {
-                using boost::program_options::value;
-                using boost::program_options::store;
-                using boost::program_options::basic_command_line_parser;
-                using boost::program_options::command_line_parser;
-                using namespace boost::program_options::command_line_style;
+            if (!options.empty())
+            {
+                using hpx::program_options::value;
+                using hpx::program_options::store;
+                using hpx::program_options::basic_command_line_parser;
+                using hpx::program_options::command_line_parser;
+                using namespace hpx::program_options::command_line_style;
 
                 store(detail::get_commandline_parser(
                         command_line_parser(options)
@@ -257,36 +261,47 @@ namespace hpx { namespace util
         // starting with the input file path. This allows to use a general
         // <app_name>.cfg file for all executables in a certain project.
         void handle_generic_config_options(std::string appname,
-            boost::program_options::variables_map& vm,
-            boost::program_options::options_description const& desc_cfgfile,
+            hpx::program_options::variables_map& vm,
+            hpx::program_options::options_description const& desc_cfgfile,
             util::section const& ini, std::size_t node, int error_mode)
         {
             if (appname.empty())
                 return;
 
-            boost::filesystem::path dir (boost::filesystem::initial_path());
-            boost::filesystem::path app (appname);
-            appname = boost::filesystem::basename(app.filename());
+            filesystem::path dir (filesystem::initial_path());
+            filesystem::path app (appname);
+            appname = filesystem::basename(app.filename());
 
             // walk up the hierarchy, trying to find a file <appname>.cfg
             while (!dir.empty()) {
-                boost::filesystem::path filename = dir / (appname + ".cfg");
+                filesystem::path filename = dir / (appname + ".cfg");
                 bool result = read_config_file_options(filename.string(),
                     desc_cfgfile, vm, ini, node,
                     error_mode & ~util::report_missing_config_file);
                 if (result)
                     break;    // break on the first options file found
 
+                // Boost filesystem and C++17 filesystem behave differently
+                // here. Boost filesystem returns an empty path for
+                // "/".parent_path() whereas C++17 filesystem will keep
+                // returning "/".
+#if defined(HPX_HAVE_CXX17_FILESYSTEM)
+                auto dir_prev = dir;
+#endif
                 dir = dir.parent_path();    // chop off last directory part
+#if defined(HPX_HAVE_CXX17_FILESYSTEM)
+                if (dir_prev == dir)
+                    break;
+#endif
             }
         }
 
         // handle all --options-config found on the command line
-        void handle_config_options(boost::program_options::variables_map& vm,
-            boost::program_options::options_description const& desc_cfgfile,
+        void handle_config_options(hpx::program_options::variables_map& vm,
+            hpx::program_options::options_description const& desc_cfgfile,
             util::section const& ini, std::size_t node, int error_mode)
         {
-            using boost::program_options::options_description;
+            using hpx::program_options::options_description;
             if (vm.count("hpx:options-file")) {
                 std::vector<std::string> const &cfg_files =
                     vm["hpx:options-file"].as<std::vector<std::string> >();
@@ -304,21 +319,21 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // parse the command line
     bool parse_commandline(util::section const& rtcfg,
-        boost::program_options::options_description const& app_options,
+        hpx::program_options::options_description const& app_options,
         std::string const& arg0, std::vector<std::string> const& args,
-        boost::program_options::variables_map& vm, std::size_t node,
+        hpx::program_options::variables_map& vm, std::size_t node,
         int error_mode, hpx::runtime_mode mode,
-        boost::program_options::options_description* visible,
+        hpx::program_options::options_description* visible,
         std::vector<std::string>* unregistered_options)
     {
-        using boost::program_options::options_description;
-        using boost::program_options::positional_options_description;
-        using boost::program_options::value;
-        using boost::program_options::store;
-        using boost::program_options::command_line_parser;
-        using boost::program_options::parsed_options;
-        using boost::program_options::basic_command_line_parser;
-        using namespace boost::program_options::command_line_style;
+        using hpx::program_options::options_description;
+        using hpx::program_options::positional_options_description;
+        using hpx::program_options::value;
+        using hpx::program_options::store;
+        using hpx::program_options::command_line_parser;
+        using hpx::program_options::parsed_options;
+        using hpx::program_options::basic_command_line_parser;
+        using namespace hpx::program_options::command_line_style;
 
         try {
             options_description cmdline_options(
@@ -403,7 +418,8 @@ namespace hpx { namespace util
                 ("hpx:node", value<std::size_t>(),
                   "number of the node this locality is run on "
                   "(must be unique, alternatively: -0, -1, ..., -9)")
-                ("hpx:ignore-batch-env", "ignore batch environment variables")
+                ("hpx:ignore-batch-env", "ignore batch environment variables "
+                 "(implied by --hpx:use-process-mask)")
                 ("hpx:expect-connecting-localities",
                   "this locality expects other localities to dynamically connect "
                   "(default: false if the number of localities is equal to one, "
@@ -432,6 +448,9 @@ namespace hpx { namespace util
                   "values. Do not use with --hpx:pu-step, --hpx:pu-offset, or "
                   "--hpx:affinity options. Implies --hpx:numa-sensitive=1"
                   "(--hpx:bind=none disables defining thread affinities).")
+                ("hpx:use-process-mask", "use the process mask to restrict"
+                 "available hardware resources (implies "
+                 "--hpx:ignore-batch-environment)")
                 ("hpx:print-bind",
                   "print to the console the bit masks calculated from the "
                   "arguments specified to all --hpx:bind options.")
@@ -613,8 +632,8 @@ namespace hpx { namespace util
 
                 // collect unregistered options, if needed
                 if (unregistered_options) {
-                    using boost::program_options::collect_unrecognized;
-                    using boost::program_options::exclude_positional;
+                    using hpx::program_options::collect_unrecognized;
+                    using hpx::program_options::exclude_positional;
                     *unregistered_options =
                         collect_unrecognized(opts.options, exclude_positional);
                 }
@@ -635,8 +654,8 @@ namespace hpx { namespace util
 
                 // collect unregistered options, if needed
                 if (unregistered_options) {
-                    using boost::program_options::collect_unrecognized;
-                    using boost::program_options::include_positional;
+                    using hpx::program_options::collect_unrecognized;
+                    using hpx::program_options::include_positional;
                     *unregistered_options =
                         collect_unrecognized(opts.options, include_positional);
                 }
@@ -691,13 +710,13 @@ namespace hpx { namespace util
 
     bool parse_commandline(
         util::section const& rtcfg,
-        boost::program_options::options_description const& app_options,
-        std::string const& cmdline, boost::program_options::variables_map& vm,
+        hpx::program_options::options_description const& app_options,
+        std::string const& cmdline, hpx::program_options::variables_map& vm,
         std::size_t node, int error_mode, hpx::runtime_mode mode,
-        boost::program_options::options_description* visible,
+        hpx::program_options::options_description* visible,
         std::vector<std::string>* unregistered_options)
     {
-        using namespace boost::program_options;
+        using namespace hpx::program_options;
 #if defined(HPX_WINDOWS)
         std::vector<std::string> args = split_winmain(cmdline);
 #else
@@ -711,8 +730,8 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // retrieve the command line arguments for the current locality
     bool retrieve_commandline_arguments(
-        boost::program_options::options_description const& app_options,
-        boost::program_options::variables_map& vm)
+        hpx::program_options::options_description const& app_options,
+        hpx::program_options::variables_map& vm)
     {
         // The command line for this application instance is available from
         // this configuration section:
@@ -737,9 +756,9 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // retrieve the command line arguments for the current locality
     bool retrieve_commandline_arguments(
-        std::string const& appname, boost::program_options::variables_map& vm)
+        std::string const& appname, hpx::program_options::variables_map& vm)
     {
-        using boost::program_options::options_description;
+        using hpx::program_options::options_description;
 
         options_description desc_commandline(
             "Usage: " + appname +  " [options]");
@@ -766,36 +785,37 @@ namespace hpx { namespace util
     }
 
     std::string
-    reconstruct_command_line(boost::program_options::variables_map const &vm)
+    reconstruct_command_line(hpx::program_options::variables_map const &vm)
     {
-        typedef std::pair<std::string, boost::program_options::variable_value>
-            value_type;
+        using value_type =
+            std::pair<std::string, hpx::program_options::variable_value>;
 
         std::string command_line;
         for (value_type const& v : vm)
         {
-            boost::any const& value = v.second.value();
-            if (boost::any_cast<std::string>(&value)) {
+            hpx::program_options::any const& value = v.second.value();
+            if (hpx::program_options::any_cast<std::string>(&value)) {
                 add_as_option(command_line, v.first,
                     embed_in_quotes(v.second.as<std::string>()));
                 if (!command_line.empty())
                     command_line += " ";
             }
-            else if (boost::any_cast<double>(&value)) {
+            else if (hpx::program_options::any_cast<double>(&value)) {
                 add_as_option(command_line, v.first,
                     std::to_string(v.second.as<double>()));
                 if (!command_line.empty())
                     command_line += " ";
             }
-            else if (boost::any_cast<int>(&value)) {
+            else if (hpx::program_options::any_cast<int>(&value)) {
                 add_as_option(command_line, v.first,
                     std::to_string(v.second.as<int>()));
                 if (!command_line.empty())
                     command_line += " ";
             }
-            else if (boost::any_cast<std::vector<std::string> >(&value)) {
-                std::vector<std::string> const& vec =
-                    v.second.as<std::vector<std::string> >();
+            else if (hpx::program_options::any_cast<std::vector<std::string>>(
+                         &value))
+            {
+                auto const& vec = v.second.as<std::vector<std::string>>();
                 for (std::string const& e : vec)
                 {
                     add_as_option(command_line, v.first, embed_in_quotes(e));

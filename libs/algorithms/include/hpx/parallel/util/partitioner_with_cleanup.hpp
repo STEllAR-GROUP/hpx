@@ -10,7 +10,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/dataflow.hpp>
 #endif
-#include <hpx/exception_list.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/type_support/unused.hpp>
 

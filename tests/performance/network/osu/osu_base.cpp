@@ -11,10 +11,10 @@
 #include <cstddef>
 
 void print_header();
-void run_benchmark(boost::program_options::variables_map & vm);
+void run_benchmark(hpx::program_options::variables_map & vm);
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map & vm)
+int hpx_main(hpx::program_options::variables_map & vm)
 {
     print_header();
     run_benchmark(vm);
@@ -25,23 +25,23 @@ int hpx_main(boost::program_options::variables_map & vm)
 
 int main(int argc, char* argv[])
 {
-    boost::program_options::options_description
+    hpx::program_options::options_description
         desc("Usage: " HPX_APPLICATION_STRING " [options]");
 
     std::cerr << "main started...\n";
 
     desc.add_options()
         ("window-size",
-         boost::program_options::value<std::size_t>()->default_value(1),
+         hpx::program_options::value<std::size_t>()->default_value(1),
          "Number of messages to send in parallel")
         ("loop",
-         boost::program_options::value<std::size_t>()->default_value(100),
+         hpx::program_options::value<std::size_t>()->default_value(100),
          "Number of loops")
         ("min-size",
-         boost::program_options::value<std::size_t>()->default_value(1),
+         hpx::program_options::value<std::size_t>()->default_value(1),
          "Minimum size of message to send")
         ("max-size",
-         boost::program_options::value<std::size_t>()->default_value((1<<22)),
+         hpx::program_options::value<std::size_t>()->default_value((1<<22)),
          "Maximum size of message to send");
 
     return hpx::init(desc, argc, argv);

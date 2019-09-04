@@ -60,7 +60,7 @@ namespace hpx { namespace iostreams { namespace server
           : write_f(make_std_ostream_write_function(os))
         {}
 
-        output_stream(std::reference_wrapper<std::ostream> os)
+        output_stream(std::reference_wrapper<std::ostream> const& os)
           : write_f(make_std_ostream_write_function(os.get()))
         {}
 

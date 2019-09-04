@@ -53,7 +53,10 @@ namespace hpx { namespace performance_counters { namespace server
         typedef base_performance_counter base_type_holder;
 
         statistics_counter()
-          : parameter1_(0), parameter2_(0)
+          : has_prev_value_(false)
+          , parameter1_(0)
+          , parameter2_(0)
+          , reset_base_counter_(false)
         {}
 
         statistics_counter(counter_info const& info,
@@ -63,13 +66,13 @@ namespace hpx { namespace performance_counters { namespace server
 
         /// Overloads from the base_counter base class.
         hpx::performance_counters::counter_value
-            get_counter_value(bool reset = false);
+            get_counter_value(bool reset = false) override;
 
-        bool start();
+        bool start() override;
 
-        bool stop();
+        bool stop() override;
 
-        void reset_counter_value();
+        void reset_counter_value() override;
 
         void on_terminate() {}
 

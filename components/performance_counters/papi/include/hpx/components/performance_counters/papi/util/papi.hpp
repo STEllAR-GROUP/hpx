@@ -10,9 +10,10 @@
 
 #if defined(HPX_HAVE_PAPI)
 
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/format.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstdint>
 #include <cstring>
@@ -20,8 +21,6 @@
 #include <vector>
 
 #include <boost/generator_iterator.hpp>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 #include <papi.h>
 
@@ -31,8 +30,8 @@
 
 namespace hpx { namespace performance_counters { namespace papi { namespace util
 {
-    using boost::program_options::options_description;
-    using boost::program_options::variables_map;
+    using hpx::program_options::options_description;
+    using hpx::program_options::variables_map;
 
     ///////////////////////////////////////////////////////////////////////////
     // PAPI call wrapper

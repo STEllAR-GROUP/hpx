@@ -12,13 +12,17 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-#include <hpx/util/lockfree/deque.hpp>
+#include <hpx/concurrency/deque.hpp>
 #else
 #include <boost/lockfree/queue.hpp>
 #endif
 
+// Does not rely on CXX11_STD_ATOMIC_128BIT
+#include <hpx/concurrency/concurrentqueue.hpp>
+
 #include <cstddef>
 #include <cstdint>
+#include <utility>
 
 namespace hpx { namespace threads { namespace policies
 {
@@ -73,6 +77,57 @@ struct lockfree_fifo
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// MoodyCamel FIFO
+template <typename T>
+struct moodycamel_fifo_backend
+{
+    typedef moodycamel::ConcurrentQueue<T> container_type;
+    typedef T value_type;
+    typedef T& reference;
+    typedef T const& const_reference;
+    typedef T && rval_reference;
+    typedef std::uint64_t size_type;
+
+    moodycamel_fifo_backend(
+        size_type initial_size = 0
+      , size_type num_thread = size_type(-1)
+        )
+      : queue_(std::size_t(initial_size))
+    {}
+
+    bool push(rval_reference val, bool /*other_end*/ = false)
+    {
+        return queue_.enqueue(std::move(val));
+    }
+
+    bool push(const_reference val, bool /*other_end*/ = false)
+    {
+        return queue_.enqueue(val);
+    }
+
+    bool pop(reference val, bool steal = true)
+    {
+        return queue_.try_dequeue(val);
+    }
+
+    bool empty()
+    {
+        return (queue_.size_approx()==0);
+    }
+
+  private:
+    container_type queue_;
+};
+
+struct concurrentqueue_fifo
+{
+    template <typename T>
+    struct apply
+    {
+        typedef moodycamel_fifo_backend<T> type;
+    };
+};
+
 // LIFO
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
 struct lockfree_lifo;

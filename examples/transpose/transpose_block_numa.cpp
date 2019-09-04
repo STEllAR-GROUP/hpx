@@ -11,6 +11,7 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/serialization.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <hpx/parallel/util/numa_allocator.hpp>
@@ -217,7 +218,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
 
 ///////////////////////////////////////////////////////////////////////////////
 std::size_t get_num_numa_nodes(hpx::threads::topology const& topo,
-    boost::program_options::variables_map& vm)
+    hpx::program_options::variables_map& vm)
 {
     std::size_t numa_nodes = topo.get_number_of_numa_nodes();
     if (numa_nodes == 0)
@@ -236,7 +237,7 @@ std::size_t get_num_numa_nodes(hpx::threads::topology const& topo,
 
 std::pair<std::size_t, std::size_t> get_num_numa_pus(
     hpx::threads::topology const& topo, std::size_t numa_nodes,
-    boost::program_options::variables_map& vm)
+    hpx::program_options::variables_map& vm)
 {
     std::size_t numa_pus = hpx::threads::hardware_concurrency() / numa_nodes;
 
@@ -252,7 +253,7 @@ std::pair<std::size_t, std::size_t> get_num_numa_pus(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     {
         // extract hardware topology
@@ -537,7 +538,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 //
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     options_description desc_commandline;
     desc_commandline.add_options()
@@ -553,10 +554,10 @@ int main(int argc, char* argv[])
          "improved cache and TLB performance")
         ( "verbose", "Verbose output")
         ("transpose-threads",
-         boost::program_options::value<std::string>()->default_value("all"),
+         hpx::program_options::value<std::string>()->default_value("all"),
          "number of threads per NUMA domain to use. (default: all)")
         ("transpose-numa-domains",
-         boost::program_options::value<std::string>()->default_value("all"),
+         hpx::program_options::value<std::string>()->default_value("all"),
          "number of NUMA domains to use. (default: all)")
     ;
 

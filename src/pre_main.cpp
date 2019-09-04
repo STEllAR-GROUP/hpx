@@ -8,8 +8,7 @@
 
 #include <hpx/runtime.hpp>
 
-#include <hpx/error_code.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/detail/barrier_node.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -22,6 +21,7 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/threadmanager_counters.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -56,7 +56,7 @@ static void register_counter_types()
     lbt_ << "(2nd stage) pre_main: registered runtime performance "
             "counter types";
 
-    threads::get_thread_manager().register_counter_types();
+    threads::register_counter_types(threads::get_thread_manager());
     lbt_ << "(2nd stage) pre_main: registered thread-manager performance "
             "counter types";
 
@@ -82,7 +82,6 @@ static void register_message_handlers()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Implements second and third stage bootstrapping.
-int pre_main(runtime_mode mode);
 int pre_main(runtime_mode mode)
 {
     // Register pre-shutdown and shutdown functions to flush pending

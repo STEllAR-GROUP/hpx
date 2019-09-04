@@ -10,7 +10,7 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/thread_description.hpp>

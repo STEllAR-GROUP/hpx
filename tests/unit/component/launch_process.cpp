@@ -3,14 +3,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/filesystem.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/process.hpp>
 #include <hpx/testing.hpp>
 
 #include <tests/unit/component/components/launch_process_test_server.hpp>
-
-#include <boost/filesystem.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -45,10 +44,10 @@ std::vector<std::string> get_environment()
 }
 
 // ----------------------------------------------------------------------------
-int hpx_main(boost::program_options::variables_map &vm)
+int hpx_main(hpx::program_options::variables_map &vm)
 {
     namespace process = hpx::components::process;
-    namespace fs = boost::filesystem;
+    namespace fs = hpx::filesystem;
 
     // find where the HPX core libraries are located
     fs::path base_dir = hpx::util::find_prefix();
@@ -153,7 +152,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 int main(int argc, char* argv[])
 {
     // add command line option which controls the random number generator seed
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()("launch,l", value<std::string>(),

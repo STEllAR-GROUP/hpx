@@ -12,6 +12,8 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 
+#include <boost/io/ios_state.hpp>
+
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////

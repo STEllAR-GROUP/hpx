@@ -22,7 +22,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/type_support/unused.hpp>

@@ -321,16 +321,15 @@ namespace verbs
         // Constructor : mostly just initializes the superclass with 'here'
         // --------------------------------------------------------------------
         parcelport(util::runtime_configuration const& ini,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void(std::size_t, char const*)> const& on_stop_thread)
-            : base_type(ini, here(ini), on_start_thread, on_stop_thread)
-            , active_send_count_(0)
-            , immediate_send_allowed_(true)
-            , stopped_(false)
-            , sends_posted(0)
-            , handled_receives(0)
-            , completions_handled(0)
-            , total_reads(0)
+            threads::policies::callback_notifier const& notifier)
+          : base_type(ini, here(ini), notifier)
+          , active_send_count_(0)
+          , immediate_send_allowed_(true)
+          , stopped_(false)
+          , sends_posted(0)
+          , handled_receives(0)
+          , completions_handled(0)
+          , total_reads(0)
         {
             FUNC_START_DEBUG_MSG;
             // we need this for background OS threads to get 'this' pointer

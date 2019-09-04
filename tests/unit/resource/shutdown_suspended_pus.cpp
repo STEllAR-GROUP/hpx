@@ -33,11 +33,11 @@ int hpx_main(int argc, char* argv[])
     // Remove all but one pu
     for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
     {
-        tp.suspend_processing_unit(thread_num).get();
+        hpx::threads::suspend_processing_unit(tp, thread_num).get();
     }
 
     // Schedule some dummy work
-    for (std::size_t i = 0; i < 100000; ++i)
+    for (std::size_t i = 0; i < 10000; ++i)
     {
         hpx::apply([](){});
     }

@@ -13,8 +13,8 @@
 
 #include <vector>
 
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
 
 using hpx::naming::id_type;
 using hpx::async;

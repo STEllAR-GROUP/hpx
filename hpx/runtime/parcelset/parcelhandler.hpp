@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -88,10 +88,7 @@ namespace hpx { namespace parcelset
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(util::runtime_configuration& cfg,
             threads::threadmanager* tm,
-            util::function_nonser<void(std::size_t, char const*)> const&
-                on_start_thread,
-            util::function_nonser<void(std::size_t, char const*)> const&
-                on_stop_thread);
+            threads::policies::callback_notifier const& notifer);
 
         ~parcelhandler() {}
 
@@ -197,10 +194,13 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         HPX_FORCEINLINE void put_parcel(parcel p)
         {
-            put_parcel(std::move(p), [=](
-                boost::system::error_code const& ec, parcel const & p) -> void {
-                    return invoke_write_handler(ec, p);
-                });
+            auto f =
+                [=](boost::system::error_code const& ec, parcel const& p) -> void
+                {
+                    invoke_write_handler(ec, p);
+                };
+
+            put_parcel(std::move(p), std::move(f));
         }
 
         /// A parcel is submitted for transport at the source locality site to

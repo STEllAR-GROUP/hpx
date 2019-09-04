@@ -178,7 +178,8 @@ set(HPX_CONF_INCLUDE_DIRS
 )
 foreach(lib ${HPX_LIBS})
   set(HPX_CONF_INCLUDE_DIRS
-    "${HPX_CONF_INCLUDE_DIRS} -I${PROJECT_SOURCE_DIR}/libs/${lib}/include")
+    "${HPX_CONF_INCLUDE_DIRS} -I${PROJECT_SOURCE_DIR}/libs/${lib}/include \
+    -I${CMAKE_BINARY_DIR}/libs/${lib}/include")
 endforeach()
 foreach(component ${HPX_COMPONENTS})
   set(HPX_CONF_INCLUDE_DIRS

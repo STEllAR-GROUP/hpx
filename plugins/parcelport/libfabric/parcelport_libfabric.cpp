@@ -91,12 +91,11 @@ namespace libfabric
     // Constructor : mostly just initializes the superclass with 'here'
     // --------------------------------------------------------------------
     parcelport::parcelport(util::runtime_configuration const& ini,
-        util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-        util::function_nonser<void(std::size_t, char const*)> const& on_stop_thread)
-        : base_type(ini, locality(), on_start_thread, on_stop_thread)
-        , stopped_(false)
-        , completions_handled_(0)
-        , senders_in_use_(0)
+        threads::policies::callback_notifier const& notifier)
+      : base_type(ini, locality(), notifier)
+      , stopped_(false)
+      , completions_handled_(0)
+      , senders_in_use_(0)
     {
         FUNC_START_DEBUG_MSG;
 

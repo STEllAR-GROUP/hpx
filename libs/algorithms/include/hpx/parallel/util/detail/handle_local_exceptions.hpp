@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
-#include <hpx/exception_list.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 

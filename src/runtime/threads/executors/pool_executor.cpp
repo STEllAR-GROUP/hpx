@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/bind.hpp>
@@ -82,8 +82,8 @@ namespace hpx { namespace threads { namespace executors
             if (stacksize == threads::thread_stacksize_default)
                 stacksize = stacksize_;
 
-            data.stacksize    = threads::get_stack_size(stacksize);
-            data.priority     = priority_;
+            data.stacksize = pool_.get_scheduler()->get_stack_size(stacksize);
+            data.priority = priority_;
             data.schedulehint = schedulehint;
 
             threads::thread_id_type id = threads::invalid_thread_id;
@@ -113,8 +113,10 @@ namespace hpx { namespace threads { namespace executors
                 desc);
 
             if (stacksize == threads::thread_stacksize_default)
+            {
                 stacksize = stacksize_;
-            data.stacksize = threads::get_stack_size(stacksize);
+            }
+            data.stacksize = pool_.get_scheduler()->get_stack_size(stacksize);
             data.priority = priority_;
 
             threads::thread_id_type id = threads::invalid_thread_id;

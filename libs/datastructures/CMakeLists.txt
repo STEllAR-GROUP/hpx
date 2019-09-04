@@ -6,13 +6,16 @@
 cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
 set(datastructures_headers
+  hpx/datastructures/any.hpp
   hpx/datastructures/tuple.hpp
   hpx/datastructures/optional.hpp
   hpx/datastructures/detail/pack.hpp
+  hpx/traits/supports_streaming_with_any.hpp
 )
 
 set(datastructures_compat_headers
   hpx/util/detail/pack.hpp
+  hpx/util/any.hpp
   hpx/util/optional.hpp
   hpx/util/tuple.hpp
 )
@@ -27,9 +30,13 @@ add_hpx_module(datastructures
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER
     "hpx/datastructures/detail/pack.hpp"
+    "hpx/traits/supports_streaming_with_any.hpp"
   SOURCES ${datastructures_sources}
   HEADERS ${datastructures_headers}
   COMPAT_HEADERS ${datastructures_compat_headers}
-  DEPENDENCIES hpx_config hpx_type_support
+  DEPENDENCIES
+    hpx_assertion
+    hpx_config
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

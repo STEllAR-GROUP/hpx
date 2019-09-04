@@ -19,17 +19,25 @@ All modules
    /libs/cache/docs/index.rst
    /libs/collectives/docs/index.rst
    /libs/concepts/docs/index.rst
+   /libs/concurrency/docs/index.rst
    /libs/config/docs/index.rst
    /libs/datastructures/docs/index.rst
+   /libs/errors/docs/index.rst
+   /libs/filesystem/docs/index.rst
    /libs/format/docs/index.rst
    /libs/hardware/docs/index.rst
    /libs/hashing/docs/index.rst
    /libs/iterator_support/docs/index.rst
    /libs/logging/docs/index.rst
+   /libs/parallel_executors/docs/index.rst
    /libs/preprocessor/docs/index.rst
+   /libs/program_options/docs/index.rst
+   /libs/resiliency/docs/index.rst
+   /libs/segmented_algorithms/docs/index.rst
    /libs/statistics/docs/index.rst
    /libs/testing/docs/index.rst
    /libs/thread_support/docs/index.rst
    /libs/timing/docs/index.rst
+   /libs/topology/docs/index.rst
    /libs/type_support/docs/index.rst
    /libs/util/docs/index.rst

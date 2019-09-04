@@ -5,7 +5,7 @@
 
 #include <hpx/runtime/threads/executors/thread_pool_attached_executors.hpp>
 
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #  include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #endif

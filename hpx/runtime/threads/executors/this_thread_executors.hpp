@@ -10,9 +10,10 @@
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -40,7 +41,10 @@ namespace hpx { namespace threads { namespace executors
           : public threads::detail::scheduled_executor_base
         {
         public:
-            this_thread_executor(char const* description = "this_thread_executor");
+            explicit this_thread_executor(
+                char const* description = "this_thread_executor",
+                policies::detail::affinity_data const& affinity_data =
+                    policies::detail::affinity_data());
             ~this_thread_executor();
 
             // Schedule the specified function for execution in this executor.

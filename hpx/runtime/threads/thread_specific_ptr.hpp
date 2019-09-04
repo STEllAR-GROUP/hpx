@@ -32,7 +32,7 @@ namespace hpx { namespace threads
         struct delete_data
           : coroutines::detail::tss_cleanup_function
         {
-            void operator()(void* data)
+            void operator()(void* data) override
             {
                 delete static_cast<T*>(data);
             }
@@ -45,7 +45,7 @@ namespace hpx { namespace threads
                 cleanup_function(cleanup_function_)
             {}
 
-            void operator()(void* data)
+            void operator()(void* data) override
             {
                 cleanup_function(static_cast<T*>(data));
             }

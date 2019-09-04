@@ -30,7 +30,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
     std::vector<block> const & trans);
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::uint64_t order = vm["matrix_size"].as<std::uint64_t>();
     std::uint64_t iterations = vm["iterations"].as<std::uint64_t>();
@@ -164,7 +164,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     options_description desc_commandline;
     desc_commandline.add_options()

@@ -8,13 +8,11 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/util/register_locks.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/util/function.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif

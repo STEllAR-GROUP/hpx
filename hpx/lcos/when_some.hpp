@@ -229,7 +229,7 @@ namespace hpx
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/util/detail/reserve.hpp>
@@ -281,7 +281,7 @@ namespace hpx { namespace lcos
                 indices = rhs.indices;
                 futures = rhs.futures;
             }
-            return true;
+            return *this;
         }
 
         when_some_result& operator=(when_some_result && rhs)
@@ -291,7 +291,7 @@ namespace hpx { namespace lcos
                 indices = std::move(rhs.indices);
                 futures = std::move(rhs.futures);
             }
-            return true;
+            return *this;
         }
 
         std::vector<std::size_t> indices;

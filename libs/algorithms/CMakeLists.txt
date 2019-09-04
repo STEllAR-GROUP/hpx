@@ -16,8 +16,6 @@ set(algorithms_headers
   hpx/parallel/algorithms/detail/accumulate.hpp
   hpx/parallel/algorithms/detail/dispatch.hpp
   hpx/parallel/algorithms/detail/distance.hpp
-  hpx/parallel/algorithms/detail/is_negative.hpp
-  hpx/parallel/algorithms/detail/predicates.hpp
   hpx/parallel/algorithms/detail/set_operation.hpp
   hpx/parallel/algorithms/detail/transfer.hpp
   hpx/parallel/algorithms/equal.hpp
@@ -88,7 +86,11 @@ set(algorithms_headers
   hpx/parallel/container_algorithms/sort.hpp
   hpx/parallel/container_algorithms/transform.hpp
   hpx/parallel/container_algorithms/unique.hpp
-  hpx/parallel/exception_list.hpp
+  hpx/parallel/datapar.hpp
+  hpx/parallel/datapar/iterator_helpers.hpp
+  hpx/parallel/datapar/loop.hpp
+  hpx/parallel/datapar/transform_loop.hpp
+  hpx/parallel/datapar/zip_iterator.hpp
   hpx/parallel/memory.hpp
   hpx/parallel/numeric.hpp
   hpx/parallel/tagspec.hpp
@@ -115,6 +117,8 @@ set(algorithms_headers
   hpx/parallel/util/transfer.hpp
   hpx/parallel/util/transform_loop.hpp
   hpx/parallel/util/zip_iterator.hpp
+  hpx/traits/is_value_proxy.hpp
+  hpx/traits/segmented_iterator_traits.hpp
 )
 
 include(HPX_AddModule)
@@ -124,6 +128,6 @@ add_hpx_module(algorithms
     # TODO: Really depends on main HPX library, but cannot add that as a
     # dependency yet. Need to have the parts that algorithms depends on in
     # separate modules first.
-    DEPENDENCIES hpx_assertion hpx_config hpx_timing
+    DEPENDENCIES hpx_assertion hpx_config hpx_iterator_support hpx_timing
     CMAKE_SUBDIRS examples tests
 )

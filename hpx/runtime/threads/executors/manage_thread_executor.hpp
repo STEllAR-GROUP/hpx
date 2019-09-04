@@ -7,7 +7,7 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_MANAGE_THREAD_EXECUTOR_JUL_16_2015_0745PM
 
 #include <hpx/config.hpp>
-#include <hpx/error.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 
 #include <cstddef>

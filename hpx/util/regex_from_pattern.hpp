@@ -7,7 +7,7 @@
 #define HPX_UTIL_REGEX_FROM_PATTERN_DEC_13_2017_1016AM
 
 #include <hpx/config.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 
 #include <string>
 

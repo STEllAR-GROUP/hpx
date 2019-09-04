@@ -50,7 +50,7 @@ namespace hpx { namespace components
             std::vector<performance_counters::performance_counter> && counters);
 
         HPX_EXPORT hpx::future<std::vector<std::uint64_t> > get_counter_values(
-            std::string component_name, std::string const& counter_name,
+            std::string const& component_name, std::string const& counter_name,
             std::vector<hpx::id_type> const& localities);
 
         HPX_EXPORT hpx::id_type const& get_best_locality(
