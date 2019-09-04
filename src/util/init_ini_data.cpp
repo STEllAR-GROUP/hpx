@@ -16,6 +16,7 @@
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/plugin.hpp>
+#include <hpx/version.hpp>
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/tokenizer.hpp>

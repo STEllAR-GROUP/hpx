@@ -96,6 +96,6 @@ add_hpx_module(logging
     SOURCES ${logging_sources}
     HEADERS ${logging_headers}
     COMPAT_HEADERS ${logging_compat_headers}
-    DEPENDENCIES hpx_assertion hpx_config hpx_filesystem
+    DEPENDENCIES hpx_assertion hpx_config hpx_filesystem hpx_concurrency hpx_timing
     CMAKE_SUBDIRS examples tests
 )
