@@ -95,7 +95,6 @@ include(CheckCXXCompilerFlag)
 include(CMakeDependentOption)
 
 # include additional macro definitions
-include(HPX_ExportTargets)
 include(HPX_Libraries)
 include(HPX_LibraryDir)
 include(HPX_AddConfigTest)

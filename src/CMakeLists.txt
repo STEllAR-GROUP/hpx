@@ -323,6 +323,7 @@ endforeach()
 
 # integrate the hpx modules with the main library
 foreach(_module ${HPX_LIBS})
+
   set(_module_target hpx_${_module})
   if(UNIX OR APPLE)
     # add the full archive (some are not used directly in libhpx and need to be
@@ -338,6 +339,7 @@ foreach(_module ${HPX_LIBS})
   # compilation against indirectly included headers
   get_target_property(_module_includes hpx_${_module} INTERFACE_INCLUDE_DIRECTORIES)
   target_include_directories(hpx PUBLIC ${_module_includes})
+
 endforeach()
 
 target_compile_definitions(hpx PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE

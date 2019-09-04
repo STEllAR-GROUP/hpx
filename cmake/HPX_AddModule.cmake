@@ -4,9 +4,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+include(HPX_ExportTargets)
+
 function(add_hpx_module name)
   # Retrieve arguments
-  set(options DEPRECATION_WARNINGS EXPORT FORCE_LINKING_GEN INSTALL_BINARIES
+  set(options DEPRECATION_WARNINGS FORCE_LINKING_GEN
     CUDA CONFIG_FILES)
   # Compatibility needs to be on/off to allow 3 states : ON/OFF and disabled
   set(one_value_args COMPATIBILITY_HEADERS GLOBAL_HEADER_GEN)
@@ -228,17 +230,13 @@ function(add_hpx_module name)
     POSITION_INDEPENDENT_CODE ON)
 
   # Install the static library for the module
-  if(${name}_INSTALL_BINARIES)
-    install(TARGETS hpx_${name} EXPORT HPXTargets
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-      COMPONENT ${name}
-    )
-    if(${name}_EXPORT)
-      hpx_export_targets(hpx_${name})
-    endif()
-  endif()
+  install(TARGETS hpx_${name} EXPORT HPXModulesTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT ${name}
+  )
+  hpx_export_modules_targets(hpx_${name})
 
   # Install the headers from the source
   install(
