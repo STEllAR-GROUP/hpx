@@ -21,7 +21,7 @@ set(HPX_LIBS
   datastructures
   debugging
   errors
-  executors
+  execution
   filesystem
   format
   functional

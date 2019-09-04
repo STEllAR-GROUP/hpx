@@ -6,10 +6,10 @@
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 =========
-executors
+execution
 =========
 
 This library is part of HPX.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/libs/executors/docs/index.html>`__.
+<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/libs/execution/docs/index.html>`__.

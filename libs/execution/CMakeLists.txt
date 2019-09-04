@@ -5,7 +5,9 @@
 
 cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
-set(executors_headers
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+set(execution_headers
   hpx/parallel/algorithms/detail/is_negative.hpp
   hpx/parallel/algorithms/detail/predicates.hpp
   hpx/parallel/datapar/execution_policy_fwd.hpp
@@ -67,9 +69,19 @@ set(executors_headers
 )
 
 include(HPX_AddModule)
-add_hpx_module(executors
+add_hpx_module(execution
     FORCE_LINKING_GEN
-    HEADERS ${executors_headers}
-    DEPENDENCIES hpx_assertion hpx_config
+    HEADERS ${execution_headers}
+    DEPENDENCIES
+      hpx_allocator_support
+      hpx_assertion
+      hpx_concepts
+      hpx_config
+      hpx_datastructures
+      hpx_iterator_support
+      hpx_preprocessor
+      hpx_timing
+      hpx_topology
+      hpx_type_support
     CMAKE_SUBDIRS examples tests
 )

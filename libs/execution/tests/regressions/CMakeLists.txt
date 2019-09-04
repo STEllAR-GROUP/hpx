@@ -30,8 +30,8 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Regressions/Modules/Executors")
+                     FOLDER "Tests/Regressions/Modules/Execution")
 
-  add_hpx_regression_test("modules.executors" ${test} ${${test}_PARAMETERS})
+  add_hpx_regression_test("modules.execution" ${test} ${${test}_PARAMETERS})
 
 endforeach()

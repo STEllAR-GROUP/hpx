@@ -33,6 +33,10 @@ include(HPX_AddModule)
 add_hpx_module(segmented_algorithms
     FORCE_LINKING_GEN
     HEADERS ${segmented_algorithms_headers}
-    DEPENDENCIES hpx_algorithms hpx_assertion hpx_config hpx_executors
+    DEPENDENCIES
+      hpx_algorithms
+      hpx_assertion
+      hpx_config
+      hpx_execution
     CMAKE_SUBDIRS examples tests
 )
