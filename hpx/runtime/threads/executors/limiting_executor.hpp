@@ -70,8 +70,10 @@ namespace hpx { namespace threads { namespace executors
         {
             if (++count_ > upper_threshold_) {
                 hpx::util::yield_while([&](){
-                    return (count_ > lower_threshold_);
-                });
+                        return (count_ > lower_threshold_);
+                    },
+                    nullptr, hpx::threads::pending, false
+                );
             }
         }
 
