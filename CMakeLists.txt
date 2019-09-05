@@ -1618,6 +1618,8 @@ set(HPX_WITH_TARGET_ARCHITECTURE ${__target_arch} CACHE INTERNAL "" FORCE)
 
 # Setup our required Boost libraries.
 include(HPX_SetupBoost)
+include(HPX_SetupBoostFilesystem)
+include(HPX_SetupBoostProgramOptions)
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
 include(HPX_SetupHwloc)

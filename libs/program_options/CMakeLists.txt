@@ -8,31 +8,6 @@ cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-include(HPX_Option)
-
-# Compatibility with using Boost.ProgramOptions, introduced in V1.4.0
-hpx_option(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY
-    BOOL "Enable Boost.ProgramOptions compatibility. (default: ON)"
-    ON ADVANCED CATEGORY "Modules")
-
-set(__boost_program_options)
-if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-
-  hpx_add_config_define_namespace(
-    DEFINE HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY
-    NAMESPACE PROGRAM_OPTIONS)
-
-  find_package(Boost ${Boost_MINIMUM_VERSION}
-    QUIET MODULE
-    COMPONENTS program_options)
-  if(Boost_PROGRAM_OPTIONS_FOUND)
-    set(__boost_program_options ${Boost_LIBRARIES})
-  else()
-    hpx_error("Could not find Boost.ProgramOptions. Provide a boost installation including the program_options library")
-  endif()
-  hpx_libraries(${Boost_LIBRARIES})
-endif()
-
 # Default location is $HPX_ROOT/libs/program_options/include
 set(program_options_headers
   hpx/program_options.hpp
@@ -86,7 +61,3 @@ add_hpx_module(program_options
     ${__boost_program_options}
   CMAKE_SUBDIRS examples tests
 )
-
-if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-  hpx_info("    Boost library found: program_options")
-endif()

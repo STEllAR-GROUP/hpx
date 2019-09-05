@@ -253,6 +253,17 @@ target_include_directories(hpx PUBLIC
   $<INSTALL_INTERFACE:include>
   )
 
+# FIXME : temporary add public dependencies to the boost libraries which are
+# only linked in the modules (which are themselves privately linked to hpx), it
+# should be removed when we make the modules object libraries that we publicly
+# link to hpx
+if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+  target_link_libraries(hpx PUBLIC hpx::boost::program_options)
+endif()
+if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
+  target_link_libraries(hpx PUBLIC hpx::boost::filesystem)
+endif()
+
 target_link_libraries(hpx PUBLIC hpx::allocator)
 
 target_link_libraries(hpx PRIVATE hpx::hwloc)

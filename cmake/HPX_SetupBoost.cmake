@@ -37,9 +37,13 @@ set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
 find_package(Boost ${Boost_MINIMUM_VERSION} REQUIRED)
 if(NOT Boost_VERSION_STRING)
   set(Boost_VERSION_STRING "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
+
+set(__boost_libraries )
+if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
+   HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE)
+  set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono thread)
 endif()
 
-set(__boost_libraries program_options)
 # Boost.System is header-only from 1.69 onwards.
 if(Boost_VERSION_STRING VERSION_LESS 1.69)
   set(__boost_libraries ${__boost_libraries} system)
@@ -98,7 +102,7 @@ endif()
 set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
 set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${Boost_LIBRARIES})
 
-find_package(Threads REQUIRED)
+find_package(Threads QUIET REQUIRED)
 set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES Threads::Threads)
 
 if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
