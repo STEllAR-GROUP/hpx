@@ -661,7 +661,8 @@ namespace hpx
             hpx::assertion::set_assertion_handler(&detail::assertion_handler);
             hpx::util::set_test_failure_handler(&detail::test_failure_handler);
 #if defined(HPX_HAVE_APEX)
-            hpx::util::set_enable_parent_task_handler(&detail::enable_parent_task_handler);
+            hpx::util::set_enable_parent_task_handler(
+                &detail::enable_parent_task_handler);
 #endif
             hpx::set_custom_exception_info_handler(&detail::custom_exception_info);
             hpx::set_pre_exception_handler(&detail::pre_exception_handler);

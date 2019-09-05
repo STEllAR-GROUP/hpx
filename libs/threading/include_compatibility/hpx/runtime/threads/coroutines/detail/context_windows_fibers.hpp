@@ -10,11 +10,13 @@
 #if defined(HPX_THREADING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message( \
-    "The header hpx/runtime/threads/coroutines/detail/context_windows_fibers.hpp is deprecated, \
-    please include hpx/threading/coroutines/detail/context_windows_fibers.hpp instead")
+    "The header hpx/runtime/threads/coroutines/detail/context_windows_fibers.hpp \
+    is deprecated, please include \
+    hpx/threading/coroutines/detail/context_windows_fibers.hpp instead")
 #else
 #warning \
-    "The header hpx/runtime/threads/coroutines/detail/context_windows_fibers.hpp is deprecated, \
-    please include hpx/threading/coroutines/detail/context_windows_fibers.hpp instead"
+    "The header hpx/runtime/threads/coroutines/detail/context_windows_fibers.hpp \
+    is deprecated, please include \
+    hpx/threading/coroutines/detail/context_windows_fibers.hpp instead"
 #endif
 #endif
