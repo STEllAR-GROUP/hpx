@@ -57,7 +57,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         // ----------------------------------------------------------------
-        void init(std::size_t queues, const thread_queue_init_parameters &init)
+        void init(std::size_t queues)
         {
             num_queues_ = queues;
             // start with unset queue pointers

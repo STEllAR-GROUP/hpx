@@ -87,7 +87,7 @@ namespace hpx { namespace threads { namespace policies
 
             std::size_t added = 0;
             task_description task;
-            while (add_count-- && addfrom->new_tasks_.pop(task, steal))
+            while (add_count-- && addfrom->new_task_items_.pop(task, steal))
             {
                 // create the new thread
                 threads::thread_init_data& data = util::get<0>(task);
@@ -103,8 +103,7 @@ namespace hpx { namespace threads { namespace policies
                 holder_->debug("add_new 2 ", queue_index, new_tasks_count_.data_, work_items_count_.data_, get_thread_id_data(tid));
                 // only insert the thread into the work-items queue if it is in
                 // pending state
-                if (state == pending)
-                {
+                if (state == pending) {
                     // pushing the new thread into the pending queue of the
                     // specified thread_queue
                     ++added;
@@ -115,10 +114,8 @@ namespace hpx { namespace threads { namespace policies
                     get_queue<queue_holder_thread<thread_queue_type>>() == holder_);
             }
 
-            if (added)
-            {
-                LTM_(debug) << "add_new: added " << added
-                            << " tasks to queues";    //-V128
+            if (added) {
+                LTM_(debug) << "add_new: added " << added << " tasks to queues"; //-V128
             }
             return added;
         }
@@ -173,14 +170,13 @@ namespace hpx { namespace threads { namespace policies
     public:
 
         thread_queue_mc(
-            thread_queue_init_parameters parameters,
-            queue_holder_thread<thread_queue_type> *holder,
+            const thread_queue_init_parameters &parameters,
             std::size_t queue_num = std::size_t(-1))
           : parameters_(parameters)
           , queue_index(queue_num)
-          , holder_(holder)
-          , work_items_(128, queue_num)
-          , new_tasks_(128)
+          , holder_(nullptr)
+          , new_task_items_(128)
+          , work_items_(128)
         {
             new_tasks_count_.data_ = 0;
             work_items_count_.data_ = 0;
@@ -197,7 +193,7 @@ namespace hpx { namespace threads { namespace policies
         {
         }
 
-        ///////////////////////////////////////////////////////////////////////
+        // ----------------------------------------------------------------
         // This returns the current length of the queues (work items and new items)
         std::int64_t get_queue_length() const
         {
@@ -236,8 +232,7 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, bool run_now, error_code& ec)
         {
             // thread has not been created yet
-            if (id)
-                *id = invalid_thread_id;
+            if (id) *id = invalid_thread_id;
 
             LOG_CUSTOM_MSG("thread_queue_mc::create_thread run_now " << run_now);
 
@@ -254,6 +249,7 @@ namespace hpx { namespace threads { namespace policies
                 if (initial_state == pending)
                     schedule_thread(get_thread_id_data(tid), false);
 
+
                 // return the thread_id of the newly created thread
                 if (id)
                     *id = tid;
@@ -267,7 +263,7 @@ namespace hpx { namespace threads { namespace policies
             // later thread creation
             ++new_tasks_count_.data_;
 
-            new_tasks_.push(task_description(std::move(data), initial_state));  //-V106
+            new_task_items_.push(task_description(std::move(data), initial_state));
             if (&ec != &throws)
                 ec = make_success_code();
 
@@ -373,22 +369,15 @@ namespace hpx { namespace threads { namespace policies
 
         queue_holder_thread<thread_queue_type> *holder_;
 
-        // list of active work items
-        work_items_type work_items_;
-
-        task_items_type new_tasks_;    // list of new tasks to run
-
         // count of new tasks to run, separate to new cache line to avoid false
         // sharing
-        mutable util::cache_line_data<
-            std::atomic<std::int64_t>
-        > new_tasks_count_;
+        util::cache_line_data<std::atomic<std::int32_t>> new_tasks_count_;
 
-        mutable util::cache_line_data<
-            std::atomic<std::int64_t>
-        > work_items_count_;
+        task_items_type new_task_items_;
 
+        util::cache_line_data<std::atomic<std::int32_t>> work_items_count_;
 
+        work_items_type work_items_;
 #ifdef SHARED_PRIORITY_SCHEDULER_DEBUG
         std::mutex special_mtx_;
 #endif
