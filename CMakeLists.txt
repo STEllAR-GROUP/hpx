@@ -64,6 +64,9 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 ################################################################################
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
+# To fix the windows link bug (need to be included only once!)
+include(HPX_FilterLibrariesMSVC)
+
 include(GNUInstallDirs)
 include(HPX_Utils)
 
