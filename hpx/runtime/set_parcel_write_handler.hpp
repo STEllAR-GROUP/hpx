@@ -8,6 +8,8 @@
 #define HPX_RUNTIME_SET_PARCEL_WRITE_HANDLER_FEB_25_2015_0806PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/errors.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/functional/function.hpp>
@@ -45,4 +47,5 @@ namespace hpx
         parcel_write_handler_type const& f);
 }
 
+#endif
 #endif

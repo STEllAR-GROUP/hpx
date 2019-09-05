@@ -16,6 +16,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/state.hpp>
 #include <hpx/format.hpp>
+#include <hpx/timing.hpp>
 
 #include <cstdint>
 #include <iostream>

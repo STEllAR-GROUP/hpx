@@ -187,6 +187,7 @@ void primary_namespace::finalize()
     }
 }
 
+#if defined(HPX_HAVE_NETWORKING)
 // Parcel routing forwards the message handler request to the routed action
 parcelset::policies::message_handler* primary_namespace::get_message_handler(
     parcelset::parcelhandler* ph
@@ -217,6 +218,7 @@ serialization::binary_filter* primary_namespace::get_serialization_filter(
     parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
     return routed_p.get_serialization_filter();
 }
+#endif
 
 // start migration of the given object
 std::pair<naming::id_type, naming::address>

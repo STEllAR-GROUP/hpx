@@ -27,15 +27,17 @@ namespace hpx { namespace actions { namespace detail
         HPX_NON_COPYABLE(invocation_count_registry);
 
     public:
-        typedef std::int64_t (*get_invocation_count_type)(bool);
-        typedef std::unordered_map<
+        using get_invocation_count_type = std::int64_t (*)(bool);
+        using map_type = std::unordered_map<
                 std::string, get_invocation_count_type, hpx::util::jenkins_hash
-            > map_type;
+            >;
 
         invocation_count_registry() {}
 
         static invocation_count_registry& local_instance();
+#if defined(HPX_HAVE_NETWORKING)
         static invocation_count_registry& remote_instance();
+#endif
 
         void register_class(std::string const& name, get_invocation_count_type fun);
 
@@ -50,11 +52,12 @@ namespace hpx { namespace actions { namespace detail
 
     private:
         struct local_tag {};
-        struct remote_tag {};
-
         friend struct hpx::util::static_<invocation_count_registry, local_tag>;
-        friend struct hpx::util::static_<invocation_count_registry, remote_tag>;
 
+#if defined(HPX_HAVE_NETWORKING)
+        struct remote_tag {};
+        friend struct hpx::util::static_<invocation_count_registry, remote_tag>;
+#endif
         map_type map_;
     };
 
@@ -62,9 +65,11 @@ namespace hpx { namespace actions { namespace detail
     void register_local_action_invocation_count(
         invocation_count_registry& registry);
 
+#if defined(HPX_HAVE_NETWORKING)
     template <typename Action>
     void register_remote_action_invocation_count(
         invocation_count_registry& registry);
+#endif
 
     template <typename Action>
     struct register_action_invocation_count
@@ -74,8 +79,10 @@ namespace hpx { namespace actions { namespace detail
             register_local_action_invocation_count<Action>(
                 invocation_count_registry::local_instance());
 
+#if defined(HPX_HAVE_NETWORKING)
             register_remote_action_invocation_count<Action>(
                 invocation_count_registry::remote_instance());
+#endif
         }
 
         static register_action_invocation_count instance;

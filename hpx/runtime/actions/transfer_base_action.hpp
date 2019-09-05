@@ -11,6 +11,9 @@
 #ifndef HPX_RUNTIME_ACTIONS_TRANSFER_BASE_ACTION_HPP
 #define HPX_RUNTIME_ACTIONS_TRANSFER_BASE_ACTION_HPP
 
+#include <hpx/config/defines.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/actions_fwd.hpp>
 
 #include <hpx/assertion.hpp>
@@ -241,7 +244,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        action_type get_action_type() const override
+        action_flavor get_action_type() const override
         {
             return derived_type::get_action_type();
         }
@@ -366,4 +369,5 @@ namespace hpx { namespace parcelset { namespace detail
 }}}
 #endif
 
+#endif
 #endif

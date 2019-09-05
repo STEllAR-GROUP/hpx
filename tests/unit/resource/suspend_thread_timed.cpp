@@ -15,6 +15,7 @@
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing.hpp>
 
 #include <chrono>
 #include <cstddef>

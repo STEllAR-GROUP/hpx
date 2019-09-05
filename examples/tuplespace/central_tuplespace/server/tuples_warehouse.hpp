@@ -12,7 +12,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/timing.hpp>
 #include <hpx/util/storage/tuple.hpp>
 
 #include <algorithm>

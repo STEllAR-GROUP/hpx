@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/runtime.hpp>
@@ -537,3 +539,4 @@ namespace hpx { namespace parcelset
     }
 }}
 
+#endif

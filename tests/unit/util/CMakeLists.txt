@@ -31,9 +31,7 @@ if(HWLOC_FOUND)
   set(parse_affinity_options_PARAMETERS THREADS_PER_LOCALITY 2)
 endif()
 
-set(serialize_buffer_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
+set(serialize_buffer_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 
 foreach(test ${tests})
   set(sources

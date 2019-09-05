@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <hpx/runtime/actions/base_action.hpp>
@@ -174,3 +176,5 @@ namespace hpx { namespace actions
         return stacksize_;
     }
 }}
+
+#endif

@@ -9,7 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/future.hpp>
 #include <hpx/resiliency/resiliency.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/timing.hpp>
 
 #include <atomic>
 #include <cstdint>

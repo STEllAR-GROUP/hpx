@@ -8,6 +8,8 @@
 #define HPX_RUNTIME_MESSAGE_HANDLER_FWD_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/errors.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 
@@ -61,4 +63,5 @@ namespace hpx
 
 }
 
+#endif
 #endif /*HPX_RUNTIME_MESSAGE_HANDLER_FWD_HPP*/

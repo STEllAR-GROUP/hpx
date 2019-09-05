@@ -9,7 +9,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/timing.hpp>
 
 #include <cstdint>
 #include <mutex>

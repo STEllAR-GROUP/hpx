@@ -11,8 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/timing.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 
 #include <hpx/parallel/executors/execution_parameters.hpp>

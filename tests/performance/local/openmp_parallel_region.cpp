@@ -10,7 +10,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_start.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/timing.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <hpx/program_options.hpp>

@@ -13,7 +13,7 @@
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/include/parallel_remove.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/timing.hpp>
 
 #include <hpx/program_options.hpp>
 

@@ -140,6 +140,7 @@ namespace hpx { namespace performance_counters
         counter_info const&, discover_counter_func const&,
         discover_counters_mode, error_code&);
 
+#if defined(HPX_HAVE_NETWORKING)
     HPX_API_EXPORT naming::gid_type remote_action_invocation_counter_creator(
         counter_info const&, error_code&);
 
@@ -162,6 +163,7 @@ namespace hpx { namespace performance_counters
     HPX_API_EXPORT bool per_action_data_counter_discoverer(
         counter_info const& info, discover_counter_func const& f,
         discover_counters_mode mode, error_code& ec);
+#endif
 #endif
 }}
 

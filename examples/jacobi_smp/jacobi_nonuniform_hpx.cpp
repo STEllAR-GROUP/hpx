@@ -9,7 +9,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/timing.hpp>
 
 #include <cstddef>
 #include <functional>

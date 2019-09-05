@@ -8,6 +8,8 @@
 #define HPX_PARCELSET_PARCEL_AWAIT_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/functional/unique_function.hpp>
 
@@ -31,4 +33,5 @@ namespace hpx { namespace parcelset { namespace detail
         put_parcels_type pp);
 }}}
 
+#endif
 #endif

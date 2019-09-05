@@ -247,9 +247,11 @@ namespace hpx { namespace components { namespace server
         void remove_here_from_connection_cache();
         void remove_here_from_console_connection_cache();
 
+#if defined(HPX_HAVE_NETWORKING)
         ///////////////////////////////////////////////////////////////////////
         void register_message_handler(char const* message_handler_type,
             char const* action, error_code& ec);
+
         parcelset::policies::message_handler* create_message_handler(
             char const* message_handler_type, char const* action,
             parcelset::parcelport* pp, std::size_t num_messages,
@@ -257,6 +259,7 @@ namespace hpx { namespace components { namespace server
         serialization::binary_filter* create_binary_filter(
             char const* binary_filter_type, bool compress,
             serialization::binary_filter* next_filter, error_code& ec);
+#endif
 
         // notify of message being sent
         void dijkstra_make_black();

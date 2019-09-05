@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_PARCEL_COALESCING)
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/regex_from_pattern.hpp>

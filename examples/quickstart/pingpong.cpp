@@ -11,6 +11,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/serialization.hpp>
+#include <hpx/timing.hpp>
 
 #include <cstddef>
 #include <iostream>

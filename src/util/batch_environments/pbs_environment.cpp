@@ -10,7 +10,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/errors.hpp>
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_HAVE_PARCELPORT_MPI) && defined(HPX_HAVE_NETWORKING)
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #endif
 
@@ -105,7 +105,7 @@ namespace hpx { namespace util { namespace batch_environments
             if (debug)
                 std::cerr << "failed opening: " << node_file << std::endl;
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_HAVE_PARCELPORT_MPI) && defined(HPX_HAVE_NETWORKING)
             // if MPI is active we can ignore the missing node-file
             if (util::mpi_environment::check_mpi_environment(cfg))
                 return;

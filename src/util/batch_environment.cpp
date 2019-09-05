@@ -82,12 +82,14 @@ namespace hpx { namespace util
         if (debug_)
             std::cerr << "got node list" << std::endl;
 
+        std::string nodes_list;
+        bool found_agas_host = false;
+
+#if defined(HPX_HAVE_NETWORKING)
         boost::asio::io_service io_service;
 
-        bool found_agas_host = false;
         std::size_t agas_node_num = 0;
-        std::string nodes_list;
-        for (std::string s : nodes)
+        for (std::string const& s : nodes)
         {
             if (!s.empty()) {
                 if (debug_)
@@ -118,16 +120,20 @@ namespace hpx { namespace util
                 nodes_list += s + ' ';
             }
         }
+#endif
 
         // if an AGAS host is specified, it needs to be in the list
         // of nodes participating in this run
-        if (!agas_host.empty() && !found_agas_host) {
-            throw hpx::detail::command_line_error("Requested AGAS host (" + agas_host +
-                ") not found in node list");
+        if (!agas_host.empty() && !found_agas_host)
+        {
+            throw hpx::detail::command_line_error("Requested AGAS host (" +
+                agas_host + ") not found in node list");
         }
 
-        if (debug_) {
-            if (!agas_node_.empty()) {
+        if (debug_)
+        {
+            if (!agas_node_.empty())
+            {
                 std::cerr << "using AGAS host: '" << agas_node_
                     << "' (node number " << agas_node_num_ << ")" << std::endl;
             }

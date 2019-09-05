@@ -10,7 +10,8 @@
 #define HPX_RUNTIME_ACTIONS_BASIC_ACTION_FWD_HPP
 
 #include <hpx/config.hpp>
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_NETWORKING) &&                                            \
+    (HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX))
 #include <hpx/concurrency/itt_notify.hpp>
 #endif
 

@@ -356,14 +356,21 @@ namespace hpx { namespace util
 
             switch (mode) {
             case runtime_mode_default:
+#if defined(HPX_HAVE_NETWORKING)
                 hpx_options.add_options()
                     ("hpx:worker", "run this instance in worker mode")
                     ("hpx:console", "run this instance in console mode")
                     ("hpx:connect", "run this instance in worker mode, "
                          "but connecting late")
                 ;
+#else
+                hpx_options.add_options()
+                    ("hpx:console", "run this instance in console mode")
+                ;
+#endif
                 break;
 
+#if defined(HPX_HAVE_NETWORKING)
             case runtime_mode_worker:
             case runtime_mode_console:
             case runtime_mode_connect:
@@ -377,6 +384,13 @@ namespace hpx { namespace util
                         "but connecting late")
                 ;
                 break;
+#else
+            case runtime_mode_console:
+                hidden_options.add_options()
+                    ("hpx:console", "run this instance in console mode")
+                ;
+                break;
+#endif
 
             case runtime_mode_invalid:
             default:
@@ -388,6 +402,7 @@ namespace hpx { namespace util
             hpx_options.add_options()
                 ("hpx:run-hpx-main",
                   "run the hpx_main function, regardless of locality mode")
+#if defined(HPX_HAVE_NETWORKING)
                 ("hpx:agas", value<std::string>(),
                   "the IP address the AGAS root server is running on, "
                   "expected format: `address:port' (default: "
@@ -413,9 +428,11 @@ namespace hpx { namespace util
                 ("hpx:iftransform", value<std::string>(),
                   "sed-style search and replace (s/search/replace/) used to "
                   "transform host names to the proper network interconnect")
+#endif
                 ("hpx:localities", value<std::size_t>(),
                   "the number of localities to wait for at application "
                   "startup (default: 1)")
+#if defined(HPX_HAVE_NETWORKING)
                 ("hpx:node", value<std::size_t>(),
                   "number of the node this locality is run on "
                   "(must be unique, alternatively: -0, -1, ..., -9)")
@@ -425,6 +442,7 @@ namespace hpx { namespace util
                   "this locality expects other localities to dynamically connect "
                   "(default: false if the number of localities is equal to one, "
                   "true if the number of initial localities is larger than 1)")
+#endif
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
                   "run on (default: 0), valid for "
@@ -524,7 +542,9 @@ namespace hpx { namespace util
                   "wait for a debugger to be attached, possible values: "
                   "off, startup, exception or test-failure (default: startup)")
 #endif
+#if defined(HPX_HAVE_NETWORKING)
                 ("hpx:list-parcel-ports", "list all available parcel-ports")
+#endif
             ;
 
             options_description counter_options(

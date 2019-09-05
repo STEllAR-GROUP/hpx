@@ -60,6 +60,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+#if defined(HPX_HAVE_NETWORKING)
         template <typename Action>
         char const* get_action_name()
 #ifndef HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION
@@ -73,6 +74,13 @@ namespace hpx { namespace actions
             static_assert(
                 traits::needs_automatic_registration<Action>::value,
                 "HPX_REGISTER_ACTION_DECLARATION missing");
+            return util::debug::type_id<Action>::typeid_.type_id();
+        }
+#endif
+#else // HPX_HAVE_NETWORKING
+        template <typename Action>
+        char const* get_action_name()
+        {
             return util::debug::type_id<Action>::typeid_.type_id();
         }
 #endif

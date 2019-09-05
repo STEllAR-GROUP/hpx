@@ -12,6 +12,8 @@
 #define HPX_PARCELSET_PARCELPORT_MAR_26_2008_1214PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -377,4 +379,5 @@ namespace hpx { namespace parcelset
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif

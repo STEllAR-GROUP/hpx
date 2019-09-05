@@ -8,9 +8,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing.hpp>
 
 #include <vector>
 

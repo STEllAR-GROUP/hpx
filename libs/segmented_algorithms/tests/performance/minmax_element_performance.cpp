@@ -10,7 +10,7 @@
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/include/parallel_minmax.hpp>
 #include <hpx/include/partitioned_vector.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/timing.hpp>
 
 #include <hpx/program_options.hpp>
 

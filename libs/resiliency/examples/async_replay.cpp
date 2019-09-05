@@ -13,6 +13,7 @@
 #include <hpx/include/future.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/resiliency/resiliency.hpp>
+#include <hpx/timing.hpp>
 
 #include <atomic>
 #include <iostream>

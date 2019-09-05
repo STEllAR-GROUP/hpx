@@ -9,10 +9,16 @@
 #include <hpx/include/async.hpp>
 #include <hpx/testing.hpp>
 
+#if defined(HPX_HAVE_NETWORKING)
 void async_callback(uint64_t index, boost::system::error_code const& ec,
     hpx::parcelset::parcel const& p)
 {
 }
+#else
+void async_callback(uint64_t index)
+{
+}
+#endif
 
 void func()
 {
@@ -24,9 +30,14 @@ int main()
     for (hpx::id_type const& id: hpx::find_all_localities())
     {
         uint64_t buffer_index = 0;
+#if defined(HPX_HAVE_NETWORKING)
         hpx::future<void> f = hpx::async_cb(func_action(), id,
             hpx::util::bind(&async_callback, buffer_index,
                 hpx::util::placeholders::_1, hpx::util::placeholders::_2));
+#else
+        hpx::future<void> f = hpx::async_cb(func_action(), id,
+            hpx::util::bind(&async_callback, buffer_index));
+#endif
         f.get();
     }
     return hpx::util::report_errors();

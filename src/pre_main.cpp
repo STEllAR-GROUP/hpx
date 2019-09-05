@@ -8,6 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/config.hpp>
 #include <hpx/runtime.hpp>
 
 #include <hpx/errors.hpp>
@@ -62,11 +63,14 @@ static void register_counter_types()
     lbt_ << "(2nd stage) pre_main: registered thread-manager performance "
             "counter types";
 
+#if defined(HPX_HAVE_NETWORKING)
     applier::get_applier().get_parcel_handler().register_counter_types();
     lbt_ << "(2nd stage) pre_main: registered parcelset performance "
             "counter types";
+#endif
 }
 
+#if defined(HPX_HAVE_NETWORKING)
 ///////////////////////////////////////////////////////////////////////////////
 extern std::vector<util::tuple<char const*, char const*> >
     message_handler_registrations;
@@ -81,6 +85,7 @@ static void register_message_handlers()
     }
     lbt_ << "(3rd stage) pre_main: registered message handlers";
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Implements second and third stage bootstrapping.
@@ -108,8 +113,10 @@ int pre_main(runtime_mode mode)
         lbt_ << "(2nd stage) pre_main: loaded components"
             << (exit_code ? ", application exit has been requested" : "");
 
+#if defined(HPX_HAVE_NETWORKING)
         // Work on registration requests for message handler plugins
         register_message_handlers();
+#endif
 
         // Register all counter types before the startup functions are being
         // executed.
@@ -161,8 +168,10 @@ int pre_main(runtime_mode mode)
         lcos::barrier::synchronize();
         lbt_ << "(2nd stage) pre_main: passed 2nd stage boot barrier";
 
+#if defined(HPX_HAVE_NETWORKING)
         // Work on registration requests for message handler plugins
         register_message_handlers();
+#endif
 
         // Register all counter types before the startup functions are being
         // executed.

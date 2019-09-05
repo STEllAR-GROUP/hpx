@@ -9,6 +9,8 @@
 #define HPX_RUNTIME_PARCELSET_FWD_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 
@@ -100,4 +102,5 @@ namespace hpx {
     }
 }
 
+#endif
 #endif /*HPX_RUNTIME_PARCELSET_FWD_HPP*/

@@ -12,10 +12,9 @@ set(tests
    )
 
 if(HPX_WITH_NETWORKING)
-    set(tests ${tests}
-        register_with_basename_1804
-       )
-
+  set(tests ${tests}
+    register_with_basename_1804
+   )
   set(register_with_basename_1804_PARAMETERS LOCALITIES 2)
 endif()
 

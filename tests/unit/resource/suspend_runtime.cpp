@@ -9,6 +9,7 @@
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/include/apply.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>

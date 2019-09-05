@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 // the module itself should not register any actions which coalesce parcels
-#if defined(HPX_HAVE_PARCEL_COALESCING) &&                                     \
+#if defined(HPX_HAVE_PARCEL_COALESCING) && defined(HPX_HAVE_NETWORKING) &&     \
     !defined(HPX_PARCEL_COALESCING_MODULE_EXPORTS) &&                          \
     !defined(HPX_COMPUTE_DEVICE_CODE)
 

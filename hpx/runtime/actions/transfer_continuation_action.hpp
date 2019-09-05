@@ -12,6 +12,8 @@
 #define HPX_RUNTIME_ACTIONS_TRANSFER_CONTINUATION_ACTION_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/transfer_base_action.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
@@ -253,4 +255,5 @@ namespace hpx { namespace traits
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif /*HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_HPP*/

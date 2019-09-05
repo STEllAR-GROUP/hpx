@@ -7,6 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/timing.hpp>
 
 #include <hpx/include/iostreams.hpp>
 

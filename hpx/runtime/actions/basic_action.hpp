@@ -21,6 +21,7 @@
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
+#include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -48,6 +49,10 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/concurrency/itt_notify.hpp>
+#endif
+#if defined(HPX_HAVE_NETWORKING)
+#include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #endif
 
 #include <boost/utility/string_ref.hpp>
@@ -204,8 +209,7 @@ namespace hpx { namespace actions
         {};
 
         ///////////////////////////////////////////////////////////////////////
-        inline std::string make_action_name(
-            boost::string_ref action_name)
+        inline std::string make_action_name(boost::string_ref action_name)
         {
             std::stringstream name;
             name << "action(" << action_name << ")";
@@ -235,32 +239,29 @@ namespace hpx { namespace actions
             >::value,
             "Using non-const references as arguments for actions is not supported.");
 
-        typedef Component component_type;
-        typedef Derived derived_type;
+        using component_type = Component;
+        using derived_type = Derived;
 
         // result_type represents the type returned when invoking operator()
-        typedef typename traits::promise_local_result<R>::type result_type;
+        using result_type = typename traits::promise_local_result<R>::type;
 
         // The remote_result_type is the remote type for the type_continuation
-        typedef typename traits::action_remote_result<R>::type remote_result_type;
+        using remote_result_type = typename traits::action_remote_result<R>::type;
 
         // The local_result_type is the local type for the type_continuation
-        typedef
-            typename traits::promise_local_result<
-                remote_result_type
-            >::type local_result_type;
+        using local_result_type =
+            typename traits::promise_local_result<remote_result_type>::type;
 
-        typedef
-            hpx::actions::typed_continuation<
-                local_result_type,
-                remote_result_type
-            > continuation_type;
+        using continuation_type =
+            hpx::actions::typed_continuation<local_result_type,
+                remote_result_type>;
 
-        typedef R internal_result_type;
-        static const std::size_t arity = sizeof...(Args);
-        typedef util::tuple<typename std::decay<Args>::type...> arguments_type;
+        static HPX_CONSTEXPR_OR_CONST std::size_t arity = sizeof...(Args);
 
-        typedef void action_tag;
+        using internal_result_type = R;
+        using arguments_type = util::tuple<typename std::decay<Args>::type...>;
+
+        using action_tag = void;
 
         ///////////////////////////////////////////////////////////////////////
         static std::string get_action_name(naming::address::address_type /*lva*/)
@@ -463,13 +464,13 @@ namespace hpx { namespace actions
             return static_cast<int>(components::get_component_type<Component>());
         }
 
-        typedef std::false_type direct_execution;
+        using direct_execution = std::false_type;
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        static base_action::action_type get_action_type()
+        HPX_CONSTEXPR static actions::action_flavor get_action_type()
         {
-            return base_action::plain_action;
+            return actions::action_flavor::plain_action;
         }
 
         /// Extract the current invocation count for this action
@@ -515,13 +516,13 @@ namespace hpx { namespace actions
         template <typename Action, typename Derived>
         struct action_type
         {
-            typedef Derived type;
+            using type = Derived;
         };
 
         template <typename Action>
         struct action_type<Action, this_type>
         {
-            typedef Action type;
+            using type = Action;
         };
     }
 
@@ -538,17 +539,16 @@ namespace hpx { namespace actions
                 Derived
             >::type>
     {
-        typedef typename detail::action_type<
-            direct_action, Derived
-        >::type derived_type;
+        using derived_type =
+            typename detail::action_type<direct_action, Derived>::type;
 
-        typedef std::true_type direct_execution;
+        using direct_execution = std::true_type;
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        static base_action::action_type get_action_type()
+        HPX_CONSTEXPR static actions::action_flavor action_flavor()
         {
-            return base_action::direct_action;
+            return actions::action_flavor::direct_action;
         }
     };
 
@@ -563,7 +563,7 @@ namespace hpx { namespace actions
       : action<TF, F, Derived>
 #endif
     {
-        typedef action<TF, F, Derived> type;
+        using type = action<TF, F, Derived>;
     };
 
     template <typename TF, TF F, typename Derived>
@@ -572,7 +572,7 @@ namespace hpx { namespace actions
       : direct_action<TF, F, Derived>
 #endif
     {
-        typedef direct_action<TF, F, Derived> type;
+        using type = direct_action<TF, F, Derived>;
     };
 
     template <typename TF, TF F, typename Derived = detail::this_type>
@@ -636,11 +636,15 @@ namespace hpx { namespace serialization
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-// Helper macro for action serialization, each of the defined actions needs to
-// be registered with the serialization library
-#define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
-    HPX_DEFINE_GET_ACTION_NAME_(action, action)                               \
+#define HPX_REGISTER_ACTION_(...)                                             \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_ACTION_, HPX_PP_NARGS(__VA_ARGS__)                       \
+    )(__VA_ARGS__))                                                           \
 /**/
+#define HPX_REGISTER_ACTION_1(action)                                         \
+    HPX_REGISTER_ACTION_2(action, action)                                     \
+/**/
+
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                    \
     namespace hpx { namespace actions { namespace detail {                    \
@@ -656,6 +660,14 @@ namespace hpx { namespace serialization
 #define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)
 #endif
 
+#if defined(HPX_HAVE_NETWORKING)
+
+// Helper macro for action serialization, each of the defined actions needs to
+// be registered with the serialization library
+#define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
+    HPX_DEFINE_GET_ACTION_NAME_(action, action)                               \
+/**/
+
 #define HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                       \
     HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                        \
     namespace hpx { namespace actions { namespace detail {                    \
@@ -667,14 +679,6 @@ namespace hpx { namespace serialization
     }}}                                                                       \
 /**/
 
-#define HPX_REGISTER_ACTION_(...)                                             \
-    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
-        HPX_REGISTER_ACTION_, HPX_PP_NARGS(__VA_ARGS__)                       \
-    )(__VA_ARGS__))                                                           \
-/**/
-#define HPX_REGISTER_ACTION_1(action)                                         \
-    HPX_REGISTER_ACTION_2(action, action)                                     \
-/**/
 #if defined(HPX_MSVC) || defined(HPX_MINGW)
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
@@ -686,7 +690,10 @@ namespace hpx { namespace serialization
             transfer_continuation_action< action>;                            \
     }}                                                                        \
 /**/
-#else
+#define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action) /**/
+
+#else // defined(HPX_MSVC) || defined(HPX_MINGW)
+
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
@@ -696,12 +703,6 @@ namespace hpx { namespace serialization
         template struct transfer_continuation_action< action>;                \
     }}                                                                        \
 /**/
-#endif
-
-#if defined(HPX_MSVC) || defined(HPX_MINGW)
-#define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \
-/**/
-#else
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \
     namespace hpx { namespace actions {                                       \
         extern template struct HPX_ALWAYS_IMPORT transfer_action< action>;    \
@@ -743,31 +744,31 @@ namespace hpx { namespace serialization
     }}                                                                        \
 /**/
 
-#define HPX_REGISTER_ACTION_DECLARATION_(...)                                 \
-    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
-        HPX_REGISTER_ACTION_DECLARATION_, HPX_PP_NARGS(__VA_ARGS__)           \
-    )(__VA_ARGS__))                                                           \
-/**/
-#define HPX_REGISTER_ACTION_DECLARATION_1(action)                             \
-    HPX_REGISTER_ACTION_DECLARATION_2(action, action)                         \
-/**/
 #define HPX_REGISTER_ACTION_DECLARATION_2(action, actionname)                 \
     HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)                   \
 /**/
 
-///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-#define HPX_ACTION_USES_STACK(action, size)                                   \
+#else // HPX_HAVE_NETWORKING
+
+#define HPX_DEFINE_GET_ACTION_NAME(action) /**/
+#define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action) /**/
+
+#define HPX_REGISTER_ACTION_2(action, actionname)                             \
+    HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
+    HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                        \
 /**/
 
-#define HPX_ACTION_USES_SMALL_STACK(action)                                   \
-/**/
-#define HPX_ACTION_USES_MEDIUM_STACK(action)                                  \
-/**/
-#define HPX_ACTION_USES_LARGE_STACK(action)                                   \
-/**/
-#define HPX_ACTION_USES_HUGE_STACK(action)                                    \
-/**/
+#define HPX_REGISTER_ACTION_DECLARATION_2(action, actionname) /**/
+
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+#define HPX_ACTION_USES_STACK(action, size) /**/
+#define HPX_ACTION_USES_SMALL_STACK(action)  /**/
+#define HPX_ACTION_USES_MEDIUM_STACK(action) /**/
+#define HPX_ACTION_USES_LARGE_STACK(action)  /**/
+#define HPX_ACTION_USES_HUGE_STACK(action)   /**/
 #else
 #define HPX_ACTION_USES_STACK(action, size)                                   \
     namespace hpx { namespace traits                                          \
@@ -795,8 +796,7 @@ namespace hpx { namespace serialization
 #endif
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-#define HPX_ACTION_DOES_NOT_SUSPEND(action)                                   \
-/**/
+#define HPX_ACTION_DOES_NOT_SUSPEND(action) /**/
 #else
 // This macro is deprecated. It expands to an inline function which will emit a
 // warning.
@@ -813,19 +813,13 @@ namespace hpx { namespace serialization
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-#define HPX_ACTION_HAS_PRIORITY(action, priority)                             \
-/**/
-#define HPX_ACTION_HAS_LOW_PRIORITY(action)                                   \
-/**/
-#define HPX_ACTION_HAS_NORMAL_PRIORITY(action)                                \
-/**/
-#define HPX_ACTION_HAS_HIGH_PRIORITY(action)                                  \
-/**/
-#define HPX_ACTION_HAS_HIGH_RECURSIVE_PRIORITY(action)                        \
-/**/
+#define HPX_ACTION_HAS_PRIORITY(action, priority)      /**/
+#define HPX_ACTION_HAS_LOW_PRIORITY(action)            /**/
+#define HPX_ACTION_HAS_NORMAL_PRIORITY(action)         /**/
+#define HPX_ACTION_HAS_HIGH_PRIORITY(action)           /**/
+#define HPX_ACTION_HAS_HIGH_RECURSIVE_PRIORITY(action) /**/
 // obsolete, kept for compatibility
-#define HPX_ACTION_HAS_CRITICAL_PRIORITY(action)                              \
-/**/
+#define HPX_ACTION_HAS_CRITICAL_PRIORITY(action) /**/
 #else
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_HAS_PRIORITY(action, priority)                             \
@@ -919,6 +913,15 @@ namespace hpx { namespace serialization
 #define HPX_REGISTER_ACTION_DECLARATION(...)                                  \
     HPX_REGISTER_ACTION_DECLARATION_(__VA_ARGS__)                             \
 /**/
+
+#define HPX_REGISTER_ACTION_DECLARATION_(...)                                 \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_ACTION_DECLARATION_, HPX_PP_NARGS(__VA_ARGS__)           \
+    )(__VA_ARGS__))                                                           \
+/**/
+#define HPX_REGISTER_ACTION_DECLARATION_1(action)                             \
+    HPX_REGISTER_ACTION_DECLARATION_2(action, action)                         \
+/**/
 #endif
 
 /// \def HPX_REGISTER_ACTION(action)
@@ -950,8 +953,7 @@ namespace hpx { namespace serialization
 ///       never both.
 ///
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-#define HPX_REGISTER_ACTION(...)                                              \
-/**/
+#define HPX_REGISTER_ACTION(...) /**/
 #else
 #define HPX_REGISTER_ACTION(...)                                              \
     HPX_REGISTER_ACTION_(__VA_ARGS__)                                         \
@@ -990,8 +992,7 @@ namespace hpx { namespace serialization
 ///       never both.
 ///
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-#define HPX_REGISTER_ACTION_ID(action, actionname, actionid)                  \
-/**/
+#define HPX_REGISTER_ACTION_ID(action, actionname, actionid) /**/
 #else
 #define HPX_REGISTER_ACTION_ID(action, actionname, actionid)                  \
     HPX_REGISTER_ACTION_2(action, actionname)                                 \

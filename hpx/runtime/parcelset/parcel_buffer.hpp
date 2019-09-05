@@ -9,6 +9,8 @@
 #define HPX_PARCELSET_PARCEL_BUFFER_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
 #include <hpx/util/integer/endian.hpp>
@@ -113,4 +115,5 @@ namespace hpx { namespace parcelset
     };
 }}
 
+#endif
 #endif

@@ -366,10 +366,12 @@ namespace hpx { namespace util
             "enabled = 1"
         };
 
+#if defined(HPX_HAVE_NETWORKING)
         std::vector<std::string> lines_pp =
             hpx::parcelset::parcelhandler::load_runtime_configuration();
 
         lines.insert(lines.end(), lines_pp.begin(), lines_pp.end());
+#endif
 
         // don't overload user overrides
         this->parse("<static defaults>", lines, false, false, false);
