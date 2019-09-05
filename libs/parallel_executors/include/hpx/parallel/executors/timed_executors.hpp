@@ -9,13 +9,13 @@
 #define HPX_PARALLEL_TIMED_EXECUTORS_JAN_06_2017_0802AM
 
 #include <hpx/config.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>

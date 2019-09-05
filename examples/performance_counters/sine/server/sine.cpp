@@ -7,7 +7,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstdint>

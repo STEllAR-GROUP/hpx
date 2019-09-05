@@ -9,10 +9,10 @@
 #define HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM
 
 #include <hpx/config.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/bind_back.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

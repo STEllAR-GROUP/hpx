@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/util/debug/demangle_helper.hpp>
+#include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
 
 #include <string>

@@ -12,7 +12,7 @@
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/util/detail/reserve.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 
 #include <algorithm>
 #include <cstddef>

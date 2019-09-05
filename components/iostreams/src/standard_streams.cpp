@@ -11,7 +11,7 @@
 #include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
-#include <hpx/util/bind_back.hpp>
+#include <hpx/functional/bind_back.hpp>
 
 #include <hpx/components/iostreams/ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>

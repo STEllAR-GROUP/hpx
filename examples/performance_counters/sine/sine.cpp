@@ -7,7 +7,7 @@
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/performance_counters.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 
 #include <cstdint>
 

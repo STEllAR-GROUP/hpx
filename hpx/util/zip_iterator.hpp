@@ -8,14 +8,14 @@
 #define HPX_UTIL_ZIP_ITERATOR_MAY_29_2014_0852PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
-#include <hpx/util/functional/segmented_iterator_helpers.hpp>
-#include <hpx/iterator_support/iterator_facade.hpp>
-#include <hpx/util/result_of.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/result_of.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/iterator_facade.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/util/functional/segmented_iterator_helpers.hpp>
 
 #include <cstddef>
 #include <iterator>

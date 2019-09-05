@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/iterator_support/is_range.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/datastructures/tuple.hpp>

@@ -8,7 +8,7 @@
 #define HPX_RUNTIME_AGAS_FWD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstdint>
 #include <string>

@@ -19,9 +19,11 @@ set(HPX_LIBS
   concurrency
   config
   datastructures
+  debugging
   errors
   filesystem
   format
+  functional
   hardware
   hashing
   iterator_support

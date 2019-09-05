@@ -7,7 +7,7 @@
 #define HPX_BIND_APR_13_2012_0137PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 
 #endif

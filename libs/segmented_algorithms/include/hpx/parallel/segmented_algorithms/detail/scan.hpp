@@ -9,15 +9,15 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHMS_SCAN
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/type_support/unused.hpp>
-#include <hpx/util/unwrap.hpp>
 #include <hpx/type_support/void_guard.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>

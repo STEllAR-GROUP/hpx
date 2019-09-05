@@ -14,6 +14,9 @@
 #endif
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
@@ -24,9 +27,6 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_back.hpp>
-#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>

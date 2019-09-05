@@ -16,6 +16,8 @@
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -32,10 +34,8 @@
 #include <hpx/testing.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
-#include <hpx/util/function.hpp>
 #include <hpx/util/query_counters.hpp>
 
 #include <boost/algorithm/string/split.hpp>

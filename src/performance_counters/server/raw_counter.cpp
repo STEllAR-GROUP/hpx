@@ -10,7 +10,7 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstdint>
 #include <utility>

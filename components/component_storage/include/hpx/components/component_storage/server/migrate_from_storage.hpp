@@ -14,7 +14,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/traits/component_pin_support.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
-#include <hpx/util/bind_back.hpp>
+#include <hpx/functional/bind_back.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>

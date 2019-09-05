@@ -7,10 +7,10 @@
 #define HPX_PARALLEL_UTIL_TRANSFORM_LOOP_SEP_08_2016_0611PM
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/datastructures/tuple.hpp>
 
 #include <algorithm>
 #include <cstddef>

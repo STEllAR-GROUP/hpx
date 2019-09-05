@@ -12,7 +12,7 @@
 #include <hpx/parallel/traits/vector_pack_alignment_size.hpp>
 #include <hpx/parallel/traits/vector_pack_load_store.hpp>
 #include <hpx/parallel/traits/vector_pack_type.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/functional/result_of.hpp>
 
 #include <cstddef>
 #include <iterator>
