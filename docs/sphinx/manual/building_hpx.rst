@@ -23,28 +23,28 @@ This section gives an introduction on how to use our build system to build
 CMake basics
 ============
 
-|cmake|_ is a cross-platform build-generator tool. CMake does not build the
+CMake is a cross-platform build-generator tool. CMake does not build the
 project, it generates the files needed by your build tool (gnu make, visual
 studio, etc.) for building |hpx|.
 
-In general, the |HPX| |cmake|_ scripts try to adhere to the general CMake policies
-on how to write |cmake|_ based projects.
+In general, the |HPX| CMake scripts try to adhere to the general CMake policies
+on how to write CMake-based projects.
 
 Basic CMake usage
 -----------------
 
-This section explains basic aspects of |cmake|, mostly for explaining those
-options which you may need on your day-to-day usage.
+This section explains basic aspects of |cmake|, specifically options needed for     
+day-to-day usage.
 
 CMake comes with extensive documentation in the form of html files and on the
-cmake executable itself. Execute ``cmake --help`` for further help options.
+CMake executable itself. Execute ``cmake --help`` for further help options.
 
-CMake requires to know for which build tool it shall generate files (GNU make,
-Visual Studio, Xcode, etc.). If not specified on the command line, it tries to
-guess it based on you environment. Once identified the build tool, CMake uses
-the corresponding Generator for creating files for your build tool. You can
+CMake needs to know which build tool it will generate files for (GNU make,
+Visual Studio, Xcode, etc.). If not specified on the command line, it will try to
+guess the build tool based on you environment. Once it has identified the build tool,
+CMake uses the corresponding generator to create files for your build tool. You can
 explicitly specify the generator with the command line option ``-G "Name of the
-generator"``. For knowing the available generators on your platform, execute:
+generator"``. To see the available generators on your platform, execute:
 
 .. code-block:: bash
 
@@ -68,7 +68,7 @@ you must tell this to CMake with the ``-G`` option.
 Quick start
 -----------
 
-We use here the command-line, non-interactive |cmake|_ interface.
+Here, you will use the command-line, non-interactive CMake interface.
 
 #. Download and install CMake here: |cmake_download|_. Version 3.3.2 is the
    minimally required version for |hpx|.
@@ -76,8 +76,8 @@ We use here the command-line, non-interactive |cmake|_ interface.
 #. Open a shell. Your development tools must be reachable from this shell
    through the ``PATH`` environment variable.
 
-#. Create a directory for containing the build. It is not supported to build
-   |hpx| on the source directory. cd to this directory:
+#. Create a directory for containing the build. Building |hpx| on the source directory
+   is not supported. cd to this directory:
 
    .. code-block:: bash
 
@@ -104,7 +104,7 @@ MinGW makefiles if you have a POSIX shell reachable through the ``PATH``
 environment variable, for instance. You can force CMake to use various compilers
 and tools. Please visit `CMake Useful Variables
 <https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/Useful-Variables#Compilers-and-Tools>`_
-for a detailed overview of specific |cmake|_ variables.
+for a detailed overview of specific CMake variables.
 
 .. _options:
 
@@ -129,8 +129,8 @@ value. You can also undefine a variable:
 Variables are stored on the CMake cache. This is a file named ``CMakeCache.txt``
 on the root of the build directory. Do not hand-edit it.
 
-Variables are listed here appending its type after a colon. It is correct to
-write the variable and the type on the CMake command line:
+Variables are listed here appending its type after a colon. You should write the 
+variable and the type on the CMake command line:
 
 .. code-block:: bash
 
@@ -170,22 +170,21 @@ on your target machine. |hpx| currently requires at least Boost V1.61.0 to work
 properly. It may build and run with older versions, but we do not test |hpx|
 with those versions, so please be warned.
 
-Installing the Boost libraries is described in detail in Boost's own
-|boost_getting_started| document. It is often possible to download the Boost
-libraries using the package manager of your distribution. Please refer to the
-corresponding documentation for your system for more information.
-
-The installation of Boost is described in detail in Boost's own
-|boost_getting_started| document. However, if you've never used the Boost
+The installation of Boost is described in detail in Boost's `Getting Started <https://www.boost.org/doc/libs/1_71_0/more/getting_started/index.html>`_
+document. However, if you've never used the Boost
 libraries (or even if you have), here's a quick primer:
 :ref:`boost_installation`.
+
+It is often possible to download the Boost libraries using the package manager of
+your distribution. Please refer to the corresponding documentation for your system
+for more information.
 
 In addition, we require a recent version of hwloc in order to support thread
 pinning and NUMA awareness. See :ref:`hwloc_installation` for instructions on
 building |hwloc|.
 
 |hpx| is written in 99.99% Standard C++ (the remaining 0.01% is platform
-specific assembly code). As such |hpx| is compilable with almost any standards
+specific assembly code). As such, |hpx| is compilable with almost any standards
 compliant C++ compiler. A compiler supporting the C++11 Standard is highly
 recommended. The code base takes advantage of C++11 language features when
 available (move semantics, rvalue references, magic statics, etc.). This may
