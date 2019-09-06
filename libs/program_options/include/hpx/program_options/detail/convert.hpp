@@ -16,11 +16,11 @@
 namespace hpx { namespace program_options {
 
     using boost::from_8_bit;
-    using boost::to_8_bit;
-    using boost::from_utf8;
-    using boost::to_utf8;
-    using boost::to_local_8_bit;
     using boost::from_local_8_bit;
+    using boost::from_utf8;
+    using boost::to_8_bit;
+    using boost::to_local_8_bit;
+    using boost::to_utf8;
     using boost::program_options::to_internal;
 
 }}    // namespace hpx::program_options

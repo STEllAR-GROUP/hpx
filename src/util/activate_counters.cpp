@@ -7,6 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/activate_counters.hpp>
 #include <hpx/util/apex.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <cstddef>

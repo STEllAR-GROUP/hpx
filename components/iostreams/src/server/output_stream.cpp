@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/functional/bind_front.hpp>
 
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

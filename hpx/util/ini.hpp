@@ -12,7 +12,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util_fwd.hpp> // this needs to go first
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <boost/lexical_cast.hpp>
 

@@ -8,7 +8,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/state.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/one_size_heap_list.hpp>
 #if defined(HPX_DEBUG)

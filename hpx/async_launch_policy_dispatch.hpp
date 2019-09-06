@@ -13,9 +13,9 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/traits/is_action.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/functional/traits/is_action.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/invoke.hpp>
 
 #include <exception>
 #include <type_traits>

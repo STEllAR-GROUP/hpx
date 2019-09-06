@@ -6,10 +6,9 @@
 #include <hpx/hpx_main.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <hpx/testing.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/program_options/parsers.hpp>
-
+#include <hpx/testing.hpp>
 
 #include <cctype>
 #include <cstdlib>
@@ -20,7 +19,8 @@
 using namespace hpx::program_options;
 using namespace std;
 
-void check_equal(const std::vector<string>& actual, char const**expected, int n)
+void check_equal(
+    const std::vector<string>& actual, char const** expected, int n)
 {
     if (actual.size() != n)
     {
@@ -47,8 +47,7 @@ void check_equal(const std::vector<string>& actual, char const**expected, int n)
 
 void test_winmain()
 {
-
-// The following expectations were obtained in Win2000 shell:
+    // The following expectations were obtained in Win2000 shell:
     TEST("1 ", {"1"});
     TEST("1\"2\" ", {"12"});
     TEST("1\"2  ", {"12  "});

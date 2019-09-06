@@ -8,7 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

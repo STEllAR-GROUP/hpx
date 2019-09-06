@@ -6,11 +6,11 @@
 #if !defined(HPX_TRAITS_ACTION_DECORATE_FUNCTION_MAR_30_2014_1054AM)
 #define HPX_TRAITS_ACTION_DECORATE_FUNCTION_MAR_30_2014_1054AM
 
+#include <hpx/concepts/has_xxx.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
-#include <hpx/concepts/has_xxx.hpp>
-#include <hpx/util/unique_function.hpp>
 
 #include <utility>
 

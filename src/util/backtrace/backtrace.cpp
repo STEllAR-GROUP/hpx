@@ -19,7 +19,7 @@
 #include <boost/config.hpp>
 
 #include <hpx/util/backtrace/backtrace.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/functional/bind_front.hpp>
 
 #if (defined(__linux) || defined(__APPLE__) || defined(__sun)) \
      && (!defined(__ANDROID__) || !defined(ANDROID))

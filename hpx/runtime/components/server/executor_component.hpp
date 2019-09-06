@@ -14,7 +14,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>

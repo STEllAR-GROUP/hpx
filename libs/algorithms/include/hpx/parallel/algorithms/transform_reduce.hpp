@@ -10,11 +10,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/traits/is_callable.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/functional/result_of.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

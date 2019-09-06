@@ -10,9 +10,9 @@
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/register_locks.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/util/function.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif

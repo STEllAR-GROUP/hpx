@@ -229,7 +229,7 @@ namespace hpx { namespace program_options {
         }
 
         // Lastly, run notify actions.
-        for (auto & k : *this)
+        for (auto& k : *this)
         {
             /* Users might wish to use variables_map to store their own values
                that are not parsed, and therefore will not have value_semantics

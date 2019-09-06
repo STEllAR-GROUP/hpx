@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/event.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/functional/invoke.hpp>
 
 #include <atomic>
 #include <utility>

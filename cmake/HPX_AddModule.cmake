@@ -175,6 +175,12 @@ function(add_hpx_module name)
     HPX_MODULE_EXPORTS
   )
 
+  # This is a temporary solution until all of HPX has been modularized as it
+  # enables using header files from HPX for compiling this module.
+  target_include_directories(hpx_${name} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
+  )
+
   add_hpx_source_group(
     NAME hpx_{name}
     ROOT ${HEADER_ROOT}/hpx

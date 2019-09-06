@@ -17,7 +17,7 @@
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 

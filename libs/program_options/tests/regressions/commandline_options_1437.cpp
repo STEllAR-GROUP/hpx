@@ -11,7 +11,7 @@
 
 bool invoked_main = false;
 
-int my_hpx_main(int argc, char **argv)
+int my_hpx_main(int argc, char** argv)
 {
     // all HPX command line arguments should have been stripped here
     HPX_TEST(argc == 1);
@@ -20,7 +20,7 @@ int my_hpx_main(int argc, char **argv)
     return hpx::finalize();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     HPX_TEST(argc > 1);
 

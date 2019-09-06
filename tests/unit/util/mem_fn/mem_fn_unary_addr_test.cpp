@@ -21,7 +21,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt
 //
 
-#include <hpx/util/mem_fn.hpp>
+#include <hpx/functional/mem_fn.hpp>
 
 #include <iostream>
 

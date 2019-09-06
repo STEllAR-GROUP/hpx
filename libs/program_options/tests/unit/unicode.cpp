@@ -27,9 +27,7 @@ void test_unicode_to_unicode()
 {
     options_description desc;
 
-    desc.add_options()
-        ("foo", wvalue<wstring>(), "unicode option")
-        ;
+    desc.add_options()("foo", wvalue<wstring>(), "unicode option");
 
     vector<wstring> args;
     args.push_back(L"--foo=\x044F");
@@ -55,9 +53,7 @@ void test_unicode_to_native()
 
     options_description desc;
 
-    desc.add_options()
-        ("foo", value<string>(), "unicode option")
-        ;
+    desc.add_options()("foo", value<string>(), "unicode option");
 
     vector<wstring> args;
     args.push_back(L"--foo=\x044F");
@@ -76,9 +72,7 @@ void test_native_to_unicode()
 
     options_description desc;
 
-    desc.add_options()
-        ("foo", wvalue<wstring>(), "unicode option")
-        ;
+    desc.add_options()("foo", wvalue<wstring>(), "unicode option");
 
     vector<string> args;
     args.push_back("--foo=\xD1\x8F");
@@ -106,19 +100,19 @@ void check_value(const woption& option, const char* name, const wchar_t* value)
 
 void test_command_line()
 {
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+    // the long_names() API function was introduced in Boost V1.68
     options_description desc;
-    desc.add_options()
-        ("foo,f", new untyped_value(), "")
+    desc.add_options()("foo,f", new untyped_value(), "")
         // Explicit qualification is a workaround for vc6
-        ("bar,b", value<std::string>(), "")
-        ("baz", new untyped_value())
-        ("qux,plug*", new untyped_value())
-        ;
+        ("bar,b", value<std::string>(), "")("baz", new untyped_value())(
+            "qux,plug*", new untyped_value());
 
-    const wchar_t* cmdline4_[] = { L"--foo=1\u0FF52", L"-f4", L"--bar=11",
-                             L"-b4", L"--plug3=10"};
-    vector<wstring> cmdline4 = sv(cmdline4_,
-                                  sizeof(cmdline4_)/sizeof(cmdline4_[0]));
+    const wchar_t* cmdline4_[] = {
+        L"--foo=1\u0FF52", L"-f4", L"--bar=11", L"-b4", L"--plug3=10"};
+    vector<wstring> cmdline4 =
+        sv(cmdline4_, sizeof(cmdline4_) / sizeof(cmdline4_[0]));
     vector<woption> a4 =
         wcommand_line_parser(cmdline4).options(desc).run().options;
 
@@ -128,6 +122,7 @@ void test_command_line()
     check_value(a4[1], "foo", L"4");
     check_value(a4[2], "bar", L"11");
     check_value(a4[4], "qux", L"10");
+#endif
 }
 
 // Since we've already tested conversion between parser encoding and
@@ -141,9 +136,7 @@ void test_config_file()
 
     options_description desc;
 
-    desc.add_options()
-        ("foo", value<string>(), "unicode option")
-        ;
+    desc.add_options()("foo", value<string>(), "unicode option");
 
     std::wstringstream stream(L"foo = \x044F");
 
@@ -153,7 +146,7 @@ void test_config_file()
     HPX_TEST(vm["foo"].as<string>() == "\xD1\x8F");
 }
 
-int main(int, char* [])
+int main(int, char*[])
 {
     test_unicode_to_unicode();
     test_unicode_to_native();
@@ -163,4 +156,3 @@ int main(int, char* [])
 
     return hpx::util::report_errors();
 }
-

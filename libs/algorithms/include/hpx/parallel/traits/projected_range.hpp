@@ -7,9 +7,9 @@
 #define HPX_PARALLEL_TRAITS_PROJECTED_RANGE_JUL_18_2015_1001PM
 
 #include <hpx/config.hpp>
+#include <hpx/functional/result_of.hpp>
 #include <hpx/iterator_support/is_range.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util/result_of.hpp>
 
 #include <hpx/parallel/traits/projected.hpp>
 

@@ -11,6 +11,8 @@
 #define HPX_PARCELSET_PARCELPORT_MAR_26_2008_1214PM
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
@@ -18,8 +20,6 @@
 #include <hpx/runtime/parcelset/detail/per_action_data_counter.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <atomic>

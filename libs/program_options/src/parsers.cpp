@@ -42,7 +42,7 @@
 // available on iOS. The right replacement is not known. See
 // https://svn.boost.org/trac/boost/ticket/5053
 extern "C" {
-    extern char*** _NSGetEnviron(void);
+extern char*** _NSGetEnviron(void);
 }
 #define environ (*_NSGetEnviron())
 #else

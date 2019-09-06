@@ -9,12 +9,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#include <hpx/functional/invoke.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/functional/traits/get_function_address.hpp>
+#include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util/invoke.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0

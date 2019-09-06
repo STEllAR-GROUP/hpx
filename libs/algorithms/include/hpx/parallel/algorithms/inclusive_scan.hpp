@@ -10,8 +10,8 @@
 #define HPX_PARALLEL_ALGORITHM_INCLUSIVE_SCAN_JAN_03_2015_0136PM
 
 #include <hpx/config.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/util/invoke.hpp>
 #include <hpx/util/unwrap.hpp>
 #include <hpx/util/zip_iterator.hpp>
 

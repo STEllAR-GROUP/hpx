@@ -19,9 +19,11 @@ set(HPX_LIBS
   concurrency
   config
   datastructures
+  debugging
   errors
   filesystem
   format
+  functional
   hardware
   hashing
   iterator_support
@@ -30,6 +32,7 @@ set(HPX_LIBS
   plugin
   preprocessor
   program_options
+  resiliency
   segmented_algorithms
   statistics
   testing

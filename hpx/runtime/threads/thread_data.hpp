@@ -20,7 +20,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/backtrace.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/util/thread_description.hpp>

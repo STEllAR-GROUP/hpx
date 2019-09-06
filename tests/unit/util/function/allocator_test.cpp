@@ -12,7 +12,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstddef>
 

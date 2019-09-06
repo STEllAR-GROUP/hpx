@@ -57,6 +57,7 @@ int main(int argc, char* argv[])
         string root = ".";
 
         options_description desc("Allowed options");
+        // clang-format off
         desc.add_options()
         // First parameter describes option name/short name
         // The second is parameter to option
@@ -77,6 +78,7 @@ int main(int argc, char* argv[])
                 "write source package list to <pathname>")
             ("root,r", value(&root), "treat <dirname> as project root directory")
         ;
+        // clang-format on
 
         variables_map vm;
         store(parse_command_line(argc, argv, desc), vm);

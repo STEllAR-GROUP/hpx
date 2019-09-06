@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_tuple.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

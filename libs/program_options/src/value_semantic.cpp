@@ -142,7 +142,7 @@ namespace hpx { namespace program_options {
         check_first_occurrence(v);
         string s(get_single_string(xs, true));
 
-        for (char & i : s)
+        for (char& i : s)
             i = char(std::tolower(i));
 
         if (s.empty() || s == "on" || s == "yes" || s == "1" || s == "true")
@@ -164,7 +164,7 @@ namespace hpx { namespace program_options {
         check_first_occurrence(v);
         wstring s(get_single_string(xs, true));
 
-        for (wchar_t & i : s)
+        for (wchar_t& i : s)
             i = wchar_t(tolower(i));
 
         if (s.empty() || s == L"on" || s == L"yes" || s == L"1" || s == L"true")
@@ -329,7 +329,7 @@ namespace hpx { namespace program_options {
         //  replace placeholder with values
         //  placeholder are denoted by surrounding '%'
         //
-        for (auto & substitution : substitutions)
+        for (auto& substitution : substitutions)
             replace_token('%' + substitution.first + '%', substitution.second);
     }
 

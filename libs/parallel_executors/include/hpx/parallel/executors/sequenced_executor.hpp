@@ -14,8 +14,8 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/sync_launch_policy_dispatch.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <hpx/parallel/exception_list.hpp>
