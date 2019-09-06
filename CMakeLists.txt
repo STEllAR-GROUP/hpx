@@ -13,8 +13,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V3.3.2
-cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+# We require at least CMake V3.6.3
+cmake_minimum_required(VERSION 3.6.3 FATAL_ERROR)
 
 if (HPX_WITH_CUDA AND CMAKE_VERSION VERSION_LESS 3.9)
   message(FATAL_ERROR "CUDA support requires at least CMake 3.9.")
@@ -71,7 +71,7 @@ include(GNUInstallDirs)
 include(HPX_Utils)
 
 # explicitly set certain policies
-cmake_policy(VERSION 3.3.2)
+cmake_policy(VERSION 3.6.3)
 hpx_set_cmake_policy(CMP0042 NEW)
 if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
   # the old behavior not supported for newer cmake versions anymore
