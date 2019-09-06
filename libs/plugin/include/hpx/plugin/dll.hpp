@@ -6,18 +6,18 @@
 #ifndef HPX_UTIL_PLUGIN_DLL_HPP
 #define HPX_UTIL_PLUGIN_DLL_HPP
 
-#include <hpx/config.hpp>
+#include <hpx/plugin/config.hpp>
 
 #ifndef HPX_MSVC
-# ifndef  HPX_HAS_DLOPEN
-#  define HPX_HAS_DLOPEN 1
-# endif
+#ifndef HPX_HAS_DLOPEN
+#define HPX_HAS_DLOPEN 1
+#endif
 #endif
 
 #if defined(HPX_MSVC) || defined(HPX_MINGW)
-#include <hpx/util/plugin/detail/dll_windows.hpp>
+#include <hpx/plugin/detail/dll_windows.hpp>
 #elif defined(HPX_HAS_DLOPEN)
-#include <hpx/util/plugin/detail/dll_dlopen.hpp>
+#include <hpx/plugin/detail/dll_dlopen.hpp>
 #else
 #error "Hpx.Plugin: your platform is not supported by this library."
 #endif

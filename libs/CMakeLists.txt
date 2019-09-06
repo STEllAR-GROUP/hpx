@@ -29,6 +29,7 @@ set(HPX_LIBS
   iterator_support
   logging
   parallel_executors
+  plugin
   preprocessor
   program_options
   resiliency

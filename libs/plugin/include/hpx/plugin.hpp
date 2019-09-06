@@ -7,8 +7,10 @@
 #ifndef HPX_UTIL_PLUGIN_HPP
 #define HPX_UTIL_PLUGIN_HPP
 
-#include <hpx/util/plugin/config.hpp>
-#include <hpx/util/plugin/dll.hpp>
-#include <hpx/util/plugin/plugin_factory.hpp>
+#include <hpx/plugin/config.hpp>
+#include <hpx/plugin/concrete_factory.hpp>
+#include <hpx/plugin/dll.hpp>
+#include <hpx/plugin/export_plugin.hpp>
+#include <hpx/plugin/plugin_factory.hpp>
 
 #endif /*HPX_UTIL_PLUGIN_HPP*/
