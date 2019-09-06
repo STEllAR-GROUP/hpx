@@ -89,13 +89,16 @@ set(logging_sources
 
 include(HPX_AddModule)
 add_hpx_module(logging
-    COMPATIBILITY_HEADERS ON
-    DEPRECATION_WARNINGS
-    FORCE_LINKING_GEN
-    GLOBAL_HEADER_GEN OFF
-    SOURCES ${logging_sources}
-    HEADERS ${logging_headers}
-    COMPAT_HEADERS ${logging_compat_headers}
-    DEPENDENCIES hpx_assertion hpx_config hpx_filesystem
-    CMAKE_SUBDIRS examples tests
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
+  FORCE_LINKING_GEN
+  GLOBAL_HEADER_GEN OFF
+  SOURCES ${logging_sources}
+  HEADERS ${logging_headers}
+  COMPAT_HEADERS ${logging_compat_headers}
+  DEPENDENCIES
+    hpx_assertion
+    hpx_config
+    hpx_filesystem
+  CMAKE_SUBDIRS examples tests
 )

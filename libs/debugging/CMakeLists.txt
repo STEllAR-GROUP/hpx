@@ -24,6 +24,7 @@ add_hpx_module(debugging
   SOURCES ${debugging_sources}
   HEADERS ${debugging_headers}
   COMPAT_HEADERS ${debugging_compat_headers}
-  DEPENDENCIES hpx_config
+  DEPENDENCIES
+    hpx_config
   CMAKE_SUBDIRS examples tests
 )

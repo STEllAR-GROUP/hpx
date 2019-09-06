@@ -37,6 +37,8 @@ add_hpx_module(iterator_support
   SOURCES ${iterator_support_sources}
   HEADERS ${iterator_support_headers}
   COMPAT_HEADERS ${iterator_support_compat_headers}
-  DEPENDENCIES hpx_config hpx_type_support
+  DEPENDENCIES
+    hpx_config
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

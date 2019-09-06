@@ -51,4 +51,5 @@ add_hpx_module(plugin
     hpx_errors
     hpx_datastructures
     hpx_filesystem
+    hpx_functional
 )
