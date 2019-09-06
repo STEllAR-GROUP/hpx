@@ -9,9 +9,9 @@
 #define HPX_LCOS_LOCAL_CONDITION_VARIABLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -54,6 +54,8 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT_OWNS_LOCK(lock);
             util::ignore_while_checking<std::unique_lock<mutex> > il(&lock);
             std::unique_lock<mutex_type> l(mtx_.data_);
+
+            util::ignore_while_checking<std::unique_lock<mutex_type>> iil(&l);
             util::unlock_guard<std::unique_lock<mutex> > unlock(lock);
             //The following ensures that the inner lock will be unlocked
             //before the outer to avoid deadlock (fixes issue #3608)
@@ -89,6 +91,7 @@ namespace hpx { namespace lcos { namespace local
 
             util::ignore_while_checking<std::unique_lock<mutex> > il(&lock);
             std::unique_lock<mutex_type> l(mtx_.data_);
+            util::ignore_while_checking<std::unique_lock<mutex_type>> iil(&l);
             util::unlock_guard<std::unique_lock<mutex> > unlock(lock);
             //The following ensures that the inner lock will be unlocked
             //before the outer to avoid deadlock (fixes issue #3608)

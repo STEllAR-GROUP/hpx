@@ -19,13 +19,14 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/protect.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
-#include <hpx/functional/bind.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/functional/protect.hpp>
+#include <hpx/util/yield_while.hpp>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>
@@ -131,12 +132,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 socket_.close(ec);    // close the socket to give it back to the OS
             }
 
-            while(operation_in_flight_ != 0)
-            {
-                if(threads::get_self_ptr())
-                    hpx::this_thread::suspend(hpx::threads::pending,
-                        "tcp::reveiver::shutdown");
-            }
+            hpx::util::yield_while(
+                [this]() { return operation_in_flight_ != 0; },
+                "tcp::reveiver::shutdown");
         }
 
     private:

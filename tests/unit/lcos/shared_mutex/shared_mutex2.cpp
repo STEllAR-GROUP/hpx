@@ -122,7 +122,7 @@ void test_can_lock_upgrade_if_currently_locked_shared()
 
         {
             std::unique_lock<mutex_type> lk(unblocked_count_mutex);
-            while(unblocked_count < (reader_count + 1))
+            while (unblocked_count < (reader_count + 1))
             {
                 unblocked_condition.wait(lk);
             }

@@ -11,18 +11,18 @@
 #define HPX_RUNTIME_THREADS_THREAD_HELPERS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util_fwd.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <atomic>
 #include <chrono>

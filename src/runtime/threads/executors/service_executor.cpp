@@ -7,17 +7,15 @@
 #include <hpx/runtime/threads/executors/service_executors.hpp>
 
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/util/io_service_pool.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/functional/unique_function.hpp>
 
 #include <boost/asio/basic_waitable_timer.hpp>
 
@@ -51,15 +49,15 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         std::unique_lock<mutex_type> l(mtx_);
         if (blocking_)
         {
+            std::size_t k = 0;
             while (task_count_ > 0)
             {
                 // We need to cancel the wait process here, since we might block
                 // other running HPX threads.
                 shutdown_cv_.wait_for(l, std::chrono::seconds(1));
-                if (hpx::threads::get_self_ptr())
-                {
-                    hpx::this_thread::suspend();
-                }
+                hpx::basic_execution::this_thread::yield_k(
+                    k, "service_executor::~service_executor");
+                ++k;
             }
         }
     }

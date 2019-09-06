@@ -13,25 +13,13 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/runtime/threads/thread_helpers.hpp>
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-#include <hpx/errors.hpp>
+#include <hpx/errors/throw_exception.hpp>
 #endif
 
-#include <chrono>
-#include <cstddef>
+#include <hpx/basic_execution/this_thread.hpp>
 
-#if defined (HPX_WINDOWS)
-#include <windows.h>
-#else
-#  ifndef _AIX
-#    include <sched.h>
-#  else
-    // AIX's sched.h defines ::var which sometimes conflicts with Lambda's var
-    extern "C" int sched_yield(void);
-#  endif
-#  include <time.h>
-#endif
+#include <hpx/runtime/threads/thread_enums.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -43,62 +31,15 @@ namespace hpx { namespace util { namespace detail
     inline void yield_k(std::size_t k, const char *thread_name,
         hpx::threads::thread_state_enum p = hpx::threads::pending_boost)
     {
-        if (k < 4) //-V112
-        {
-        }
-#if defined(HPX_SMT_PAUSE)
-        else if (k < 16)
-        {
-            HPX_SMT_PAUSE;
-        }
-#endif
-        else if (k < 32 || k & 1) //-V112
-        {
-            if (!hpx::threads::get_self_ptr())
-            {
-#if defined(HPX_WINDOWS)
-                Sleep(0);
-#else
-                sched_yield();
-#endif
-            }
-            else
-            {
-                hpx::this_thread::suspend(p, thread_name);
-            }
-        }
-        else
-        {
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-            if (spinlock_break_on_deadlock &&
-                k > spinlock_deadlock_detection_limit)
-            {
-                HPX_THROW_EXCEPTION(deadlock,
-                    thread_name, "possible deadlock detected");
-            }
-#endif
-            if (!hpx::threads::get_self_ptr())
-            {
-#if defined(HPX_WINDOWS)
-                Sleep(1);
-#else
-                // g++ -Wextra warns on {} or {0}
-                struct timespec rqtp = { 0, 0 };
-
-                // POSIX says that timespec has tv_sec and tv_nsec
-                // But it doesn't guarantee order or placement
-
-                rqtp.tv_sec = 0;
-                rqtp.tv_nsec = 1000;
-
-                nanosleep( &rqtp, nullptr );
-#endif
-            }
-            else
-            {
-                hpx::this_thread::suspend(hpx::threads::pending, thread_name);
-            }
+        if (k > 32 && spinlock_break_on_deadlock &&
+            k > spinlock_deadlock_detection_limit)
+        {
+            HPX_THROW_EXCEPTION(
+                deadlock, thread_name, "possible deadlock detected");
         }
+#endif
+        hpx::basic_execution::this_thread::yield_k(k, thread_name);
     }
 }}}
 

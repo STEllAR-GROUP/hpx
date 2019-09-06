@@ -17,7 +17,6 @@ set(concurrency_headers
   hpx/concurrency/detail/freelist.hpp
   hpx/concurrency/detail/tagged_ptr_pair.hpp
   hpx/concurrency/itt_notify.hpp
-  hpx/concurrency/register_locks.hpp
   hpx/concurrency/spinlock.hpp
   hpx/concurrency/spinlock_pool.hpp
   hpx/concurrency/thread_name.hpp
@@ -31,7 +30,6 @@ set(concurrency_compat_headers
   hpx/util/lockfree/detail/tagged_ptr_pair.hpp
   hpx/util/lockfree/freelist.hpp
   hpx/util/itt_notify.hpp
-  hpx/util/register_locks.hpp
   hpx/util/spinlock.hpp
   hpx/util/spinlock_pool.hpp
 )
@@ -40,7 +38,6 @@ set(concurrency_compat_headers
 set(concurrency_sources
   barrier.cpp
   itt_notify.cpp
-  register_locks.cpp
   thread_name.cpp
 )
 
@@ -57,6 +54,7 @@ add_hpx_module(concurrency
     hpx_assertion
     hpx_concepts
     hpx_config
+    hpx_basic_execution
     hpx_errors
     hpx_hashing
     hpx_thread_support

@@ -9,7 +9,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -75,6 +75,16 @@ namespace hpx { namespace threads
         HPX_ASSERT(exit_funcs_.empty() || ran_exit_funcs_);
 
         exit_funcs_.clear();
+    }
+
+    coroutine_type::result_type thread_data::operator()(
+        hpx::basic_execution::this_thread::detail::agent_storage* agent_storage)
+    {
+        HPX_ASSERT(get_state().state() == active);
+        HPX_ASSERT(this == coroutine_.get_thread_id().get());
+        hpx::basic_execution::this_thread::reset_agent ctx(
+            agent_storage, agent_);
+        return coroutine_(set_state_ex(wait_signaled));
     }
 
     bool thread_data::interruption_point(bool throw_on_interrupt)

@@ -10,20 +10,22 @@
 #define HPX_RUNTIME_THREADS_THREAD_DATA_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
+#include <hpx/runtime/threads/execution_agent.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/errors.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/util/backtrace.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/concurrency/spinlock_pool.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/util/backtrace.hpp>
 #include <hpx/util/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
@@ -503,11 +505,9 @@ namespace hpx { namespace threads
         ///                 should be scheduled from this point on. The thread
         ///                 manager will use the returned value to set the
         ///                 thread's scheduling status.
-        coroutine_type::result_type operator()()
-        {
-            HPX_ASSERT(this == coroutine_.get_thread_id().get());
-            return coroutine_(set_state_ex(wait_signaled));
-        }
+        coroutine_type::result_type operator()(
+            hpx::basic_execution::this_thread::detail::agent_storage*
+                agent_storage);
 
         thread_id_type get_thread_id() const
         {
@@ -564,33 +564,39 @@ namespace hpx { namespace threads
         //virtual void reset() {}
 
         /// Construct a new \a thread
-        thread_data(thread_init_data& init_data,
-            void* queue, thread_state_enum newstate)
-          : current_state_(thread_state(newstate, wait_signaled)),
+        thread_data(thread_init_data& init_data, void* queue,
+            thread_state_enum newstate)
+          : current_state_(thread_state(newstate, wait_signaled))
+          ,
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-            description_(init_data.description),
-            lco_description_(),
+          description_(init_data.description)
+          , lco_description_()
+          ,
 #endif
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
-            parent_locality_id_(init_data.parent_locality_id),
-            parent_thread_id_(init_data.parent_id),
-            parent_thread_phase_(init_data.parent_phase),
+          parent_locality_id_(init_data.parent_locality_id)
+          , parent_thread_id_(init_data.parent_id)
+          , parent_thread_phase_(init_data.parent_phase)
+          ,
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-            marked_state_(unknown),
+          marked_state_(unknown)
+          ,
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-            backtrace_(nullptr),
+          backtrace_(nullptr)
+          ,
 #endif
-            priority_(init_data.priority),
-            requested_interrupt_(false),
-            enabled_interrupt_(true),
-            ran_exit_funcs_(false),
-            scheduler_base_(init_data.scheduler_base),
-            stacksize_(init_data.stacksize),
-            coroutine_(std::move(init_data.func),
-                thread_id_type(this_()), init_data.stacksize),
-            queue_(queue)
+          priority_(init_data.priority)
+          , requested_interrupt_(false)
+          , enabled_interrupt_(true)
+          , ran_exit_funcs_(false)
+          , scheduler_base_(init_data.scheduler_base)
+          , stacksize_(init_data.stacksize)
+          , coroutine_(std::move(init_data.func), thread_id_type(this_()),
+                init_data.stacksize)
+          , queue_(queue)
+          , agent_(coroutine_.impl())
         {
             LTM_(debug) << "thread::thread(" << this << "), description("
                         << get_description() << ")";
@@ -713,6 +719,9 @@ namespace hpx { namespace threads
 
         coroutine_type coroutine_;
         void* queue_;
+
+    public:
+        execution_agent agent_;
 #if defined(HPX_HAVE_APEX)
         apex_task_wrapper apex_data_;
 #endif
