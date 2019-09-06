@@ -16,6 +16,7 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/runtime/threads/execution_agent.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 
@@ -56,9 +57,12 @@ namespace hpx { namespace threads {
         static util::internal_allocator<thread_data_stackless> thread_alloc_;
 
     public:
-        stackless_coroutine_type::result_type call()
+        stackless_coroutine_type::result_type call(
+            hpx::basic_execution::this_thread::detail::agent_storage*)
         {
+            HPX_ASSERT(get_state().state() == active);
             HPX_ASSERT(this == coroutine_.get_thread_id().get());
+
             return coroutine_(this->thread_data::set_state_ex(wait_signaled));
         }
 

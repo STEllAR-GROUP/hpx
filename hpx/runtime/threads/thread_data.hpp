@@ -10,17 +10,18 @@
 #define HPX_RUNTIME_THREADS_THREAD_DATA_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/function.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-
-#include <hpx/assertion.hpp>
-#include <hpx/concurrency/spinlock_pool.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
@@ -478,7 +479,9 @@ namespace hpx { namespace threads {
         ///                 should be scheduled from this point on. The thread
         ///                 manager will use the returned value to set the
         ///                 thread's scheduling status.
-        inline coroutine_type::result_type operator()();
+        inline coroutine_type::result_type operator()(
+            hpx::basic_execution::this_thread::detail::agent_storage*
+                agent_storage);
 
         virtual thread_id_type get_thread_id() const
         {
@@ -512,7 +515,7 @@ namespace hpx { namespace threads {
 
         // Construct a new \a thread
         thread_data(thread_init_data& init_data, void* queue,
-            thread_state_enum newstate, bool  is_stackless = false);
+            thread_state_enum newstate, bool is_stackless = false);
 
         virtual ~thread_data();
         virtual void destroy() = 0;
@@ -564,6 +567,8 @@ namespace hpx { namespace threads {
         std::ptrdiff_t stacksize_;
 
         void* queue_;
+
+    public:
 #if defined(HPX_HAVE_APEX)
         apex_task_wrapper apex_data_;
 #endif
@@ -583,13 +588,14 @@ namespace hpx { namespace threads {
 
 namespace hpx { namespace threads {
 
-    inline coroutine_type::result_type thread_data::operator()()
+    inline coroutine_type::result_type thread_data::operator()(
+        hpx::basic_execution::this_thread::detail::agent_storage* agent_storage)
     {
         if (is_stackless_)
         {
-            return static_cast<thread_data_stackless*>(this)->call();
+            return static_cast<thread_data_stackless*>(this)->call(agent_storage);
         }
-        return static_cast<thread_data_stackful*>(this)->call();
+        return static_cast<thread_data_stackful*>(this)->call(agent_storage);
     }
 }}
 #endif /*HPX_RUNTIME_THREADS_THREAD_DATA_HPP*/

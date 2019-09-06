@@ -12,8 +12,8 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming_fwd.hpp>

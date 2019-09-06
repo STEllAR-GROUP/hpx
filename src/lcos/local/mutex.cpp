@@ -8,8 +8,8 @@
 #include <hpx/lcos/local/mutex.hpp>
 
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -104,7 +104,10 @@ namespace hpx { namespace lcos { namespace local
         HPX_ITT_SYNC_RELEASED(this);
         owner_id_ = threads::invalid_thread_id;
 
-        cond_.notify_one(std::move(l), threads::thread_priority_boost, ec);
+        {
+            util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
+            cond_.notify_one(std::move(l), threads::thread_priority_boost, ec);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

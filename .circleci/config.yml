@@ -699,6 +699,7 @@ jobs:
           command: |
               ninja -j2 -k 0 tests.unit.modules.allocator_support
               ninja -j2 -k 0 tests.unit.modules.assertion
+              ninja -j2 -k 0 tests.unit.modules.basic_execution
               ninja -j2 -k 0 tests.unit.modules.cache
               ninja -j2 -k 0 tests.unit.modules.collectives
               ninja -j2 -k 0 tests.unit.modules.compute
@@ -734,6 +735,7 @@ jobs:
               ulimit -c unlimited
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.allocator_support
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.assertion
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.basic_execution
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.compute

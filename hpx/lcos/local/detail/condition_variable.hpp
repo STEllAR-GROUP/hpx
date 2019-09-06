@@ -9,6 +9,7 @@
 #define HPX_LCOS_LOCAL_DETAIL_CONDITION_VARIABLE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/basic_execution/agent_ref.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
@@ -30,36 +31,32 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         HPX_NON_COPYABLE(condition_variable);
 
     private:
-        typedef lcos::local::spinlock mutex_type;
+        using mutex_type = lcos::local::spinlock;
 
     private:
         // define data structures needed for intrusive slist container used for
         // the queues
         struct queue_entry
         {
-            typedef boost::intrusive::slist_member_hook<
-                boost::intrusive::link_mode<boost::intrusive::normal_link>
-            > hook_type;
+            using hook_type = boost::intrusive::slist_member_hook<
+                boost::intrusive::link_mode<boost::intrusive::normal_link>>;
 
-            queue_entry(threads::thread_id_type const& id, void* q)
-              : id_(id), q_(q)
+            queue_entry(hpx::basic_execution::agent_ref ctx, void* q)
+              : ctx_(ctx)
+              , q_(q)
             {}
 
-            threads::thread_id_type id_;
+            hpx::basic_execution::agent_ref ctx_;
             void* q_;
             hook_type slist_hook_;
         };
 
-        typedef boost::intrusive::member_hook<
-            queue_entry, queue_entry::hook_type,
-            &queue_entry::slist_hook_
-        > slist_option_type;
+        using slist_option_type = boost::intrusive::member_hook<queue_entry,
+            queue_entry::hook_type, &queue_entry::slist_hook_>;
 
-        typedef boost::intrusive::slist<
-            queue_entry, slist_option_type,
-            boost::intrusive::cache_last<true>,
-            boost::intrusive::constant_time_size<true>
-        > queue_type;
+        using queue_type = boost::intrusive::slist<queue_entry,
+            slist_option_type, boost::intrusive::cache_last<true>,
+            boost::intrusive::constant_time_size<true>>;
 
         struct reset_queue_entry
         {
@@ -69,7 +66,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             ~reset_queue_entry()
             {
-                if (e_.id_ != threads::invalid_thread_id)
+                if (e_.ctx_)
                 {
                     queue_type* q = static_cast<queue_type*>(e_.q_);
                     q->erase(last_);     // remove entry from queue

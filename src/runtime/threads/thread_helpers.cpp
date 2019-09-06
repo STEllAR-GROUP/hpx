@@ -9,6 +9,9 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
+#ifdef HPX_HAVE_VERIFY_LOCKS
+#include <hpx/basic_execution/register_locks.hpp>
+#endif
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
@@ -18,9 +21,6 @@
 #include <hpx/state.hpp>
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
-#endif
-#ifdef HPX_HAVE_VERIFY_LOCKS
-#  include <hpx/concurrency/register_locks.hpp>
 #endif
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
