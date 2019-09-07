@@ -97,6 +97,7 @@ endif()
 '''
 
 tests_cmakelists_template = cmake_header + f'''
+include(HPX_Message)
 include(HPX_Option)
 
 if (NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
@@ -104,7 +105,7 @@ if (NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
   return()
 endif()
 if (NOT HPX_{lib_name_upper}_WITH_TESTS)
-  message(STATUS "Tests for {lib_name} disabled")
+  hpx_info("    Tests for {lib_name} disabled")
   return()
 endif()
 
