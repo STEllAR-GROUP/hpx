@@ -140,16 +140,18 @@ function(add_hpx_module name)
       )
   endif()
 
+  # generate configuration header for this module
   set(config_header
     "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}/config/defines.hpp")
-  write_config_defines_file(
-    NAMESPACE ${name_upper}
-    FILENAME ${config_header})
 
+  write_config_defines_file(NAMESPACE ${name_upper} FILENAME ${config_header})
+
+  # list all specified headers
   foreach(header_file ${headers})
     hpx_debug(${header_file})
   endforeach(header_file)
 
+  # create library modules
   add_library(hpx_${name} STATIC
     ${sources} ${force_linking_source}
     ${headers} ${global_header} ${compat_headers}

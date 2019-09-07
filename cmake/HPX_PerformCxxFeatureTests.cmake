@@ -138,6 +138,9 @@ function(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_shared_ptr(
     REQUIRED "HPX needs support for C++11 std::shared_ptr")
 
+  hpx_check_for_cxx11_std_shared_ptr_lwg3018(
+    DEFINITIONS HPX_HAVE_CXX11_SHARED_PTR_LWG3018)
+
   hpx_check_for_cxx11_std_shuffle(
     DEFINITIONS HPX_HAVE_CXX11_STD_SHUFFLE)
 

@@ -23,7 +23,6 @@
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/assign/std/vector.hpp>
 
 #include <string>
 #include <vector>
@@ -54,13 +53,12 @@ namespace hpx { namespace plugins
         ///         implemented in this module.
         bool get_plugin_info(std::vector<std::string>& fillini) override
         {
-            using namespace boost::assign;
-            fillini += std::string("[") + Section + ".plugins." +
-                unique_plugin_name<plugin_registry>::call() + "]";
-            fillini += std::string("name = ") + Name;
-            fillini += std::string("path = ") +
-                util::find_prefixes(std::string("/") + Suffix, Name);
-            fillini += "enabled = 1";
+            fillini.emplace_back(std::string("[") + Section + ".plugins." +
+                unique_plugin_name<plugin_registry>::call() + "]");
+            fillini.emplace_back(std::string("name = ") + Name);
+            fillini.emplace_back(std::string("path = ") +
+                util::find_prefixes(std::string("/") + Suffix, Name));
+            fillini.emplace_back("enabled = 1");
 
             char const* more = traits::plugin_config_data<Plugin>::call();
             if (more) {

@@ -11,8 +11,6 @@
 
 #include <hpx/util/storage/tuple.hpp>
 
-#include <boost/any.hpp>
-
 #include <iostream>
 #include <sstream>
 #include <string>

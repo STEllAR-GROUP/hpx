@@ -7,9 +7,7 @@
 #define HPX_PLUGIN_REGISTRY_BASE_MAR_24_2013_0225PM
 
 #include <hpx/config.hpp>
-
-#include <hpx/util/plugin.hpp>
-#include <hpx/util/plugin/export_plugin.hpp>
+#include <hpx/plugin.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <string>
