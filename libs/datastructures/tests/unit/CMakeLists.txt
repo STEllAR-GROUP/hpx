@@ -7,6 +7,7 @@ set(tests
   any
   boost_any
   is_tuple_like
+  tuple
 )
 
 foreach(test ${tests})

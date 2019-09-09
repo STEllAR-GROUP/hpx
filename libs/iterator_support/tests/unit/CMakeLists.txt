@@ -6,16 +6,21 @@
 set(tests
     is_iterator
     is_range
+    iterator_adaptor
+    iterator_facade
     range
 )
 
 # Set the dependencies of each test
+set(is_iterator_FLAGS NOLIBS)
 set(is_iterator_LIBS
   DEPENDENCIES hpx_config hpx_iterator_support partitioned_vector_component
     hpx_testing)
 
+set(is_range_FLAGS NOLIBS)
 set(is_range_LIBS DEPENDENCIES hpx_config hpx_iterator_support hpx_testing)
 
+set(range_FLAGS NOLIBS)
 set(range_LIBS DEPENDENCIES hpx_config hpx_iterator_support hpx_testing)
 
 # Add the tests
