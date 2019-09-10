@@ -119,7 +119,7 @@ namespace hpx { namespace util {
     {
     public:
         // constructors
-        basic_any() noexcept
+        HPX_CONSTEXPR basic_any() noexcept
           : table(
                 detail::any::get_table<detail::any::empty>::template get<IArch,
                     OArch, Char>())
@@ -136,17 +136,6 @@ namespace hpx { namespace util {
             assign(x);
         }
 
-        template <typename T>
-        explicit basic_any(T const& x)
-          : table(detail::any::get_table<typename util::decay<T>::type>::
-                    template get<IArch, OArch, Char>())
-          , object(nullptr)
-        {
-            using value_type = typename util::decay<T>::type;
-            new_object(object, x,
-                typename detail::any::get_table<value_type>::is_small());
-        }
-
         // Move constructor
         basic_any(basic_any&& x) noexcept
           : table(x.table)
@@ -160,17 +149,57 @@ namespace hpx { namespace util {
 
         // Perfect forwarding of T
         template <typename T>
-        explicit basic_any(T&& x,
-            typename std::enable_if<!std::is_same<basic_any,
-                typename util::decay<T>::type>::value>::type* = nullptr)
+        basic_any(T&& x,
+            typename std::enable_if<
+                !std::is_same<basic_any, typename std::decay<T>::type>::value &&
+                std::is_copy_constructible<
+                    typename std::decay<T>::type>::value>::type* = nullptr)
           : table(detail::any::get_table<typename util::decay<T>::type>::
                     template get<IArch, OArch, Char>())
           , object(nullptr)
         {
             using value_type = typename util::decay<T>::type;
-            new_object(object, std::forward<T>(x),
-                typename detail::any::get_table<value_type>::is_small());
+            new_object<T>(object,
+                typename detail::any::get_table<value_type>::is_small(),
+                std::forward<T>(x));
         }
+
+#if defined(HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
+        template <typename T, typename... Ts,
+            typename Enable = typename std::enable_if<
+                std::is_constructible<typename std::decay<T>::type,
+                    Ts...>::value &&
+                std::is_copy_constructible<
+                    typename std::decay<T>::type>::value>::type>
+        explicit basic_any(std::in_place_type_t<T>, Ts&&... ts)
+          : table(detail::any::get_table<typename std::decay<T>::type>::
+                    template get<IArch, OArch, Char>())
+          , object(nullptr)
+        {
+            using value_type = typename std::decay<T>::type;
+            new_object<T>(object,
+                typename detail::any::get_table<value_type>::is_small(),
+                std::forward<Ts>(ts)...);
+        }
+
+        template <typename T, typename U, typename... Ts,
+            typename Enable = typename std::enable_if<
+                std::is_constructible<typename std::decay<T>::type,
+                    Ts...>::value &&
+                std::is_copy_constructible<
+                    typename std::decay<T>::type>::value>::type>
+        explicit basic_any(
+            std::in_place_type_t<T>, std::initializer_list<U> il, Ts&&... ts)
+          : table(detail::any::get_table<typename std::decay<T>::type>::
+                    template get<IArch, OArch, Char>())
+          , object(nullptr)
+        {
+            using value_type = typename std::decay<T>::type;
+            new_object<T>(object,
+                typename detail::any::get_table<value_type>::is_small(),
+                il, std::forward<Ts>(ts)...);
+        }
+#endif
 
         ~basic_any()
         {
@@ -199,18 +228,18 @@ namespace hpx { namespace util {
             return *this;
         }
 
-        template <typename T>
-        static void new_object(void*& object, T&& x, std::true_type)
+        template <typename T, typename... Ts>
+        static void new_object(void*& object, std::true_type, Ts&&... ts)
         {
-            using value_type = typename util::decay<T>::type;
-            new (&object) value_type(std::forward<T>(x));
+            using value_type = typename std::decay<T>::type;
+            new (&object) value_type(std::forward<Ts>(ts)...);
         }
 
-        template <typename T>
-        static void new_object(void*& object, T&& x, std::false_type)
+        template <typename T, typename... Ts>
+        static void new_object(void*& object, std::false_type, Ts&&... ts)
         {
-            using value_type = typename util::decay<T>::type;
-            object = new value_type(std::forward<T>(x));
+            using value_type = typename std::decay<T>::type;
+            object = new value_type(std::forward<Ts>(ts)...);
         }
 
     public:
@@ -230,53 +259,15 @@ namespace hpx { namespace util {
         }
 
         // Perfect forwarding of T
-        template <typename T>
+        template <typename T,
+            typename Enable = typename std::enable_if<
+                !std::is_same<basic_any, typename std::decay<T>::type>::value &&
+                std::is_copy_constructible<
+                    typename std::decay<T>::type>::value>::type>
         basic_any& operator=(T&& rhs)
         {
             basic_any(std::forward<T>(rhs)).swap(*this);
             return *this;
-        }
-
-        // equality operator
-        friend bool operator==(basic_any const& x, basic_any const& y)
-        {
-            if (&x == &y)    // same object
-            {
-                return true;
-            }
-
-            if (x.table == y.table)    // same type
-            {
-                return x.table->equal_to(
-                    &x.object, &y.object);    // equal value?
-            }
-
-            return false;
-        }
-
-        template <typename T>
-        friend bool operator==(basic_any const& b, T const& x)
-        {
-            using value_type = typename util::decay<T>::type;
-
-            if (b.type() == typeid(value_type))    // same type
-            {
-                return b.cast<value_type>() == x;
-            }
-
-            return false;
-        }
-
-        // inequality operator
-        friend bool operator!=(basic_any const& x, basic_any const& y)
-        {
-            return !(x == y);
-        }
-
-        template <typename T>
-        friend bool operator!=(basic_any const& b, T const& x)
-        {
-            return !(b == x);
         }
 
         // utility functions
@@ -303,30 +294,36 @@ namespace hpx { namespace util {
                 *reinterpret_cast<T const*>(object);
         }
 
-// implicit casting is disabled by default for compatibility with hpx::any
-#ifdef HPX_ANY_IMPLICIT_CASTING
-        // automatic casting operator
-        template <typename T>
-        operator T const&() const
+        bool has_value() const noexcept
         {
-            return cast<T>();
-        }
-#endif    // implicit casting
-
-        bool empty() const noexcept
-        {
-            return type() == typeid(detail::any::empty);
+            return type() != typeid(detail::any::empty);
         }
 
         void reset()
         {
-            if (!empty())
+            if (has_value())
             {
                 table->static_delete(&object);
                 table = detail::any::get_table<
                     detail::any::empty>::template get<IArch, OArch, Char>();
                 object = nullptr;
             }
+        }
+
+        // equality operator
+        bool equal_to(basic_any const& rhs) const noexcept
+        {
+            if (this == &rhs)    // same object
+            {
+                return true;
+            }
+
+            if (type() == rhs.type())    // same type
+            {
+                return table->equal_to(&object, &rhs.object);    // equal value?
+            }
+
+            return false;
         }
 
         // these functions have been added in the assumption that the embedded
@@ -368,7 +365,7 @@ namespace hpx { namespace util {
 
         void save(OArch& ar, const unsigned version) const
         {
-            bool is_empty = empty();
+            bool is_empty = !has_value();
             ar & is_empty;
             if (!is_empty)
             {
@@ -388,6 +385,35 @@ namespace hpx { namespace util {
         detail::any::fxn_ptr_table<IArch, OArch, Char>* table;
         void* object;
     };
+
+    ////////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
+    template <typename T, typename Char, typename... Ts>
+    basic_any<serialization::input_archive, serialization::output_archive, Char>
+    make_any(Ts&&... ts)
+    {
+        return basic_any<serialization::input_archive,
+            serialization::output_archive, Char>(
+            std::in_place_type<T>, std::forward<Ts>(ts)...);
+    }
+
+    template <typename T, typename Char, typename U, typename... Ts>
+    basic_any<serialization::input_archive, serialization::output_archive, Char>
+    make_any(std::initializer_list<U> il, Ts&&... ts)
+    {
+        return basic_any<serialization::input_archive,
+            serialization::output_archive, Char>(
+            std::in_place_type<T>, il, std::forward<Ts>(ts)...);
+    }
+#endif
+
+    template <typename T, typename Char>
+    basic_any<serialization::input_archive, serialization::output_archive, Char>
+    make_any(T&& t)
+    {
+        return basic_any<serialization::input_archive,
+            serialization::output_archive, Char>(std::forward<T>(t));
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     // backwards compatibility

@@ -109,7 +109,7 @@ namespace hpx { namespace program_options {
     void untyped_value::xparse(hpx::util::any_nonser& value_store,
         const std::vector<std::string>& new_tokens) const
     {
-        if (!value_store.empty())
+        if (value_store.has_value())
             throw multiple_occurrences();
         if (new_tokens.size() > 1)
             throw multiple_values();
@@ -196,7 +196,7 @@ namespace hpx { namespace program_options {
         HPX_EXPORT
         void check_first_occurrence(const hpx::util::any_nonser& value)
         {
-            if (!value.empty())
+            if (value.has_value())
                 throw multiple_occurrences();
         }
     }    // namespace validators

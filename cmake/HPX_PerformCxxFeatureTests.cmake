@@ -220,5 +220,8 @@ function(hpx_perform_cxx_feature_tests)
 
     hpx_check_for_cxx17_aligned_new(
       DEFINITIONS HPX_HAVE_CXX17_ALIGNED_NEW)
+
+    hpx_check_for_cxx17_std_in_place_type_t(
+      DEFINITIONS HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
   endif()
 endfunction()
