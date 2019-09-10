@@ -1175,6 +1175,25 @@ if(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
 endif()
 
 ################################################################################
+# Colored output (when using ninja)
+################################################################################
+if (CMAKE_MAKE_PROGRAM MATCHES ninja)
+  hpx_option(CMAKE_FORCE_COLORED_OUTPUT BOOL
+      "Always produce ANSI-colored output (GNU/Clang only)." TRUE ADVANCED)
+else ()
+  hpx_option(CMAKE_FORCE_COLORED_OUTPUT BOOL
+    "Always produce ANSI-colored output (GNU/Clang only)." FALSE ADVANCED)
+endif ()
+
+if (${CMAKE_FORCE_COLORED_OUTPUT})
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    add_compile_options (-fdiagnostics-color=always)
+  elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    add_compile_options (-fcolor-diagnostics)
+  endif ()
+endif ()
+
+################################################################################
 # check for miscellaneous things
 ################################################################################
 
