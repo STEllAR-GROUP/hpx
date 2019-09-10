@@ -82,7 +82,8 @@ namespace hpx { namespace plugins
             fillini.emplace_back("enable = $[hpx.parcel.enable]");
 
             std::string name_uc;
-            std::transform(name.begin(), name.end(), name_uc.begin(),
+            name_uc.reserve(name.size());
+            std::transform(name.begin(), name.end(), std::back_inserter(name_uc),
                 [](char c) { return std::toupper(c); });
 
             // basic parcelport configuration ...
