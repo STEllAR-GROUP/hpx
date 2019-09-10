@@ -93,10 +93,8 @@ namespace hpx { namespace threads { namespace policies {
     //         typedef ... type;
     //     };
     // };
-    template <typename Mutex = std::mutex,
-        typename PendingQueuing = lockfree_lifo,
-        typename StagedQueuing = lockfree_lifo,
-        typename TerminatedQueuing = lockfree_fifo>
+    template <typename Mutex, typename PendingQueuing, typename StagedQueuing,
+        typename TerminatedQueuing>
     class thread_queue_mc
     {
     private:
