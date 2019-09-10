@@ -108,7 +108,7 @@
                 std::transform(actname.begin(), actname.end(),                 \
                     actname.begin(), [](char c) { return std::tolower(c); });  \
                 HPX_PLUGIN_LIST_NAME_(prefix, name, classname)()->             \
-                    insert(std::make_pair(actname, w));                        \
+                    insert(std::make_pair(actname, hpx::util::any_nonser(w))); \
             }                                                                  \
         } HPX_PLUGIN_EXPORTER_INSTANCE_NAME_(                                  \
             prefix, name, actualname, classname);                              \
