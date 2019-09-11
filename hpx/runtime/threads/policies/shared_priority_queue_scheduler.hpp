@@ -68,10 +68,10 @@ namespace hpx { namespace threads { namespace policies {
     class shared_priority_queue_scheduler : public scheduler_base
     {
     public:
-        typedef std::false_type has_periodic_maintenance;
+        using has_periodic_maintenance = std::false_type;
 
-        typedef thread_queue_mc<Mutex, PendingQueuing, TerminatedQueuing>
-            thread_queue_type;
+        using thread_queue_type = thread_queue_mc<Mutex, PendingQueuing,
+            PendingQueuing, TerminatedQueuing>;
 
         struct init_parameter
         {
