@@ -13,6 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/invoke_fused.hpp>
 #include <hpx/lcos/sync_fwd.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/preprocessor/cat.hpp>
@@ -39,12 +40,11 @@
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_remote_result.hpp>
 #include <hpx/traits/action_stacksize.hpp>
-#include <hpx/traits/is_action.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/invoke_fused.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/concurrency/itt_notify.hpp>
 #endif

@@ -8,14 +8,14 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/logging.hpp>
+#include <hpx/plugin.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/init_ini_data.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/util/plugin.hpp>
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/tokenizer.hpp>

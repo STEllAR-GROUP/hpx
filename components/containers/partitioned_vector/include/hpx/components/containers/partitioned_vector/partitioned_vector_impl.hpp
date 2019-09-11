@@ -20,7 +20,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/util/bind_back.hpp>
+#include <hpx/functional/bind_back.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>

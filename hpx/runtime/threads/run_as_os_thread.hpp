@@ -11,8 +11,8 @@
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/service_executors.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/result_of.hpp>
 
 #include <type_traits>
 #include <utility>

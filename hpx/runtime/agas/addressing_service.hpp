@@ -29,7 +29,7 @@
 #include <hpx/cache/lru_cache.hpp>
 #include <hpx/cache/statistics/local_full_statistics.hpp>
 #include <hpx/util_fwd.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 

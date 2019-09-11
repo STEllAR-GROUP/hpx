@@ -12,7 +12,7 @@
 
 // NOTE: Warning caused by assignment of hpx::util::function_nonser<float()> to
 // hpx::util::function_nonser<double()> in test_emptiness. Triggered in
-// hpx/util/function.hpp which is included latest by hpx/include/util.hpp.
+// hpx/functional/function.hpp which is included latest by hpx/include/util.hpp.
 #if defined(__clang__)
 #  pragma clang diagnostic push
 #  pragma clang diagnostic ignored "-Wdouble-promotion"

@@ -7,12 +7,12 @@
 #define HPX_RUNTIME_APPLIER_REGISTER_APPLY_COLOCATED_MAR_09_2014_1214PM
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/util/unique_function.hpp>
 
 namespace hpx { namespace detail
 {

@@ -21,7 +21,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/traits/component_pin_support.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
-#include <hpx/util/bind_back.hpp>
+#include <hpx/functional/bind_back.hpp>
 
 #include <memory>
 

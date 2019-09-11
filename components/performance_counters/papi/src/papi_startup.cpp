@@ -19,7 +19,7 @@
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/util/bind_back.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/util/thread_mapper.hpp>
 
 #include <hpx/program_options.hpp>

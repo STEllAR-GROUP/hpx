@@ -14,15 +14,15 @@
 // hpxinspect:nodeprecatedinclude:boost/program_options/value_semantic.hpp
 
 #include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/value_semantic.hpp>
+#include <boost/program_options/variables_map.hpp>
 
 namespace hpx { namespace program_options {
 
-    using boost::program_options::store;
-    using boost::program_options::notify;
-    using boost::program_options::variable_value;
     using boost::program_options::abstract_variables_map;
+    using boost::program_options::notify;
+    using boost::program_options::store;
+    using boost::program_options::variable_value;
     using boost::program_options::variables_map;
 
 }}    // namespace hpx::program_options

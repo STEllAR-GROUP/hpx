@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/result_of.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -16,7 +17,6 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/unique_ptr.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util/result_of.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <memory>

@@ -8,7 +8,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 
 #include <boost/lockfree/queue.hpp>
 

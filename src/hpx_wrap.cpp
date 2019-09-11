@@ -26,7 +26,7 @@ namespace hpx_start
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <string>
 #include <vector>

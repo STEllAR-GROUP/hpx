@@ -12,17 +12,17 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/functional/traits/get_function_address.hpp>
+#include <hpx/functional/traits/get_function_annotation.hpp>
 #endif
 #include <hpx/assertion.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/util/annotated_function.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
-#include <hpx/util/invoke.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/util/annotated_function.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>

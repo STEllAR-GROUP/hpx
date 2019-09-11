@@ -27,7 +27,8 @@ bool check_float(Double1 test, Double2 expected)
     double expected_d = double(expected);
 
     double seperation = expected_d * (1. + FLOAT_SEPERATION) / expected_d;
-    if ((test_d < expected_d + seperation) && (test_d > expected_d - seperation))
+    if ((test_d < expected_d + seperation) &&
+        (test_d > expected_d - seperation))
     {
         return true;
     }
@@ -90,6 +91,7 @@ stringstream make_file()
 po::options_description set_options()
 {
     po::options_description opts;
+    // clang-format off
     opts.add_options()
         ("global_string",po::value<string>())
 
@@ -144,6 +146,7 @@ po::options_description set_options()
         ("booleans.present_equal_true", po::bool_switch())
         ("booleans.present_no_equal_true", po::bool_switch())
         ;
+    // clang-format on
 
     return opts;
 }
@@ -188,9 +191,9 @@ void check_results(po::variables_map& vm, vector<string> unregistered)
 
     int expected_int_postitive = 41;
     int expected_int_negative = -42;
-//     int expected_int_hex = 0x43;
-//     int expected_int_oct = 044;
-//     int expected_int_bin = 0b101010;
+    //     int expected_int_hex = 0x43;
+    //     int expected_int_oct = 044;
+    //     int expected_int_bin = 0b101010;
 
     float expected_float_positive = 51.1f;
     float expected_float_negative = -52.1f;
@@ -214,7 +217,7 @@ void check_results(po::variables_map& vm, vector<string> unregistered)
     bool expected_onoff_true = true;
     bool expected_onoff_false = false;
     bool expected_present_equal_true = true;
-//     bool expected_present_no_equal_true = true;
+    //     bool expected_present_no_equal_true = true;
 
     VERIFY(vm["global_string"].as<string>() == expected_global_string);
 

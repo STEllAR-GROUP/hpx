@@ -9,8 +9,8 @@
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/util/bind_front.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstdint>
 #include <sstream>

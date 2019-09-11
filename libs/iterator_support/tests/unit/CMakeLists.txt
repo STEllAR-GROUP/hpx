@@ -6,9 +6,24 @@
 set(tests
     is_iterator
     is_range
+    iterator_adaptor
+    iterator_facade
     range
 )
 
+# Set the dependencies of each test
+set(is_iterator_FLAGS NOLIBS)
+set(is_iterator_LIBS
+  DEPENDENCIES hpx_config hpx_iterator_support partitioned_vector_component
+    hpx_testing)
+
+set(is_range_FLAGS NOLIBS)
+set(is_range_LIBS DEPENDENCIES hpx_config hpx_iterator_support hpx_testing)
+
+set(range_FLAGS NOLIBS)
+set(range_LIBS DEPENDENCIES hpx_config hpx_iterator_support hpx_testing)
+
+# Add the tests
 foreach(test ${tests})
   set(sources ${test}.cpp)
 
@@ -17,8 +32,7 @@ foreach(test ${tests})
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
-                     DEPENDENCIES hpx_assertion hpx_config hpx_iterator_support
-                     hpx_testing partitioned_vector_component
+                     ${${test}_LIBS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Unit/Modules/Iterator_support")

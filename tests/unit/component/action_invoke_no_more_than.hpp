@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -15,7 +16,6 @@
 #include <hpx/traits/action_decorate_continuation.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/util/bind_back.hpp>
 #include <hpx/type_support/static.hpp>
 
 #include <memory>

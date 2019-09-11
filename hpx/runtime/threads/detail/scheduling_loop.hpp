@@ -11,11 +11,14 @@
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+# include <hpx/runtime/threads/scoped_background_timer.hpp>
+#endif
 #include <hpx/state.hpp>
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>

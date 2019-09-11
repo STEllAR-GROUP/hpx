@@ -12,9 +12,9 @@
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/traits/plugin_config_data.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_back.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <hpx/plugins/message_handler_factory.hpp>

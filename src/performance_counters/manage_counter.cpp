@@ -11,7 +11,7 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/version.hpp>
 
 #include <memory>

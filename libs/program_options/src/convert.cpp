@@ -83,8 +83,8 @@ namespace hpx { namespace program_options {
     {
         using namespace std::placeholders;
         return detail::convert<wchar_t>(s,
-            std::bind(&std::codecvt<wchar_t, char, std::mbstate_t>::in, &cvt, _1,
-                _2, _3, _4, _5, _6, _7));
+            std::bind(&std::codecvt<wchar_t, char, std::mbstate_t>::in, &cvt,
+                _1, _2, _3, _4, _5, _6, _7));
     }
 
     HPX_EXPORT std::string to_8_bit(const std::wstring& s,
@@ -92,8 +92,8 @@ namespace hpx { namespace program_options {
     {
         using namespace std::placeholders;
         return detail::convert<char>(s,
-            std::bind(&std::codecvt<wchar_t, char, std::mbstate_t>::out, &cvt, _1,
-                _2, _3, _4, _5, _6, _7));
+            std::bind(&std::codecvt<wchar_t, char, std::mbstate_t>::out, &cvt,
+                _1, _2, _3, _4, _5, _6, _7));
     }
 
     namespace {

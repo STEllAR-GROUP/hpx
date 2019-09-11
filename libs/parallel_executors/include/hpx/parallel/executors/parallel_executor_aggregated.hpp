@@ -11,6 +11,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_launch_policy_dispatch.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/latch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -22,8 +24,6 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/iterator_support/range.hpp>
 
 #include <algorithm>
 #include <cstddef>

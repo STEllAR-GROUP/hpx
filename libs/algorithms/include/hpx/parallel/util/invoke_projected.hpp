@@ -7,8 +7,8 @@
 #define HPX_PARALLEL_UTIL_INVOKE_PROJECTED_SEP_27_2016_0912AM
 
 #include <hpx/config.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util/invoke.hpp>
 
 #include <utility>
 

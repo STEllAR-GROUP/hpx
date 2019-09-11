@@ -8,6 +8,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/register_locks.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
@@ -16,7 +17,6 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/state.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util/bind.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

@@ -7,7 +7,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 
 #include <cstddef>
 #include <cstdint>

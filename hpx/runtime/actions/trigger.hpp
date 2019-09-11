@@ -8,8 +8,8 @@
 #define HPX_RUNTIME_ACTIONS_TRIGGER_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
-#include <hpx/util/invoke.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <exception>

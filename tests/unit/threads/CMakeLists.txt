@@ -38,6 +38,7 @@ set(lockfree_fifo_LIBRARIES
     hpx_config
     hpx_concurrency
     hpx_datastructures
+    hpx_functional
     hpx_program_options
     hpx_testing
     hpx_type_support)

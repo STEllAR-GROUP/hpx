@@ -14,8 +14,8 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_id_type.hpp>
 #include <hpx/util_fwd.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/functional/function.hpp>
+#include <hpx/functional/unique_function.hpp>
 #if defined(HPX_HAVE_APEX)
 // forward declare the APEX object
 namespace apex { struct task_wrapper; }

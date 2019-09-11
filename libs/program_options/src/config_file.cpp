@@ -25,7 +25,7 @@ namespace hpx { namespace program_options { namespace detail {
       : allowed_options(allowed_options)
       , m_allow_unregistered(allow_unregistered)
     {
-        for (const auto & allowed_option : allowed_options)
+        for (const auto& allowed_option : allowed_options)
         {
             add_option(allowed_option.c_str());
         }

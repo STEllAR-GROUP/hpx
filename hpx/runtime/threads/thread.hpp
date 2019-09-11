@@ -12,7 +12,7 @@
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util_fwd.hpp>
 

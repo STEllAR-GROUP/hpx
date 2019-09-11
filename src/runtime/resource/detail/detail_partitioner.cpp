@@ -7,6 +7,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/resource/partitioner.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/topology/topology.hpp>
 #include <hpx/type_support/static.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/function.hpp>
 
 #include <atomic>
 #include <cstddef>

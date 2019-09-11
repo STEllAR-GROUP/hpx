@@ -28,3 +28,4 @@ information on how to build and use |hpx| in different scenarios.
    manual/optimizing_hpx_applications
    manual/hpx_runtime_and_resources
    manual/miscellaneous
+   manual/troubleshooting

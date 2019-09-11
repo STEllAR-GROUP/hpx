@@ -9,13 +9,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/plugin.hpp>
+#include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/plugin/dll.hpp>
-#include <hpx/plugins/plugin_registry_base.hpp>
 
 #include <cstddef>
 #include <cstdint>

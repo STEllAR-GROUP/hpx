@@ -22,7 +22,7 @@
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/util/bind_back.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>

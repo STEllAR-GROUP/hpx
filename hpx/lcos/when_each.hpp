@@ -127,6 +127,10 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/when_some.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -138,10 +142,6 @@ namespace hpx
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unwrap_ref.hpp>
-#include <hpx/util/bind_back.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/datastructures/tuple.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

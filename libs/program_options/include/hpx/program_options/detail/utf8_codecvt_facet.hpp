@@ -90,7 +90,7 @@ namespace hpx { namespace program_options { namespace detail {
 
     using boost::program_options::detail::utf8_codecvt_facet;
 
-}}}
+}}}    // namespace hpx::program_options::detail
 
 #else
 

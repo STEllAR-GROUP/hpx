@@ -16,7 +16,7 @@ namespace hpx { namespace program_options {
     };
 
     force_linking_helper& force_linking();
-}}
+}}    // namespace hpx::program_options
 #else
 
 #include <hpx/program_options.hpp>
@@ -31,7 +31,8 @@ namespace hpx { namespace program_options {
     using parse_environment1_type = basic_parsed_options<char> (*)(
         options_description const&, char const*);
     using parse_environment2_type = basic_parsed_options<char> (*)(
-        options_description const&, std::function<std::string(std::string)> const&);
+        options_description const&,
+        std::function<std::string(std::string)> const&);
     using parse_environment3_type = basic_parsed_options<char> (*)(
         options_description const&, std::string const&);
 

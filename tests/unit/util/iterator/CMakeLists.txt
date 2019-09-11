@@ -4,8 +4,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    iterator_adaptor
-    iterator_facade
     stencil3_iterator
     transform_iterator
     transform_iterator2

@@ -14,7 +14,7 @@
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstdint>
 #include <string>

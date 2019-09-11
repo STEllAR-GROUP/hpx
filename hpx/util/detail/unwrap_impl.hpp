@@ -10,10 +10,10 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_tuple_like.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/util/invoke_fused.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/invoke_fused.hpp>
 #include <hpx/util/pack_traversal.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/functional/result_of.hpp>
 
 #include <cstddef>
 #include <type_traits>

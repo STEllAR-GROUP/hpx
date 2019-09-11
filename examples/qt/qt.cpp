@@ -7,7 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/thread_executors.hpp>
 #include <hpx/lcos/future_wait.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 
 #include <cstddef>
 #include <vector>

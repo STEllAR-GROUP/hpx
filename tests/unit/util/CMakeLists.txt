@@ -14,7 +14,6 @@ set(tests
     serializable_any
     serializable_boost_any
     tagged
-    tuple
     unwrap
    )
 
