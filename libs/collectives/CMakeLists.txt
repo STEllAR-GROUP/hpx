@@ -60,12 +60,13 @@ add_hpx_module(collectives
       hpx_config
       hpx_datastructures
       hpx_errors
+      hpx_execution
       hpx_format
       hpx_functional
       hpx_hashing
       hpx_iterator_support
       hpx_logging
-      hpx_parallel_executors
+      hpx_plugin
       hpx_preprocessor
       hpx_program_options
       hpx_timing
