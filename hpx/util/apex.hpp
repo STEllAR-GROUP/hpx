@@ -6,12 +6,12 @@
 #pragma once // prevent multiple inclusions of this header file.
 
 #include <hpx/config.hpp>
-#include <hpx/util/thread_description.hpp>
-#include <hpx/runtime/startup_function.hpp>
+#include <hpx/runtime/threads/thread_id_type.hpp>
 
 #ifdef HPX_HAVE_APEX
 #include "apex_api.hpp"
 #include <memory>
+#include <cstddef>
 #include <cstdint>
 #include <string>
 typedef std::shared_ptr<apex::task_wrapper> apex_task_wrapper;
@@ -19,42 +19,44 @@ typedef std::shared_ptr<apex::task_wrapper> apex_task_wrapper;
 typedef void* apex_task_wrapper;
 #endif
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
+
 #ifdef HPX_HAVE_APEX
 
     using enable_parent_task_handler_type = std::function<bool()>;
-    
+
     HPX_EXPORT void set_enable_parent_task_handler(enable_parent_task_handler_type f);
 
     HPX_EXPORT apex_task_wrapper apex_new_task(
-                thread_description const& description,
+                std::size_t address,
+                std::uint32_t parent_task_locality,
+                threads::thread_id_type const& parent_task);
+
+    HPX_EXPORT apex_task_wrapper apex_new_task(
+                char const *description,
                 std::uint32_t parent_task_locality,
                 threads::thread_id_type const& parent_task);
 
     inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
-                thread_description const& description)
+                std::size_t address)
+    {
+        if (wrapper == nullptr) {
+            threads::thread_id_type parent_task(nullptr);
+            // doesn't matter which locality we use, the parent is null
+            return apex_new_task(address, 0, parent_task);
+        }
+        return apex::update_task(wrapper, address);
+    }
+
+    inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
+                char const *description)
     {
         if (wrapper == nullptr) {
             threads::thread_id_type parent_task(nullptr);
             // doesn't matter which locality we use, the parent is null
             return apex_new_task(description, 0, parent_task);
-        } else if (description.kind() == thread_description::data_type_description) {
-            return apex::update_task(wrapper,
-                description.get_description());
-        } else {
-            return apex::update_task(wrapper,
-                description.get_address());
         }
-    }
-
-    inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper, char const* name)
-    {
-        if (wrapper == nullptr) {
-            apex_task_wrapper parent_task(nullptr);
-            return apex::new_task(std::string(name), UINTMAX_MAX, parent_task);
-        }
-        return apex::update_task(wrapper, name);
+        return apex::update_task(wrapper, description);
     }
 
     /* This is a scoped object around task scheduling to measure the time
@@ -106,15 +108,20 @@ namespace hpx { namespace util
 
 #else
     inline apex_task_wrapper apex_new_task(
-                thread_description const& description,
+                std::size_t address,
+                std::uint32_t parent_task_locality,
+                threads::thread_id_type const& parent_task) {return nullptr;}
+
+    inline apex_task_wrapper apex_new_task(
+                char const *description,
                 std::uint32_t parent_task_locality,
                 threads::thread_id_type const& parent_task) {return nullptr;}
 
     inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
-                thread_description const& description) {return nullptr;}
+                std::size_t address) {return nullptr;}
 
     inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
-                char const* name) {return nullptr;}
+                char const* description) {return nullptr;}
 
     struct apex_wrapper
     {

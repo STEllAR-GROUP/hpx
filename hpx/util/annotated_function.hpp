@@ -79,9 +79,15 @@ namespace hpx { namespace util
                 nullptr)
         {
 #if defined(HPX_HAVE_APEX)
-            threads::set_self_apex_data(
-                apex_update_task(threads::get_self_apex_data(),
-                desc_));
+            if (desc_.kind() == thread_description::data_type_description) {
+                threads::set_self_apex_data(
+                        apex_update_task(threads::get_self_apex_data(),
+                            desc_.get_description()));
+            } else {
+                threads::set_self_apex_data(
+                        apex_update_task(threads::get_self_apex_data(),
+                            desc_.get_address()));
+            }
 #endif
         }
 
@@ -94,9 +100,15 @@ namespace hpx { namespace util
                 nullptr)
         {
 #if defined(HPX_HAVE_APEX)
-            threads::set_self_apex_data(
-                apex_update_task(threads::get_self_apex_data(),
-                desc_));
+            if (desc_.kind() == thread_description::data_type_description) {
+                threads::set_self_apex_data(
+                        apex_update_task(threads::get_self_apex_data(),
+                            desc_.get_description()));
+            } else {
+                threads::set_self_apex_data(
+                        apex_update_task(threads::get_self_apex_data(),
+                            desc_.get_address()));
+            }
 #endif
         }
 
