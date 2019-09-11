@@ -16,8 +16,9 @@
 #define HPX_FILESYSTEM_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/filesystem/config/defines.hpp>
 
-#if defined(HPX_HAVE_CXX17_FILESYSTEM)
+#if !defined(HPX_FILESYSTEM_HAVE_BOOST_FILESYSTEM_COMPATIBILITY)
 #include <filesystem>
 #include <system_error>
 
