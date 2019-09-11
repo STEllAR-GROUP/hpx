@@ -63,9 +63,15 @@ namespace hpx { namespace threads
             parent_phase = rhs.parent_phase;
 #endif
 #ifdef HPX_HAVE_APEX
-        // HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
-        // and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on
-            apex_data = apex_new_task(description, parent_id);
+            // HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
+            // and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on
+            if (description.kind() == description.data_type_description) {
+                apex_data = util::apex_new_task(description.get_description(),
+                        parent_id);
+            } else {
+                apex_data = util::apex_new_task(description.get_address(),
+                        parent_id);
+            }
 #endif
             return *this;
         }
@@ -79,16 +85,22 @@ namespace hpx { namespace threads
             parent_locality_id(rhs.parent_locality_id), parent_id(rhs.parent_id),
             parent_phase(rhs.parent_phase),
 #endif
-#ifdef HPX_HAVE_APEX
-        /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
-         * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
-            apex_data(apex_new_task(description, parent_id)),
-#endif
             priority(rhs.priority),
             schedulehint(rhs.schedulehint),
             stacksize(rhs.stacksize),
             scheduler_base(rhs.scheduler_base)
         {
+#ifdef HPX_HAVE_APEX
+        /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
+         * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
+            if (description.kind() == description.data_type_description) {
+                apex_data = util::apex_new_task(description.get_description(),
+                        parent_id);
+            } else {
+                apex_data = util::apex_new_task(description.get_address(),
+                        parent_id);
+            }
+#endif
             if (stacksize == 0)
                 stacksize = HPX_SMALL_STACK_SIZE;
         }
@@ -106,15 +118,21 @@ namespace hpx { namespace threads
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_id(0), parent_id(nullptr), parent_phase(0),
 #endif
-#ifdef HPX_HAVE_APEX
-        /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
-         * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
-            apex_data(apex_new_task(description, parent_id)),
-#endif
             priority(priority_), schedulehint(os_thread),
             stacksize(stacksize_),
             scheduler_base(scheduler_base_)
         {
+#ifdef HPX_HAVE_APEX
+          /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
+           * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
+            if (description.kind() == description.data_type_description) {
+                apex_data = util::apex_new_task(description.get_description(),
+                            parent_id);
+            } else {
+                apex_data = util::apex_new_task(description.get_address(),
+                            parent_id);
+            }
+#endif
             if (stacksize == 0)
                 stacksize = HPX_SMALL_STACK_SIZE;
         }
