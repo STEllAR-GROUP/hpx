@@ -244,9 +244,9 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
 
 .. note::
 
-   When building Boost using gcc please note that it is always a good idea to
+   When building Boost using gcc, please note that it is always a good idea to
    specify a ``cxxflags=-std=c++11`` command line argument to ``b2`` (``bjam``).
-   Note however, that this is absolutely necessary when using gcc V5.2 and
+   Note, however, that this is absolutely necessary when using gcc V5.2 and
    above.
 
 .. list-table:: Software prerequisites for |hpx| on Windows systems
@@ -299,7 +299,7 @@ listed below.
 .. note::
 
    In order to use a high speed parcelport, we currently recommend configuring
-   HPX to use MPI so that MPI can be used for communication between different
+   |HPX| to use MPI so that MPI can be used for communication between different
    localities. Please set the CMake variable ``MPI_CXX_COMPILER`` to your MPI
    C++ compiler wrapper if not detected automatically.
 
@@ -338,9 +338,9 @@ listed below.
      * Minimum version
      * Notes
    * * |papi|
+     * 
+     *
      * Used for accessing hardware performance data.
-     *
-     *
    * * |jemalloc|_
      * 2.1.2
      * 2.1.0
