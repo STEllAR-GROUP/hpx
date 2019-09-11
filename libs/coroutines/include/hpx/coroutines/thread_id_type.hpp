@@ -17,28 +17,30 @@
 #include <iosfwd>
 
 namespace hpx { namespace threads {
+
     class HPX_EXPORT thread_data;
 
-    struct thread_id_type
+    template <typename T>
+    struct thread_id
     {
-        constexpr thread_id_type()
+        constexpr thread_id()
           : thrd_(nullptr)
         {
         }
-        explicit constexpr thread_id_type(thread_data* thrd)
+        explicit constexpr thread_id(T* thrd)
           : thrd_(thrd)
         {
         }
 
-        thread_id_type(thread_id_type const&) = default;
-        thread_id_type& operator=(thread_id_type const&) = default;
+        thread_id(thread_id const&) = default;
+        thread_id& operator=(thread_id const&) = default;
 
-        constexpr thread_data* operator->() const
+        constexpr T* operator->() const
         {
             return thrd_;
         }
 
-        constexpr thread_data& operator*() const
+        constexpr T& operator*() const
         {
             return *thrd_;
         }
@@ -48,7 +50,7 @@ namespace hpx { namespace threads {
             return nullptr != thrd_;
         }
 
-        constexpr thread_data* get() const
+        constexpr T* get() const
         {
             return thrd_;
         }
@@ -58,79 +60,78 @@ namespace hpx { namespace threads {
             thrd_ = nullptr;
         }
 
-        friend constexpr bool operator==(
-            std::nullptr_t, thread_id_type const& rhs)
+        friend constexpr bool operator==(std::nullptr_t, thread_id const& rhs)
         {
             return nullptr == rhs.thrd_;
         }
 
-        friend constexpr bool operator!=(
-            std::nullptr_t, thread_id_type const& rhs)
+        friend constexpr bool operator!=(std::nullptr_t, thread_id const& rhs)
         {
             return nullptr != rhs.thrd_;
         }
 
-        friend constexpr bool operator==(
-            thread_id_type const& lhs, std::nullptr_t)
+        friend constexpr bool operator==(thread_id const& lhs, std::nullptr_t)
         {
             return nullptr == lhs.thrd_;
         }
 
-        friend constexpr bool operator!=(
-            thread_id_type const& lhs, std::nullptr_t)
+        friend constexpr bool operator!=(thread_id const& lhs, std::nullptr_t)
         {
             return nullptr != lhs.thrd_;
         }
 
         friend constexpr bool operator==(
-            thread_id_type const& lhs, thread_id_type const& rhs)
+            thread_id const& lhs, thread_id const& rhs)
         {
             return lhs.thrd_ == rhs.thrd_;
         }
 
         friend constexpr bool operator!=(
-            thread_id_type const& lhs, thread_id_type const& rhs)
+            thread_id const& lhs, thread_id const& rhs)
         {
             return lhs.thrd_ != rhs.thrd_;
         }
 
         friend HPX_CXX14_CONSTEXPR bool operator<(
-            thread_id_type const& lhs, thread_id_type const& rhs)
+            thread_id const& lhs, thread_id const& rhs)
         {
             return std::less<void const*>{}(lhs.thrd_, rhs.thrd_);
         }
 
         friend HPX_CXX14_CONSTEXPR bool operator>(
-            thread_id_type const& lhs, thread_id_type const& rhs)
+            thread_id const& lhs, thread_id const& rhs)
         {
             return std::less<void const*>{}(rhs.thrd_, lhs.thrd_);
         }
 
         friend HPX_CXX14_CONSTEXPR bool operator<=(
-            thread_id_type const& lhs, thread_id_type const& rhs)
+            thread_id const& lhs, thread_id const& rhs)
         {
             return !(rhs > lhs);
         }
 
         friend HPX_CXX14_CONSTEXPR bool operator>=(
-            thread_id_type const& lhs, thread_id_type const& rhs)
+            thread_id const& lhs, thread_id const& rhs)
         {
             return !(rhs < lhs);
         }
 
         template <typename Char, typename Traits>
         friend std::basic_ostream<Char, Traits>& operator<<(
-            std::basic_ostream<Char, Traits>& os, thread_id_type const& id)
+            std::basic_ostream<Char, Traits>& os, thread_id const& id)
         {
             os << id.get();
             return os;
         }
 
     private:
-        thread_data* thrd_;
+        T* thrd_;
     };
 
+    typedef thread_id<thread_data> thread_id_type;
+
     HPX_CONSTEXPR_OR_CONST thread_id_type invalid_thread_id;
+
 }}    // namespace hpx::threads
 
 namespace std {
