@@ -371,7 +371,7 @@ namespace hpx { namespace threads {
 
         ///////////////////////////////////////////////////////////////////////////
         // thread counts counter creation function
-#if defined(HPX_HAVE_COROUTINE_COUNTS)
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
         naming::gid_type thread_counts_counter_creator(
             performance_counters::counter_info const& info, error_code& ec)
         {
@@ -427,7 +427,7 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     void register_counter_types(threadmanager& tm)
     {
-#if defined(HPX_HAVE_COROUTINE_COUNTS)
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
         performance_counters::create_counter_func counts_creator(
             util::bind_front(&detail::thread_counts_counter_creator));
 #endif
@@ -703,7 +703,7 @@ namespace hpx { namespace threads {
                     &thread_pool_base::get_thread_count_staged),
                 &performance_counters::locality_pool_thread_counter_discoverer,
                 ""},
-#if defined(HPX_HAVE_COROUTINE_COUNTS)
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
             {"/threads/count/stack-recycles", performance_counters::counter_raw,
                 "returns the total number of HPX-thread recycling operations "
                 "performed for the referenced locality",

@@ -241,7 +241,7 @@ namespace hpx { namespace threads { namespace coroutines
                         static_cast<char*>(stack_pointer_) - stack_size_;
                     if (posix::reset_stack(limit, stack_size_))
                     {
-#if defined(HPX_HAVE_COROUTINE_COUNTS)
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
                         increment_stack_unbind_count();
 #endif
                     }
@@ -255,7 +255,7 @@ namespace hpx { namespace threads { namespace coroutines
             {
                 if (ctx_)
                 {
-#if defined(HPX_HAVE_COROUTINE_COUNTS)
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
                     increment_stack_recycle_count();
 #endif
                     ctx_ = boost::context::detail::make_fcontext(
@@ -263,7 +263,7 @@ namespace hpx { namespace threads { namespace coroutines
                 }
             }
 
-#if defined(HPX_HAVE_COROUTINE_COUNTS)
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
             typedef std::atomic<std::int64_t> counter_type;
 
         private:

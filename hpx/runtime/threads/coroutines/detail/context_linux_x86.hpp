@@ -323,7 +323,7 @@ namespace hpx { namespace threads { namespace coroutines
                 if (posix::reset_stack(
                     m_stack, static_cast<std::size_t>(m_stack_size)))
                 {
-#if defined(HPX_HAVE_COROUTINE_COUNTS)
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
                     increment_stack_unbind_count();
 #endif
                 }
@@ -332,7 +332,7 @@ namespace hpx { namespace threads { namespace coroutines
             void rebind_stack()
             {
                 HPX_ASSERT(m_stack);
-#if defined(HPX_HAVE_COROUTINE_COUNTS)
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
                 increment_stack_recycle_count();
 #endif
 
@@ -359,7 +359,7 @@ namespace hpx { namespace threads { namespace coroutines
 
             typedef std::atomic<std::int64_t> counter_type;
 
-#if defined(HPX_HAVE_COROUTINE_COUNTS)
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
         private:
             static counter_type& get_stack_unbind_counter()
             {

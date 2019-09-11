@@ -237,12 +237,12 @@ namespace hpx { namespace threads { namespace coroutines
 
             void rebind_stack() noexcept
             {
-#if defined(HPX_HAVE_COROUTINE_COUNTS)
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
                 increment_stack_recycle_count();
 #endif
             }
 
-#if defined(HPX_HAVE_COROUTINE_COUNTS)
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
             typedef std::atomic<std::int64_t> counter_type;
 
         private:

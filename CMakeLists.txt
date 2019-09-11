@@ -602,11 +602,11 @@ if(HPX_WITH_THREAD_STEALING_COUNTS)
   hpx_add_config_define(HPX_HAVE_THREAD_STEALING_COUNTS)
 endif()
 
-hpx_option(HPX_WITH_COROUTINE_COUNTS BOOL
+hpx_option(HPX_WITH_COROUTINE_COUNTERS BOOL
   "Enable keeping track of coroutine creation and rebind counts (default: OFF)"
    OFF CATEGORY "Thread Manager" ADVANCED)
-if(HPX_WITH_COROUTINE_COUNTS)
-  hpx_add_config_define(HPX_HAVE_COROUTINE_COUNTS)
+if(HPX_WITH_COROUTINE_COUNTERS)
+  hpx_add_config_define(HPX_HAVE_COROUTINE_COUNTERS)
 endif()
 
 hpx_option(HPX_WITH_THREAD_LOCAL_STORAGE BOOL
