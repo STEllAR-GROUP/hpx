@@ -758,8 +758,6 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                 {"HINT_NONE" COMMA "HINT....." COMMA "ERROR...." COMMA  "NORMAL..."});
             LOG_CUSTOM_VAR(const char *msg = nullptr);
 
-            std::unique_lock<pu_mutex_type> l;
-
             using threads::thread_schedule_hint_mode;
 
             switch (data.schedulehint.mode) {
@@ -774,7 +772,7 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                     // Reset thread_num to first queue.
                     thread_num = 0;
                 }
-                thread_num = select_active_pu(l, thread_num);
+                thread_num = select_active_pu(thread_num);
                 domain_num     = d_lookup_[thread_num];
                 q_index        = q_lookup_[thread_num];
                 break;
@@ -783,7 +781,7 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             {
                 // Create thread on requested worker thread
                 LOG_CUSTOM_VAR(msg = msgs[3]);
-                thread_num = select_active_pu(l, data.schedulehint.hint);
+                thread_num = select_active_pu(data.schedulehint.hint);
                 domain_num = d_lookup_[thread_num];
                 q_index    = q_lookup_[thread_num];
                 break;
@@ -957,8 +955,6 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                 {"HINT_NONE" COMMA "HINT....." COMMA "ERROR...." COMMA  "NORMAL..."});
             LOG_CUSTOM_VAR(const char *msg = nullptr);
 
-            std::unique_lock<pu_mutex_type> l;
-
             using threads::thread_schedule_hint_mode;
 
             switch (schedulehint.mode) {
@@ -973,7 +969,7 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                     // Reset thread_num to first queue.
                     thread_num = 0;
                 }
-                thread_num = select_active_pu(l, thread_num, allow_fallback);
+                thread_num = select_active_pu(thread_num, allow_fallback);
                 domain_num     = d_lookup_[thread_num];
                 q_index        = q_lookup_[thread_num];
                 break;
@@ -982,7 +978,7 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             {
                 // Create thread on requested worker thread
                 LOG_CUSTOM_VAR(msg = msgs[3]);
-                thread_num = select_active_pu(l, schedulehint.hint,
+                thread_num = select_active_pu(schedulehint.hint,
                     allow_fallback);
                 domain_num = d_lookup_[thread_num];
                 q_index    = q_lookup_[thread_num];

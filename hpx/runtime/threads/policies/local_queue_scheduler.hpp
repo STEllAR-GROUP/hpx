@@ -330,8 +330,7 @@ namespace hpx { namespace threads { namespace policies {
                 num_thread %= queue_size;
             }
 
-            std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread);
+            num_thread = select_active_pu(num_thread);
 
             HPX_ASSERT(num_thread < queue_size);
             queues_[num_thread]->create_thread(
@@ -490,8 +489,7 @@ namespace hpx { namespace threads { namespace policies {
                 num_thread %= queue_size;
             }
 
-            std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread, allow_fallback);
+            num_thread = select_active_pu(num_thread, allow_fallback);
 
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 
@@ -525,8 +523,7 @@ namespace hpx { namespace threads { namespace policies {
                 num_thread %= queue_size;
             }
 
-            std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread, allow_fallback);
+            num_thread = select_active_pu(num_thread, allow_fallback);
 
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 

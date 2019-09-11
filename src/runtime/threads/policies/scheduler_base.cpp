@@ -143,12 +143,13 @@ namespace hpx { namespace threads { namespace policies
     }
 
     std::size_t scheduler_base::select_active_pu(
-        std::unique_lock<pu_mutex_type>& l, std::size_t num_thread,
+        std::size_t num_thread,
         bool allow_fallback)
     {
         if (modes_[num_thread].data_.load(std::memory_order_relaxed) &
             threads::policies::enable_elasticity)
         {
+            std::unique_lock<pu_mutex_type> l;
             std::size_t states_size = states_.size();
 
             if (!allow_fallback)

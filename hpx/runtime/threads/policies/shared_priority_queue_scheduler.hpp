@@ -623,8 +623,6 @@ namespace hpx { namespace threads { namespace policies {
             std::size_t domain_num = 0;
             std::size_t q_index = std::size_t(-1);
 
-            std::unique_lock<pu_mutex_type> l;
-
             using threads::thread_schedule_hint_mode;
 
             switch (data.schedulehint.mode) {
@@ -638,7 +636,7 @@ namespace hpx { namespace threads { namespace policies {
                     // Reset thread_num to first queue.
                     thread_num = 0;
                 }
-                thread_num = select_active_pu(l, thread_num);
+                thread_num = select_active_pu(thread_num);
                 domain_num     = d_lookup_[thread_num];
                 q_index        = q_lookup_[thread_num];
                 break;
@@ -646,7 +644,7 @@ namespace hpx { namespace threads { namespace policies {
             case thread_schedule_hint_mode::thread_schedule_hint_mode_thread:
             {
                 // Create thread on requested worker thread
-                thread_num = select_active_pu(l, data.schedulehint.hint);
+                thread_num = select_active_pu(data.schedulehint.hint);
                 domain_num = d_lookup_[thread_num];
                 q_index    = q_lookup_[thread_num];
                 break;
@@ -785,7 +783,6 @@ namespace hpx { namespace threads { namespace policies {
             std::size_t domain_num = 0;
             std::size_t q_index = std::size_t(-1);
 
-            std::unique_lock<pu_mutex_type> l;
 
             using threads::thread_schedule_hint_mode;
 
@@ -800,7 +797,7 @@ namespace hpx { namespace threads { namespace policies {
                     // Reset thread_num to first queue.
                     thread_num = 0;
                 }
-                thread_num = select_active_pu(l, thread_num, allow_fallback);
+                thread_num = select_active_pu(thread_num, allow_fallback);
                 domain_num     = d_lookup_[thread_num];
                 q_index        = q_lookup_[thread_num];
                 break;
@@ -808,7 +805,7 @@ namespace hpx { namespace threads { namespace policies {
             case thread_schedule_hint_mode::thread_schedule_hint_mode_thread:
             {
                 // Create thread on requested worker thread
-                thread_num = select_active_pu(l, schedulehint.hint,
+                thread_num = select_active_pu(schedulehint.hint,
                     allow_fallback);
                 domain_num = d_lookup_[thread_num];
                 q_index    = q_lookup_[thread_num];
@@ -873,8 +870,6 @@ namespace hpx { namespace threads { namespace policies {
             std::size_t domain_num = 0;
             std::size_t q_index = std::size_t(-1);
 
-            std::unique_lock<pu_mutex_type> l;
-
             using threads::thread_schedule_hint_mode;
 
             switch (schedulehint.mode) {
@@ -888,7 +883,7 @@ namespace hpx { namespace threads { namespace policies {
                     // Reset thread_num to first queue.
                     thread_num = 0;
                 }
-                thread_num = select_active_pu(l, thread_num, allow_fallback);
+                thread_num = select_active_pu(thread_num, allow_fallback);
                 domain_num     = d_lookup_[thread_num];
                 q_index        = q_lookup_[thread_num];
                 break;
@@ -896,7 +891,7 @@ namespace hpx { namespace threads { namespace policies {
             case thread_schedule_hint_mode::thread_schedule_hint_mode_thread:
             {
                 // Create thread on requested worker thread
-                thread_num = select_active_pu(l, schedulehint.hint,
+                thread_num = select_active_pu(schedulehint.hint,
                     allow_fallback);
                 domain_num = d_lookup_[thread_num];
                 q_index    = q_lookup_[thread_num];

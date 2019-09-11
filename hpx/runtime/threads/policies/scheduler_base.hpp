@@ -89,8 +89,8 @@ namespace hpx { namespace threads { namespace policies {
         virtual void suspend(std::size_t num_thread);
         virtual void resume(std::size_t num_thread);
 
-        std::size_t select_active_pu(std::unique_lock<pu_mutex_type>& l,
-            std::size_t num_thread, bool allow_fallback = false);
+        std::size_t select_active_pu(std::size_t num_thread,
+                                     bool allow_fallback = false);
 
         // allow to access/manipulate states
         std::atomic<hpx::state>& get_state(std::size_t num_thread);
