@@ -17,7 +17,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/util/thread_description.hpp>
 

@@ -8,7 +8,7 @@
 #define HPX_PARALLEL_UTIL_COMPARE_PROJECTED_JAN_25_2016_1144AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/functional/invoke.hpp>
 
 #include <utility>
 

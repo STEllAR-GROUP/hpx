@@ -13,7 +13,7 @@
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <atomic>

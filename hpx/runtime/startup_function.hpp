@@ -10,7 +10,7 @@
 #define HPX_RUNTIME_STARTUP_FUNCTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 namespace hpx
 {

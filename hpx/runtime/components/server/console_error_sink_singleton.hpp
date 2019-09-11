@@ -8,7 +8,7 @@
 #define HPX_COMPONENTS_CONSOLE_ERROR_SINK_SINGLETON_JAN_26_2009_0503PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 
 #include <mutex>

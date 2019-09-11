@@ -9,13 +9,13 @@
 #define HPX_LCOS_ASYNC_CONTINUE_FWD_JAN_25_2013_0828AM
 
 #include <hpx/config.hpp>
+#include <hpx/functional/result_of.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/action_remote_result.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util/result_of.hpp>
 
 #ifndef HPX_MSVC
 #include <type_traits>

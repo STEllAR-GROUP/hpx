@@ -18,7 +18,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
-#include <hpx/util/debug/demangle_helper.hpp>
+#include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/type_support/static.hpp>
 

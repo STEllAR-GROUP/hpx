@@ -13,7 +13,7 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/format.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/testing.hpp>
 
 #include <boost/algorithm/string/split.hpp>

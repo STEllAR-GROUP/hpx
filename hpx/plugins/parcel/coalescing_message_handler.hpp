@@ -10,10 +10,10 @@
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 
+#include <hpx/functional/function.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
-#include <hpx/util/function.hpp>
 #include <hpx/statistics/histogram.hpp>
 #include <hpx/util/pool_timer.hpp>
 

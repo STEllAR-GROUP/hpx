@@ -22,7 +22,7 @@
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
-#include <hpx/traits/is_action.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_valid_action.hpp>

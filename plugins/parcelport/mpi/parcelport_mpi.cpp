@@ -285,7 +285,8 @@ namespace hpx { namespace traits
                 "env = ${HPX_HAVE_PARCELPORT_MPI_ENV:" HPX_HAVE_PARCELPORT_MPI_ENV "}\n"
 #else
                 "env = ${HPX_HAVE_PARCELPORT_MPI_ENV:"
-                        "MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE"
+                        "MV2_COMM_WORLD_RANK,PMIX_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,"
+                        "ALPS_APP_PE"
                     "}\n"
 #endif
                 "multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:0}\n"

@@ -16,7 +16,7 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/functional/bind_front.hpp>
 
 #include <cstdint>
 #include <mutex>

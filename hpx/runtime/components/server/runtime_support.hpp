@@ -15,6 +15,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/plugin.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -26,7 +27,6 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/is_component.hpp>
-#include <hpx/util/plugin.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <atomic>

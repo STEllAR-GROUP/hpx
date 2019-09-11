@@ -10,7 +10,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/functional/bind_front.hpp>
 
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>

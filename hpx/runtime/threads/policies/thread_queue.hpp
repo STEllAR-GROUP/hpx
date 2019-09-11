@@ -14,13 +14,13 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/util/function.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES

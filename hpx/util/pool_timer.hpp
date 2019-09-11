@@ -7,7 +7,7 @@
 #define HPX_UTIL_POOL_TIMER
 
 #include <hpx/config.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <boost/system/error_code.hpp>

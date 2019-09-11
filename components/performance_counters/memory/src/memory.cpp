@@ -9,7 +9,7 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <hpx/components/performance_counters/memory/mem_counter.hpp>
 

@@ -6,7 +6,7 @@
 #if !defined(HPX_UTIL_MAP_HOSTNAMES_AUG_29_2011_1257PM)
 #define HPX_UTIL_MAP_HOSTNAMES_AUG_29_2011_1257PM
 
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstdint>
 #include <map>

@@ -15,10 +15,10 @@
 #include <hpx/performance_counters/server/statistics_counter.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/format.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/regex_from_pattern.hpp>
 #include <hpx/statistics/rolling_max.hpp>

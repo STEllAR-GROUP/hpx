@@ -13,7 +13,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/function_ref.hpp>
+#include <hpx/functional/function_ref.hpp>
 #include <hpx/testing.hpp>
 
 #include <functional>

@@ -7,7 +7,7 @@
 #define HPX_NETWORK_BACKGROUND_CALLBACK_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstddef>
 #include <cstdint>

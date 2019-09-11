@@ -9,8 +9,8 @@
 #define HPX_PARALLEL_ALGORITHMS_IS_SORTED_FEB_9_2015_0331PM
 
 #include <hpx/config.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/util/invoke.hpp>
 #include <hpx/iterator_support/range.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

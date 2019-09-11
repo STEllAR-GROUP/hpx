@@ -9,6 +9,10 @@
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/register_locks.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -17,9 +21,6 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_front.hpp>
-#include <hpx/util/unique_function.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

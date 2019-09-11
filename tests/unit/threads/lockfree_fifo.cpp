@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/bind.hpp>
 
 #include <boost/lockfree/queue.hpp>
 #include <hpx/program_options.hpp>

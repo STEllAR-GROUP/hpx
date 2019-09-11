@@ -11,6 +11,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -22,8 +24,6 @@
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/scoped_timer.hpp>
 #include <hpx/type_support/unused.hpp>
-#include <hpx/util/bind_back.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/regex_from_pattern.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>

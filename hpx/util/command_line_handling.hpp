@@ -10,7 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 

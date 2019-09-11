@@ -521,6 +521,13 @@ function(hpx_check_for_cxx11_std_shared_ptr)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx11_std_shared_ptr_lwg3018)
+  add_hpx_config_test(HPX_WITH_CXX11_SHARED_PTR_LWG3018
+    SOURCE cmake/tests/cxx11_std_shared_ptr_lwg3018.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_cxx11_std_shuffle)
   add_hpx_config_test(HPX_WITH_CXX11_SHUFFLE
     SOURCE cmake/tests/cxx11_std_shuffle.cpp

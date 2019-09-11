@@ -22,9 +22,9 @@
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/protect.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/functional/protect.hpp>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>

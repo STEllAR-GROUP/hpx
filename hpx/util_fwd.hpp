@@ -18,22 +18,10 @@ namespace hpx { namespace util
 
     struct command_line_handling;
 
-    template <typename Sig, bool Serializable = true>
-    class function;
-
-    template <typename Sig>
-    using function_nonser = function<Sig, false>;
-
     class HPX_EXPORT io_service_pool;
 
     class HPX_EXPORT runtime_configuration;
     class HPX_EXPORT section;
-
-    template <typename Sig, bool Serializable = true>
-    class unique_function;
-
-    template <typename Sig>
-    using unique_function_nonser = unique_function<Sig, false>;
     /// \endcond
 }}
 

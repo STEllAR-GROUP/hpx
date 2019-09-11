@@ -7,12 +7,10 @@
 #define HPX_PLUGIN_FACTORY_BASE_MAR_24_2013_0333PM
 
 #include <hpx/config.hpp>
-#include <hpx/plugins/plugin_registry_base.hpp>
-
 #include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/plugin.hpp>
+#include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/plugin.hpp>
-#include <hpx/util/plugin/export_plugin.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins

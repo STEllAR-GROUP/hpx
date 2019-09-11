@@ -8,11 +8,10 @@
 #define HPX_INIT_INI_DATA_SEP_26_2008_0344PM
 
 #include <hpx/filesystem.hpp>
+#include <hpx/plugin.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/plugin/dll.hpp>
-#include <hpx/util/plugin/virtual_constructor.hpp>
 
 #include <map>
 #include <memory>

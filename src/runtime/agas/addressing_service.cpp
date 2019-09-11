@@ -15,6 +15,9 @@
 #include <hpx/concurrency/register_locks.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/logging.hpp>
@@ -43,9 +46,6 @@
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_back.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
