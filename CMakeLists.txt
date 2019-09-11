@@ -602,6 +602,13 @@ if(HPX_WITH_THREAD_STEALING_COUNTS)
   hpx_add_config_define(HPX_HAVE_THREAD_STEALING_COUNTS)
 endif()
 
+hpx_option(HPX_WITH_COROUTINE_COUNTS BOOL
+  "Enable keeping track of coroutine creation and rebind counts (default: OFF)"
+   ADVANCED CATEGORY "Thread Manager")
+if(HPX_WITH_COROUTINE_COUNTS)
+  hpx_add_config_define(HPX_HAVE_COROUTINE_COUNTS)
+endif()
+
 hpx_option(HPX_WITH_THREAD_LOCAL_STORAGE BOOL
   "Enable thread local storage for all HPX threads (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)

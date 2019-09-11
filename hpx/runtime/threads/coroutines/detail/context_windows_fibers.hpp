@@ -237,26 +237,32 @@ namespace hpx { namespace threads { namespace coroutines
 
             void rebind_stack() noexcept
             {
+#if defined(HPX_HAVE_COROUTINE_COUNTS)
                 increment_stack_recycle_count();
+#endif
             }
 
+#if defined(HPX_HAVE_COROUTINE_COUNTS)
             typedef std::atomic<std::int64_t> counter_type;
 
+        private:
             static counter_type& get_stack_recycle_counter() noexcept
             {
                 static counter_type counter(0);
                 return counter;
             }
 
-            static std::uint64_t get_stack_recycle_count(bool reset) noexcept
-            {
-                return util::get_and_reset_value(get_stack_recycle_counter(), reset);
-            }
-
             static std::uint64_t increment_stack_recycle_count() noexcept
             {
                 return ++get_stack_recycle_counter();
             }
+
+        public:
+            static std::uint64_t get_stack_recycle_count(bool reset) noexcept
+            {
+                return util::get_and_reset_value(get_stack_recycle_counter(), reset);
+            }
+#endif
 
         private:
             std::ptrdiff_t stacksize_;

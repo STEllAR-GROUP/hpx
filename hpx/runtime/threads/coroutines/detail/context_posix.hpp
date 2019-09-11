@@ -350,7 +350,11 @@ namespace hpx { namespace threads { namespace coroutines
                 {
                     if (posix::reset_stack(
                         m_stack, static_cast<std::size_t>(m_stack_size)))
+                    {
+#if defined(HPX_HAVE_COROUTINE_COUNTS)
                         increment_stack_unbind_count();
+#endif
+                    }
                 }
             }
 
@@ -360,7 +364,9 @@ namespace hpx { namespace threads { namespace coroutines
                 {
                     // just reset the context stack pointer to its initial value at
                     // the stack start
+#if defined(HPX_HAVE_COROUTINE_COUNTS)
                     increment_stack_recycle_count();
+#endif
                     int error = HPX_COROUTINE_MAKE_CONTEXT(
                         &m_ctx, m_stack, m_stack_size, funp_, this, nullptr);
                     HPX_UNUSED(error);
@@ -369,22 +375,14 @@ namespace hpx { namespace threads { namespace coroutines
             }
 
 
+#if defined(HPX_HAVE_COROUTINE_COUNTS)
             typedef std::atomic<std::int64_t> counter_type;
 
+        private:
             static counter_type& get_stack_unbind_counter()
             {
                 static counter_type counter(0);
                 return counter;
-            }
-
-            static std::uint64_t get_stack_unbind_count(bool reset)
-            {
-                return util::get_and_reset_value(get_stack_unbind_counter(), reset);
-            }
-
-            static std::uint64_t increment_stack_unbind_count()
-            {
-                return ++get_stack_unbind_counter();
             }
 
             static counter_type& get_stack_recycle_counter()
@@ -393,15 +391,27 @@ namespace hpx { namespace threads { namespace coroutines
                 return counter;
             }
 
-            static std::uint64_t get_stack_recycle_count(bool reset)
+            static std::uint64_t increment_stack_unbind_count()
             {
-                return util::get_and_reset_value(get_stack_recycle_counter(), reset);
+                return ++get_stack_unbind_counter();
             }
 
             static std::uint64_t increment_stack_recycle_count()
             {
                 return ++get_stack_recycle_counter();
             }
+
+        public:
+            static std::uint64_t get_stack_unbind_count(bool reset)
+            {
+                return util::get_and_reset_value(get_stack_unbind_counter(), reset);
+            }
+
+            static std::uint64_t get_stack_recycle_count(bool reset)
+            {
+                return util::get_and_reset_value(get_stack_recycle_counter(), reset);
+            }
+#endif
 
         private:
             // declare m_stack_size first so we can use it to initialize m_stack

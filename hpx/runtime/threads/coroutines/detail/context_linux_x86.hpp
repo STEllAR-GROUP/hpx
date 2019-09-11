@@ -322,13 +322,19 @@ namespace hpx { namespace threads { namespace coroutines
                 HPX_ASSERT(m_stack);
                 if (posix::reset_stack(
                     m_stack, static_cast<std::size_t>(m_stack_size)))
+                {
+#if defined(HPX_HAVE_COROUTINE_COUNTS)
                     increment_stack_unbind_count();
+#endif
+                }
             }
 
             void rebind_stack()
             {
                 HPX_ASSERT(m_stack);
+#if defined(HPX_HAVE_COROUTINE_COUNTS)
                 increment_stack_recycle_count();
+#endif
 
                 // On rebind, we initialize our stack to ensure a virgin stack
                 m_sp = (static_cast<void**>(m_stack)
@@ -353,20 +359,12 @@ namespace hpx { namespace threads { namespace coroutines
 
             typedef std::atomic<std::int64_t> counter_type;
 
+#if defined(HPX_HAVE_COROUTINE_COUNTS)
+        private:
             static counter_type& get_stack_unbind_counter()
             {
                 static counter_type counter(0);
                 return counter;
-            }
-
-            static std::uint64_t get_stack_unbind_count(bool reset)
-            {
-                return util::get_and_reset_value(get_stack_unbind_counter(), reset);
-            }
-
-            static std::uint64_t increment_stack_unbind_count()
-            {
-                return ++get_stack_unbind_counter();
             }
 
             static counter_type& get_stack_recycle_counter()
@@ -375,15 +373,27 @@ namespace hpx { namespace threads { namespace coroutines
                 return counter;
             }
 
-            static std::uint64_t get_stack_recycle_count(bool reset)
+            static std::uint64_t increment_stack_unbind_count()
             {
-                return util::get_and_reset_value(get_stack_recycle_counter(), reset);
+                return ++get_stack_unbind_counter();
             }
 
             static std::uint64_t increment_stack_recycle_count()
             {
                 return ++get_stack_recycle_counter();
             }
+
+        public:
+            static std::uint64_t get_stack_unbind_count(bool reset)
+            {
+                return util::get_and_reset_value(get_stack_unbind_counter(), reset);
+            }
+
+            static std::uint64_t get_stack_recycle_count(bool reset)
+            {
+                return util::get_and_reset_value(get_stack_recycle_counter(), reset);
+            }
+#endif
 
             friend void swap_context(x86_linux_context_impl_base& from,
                 x86_linux_context_impl_base const& to, default_hint);
