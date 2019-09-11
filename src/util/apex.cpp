@@ -27,7 +27,7 @@ namespace hpx { namespace util
     {
         apex_task_wrapper parent_wrapper = nullptr;
         // Parent pointers aren't reliable in distributed runs.
-        if (parent_task != nullptr && enable_parent_task_handler 
+        if (parent_task != nullptr && enable_parent_task_handler
                 && enable_parent_task_handler()) {
             parent_wrapper = parent_task.get()->get_apex_data();
         }
