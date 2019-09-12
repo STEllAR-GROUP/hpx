@@ -58,15 +58,12 @@
 #include <limits>
 #include <utility>
 
-
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_COROUTINE_NUM_ALL_HEAPS (HPX_COROUTINE_NUM_HEAPS +                \
-    HPX_COROUTINE_NUM_HEAPS/2 + HPX_COROUTINE_NUM_HEAPS/4 +                   \
-    HPX_COROUTINE_NUM_HEAPS/4)                                                \
-/**/
+#define HPX_COROUTINE_NUM_ALL_HEAPS                                            \
+    (HPX_COROUTINE_NUM_HEAPS + HPX_COROUTINE_NUM_HEAPS / 2 +                   \
+        HPX_COROUTINE_NUM_HEAPS / 4 + HPX_COROUTINE_NUM_HEAPS / 4) /**/
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
     //////////////////////////////////////////////////////////////////////////
     //
     struct allocation_counters
@@ -84,7 +81,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return m_allocation_counter[i % HPX_COROUTINE_NUM_ALL_HEAPS];
         }
 
-        std::atomic<std::uint64_t> m_allocation_counter[HPX_COROUTINE_NUM_ALL_HEAPS];
+        std::atomic<std::uint64_t>
+            m_allocation_counter[HPX_COROUTINE_NUM_ALL_HEAPS];
     };
 
     /////////////////////////////////////////////////////////////////////////////
@@ -117,7 +115,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
           , m_type_info()
           , m_thread_id(id)
           , continuation_recursion_count_(0)
-        {}
+        {
+        }
 
         void reset()
         {
@@ -193,7 +192,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                     //throw abnormal_exit(tinfo ? *tinfo :
                     //      typeid(unknown_exception_tag));
                 }
-                else {
+                else
+                {
                     HPX_ASSERT(0 && "unknown exit status");
                 }
             }
@@ -209,7 +209,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         //         resumed.
         void yield()
         {
-            HPX_ASSERT(m_exit_state < ctx_exit_signaled); //prevent infinite loops
+            HPX_ASSERT(
+                m_exit_state < ctx_exit_signaled);    //prevent infinite loops
             HPX_ASSERT(running());
 
             m_state = ctx_ready;
@@ -294,53 +295,53 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return continuation_recursion_count_;
         }
 
-//         static std::uint64_t get_allocation_count_all(bool reset)
-//         {
-//             std::uint64_t count = 0;
-//             for (std::size_t i = 0; i < HPX_COROUTINE_NUM_ALL_HEAPS; ++i) {
-//                 count += m_allocation_counters.get(i).load();
-//                 if (reset)
-//                     m_allocation_counters.get(i).store(0);
-//             }
-//             return count;
-//         }
-//         static std::uint64_t get_allocation_count(std::size_t heap_num, bool reset)
-//         {
-//             std::uint64_t result = m_allocation_counters.get(heap_num).load();
-//
-//             if (reset)
-//                 m_allocation_counters.get(heap_num).store(0);
-//             return result;
-//         }
-//
-//         static std::uint64_t increment_allocation_count(std::size_t heap_num)
-//         {
-//             return ++m_allocation_counters.get(heap_num);
-//         }
+        //static std::uint64_t get_allocation_count_all(bool reset)
+        //{
+        //    std::uint64_t count = 0;
+        //    for (std::size_t i = 0; i < HPX_COROUTINE_NUM_ALL_HEAPS; ++i) {
+        //        count += m_allocation_counters.get(i).load();
+        //        if (reset)
+        //            m_allocation_counters.get(i).store(0);
+        //    }
+        //    return count;
+        //}
+        //static std::uint64_t get_allocation_count(std::size_t heap_num, bool reset)
+        //{
+        //    std::uint64_t result = m_allocation_counters.get(heap_num).load();
+        //
+        //    if (reset)
+        //        m_allocation_counters.get(heap_num).store(0);
+        //    return result;
+        //}
+        //
+        //static std::uint64_t increment_allocation_count(std::size_t heap_num)
+        //{
+        //    return ++m_allocation_counters.get(heap_num);
+        //}
 
     protected:
         // global coroutine state
         enum context_state
         {
-            ctx_running,  // context running.
-            ctx_ready,    // context at yield point.
-            ctx_exited    // context is finished.
+            ctx_running,    // context running.
+            ctx_ready,      // context at yield point.
+            ctx_exited      // context is finished.
         };
 
         // exit request state
         enum context_exit_state
         {
-            ctx_exit_not_requested,  // exit not requested.
-            ctx_exit_pending,        // exit requested.
-            ctx_exit_signaled        // exit request delivered.
+            ctx_exit_not_requested,    // exit not requested.
+            ctx_exit_pending,          // exit requested.
+            ctx_exit_signaled          // exit request delivered.
         };
 
         // exit status
         enum context_exit_status
         {
             ctx_not_exited,
-            ctx_exited_return,    // process exited by return.
-            ctx_exited_abnormally // process exited uncleanly.
+            ctx_exited_return,       // process exited by return.
+            ctx_exited_abnormally    // process exited uncleanly.
         };
 
         void rebind_base(thread_id_type id)
@@ -364,8 +365,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
         // Nothrow.
-        void do_return(context_exit_status status, std::exception_ptr && info)
-            noexcept
+        void do_return(
+            context_exit_status status, std::exception_ptr&& info) noexcept
         {
             HPX_ASSERT(status != ctx_not_exited);
             HPX_ASSERT(m_state == ctx_running);
@@ -379,7 +380,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
     protected:
-
         // Nothrow.
         void do_yield() noexcept
         {
@@ -387,7 +387,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
         // Nothrow.
-        void do_invoke() throw ()
+        void do_invoke() throw()
         {
             HPX_ASSERT(is_ready());
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
@@ -406,7 +406,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
         }
 
-        typedef typename default_context_impl<CoroutineImpl>::context_impl_base ctx_type;
+        typedef typename default_context_impl<CoroutineImpl>::context_impl_base
+            ctx_type;
         ctx_type m_caller;
 
         static HPX_EXPORT allocation_counters m_allocation_counters;
@@ -433,6 +434,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         std::size_t continuation_recursion_count_;
     };
-}}}}
+}}}}    // namespace hpx::threads::coroutines::detail
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_BASE_HPP*/

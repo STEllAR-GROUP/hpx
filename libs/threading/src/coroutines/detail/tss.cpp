@@ -10,10 +10,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/threading/coroutines/coroutine.hpp>
 #include <hpx/threading/coroutines/detail/coroutine_self.hpp>
 #include <hpx/threading/coroutines/detail/tss.hpp>
-#include <hpx/errors.hpp>
 
 #include <hpx/runtime/threads_fwd.hpp>
 
@@ -21,8 +21,7 @@
 #include <map>
 #include <memory>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     void tss_data_node::cleanup(bool cleanup_existing)
     {
@@ -202,8 +201,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     }
 
     void set_tss_data(void const* key,
-        std::shared_ptr<tss_cleanup_function> const& func,
-        void* tss_data, bool cleanup_existing)
+        std::shared_ptr<tss_cleanup_function> const& func, void* tss_data,
+        bool cleanup_existing)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         if (tss_data_node* const current_node = find_tss_data(key))
@@ -219,5 +218,4 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 #endif
     }
-}}}}
-
+}}}}    // namespace hpx::threads::coroutines::detail

@@ -12,9 +12,9 @@
 #include <hpx/threading/coroutines/detail/coroutine_impl.hpp>
 
 #if defined(HPX_HAVE_APEX)
-#include <hpx/threading/thread_id_type.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/threading/apex.hpp>
+#include <hpx/threading/thread_id_type.hpp>
 #endif
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
@@ -25,4 +25,4 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     template <typename CoroutineImpl>
     allocation_counters context_base<CoroutineImpl>::m_allocation_counters;
 
-}}}}
+}}}}    // namespace hpx::threads::coroutines::detail

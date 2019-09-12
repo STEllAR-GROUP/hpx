@@ -30,24 +30,22 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assertion.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/threading/coroutines/coroutine.hpp>
 #include <hpx/threading/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/threading/coroutines/detail/coroutine_self.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <cstddef>
 #include <exception>
 #include <utility>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
-    namespace
-    {
+    namespace {
         struct reset_self_on_exit
         {
-            reset_self_on_exit(coroutine_self* val,
-                    coroutine_self* old_val = nullptr)
+            reset_self_on_exit(
+                coroutine_self* val, coroutine_self* old_val = nullptr)
               : old_self(old_val)
             {
                 coroutine_self::set_self(val);
@@ -60,12 +58,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
             coroutine_self* old_self;
         };
-    }
+    }    // namespace
 
 #if defined(HPX_DEBUG)
     coroutine_impl::~coroutine_impl()
     {
-        HPX_ASSERT(!m_fun);   // functor should have been reset by now
+        HPX_ASSERT(!m_fun);    // functor should have been reset by now
     }
 #endif
 
@@ -93,13 +91,15 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                     reset_self_on_exit on_exit(&self, old_self);
 
                     result_last = m_fun(*this->args());
-                    HPX_ASSERT(result_last.first == thread_state_enum::terminated);
+                    HPX_ASSERT(
+                        result_last.first == thread_state_enum::terminated);
                 }
 
                 // return value to other side of the fence
                 this->bind_result(result_last);
             }
-            catch (...) {
+            catch (...)
+            {
                 status = super_type::ctx_exited_abnormally;
                 tinfo = std::current_exception();
             }
@@ -111,4 +111,4 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         // should not get here, never
         HPX_ASSERT(this->m_state == super_type::ctx_running);
     }
-}}}}
+}}}}    // namespace hpx::threads::coroutines::detail

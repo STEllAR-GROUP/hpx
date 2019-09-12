@@ -59,26 +59,22 @@ namespace hpx { namespace threads {
             thrd_ = nullptr;
         }
 
-        friend constexpr bool operator==(
-            std::nullptr_t, thread_id const& rhs)
+        friend constexpr bool operator==(std::nullptr_t, thread_id const& rhs)
         {
             return nullptr == rhs.thrd_;
         }
 
-        friend constexpr bool operator!=(
-            std::nullptr_t, thread_id const& rhs)
+        friend constexpr bool operator!=(std::nullptr_t, thread_id const& rhs)
         {
             return nullptr != rhs.thrd_;
         }
 
-        friend constexpr bool operator==(
-            thread_id const& lhs, std::nullptr_t)
+        friend constexpr bool operator==(thread_id const& lhs, std::nullptr_t)
         {
             return nullptr == lhs.thrd_;
         }
 
-        friend constexpr bool operator!=(
-            thread_id const& lhs, std::nullptr_t)
+        friend constexpr bool operator!=(thread_id const& lhs, std::nullptr_t)
         {
             return nullptr != lhs.thrd_;
         }
@@ -135,7 +131,7 @@ namespace hpx { namespace threads {
 
     HPX_CONSTEXPR_OR_CONST thread_id_type invalid_thread_id;
 
-}} // hpx::threads
+}}    // namespace hpx::threads
 
 namespace std {
     template <>
@@ -148,6 +144,6 @@ namespace std {
             return hasher_(v.get());
         }
     };
-}
+}    // namespace std
 
 #endif

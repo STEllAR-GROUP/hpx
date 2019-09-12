@@ -9,12 +9,12 @@
 
 #if defined(HPX_THREADING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp \
     is deprecated, please include \
     hpx/threading/coroutines/detail/coroutine_accessor.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp \
     is deprecated, please include \
     hpx/threading/coroutines/detail/coroutine_accessor.hpp instead"

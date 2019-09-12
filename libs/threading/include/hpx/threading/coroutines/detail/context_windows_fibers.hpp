@@ -35,8 +35,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/threading/coroutines/detail/swap_context.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
@@ -49,8 +49,7 @@
 extern "C" void switch_to_fiber(void* lpFiber) noexcept;
 #endif
 
-namespace hpx { namespace threads { namespace coroutines
-{
+namespace hpx { namespace threads { namespace coroutines {
     // On Windows we need a special preparation for the main coroutines thread
     struct prepare_main_thread
     {
@@ -69,8 +68,7 @@ namespace hpx { namespace threads { namespace coroutines
         }
     };
 
-    namespace detail { namespace windows
-    {
+    namespace detail { namespace windows {
         typedef LPVOID fiber_ptr;
 
 #if _WIN32_WINNT < 0x0600
@@ -112,7 +110,10 @@ namespace hpx { namespace threads { namespace coroutines
              * An empty context cannot be restored from,
              * but can be saved in.
              */
-            fibers_context_impl_base() noexcept : m_ctx(nullptr) {}
+            fibers_context_impl_base() noexcept
+              : m_ctx(nullptr)
+            {
+            }
 
             /*
              * Free function. Saves the current context in @p from
@@ -145,7 +146,9 @@ namespace hpx { namespace threads { namespace coroutines
                     HPX_ASSERT(result);
                     HPX_UNUSED(result);
                     from.m_ctx = nullptr;
-                } else {
+                }
+                else
+                {
                     bool call_from_main = from.m_ctx == nullptr;
                     if (call_from_main)
                         from.m_ctx = GetCurrentFiber();
@@ -164,7 +167,8 @@ namespace hpx { namespace threads { namespace coroutines
         protected:
             explicit fibers_context_impl_base(fiber_ptr ctx) noexcept
               : m_ctx(ctx)
-            {}
+            {
+            }
 
             fiber_ptr m_ctx;
         };
@@ -181,8 +185,7 @@ namespace hpx { namespace threads { namespace coroutines
         static const std::size_t stack_size = sizeof(void*) >= 8 ? 2048 : 1024;
 
         template <typename CoroutineImpl>
-        class fibers_context_impl
-          : public fibers_context_impl_base
+        class fibers_context_impl : public fibers_context_impl_base
         {
         public:
             HPX_NON_COPYABLE(fibers_context_impl);
@@ -190,7 +193,10 @@ namespace hpx { namespace threads { namespace coroutines
         public:
             typedef fibers_context_impl_base context_impl_base;
 
-            enum { default_stack_size = stack_size };
+            enum
+            {
+                default_stack_size = stack_size
+            };
 
             /**
              * Create a context that on restore invokes Functor on
@@ -198,24 +204,24 @@ namespace hpx { namespace threads { namespace coroutines
              */
             explicit fibers_context_impl(std::ptrdiff_t stack_size)
               : stacksize_(stack_size == -1 ? default_stack_size : stack_size)
-            {}
+            {
+            }
 
             void init()
             {
-                if (m_ctx != nullptr) return;
+                if (m_ctx != nullptr)
+                    return;
 
-                m_ctx = CreateFiberEx(stack_size == -1 ? default_stack_size : stack_size,
-                        stack_size == -1 ? default_stack_size : stack_size, 0,
-                        static_cast<LPFIBER_START_ROUTINE>(&trampoline<CoroutineImpl>),
-                        static_cast<LPVOID>(this));
+                m_ctx = CreateFiberEx(
+                    stack_size == -1 ? default_stack_size : stack_size,
+                    stack_size == -1 ? default_stack_size : stack_size, 0,
+                    static_cast<LPFIBER_START_ROUTINE>(
+                        &trampoline<CoroutineImpl>),
+                    static_cast<LPVOID>(this));
                 if (nullptr == m_ctx)
                 {
-                    throw boost::system::system_error(
-                        boost::system::error_code(
-                            GetLastError(),
-                            boost::system::system_category()
-                            )
-                        );
+                    throw boost::system::system_error(boost::system::error_code(
+                        GetLastError(), boost::system::system_category()));
                 }
             }
 
@@ -231,9 +237,7 @@ namespace hpx { namespace threads { namespace coroutines
                 return stacksize_;
             }
 
-            HPX_CXX14_CONSTEXPR void reset_stack() noexcept
-            {
-            }
+            HPX_CXX14_CONSTEXPR void reset_stack() noexcept {}
 
             void rebind_stack() noexcept
             {
@@ -250,7 +254,8 @@ namespace hpx { namespace threads { namespace coroutines
 
             static std::uint64_t get_stack_recycle_count(bool reset) noexcept
             {
-                return util::get_and_reset_value(get_stack_recycle_counter(), reset);
+                return util::get_and_reset_value(
+                    get_stack_recycle_counter(), reset);
             }
 
             static std::uint64_t increment_stack_recycle_count() noexcept
@@ -261,7 +266,7 @@ namespace hpx { namespace threads { namespace coroutines
         private:
             std::ptrdiff_t stacksize_;
         };
-    }}
-}}}
+    }}    // namespace detail::windows
+}}}       // namespace hpx::threads::coroutines
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_WINDOWS_HPP*/
