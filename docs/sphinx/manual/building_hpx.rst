@@ -379,7 +379,7 @@ listed below.
 Documentation
 -------------
 
-To build the |hpx| documentation you need recent versions of the following
+To build the |hpx| documentation, you need recent versions of the following
 packages:
 
 - ``python`` (2 or 3)
@@ -389,13 +389,13 @@ packages:
 - ``doxygen``
 
 If the |python|_ dependencies are not available through your system package
-manager you can install them using the |python|_ package manager ``pip``:
+manager, you can install them using the Python package manager ``pip``:
 
 .. code-block:: bash
 
    pip install --user sphinx sphinx_rtd_theme breathe
 
-You may need to set the following |cmake|_ variables to make sure |cmake|_ can
+You may need to set the following CMake variables to make sure CMake can
 find the required dependencies.
 
 .. option:: DOXYGEN_ROOT:PATH
@@ -417,17 +417,16 @@ Installing Boost
 
 .. important::
 
-   When building Boost using gcc please note that it is always a good idea to
+   When building Boost using gcc, please note that it is always a good idea to
    specify a ``cxxflags=-std=c++11`` command line argument to ``b2`` (``bjam``).
-   Note however, that this is absolutely necessary when using gcc V5.2 and
-   above.
+   Doint so is absolutely necessary when using gcc V5.2 and above.
 
 .. important::
 
    On Windows, depending on the installed versions of Visual Studio, you might
    also want to pass the correct toolset to the ``b2`` command depending on
    which version of the IDE you want to use. In addition, passing
-   ``address-model=64`` is highly recommended. It might be also necessary to add
+   ``address-model=64`` is highly recommended. It might also be necessary to add
    command line argument ``--build-type=complete`` to the ``b2`` command on the
    Windows platform.
 
@@ -438,8 +437,8 @@ older version of Boost. We suggest you download the most recent release of the
 Boost libraries from here: |boost_downloads|_. Unpack the downloaded archive
 into a directory of your choosing. We will refer to this directory a ``$BOOST``.
 
-Building and installing the Boost binaries is simple, regardless what platform
-you are on the basic instructions are as follows (with possible additional
+Building and installing the Boost binaries is simple. Regardless of what platform
+you are on, the basic instructions are as follows (with possible additional
 platform-dependent command line arguments):
 
 .. code-block:: bash
@@ -453,9 +452,9 @@ where: ``<where to install boost>`` is the directory the built binaries will be
 installed to, and ``<N>`` is the number of cores to use to build the Boost
 binaries.
 
-After the above sequence of commands has been executed (this may take a while!)
+After the above sequence of commands has been executed (this may take a while!),
 you will need to specify the directory where Boost was installed as
-``BOOST_ROOT`` (``<where to install boost>``) while executing cmake for |hpx| as
+``BOOST_ROOT`` (``<where to install boost>``) while executing CMake for |hpx| as
 explained in detail in the sections :ref:`unix_installation` and
 :ref:`windows_installation`.
 
@@ -467,8 +466,8 @@ Installing Hwloc
 .. note::
 
    These instructions are for everything except Windows. On Windows there is no
-   need to build hwloc. Instead download the latest release, extract the files,
-   and set ``HWLOC_ROOT`` during cmake configuration to the directory in which
+   need to build hwloc. Instead, download the latest release, extract the files,
+   and set ``HWLOC_ROOT`` during CMake configuration to the directory in which
    you extracted the files.
 
 We suggest you download the most recent release of hwloc from here:
@@ -486,12 +485,12 @@ To build hwloc run:
 where: ``<where to install hwloc>`` is the directory the built binaries will be
 installed to, and ``<N>`` is the number of cores to use to build hwloc.
 
-After the above sequence of commands has been executed you will need to specify
-the directory where Hwloc was installed as ``HWLOC_ROOT`` (``<where to install
-hwloc>``) while executing cmake for |hpx| as explained in detail in the sections
+After the above sequence of commands has been executed, you will need to specify
+the directory where hwloc was installed as ``HWLOC_ROOT`` (``<where to install
+hwloc>``) while executing CMake for |hpx| as explained in detail in the sections
 :ref:`unix_installation` and :ref:`windows_installation`.
 
-Please see |hwloc_doc|_ for more information about Hwloc.
+Please see |hwloc_doc|_ for more information about hwloc.
 
 .. _building_hpx:
 
@@ -504,7 +503,7 @@ Basic information
 -----------------
 
 Once |cmake| has been run, the build process can be started. The |hpx| build
-process is highly configurable through |cmake| and various |cmake| variables
+process is highly configurable through |cmake|, and various |cmake| variables
 influence the build process. The build process consists of the following parts:
 
 * The |hpx| core libraries (target core): This forms the basic set of |hpx|
@@ -523,9 +522,9 @@ influence the build process. The build process consists of the following parts:
     (partitioned) hash table.
   * ``partioned_vector_component``: The component needed for a distributed
     (partitioned) vector.
-  * ``memory_component``: A dynamically loaded plugin that exposed memory based
+  * ``memory_component``: A dynamically loaded plugin that exposes memory based
     performance counters (only available on Linux).
-  * ``io_counter_component``: A dynamically loaded plugin plugin that exposes
+  * ``io_counter_component``: A dynamically loaded plugin that exposes
     I/O performance counters (only available on Linux).
   * ``papi_component``: A dynamically loaded plugin that exposes PAPI
     performance counters (enabled with :option:`HPX_WITH_PAPI:BOOL`, default is
@@ -540,33 +539,33 @@ influence the build process. The build process consists of the following parts:
   ``=Off``). They are not built by the ``all`` target and have to be built
   separately.
 * |hpx| Documentation (target ``docs``): This target builds the documentation,
-  this is not enabled by default (enable by setting
+  and is not enabled by default (enable by setting
   :option:`HPX_WITH_DOCUMENTATION:BOOL`\ ``=On``. For more information see
   :ref:`documentation`.
 
 For a complete list of available |cmake| variables that influence the build of
-|hpx| see :ref:`cmake_variables`.
+|hpx|, see :ref:`cmake_variables`.
 
-The variables can be used to refine the recipes that can be found
-:ref:`build_recipes` which show some basic steps on how to build HPX for a
+The variables can be used to refine the recipes that can be found at
+:ref:`build_recipes` which show some basic steps on how to build |HPX| for a
 specific platform.
 
 In order to use |hpx|, only the core libraries are required (the ones marked as
-optional above are truly optional). When building against |hpx|, the |cmake|_
+optional above are truly optional). When building against |hpx|, the CMake
 variable ``HPX_LIBRARIES`` will contain ``hpx`` and ``hpx_init`` (for pkgconfig,
 those are added to the ``Libs`` sections). In order to use the optional
 libraries, you need to specify them as link dependencies in your build (See
 :ref:`creating_hpx_projects`).
 
-As |hpx| is a modern C++ Library we require a certain minimal set of features
+As |hpx| is a modern C++ library, we require a certain minimum set of features
 from the C++11 standard. In addition, we make use of certain C++14 features if
 the used compiler supports them. This means that the |hpx| build system will try
 to determine the highest support C++ standard flavor and check for availability
 of those features. That is, the default will be the highest C++ standard version
-available. If you want to force |hpx| to use a specific C++ standard version you
-can use the following |cmake|_ variables:
+available. If you want to force |hpx| to use a specific C++ standard version, you
+can use the following CMake variables:
 
-* ``HPX_WITH_CXX0X``: Enables Pre-C++11 support (This is the minimal required
+* ``HPX_WITH_CXX0X``: Enables Pre-C++11 support (This is the minimum required
   mode on older gcc versions).
 * ``HPX_WITH_CXX11``: Enables C++11 support
 * ``HPX_WITH_CXX14``: Enables C++14 support
@@ -585,8 +584,8 @@ support). The |cmake| variable used to set the build type is
 <https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html>`_).
 Available build types are:
 
-* **Debug**: Full debug symbols available and additional assertions to help
-  debugging. To enable the debug build type for the |hpx| API, the C++ Macro
+* **Debug**: Full debug symbols are available as well as additional assertions to 
+  help debugging. To enable the debug build type for the |hpx| API, the C++ Macro
   ``HPX_DEBUG`` is defined.
 * **RelWithDebInfo**: Release build with debugging symbols. This is most useful
   for profiling applications
@@ -598,7 +597,7 @@ Available build types are:
 
    We currently don't guarantee ABI compatibility between Debug and Release
    builds. Please make sure that applications built against |hpx| use the same
-   build type as you used to build |hpx|. For |cmake|_ builds, this means that
+   build type as you used to build |hpx|. For CMake builds, this means that
    the ``CMAKE_BUILD_TYPE`` variables have to match and for projects not using
    |cmake|_, the ``HPX_DEBUG`` macro has to be set in debug mode.
 
@@ -607,8 +606,8 @@ Available build types are:
 Platform specific notes
 -----------------------
 
-Some platforms require to have special link and/or compiler flags specified to
-build HPX. This is handled via |cmake|_'s support for different toolchains (see
+Some platforms require users to have special link and/or compiler flags specified to
+build |HPX|. This is handled via CMake's support for different toolchains (see
 `cmake-toolchains(7)
 <https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html>`_ for more
 information). This is also used for cross compilation.
@@ -617,7 +616,7 @@ information). This is also used for cross compilation.
 itself and applications depending on |hpx|. Please see :ref:`cmake_toolchains`
 for more information.
 
-In order to enable full static linking with the libraries, the |cmake|_ variable
+In order to enable full static linking with the libraries, the CMake variable
 :option:`HPX_WITH_STATIC_LINKING:BOOL` has to be set to ``On``.
 
 .. _debugging_core:
@@ -630,7 +629,7 @@ and exception handlers
 :option:`HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS:BOOL`. If this option is
 not specified, the signal handlers change the application state. For example,
 after a segmentation fault the stack trace will show the signal handler.
-Similarly, unhandled exceptions are also caught by the these handlers and the
+Similarly, unhandled exceptions are also caught by these handlers and the
 stack trace will not point to the location where the unhandled exception was
 thrown.
 
