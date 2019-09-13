@@ -641,7 +641,7 @@ application run is required to gain potentially helpful information like a
 stacktrace.
 
 To debug with core files, the operating system first has to be told to actually
-write them. On most unix systems this can be done by calling:
+write them. On most Unix systems this can be done by calling:
 
 .. code-block:: bash
 
@@ -690,7 +690,7 @@ How to install |hpx| on Unix variants
            [other CMake variable definitions] \
            /path/to/source/tree
 
-  for instance:
+  For instance:
 
   .. code-block:: bash
 
@@ -736,7 +736,7 @@ How to install |hpx| on Unix variants
         gmake examples
         gmake install
 
-For more detailed information about using |cmake| please refer its documentation
+For more detailed information about using |cmake|, please refer to its documentation
 and also the section :ref:`building_hpx`. Please pay special attention to the
 section about :option:`HPX_WITH_MALLOC:STRING` as this is crucial for getting
 decent performance.
@@ -768,7 +768,7 @@ need to set up either of the following in your ``~/user-config.jam`` file:
 
 (Again, remember to replace ``/path/to`` with whatever you used earlier.)
 
-You can then use as build command either:
+Then, you can use one of the following for your build command:
 
 .. code-block:: bash
 
@@ -781,8 +781,8 @@ or:
    b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang install -j4
 
 We verified this using Boost V1.53. If you use a different version, just
-remember to replace ``/usr/local/include/boost-1_53`` with whatever include prefix
-you had in your installation.
+remember to replace ``/usr/local/include/boost-1_53`` with whatever prefix
+you used in your installation.
 
 Build HPX, finally
 ..................
@@ -815,8 +815,8 @@ To build with Clang 3.3 (trunk), execute:
        -DBOOST_SUFFIX=-clang-darwin33-mt-1_53 \
    make
 
-For more detailed information about using |cmake| please refer its documentation
-and to the section :ref:`building_hpx` for.
+For more detailed information about using |cmake|, please refer its documentation
+and to the section :ref:`building_hpx`.
 
 Alternative installation method of HPX on OS X (Mac)
 ....................................................
@@ -885,12 +885,12 @@ required libraries via MacPorts:
       popd
 
 #. Note that you need to set ``BOOST_ROOT``, ``HPX_ROOT`` and
-   ``DYLD_LIBRARY_PATH`` (for both ``BOOST_ROOT`` and ``HPX_ROOT`` every time
-   you configure, build, or run an HPX application.
+   ``DYLD_LIBRARY_PATH`` (for both ``BOOST_ROOT`` and ``HPX_ROOT``) every time
+   you configure, build, or run an |HPX| application.
 
 #. If you want to use |hpx| with MPI, you need to enable the MPI parcelport, and
-   also specify the location of the MPI wrapper scripts. This can be done e.g.
-   with the following command:
+   also specify the location of the MPI wrapper scripts. This can be done using
+   the following command:
 
    .. code-block:: bash
 
@@ -917,7 +917,7 @@ Installation of required prerequisites
 ......................................
 
 * Download the Boost c++ libraries from |boost_downloads|_
-* Install the boost library as explained in the section
+* Install the Boost library as explained in the section
   :ref:`boost_installation`
 * Install the hwloc library as explained in the section
   :ref:`hwloc_installation`
@@ -932,7 +932,7 @@ Installation of the |hpx| library
 * Create a build folder. |hpx| requires an out-of-tree-build. This means that
   you will be unable to run CMake in the |hpx| source folder.
 * Open up the CMake GUI. In the input box labelled "Where is the source code:",
-  enter the full path to the source folder. The source directory is one where
+  enter the full path to the source folder. The source directory is the one where
   the sources were checked out. CMakeLists.txt files in the source directory as
   well as the subdirectories describe the build to CMake. In addition to this,
   there are CMake scripts (usually ending in .cmake) stored in a special CMake
@@ -944,8 +944,8 @@ Installation of the |hpx| library
 * Add CMake variable definitions (if any) by clicking the "Add Entry" button.
   There are two required variables you need to define: ``BOOST_ROOT`` and
   ``HWLOC_ROOT`` These (``PATH``) variables need to be set to point to the root
-  folder of your |boost|_ and |hwloc|_ installations. It is recommended to set
-  the variable ``CMAKE_INSTALL_PREFIX`` as well. This determines where the HPX
+  folder of your Boost and hwloc installations. It is recommended to set
+  the variable ``CMAKE_INSTALL_PREFIX`` as well. This determines where the |HPX|
   libraries will be built and installed. If this (``PATH``) variable is set, it
   has to refer to the directory where the built |hpx| files should be installed
   to.
@@ -953,11 +953,11 @@ Installation of the |hpx| library
   to use. Select the Visual Studio 10 (64Bit) compiler (it usually is the
   default if available). The Visual Studio 2012 (64Bit) and Visual Studio 2013
   (64Bit) compilers are supported as well. Note that while it is possible to
-  build HPX for x86, we don't recommend doing so as 32 bit runs are severely
-  restricted by a 32 bit Windows system limitation affecting the number of HPX
+  build |HPX| for x86, we don't recommend doing so as 32 bit runs are severely
+  restricted by a 32 bit Windows system limitation affecting the number of |HPX|
   threads you can create.
 * Press "Configure" again. Repeat this step until the "Generate" button becomes
-  clickable (and until no variable definitions are marked red anymore).
+  clickable (and until no variable definitions are marked in red anymore).
 * Press "Generate".
 * Open up the build folder, and double-click hpx.sln.
 * Build the INSTALL target.
@@ -970,14 +970,14 @@ documentation and also the section :ref:`building_hpx`.
 How to build HPX under Windows 10 x64 with Visual Studio 2015
 .............................................................
 
-* Download the |cmake|_ V3.4.3 installer (or latest version) from `here
+* Download the CMake V3.4.3 installer (or latest version) from `here
   <https://blog.kitware.com/cmake-3-4-3-available-for-download/>`__
-* Download the |hwloc|_ V1.11.0 (or latest version) from `here
+* Download the hwloc V1.11.0 (or the latest version) from `here
   <http://www.open-mpi.org/software/hwloc/v1.11/downloads/hwloc-win64-build-1.11.0.zip>`__
   and unpack it.
-* Download the latest |boost|_ libraries from `here
+* Download the latest Boost libraries from `here
   <https://www.boost.org/users/download/>`__ and unpack them.
-* Build the boost DLLs and LIBs by using these commands from Command Line (or
+* Build the Boost DLLs and LIBs by using these commands from Command Line (or
   PowerShell). Open CMD/PowerShell inside the Boost dir and type in:
 
   .. code-block:: bash
@@ -996,7 +996,7 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
 * Open CMake-GUI.exe and set up your source directory (input field 'Where is the
   source code') to the *base directory* of the source code you downloaded from
-  HPX's GitHub pages. Here's an example of my CMake path settings which point to
+  HPX's GitHub pages. Here's an example of my CMake path settings, which point to
   my ``Documents/GitHub/hpx`` folder:
 
   .. _win32_cmake_settings1:
@@ -1005,35 +1005,35 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
      Example CMake path settings.
 
-  Inside the 'Where is the source-code' enter the base directory of your HPX
+  Inside the 'Where is the source-code' enter the base directory of your |HPX|
   source directory (do not enter the "src" sub-directory!) Inside 'Where to
   build the binaries' you should put in the path where all the building process
   will happen. This is important because the building machinery will do an
-  "out-of-tree" build. CMake is not touching or changing in any way the original
-  source files. Instead, it will generate Visual Studio Solution Files which
-  will build HPX packages out of the HPX source tree.
+  "out-of-tree" build. CMake will not touch or change the original source files
+  in any way. Instead, it will generate Visual Studio Solution Files, which
+  will build |HPX| packages out of the |HPX| source tree.
 
-* Set three new environment variables (in CMake, not in Windows environment, by
-  the way): ``BOOST_ROOT``, ``HWLOC_ROOT``, ``CMAKE_INSTALL_PREFIX``. The
-  meaning of these variables is as follows:
+* Set three new environment variables (in CMake, not in Windows environment):
+  ``BOOST_ROOT``, ``HWLOC_ROOT``, ``CMAKE_INSTALL_PREFIX``. The meaning of
+  these variables is as follows:
 
   * ``BOOST_ROOT`` the root directory of the unpacked Boost headers/cpp files.
   * ``HWLOC_ROOT`` the root directory of the unpacked Portable Hardware Locality
     files.
-  * ``CMAKE_INSTALL_PREFIX`` the "root directory" where the future builds of HPX
-    should be installed to.
+  * ``CMAKE_INSTALL_PREFIX`` the "root directory" where the future builds of |HPX|
+    should be installed.
 
     .. note::
 
-       HPX is a BIG software collection and I really don't recommend using the
+       |HPX| is a BIG software collection, and I really don't recommend using the
        default ``C:\Program Files\hpx``. I prefer simpler paths *without* white
        space, like ``C:\bin\hpx`` or ``D:\bin\hpx`` etc.
 
   To insert new env-vars click on "Add Entry" and then insert the name inside
-  "Name", select ``PATH`` as Type and put the path-name in "Path" text field.
+  "Name", select ``PATH`` as Type and put the path-name in the "Path" text field.
   Repeat this for the first three variables.
 
-  This is how variable insertion looks like:
+  This is how variable insertion will look:
 
   .. _win32_cmake_settings2:
 
@@ -1041,21 +1041,21 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
      Example CMake adding entry.
 
-  Alternatively you could provide ``BOOST_LIBRARYDIR`` instead of
-  ``BOOST_ROOT`` with a difference that ``BOOST_LIBRARYDIR`` should point to
+  Alternatively, you could provide ``BOOST_LIBRARYDIR`` instead of
+  ``BOOST_ROOT``; the difference is that ``BOOST_LIBRARYDIR`` should point to
   the subdirectory inside Boost root where all the compiled DLLs/LIBs are. I
   myself have used ``BOOST_LIBRARYDIR`` which pointed to the ``bin.v2``
-  subdirectory under the Boost rootdir. Important is to keep the meanings of
+  subdirectory under the Boost rootdir. It is important to keep the meanings of
   these two variables separated from each other: ``BOOST_DIR`` points to the
-  ROOT folder of the boost library. ``BOOST_LIBRARYDIR`` points to the subdir
-  inside Boost root folder where the compiled binaries are.
+  ROOT folder of the Boost library. ``BOOST_LIBRARYDIR`` points to the subdir
+  inside the Boost root folder where the compiled binaries are.
 
 * Click the 'Configure' button of CMake-GUI. You will be immediately presented a
   small window where you can select the C++ compiler to be used within Visual
-  Studio. In my case I have used the latest v14 (a.k.a C++ 2015) but older
-  versions should be sufficient too. Make sure to select the 64Bit compiler
+  Studio. In my case, I have used the latest v14 (a.k.a C++ 2015) but older
+  versions should be sufficient too. Make sure to select the 64Bit compiler.
 
-* After the generate process has finished successfully click the 'Generate'
+* After the generate process has finished successfully, click the 'Generate'
   button. Now, CMake will put new VS Solution files into the BUILD folder you
   selected at the beginning.
 
@@ -1069,7 +1069,7 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
      Visual Studio INSTALL target.
 
-  It will take some time to compile everything and in the end you should see an
+  It will take some time to compile everything, and in the end you should see an
   output similar to this one:
 
   .. _win32_vs_build_output:
@@ -1085,7 +1085,7 @@ How to Install |hpx| on BlueGene/Q
 
 So far we only support BGClang for compiling |hpx| on the BlueGene/Q.
 
-* Check if BGClang is available on your installation. If not obtain and install
+* Check if BGClang is available on your installation. If not, obtain and install
   a copy from the `BGClang trac page
   <https://trac.alcf.anl.gov/projects/llvm-bgq>`_.
 
@@ -1187,15 +1187,15 @@ Installation of the Boost Libraries
            <linkflags>"-std=c++0x -mmic"
          ;
 
-* Change to the directory you unpacked boost in (from now on referred to as
-  ``$BOOST_ROOT``) and execute the following commands:
+* Change to the directory you unpacked Boost in (which will be referred to as
+  ``$BOOST_ROOT`` from now on) and execute the following commands:
 
   .. code-block:: bash
 
      ./bootstrap.sh
      ./b2 toolset=intel-mic -j<N>
 
-  You should now have all the required boost libraries.
+  You should now have all the required Boost libraries.
 
 Installation of the Hwloc library
 .................................
@@ -1221,8 +1221,8 @@ Building |hpx|
 ..............
 
 After all the prerequisites have been successfully installed, we can now start
-building and installing |hpx|. The build procedure is almost the same as for
-:ref:`unix_installation` with the sole difference that you have to enable the
+building and installing |hpx|. The build procedure is almost the same as the one 
+for :ref:`unix_installation` with the sole difference that you have to enable the
 Xeon Phi in the CMake Build system. This is achieved by invoking CMake in the
 following way:
 
@@ -1247,12 +1247,12 @@ How to install |hpx| on Fedora distributions
 .. important::
 
    There are official |hpx| packages for Fedora. Unless you want to customize
-   your build you may want to start off with the official packages. Instructions
+   your, build you may want to start off with the official packages. Instructions
    can be found on the |stellar_hpx_download|_ page.
 
 .. note::
 
-   This section of the manual is based off of our collaborators Patrick Diehl's
+   This section of the manual is based off of our collaborator Patrick Diehl's
    blog post `Installing HPX on Fedora 22
    <http://diehlpk.github.io/2015/08/04/hpx-fedora.html>`_.
 
@@ -1265,7 +1265,7 @@ How to install |hpx| on Fedora distributions
        docbook-style-xsl libsodium-devel doxygen boost-doc hdf5-devel \
        fop boost-devel boost-openmpi-devel boost-mpich-devel
 
-* Get the development branch of HPX:
+* Get the development branch of |HPX|:
 
   .. code-block:: bash
 
@@ -1284,13 +1284,13 @@ How to install |hpx| on Fedora distributions
 
   .. note::
 
-     To build HPX without examples use:
+     To build |HPX| without examples use:
 
      .. code-block:: bash
 
         cmake -DCMAKE_INSTALL_PREFIX=/opt/hpx -DHPX_WITH_EXAMPLES=Off ..
 
-* Add the library path of HPX to ldconfig:
+* Add the library path of |HPX| to ldconfig:
 
   .. code-block:: bash
 
@@ -1305,7 +1305,7 @@ How to install |hpx| on Arch distributions
 .. important::
 
    There are |hpx| packages for Arch in the AUR. Unless you want to customize
-   your build you may want to start off with those. Instructions can be found on
+   your build, you may want to start off with those. Instructions can be found on
    the |stellar_hpx_download|_ page.
 
 * Install all packages for a minimal installation:
@@ -1314,7 +1314,7 @@ How to install |hpx| on Arch distributions
 
      sudo pacman -S gcc clang cmake boost hwloc gperftools
 
-* For building the documentation you will need to further install the following:
+* For building the documentation, you will need to further install the following:
 
   .. code-block:: bash
 
@@ -1322,7 +1322,7 @@ How to install |hpx| on Arch distributions
 
      pip install --user sphinx sphinx_rtd_theme breathe
 
-The rest of the installation steps are same as provided with Fedora
+The rest of the installation steps are the same as those for the Fedora
 or Unix variants.
 
 How to install |hpx| on Debian-based distributions
@@ -1349,7 +1349,7 @@ How to install |hpx| on Debian-based distributions
 
      sudo apt install doxygen python-sphinx python-sphinx-rtd-theme python-breathe
 
-The rest of the installation steps are same as provided with Fedora
+The rest of the installation steps are same as those for the Fedora
 or Unix variants.
 
 .. include:: ../../generated/cmake_toolchains.rst
