@@ -73,9 +73,11 @@ char const* const locality_pool_thread_no_total_counter_names[] =
 
 char const* const locality_counter_names[] =
 {
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
     "/threads/count/stack-recycles",
 #if !defined(HPX_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
     "/threads/count/stack-unbinds",
+#endif
 #endif
     "/scheduler/utilization/instantaneous",
     nullptr
