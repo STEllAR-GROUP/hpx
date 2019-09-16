@@ -63,20 +63,27 @@ set(functional_sources
 
 include(HPX_AddModule)
 add_hpx_module(functional
-    COMPATIBILITY_HEADERS ON # Added in 1.4.0
-    DEPRECATION_WARNINGS
-    FORCE_LINKING_GEN
-    GLOBAL_HEADER_GEN ON
-    EXCLUDE
-      "hpx/functional/traits/get_function_address.hpp"
-      "hpx/functional/traits/get_function_annotation.hpp"
-      "hpx/functional/traits/is_action.hpp"
-      "hpx/functional/traits/is_bind_expression.hpp"
-      "hpx/functional/traits/is_callable.hpp"
-      "hpx/functional/traits/is_placeholder.hpp"
-    SOURCES ${functional_sources}
-    HEADERS ${functional_headers}
-    COMPAT_HEADERS ${functional_compat_headers}
-    DEPENDENCIES hpx_assertion hpx_concurrency hpx_config hpx_debugging hpx_errors
-    CMAKE_SUBDIRS examples tests
+  COMPATIBILITY_HEADERS  ON # Added in 1.4.0
+  DEPRECATION_WARNINGS
+  FORCE_LINKING_GEN
+  GLOBAL_HEADER_GEN ON
+  EXCLUDE
+    "hpx/functional/traits/get_function_address.hpp"
+    "hpx/functional/traits/get_function_annotation.hpp"
+    "hpx/functional/traits/is_action.hpp"
+    "hpx/functional/traits/is_bind_expression.hpp"
+    "hpx/functional/traits/is_callable.hpp"
+    "hpx/functional/traits/is_placeholder.hpp"
+  SOURCES ${functional_sources}
+  HEADERS ${functional_headers}
+  COMPAT_HEADERS ${functional_compat_headers}
+  DEPENDENCIES
+    hpx_assertion
+    hpx_concurrency
+    hpx_config
+    hpx_datastructures
+    hpx_debugging
+    hpx_errors
+    hpx_type_support
+  CMAKE_SUBDIRS examples tests
 )

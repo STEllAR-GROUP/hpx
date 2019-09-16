@@ -39,10 +39,11 @@ set(config_sources
 
 include(HPX_AddModule)
 add_hpx_module(config
-    COMPATIBILITY_HEADERS OFF
-    GLOBAL_HEADER_GEN OFF
-    SOURCES ${config_sources}
-    HEADERS ${config_headers}
-    DEPENDENCIES hpx_preprocessor
-    CMAKE_SUBDIRS examples tests
+  COMPATIBILITY_HEADERS OFF
+  GLOBAL_HEADER_GEN OFF
+  SOURCES ${config_sources}
+  HEADERS ${config_headers}
+  DEPENDENCIES
+    hpx_preprocessor
+  CMAKE_SUBDIRS examples tests
 )

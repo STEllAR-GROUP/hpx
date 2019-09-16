@@ -27,14 +27,21 @@ set(topology_sources
 
 include(HPX_AddModule)
 add_hpx_module(topology
-    COMPATIBILITY_HEADERS ON    # Added in 1.4.0
-    DEPRECATION_WARNINGS
-    FORCE_LINKING_GEN
-    GLOBAL_HEADER_GEN ON
-    SOURCES ${topology_sources}
-    HEADERS ${topology_headers}
-    COMPAT_HEADERS ${topology_compat_headers}
-    DEPENDENCIES hpx_config hpx_concurrency hpx_errors
-    CMAKE_SUBDIRS examples tests
+  COMPATIBILITY_HEADERS ON    # Added in 1.4.0
+  DEPRECATION_WARNINGS
+  FORCE_LINKING_GEN
+  GLOBAL_HEADER_GEN ON
+  SOURCES ${topology_sources}
+  HEADERS ${topology_headers}
+  COMPAT_HEADERS ${topology_compat_headers}
+  DEPENDENCIES
+    hpx_assertion
+    hpx_config
+    hpx_concurrency
+    hpx_errors
+    hpx_format
+    hpx_logging
+    hpx_type_support
+  CMAKE_SUBDIRS examples tests
 )
 

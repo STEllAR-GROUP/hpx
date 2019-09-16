@@ -70,18 +70,19 @@ set(execution_headers
 
 include(HPX_AddModule)
 add_hpx_module(execution
-    FORCE_LINKING_GEN
-    HEADERS ${execution_headers}
-    DEPENDENCIES
-      hpx_allocator_support
-      hpx_assertion
-      hpx_concepts
-      hpx_config
-      hpx_datastructures
-      hpx_iterator_support
-      hpx_preprocessor
-      hpx_timing
-      hpx_topology
-      hpx_type_support
-    CMAKE_SUBDIRS examples tests
+  FORCE_LINKING_GEN
+  HEADERS ${execution_headers}
+  DEPENDENCIES
+    hpx_assertion
+    hpx_allocator_support
+    hpx_concepts
+    hpx_config
+    hpx_datastructures
+    hpx_functional
+    hpx_iterator_support
+    hpx_preprocessor
+    hpx_timing
+    hpx_topology
+    hpx_type_support
+  CMAKE_SUBDIRS examples tests
 )

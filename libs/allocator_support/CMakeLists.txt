@@ -26,6 +26,8 @@ add_hpx_module(allocator_support
   SOURCES ${allocator_support_sources}
   HEADERS ${allocator_support_headers}
   COMPAT_HEADERS ${allocator_support_compat_headers}
-  DEPENDENCIES hpx_config hpx_preprocessor
+  DEPENDENCIES
+    hpx_config
+    hpx_preprocessor
   CMAKE_SUBDIRS examples tests
 )

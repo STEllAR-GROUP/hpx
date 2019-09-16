@@ -33,12 +33,11 @@ set(preprocessor_sources
 
 include(HPX_AddModule)
 add_hpx_module(preprocessor
-    COMPATIBILITY_HEADERS ON
-    DEPRECATION_WARNINGS
-    FORCE_LINKING_GEN
-    SOURCES ${preprocessor_sources}
-    HEADERS ${preprocessor_headers}
-    COMPAT_HEADERS ${preprocessor_compat_headers}
-    DEPENDENCIES hpx_config
-    CMAKE_SUBDIRS tests
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
+  FORCE_LINKING_GEN
+  SOURCES ${preprocessor_sources}
+  HEADERS ${preprocessor_headers}
+  COMPAT_HEADERS ${preprocessor_compat_headers}
+  CMAKE_SUBDIRS tests
 )

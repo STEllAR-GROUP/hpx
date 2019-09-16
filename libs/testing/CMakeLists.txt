@@ -24,14 +24,17 @@ set(testing_sources
 
 include(HPX_AddModule)
 add_hpx_module(testing
-    COMPATIBILITY_HEADERS ON    # Added in 1.4.0
-    DEPRECATION_WARNINGS
-    FORCE_LINKING_GEN
-    GLOBAL_HEADER_GEN OFF
-    SOURCES ${testing_sources}
-    HEADERS ${testing_headers}
-    COMPAT_HEADERS ${testing_compat_headers}
-    DEPENDENCIES hpx_assertion hpx_config
-    CMAKE_SUBDIRS examples tests
+  COMPATIBILITY_HEADERS ON    # Added in 1.4.0
+  DEPRECATION_WARNINGS
+  FORCE_LINKING_GEN
+  GLOBAL_HEADER_GEN OFF
+  SOURCES ${testing_sources}
+  HEADERS ${testing_headers}
+  COMPAT_HEADERS ${testing_compat_headers}
+  DEPENDENCIES
+    hpx_assertion
+    hpx_config
+    hpx_preprocessor
+  CMAKE_SUBDIRS examples tests
 )
 
