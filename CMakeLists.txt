@@ -169,7 +169,6 @@ endif()
 set(DEFAULT_MALLOC "system")
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
   set(DEFAULT_MALLOC "tcmalloc")
-#    set(DEFAULT_MALLOC "jemalloc")
 endif()
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
@@ -189,9 +188,9 @@ endif()
 
 hpx_option(HPX_WITH_MALLOC
   STRING
-  "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"
+  "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, mimalloc, tbbmalloc, and custom (default is: tcmalloc)"
   ${DEFAULT_MALLOC}
-  STRINGS "system;tcmalloc;jemalloc;tbbmalloc;custom")
+  STRINGS "system;tcmalloc;jemalloc;mimalloc;tbbmalloc;custom")
 
 # On some systems jemalloc requires an explicit prefix for the API functions
 # (i.e. 'malloc' is called 'je_malloc', etc.)

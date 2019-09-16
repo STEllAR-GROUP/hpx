@@ -346,6 +346,10 @@ listed below.
      * 2.1.2
      * 2.1.0
      * Used as a replacement for the system allocator.
+   * * |mimalloc|_
+     * latest
+     * 1.0.0
+     * Used as a replacement for the system allocator.
    * * |hdf5|_
      * 1.8.7
      * 1.6.7

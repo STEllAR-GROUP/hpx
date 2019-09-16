@@ -328,6 +328,8 @@ rst_prolog += '''
 .. _visual_cxx: https://msdn.microsoft.com/en-us/visualc/default.aspx
 .. |jemalloc| replace:: jemalloc
 .. _jemalloc: https://www.canonware.com/jemalloc
+.. |mimalloc| replace:: mi-malloc
+.. _mimalloc: http://microsoft.github.io/mimalloc/
 .. |libunwind| replace:: libunwind
 .. _libunwind: https://www.nongnu.org/libunwind
 .. |hdf5| replace:: Hierarchical Data Format V5 (HDF5)
