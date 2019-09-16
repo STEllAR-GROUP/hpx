@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <cstdio> // remove
 #include <fstream>
+#include <typeinfo>
 #include <vector>
 
 #include <boost/config.hpp>
@@ -71,8 +72,10 @@ int hpx_main(variables_map& vm)
         out(buffer, any);
         any_type any_in;
         in(buffer, any_in);
-        HPX_TEST(!any_in.empty());
-        HPX_TEST_EQ(any, any_in);
+        HPX_TEST(any_in.has_value());
+        HPX_TEST(any.type() == any_in.type());
+        HPX_TEST_EQ(hpx::util::any_cast<small_object>(any),
+            hpx::util::any_cast<small_object>(any_in));
     }
 
     {
@@ -86,8 +89,9 @@ int hpx_main(variables_map& vm)
         out(buffer, any);
         any_type any_in;
         in(buffer, any_in);
-        HPX_TEST(!any_in.empty());
-        HPX_TEST_EQ(any, any_in);
+        HPX_TEST(any.type() == any_in.type());
+        HPX_TEST_EQ(hpx::util::any_cast<big_object>(any),
+            hpx::util::any_cast<big_object>(any_in));
     }
 
     return finalize();
