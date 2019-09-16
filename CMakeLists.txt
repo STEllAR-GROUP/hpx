@@ -340,7 +340,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 endif()
 
 hpx_option(HPX_WITH_IO_COUNTERS BOOL
-  "Build HPX runtime (default: ${HPX_WITH_IO_COUNTERS_DEFAULT})"
+  "Enable IO counters (default: ${HPX_WITH_IO_COUNTERS_DEFAULT})"
   ${HPX_WITH_IO_COUNTERS_DEFAULT} ADVANCED CATEGORY "Build Targets")
 if(HPX_WITH_IO_COUNTERS)
   hpx_add_config_define(HPX_HAVE_IO_COUNTERS)
@@ -600,6 +600,13 @@ hpx_option(HPX_WITH_THREAD_STEALING_COUNTS BOOL
 
 if(HPX_WITH_THREAD_STEALING_COUNTS)
   hpx_add_config_define(HPX_HAVE_THREAD_STEALING_COUNTS)
+endif()
+
+hpx_option(HPX_WITH_COROUTINE_COUNTERS BOOL
+  "Enable keeping track of coroutine creation and rebind counts (default: OFF)"
+   OFF CATEGORY "Thread Manager" ADVANCED)
+if(HPX_WITH_COROUTINE_COUNTERS)
+  hpx_add_config_define(HPX_HAVE_COROUTINE_COUNTERS)
 endif()
 
 hpx_option(HPX_WITH_THREAD_LOCAL_STORAGE BOOL
