@@ -30,6 +30,7 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
+#include <hpx/runtime_handlers.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/util/apex.hpp>
@@ -310,84 +311,8 @@ namespace hpx
     extern void termination_handler(int signum);
 #endif
 
-    extern void new_handler();
-
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        HPX_NORETURN void assertion_handler(
-            hpx::assertion::source_location const& loc, const char* expr,
-            std::string const& msg)
-        {
-            hpx::util::may_attach_debugger("exception");
-
-            std::ostringstream strm;
-            strm << "Assertion '" << expr << "' failed";
-            if (!msg.empty())
-            {
-                strm << " (" << msg << ")";
-            }
-
-            hpx::exception e(hpx::assertion_failure, strm.str());
-            std::cerr << hpx::diagnostic_information(
-                             hpx::detail::get_exception(e, loc.function_name,
-                                 loc.file_name, loc.line_number))
-                      << std::endl;
-            std::abort();
-        }
-
-        void test_failure_handler()
-        {
-            hpx::util::may_attach_debugger("test-failure");
-        }
-
-#if defined(HPX_HAVE_VERIFY_LOCKS)
-        void registered_locks_error_handler()
-        {
-            std::string back_trace = hpx::util::trace(std::size_t(128));
-
-            // throw or log, depending on config options
-            if (get_config_entry("hpx.throw_on_held_lock", "1") == "0")
-            {
-                if (back_trace.empty())
-                {
-                    LERR_(debug)
-                        << "suspending thread while at least one lock is "
-                           "being held (stack backtrace was disabled at "
-                           "compile time)";
-                }
-                else
-                {
-                    LERR_(debug)
-                        << "suspending thread while at least one lock is "
-                        << "being held, stack backtrace: " << back_trace;
-                }
-            }
-            else
-            {
-                if (back_trace.empty())
-                {
-                    HPX_THROW_EXCEPTION(invalid_status, "verify_no_locks",
-                        "suspending thread while at least one lock is "
-                        "being held (stack backtrace was disabled at "
-                        "compile time)");
-                }
-                else
-                {
-                    HPX_THROW_EXCEPTION(invalid_status, "verify_no_locks",
-                        "suspending thread while at least one lock is "
-                        "being held, stack backtrace: " +
-                            back_trace);
-                }
-            }
-        }
-
-        bool register_locks_predicate()
-        {
-            return threads::get_self_ptr() != nullptr;
-        }
-#endif
-
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         struct dump_config
         {
@@ -657,6 +582,8 @@ namespace hpx
             hpx::util::set_test_failure_handler(&detail::test_failure_handler);
             hpx::set_custom_exception_info_handler(&detail::custom_exception_info);
             hpx::set_pre_exception_handler(&detail::pre_exception_handler);
+            hpx::set_thread_termination_handler(
+                [](std::exception_ptr const& e) { report_error(e); });
 #if defined(HPX_HAVE_VERIFY_LOCKS)
             hpx::util::set_registered_locks_error_handler(
                 &detail::registered_locks_error_handler);

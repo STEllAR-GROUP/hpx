@@ -6,8 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/threadmanager.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/threadmanager.hpp>
 #include <hpx/testing.hpp>
 
 #include <chrono>
@@ -19,13 +19,13 @@ using hpx::program_options::options_description;
 ///////////////////////////////////////////////////////////////////////////////
 inline void set_description(char const* test_name)
 {
-    hpx::threads::set_thread_description(hpx::threads::get_self_id(), test_name);
+    hpx::threads::set_thread_description(
+        hpx::threads::get_self_id(), test_name);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Clock, typename Duration>
-inline int time_cmp(
-    std::chrono::time_point<Clock, Duration> const& xt1,
+inline int time_cmp(std::chrono::time_point<Clock, Duration> const& xt1,
     std::chrono::time_point<Clock, Duration> const& xt2)
 {
     if (xt1 == xt2)
@@ -34,8 +34,7 @@ inline int time_cmp(
 }
 
 template <typename Clock, typename Duration, typename Rep, typename Period>
-inline bool in_range(
-    std::chrono::time_point<Clock, Duration> const& xt,
+inline bool in_range(std::chrono::time_point<Clock, Duration> const& xt,
     std::chrono::duration<Rep, Period> const& d)
 {
     std::chrono::time_point<Clock, Duration> const now = Clock::now();
@@ -85,7 +84,7 @@ void test_sleep()
 
     // Ensure it's in a range instead of checking actual equality due to time
     // lapse
-    HPX_TEST(in_range(now, std::chrono::seconds(4))); //-V112
+    HPX_TEST(in_range(now, std::chrono::seconds(4)));    //-V112
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -147,17 +146,19 @@ void test_thread_interrupts_at_interruption_point()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void disabled_interruption_point_thread(hpx::lcos::local::spinlock* m,
-    hpx::lcos::local::barrier* b, bool* failed)
+void disabled_interruption_point_thread(
+    hpx::lcos::local::spinlock* m, hpx::lcos::local::barrier* b, bool* failed)
 {
     hpx::this_thread::disable_interruption dc;
     b->wait();
-    try {
+    try
+    {
         std::lock_guard<hpx::lcos::local::spinlock> lk(*m);
         hpx::this_thread::interruption_point();
         *failed = false;
     }
-    catch(...) {
+    catch (...)
+    {
         b->wait();
         throw;
     }
@@ -171,15 +172,18 @@ void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
     bool caught = false;
     bool failed = true;
     hpx::thread thrd(&disabled_interruption_point_thread, &m, &b, &failed);
-    b.wait();       // Make sure the test thread has been started and marked itself
-                    // to disable interrupts.
-    try {
+    b.wait();    // Make sure the test thread has been started and marked itself
+                 // to disable interrupts.
+    try
+    {
         std::unique_lock<hpx::lcos::local::spinlock> lk(m);
         hpx::util::ignore_while_checking<
-            std::unique_lock<hpx::lcos::local::spinlock> > il(&lk);
+            std::unique_lock<hpx::lcos::local::spinlock>>
+            il(&lk);
         thrd.interrupt();
     }
-    catch(hpx::exception& e) {
+    catch (hpx::exception& e)
+    {
         HPX_TEST(e.get_error() == hpx::thread_not_interruptable);
         caught = true;
     }
@@ -195,8 +199,9 @@ void test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 {
     set_description("test_thread_no_interrupt_if_interrupts_disabled_at\
                     _interruption_point");
-    timed_test
-        (&do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point,1);
+    timed_test(
+        &do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point,
+        1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -206,7 +211,8 @@ struct non_copyable_callable
 
     non_copyable_callable()
       : value(0)
-    {}
+    {
+    }
 
     non_copyable_callable(non_copyable_callable const&) = delete;
     non_copyable_callable& operator=(non_copyable_callable const&) = delete;
@@ -286,11 +292,12 @@ void test_creation_through_reference_wrapper()
 //     timed_test(&do_test_timed_join, 10);
 // }
 
-void simple_sync_thread(hpx::lcos::local::barrier& b1, hpx::lcos::local::barrier& b2)
+void simple_sync_thread(
+    hpx::lcos::local::barrier& b1, hpx::lcos::local::barrier& b2)
 {
-    b1.wait();   // wait for both threads to be started
+    b1.wait();    // wait for both threads to be started
     // ... do nothing
-    b2.wait();   // wait for the tests to be completed
+    b2.wait();    // wait for the tests to be completed
 }
 
 void test_swap()
@@ -302,7 +309,7 @@ void test_swap()
     hpx::thread t1(&simple_sync_thread, std::ref(b1), std::ref(b2));
     hpx::thread t2(&simple_sync_thread, std::ref(b1), std::ref(b2));
 
-    b1.wait();   // wait for both threads to be started
+    b1.wait();    // wait for both threads to be started
 
     hpx::thread::id id1 = t1.get_id();
     hpx::thread::id id2 = t2.get_id();
@@ -315,10 +322,34 @@ void test_swap()
     HPX_TEST(t1.get_id() == id1);
     HPX_TEST(t2.get_id() == id2);
 
-    b2.wait();   // wait for the tests to be completed
+    b2.wait();    // wait for the tests to be completed
 
     t1.join();
     t2.join();
+}
+
+void test_double_join()
+{
+    set_description("test_double_join");
+
+    hpx::thread t([]() {});
+    t.join();
+
+    bool threw = true;
+    bool caught = false;
+    try
+    {
+        t.join();
+        threw = false;
+    }
+    catch (hpx::exception& e)
+    {
+        HPX_TEST(e.get_error() == hpx::invalid_status);
+        caught = true;
+    }
+
+    HPX_TEST(threw);
+    HPX_TEST(caught);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -332,6 +363,7 @@ int hpx_main(variables_map&)
         test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point();
         test_creation_through_reference_wrapper();
         test_swap();
+        test_double_join();
     }
 
     hpx::finalize();
@@ -347,4 +379,3 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv);
 }
-
