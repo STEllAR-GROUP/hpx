@@ -327,7 +327,7 @@ rst_prolog += '''
 .. |visual_cxx| replace:: Visual C++
 .. _visual_cxx: https://msdn.microsoft.com/en-us/visualc/default.aspx
 .. |jemalloc| replace:: jemalloc
-.. _jemalloc: https://www.canonware.com/jemalloc
+.. _jemalloc: http://jemalloc.net
 .. |mimalloc| replace:: mi-malloc
 .. _mimalloc: http://microsoft.github.io/mimalloc/
 .. |libunwind| replace:: libunwind
