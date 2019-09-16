@@ -25,10 +25,14 @@
 #include <hpx/parallel/executors/fused_bulk_execute.hpp>
 #include <hpx/parallel/executors/post_policy_dispatch.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/unwrap.hpp>
@@ -170,12 +174,16 @@ namespace hpx { namespace parallel { namespace execution {
             typename detail::bulk_function_result<F, S, Ts...>::type>>
         bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
         {
-            // lazily initialize once
-            static std::size_t global_num_tasks =
-                (std::min)(std::size_t(128), hpx::get_os_thread_count());
-
-            std::size_t num_tasks =
-                (num_tasks_ == std::size_t(-1)) ? global_num_tasks : num_tasks_;
+            std::size_t num_tasks = num_tasks_;
+            if (num_tasks == std::size_t(-1))
+            {
+                auto tid = threads::get_self_id();
+                auto pool = tid ?
+                    tid->get_scheduler_base()->get_parent_pool() :
+                    &hpx::threads::get_thread_manager().default_pool();
+                num_tasks =
+                    (std::min)(std::size_t(128), pool->get_os_thread_count());
+            }
 
             typedef std::vector<hpx::future<
                 typename detail::bulk_function_result<F, S, Ts...>::type>>
@@ -305,7 +313,9 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int version)
         {
-            ar& policy_& num_spread_& num_tasks_;
+            // clang-format off
+            ar & policy_ & num_spread_ & num_tasks_;
+            // clang-format on
         }
         /// \endcond
 
