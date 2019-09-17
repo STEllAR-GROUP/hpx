@@ -25,6 +25,11 @@ set(topology_sources
   topology.cpp
 )
 
+find_package(Hwloc QUIET)
+if(NOT HWLOC_FOUND)
+  hpx_error("    Hwloc could not be found, please specify HWLOC_ROOT to point to the correct location")
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(topology
   COMPATIBILITY_HEADERS ON    # Added in 1.4.0
@@ -42,6 +47,7 @@ add_hpx_module(topology
     hpx_format
     hpx_logging
     hpx_type_support
+    ${HWLOC_LIBRARIES}
   CMAKE_SUBDIRS examples tests
 )
 
