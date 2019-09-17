@@ -14,13 +14,13 @@
 |cmake| toolchains shipped with |hpx|
 =====================================
 
-In order to compile HPX for various platforms, we provide a variety of toolchain
-files that take care of setting up various |cmake| variables like compilers etc.
+In order to compile |HPX| for various platforms, we provide a variety of toolchain
+files that take care of setting up various |cmake| variables like compilers, etc.
 They are located in the ``cmake/toolchains`` directory:
 
 @HPX_CMAKE_TOOLCHAINS_LIST_RST@
 
 To use them pass the ``-DCMAKE_TOOLCHAIN_FILE=<toolchain>`` argument to the
-cmake invocation.
+CMake invocation.
 
 @HPX_CMAKE_TOOLCHAINS_RST@
