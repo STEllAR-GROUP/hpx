@@ -996,8 +996,8 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
 * Open CMake-GUI.exe and set up your source directory (input field 'Where is the
   source code') to the *base directory* of the source code you downloaded from
-  HPX's GitHub pages. Here's an example of my CMake path settings, which point to
-  my ``Documents/GitHub/hpx`` folder:
+  |HPX|'s GitHub pages. Here's an example of CMake path settings, which point to
+  the ``Documents/GitHub/hpx`` folder:
 
   .. _win32_cmake_settings1:
 
@@ -1005,9 +1005,9 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
      Example CMake path settings.
 
-  Inside the 'Where is the source-code' enter the base directory of your |HPX|
-  source directory (do not enter the "src" sub-directory!) Inside 'Where to
-  build the binaries' you should put in the path where all the building process
+  Inside 'Where is the source-code' enter the base directory of your |HPX|
+  source directory (do not enter the "src" sub-directory!). Inside 'Where to
+  build the binaries' you should put in the path where all the building processes
   will happen. This is important because the building machinery will do an
   "out-of-tree" build. CMake will not touch or change the original source files
   in any way. Instead, it will generate Visual Studio Solution Files, which
@@ -1017,17 +1017,17 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
   ``BOOST_ROOT``, ``HWLOC_ROOT``, ``CMAKE_INSTALL_PREFIX``. The meaning of
   these variables is as follows:
 
-  * ``BOOST_ROOT`` the root directory of the unpacked Boost headers/cpp files.
-  * ``HWLOC_ROOT`` the root directory of the unpacked Portable Hardware Locality
+  * ``BOOST_ROOT`` the |HPX| root directory of the unpacked Boost headers/cpp files.
+  * ``HWLOC_ROOT`` the |HPX| root directory of the unpacked Portable Hardware Locality
     files.
-  * ``CMAKE_INSTALL_PREFIX`` the "root directory" where the future builds of |HPX|
+  * ``CMAKE_INSTALL_PREFIX`` the |HPX| root directory where the future builds of |HPX|
     should be installed.
 
     .. note::
 
-       |HPX| is a BIG software collection, and I really don't recommend using the
-       default ``C:\Program Files\hpx``. I prefer simpler paths *without* white
-       space, like ``C:\bin\hpx`` or ``D:\bin\hpx`` etc.
+       |HPX| is a very large software collection, so it is not recommend to use the
+       default ``C:\Program Files\hpx``. Many users may prefer to use simpler paths *without*
+       whitespace, like ``C:\bin\hpx`` or ``D:\bin\hpx`` etc.
 
   To insert new env-vars click on "Add Entry" and then insert the name inside
   "Name", select ``PATH`` as Type and put the path-name in the "Path" text field.
@@ -1050,9 +1050,9 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
   ROOT folder of the Boost library. ``BOOST_LIBRARYDIR`` points to the subdir
   inside the Boost root folder where the compiled binaries are.
 
-* Click the 'Configure' button of CMake-GUI. You will be immediately presented a
+* Click the 'Configure' button of CMake-GUI. You will be immediately presented with a
   small window where you can select the C++ compiler to be used within Visual
-  Studio. In my case, I have used the latest v14 (a.k.a C++ 2015) but older
+  Studio. This has been tested using the latest v14 (a.k.a C++ 2015) but older
   versions should be sufficient too. Make sure to select the 64Bit compiler.
 
 * After the generate process has finished successfully, click the 'Generate'
@@ -1129,7 +1129,7 @@ So far we only support BGClang for compiling |hpx| on the BlueGene/Q.
 
      git clone git://github.com/STEllAR-GROUP/hpx.git
 
-* Generate the |hpx| buildfiles using cmake:
+* Generate the |hpx| buildfiles using CMake:
 
   .. code-block:: bash
 
@@ -1234,7 +1234,7 @@ following way:
        -DHWLOC_ROOT=$HWLOC_ROOT                      \
        /path/to/hpx
 
-For more detailed information about using |cmake| please refer to its
+For more detailed information about using |cmake|, please refer to its
 documentation and to the section :ref:`building_hpx`. Please pay special
 attention to the section about :option:`HPX_WITH_MALLOC:STRING` as this is
 crucial for getting decent performance on the Xeon Phi.
@@ -1334,7 +1334,7 @@ How to install |hpx| on Debian-based distributions
 
      sudo apt install cmake libboost-all-dev hwloc libgoogle-perftools-dev
 
-* For building the documentation you will need to further install the following:
+* To build the documentation you will need to further install the following:
 
   .. code-block:: bash
 
