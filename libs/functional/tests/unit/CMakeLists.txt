@@ -18,7 +18,7 @@ set(function_tests
   stateless_test
   sum_avg
 )
-    
+
 add_hpx_pseudo_target(tests.unit.modules.functional.function)
 
 foreach(test ${function_tests})

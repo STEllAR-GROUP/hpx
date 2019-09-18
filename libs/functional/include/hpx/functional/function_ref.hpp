@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstring>
+#include <functional>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -114,6 +115,17 @@ namespace hpx { namespace util {
             vptr = get_vtable<T>()->invoke;
 #endif
             object = reinterpret_cast<void*>(std::addressof(f));
+        }
+
+        template <typename T>
+        void assign(std::reference_wrapper<T> f_ref) noexcept
+        {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            vptr = get_vtable<T>();
+#else
+            vptr = get_vtable<T>()->invoke;
+#endif
+            object = reinterpret_cast<void*>(std::addressof(f_ref.get()));
         }
 
         template <typename T>
