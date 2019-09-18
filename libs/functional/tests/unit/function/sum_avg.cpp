@@ -10,8 +10,7 @@
 
 // For more information, see http://www.boost.org/
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/testing.hpp>
 
 void do_sum_avg(int values[], int n, int& sum, float& avg)

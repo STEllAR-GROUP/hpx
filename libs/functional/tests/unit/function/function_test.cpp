@@ -20,8 +20,7 @@
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wdouble-promotion"
 #endif
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/functional/function.hpp>
 #if defined(__clang__)
 #  pragma clang diagnostic pop
 #elif defined(__GNUC__)
