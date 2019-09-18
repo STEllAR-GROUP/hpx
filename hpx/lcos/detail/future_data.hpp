@@ -834,11 +834,9 @@ namespace detail
         }
 
     protected:
-        static threads::thread_result_type run_impl(future_base_type this_)
+        static void run_impl(future_base_type this_)
         {
             this_->do_run();
-            return threads::thread_result_type(
-                threads::terminated, threads::invalid_thread_id);
         }
 
     public:
@@ -909,12 +907,10 @@ namespace detail
         };
 
     protected:
-        static threads::thread_result_type run_impl(future_base_type this_)
+        static void run_impl(future_base_type this_)
         {
             reset_id r(*this_);
             this_->do_run();
-            return threads::thread_result_type(
-                threads::terminated, threads::invalid_thread_id);
         }
 
     public:
