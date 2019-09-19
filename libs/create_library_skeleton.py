@@ -63,7 +63,7 @@ index_rst = f'''..
 root_cmakelists_template = cmake_header + f'''
 cmake_minimum_required(VERSION {cmake_version} FATAL_ERROR)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${{CMAKE_CURRENT_SOURCE_DIR}}/cmake")
 
 set({lib_name}_headers)
 
