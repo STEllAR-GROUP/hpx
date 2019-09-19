@@ -19,7 +19,7 @@ Configuring |hpx| applications
 All |hpx| applications can be configured using special command line options
 and/or using special configuration files. This section describes the available
 options, the configuration file format, and the algorithm used to locate
-possible predefined configuration files. Additionally this section describes the
+possible predefined configuration files. Additionally, this section describes the
 defaults assumed if no external configuration information is supplied.
 
 During startup any |hpx| application applies a predefined search pattern to
@@ -40,27 +40,26 @@ line configuration options (see the description of the :option:`--hpx:ini`,
 The |hpx| INI File Format
 -------------------------
 
-All |hpx| applications can be configured using a special file format which is
+All |hpx| applications can be configured using a special file format that is
 similar to the well-known |ini_file_format|_. This is a structured text format
-allowing to group key/value pairs (properties) into sections. The basic element
+that allows users to group key/value pairs (properties) into sections. The basic element
 contained in an ini file is the property. Every property has a name and a
-value, delimited by an equals sign ``'='``. The name appears to the left of the
-equals sign:
+value, delimited by an equal sign ``'='``. The name appears to the left of the
+equal sign:
 
 .. code-block:: ini
 
    name=value
 
 The value may contain equal signs as only the first ``'='`` character
-is interpreted as the delimiter between ``name`` and ``value`` Whitespace before
+is interpreted as the delimiter between ``name`` and ``value``. Whitespace before
 the name, after the value and immediately before and after the delimiting equal
 sign is ignored. Whitespace inside the value is retained.
 
 Properties may be grouped into arbitrarily named sections. The section name
-appears on a line by itself, in square brackets ``[`` and ``]``. All properties
-after the section declaration are associated with that section. There is no
-explicit "end of section" delimiter; sections end at the next section
-declaration, or the end of the file:
+appears on a line by itself, in square brackets. All properties after the section
+declaration are associated with that section. There is no explicit "end of section"
+delimiter; sections end at the next section declaration or the end of the file:
 
 .. code-block:: ini
 
@@ -74,10 +73,10 @@ a dot ``'.'``:
 
    [outer_section.inner_section]
 
-Here ``inner_section`` is logically nested within ``outer_section``.
+Here, ``inner_section`` is logically nested within ``outer_section``.
 
 It is possible to use the full section name concatenated with the property
-name to refer to a particular property. For example in:
+name to refer to a particular property. For example, in:
 
 .. code-block:: ini
 
@@ -87,18 +86,18 @@ name to refer to a particular property. For example in:
 the property value of ``d`` can be referred to as ``a.b.c.d=e``.
 
 In |hpx| ini files can contain comments. Hash signs ``'#'`` at the beginning
-of a line indicate a comment. All characters starting with the ``'#'`` until the
-end of line are ignored.
+of a line indicate a comment. All characters starting with ``'#'`` until the
+end of the line are ignored.
 
 If a property with the same name is reused inside a section, the second
 occurrence of this property name will override the first occurrence (discard the
 first value). Duplicate sections simply merge their properties together, as if
 they occurred contiguously.
 
-In |hpx| ini files, a property value ``${FOO:default}`` will use the environmental
+In |hpx| ini files a property value ``${FOO:default}`` will use the environmental
 variable ``FOO`` to extract the actual value if it is set and ``default`` otherwise.
 No default has to be specified. Therefore ``${FOO}`` refers to the environmental
-variable ``FOO``. If ``FOO`` is not set or empty the overall expression will evaluate
+variable ``FOO``. If ``FOO`` is not set or empty, the overall expression will evaluate
 to an empty string. A property value ``$[section.key:default]`` refers to the value
 held by the property ``section.key`` if it exists and ``default`` otherwise. No
 default has to be specified. Therefore ``$[section.key]`` refers to the property
@@ -110,7 +109,7 @@ expression will evaluate to an empty string.
    Any property ``$[section.key:default]`` is evaluated whenever it is queried
    and not when the configuration data is initialized. This allows for lazy
    evaluation and relaxes initialization order of different sections. The only
-   exception are recursive property values, e.g. values referring to the very
+   exception are recursive property values, e.g., values referring to the very
    key they are associated with. Those property values are evaluated at
    initialization time to avoid infinite recursion.
 
@@ -236,7 +235,7 @@ The ``hpx`` configuration section
    * * ``hpx.minimal_deadlock_detection``
      * This setting enables support for minimal deadlock detection for
        |hpx|-threads. By default this is set to ``1`` (for Debug builds) or to
-       ``0`` (for Release, RelWithDebInfo, RelMinSize builds), this setting is
+       ``0`` (for Release, RelWithDebInfo, RelMinSize builds). This setting is
        effective only if ``HPX_WITH_THREAD_DEADLOCK_DETECTION`` is set during
        configuration in CMake.
    * * ``hpx.spinlock_deadlock_detection``
@@ -246,22 +245,22 @@ The ``hpx`` configuration section
        configuration in CMake. By default this is set to ``1`` (for Debug
        builds) or to ``0`` (for Release, RelWithDebInfo, RelMinSize builds).
    * * ``hpx.spinlock_deadlock_detection_limit``
-     * This setting specifies the upper limit of allowed number of spins that
+     * This setting specifies the upper limit of the allowed number of spins that
        spinlocks are allowed to perform. This setting is applicable only if
        ``HPX_WITH_SPINLOCK_DEADLOCK_DETECTION`` is set during configuration in
        CMake. By default this is set to ``1000000``.
    * * ``hpx.max_background_threads``
-     * This setting defines the number of threads in the scheduler which are
+     * This setting defines the number of threads in the scheduler, which are
        used to execute background work. By default this is the same as the
        number of cores used for the scheduler.
    * * ``hpx.max_idle_loop_count``
      * By default this is defined by the preprocessor constant
-       ``HPX_IDLE_LOOP_COUNT_MAX``. This is an internal setting which you should
+       ``HPX_IDLE_LOOP_COUNT_MAX``. This is an internal setting that you should
        change only if you know exactly what you are doing.
    * * ``hpx.max_busy_loop_count``
      * This setting defines the maximum value of the busy-loop counter in the
        scheduler. By default this is defined by the preprocessor constant
-       ``HPX_BUSY_LOOP_COUNT_MAX``. This is an internal setting which you should
+       ``HPX_BUSY_LOOP_COUNT_MAX``. This is an internal setting that you should
        change only if you know exactly what you are doing.
    * * ``hpx.max_idle_backoff_time``
      * This setting defines the maximum time (in milliseconds) for the scheduler
@@ -269,7 +268,7 @@ The ``hpx`` configuration section
        This setting is applicable only if
        ``HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF`` is set during configuration in
        |cmake|. By default this is defined by the preprocessor constant
-       ``HPX_IDLE_BACKOFF_TIME_MAX``. This is an internal setting which you
+       ``HPX_IDLE_BACKOFF_TIME_MAX``. This is an internal setting that you
        should change only if you know exactly what you are doing.
    * * ``hpx.stacks.small_size``
      * This is initialized to the small stack size to be used by |hpx|-threads.
@@ -328,9 +327,9 @@ The ``hpx.thread_queue`` configuration section
 
 .. important::
 
-   These setting control internal values used by the thread scheduling queues in
-   the |hpx| scheduler. You should not modify these settings except if you know
-   exactly what you are doing]
+   These are the setting control internal values used by the thread scheduling queues
+   in the |hpx| scheduler. You should not modify these settings unless you know
+   exactly what you are doing.
 
 .. code-block:: ini
 
