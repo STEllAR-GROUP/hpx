@@ -15,7 +15,7 @@
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/util/ini.hpp>
 
 #include <cstddef>

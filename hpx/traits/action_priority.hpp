@@ -7,7 +7,7 @@
 #if !defined(HPX_TRAITS_ACTION_PRIORITY_SEP_03_2012_1138AM)
 #define HPX_TRAITS_ACTION_PRIORITY_SEP_03_2012_1138AM
 
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 
 namespace hpx { namespace traits
 {

@@ -58,6 +58,7 @@ add_hpx_module(collectives
       hpx_cache
       hpx_concurrency
       hpx_config
+      hpx_coroutines
       hpx_datastructures
       hpx_errors
       hpx_execution

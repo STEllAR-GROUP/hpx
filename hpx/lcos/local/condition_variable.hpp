@@ -15,7 +15,7 @@
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>

@@ -14,7 +14,7 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
+#include <hpx/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>

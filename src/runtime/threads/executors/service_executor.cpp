@@ -9,7 +9,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/functional/bind.hpp>

@@ -8,7 +8,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/testing.hpp>
 //
-#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
+#include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <algorithm>
 #include <cstddef>
 #include <string>

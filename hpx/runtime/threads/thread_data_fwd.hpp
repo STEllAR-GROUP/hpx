@@ -11,9 +11,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_id_type.hpp>
+#include <hpx/coroutines/coroutine_fwd.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/util_fwd.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/unique_function.hpp>

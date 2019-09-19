@@ -27,7 +27,7 @@
 #include <hpx/lcos/detail/future_transforms.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
+#include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_access.hpp>

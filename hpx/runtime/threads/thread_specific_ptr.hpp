@@ -13,7 +13,7 @@
 #define HPX_UTIL_RUNTIME_THREADS_THREAD_SPECIFIC_PTR_MAR_20_2014_0941A320PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/coroutines/detail/tss.hpp>
+#include <hpx/coroutines/detail/tss.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <memory>

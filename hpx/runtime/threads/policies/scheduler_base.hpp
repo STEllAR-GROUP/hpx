@@ -19,7 +19,7 @@
 #include <hpx/state.hpp>
 #include <hpx/util_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
-#include <hpx/runtime/threads/coroutines/detail/tss.hpp>
+#include <hpx/coroutines/detail/tss.hpp>
 #endif
 
 #include <atomic>

@@ -11,7 +11,7 @@
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>

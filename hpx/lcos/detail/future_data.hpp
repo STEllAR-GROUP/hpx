@@ -15,7 +15,7 @@
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
+#include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>

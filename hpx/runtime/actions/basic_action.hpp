@@ -36,7 +36,7 @@
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/serialization/tuple.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/action_priority.hpp>

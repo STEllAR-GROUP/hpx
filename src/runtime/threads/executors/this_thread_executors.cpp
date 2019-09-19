@@ -23,7 +23,7 @@
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/timing/steady_clock.hpp>
