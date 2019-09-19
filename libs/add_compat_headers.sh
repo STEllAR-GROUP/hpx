@@ -12,18 +12,23 @@
 
 script_sourced=0
 # Important to be at the beginning
-if [[ $_ != $0 ]]; then
+if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
     script_sourced=1
 fi
+
+function _exit() {
+    if [[ $script_sourced -eq 0 ]]; then
+        exit
+    fi
+}
 
 if [[ $# -lt 1 ]]; then
     arg=${BASH_SOURCE[0]}
     echo "Usage : "$arg" -m <module_name> --old_path <include_path> --new_path <include_path>"
     echo "Example: "$arg" -m cache -o hpx/util/cache -n hpx/cache"
     echo "Can specify the --project_path if different from $HPX_ROOT"
-    if [[ script_sourced -eq 1 ]]; then
-        return
-    fi  
+    _exit
+    return
 fi
 
 function parse_arguments() {
@@ -64,6 +69,7 @@ function parse_arguments() {
                 [-n, --new_path <value>] [-p, --project_path <value>]"
                 echo "Example: "$0" -m cache -o hpx/util/cache -n hpx/cache"
                 echo "Can specify the --project_path if different from $HPX_ROOT"
+                _exit
                 return
         esac
     done
@@ -93,12 +99,16 @@ module_caps=${module^^}
 # Project path not set (full specified path to be sure which source is used)
 if [[ -z $HPX_ROOT && -z $project_path ]]; then
     "HPX_ROOT env var doesn't exists and project_path option not specified !"
-    if [[ script_sourced -eq 1 ]]; then
-        return
-    fi  
+    _exit
+    return
 fi
 
 pushd $module_path/include_compatibility/${old_root}
+if [[ $? -eq 1 ]]; then
+    echo "Please specify a correct project_path"
+    _exit
+    return
+fi
 # To enable **
 shopt -s globstar
 # Globbing step to get all the include_compatibility files, the files have to
