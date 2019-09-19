@@ -10,11 +10,13 @@
 #if defined(HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
-    "The header hpx/runtime/threads/coroutines/detail/context_linux_x86.hpp is deprecated, \
-    please include hpx/coroutines/detail/context_linux_x86.hpp instead")
+    "The header hpx/runtime/threads/coroutines/detail/context_linux_x86.hpp is \
+    deprecated, please include hpx/coroutines/detail/context_linux_x86.hpp \
+    instead")
 #else
 #warning                                                                       \
-    "The header hpx/runtime/threads/coroutines/detail/context_linux_x86.hpp is deprecated, \
-    please include hpx/coroutines/detail/context_linux_x86.hpp instead"
+    "The header hpx/runtime/threads/coroutines/detail/context_linux_x86.hpp \
+    is deprecated, please include hpx/coroutines/detail/context_linux_x86.hpp \
+    instead"
 #endif
 #endif
