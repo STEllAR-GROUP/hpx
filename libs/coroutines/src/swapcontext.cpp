@@ -14,7 +14,8 @@
 
 #if defined(__x86_64__) || defined(__amd64__)
 #include "swapcontext64.ipp"
-#elif defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__)
+#elif defined(__i386__) || defined(__i486__) || defined(__i586__) ||           \
+    defined(__i686__)
 #include "swapcontext32.ipp"
 #else
 #error Unsupported platform

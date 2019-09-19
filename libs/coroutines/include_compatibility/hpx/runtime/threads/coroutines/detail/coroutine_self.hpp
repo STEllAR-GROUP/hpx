@@ -9,11 +9,11 @@
 
 #if defined(HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/runtime/threads/coroutines/detail/coroutine_self.hpp is deprecated, \
     please include hpx/coroutines/detail/coroutine_self.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/runtime/threads/coroutines/detail/coroutine_self.hpp is deprecated, \
     please include hpx/coroutines/detail/coroutine_self.hpp instead"
 #endif

@@ -30,15 +30,22 @@
 #ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SWAP_CONTEXT_HPP
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SWAP_CONTEXT_HPP
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
-    class default_hint {};
-    class yield_hint : public default_hint {};
-    class invoke_hint : public default_hint {};
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
+    class default_hint
+    {
+    };
+    class yield_hint : public default_hint
+    {
+    };
+    class invoke_hint : public default_hint
+    {
+    };
 
     /////////////////////////////////////////////////////////////////////////////
     // This is the base class of all context implementations
-    struct context_impl_base {};
-}}}}
+    struct context_impl_base
+    {
+    };
+}}}}    // namespace hpx::threads::coroutines::detail
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SWAP_CONTEXT_HPP*/

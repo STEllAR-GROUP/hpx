@@ -30,8 +30,7 @@
 #ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
     struct coroutine_accessor
     {
         template <typename Coroutine>
@@ -52,6 +51,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return x.get_impl();
         }
     };
-}}}}
+}}}}    // namespace hpx::threads::coroutines::detail
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP*/

@@ -109,45 +109,42 @@
 #if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 
 #include <hpx/coroutines/detail/context_generic_context.hpp>
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
     template <typename CoroutineImpl>
-    using default_context_impl = generic_context::fcontext_context_impl<CoroutineImpl>;
-}}}}
+    using default_context_impl =
+        generic_context::fcontext_context_impl<CoroutineImpl>;
+}}}}    // namespace hpx::threads::coroutines::detail
 
 #elif (defined(__linux) || defined(linux) || defined(__linux__)) &&            \
     !defined(__bgq__) && !defined(__powerpc__) && !defined(__s390x_)
 
 #include <hpx/coroutines/detail/context_linux_x86.hpp>
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
     template <typename CoroutineImpl>
     using default_context_impl = lx::x86_linux_context_impl<CoroutineImpl>;
-}}}}
+}}}}    // namespace hpx::threads::coroutines::detail
 
 #elif defined(_POSIX_VERSION) || defined(__bgq__) || defined(__powerpc__) ||   \
     defined(__s390x_)
 
 #include <hpx/coroutines/detail/context_posix.hpp>
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
     template <typename CoroutineImpl>
     using default_context_impl = posix::ucontext_context_impl<CoroutineImpl>;
-}}}}
+}}}}    // namespace hpx::threads::coroutines::detail
 
 #elif defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 
 #include <hpx/coroutines/detail/context_windows_fibers.hpp>
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
     template <typename CoroutineImpl>
     using default_context_impl = windows::fibers_context_impl<CoroutineImpl>;
-}}}}
+}}}}    // namespace hpx::threads::coroutines::detail
 
 #else
 
 #error No default_context_impl available for this system
 
-#endif // HPX_HAVE_GENERIC_CONTEXT_COROUTINES
+#endif    // HPX_HAVE_GENERIC_CONTEXT_COROUTINES
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_IMPL_HPP*/

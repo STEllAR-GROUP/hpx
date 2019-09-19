@@ -32,8 +32,8 @@
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_IMPL_HPP
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning (push)
-#pragma warning (disable: 4355) //this used in base member initializer
+#pragma warning(push)
+#pragma warning(disable : 4355)    //this used in base member initializer
 #endif
 
 #include <hpx/config.hpp>
@@ -48,13 +48,11 @@
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     // This type augments the context_base type with the type of the stored
     // functor.
-    class coroutine_impl
-      : public context_base<coroutine_impl>
+    class coroutine_impl : public context_base<coroutine_impl>
     {
     public:
         HPX_NON_COPYABLE(coroutine_impl);
@@ -66,15 +64,17 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         typedef std::pair<thread_state_enum, thread_id_type> result_type;
         typedef thread_state_ex_enum arg_type;
 
-        typedef util::unique_function_nonser<result_type(arg_type)> functor_type;
+        typedef util::unique_function_nonser<result_type(arg_type)>
+            functor_type;
 
-        coroutine_impl(functor_type&& f, thread_id_type id,
-            std::ptrdiff_t stack_size)
+        coroutine_impl(
+            functor_type&& f, thread_id_type id, std::ptrdiff_t stack_size)
           : context_base(stack_size, id)
           , m_result(unknown, invalid_thread_id)
           , m_arg(nullptr)
           , m_fun(std::move(f))
-        {}
+        {
+        }
 
 #if defined(HPX_DEBUG)
         HPX_EXPORT ~coroutine_impl();
@@ -92,7 +92,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         {
             return m_result;
         }
-        arg_type * args()
+        arg_type* args()
         {
             HPX_ASSERT(m_arg);
             return m_arg;
@@ -113,17 +113,16 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         void reset()
         {
             this->reset_stack();
-            m_fun.reset(); // just reset the bound function
+            m_fun.reset();    // just reset the bound function
             this->super_type::reset();
         }
 
-        void rebind(functor_type && f, thread_id_type id)
+        void rebind(functor_type&& f, thread_id_type id)
         {
-            this->rebind_stack();     // count how often a coroutines object was reused
+            this->rebind_stack();    // count how often a coroutines object was reused
             m_fun = std::move(f);
             this->super_type::rebind_base(id);
         }
-
 
     private:
         result_type m_result;
@@ -131,7 +130,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         functor_type m_fun;
     };
-}}}}
+}}}}    // namespace hpx::threads::coroutines::detail
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)

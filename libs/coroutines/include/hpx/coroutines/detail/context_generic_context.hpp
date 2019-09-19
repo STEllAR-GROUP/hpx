@@ -26,8 +26,8 @@
 #include <hpx/coroutines/detail/posix_utility.hpp>
 #endif
 
-#include <boost/version.hpp>
 #include <boost/context/detail/fcontext.hpp>
+#include <boost/version.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -42,49 +42,52 @@
 
 #define HPX_COROUTINES_SEGMENTS 10
 
-extern "C"
-{
-    void *__splitstack_makecontext(std::size_t,
-        void *[HPX_COROUTINES_SEGMENTS], std::size_t *);
-    void __splitstack_releasecontext(void *[HPX_COROUTINES_SEGMENTS]);
-    void __splitstack_resetcontext(void *[HPX_COROUTINES_SEGMENTS]);
-    void __splitstack_block_signals_context(void *[HPX_COROUTINES_SEGMENTS],
-        int * new_value, int * old_value);
-    void __splitstack_getcontext(void * [HPX_COROUTINES_SEGMENTS]);
-    void __splitstack_setcontext(void * [HPX_COROUTINES_SEGMENTS]);
+extern "C" {
+void* __splitstack_makecontext(
+    std::size_t, void * [HPX_COROUTINES_SEGMENTS], std::size_t*);
+void __splitstack_releasecontext(void * [HPX_COROUTINES_SEGMENTS]);
+void __splitstack_resetcontext(void * [HPX_COROUTINES_SEGMENTS]);
+void __splitstack_block_signals_context(
+    void * [HPX_COROUTINES_SEGMENTS], int* new_value, int* old_value);
+void __splitstack_getcontext(void * [HPX_COROUTINES_SEGMENTS]);
+void __splitstack_setcontext(void * [HPX_COROUTINES_SEGMENTS]);
 }
 
-#if !defined (SIGSTKSZ)
-# define SIGSTKSZ (8 * 1024)
-# define UDEF_SIGSTKSZ
+#if !defined(SIGSTKSZ)
+#define SIGSTKSZ (8 * 1024)
+#define UDEF_SIGSTKSZ
 #endif
 
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace coroutines
-{
+namespace hpx { namespace threads { namespace coroutines {
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
     {
         HPX_CONSTEXPR prepare_main_thread() {}
     };
 
-    namespace detail { namespace generic_context
-    {
+    namespace detail { namespace generic_context {
         ///////////////////////////////////////////////////////////////////////
         // This is taken directly from one of the Boost.Context examples
 #if !defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
         struct stack_allocator
         {
             static std::size_t maximum_stacksize()
-            { return HPX_HUGE_STACK_SIZE; }
+            {
+                return HPX_HUGE_STACK_SIZE;
+            }
 
             static std::size_t default_stacksize()
-            { return HPX_MEDIUM_STACK_SIZE; }
+            {
+                return HPX_MEDIUM_STACK_SIZE;
+            }
 
             static std::size_t minimum_stacksize()
-            { return HPX_SMALL_STACK_SIZE; }
+            {
+                return HPX_SMALL_STACK_SIZE;
+            }
 
             void* allocate(std::size_t size) const
             {
@@ -93,7 +96,8 @@ namespace hpx { namespace threads { namespace coroutines
                 posix::watermark_stack(limit, size);
 #else
                 void* limit = std::calloc(size, sizeof(char));
-                if (!limit) throw std::bad_alloc();
+                if (!limit)
+                    throw std::bad_alloc();
 #endif
                 return static_cast<char*>(limit) + size;
             }
@@ -112,11 +116,11 @@ namespace hpx { namespace threads { namespace coroutines
 #else
         struct stack_allocator
         {
-            typedef void *segments_context[HPX_COROUTINES_SEGMENTS];
+            typedef void* segments_context[HPX_COROUTINES_SEGMENTS];
 
             static std::size_t maximum_stacksize()
             {
-                HPX_ASSERT_MSG( false, "segmented stack is unbound");
+                HPX_ASSERT_MSG(false, "segmented stack is unbound");
                 return 0;
             }
 
@@ -135,13 +139,15 @@ namespace hpx { namespace threads { namespace coroutines
             {
                 HPX_ASSERT(default_stacksize() <= size);
 
-                void* limit = __splitstack_makecontext(size, segments_ctx_, &size);
-                if (!limit) throw std::bad_alloc();
+                void* limit =
+                    __splitstack_makecontext(size, segments_ctx_, &size);
+                if (!limit)
+                    throw std::bad_alloc();
 
                 int off = 0;
-                 __splitstack_block_signals_context(segments_ctx_, &off, 0);
+                __splitstack_block_signals_context(segments_ctx_, &off, 0);
 
-                return static_cast<char *>(limit) + size;
+                return static_cast<char*>(limit) + size;
             }
 
             void deallocate(void* vp, std::size_t size) const
@@ -158,8 +164,9 @@ namespace hpx { namespace threads { namespace coroutines
         template <typename T>
         HPX_FORCEINLINE void trampoline(boost::context::detail::transfer_t tr)
         {
-            auto arg = reinterpret_cast<std::pair<void*,
-                 boost::context::detail::fcontext_t*>*>(tr.data);
+            auto arg = reinterpret_cast<
+                std::pair<void*, boost::context::detail::fcontext_t*>*>(
+                tr.data);
 
             HPX_ASSERT(arg->second);
             *arg->second = tr.fctx;
@@ -187,25 +194,25 @@ namespace hpx { namespace threads { namespace coroutines
               , funp_(&trampoline<CoroutineImpl>)
               , ctx_(0)
               , alloc_()
-              , stack_size_(
-                    (stack_size == -1) ?
-                    alloc_.minimum_stacksize() : std::size_t(stack_size)
-                )
+              , stack_size_((stack_size == -1) ? alloc_.minimum_stacksize() :
+                                                 std::size_t(stack_size))
               , stack_pointer_(nullptr)
-            {}
+            {
+            }
 
             void init()
             {
-                if (stack_pointer_ != nullptr) return;
+                if (stack_pointer_ != nullptr)
+                    return;
 
                 stack_pointer_ = alloc_.allocate(stack_size_);
                 if (stack_pointer_ == nullptr)
                 {
-                    throw std::runtime_error("could not allocate memory for stack");
+                    throw std::runtime_error(
+                        "could not allocate memory for stack");
                 }
-                ctx_ =
-                    boost::context::detail::make_fcontext(
-                            stack_pointer_, stack_size_, funp_);
+                ctx_ = boost::context::detail::make_fcontext(
+                    stack_pointer_, stack_size_, funp_);
             }
 
             ~fcontext_context_impl()
@@ -315,7 +322,7 @@ namespace hpx { namespace threads { namespace coroutines
                 // switch to other coroutine context
                 to.cb_.second = &from.ctx_;
                 auto transfer = boost::context::detail::jump_fcontext(
-                        to.ctx_, reinterpret_cast<void*>(&to.cb_));
+                    to.ctx_, reinterpret_cast<void*>(&to.cb_));
                 to.ctx_ = transfer.fctx;
 
 #if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
@@ -329,9 +336,9 @@ namespace hpx { namespace threads { namespace coroutines
             boost::context::detail::fcontext_t ctx_;
             stack_allocator alloc_;
             std::size_t stack_size_;
-            void * stack_pointer_;
+            void* stack_pointer_;
         };
-    }}
-}}}
+    }}    // namespace detail::generic_context
+}}}       // namespace hpx::threads::coroutines
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_GENERIC_HPP*/

@@ -49,8 +49,7 @@
 #include <limits>
 #include <utility>
 
-namespace hpx { namespace threads { namespace coroutines
-{
+namespace hpx { namespace threads { namespace coroutines {
     /////////////////////////////////////////////////////////////////////////////
     class coroutine
     {
@@ -63,11 +62,11 @@ namespace hpx { namespace threads { namespace coroutines
         typedef impl_type::result_type result_type;
         typedef impl_type::arg_type arg_type;
 
-        typedef util::unique_function_nonser<result_type(arg_type)> functor_type;
+        typedef util::unique_function_nonser<result_type(arg_type)>
+            functor_type;
 
-        coroutine(functor_type&& f,
-                thread_id_type id,
-                std::ptrdiff_t stack_size = detail::default_stack_size)
+        coroutine(functor_type&& f, thread_id_type id,
+            std::ptrdiff_t stack_size = detail::default_stack_size)
           : impl_(std::move(f), id, stack_size)
         {
             HPX_ASSERT(impl_.is_ready());
@@ -75,8 +74,8 @@ namespace hpx { namespace threads { namespace coroutines
 
         coroutine(coroutine const& src) = delete;
         coroutine& operator=(coroutine const& src) = delete;
-        coroutine(coroutine && src) = delete;
-        coroutine& operator=(coroutine && src) = delete;
+        coroutine(coroutine&& src) = delete;
+        coroutine& operator=(coroutine&& src) = delete;
 
         thread_id_type get_thread_id() const
         {
@@ -144,6 +143,6 @@ namespace hpx { namespace threads { namespace coroutines
     private:
         impl_type impl_;
     };
-}}}
+}}}    // namespace hpx::threads::coroutines
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_COROUTINE_HPP*/

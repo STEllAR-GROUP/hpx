@@ -16,8 +16,7 @@
 #include <functional>
 #include <iosfwd>
 
-namespace hpx {
-namespace threads {
+namespace hpx { namespace threads {
     class HPX_EXPORT thread_data;
 
     struct thread_id_type
@@ -132,20 +131,19 @@ namespace threads {
     };
 
     HPX_CONSTEXPR_OR_CONST thread_id_type invalid_thread_id;
-}
-}
+}}    // namespace hpx::threads
 
 namespace std {
-template <>
-struct hash<::hpx::threads::thread_id_type>
-{
-    std::size_t operator()(::hpx::threads::thread_id_type const& v) const
-        noexcept
+    template <>
+    struct hash<::hpx::threads::thread_id_type>
     {
-        std::hash<const ::hpx::threads::thread_data*> hasher_;
-        return hasher_(v.get());
-    }
-};
-}
+        std::size_t operator()(::hpx::threads::thread_id_type const& v) const
+            noexcept
+        {
+            std::hash<const ::hpx::threads::thread_data*> hasher_;
+            return hasher_(v.get());
+        }
+    };
+}    // namespace std
 
 #endif

@@ -9,11 +9,11 @@
 #define HPX_PARALLEL_EXECUTION_DETAIL_POST_POLICY_DISPATCH_DEC_05_2017_0234PM
 
 #include <hpx/config.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <cstdint>

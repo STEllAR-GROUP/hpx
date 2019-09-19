@@ -9,11 +9,11 @@
 
 #if defined(HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/runtime/threads/coroutines/detail/swap_context.hpp is deprecated, \
     please include hpx/coroutines/detail/swap_context.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/runtime/threads/coroutines/detail/swap_context.hpp is deprecated, \
     please include hpx/coroutines/detail/swap_context.hpp instead"
 #endif

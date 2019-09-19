@@ -11,11 +11,10 @@
 
 #include <cstddef>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
     coroutine_self*& coroutine_self::local_self()
     {
         HPX_NATIVE_TLS coroutine_self* local_self_ = nullptr;
         return local_self_;
     }
-}}}}
+}}}}    // namespace hpx::threads::coroutines::detail

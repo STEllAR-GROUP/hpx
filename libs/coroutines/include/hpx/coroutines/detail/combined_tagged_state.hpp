@@ -14,8 +14,7 @@
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace detail
-{
+namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T1, typename T2>
     class combined_tagged_state
@@ -27,8 +26,8 @@ namespace hpx { namespace threads { namespace detail
         typedef std::int8_t thread_state_ex_type;
         typedef std::int64_t tag_type;
 
-        static const std::size_t state_shift    = 56;  // 8th byte
-        static const std::size_t state_ex_shift = 48;  // 7th byte
+        static const std::size_t state_shift = 56;       // 8th byte
+        static const std::size_t state_ex_shift = 48;    // 7th byte
 
         static const tagged_state_type state_mask = 0xffull;
         static const tagged_state_type state_ex_mask = 0xffull;
@@ -51,8 +50,8 @@ namespace hpx { namespace threads { namespace detail
             return (i >> state_ex_shift) & state_ex_mask;
         }
 
-        static tagged_state_type pack_state(tagged_state_type state,
-            tagged_state_type state_ex, tag_type tag)
+        static tagged_state_type pack_state(
+            tagged_state_type state, tagged_state_type state_ex, tag_type tag)
         {
             HPX_ASSERT(!(state & ~state_mask));
             HPX_ASSERT(!(state_ex & ~state_ex_mask));
@@ -65,29 +64,32 @@ namespace hpx { namespace threads { namespace detail
         ///////////////////////////////////////////////////////////////////////
         combined_tagged_state() noexcept
           : state_(0)
-        {}
+        {
+        }
 
         combined_tagged_state(T1 state, T2 state_ex, tag_type t = 0)
           : state_(pack_state(state, state_ex, t))
-        {}
+        {
+        }
 
         combined_tagged_state(combined_tagged_state state, tag_type t)
           : state_(pack_state(state.state(), state.state_ex(), t))
-        {}
+        {
+        }
 
         ///////////////////////////////////////////////////////////////////////
-        void set (T1 state, T2 state_ex, tag_type t)
+        void set(T1 state, T2 state_ex, tag_type t)
         {
             state_ = pack_state(state, state_ex, t);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool operator== (combined_tagged_state const & p) const
+        bool operator==(combined_tagged_state const& p) const
         {
             return state_ == p.state_;
         }
 
-        bool operator!= (combined_tagged_state const & p) const
+        bool operator!=(combined_tagged_state const& p) const
         {
             return !operator==(p);
         }
@@ -129,6 +131,6 @@ namespace hpx { namespace threads { namespace detail
     protected:
         tagged_state_type state_;
     };
-}}}
+}}}    // namespace hpx::threads::detail
 
 #endif

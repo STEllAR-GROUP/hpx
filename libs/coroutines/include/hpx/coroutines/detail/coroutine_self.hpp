@@ -46,8 +46,7 @@
 #include <limits>
 #include <utility>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
     class coroutine_self
     {
     public:
@@ -75,7 +74,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         friend struct detail::coroutine_accessor;
 
         typedef coroutine_impl impl_type;
-        typedef impl_type* impl_ptr; // Note, no reference counting here.
+        typedef impl_type* impl_ptr;    // Note, no reference counting here.
         typedef impl_type::thread_id_type thread_id_type;
 
         typedef impl_type::result_type result_type;
@@ -106,7 +105,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
         template <typename F>
-        yield_decorator_type decorate_yield(F && f)
+        yield_decorator_type decorate_yield(F&& f)
         {
             yield_decorator_type tmp(std::forward<F>(f));
             std::swap(tmp, yield_decorator_);
@@ -120,7 +119,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return tmp;
         }
 
-        yield_decorator_type decorate_yield(yield_decorator_type && f)
+        yield_decorator_type decorate_yield(yield_decorator_type&& f)
         {
             std::swap(f, yield_decorator_);
             return std::move(f);
@@ -158,10 +157,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
         }
 
-        explicit coroutine_self(impl_type * pimpl,
-                coroutine_self* next_self = nullptr)
-          : m_pimpl(pimpl), next_self_(next_self)
-        {}
+        explicit coroutine_self(
+            impl_type* pimpl, coroutine_self* next_self = nullptr)
+          : m_pimpl(pimpl)
+          , next_self_(next_self)
+        {
+        }
 
         std::size_t get_thread_data() const
         {
@@ -229,6 +230,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         impl_ptr m_pimpl;
         coroutine_self* next_self_;
     };
-}}}}
+}}}}    // namespace hpx::threads::coroutines::detail
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SELF_HPP*/

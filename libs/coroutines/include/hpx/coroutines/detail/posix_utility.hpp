@@ -72,115 +72,117 @@
  * Stack allocation routines and trampolines for setcontext
  */
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
-namespace posix
-{
-    HPX_EXPORT extern bool use_guard_pages;
+    namespace posix {
+        HPX_EXPORT extern bool use_guard_pages;
 
-#if defined(HPX_HAVE_THREAD_STACK_MMAP) && defined(_POSIX_MAPPED_FILES) \
- && _POSIX_MAPPED_FILES > 0
+#if defined(HPX_HAVE_THREAD_STACK_MMAP) && defined(_POSIX_MAPPED_FILES) &&     \
+    _POSIX_MAPPED_FILES > 0
 
-    inline void* alloc_stack(std::size_t size)
-    {
-        void* real_stack = ::mmap(nullptr,
-            size + EXEC_PAGESIZE,
-            PROT_EXEC | PROT_READ | PROT_WRITE,
-#if defined(__APPLE__)
-            MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
-#elif defined(__FreeBSD__)
-            MAP_PRIVATE | MAP_ANON,
-#else
-            MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
-#endif
-            -1,
-            0
-            );
-
-        if (real_stack == MAP_FAILED)
+        inline void* alloc_stack(std::size_t size)
         {
-            if (ENOMEM == errno && use_guard_pages)
+            void* real_stack = ::mmap(nullptr, size + EXEC_PAGESIZE,
+                PROT_EXEC | PROT_READ | PROT_WRITE,
+#if defined(__APPLE__)
+                MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
+#elif defined(__FreeBSD__)
+                MAP_PRIVATE | MAP_ANON,
+#else
+                MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
+#endif
+                -1, 0);
+
+            if (real_stack == MAP_FAILED)
             {
-                throw std::runtime_error("mmap() failed to allocate "
-                    "thread stack due to insufficient resources, "
-                    "increase /proc/sys/vm/max_map_count or add "
-                    "-Ihpx.stacks.use_guard_pages=0 to the command line");
+                if (ENOMEM == errno && use_guard_pages)
+                {
+                    throw std::runtime_error(
+                        "mmap() failed to allocate "
+                        "thread stack due to insufficient resources, "
+                        "increase /proc/sys/vm/max_map_count or add "
+                        "-Ihpx.stacks.use_guard_pages=0 to the command line");
+                }
+                else
+                {
+                    throw std::runtime_error(
+                        "mmap() failed to allocate thread stack");
+                }
+            }
+
+#if defined(HPX_HAVE_THREAD_GUARD_PAGE)
+            if (use_guard_pages)
+            {
+                // Add a guard page.
+                ::mprotect(real_stack, EXEC_PAGESIZE, PROT_NONE);
+
+                void** stack = static_cast<void**>(real_stack) +
+                    (EXEC_PAGESIZE / sizeof(void*));
+                return static_cast<void*>(stack);
+            }
+            return real_stack;
+#else
+            return real_stack;
+#endif
+        }
+
+        inline void watermark_stack(void* stack, std::size_t size)
+        {
+            HPX_ASSERT(size > EXEC_PAGESIZE);
+
+            // Fill the bottom 8 bytes of the first page with 1s.
+            void** watermark = static_cast<void**>(stack) +
+                ((size - EXEC_PAGESIZE) / sizeof(void*));
+            *watermark = reinterpret_cast<void*>(0xDEADBEEFDEADBEEFull);
+        }
+
+        inline bool reset_stack(void* stack, std::size_t size)
+        {
+            void** watermark = static_cast<void**>(stack) +
+                ((size - EXEC_PAGESIZE) / sizeof(void*));
+
+            // If the watermark has been overwritten, then we've gone past the first
+            // page.
+            if ((reinterpret_cast<void*>(0xDEADBEEFDEADBEEFull)) != *watermark)
+            {
+                // We never free up the first page, as it's initialized only when the
+                // stack is created.
+                ::madvise(stack, size - EXEC_PAGESIZE, MADV_DONTNEED);
+                return true;
+            }
+
+            return false;
+        }
+
+        inline void free_stack(void* stack, std::size_t size)
+        {
+#if defined(HPX_HAVE_THREAD_GUARD_PAGE)
+            if (use_guard_pages)
+            {
+                void** real_stack = static_cast<void**>(stack) -
+                    (EXEC_PAGESIZE / sizeof(void*));
+                ::munmap(static_cast<void*>(real_stack), size + EXEC_PAGESIZE);
             }
             else
             {
-                throw std::runtime_error("mmap() failed to allocate thread stack");
+                ::munmap(stack, size);
             }
-        }
-
-#if defined(HPX_HAVE_THREAD_GUARD_PAGE)
-        if (use_guard_pages)
-        {
-            // Add a guard page.
-            ::mprotect(real_stack, EXEC_PAGESIZE, PROT_NONE);
-
-            void** stack = static_cast<void**>(real_stack) + (EXEC_PAGESIZE
-                / sizeof(void*));
-            return static_cast<void*>(stack);
-        }
-        return real_stack;
 #else
-        return real_stack;
-#endif
-    }
-
-    inline void watermark_stack(void* stack, std::size_t size)
-    {
-        HPX_ASSERT(size > EXEC_PAGESIZE);
-
-        // Fill the bottom 8 bytes of the first page with 1s.
-        void** watermark = static_cast<void**>(stack) + ((size - EXEC_PAGESIZE)
-            / sizeof(void*));
-        *watermark = reinterpret_cast<void*>(0xDEADBEEFDEADBEEFull);
-    }
-
-    inline bool reset_stack(void* stack, std::size_t size)
-    {
-        void** watermark = static_cast<void**>(stack) + ((size - EXEC_PAGESIZE)
-            / sizeof(void*));
-
-        // If the watermark has been overwritten, then we've gone past the first
-        // page.
-        if ((reinterpret_cast<void*>(0xDEADBEEFDEADBEEFull)) != *watermark)
-        {
-            // We never free up the first page, as it's initialized only when the
-            // stack is created.
-            ::madvise(stack, size - EXEC_PAGESIZE, MADV_DONTNEED);
-            return true;
-        }
-
-        return false;
-    }
-
-    inline void free_stack(void* stack, std::size_t size)
-    {
-#if defined(HPX_HAVE_THREAD_GUARD_PAGE)
-        if (use_guard_pages) {
-            void** real_stack =
-                static_cast<void**>(stack) - (EXEC_PAGESIZE / sizeof(void*));
-            ::munmap(static_cast<void*>(real_stack), size + EXEC_PAGESIZE);
-        } else {
             ::munmap(stack, size);
-        }
-#else
-        ::munmap(stack, size);
 #endif
-    }
+        }
 
-#else  // non-mmap()
+#else    // non-mmap()
 
-    //this should be a fine default.
-    static const std::size_t stack_alignment =
-        sizeof(void*) > 16 ? sizeof(void*) : 16;
+        //this should be a fine default.
+        static const std::size_t stack_alignment = sizeof(void*) > 16 ?
+            sizeof(void*) :
+            16;
 
-    struct stack_aligner
-    {
-        alignas(stack_alignment) char dummy[stack_alignment];
-    };
+        struct stack_aligner
+        {
+            alignas(stack_alignment) char dummy[stack_alignment];
+        };
 
-    /**
+        /**
      * Stack allocator and deleter functions.
      * Better implementations are possible using
      * mmap (might be required on some systems) and/or
@@ -189,68 +191,79 @@ namespace posix
      * the use of malloc to allocate stacks for makectx.
      * We use new/delete for guaranteed alignment.
      */
-    inline void* alloc_stack(std::size_t size)
-    {
-        return new stack_aligner[size / sizeof(stack_aligner)];
-    }
+        inline void* alloc_stack(std::size_t size)
+        {
+            return new stack_aligner[size / sizeof(stack_aligner)];
+        }
 
-    inline void watermark_stack(void* stack, std::size_t size)
-    {} // no-op
+        inline void watermark_stack(void* stack, std::size_t size) {
+        }    // no-op
 
-    inline bool reset_stack(void* stack, std::size_t size)
-    {
-        return false;
-    }
+        inline bool reset_stack(void* stack, std::size_t size)
+        {
+            return false;
+        }
 
-    inline void free_stack(void* stack, std::size_t size)
-    {
-        delete[] static_cast<stack_aligner*>(stack);
-    }
+        inline void free_stack(void* stack, std::size_t size)
+        {
+            delete[] static_cast<stack_aligner*>(stack);
+        }
 
-#endif  // non-mmap() implementation of alloc_stack()/free_stack()
+#endif    // non-mmap() implementation of alloc_stack()/free_stack()
 
-    /**
+        /**
      * The splitter is needed for 64 bit systems.
      * @note The current implementation does NOT use
      * (for debug reasons).
      * Thus it is not 64 bit clean.
      * Use it for 64 bits systems.
      */
-    template <typename T>
-    union splitter
-    {
-        int int_[2];
-        T* ptr;
-
-        splitter(int first_, int second_)
+        template <typename T>
+        union splitter
         {
-            int_[0] = first_;
-            int_[1] = second_;
+            int int_[2];
+            T* ptr;
+
+            splitter(int first_, int second_)
+            {
+                int_[0] = first_;
+                int_[1] = second_;
+            }
+
+            int first()
+            {
+                return int_[0];
+            }
+
+            int second()
+            {
+                return int_[1];
+            }
+
+            splitter(T* ptr_)
+              : ptr(ptr_)
+            {
+            }
+
+            void operator()()
+            {
+                (*ptr)();
+            }
+        };
+
+        template <typename T>
+        inline void trampoline_split(int first, int second)
+        {
+            splitter<T> split(first, second);
+            split();
         }
 
-        int first() { return int_[0]; }
-
-        int second() { return int_[1]; }
-
-        splitter(T* ptr_) : ptr(ptr_) {}
-
-        void operator()() { (*ptr)(); }
-    };
-
-    template <typename T>
-    inline void trampoline_split(int first, int second)
-    {
-        splitter<T> split(first, second);
-        split();
-    }
-
-    template <typename T>
-    inline void trampoline(void * fun)
-    {
-        (*static_cast<T *>(fun))();
-    }
-}
-}}}}
+        template <typename T>
+        inline void trampoline(void* fun)
+        {
+            (*static_cast<T*>(fun))();
+        }
+}}}}}    // namespace hpx::threads::coroutines::detail::posix
 
 #else
 #error This header can only be included when compiling for posix systems.

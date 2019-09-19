@@ -33,19 +33,14 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace threads
-{
-    namespace coroutines
-    {
-        namespace detail
-        {
-            class coroutine_self;
+namespace hpx { namespace threads { namespace coroutines {
+    namespace detail {
+        class coroutine_self;
 
-            class coroutine_impl;
-        }
+        class coroutine_impl;
+    }    // namespace detail
 
-        class coroutine;
-    }
-}}
+    class coroutine;
+}}}    // namespace hpx::threads::coroutines
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_COROUTINE_FWD_HPP*/

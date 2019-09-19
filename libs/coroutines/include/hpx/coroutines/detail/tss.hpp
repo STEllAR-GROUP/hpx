@@ -20,8 +20,7 @@
 #include <memory>
 #include <utility>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
+namespace hpx { namespace threads { namespace coroutines { namespace detail {
     //////////////////////////////////////////////////////////////////////////
     struct tss_cleanup_function
     {
@@ -40,24 +39,27 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     public:
         tss_data_node()
           : value_(nullptr)
-        {}
+        {
+        }
 
         tss_data_node(void* val)
-          : func_(),
-            value_(val)
-        {}
+          : func_()
+          , value_(val)
+        {
+        }
 
         tss_data_node(std::shared_ptr<tss_cleanup_function> f, void* val)
-          : func_(f),
-            value_(val)
-        {}
+          : func_(f)
+          , value_(val)
+        {
+        }
 
         tss_data_node(tss_data_node const&) = delete;
         tss_data_node& operator=(tss_data_node const&) = delete;
 
         tss_data_node(tss_data_node&& other)
-          : func_(std::move(other.func_)),
-            value_(other.value_)
+          : func_(std::move(other.func_))
+          , value_(other.value_)
         {
             other.value_ = nullptr;
         }
@@ -94,8 +96,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         void cleanup(bool cleanup_existing = true);
 
-        void reinit(std::shared_ptr<tss_cleanup_function> const& f,
-            void* data, bool cleanup_existing)
+        void reinit(std::shared_ptr<tss_cleanup_function> const& f, void* data,
+            bool cleanup_existing)
         {
             cleanup(cleanup_existing);
             func_ = f;
@@ -130,13 +132,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
     public:
-        tss_storage()
-        {
-        }
+        tss_storage() {}
 
-        ~tss_storage()
-        {
-        }
+        ~tss_storage() {}
 
         std::size_t get_thread_data() const
         {
@@ -164,7 +162,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         void insert(void const* key, void* tss_data)
         {
             std::shared_ptr<tss_cleanup_function> func;
-            insert(key, func, tss_data); //-V614
+            insert(key, func, tss_data);    //-V614
         }
 
         void erase(void const* key, bool cleanup_existing)
@@ -190,8 +188,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     HPX_EXPORT void add_new_tss_node(void const* key,
         std::shared_ptr<tss_cleanup_function> const& func, void* tss_data);
 
-    HPX_EXPORT void erase_tss_node(void const* key,
-        bool cleanup_existing = false);
+    HPX_EXPORT void erase_tss_node(
+        void const* key, bool cleanup_existing = false);
 
     HPX_EXPORT void set_tss_data(void const* key,
         std::shared_ptr<tss_cleanup_function> const& func,
@@ -204,7 +202,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     HPX_EXPORT void delete_tss_storage(tss_storage*& storage);
 
     HPX_EXPORT std::size_t get_tss_thread_data(tss_storage* storage);
-    HPX_EXPORT std::size_t set_tss_thread_data(tss_storage* storage, std::size_t);
-}}}}
+    HPX_EXPORT std::size_t set_tss_thread_data(
+        tss_storage* storage, std::size_t);
+}}}}    // namespace hpx::threads::coroutines::detail
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_TSS_HPP*/
