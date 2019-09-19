@@ -348,7 +348,7 @@ The ``hpx.thread_queue`` configuration section
      * Description
    * * ``hpx.thread_queue.min_tasks_to_steal_pending``
      * The value of this property defines the number of pending |hpx| threads
-       which have to be available before neighboring cores are allowed to steal
+       that have to be available before neighboring cores are allowed to steal
        work. The default is to allow stealing always.
    * * ``hpx.thread_queue.min_tasks_to_steal_staged``
      * The value of this property defines the number of staged |hpx| tasks have
@@ -356,15 +356,15 @@ The ``hpx.thread_queue`` configuration section
        The default is to allow stealing only if there are more tan 10 tasks
        available.
    * * ``hpx.thread_queue.min_add_new_count``
-     * The value of this property defines the minimal number tasks to be
+     * The value of this property defines the minimal number of tasks to be
        converted into |hpx| threads whenever the thread queues for a core have
        run empty.
    * * ``hpx.thread_queue.max_add_new_count``
-     * The value of this property defines the maximal number tasks to be
+     * The value of this property defines the maximal number of tasks to be
        converted into |hpx| threads whenever the thread queues for a core have
        run empty.
    * * ``hpx.thread_queue.max_delete_count``
-     * The value of this property defines the number number of terminated |hpx|
+     * The value of this property defines the number of terminated |hpx|
        threads to discard during each invocation of the corresponding function.
 
 The ``hpx.components`` configuration section
@@ -383,7 +383,7 @@ The ``hpx.components`` configuration section
      * Description
    * * ``hpx.components.load_external``
      * This entry defines whether external components will be loaded on this
-       :term:`locality`. This entry normally is set to ``1`` and usually there is
+       :term:`locality`. This entry is normally set to ``1`` and usually there is
        no need to directly change this value. It is automatically set to ``0`` for
        a dedicated :term:`AGAS` server :term:`locality`.
 
@@ -416,11 +416,11 @@ of the components will contain at least the following properties:
        factory.
    * * ``hpx.components.<component_instance_name>.enabled``
      * This setting explicitly enables or disables the component. This is an
-       optional property, |hpx| assumed that the component is enabled if it is
+       optional property. |Hpx| assumes that the component is enabled if it is
        not defined.
 
 The value for ``<component_instance_name>`` is usually the same as for the
-corresponding ``name`` property. However generally it can be defined to any
+corresponding ``name`` property. However, generally it can be defined to any
 arbitrary instance name. It is used to distinguish between different ini
 sections, one for each component.
 
@@ -453,7 +453,7 @@ The ``hpx.parcel`` configuration section
        layer to listen to. This IP address will be used as long as no other
        values are specified (for instance using the :option:`--hpx:hpx` command
        line option). The expected format is any valid IP address or domain name
-       format which can be resolved into an IP address. The default depends on
+       format that can be resolved into an IP address. The default depends on
        the compile time preprocessor constant ``HPX_INITIAL_IP_ADDRESS``
        (``"127.0.0.1"``).
    * * ``hpx.parcel.port``
@@ -468,7 +468,7 @@ The ``hpx.parcel`` configuration section
        preprocessor constant ``HPX_PARCEL_BOOTSTRAP`` (``"tcp"``).
    * * ``hpx.parcel.max_connections``
      * This property defines how many network connections between different
-       localities are overall kept alive by each of :term:`locality`. The
+       localities are overall kept alive by each :term:`locality`. The
        default depends on the compile time preprocessor constant
        ``HPX_PARCEL_MAX_CONNECTIONS`` (``512``).
    * * ``hpx.parcel.max_connections_per_locality``
@@ -477,13 +477,13 @@ The ``hpx.parcel`` configuration section
        on the compile time preprocessor constant
        ``HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY`` (``4``).
    * * ``hpx.parcel.max_message_size``
-     * This property defines the maximum allowed message size which will be
+     * This property defines the maximum allowed message size that will be
        transferrable through the :term:`parcel` layer. The default depends on the
        compile time preprocessor constant ``HPX_PARCEL_MAX_MESSAGE_SIZE``
        (``1000000000`` bytes).
    * * ``hpx.parcel.max_outbound_message_size``
      * This property defines the maximum allowed outbound coalesced message size
-       which will be transferrable through the parcel layer. The default depends
+       that will be transferrable through the parcel layer. The default depends
        on the compile time preprocessor constant
        ``HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE`` (``1000000`` bytes).
    * * ``hpx.parcel.array_optimization``
@@ -524,7 +524,7 @@ The following settings relate to the TCP/IP parcelport.
    * * Property
      * Description
    * * ``hpx.parcel.tcp.enable``
-     * Enable the use of the default TCP parcelport. Note that the initial
+     * Enables the use of the default TCP parcelport. Note that the initial
        bootstrap of the overall |hpx| application will be performed using the
        default TCP connections. This parcelport is enabled by default. This will
        be disabled only if MPI is enabled (see below).
@@ -549,19 +549,19 @@ The following settings relate to the TCP/IP parcelport.
        taken from ``hpx.threadpools.parcel_pool_size``.
    * * ``hpx.parcel.tcp.max_connections``
      * This property defines how many network connections between different
-       localities are overall kept alive by each of :term:`locality`. The
+       localities are overall kept alive by each :term:`locality`. The
        default is taken from ``hpx.parcel.max_connections``.
    * * ``hpx.parcel.tcp.max_connections_per_locality``
      * This property defines the maximum number of network connections that one
        :term:`locality` will open to another :term:`locality`. The default is
        taken from ``hpx.parcel.max_connections_per_locality``.
    * * ``hpx.parcel.tcp.max_message_size``
-     * This property defines the maximum allowed message size which will be
+     * This property defines the maximum allowed message size that will be
        transferrable through the :term:`parcel` layer. The default is taken from
        ``hpx.parcel.max_message_size``.
    * * ``hpx.parcel.tcp.max_outbound_message_size``
      * This property defines the maximum allowed outbound coalesced message size
-       which will be transferrable through the :term:`parcel` layer. The default is
+       that will be transferrable through the :term:`parcel` layer. The default is
        taken from ``hpx.parcel.max_outbound_connections``.
 
 The following settings relate to the MPI parcelport. These settings take effect
