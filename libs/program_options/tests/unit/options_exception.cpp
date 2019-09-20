@@ -24,9 +24,12 @@ using namespace std;
 void test_ambiguous()
 {
     options_description desc;
-    desc.add_options()("cfgfile,c", value<string>()->multitoken(),
-        "the config file")("output,c", value<string>(), "the output file")(
-        "output,o", value<string>(), "the output file");
+    // clang-format off
+    desc.add_options()
+        ("cfgfile,c", value<string>()->multitoken(), "the config file")
+        ("output,c", value<string>(), "the output file")
+        ("output,o", value<string>(), "the output file");
+    // clang-format on
 
     const char* cmdline[] = {"program", "-c", "file", "-o", "anotherfile"};
 
@@ -49,9 +52,11 @@ void test_ambiguous()
 void test_ambiguous_long()
 {
     options_description desc;
-    desc.add_options()("cfgfile,c", value<string>()->multitoken(),
-        "the config file")("output,c", value<string>(), "the output file")(
-        "output,o", value<string>(), "the output file");
+    // clang-format off
+    desc.add_options()("cfgfile,c", value<string>()->multitoken(), "the config file")
+        ("output,c", value<string>(), "the output file")
+        ("output,o", value<string>(), "the output file");
+    // clang-format on
 
     const char* cmdline[] = {
         "program", "--cfgfile", "file", "--output", "anotherfile"};
@@ -78,8 +83,11 @@ void test_ambiguous_multiple_long_names()
     (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
     // the long_names() API function was introduced in Boost V1.68
     options_description desc;
-    desc.add_options()("cfgfile,foo,c", value<string>()->multitoken(),
-        "the config file")("output,foo,o", value<string>(), "the output file");
+    // clang-format off
+    desc.add_options()
+        ("cfgfile,foo,c", value<string>()->multitoken(), "the config file")
+        ("output,foo,o", value<string>(), "the output file");
+    // clang-format on
 
     const char* cmdline[] = {"program", "--foo", "file"};
 
