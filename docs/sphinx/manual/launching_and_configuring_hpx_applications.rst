@@ -763,7 +763,7 @@ The ``hpx.commandline`` configuration section
 .............................................
 
 The following table lists the definition of all pre-defined command line option
-shortcuts. For more information about commandline options see the section
+shortcuts. For more information about commandline options, see the section
 :ref:`commandline`.
 
 .. code-block:: ini
