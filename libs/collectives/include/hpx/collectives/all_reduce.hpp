@@ -108,7 +108,7 @@ namespace hpx { namespace lcos {
     ///       \a \<type\>_all_reduce.
     ///
     #define HPX_REGISTER_ALLREDUCE_DECLARATION(type, name)
-    
+
     /// \def HPX_REGISTER_ALLREDUCE(type, name)
     ///
     /// \brief Define a all_reduce object named \a name for a given data type \a type.
