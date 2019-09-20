@@ -9,17 +9,16 @@
 #include <hpx/config.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache { namespace policies
-{
+namespace hpx { namespace util { namespace cache { namespace policies {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Entry>
     struct always
     {
-        bool operator() (Entry const&)
+        bool operator()(Entry const&)
         {
-            return true;      // always true
+            return true;    // always true
         }
     };
-}}}}
+}}}}    // namespace hpx::util::cache::policies
 
 #endif

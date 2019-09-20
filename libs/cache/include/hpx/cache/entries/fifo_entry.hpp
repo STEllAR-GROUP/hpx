@@ -12,8 +12,7 @@
 #include <chrono>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache { namespace entries
-{
+namespace hpx { namespace util { namespace cache { namespace entries {
     ///////////////////////////////////////////////////////////////////////////
     /// \class fifo_entry fifo_entry.hpp hpx/cache/entries/fifo_entry.hpp
     ///
@@ -31,21 +30,21 @@ namespace hpx { namespace util { namespace cache { namespace entries
     ///                   less_than_comparable.
     ///
     template <typename Value>
-    class fifo_entry : public entry<Value, fifo_entry<Value> >
+    class fifo_entry : public entry<Value, fifo_entry<Value>>
     {
     private:
-        typedef entry<Value, fifo_entry<Value> > base_type;
+        typedef entry<Value, fifo_entry<Value>> base_type;
 
     public:
         /// \brief Any cache entry has to be default constructible
-        fifo_entry()
-        {}
+        fifo_entry() {}
 
         /// \brief Construct a new instance of a cache entry holding the given
         ///        value.
         explicit fifo_entry(Value const& val)
           : base_type(val)
-        {}
+        {
+        }
 
         /// \brief    The function \a insert is called by a cache whenever it
         ///           is about to be inserted into the cache.
@@ -68,7 +67,7 @@ namespace hpx { namespace util { namespace cache { namespace entries
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has been created earlier (FIFO).
-        friend bool operator< (fifo_entry const& lhs, fifo_entry const& rhs)
+        friend bool operator<(fifo_entry const& lhs, fifo_entry const& rhs)
         {
             return lhs.get_creation_time() < rhs.get_creation_time();
         }
@@ -76,6 +75,6 @@ namespace hpx { namespace util { namespace cache { namespace entries
     private:
         std::chrono::steady_clock::time_point insertion_time_;
     };
-}}}}
+}}}}    // namespace hpx::util::cache::entries
 
 #endif
