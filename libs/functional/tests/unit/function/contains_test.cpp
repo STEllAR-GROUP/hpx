@@ -13,11 +13,17 @@
 
 #include <functional>
 
-static int forty_two() { return 42; }
+static int forty_two()
+{
+    return 42;
+}
 
 struct Seventeen
 {
-    int operator()() const { return 17; }
+    int operator()() const
+    {
+        return 17;
+    }
 };
 
 //struct ReturnInt
@@ -172,8 +178,8 @@ static void target_test()
 int main(int, char*[])
 {
     target_test();
-//    equal_test();
-//    ref_equal_test();
+    //    equal_test();
+    //    ref_equal_test();
 
     return hpx::util::report_errors();
 }

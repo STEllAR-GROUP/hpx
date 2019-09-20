@@ -15,16 +15,22 @@
 
 #include <functional>
 
-struct stateful_type { int operator()(int x) const { return x; } };
+struct stateful_type
+{
+    int operator()(int x) const
+    {
+        return x;
+    }
+};
 
 int main()
 {
     stateful_type a_function_object;
-    hpx::util::function_nonser<int (int)> f;
+    hpx::util::function_nonser<int(int)> f;
 
     f = std::ref(a_function_object);
     HPX_TEST_EQ(f(42), 42);
-    hpx::util::function_nonser<int (int)> f2(f);
+    hpx::util::function_nonser<int(int)> f2(f);
     HPX_TEST_EQ(f2(42), 42);
 
     return hpx::util::report_errors();

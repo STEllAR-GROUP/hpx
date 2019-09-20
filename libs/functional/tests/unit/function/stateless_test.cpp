@@ -18,7 +18,10 @@
 
 struct stateless_integer_add
 {
-    int operator()(int x, int y) const { return x+y; }
+    int operator()(int x, int y) const
+    {
+        return x + y;
+    }
 
     void* operator new(std::size_t)
     {
@@ -30,13 +33,9 @@ struct stateless_integer_add
         return p;
     }
 
-    void operator delete(void*, void*) noexcept
-    {
-    }
+    void operator delete(void*, void*) noexcept {}
 
-    void operator delete(void*) noexcept
-    {
-    }
+    void operator delete(void*) noexcept {}
 };
 
 int main(int, char*[])
