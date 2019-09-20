@@ -9,12 +9,10 @@
 
 #if defined(HPX_PLUGIN_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/plugin/export_plugin.hpp is deprecated, \
+#pragma message("The header hpx/util/plugin/export_plugin.hpp is deprecated, \
     please include hpx/plugin/export_plugin.hpp instead")
 #else
-#warning \
-    "The header hpx/util/plugin/export_plugin.hpp is deprecated, \
+#warning "The header hpx/util/plugin/export_plugin.hpp is deprecated, \
     please include hpx/plugin/export_plugin.hpp instead"
 #endif
 #endif

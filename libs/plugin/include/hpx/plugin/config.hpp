@@ -36,7 +36,7 @@ namespace hpx { namespace util { namespace plugin {
     template <typename T>
     using shared_ptr = boost::shared_ptr<T>;
 
-}}}
+}}}    // namespace hpx::util::plugin
 
 #endif
 

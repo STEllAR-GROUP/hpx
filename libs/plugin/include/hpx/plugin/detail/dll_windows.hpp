@@ -11,7 +11,6 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
-#include <hpx/plugin/config.hpp>
 
 #include <iostream>
 #include <sstream>

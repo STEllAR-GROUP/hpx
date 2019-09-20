@@ -9,12 +9,11 @@
 
 #if defined(HPX_PLUGIN_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/util/plugin/virtual_constructor.hpp is deprecated, \
     please include hpx/plugin/virtual_constructor.hpp instead")
 #else
-#warning \
-    "The header hpx/util/plugin/virtual_constructor.hpp is deprecated, \
+#warning "The header hpx/util/plugin/virtual_constructor.hpp is deprecated, \
     please include hpx/plugin/virtual_constructor.hpp instead"
 #endif
 #endif
