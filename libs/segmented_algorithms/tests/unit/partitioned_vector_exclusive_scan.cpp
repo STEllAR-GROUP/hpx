@@ -231,8 +231,8 @@ void exclusive_scan_algo_tests_inplace_with_policy_async(std::size_t size,
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T, typename DistPolicy>
-void exclusive_scan_tests_with_policy(std::size_t size,
-    DistPolicy const& policy)
+void exclusive_scan_tests_with_policy(
+    std::size_t size, DistPolicy const& policy)
 {
     using namespace hpx::parallel::execution;
 
@@ -291,8 +291,8 @@ void exclusive_scan_tests_segmented_out_with_policy(
 }
 
 template <typename T, typename DistPolicy>
-void exclusive_scan_tests_inplace_with_policy(std::size_t size,
-    DistPolicy const& policy)
+void exclusive_scan_tests_inplace_with_policy(
+    std::size_t size, DistPolicy const& policy)
 {
     using namespace hpx::parallel::execution;
 

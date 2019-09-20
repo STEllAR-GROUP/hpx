@@ -14,8 +14,8 @@
 
 #include <hpx/async.hpp>
 #include <hpx/dataflow.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/lcos/future.hpp>
 
 #include <cstddef>
 #include <exception>

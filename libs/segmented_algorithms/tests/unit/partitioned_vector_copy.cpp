@@ -4,8 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/parallel_copy.hpp>
+#include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/transfer.hpp>
 
 #include <hpx/testing.hpp>
@@ -100,8 +100,8 @@ void copy_algo_tests_with_policy_async(std::size_t size, std::size_t localities,
 }
 
 template <typename T, typename DistPolicy>
-void copy_tests_with_policy(std::size_t size, std::size_t localities,
-    DistPolicy const& policy)
+void copy_tests_with_policy(
+    std::size_t size, std::size_t localities, DistPolicy const& policy)
 {
     hpx::partitioned_vector<T> v1(size, policy);
 
@@ -152,8 +152,8 @@ void copy_tests()
     copy_tests_with_policy<T>(length, 1, hpx::container_layout);
     copy_tests_with_policy<T>(length, 3, hpx::container_layout(3));
     copy_tests_with_policy<T>(length, 3, hpx::container_layout(3, localities));
-    copy_tests_with_policy<T>(length, localities.size(),
-        hpx::container_layout(localities));
+    copy_tests_with_policy<T>(
+        length, localities.size(), hpx::container_layout(localities));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -164,4 +164,3 @@ int main()
 
     return 0;
 }
-

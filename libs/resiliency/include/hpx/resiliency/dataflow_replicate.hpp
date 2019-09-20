@@ -10,8 +10,8 @@
 #if !defined(HPX_RESILIENCY_DATAFLOW_REPLICATE_HPP_2018_OCT_20_0548PM)
 #define HPX_RESILIENCY_DATAFLOW_REPLICATE_HPP_2018_OCT_20_0548PM
 
-#include <hpx/resiliency/async_replicate.hpp>
 #include <hpx/resiliency/config.hpp>
+#include <hpx/resiliency/async_replicate.hpp>
 
 #include <hpx/async.hpp>
 #include <hpx/dataflow.hpp>

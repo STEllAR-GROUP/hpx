@@ -24,12 +24,10 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // segmented_all_any_none
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         /// \cond NOINTERNAL
 
@@ -38,7 +36,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typename F, typename Proj>
         static typename util::detail::algorithm_result<ExPolicy, bool>::type
         segmented_none_of(Algo&& algo, ExPolicy const& policy, FwdIter first,
-            FwdIter last, F&& f, Proj && proj, std::true_type)
+            FwdIter last, F&& f, Proj&& proj, std::true_type)
         {
             typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -102,7 +100,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typename F, typename Proj>
         static typename util::detail::algorithm_result<ExPolicy, bool>::type
         segmented_none_of(Algo&& algo, ExPolicy const& policy, FwdIter first,
-            FwdIter last, F&& f, Proj && proj, std::false_type)
+            FwdIter last, F&& f, Proj&& proj, std::false_type)
         {
             typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -164,8 +162,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             return result::get(dataflow(
-                [=](std::vector<shared_future<bool>>&& r) -> bool
-                {
+                [=](std::vector<shared_future<bool>>&& r) -> bool {
                     // handle any remote exceptions, will throw on error
                     std::list<std::exception_ptr> errors;
                     parallel::util::detail::handle_remote_exceptions<
@@ -183,10 +180,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::move(segments)));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        none_of_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-            Proj && proj, std::true_type)
+        template <typename ExPolicy, typename FwdIter, typename F,
+            typename Proj>
+        typename util::detail::algorithm_result<ExPolicy, bool>::type none_of_(
+            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f, Proj&& proj,
+            std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
@@ -199,10 +197,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 is_seq());
         }
 
-        template <typename ExPolicy, typename FwdIter, typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        none_of_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-            Proj && proj, std::false_type);
+        template <typename ExPolicy, typename FwdIter, typename F,
+            typename Proj>
+        typename util::detail::algorithm_result<ExPolicy, bool>::type none_of_(
+            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f, Proj&& proj,
+            std::false_type);
 
         ///////////////////////////////////////////////////////////////////////
         // sequential remote implementation
@@ -210,7 +209,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typename F, typename Proj>
         static typename util::detail::algorithm_result<ExPolicy, bool>::type
         segmented_any_of(Algo&& algo, ExPolicy const& policy, FwdIter first,
-            FwdIter last, F&& f, Proj && proj, std::true_type)
+            FwdIter last, F&& f, Proj&& proj, std::true_type)
         {
             typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -274,7 +273,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typename F, typename Proj>
         static typename util::detail::algorithm_result<ExPolicy, bool>::type
         segmented_any_of(Algo&& algo, ExPolicy const& policy, FwdIter first,
-            FwdIter last, F&& f, Proj && proj, std::false_type)
+            FwdIter last, F&& f, Proj&& proj, std::false_type)
         {
             typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -336,8 +335,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             return result::get(dataflow(
-                [=](std::vector<shared_future<bool>>&& r) -> bool
-                {
+                [=](std::vector<shared_future<bool>>&& r) -> bool {
                     // handle any remote exceptions, will throw on error
                     std::list<std::exception_ptr> errors;
                     parallel::util::detail::handle_remote_exceptions<
@@ -355,10 +353,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::move(segments)));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        any_of_(ExPolicy&& policy, FwdIter first, FwdIter last, F && f,
-            Proj && proj, std::true_type)
+        template <typename ExPolicy, typename FwdIter, typename F,
+            typename Proj>
+        typename util::detail::algorithm_result<ExPolicy, bool>::type any_of_(
+            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f, Proj&& proj,
+            std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
@@ -371,10 +370,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 is_seq());
         }
 
-        template <typename ExPolicy, typename FwdIter, typename F, typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        any_of_(ExPolicy&& policy, FwdIter first, FwdIter last, F && f,
-            Proj && proj, std::false_type);
+        template <typename ExPolicy, typename FwdIter, typename F,
+            typename Proj>
+        typename util::detail::algorithm_result<ExPolicy, bool>::type any_of_(
+            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f, Proj&& proj,
+            std::false_type);
 
         ///////////////////////////////////////////////////////////////////////
         // sequential remote implementation
@@ -382,7 +382,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typename F, typename Proj>
         static typename util::detail::algorithm_result<ExPolicy, bool>::type
         segmented_all_of(Algo&& algo, ExPolicy const& policy, FwdIter first,
-            FwdIter last, F&& f, Proj && proj, std::true_type)
+            FwdIter last, F&& f, Proj&& proj, std::true_type)
         {
             typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -446,7 +446,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typename F, typename Proj>
         static typename util::detail::algorithm_result<ExPolicy, bool>::type
         segmented_all_of(Algo&& algo, ExPolicy const& policy, FwdIter first,
-            FwdIter last, F&& f, Proj && proj, std::false_type)
+            FwdIter last, F&& f, Proj&& proj, std::false_type)
         {
             typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -508,8 +508,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             return result::get(dataflow(
-                [=](std::vector<shared_future<bool>>&& r) -> bool
-                {
+                [=](std::vector<shared_future<bool>>&& r) -> bool {
                     // handle any remote exceptions, will throw on error
                     std::list<std::exception_ptr> errors;
                     parallel::util::detail::handle_remote_exceptions<
@@ -529,9 +528,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
         template <typename ExPolicy, typename FwdIter, typename F,
             typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        all_of_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
-            Proj && proj, std::true_type)
+        typename util::detail::algorithm_result<ExPolicy, bool>::type all_of_(
+            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f, Proj&& proj,
+            std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
@@ -546,12 +545,12 @@ namespace hpx { namespace parallel { inline namespace v1
 
         template <typename ExPolicy, typename FwdIter, typename F,
             typename Proj>
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        all_of_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
-            Proj && proj, std::false_type);
+        typename util::detail::algorithm_result<ExPolicy, bool>::type all_of_(
+            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f, Proj&& proj,
+            std::false_type);
 
         /// \endcond
-    }
-}}}
+    }    // namespace detail
+}}}      // namespace hpx::parallel::v1
 
 #endif

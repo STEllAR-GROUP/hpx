@@ -4,8 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/parallel_reduce.hpp>
+#include <hpx/include/partitioned_vector_predef.hpp>
 
 #include <hpx/testing.hpp>
 
@@ -21,56 +21,46 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename T>
-T test_reduce(ExPolicy && policy,
-    hpx::partitioned_vector<T> const& xvalues)
+T test_reduce(ExPolicy&& policy, hpx::partitioned_vector<T> const& xvalues)
 {
-    return
-        hpx::parallel::reduce(policy,
-            xvalues.begin(), xvalues.end(),
-            T(1), std::plus<T>()
-        );
+    return hpx::parallel::reduce(
+        policy, xvalues.begin(), xvalues.end(), T(1), std::plus<T>());
 }
 
 template <typename ExPolicy, typename T>
-hpx::future<T>
-test_reduce_async(ExPolicy && policy,
-    hpx::partitioned_vector<T> const& xvalues)
+hpx::future<T> test_reduce_async(
+    ExPolicy&& policy, hpx::partitioned_vector<T> const& xvalues)
 {
-    return
-        hpx::parallel::reduce(policy,
-            xvalues.begin(), xvalues.end(),
-            T(1), std::plus<T>()
-        );
+    return hpx::parallel::reduce(
+        policy, xvalues.begin(), xvalues.end(), T(1), std::plus<T>());
 }
 
 template <typename T>
-void reduce_tests(std::size_t num,
-    hpx::partitioned_vector<T> const& xvalues)
+void reduce_tests(std::size_t num, hpx::partitioned_vector<T> const& xvalues)
 {
     HPX_TEST_EQ(
-        test_reduce(hpx::parallel::execution::seq, xvalues),
-        T(num + 1));
+        test_reduce(hpx::parallel::execution::seq, xvalues), T(num + 1));
     HPX_TEST_EQ(
-        test_reduce(hpx::parallel::execution::par, xvalues),
-        T(num + 1));
+        test_reduce(hpx::parallel::execution::par, xvalues), T(num + 1));
 
-    HPX_TEST_EQ(
-        test_reduce_async(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            xvalues).get(),
+    HPX_TEST_EQ(test_reduce_async(hpx::parallel::execution::seq(
+                                      hpx::parallel::execution::task),
+                    xvalues)
+                    .get(),
         T(num + 1));
-    HPX_TEST_EQ(
-        test_reduce_async(
-            hpx::parallel::execution::par(hpx::parallel::execution::task),
-            xvalues).get(),
+    HPX_TEST_EQ(test_reduce_async(hpx::parallel::execution::par(
+                                      hpx::parallel::execution::task),
+                    xvalues)
+                    .get(),
         T(num + 1));
 }
 
 template <typename T>
-void reduce_tests(std::vector<hpx::id_type> &localities)
+void reduce_tests(std::vector<hpx::id_type>& localities)
 {
     std::size_t const num = 10007;
-    hpx::partitioned_vector<T> xvalues(num, T(1),hpx::container_layout(localities));
+    hpx::partitioned_vector<T> xvalues(
+        num, T(1), hpx::container_layout(localities));
     reduce_tests(num, xvalues);
 }
 

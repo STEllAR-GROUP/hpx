@@ -110,8 +110,8 @@ struct validate_exception : std::exception
 {
 };
 
-chk_vector update(subdomain_future left_input,
-    subdomain_future center_input, subdomain_future right_input)
+chk_vector update(subdomain_future left_input, subdomain_future center_input,
+    subdomain_future right_input)
 {
     const auto left = left_input.get();
     const auto center = center_input.get();
