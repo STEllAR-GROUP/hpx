@@ -3,7 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/testing.hpp>
 
@@ -18,13 +17,13 @@ struct foo
 int main()
 {
     {
-        hpx::util::function<int()> fun = foo();
+        hpx::util::function_nonser<int()> fun = foo();
 
         HPX_TEST(fun.target<foo>() != nullptr);
     }
 
     {
-        hpx::util::function<int()> fun = foo();
+        hpx::util::function_nonser<int()> fun = foo();
 
         HPX_TEST(fun.target<foo const>() != nullptr);
     }

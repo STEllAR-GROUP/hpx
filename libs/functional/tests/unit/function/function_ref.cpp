@@ -11,8 +11,6 @@
 
 // For more information, see http://www.boost.org
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
 #include <hpx/functional/function_ref.hpp>
 #include <hpx/testing.hpp>
 

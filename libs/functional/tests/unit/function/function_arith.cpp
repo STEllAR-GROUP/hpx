@@ -10,8 +10,7 @@
 
 // For more information, see http://www.boost.org/
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/testing.hpp>
 
 float mul_ints(int x, int y) { return ((float)x) * y; }

@@ -10,7 +10,6 @@
 
 // For more information, see http://www.boost.org
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/functional/function.hpp>
 
@@ -75,8 +74,7 @@ struct DoNothing: base
 
 static void do_nothing() {}
 
-int
-    test_main(int, char*[])
+int main(int, char*[])
 {
     hpx::util::function_nonser<int(int, int)> f;
     f.assign( plus_int<disable_small_object_optimization>(), counting_allocator<int>() );
@@ -136,5 +134,5 @@ int
     fv.assign(&do_nothing, std::allocator<int>() );
     fv2.assign(fv, std::allocator<int>() );
 
-    return 0;
+    return hpx::util::report_errors();
 }
