@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 
+// clang-format off
 #if defined(HPX_MSVC)
   #include <hpx/hardware/timestamp/msvc.hpp>
 #elif defined(__amd64__) || defined(__amd64) || defined(__x86_64__) ||         \
@@ -41,7 +42,6 @@
 #else
     #error Unsupported platform.
 #endif
+// clang-format on
 
-#endif // HPX_E19D2797_B133_4BDB_8E25_2DD9BDE7E093
-
-
+#endif    // HPX_E19D2797_B133_4BDB_8E25_2DD9BDE7E093
