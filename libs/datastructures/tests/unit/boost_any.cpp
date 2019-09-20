@@ -5,9 +5,9 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/datastructures/any.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/datastructures/any.hpp>
 
 #include "small_big_object.hpp"
 
@@ -36,8 +36,7 @@ namespace any_tests    // test suite
         void (*test_func)();
     };
 
-    const test_case test_cases[] = {
-        {"default construction", test_default_ctor},
+    const test_case test_cases[] = {{"default construction", test_default_ctor},
         {"single argument construction", test_converting_ctor},
         {"copy construction", test_copy_ctor},
         {"copy assignment operator", test_copy_assign},
@@ -105,8 +104,8 @@ namespace std {
 
 namespace any_tests    // test definitions
 {
-    using hpx::util::any_nonser;
     using hpx::util::any_cast;
+    using hpx::util::any_nonser;
 
     void test_default_ctor()
     {
@@ -115,8 +114,8 @@ namespace any_tests    // test definitions
         HPX_TEST_MSG(!value.has_value(), "empty");
         HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
             "any_cast<int>");
-        HPX_TEST_EQ_MSG(value.type(),
-            typeid(hpx::util::detail::any::empty), "type");
+        HPX_TEST_EQ_MSG(
+            value.type(), typeid(hpx::util::detail::any::empty), "type");
     }
 
     void test_converting_ctor()
