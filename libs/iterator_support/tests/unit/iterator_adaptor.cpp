@@ -5,10 +5,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/testing.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/hpx_main.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
+#include <hpx/testing.hpp>
 
 #include "iterator_tests.hpp"
 
@@ -29,9 +29,7 @@ struct mult_functor
     // DefaultConstructible, as the transform_iterator must be
     // DefaultConstructible to satisfy the requirements for
     // TrivialIterator.
-    mult_functor()
-    {
-    }
+    mult_functor() {}
     mult_functor(int aa)
       : a(aa)
     {
@@ -74,9 +72,7 @@ typedef std::set<storage::iterator> iterator_set;
 template <class T>
 struct foo;
 
-void blah(int)
-{
-}
+void blah(int) {}
 
 struct my_gen
 {
@@ -97,18 +93,16 @@ struct my_gen
 
 template <typename V>
 struct ptr_iterator
-  : hpx::util::iterator_adaptor<
-        ptr_iterator<V>, V*, V, std::random_access_iterator_tag>
+  : hpx::util::iterator_adaptor<ptr_iterator<V>, V*, V,
+        std::random_access_iterator_tag>
 {
 private:
-    typedef hpx::util::iterator_adaptor<
-            ptr_iterator<V>, V*, V, std::random_access_iterator_tag
-        > base_adaptor_type;
+    typedef hpx::util::iterator_adaptor<ptr_iterator<V>, V*, V,
+        std::random_access_iterator_tag>
+        base_adaptor_type;
 
 public:
-    ptr_iterator()
-    {
-    }
+    ptr_iterator() {}
 
     ptr_iterator(V* d)
       : base_adaptor_type(d)
@@ -117,9 +111,8 @@ public:
 
     template <typename V2>
     ptr_iterator(const ptr_iterator<V2>& x,
-            typename std::enable_if<
-                std::is_convertible<V2*, V*>::value
-            >::type* = nullptr)
+        typename std::enable_if<std::is_convertible<V2*, V*>::value>::type* =
+            nullptr)
       : base_adaptor_type(x.base())
     {
     }
@@ -128,25 +121,23 @@ public:
 // Non-functional iterator for category modification checking
 template <typename Iter, typename Category>
 struct modify_traversal
-  : hpx::util::iterator_adaptor<
-        modify_traversal<Iter, Category>, Iter, void, Category>
+  : hpx::util::iterator_adaptor<modify_traversal<Iter, Category>, Iter, void,
+        Category>
 {
 };
 
 template <typename T>
 struct fwd_iterator
-  : hpx::util::iterator_adaptor<
-        fwd_iterator<T>, tests::forward_iterator_archetype<T> >
+  : hpx::util::iterator_adaptor<fwd_iterator<T>,
+        tests::forward_iterator_archetype<T>>
 {
 private:
-    typedef hpx::util::iterator_adaptor<
-            fwd_iterator<T>, tests::forward_iterator_archetype<T>
-        > base_adaptor_type;
+    typedef hpx::util::iterator_adaptor<fwd_iterator<T>,
+        tests::forward_iterator_archetype<T>>
+        base_adaptor_type;
 
 public:
-    fwd_iterator()
-    {
-    }
+    fwd_iterator() {}
 
     fwd_iterator(tests::forward_iterator_archetype<T> d)
       : base_adaptor_type(d)
@@ -156,18 +147,16 @@ public:
 
 template <typename T>
 struct in_iterator
-  : hpx::util::iterator_adaptor<
-        in_iterator<T>, tests::input_iterator_archetype_no_proxy<T> >
+  : hpx::util::iterator_adaptor<in_iterator<T>,
+        tests::input_iterator_archetype_no_proxy<T>>
 {
 private:
-    typedef hpx::util::iterator_adaptor<
-            in_iterator<T>, tests::input_iterator_archetype_no_proxy<T>
-        > base_adaptor_type;
+    typedef hpx::util::iterator_adaptor<in_iterator<T>,
+        tests::input_iterator_archetype_no_proxy<T>>
+        base_adaptor_type;
 
 public:
-    in_iterator()
-    {
-    }
+    in_iterator() {}
     in_iterator(tests::input_iterator_archetype_no_proxy<T> d)
       : base_adaptor_type(d)
     {
@@ -176,19 +165,14 @@ public:
 
 template <typename Iter>
 struct constant_iterator
-    : hpx::util::iterator_adaptor<
-            constant_iterator<Iter>, Iter,
-            typename std::iterator_traits<Iter>::value_type const
-      >
+  : hpx::util::iterator_adaptor<constant_iterator<Iter>, Iter,
+        typename std::iterator_traits<Iter>::value_type const>
 {
-    typedef hpx::util::iterator_adaptor<
-            constant_iterator<Iter>, Iter,
-            typename std::iterator_traits<Iter>::value_type const
-        > base_adaptor_type;
+    typedef hpx::util::iterator_adaptor<constant_iterator<Iter>, Iter,
+        typename std::iterator_traits<Iter>::value_type const>
+        base_adaptor_type;
 
-    constant_iterator()
-    {
-    }
+    constant_iterator() {}
     constant_iterator(Iter it)
       : base_adaptor_type(it)
     {
@@ -197,10 +181,9 @@ struct constant_iterator
 
 int main()
 {
-    tests::dummy_type array[] = {
-        tests::dummy_type(0), tests::dummy_type(1), tests::dummy_type(2),
-        tests::dummy_type(3), tests::dummy_type(4), tests::dummy_type(5)
-    };
+    tests::dummy_type array[] = {tests::dummy_type(0), tests::dummy_type(1),
+        tests::dummy_type(2), tests::dummy_type(3), tests::dummy_type(4),
+        tests::dummy_type(5)};
     const int N = sizeof(array) / sizeof(tests::dummy_type);
 
     // sanity check, if this doesn't pass the test is buggy
@@ -237,8 +220,8 @@ int main()
         HPX_TEST((std::is_same<Iter1::value_type, int>::value));
         HPX_TEST((std::is_same<Iter1::reference, const int&>::value));
 
-//         HPX_TEST(boost::is_readable_iterator<Iter1>::value);
-//         HPX_TEST(boost::is_lvalue_iterator<Iter1>::value);
+        //HPX_TEST(boost::is_readable_iterator<Iter1>::value);
+        //HPX_TEST(boost::is_lvalue_iterator<Iter1>::value);
 
         HPX_TEST((std::is_same<Iter1::pointer, int const*>::value));
     }
@@ -254,18 +237,16 @@ int main()
         HPX_TEST((std::is_same<Iter::reference, int const&>::value));
         HPX_TEST((std::is_same<Iter::pointer, int const*>::value));
 
-//         HPX_TEST(boost::is_non_const_lvalue_iterator<BaseIter>::value);
-//         HPX_TEST(boost::is_lvalue_iterator<Iter>::value);
+        //HPX_TEST(boost::is_non_const_lvalue_iterator<BaseIter>::value);
+        //HPX_TEST(boost::is_lvalue_iterator<Iter>::value);
 
         typedef modify_traversal<BaseIter, std::input_iterator_tag>
             IncrementableIter;
 
-        HPX_TEST((std::is_same<
-                BaseIter::iterator_category, std::random_access_iterator_tag
-            >::value));
-        HPX_TEST((std::is_same<
-                IncrementableIter::iterator_category, std::input_iterator_tag
-            >::value));
+        HPX_TEST((std::is_same<BaseIter::iterator_category,
+            std::random_access_iterator_tag>::value));
+        HPX_TEST((std::is_same<IncrementableIter::iterator_category,
+            std::input_iterator_tag>::value));
     }
 
     // Test the iterator_adaptor
@@ -310,10 +291,8 @@ int main()
         typedef ptr_iterator<int> BaseIter;
 
         HPX_TEST((std::is_same<BaseIter::base_type, int*>::value));
-        HPX_TEST((std::is_same<
-                constant_iterator<BaseIter>::base_type,
-                BaseIter
-            >::value));
+        HPX_TEST((std::is_same<constant_iterator<BaseIter>::base_type,
+            BaseIter>::value));
 
         typedef modify_traversal<BaseIter, std::forward_iterator_tag>
             IncrementableIter;
