@@ -56,6 +56,6 @@ namespace hpx { namespace assertion { namespace detail {
 #endif
     }
 
-}}}
+}}}    // namespace hpx::assertion::detail
 
 #endif
