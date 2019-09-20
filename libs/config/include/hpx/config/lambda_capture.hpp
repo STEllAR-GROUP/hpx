@@ -20,11 +20,11 @@
 #include <utility>
 
 #if defined(HPX_HAVE_CXX14_LAMBDAS)
-#define HPX_CAPTURE_FORWARD(var)  var = std::forward<decltype(var)>(var)
-#define HPX_CAPTURE_MOVE(var)     var = std::move(var)
+#define HPX_CAPTURE_FORWARD(var) var = std::forward<decltype(var)>(var)
+#define HPX_CAPTURE_MOVE(var) var = std::move(var)
 #else
-#define HPX_CAPTURE_FORWARD(var)  var
-#define HPX_CAPTURE_MOVE(var)     var
+#define HPX_CAPTURE_FORWARD(var) var
+#define HPX_CAPTURE_MOVE(var) var
 #endif
 #endif
 

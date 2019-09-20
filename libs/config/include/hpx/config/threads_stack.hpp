@@ -8,12 +8,13 @@
 #ifndef HPX_CONFIG_THREADS_STACK_HPP
 #define HPX_CONFIG_THREADS_STACK_HPP
 
+#include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/debug.hpp>
 #include <hpx/config/defines.hpp>
-#include <hpx/config/compiler_specific.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 
+// clang-format off
 #if !defined(HPX_THREADS_STACK_OVERHEAD)
 #  if defined(HPX_DEBUG)
 #    if defined(HPX_GCC_VERSION)
@@ -67,5 +68,6 @@
 #if !defined(HPX_HUGE_STACK_SIZE)
 #  define HPX_HUGE_STACK_SIZE     0x2000000       // 32MByte
 #endif
+// clang-format on
 
 #endif

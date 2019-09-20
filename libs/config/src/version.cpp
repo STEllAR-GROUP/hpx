@@ -11,10 +11,9 @@
 #include <hpx/preprocessor/stringize.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     HPX_EXPORT char const HPX_CHECK_VERSION[] =
         HPX_PP_STRINGIZE(HPX_CHECK_VERSION);
     HPX_EXPORT char const HPX_CHECK_BOOST_VERSION[] =
         HPX_PP_STRINGIZE(HPX_CHECK_BOOST_VERSION);
-}
+}    // namespace hpx

@@ -20,6 +20,7 @@
 #include <ciso646>
 #endif
 
+// clang-format off
 #if defined(__has_feature)
 #  if __has_feature(cxx_thread_local)
 #    define HPX_NATIVE_TLS thread_local
@@ -41,6 +42,7 @@
 #    error "Native thread local storage is not supported for this platform, please undefine HPX_HAVE_NATIVE_TLS"
 #  endif
 #endif
+// clang-format on
 #endif
 
 #endif

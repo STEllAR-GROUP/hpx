@@ -13,6 +13,7 @@
 #define HPX_FORCEINLINE
 #else
 
+// clang-format off
 #if !defined(HPX_FORCEINLINE)
 #   if defined(__NVCC__) || defined(__CUDACC__)
 #       define HPX_FORCEINLINE inline
@@ -24,7 +25,7 @@
 #       define HPX_FORCEINLINE inline
 #   endif
 #endif
+// clang-format on
 #endif
-
 
 #endif
