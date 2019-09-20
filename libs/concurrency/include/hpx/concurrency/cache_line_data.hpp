@@ -73,7 +73,8 @@ namespace hpx {
             Data data_;
 
             //  cppcheck-suppress unusedVariable
-            char cacheline_pad[detail::get_cache_line_padding_size(sizeof(Data))];
+            char cacheline_pad[detail::get_cache_line_padding_size(
+                sizeof(Data))];
         };
 #else
         template <typename Data>
@@ -83,7 +84,8 @@ namespace hpx {
             Data data_;
 
             // cppcheck-suppress unusedVariable
-            char cacheline_pad[detail::get_cache_line_padding_size(sizeof(Data))];
+            char cacheline_pad[detail::get_cache_line_padding_size(
+                sizeof(Data))];
         };
 #endif
 
