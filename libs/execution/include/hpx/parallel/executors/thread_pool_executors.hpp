@@ -16,8 +16,7 @@
 #include <hpx/parallel/executors/thread_timed_execution.hpp>
 #include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
     /// Creates a new local_queue_executor
@@ -66,6 +65,6 @@ namespace hpx { namespace parallel { namespace execution
     using static_priority_queue_executor =
         threads::executors::static_priority_queue_executor;
 #endif
-}}}
+}}}    // namespace hpx::parallel::execution
 
 #endif

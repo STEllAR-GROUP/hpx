@@ -18,34 +18,31 @@
 
 #include <Vc/Vc>
 
-namespace hpx { namespace parallel { namespace traits
-{
+namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    std::size_t count_bits(Vc::Mask<T, Abi> const& mask)
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(
+        Vc::Mask<T, Abi> const& mask)
     {
         return mask.count();
     }
-}}}
+}}}    // namespace hpx::parallel::traits
 
 #else
 
 #include <Vc/datapar>
 
-namespace hpx { namespace parallel { namespace traits
-{
+namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    std::size_t count_bits(Vc::mask<T, Abi> const& mask)
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(
+        Vc::mask<T, Abi> const& mask)
     {
         return Vc::popcount(mask);
     }
-}}}
+}}}    // namespace hpx::parallel::traits
 
-#endif  // Vc_IS_VERSION_1
+#endif    // Vc_IS_VERSION_1
 
 #endif
 #endif
-

@@ -16,8 +16,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     /// Iterations are dynamically assigned to threads in blocks as threads
     /// request them until no blocks remain to be assigned. Similar to
@@ -41,28 +40,27 @@ namespace hpx { namespace parallel { namespace execution
         ///                     schedule together.
         ///                     The default minimal chunk size is 1.
         ///
-        HPX_CONSTEXPR explicit
-        guided_chunk_size(std::size_t min_chunk_size = 1)
+        HPX_CONSTEXPR explicit guided_chunk_size(std::size_t min_chunk_size = 1)
           : min_chunk_size_(min_chunk_size)
-        {}
+        {
+        }
 
         /// \cond NOINTERNAL
         // This executor parameters type provides variable chunk sizes and
         // needs to be invoked for each of the chunks to be combined.
         typedef std::true_type has_variable_chunk_size;
 
-//         template <typename Executor>
-//         static std::size_t get_maximal_number_of_chunks(
-//             Executor && exec, std::size_t cores, std:size_t num_tasks)
-//         {
-//             // FIXME: find appropriate approximation
-//             return ...;
-//         }
+        //         template <typename Executor>
+        //         static std::size_t get_maximal_number_of_chunks(
+        //             Executor && exec, std::size_t cores, std:size_t num_tasks)
+        //         {
+        //             // FIXME: find appropriate approximation
+        //             return ...;
+        //         }
 
         template <typename Executor, typename F>
-        HPX_CONSTEXPR std::size_t
-        get_chunk_size(Executor && exec, F &&, std::size_t cores,
-            std::size_t num_tasks) const
+        HPX_CONSTEXPR std::size_t get_chunk_size(Executor&& exec, F&&,
+            std::size_t cores, std::size_t num_tasks) const
         {
             return (std::max)(min_chunk_size_, (num_tasks + cores - 1) / cores);
         }
@@ -73,9 +71,9 @@ namespace hpx { namespace parallel { namespace execution
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
-            ar & min_chunk_size_;
+            ar& min_chunk_size_;
         }
         /// \endcond
 
@@ -84,16 +82,16 @@ namespace hpx { namespace parallel { namespace execution
         std::size_t min_chunk_size_;
         /// \endcond
     };
-}}}
+}}}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <>
     struct is_executor_parameters<parallel::execution::guided_chunk_size>
       : std::true_type
-    {};
+    {
+    };
     /// \endcond
-}}}
+}}}    // namespace hpx::parallel::execution
 
 #endif

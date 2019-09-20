@@ -176,28 +176,26 @@ namespace hpx { namespace threads {
     bulk_then_execute(Executor&& exec, F&& f, Shape const& shape,
         Future&& predecessor, Ts&&... ts)
     {
-        typedef typename parallel::execution::detail::then_bulk_function_result<
-                F, Shape, Future, Ts...
-            >::type func_result_type;
+        typedef
+            typename parallel::execution::detail::then_bulk_function_result<F,
+                Shape, Future, Ts...>::type func_result_type;
 
-        typedef std::vector<hpx::lcos::future<func_result_type> > result_type;
+        typedef std::vector<hpx::lcos::future<func_result_type>> result_type;
 
         auto func =
             parallel::execution::detail::make_fused_bulk_async_execute_helper<
-                result_type
-            >(exec, std::forward<F>(f), shape,
+                result_type>(exec, std::forward<F>(f), shape,
                 hpx::util::make_tuple(std::forward<Ts>(ts)...));
 
         // void or std::vector<func_result_type>
-        typedef typename parallel::execution::detail::bulk_then_execute_result<
-                F, Shape, Future, Ts...
-            >::type vector_result_type;
+        typedef
+            typename parallel::execution::detail::bulk_then_execute_result<F,
+                Shape, Future, Ts...>::type vector_result_type;
 
         typedef hpx::future<vector_result_type> result_future_type;
 
         typedef typename hpx::traits::detail::shared_state_ptr<
-                result_future_type
-            >::type shared_state_type;
+            result_future_type>::type shared_state_type;
 
         typedef typename std::decay<Future>::type future_type;
 

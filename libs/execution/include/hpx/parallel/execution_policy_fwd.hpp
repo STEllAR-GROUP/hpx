@@ -11,8 +11,7 @@
 #include <hpx/parallel/datapar/execution_policy_fwd.hpp>
 #endif
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     // forward declarations, see execution_policy.hpp
     struct sequenced_policy;
@@ -36,6 +35,6 @@ namespace hpx { namespace parallel { namespace execution
     struct parallel_task_policy_shim;
 
     struct parallel_unsequenced_policy;
-}}}
+}}}    // namespace hpx::parallel::execution
 
 #endif

@@ -14,38 +14,39 @@
 
 #include <type_traits>
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         template <typename Category1, typename Category2>
-        struct is_not_weaker
-          : std::false_type
-        {};
+        struct is_not_weaker : std::false_type
+        {
+        };
 
         template <typename Category>
-        struct is_not_weaker<Category, Category>
-          : std::true_type
-        {};
+        struct is_not_weaker<Category, Category> : std::true_type
+        {
+        };
 
         template <>
         struct is_not_weaker<parallel_execution_tag, unsequenced_execution_tag>
           : std::true_type
-        {};
+        {
+        };
 
         template <>
         struct is_not_weaker<sequenced_execution_tag, unsequenced_execution_tag>
           : std::true_type
-        {};
+        {
+        };
 
         template <>
         struct is_not_weaker<sequenced_execution_tag, parallel_execution_tag>
           : std::true_type
-        {};
+        {
+        };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Rebind the type of executor used by an execution policy. The execution
     /// category of Executor shall not be weaker than that of ExecutionPolicy.
@@ -58,20 +59,16 @@ namespace hpx { namespace parallel { namespace execution
 
         typedef typename ExecutionPolicy::execution_category category1;
         typedef typename hpx::traits::executor_execution_category<
-                executor_type
-            >::type category2;
+            executor_type>::type category2;
 
-        static_assert(
-            detail::is_not_weaker<category2, category1>::value,
-            "detail::is_not_weaker<category2, category1>::value"
-        );
+        static_assert(detail::is_not_weaker<category2, category1>::value,
+            "detail::is_not_weaker<category2, category1>::value");
         /// \endcond
 
         /// The type of the rebound execution policy
-        typedef typename ExecutionPolicy::template rebind<
-                executor_type, parameters_type
-            >::type type;
+        typedef typename ExecutionPolicy::template rebind<executor_type,
+            parameters_type>::type type;
     };
-}}}
+}}}    // namespace hpx::parallel::execution
 
 #endif

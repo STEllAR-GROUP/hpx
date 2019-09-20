@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/datapar.hpp>
 
 #include <iostream>
@@ -40,8 +40,10 @@ void test_transform_exception()
     test_transform_exception(execution::dataseq, IteratorTag());
     test_transform_exception(execution::datapar, IteratorTag());
 
-    test_transform_exception_async(execution::dataseq(execution::task), IteratorTag());
-    test_transform_exception_async(execution::datapar(execution::task), IteratorTag());
+    test_transform_exception_async(
+        execution::dataseq(execution::task), IteratorTag());
+    test_transform_exception_async(
+        execution::datapar(execution::task), IteratorTag());
 }
 
 void transform_exception_test()
@@ -59,8 +61,10 @@ void test_transform_bad_alloc()
     test_transform_bad_alloc(execution::dataseq, IteratorTag());
     test_transform_bad_alloc(execution::datapar, IteratorTag());
 
-    test_transform_bad_alloc_async(execution::dataseq(execution::task), IteratorTag());
-    test_transform_bad_alloc_async(execution::datapar(execution::task), IteratorTag());
+    test_transform_bad_alloc_async(
+        execution::dataseq(execution::task), IteratorTag());
+    test_transform_bad_alloc_async(
+        execution::datapar(execution::task), IteratorTag());
 }
 
 void transform_bad_alloc_test()
@@ -72,7 +76,7 @@ void transform_bad_alloc_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -92,15 +96,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
@@ -108,5 +108,3 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
-
-

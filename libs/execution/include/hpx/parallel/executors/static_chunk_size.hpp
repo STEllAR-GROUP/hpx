@@ -17,8 +17,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     /// Loop iterations are divided into pieces of size \a chunk_size and then
     /// assigned to threads. If \a chunk_size is not specified, the iterations
@@ -37,7 +36,8 @@ namespace hpx { namespace parallel { namespace execution
         ///
         HPX_CONSTEXPR static_chunk_size()
           : chunk_size_(0)
-        {}
+        {
+        }
 
         /// Construct a \a static_chunk_size executor parameters object
         ///
@@ -47,12 +47,13 @@ namespace hpx { namespace parallel { namespace execution
         ///
         HPX_CONSTEXPR explicit static_chunk_size(std::size_t chunk_size)
           : chunk_size_(chunk_size)
-        {}
+        {
+        }
 
         /// \cond NOINTERNAL
         template <typename Executor, typename F>
-        std::size_t get_chunk_size(Executor& exec, F &&, std::size_t cores,
-            std::size_t num_tasks)
+        std::size_t get_chunk_size(
+            Executor& exec, F&&, std::size_t cores, std::size_t num_tasks)
         {
             // use the given chunk size if given
             if (chunk_size_ != 0)
@@ -65,7 +66,7 @@ namespace hpx { namespace parallel { namespace execution
             // by default use static work distribution over number of
             // available compute resources, create four times the number of
             // chunks than we have cores
-            return (num_tasks + 4 * cores - 1) / (4 * cores);   // round up
+            return (num_tasks + 4 * cores - 1) / (4 * cores);    // round up
         }
         /// \endcond
 
@@ -74,9 +75,9 @@ namespace hpx { namespace parallel { namespace execution
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
-            ar & chunk_size_;
+            ar& chunk_size_;
         }
         /// \endcond
 
@@ -85,16 +86,16 @@ namespace hpx { namespace parallel { namespace execution
         std::size_t chunk_size_;
         /// \endcond
     };
-}}}
+}}}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <>
     struct is_executor_parameters<parallel::execution::static_chunk_size>
       : std::true_type
-    {};
+    {
+    };
     /// \endcond
-}}}
+}}}    // namespace hpx::parallel::execution
 
 #endif

@@ -9,18 +9,19 @@
 #if !defined(HPX_PARALLEL_EXECUTORS_EXECUTION_FWD_DEC_23_0712PM)
 #define HPX_PARALLEL_EXECUTORS_EXECUTION_FWD_DEC_23_0712PM
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 #include <hpx/config.hpp>
 #include <hpx/traits/executor_traits.hpp>
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     /// Function invocations executed by a group of sequential execution agents
     /// execute in sequential order.
-    struct sequenced_execution_tag {};
+    struct sequenced_execution_tag
+    {
+    };
 
     /// Function invocations executed by a group of parallel execution agents
     /// execute in unordered fashion. Any such invocations executing in the
@@ -28,7 +29,9 @@ namespace hpx { namespace parallel { namespace execution
     ///
     /// \note \a parallel_execution_tag is weaker than
     ///       \a sequenced_execution_tag.
-    struct parallel_execution_tag {};
+    struct parallel_execution_tag
+    {
+    };
 
     /// Function invocations executed by a group of vector execution agents are
     /// permitted to execute in unordered fashion when executed in different
@@ -37,7 +40,9 @@ namespace hpx { namespace parallel { namespace execution
     ///
     /// \note \a unsequenced_execution_tag is weaker than
     ///       \a parallel_execution_tag.
-    struct unsequenced_execution_tag {};
+    struct unsequenced_execution_tag
+    {
+    };
 
     /// \cond NOINTERNAL
     struct task_policy_tag
@@ -48,26 +53,39 @@ namespace hpx { namespace parallel { namespace execution
 
     ///////////////////////////////////////////////////////////////////////////
     // Define infrastructure for customization points
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
-        struct post_tag {};
-        struct sync_execute_tag {};
-        struct async_execute_tag {};
-        struct then_execute_tag {};
-        struct bulk_sync_execute_tag {};
-        struct bulk_async_execute_tag {};
-        struct bulk_then_execute_tag {};
+        struct post_tag
+        {
+        };
+        struct sync_execute_tag
+        {
+        };
+        struct async_execute_tag
+        {
+        };
+        struct then_execute_tag
+        {
+        };
+        struct bulk_sync_execute_tag
+        {
+        };
+        struct bulk_async_execute_tag
+        {
+        };
+        struct bulk_then_execute_tag
+        {
+        };
 
-        template <typename Executor, typename ... Ts>
+        template <typename Executor, typename... Ts>
         struct undefined_customization_point;
 
         template <typename Tag>
         struct customization_point
         {
-            template <typename Executor, typename ... Ts>
-            auto operator()(Executor && exec, Ts &&... ts) const
-            ->  undefined_customization_point<Executor, Ts...>
+            template <typename Executor, typename... Ts>
+            auto operator()(Executor&& exec, Ts&&... ts) const
+                -> undefined_customization_point<Executor, Ts...>
             {
                 return undefined_customization_point<Executor, Ts...>{};
             }
@@ -84,13 +102,11 @@ namespace hpx { namespace parallel { namespace execution
         T const static_const<T>::value = T{};
 
         /// \endcond
-    }
-
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // Executor customization points
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         template <typename Executor, typename Enable = void>
         struct async_execute_fn_helper;
@@ -113,122 +129,105 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Executor, typename Enable = void>
         struct bulk_then_execute_fn_helper;
         /// \endcond
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // Executor customization point implementations
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
         // bulk_async_execute dispatch point
-        template <typename Executor, typename F, typename Shape, typename ... Ts>
-        HPX_FORCEINLINE auto
-        bulk_async_execute(Executor && exec, F && f, Shape const& shape,
-                Ts &&... ts)
-        ->  typename bulk_async_execute_fn_helper<
-                typename std::decay<Executor>::type
-            >::template result<Executor, F, Shape, Ts...>::type
+        template <typename Executor, typename F, typename Shape, typename... Ts>
+        HPX_FORCEINLINE auto bulk_async_execute(
+            Executor&& exec, F&& f, Shape const& shape, Ts&&... ts) ->
+            typename bulk_async_execute_fn_helper<
+                typename std::decay<Executor>::type>::template result<Executor,
+                F, Shape, Ts...>::type
         {
-            return bulk_async_execute_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    shape, std::forward<Ts>(ts)...);
+            return bulk_async_execute_fn_helper<typename std::decay<
+                Executor>::type>::call(std::forward<Executor>(exec),
+                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
         // async_execute dispatch point
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE auto
-        async_execute(Executor && exec, F && f, Ts &&... ts)
-        ->  typename async_execute_fn_helper<
-                typename std::decay<Executor>::type
-            >::template result<Executor, F, Ts...>::type
+        template <typename Executor, typename F, typename... Ts>
+        HPX_FORCEINLINE auto async_execute(Executor&& exec, F&& f, Ts&&... ts)
+            -> typename async_execute_fn_helper<typename std::decay<
+                Executor>::type>::template result<Executor, F, Ts...>::type
         {
-            return async_execute_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    std::forward<Ts>(ts)...);
+            return async_execute_fn_helper<typename std::decay<
+                Executor>::type>::call(std::forward<Executor>(exec),
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
         // sync_execute dispatch point
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE auto
-        sync_execute(Executor && exec, F && f, Ts &&... ts)
-        ->  typename sync_execute_fn_helper<
-                typename std::decay<Executor>::type
-            >::template result<Executor, F, Ts...>::type
+        template <typename Executor, typename F, typename... Ts>
+        HPX_FORCEINLINE auto sync_execute(Executor&& exec, F&& f, Ts&&... ts) ->
+            typename sync_execute_fn_helper<typename std::decay<
+                Executor>::type>::template result<Executor, F, Ts...>::type
         {
-            return sync_execute_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
+            return sync_execute_fn_helper<typename std::decay<Executor>::type>::
+                call(std::forward<Executor>(exec), std::forward<F>(f),
                     std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
         // post dispatch point
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE auto
-        post(Executor && exec, F && f, Ts &&... ts)
-        ->  typename post_fn_helper<
-                typename std::decay<Executor>::type
-            >::template result<Executor, F, Ts...>::type
+        template <typename Executor, typename F, typename... Ts>
+        HPX_FORCEINLINE auto post(Executor&& exec, F&& f, Ts&&... ts) ->
+            typename post_fn_helper<typename std::decay<Executor>::type>::
+                template result<Executor, F, Ts...>::type
         {
-            return post_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    std::forward<Ts>(ts)...);
+            return post_fn_helper<typename std::decay<Executor>::type>::call(
+                std::forward<Executor>(exec), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
         // bulk_then_execute dispatch point
         template <typename Executor, typename F, typename Shape,
-            typename Future, typename ... Ts>
-        HPX_FORCEINLINE auto
-        bulk_then_execute(Executor && exec, F && f, Shape const& shape,
-                Future&& predecessor, Ts &&... ts)
-        ->  typename bulk_then_execute_fn_helper<
-                typename std::decay<Executor>::type
-            >::template result<Executor, F, Shape, Future, Ts...>::type
+            typename Future, typename... Ts>
+        HPX_FORCEINLINE auto bulk_then_execute(Executor&& exec, F&& f,
+            Shape const& shape, Future&& predecessor, Ts&&... ts) ->
+            typename bulk_then_execute_fn_helper<
+                typename std::decay<Executor>::type>::template result<Executor,
+                F, Shape, Future, Ts...>::type
         {
-            return bulk_then_execute_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    shape, std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
+            return bulk_then_execute_fn_helper<typename std::decay<
+                Executor>::type>::call(std::forward<Executor>(exec),
+                std::forward<F>(f), shape, std::forward<Future>(predecessor),
+                std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
         // bulk_sync_execute dispatch point
-        template <typename Executor, typename F, typename Shape, typename ... Ts>
-        HPX_FORCEINLINE auto
-        bulk_sync_execute(Executor && exec, F && f, Shape const& shape,
-                Ts &&... ts)
-        ->  typename bulk_sync_execute_fn_helper<
-                typename std::decay<Executor>::type
-            >::template result<Executor, F, Shape, Ts...>::type
+        template <typename Executor, typename F, typename Shape, typename... Ts>
+        HPX_FORCEINLINE auto bulk_sync_execute(
+            Executor&& exec, F&& f, Shape const& shape, Ts&&... ts) ->
+            typename bulk_sync_execute_fn_helper<
+                typename std::decay<Executor>::type>::template result<Executor,
+                F, Shape, Ts...>::type
         {
-            return bulk_sync_execute_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    shape, std::forward<Ts>(ts)...);
+            return bulk_sync_execute_fn_helper<typename std::decay<
+                Executor>::type>::call(std::forward<Executor>(exec),
+                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
         // then_execute dispatch point
         template <typename Executor, typename F, typename Future,
-            typename ... Ts>
-        HPX_FORCEINLINE auto
-        then_execute(Executor && exec, F && f, Future&& predecessor,
-                Ts &&... ts)
-        ->  typename then_execute_fn_helper<
-                typename std::decay<Executor>::type
-            >::template result<Executor, F, Future, Ts...>::type
+            typename... Ts>
+        HPX_FORCEINLINE auto then_execute(
+            Executor&& exec, F&& f, Future&& predecessor, Ts&&... ts) ->
+            typename then_execute_fn_helper<
+                typename std::decay<Executor>::type>::template result<Executor,
+                F, Future, Ts...>::type
         {
-            return then_execute_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
+            return then_execute_fn_helper<typename std::decay<Executor>::type>::
+                call(std::forward<Executor>(exec), std::forward<F>(f),
                     std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
         }
 
@@ -274,8 +273,8 @@ namespace hpx { namespace parallel { namespace execution
         public:
             template <typename Executor, typename F, typename Future,
                 typename... Ts>
-            HPX_FORCEINLINE auto operator()(Executor&& exec, F&& f,
-                Future&& predecessor, Ts&&... ts) const
+            HPX_FORCEINLINE auto operator()(
+                Executor&& exec, F&& f, Future&& predecessor, Ts&&... ts) const
                 -> decltype(then_execute(std::forward<Executor>(exec),
                     std::forward<F>(f), std::forward<Future>(predecessor),
                     std::forward<Ts>(ts)...))
@@ -294,13 +293,12 @@ namespace hpx { namespace parallel { namespace execution
         {
         public:
             template <typename Executor, typename F, typename... Ts>
-            HPX_FORCEINLINE auto operator()(
-                Executor&& exec, F&& f, Ts&&... ts) const
-                -> decltype(post(std::forward<Executor>(exec),
-                    std::forward<F>(f), std::forward<Ts>(ts)...))
+            HPX_FORCEINLINE auto operator()(Executor&& exec, F&& f,
+                Ts&&... ts) const -> decltype(post(std::forward<Executor>(exec),
+                std::forward<F>(f), std::forward<Ts>(ts)...))
             {
-                return post(std::forward<Executor>(exec),
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                return post(std::forward<Executor>(exec), std::forward<F>(f),
+                    std::forward<Ts>(ts)...);
             }
         };
 
@@ -312,8 +310,8 @@ namespace hpx { namespace parallel { namespace execution
         public:
             template <typename Executor, typename F, typename Shape,
                 typename... Ts>
-            HPX_FORCEINLINE auto operator()(Executor&& exec, F&& f,
-                Shape const& shape, Ts&&... ts) const
+            HPX_FORCEINLINE auto operator()(
+                Executor&& exec, F&& f, Shape const& shape, Ts&&... ts) const
                 -> decltype(bulk_async_execute(std::forward<Executor>(exec),
                     std::forward<F>(f), shape, std::forward<Ts>(ts)...))
             {
@@ -330,8 +328,8 @@ namespace hpx { namespace parallel { namespace execution
         public:
             template <typename Executor, typename F, typename Shape,
                 typename... Ts>
-            HPX_FORCEINLINE auto operator()(Executor&& exec, F&& f,
-                Shape const& shape, Ts&&... ts) const
+            HPX_FORCEINLINE auto operator()(
+                Executor&& exec, F&& f, Shape const& shape, Ts&&... ts) const
                 -> decltype(bulk_sync_execute(std::forward<Executor>(exec),
                     std::forward<F>(f), shape, std::forward<Ts>(ts)...))
             {
@@ -351,20 +349,19 @@ namespace hpx { namespace parallel { namespace execution
             HPX_FORCEINLINE auto operator()(Executor&& exec, F&& f,
                 Shape const& shape, Future&& predecessor, Ts&&... ts) const
                 -> decltype(bulk_then_execute(std::forward<Executor>(exec),
-                    std::forward<F>(f), shape, std::forward<Future>(predecessor),
-                    std::forward<Ts>(ts)...))
+                    std::forward<F>(f), shape,
+                    std::forward<Future>(predecessor), std::forward<Ts>(ts)...))
             {
                 return bulk_then_execute(std::forward<Executor>(exec),
-                    std::forward<F>(f), shape, std::forward<Future>(predecessor),
-                    std::forward<Ts>(ts)...);
+                    std::forward<F>(f), shape,
+                    std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     // define customization points
-    namespace
-    {
+    namespace {
         ///////////////////////////////////////////////////////////////////////
         // OneWayExecutor customization point: execution::execute
 
@@ -387,8 +384,7 @@ namespace hpx { namespace parallel { namespace execution
         ///
         constexpr detail::customization_point<detail::sync_execute_tag> const&
             sync_execute = detail::static_const<
-                    detail::customization_point<detail::sync_execute_tag>
-                >::value;
+                detail::customization_point<detail::sync_execute_tag>>::value;
 
         ///////////////////////////////////////////////////////////////////////
         // TwoWayExecutor customization points: execution::async_execute,
@@ -420,8 +416,7 @@ namespace hpx { namespace parallel { namespace execution
         ///
         constexpr detail::customization_point<detail::async_execute_tag> const&
             async_execute = detail::static_const<
-                    detail::customization_point<detail::async_execute_tag>
-                >::value;
+                detail::customization_point<detail::async_execute_tag>>::value;
 
         /// Customization point for execution agent creation depending on a
         /// given future.
@@ -445,8 +440,7 @@ namespace hpx { namespace parallel { namespace execution
         ///
         constexpr detail::customization_point<detail::then_execute_tag> const&
             then_execute = detail::static_const<
-                    detail::customization_point<detail::then_execute_tag>
-                >::value;
+                detail::customization_point<detail::then_execute_tag>>::value;
 
         ///////////////////////////////////////////////////////////////////////
         // NonBlockingOneWayExecutor customization point: execution::post
@@ -469,10 +463,9 @@ namespace hpx { namespace parallel { namespace execution
         ///       returned future), and for non-blocking two way executors
         ///       (calls exec.post(f, ts...) if it exists).
         ///
-        constexpr detail::customization_point<detail::post_tag> const&
-            post = detail::static_const<
-                    detail::customization_point<detail::post_tag>
-                >::value;
+        constexpr detail::customization_point<detail::post_tag> const& post =
+            detail::static_const<
+                detail::customization_point<detail::post_tag>>::value;
 
         ///////////////////////////////////////////////////////////////////////
         // BulkTwoWayExecutor customization points:
@@ -513,10 +506,10 @@ namespace hpx { namespace parallel { namespace execution
         ///       exists; otherwise it executes sync_execute(f, shape, ts...)
         ///       as often as needed.
         ///
-        constexpr detail::customization_point<detail::bulk_sync_execute_tag> const&
-            bulk_sync_execute = detail::static_const<
-                    detail::customization_point<detail::bulk_sync_execute_tag>
-                >::value;
+        constexpr detail::customization_point<
+            detail::bulk_sync_execute_tag> const& bulk_sync_execute =
+            detail::static_const<detail::customization_point<
+                detail::bulk_sync_execute_tag>>::value;
 
         /// Bulk form of asynchronous execution agent creation.
         ///
@@ -551,10 +544,10 @@ namespace hpx { namespace parallel { namespace execution
         ///       exists; otherwise it executes async_execute(f, shape, ts...)
         ///       as often as needed.
         ///
-        constexpr detail::customization_point<detail::bulk_async_execute_tag> const&
-            bulk_async_execute = detail::static_const<
-                    detail::customization_point<detail::bulk_async_execute_tag>
-                >::value;
+        constexpr detail::customization_point<
+            detail::bulk_async_execute_tag> const& bulk_async_execute =
+            detail::static_const<detail::customization_point<
+                detail::bulk_async_execute_tag>>::value;
 
         /// Bulk form of execution agent creation depending on a given future.
         ///
@@ -593,12 +586,11 @@ namespace hpx { namespace parallel { namespace execution
         ///       async_execute(f, shape, pred.share(), ts...) (if this executor
         ///       is also a TwoWayExecutor) - as often as needed.
         ///
-        constexpr detail::customization_point<detail::bulk_then_execute_tag> const&
-            bulk_then_execute = detail::static_const<
-                    detail::customization_point<detail::bulk_then_execute_tag>
-                >::value;
-    }
-}}}
+        constexpr detail::customization_point<
+            detail::bulk_then_execute_tag> const& bulk_then_execute =
+            detail::static_const<detail::customization_point<
+                detail::bulk_then_execute_tag>>::value;
+    }    // namespace
+}}}      // namespace hpx::parallel::execution
 
 #endif
-

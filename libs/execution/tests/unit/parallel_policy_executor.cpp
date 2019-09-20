@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/testing.hpp>
 
@@ -28,8 +28,7 @@ void test_sync(bool sync)
     typedef hpx::parallel::execution::parallel_policy_executor<Policy> executor;
 
     executor exec;
-    bool result =
-        hpx::parallel::execution::sync_execute(exec, &test, 42) ==
+    bool result = hpx::parallel::execution::sync_execute(exec, &test, 42) ==
         hpx::this_thread::get_id();
 
     HPX_TEST(sync == result);
@@ -51,9 +50,9 @@ void test_async(bool sync)
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id test_f(hpx::future<void> f, int passed_through)
 {
-    HPX_TEST(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());    // make sure, future is ready
 
-    f.get();                    // propagate exceptions
+    f.get();    // propagate exceptions
 
     HPX_TEST_EQ(passed_through, 42);
     return hpx::this_thread::get_id();
@@ -75,13 +74,13 @@ void test_then(bool sync)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test_s(int value, hpx::thread::id tid, int passed_through) //-V813
+void bulk_test_s(int value, hpx::thread::id tid, int passed_through)    //-V813
 {
     HPX_TEST(tid == hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
-void bulk_test_a(int value, hpx::thread::id tid, int passed_through) //-V813
+void bulk_test_a(int value, hpx::thread::id tid, int passed_through)    //-V813
 {
     HPX_TEST(tid != hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -102,8 +101,8 @@ void test_bulk_sync(bool sync)
 
     executor exec;
     hpx::parallel::execution::bulk_sync_execute(exec,
-        hpx::util::bind(sync ? &bulk_test_s : &bulk_test_a, _1, tid, _2),
-        v, 42);
+        hpx::util::bind(sync ? &bulk_test_s : &bulk_test_a, _1, tid, _2), v,
+        42);
     hpx::parallel::execution::bulk_sync_execute(
         exec, sync ? &bulk_test_s : &bulk_test_a, v, tid, 42);
 }
@@ -125,32 +124,32 @@ void test_bulk_async(bool sync)
     executor exec;
     hpx::when_all(
         hpx::parallel::execution::bulk_async_execute(exec,
-            hpx::util::bind(sync ? &bulk_test_s : &bulk_test_a, _1, tid, _2),
-            v, 42))
+            hpx::util::bind(sync ? &bulk_test_s : &bulk_test_a, _1, tid, _2), v,
+            42))
         .get();
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-        exec, sync ? &bulk_test_s : &bulk_test_a, v, tid, 42)
-    ).get();
+                      exec, sync ? &bulk_test_s : &bulk_test_a, v, tid, 42))
+        .get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void bulk_test_f_s(int value, hpx::shared_future<void> f, hpx::thread::id tid,
-    int passed_through) //-V813
+    int passed_through)    //-V813
 {
-    HPX_TEST(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());    // make sure, future is ready
 
-    f.get();                    // propagate exceptions
+    f.get();    // propagate exceptions
 
     HPX_TEST(tid == hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
 void bulk_test_f_a(int value, hpx::shared_future<void> f, hpx::thread::id tid,
-    int passed_through) //-V813
+    int passed_through)    //-V813
 {
-    HPX_TEST(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());    // make sure, future is ready
 
-    f.get();                    // propagate exceptions
+    f.get();    // propagate exceptions
 
     HPX_TEST(tid != hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -174,11 +173,13 @@ void test_bulk_then(bool sync)
 
     executor exec;
     hpx::parallel::execution::bulk_then_execute(exec,
-        hpx::util::bind(sync ? &bulk_test_f_s : &bulk_test_f_a, _1, _2, tid, _3),
-        v, f, 42) .get();
+        hpx::util::bind(
+            sync ? &bulk_test_f_s : &bulk_test_f_a, _1, _2, tid, _3),
+        v, f, 42)
+        .get();
     hpx::parallel::execution::bulk_then_execute(
-        exec, sync ? &bulk_test_f_s : &bulk_test_f_a, v, f, tid, 42
-    ).get();
+        exec, sync ? &bulk_test_f_s : &bulk_test_f_a, v, f, tid, 42)
+        .get();
 }
 
 template <typename Policy>
@@ -187,26 +188,19 @@ void static_check_executor()
     using namespace hpx::traits;
     using executor = hpx::parallel::execution::parallel_policy_executor<Policy>;
 
-    static_assert(
-        !has_sync_execute_member<executor>::value,
+    static_assert(!has_sync_execute_member<executor>::value,
         "!has_sync_execute_member<executor>::value");
-    static_assert(
-        has_async_execute_member<executor>::value,
+    static_assert(has_async_execute_member<executor>::value,
         "has_async_execute_member<executor>::value");
-    static_assert(
-        has_then_execute_member<executor>::value,
+    static_assert(has_then_execute_member<executor>::value,
         "has_then_execute_member<executor>::value");
-    static_assert(
-        !has_bulk_sync_execute_member<executor>::value,
+    static_assert(!has_bulk_sync_execute_member<executor>::value,
         "!has_bulk_sync_execute_member<executor>::value");
-    static_assert(
-        has_bulk_async_execute_member<executor>::value,
+    static_assert(has_bulk_async_execute_member<executor>::value,
         "has_bulk_async_execute_member<executor>::value");
-    static_assert(
-        has_bulk_then_execute_member<executor>::value,
+    static_assert(has_bulk_then_execute_member<executor>::value,
         "has_bulk_then_execute_member<executor>::value");
-    static_assert(
-        has_post_member<executor>::value,
+    static_assert(has_post_member<executor>::value,
         "check has_post_member<executor>::value");
 }
 
@@ -240,13 +234,11 @@ int hpx_main(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv, cfg), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

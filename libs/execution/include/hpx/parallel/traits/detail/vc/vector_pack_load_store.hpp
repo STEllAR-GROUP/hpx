@@ -22,8 +22,7 @@
 #include <Vc/Vc>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace traits
-{
+namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi, typename NewT>
     struct rebind_pack<Vc::Vector<T, Abi>, NewT>
@@ -46,7 +45,7 @@ namespace hpx { namespace parallel { namespace traits
 
     // don't wrap types twice
     template <typename T, typename Abi1, typename NewT, typename Abi2>
-    struct rebind_pack<Vc::Vector<T, Abi1>, Vc::Vector<NewT, Abi2> >
+    struct rebind_pack<Vc::Vector<T, Abi1>, Vc::Vector<NewT, Abi2>>
     {
         typedef Vc::Vector<NewT, Abi2> type;
     };
@@ -54,13 +53,13 @@ namespace hpx { namespace parallel { namespace traits
     template <typename T, std::size_t N1, typename V1, std::size_t W1,
         typename NewT, std::size_t N2, typename V2, std::size_t W2>
     struct rebind_pack<Vc::SimdArray<T, N1, V1, W1>,
-        Vc::SimdArray<NewT, N2, V2, W2> >
+        Vc::SimdArray<NewT, N2, V2, W2>>
     {
         typedef Vc::SimdArray<NewT, N2, V2, W2> type;
     };
 
     template <typename T, typename NewT>
-    struct rebind_pack<Vc::Scalar::Vector<T>, Vc::Scalar::Vector<NewT> >
+    struct rebind_pack<Vc::Scalar::Vector<T>, Vc::Scalar::Vector<NewT>>
     {
         typedef Vc::Scalar::Vector<NewT> type;
     };
@@ -85,9 +84,9 @@ namespace hpx { namespace parallel { namespace traits
     };
 
     template <typename V, typename T, typename Abi>
-    struct vector_pack_load<V, Vc::Vector<T, Abi> >
+    struct vector_pack_load<V, Vc::Vector<T, Abi>>
     {
-        typedef typename rebind_pack<V, Vc::Vector<T, Abi> >::type value_type;
+        typedef typename rebind_pack<V, Vc::Vector<T, Abi>>::type value_type;
 
         template <typename Iter>
         static value_type aligned(Iter const& iter)
@@ -104,9 +103,9 @@ namespace hpx { namespace parallel { namespace traits
 
     template <typename Value, typename T, std::size_t N, typename V,
         std::size_t W>
-    struct vector_pack_load<Value, Vc::SimdArray<T, N, V, W> >
+    struct vector_pack_load<Value, Vc::SimdArray<T, N, V, W>>
     {
-        typedef typename rebind_pack<Value, Vc::SimdArray<T, N, V, W> >::type
+        typedef typename rebind_pack<Value, Vc::SimdArray<T, N, V, W>>::type
             value_type;
 
         template <typename Iter>
@@ -140,7 +139,7 @@ namespace hpx { namespace parallel { namespace traits
     };
 
     template <typename V, typename T, typename Abi>
-    struct vector_pack_store<V, Vc::Vector<T, Abi> >
+    struct vector_pack_store<V, Vc::Vector<T, Abi>>
     {
         template <typename Iter>
         static void aligned(V const& value, Iter const& iter)
@@ -157,7 +156,7 @@ namespace hpx { namespace parallel { namespace traits
 
     template <typename Value, typename T, std::size_t N, typename V,
         std::size_t W>
-    struct vector_pack_store<Value, Vc::SimdArray<T, N, V, W> >
+    struct vector_pack_store<Value, Vc::SimdArray<T, N, V, W>>
     {
         template <typename Iter>
         static void aligned(Value const& value, Iter const& iter)
@@ -171,15 +170,14 @@ namespace hpx { namespace parallel { namespace traits
             *iter = value;
         }
     };
-}}}
+}}}    // namespace hpx::parallel::traits
 
 #else
 
 #include <Vc/datapar>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace traits
-{
+namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi, typename NewT>
     struct rebind_pack<Vc::datapar<T, Abi>, NewT>
@@ -189,7 +187,7 @@ namespace hpx { namespace parallel { namespace traits
 
     // don't wrap types twice
     template <typename T, typename Abi1, typename NewT, typename Abi2>
-    struct rebind_pack<Vc::datapar<T, Abi1>, Vc::datapar<NewT, Abi2> >
+    struct rebind_pack<Vc::datapar<T, Abi1>, Vc::datapar<NewT, Abi2>>
     {
         typedef Vc::datapar<NewT, Abi2> type;
     };
@@ -199,21 +197,21 @@ namespace hpx { namespace parallel { namespace traits
     struct vector_pack_load
     {
         template <typename Iter>
-        static typename rebind_pack<V, ValueType>::type
-        aligned(Iter const& iter)
+        static typename rebind_pack<V, ValueType>::type aligned(
+            Iter const& iter)
         {
             typedef typename rebind_pack<V, ValueType>::type vector_pack_type;
-            return vector_pack_type(std::addressof(*iter),
-                Vc::flags::vector_aligned);
+            return vector_pack_type(
+                std::addressof(*iter), Vc::flags::vector_aligned);
         }
 
         template <typename Iter>
-        static typename rebind_pack<V, ValueType>::type
-        unaligned(Iter const& iter)
+        static typename rebind_pack<V, ValueType>::type unaligned(
+            Iter const& iter)
         {
             typedef typename rebind_pack<V, ValueType>::type vector_pack_type;
-            return vector_pack_type(std::addressof(*iter),
-                Vc::flags::element_aligned);
+            return vector_pack_type(
+                std::addressof(*iter), Vc::flags::element_aligned);
         }
     };
 
@@ -233,9 +231,9 @@ namespace hpx { namespace parallel { namespace traits
             value.copy_to(std::addressof(*iter), Vc::flags::element_aligned);
         }
     };
-}}}
+}}}    // namespace hpx::parallel::traits
 
-#endif  // Vc_IS_VERSION_1
+#endif    // Vc_IS_VERSION_1
 
 #endif
 #endif

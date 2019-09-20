@@ -25,25 +25,23 @@ std::thread::id test(int passed_through)
 template <typename Executor>
 void test_sync(Executor& exec)
 {
-    HPX_TEST(
-        hpx::parallel::execution::sync_execute(exec, &test, 42) !=
+    HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) !=
         std::this_thread::get_id());
 }
 
 template <typename Executor>
 void test_async(Executor& exec)
 {
-    HPX_TEST(
-        hpx::parallel::execution::async_execute(exec, &test, 42).get() !=
+    HPX_TEST(hpx::parallel::execution::async_execute(exec, &test, 42).get() !=
         std::this_thread::get_id());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 std::thread::id test_f(hpx::future<void> f, int passed_through)
 {
-    HPX_TEST(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());    // make sure, future is ready
 
-    f.get();                    // propagate exceptions
+    f.get();    // propagate exceptions
 
     HPX_TEST_EQ(passed_through, 42);
     return std::this_thread::get_id();
@@ -79,8 +77,7 @@ void test_bulk_sync(Executor& exec)
 
     hpx::parallel::execution::bulk_sync_execute(
         exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
-    hpx::parallel::execution::bulk_sync_execute(
-        exec, &bulk_test, v, tid, 42);
+    hpx::parallel::execution::bulk_sync_execute(exec, &bulk_test, v, tid, 42);
 }
 
 template <typename Executor>
@@ -95,20 +92,20 @@ void test_bulk_async(Executor& exec)
     using hpx::util::placeholders::_2;
 
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-        exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42)
-    ).get();
+                      exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42))
+        .get();
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-        exec, &bulk_test, v, tid, 42)
-    ).get();
+                      exec, &bulk_test, v, tid, 42))
+        .get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
-    int passed_through) //-V813
+    int passed_through)    //-V813
 {
-    HPX_TEST(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());    // make sure, future is ready
 
-    f.get();                    // propagate exceptions
+    f.get();    // propagate exceptions
 
     HPX_TEST(tid != hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -129,11 +126,11 @@ void test_bulk_then(Executor& exec)
     hpx::shared_future<void> f = hpx::make_ready_future();
 
     hpx::parallel::execution::bulk_then_execute(
-        exec, hpx::util::bind(&bulk_test_f, _1, _2, tid, _3), v, f, 42
-    ).get();
+        exec, hpx::util::bind(&bulk_test_f, _1, _2, tid, _3), v, f, 42)
+        .get();
     hpx::parallel::execution::bulk_then_execute(
-        exec, &bulk_test_f, v, f, tid, 42
-    ).get();
+        exec, &bulk_test_f, v, f, tid, 42)
+        .get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -163,14 +160,16 @@ int hpx_main(int argc, char* argv[])
 #if defined(HPX_HAVE_NETWORKING)
     if (hpx::is_networking_enabled())
     {
-        execution::service_executor exec(service_executor_type::parcel_thread_pool);
+        execution::service_executor exec(
+            service_executor_type::parcel_thread_pool);
         test_service_executor(exec);
     }
 #endif
 
 #if defined(HPX_HAVE_TIMER_POOL)
     {
-        execution::service_executor exec(service_executor_type::timer_thread_pool);
+        execution::service_executor exec(
+            service_executor_type::timer_thread_pool);
         test_service_executor(exec);
     }
 #endif
@@ -186,8 +185,8 @@ int hpx_main(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

@@ -11,22 +11,19 @@
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace traits
-{
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    std::size_t count_bits(bool value)
+namespace hpx { namespace parallel { namespace traits {
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(bool value)
     {
         return value ? 1 : 0;
     }
-}}}
+}}}    // namespace hpx::parallel::traits
 
 #if defined(HPX_HAVE_DATAPAR)
 
 #if !defined(__CUDACC__)
-#include <hpx/parallel/traits/detail/vc/vector_pack_count_bits.hpp>
 #include <hpx/parallel/traits/detail/boost_simd/vector_pack_count_bits.hpp>
+#include <hpx/parallel/traits/detail/vc/vector_pack_count_bits.hpp>
 #endif
 
 #endif
 #endif
-
