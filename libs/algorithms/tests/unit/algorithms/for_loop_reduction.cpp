@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/testing.hpp>
 
 #include <hpx/include/parallel_for_loop.hpp>
@@ -25,7 +25,7 @@ int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename ExPolicy, typename IteratorTag>
-void test_for_loop_reduction_plus(ExPolicy && policy, IteratorTag)
+void test_for_loop_reduction_plus(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -38,14 +38,10 @@ void test_for_loop_reduction_plus(ExPolicy && policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t sum = 0;
-    hpx::parallel::for_loop(
-        std::forward<ExPolicy>(policy),
+    hpx::parallel::for_loop(std::forward<ExPolicy>(policy),
         iterator(std::begin(c)), iterator(std::end(c)),
         hpx::parallel::reduction_plus(sum),
-        [](iterator it, std::size_t& sum)
-        {
-            sum += *it;
-        });
+        [](iterator it, std::size_t& sum) { sum += *it; });
 
     // verify values
     std::size_t sum2 =
@@ -54,7 +50,7 @@ void test_for_loop_reduction_plus(ExPolicy && policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_for_loop_reduction_multiplies(ExPolicy && policy, IteratorTag)
+void test_for_loop_reduction_multiplies(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -67,14 +63,10 @@ void test_for_loop_reduction_multiplies(ExPolicy && policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t prod = 0;
-    hpx::parallel::for_loop(
-        std::forward<ExPolicy>(policy),
+    hpx::parallel::for_loop(std::forward<ExPolicy>(policy),
         iterator(std::begin(c)), iterator(std::end(c)),
         hpx::parallel::reduction_multiplies(prod),
-        [](iterator it, std::size_t& prod)
-        {
-            prod *= *it;
-        });
+        [](iterator it, std::size_t& prod) { prod *= *it; });
 
     // verify values
     std::size_t prod2 = std::accumulate(std::begin(c), std::end(c),
@@ -83,7 +75,7 @@ void test_for_loop_reduction_multiplies(ExPolicy && policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_for_loop_reduction_min(ExPolicy && policy, IteratorTag)
+void test_for_loop_reduction_min(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -97,18 +89,16 @@ void test_for_loop_reduction_min(ExPolicy && policy, IteratorTag)
 
     std::size_t minval = c[0];
 
-    hpx::parallel::for_loop(
-        std::forward<ExPolicy>(policy),
+    hpx::parallel::for_loop(std::forward<ExPolicy>(policy),
         iterator(std::begin(c)), iterator(std::end(c)),
         hpx::parallel::reduction_min(minval),
-        [](iterator it, std::size_t& minval)
-        {
+        [](iterator it, std::size_t& minval) {
             minval = (std::min)(minval, *it);
         });
 
     // verify values
-    std::size_t minval2 = std::accumulate(std::begin(c), std::end(c),
-        c[0], hpx::parallel::v1::detail::min_of<std::size_t>());
+    std::size_t minval2 = std::accumulate(std::begin(c), std::end(c), c[0],
+        hpx::parallel::v1::detail::min_of<std::size_t>());
     HPX_TEST_EQ(minval, minval2);
 }
 
@@ -139,7 +129,7 @@ void for_loop_reduction_test()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy>
-void test_for_loop_reduction_bit_and_idx(ExPolicy && policy)
+void test_for_loop_reduction_bit_and_idx(ExPolicy&& policy)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -149,14 +139,9 @@ void test_for_loop_reduction_bit_and_idx(ExPolicy && policy)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t bits = ~std::size_t(0);
-    hpx::parallel::for_loop(
-        std::forward<ExPolicy>(policy),
-        0, c.size(),
+    hpx::parallel::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
         hpx::parallel::reduction_bit_and(bits),
-        [&c](std::size_t i, std::size_t& bits)
-        {
-            bits &= c[i];
-        });
+        [&c](std::size_t i, std::size_t& bits) { bits &= c[i]; });
 
     // verify values
     std::size_t bits2 = std::accumulate(std::begin(c), std::end(c),
@@ -165,7 +150,7 @@ void test_for_loop_reduction_bit_and_idx(ExPolicy && policy)
 }
 
 template <typename ExPolicy>
-void test_for_loop_reduction_bit_or_idx(ExPolicy && policy)
+void test_for_loop_reduction_bit_or_idx(ExPolicy&& policy)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -175,18 +160,13 @@ void test_for_loop_reduction_bit_or_idx(ExPolicy && policy)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t bits = 0;
-    hpx::parallel::for_loop(
-        std::forward<ExPolicy>(policy),
-        0, c.size(),
+    hpx::parallel::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
         hpx::parallel::reduction_bit_or(bits),
-        [&c](std::size_t i, std::size_t& bits)
-        {
-            bits |= c[i];
-        });
+        [&c](std::size_t i, std::size_t& bits) { bits |= c[i]; });
 
     // verify values
-    std::size_t bits2 = std::accumulate(std::begin(c), std::end(c),
-        std::size_t(0), std::bit_or<std::size_t>());
+    std::size_t bits2 = std::accumulate(
+        std::begin(c), std::end(c), std::size_t(0), std::bit_or<std::size_t>());
     HPX_TEST_EQ(bits, bits2);
 }
 
@@ -206,7 +186,7 @@ void for_loop_reduction_test_idx()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -226,15 +206,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

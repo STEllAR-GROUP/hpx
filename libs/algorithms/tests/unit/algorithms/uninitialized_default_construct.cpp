@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 
 #include <iostream>
 #include <string>
@@ -21,19 +21,19 @@ void test_uninitialized_default_construct()
     test_uninitialized_default_construct(execution::par, IteratorTag());
     test_uninitialized_default_construct(execution::par_unseq, IteratorTag());
 
-    test_uninitialized_default_construct_async(execution::seq(execution::task),
-        IteratorTag());
-    test_uninitialized_default_construct_async(execution::par(execution::task),
-        IteratorTag());
+    test_uninitialized_default_construct_async(
+        execution::seq(execution::task), IteratorTag());
+    test_uninitialized_default_construct_async(
+        execution::par(execution::task), IteratorTag());
 
     test_uninitialized_default_construct2(execution::seq, IteratorTag());
     test_uninitialized_default_construct2(execution::par, IteratorTag());
     test_uninitialized_default_construct2(execution::par_unseq, IteratorTag());
 
-    test_uninitialized_default_construct_async2(execution::seq(execution::task),
-        IteratorTag());
-    test_uninitialized_default_construct_async2(execution::par(execution::task),
-        IteratorTag());
+    test_uninitialized_default_construct_async2(
+        execution::seq(execution::task), IteratorTag());
+    test_uninitialized_default_construct_async2(
+        execution::par(execution::task), IteratorTag());
 }
 
 void uninitialized_default_construct_test()
@@ -51,20 +51,21 @@ void test_uninitialized_default_construct_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_uninitialized_default_construct_exception(execution::seq, IteratorTag());
-    test_uninitialized_default_construct_exception(execution::par, IteratorTag());
+    test_uninitialized_default_construct_exception(
+        execution::seq, IteratorTag());
+    test_uninitialized_default_construct_exception(
+        execution::par, IteratorTag());
 
     test_uninitialized_default_construct_exception_async(
-        execution::seq(execution::task),
-        IteratorTag());
+        execution::seq(execution::task), IteratorTag());
     test_uninitialized_default_construct_exception_async(
-        execution::par(execution::task),
-        IteratorTag());
+        execution::par(execution::task), IteratorTag());
 }
 
 void uninitialized_default_construct_exception_test()
 {
-    test_uninitialized_default_construct_exception<std::random_access_iterator_tag>();
+    test_uninitialized_default_construct_exception<
+        std::random_access_iterator_tag>();
     test_uninitialized_default_construct_exception<std::forward_iterator_tag>();
 }
 
@@ -77,26 +78,27 @@ void test_uninitialized_default_construct_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_uninitialized_default_construct_bad_alloc(execution::seq, IteratorTag());
-    test_uninitialized_default_construct_bad_alloc(execution::par, IteratorTag());
+    test_uninitialized_default_construct_bad_alloc(
+        execution::seq, IteratorTag());
+    test_uninitialized_default_construct_bad_alloc(
+        execution::par, IteratorTag());
 
     test_uninitialized_default_construct_bad_alloc_async(
-        execution::seq(execution::task),
-        IteratorTag());
+        execution::seq(execution::task), IteratorTag());
     test_uninitialized_default_construct_bad_alloc_async(
-        execution::par(execution::task),
-        IteratorTag());
+        execution::par(execution::task), IteratorTag());
 }
 
 void uninitialized_default_construct_bad_alloc_test()
 {
-    test_uninitialized_default_construct_bad_alloc<std::random_access_iterator_tag>();
+    test_uninitialized_default_construct_bad_alloc<
+        std::random_access_iterator_tag>();
     test_uninitialized_default_construct_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -116,15 +118,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

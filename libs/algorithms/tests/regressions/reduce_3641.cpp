@@ -16,7 +16,6 @@
 #include <cstdint>
 #include <iterator>
 
-
 int main()
 {
     std::int64_t result = hpx::parallel::reduce(hpx::parallel::execution::seq,

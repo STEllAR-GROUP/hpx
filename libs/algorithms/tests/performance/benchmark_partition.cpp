@@ -6,8 +6,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/format.hpp>
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/include/parallel_partition.hpp>
@@ -35,9 +35,10 @@ unsigned int seed = std::random_device{}();
 struct random_fill
 {
     random_fill()
-        : gen(seed),
-        dist(0, random_fill_range)
-    {}
+      : gen(seed)
+      , dist(0, random_fill_range)
+    {
+    }
 
     int operator()()
     {
@@ -50,16 +51,16 @@ struct random_fill
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename OrgIter, typename FwdIter, typename Pred>
-double run_partition_benchmark_std(int test_count,
-    OrgIter org_first, OrgIter org_last, FwdIter first, FwdIter last, Pred pred)
+double run_partition_benchmark_std(int test_count, OrgIter org_first,
+    OrgIter org_last, FwdIter first, FwdIter last, Pred pred)
 {
     std::uint64_t time = std::uint64_t(0);
 
     for (int i = 0; i < test_count; ++i)
     {
         // Restore [first, last) with original data.
-        hpx::parallel::copy(hpx::parallel::execution::par,
-            org_first, org_last, first);
+        hpx::parallel::copy(
+            hpx::parallel::execution::par, org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
         std::partition(first, last, pred);
@@ -79,8 +80,8 @@ double run_partition_benchmark_hpx(int test_count, ExPolicy policy,
     for (int i = 0; i < test_count; ++i)
     {
         // Restore [first, last) with original data.
-        hpx::parallel::copy(hpx::parallel::execution::par,
-            org_first, org_last, first);
+        hpx::parallel::copy(
+            hpx::parallel::execution::par, org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
         hpx::parallel::partition(policy, first, last, pred);
@@ -92,8 +93,8 @@ double run_partition_benchmark_hpx(int test_count, ExPolicy policy,
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void run_benchmark(std::size_t vector_size, int test_count, int base_num,
-    IteratorTag)
+void run_benchmark(
+    std::size_t vector_size, int test_count, int base_num, IteratorTag)
 {
     std::cout << "* Preparing Benchmark..." << std::endl;
 
@@ -116,47 +117,39 @@ void run_benchmark(std::size_t vector_size, int test_count, int base_num,
 
     std::cout << "* Running Benchmark..." << std::endl;
 
-    auto pred = [base_num](int t) {
-        return t < base_num;
-    };
+    auto pred = [base_num](int t) { return t < base_num; };
 
     std::cout << "--- run_partition_benchmark_std ---" << std::endl;
-    double time_std =
-        run_partition_benchmark_std(test_count, org_first, org_last,
-            first, last, pred);
+    double time_std = run_partition_benchmark_std(
+        test_count, org_first, org_last, first, last, pred);
 
     std::cout << "--- run_partition_benchmark_seq ---" << std::endl;
-    double time_seq =
-        run_partition_benchmark_hpx(test_count, execution::seq,
-            org_first, org_last,
-            first, last, pred);
+    double time_seq = run_partition_benchmark_hpx(
+        test_count, execution::seq, org_first, org_last, first, last, pred);
 
     std::cout << "--- run_partition_benchmark_par ---" << std::endl;
-    double time_par =
-        run_partition_benchmark_hpx(test_count, execution::par,
-            org_first, org_last,
-            first, last, pred);
+    double time_par = run_partition_benchmark_hpx(
+        test_count, execution::par, org_first, org_last, first, last, pred);
 
     std::cout << "--- run_partition_benchmark_par_unseq ---" << std::endl;
-    double time_par_unseq =
-        run_partition_benchmark_hpx(test_count, execution::par_unseq,
-            org_first, org_last,
-            first, last, pred);
+    double time_par_unseq = run_partition_benchmark_hpx(test_count,
+        execution::par_unseq, org_first, org_last, first, last, pred);
 
-    std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
+    std::cout << "\n-------------- Benchmark Result --------------"
+              << std::endl;
     auto fmt = "partition ({1}) : {2}(sec)";
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
-    hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq)
+        << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 std::string correct_iterator_tag_str(std::string iterator_tag)
 {
-    if (iterator_tag != "random" &&
-        iterator_tag != "bidirectional" &&
+    if (iterator_tag != "random" && iterator_tag != "bidirectional" &&
         iterator_tag != "forward")
         return "random";
     else
@@ -185,7 +178,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         seed = vm["seed"].as<std::uint32_t>();
 
     std::mt19937 gen(static_cast<unsigned int>(seed));
-    std::uniform_int_distribution<> dis(0,random_fill_range-1);
+    std::uniform_int_distribution<> dis(0, random_fill_range - 1);
 
     // pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
@@ -193,8 +186,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (vm.count("base_num"))
         base_num = vm["base_num"].as<int>();
     int test_count = vm["test_count"].as<int>();
-    std::string iterator_tag_str = correct_iterator_tag_str(
-        vm["iterator_tag"].as<std::string>());
+    std::string iterator_tag_str =
+        correct_iterator_tag_str(vm["iterator_tag"].as<std::string>());
 
     std::size_t const os_threads = hpx::get_os_thread_count();
 
@@ -206,7 +199,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "iterator_tag    : " << iterator_tag_str << std::endl;
     std::cout << "test_count      : " << test_count << std::endl;
     std::cout << "os threads      : " << os_threads << std::endl;
-    std::cout << "----------------------------------------------\n" << std::endl;
+    std::cout << "----------------------------------------------\n"
+              << std::endl;
 
     if (iterator_tag_str == "random")
         run_benchmark(vector_size, test_count, base_num,
@@ -214,9 +208,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     else if (iterator_tag_str == "bidirectional")
         run_benchmark(vector_size, test_count, base_num,
             std::bidirectional_iterator_tag());
-    else // forward
-        run_benchmark(vector_size, test_count, base_num,
-            std::forward_iterator_tag());
+    else    // forward
+        run_benchmark(
+            vector_size, test_count, base_num, std::forward_iterator_tag());
 
     return hpx::finalize();
 }
@@ -227,31 +221,24 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("vector_size",
-            hpx::program_options::value<std::size_t>()->default_value(1000000),
-            "size of vector (default: 1000000)")
-        ("iterator_tag",
-            hpx::program_options::value<std::string>()->default_value("random"),
-            "the kind of iterator tag (random/bidirectional/forward)")
-        ("base_num",
-            hpx::program_options::value<int>(),
-            hpx::util::format(
-                "the base number for partitioning."
-                " The range of random_fill is [0, {1}]"
-                " (default: random number in the range [0, {2}]",
-                random_fill_range, random_fill_range).c_str())
-        ("test_count",
-            hpx::program_options::value<int>()->default_value(10),
-            "number of tests to be averaged (default: 10)")
-        ("seed,s", hpx::program_options::value<std::uint32_t>(),
-            "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("vector_size",
+        hpx::program_options::value<std::size_t>()->default_value(1000000),
+        "size of vector (default: 1000000)")("iterator_tag",
+        hpx::program_options::value<std::string>()->default_value("random"),
+        "the kind of iterator tag (random/bidirectional/forward)")("base_num",
+        hpx::program_options::value<int>(),
+        hpx::util::format("the base number for partitioning."
+                          " The range of random_fill is [0, {1}]"
+                          " (default: random number in the range [0, {2}]",
+            random_fill_range, random_fill_range)
+            .c_str())("test_count",
+        hpx::program_options::value<int>()->default_value(10),
+        "number of tests to be averaged (default: 10)")("seed,s",
+        hpx::program_options::value<std::uint32_t>(),
+        "the random number generator seed to use for this run");
 
     // initialize program
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

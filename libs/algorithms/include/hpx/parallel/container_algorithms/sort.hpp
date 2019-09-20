@@ -20,8 +20,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /// Sorts the elements in the range \a rng  in ascending order. The
     /// order of equal elements is not guaranteed to be preserved. The function
     /// uses the given comparison function object comp (defaults to using
@@ -87,27 +86,20 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename Rng,
         typename Proj = util::projection_identity,
         typename Compare = detail::less,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Compare,
-                traits::projected_range<Proj, Rng>,
-                traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, typename hpx::traits::range_iterator<Rng>::type
-    >::type
-    sort(ExPolicy && policy, Rng && rng, Compare && comp = Compare(),
-        Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    Compare, traits::projected_range<Proj, Rng>,
+                    traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_iterator<Rng>::type>::type
+    sort(ExPolicy&& policy, Rng&& rng, Compare&& comp = Compare(),
+        Proj&& proj = Proj())
     {
-        return sort(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), std::forward<Compare>(comp),
+        return sort(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), std::forward<Compare>(comp),
             std::forward<Proj>(proj));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif
-
-

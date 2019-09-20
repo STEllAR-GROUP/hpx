@@ -10,8 +10,7 @@
 
 #include <functional>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail
-{
+namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     // provide implementation of std::accumulate supporting iterators/sentinels
     template <typename InIterB, typename InIterE, typename T, typename F>
     inline T accumulate(InIterB first, InIterE last, T value, F reduce_op)
@@ -28,6 +27,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
     {
         return accumulate(first, last, value, std::plus<T>());
     }
-}}}}
+}}}}    // namespace hpx::parallel::v1::detail
 
 #endif

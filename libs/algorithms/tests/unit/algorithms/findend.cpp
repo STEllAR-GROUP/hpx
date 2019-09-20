@@ -73,7 +73,7 @@ void test_find_end1_proj(ExPolicy policy, IteratorTag)
 
     iterator index = hpx::parallel::find_end(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h),
-        std::equal_to<std::size_t>(), [](std::size_t x){return x % 65536;});
+        std::equal_to<std::size_t>(), [](std::size_t x) { return x % 65536; });
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
@@ -115,15 +115,15 @@ void test_find_end1_async_proj(ExPolicy p, IteratorTag)
     // fill vector with random values above 2
     std::fill(std::begin(c), std::end(c), dis(gen));
     // create subsequence in middle of vector
-    c[c.size() / 2] = 1+65536;
-    c[c.size() / 2 + 1] = 2+65536;
+    c[c.size() / 2] = 1 + 65536;
+    c[c.size() / 2 + 1] = 2 + 65536;
 
     std::size_t h[] = {1, 2};
 
-    hpx::future<iterator> f =
-        hpx::parallel::find_end(p, iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(h), std::end(h),
-        std::equal_to<std::size_t>(), [](std::size_t x){return x % 65536;});
+    hpx::future<iterator> f = hpx::parallel::find_end(p,
+        iterator(std::begin(c)), iterator(std::end(c)), std::begin(h),
+        std::end(h), std::equal_to<std::size_t>(),
+        [](std::size_t x) { return x % 65536; });
     f.wait();
 
     // create iterator at position of value to be found
@@ -201,13 +201,11 @@ void test_find_end2_proj(ExPolicy policy, IteratorTag)
     c[c.size() - 1] = 2;
     c[c.size() - 2] = 1;
 
-    std::size_t h[] = {1+65536, 2+65536};
+    std::size_t h[] = {1 + 65536, 2 + 65536};
 
     iterator index = hpx::parallel::find_end(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h),
-        std::equal_to<std::size_t>(),
-        [](std::size_t x) { return x % 65536; });
-
+        std::equal_to<std::size_t>(), [](std::size_t x) { return x % 65536; });
 
     base_iterator test_index = std::begin(c) + c.size() - 2;
 
@@ -259,13 +257,12 @@ void test_find_end2_async_proj(ExPolicy p, IteratorTag)
     c[c.size() - 1] = 2;
     c[c.size() - 2] = 1;
 
-    std::size_t h[] = {1+65536, 2+65536};
+    std::size_t h[] = {1 + 65536, 2 + 65536};
 
-    hpx::future<iterator> f =
-        hpx::parallel::find_end(p, iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(h), std::end(h),
-            std::equal_to<std::size_t>(),
-            [](std::size_t x) { return x % 65536; });
+    hpx::future<iterator> f = hpx::parallel::find_end(p,
+        iterator(std::begin(c)), iterator(std::end(c)), std::begin(h),
+        std::end(h), std::equal_to<std::size_t>(),
+        [](std::size_t x) { return x % 65536; });
 
     f.wait();
 
@@ -346,12 +343,11 @@ void test_find_end3_proj(ExPolicy policy, IteratorTag)
     std::size_t sub_size = c.size() / 16 + 1;
 
     std::vector<std::size_t> h(sub_size);
-    std::iota(std::begin(h), std::end(h), 1+65536);
+    std::iota(std::begin(h), std::end(h), 1 + 65536);
 
     iterator index = hpx::parallel::find_end(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h),
-        std::equal_to<std::size_t>(),
-        [](std::size_t x) { return x % 65536; });
+        std::equal_to<std::size_t>(), [](std::size_t x) { return x % 65536; });
 
     base_iterator test_index = std::begin(c);
 
@@ -402,15 +398,14 @@ void test_find_end3_async_proj(ExPolicy p, IteratorTag)
     std::size_t sub_size = c.size() / 16 + 1;
 
     std::vector<std::size_t> h(sub_size);
-    std::iota(std::begin(h), std::end(h), 1+65536);
+    std::iota(std::begin(h), std::end(h), 1 + 65536);
 
     // create only two partitions, splitting the desired sub sequence into
     // separate partitions.
-    hpx::future<iterator> f =
-        hpx::parallel::find_end(p, iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(h), std::end(h),
-            std::equal_to<std::size_t>(),
-            [](std::size_t x) { return x % 65536; });
+    hpx::future<iterator> f = hpx::parallel::find_end(p,
+        iterator(std::begin(c)), iterator(std::end(c)), std::begin(h),
+        std::end(h), std::equal_to<std::size_t>(),
+        [](std::size_t x) { return x % 65536; });
 
     f.wait();
 
@@ -487,11 +482,11 @@ void test_find_end4_proj(ExPolicy policy, IteratorTag)
     c[c.size() / 2] = 1;
     c[c.size() / 2 + 1] = 2;
 
-    std::size_t h[] = {1+65536, 2+65536};
+    std::size_t h[] = {1 + 65536, 2 + 65536};
 
-    iterator index = hpx::parallel::find_end(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(h), std::end(h),
-        [](std::size_t v1, std::size_t v2) { return !(v1 != v2); },
+    iterator index = hpx::parallel::find_end(
+        policy, iterator(std::begin(c)), iterator(std::end(c)), std::begin(h),
+        std::end(h), [](std::size_t v1, std::size_t v2) { return !(v1 != v2); },
         [](std::size_t x) { return x % 65536; });
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
@@ -541,12 +536,11 @@ void test_find_end4_async_proj(ExPolicy p, IteratorTag)
     c[c.size() / 2] = 1;
     c[c.size() / 2 + 1] = 2;
 
-    std::size_t h[] = {1+65536, 2+65536};
+    std::size_t h[] = {1 + 65536, 2 + 65536};
 
-    hpx::future<iterator> f =
-        hpx::parallel::find_end(p, iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(h), std::end(h),
-            [](std::size_t v1, std::size_t v2) { return !(v1 != v2); },
+    hpx::future<iterator> f = hpx::parallel::find_end(
+        p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(h),
+        std::end(h), [](std::size_t v1, std::size_t v2) { return !(v1 != v2); },
         [](std::size_t v) { return v % 65536; });
 
     f.wait();

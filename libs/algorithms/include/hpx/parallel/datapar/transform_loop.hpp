@@ -12,11 +12,11 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/datapar/execution_policy_fwd.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
-#include <hpx/parallel/util/transform_loop.hpp>
+#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
+#include <hpx/parallel/util/transform_loop.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/type_support/decay.hpp>
 
@@ -27,10 +27,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace util
-{
-    namespace detail
-    {
+namespace hpx { namespace parallel { namespace util {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename Iterator>
         struct datapar_transform_loop_n
@@ -38,18 +36,16 @@ namespace hpx { namespace parallel { namespace util
             typedef typename hpx::util::decay<Iterator>::type iterator_type;
 
             typedef typename traits::vector_pack_type<
-                    typename std::iterator_traits<iterator_type>::value_type
-                >::type V;
+                typename std::iterator_traits<iterator_type>::value_type>::type
+                V;
 
             template <typename InIter, typename OutIter, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            static typename std::enable_if<
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
                 iterators_datapar_compatible<InIter, OutIter>::value &&
                     iterator_datapar_compatible<InIter>::value &&
                     iterator_datapar_compatible<OutIter>::value,
-                std::pair<InIter, OutIter>
-            >::type
-            call(InIter first, std::size_t count, OutIter dest, F && f)
+                std::pair<InIter, OutIter>>::type
+            call(InIter first, std::size_t count, OutIter dest, F&& f)
             {
                 std::size_t len = count;
 
@@ -62,7 +58,7 @@ namespace hpx { namespace parallel { namespace util
                     traits::vector_pack_size<V>::value;
 
                 for (std::int64_t lenV = std::int64_t(count - (size + 1));
-                        lenV > 0; lenV -= size, len -= size)
+                     lenV > 0; lenV -= size, len -= size)
                 {
                     datapar_transform_loop_step::callv(f, first, dest);
                 }
@@ -76,18 +72,16 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename InIter, typename OutIter, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            static typename std::enable_if<
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
                 !iterators_datapar_compatible<InIter, OutIter>::value ||
                     !iterator_datapar_compatible<InIter>::value ||
                     !iterator_datapar_compatible<OutIter>::value,
-                std::pair<InIter, OutIter>
-            >::type
-            call(InIter first, std::size_t count, OutIter dest, F && f)
+                std::pair<InIter, OutIter>>::type
+            call(InIter first, std::size_t count, OutIter dest, F&& f)
             {
                 return util::transform_loop_n<
-                        parallel::execution::sequenced_policy
-                    >(first, count, dest, std::forward<F>(f));
+                    parallel::execution::sequenced_policy>(
+                    first, count, dest, std::forward<F>(f));
             }
         };
 
@@ -103,32 +97,28 @@ namespace hpx { namespace parallel { namespace util
             typedef typename traits::vector_pack_type<value_type, 1>::type V1;
 
             template <typename InIter, typename OutIter, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            static typename std::enable_if<
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
                 iterators_datapar_compatible<InIter, OutIter>::value &&
                     iterator_datapar_compatible<InIter>::value &&
                     iterator_datapar_compatible<OutIter>::value,
-                std::pair<InIter, OutIter>
-            >::type
-            call(InIter first, InIter last, OutIter dest, F && f)
+                std::pair<InIter, OutIter>>::type
+            call(InIter first, InIter last, OutIter dest, F&& f)
             {
                 return util::transform_loop_n<
-                        parallel::execution::datapar_policy
-                    >(first, std::distance(first, last), dest, std::forward<F>(f));
+                    parallel::execution::datapar_policy>(first,
+                    std::distance(first, last), dest, std::forward<F>(f));
             }
 
             template <typename InIter, typename OutIter, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            static typename std::enable_if<
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
                 !iterators_datapar_compatible<InIter, OutIter>::value ||
                     !iterator_datapar_compatible<InIter>::value ||
                     !iterator_datapar_compatible<OutIter>::value,
-                std::pair<InIter, OutIter>
-            >::type
-            call(InIter first, InIter last, OutIter dest, F && f)
+                std::pair<InIter, OutIter>>::type
+            call(InIter first, InIter last, OutIter dest, F&& f)
             {
-                return util::transform_loop(parallel::execution::seq,
-                    first, last, dest, std::forward<F>(f));
+                return util::transform_loop(parallel::execution::seq, first,
+                    last, dest, std::forward<F>(f));
             }
         };
 
@@ -144,17 +134,15 @@ namespace hpx { namespace parallel { namespace util
 
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            static typename std::enable_if<
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
                 iterators_datapar_compatible<InIter1, OutIter>::value &&
                     iterators_datapar_compatible<InIter2, OutIter>::value &&
                     iterator_datapar_compatible<InIter1>::value &&
                     iterator_datapar_compatible<InIter2>::value &&
                     iterator_datapar_compatible<OutIter>::value,
-                hpx::util::tuple<InIter1, InIter2, OutIter>
-            >::type
+                hpx::util::tuple<InIter1, InIter2, OutIter>>::type
             call(InIter1 first1, std::size_t count, InIter2 first2,
-                OutIter dest, F && f)
+                OutIter dest, F&& f)
             {
                 std::size_t len = count;
 
@@ -167,7 +155,7 @@ namespace hpx { namespace parallel { namespace util
                     traits::vector_pack_size<V>::value;
 
                 for (std::int64_t lenV = std::int64_t(count - (size + 1));
-                        lenV > 0; lenV -= size, len -= size)
+                     lenV > 0; lenV -= size, len -= size)
                 {
                     datapar_transform_loop_step::callv(f, first1, first2, dest);
                 }
@@ -177,27 +165,25 @@ namespace hpx { namespace parallel { namespace util
                     datapar_transform_loop_step::call1(f, first1, first2, dest);
                 }
 
-                return hpx::util::make_tuple(std::move(first1),
-                    std::move(first2), std::move(dest));
+                return hpx::util::make_tuple(
+                    std::move(first1), std::move(first2), std::move(dest));
             }
 
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            static typename std::enable_if<
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
                 !iterators_datapar_compatible<InIter1, OutIter>::value ||
                     !iterators_datapar_compatible<InIter2, OutIter>::value ||
                     !iterator_datapar_compatible<InIter1>::value ||
                     !iterator_datapar_compatible<InIter2>::value ||
                     !iterator_datapar_compatible<OutIter>::value,
-                hpx::util::tuple<InIter1, InIter2, OutIter>
-            >::type
+                hpx::util::tuple<InIter1, InIter2, OutIter>>::type
             call(InIter1 first1, std::size_t count, InIter2 first2,
-                OutIter dest, F && f)
+                OutIter dest, F&& f)
             {
                 return util::transform_binary_loop_n<
-                        parallel::execution::sequenced_policy
-                    >(first1, count, first2, dest, std::forward<F>(f));
+                    parallel::execution::sequenced_policy>(
+                    first1, count, first2, dest, std::forward<F>(f));
             }
         };
 
@@ -221,130 +207,116 @@ namespace hpx { namespace parallel { namespace util
 
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            static typename std::enable_if<
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
                 iterators_datapar_compatible<InIter1, OutIter>::value &&
                     iterators_datapar_compatible<InIter2, OutIter>::value &&
                     iterator_datapar_compatible<InIter1>::value &&
                     iterator_datapar_compatible<InIter2>::value &&
                     iterator_datapar_compatible<OutIter>::value,
-                hpx::util::tuple<InIter1, InIter2, OutIter>
-            >::type
+                hpx::util::tuple<InIter1, InIter2, OutIter>>::type
             call(InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
-                F && f)
+                F&& f)
             {
                 return util::transform_binary_loop_n<
-                        parallel::execution::datapar_policy
-                    >(first1, std::distance(first1, last1), first2, dest,
-                        std::forward<F>(f));
+                    parallel::execution::datapar_policy>(first1,
+                    std::distance(first1, last1), first2, dest,
+                    std::forward<F>(f));
             }
 
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            static typename std::enable_if<
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
                 !iterators_datapar_compatible<InIter1, OutIter>::value ||
                     !iterators_datapar_compatible<InIter2, OutIter>::value ||
                     !iterator_datapar_compatible<InIter1>::value ||
                     !iterator_datapar_compatible<InIter2>::value ||
                     !iterator_datapar_compatible<OutIter>::value,
-                hpx::util::tuple<InIter1, InIter2, OutIter>
-            >::type
+                hpx::util::tuple<InIter1, InIter2, OutIter>>::type
             call(InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
-                F && f)
+                F&& f)
             {
                 return util::transform_binary_loop<
-                        parallel::execution::sequenced_policy
-                    >(first1, last1, first2, dest, std::forward<F>(f));
+                    parallel::execution::sequenced_policy>(
+                    first1, last1, first2, dest, std::forward<F>(f));
             }
 
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            static typename std::enable_if<
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
                 iterators_datapar_compatible<InIter1, OutIter>::value &&
                     iterators_datapar_compatible<InIter2, OutIter>::value &&
                     iterator_datapar_compatible<InIter1>::value &&
                     iterator_datapar_compatible<InIter2>::value &&
                     iterator_datapar_compatible<OutIter>::value,
-                hpx::util::tuple<InIter1, InIter2, OutIter>
-            >::type
+                hpx::util::tuple<InIter1, InIter2, OutIter>>::type
             call(InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
-                OutIter dest, F && f)
+                OutIter dest, F&& f)
             {
-                std::size_t count = (std::min)(std::distance(first1, last1),
-                    std::distance(first2, last2));
+                std::size_t count = (std::min)(
+                    std::distance(first1, last1), std::distance(first2, last2));
 
                 return util::transform_binary_loop_n<
-                        parallel::execution::datapar_policy
-                    >(first1, count, first2, dest, std::forward<F>(f));
+                    parallel::execution::datapar_policy>(
+                    first1, count, first2, dest, std::forward<F>(f));
             }
 
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            static typename std::enable_if<
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
                 !iterators_datapar_compatible<InIter1, OutIter>::value ||
                     !iterators_datapar_compatible<InIter2, OutIter>::value ||
                     !iterator_datapar_compatible<InIter1>::value ||
                     !iterator_datapar_compatible<InIter2>::value ||
                     !iterator_datapar_compatible<OutIter>::value,
-                hpx::util::tuple<InIter1, InIter2, OutIter>
-            >::type
+                hpx::util::tuple<InIter1, InIter2, OutIter>>::type
             call(InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
-                OutIter dest, F && f)
+                OutIter dest, F&& f)
             {
                 return util::transform_binary_loop<
-                        parallel::execution::sequenced_policy
-                    >(first1, last1, first2, last2, dest, std::forward<F>(f));
+                    parallel::execution::sequenced_policy>(
+                    first1, last1, first2, last2, dest, std::forward<F>(f));
             }
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename Iter, typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    typename std::enable_if<
+    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         execution::is_vectorpack_execution_policy<ExPolicy>::value,
-        std::pair<Iter, OutIter>
-    >::type
-    transform_loop_n(Iter it, std::size_t count, OutIter dest, F && f)
+        std::pair<Iter, OutIter>>::type
+    transform_loop_n(Iter it, std::size_t count, OutIter dest, F&& f)
     {
-        return detail::datapar_transform_loop_n<Iter>::call(it, count, dest,
-            std::forward<F>(f));
+        return detail::datapar_transform_loop_n<Iter>::call(
+            it, count, dest, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    std::pair<Iter, OutIter>
-    transform_loop(parallel::execution::datapar_policy, Iter it, Iter end,
-        OutIter dest, F && f)
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter, OutIter> transform_loop(
+        parallel::execution::datapar_policy, Iter it, Iter end, OutIter dest,
+        F&& f)
     {
-        return detail::datapar_transform_loop<Iter>::call(it, end, dest,
-            std::forward<F>(f));
+        return detail::datapar_transform_loop<Iter>::call(
+            it, end, dest, std::forward<F>(f));
     }
 
     template <typename Iter, typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    std::pair<Iter, OutIter>
-    transform_loop(parallel::execution::datapar_task_policy, Iter it,
-        Iter end, OutIter dest, F && f)
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter, OutIter> transform_loop(
+        parallel::execution::datapar_task_policy, Iter it, Iter end,
+        OutIter dest, F&& f)
     {
-        return detail::datapar_transform_loop<Iter>::call(it, end, dest,
-            std::forward<F>(f));
+        return detail::datapar_transform_loop<Iter>::call(
+            it, end, dest, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    typename std::enable_if<
+    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         execution::is_vectorpack_execution_policy<ExPolicy>::value,
-        hpx::util::tuple<InIter1, InIter2, OutIter>
-    >::type
-    transform_binary_loop_n(InIter1 first1, std::size_t count, InIter2 first2,
-        OutIter dest, F && f)
+        hpx::util::tuple<InIter1, InIter2, OutIter>>::type
+    transform_binary_loop_n(
+        InIter1 first1, std::size_t count, InIter2 first2, OutIter dest, F&& f)
     {
         return detail::datapar_transform_binary_loop_n<InIter1, InIter2>::call(
             first1, count, first2, dest, std::forward<F>(f));
@@ -354,13 +326,11 @@ namespace hpx { namespace parallel { namespace util
 
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    typename std::enable_if<
+    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         execution::is_vectorpack_execution_policy<ExPolicy>::value,
-        hpx::util::tuple<InIter1, InIter2, OutIter>
-    >::type
-    transform_binary_loop(InIter1 first1, InIter1 last1, InIter2 first2,
-        OutIter dest, F && f)
+        hpx::util::tuple<InIter1, InIter2, OutIter>>::type
+    transform_binary_loop(
+        InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest, F&& f)
     {
         return detail::datapar_transform_binary_loop<InIter1, InIter2>::call(
             first1, last1, first2, dest, std::forward<F>(f));
@@ -368,19 +338,16 @@ namespace hpx { namespace parallel { namespace util
 
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    typename std::enable_if<
+    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         execution::is_vectorpack_execution_policy<ExPolicy>::value,
-        hpx::util::tuple<InIter1, InIter2, OutIter>
-    >::type
+        hpx::util::tuple<InIter1, InIter2, OutIter>>::type
     transform_binary_loop(InIter1 first1, InIter1 last1, InIter2 first2,
-        InIter2 last2, OutIter dest, F && f)
+        InIter2 last2, OutIter dest, F&& f)
     {
         return detail::datapar_transform_binary_loop<InIter1, InIter2>::call(
             first1, last1, first2, last2, dest, std::forward<F>(f));
     }
-}}}
+}}}    // namespace hpx::parallel::util
 
 #endif
 #endif
-

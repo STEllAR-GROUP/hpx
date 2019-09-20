@@ -13,19 +13,20 @@
 #include <functional>
 #include <memory>
 
-namespace hpx { namespace parallel { namespace util
-{
-    namespace detail
-    {
+namespace hpx { namespace parallel { namespace util {
+    namespace detail {
         struct no_data
         {
-            bool operator<= (no_data) const { return true; }
+            bool operator<=(no_data) const
+            {
+                return true;
+            }
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // cancellation_token is used for premature cancellation of algorithms
-    template <typename T = detail::no_data, typename Pred = std::less_equal<T> >
+    template <typename T = detail::no_data, typename Pred = std::less_equal<T>>
     class cancellation_token
     {
     private:
@@ -35,23 +36,26 @@ namespace hpx { namespace parallel { namespace util
     public:
         cancellation_token(T data)
           : was_cancelled_(std::make_shared<flag_type>(data))
-        {}
+        {
+        }
 
         bool was_cancelled(T data) const noexcept
         {
-            return Pred()(was_cancelled_->load(std::memory_order_relaxed), data);
+            return Pred()(
+                was_cancelled_->load(std::memory_order_relaxed), data);
         }
 
         void cancel(T data) noexcept
         {
             T old_data = was_cancelled_->load(std::memory_order_relaxed);
 
-            do {
+            do
+            {
                 if (Pred()(old_data, data))
-                    break;      // if we already have a closer one, break
+                    break;    // if we already have a closer one, break
 
-            } while (!was_cancelled_->compare_exchange_strong(old_data, data,
-                std::memory_order_relaxed));
+            } while (!was_cancelled_->compare_exchange_strong(
+                old_data, data, std::memory_order_relaxed));
         }
 
         T get_data() const noexcept
@@ -63,7 +67,7 @@ namespace hpx { namespace parallel { namespace util
     // special case for when no additional data needs to be stored at the
     // cancellation point
     template <>
-    class cancellation_token<detail::no_data, std::less_equal<detail::no_data> >
+    class cancellation_token<detail::no_data, std::less_equal<detail::no_data>>
     {
     private:
         typedef std::atomic<bool> flag_type;
@@ -72,7 +76,8 @@ namespace hpx { namespace parallel { namespace util
     public:
         cancellation_token()
           : was_cancelled_(std::make_shared<flag_type>(false))
-        {}
+        {
+        }
 
         bool was_cancelled() const noexcept
         {
@@ -84,6 +89,6 @@ namespace hpx { namespace parallel { namespace util
             was_cancelled_->store(true, std::memory_order_relaxed);
         }
     };
-}}}
+}}}    // namespace hpx::parallel::util
 
 #endif

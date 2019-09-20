@@ -27,12 +27,10 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // adjacent_difference
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         template <typename Iter>
         struct adjacent_difference
@@ -40,13 +38,13 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             adjacent_difference()
               : adjacent_difference::algorithm("adjacent_difference")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter, typename OutIter,
                 typename Op>
-            static OutIter
-            sequential(ExPolicy, InIter first, InIter last, OutIter dest,
-                Op && op)
+            static OutIter sequential(
+                ExPolicy, InIter first, InIter last, OutIter dest, Op&& op)
             {
                 return std::adjacent_difference(
                     first, last, dest, std::forward<Op>(op));
@@ -54,15 +52,15 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename Op>
-            static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter2
-            >::type
-            parallel(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
-                FwdIter2 dest, Op && op)
+            static typename util::detail::algorithm_result<ExPolicy,
+                FwdIter2>::type
+            parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+                FwdIter2 dest, Op&& op)
             {
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter1, FwdIter2>
                     zip_iterator;
-                typedef util::detail::algorithm_result<ExPolicy, FwdIter2> result;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter2>
+                    result;
                 typedef typename std::iterator_traits<FwdIter1>::difference_type
                     difference_type;
 
@@ -79,10 +77,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     return result::get(std::move(dest));
                 }
 
-                auto f1 =
-                    [HPX_CAPTURE_FORWARD(op)](
-                        zip_iterator part_begin, std::size_t part_size) mutable
-                {
+                auto f1 = [HPX_CAPTURE_FORWARD(op)](zip_iterator part_begin,
+                              std::size_t part_size) mutable {
                     // VS2015RC bails out when op is captured by ref
                     using hpx::util::get;
                     util::loop_n<ExPolicy>(
@@ -110,13 +106,11 @@ namespace hpx { namespace parallel { inline namespace v1
             typename Op>
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
         adjacent_difference_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, Op && op, std::false_type)
+            FwdIter2 dest, Op&& op, std::false_type)
         {
-            static_assert(
-                (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Requires at least forward iterator.");
-            static_assert(
-                (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
             typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
@@ -130,9 +124,9 @@ namespace hpx { namespace parallel { inline namespace v1
             typename Op>
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
         adjacent_difference_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, Op && op, std::true_type);
+            FwdIter2 dest, Op&& op, std::true_type);
         /// \endcond
-    }
+    }    // namespace detail
     ////////////////////////////////////////////////////////////////////////////
     /// Assigns each value in the range given by result its corresponding
     /// element in the range [first, last] and the one preceding it except
@@ -189,16 +183,14 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    >::type
-    adjacent_difference(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest)
+        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
+    adjacent_difference(
+        ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
     {
         typedef typename std::iterator_traits<FwdIter1>::value_type value_type;
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
-        return detail::adjacent_difference_(
-            std::forward<ExPolicy>(policy), first, last, dest,
-            std::minus<value_type>(), is_segmented());
+        return detail::adjacent_difference_(std::forward<ExPolicy>(policy),
+            first, last, dest, std::minus<value_type>(), is_segmented());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -270,16 +262,14 @@ namespace hpx { namespace parallel { inline namespace v1
         typename Op>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    >::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
     adjacent_difference(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, Op && op)
+        FwdIter2 dest, Op&& op)
     {
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
-        return detail::adjacent_difference_(
-            std::forward<ExPolicy>(policy), first, last, dest,
-            std::forward<Op>(op), is_segmented());
+        return detail::adjacent_difference_(std::forward<ExPolicy>(policy),
+            first, last, dest, std::forward<Op>(op), is_segmented());
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

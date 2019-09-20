@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/testing.hpp>
 
@@ -27,32 +27,32 @@ void test_copy_if(ExPolicy policy)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag> iterator;
+    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag>
+        iterator;
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    auto middle = std::begin(c) + c.size()/2;
+    auto middle = std::begin(c) + c.size() / 2;
     std::iota(std::begin(c), middle, std::rand());
     std::fill(middle, std::end(c), -1);
 
-    hpx::parallel::copy_if(policy, c, std::begin(d),
-        [](int i){ return !(i < 0); });
+    hpx::parallel::copy_if(
+        policy, c, std::begin(d), [](int i) { return !(i < 0); });
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c), middle, std::begin(d),
-        [&count](int v1, int v2) -> bool {
+    HPX_TEST(std::equal(
+        std::begin(c), middle, std::begin(d), [&count](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
         }));
 
-    HPX_TEST(std::equal(middle, std::end(c),
-        std::begin(d) + d.size()/2,
+    HPX_TEST(std::equal(middle, std::end(c), std::begin(d) + d.size() / 2,
         [&count](int v1, int v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
-            return v1!=v2;
-    }));
+            return v1 != v2;
+        }));
 
     HPX_TEST_EQ(count, d.size());
 }
@@ -61,34 +61,33 @@ template <typename ExPolicy>
 void test_copy_if_async(ExPolicy p)
 {
     typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag> iterator;
+    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag>
+        iterator;
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    auto middle = std::begin(c) + c.size()/2;
+    auto middle = std::begin(c) + c.size() / 2;
     std::iota(std::begin(c), middle, std::rand());
     std::fill(middle, std::end(c), -1);
 
-    auto f =
-        hpx::parallel::copy_if(p, c, std::begin(d),
-            [](int i){ return !(i < 0); });
+    auto f = hpx::parallel::copy_if(
+        p, c, std::begin(d), [](int i) { return !(i < 0); });
     f.wait();
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c), middle, std::begin(d),
-        [&count](int v1, int v2) -> bool {
+    HPX_TEST(std::equal(
+        std::begin(c), middle, std::begin(d), [&count](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
         }));
 
-    HPX_TEST(std::equal(middle, std::end(c),
-        std::begin(d) + d.size()/2,
+    HPX_TEST(std::equal(middle, std::end(c), std::begin(d) + d.size() / 2,
         [&count](int v1, int v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
-            return v1!=v2;
-    }));
+            return v1 != v2;
+        }));
 
     HPX_TEST_EQ(count, d.size());
 }
@@ -107,7 +106,7 @@ void test_copy_if()
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -125,15 +124,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
