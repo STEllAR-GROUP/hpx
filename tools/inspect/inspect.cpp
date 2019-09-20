@@ -57,6 +57,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include "crlf_check.hpp"
 #include "end_check.hpp"
 #include "license_check.hpp"
+#include "spdx_license_check.hpp"
 #include "link_check.hpp"
 #include "path_name_check.hpp"
 #include "tab_check.hpp"
@@ -795,6 +796,7 @@ int cpp_main( int argc_param, char * argv_param[] )
         "Usage: inspect [dir [dir ...]] [options]");
 
     bool license_ck = false;
+    bool spdx_license_ck = false;
     bool copyright_ck = false;
     bool crlf_ck = false;
     bool end_ck = false;
@@ -824,6 +826,8 @@ int cpp_main( int argc_param, char * argv_param[] )
 
         ("license", value<bool>(&license_ck)->implicit_value(false),
             "check for Boost license violations (default: off)")
+        ("spdx_license", value<bool>(&spdx_license_ck)->implicit_value(false),
+            "check for SPDX license violations (default: off)")
         ("copyright", value<bool>(&copyright_ck)->implicit_value(false),
             "check for copyright violations (default: off)")
         ("crlf", value<bool>(&crlf_ck)->implicit_value(false),
@@ -922,6 +926,7 @@ int cpp_main( int argc_param, char * argv_param[] )
     if (vm.count("all"))
     {
         license_ck = true;
+        spdx_license_ck = true;
         copyright_ck = true;
         crlf_ck = true;
         end_ck = true;
@@ -953,6 +958,9 @@ int cpp_main( int argc_param, char * argv_param[] )
   if ( license_ck )
     inspectors.push_back( inspector_element(
         new boost::inspect::license_check ) );
+  if ( spdx_license_ck )
+    inspectors.push_back( inspector_element(
+        new boost::inspect::spdx_license_check ) );
   if ( copyright_ck )
     inspectors.push_back( inspector_element(
         new boost::inspect::copyright_check ) );
