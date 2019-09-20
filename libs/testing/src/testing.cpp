@@ -11,14 +11,13 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <iostream>
 #include <sstream>
-#include <functional>
 
 #include <boost/io/ios_state.hpp>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     static test_failure_handler_type test_failure_handler;
 
     void set_test_failure_handler(test_failure_handler_type f)
@@ -26,8 +25,7 @@ namespace hpx { namespace util
         test_failure_handler = f;
     }
 
-    namespace detail
-    {
+    namespace detail {
         void fixture::increment(counter_type c)
         {
             if (test_failure_handler)
@@ -65,7 +63,7 @@ namespace hpx { namespace util
         }
 
         fixture global_fixture{std::cerr};
-    }
+    }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
     int report_errors(std::ostream& stream)
@@ -99,4 +97,4 @@ namespace hpx { namespace util
     {
         print_cdash_timing(name, time / 1e9);
     }
-}}
+}}    // namespace hpx::util
