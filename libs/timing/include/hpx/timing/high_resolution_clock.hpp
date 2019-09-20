@@ -49,6 +49,6 @@ namespace hpx { namespace util {
             return (duration_values::max)().count();
         }
     };
-}}
+}}    // namespace hpx::util
 
 #endif
