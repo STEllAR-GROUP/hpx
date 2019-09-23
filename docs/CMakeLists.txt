@@ -47,7 +47,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/resource/partitioner.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/resource/partitioner_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/policies/scheduler_mode.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_enums.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_helpers.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_pool_base.hpp"

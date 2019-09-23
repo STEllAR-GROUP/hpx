@@ -3,10 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_executors.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
@@ -21,36 +21,36 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Parameters>
-void chunk_size_test_seq(Parameters && params)
+void chunk_size_test_seq(Parameters&& params)
 {
     using namespace hpx::parallel;
 
     typedef std::random_access_iterator_tag iterator_tag;
     test_for_each(execution::seq.with(std::ref(params)), iterator_tag());
-    test_for_each_async(execution::seq(execution::task).with(std::ref(params)),
-        iterator_tag());
+    test_for_each_async(
+        execution::seq(execution::task).with(std::ref(params)), iterator_tag());
 
     execution::sequenced_executor seq_exec;
-    test_for_each(execution::seq.on(seq_exec).with(std::ref(params)),
-        iterator_tag());
+    test_for_each(
+        execution::seq.on(seq_exec).with(std::ref(params)), iterator_tag());
     test_for_each_async(
         execution::seq(execution::task).on(seq_exec).with(std::ref(params)),
         iterator_tag());
 }
 
 template <typename Parameters>
-void chunk_size_test_par(Parameters && params)
+void chunk_size_test_par(Parameters&& params)
 {
     using namespace hpx::parallel;
 
     typedef std::random_access_iterator_tag iterator_tag;
     test_for_each(execution::par.with(std::ref(params)), iterator_tag());
-    test_for_each_async(execution::par(execution::task).with(std::ref(params)),
-        iterator_tag());
+    test_for_each_async(
+        execution::par(execution::task).with(std::ref(params)), iterator_tag());
 
     execution::parallel_executor par_exec;
-    test_for_each(execution::par.on(par_exec).with(std::ref(params)),
-        iterator_tag());
+    test_for_each(
+        execution::par.on(par_exec).with(std::ref(params)), iterator_tag());
     test_for_each_async(
         execution::par(execution::task).on(par_exec).with(std::ref(params)),
         iterator_tag());
@@ -59,23 +59,26 @@ void chunk_size_test_par(Parameters && params)
 struct timer_hooks_parameters
 {
     timer_hooks_parameters(char const* name)
-      : name_(name), time_(0), count_(0)
-    {}
+      : name_(name)
+      , time_(0)
+      , count_(0)
+    {
+    }
 
     template <typename Executor>
-    void mark_begin_execution(Executor &&)
+    void mark_begin_execution(Executor&&)
     {
         ++count_;
         time_ = hpx::util::high_resolution_clock::now();
     }
 
     template <typename Executor>
-    void mark_end_of_scheduling(Executor &&)
+    void mark_end_of_scheduling(Executor&&)
     {
     }
 
     template <typename Executor>
-    void mark_end_execution(Executor &&)
+    void mark_end_execution(Executor&&)
     {
         time_ = hpx::util::high_resolution_clock::now() - time_;
         ++count_;
@@ -86,13 +89,12 @@ struct timer_hooks_parameters
     std::atomic<std::size_t> count_;
 };
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     template <>
-    struct is_executor_parameters<timer_hooks_parameters>
-      : std::true_type
-    {};
-}}}
+    struct is_executor_parameters<timer_hooks_parameters> : std::true_type
+    {
+    };
+}}}    // namespace hpx::parallel::execution
 
 void test_timer_hooks()
 {
@@ -127,15 +129,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

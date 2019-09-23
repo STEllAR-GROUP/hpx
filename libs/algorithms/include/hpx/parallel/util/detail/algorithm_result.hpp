@@ -9,15 +9,14 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/parallel/execution_policy_fwd.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace util { namespace detail
-{
+namespace hpx { namespace parallel { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename T>
     struct algorithm_result_impl
@@ -32,13 +31,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
 
         template <typename T_>
-        static type get(T_ && t)
+        static type get(T_&& t)
         {
             return std::forward<T_>(t);
         }
 
         template <typename T_>
-        static type get(hpx::future<T_> && t)
+        static type get(hpx::future<T_>&& t)
         {
             return t.get();
         }
@@ -55,13 +54,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         static void get(hpx::util::unused_type) {}
 
-        static void get(hpx::future<void> && t)
+        static void get(hpx::future<void>&& t)
         {
             t.get();
         }
 
         template <typename T>
-        static void get(hpx::future<T> && t)
+        static void get(hpx::future<T>&& t)
         {
             t.get();
         }
@@ -74,12 +73,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         typedef hpx::future<T> type;
 
         // Obtain initiating function's return type.
-        static type get(T && t)
+        static type get(T&& t)
         {
             return hpx::make_ready_future(std::move(t));
         }
 
-        static type get(hpx::future<T> && t)
+        static type get(hpx::future<T>&& t)
         {
             return std::move(t);
         }
@@ -102,13 +101,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             return hpx::make_ready_future();
         }
 
-        static type get(hpx::future<void> && t)
+        static type get(hpx::future<void>&& t)
         {
             return std::move(t);
         }
 
         template <typename T>
-        static type get(hpx::future<T> && t)
+        static type get(hpx::future<T>&& t)
         {
             return hpx::future<void>(std::move(t));
         }
@@ -121,12 +120,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         typedef hpx::future<T> type;
 
         // Obtain initiating function's return type.
-        static type get(T && t)
+        static type get(T&& t)
         {
             return hpx::make_ready_future(std::move(t));
         }
 
-        static type get(hpx::future<T> && t)
+        static type get(hpx::future<T>&& t)
         {
             return std::move(t);
         }
@@ -149,13 +148,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             return hpx::make_ready_future();
         }
 
-        static type get(hpx::future<void> && t)
+        static type get(hpx::future<void>&& t)
         {
             return std::move(t);
         }
 
         template <typename T>
-        static type get(hpx::future<T> && t)
+        static type get(hpx::future<T>&& t)
         {
             return hpx::future<void>(std::move(t));
         }
@@ -164,73 +163,85 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Executor, typename Parameters, typename T>
     struct algorithm_result_impl<
-            execution::sequenced_task_policy_shim<Executor, Parameters>, T>
+        execution::sequenced_task_policy_shim<Executor, Parameters>, T>
       : algorithm_result_impl<execution::sequenced_task_policy, T>
-    {};
+    {
+    };
 
     template <typename Executor, typename Parameters>
     struct algorithm_result_impl<
-            execution::sequenced_task_policy_shim<Executor, Parameters>, void>
+        execution::sequenced_task_policy_shim<Executor, Parameters>, void>
       : algorithm_result_impl<execution::sequenced_task_policy, void>
-    {};
+    {
+    };
 
     template <typename Executor, typename Parameters, typename T>
     struct algorithm_result_impl<
-            execution::parallel_task_policy_shim<Executor, Parameters>, T>
+        execution::parallel_task_policy_shim<Executor, Parameters>, T>
       : algorithm_result_impl<execution::parallel_task_policy, T>
-    {};
+    {
+    };
 
     template <typename Executor, typename Parameters>
     struct algorithm_result_impl<
-            execution::parallel_task_policy_shim<Executor, Parameters>, void>
+        execution::parallel_task_policy_shim<Executor, Parameters>, void>
       : algorithm_result_impl<execution::parallel_task_policy, void>
-    {};
+    {
+    };
 
 #if defined(HPX_HAVE_DATAPAR)
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct algorithm_result_impl<execution::dataseq_task_policy, T>
       : algorithm_result_impl<execution::sequenced_task_policy, T>
-    {};
+    {
+    };
 
     template <>
     struct algorithm_result_impl<execution::dataseq_task_policy, void>
       : algorithm_result_impl<execution::sequenced_task_policy, void>
-    {};
+    {
+    };
 
     template <typename Executor, typename Parameters, typename T>
     struct algorithm_result_impl<
-            execution::dataseq_task_policy_shim<Executor, Parameters>, T>
+        execution::dataseq_task_policy_shim<Executor, Parameters>, T>
       : algorithm_result_impl<execution::sequenced_task_policy, T>
-    {};
+    {
+    };
 
     template <typename Executor, typename Parameters>
     struct algorithm_result_impl<
-            execution::dataseq_task_policy_shim<Executor, Parameters>, void>
+        execution::dataseq_task_policy_shim<Executor, Parameters>, void>
       : algorithm_result_impl<execution::sequenced_task_policy, void>
-    {};
+    {
+    };
 
     template <typename T>
     struct algorithm_result_impl<execution::datapar_task_policy, T>
       : algorithm_result_impl<execution::parallel_task_policy, T>
-    {};
+    {
+    };
 
     template <>
     struct algorithm_result_impl<execution::datapar_task_policy, void>
       : algorithm_result_impl<execution::parallel_task_policy, void>
-    {};
+    {
+    };
 
     template <typename Executor, typename Parameters, typename T>
     struct algorithm_result_impl<
-            execution::datapar_task_policy_shim<Executor, Parameters>, T>
+        execution::datapar_task_policy_shim<Executor, Parameters>, T>
       : algorithm_result_impl<execution::parallel_task_policy, T>
-    {};
+    {
+    };
 
     template <typename Executor, typename Parameters>
     struct algorithm_result_impl<
-            execution::datapar_task_policy_shim<Executor, Parameters>, void>
+        execution::datapar_task_policy_shim<Executor, Parameters>, void>
       : algorithm_result_impl<execution::parallel_task_policy, void>
-    {};
+    {
+    };
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
@@ -244,26 +255,23 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename U, typename Conv,
-    HPX_CONCEPT_REQUIRES_(
-        hpx::traits::is_invocable<Conv, U>::value)>
-    typename hpx::util::invoke_result<Conv, U>::type
-    convert_to_result(U && val, Conv && conv)
+        HPX_CONCEPT_REQUIRES_(hpx::traits::is_invocable<Conv, U>::value)>
+    typename hpx::util::invoke_result<Conv, U>::type convert_to_result(
+        U&& val, Conv&& conv)
     {
         return hpx::util::invoke(conv, val);
     }
 
     template <typename U, typename Conv,
-    HPX_CONCEPT_REQUIRES_(
-        hpx::traits::is_invocable<Conv, U>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::traits::is_invocable<Conv, U>::value)>
     hpx::future<typename hpx::util::invoke_result<Conv, U>::type>
-    convert_to_result(hpx::future<U> && f, Conv && conv)
+    convert_to_result(hpx::future<U>&& f, Conv&& conv)
     {
         typedef typename hpx::util::invoke_result<Conv, U>::type result_type;
 
         return lcos::make_future<result_type>(
-                std::move(f), std::forward<Conv>(conv)
-            );
+            std::move(f), std::forward<Conv>(conv));
     }
-}}}}
+}}}}    // namespace hpx::parallel::util::detail
 
 #endif

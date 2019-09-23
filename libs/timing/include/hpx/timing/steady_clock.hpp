@@ -75,6 +75,6 @@ namespace hpx { namespace util {
     private:
         value_type _rel_time;
     };
-}}
+}}    // namespace hpx::util
 
 #endif /*HPX_UTIL_STEADY_CLOCK_HPP*/

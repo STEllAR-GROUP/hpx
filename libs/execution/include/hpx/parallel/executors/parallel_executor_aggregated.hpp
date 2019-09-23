@@ -6,7 +6,8 @@
 
 /// \file parallel/executors/parallel_executor_aggregated.hpp
 
-#if !defined(HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_AGGREGATED_DEC_20_2018_0624PM)
+#if !defined(                                                                  \
+    HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_AGGREGATED_DEC_20_2018_0624PM)
 #define HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_AGGREGATED_DEC_20_2018_0624PM
 
 #include <hpx/config.hpp>
@@ -32,8 +33,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     /// A \a parallel_executor_aggregated creates groups of parallel execution
     /// agents that execute in threads implicitly created by the executor. This
@@ -55,9 +55,11 @@ namespace hpx { namespace parallel { namespace execution
 
         /// Create a new parallel executor
         HPX_CONSTEXPR explicit parallel_policy_executor_aggregated(
-                std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
-          : num_spread_(spread), num_tasks_(tasks)
-        {}
+            std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
+          : num_spread_(spread)
+          , num_tasks_(tasks)
+        {
+        }
 
         /// \cond NOINTERNAL
         bool operator==(parallel_policy_executor_aggregated const& rhs) const
@@ -93,8 +95,8 @@ namespace hpx { namespace parallel { namespace execution
         template <typename F, typename... Ts>
         static void post(F&& f, Ts&&... ts)
         {
-            hpx::util::thread_description desc(f,
-                "parallel_executor_aggregated::post");
+            hpx::util::thread_description desc(
+                f, "parallel_executor_aggregated::post");
 
             detail::post_policy_dispatch<Policy>::call(
                 desc, Policy{}, std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -112,7 +114,8 @@ namespace hpx { namespace parallel { namespace execution
                     (std::min)(std::size_t(128), hpx::get_os_thread_count());
 
                 std::size_t num_tasks = (num_tasks_ == std::size_t(-1)) ?
-                    global_num_tasks : num_tasks_;
+                    global_num_tasks :
+                    num_tasks_;
 
                 std::exception_ptr e;
                 lcos::local::spinlock mtx_e;
@@ -149,8 +152,7 @@ namespace hpx { namespace parallel { namespace execution
                 // spawn tasks sequentially
                 for (std::size_t i = 0; i != size; ++i, ++it)
                 {
-                    post([&, it]
-                    {
+                    post([&, it] {
                         // properly handle all exceptions thrown from 'f'
                         try
                         {
@@ -183,8 +185,7 @@ namespace hpx { namespace parallel { namespace execution
 
                     while (size > chunk_size)
                     {
-                        post([&, chunk_size, num_tasks, it]
-                        {
+                        post([&, chunk_size, num_tasks, it] {
                             spawn_hierarchical(l, chunk_size, num_tasks, f, it,
                                 e, mtx_e, ts...);
                         });
@@ -213,9 +214,8 @@ namespace hpx { namespace parallel { namespace execution
             // for now, wrap single future in a vector to avoid having to
             // change the executor and algorithm infrastructure
             std::vector<hpx::future<void>> result;
-            result.push_back(
-                async_execute(sync_exec{num_spread_, num_tasks_},
-                    std::forward<F>(f), shape, std::forward<Ts>(ts)...));
+            result.push_back(async_execute(sync_exec{num_spread_, num_tasks_},
+                std::forward<F>(f), shape, std::forward<Ts>(ts)...));
             return result;
         }
 
@@ -224,9 +224,9 @@ namespace hpx { namespace parallel { namespace execution
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
-            ar & num_spread_ & num_tasks_;
+            ar& num_spread_& num_tasks_;
         }
         /// \endcond
 
@@ -251,10 +251,13 @@ namespace hpx { namespace parallel { namespace execution
 
         /// Create a new parallel executor
         HPX_CONSTEXPR explicit parallel_policy_executor_aggregated(
-                hpx::launch l = hpx::launch::async_policy{},
-                std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
-          : policy_(l), num_spread_(spread), num_tasks_(tasks)
-        {}
+            hpx::launch l = hpx::launch::async_policy{}, std::size_t spread = 4,
+            std::size_t tasks = std::size_t(-1))
+          : policy_(l)
+          , num_spread_(spread)
+          , num_tasks_(tasks)
+        {
+        }
 
         /// \cond NOINTERNAL
         bool operator==(parallel_policy_executor_aggregated const& rhs) const
@@ -290,8 +293,8 @@ namespace hpx { namespace parallel { namespace execution
         template <typename F, typename... Ts>
         void post(F&& f, Ts&&... ts) const
         {
-            hpx::util::thread_description desc(f,
-                "parallel_executor_aggregated::post");
+            hpx::util::thread_description desc(
+                f, "parallel_executor_aggregated::post");
 
             detail::post_policy_dispatch<hpx::launch>::call(
                 desc, policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -309,7 +312,8 @@ namespace hpx { namespace parallel { namespace execution
                     (std::min)(std::size_t(128), hpx::get_os_thread_count());
 
                 std::size_t num_tasks = (num_tasks_ == std::size_t(-1)) ?
-                    global_num_tasks : num_tasks_;
+                    global_num_tasks :
+                    num_tasks_;
 
                 std::exception_ptr e;
                 lcos::local::spinlock mtx_e;
@@ -344,15 +348,13 @@ namespace hpx { namespace parallel { namespace execution
                 lcos::local::spinlock& mtx_e, Ts const&... ts) const
             {
                 // spawn tasks sequentially
-                hpx::util::thread_description desc(f,
-                    "parallel_executor_aggregated::spawn_sequential");
+                hpx::util::thread_description desc(
+                    f, "parallel_executor_aggregated::spawn_sequential");
 
                 for (std::size_t i = 0; i != size; ++i, ++it)
                 {
                     detail::post_policy_dispatch<hpx::launch>::call(
-                        desc, policy_,
-                        [&, it]() -> void
-                        {
+                        desc, policy_, [&, it]() -> void {
                             // properly handle all exceptions thrown from 'f'
                             try
                             {
@@ -379,8 +381,8 @@ namespace hpx { namespace parallel { namespace execution
                 if (size > num_tasks)
                 {
                     // spawn hierarchical tasks
-                    hpx::util::thread_description desc(f,
-                        "parallel_executor_aggregated::spawn_hierarchical");
+                    hpx::util::thread_description desc(
+                        f, "parallel_executor_aggregated::spawn_hierarchical");
 
                     std::size_t chunk_size =
                         (size + num_spread_) / num_spread_ - 1;
@@ -389,9 +391,7 @@ namespace hpx { namespace parallel { namespace execution
                     while (size > chunk_size)
                     {
                         detail::post_policy_dispatch<hpx::launch>::call(
-                            desc, policy_,
-                            [&, chunk_size, num_tasks, it]
-                            {
+                            desc, policy_, [&, chunk_size, num_tasks, it] {
                                 spawn_hierarchical(l, chunk_size, num_tasks, f,
                                     it, e, mtx_e, ts...);
                             });
@@ -432,9 +432,9 @@ namespace hpx { namespace parallel { namespace execution
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
-            ar & policy_ & num_spread_ & num_tasks_;
+            ar& policy_& num_spread_& num_tasks_;
         }
         /// \endcond
 
@@ -449,29 +449,31 @@ namespace hpx { namespace parallel { namespace execution
     ///////////////////////////////////////////////////////////////////////////
     using parallel_executor_aggregated =
         parallel_policy_executor_aggregated<hpx::launch::async_policy>;
-}}}
+}}}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <typename Policy>
     struct is_one_way_executor<
-            parallel::execution::parallel_policy_executor_aggregated<Policy>>
+        parallel::execution::parallel_policy_executor_aggregated<Policy>>
       : std::true_type
-    {};
+    {
+    };
 
     template <typename Policy>
     struct is_two_way_executor<
-            parallel::execution::parallel_policy_executor_aggregated<Policy>>
+        parallel::execution::parallel_policy_executor_aggregated<Policy>>
       : std::true_type
-    {};
+    {
+    };
 
     template <typename Policy>
     struct is_bulk_two_way_executor<
-            parallel::execution::parallel_policy_executor_aggregated<Policy>>
+        parallel::execution::parallel_policy_executor_aggregated<Policy>>
       : std::true_type
-    {};
+    {
+    };
     /// \endcond
-}}}
+}}}    // namespace hpx::parallel::execution
 
 #endif

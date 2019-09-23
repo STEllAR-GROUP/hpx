@@ -3,16 +3,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_is_partitioned.hpp>
 #include <hpx/testing.hpp>
 
 #include <cstddef>
-#include <iterator>
 #include <iostream>
-#include <string>
+#include <iterator>
 #include <random>
+#include <string>
 #include <vector>
 
 #include "test_utils.hpp"
@@ -20,7 +20,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int seed = std::random_device{}();
 std::mt19937 gen(seed);
-std::uniform_int_distribution<> dis(0,99);
+std::uniform_int_distribution<> dis(0, 99);
 
 template <typename ExPolicy, typename IteratorTag>
 void test_partitioned1(ExPolicy policy, IteratorTag)
@@ -35,14 +35,11 @@ void test_partitioned1(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size()/2,
-        2*(dis(gen)));
-    std::fill(std::begin(c) + c.size()/2, std::end(c),
-        2*(dis(gen)) + 1);
+    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
+    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
 
-    bool parted = hpx::parallel::is_partitioned(policy,
-        iterator(std::begin(c)), iterator(std::end(c)),
-        [](std::size_t n){ return n % 2 == 0; });
+    bool parted = hpx::parallel::is_partitioned(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), [](std::size_t n) { return n % 2 == 0; });
 
     HPX_TEST(parted);
 }
@@ -56,15 +53,12 @@ void test_partitioned1_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size()/2,
-        2*(dis(gen)));
-    std::fill(std::begin(c) + c.size()/2, std::end(c),
-        2*(dis(gen)) + 1);
+    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
+    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
 
     hpx::future<bool> f =
-        hpx::parallel::is_partitioned(p,
-        iterator(std::begin(c)), iterator(std::end(c)),
-        [](std::size_t n){ return n % 2 == 0; });
+        hpx::parallel::is_partitioned(p, iterator(std::begin(c)),
+            iterator(std::end(c)), [](std::size_t n) { return n % 2 == 0; });
     f.wait();
 
     HPX_TEST(f.get());
@@ -101,19 +95,17 @@ void test_partitioned2(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c_odd(10007);
     //fill all of array with odds
-    std::fill(std::begin(c_odd), std::end(c_odd),
-        2*(dis(gen)) + 1);
+    std::fill(std::begin(c_odd), std::end(c_odd), 2 * (dis(gen)) + 1);
     std::vector<std::size_t> c_even(10007);
     //fill all of array with evens
-    std::fill(std::begin(c_odd), std::end(c_odd),
-        2*(dis(gen)));
+    std::fill(std::begin(c_odd), std::end(c_odd), 2 * (dis(gen)));
 
     bool parted_odd = hpx::parallel::is_partitioned(policy,
         iterator(std::begin(c_odd)), iterator(std::end(c_odd)),
-        [](std::size_t n){ return n % 2 == 0; });
+        [](std::size_t n) { return n % 2 == 0; });
     bool parted_even = hpx::parallel::is_partitioned(policy,
         iterator(std::begin(c_even)), iterator(std::end(c_even)),
-        [](std::size_t n){ return n % 2 == 0; });
+        [](std::size_t n) { return n % 2 == 0; });
 
     HPX_TEST(parted_odd);
     HPX_TEST(parted_even);
@@ -127,19 +119,17 @@ void test_partitioned2_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c_odd(10007);
     //fill all of array with odds
-    std::fill(std::begin(c_odd), std::end(c_odd),
-        2*(dis(gen)) + 1);
+    std::fill(std::begin(c_odd), std::end(c_odd), 2 * (dis(gen)) + 1);
     std::vector<std::size_t> c_even(10007);
     //fill all of array with evens
-    std::fill(std::begin(c_odd), std::end(c_odd),
-        2*(dis(gen)));
+    std::fill(std::begin(c_odd), std::end(c_odd), 2 * (dis(gen)));
 
     hpx::future<bool> f_odd = hpx::parallel::is_partitioned(p,
         iterator(std::begin(c_odd)), iterator(std::end(c_odd)),
-        [](std::size_t n){ return n % 2 == 0; });
+        [](std::size_t n) { return n % 2 == 0; });
     hpx::future<bool> f_even = hpx::parallel::is_partitioned(p,
         iterator(std::begin(c_even)), iterator(std::end(c_even)),
-        [](std::size_t n){ return n % 2 == 0; });
+        [](std::size_t n) { return n % 2 == 0; });
 
     f_odd.wait();
     HPX_TEST(f_odd.get());
@@ -179,22 +169,22 @@ void test_partitioned3(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c_beg(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c_beg), std::begin(c_beg) + c_beg.size()/2,
-        2*(dis(gen)));
-    std::fill(std::begin(c_beg) + c_beg.size()/2, std::end(c_beg),
-        2*(dis(gen)) + 1);
+    std::fill(std::begin(c_beg), std::begin(c_beg) + c_beg.size() / 2,
+        2 * (dis(gen)));
+    std::fill(std::begin(c_beg) + c_beg.size() / 2, std::end(c_beg),
+        2 * (dis(gen)) + 1);
     std::vector<size_t> c_end = c_beg;
     //add odd number to the beginning
     c_beg[0] -= 1;
     //add even number to end
-    c_end[c_end.size()-1] -= 1;
+    c_end[c_end.size() - 1] -= 1;
 
     bool parted1 = hpx::parallel::is_partitioned(policy,
         iterator(std::begin(c_beg)), iterator(std::end(c_beg)),
-        [](std::size_t n){ return n % 2 == 0; });
+        [](std::size_t n) { return n % 2 == 0; });
     bool parted2 = hpx::parallel::is_partitioned(policy,
         iterator(std::begin(c_end)), iterator(std::end(c_end)),
-        [](std::size_t n){ return n % 2 == 0; });
+        [](std::size_t n) { return n % 2 == 0; });
 
     HPX_TEST(!parted1);
     HPX_TEST(!parted2);
@@ -216,22 +206,22 @@ void test_partitioned3_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c_beg(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c_beg), std::begin(c_beg) + c_beg.size()/2,
-        2*(dis(gen)));
-    std::fill(std::begin(c_beg) + c_beg.size()/2, std::end(c_beg),
-        2*(dis(gen)) + 1);
+    std::fill(std::begin(c_beg), std::begin(c_beg) + c_beg.size() / 2,
+        2 * (dis(gen)));
+    std::fill(std::begin(c_beg) + c_beg.size() / 2, std::end(c_beg),
+        2 * (dis(gen)) + 1);
     std::vector<size_t> c_end = c_beg;
     //add odd number to the beginning
     c_beg[0] -= 1;
     //add even number to end
-    c_end[c_end.size()-1] -= 1;
+    c_end[c_end.size() - 1] -= 1;
 
     hpx::future<bool> f_beg = hpx::parallel::is_partitioned(p,
         iterator(std::begin(c_beg)), iterator(std::end(c_beg)),
-        [](std::size_t n){ return n % 2 == 0; });
+        [](std::size_t n) { return n % 2 == 0; });
     hpx::future<bool> f_end = hpx::parallel::is_partitioned(p,
         iterator(std::begin(c_end)), iterator(std::end(c_end)),
-        [](std::size_t n){ return n % 2 == 0; });
+        [](std::size_t n) { return n % 2 == 0; });
 
     f_beg.wait();
     HPX_TEST(!f_beg.get());
@@ -272,27 +262,26 @@ void test_partitioned_exception(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size()/2,
-        2*(dis(gen)));
-    std::fill(std::begin(c) + c.size()/2, std::end(c),
-        2*(dis(gen)) + 1);
+    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
+    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
 
     bool caught_exception = false;
-    try{
+    try
+    {
         hpx::parallel::is_partitioned(policy,
             decorated_iterator(
-                std::begin(c),
-                [](){ throw std::runtime_error("test"); }),
+                std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(
-                std::end(c),
-                [](){ throw std::runtime_error("test"); }),
-            [](std::size_t n){ return n % 2 == 0; });
+                std::end(c), []() { throw std::runtime_error("test"); }),
+            [](std::size_t n) { return n % 2 == 0; });
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -309,33 +298,29 @@ void test_partitioned_async_exception(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size()/2,
-        2*(dis(gen)));
-    std::fill(std::begin(c) + c.size()/2, std::end(c),
-        2*(dis(gen)) + 1);
+    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
+    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
 
     bool caught_exception = false;
-    try {
-        hpx::future<bool> f =
-            hpx::parallel::is_partitioned(p,
-                decorated_iterator(
-                    std::begin(c),
-                    [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(
-                    std::end(c),
-                    [](){ throw std::runtime_error("test"); }),
-                [](std::size_t n){ return n % 2 == 0; });
+    try
+    {
+        hpx::future<bool> f = hpx::parallel::is_partitioned(p,
+            decorated_iterator(
+                std::begin(c), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(
+                std::end(c), []() { throw std::runtime_error("test"); }),
+            [](std::size_t n) { return n % 2 == 0; });
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
-        test::test_num_exceptions<
-            ExPolicy, IteratorTag
-            >::call(p, e);
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -352,8 +337,10 @@ void test_partitioned_exception()
     test_partitioned_exception(execution::seq, IteratorTag());
     test_partitioned_exception(execution::par, IteratorTag());
 
-    test_partitioned_async_exception(execution::seq(execution::task), IteratorTag());
-    test_partitioned_async_exception(execution::par(execution::task), IteratorTag());
+    test_partitioned_async_exception(
+        execution::seq(execution::task), IteratorTag());
+    test_partitioned_async_exception(
+        execution::par(execution::task), IteratorTag());
 }
 
 void partitioned_exception_test()
@@ -377,27 +364,24 @@ void test_partitioned_bad_alloc(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size()/2,
-        2*(dis(gen)));
-    std::fill(std::begin(c) + c.size()/2, std::end(c),
-        2*(dis(gen)) + 1);
+    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
+    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
 
     bool caught_bad_alloc = false;
-    try {
+    try
+    {
         hpx::parallel::is_partitioned(policy,
-            decorated_iterator(
-                std::begin(c),
-                [](){ throw std::bad_alloc(); }),
-            decorated_iterator(
-                std::end(c),
-                [](){ throw std::bad_alloc(); }),
-            [](std::size_t n){ return n % 2 == 0; });
+            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
+            decorated_iterator(std::end(c), []() { throw std::bad_alloc(); }),
+            [](std::size_t n) { return n % 2 == 0; });
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -414,30 +398,26 @@ void test_partitioned_async_bad_alloc(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size()/2,
-        2*(dis(gen)));
-    std::fill(std::begin(c) + c.size()/2, std::end(c),
-        2*(dis(gen)) + 1);
+    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
+    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
 
     bool caught_bad_alloc = false;
-    try {
-        hpx::future<bool> f =
-            hpx::parallel::is_partitioned(p,
-                decorated_iterator(
-                    std::begin(c),
-                    [](){ throw std::bad_alloc(); }),
-                decorated_iterator(
-                    std::end(c),
-                    [](){ throw std::bad_alloc(); }),
-                [](std::size_t n){ return n % 2 == 0; });
+    try
+    {
+        hpx::future<bool> f = hpx::parallel::is_partitioned(p,
+            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
+            decorated_iterator(std::end(c), []() { throw std::bad_alloc(); }),
+            [](std::size_t n) { return n % 2 == 0; });
 
         f.get();
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -455,8 +435,10 @@ void test_partitioned_bad_alloc()
     test_partitioned_bad_alloc(execution::par, IteratorTag());
     test_partitioned_bad_alloc(execution::seq, IteratorTag());
 
-    test_partitioned_async_bad_alloc(execution::seq(execution::task), IteratorTag());
-    test_partitioned_async_bad_alloc(execution::par(execution::task), IteratorTag());
+    test_partitioned_async_bad_alloc(
+        execution::seq(execution::task), IteratorTag());
+    test_partitioned_async_bad_alloc(
+        execution::par(execution::task), IteratorTag());
 }
 
 void partitioned_bad_alloc_test()
@@ -464,7 +446,6 @@ void partitioned_bad_alloc_test()
     test_partitioned_bad_alloc<std::random_access_iterator_tag>();
     test_partitioned_bad_alloc<std::forward_iterator_tag>();
 }
-
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
@@ -483,9 +464,7 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status");

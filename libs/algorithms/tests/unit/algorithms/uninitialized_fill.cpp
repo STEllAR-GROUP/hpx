@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_uninitialized_fill.hpp>
 #include <hpx/testing.hpp>
 
@@ -32,16 +32,15 @@ void test_uninitialized_fill(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    hpx::parallel::uninitialized_fill(policy,
-        iterator(std::begin(c)), iterator(std::end(c)), 10);
+    hpx::parallel::uninitialized_fill(
+        policy, iterator(std::begin(c)), iterator(std::end(c)), 10);
 
     // verify values
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c),
-        [&count](std::size_t v) -> void {
-            HPX_TEST_EQ(v, std::size_t(10));
-            ++count;
-        });
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, std::size_t(10));
+        ++count;
+    });
     HPX_TEST_EQ(count, c.size());
 }
 
@@ -54,17 +53,14 @@ void test_uninitialized_fill_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    hpx::future<void> f =
-        hpx::parallel::uninitialized_fill(p,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            10);
+    hpx::future<void> f = hpx::parallel::uninitialized_fill(
+        p, iterator(std::begin(c)), iterator(std::end(c)), 10);
     f.wait();
 
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c),
-        [&count](std::size_t v) -> void {
-            HPX_TEST_EQ(v, std::size_t(10));
-            ++count;
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, std::size_t(10));
+        ++count;
     });
     HPX_TEST_EQ(count, c.size());
 }
@@ -77,10 +73,10 @@ void test_uninitialized_fill()
     test_uninitialized_fill(execution::par, IteratorTag());
     test_uninitialized_fill(execution::par_unseq, IteratorTag());
 
-    test_uninitialized_fill_async(execution::seq(execution::task),
-        IteratorTag());
-    test_uninitialized_fill_async(execution::par(execution::task),
-        IteratorTag());
+    test_uninitialized_fill_async(
+        execution::seq(execution::task), IteratorTag());
+    test_uninitialized_fill_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void uninitialized_fill_test()
@@ -104,29 +100,29 @@ void test_uninitialized_fill_exception(ExPolicy policy, IteratorTag)
     std::vector<test::count_instances> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    std::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % c.size());    //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::parallel::uninitialized_fill(policy,
-            decorated_iterator(
-                std::begin(c),
-                [&throw_after]()
-                {
+            decorated_iterator(std::begin(c),
+                [&throw_after]() {
                     if (throw_after-- == 0)
                         throw std::runtime_error("test");
                 }),
-            decorated_iterator(std::end(c)),
-            10);
+            decorated_iterator(std::end(c)), 10);
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -144,34 +140,33 @@ void test_uninitialized_fill_exception_async(ExPolicy p, IteratorTag)
     std::vector<test::count_instances> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    std::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % c.size());    //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        hpx::future<void> f =
-            hpx::parallel::uninitialized_fill(p,
-                decorated_iterator(
-                    std::begin(c),
-                    [&throw_after]()
-                    {
-                        if (throw_after-- == 0)
-                            throw std::runtime_error("test");
-                    }),
-                decorated_iterator(std::end(c)),
-                10);
+    try
+    {
+        hpx::future<void> f = hpx::parallel::uninitialized_fill(p,
+            decorated_iterator(std::begin(c),
+                [&throw_after]() {
+                    if (throw_after-- == 0)
+                        throw std::runtime_error("test");
+                }),
+            decorated_iterator(std::end(c)), 10);
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -191,10 +186,10 @@ void test_uninitialized_fill_exception()
     test_uninitialized_fill_exception(execution::seq, IteratorTag());
     test_uninitialized_fill_exception(execution::par, IteratorTag());
 
-    test_uninitialized_fill_exception_async(execution::seq(execution::task),
-        IteratorTag());
-    test_uninitialized_fill_exception_async(execution::par(execution::task),
-        IteratorTag());
+    test_uninitialized_fill_exception_async(
+        execution::seq(execution::task), IteratorTag());
+    test_uninitialized_fill_exception_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void uninitialized_fill_exception_test()
@@ -218,28 +213,28 @@ void test_uninitialized_fill_bad_alloc(ExPolicy policy, IteratorTag)
     std::vector<test::count_instances> c(100007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    std::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % c.size());    //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_bad_alloc = false;
-    try {
+    try
+    {
         hpx::parallel::uninitialized_fill(policy,
-            decorated_iterator(
-                std::begin(c),
-                [&throw_after]()
-                {
+            decorated_iterator(std::begin(c),
+                [&throw_after]() {
                     if (throw_after-- == 0)
                         throw std::bad_alloc();
                 }),
-            decorated_iterator(std::end(c)),
-            10);
+            decorated_iterator(std::end(c)), 10);
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -257,33 +252,32 @@ void test_uninitialized_fill_bad_alloc_async(ExPolicy p, IteratorTag)
     std::vector<test::count_instances> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    std::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % c.size());    //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
-    try {
-        hpx::future<void> f =
-            hpx::parallel::uninitialized_fill(p,
-                decorated_iterator(
-                    std::begin(c),
-                    [&throw_after]()
-                    {
-                        if (throw_after-- == 0)
-                            throw std::bad_alloc();
-                    }),
-                decorated_iterator(std::end(c)),
-                10);
+    try
+    {
+        hpx::future<void> f = hpx::parallel::uninitialized_fill(p,
+            decorated_iterator(std::begin(c),
+                [&throw_after]() {
+                    if (throw_after-- == 0)
+                        throw std::bad_alloc();
+                }),
+            decorated_iterator(std::end(c)), 10);
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -303,10 +297,10 @@ void test_uninitialized_fill_bad_alloc()
     test_uninitialized_fill_bad_alloc(execution::seq, IteratorTag());
     test_uninitialized_fill_bad_alloc(execution::par, IteratorTag());
 
-    test_uninitialized_fill_bad_alloc_async(execution::seq(execution::task),
-        IteratorTag());
-    test_uninitialized_fill_bad_alloc_async(execution::par(execution::task),
-        IteratorTag());
+    test_uninitialized_fill_bad_alloc_async(
+        execution::seq(execution::task), IteratorTag());
+    test_uninitialized_fill_bad_alloc_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void uninitialized_fill_bad_alloc_test()
@@ -317,7 +311,7 @@ void uninitialized_fill_bad_alloc_test()
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -337,20 +331,15 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
-
 }

@@ -19,7 +19,8 @@ namespace hpx { namespace assertion {
         unsigned line_number;
         const char* function_name;
     };
-    HPX_EXPORT std::ostream& operator<<(std::ostream& os, source_location const& loc);
-}}
+    HPX_EXPORT std::ostream& operator<<(
+        std::ostream& os, source_location const& loc);
+}}    // namespace hpx::assertion
 
 #endif

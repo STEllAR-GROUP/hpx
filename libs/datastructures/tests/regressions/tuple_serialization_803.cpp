@@ -7,8 +7,8 @@
 // support functions for util::tuple).
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/util.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/util.hpp>
 //#include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/testing.hpp>
@@ -42,7 +42,7 @@ void worker1_ref(tuple_type const& t)
 }
 HPX_PLAIN_ACTION(worker1_ref);
 
-void worker2_ref(tuple_base_type const&t)
+void worker2_ref(tuple_base_type const& t)
 {
     HPX_TEST_EQ(hpx::util::get<0>(t), 42);
     HPX_TEST_EQ(hpx::util::get<1>(t), 3.14);
@@ -83,4 +83,3 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
-

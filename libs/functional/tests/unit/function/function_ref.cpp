@@ -22,37 +22,94 @@ using std::string;
 
 int global_int;
 
-struct write_five_obj { void operator()() const { global_int = 5; } };
-struct write_three_obj { int operator()() const { global_int = 3; return 7; }};
-static void write_five() { global_int = 5; }
-static void write_three() { global_int = 3; }
-struct generate_five_obj { int operator()() const { return 5; } };
-struct generate_three_obj { int operator()() const { return 3; } };
-static int generate_five() { return 5; }
-static int generate_three() { return 3; }
-static string identity_str(const string& s) { return s; }
-static string string_cat(const string& s1, const string& s2) { return s1+s2; }
-static int sum_ints(int x, int y) { return x+y; }
+struct write_five_obj
+{
+    void operator()() const
+    {
+        global_int = 5;
+    }
+};
+struct write_three_obj
+{
+    int operator()() const
+    {
+        global_int = 3;
+        return 7;
+    }
+};
+static void write_five()
+{
+    global_int = 5;
+}
+static void write_three()
+{
+    global_int = 3;
+}
+struct generate_five_obj
+{
+    int operator()() const
+    {
+        return 5;
+    }
+};
+struct generate_three_obj
+{
+    int operator()() const
+    {
+        return 3;
+    }
+};
+static int generate_five()
+{
+    return 5;
+}
+static int generate_three()
+{
+    return 3;
+}
+static string identity_str(const string& s)
+{
+    return s;
+}
+static string string_cat(const string& s1, const string& s2)
+{
+    return s1 + s2;
+}
+static int sum_ints(int x, int y)
+{
+    return x + y;
+}
 
 struct write_const_1_nonconst_2
 {
-    void operator()() { global_int = 2; }
-    void operator()() const { global_int = 1; }
+    void operator()()
+    {
+        global_int = 2;
+    }
+    void operator()() const
+    {
+        global_int = 1;
+    }
 };
 
 struct add_to_obj
 {
-    add_to_obj(int v) : value(v) {}
+    add_to_obj(int v)
+      : value(v)
+    {
+    }
 
-    int operator()(int x) const { return value + x; }
+    int operator()(int x) const
+    {
+        return value + x;
+    }
 
     int value;
 };
 
-static void
-    test_zero_args()
+static void test_zero_args()
 {
-    typedef hpx::util::function_ref<void ()> func_void_type;
+    typedef hpx::util::function_ref<void()> func_void_type;
 
     write_five_obj five;
     write_three_obj three;
@@ -68,12 +125,12 @@ static void
     global_int = 0;
 
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wself-assign-overloaded"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wself-assign-overloaded"
 #endif
     v1 = v1;
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#  pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #endif
 
     v1();
@@ -86,34 +143,34 @@ static void
     global_int = 0;
 
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wself-assign-overloaded"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wself-assign-overloaded"
 #endif
     v1 = (v1);
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#  pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #endif
 
     v1();
-    HPX_TEST(global_int == 5);\
+    HPX_TEST(global_int == 5);
 
     // Invocation
     v1 = write_five;
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 5);\
+    HPX_TEST(global_int == 5);
 
     // Invocation
     v1 = write_three;
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 3);\
+    HPX_TEST(global_int == 3);
 
     // Invocation
     v1 = five;
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 5);\
+    HPX_TEST(global_int == 5);
 
     // Invocation
     v1 = &write_three;
@@ -347,8 +404,8 @@ static void
 
     // Const vs. non-const
     write_const_1_nonconst_2 one_or_two;
-    const hpx::util::function_ref<void ()> v7(one_or_two);
-    hpx::util::function_ref<void ()> v8(one_or_two);
+    const hpx::util::function_ref<void()> v7(one_or_two);
+    hpx::util::function_ref<void()> v8(one_or_two);
 
     global_int = 0;
     v7();
@@ -359,7 +416,7 @@ static void
     HPX_TEST(global_int == 2);
 
     // Test return values
-    typedef hpx::util::function_ref<int ()> func_int_type;
+    typedef hpx::util::function_ref<int()> func_int_type;
     generate_five_obj gen_five;
     generate_three_obj gen_three;
 
@@ -374,7 +431,7 @@ static void
     HPX_TEST(i0() == 3);
 
     // Test return values with compatible types
-    typedef hpx::util::function_ref<long ()> func_long_type;
+    typedef hpx::util::function_ref<long()> func_long_type;
     func_long_type i1(gen_five);
 
     HPX_TEST(i1() == 5);
@@ -386,40 +443,43 @@ static void
     HPX_TEST(i1() == 3);
 }
 
-static void
-    test_one_arg()
+static void test_one_arg()
 {
     std::negate<int> neg;
 
-    hpx::util::function_ref<int (int)> f1(neg);
+    hpx::util::function_ref<int(int)> f1(neg);
     HPX_TEST(f1(5) == -5);
 
-    hpx::util::function_ref<string (string)> id(&identity_str);
+    hpx::util::function_ref<string(string)> id(&identity_str);
     HPX_TEST(id("str") == "str");
 
-    hpx::util::function_ref<string (const char*)> id2(&identity_str);
+    hpx::util::function_ref<string(const char*)> id2(&identity_str);
     HPX_TEST(id2("foo") == "foo");
 
     add_to_obj add_to(5);
-    hpx::util::function_ref<int (int)> f2(add_to);
+    hpx::util::function_ref<int(int)> f2(add_to);
     HPX_TEST(f2(3) == 8);
 
-    const hpx::util::function_ref<int (int)> cf2(add_to);
+    const hpx::util::function_ref<int(int)> cf2(add_to);
     HPX_TEST(cf2(3) == 8);
 }
 
-static void
-    test_two_args()
+static void test_two_args()
 {
-    hpx::util::function_ref<string (const string&, const string&)> cat(&string_cat);
+    hpx::util::function_ref<string(const string&, const string&)> cat(
+        &string_cat);
     HPX_TEST(cat("str", "ing") == "string");
 
-    hpx::util::function_ref<int (short, short)> sum(&sum_ints);
+    hpx::util::function_ref<int(short, short)> sum(&sum_ints);
     HPX_TEST(sum(2, 3) == 5);
 }
 
-struct add_with_throw_on_copy {
-    int operator()(int x, int y) const { return x+y; }
+struct add_with_throw_on_copy
+{
+    int operator()(int x, int y) const
+    {
+        return x + y;
+    }
 
     add_with_throw_on_copy() {}
 
@@ -434,24 +494,24 @@ struct add_with_throw_on_copy {
     }
 };
 
-static void
-    test_ref()
+static void test_ref()
 {
     add_with_throw_on_copy atc;
-    try {
-        hpx::util::function_ref<int (int, int)> f(std::ref(atc));
+    try
+    {
+        hpx::util::function_ref<int(int, int)> f(std::ref(atc));
         HPX_TEST(f(1, 3) == 4);
     }
-    catch(std::runtime_error const& /*e*/) {
+    catch (std::runtime_error const& /*e*/)
+    {
         HPX_TEST_MSG(false, "Nonthrowing constructor threw an exception");
     }
 }
 
-static void
-    test_ptr_ref()
+static void test_ptr_ref()
 {
-    typedef hpx::util::function_ref<void ()> func_void_type;
-    typedef hpx::util::function_ref<int ()> func_int_type;
+    typedef hpx::util::function_ref<void()> func_void_type;
+    typedef hpx::util::function_ref<int()> func_int_type;
 
     // Invocation of a function
     void (*void_ptr)() = &write_five;
@@ -482,32 +542,33 @@ static void
     HPX_TEST(v2() == 5);
 }
 
-struct big_aggregating_structure {
+struct big_aggregating_structure
+{
     // int disable_small_objects_optimizations[32];
 
     big_aggregating_structure()
     {
-        ++ global_int;
+        ++global_int;
     }
 
     big_aggregating_structure(const big_aggregating_structure&)
     {
-        ++ global_int;
+        ++global_int;
     }
 
     ~big_aggregating_structure()
     {
-        -- global_int;
+        --global_int;
     }
 
     void operator()()
     {
-        ++ global_int;
+        ++global_int;
     }
 
     void operator()(int)
     {
-        ++ global_int;
+        ++global_int;
     }
 };
 
@@ -542,7 +603,7 @@ static void test_copy_semantics()
     HPX_TEST(global_int == 3);
 }
 
-int main(int, char* [])
+int main(int, char*[])
 {
     test_zero_args();
     test_one_arg();

@@ -8,16 +8,15 @@
 #define HPX_UTIL_DEBUG_DEMANGLE_HELPER_OCT_28_2011_0410PM
 
 #include <hpx/config.hpp>
+#include <cstdlib>
 #include <string>
 #include <type_traits>
 #include <typeinfo>
-#include <cstdlib>
 
 // --------------------------------------------------------------------
 // Always present regardless of compiler : used by serialization code
 // --------------------------------------------------------------------
-namespace hpx { namespace util { namespace debug
-{
+namespace hpx { namespace util { namespace debug {
     template <typename T>
     struct demangle_helper
     {
@@ -26,19 +25,18 @@ namespace hpx { namespace util { namespace debug
             return typeid(T).name();
         }
     };
-}}}
+}}}    // namespace hpx::util::debug
 
 #if defined(__GNUG__)
 
 #include <cxxabi.h>
-#include <stdlib.h>
 #include <memory>
+#include <stdlib.h>
 
 // --------------------------------------------------------------------
 // if available : demangle an arbitrary c++ type using gnu utility
 // --------------------------------------------------------------------
-namespace hpx { namespace util { namespace debug
-{
+namespace hpx { namespace util { namespace debug {
     template <typename T>
     class cxxabi_demangle_helper
     {
@@ -56,24 +54,22 @@ namespace hpx { namespace util { namespace debug
         }
 
     private:
-        std::unique_ptr<char, void(*)(void*)> demangled_;
+        std::unique_ptr<char, void (*)(void*)> demangled_;
     };
 
-}}}
+}}}    // namespace hpx::util::debug
 
 #else
 
-namespace hpx { namespace util { namespace debug
-{
+namespace hpx { namespace util { namespace debug {
     template <typename T>
     using cxxabi_demangle_helper = demangle_helper<T>;
-}}}
+}}}    // namespace hpx::util::debug
 
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace debug
-{
+namespace hpx { namespace util { namespace debug {
     template <typename T>
     struct type_id
     {
@@ -91,7 +87,8 @@ namespace hpx { namespace util { namespace debug
     };
 
     template <typename T>
-    cxxabi_demangle_helper<T> cxx_type_id<T>::typeid_ = cxxabi_demangle_helper<T>();
+    cxxabi_demangle_helper<T> cxx_type_id<T>::typeid_ =
+        cxxabi_demangle_helper<T>();
 #else
     template <typename T>
     using cxx_type_id = type_id<T>;
@@ -102,25 +99,25 @@ namespace hpx { namespace util { namespace debug
     // usage : std::cout << print_type<args...>("separator")
     // separator is appended if the number of types > 1
     // --------------------------------------------------------------------
-    template <typename T=void>
-    inline std::string print_type(const char *delim="")
+    template <typename T = void>
+    inline std::string print_type(const char* delim = "")
     {
         return std::string(cxx_type_id<T>::typeid_.type_id());
     }
 
     template <>
-    inline std::string print_type<>(const char *)
+    inline std::string print_type<>(const char*)
     {
         return "void";
     }
 
-    template <typename T, typename ...Args>
-    inline typename std::enable_if<sizeof...(Args)!=0, std::string>::type
-    print_type(const char *delim="")
+    template <typename T, typename... Args>
+    inline typename std::enable_if<sizeof...(Args) != 0, std::string>::type
+    print_type(const char* delim = "")
     {
         std::string temp(cxx_type_id<T>::typeid_.type_id());
         return temp + delim + print_type<Args...>(delim);
     }
-}}}
+}}}    // namespace hpx::util::debug
 
 #endif

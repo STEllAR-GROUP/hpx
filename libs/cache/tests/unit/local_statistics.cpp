@@ -9,31 +9,27 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>
 
-#include <string>
-#include <map>
 #include <functional>
+#include <map>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct data
 {
     data(char const* const k, char const* const v)
-      : key(k), value(v)
-    {}
+      : key(k)
+      , value(v)
+    {
+    }
 
     char const* const key;
     char const* const value;
 };
 
-data cache_entries[] =
-{
-    data ("white", "255,255,255"),
-    data ("yellow", "255,255,0"),
-    data ("green", "0,255,0"),
-    data ("blue", "0,0,255"),
-    data ("magenta", "255,0,255"),
-    data ("black", "0,0,0"),
-    data (nullptr, nullptr)
-};
+data cache_entries[] = {data("white", "255,255,255"),
+    data("yellow", "255,255,0"), data("green", "0,255,0"),
+    data("blue", "0,0,255"), data("magenta", "255,0,255"),
+    data("black", "0,0,0"), data(nullptr, nullptr)};
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_statistics_insert()
@@ -41,18 +37,18 @@ void test_statistics_insert()
     using namespace hpx::util::cache;
 
     typedef entries::lru_entry<std::string> entry_type;
-    typedef local_cache<
-        std::string, entry_type, std::less<entry_type>,
+    typedef local_cache<std::string, entry_type, std::less<entry_type>,
         policies::always<entry_type>, std::map<std::string, entry_type>,
-        statistics::local_statistics
-    > cache_type;
+        statistics::local_statistics>
+        cache_type;
 
     cache_type c(3);
 
     HPX_TEST(3 == c.capacity());
 
     // insert all items into the cache
-    for (data* d = &cache_entries[0]; d->key != nullptr; ++d) {
+    for (data* d = &cache_entries[0]; d->key != nullptr; ++d)
+    {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST(3 >= c.size());
     }
@@ -74,11 +70,10 @@ void test_statistics_insert_with_touch()
     using namespace hpx::util::cache;
 
     typedef entries::lru_entry<std::string> entry_type;
-    typedef local_cache<
-        std::string, entry_type, std::less<entry_type>,
+    typedef local_cache<std::string, entry_type, std::less<entry_type>,
         policies::always<entry_type>, std::map<std::string, entry_type>,
-        statistics::local_statistics
-    > cache_type;
+        statistics::local_statistics>
+        cache_type;
 
     cache_type c(3);
 
@@ -88,7 +83,8 @@ void test_statistics_insert_with_touch()
     int i = 0;
     data* d = &cache_entries[0];
 
-    for (/**/; i < 3 && d->key != nullptr; ++d, ++i) {
+    for (/**/; i < 3 && d->key != nullptr; ++d, ++i)
+    {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST(3 >= c.size());
     }
@@ -101,7 +97,8 @@ void test_statistics_insert_with_touch()
     HPX_TEST(white == "255,255,255");
 
     // add two more items
-    for (i = 0; i < 2 && d->key != nullptr; ++d, ++i) {
+    for (i = 0; i < 2 && d->key != nullptr; ++d, ++i)
+    {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST(3 == c.size());
     }
@@ -112,7 +109,7 @@ void test_statistics_insert_with_touch()
 
     // there should be 3 items in the cache, and white should be there as well
     HPX_TEST(3 == c.size());
-    HPX_TEST(c.holds_key("white"));   // does not call the entry's touch()
+    HPX_TEST(c.holds_key("white"));    // does not call the entry's touch()
 
     // retrieve statistics
     statistics::local_statistics const& stats = c.get_statistics();
@@ -128,11 +125,10 @@ void test_statistics_update()
     using namespace hpx::util::cache;
 
     typedef entries::lru_entry<std::string> entry_type;
-    typedef local_cache<
-        std::string, entry_type, std::less<entry_type>,
+    typedef local_cache<std::string, entry_type, std::less<entry_type>,
         policies::always<entry_type>, std::map<std::string, entry_type>,
-        statistics::local_statistics
-    > cache_type;
+        statistics::local_statistics>
+        cache_type;
 
     cache_type c(4);    // this time we can hold 4 items
 
@@ -142,7 +138,8 @@ void test_statistics_update()
     int i = 0;
     data* d = &cache_entries[0];
 
-    for (/**/; i < 3 && d->key != nullptr; ++d, ++i) {
+    for (/**/; i < 3 && d->key != nullptr; ++d, ++i)
+    {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST(3 >= c.size());
     }
@@ -151,7 +148,7 @@ void test_statistics_update()
     HPX_TEST(3 == c.size());
 
     // now update some items
-    HPX_TEST(c.update("black", "255,0,0"));     // isn't in the cache
+    HPX_TEST(c.update("black", "255,0,0"));    // isn't in the cache
     HPX_TEST(4 == c.size());
 
     HPX_TEST(c.update("yellow", "255,0,0"));
@@ -174,7 +171,8 @@ struct erase_func
 {
     erase_func(std::string const& key)
       : key_(key)
-    {}
+    {
+    }
 
     template <typename Entry>
     bool operator()(Entry const& e) const
@@ -190,18 +188,18 @@ void test_statistics_erase_one()
     using namespace hpx::util::cache;
 
     typedef entries::lru_entry<std::string> entry_type;
-    typedef local_cache<
-        std::string, entry_type, std::less<entry_type>,
+    typedef local_cache<std::string, entry_type, std::less<entry_type>,
         policies::always<entry_type>, std::map<std::string, entry_type>,
-        statistics::local_statistics
-    > cache_type;
+        statistics::local_statistics>
+        cache_type;
 
     cache_type c(3);
 
     HPX_TEST(3 == c.capacity());
 
     // insert all items into the cache
-    for (data* d = &cache_entries[0]; d->key != nullptr; ++d) {
+    for (data* d = &cache_entries[0]; d->key != nullptr; ++d)
+    {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST(3 >= c.size());
     }
@@ -209,7 +207,7 @@ void test_statistics_erase_one()
     entry_type blue;
     HPX_TEST(c.get_entry("blue", blue));
 
-    c.erase(erase_func("blue"));            // removals count as eviction
+    c.erase(erase_func("blue"));    // removals count as eviction
 
     // there should be 2 items in the cache
     HPX_TEST(!c.get_entry("blue", blue));
@@ -233,4 +231,3 @@ int main()
 
     return hpx::util::report_errors();
 }
-

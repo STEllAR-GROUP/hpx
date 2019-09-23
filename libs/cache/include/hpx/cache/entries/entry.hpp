@@ -13,15 +13,13 @@
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache { namespace entries
-{
+namespace hpx { namespace util { namespace cache { namespace entries {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Value, typename Derived = void>
     class entry;
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <typename Value, typename Derived>
         struct derived
         {
@@ -33,7 +31,7 @@ namespace hpx { namespace util { namespace cache { namespace entries
         {
             typedef entry<Value> type;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     /// \class entry entry.hpp hpx/cache/entries/entry.hpp
@@ -47,22 +45,21 @@ namespace hpx { namespace util { namespace cache { namespace entries
     template <typename Value, typename Derived>
     class entry
       : boost::less_than_comparable<
-            typename detail::derived<Value, Derived>::type
-        >
+            typename detail::derived<Value, Derived>::type>
     {
     public:
         typedef Value value_type;
 
     public:
         /// \brief Any cache entry has to be default constructible
-        entry()
-        {}
+        entry() {}
 
         /// \brief Construct a new instance of a cache entry holding the given
         ///        value.
         explicit entry(value_type const& val)
           : value_(val)
-        {}
+        {
+        }
 
         /// \brief    The function \a touch is called by a cache holding this
         ///           instance whenever it has been requested (touched).
@@ -121,7 +118,7 @@ namespace hpx { namespace util { namespace cache { namespace entries
 
         /// \brief    Forwarding operator< allowing to compare entries in stead
         ///           of the values.
-        friend bool operator< (entry const& lhs, entry const& rhs)
+        friend bool operator<(entry const& lhs, entry const& rhs)
         {
             return lhs.value_ < rhs.value_;
         }
@@ -129,12 +126,18 @@ namespace hpx { namespace util { namespace cache { namespace entries
         /// \brief Get a reference to the stored data value
         ///
         /// \note This function is part of the CacheEntry concept
-        value_type& get() { return value_; }
-        value_type const& get() const { return value_; }
+        value_type& get()
+        {
+            return value_;
+        }
+        value_type const& get() const
+        {
+            return value_;
+        }
 
     private:
         value_type value_;
     };
-}}}}
+}}}}    // namespace hpx::util::cache::entries
 
 #endif

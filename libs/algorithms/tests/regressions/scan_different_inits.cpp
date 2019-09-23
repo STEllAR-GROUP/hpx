@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_scan.hpp>
 #include <hpx/include/parallel_transform_scan.hpp>
 #include <hpx/testing.hpp>
@@ -24,22 +24,24 @@ void test_zero()
     std::vector<int> b, c, d, e, f, g;
     auto policy = hpx::parallel::execution::par;
 
-    Iter i_inc_add = hpx::parallel::inclusive_scan(policy, a.begin(), a.end(),
-        b.begin(), [](int bar, int baz) { return bar + baz; }, 100);
-    Iter i_inc_mult = hpx::parallel::inclusive_scan(policy, a.begin(), a.end(),
-        c.begin(), [](int bar, int baz) { return bar * baz; }, 10);
+    Iter i_inc_add = hpx::parallel::inclusive_scan(
+        policy, a.begin(), a.end(), b.begin(),
+        [](int bar, int baz) { return bar + baz; }, 100);
+    Iter i_inc_mult = hpx::parallel::inclusive_scan(
+        policy, a.begin(), a.end(), c.begin(),
+        [](int bar, int baz) { return bar * baz; }, 10);
     Iter i_exc_add = hpx::parallel::exclusive_scan(policy, a.begin(), a.end(),
         d.begin(), 100, [](int bar, int baz) { return bar + baz; });
     Iter i_exc_mult = hpx::parallel::exclusive_scan(policy, a.begin(), a.end(),
         e.begin(), 10, [](int bar, int baz) { return bar * baz; });
-    Iter i_transform_inc =
-        hpx::parallel::transform_inclusive_scan(policy, a.begin(), a.end(),
-            f.begin(), [](int bar, int baz) { return 2 * bar + 2 * baz; },
-            [](int foo) { return foo - 3; }, 10);
-    Iter i_transform_exc =
-        hpx::parallel::transform_exclusive_scan(policy, a.begin(), a.end(),
-            g.begin(), 10, [](int bar, int baz) { return 2 * bar + 2 * baz; },
-            [](int foo) { return foo - 3; });
+    Iter i_transform_inc = hpx::parallel::transform_inclusive_scan(
+        policy, a.begin(), a.end(), f.begin(),
+        [](int bar, int baz) { return 2 * bar + 2 * baz; },
+        [](int foo) { return foo - 3; }, 10);
+    Iter i_transform_exc = hpx::parallel::transform_exclusive_scan(
+        policy, a.begin(), a.end(), g.begin(), 10,
+        [](int bar, int baz) { return 2 * bar + 2 * baz; },
+        [](int foo) { return foo - 3; });
 
     HPX_TEST(i_inc_add == b.begin());
     HPX_TEST(i_inc_mult == c.begin());
@@ -56,22 +58,24 @@ void test_async_zero()
     std::vector<int> b, c, d, e, f, g;
     auto policy = hpx::parallel::execution::par(hpx::parallel::execution::task);
 
-    Fut_Iter f_inc_add = hpx::parallel::inclusive_scan(policy, a.begin(),
-        a.end(), b.begin(), [](int bar, int baz) { return bar + baz; }, 100);
-    Fut_Iter f_inc_mult = hpx::parallel::inclusive_scan(policy, a.begin(),
-        a.end(), c.begin(), [](int bar, int baz) { return bar * baz; }, 10);
+    Fut_Iter f_inc_add = hpx::parallel::inclusive_scan(
+        policy, a.begin(), a.end(), b.begin(),
+        [](int bar, int baz) { return bar + baz; }, 100);
+    Fut_Iter f_inc_mult = hpx::parallel::inclusive_scan(
+        policy, a.begin(), a.end(), c.begin(),
+        [](int bar, int baz) { return bar * baz; }, 10);
     Fut_Iter f_exc_add = hpx::parallel::exclusive_scan(policy, a.begin(),
         a.end(), d.begin(), 100, [](int bar, int baz) { return bar + baz; });
     Fut_Iter f_exc_mult = hpx::parallel::exclusive_scan(policy, a.begin(),
         a.end(), e.begin(), 10, [](int bar, int baz) { return bar * baz; });
-    Fut_Iter f_transform_inc =
-        hpx::parallel::transform_inclusive_scan(policy, a.begin(), a.end(),
-            f.begin(), [](int bar, int baz) { return 2 * bar + 2 * baz; },
-            [](int foo) { return foo - 3; }, 10);
-    Fut_Iter f_transform_exc =
-        hpx::parallel::transform_exclusive_scan(policy, a.begin(), a.end(),
-            g.begin(), 10, [](int bar, int baz) { return 2 * bar + 2 * baz; },
-            [](int foo) { return foo - 3; });
+    Fut_Iter f_transform_inc = hpx::parallel::transform_inclusive_scan(
+        policy, a.begin(), a.end(), f.begin(),
+        [](int bar, int baz) { return 2 * bar + 2 * baz; },
+        [](int foo) { return foo - 3; }, 10);
+    Fut_Iter f_transform_exc = hpx::parallel::transform_exclusive_scan(
+        policy, a.begin(), a.end(), g.begin(), 10,
+        [](int bar, int baz) { return 2 * bar + 2 * baz; },
+        [](int foo) { return foo - 3; });
 
     HPX_TEST(f_inc_add.get() == b.begin());
     HPX_TEST(f_inc_mult.get() == c.begin());

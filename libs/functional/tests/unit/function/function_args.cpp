@@ -30,18 +30,28 @@ struct counter
     {
         std::cout << "default-constructions: " << default_constructions << "\n";
         std::cout << "copy-constructions: " << copy_constructions << "\n";
-        std::cout << "move-constructions: " << move_constructions << "\n" << std::endl;
+        std::cout << "move-constructions: " << move_constructions << "\n"
+                  << std::endl;
     }
 
-    counter(){ ++default_constructions; }
-    counter(counter const&){ ++copy_constructions; }
-    counter(counter &&){ ++move_constructions; }
+    counter()
+    {
+        ++default_constructions;
+    }
+    counter(counter const&)
+    {
+        ++copy_constructions;
+    }
+    counter(counter&&)
+    {
+        ++move_constructions;
+    }
 
 private:
     ;
 
     counter& operator=(counter const&);
-    counter& operator=(counter &&);
+    counter& operator=(counter&&);
 };
 
 int counter::default_constructions = 0;
@@ -49,7 +59,7 @@ int counter::copy_constructions = 0;
 int counter::move_constructions = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
-void f_value(counter){}
+void f_value(counter) {}
 
 void test_by_value()
 {
@@ -68,7 +78,7 @@ void test_by_value()
     counter::print();
 }
 
-void f_lvalue_ref(counter&){}
+void f_lvalue_ref(counter&) {}
 
 void test_by_lvalue_ref()
 {
@@ -87,7 +97,7 @@ void test_by_lvalue_ref()
     counter::print();
 }
 
-void f_const_lvalue_ref(counter const&){}
+void f_const_lvalue_ref(counter const&) {}
 
 void test_by_const_lvalue_ref()
 {
@@ -106,7 +116,7 @@ void test_by_const_lvalue_ref()
     counter::print();
 }
 
-void f_rvalue_ref(counter &&){}
+void f_rvalue_ref(counter&&) {}
 
 void test_by_rvalue_ref()
 {
@@ -125,7 +135,7 @@ void test_by_rvalue_ref()
     counter::print();
 }
 
-int main(int, char* [])
+int main(int, char*[])
 {
     test_by_value();
     test_by_lvalue_ref();

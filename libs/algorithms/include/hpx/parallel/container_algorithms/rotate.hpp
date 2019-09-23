@@ -23,8 +23,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     /// Performs a left rotation on a range of elements. Specifically,
     /// \a rotate swaps the elements in the range [first, last) in such a way
@@ -71,21 +70,17 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           pair(first + (last - new_first), last).
     ///
     template <typename ExPolicy, typename Rng,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<
             tag::begin(typename hpx::traits::range_iterator<Rng>::type),
-            tag::end(typename hpx::traits::range_iterator<Rng>::type)
-        >
-    >::type
-    rotate(ExPolicy && policy, Rng && rng,
+            tag::end(typename hpx::traits::range_iterator<Rng>::type)>>::type
+    rotate(ExPolicy&& policy, Rng&& rng,
         typename hpx::traits::range_iterator<Rng>::type middle)
     {
-        return rotate(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), middle, hpx::util::end(rng));
+        return rotate(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            middle, hpx::util::end(rng));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -136,23 +131,20 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           element past the last element copied.
     ///
     template <typename ExPolicy, typename Rng, typename OutIter,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        hpx::traits::is_iterator<OutIter>::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&&
+                    hpx::traits::is_iterator<OutIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<
             tag::in(typename hpx::traits::range_iterator<Rng>::type),
-            tag::out(OutIter)
-        >
-    >::type
-    rotate_copy(ExPolicy && policy, Rng && rng,
-        typename hpx::traits::range_iterator<Rng>::type middle, OutIter dest_first)
+            tag::out(OutIter)>>::type
+    rotate_copy(ExPolicy&& policy, Rng&& rng,
+        typename hpx::traits::range_iterator<Rng>::type middle,
+        OutIter dest_first)
     {
         return rotate_copy(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), middle, hpx::util::end(rng), dest_first);
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

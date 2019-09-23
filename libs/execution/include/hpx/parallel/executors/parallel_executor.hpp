@@ -10,9 +10,11 @@
 #define HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_MAY_13_2015_1057AM
 
 #include <hpx/config.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async_launch_policy_dispatch.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/one_shot.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -28,8 +30,6 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>
@@ -38,10 +38,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { namespace execution
-{
-    namespace detail
-    {
+namespace hpx { namespace parallel { namespace execution {
+    namespace detail {
         template <typename Policy>
         struct get_default_policy
         {
@@ -70,7 +68,7 @@ namespace hpx { namespace parallel { namespace execution
 
         template <typename F, typename Shape, typename Future, typename... Ts>
         struct then_bulk_function_result;
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     /// A \a parallel_executor creates groups of parallel execution agents
@@ -93,10 +91,13 @@ namespace hpx { namespace parallel { namespace execution
 
         /// Create a new parallel executor
         HPX_CONSTEXPR explicit parallel_policy_executor(
-                Policy l = detail::get_default_policy<Policy>::call(),
-                std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
-          : policy_(l), num_spread_(spread), num_tasks_(tasks)
-        {}
+            Policy l = detail::get_default_policy<Policy>::call(),
+            std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
+          : policy_(l)
+          , num_spread_(spread)
+          , num_tasks_(tasks)
+        {
+        }
 
         /// \cond NOINTERNAL
         bool operator==(parallel_policy_executor const& rhs) const noexcept
@@ -119,58 +120,54 @@ namespace hpx { namespace parallel { namespace execution
         /// \cond NOINTERNAL
 
         // TwoWayExecutor interface
-        template <typename F, typename ... Ts>
+        template <typename F, typename... Ts>
         hpx::future<
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
-        >
-        async_execute(F && f, Ts &&... ts) const
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
+        async_execute(F&& f, Ts&&... ts) const
         {
             return hpx::detail::async_launch_policy_dispatch<Policy>::call(
                 policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-        template <typename F, typename Future, typename ... Ts>
+        template <typename F, typename Future, typename... Ts>
         HPX_FORCEINLINE
-        hpx::future<
-            typename hpx::util::detail::invoke_deferred_result<
-                F, Future, Ts...
-            >::type
-        >
-        then_execute(F && f, Future&& predecessor, Ts &&... ts)
+            hpx::future<typename hpx::util::detail::invoke_deferred_result<F,
+                Future, Ts...>::type>
+            then_execute(F&& f, Future&& predecessor, Ts&&... ts)
         {
             using result_type =
-                typename hpx::util::detail::invoke_deferred_result<
-                    F, Future, Ts...>::type;
+                typename hpx::util::detail::invoke_deferred_result<F, Future,
+                    Ts...>::type;
 
-            auto && func = hpx::util::one_shot(hpx::util::bind_back(
+            auto&& func = hpx::util::one_shot(hpx::util::bind_back(
                 std::forward<F>(f), std::forward<Ts>(ts)...));
 
-            typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
-                lcos::detail::make_continuation_alloc_nounwrap<result_type>(
+            typename hpx::traits::detail::shared_state_ptr<result_type>::type
+                p = lcos::detail::make_continuation_alloc_nounwrap<result_type>(
                     hpx::util::internal_allocator<>{},
-                    std::forward<Future>(predecessor), policy_, std::move(func));
+                    std::forward<Future>(predecessor), policy_,
+                    std::move(func));
 
-            return hpx::traits::future_access<hpx::future<result_type> >::create(
+            return hpx::traits::future_access<hpx::future<result_type>>::create(
                 std::move(p));
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
-        template <typename F, typename ... Ts>
-        void post(F && f, Ts &&... ts) const
+        template <typename F, typename... Ts>
+        void post(F&& f, Ts&&... ts) const
         {
-            hpx::util::thread_description desc(f,
-                "hpx::parallel::execution::parallel_executor::post");
+            hpx::util::thread_description desc(
+                f, "hpx::parallel::execution::parallel_executor::post");
 
             detail::post_policy_dispatch<Policy>::call(
                 desc, policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         // BulkTwoWayExecutor interface
-        template <typename F, typename S, typename ... Ts>
+        template <typename F, typename S, typename... Ts>
         std::vector<hpx::future<
-            typename detail::bulk_function_result<F, S, Ts...>::type
-        > >
-        bulk_async_execute(F && f, S const& shape, Ts &&... ts) const
+            typename detail::bulk_function_result<F, S, Ts...>::type>>
+        bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
         {
             // lazily initialize once
             static std::size_t global_num_tasks =
@@ -180,10 +177,8 @@ namespace hpx { namespace parallel { namespace execution
                 (num_tasks_ == std::size_t(-1)) ? global_num_tasks : num_tasks_;
 
             typedef std::vector<hpx::future<
-                    typename detail::bulk_function_result<
-                        F, S, Ts...
-                    >::type
-                > > result_type;
+                typename detail::bulk_function_result<F, S, Ts...>::type>>
+                result_type;
 
             result_type results;
             std::size_t size = hpx::util::size(shape);
@@ -194,9 +189,11 @@ namespace hpx { namespace parallel { namespace execution
             {
                 spawn_hierarchical(results, l, 0, size, num_tasks, f,
                     hpx::util::begin(shape), ts...);
-            } else {
-                spawn_sequential(results, l, 0, size, f,
-                    hpx::util::begin(shape), ts...);
+            }
+            else
+            {
+                spawn_sequential(
+                    results, l, 0, size, f, hpx::util::begin(shape), ts...);
             }
             l.wait();
 
@@ -204,9 +201,8 @@ namespace hpx { namespace parallel { namespace execution
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
-        hpx::future<
-            typename detail::bulk_then_execute_result<F, S, Future, Ts...>::type
-        >
+        hpx::future<typename detail::bulk_then_execute_result<F, S, Future,
+            Ts...>::type>
         bulk_then_execute(
             F&& f, S const& shape, Future&& predecessor, Ts&&... ts)
         {
@@ -217,9 +213,9 @@ namespace hpx { namespace parallel { namespace execution
             // std::vector<future<func_result_type>>
             using result_type = std::vector<hpx::future<func_result_type>>;
 
-            auto && func =
-                detail::make_fused_bulk_async_execute_helper<result_type>(
-                    *this, std::forward<F>(f), shape,
+            auto&& func =
+                detail::make_fused_bulk_async_execute_helper<result_type>(*this,
+                    std::forward<F>(f), shape,
                     hpx::util::make_tuple(std::forward<Ts>(ts)...));
 
             // void or std::vector<func_result_type>
@@ -242,8 +238,7 @@ namespace hpx { namespace parallel { namespace execution
                     hpx::util::internal_allocator<>{},
                     std::forward<Future>(predecessor), policy_,
                     [HPX_CAPTURE_MOVE(func)](future_type&& predecessor) mutable
-                    ->  vector_result_type
-                    {
+                    -> vector_result_type {
                         // use unwrap directly (instead of lazily) to avoid
                         // having to pull in dataflow
                         return hpx::util::unwrap(func(std::move(predecessor)));
@@ -256,8 +251,8 @@ namespace hpx { namespace parallel { namespace execution
 
     protected:
         /// \cond NOINTERNAL
-        template <typename Result, typename F, typename Iter, typename ... Ts>
-        void spawn_sequential(std::vector<hpx::future<Result> >& results,
+        template <typename Result, typename F, typename Iter, typename... Ts>
+        void spawn_sequential(std::vector<hpx::future<Result>>& results,
             lcos::local::latch& l, std::size_t base, std::size_t size,
             F const& func, Iter it, Ts const&... ts) const
         {
@@ -272,17 +267,17 @@ namespace hpx { namespace parallel { namespace execution
             l.count_down(size);
         }
 
-        template <typename Result, typename F, typename Iter, typename ... Ts>
-        void spawn_hierarchical(std::vector<hpx::future<Result> >& results,
+        template <typename Result, typename F, typename Iter, typename... Ts>
+        void spawn_hierarchical(std::vector<hpx::future<Result>>& results,
             lcos::local::latch& l, std::size_t base, std::size_t size,
-            std::size_t num_tasks, F const& func, Iter it, Ts const&... ts) const
+            std::size_t num_tasks, F const& func, Iter it,
+            Ts const&... ts) const
         {
             if (size > num_tasks)
             {
                 // spawn hierarchical tasks
                 std::size_t chunk_size = (size + num_spread_) / num_spread_ - 1;
                 chunk_size = (std::max)(chunk_size, num_tasks);
-
 
                 while (size > chunk_size)
                 {
@@ -307,9 +302,9 @@ namespace hpx { namespace parallel { namespace execution
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
-            ar & policy_ & num_spread_ & num_tasks_;
+            ar& policy_& num_spread_& num_tasks_;
         }
         /// \endcond
 
@@ -322,29 +317,28 @@ namespace hpx { namespace parallel { namespace execution
     };
 
     using parallel_executor = parallel_policy_executor<hpx::launch>;
-}}}
+}}}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <typename Policy>
     struct is_one_way_executor<
-            parallel::execution::parallel_policy_executor<Policy> >
-      : std::true_type
-    {};
+        parallel::execution::parallel_policy_executor<Policy>> : std::true_type
+    {
+    };
 
     template <typename Policy>
     struct is_two_way_executor<
-            parallel::execution::parallel_policy_executor<Policy> >
-      : std::true_type
-    {};
+        parallel::execution::parallel_policy_executor<Policy>> : std::true_type
+    {
+    };
 
     template <typename Policy>
     struct is_bulk_two_way_executor<
-            parallel::execution::parallel_policy_executor<Policy> >
-      : std::true_type
-    {};
+        parallel::execution::parallel_policy_executor<Policy>> : std::true_type
+    {
+    };
     /// \endcond
-}}}
+}}}    // namespace hpx::parallel::execution
 
 #endif

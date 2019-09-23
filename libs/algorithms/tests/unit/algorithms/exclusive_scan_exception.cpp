@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_scan.hpp>
 #include <hpx/testing.hpp>
 
@@ -34,22 +34,23 @@ void test_exclusive_scan_exception(ExPolicy policy, IteratorTag)
     std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     bool caught_exception = false;
-    try {
-        hpx::parallel::exclusive_scan(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            std::begin(d), std::size_t(0),
-            [](std::size_t v1, std::size_t v2)
-            {
+    try
+    {
+        hpx::parallel::exclusive_scan(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), std::begin(d), std::size_t(0),
+            [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), v1 + v2;
             });
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -68,26 +69,26 @@ void test_exclusive_scan_exception_async(ExPolicy p, IteratorTag)
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        hpx::future<void> f =
-            hpx::parallel::exclusive_scan(p,
-                iterator(std::begin(c)), iterator(std::end(c)),
-                std::begin(d), std::size_t(0),
-                [](std::size_t v1, std::size_t v2)
-                {
-                    return throw std::runtime_error("test"), v1 + v2;
-                });
+    try
+    {
+        hpx::future<void> f = hpx::parallel::exclusive_scan(p,
+            iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
+            std::size_t(0), [](std::size_t v1, std::size_t v2) {
+                return throw std::runtime_error("test"), v1 + v2;
+            });
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -106,8 +107,10 @@ void test_exclusive_scan_exception()
     test_exclusive_scan_exception(execution::seq, IteratorTag());
     test_exclusive_scan_exception(execution::par, IteratorTag());
 
-    test_exclusive_scan_exception_async(execution::seq(execution::task), IteratorTag());
-    test_exclusive_scan_exception_async(execution::par(execution::task), IteratorTag());
+    test_exclusive_scan_exception_async(
+        execution::seq(execution::task), IteratorTag());
+    test_exclusive_scan_exception_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void exclusive_scan_exception_test()
@@ -119,7 +122,7 @@ void exclusive_scan_exception_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -128,7 +131,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     exclusive_scan_exception_test();
 
-  return hpx::finalize();
+    return hpx::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -138,14 +141,10 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

@@ -3,11 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/parallel_executor_parameters.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/include/parallel_executor_parameters.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/testing.hpp>
 
 #include <algorithm>
@@ -66,16 +66,16 @@ void test_persistent_executitor_parameters_ref()
 
     {
         execution::persistent_auto_chunk_size p;
-        test_for_each_async(execution::par(execution::task).with(std::ref(p)),
-            iterator_tag());
+        test_for_each_async(
+            execution::par(execution::task).with(std::ref(p)), iterator_tag());
     }
 
     execution::parallel_executor par_exec;
 
     {
         execution::persistent_auto_chunk_size p;
-        test_for_each(execution::par.on(par_exec).with(std::ref(p)),
-            iterator_tag());
+        test_for_each(
+            execution::par.on(par_exec).with(std::ref(p)), iterator_tag());
     }
 
     {
@@ -109,15 +109,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

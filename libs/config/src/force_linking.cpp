@@ -6,8 +6,7 @@
 #include <hpx/config/force_linking.hpp>
 #include <hpx/config/version.hpp>
 
-namespace hpx { namespace config
-{
+namespace hpx { namespace config {
     // reference all symbols that have to be explicitly linked with the core
     // library
     force_linking_helper& force_linking()
@@ -16,5 +15,4 @@ namespace hpx { namespace config
             hpx::HPX_CHECK_VERSION, hpx::HPX_CHECK_BOOST_VERSION};
         return helper;
     }
-}}
-
+}}    // namespace hpx::config

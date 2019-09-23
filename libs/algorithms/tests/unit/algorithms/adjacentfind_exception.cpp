@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_adjacent_find.hpp>
 #include <hpx/testing.hpp>
 
@@ -30,25 +30,27 @@ void test_adjacent_find_exception(ExPolicy policy, IteratorTag)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator <base_iterator, IteratorTag>
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen() + 1);
 
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::parallel::adjacent_find(policy,
             decorated_iterator(
-                std::begin(c),
-                [](){ throw std::runtime_error("test"); }),
+                std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)));
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -59,7 +61,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_adjacent_find_exception_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator <base_iterator, IteratorTag>
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
@@ -68,13 +70,12 @@ void test_adjacent_find_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
 
-    try {
-        hpx::future<decorated_iterator> f =
-            hpx::parallel::adjacent_find(p,
-                decorated_iterator(
-                    std::begin(c),
-                    [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c)));
+    try
+    {
+        hpx::future<decorated_iterator> f = hpx::parallel::adjacent_find(p,
+            decorated_iterator(
+                std::begin(c), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(std::end(c)));
 
         returned_from_algorithm = true;
 
@@ -82,11 +83,13 @@ void test_adjacent_find_exception_async(ExPolicy p, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -105,8 +108,10 @@ void test_adjacent_find_exception()
     test_adjacent_find_exception(execution::seq, IteratorTag());
     test_adjacent_find_exception(execution::par, IteratorTag());
 
-    test_adjacent_find_exception_async(execution::seq(execution::task), IteratorTag());
-    test_adjacent_find_exception_async(execution::par(execution::task), IteratorTag());
+    test_adjacent_find_exception_async(
+        execution::seq(execution::task), IteratorTag());
+    test_adjacent_find_exception_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void adjacent_find_exception_test()
@@ -134,15 +139,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

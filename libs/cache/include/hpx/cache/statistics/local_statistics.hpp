@@ -12,17 +12,20 @@
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache { namespace statistics
-{
+namespace hpx { namespace util { namespace cache { namespace statistics {
     ///////////////////////////////////////////////////////////////////////////
     class local_statistics : public no_statistics
     {
     public:
         local_statistics()
-          : hits_(0), misses_(0), insertions_(0), evictions_(0)
-        {}
+          : hits_(0)
+          , misses_(0)
+          , insertions_(0)
+          , evictions_(0)
+        {
+        }
 
-        std::size_t get_and_reset(std::size_t & value, bool reset)
+        std::size_t get_and_reset(std::size_t& value, bool reset)
         {
             std::size_t result = value;
             if (reset)
@@ -66,21 +69,33 @@ namespace hpx { namespace util { namespace cache { namespace statistics
 
         /// \brief  The function \a got_hit will be called by a cache instance
         ///         whenever a entry got touched.
-        void got_hit() { ++hits_; }
+        void got_hit()
+        {
+            ++hits_;
+        }
 
         /// \brief  The function \a got_miss will be called by a cache instance
         ///         whenever a requested entry has not been found in the cache.
-        void got_miss() { ++ misses_; }
+        void got_miss()
+        {
+            ++misses_;
+        }
 
         /// \brief  The function \a got_insertion will be called by a cache
         ///         instance whenever a new entry has been inserted.
-        void got_insertion() { ++insertions_; }
+        void got_insertion()
+        {
+            ++insertions_;
+        }
 
         /// \brief  The function \a got_eviction will be called by a cache
         ///         instance whenever an entry has been removed from the cache
         ///         because a new inserted entry let the cache grow beyond its
         ///         capacity.
-        void got_eviction() { ++evictions_; }
+        void got_eviction()
+        {
+            ++evictions_;
+        }
 
         /// \brief Reset all statistics
         void clear()
@@ -97,7 +112,6 @@ namespace hpx { namespace util { namespace cache { namespace statistics
         std::size_t insertions_;
         std::size_t evictions_;
     };
-}}}}
+}}}}    // namespace hpx::util::cache::statistics
 
 #endif
-

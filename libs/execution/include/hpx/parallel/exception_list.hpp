@@ -19,10 +19,8 @@
 #include <exception>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
-    namespace detail
-    {
+namespace hpx { namespace parallel { inline namespace v1 {
+    namespace detail {
         /// \cond NOINTERNAL
         template <typename ExPolicy, typename Result = void>
         struct handle_exception_impl
@@ -31,16 +29,20 @@ namespace hpx { namespace parallel { inline namespace v1
 
             HPX_NORETURN static Result call()
             {
-                try {
-                    throw; //-V667
+                try
+                {
+                    throw;    //-V667
                 }
-                catch(std::bad_alloc const&) {
+                catch (std::bad_alloc const&)
+                {
                     throw;
                 }
-                catch (hpx::exception_list const&) {
+                catch (hpx::exception_list const&)
+                {
                     throw;
                 }
-                catch (...) {
+                catch (...)
+                {
                     throw hpx::exception_list(std::current_exception());
                 }
             }
@@ -54,16 +56,20 @@ namespace hpx { namespace parallel { inline namespace v1
 
             HPX_NORETURN static Result call(std::exception_ptr const& e)
             {
-                try {
+                try
+                {
                     std::rethrow_exception(e);
                 }
-                catch (std::bad_alloc const&) {
+                catch (std::bad_alloc const&)
+                {
                     throw;
                 }
-                catch (hpx::exception_list const&) {
+                catch (hpx::exception_list const&)
+                {
                     throw;
                 }
-                catch (...) {
+                catch (...)
+                {
                     throw hpx::exception_list(std::current_exception());
                 }
             }
@@ -77,16 +83,20 @@ namespace hpx { namespace parallel { inline namespace v1
 
             static future<Result> call()
             {
-                try {
-                    throw; //-V667
+                try
+                {
+                    throw;    //-V667
                 }
-                catch(std::bad_alloc const& e) {
+                catch (std::bad_alloc const& e)
+                {
                     return hpx::make_exceptional_future<Result>(e);
                 }
-                catch (hpx::exception_list const& el) {
+                catch (hpx::exception_list const& el)
+                {
                     return hpx::make_exceptional_future<Result>(el);
                 }
-                catch (...) {
+                catch (...)
+                {
                     return hpx::make_exceptional_future<Result>(
                         hpx::exception_list(std::current_exception()));
                 }
@@ -105,17 +115,21 @@ namespace hpx { namespace parallel { inline namespace v1
 
             static future<Result> call(std::exception_ptr const& e)
             {
-                try {
+                try
+                {
                     std::rethrow_exception(e);
                 }
-                catch (std::bad_alloc const&) {
+                catch (std::bad_alloc const&)
+                {
                     return hpx::make_exceptional_future<Result>(
                         std::current_exception());
                 }
-                catch (hpx::exception_list const& el) {
+                catch (hpx::exception_list const& el)
+                {
                     return hpx::make_exceptional_future<Result>(el);
                 }
-                catch (...) {
+                catch (...)
+                {
                     return hpx::make_exceptional_future<Result>(
                         hpx::exception_list(std::current_exception()));
                 }
@@ -126,42 +140,49 @@ namespace hpx { namespace parallel { inline namespace v1
         template <typename Result>
         struct handle_exception_impl<execution::sequenced_task_policy, Result>
           : handle_exception_task_impl<Result>
-        {};
+        {
+        };
 
         template <typename Executor, typename Parameters, typename Result>
         struct handle_exception_impl<
-                execution::sequenced_task_policy_shim<Executor, Parameters>, Result>
+            execution::sequenced_task_policy_shim<Executor, Parameters>, Result>
           : handle_exception_task_impl<Result>
-        {};
+        {
+        };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
         struct handle_exception_impl<execution::parallel_task_policy, Result>
           : handle_exception_task_impl<Result>
-        {};
+        {
+        };
 
         template <typename Executor, typename Parameters, typename Result>
         struct handle_exception_impl<
-                execution::parallel_task_policy_shim<Executor, Parameters>, Result>
+            execution::parallel_task_policy_shim<Executor, Parameters>, Result>
           : handle_exception_task_impl<Result>
-        {};
+        {
+        };
 
 #if defined(HPX_HAVE_DATAPAR)
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
         struct handle_exception_impl<execution::dataseq_task_policy, Result>
           : handle_exception_task_impl<Result>
-        {};
+        {
+        };
 
         template <typename Result>
         struct handle_exception_impl<execution::datapar_task_policy, Result>
           : handle_exception_task_impl<Result>
-        {};
+        {
+        };
 #endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
-        struct handle_exception_impl<execution::parallel_unsequenced_policy, Result>
+        struct handle_exception_impl<execution::parallel_unsequenced_policy,
+            Result>
         {
             typedef Result type;
 
@@ -173,7 +194,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             HPX_NORETURN
-            static hpx::future<Result> call(hpx::future<Result> &&)
+            static hpx::future<Result> call(hpx::future<Result>&&)
             {
                 hpx::terminate();
             }
@@ -187,16 +208,16 @@ namespace hpx { namespace parallel { inline namespace v1
 
         template <typename ExPolicy, typename Result = void>
         struct handle_exception
-          : handle_exception_impl<
-                typename hpx::util::decay<ExPolicy>::type, Result
-            >
-        {};
+          : handle_exception_impl<typename hpx::util::decay<ExPolicy>::type,
+                Result>
+        {
+        };
         /// \endcond
-    }
+    }    // namespace detail
 
     // we're just reusing our existing implementation
 
     using hpx::exception_list;
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

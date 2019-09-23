@@ -101,7 +101,7 @@ namespace hpx { namespace resiliency {
             hpx::launch::sync,    // do not schedule new thread for the lambda
             [HPX_CAPTURE_FORWARD(pred), HPX_CAPTURE_FORWARD(vote), n](
                 std::vector<hpx::future<result_type>>&& results) mutable
-                -> result_type {
+            -> result_type {
                 // Store all valid results
                 std::vector<result_type> valid_results;
                 valid_results.reserve(n);

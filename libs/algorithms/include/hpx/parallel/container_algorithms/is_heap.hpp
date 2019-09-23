@@ -20,8 +20,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /// Returns whether the range is max heap. That is, true if the range is
     /// max heap, false otherwise. The function uses the given comparison
     /// function object \a comp (defaults to using operator<()).
@@ -80,22 +79,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename Comp = detail::less,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Comp,
-            traits::projected_range<Proj, Rng>,
-            traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
-    is_heap(ExPolicy && policy, Rng && rng,
-        Comp && comp = Comp(), Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    Comp, traits::projected_range<Proj, Rng>,
+                    traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy, bool>::type is_heap(
+        ExPolicy&& policy, Rng&& rng, Comp&& comp = Comp(),
+        Proj&& proj = Proj())
     {
-        return is_heap(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng),
-            std::forward<Comp>(comp), std::forward<Proj>(proj));
+        return is_heap(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), std::forward<Comp>(comp),
+            std::forward<Proj>(proj));
     }
 
     /// Returns the upper bound of the largest range beginning at \a first
@@ -159,26 +154,20 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename Comp = detail::less,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Comp,
-            traits::projected_range<Proj, Rng>,
-            traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
-        typename hpx::traits::range_iterator<Rng>::type
-    >::type
-    is_heap_until(ExPolicy && policy, Rng && rng,
-        Comp && comp = Comp(), Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    Comp, traits::projected_range<Proj, Rng>,
+                    traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_iterator<Rng>::type>::type
+    is_heap_until(ExPolicy&& policy, Rng&& rng, Comp&& comp = Comp(),
+        Proj&& proj = Proj())
     {
         return is_heap_until(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), hpx::util::end(rng),
             std::forward<Comp>(comp), std::forward<Proj>(proj));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

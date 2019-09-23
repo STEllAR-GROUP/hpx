@@ -16,17 +16,15 @@
 #include <intrin.h>
 #include <windows.h>
 
-namespace hpx { namespace util { namespace hardware
-{
+namespace hpx { namespace util { namespace hardware {
     inline std::uint64_t timestamp()
     {
         LARGE_INTEGER now;
         QueryPerformanceCounter(&now);
         return static_cast<std::uint64_t>(now.QuadPart);
     }
-}}}
+}}}    // namespace hpx::util::hardware
 
 #endif
 
-#endif // HPX_874FFB61_BEF5_4D46_B024_6DAAF81BACF1
-
+#endif    // HPX_874FFB61_BEF5_4D46_B024_6DAAF81BACF1

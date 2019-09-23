@@ -20,8 +20,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // none_of
 
@@ -89,20 +88,15 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename F,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F, traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
-    none_of(ExPolicy && policy, Rng && rng, F && f,
-        Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    F, traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy, bool>::type none_of(
+        ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
     {
-        return none_of(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
-            std::forward<Proj>(proj));
+        return none_of(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), std::forward<F>(f), std::forward<Proj>(proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -172,20 +166,15 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename F,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F, traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
-    any_of(ExPolicy && policy, Rng && rng, F && f,
-        Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    F, traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy, bool>::type any_of(
+        ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
     {
-        return any_of(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
-            std::forward<Proj>(proj));
+        return any_of(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), std::forward<F>(f), std::forward<Proj>(proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -255,22 +244,17 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename F,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F, traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
-    all_of(ExPolicy && policy, Rng && rng, F && f,
-        Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    F, traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy, bool>::type all_of(
+        ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
     {
-        return all_of(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
-            std::forward<Proj>(proj));
+        return all_of(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), std::forward<F>(f), std::forward<Proj>(proj));
     }
 
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

@@ -20,8 +20,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /// Moves the elements in the range \a rng to another range beginning
     /// at \a dest. After this operation the elements in the moved-from
     /// range will still contain valid values of the appropriate type,
@@ -69,22 +68,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           destination range, one past the last element moved.
     ///
     template <typename ExPolicy, typename Rng, typename OutIter,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        hpx::traits::is_iterator<OutIter>::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&&
+                    hpx::traits::is_iterator<OutIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<
             tag::in(typename hpx::traits::range_traits<Rng>::iterator_type),
-            tag::out(OutIter)
-        >
-    >::type
-    move(ExPolicy && policy, Rng && rng, OutIter dest)
+            tag::out(OutIter)>>::type
+    move(ExPolicy&& policy, Rng&& rng, OutIter dest)
     {
-        return move(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), dest);
+        return move(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), dest);
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

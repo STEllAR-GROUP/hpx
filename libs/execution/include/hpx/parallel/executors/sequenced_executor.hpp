@@ -10,12 +10,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_launch_policy_dispatch.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/sync_launch_policy_dispatch.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/invoke.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <hpx/parallel/exception_list.hpp>
@@ -26,8 +26,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     /// A \a sequential_executor creates groups of sequential execution agents
     /// which execute in the calling thread. The sequential order is given by
@@ -56,9 +55,10 @@ namespace hpx { namespace parallel { namespace execution
         typedef sequenced_execution_tag execution_category;
 
         // OneWayExecutor interface
-        template <typename F, typename ... Ts>
-        static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
-        sync_execute(F && f, Ts &&... ts)
+        template <typename F, typename... Ts>
+        static
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
+            sync_execute(F&& f, Ts&&... ts)
         {
             return hpx::detail::sync_launch_policy_dispatch<
                 launch::sync_policy>::call(launch::sync, std::forward<F>(f),
@@ -66,11 +66,10 @@ namespace hpx { namespace parallel { namespace execution
         }
 
         // TwoWayExecutor interface
-        template <typename F, typename ... Ts>
+        template <typename F, typename... Ts>
         static hpx::future<
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
-        >
-        async_execute(F && f, Ts &&... ts)
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
+        async_execute(F&& f, Ts&&... ts)
         {
             return hpx::detail::async_launch_policy_dispatch<
                 launch::deferred_policy>::call(launch::deferred,
@@ -78,47 +77,47 @@ namespace hpx { namespace parallel { namespace execution
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
-        template <typename F, typename ... Ts>
-        static void post(F && f, Ts &&... ts)
+        template <typename F, typename... Ts>
+        static void post(F&& f, Ts&&... ts)
         {
             sync_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         // BulkTwoWayExecutor interface
-        template <typename F, typename S, typename ... Ts>
+        template <typename F, typename S, typename... Ts>
         static std::vector<hpx::future<
-            typename detail::bulk_function_result<F, S, Ts...>::type
-        > >
-        bulk_async_execute(F && f, S const& shape, Ts &&... ts)
+            typename detail::bulk_function_result<F, S, Ts...>::type>>
+        bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
         {
-            typedef typename
-                    detail::bulk_function_result<F, S, Ts...>::type
+            typedef typename detail::bulk_function_result<F, S, Ts...>::type
                 result_type;
-            std::vector<hpx::future<result_type> > results;
+            std::vector<hpx::future<result_type>> results;
 
-            try {
-                for (auto const& elem: shape)
+            try
+            {
+                for (auto const& elem : shape)
                 {
                     results.push_back(async_execute(f, elem, ts...));
                 }
             }
-            catch (std::bad_alloc const& ba) {
+            catch (std::bad_alloc const& ba)
+            {
                 throw ba;
             }
-            catch (...) {
+            catch (...)
+            {
                 throw exception_list(std::current_exception());
             }
 
             return results;
         }
 
-        template <typename F, typename S, typename ... Ts>
+        template <typename F, typename S, typename... Ts>
         static typename detail::bulk_execute_result<F, S, Ts...>::type
-        bulk_sync_execute(F && f, S const& shape, Ts &&... ts)
+        bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
         {
-            return hpx::util::unwrap(
-                bulk_async_execute(std::forward<F>(f), shape,
-                    std::forward<Ts>(ts)...));
+            return hpx::util::unwrap(bulk_async_execute(
+                std::forward<F>(f), shape, std::forward<Ts>(ts)...));
         }
 
         std::size_t processing_units_count()
@@ -130,36 +129,39 @@ namespace hpx { namespace parallel { namespace execution
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
         }
         /// \endcond
     };
-}}}
+}}}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <>
     struct is_one_way_executor<parallel::execution::sequenced_executor>
       : std::true_type
-    {};
+    {
+    };
 
     template <>
     struct is_bulk_one_way_executor<parallel::execution::sequenced_executor>
       : std::true_type
-    {};
+    {
+    };
 
     template <>
     struct is_two_way_executor<parallel::execution::sequenced_executor>
       : std::true_type
-    {};
+    {
+    };
 
     template <>
     struct is_bulk_two_way_executor<parallel::execution::sequenced_executor>
       : std::true_type
-    {};
+    {
+    };
     /// \endcond
-}}}
+}}}    // namespace hpx::parallel::execution
 
 #endif

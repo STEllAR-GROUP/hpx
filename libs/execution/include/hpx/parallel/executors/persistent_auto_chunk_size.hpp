@@ -10,17 +10,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/traits/is_executor_parameters.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     /// Loop iterations are divided into pieces and then assigned to threads.
     /// The number of loop iterations combined is determined based on
@@ -40,16 +39,21 @@ namespace hpx { namespace parallel { namespace execution
         ///       any of the scheduled chunks should run.
         ///
         HPX_CONSTEXPR persistent_auto_chunk_size()
-          : chunk_size_time_(0) , min_time_(80000)
-        {}
+          : chunk_size_time_(0)
+          , min_time_(80000)
+        {
+        }
 
         /// Construct an \a persistent_auto_chunk_size executor parameters object
         ///
         /// \param time_cs      The execution time for each chunk.
         ///
-        explicit persistent_auto_chunk_size(hpx::util::steady_duration const& time_cs)
-          : chunk_size_time_(time_cs.value().count()), min_time_(80000)
-        {}
+        explicit persistent_auto_chunk_size(
+            hpx::util::steady_duration const& time_cs)
+          : chunk_size_time_(time_cs.value().count())
+          , min_time_(80000)
+        {
+        }
 
         /// Construct an \a persistent_auto_chunk_size executor parameters object
         ///
@@ -59,18 +63,19 @@ namespace hpx { namespace parallel { namespace execution
         /// \param time_cs       The execution time for each chunk.
         ///
         persistent_auto_chunk_size(hpx::util::steady_duration const& time_cs,
-                hpx::util::steady_duration const& rel_time)
-          : chunk_size_time_(time_cs.value().count()),
-            min_time_(rel_time.value().count())
-        {}
+            hpx::util::steady_duration const& rel_time)
+          : chunk_size_time_(time_cs.value().count())
+          , min_time_(rel_time.value().count())
+        {
+        }
 
         /// \cond NOINTERNAL
         // Estimate a chunk size based on number of cores used.
         template <typename Executor, typename F>
-        std::size_t get_chunk_size(Executor& exec, F && f, std::size_t cores,
-            std::size_t count)
+        std::size_t get_chunk_size(
+            Executor& exec, F&& f, std::size_t cores, std::size_t count)
         {
-            if (count > 100*cores)
+            if (count > 100 * cores)
             {
                 using hpx::util::high_resolution_clock;
                 std::uint64_t t = high_resolution_clock::now();
@@ -80,7 +85,8 @@ namespace hpx { namespace parallel { namespace execution
                 {
                     if (chunk_size_time_ == 0)
                     {
-                        t = (high_resolution_clock::now() - t) / test_chunk_size;
+                        t = (high_resolution_clock::now() - t) /
+                            test_chunk_size;
                         chunk_size_time_ = t;
                     }
                     else
@@ -106,28 +112,28 @@ namespace hpx { namespace parallel { namespace execution
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
-            ar  & chunk_size_time_& min_time_;
+            ar& chunk_size_time_& min_time_;
         }
         /// \endcond
 
     private:
         /// \cond NOINTERNAL
-        std::uint64_t chunk_size_time_; // nanoseconds
-        std::uint64_t min_time_;        // nanoseconds
+        std::uint64_t chunk_size_time_;    // nanoseconds
+        std::uint64_t min_time_;           // nanoseconds
         /// \endcond
     };
-}}}
+}}}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <>
-    struct is_executor_parameters<parallel::execution::persistent_auto_chunk_size>
-      : std::true_type
-    {};
+    struct is_executor_parameters<
+        parallel::execution::persistent_auto_chunk_size> : std::true_type
+    {
+    };
     /// \endcond
-}}}
+}}}    // namespace hpx::parallel::execution
 
 #endif

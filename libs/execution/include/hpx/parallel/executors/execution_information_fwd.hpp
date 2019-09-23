@@ -6,7 +6,8 @@
 
 // hpxinspect:nounnamed
 
-#if !defined(HPX_PARALLEL_EXECUTORS_EXECUTION_INFORMATION_FWD_JAN_16_2017_0350PM)
+#if !defined(                                                                  \
+    HPX_PARALLEL_EXECUTORS_EXECUTION_INFORMATION_FWD_JAN_16_2017_0350PM)
 #define HPX_PARALLEL_EXECUTORS_EXECUTION_INFORMATION_FWD_JAN_16_2017_0350PM
 
 #include <hpx/config.hpp>
@@ -18,24 +19,29 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     // Define infrastructure for customization points
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
-        struct processing_units_count_tag {};
-        struct has_pending_closures_tag {};
-        struct get_pu_mask_tag {};
-        struct set_scheduler_mode_tag {};
+        struct processing_units_count_tag
+        {
+        };
+        struct has_pending_closures_tag
+        {
+        };
+        struct get_pu_mask_tag
+        {
+        };
+        struct set_scheduler_mode_tag
+        {
+        };
         /// \endcond
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // Executor information customization points
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         template <typename Executor, typename Enable = void>
         struct processing_units_count_fn_helper;
@@ -49,24 +55,22 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Executor, typename Enable = void>
         struct set_scheduler_mode_fn_helper;
         /// \endcond
-    }
+    }    // namespace detail
 
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
         // processing_units_count dispatch point
         template <typename Executor, typename Parameters>
-        HPX_FORCEINLINE auto
-        processing_units_count(Executor && exec, Parameters& params)
-        -> typename processing_units_count_fn_helper<
-                typename std::decay<Executor>::type
-            >::template result<Executor, Parameters>::type
+        HPX_FORCEINLINE auto processing_units_count(
+            Executor&& exec, Parameters& params) ->
+            typename processing_units_count_fn_helper<typename std::decay<
+                Executor>::type>::template result<Executor, Parameters>::type
         {
             return processing_units_count_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(0, std::forward<Executor>(exec), params);
+                typename std::decay<Executor>::type>::call(0,
+                std::forward<Executor>(exec), params);
         }
 
         template <>
@@ -77,7 +81,7 @@ namespace hpx { namespace parallel { namespace execution
             HPX_FORCEINLINE auto operator()(
                 Executor&& exec, Parameters& params) const
                 -> decltype(processing_units_count(
-                        std::forward<Executor>(exec), params))
+                    std::forward<Executor>(exec), params))
             {
                 return processing_units_count(
                     std::forward<Executor>(exec), params);
@@ -87,15 +91,13 @@ namespace hpx { namespace parallel { namespace execution
         ///////////////////////////////////////////////////////////////////////
         // has_pending_closures dispatch point
         template <typename Executor>
-        HPX_FORCEINLINE auto
-        has_pending_closures(Executor && exec)
-        -> typename has_pending_closures_fn_helper<
-                typename std::decay<Executor>::type
-            >::template result<Executor>::type
+        HPX_FORCEINLINE auto has_pending_closures(Executor&& exec) ->
+            typename has_pending_closures_fn_helper<typename std::decay<
+                Executor>::type>::template result<Executor>::type
         {
             return has_pending_closures_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(0, std::forward<Executor>(exec));
+                typename std::decay<Executor>::type>::call(0,
+                std::forward<Executor>(exec));
         }
 
         template <>
@@ -113,16 +115,14 @@ namespace hpx { namespace parallel { namespace execution
         ///////////////////////////////////////////////////////////////////////
         // get_pu_mask dispatch point
         template <typename Executor>
-        HPX_FORCEINLINE auto
-        get_pu_mask(Executor && exec, threads::topology& topo,
-                std::size_t thread_num)
-        -> typename get_pu_mask_fn_helper<
-                typename std::decay<Executor>::type
-            >::template result<Executor>::type
+        HPX_FORCEINLINE auto get_pu_mask(
+            Executor&& exec, threads::topology& topo, std::size_t thread_num) ->
+            typename get_pu_mask_fn_helper<typename std::decay<
+                Executor>::type>::template result<Executor>::type
         {
             return get_pu_mask_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(0, std::forward<Executor>(exec), topo, thread_num);
+                typename std::decay<Executor>::type>::call(0,
+                std::forward<Executor>(exec), topo, thread_num);
         }
 
         template <>
@@ -132,8 +132,8 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor>
             HPX_FORCEINLINE auto operator()(Executor&& exec,
                 threads::topology& topo, std::size_t thread_num) const
-            -> decltype(get_pu_mask(std::forward<Executor>(exec), topo,
-                    thread_num))
+                -> decltype(
+                    get_pu_mask(std::forward<Executor>(exec), topo, thread_num))
             {
                 return get_pu_mask(
                     std::forward<Executor>(exec), topo, thread_num);
@@ -142,15 +142,14 @@ namespace hpx { namespace parallel { namespace execution
 
         // set_scheduler_mode dispatch point
         template <typename Executor, typename Mode>
-        HPX_FORCEINLINE auto
-        set_scheduler_mode(Executor && exec, Mode const& mode)
-        -> typename set_scheduler_mode_fn_helper<
-                typename std::decay<Executor>::type
-            >::template result<Executor, Mode>::type
+        HPX_FORCEINLINE auto set_scheduler_mode(
+            Executor&& exec, Mode const& mode) ->
+            typename set_scheduler_mode_fn_helper<typename std::decay<
+                Executor>::type>::template result<Executor, Mode>::type
         {
             return set_scheduler_mode_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(0, std::forward<Executor>(exec), mode);
+                typename std::decay<Executor>::type>::call(0,
+                std::forward<Executor>(exec), mode);
         }
 
         template <>
@@ -160,17 +159,17 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor, typename Mode>
             HPX_FORCEINLINE auto operator()(
                 Executor&& exec, Mode const& mode) const
-            -> decltype(set_scheduler_mode(std::forward<Executor>(exec), mode))
+                -> decltype(
+                    set_scheduler_mode(std::forward<Executor>(exec), mode))
             {
                 return set_scheduler_mode(std::forward<Executor>(exec), mode);
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     // define customization points
-    namespace
-    {
+    namespace {
         /// Retrieve the number of (kernel-)threads used by the associated
         /// executor.
         ///
@@ -181,10 +180,9 @@ namespace hpx { namespace parallel { namespace execution
         ///       otherwise it executes hpx::get_os_thread_count().
         ///
         constexpr detail::customization_point<
-                detail::processing_units_count_tag
-            > const& processing_units_count = detail::static_const<
-                    detail::customization_point<detail::processing_units_count_tag>
-                >::value;
+            detail::processing_units_count_tag> const& processing_units_count =
+            detail::static_const<detail::customization_point<
+                detail::processing_units_count_tag>>::value;
 
         /// Retrieve whether this executor has operations pending or not.
         ///
@@ -195,10 +193,9 @@ namespace hpx { namespace parallel { namespace execution
         ///       will always return \a false
         ///
         constexpr detail::customization_point<
-                detail::has_pending_closures_tag
-            > const& has_pending_closures = detail::static_const<
-                    detail::customization_point<detail::has_pending_closures_tag>
-                >::value;
+            detail::has_pending_closures_tag> const& has_pending_closures =
+            detail::static_const<detail::customization_point<
+                detail::has_pending_closures_tag>>::value;
 
         /// Retrieve the bitmask describing the processing units the given
         /// thread is allowed to run on
@@ -217,8 +214,7 @@ namespace hpx { namespace parallel { namespace execution
         ///
         constexpr detail::customization_point<detail::get_pu_mask_tag> const&
             get_pu_mask = detail::static_const<
-                    detail::customization_point<detail::get_pu_mask_tag>
-                >::value;
+                detail::customization_point<detail::get_pu_mask_tag>>::value;
 
         /// Set various modes of operation on the scheduler underneath the
         /// given executor.
@@ -230,12 +226,10 @@ namespace hpx { namespace parallel { namespace execution
         ///       otherwise it does nothing.
         ///
         constexpr detail::customization_point<
-                detail::set_scheduler_mode_tag
-            > const& set_scheduler_mode = detail::static_const<
-                    detail::customization_point<detail::set_scheduler_mode_tag>
-                >::value;
-    }
-}}}
+            detail::set_scheduler_mode_tag> const& set_scheduler_mode =
+            detail::static_const<detail::customization_point<
+                detail::set_scheduler_mode_tag>>::value;
+    }    // namespace
+}}}      // namespace hpx::parallel::execution
 
 #endif
-

@@ -6,8 +6,8 @@
 #ifndef HPX_CONFIG_ATTRIBUTES_HPP
 #define HPX_CONFIG_ATTRIBUTES_HPP
 
-#include <hpx/config/defines.hpp>
 #include <hpx/config/compiler_specific.hpp>
+#include <hpx/config/defines.hpp>
 
 #if defined(DOXYGEN)
 
@@ -27,6 +27,7 @@
 #else
 
 ///////////////////////////////////////////////////////////////////////////////
+// clang-format off
 #if defined(HPX_MSVC)
 #   define HPX_NOINLINE __declspec(noinline)
 #elif defined(__GNUC__)
@@ -85,6 +86,7 @@
 #else
 #   define HPX_FALLTHROUGH
 #endif
+// clang-format on
 
 #endif
 #endif

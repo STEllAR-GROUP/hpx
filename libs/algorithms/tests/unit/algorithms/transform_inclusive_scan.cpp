@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_transform_scan.hpp>
 #include <hpx/testing.hpp>
 
@@ -33,11 +33,10 @@ void test_transform_inclusive_scan1(ExPolicy policy, IteratorTag)
 
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
-    auto conv = [](std::size_t val) { return 2*val; };
+    auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::parallel::transform_inclusive_scan(policy,
-        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
-        op, conv, val);
+    hpx::parallel::transform_inclusive_scan(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(d), op, conv, val);
 
     // verify values
     std::vector<std::size_t> e(c.size());
@@ -59,12 +58,11 @@ void test_transform_inclusive_scan1_async(ExPolicy p, IteratorTag)
 
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
-    auto conv = [](std::size_t val) { return 2*val; };
+    auto conv = [](std::size_t val) { return 2 * val; };
 
     hpx::future<void> f =
-        hpx::parallel::transform_inclusive_scan(p,
-            iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
-            op, conv, val);
+        hpx::parallel::transform_inclusive_scan(p, iterator(std::begin(c)),
+            iterator(std::end(c)), std::begin(d), op, conv, val);
     f.wait();
 
     // verify values
@@ -84,10 +82,10 @@ void test_transform_inclusive_scan1()
     test_transform_inclusive_scan1(execution::par, IteratorTag());
     test_transform_inclusive_scan1(execution::par_unseq, IteratorTag());
 
-    test_transform_inclusive_scan1_async(execution::seq(execution::task),
-        IteratorTag());
-    test_transform_inclusive_scan1_async(execution::par(execution::task),
-        IteratorTag());
+    test_transform_inclusive_scan1_async(
+        execution::seq(execution::task), IteratorTag());
+    test_transform_inclusive_scan1_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void transform_inclusive_scan_test1()
@@ -112,11 +110,10 @@ void test_transform_inclusive_scan2(ExPolicy policy, IteratorTag)
     std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
-    auto conv = [](std::size_t val) { return 2*val; };
+    auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::parallel::transform_inclusive_scan(policy,
-        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
-        op, conv);
+    hpx::parallel::transform_inclusive_scan(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(d), op, conv);
 
     // verify values
     std::vector<std::size_t> e(c.size());
@@ -137,12 +134,11 @@ void test_transform_inclusive_scan2_async(ExPolicy p, IteratorTag)
     std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
-    auto conv = [](std::size_t val) { return 2*val; };
+    auto conv = [](std::size_t val) { return 2 * val; };
 
     hpx::future<void> f =
-        hpx::parallel::transform_inclusive_scan(p,
-            iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
-            op, conv);
+        hpx::parallel::transform_inclusive_scan(p, iterator(std::begin(c)),
+            iterator(std::end(c)), std::begin(d), op, conv);
     f.wait();
 
     // verify values
@@ -162,10 +158,10 @@ void test_transform_inclusive_scan2()
     test_transform_inclusive_scan2(execution::par, IteratorTag());
     test_transform_inclusive_scan2(execution::par_unseq, IteratorTag());
 
-    test_transform_inclusive_scan2_async(execution::seq(execution::task),
-        IteratorTag());
-    test_transform_inclusive_scan2_async(execution::par(execution::task),
-        IteratorTag());
+    test_transform_inclusive_scan2_async(
+        execution::seq(execution::task), IteratorTag());
+    test_transform_inclusive_scan2_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void transform_inclusive_scan_test2()
@@ -190,25 +186,25 @@ void test_transform_inclusive_scan_exception(ExPolicy policy, IteratorTag)
     std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     bool caught_exception = false;
-    try {
-        hpx::parallel::transform_inclusive_scan(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
+    try
+    {
+        hpx::parallel::transform_inclusive_scan(
+            policy, iterator(std::begin(c)), iterator(std::end(c)),
             std::begin(d),
-            [](std::size_t v1, std::size_t v2)
-            {
+            [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), v1 + v2;
             },
-            [](std::size_t val) { return val; },
-            std::size_t(0)
-        );
+            [](std::size_t val) { return val; }, std::size_t(0));
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -227,29 +223,27 @@ void test_transform_inclusive_scan_exception_async(ExPolicy p, IteratorTag)
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        hpx::future<void> f =
-            hpx::parallel::transform_inclusive_scan(p,
-                iterator(std::begin(c)), iterator(std::end(c)),
-                std::begin(d),
-                [](std::size_t v1, std::size_t v2)
-                {
-                    return throw std::runtime_error("test"), v1 + v2;
-                },
-                [](std::size_t val) { return val; },
-                std::size_t(0)
-            );
+    try
+    {
+        hpx::future<void> f = hpx::parallel::transform_inclusive_scan(
+            p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
+            [](std::size_t v1, std::size_t v2) {
+                return throw std::runtime_error("test"), v1 + v2;
+            },
+            [](std::size_t val) { return val; }, std::size_t(0));
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -269,11 +263,9 @@ void test_transform_inclusive_scan_exception()
     test_transform_inclusive_scan_exception(execution::par, IteratorTag());
 
     test_transform_inclusive_scan_exception_async(
-        execution::seq(execution::task),
-        IteratorTag());
+        execution::seq(execution::task), IteratorTag());
     test_transform_inclusive_scan_exception_async(
-        execution::par(execution::task),
-        IteratorTag());
+        execution::par(execution::task), IteratorTag());
 }
 
 void transform_inclusive_scan_exception_test()
@@ -298,24 +290,24 @@ void test_transform_inclusive_scan_bad_alloc(ExPolicy policy, IteratorTag)
     std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     bool caught_exception = false;
-    try {
-        hpx::parallel::transform_inclusive_scan(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
+    try
+    {
+        hpx::parallel::transform_inclusive_scan(
+            policy, iterator(std::begin(c)), iterator(std::end(c)),
             std::begin(d),
-            [](std::size_t v1, std::size_t v2)
-            {
+            [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), v1 + v2;
             },
-            [](std::size_t val) { return val; },
-            std::size_t(0)
-        );
+            [](std::size_t val) { return val; }, std::size_t(0));
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_exception = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -334,28 +326,26 @@ void test_transform_inclusive_scan_bad_alloc_async(ExPolicy p, IteratorTag)
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        hpx::future<void> f =
-            hpx::parallel::transform_inclusive_scan(p,
-                iterator(std::begin(c)), iterator(std::end(c)),
-                std::begin(d),
-                [](std::size_t v1, std::size_t v2)
-                {
-                    return throw std::bad_alloc(), v1 + v2;
-                },
-                [](std::size_t val) { return val; },
-                std::size_t(0)
-            );
+    try
+    {
+        hpx::future<void> f = hpx::parallel::transform_inclusive_scan(
+            p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
+            [](std::size_t v1, std::size_t v2) {
+                return throw std::bad_alloc(), v1 + v2;
+            },
+            [](std::size_t val) { return val; }, std::size_t(0));
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_exception = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -375,11 +365,9 @@ void test_transform_inclusive_scan_bad_alloc()
     test_transform_inclusive_scan_bad_alloc(execution::par, IteratorTag());
 
     test_transform_inclusive_scan_bad_alloc_async(
-        execution::seq(execution::task),
-        IteratorTag());
+        execution::seq(execution::task), IteratorTag());
     test_transform_inclusive_scan_bad_alloc_async(
-        execution::par(execution::task),
-        IteratorTag());
+        execution::par(execution::task), IteratorTag());
 }
 
 void transform_inclusive_scan_bad_alloc_test()
@@ -391,7 +379,7 @@ void transform_inclusive_scan_bad_alloc_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -414,14 +402,10 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

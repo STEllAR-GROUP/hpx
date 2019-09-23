@@ -19,7 +19,7 @@
 struct pred
 {
     template <typename T>
-    bool operator()(const T &prev, const T &curr) const
+    bool operator()(const T& prev, const T& curr) const
     {
         return curr < prev;
     }
@@ -44,22 +44,23 @@ void test_adjacent_find(ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues)
         hpx::parallel::adjacent_find(policy, xvalues.begin(), xvalues.end());
     HPX_TEST_EQ(std::distance(xvalues.begin(), result), 31);
 
-    result = hpx::parallel::adjacent_find(policy, xvalues.begin(),
-        xvalues.end(), pred());
+    result = hpx::parallel::adjacent_find(
+        policy, xvalues.begin(), xvalues.end(), pred());
     HPX_TEST_EQ(std::distance(xvalues.begin(), result), 4);
 }
 
 template <typename ExPolicy, typename T>
-void test_adjacent_find_async(ExPolicy&& policy,
-    hpx::partitioned_vector<T>& xvalues)
+void test_adjacent_find_async(
+    ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues)
 {
     auto result =
         hpx::parallel::adjacent_find(policy, xvalues.begin(), xvalues.end())
             .get();
     HPX_TEST_EQ(std::distance(xvalues.begin(), result), 31);
 
-    result = hpx::parallel::adjacent_find(policy, xvalues.begin(),
-        xvalues.end(), pred()).get();
+    result = hpx::parallel::adjacent_find(
+        policy, xvalues.begin(), xvalues.end(), pred())
+                 .get();
     HPX_TEST_EQ(std::distance(xvalues.begin(), result), 4);
 }
 

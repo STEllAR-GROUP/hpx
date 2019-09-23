@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/partitioned_vector_predef.hpp>
-#include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_count.hpp>
+#include <hpx/include/parallel_for_each.hpp>
+#include <hpx/include/partitioned_vector_predef.hpp>
 
 #include <hpx/testing.hpp>
 
@@ -31,7 +31,10 @@ struct pfo
 template <typename T>
 struct cmp
 {
-    cmp(T const& val = T()) : value_(val) {}
+    cmp(T const& val = T())
+      : value_(val)
+    {
+    }
 
     template <typename T_>
     bool operator()(T_ const& val) const
@@ -44,14 +47,14 @@ struct cmp
     template <typename Archive>
     void serialize(Archive& ar, unsigned version)
     {
-        ar & value_;
+        ar& value_;
     }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename T>
-void verify_values(ExPolicy && policy, hpx::partitioned_vector<T> const& v,
-    T const& val)
+void verify_values(
+    ExPolicy&& policy, hpx::partitioned_vector<T> const& v, T const& val)
 {
     typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
 
@@ -67,21 +70,19 @@ void verify_values(ExPolicy && policy, hpx::partitioned_vector<T> const& v,
 }
 
 template <typename ExPolicy, typename T>
-void verify_values_count(ExPolicy && policy, hpx::partitioned_vector<T> const& v,
-    T const& val)
+void verify_values_count(
+    ExPolicy&& policy, hpx::partitioned_vector<T> const& v, T const& val)
 {
     HPX_TEST_EQ(
-        std::size_t(hpx::parallel::count(
-            policy, v.begin(), v.end(), val)),
+        std::size_t(hpx::parallel::count(policy, v.begin(), v.end(), val)),
         v.size());
-    HPX_TEST_EQ(
-        std::size_t(hpx::parallel::count_if(
-            policy, v.begin(), v.end(), cmp<T>(val))),
+    HPX_TEST_EQ(std::size_t(hpx::parallel::count_if(
+                    policy, v.begin(), v.end(), cmp<T>(val))),
         v.size());
 }
 
 template <typename ExPolicy, typename T>
-void test_for_each(ExPolicy && policy, hpx::partitioned_vector<T>& v, T val)
+void test_for_each(ExPolicy&& policy, hpx::partitioned_vector<T>& v, T val)
 {
     verify_values(policy, v, val);
     verify_values_count(policy, v, val);
@@ -93,7 +94,7 @@ void test_for_each(ExPolicy && policy, hpx::partitioned_vector<T>& v, T val)
 }
 
 template <typename ExPolicy, typename T>
-void test_for_each_n(ExPolicy && policy, hpx::partitioned_vector<T>& v, T val)
+void test_for_each_n(ExPolicy&& policy, hpx::partitioned_vector<T>& v, T val)
 {
     verify_values(policy, v, val);
     verify_values_count(policy, v, val);
@@ -105,21 +106,22 @@ void test_for_each_n(ExPolicy && policy, hpx::partitioned_vector<T>& v, T val)
 }
 
 template <typename ExPolicy, typename T>
-void verify_values_count_async(ExPolicy && policy,
-    hpx::partitioned_vector<T> const& v, T const& val)
+void verify_values_count_async(
+    ExPolicy&& policy, hpx::partitioned_vector<T> const& v, T const& val)
 {
     HPX_TEST_EQ(
-        std::size_t(hpx::parallel::count(
-            policy, v.begin(), v.end(), val).get()),
+        std::size_t(
+            hpx::parallel::count(policy, v.begin(), v.end(), val).get()),
         v.size());
-    HPX_TEST_EQ(
-        std::size_t(hpx::parallel::count_if(
-            policy, v.begin(), v.end(), cmp<T>(val)).get()),
+    HPX_TEST_EQ(std::size_t(hpx::parallel::count_if(
+                    policy, v.begin(), v.end(), cmp<T>(val))
+                                .get()),
         v.size());
 }
 
 template <typename ExPolicy, typename T>
-void test_for_each_async(ExPolicy && policy, hpx::partitioned_vector<T>& v, T val)
+void test_for_each_async(
+    ExPolicy&& policy, hpx::partitioned_vector<T>& v, T val)
 {
     verify_values(policy, v, val);
     verify_values_count_async(policy, v, val);
@@ -131,12 +133,14 @@ void test_for_each_async(ExPolicy && policy, hpx::partitioned_vector<T>& v, T va
 }
 
 template <typename ExPolicy, typename T>
-void test_for_each_n_async(ExPolicy && policy, hpx::partitioned_vector<T>& v, T val)
+void test_for_each_n_async(
+    ExPolicy&& policy, hpx::partitioned_vector<T>& v, T val)
 {
     verify_values(policy, v, val);
     verify_values_count_async(policy, v, val);
 
-    hpx::parallel::for_each_n(policy, v.begin(), v.end() - v.begin(), pfo()).get();
+    hpx::parallel::for_each_n(policy, v.begin(), v.end() - v.begin(), pfo())
+        .get();
 
     verify_values(policy, v, ++val);
     verify_values_count_async(policy, v, val);
@@ -144,34 +148,37 @@ void test_for_each_n_async(ExPolicy && policy, hpx::partitioned_vector<T>& v, T 
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void for_each_tests(std::vector<hpx::id_type> &localities)
+void for_each_tests(std::vector<hpx::id_type>& localities)
 {
     std::size_t const length = 12;
 
     {
         hpx::partitioned_vector<T> v;
-        hpx::parallel::for_each(hpx::parallel::execution::seq,
-            v.begin(), v.end(), pfo());
-        hpx::parallel::for_each(hpx::parallel::execution::par,
-            v.begin(), v.end(), pfo());
+        hpx::parallel::for_each(
+            hpx::parallel::execution::seq, v.begin(), v.end(), pfo());
+        hpx::parallel::for_each(
+            hpx::parallel::execution::par, v.begin(), v.end(), pfo());
         hpx::parallel::for_each(
             hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            v.begin(), v.end(), pfo()).get();
+            v.begin(), v.end(), pfo())
+            .get();
         hpx::parallel::for_each(
             hpx::parallel::execution::par(hpx::parallel::execution::task),
-            v.begin(), v.end(), pfo()).get();
+            v.begin(), v.end(), pfo())
+            .get();
     }
 
     {
-        hpx::partitioned_vector<T> v(length, T(0),hpx::container_layout(localities));
+        hpx::partitioned_vector<T> v(
+            length, T(0), hpx::container_layout(localities));
         test_for_each(hpx::parallel::execution::seq, v, T(0));
         test_for_each(hpx::parallel::execution::par, v, T(1));
         test_for_each_async(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            v, T(2));
+            hpx::parallel::execution::seq(hpx::parallel::execution::task), v,
+            T(2));
         test_for_each_async(
-            hpx::parallel::execution::par(hpx::parallel::execution::task),
-            v, T(3));
+            hpx::parallel::execution::par(hpx::parallel::execution::task), v,
+            T(3));
     }
 }
 
@@ -179,48 +186,53 @@ void for_each_tests(std::vector<hpx::id_type> &localities)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void for_each_n_tests(std::vector<hpx::id_type> &localities)
+void for_each_n_tests(std::vector<hpx::id_type>& localities)
 {
     std::size_t const length = 12;
 
     {
         hpx::partitioned_vector<T> v;
-        hpx::parallel::for_each_n(hpx::parallel::execution::seq,
-            v.begin(), 0, pfo());
-        hpx::parallel::for_each_n(hpx::parallel::execution::par,
-            v.begin(), 0, pfo());
+        hpx::parallel::for_each_n(
+            hpx::parallel::execution::seq, v.begin(), 0, pfo());
+        hpx::parallel::for_each_n(
+            hpx::parallel::execution::par, v.begin(), 0, pfo());
         hpx::parallel::for_each_n(
             hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            v.begin(), 0, pfo()).get();
+            v.begin(), 0, pfo())
+            .get();
         hpx::parallel::for_each_n(
             hpx::parallel::execution::par(hpx::parallel::execution::task),
-            v.begin(), 0, pfo()).get();
+            v.begin(), 0, pfo())
+            .get();
     }
 
     {
         hpx::partitioned_vector<T> v;
-        hpx::parallel::for_each_n(hpx::parallel::execution::seq,
-            v.begin(), -1, pfo());
-        hpx::parallel::for_each_n(hpx::parallel::execution::par,
-            v.begin(), -1, pfo());
+        hpx::parallel::for_each_n(
+            hpx::parallel::execution::seq, v.begin(), -1, pfo());
+        hpx::parallel::for_each_n(
+            hpx::parallel::execution::par, v.begin(), -1, pfo());
         hpx::parallel::for_each_n(
             hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            v.begin(), -1, pfo()).get();
+            v.begin(), -1, pfo())
+            .get();
         hpx::parallel::for_each_n(
             hpx::parallel::execution::par(hpx::parallel::execution::task),
-            v.begin(), -1, pfo()).get();
+            v.begin(), -1, pfo())
+            .get();
     }
 
     {
-        hpx::partitioned_vector<T> v(length, T(0), hpx::container_layout(localities));
+        hpx::partitioned_vector<T> v(
+            length, T(0), hpx::container_layout(localities));
         test_for_each_n(hpx::parallel::execution::seq, v, T(0));
         test_for_each_n(hpx::parallel::execution::par, v, T(1));
         test_for_each_n_async(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            v, T(2));
+            hpx::parallel::execution::seq(hpx::parallel::execution::task), v,
+            T(2));
         test_for_each_n_async(
-            hpx::parallel::execution::par(hpx::parallel::execution::task),
-            v, T(3));
+            hpx::parallel::execution::par(hpx::parallel::execution::task), v,
+            T(3));
     }
 }
 

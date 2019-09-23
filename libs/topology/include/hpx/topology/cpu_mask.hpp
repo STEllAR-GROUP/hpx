@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <string>
 
+// clang-format off
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS) ||                                  \
     (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT > 64)
 #  if defined(HPX_HAVE_MAX_CPU_COUNT)
@@ -26,6 +27,7 @@
 #    include <boost/dynamic_bitset.hpp>
 #  endif
 #endif
+// clang-format on
 
 namespace hpx { namespace threads {
     /// \cond NOINTERNAL
@@ -130,6 +132,7 @@ namespace hpx { namespace threads {
 
 #define HPX_CPU_MASK_PREFIX "0x"
 
+// clang-format off
 #else
 #  if defined(HPX_HAVE_MAX_CPU_COUNT)
     typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> mask_type;
@@ -138,6 +141,7 @@ namespace hpx { namespace threads {
     typedef boost::dynamic_bitset<std::uint64_t> mask_type;
     typedef boost::dynamic_bitset<std::uint64_t> const& mask_cref_type;
 #  endif
+    // clang-format on
 
     inline bool any(mask_cref_type mask)
     {
@@ -169,6 +173,7 @@ namespace hpx { namespace threads {
         return mask.size();
     }
 
+    // clang-format off
     inline void resize(mask_type& mask, std::size_t s)
     {
 #  if defined(HPX_HAVE_MAX_CPU_COUNT)
@@ -200,6 +205,7 @@ namespace hpx { namespace threads {
 #  else
 #    define HPX_CPU_MASK_PREFIX "0x"
 #  endif
+    // clang-format on
 
     inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
@@ -231,8 +237,8 @@ namespace hpx { namespace threads {
 
 #endif
 
-    HPX_API_EXPORT std::string to_string(mask_cref_type);
-    /// \endcond
+        HPX_API_EXPORT std::string to_string(mask_cref_type);
+        /// \endcond
 }}    // namespace hpx::threads
 
 #endif /*HPX_RUNTIME_THREADS_CPU_MASK_HPP*/

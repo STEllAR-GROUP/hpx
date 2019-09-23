@@ -6,12 +6,12 @@
 // hpxinspect:nodeprecatedinclude:boost/ref.hpp
 // hpxinspect:nodeprecatedname:boost::reference_wrapper
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_executors.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/testing.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -28,30 +28,34 @@
 #include "foreach_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ... Parameters>
-void parameters_test_impl(Parameters &&... params)
+template <typename... Parameters>
+void parameters_test_impl(Parameters&&... params)
 {
     using namespace hpx::parallel;
 
     typedef std::random_access_iterator_tag iterator_tag;
     test_for_each(execution::seq.with(params...), iterator_tag());
     test_for_each(execution::par.with(params...), iterator_tag());
-    test_for_each_async(execution::seq(execution::task).with(params...), iterator_tag());
-    test_for_each_async(execution::par(execution::task).with(params...), iterator_tag());
+    test_for_each_async(
+        execution::seq(execution::task).with(params...), iterator_tag());
+    test_for_each_async(
+        execution::par(execution::task).with(params...), iterator_tag());
 
     execution::sequenced_executor seq_exec;
     test_for_each(execution::seq.on(seq_exec).with(params...), iterator_tag());
-    test_for_each_async(execution::seq(execution::task).on(seq_exec).with(params...),
+    test_for_each_async(
+        execution::seq(execution::task).on(seq_exec).with(params...),
         iterator_tag());
 
     execution::parallel_executor par_exec;
     test_for_each(execution::par.on(par_exec).with(params...), iterator_tag());
-    test_for_each_async(execution::par(execution::task).on(par_exec).with(params...),
+    test_for_each_async(
+        execution::par(execution::task).on(par_exec).with(params...),
         iterator_tag());
 }
 
-template <typename ... Parameters>
-void parameters_test(Parameters &&... params)
+template <typename... Parameters>
+void parameters_test(Parameters&&... params)
 {
     parameters_test_impl(std::ref(params)...);
     parameters_test_impl(boost::ref(params)...);
@@ -105,7 +109,8 @@ void test_auto_chunk_size()
     }
 
     {
-        hpx::parallel::execution::auto_chunk_size acs(std::chrono::milliseconds(1));
+        hpx::parallel::execution::auto_chunk_size acs(
+            std::chrono::milliseconds(1));
         parameters_test(acs);
     }
 }
@@ -119,8 +124,7 @@ void test_persistent_auto_chunk_size()
 
     {
         hpx::parallel::execution::persistent_auto_chunk_size pacs(
-            std::chrono::milliseconds(0),
-            std::chrono::milliseconds(1));
+            std::chrono::milliseconds(0), std::chrono::milliseconds(1));
         parameters_test(pacs);
     }
 
@@ -136,33 +140,33 @@ struct timer_hooks_parameters
 {
     timer_hooks_parameters(char const* name)
       : name_(name)
-    {}
-
-    template <typename Executor>
-    void mark_begin_execution(Executor &&)
     {
     }
 
     template <typename Executor>
-    void mark_end_of_scheduling(Executor &&)
+    void mark_begin_execution(Executor&&)
     {
     }
 
     template <typename Executor>
-    void mark_end_execution(Executor &&)
+    void mark_end_of_scheduling(Executor&&)
+    {
+    }
+
+    template <typename Executor>
+    void mark_end_execution(Executor&&)
     {
     }
 
     std::string name_;
 };
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     template <>
-    struct is_executor_parameters<timer_hooks_parameters>
-      : std::true_type
-    {};
-}}}
+    struct is_executor_parameters<timer_hooks_parameters> : std::true_type
+    {
+    };
+}}}    // namespace hpx::parallel::execution
 
 void test_combined_hooks()
 {
@@ -201,15 +205,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

@@ -6,8 +6,7 @@
 #if !defined(HPX_CONFIG_FORCE_LINKING_HPP)
 #define HPX_CONFIG_FORCE_LINKING_HPP
 
-namespace hpx { namespace config
-{
+namespace hpx { namespace config {
     struct force_linking_helper
     {
         const char* const hpx_version;
@@ -15,6 +14,6 @@ namespace hpx { namespace config
     };
 
     force_linking_helper& force_linking();
-}}
+}}    // namespace hpx::config
 
 #endif

@@ -27,12 +27,10 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // uninitialized_fill
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // provide our own implementation of std::uninitialized_fill as some
@@ -40,17 +38,19 @@ namespace hpx { namespace parallel { inline namespace v1
         template <typename InIter, typename T>
         void std_uninitialized_fill(InIter first, InIter last, T const& value)
         {
-            typedef typename std::iterator_traits<InIter>::value_type
-                value_type;
+            typedef
+                typename std::iterator_traits<InIter>::value_type value_type;
 
             InIter current = first;
-            try {
+            try
+            {
                 for (/* */; current != last; ++current)
                 {
                     ::new (std::addressof(*current)) value_type(value);
                 }
             }
-            catch (...) {
+            catch (...)
+            {
                 for (/* */; first != current; ++first)
                 {
                     (*first).~value_type();
@@ -61,58 +61,49 @@ namespace hpx { namespace parallel { inline namespace v1
 
         template <typename InIter, typename T>
         InIter sequential_uninitialized_fill_n(InIter first, std::size_t count,
-            T const& value, util::cancellation_token<util::detail::no_data>& tok)
+            T const& value,
+            util::cancellation_token<util::detail::no_data>& tok)
         {
-            typedef typename std::iterator_traits<InIter>::value_type
-                value_type;
+            typedef
+                typename std::iterator_traits<InIter>::value_type value_type;
 
-            return
-                util::loop_with_cleanup_n_with_token(
-                    first, count, tok,
-                    [&value](InIter it) -> void
-                    {
-                        ::new (std::addressof(*it)) value_type(value);
-                    },
-                    [](InIter it) -> void
-                    {
-                        (*it).~value_type();
-                    });
+            return util::loop_with_cleanup_n_with_token(
+                first, count, tok,
+                [&value](InIter it) -> void {
+                    ::new (std::addressof(*it)) value_type(value);
+                },
+                [](InIter it) -> void { (*it).~value_type(); });
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter, typename T>
         typename util::detail::algorithm_result<ExPolicy>::type
-        parallel_sequential_uninitialized_fill_n(ExPolicy && policy,
-            Iter first, std::size_t count, T const& value)
+        parallel_sequential_uninitialized_fill_n(
+            ExPolicy&& policy, Iter first, std::size_t count, T const& value)
         {
             if (count == 0)
                 return util::detail::algorithm_result<ExPolicy>::get();
 
             typedef std::pair<Iter, Iter> partition_result_type;
-            typedef typename std::iterator_traits<Iter>::value_type
-                value_type;
+            typedef typename std::iterator_traits<Iter>::value_type value_type;
 
             util::cancellation_token<util::detail::no_data> tok;
-            return util::partitioner_with_cleanup<
-                    ExPolicy, void, partition_result_type
-                >::call(
+            return util::partitioner_with_cleanup<ExPolicy, void,
+                partition_result_type>::
+                call(
                     std::forward<ExPolicy>(policy), first, count,
-                    [value, tok](Iter it, std::size_t part_size)
-                        mutable -> partition_result_type
-                    {
+                    [value, tok](Iter it, std::size_t part_size) mutable
+                    -> partition_result_type {
                         return std::make_pair(it,
                             sequential_uninitialized_fill_n(
                                 it, part_size, value, tok));
                     },
                     // finalize, called once if no error occurred
-                    [](std::vector<hpx::future<partition_result_type> > &&)
-                        -> void
-                    {
-                    },
+                    [](std::vector<hpx::future<partition_result_type>> &&)
+                        -> void {},
                     // cleanup function, called for each partition which
                     // didn't fail, but only if at least one failed
-                    [](partition_result_type && r) -> void
-                    {
+                    [](partition_result_type&& r) -> void {
                         while (r.first != r.second)
                         {
                             (*r.first).~value_type();
@@ -122,16 +113,16 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         ///////////////////////////////////////////////////////////////////////
-        struct uninitialized_fill
-          : public detail::algorithm<uninitialized_fill>
+        struct uninitialized_fill : public detail::algorithm<uninitialized_fill>
         {
             uninitialized_fill()
               : uninitialized_fill::algorithm("uninitialized_fill")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter, typename T>
-            static hpx::util::unused_type
-            sequential(ExPolicy, InIter first, InIter last, T const& value)
+            static hpx::util::unused_type sequential(
+                ExPolicy, InIter first, InIter last, T const& value)
             {
                 std_uninitialized_fill(first, last, value);
                 return hpx::util::unused;
@@ -139,8 +130,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy, typename Iter, typename T>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy && policy, Iter first, Iter last,
-                T const& value)
+            parallel(ExPolicy&& policy, Iter first, Iter last, T const& value)
             {
                 if (first == last)
                     return util::detail::algorithm_result<ExPolicy>::get();
@@ -151,7 +141,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Copies the given \a value to an uninitialized memory area, defined by
     /// the range [first, last). If an exception is thrown during the
@@ -194,49 +184,49 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           otherwise.
     ///
     template <typename ExPolicy, typename FwdIter, typename T>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy>::type
-    >::type
-    uninitialized_fill(ExPolicy && policy, FwdIter first, FwdIter last,
-        T const& value)
+    inline
+        typename std::enable_if<execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy>::type>::type
+        uninitialized_fill(
+            ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::uninitialized_fill().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, value);
+            std::forward<ExPolicy>(policy), is_seq(), first, last, value);
     }
 
     /////////////////////////////////////////////////////////////////////////////
     // uninitialized_fill_n
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // provide our own implementation of std::uninitialized_fill_n as some
         // versions of MSVC horribly fail at compiling it for some types T
         template <typename InIter, typename Size, typename T>
-        InIter std_uninitialized_fill_n(InIter first, Size count,
-            T const& value)
+        InIter std_uninitialized_fill_n(
+            InIter first, Size count, T const& value)
         {
-            typedef typename std::iterator_traits<InIter>::value_type
-                value_type;
+            typedef
+                typename std::iterator_traits<InIter>::value_type value_type;
 
             InIter current = first;
-            try {
-                for (/* */; count > 0; ++current, (void) --count) {
+            try
+            {
+                for (/* */; count > 0; ++current, (void) --count)
+                {
                     ::new (static_cast<void*>(std::addressof(*current)))
                         value_type(value);
                 }
                 return current;
             }
-            catch (...) {
-                for (/* */; first != current; ++first) {
+            catch (...)
+            {
+                for (/* */; first != current; ++first)
+                {
                     (*first).~value_type();
                 }
                 throw;
@@ -248,11 +238,12 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             uninitialized_fill_n()
               : uninitialized_fill_n::algorithm("uninitialized_fill_n")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter, typename T>
-            static hpx::util::unused_type
-            sequential(ExPolicy, InIter first, std::size_t count, T const& value)
+            static hpx::util::unused_type sequential(
+                ExPolicy, InIter first, std::size_t count, T const& value)
             {
                 std_uninitialized_fill_n(first, count, value);
                 return hpx::util::unused;
@@ -260,7 +251,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy, typename FwdIter, typename T>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy && policy, FwdIter first, std::size_t count,
+            parallel(ExPolicy&& policy, FwdIter first, std::size_t count,
                 T const& value)
             {
                 return parallel_sequential_uninitialized_fill_n(
@@ -268,7 +259,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Copies the given \a value value to the first count elements in an
     /// uninitialized memory area beginning at first. If an exception is thrown
@@ -314,15 +305,13 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           otherwise.
     ///
     template <typename ExPolicy, typename FwdIter, typename Size, typename T>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy>::type
-    >::type
-    uninitialized_fill_n(ExPolicy && policy, FwdIter first, Size count,
-        T const& value)
+    inline
+        typename std::enable_if<execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy>::type>::type
+        uninitialized_fill_n(
+            ExPolicy&& policy, FwdIter first, Size count, T const& value)
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
         // if count is representing a negative value, we do nothing
@@ -334,9 +323,9 @@ namespace hpx { namespace parallel { inline namespace v1
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::uninitialized_fill_n().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, std::size_t(count), value);
+            std::forward<ExPolicy>(policy), is_seq(), first, std::size_t(count),
+            value);
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

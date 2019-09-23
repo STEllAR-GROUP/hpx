@@ -9,8 +9,8 @@
 #if !defined(HPX_RESILIENCY_DATAFLOW_REPLAY_HPP_2019_FEB_04_0449PM)
 #define HPX_RESILIENCY_DATAFLOW_REPLAY_HPP_2019_FEB_04_0449PM
 
-#include <hpx/resiliency/async_replay.hpp>
 #include <hpx/resiliency/config.hpp>
+#include <hpx/resiliency/async_replay.hpp>
 
 #include <hpx/async.hpp>
 #include <hpx/dataflow.hpp>

@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_find.hpp>
 #include <hpx/testing.hpp>
 
@@ -21,8 +21,8 @@
 ////////////////////////////////////////////////////////////////////////////
 unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
-std::uniform_int_distribution<> dis(0,10006);
-std::uniform_int_distribution<> dist(0,2);
+std::uniform_int_distribution<> dis(0, 10006);
+std::uniform_int_distribution<> dist(0, 2);
 
 template <typename ExPolicy, typename IteratorTag>
 void test_find_first_of(ExPolicy policy, IteratorTag)
@@ -39,7 +39,7 @@ void test_find_first_of(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen() + 19);
     std::size_t h[] = {1, 7, 18, 3};
-    c[find_first_of_pos] = h[random_sub_seq_pos]; //-V108
+    c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
 
     base_iterator index = hpx::parallel::find_first_of(policy, c, h);
 
@@ -61,13 +61,12 @@ void test_find_first_of_proj(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), (gen() % 32768) + 19);
-    std::size_t h[] = {1+65536, 7+65536, 18+65536, 3+65536};
+    std::size_t h[] = {1 + 65536, 7 + 65536, 18 + 65536, 3 + 65536};
     c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
 
-    base_iterator index =
-        hpx::parallel::find_first_of(policy, c, h,
-            std::equal_to<std::size_t>(),
-        [](std::size_t x){ return x % 65536;},
+    base_iterator index = hpx::parallel::find_first_of(
+        policy, c, h, std::equal_to<std::size_t>(),
+        [](std::size_t x) { return x % 65536; },
         [](std::size_t x) { return x % 65536; });
 
     base_iterator test_index = std::begin(c) + find_first_of_pos;
@@ -86,7 +85,7 @@ void test_find_first_of_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen() + 19);
     std::size_t h[] = {1, 7, 18, 3};
-    c[find_first_of_pos] = h[random_sub_seq_pos]; //-V108
+    c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
 
     hpx::future<base_iterator> f = hpx::parallel::find_first_of(p, c, h);
     f.wait();
@@ -105,14 +104,13 @@ void test_find_first_of_async_proj(ExPolicy p, IteratorTag)
     int random_sub_seq_pos = dist(gen);
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c),( gen() % 32768)  + 19);
-    std::size_t h[] = {1+65536, 7+65536, 18+65536, 3+65536};
+    std::iota(std::begin(c), std::end(c), (gen() % 32768) + 19);
+    std::size_t h[] = {1 + 65536, 7 + 65536, 18 + 65536, 3 + 65536};
     c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
 
-    hpx::future<base_iterator> f =
-        hpx::parallel::find_first_of(p, c,h,
-            std::equal_to<std::size_t>(),
-        [](std::size_t x){ return x % 65536;},
+    hpx::future<base_iterator> f = hpx::parallel::find_first_of(
+        p, c, h, std::equal_to<std::size_t>(),
+        [](std::size_t x) { return x % 65536; },
         [](std::size_t x) { return x % 65536; });
     f.wait();
 
@@ -135,8 +133,10 @@ void test_find_first_of()
 
     test_find_first_of_async(execution::seq(execution::task), IteratorTag());
     test_find_first_of_async(execution::par(execution::task), IteratorTag());
-    test_find_first_of_async_proj(execution::seq(execution::task), IteratorTag());
-    test_find_first_of_async_proj(execution::par(execution::task), IteratorTag());
+    test_find_first_of_async_proj(
+        execution::seq(execution::task), IteratorTag());
+    test_find_first_of_async_proj(
+        execution::par(execution::task), IteratorTag());
 }
 
 void find_first_of_test()
@@ -166,15 +166,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

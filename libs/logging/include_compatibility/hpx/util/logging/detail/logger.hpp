@@ -13,7 +13,8 @@
     "The header hpx/util/logging/detail/logger.hpp is deprecated,              \
     please include hpx/logging/detail/logger.hpp instead")
 #else
-#warning "The header hpx/util/logging/detail/logger.hpp is deprecated,         \
+#warning                                                                       \
+    "The header hpx/util/logging/detail/logger.hpp is deprecated,         \
     please include hpx/logging/detail/logger.hpp instead"
 #endif
 #endif

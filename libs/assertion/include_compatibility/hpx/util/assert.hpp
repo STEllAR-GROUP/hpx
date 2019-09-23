@@ -19,7 +19,8 @@
     "The header hpx/util/assert.hpp is deprecated,                             \
     please include hpx/assertion.hpp instead")
 #else
-#warning "The header hpx/util/assert.hpp is deprecated,                        \
+#warning                                                                       \
+    "The header hpx/util/assert.hpp is deprecated,                        \
     please include hpx/assertion.hpp instead"
 #endif
 #endif

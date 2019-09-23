@@ -9,12 +9,11 @@
 
 #if defined(HPX_CACHE_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/util/cache/policies/always.hpp is deprecated, \
     please include hpx/cache/policies/always.hpp instead")
 #else
-#warning \
-    "The header hpx/util/cache/policies/always.hpp is deprecated, \
+#warning "The header hpx/util/cache/policies/always.hpp is deprecated, \
     please include hpx/cache/policies/always.hpp instead"
 #endif
 #endif

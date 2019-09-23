@@ -14,25 +14,36 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/testing.hpp>
 
-struct tried_to_copy {};
+struct tried_to_copy
+{
+};
 
 struct MaybeThrowOnCopy
 {
-    MaybeThrowOnCopy(int value = 0) : value(value) {}
+    MaybeThrowOnCopy(int value = 0)
+      : value(value)
+    {
+    }
 
-    MaybeThrowOnCopy(const MaybeThrowOnCopy& other) : value(other.value) {
+    MaybeThrowOnCopy(const MaybeThrowOnCopy& other)
+      : value(other.value)
+    {
         if (throwOnCopy)
             throw tried_to_copy();
     }
 
-    MaybeThrowOnCopy& operator=(const MaybeThrowOnCopy& other) {
+    MaybeThrowOnCopy& operator=(const MaybeThrowOnCopy& other)
+    {
         if (throwOnCopy)
             throw tried_to_copy();
         value = other.value;
         return *this;
     }
 
-    int operator()() { return value; }
+    int operator()()
+    {
+        return value;
+    }
 
     int value;
 
@@ -45,7 +56,7 @@ struct MaybeThrowOnCopy
 
 bool MaybeThrowOnCopy::throwOnCopy = false;
 
-int main(int, char* [])
+int main(int, char*[])
 {
     hpx::util::function_nonser<int()> f;
     hpx::util::function_nonser<int()> g;

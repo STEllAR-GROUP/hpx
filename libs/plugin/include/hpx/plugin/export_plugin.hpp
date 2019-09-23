@@ -11,11 +11,10 @@
 
 #include <hpx/plugin/config.hpp>
 #include <hpx/datastructures/any.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/plugin/abstract_factory.hpp>
 #include <hpx/plugin/concrete_factory.hpp>
-#include <hpx/plugin/config.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 
 #include <algorithm>
 #include <cctype>
@@ -102,13 +101,14 @@
             HPX_PLUGIN_EXPORTER_NAME_(prefix, name, actualname, classname)()   \
             {                                                                  \
                 static hpx::util::plugin::concrete_factory<BaseType,           \
-                    ActualType> cf;                                            \
+                    ActualType>                                                \
+                    cf;                                                        \
                 hpx::util::plugin::abstract_factory<BaseType>* w = &cf;        \
                 std::string actname(HPX_PP_STRINGIZE(actualname));             \
                 std::transform(actname.begin(), actname.end(),                 \
                     actname.begin(), [](char c) { return std::tolower(c); });  \
-                HPX_PLUGIN_LIST_NAME_(prefix, name, classname)()->             \
-                    insert(std::make_pair(actname, hpx::util::any_nonser(w))); \
+                HPX_PLUGIN_LIST_NAME_(prefix, name, classname)                 \
+                ()->insert(std::make_pair(actname, hpx::util::any_nonser(w))); \
             }                                                                  \
         } HPX_PLUGIN_EXPORTER_INSTANCE_NAME_(                                  \
             prefix, name, actualname, classname);                              \

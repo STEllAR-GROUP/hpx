@@ -9,12 +9,11 @@
 
 #if defined(HPX_PLUGIN_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/util/plugin/detail/dll_dlopen.hpp is deprecated, \
     please include hpx/plugin/detail/dll_dlopen.hpp instead")
 #else
-#warning \
-    "The header hpx/util/plugin/detail/dll_dlopen.hpp is deprecated, \
+#warning "The header hpx/util/plugin/detail/dll_dlopen.hpp is deprecated, \
     please include hpx/plugin/detail/dll_dlopen.hpp instead"
 #endif
 #endif

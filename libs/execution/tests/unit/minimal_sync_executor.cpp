@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/testing.hpp>
 
@@ -34,13 +34,14 @@ void sync_test_void(int passed_through)
 }
 
 hpx::thread::id sync_bulk_test(int value, hpx::thread::id tid,
-    int passed_through) //-V813
+    int passed_through)    //-V813
 {
     HPX_TEST_EQ(passed_through, 42);
     return hpx::this_thread::get_id();
 }
 
-void sync_bulk_test_void(int value, hpx::thread::id tid, int passed_through) //-V813
+void sync_bulk_test_void(
+    int value, hpx::thread::id tid, int passed_through)    //-V813
 {
     HPX_TEST(tid == hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -48,9 +49,9 @@ void sync_bulk_test_void(int value, hpx::thread::id tid, int passed_through) //-
 
 hpx::thread::id then_test(hpx::future<void> f, int passed_through)
 {
-    HPX_TEST(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());    // make sure, future is ready
 
-    f.get();                    // propagate exceptions
+    f.get();    // propagate exceptions
 
     HPX_TEST_EQ(passed_through, 42);
     return hpx::this_thread::get_id();
@@ -58,19 +59,19 @@ hpx::thread::id then_test(hpx::future<void> f, int passed_through)
 
 void then_test_void(hpx::future<void> f, int passed_through)
 {
-    HPX_TEST(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());    // make sure, future is ready
 
-    f.get();                    // propagate exceptions
+    f.get();    // propagate exceptions
 
     HPX_TEST_EQ(passed_through, 42);
 }
 
 hpx::thread::id then_bulk_test(int value, hpx::shared_future<void> f,
-    hpx::thread::id tid, int passed_through) //-V813
+    hpx::thread::id tid, int passed_through)    //-V813
 {
-    HPX_TEST(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());    // make sure, future is ready
 
-    f.get();                    // propagate exceptions
+    f.get();    // propagate exceptions
 
     HPX_TEST(tid == hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -79,11 +80,11 @@ hpx::thread::id then_bulk_test(int value, hpx::shared_future<void> f,
 }
 
 void then_bulk_test_void(int value, hpx::shared_future<void> f,
-    hpx::thread::id tid, int passed_through) //-V813
+    hpx::thread::id tid, int passed_through)    //-V813
 {
-    HPX_TEST(f.is_ready());   // make sure, future is ready
+    HPX_TEST(f.is_ready());    // make sure, future is ready
 
-    f.get();                    // propagate exceptions
+    f.get();    // propagate exceptions
 
     HPX_TEST(tid == hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -93,8 +94,7 @@ void then_bulk_test_void(int value, hpx::shared_future<void> f,
 template <typename Executor>
 void test_sync(Executor& exec)
 {
-    HPX_TEST(
-        hpx::parallel::execution::sync_execute(exec, &sync_test, 42) ==
+    HPX_TEST(hpx::parallel::execution::sync_execute(exec, &sync_test, 42) ==
         hpx::this_thread::get_id());
 
     hpx::parallel::execution::sync_execute(exec, &sync_test_void, 42);
@@ -114,9 +114,8 @@ template <typename Executor>
 void test_then(Executor& exec)
 {
     hpx::future<void> f1 = hpx::make_ready_future();
-    HPX_TEST(
-        hpx::parallel::execution::then_execute(exec, &then_test, f1, 42).get() ==
-        hpx::this_thread::get_id());
+    HPX_TEST(hpx::parallel::execution::then_execute(exec, &then_test, f1, 42)
+                 .get() == hpx::this_thread::get_id());
 
     hpx::future<void> f2 = hpx::make_ready_future();
     hpx::parallel::execution::then_execute(exec, &then_test_void, f2, 42).get();
@@ -165,23 +164,20 @@ void test_bulk_async(Executor& exec)
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
-    hpx::when_all(
-        hpx::parallel::execution::bulk_async_execute(
-            exec, hpx::util::bind(&sync_bulk_test, _1, tid, _2), v, 42)
-    ).get();
-    hpx::when_all(
-        hpx::parallel::execution::bulk_async_execute(
-            exec, &sync_bulk_test, v, tid, 42)
-    ).get();
+    hpx::when_all(hpx::parallel::execution::bulk_async_execute(exec,
+                      hpx::util::bind(&sync_bulk_test, _1, tid, _2), v, 42))
+        .get();
+    hpx::when_all(hpx::parallel::execution::bulk_async_execute(
+                      exec, &sync_bulk_test, v, tid, 42))
+        .get();
 
     hpx::when_all(
         hpx::parallel::execution::bulk_async_execute(
-            exec, hpx::util::bind(&sync_bulk_test_void, _1, tid, _2), v, 42)
-    ).get();
-    hpx::when_all(
-        hpx::parallel::execution::bulk_async_execute(
-            exec, &sync_bulk_test_void, v, tid, 42)
-    ).get();
+            exec, hpx::util::bind(&sync_bulk_test_void, _1, tid, _2), v, 42))
+        .get();
+    hpx::when_all(hpx::parallel::execution::bulk_async_execute(
+                      exec, &sync_bulk_test_void, v, tid, 42))
+        .get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -197,7 +193,8 @@ void test_bulk_then(Executor& exec)
 
     std::vector<hpx::thread::id> tids =
         hpx::parallel::execution::bulk_then_execute(
-            exec, &then_bulk_test, v, f, tid, 42).get();
+            exec, &then_bulk_test, v, f, tid, 42)
+            .get();
 
     for (auto const& tid : tids)
     {
@@ -205,7 +202,8 @@ void test_bulk_then(Executor& exec)
     }
 
     hpx::parallel::execution::bulk_then_execute(
-        exec, &then_bulk_test_void, v, f, tid, 42).get();
+        exec, &then_bulk_test_void, v, f, tid, 42)
+        .get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -215,14 +213,11 @@ std::atomic<std::size_t> count_bulk_sync(0);
 template <typename Executor>
 void test_executor(std::array<std::size_t, 2> expected)
 {
-    typedef typename hpx::traits::executor_execution_category<
-            Executor
-        >::type execution_category;
+    typedef typename hpx::traits::executor_execution_category<Executor>::type
+        execution_category;
 
-    HPX_TEST((std::is_same<
-            hpx::parallel::execution::sequenced_execution_tag,
-            execution_category
-        >::value));
+    HPX_TEST((std::is_same<hpx::parallel::execution::sequenced_execution_tag,
+        execution_category>::value));
 
     count_sync.store(0);
     count_bulk_sync.store(0);
@@ -244,116 +239,104 @@ void test_executor(std::array<std::size_t, 2> expected)
 ///////////////////////////////////////////////////////////////////////////////
 struct test_sync_executor1
 {
-    typedef hpx::parallel::execution::sequenced_execution_tag execution_category;
+    typedef hpx::parallel::execution::sequenced_execution_tag
+        execution_category;
 
-    template <typename F, typename ... Ts>
+    template <typename F, typename... Ts>
     static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
-    sync_execute(F && f, Ts &&... ts)
+    sync_execute(F&& f, Ts&&... ts)
     {
         ++count_sync;
         return hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     template <>
-    struct is_one_way_executor<test_sync_executor1>
-      : std::true_type
-    {};
-}}}
+    struct is_one_way_executor<test_sync_executor1> : std::true_type
+    {
+    };
+}}}    // namespace hpx::parallel::execution
 
 struct test_sync_executor2 : test_sync_executor1
 {
-    typedef hpx::parallel::execution::sequenced_execution_tag execution_category;
+    typedef hpx::parallel::execution::sequenced_execution_tag
+        execution_category;
 
-    template <typename F, typename Shape, typename ... Ts>
-    static typename hpx::parallel::execution::detail::bulk_execute_result<
-        F, Shape, Ts...
-    >::type
-    call(std::false_type, F && f, Shape const& shape, Ts &&... ts)
+    template <typename F, typename Shape, typename... Ts>
+    static typename hpx::parallel::execution::detail::bulk_execute_result<F,
+        Shape, Ts...>::type
+    call(std::false_type, F&& f, Shape const& shape, Ts&&... ts)
     {
-        typedef typename hpx::parallel::execution::detail::bulk_function_result<
-                    F, Shape, Ts...
-                >::type result_type;
+        typedef
+            typename hpx::parallel::execution::detail::bulk_function_result<F,
+                Shape, Ts...>::type result_type;
 
         std::vector<result_type> results;
-        for (auto const& elem: shape)
+        for (auto const& elem : shape)
         {
             results.push_back(hpx::util::invoke(f, elem, ts...));
         }
         return results;
     }
 
-    template <typename F, typename Shape, typename ... Ts>
-    static void
-    call(std::true_type, F && f, Shape const& shape, Ts &&... ts)
+    template <typename F, typename Shape, typename... Ts>
+    static void call(std::true_type, F&& f, Shape const& shape, Ts&&... ts)
     {
-        for (auto const& elem: shape)
+        for (auto const& elem : shape)
         {
             hpx::util::invoke(f, elem, ts...);
         }
     }
 
-    template <typename F, typename Shape, typename ... Ts>
-    static typename hpx::parallel::execution::detail::bulk_execute_result<
-        F, Shape, Ts...
-    >::type
-    bulk_sync_execute(F && f, Shape const& shape, Ts &&... ts)
+    template <typename F, typename Shape, typename... Ts>
+    static typename hpx::parallel::execution::detail::bulk_execute_result<F,
+        Shape, Ts...>::type
+    bulk_sync_execute(F&& f, Shape const& shape, Ts&&... ts)
     {
         ++count_bulk_sync;
 
-        typedef typename std::is_void<
-                typename hpx::parallel::execution::detail::bulk_function_result<
-                    F, Shape, Ts...
-                >::type
-            >::type is_void;
+        typedef
+            typename std::is_void<typename hpx::parallel::execution::detail::
+                    bulk_function_result<F, Shape, Ts...>::type>::type is_void;
 
-        return call(is_void(), std::forward<F>(f), shape,
-            std::forward<Ts>(ts)...);
+        return call(
+            is_void(), std::forward<F>(f), shape, std::forward<Ts>(ts)...);
     }
 };
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     template <>
-    struct is_one_way_executor<test_sync_executor2>
-      : std::true_type
-    {};
+    struct is_one_way_executor<test_sync_executor2> : std::true_type
+    {
+    };
 
     template <>
-    struct is_bulk_one_way_executor<test_sync_executor2>
-      : std::true_type
-    {};
-}}}
+    struct is_bulk_one_way_executor<test_sync_executor2> : std::true_type
+    {
+    };
+}}}    // namespace hpx::parallel::execution
 
 template <typename Executor, typename B1, typename B2>
 void static_check_executor(B1, B2)
 {
     using namespace hpx::traits;
 
-    static_assert(
-        has_sync_execute_member<Executor>::value == B1::value,
+    static_assert(has_sync_execute_member<Executor>::value == B1::value,
         "check has_sync_execute_member<Executor>::value");
-    static_assert(
-        has_bulk_sync_execute_member<Executor>::value == B2::value,
+    static_assert(has_bulk_sync_execute_member<Executor>::value == B2::value,
         "check has_bulk_sync_execute_member<Executor>::value");
 
-    static_assert(
-        !has_async_execute_member<Executor>::value,
+    static_assert(!has_async_execute_member<Executor>::value,
         "!has_async_execute_member<Executor>::value");
-    static_assert(
-        !has_bulk_async_execute_member<Executor>::value,
+    static_assert(!has_bulk_async_execute_member<Executor>::value,
         "!has_bulk_async_execute_member<Executor>::value");
-    static_assert(
-        !has_then_execute_member<Executor>::value,
+    static_assert(!has_then_execute_member<Executor>::value,
         "!has_then_execute_member<Executor>::value");
-    static_assert(
-        !has_bulk_then_execute_member<Executor>::value,
+    static_assert(!has_bulk_then_execute_member<Executor>::value,
         "!has_bulk_then_execute_member<Executor>::value");
     static_assert(
-        !has_post_member<Executor>::value,
-        "!has_post_member<Executor>::value");
+        !has_post_member<Executor>::value, "!has_post_member<Executor>::value");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -365,8 +348,8 @@ int hpx_main(int argc, char* argv[])
     static_check_executor<test_sync_executor1>(t, f);
     static_check_executor<test_sync_executor2>(t, t);
 
-    test_executor<test_sync_executor1>({{ 1078, 0 }});
-    test_executor<test_sync_executor2>({{ 436, 6 }});
+    test_executor<test_sync_executor1>({{1078, 0}});
+    test_executor<test_sync_executor2>({{436, 6}});
 
     return hpx::finalize();
 }
@@ -374,13 +357,11 @@ int hpx_main(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv, cfg), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

@@ -22,8 +22,7 @@
 #include <boost/simd/function/store.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace traits
-{
+namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, std::size_t N, typename Abi, typename NewT>
     struct rebind_pack<boost::simd::pack<T, N, Abi>, NewT>
@@ -32,10 +31,10 @@ namespace hpx { namespace parallel { namespace traits
     };
 
     // don't wrap types twice
-    template <typename T, std::size_t N1, typename Abi1,
-        typename NewT, std::size_t N2, typename Abi2>
+    template <typename T, std::size_t N1, typename Abi1, typename NewT,
+        std::size_t N2, typename Abi2>
     struct rebind_pack<boost::simd::pack<T, N1, Abi1>,
-        boost::simd::pack<NewT, N2, Abi2> >
+        boost::simd::pack<NewT, N2, Abi2>>
     {
         typedef boost::simd::pack<NewT, N2, Abi2> type;
     };
@@ -61,9 +60,9 @@ namespace hpx { namespace parallel { namespace traits
     };
 
     template <typename V, typename T, std::size_t N, typename Abi>
-    struct vector_pack_load<V, boost::simd::pack<T, N, Abi> >
+    struct vector_pack_load<V, boost::simd::pack<T, N, Abi>>
     {
-        typedef typename rebind_pack<V, boost::simd::pack<T, N, Abi> >::type
+        typedef typename rebind_pack<V, boost::simd::pack<T, N, Abi>>::type
             value_type;
 
         template <typename Iter>
@@ -97,7 +96,7 @@ namespace hpx { namespace parallel { namespace traits
     };
 
     template <typename V, typename T, std::size_t N, typename Abi>
-    struct vector_pack_store<V, boost::simd::pack<T, N, Abi> >
+    struct vector_pack_store<V, boost::simd::pack<T, N, Abi>>
     {
         template <typename Iter>
         static void aligned(V const& value, Iter const& iter)
@@ -111,7 +110,7 @@ namespace hpx { namespace parallel { namespace traits
             *iter = value;
         }
     };
-}}}
+}}}    // namespace hpx::parallel::traits
 
 #endif
 #endif

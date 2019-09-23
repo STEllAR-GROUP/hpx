@@ -3,29 +3,29 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_EXECUTION_DETAIL_POST_POLICY_DISPATCH_DEC_05_2017_0234PM)
+#if !defined(                                                                  \
+    HPX_PARALLEL_EXECUTION_DETAIL_POST_POLICY_DISPATCH_DEC_05_2017_0234PM)
 #define HPX_PARALLEL_EXECUTION_DETAIL_POST_POLICY_DISPATCH_DEC_05_2017_0234PM
 
 #include <hpx/config.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/functional/deferred_call.hpp>
 
 #include <cstdint>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace execution { namespace detail
-{
+namespace hpx { namespace parallel { namespace execution { namespace detail {
     ///////////////////////////////////////////////////////////////////////
     template <typename Policy>
     struct post_policy_dispatch
     {
         template <typename F, typename... Ts>
         static void call(hpx::util::thread_description const& desc,
-            Policy const& policy, F && f, Ts &&... ts)
+            Policy const& policy, F&& f, Ts&&... ts)
         {
             threads::register_thread_nullary(
                 hpx::util::deferred_call(
@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail
     {
         template <typename F, typename... Ts>
         static void call(hpx::util::thread_description const& desc,
-            launch::fork_policy const& policy, F && f, Ts &&... ts)
+            launch::fork_policy const& policy, F&& f, Ts&&... ts)
         {
             threads::thread_id_type tid = threads::register_thread_nullary(
                 hpx::util::deferred_call(
@@ -58,7 +58,6 @@ namespace hpx { namespace parallel { namespace execution { namespace detail
             }
         }
     };
-}}}}
+}}}}    // namespace hpx::parallel::execution::detail
 
 #endif
-

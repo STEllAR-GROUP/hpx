@@ -8,27 +8,27 @@
 #include <type_traits>
 #include <vector>
 
-struct iota :
-    public hpx::parallel::v1::detail::algorithm<iota>
+struct iota : public hpx::parallel::v1::detail::algorithm<iota>
 {
     iota()
-        : iota::algorithm("iota")
-    {}
+      : iota::algorithm("iota")
+    {
+    }
 
     template <typename ExPolicy, typename InIter, typename T>
-    static hpx::util::unused_type
-    sequential(ExPolicy && policy, InIter first, InIter last, T && init)
+    static hpx::util::unused_type sequential(
+        ExPolicy&& policy, InIter first, InIter last, T&& init)
     {
         std::iota(first, last, init);
         return hpx::util::unused;
     }
 
     template <typename ExPolicy, typename InIter, typename T>
-    static hpx::util::unused_type
-    parallel(ExPolicy && policy, InIter first, InIter last, T && init)
+    static hpx::util::unused_type parallel(
+        ExPolicy&& policy, InIter first, InIter last, T&& init)
     {
         return hpx::util::void_guard<result_type>(),
-            sequential(policy, first, last, init);
+               sequential(policy, first, last, init);
     }
 };
 
@@ -52,40 +52,39 @@ void iota_vector(hpx::partitioned_vector<T>& v, T val)
         local_iterator_type beg = traits::begin(sit);
         local_iterator_type end = traits::end(sit);
 
-        hpx::parallel::v1::detail::dispatch(traits::get_id(sit),
-            iota(), hpx::parallel::execution::seq, std::true_type(),
-            beg, end, temp_val
-        );
+        hpx::parallel::v1::detail::dispatch(traits::get_id(sit), iota(),
+            hpx::parallel::execution::seq, std::true_type(), beg, end,
+            temp_val);
 
         temp_val = T(temp_val + std::distance(beg, end));
     }
 }
 
 template <typename Value>
-struct verify_ :
-    public hpx::parallel::v1::detail::algorithm<verify_<Value>, Value>
+struct verify_
+  : public hpx::parallel::v1::detail::algorithm<verify_<Value>, Value>
 {
     verify_()
-        : verify_::algorithm("verify")
-    {}
+      : verify_::algorithm("verify")
+    {
+    }
 
     template <typename ExPolicy, typename SegIter, typename InIter>
-    static Value
-    sequential(ExPolicy && policy, SegIter first, SegIter last, InIter in)
+    static Value sequential(
+        ExPolicy&& policy, SegIter first, SegIter last, InIter in)
     {
         return std::equal(first, last, in.begin());
     }
 
     template <typename ExPolicy, typename SegIter, typename InIter>
-    static Value
-    parallel(ExPolicy && policy, InIter first, InIter last, InIter in)
+    static Value parallel(
+        ExPolicy&& policy, InIter first, InIter last, InIter in)
     {
         return sequential(policy, first, last, in);
     }
 };
 
-
-template<typename T>
+template <typename T>
 void verify_values(hpx::partitioned_vector<T> v1, std::vector<T> v2)
 {
     auto first = v1.begin();
@@ -110,16 +109,14 @@ void verify_values(hpx::partitioned_vector<T> v1, std::vector<T> v2)
         std::vector<T> test(std::distance(beg, end));
         std::copy_n(beg2, test.size(), test.begin());
 
-        results.push_back(
-            hpx::parallel::v1::detail::dispatch(traits::get_id(sit),
-                verify_<bool>(), hpx::parallel::execution::seq,
-                std::true_type(), beg, end, test
-        ));
+        results.push_back(hpx::parallel::v1::detail::dispatch(
+            traits::get_id(sit), verify_<bool>(), hpx::parallel::execution::seq,
+            std::true_type(), beg, end, test));
 
         beg2 += std::distance(beg, end);
     }
-    bool final_result = std::all_of(results.begin(), results.end(),
-        [](bool v) { return v; });
+    bool final_result =
+        std::all_of(results.begin(), results.end(), [](bool v) { return v; });
 
     HPX_TEST(final_result);
 }

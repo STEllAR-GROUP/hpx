@@ -17,30 +17,32 @@
 
 #include <intrin.h>
 
-namespace hpx { namespace util { namespace hardware
-{
+namespace hpx { namespace util { namespace hardware {
 
-struct cpuid_register
-{
-    enum info
+    struct cpuid_register
     {
-        eax = 0,
-        ebx = 1,
-        ecx = 2,
-        edx = 3
+        enum info
+        {
+            eax = 0,
+            ebx = 1,
+            ecx = 2,
+            edx = 3
+        };
     };
-};
 
-void cpuid(std::uint32_t (&cpuinfo)[4], std::uint32_t eax)
-{ ::__cpuid(cpuinfo, eax); }
+    void cpuid(std::uint32_t (&cpuinfo)[4], std::uint32_t eax)
+    {
+        ::__cpuid(cpuinfo, eax);
+    }
 
-void cpuidex(std::uint32_t (&cpuinfo)[4], std::uint32_t eax,
-             std::uint32_t ecx)
-{ ::__cpuidex(cpuinfo, eax, ecx); }
+    void cpuidex(
+        std::uint32_t (&cpuinfo)[4], std::uint32_t eax, std::uint32_t ecx)
+    {
+        ::__cpuidex(cpuinfo, eax, ecx);
+    }
 
-}}}
+}}}    // namespace hpx::util::hardware
 
 #endif
 
-#endif // HPX_1AB68005_619C_4049_9C2B_DCD5F336B508
-
+#endif    // HPX_1AB68005_619C_4049_9C2B_DCD5F336B508

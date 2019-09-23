@@ -17,8 +17,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache
-{
+namespace hpx { namespace util { namespace cache {
     ///////////////////////////////////////////////////////////////////////////
     /// \class local_cache local_cache.hpp hpx/cache/local_cache.hpp
     ///
@@ -57,13 +56,11 @@ namespace hpx { namespace util { namespace cache
     ///                       the type \a statistics#no_statistics which does
     ///                       not collect any numbers, but provides empty stubs
     ///                       allowing the code to compile.
-    template <
-        typename Key, typename Entry,
+    template <typename Key, typename Entry,
         typename UpdatePolicy = std::less<Entry>,
         typename InsertPolicy = policies::always<Entry>,
         typename CacheStorage = std::map<Key, Entry>,
-        typename Statistics = statistics::no_statistics
-    >
+        typename Statistics = statistics::no_statistics>
     class local_cache
     {
         ///////////////////////////////////////////////////////////////////////
@@ -77,7 +74,8 @@ namespace hpx { namespace util { namespace cache
         {
             adapt(Func f)
               : f_(f)
-            {}
+            {
+            }
 
             bool operator()(Iterator const& lhs, Iterator const& rhs) const
             {
@@ -129,11 +127,14 @@ namespace hpx { namespace util { namespace cache
         ///                   the \a InsertPolicy template parameter.
         ///
         local_cache(size_type max_size = 0,
-                update_policy_type const& up = update_policy_type(),
-                insert_policy_type const& ip = insert_policy_type())
-          : max_size_(max_size), current_size_(0),
-            update_policy_(up), insert_policy_(ip)
-        {}
+            update_policy_type const& up = update_policy_type(),
+            insert_policy_type const& ip = insert_policy_type())
+          : max_size_(max_size)
+          , current_size_(0)
+          , update_policy_(up)
+          , insert_policy_(ip)
+        {
+        }
 
         local_cache(local_cache&& other)
           : max_size_(other.max_size_)
@@ -143,7 +144,8 @@ namespace hpx { namespace util { namespace cache
           , update_policy_(std::move(other.update_policy_.f_))
           , insert_policy_(std::move(other.insert_policy_))
           , statistics_(std::move(other.statistics_))
-        {}
+        {
+        }
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Return current size of the cache.
@@ -187,10 +189,10 @@ namespace hpx { namespace util { namespace cache
             if (max_size && max_size < max_size_ &&
                 !free_space(long(max_size_ - max_size)))
             {
-                retval = false;     // not able to shrink cache
+                retval = false;    // not able to shrink cache
             }
 
-            max_size_ = max_size;   // change capacity in any case
+            max_size_ = max_size;    // change capacity in any case
             return retval;
         }
 
@@ -233,16 +235,18 @@ namespace hpx { namespace util { namespace cache
 
             // locate the requested entry
             iterator it = store_.find(k);
-            if (it == store_.end()) {
-                statistics_.got_miss();     // update statistics
-                return false;               // doesn't exist in this cache
+            if (it == store_.end())
+            {
+                statistics_.got_miss();    // update statistics
+                return false;              // doesn't exist in this cache
             }
 
             // touch the found entry
-            if ((*it).second.touch()) {
+            if ((*it).second.touch())
+            {
                 // reorder heap based on the changed entry attributes
-                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
-                    update_policy_);
+                std::make_heap(
+                    entry_heap_.begin(), entry_heap_.end(), update_policy_);
             }
 
             // update statistics
@@ -274,16 +278,18 @@ namespace hpx { namespace util { namespace cache
 
             // locate the requested entry
             iterator it = store_.find(k);
-            if (it == store_.end()) {
-                statistics_.got_miss();     // update statistics
-                return false;               // doesn't exist in this cache
+            if (it == store_.end())
+            {
+                statistics_.got_miss();    // update statistics
+                return false;              // doesn't exist in this cache
             }
 
             // touch the found entry
-            if ((*it).second.touch()) {
+            if ((*it).second.touch())
+            {
                 // reorder heap based on the changed entry attributes
-                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
-                    update_policy_);
+                std::make_heap(
+                    entry_heap_.begin(), entry_heap_.end(), update_policy_);
             }
 
             // update statistics
@@ -314,16 +320,18 @@ namespace hpx { namespace util { namespace cache
 
             // locate the requested entry
             iterator it = store_.find(k);
-            if (it == store_.end()) {
-                statistics_.got_miss();     // update statistics
-                return false;               // doesn't exist in this cache
+            if (it == store_.end())
+            {
+                statistics_.got_miss();    // update statistics
+                return false;              // doesn't exist in this cache
             }
 
             // touch the found entry
-            if ((*it).second.touch()) {
+            if ((*it).second.touch())
+            {
                 // reorder heap based on the changed entry attributes
-                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
-                    update_policy_);
+                std::make_heap(
+                    entry_heap_.begin(), entry_heap_.end(), update_policy_);
             }
 
             // update statistics
@@ -403,7 +411,8 @@ namespace hpx { namespace util { namespace cache
 
             // insert new entry to cache
             typedef typename storage_type::value_type storage_value_type;
-            std::pair<iterator, bool> p = store_.insert(storage_value_type(k, e));
+            std::pair<iterator, bool> p =
+                store_.insert(storage_value_type(k, e));
             if (!p.second)
                 return false;
 
@@ -411,8 +420,8 @@ namespace hpx { namespace util { namespace cache
 
             // update the entry heap
             entry_heap_.push_back(p.first);
-            std::push_heap(entry_heap_.begin(), entry_heap_.end(),
-                update_policy_);
+            std::push_heap(
+                entry_heap_.begin(), entry_heap_.end(), update_policy_);
 
             // update statistics
             statistics_.got_insertion();
@@ -447,20 +456,22 @@ namespace hpx { namespace util { namespace cache
             update_on_exit update(statistics_, statistics::method_update_entry);
 
             iterator it = store_.find(k);
-            if (it == store_.end()) {
+            if (it == store_.end())
+            {
                 // doesn't exist in this cache
-                statistics_.got_miss(); // update statistics
-                return insert(k, val);  // insert into cache
+                statistics_.got_miss();    // update statistics
+                return insert(k, val);     // insert into cache
             }
 
             // update cache entry
             (*it).second.get() = val;
 
             // touch the entry
-            if ((*it).second.touch()) {
+            if ((*it).second.touch())
+            {
                 // reorder heap based on the changed entry attributes
-                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
-                    update_policy_);
+                std::make_heap(
+                    entry_heap_.begin(), entry_heap_.end(), update_policy_);
             }
 
             // update statistics
@@ -495,18 +506,17 @@ namespace hpx { namespace util { namespace cache
         ///               If the entry currently is not held by the cache it is
         ///               added and the return value reflects the outcome of
         ///               the corresponding insert operation.
-        template <
-            typename F
-        >
+        template <typename F>
         bool update_if(key_type const& k, value_type const& val, F f)
         {
             update_on_exit update(statistics_, statistics::method_update_entry);
 
             iterator it = store_.find(k);
-            if (it == store_.end()) {
+            if (it == store_.end())
+            {
                 // doesn't exist in this cache
-                statistics_.got_miss(); // update statistics
-                return insert(k, val);  // insert into cache
+                statistics_.got_miss();    // update statistics
+                return insert(k, val);     // insert into cache
             }
 
             if (!f(k, (*it).first))
@@ -516,10 +526,11 @@ namespace hpx { namespace util { namespace cache
             (*it).second.get() = val;
 
             // touch the entry
-            if ((*it).second.touch()) {
+            if ((*it).second.touch())
+            {
                 // reorder heap based on the changed entry attributes
-                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
-                    update_policy_);
+                std::make_heap(
+                    entry_heap_.begin(), entry_heap_.end(), update_policy_);
             }
 
             // update statistics
@@ -554,28 +565,30 @@ namespace hpx { namespace util { namespace cache
             update_on_exit update(statistics_, statistics::method_update_entry);
 
             iterator it = store_.find(k);
-            if (it == store_.end()) {
+            if (it == store_.end())
+            {
                 // doesn't exist in this cache
-                statistics_.got_miss();     // update statistics
-                return insert(k, e);        // insert into cache
+                statistics_.got_miss();    // update statistics
+                return insert(k, e);       // insert into cache
             }
 
             // make sure the old entry agrees to be removed
             if (!(*it).second.remove())
-                return false;           // entry doesn't want to be removed
+                return false;    // entry doesn't want to be removed
 
             // make sure the new entry agrees to be inserted
             if (!insert_policy_(e) || !e.insert())
-                return false;           // entry doesn't want to be inserted
+                return false;    // entry doesn't want to be inserted
 
             // update cache entry
             (*it).second = e;
 
             // touch the entry
-            if ((*it).second.touch()) {
+            if ((*it).second.touch())
+            {
                 // reorder heap based on the changed entry attributes
-                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
-                    update_policy_);
+                std::make_heap(
+                    entry_heap_.begin(), entry_heap_.end(), update_policy_);
             }
 
             // update statistics
@@ -607,7 +620,8 @@ namespace hpx { namespace util { namespace cache
 
             size_type erased = 0;
             for (heap_iterator it = entry_heap_.begin();
-                 it != entry_heap_.end(); /**/)
+                 it != entry_heap_.end();
+                /**/)
             {
                 iterator sit = *it;
 
@@ -615,7 +629,8 @@ namespace hpx { namespace util { namespace cache
                 // do not remove this entry from the cache if either the
                 // function object or the entries' remove function return false
                 typename storage_type::value_type& val = *sit;
-                if (ep(val) && val.second.remove()) {
+                if (ep(val) && val.second.remove())
+                {
                     // update the current size and the overall size of the
                     // removed items
                     size_type entry_size = (*(*it)).second.get_size();
@@ -632,15 +647,16 @@ namespace hpx { namespace util { namespace cache
                     // update statistics
                     statistics_.got_eviction();
                 }
-                else {
+                else
+                {
                     // do not remove this item from cache
                     ++it;
                 }
             }
 
             // reorder heap based on the changed entry list
-            std::make_heap(entry_heap_.begin(), entry_heap_.end(),
-                update_policy_);
+            std::make_heap(
+                entry_heap_.begin(), entry_heap_.end(), update_policy_);
 
             return erased;
         }
@@ -693,23 +709,27 @@ namespace hpx { namespace util { namespace cache
     protected:
         ///////////////////////////////////////////////////////////////////////
         // Free some space in the cache
-        bool free_space (long num_free)
+        bool free_space(long num_free)
         {
             if (entry_heap_.empty())
                 return false;
 
             bool is_heap = true;
             for (heap_iterator it = entry_heap_.begin();
-                 num_free > 0 && it != entry_heap_.end(); /**/)
+                 num_free > 0 && it != entry_heap_.end();
+                /**/)
             {
                 iterator sit = *it;
-                if (!(*sit).second.remove()) {
-                    ++it;     // do not remove this entry from the cache
+                if (!(*sit).second.remove())
+                {
+                    ++it;    // do not remove this entry from the cache
                 }
-                else {
+                else
+                {
                     size_type entry_size = (*(*it)).second.get_size();
 
-                    if (it == entry_heap_.begin()) {
+                    if (it == entry_heap_.begin())
+                    {
                         // if we're at the top of the list, just pop the item
                         // this doesn't disturb the heap property of the heap
                         ++it;
@@ -717,7 +737,8 @@ namespace hpx { namespace util { namespace cache
                             update_policy_);
                         entry_heap_.pop_back();
                     }
-                    else {
+                    else
+                    {
                         // otherwise we remove the element manually, forcing
                         // the heap to be rebuilt at the end
                         it = entry_heap_.erase(it);
@@ -735,18 +756,19 @@ namespace hpx { namespace util { namespace cache
             }
 
             // reorder heap based on the changed entry list
-            if (!is_heap) {
-                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
-                    update_policy_);
+            if (!is_heap)
+            {
+                std::make_heap(
+                    entry_heap_.begin(), entry_heap_.end(), update_policy_);
             }
 
             return num_free <= 0;
         }
 
     private:
-        size_type max_size_;                // cache capacity
-        size_type current_size_;            // current cache size
-        storage_type store_;                // the cache itself
+        size_type max_size_;        // cache capacity
+        size_type current_size_;    // current cache size
+        storage_type store_;        // the cache itself
 
         // we store a list of pointers to the held keys in a std::heap which
         // is being sorted based on the criteria defined by the UpdatePolicy
@@ -755,8 +777,8 @@ namespace hpx { namespace util { namespace cache
         adapted_update_policy_type update_policy_;
         insert_policy_type insert_policy_;
 
-        statistics_type statistics_;        // embedded statistics instance
+        statistics_type statistics_;    // embedded statistics instance
     };
-}}}
+}}}    // namespace hpx::util::cache
 
 #endif

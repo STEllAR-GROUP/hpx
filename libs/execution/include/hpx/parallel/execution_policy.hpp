@@ -29,8 +29,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     /// Default sequential execution policy object.
     static task_policy_tag HPX_CONSTEXPR_OR_CONST task;
@@ -51,9 +50,8 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef execution::extract_executor_parameters<
-                executor_type
-            >::type executor_parameters_type;
+        typedef execution::extract_executor_parameters<executor_type>::type
+            executor_parameters_type;
 
         /// The category of the execution agents created by this execution
         /// policy.
@@ -66,9 +64,7 @@ namespace hpx { namespace parallel { namespace execution
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef sequenced_task_policy_shim<
-                    Executor_, Parameters_
-                > type;
+            typedef sequenced_task_policy_shim<Executor_, Parameters_> type;
         };
 
         /// \cond NOINTERNAL
@@ -103,24 +99,20 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new sequenced_task_policy
         ///
         template <typename Executor>
-        typename rebind_executor<
-            sequenced_task_policy, Executor,
-            executor_parameters_type
-        >::type
-        on(Executor && exec) const
+        typename rebind_executor<sequenced_task_policy, Executor,
+            executor_parameters_type>::type
+        on(Executor&& exec) const
         {
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
                 hpx::traits::is_threads_executor<executor_type>::value ||
-                hpx::traits::is_executor_any<executor_type>::value,
+                    hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
-            typedef typename rebind_executor<
-                sequenced_task_policy, Executor,
-                executor_parameters_type
-            >::type rebound_type;
+            typedef typename rebind_executor<sequenced_task_policy, Executor,
+                executor_parameters_type>::type rebound_type;
             return rebound_type(std::forward<Executor>(exec), parameters());
         }
 
@@ -139,37 +131,47 @@ namespace hpx { namespace parallel { namespace execution
         ///
         /// \returns The new sequenced_task_policy
         ///
-        template <typename... Parameters, typename ParametersType =
-            typename executor_parameters_join<Parameters...>::type>
-        typename rebind_executor<
-            sequenced_task_policy, executor_type, ParametersType
-        >::type
-        with(Parameters &&... params) const
+        template <typename... Parameters,
+            typename ParametersType =
+                typename executor_parameters_join<Parameters...>::type>
+        typename rebind_executor<sequenced_task_policy, executor_type,
+            ParametersType>::type
+        with(Parameters&&... params) const
         {
-            typedef typename rebind_executor<
-                sequenced_task_policy, executor_type, ParametersType
-            >::type rebound_type;
+            typedef typename rebind_executor<sequenced_task_policy,
+                executor_type, ParametersType>::type rebound_type;
             return rebound_type(executor(),
                 join_executor_parameters(std::forward<Parameters>(params)...));
         }
 
     public:
         /// Return the associated executor object.
-        executor_type& executor() { return exec_; }
+        executor_type& executor()
+        {
+            return exec_;
+        }
         /// Return the associated executor object.
-        HPX_CONSTEXPR executor_type const& executor() const { return exec_; }
+        HPX_CONSTEXPR executor_type const& executor() const
+        {
+            return exec_;
+        }
 
         /// Return the associated executor parameters object.
-        executor_parameters_type& parameters() { return params_; }
+        executor_parameters_type& parameters()
+        {
+            return params_;
+        }
         /// Return the associated executor parameters object.
         HPX_CONSTEXPR executor_parameters_type const& parameters() const
-            { return params_; }
+        {
+            return params_;
+        }
 
     private:
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
         }
 
@@ -189,8 +191,7 @@ namespace hpx { namespace parallel { namespace execution
     /// corresponding algorithm when invoked with the
     /// sequenced_policy.
     template <typename Executor, typename Parameters>
-    struct sequenced_task_policy_shim
-      : sequenced_task_policy
+    struct sequenced_task_policy_shim : sequenced_task_policy
     {
         /// The type of the executor associated with this execution policy
         typedef Executor executor_type;
@@ -202,8 +203,7 @@ namespace hpx { namespace parallel { namespace execution
         /// The category of the execution agents created by this execution
         /// policy.
         typedef typename hpx::traits::executor_execution_category<
-                executor_type
-            >::type execution_category;
+            executor_type>::type execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -212,9 +212,7 @@ namespace hpx { namespace parallel { namespace execution
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef sequenced_task_policy_shim<
-                    Executor_, Parameters_
-                > type;
+            typedef sequenced_task_policy_shim<Executor_, Parameters_> type;
         };
 
         /// Create a new sequenced_task_policy from itself
@@ -245,24 +243,20 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new sequenced_task_policy
         ///
         template <typename Executor_>
-        typename rebind_executor<
-            sequenced_task_policy_shim, Executor_,
-            executor_parameters_type
-        >::type
-        on(Executor_ && exec) const
+        typename rebind_executor<sequenced_task_policy_shim, Executor_,
+            executor_parameters_type>::type
+        on(Executor_&& exec) const
         {
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
                 hpx::traits::is_threads_executor<executor_type>::value ||
-                hpx::traits::is_executor_any<executor_type>::value,
+                    hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
-            typedef typename rebind_executor<
-                sequenced_task_policy_shim, Executor_,
-                executor_parameters_type
-            >::type rebound_type;
+            typedef typename rebind_executor<sequenced_task_policy_shim,
+                Executor_, executor_parameters_type>::type rebound_type;
             return rebound_type(std::forward<Executor_>(exec), params_);
         }
 
@@ -281,54 +275,66 @@ namespace hpx { namespace parallel { namespace execution
         ///
         /// \returns The new sequenced_task_policy_shim
         ///
-        template <typename... Parameters_, typename ParametersType =
-            typename executor_parameters_join<Parameters_...>::type>
-        typename rebind_executor<
-            sequenced_task_policy_shim, executor_type, ParametersType
-        >::type
-        with(Parameters_ &&... params) const
+        template <typename... Parameters_,
+            typename ParametersType =
+                typename executor_parameters_join<Parameters_...>::type>
+        typename rebind_executor<sequenced_task_policy_shim, executor_type,
+            ParametersType>::type
+        with(Parameters_&&... params) const
         {
-            typedef typename rebind_executor<
-                sequenced_task_policy_shim, executor_type,
-                ParametersType
-            >::type rebound_type;
+            typedef typename rebind_executor<sequenced_task_policy_shim,
+                executor_type, ParametersType>::type rebound_type;
             return rebound_type(exec_,
                 join_executor_parameters(std::forward<Parameters_>(params)...));
         }
 
         /// Return the associated executor object.
-        Executor& executor() { return exec_; }
+        Executor& executor()
+        {
+            return exec_;
+        }
         /// Return the associated executor object.
-        HPX_CONSTEXPR Executor const& executor() const { return exec_; }
+        HPX_CONSTEXPR Executor const& executor() const
+        {
+            return exec_;
+        }
 
         /// Return the associated executor parameters object.
-        Parameters& parameters() { return params_; }
+        Parameters& parameters()
+        {
+            return params_;
+        }
         /// Return the associated executor parameters object.
-        HPX_CONSTEXPR Parameters const& parameters() const { return params_; }
+        HPX_CONSTEXPR Parameters const& parameters() const
+        {
+            return params_;
+        }
 
         /// \cond NOINTERNAL
-        template <typename Dependent = void, typename Enable =
-            typename std::enable_if<
+        template <typename Dependent = void,
+            typename Enable = typename std::enable_if<
                 std::is_constructible<Executor>::value &&
                     std::is_constructible<Parameters>::value,
-                Dependent
-            >::type>
-        HPX_CONSTEXPR sequenced_task_policy_shim() {}
+                Dependent>::type>
+        HPX_CONSTEXPR sequenced_task_policy_shim()
+        {
+        }
 
         template <typename Executor_, typename Parameters_>
         HPX_CONSTEXPR sequenced_task_policy_shim(
-                Executor_ && exec, Parameters_ && params)
-          : exec_(std::forward<Executor_>(exec)),
-            params_(std::forward<Parameters_>(params))
-        {}
+            Executor_&& exec, Parameters_&& params)
+          : exec_(std::forward<Executor_>(exec))
+          , params_(std::forward<Parameters_>(params))
+        {
+        }
 
     private:
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
-            ar & exec_ & params_;
+            ar& exec_& params_;
         }
 
     private:
@@ -348,9 +354,8 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef execution::extract_executor_parameters<
-                executor_type
-            >::type executor_parameters_type;
+        typedef execution::extract_executor_parameters<executor_type>::type
+            executor_parameters_type;
 
         /// The category of the execution agents created by this execution
         /// policy.
@@ -363,13 +368,15 @@ namespace hpx { namespace parallel { namespace execution
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef sequenced_policy_shim<
-                    Executor_, Parameters_
-                > type;
+            typedef sequenced_policy_shim<Executor_, Parameters_> type;
         };
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR sequenced_policy() : exec_{}, params_{} {}
+        HPX_CONSTEXPR sequenced_policy()
+          : exec_{}
+          , params_{}
+        {
+        }
         /// \endcond
 
         /// Create a new sequenced_task_policy.
@@ -400,22 +407,20 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new sequenced_policy
         ///
         template <typename Executor>
-        typename rebind_executor<
-            sequenced_policy, Executor, executor_parameters_type
-        >::type
-        on(Executor && exec) const
+        typename rebind_executor<sequenced_policy, Executor,
+            executor_parameters_type>::type
+        on(Executor&& exec) const
         {
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
                 hpx::traits::is_threads_executor<executor_type>::value ||
-                hpx::traits::is_executor_any<executor_type>::value,
+                    hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
-            typedef typename rebind_executor<
-                sequenced_policy, Executor, executor_parameters_type
-            >::type rebound_type;
+            typedef typename rebind_executor<sequenced_policy, Executor,
+                executor_parameters_type>::type rebound_type;
             return rebound_type(std::forward<Executor>(exec), parameters());
         }
 
@@ -434,16 +439,15 @@ namespace hpx { namespace parallel { namespace execution
         ///
         /// \returns The new sequenced_policy
         ///
-        template <typename... Parameters, typename ParametersType =
-            typename executor_parameters_join<Parameters...>::type>
-        typename rebind_executor<
-            sequenced_policy, executor_type, ParametersType
-        >::type
-        with(Parameters &&... params) const
+        template <typename... Parameters,
+            typename ParametersType =
+                typename executor_parameters_join<Parameters...>::type>
+        typename rebind_executor<sequenced_policy, executor_type,
+            ParametersType>::type
+        with(Parameters&&... params) const
         {
-            typedef typename rebind_executor<
-                sequenced_policy, executor_type, ParametersType
-            >::type rebound_type;
+            typedef typename rebind_executor<sequenced_policy, executor_type,
+                ParametersType>::type rebound_type;
             return rebound_type(executor(),
                 join_executor_parameters(std::forward<Parameters>(params)...));
         }
@@ -451,21 +455,32 @@ namespace hpx { namespace parallel { namespace execution
     public:
         /// Return the associated executor object.
         /// Return the associated executor object.
-        executor_type& executor() { return exec_; }
+        executor_type& executor()
+        {
+            return exec_;
+        }
         /// Return the associated executor object.
-        HPX_CONSTEXPR executor_type const& executor() const { return exec_; }
+        HPX_CONSTEXPR executor_type const& executor() const
+        {
+            return exec_;
+        }
 
         /// Return the associated executor parameters object.
-        executor_parameters_type& parameters() { return params_; }
+        executor_parameters_type& parameters()
+        {
+            return params_;
+        }
         /// Return the associated executor parameters object.
         HPX_CONSTEXPR executor_parameters_type const& parameters() const
-            { return params_; }
+        {
+            return params_;
+        }
 
     private:
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
         }
 
@@ -493,8 +508,7 @@ namespace hpx { namespace parallel { namespace execution
         /// The category of the execution agents created by this execution
         /// policy.
         typedef typename hpx::traits::executor_execution_category<
-                executor_type
-            >::type execution_category;
+            executor_type>::type execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -503,9 +517,7 @@ namespace hpx { namespace parallel { namespace execution
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef sequenced_policy_shim<
-                    Executor_, Parameters_
-                > type;
+            typedef sequenced_policy_shim<Executor_, Parameters_> type;
         };
 
         /// Create a new sequenced_task_policy.
@@ -518,8 +530,8 @@ namespace hpx { namespace parallel { namespace execution
         HPX_CONSTEXPR sequenced_task_policy_shim<Executor, Parameters>
         operator()(task_policy_tag tag) const
         {
-            return sequenced_task_policy_shim<
-                Executor, Parameters>(exec_, params_);
+            return sequenced_task_policy_shim<Executor, Parameters>(
+                exec_, params_);
         }
 
         /// Create a new sequenced_policy from the given
@@ -537,24 +549,20 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new sequenced_policy
         ///
         template <typename Executor_>
-        typename rebind_executor<
-            sequenced_policy_shim, Executor_,
-            executor_parameters_type
-        >::type
-        on(Executor_ && exec) const
+        typename rebind_executor<sequenced_policy_shim, Executor_,
+            executor_parameters_type>::type
+        on(Executor_&& exec) const
         {
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
                 hpx::traits::is_threads_executor<executor_type>::value ||
-                hpx::traits::is_executor_any<executor_type>::value,
+                    hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
-            typedef typename rebind_executor<
-                sequenced_policy_shim, Executor_,
-                executor_parameters_type
-            >::type rebound_type;
+            typedef typename rebind_executor<sequenced_policy_shim, Executor_,
+                executor_parameters_type>::type rebound_type;
             return rebound_type(std::forward<Executor_>(exec), params_);
         }
 
@@ -573,53 +581,66 @@ namespace hpx { namespace parallel { namespace execution
         ///
         /// \returns The new sequenced_policy_shim
         ///
-        template <typename... Parameters_, typename ParametersType =
-            typename executor_parameters_join<Parameters_...>::type>
-        typename rebind_executor<
-            sequenced_policy_shim, executor_type, ParametersType
-        >::type
-        with(Parameters_ &&... params) const
+        template <typename... Parameters_,
+            typename ParametersType =
+                typename executor_parameters_join<Parameters_...>::type>
+        typename rebind_executor<sequenced_policy_shim, executor_type,
+            ParametersType>::type
+        with(Parameters_&&... params) const
         {
-            typedef typename rebind_executor<
-                sequenced_policy_shim, executor_type, ParametersType
-            >::type rebound_type;
+            typedef typename rebind_executor<sequenced_policy_shim,
+                executor_type, ParametersType>::type rebound_type;
             return rebound_type(exec_,
                 join_executor_parameters(std::forward<Parameters_>(params)...));
         }
 
         /// Return the associated executor object.
-        Executor& executor() { return exec_; }
+        Executor& executor()
+        {
+            return exec_;
+        }
         /// Return the associated executor object.
-        HPX_CONSTEXPR Executor const& executor() const { return exec_; }
+        HPX_CONSTEXPR Executor const& executor() const
+        {
+            return exec_;
+        }
 
         /// Return the associated executor parameters object.
-        Parameters& parameters() { return params_; }
+        Parameters& parameters()
+        {
+            return params_;
+        }
         /// Return the associated executor parameters object.
-        HPX_CONSTEXPR Parameters const& parameters() const { return params_; }
+        HPX_CONSTEXPR Parameters const& parameters() const
+        {
+            return params_;
+        }
 
         /// \cond NOINTERNAL
-        template <typename Dependent = void, typename Enable =
-            typename std::enable_if<
+        template <typename Dependent = void,
+            typename Enable = typename std::enable_if<
                 std::is_constructible<Executor>::value &&
                     std::is_constructible<Parameters>::value,
-                Dependent
-            >::type>
-        HPX_CONSTEXPR sequenced_policy_shim() {}
+                Dependent>::type>
+        HPX_CONSTEXPR sequenced_policy_shim()
+        {
+        }
 
         template <typename Executor_, typename Parameters_>
         HPX_CONSTEXPR sequenced_policy_shim(
-                Executor_ && exec, Parameters_ && params)
-          : exec_(std::forward<Executor_>(exec)),
-            params_(std::forward<Parameters_>(params))
-        {}
+            Executor_&& exec, Parameters_&& params)
+          : exec_(std::forward<Executor_>(exec))
+          , params_(std::forward<Parameters_>(params))
+        {
+        }
 
     private:
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
-            ar & exec_ & params_;
+            ar& exec_& params_;
         }
 
     private:
@@ -643,9 +664,8 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef execution::extract_executor_parameters<
-                executor_type
-            >::type executor_parameters_type;
+        typedef execution::extract_executor_parameters<executor_type>::type
+            executor_parameters_type;
 
         /// The category of the execution agents created by this execution
         /// policy.
@@ -658,9 +678,7 @@ namespace hpx { namespace parallel { namespace execution
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef parallel_task_policy_shim<
-                    Executor_, Parameters_
-                > type;
+            typedef parallel_task_policy_shim<Executor_, Parameters_> type;
         };
 
         /// \cond NOINTERNAL
@@ -694,23 +712,20 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new parallel_task_policy
         ///
         template <typename Executor>
-        typename rebind_executor<
-            parallel_task_policy, Executor, executor_parameters_type
-        >::type
-        on(Executor && exec) const
+        typename rebind_executor<parallel_task_policy, Executor,
+            executor_parameters_type>::type
+        on(Executor&& exec) const
         {
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
                 hpx::traits::is_threads_executor<executor_type>::value ||
-                hpx::traits::is_executor_any<executor_type>::value,
+                    hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
-            typedef typename rebind_executor<
-                parallel_task_policy, Executor,
-                executor_parameters_type
-            >::type rebound_type;
+            typedef typename rebind_executor<parallel_task_policy, Executor,
+                executor_parameters_type>::type rebound_type;
             return rebound_type(std::forward<Executor>(exec), parameters());
         }
 
@@ -729,37 +744,47 @@ namespace hpx { namespace parallel { namespace execution
         ///
         /// \returns The new parallel_policy_shim
         ///
-        template <typename... Parameters, typename ParametersType =
-            typename executor_parameters_join<Parameters...>::type>
-        typename rebind_executor<
-            parallel_task_policy, executor_type, ParametersType
-        >::type
-        with(Parameters &&... params) const
+        template <typename... Parameters,
+            typename ParametersType =
+                typename executor_parameters_join<Parameters...>::type>
+        typename rebind_executor<parallel_task_policy, executor_type,
+            ParametersType>::type
+        with(Parameters&&... params) const
         {
-            typedef typename rebind_executor<
-                parallel_task_policy, executor_type, ParametersType
-            >::type rebound_type;
+            typedef typename rebind_executor<parallel_task_policy,
+                executor_type, ParametersType>::type rebound_type;
             return rebound_type(executor(),
                 join_executor_parameters(std::forward<Parameters>(params)...));
         }
 
     public:
         /// Return the associated executor object.
-        executor_type& executor() { return exec_; }
+        executor_type& executor()
+        {
+            return exec_;
+        }
         /// Return the associated executor object.
-        HPX_CONSTEXPR executor_type const& executor() const { return exec_; }
+        HPX_CONSTEXPR executor_type const& executor() const
+        {
+            return exec_;
+        }
 
         /// Return the associated executor parameters object.
-        executor_parameters_type& parameters() { return params_; }
+        executor_parameters_type& parameters()
+        {
+            return params_;
+        }
         /// Return the associated executor parameters object.
         HPX_CONSTEXPR executor_parameters_type const& parameters() const
-            { return params_; }
+        {
+            return params_;
+        }
 
     private:
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
         }
 
@@ -786,8 +811,7 @@ namespace hpx { namespace parallel { namespace execution
         /// The category of the execution agents created by this execution
         /// policy.
         typedef typename hpx::traits::executor_execution_category<
-                executor_type
-            >::type execution_category;
+            executor_type>::type execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -796,9 +820,7 @@ namespace hpx { namespace parallel { namespace execution
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef parallel_task_policy_shim<
-                    Executor_, Parameters_
-                > type;
+            typedef parallel_task_policy_shim<Executor_, Parameters_> type;
         };
 
         /// Create a new parallel_task_policy_shim from itself
@@ -829,24 +851,20 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new parallel_task_policy
         ///
         template <typename Executor_>
-        typename rebind_executor<
-            parallel_task_policy_shim, Executor_,
-            executor_parameters_type
-        >::type
-        on(Executor_ && exec) const
+        typename rebind_executor<parallel_task_policy_shim, Executor_,
+            executor_parameters_type>::type
+        on(Executor_&& exec) const
         {
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
                 hpx::traits::is_threads_executor<executor_type>::value ||
-                hpx::traits::is_executor_any<executor_type>::value,
+                    hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
-            typedef typename rebind_executor<
-                parallel_task_policy_shim, Executor_,
-                executor_parameters_type
-            >::type rebound_type;
+            typedef typename rebind_executor<parallel_task_policy_shim,
+                Executor_, executor_parameters_type>::type rebound_type;
             return rebound_type(std::forward<Executor_>(exec), params_);
         }
 
@@ -865,53 +883,66 @@ namespace hpx { namespace parallel { namespace execution
         ///
         /// \returns The new parallel_policy_shim
         ///
-        template <typename... Parameters_, typename ParametersType =
-            typename executor_parameters_join<Parameters_...>::type>
-        typename rebind_executor<
-            parallel_task_policy_shim, executor_type, ParametersType
-        >::type
-        with(Parameters_ &&... params) const
+        template <typename... Parameters_,
+            typename ParametersType =
+                typename executor_parameters_join<Parameters_...>::type>
+        typename rebind_executor<parallel_task_policy_shim, executor_type,
+            ParametersType>::type
+        with(Parameters_&&... params) const
         {
-            typedef typename rebind_executor<
-                parallel_task_policy_shim, executor_type, ParametersType
-            >::type rebound_type;
+            typedef typename rebind_executor<parallel_task_policy_shim,
+                executor_type, ParametersType>::type rebound_type;
             return rebound_type(exec_,
                 join_executor_parameters(std::forward<Parameters_>(params)...));
         }
 
         /// Return the associated executor object.
-        Executor& executor() { return exec_; }
+        Executor& executor()
+        {
+            return exec_;
+        }
         /// Return the associated executor object.
-        HPX_CONSTEXPR Executor const& executor() const { return exec_; }
+        HPX_CONSTEXPR Executor const& executor() const
+        {
+            return exec_;
+        }
 
         /// Return the associated executor parameters object.
-        Parameters& parameters() { return params_; }
+        Parameters& parameters()
+        {
+            return params_;
+        }
         /// Return the associated executor parameters object.
-        HPX_CONSTEXPR Parameters const& parameters() const { return params_; }
+        HPX_CONSTEXPR Parameters const& parameters() const
+        {
+            return params_;
+        }
 
         /// \cond NOINTERNAL
-        template <typename Dependent = void, typename Enable =
-            typename std::enable_if<
+        template <typename Dependent = void,
+            typename Enable = typename std::enable_if<
                 std::is_constructible<Executor>::value &&
                     std::is_constructible<Parameters>::value,
-                Dependent
-            >::type>
-        HPX_CONSTEXPR parallel_task_policy_shim() {}
+                Dependent>::type>
+        HPX_CONSTEXPR parallel_task_policy_shim()
+        {
+        }
 
         template <typename Executor_, typename Parameters_>
         HPX_CONSTEXPR parallel_task_policy_shim(
-                Executor_ && exec, Parameters_ && params)
-          : exec_(std::forward<Executor_>(exec)),
-            params_(std::forward<Parameters_>(params))
-        {}
+            Executor_&& exec, Parameters_&& params)
+          : exec_(std::forward<Executor_>(exec))
+          , params_(std::forward<Parameters_>(params))
+        {
+        }
 
     private:
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
-            ar & exec_ & params_;
+            ar& exec_& params_;
         }
 
     private:
@@ -931,9 +962,8 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef execution::extract_executor_parameters<
-                executor_type
-            >::type executor_parameters_type;
+        typedef execution::extract_executor_parameters<executor_type>::type
+            executor_parameters_type;
 
         /// The category of the execution agents created by this execution
         /// policy.
@@ -946,13 +976,15 @@ namespace hpx { namespace parallel { namespace execution
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef parallel_policy_shim<
-                    Executor_, Parameters_
-                > type;
+            typedef parallel_policy_shim<Executor_, Parameters_> type;
         };
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR parallel_policy() : exec_{}, params_{} {}
+        HPX_CONSTEXPR parallel_policy()
+          : exec_{}
+          , params_{}
+        {
+        }
         /// \endcond
 
         /// Create a new parallel_policy referencing a chunk size.
@@ -978,22 +1010,20 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new parallel_policy
         ///
         template <typename Executor>
-        typename rebind_executor<
-            parallel_policy, Executor, executor_parameters_type
-        >::type
-        on(Executor && exec) const
+        typename rebind_executor<parallel_policy, Executor,
+            executor_parameters_type>::type
+        on(Executor&& exec) const
         {
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
                 hpx::traits::is_threads_executor<executor_type>::value ||
-                hpx::traits::is_executor_any<executor_type>::value,
+                    hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
-            typedef typename rebind_executor<
-                parallel_policy, Executor, executor_parameters_type
-            >::type rebound_type;
+            typedef typename rebind_executor<parallel_policy, Executor,
+                executor_parameters_type>::type rebound_type;
             return rebound_type(std::forward<Executor>(exec), parameters());
         }
 
@@ -1011,37 +1041,47 @@ namespace hpx { namespace parallel { namespace execution
         ///
         /// \returns The new parallel_policy
         ///
-        template <typename... Parameters, typename ParametersType =
-            typename executor_parameters_join<Parameters...>::type>
-        typename rebind_executor<
-            parallel_policy, executor_type, ParametersType
-        >::type
-        with(Parameters &&... params) const
+        template <typename... Parameters,
+            typename ParametersType =
+                typename executor_parameters_join<Parameters...>::type>
+        typename rebind_executor<parallel_policy, executor_type,
+            ParametersType>::type
+        with(Parameters&&... params) const
         {
-            typedef typename rebind_executor<
-                parallel_policy, executor_type, ParametersType
-            >::type rebound_type;
+            typedef typename rebind_executor<parallel_policy, executor_type,
+                ParametersType>::type rebound_type;
             return rebound_type(executor(),
                 join_executor_parameters(std::forward<Parameters>(params)...));
         }
 
     public:
         /// Return the associated executor object.
-        executor_type& executor() { return exec_; }
+        executor_type& executor()
+        {
+            return exec_;
+        }
         /// Return the associated executor object.
-        HPX_CONSTEXPR executor_type const& executor() const { return exec_; }
+        HPX_CONSTEXPR executor_type const& executor() const
+        {
+            return exec_;
+        }
 
         /// Return the associated executor parameters object.
-        executor_parameters_type& parameters() { return params_; }
+        executor_parameters_type& parameters()
+        {
+            return params_;
+        }
         /// Return the associated executor parameters object.
         HPX_CONSTEXPR executor_parameters_type const& parameters() const
-            { return params_; }
+        {
+            return params_;
+        }
 
     private:
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
         }
 
@@ -1069,8 +1109,7 @@ namespace hpx { namespace parallel { namespace execution
         /// The category of the execution agents created by this execution
         /// policy.
         typedef typename hpx::traits::executor_execution_category<
-                executor_type
-            >::type execution_category;
+            executor_type>::type execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -1079,9 +1118,7 @@ namespace hpx { namespace parallel { namespace execution
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef parallel_policy_shim<
-                    Executor_, Parameters_
-                > type;
+            typedef parallel_policy_shim<Executor_, Parameters_> type;
         };
 
         /// Create a new parallel_policy referencing a chunk size.
@@ -1113,24 +1150,20 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new parallel_policy
         ///
         template <typename Executor_>
-        typename rebind_executor<
-            parallel_policy_shim, Executor_,
-            executor_parameters_type
-        >::type
-        on(Executor_ && exec) const
+        typename rebind_executor<parallel_policy_shim, Executor_,
+            executor_parameters_type>::type
+        on(Executor_&& exec) const
         {
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
                 hpx::traits::is_threads_executor<executor_type>::value ||
-                hpx::traits::is_executor_any<executor_type>::value,
+                    hpx::traits::is_executor_any<executor_type>::value,
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
-            typedef typename rebind_executor<
-                parallel_policy_shim, Executor_,
-                executor_parameters_type
-            >::type rebound_type;
+            typedef typename rebind_executor<parallel_policy_shim, Executor_,
+                executor_parameters_type>::type rebound_type;
             return rebound_type(std::forward<Executor_>(exec), params_);
         }
 
@@ -1148,53 +1181,66 @@ namespace hpx { namespace parallel { namespace execution
         ///
         /// \returns The new parallel_policy_shim
         ///
-        template <typename... Parameters_, typename ParametersType =
-            typename executor_parameters_join<Parameters_...>::type>
-        typename rebind_executor<
-            parallel_policy_shim, executor_type, ParametersType
-        >::type
-        with(Parameters_ &&... params) const
+        template <typename... Parameters_,
+            typename ParametersType =
+                typename executor_parameters_join<Parameters_...>::type>
+        typename rebind_executor<parallel_policy_shim, executor_type,
+            ParametersType>::type
+        with(Parameters_&&... params) const
         {
-            typedef typename rebind_executor<
-                parallel_policy_shim, executor_type, ParametersType
-            >::type rebound_type;
+            typedef typename rebind_executor<parallel_policy_shim,
+                executor_type, ParametersType>::type rebound_type;
             return rebound_type(exec_,
                 join_executor_parameters(std::forward<Parameters_>(params)...));
         }
 
         /// Return the associated executor object.
-        Executor& executor() { return exec_; }
+        Executor& executor()
+        {
+            return exec_;
+        }
         /// Return the associated executor object.
-        HPX_CONSTEXPR Executor const& executor() const { return exec_; }
+        HPX_CONSTEXPR Executor const& executor() const
+        {
+            return exec_;
+        }
 
         /// Return the associated executor parameters object.
-        Parameters& parameters() { return params_; }
+        Parameters& parameters()
+        {
+            return params_;
+        }
         /// Return the associated executor parameters object.
-        HPX_CONSTEXPR Parameters const& parameters() const { return params_; }
+        HPX_CONSTEXPR Parameters const& parameters() const
+        {
+            return params_;
+        }
 
         /// \cond NOINTERNAL
-        template <typename Dependent = void, typename Enable =
-            typename std::enable_if<
+        template <typename Dependent = void,
+            typename Enable = typename std::enable_if<
                 std::is_constructible<Executor>::value &&
                     std::is_constructible<Parameters>::value,
-                Dependent
-            >::type>
-        HPX_CONSTEXPR parallel_policy_shim() {}
+                Dependent>::type>
+        HPX_CONSTEXPR parallel_policy_shim()
+        {
+        }
 
         template <typename Executor_, typename Parameters_>
         HPX_CONSTEXPR parallel_policy_shim(
-                Executor_ && exec, Parameters_ && params)
-          : exec_(std::forward<Executor_>(exec)),
-            params_(std::forward<Parameters_>(params))
-        {}
+            Executor_&& exec, Parameters_&& params)
+          : exec_(std::forward<Executor_>(exec))
+          , params_(std::forward<Parameters_>(params))
+        {
+        }
 
     private:
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
-            ar & exec_ & params_;
+            ar& exec_& params_;
         }
 
     private:
@@ -1214,16 +1260,19 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef execution::extract_executor_parameters<
-                executor_type
-            >::type executor_parameters_type;
+        typedef execution::extract_executor_parameters<executor_type>::type
+            executor_parameters_type;
 
         /// The category of the execution agents created by this execution
         /// policy.
         typedef parallel_execution_tag execution_category;
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR parallel_unsequenced_policy() : exec_{}, params_{} {}
+        HPX_CONSTEXPR parallel_unsequenced_policy()
+          : exec_{}
+          , params_{}
+        {
+        }
         /// \endcond
 
         /// Create a new parallel_unsequenced_policy from itself
@@ -1233,29 +1282,39 @@ namespace hpx { namespace parallel { namespace execution
         ///
         /// \returns The new parallel_unsequenced_policy
         ///
-        parallel_unsequenced_policy operator()(
-            task_policy_tag /*tag*/) const
+        parallel_unsequenced_policy operator()(task_policy_tag /*tag*/) const
         {
             return *this;
         }
 
     public:
         /// Return the associated executor object.
-        executor_type& executor() { return exec_; }
+        executor_type& executor()
+        {
+            return exec_;
+        }
         /// Return the associated executor object.
-        HPX_CONSTEXPR executor_type const& executor() const { return exec_; }
+        HPX_CONSTEXPR executor_type const& executor() const
+        {
+            return exec_;
+        }
 
         /// Return the associated executor parameters object.
-        executor_parameters_type& parameters() { return params_; }
+        executor_parameters_type& parameters()
+        {
+            return params_;
+        }
         /// Return the associated executor parameters object.
         HPX_CONSTEXPR executor_parameters_type const& parameters() const
-            { return params_; }
+        {
+            return params_;
+        }
 
     private:
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
         }
 
@@ -1272,178 +1331,175 @@ namespace hpx { namespace parallel { namespace execution
     // of a rebind operation. This information can be used to inhibit the
     // construction of a generic execution_policy from any of the rebound
     // policies.
-    namespace detail
-    {
+    namespace detail {
         template <typename Executor, typename Parameters>
         struct is_rebound_execution_policy<
-                sequenced_policy_shim<Executor, Parameters> >
-          : std::true_type
-        {};
+            sequenced_policy_shim<Executor, Parameters>> : std::true_type
+        {
+        };
 
         template <typename Executor, typename Parameters>
         struct is_rebound_execution_policy<
-                sequenced_task_policy_shim<Executor, Parameters> >
-          : std::true_type
-        {};
+            sequenced_task_policy_shim<Executor, Parameters>> : std::true_type
+        {
+        };
 
         template <typename Executor, typename Parameters>
         struct is_rebound_execution_policy<
-                parallel_policy_shim<Executor, Parameters> >
-          : std::true_type
-        {};
+            parallel_policy_shim<Executor, Parameters>> : std::true_type
+        {
+        };
 
         template <typename Executor, typename Parameters>
         struct is_rebound_execution_policy<
-                parallel_task_policy_shim<Executor, Parameters> >
-          : std::true_type
-        {};
-    }
+            parallel_task_policy_shim<Executor, Parameters>> : std::true_type
+        {
+        };
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         template <>
-        struct is_execution_policy<parallel_policy>
-          : std::true_type
-        {};
+        struct is_execution_policy<parallel_policy> : std::true_type
+        {
+        };
 
         template <typename Executor, typename Parameters>
-        struct is_execution_policy<
-                parallel_policy_shim<Executor, Parameters> >
+        struct is_execution_policy<parallel_policy_shim<Executor, Parameters>>
           : std::true_type
-        {};
+        {
+        };
 
         template <>
-        struct is_execution_policy<parallel_unsequenced_policy>
-          : std::true_type
-        {};
+        struct is_execution_policy<parallel_unsequenced_policy> : std::true_type
+        {
+        };
 
         template <>
-        struct is_execution_policy<sequenced_policy>
-          : std::true_type
-        {};
+        struct is_execution_policy<sequenced_policy> : std::true_type
+        {
+        };
 
         template <typename Executor, typename Parameters>
-        struct is_execution_policy<
-                sequenced_policy_shim<Executor, Parameters> >
+        struct is_execution_policy<sequenced_policy_shim<Executor, Parameters>>
           : std::true_type
-        {};
+        {
+        };
 
         // extension
         template <>
-        struct is_execution_policy<sequenced_task_policy>
-          : std::true_type
-        {};
+        struct is_execution_policy<sequenced_task_policy> : std::true_type
+        {
+        };
 
         template <typename Executor, typename Parameters>
         struct is_execution_policy<
-                sequenced_task_policy_shim<Executor, Parameters> >
-          : std::true_type
-        {};
+            sequenced_task_policy_shim<Executor, Parameters>> : std::true_type
+        {
+        };
 
         template <>
-        struct is_execution_policy<parallel_task_policy>
-          : std::true_type
-        {};
+        struct is_execution_policy<parallel_task_policy> : std::true_type
+        {
+        };
 
         template <typename Executor, typename Parameters>
         struct is_execution_policy<
-                parallel_task_policy_shim<Executor, Parameters> >
-          : std::true_type
-        {};
+            parallel_task_policy_shim<Executor, Parameters>> : std::true_type
+        {
+        };
         /// \endcond
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         template <>
-        struct is_parallel_execution_policy<parallel_policy>
-          : std::true_type
-        {};
+        struct is_parallel_execution_policy<parallel_policy> : std::true_type
+        {
+        };
 
         template <typename Executor, typename Parameters>
         struct is_parallel_execution_policy<
-                parallel_policy_shim<Executor, Parameters> >
-          : std::true_type
-        {};
+            parallel_policy_shim<Executor, Parameters>> : std::true_type
+        {
+        };
 
         template <>
-        struct is_parallel_execution_policy<
-                parallel_unsequenced_policy>
+        struct is_parallel_execution_policy<parallel_unsequenced_policy>
           : std::true_type
-        {};
+        {
+        };
 
         template <>
         struct is_parallel_execution_policy<parallel_task_policy>
           : std::true_type
-        {};
+        {
+        };
 
         template <typename Executor, typename Parameters>
         struct is_parallel_execution_policy<
-                parallel_task_policy_shim<Executor, Parameters> >
-          : std::true_type
-        {};
+            parallel_task_policy_shim<Executor, Parameters>> : std::true_type
+        {
+        };
         /// \endcond
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         template <>
         struct is_sequenced_execution_policy<sequenced_task_policy>
           : std::true_type
-        {};
+        {
+        };
 
         template <typename Executor, typename Parameters>
         struct is_sequenced_execution_policy<
-                sequenced_task_policy_shim<Executor, Parameters> >
-          : std::true_type
-        {};
+            sequenced_task_policy_shim<Executor, Parameters>> : std::true_type
+        {
+        };
 
         template <>
-        struct is_sequenced_execution_policy<sequenced_policy>
-          : std::true_type
-        {};
+        struct is_sequenced_execution_policy<sequenced_policy> : std::true_type
+        {
+        };
 
         template <typename Executor, typename Parameters>
         struct is_sequenced_execution_policy<
-                sequenced_policy_shim<Executor, Parameters> >
-          : std::true_type
-        {};
+            sequenced_policy_shim<Executor, Parameters>> : std::true_type
+        {
+        };
         /// \endcond
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         template <>
-        struct is_async_execution_policy<sequenced_task_policy>
-          : std::true_type
-        {};
+        struct is_async_execution_policy<sequenced_task_policy> : std::true_type
+        {
+        };
 
         template <typename Executor, typename Parameters>
         struct is_async_execution_policy<
-                sequenced_task_policy_shim<Executor, Parameters> >
-          : std::true_type
-        {};
+            sequenced_task_policy_shim<Executor, Parameters>> : std::true_type
+        {
+        };
 
         template <>
-        struct is_async_execution_policy<parallel_task_policy>
-          : std::true_type
-        {};
+        struct is_async_execution_policy<parallel_task_policy> : std::true_type
+        {
+        };
 
         template <typename Executor, typename Parameters>
         struct is_async_execution_policy<
-                parallel_task_policy_shim<Executor, Parameters> >
-          : std::true_type
-        {};
+            parallel_task_policy_shim<Executor, Parameters>> : std::true_type
+        {
+        };
         /// \endcond
-    }
-}}}
+    }    // namespace detail
+}}}      // namespace hpx::parallel::execution
 
 #endif

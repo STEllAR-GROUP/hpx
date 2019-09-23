@@ -15,8 +15,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     /// Loop iterations are divided into pieces of size \a chunk_size and then
     /// dynamically scheduled among the threads; when a thread finishes one
@@ -36,12 +35,13 @@ namespace hpx { namespace parallel { namespace execution
         ///
         HPX_CONSTEXPR explicit dynamic_chunk_size(std::size_t chunk_size = 1)
           : chunk_size_(chunk_size)
-        {}
+        {
+        }
 
         /// \cond NOINTERNAL
         template <typename Executor, typename F>
-        HPX_CONSTEXPR std::size_t
-        get_chunk_size(Executor&, F &&, std::size_t, std::size_t) const
+        HPX_CONSTEXPR std::size_t get_chunk_size(
+            Executor&, F&&, std::size_t, std::size_t) const
         {
             return chunk_size_;
         }
@@ -52,9 +52,9 @@ namespace hpx { namespace parallel { namespace execution
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
-            ar & chunk_size_;
+            ar& chunk_size_;
         }
         /// \endcond
 
@@ -63,16 +63,16 @@ namespace hpx { namespace parallel { namespace execution
         std::size_t chunk_size_;
         /// \endcond
     };
-}}}
+}}}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <>
     struct is_executor_parameters<parallel::execution::dynamic_chunk_size>
-        : std::true_type
-    {};
+      : std::true_type
+    {
+    };
     /// \endcond
-}}}
+}}}    // namespace hpx::parallel::execution
 
 #endif
