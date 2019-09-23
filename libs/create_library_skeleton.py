@@ -2,6 +2,7 @@
 '''
 Copyright (c) 2018 Thomas Heller
 
+SPDX-License-Identifier: BSL-1.0
 Distributed under the Boost Software License, Version 1.0. (See accompanying
 file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -25,16 +26,18 @@ cmake_version = '3.3.2'
 
 cmake_header = f'''# Copyright (c) 2019 The STE||AR-Group
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 '''
 
 readme_template = f'''
 ..
-   Copyright (c) 2019 The STE||AR-Group
+    Copyright (c) 2019 The STE||AR-Group
 
-   Distributed under the Boost Software License, Version 1.0. (See accompanying
-   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    SPDX-License-Identifier: BSL-1.0
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 {header_str}
 {lib_name}
@@ -47,10 +50,11 @@ Documentation can be found `here
 '''
 
 index_rst = f'''..
-   Copyright (c) 2019 The STE||AR-Group
+    Copyright (c) 2019 The STE||AR-Group
 
-   Distributed under the Boost Software License, Version 1.0. (See accompanying
-   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    SPDX-License-Identifier: BSL-1.0
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 .. _libs_{lib_name}:
 
@@ -287,10 +291,11 @@ f.write(libs_cmakelists)
 
 # Adapting all_modules.rst
 all_modules_rst = f'''..
-   Copyright (c) 2018-2019 The STE||AR-Group
+    Copyright (c) 2018-2019 The STE||AR-Group
 
-   Distributed under the Boost Software License, Version 1.0. (See accompanying
-   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    SPDX-License-Identifier: BSL-1.0
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 .. _all_modules:
 
