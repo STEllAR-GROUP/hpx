@@ -176,7 +176,7 @@ int main(int argc, char* argv[])
         hpx::threads::policies::thread_queue_init_parameters
             thread_queue_init{};
         sched_type::init_parameter_type scheduler_init(
-            num_threads, ad, num_threads, 1, thread_queue_init, "my_scheduler");
+            num_threads, ad, num_threads, thread_queue_init, "my_scheduler");
         hpx::threads::thread_pool_init_parameters thread_pool_init("my_pool", 0,
             hpx::threads::policies::scheduler_mode::default_mode, num_threads,
             0, notifier, ad,

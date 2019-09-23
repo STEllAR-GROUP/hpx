@@ -29,6 +29,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+// JB set work stealing false in mode set
+
 // TODO: add branch prediction and function heat
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,14 +75,17 @@ namespace hpx { namespace threads { namespace policies
           : base_type(init, deferred_initialization)
         {}
 
-        virtual bool has_thread_stealing(std::size_t num_thread) const override
-        {
-            return false;
-        }
-
         static std::string get_scheduler_name()
         {
             return "static_queue_scheduler";
+        }
+
+        void set_scheduler_mode(scheduler_mode mode) override
+        {
+            // this scheduler does not support stealing or numa stealing
+            mode = scheduler_mode(mode & ~scheduler_mode::enable_stealing);
+            mode = scheduler_mode(mode & ~scheduler_mode::enable_stealing_numa);
+            scheduler_base::set_scheduler_mode(mode);
         }
 
         /// Return the next thread to be executed, return false if none is

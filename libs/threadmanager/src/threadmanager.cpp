@@ -341,6 +341,10 @@ namespace hpx { namespace threads {
                 max_background_threads, max_idle_loop_count,
                 max_busy_loop_count);
 
+            std::string affinity_desc;
+            std::size_t numa_sensitive =
+                hpx::util::get_affinity_description(cfg_, affinity_desc);
+
             switch (sched_type)
             {
             case resource::user_defined:
@@ -363,9 +367,6 @@ namespace hpx { namespace threads {
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
-                std::string affinity_desc;
-                std::size_t numa_sensitive =
-                    hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
                 using local_sched_type =
@@ -373,10 +374,17 @@ namespace hpx { namespace threads {
 
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
-                    thread_pool_init.affinity_data_, numa_sensitive,
+                    thread_pool_init.affinity_data_,
                     thread_queue_init, "core-local_queue_scheduler");
+
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
+
+                // set the default scheduler flags
+                sched->add_scheduler_mode(thread_pool_init.mode_);
+                // conditionally set/unset this flag
+                sched->update_scheduler_mode(
+                    policies::enable_stealing_numa, !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -399,9 +407,6 @@ namespace hpx { namespace threads {
                 std::size_t num_high_priority_queues =
                     hpx::util::get_num_high_priority_queues(
                         cfg_, rp.get_num_threads(name));
-                std::string affinity_desc;
-                std::size_t numa_sensitive =
-                    hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
                 using local_sched_type =
@@ -411,10 +416,17 @@ namespace hpx { namespace threads {
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
-                    numa_sensitive, thread_queue_init,
+                    thread_queue_init,
                     "core-local_priority_queue_scheduler");
+
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
+
+                // set the default scheduler flags
+                sched->add_scheduler_mode(thread_pool_init.mode_);
+                // conditionally set/unset this flag
+                sched->update_scheduler_mode(
+                    policies::enable_stealing_numa, !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -433,9 +445,6 @@ namespace hpx { namespace threads {
                 std::size_t num_high_priority_queues =
                     hpx::util::get_num_high_priority_queues(
                         cfg_, rp.get_num_threads(name));
-                std::string affinity_desc;
-                std::size_t numa_sensitive =
-                    hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
                 using local_sched_type =
@@ -445,10 +454,17 @@ namespace hpx { namespace threads {
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
-                    numa_sensitive, thread_queue_init,
+                    thread_queue_init,
                     "core-local_priority_queue_scheduler");
+
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
+
+                // set the default scheduler flags
+                sched->add_scheduler_mode(thread_pool_init.mode_);
+                // conditionally set/unset this flag
+                sched->update_scheduler_mode(
+                    policies::enable_stealing_numa, !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -472,9 +488,6 @@ namespace hpx { namespace threads {
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
-                std::string affinity_desc;
-                std::size_t numa_sensitive =
-                    hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
                 using local_sched_type =
@@ -482,10 +495,17 @@ namespace hpx { namespace threads {
 
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
-                    thread_pool_init.affinity_data_, numa_sensitive,
+                    thread_pool_init.affinity_data_,
                     thread_queue_init, "core-static_queue_scheduler");
+
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
+
+                // set the default scheduler flags
+                sched->add_scheduler_mode(thread_pool_init.mode_);
+                // conditionally set/unset this flag
+                sched->update_scheduler_mode(
+                    policies::enable_stealing_numa, !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -509,9 +529,6 @@ namespace hpx { namespace threads {
                 std::size_t num_high_priority_queues =
                     hpx::util::get_num_high_priority_queues(
                         cfg_, rp.get_num_threads(name));
-                std::string affinity_desc;
-                std::size_t numa_sensitive =
-                    hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
                 using local_sched_type =
@@ -519,11 +536,19 @@ namespace hpx { namespace threads {
 
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
-                    thread_pool_init.affinity_data_, num_high_priority_queues,
-                    numa_sensitive, thread_queue_init,
+                    thread_pool_init.affinity_data_,
+                    num_high_priority_queues,
+                    thread_queue_init,
                     "core-static_priority_queue_scheduler");
+
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
+
+                // set the default scheduler flags
+                sched->add_scheduler_mode(thread_pool_init.mode_);
+                // conditionally set/unset this flag
+                sched->update_scheduler_mode(
+                    policies::enable_stealing_numa, !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -556,10 +581,17 @@ namespace hpx { namespace threads {
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
-                    cfg_.numa_sensitive_, thread_queue_init,
+                    thread_queue_init,
                     "core-abp_fifo_priority_queue_scheduler");
+
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
+
+                // set the default scheduler flags
+                sched->add_scheduler_mode(thread_pool_init.mode_);
+                // conditionally set/unset this flag
+                sched->update_scheduler_mode(
+                    policies::enable_stealing_numa, !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -594,10 +626,17 @@ namespace hpx { namespace threads {
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
-                    cfg_.numa_sensitive_, thread_queue_init,
+                    thread_queue_init,
                     "core-abp_fifo_priority_queue_scheduler");
+
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
+
+                // set the default scheduler flags
+                sched->add_scheduler_mode(thread_pool_init.mode_);
+                // conditionally set/unset this flag
+                sched->update_scheduler_mode(
+                    policies::enable_stealing_numa, !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -624,8 +663,15 @@ namespace hpx { namespace threads {
                     thread_pool_init.num_threads_, {4, 4, 64},    // -V112
                     thread_pool_init.affinity_data_, thread_queue_init,
                     "core-shared_priority_queue_scheduler");
+
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
+
+                // set the default scheduler flags
+                sched->add_scheduler_mode(thread_pool_init.mode_);
+                // conditionally set/unset this flag
+                sched->update_scheduler_mode(
+                    policies::enable_stealing_numa, !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(

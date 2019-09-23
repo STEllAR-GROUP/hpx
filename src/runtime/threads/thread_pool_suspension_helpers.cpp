@@ -84,7 +84,7 @@ namespace hpx { namespace threads {
                     "this thread pool does not support suspending "
                     "processing units"));
         }
-        else if (!pool.get_scheduler()->has_thread_stealing(virt_core) &&
+        else if (!pool.get_scheduler()->has_work_stealing() &&
             hpx::this_thread::get_pool() == &pool)
         {
             return hpx::make_exceptional_future<void>(
@@ -118,7 +118,7 @@ namespace hpx { namespace threads {
 
         if (threads::get_self_ptr())
         {
-            if (!pool.get_scheduler()->has_thread_stealing(virt_core) &&
+            if (!pool.get_scheduler()->has_work_stealing() &&
                 hpx::this_thread::get_pool() == &pool)
             {
                 HPX_THROW_EXCEPTION(invalid_status,
