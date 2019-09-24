@@ -538,6 +538,7 @@ void tuple_swap_test()
 
 void tuple_std_test()
 {
+#if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
     hpx::util::tuple<int, float, double> t1(1, 2.0f, 3.0);
     std::tuple<int, float, double> t2 = t1;
     hpx::util::tuple<int, float, double> t3 = t2;
@@ -564,6 +565,7 @@ void tuple_std_test()
     HPX_TEST(hpx::util::get<2>(t1) == 3.0);
     HPX_TEST(hpx::util::get<2>(t2) == 3.0);
     HPX_TEST(hpx::util::get<2>(t3) == 3.0);
+#endif
 }
 
 void tuple_structured_binding_test()

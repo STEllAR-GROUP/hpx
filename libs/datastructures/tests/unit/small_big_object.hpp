@@ -20,7 +20,7 @@ struct small_object
 private:
     std::uint64_t x_;
 
-  public:
+public:
     template <typename Archive>
     void serialize(Archive& ar, unsigned const)
     {
@@ -127,7 +127,7 @@ private:
     std::uint64_t x_;
     std::uint64_t y_;
 
-  public:
+public:
     template <typename Archive>
     void serialize(Archive& ar, unsigned const)
     {
