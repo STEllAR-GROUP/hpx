@@ -96,7 +96,7 @@ they occurred contiguously.
 
 In |hpx| ini files a property value ``${FOO:default}`` will use the environmental
 variable ``FOO`` to extract the actual value if it is set and ``default`` otherwise.
-No default has to be specified. Therefore ``${FOO}`` refers to the environmental
+No default has to be specified. Therefore, ``${FOO}`` refers to the environmental
 variable ``FOO``. If ``FOO`` is not set or empty, the overall expression will evaluate
 to an empty string. A property value ``$[section.key:default]`` refers to the value
 held by the property ``section.key`` if it exists and ``default`` otherwise. No
@@ -157,7 +157,7 @@ The ``system`` configuration section
      * This is initialized to the base directory the current executable has been
        loaded from.
 
-The ``hpx`` configuration section
+The `|HPX| configuration section
 .................................
 
 .. code-block:: ini
@@ -200,7 +200,7 @@ The ``hpx`` configuration section
    * * ``hpx.component_path``
      * Duplicates are discarded.
        This property can refer to a list of directories separated by ``':'``
-       (Linux, Android, and MacOS) or using ``';'`` (Windows).
+       (Linux, Android, and MacOS) or by ``';'`` (Windows).
    * * ``hpx.master_ini_path``
      * This is initialized to the list of default paths of the main hpx.ini
        configuration files. This property can refer to a list of directories
@@ -212,8 +212,8 @@ The ``hpx`` configuration section
        separated by ``':'`` (Linux, Android, and MacOS) or using ``';'``
        (Windows).
    * * ``hpx.os_threads``
-     * This setting reflects the number of OS-threads used for running
-       |hpx|-threads. Defaults to number of detected cores (not hyperthreads/PUs).
+     * This setting reflects the number of OS threads used for running
+       |hpx| threads. Defaults to number of detected cores (not hyperthreads/PUs).
    * * ``hpx.localities``
      * This setting reflects the number of localities the application is running
        on. Defaults to ``1``.
@@ -234,7 +234,7 @@ The ``hpx`` configuration section
        in CMake. This setting has no effect if ``hpx.lock_detection=0``.
    * * ``hpx.minimal_deadlock_detection``
      * This setting enables support for minimal deadlock detection for
-       |hpx|-threads. By default this is set to ``1`` (for Debug builds) or to
+       |hpx| threads. By default this is set to ``1`` (for Debug builds) or to
        ``0`` (for Release, RelWithDebInfo, RelMinSize builds). This setting is
        effective only if ``HPX_WITH_THREAD_DEADLOCK_DETECTION`` is set during
        configuration in CMake.
@@ -271,22 +271,22 @@ The ``hpx`` configuration section
        ``HPX_IDLE_BACKOFF_TIME_MAX``. This is an internal setting that you
        should change only if you know exactly what you are doing.
    * * ``hpx.stacks.small_size``
-     * This is initialized to the small stack size to be used by |hpx|-threads.
+     * This is initialized to the small stack size to be used by |hpx| threads.
        Set by default to the value of the compile time preprocessor constant
        ``HPX_SMALL_STACK_SIZE`` (defaults to ``0x8000``). This value is used for
        all |hpx| threads by default, except for the thread running ``hpx_main``
        (which runs on a large stack).
    * * ``hpx.stacks.medium_size``
-     * This is initialized to the medium stack size to be used by |hpx|-threads.
+     * This is initialized to the medium stack size to be used by |hpx| threads.
        Set by default to the value of the compile time preprocessor constant
        ``HPX_MEDIUM_STACK_SIZE`` (defaults to ``0x20000``).
    * * ``hpx.stacks.large_size``
-     * This is initialized to the large stack size to be used by |hpx|-threads.
+     * This is initialized to the large stack size to be used by |hpx| threads.
        Set by default to the value of the compile time preprocessor constant
        ``HPX_LARGE_STACK_SIZE`` (defaults to ``0x200000``). This setting is used
        by default for the thread running ``hpx_main`` only.
    * * ``hpx.stacks.huge_size``
-     * This is initialized to the huge stack size to be used by |hpx|-threads.
+     * This is initialized to the huge stack size to be used by |hpx| threads.
        Set by default to the value of the compile time preprocessor constant
        ``HPX_HUGE_STACK_SIZE`` (defaults to ``0x2000000``).
    * * ``hpx.stacks.use_guard_pages``
@@ -313,13 +313,13 @@ The ``hpx.threadpools`` configuration section
    * * Property
      * Description
    * * ``hpx.threadpools.io_pool_size``
-     * The value of this property defines the number of OS-threads created for
+     * The value of this property defines the number of OS threads created for
        the internal I/O thread pool.
    * * ``hpx.threadpools.parcel_pool_size``
-     * The value of this property defines the number of OS-threads created for
+     * The value of this property defines the number of OS threads created for
        the internal parcel thread pool.
    * * ``hpx.threadpools.timer_pool_size``
-     * The value of this property defines the number of OS-threads created for
+     * The value of this property defines the number of OS threads created for
        the internal timer thread pool.
 
 The ``hpx.thread_queue`` configuration section
@@ -383,7 +383,7 @@ The ``hpx.components`` configuration section
      * Description
    * * ``hpx.components.load_external``
      * This entry defines whether external components will be loaded on this
-       :term:`locality`. This entry is normally set to ``1`` and usually there is
+       :term:`locality`. This entry is normally set to ``1``, and usually there is
        no need to directly change this value. It is automatically set to ``0`` for
        a dedicated :term:`AGAS` server :term:`locality`.
 
@@ -451,7 +451,7 @@ The ``hpx.parcel`` configuration section
    * * ``hpx.parcel.address``
      * This property defines the default IP address to be used for the :term:`parcel`
        layer to listen to. This IP address will be used as long as no other
-       values are specified (for instance using the :option:`--hpx:hpx` command
+       values are specified (for instance, using the :option:`--hpx:hpx` command
        line option). The expected format is any valid IP address or domain name
        format that can be resolved into an IP address. The default depends on
        the compile time preprocessor constant ``HPX_INITIAL_IP_ADDRESS``
@@ -544,7 +544,7 @@ The following settings relate to the TCP/IP parcelport.
        encoding and decoding parcels). The default is the same value as set for
        ``hpx.parcel.async_serialization``.
    * * ``hpx.parcel.tcp.parcel_pool_size``
-     * The value of this property defines the number of OS-threads created for
+     * The value of this property defines the number of OS threads created for
        the internal parcel thread pool of the TCP :term:`parcel` port. The default is
        taken from ``hpx.threadpools.parcel_pool_size``.
    * * ``hpx.parcel.tcp.max_connections``
@@ -566,8 +566,8 @@ The following settings relate to the TCP/IP parcelport.
 
 The following settings relate to the MPI parcelport. These settings take effect
 only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` is set (the
-equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
-``ON``.
+equivalent CMake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
+``ON``).
 
 .. code-block:: ini
 
@@ -594,19 +594,19 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
    * * Property
      * Description
    * * ``hpx.parcel.mpi.enable``
-     * Enable the use of the MPI parcelport. HPX tries to detect if the
+     * Enables the use of the MPI parcelport. |HPX| tries to detect if the
        application was started within a parallel MPI environment. If the
        detection was succesful, the MPI parcelport is enabled by default. To
        explicitly disable the MPI parcelport, set to 0. Note that the initial
        bootstrap of the overall |hpx| application will be performed using MPI as
        well.
    * * ``hpx.parcel.mpi.env``
-     * This property influences which environment variables (comma separated)
+     * This property influences which environment variables (separated by commas)
        will be analyzed to find out whether the application was invoked by MPI.
    * * ``hpx.parcel.mpi.multithreaded``
      * This property is used to determine what threading mode to use when
-       initializing MPI. If this setting is ``0`` |hpx| will initialize MPI with
-       ``MPI_THREAD_SINGLE`` if the value is not equal to ``0`` |hpx| will
+       initializing MPI. If this setting is ``0``, |hpx| will initialize MPI with
+       ``MPI_THREAD_SINGLE``. If the value is not equal to ``0``, |hpx| will
        initialize MPI with ``MPI_THREAD_MULTI``.
    * * ``hpx.parcel.mpi.rank``
      * This property will be initialized to the MPI rank of the
@@ -625,7 +625,7 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
        parcel data. The default is the same value as set for
        ``hpx.parcel.zero_copy_optimization``.
    * * ``hpx.parcel.mpi.use_io_pool``
-     * This property can be set to run the progress thread inside of HPX threads
+     * This property can be set to run the progress thread inside of |HPX| threads
        instead of a separate thread pool. The default is ``1``.
    * * ``hpx.parcel.mpi.async_serialization``
      * This property defines whether this :term:`locality` is allowed to spawn a
@@ -633,24 +633,24 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
        encoding and decoding parcels). The default is the same value as set for
        ``hpx.parcel.async_serialization``.
    * * ``hpx.parcel.mpi.parcel_pool_size``
-     * The value of this property defines the number of OS-threads created for
+     * The value of this property defines the number of OS threads created for
        the internal parcel thread pool of the MPI :term:`parcel` port. The default is
        taken from ``hpx.threadpools.parcel_pool_size``.
    * * ``hpx.parcel.mpi.max_connections``
      * This property defines how many network connections between different
-       localities are overall kept alive by each of :term:`locality`. The
+       localities are overall kept alive by each :term:`locality`. The
        default is taken from ``hpx.parcel.max_connections``.
    * * ``hpx.parcel.mpi.max_connections_per_locality``
      * This property defines the maximum number of network connections that one
        :term:`locality` will open to another :term:`locality`. The default is
        taken from ``hpx.parcel.max_connections_per_locality``.
    * * ``hpx.parcel.mpi.max_message_size``
-     * This property defines the maximum allowed message size which will be
+     * This property defines the maximum allowed message size that will be
        transferrable through the :term:`parcel` layer. The default is taken from
        ``hpx.parcel.max_message_size``.
    * * ``hpx.parcel.mpi.max_outbound_message_size``
      * This property defines the maximum allowed outbound coalesced message size
-       which will be transferrable through the :term:`parcel` layer. The default is
+       that will be transferrable through the :term:`parcel` layer. The default is
        taken from ``hpx.parcel.max_outbound_connections``.
 
 The ``hpx.agas`` configuration section
@@ -680,15 +680,15 @@ The ``hpx.agas`` configuration section
    * * ``hpx.agas.address``
      * This property defines the default IP address to be used for the
        :term:`AGAS` root server. This IP address will be used as long as no
-       other values are specified (for instance using the :option:`--hpx:agas`
+       other values are specified (for instance, using the :option:`--hpx:agas`
        command line option). The expected format is any valid IP address or
-       domain name format which can be resolved into an IP address. The default
+       domain name format that can be resolved into an IP address. The default
        depends on the compile time preprocessor constant
        ``HPX_INITIAL_IP_ADDRESS`` (``"127.0.0.1"``).
    * * ``hpx.agas.port``
      * This property defines the default IP port to be used for the :term:`AGAS`
        root server. This IP port will be used as long as no other values are
-       specified (for instance using the :option:`--hpx:agas` command line
+       specified (for instance, using the :option:`--hpx:agas` command line
        option). The default depends on the compile time preprocessor constant
        ``HPX_INITIAL_IP_PORT`` (``7009``).
    * * ``hpx.agas.service_mode``
@@ -772,53 +772,53 @@ shortcuts. For more information about commandline options, see the section
      * Allow for unknown command line options to be passed through to
        ``hpx_main()`` Defaults to ``0``.
    * * ``hpx.commandline.aliases.-a``
-     * On the commandline, ``-a`` expands to: :option:`--hpx:agas`.
+     * On the commandline ``-a`` expands to: :option:`--hpx:agas`.
    * * ``hpx.commandline.aliases.-c``
-     * On the commandline, ``-c`` expands to: :option:`--hpx:console`.
+     * On the commandline ``-c`` expands to: :option:`--hpx:console`.
    * * ``hpx.commandline.aliases.-h``
-     * On the commandline, ``-h`` expands to: :option:`--hpx:help`.
+     * On the commandline ``-h`` expands to: :option:`--hpx:help`.
    * * ``hpx.commandline.aliases.--help``
-     * On the commandline, ``--help`` expands to: :option:`--hpx:help`.
+     * On the commandline ``--help`` expands to: :option:`--hpx:help`.
    * * ``hpx.commandline.aliases.-I``
-     * On the commandline, ``-I`` expands to: :option:`--hpx:ini`.
+     * On the commandline ``-I`` expands to: :option:`--hpx:ini`.
    * * ``hpx.commandline.aliases.-l``
-     * On the commandline, ``-l`` expands to: :option:`--hpx:localities`.
+     * On the commandline ``-l`` expands to: :option:`--hpx:localities`.
    * * ``hpx.commandline.aliases.-p``
-     * On the commandline, ``-p`` expands to: :option:`--hpx:app-config`.
+     * On the commandline ``-p`` expands to: :option:`--hpx:app-config`.
    * * ``hpx.commandline.aliases.-q``
-     * On the commandline, ``-q`` expands to: :option:`--hpx:queuing`.
+     * On the commandline ``-q`` expands to: :option:`--hpx:queuing`.
    * * ``hpx.commandline.aliases.-r``
-     * On the commandline, ``-r`` expands to: :option:`--hpx:run-agas-server`.
+     * On the commandline ``-r`` expands to: :option:`--hpx:run-agas-server`.
    * * ``hpx.commandline.aliases.-t``
-     * On the commandline, ``-t`` expands to: :option:`--hpx:threads`.
+     * On the commandline ``-t`` expands to: :option:`--hpx:threads`.
    * * ``hpx.commandline.aliases.-v``
-     * On the commandline, ``-v`` expands to: :option:`--hpx:version`.
+     * On the commandline ``-v`` expands to: :option:`--hpx:version`.
    * * ``hpx.commandline.aliases.--version``
-     * On the commandline, ``--version`` expands to: :option:`--hpx:version`.
+     * On the commandline ``--version`` expands to: :option:`--hpx:version`.
    * * ``hpx.commandline.aliases.-w``
-     * On the commandline, ``-w`` expands to: :option:`--hpx:worker`.
+     * On the commandline ``-w`` expands to: :option:`--hpx:worker`.
    * * ``hpx.commandline.aliases.-x``
-     * On the commandline, ``-x`` expands to: :option:`--hpx:hpx`.
+     * On the commandline ``-x`` expands to: :option:`--hpx:hpx`.
    * * ``hpx.commandline.aliases.-0``
-     * On the commandline, ``-0`` expands to: :option:`--hpx:node`\ ``=0``.
+     * On the commandline ``-0`` expands to: :option:`--hpx:node`\ ``=0``.
    * * ``hpx.commandline.aliases.-1``
-     * On the commandline, ``-1`` expands to: :option:`--hpx:node`\ ``=1``.
+     * On the commandline ``-1`` expands to: :option:`--hpx:node`\ ``=1``.
    * * ``hpx.commandline.aliases.-2``
-     * On the commandline, ``-2`` expands to: :option:`--hpx:node`\ ``=2``.
+     * On the commandline ``-2`` expands to: :option:`--hpx:node`\ ``=2``.
    * * ``hpx.commandline.aliases.-3``
-     * On the commandline, ``-3`` expands to: :option:`--hpx:node`\ ``=3``.
+     * On the commandline ``-3`` expands to: :option:`--hpx:node`\ ``=3``.
    * * ``hpx.commandline.aliases.-4``
-     * On the commandline, ``-4`` expands to: :option:`--hpx:node`\ ``=4``.
+     * On the commandline ``-4`` expands to: :option:`--hpx:node`\ ``=4``.
    * * ``hpx.commandline.aliases.-5``
-     * On the commandline, ``-5`` expands to: :option:`--hpx:node`\ ``=5``.
+     * On the commandline ``-5`` expands to: :option:`--hpx:node`\ ``=5``.
    * * ``hpx.commandline.aliases.-6``
-     * On the commandline, ``-6`` expands to: :option:`--hpx:node`\ ``=6``.
+     * On the commandline ``-6`` expands to: :option:`--hpx:node`\ ``=6``.
    * * ``hpx.commandline.aliases.-7``
-     * On the commandline, ``-7`` expands to: :option:`--hpx:node`\ ``=7``.
+     * On the commandline ``-7`` expands to: :option:`--hpx:node`\ ``=7``.
    * * ``hpx.commandline.aliases.-8``
-     * On the commandline, ``-8`` expands to: :option:`--hpx:node`\ ``=8``.
+     * On the commandline ``-8`` expands to: :option:`--hpx:node`\ ``=8``.
    * * ``hpx.commandline.aliases.-9``
-     * On the commandline, ``-9`` expands to: :option:`--hpx:node`\ ``=9``.
+     * On the commandline ``-9`` expands to: :option:`--hpx:node`\ ``=9``.
 
 .. _loading_ini_files:
 
