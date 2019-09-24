@@ -21,8 +21,8 @@
 #include <hpx/parallel/segmented_algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/segmented_algorithms/minmax.hpp>
 #include <hpx/parallel/segmented_algorithms/reduce.hpp>
-#include <hpx/parallel/segmented_algorithms/transform_exclusive_scan.hpp>
 #include <hpx/parallel/segmented_algorithms/transform.hpp>
+#include <hpx/parallel/segmented_algorithms/transform_exclusive_scan.hpp>
 #include <hpx/parallel/segmented_algorithms/transform_inclusive_scan.hpp>
 #include <hpx/parallel/segmented_algorithms/transform_reduce.hpp>
 

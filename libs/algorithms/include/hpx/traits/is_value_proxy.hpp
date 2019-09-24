@@ -12,9 +12,9 @@
 
 namespace hpx { namespace traits {
     template <typename T>
-    struct is_value_proxy
-      : std::false_type
-    {};
-}}
+    struct is_value_proxy : std::false_type
+    {
+    };
+}}    // namespace hpx::traits
 
 #endif

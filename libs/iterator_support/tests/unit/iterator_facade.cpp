@@ -11,9 +11,9 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/type_support/always_void.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/type_support/always_void.hpp>
 
 #include "iterator_tests.hpp"
 
@@ -25,16 +25,15 @@
 // iterators works properly.
 template <typename Ref>
 class counter_iterator
-  : public hpx::util::iterator_facade<
-        counter_iterator<Ref>
-      , int const
-      , std::input_iterator_tag
-      , Ref
-    >
+  : public hpx::util::iterator_facade<counter_iterator<Ref>, int const,
+        std::input_iterator_tag, Ref>
 {
- public:
+public:
     counter_iterator() {}
-    counter_iterator(int* state) : state(state) {}
+    counter_iterator(int* state)
+      : state(state)
+    {
+    }
 
     void increment()
     {
@@ -56,37 +55,38 @@ class counter_iterator
 
 struct proxy
 {
-    proxy(int& x) : state(x) {}
+    proxy(int& x)
+      : state(x)
+    {
+    }
 
     operator int const&() const
     {
         return state;
     }
 
-    int& operator=(int x) { state = x; return state; }
+    int& operator=(int x)
+    {
+        state = x;
+        return state;
+    }
 
     int& state;
 };
 
 struct value
 {
-    void mutator() {} // non-const member function
+    void mutator() {}    // non-const member function
 };
 
 struct input_iter
-  : hpx::util::iterator_facade<
-        input_iter
-      , value
-      , std::forward_iterator_tag
-      , value
-    >
+  : hpx::util::iterator_facade<input_iter, value, std::forward_iterator_tag,
+        value>
 {
- public:
+public:
     input_iter() {}
 
-    void increment()
-    {
-    }
+    void increment() {}
 
     value dereference() const
     {
@@ -104,37 +104,34 @@ struct wrapper
 {
     T m_x;
 
-    template <typename T_,
-        typename TD = typename std::decay<T_>::type,
+    template <typename T_, typename TD = typename std::decay<T_>::type,
         typename Enable =
             typename std::enable_if<!std::is_same<TD, wrapper<T>>::value>::type>
     explicit wrapper(T_&& x)
       : m_x(std::forward<T_>(x))
-    {}
+    {
+    }
 
     template <typename U>
     wrapper(const wrapper<U>& other,
-            typename std::enable_if<std::is_convertible<U, T>::value>::type* = 0)
+        typename std::enable_if<std::is_convertible<U, T>::value>::type* = 0)
       : m_x(other.m_x)
-    {}
+    {
+    }
 };
 
 struct iterator_with_proxy_reference
-  : hpx::util::iterator_facade<
-        iterator_with_proxy_reference
-      , wrapper<int>
-      , std::forward_iterator_tag
-      , wrapper<int&>
-    >
+  : hpx::util::iterator_facade<iterator_with_proxy_reference, wrapper<int>,
+        std::forward_iterator_tag, wrapper<int&>>
 {
     int& m_x;
 
     explicit iterator_with_proxy_reference(int& x)
       : m_x(x)
-    {}
+    {
+    }
 
-    void increment()
-    {}
+    void increment() {}
 
     reference dereference() const
     {

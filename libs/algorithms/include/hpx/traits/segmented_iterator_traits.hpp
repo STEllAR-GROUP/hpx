@@ -13,8 +13,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator, typename Enable = void>
     struct segmented_iterator_traits
@@ -25,7 +24,8 @@ namespace hpx { namespace traits
     template <typename Iterator, typename Enable>
     struct is_segmented_iterator
       : segmented_iterator_traits<Iterator>::is_segmented_iterator
-    {};
+    {
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // traits allowing to distinguish iterators which have a purely local
@@ -64,8 +64,8 @@ namespace hpx { namespace traits
     template <typename Iterator, typename Enable>
     struct is_segmented_local_iterator
       : segmented_local_iterator_traits<Iterator>::is_segmented_local_iterator
-    {};
-}}
+    {
+    };
+}}    // namespace hpx::traits
 
 #endif
-

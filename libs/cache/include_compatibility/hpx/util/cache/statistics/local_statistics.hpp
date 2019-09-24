@@ -9,11 +9,11 @@
 
 #if defined(HPX_CACHE_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/util/cache/statistics/local_statistics.hpp is deprecated, \
     please include hpx/cache/statistics/local_statistics.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/util/cache/statistics/local_statistics.hpp is deprecated, \
     please include hpx/cache/statistics/local_statistics.hpp instead"
 #endif

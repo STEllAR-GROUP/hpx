@@ -51,7 +51,7 @@ struct user_defined_type
     user_defined_type(int rand_no)
       : val(rand_no)
     {
-        std::uniform_int_distribution<> dist(0,name_list.size()-1);
+        std::uniform_int_distribution<> dist(0, name_list.size() - 1);
         name = name_list[dist(_gen)];
     }
 
@@ -94,16 +94,16 @@ struct user_defined_type
 };
 
 const std::vector<std::string> user_defined_type::name_list{
-    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"
-};
+    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill
 {
     random_fill() = default;
     random_fill(int rand_base, int range)
-      : gen(_gen()),
-        dist(rand_base - range / 2, rand_base + range / 2)
-    {}
+      : gen(_gen())
+      , dist(rand_base - range / 2, rand_base + range / 2)
+    {
+    }
 
     int operator()()
     {
@@ -115,9 +115,10 @@ struct random_fill
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag, typename DataType, typename Comp>
-void test_inplace_merge(ExPolicy policy, IteratorTag, DataType, Comp comp,
-    int rand_base)
+template <typename ExPolicy, typename IteratorTag, typename DataType,
+    typename Comp>
+void test_inplace_merge(
+    ExPolicy policy, IteratorTag, DataType, Comp comp, int rand_base)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -145,21 +146,19 @@ void test_inplace_merge(ExPolicy policy, IteratorTag, DataType, Comp comp,
     base_iterator sol_middle = sol_first + left_size;
     base_iterator sol_last = std::end(sol);
 
-    hpx::parallel::inplace_merge(policy,
-        iterator(res_first), iterator(res_middle), iterator(res_last),
-        comp);
-    std::inplace_merge(
-        sol_first, sol_middle, sol_last,
-        comp);
+    hpx::parallel::inplace_merge(policy, iterator(res_first),
+        iterator(res_middle), iterator(res_last), comp);
+    std::inplace_merge(sol_first, sol_middle, sol_last, comp);
 
     bool equality = test::equal(res_first, res_last, sol_first, sol_last);
 
     HPX_TEST(equality);
 }
 
-template <typename ExPolicy, typename IteratorTag, typename DataType, typename Comp>
-void test_inplace_merge_async(ExPolicy policy, IteratorTag, DataType, Comp comp,
-    int rand_base)
+template <typename ExPolicy, typename IteratorTag, typename DataType,
+    typename Comp>
+void test_inplace_merge_async(
+    ExPolicy policy, IteratorTag, DataType, Comp comp, int rand_base)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -187,13 +186,10 @@ void test_inplace_merge_async(ExPolicy policy, IteratorTag, DataType, Comp comp,
     base_iterator sol_middle = sol_first + left_size;
     base_iterator sol_last = std::end(sol);
 
-    auto f = hpx::parallel::inplace_merge(policy,
-        iterator(res_first), iterator(res_middle), iterator(res_last),
-        comp);
+    auto f = hpx::parallel::inplace_merge(policy, iterator(res_first),
+        iterator(res_middle), iterator(res_last), comp);
     f.get();
-    std::inplace_merge(
-        sol_first, sol_middle, sol_last,
-        comp);
+    std::inplace_merge(sol_first, sol_middle, sol_last, comp);
 
     bool equality = test::equal(res_first, res_last, sol_first, sol_last);
 
@@ -224,19 +220,21 @@ void test_inplace_merge_exception(ExPolicy policy, IteratorTag)
     std::sort(res_middle, res_last);
 
     bool caught_exception = false;
-    try {
-        auto result = hpx::parallel::inplace_merge(policy,
-            iterator(res_first), iterator(res_middle), iterator(res_last),
-            throw_always());
+    try
+    {
+        auto result = hpx::parallel::inplace_merge(policy, iterator(res_first),
+            iterator(res_middle), iterator(res_last), throw_always());
 
         HPX_UNUSED(result);
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -263,20 +261,22 @@ void test_inplace_merge_exception_async(ExPolicy policy, IteratorTag)
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f = hpx::parallel::inplace_merge(policy,
-            iterator(res_first), iterator(res_middle), iterator(res_last),
-            throw_always());
+    try
+    {
+        auto f = hpx::parallel::inplace_merge(policy, iterator(res_first),
+            iterator(res_middle), iterator(res_last), throw_always());
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -308,18 +308,20 @@ void test_inplace_merge_bad_alloc(ExPolicy policy, IteratorTag)
     std::sort(res_middle, res_last);
 
     bool caught_bad_alloc = false;
-    try {
-        auto result = hpx::parallel::inplace_merge(policy,
-            iterator(res_first), iterator(res_middle), iterator(res_last),
-            throw_bad_alloc());
+    try
+    {
+        auto result = hpx::parallel::inplace_merge(policy, iterator(res_first),
+            iterator(res_middle), iterator(res_last), throw_bad_alloc());
 
         HPX_UNUSED(result);
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -346,19 +348,21 @@ void test_inplace_merge_bad_alloc_async(ExPolicy policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
-    try{
-        auto f = hpx::parallel::inplace_merge(policy,
-            iterator(res_first), iterator(res_middle), iterator(res_last),
-            throw_bad_alloc());
+    try
+    {
+        auto f = hpx::parallel::inplace_merge(policy, iterator(res_first),
+            iterator(res_middle), iterator(res_last), throw_bad_alloc());
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -368,8 +372,8 @@ void test_inplace_merge_bad_alloc_async(ExPolicy policy, IteratorTag)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag, typename DataType>
-void test_inplace_merge_etc(ExPolicy policy, IteratorTag,
-    DataType, int rand_base)
+void test_inplace_merge_etc(
+    ExPolicy policy, IteratorTag, DataType, int rand_base)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -402,10 +406,9 @@ void test_inplace_merge_etc(ExPolicy policy, IteratorTag,
 
         sol = res = org;
 
-        hpx::parallel::inplace_merge(policy,
-            iterator(res_first), iterator(res_middle), iterator(res_last));
-        std::inplace_merge(
-            sol_first, sol_middle, sol_last);
+        hpx::parallel::inplace_merge(policy, iterator(res_first),
+            iterator(res_middle), iterator(res_last));
+        std::inplace_merge(sol_first, sol_middle, sol_last);
 
         bool equality = test::equal(res_first, res_last, sol_first, sol_last);
 
@@ -420,11 +423,10 @@ void test_inplace_merge_etc(ExPolicy policy, IteratorTag,
         sol = res = org;
 
         DataType val;
-        hpx::parallel::inplace_merge(policy,
-            iterator(res_first), iterator(res_middle), iterator(res_last),
-            [](DataType const& a, DataType const& b) -> bool {
-                return a < b;
-            },
+        hpx::parallel::inplace_merge(
+            policy, iterator(res_first), iterator(res_middle),
+            iterator(res_last),
+            [](DataType const& a, DataType const& b) -> bool { return a < b; },
             [&val](DataType const& elem) -> DataType& {
                 // This is projection.
                 return val;
@@ -440,8 +442,8 @@ void test_inplace_merge_etc(ExPolicy policy, IteratorTag,
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag, typename DataType>
-void test_inplace_merge_stable(ExPolicy policy, IteratorTag,
-    DataType, int rand_base)
+void test_inplace_merge_stable(
+    ExPolicy policy, IteratorTag, DataType, int rand_base)
 {
 #if defined(HPX_HAVE_STABLE_INPLACE_MERGE)
     static_assert(
@@ -463,23 +465,19 @@ void test_inplace_merge_stable(ExPolicy policy, IteratorTag,
 
     int no = 0;
     auto rf = random_fill(rand_base, 6);
-    std::generate(res_first, res_middle,
-        [&no, &rf]() -> std::pair<int, int> {
-            return { rf(), no++ };
-        });
+    std::generate(res_first, res_middle, [&no, &rf]() -> std::pair<int, int> {
+        return {rf(), no++};
+    });
     rf = random_fill(rand_base, 8);
-    std::generate(res_middle, res_last,
-        [&no, &rf]() -> std::pair<int, int> {
-            return { rf(), no++ };
-        });
+    std::generate(res_middle, res_last, [&no, &rf]() -> std::pair<int, int> {
+        return {rf(), no++};
+    });
     std::sort(res_first, res_middle);
     std::sort(res_middle, res_last);
 
-    hpx::parallel::inplace_merge(policy,
-        iterator(res_first), iterator(res_middle), iterator(res_last),
-        [](DataType const& a, DataType const& b) -> bool {
-            return a < b;
-        },
+    hpx::parallel::inplace_merge(
+        policy, iterator(res_first), iterator(res_middle), iterator(res_last),
+        [](DataType const& a, DataType const& b) -> bool { return a < b; },
         [](ElemType const& elem) -> DataType const& {
             // This is projection.
             return elem.first;
@@ -513,77 +511,77 @@ void test_inplace_merge()
     int rand_base = _gen();
 
     ////////// Test cases for 'int' type.
-    test_inplace_merge(execution::seq, IteratorTag(), int(),
-        [](const int a, const int b) -> bool {
-            return a < b;
-        }, rand_base);
-    test_inplace_merge(execution::par, IteratorTag(), int(),
-        [](const int a, const int b) -> bool {
-            return a < b;
-        }, rand_base);
-    test_inplace_merge(execution::par_unseq, IteratorTag(), int(),
-        [](const int a, const int b) -> bool {
-            return a > b;
-        }, rand_base);
+    test_inplace_merge(
+        execution::seq, IteratorTag(), int(),
+        [](const int a, const int b) -> bool { return a < b; }, rand_base);
+    test_inplace_merge(
+        execution::par, IteratorTag(), int(),
+        [](const int a, const int b) -> bool { return a < b; }, rand_base);
+    test_inplace_merge(
+        execution::par_unseq, IteratorTag(), int(),
+        [](const int a, const int b) -> bool { return a > b; }, rand_base);
 
     ////////// Test cases for user defined type.
-    test_inplace_merge(execution::seq, IteratorTag(), user_defined_type(),
+    test_inplace_merge(
+        execution::seq, IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {
             return a < b;
-        }, rand_base);
-    test_inplace_merge(execution::par, IteratorTag(), user_defined_type(),
+        },
+        rand_base);
+    test_inplace_merge(
+        execution::par, IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {
             return a > b;
-        }, rand_base);
-    test_inplace_merge(execution::par_unseq, IteratorTag(), user_defined_type(),
+        },
+        rand_base);
+    test_inplace_merge(
+        execution::par_unseq, IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {
             return a < b;
-        }, rand_base);
+        },
+        rand_base);
 
     ////////// Asynchronous test cases for 'int' type.
-    test_inplace_merge_async(execution::seq(execution::task), IteratorTag(), int(),
-        [](const int a, const int b) -> bool {
-            return a > b;
-        }, rand_base);
-    test_inplace_merge_async(execution::par(execution::task), IteratorTag(), int(),
-        [](const int a, const int b) -> bool {
-            return a > b;
-        }, rand_base);
+    test_inplace_merge_async(
+        execution::seq(execution::task), IteratorTag(), int(),
+        [](const int a, const int b) -> bool { return a > b; }, rand_base);
+    test_inplace_merge_async(
+        execution::par(execution::task), IteratorTag(), int(),
+        [](const int a, const int b) -> bool { return a > b; }, rand_base);
 
     ////////// Asynchronous test cases for user defined type.
-    test_inplace_merge_async(execution::seq(execution::task), IteratorTag(),
-        user_defined_type(),
+    test_inplace_merge_async(
+        execution::seq(execution::task), IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {
             return a < b;
-        }, rand_base);
-    test_inplace_merge_async(execution::par(execution::task), IteratorTag(),
-        user_defined_type(),
+        },
+        rand_base);
+    test_inplace_merge_async(
+        execution::par(execution::task), IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {
             return a < b;
-        }, rand_base);
+        },
+        rand_base);
 
     ////////// Another test cases for justifying the implementation.
-    test_inplace_merge_etc(execution::seq, IteratorTag(),
-        user_defined_type(), rand_base);
-    test_inplace_merge_etc(execution::par, IteratorTag(),
-        user_defined_type(), rand_base);
-    test_inplace_merge_etc(execution::par_unseq, IteratorTag(),
-        user_defined_type(), rand_base);
+    test_inplace_merge_etc(
+        execution::seq, IteratorTag(), user_defined_type(), rand_base);
+    test_inplace_merge_etc(
+        execution::par, IteratorTag(), user_defined_type(), rand_base);
+    test_inplace_merge_etc(
+        execution::par_unseq, IteratorTag(), user_defined_type(), rand_base);
 
     ////////// Test cases for checking whether the algorithm is stable.
-    test_inplace_merge_stable(execution::seq, IteratorTag(),
-        int(), rand_base);
-    test_inplace_merge_stable(execution::par, IteratorTag(),
-        int(), rand_base);
-    test_inplace_merge_stable(execution::par_unseq, IteratorTag(),
-        int(), rand_base);
-    test_inplace_merge_stable(execution::seq, IteratorTag(),
-        user_defined_type(), rand_base);
-    test_inplace_merge_stable(execution::par, IteratorTag(),
-        user_defined_type(), rand_base);
-    test_inplace_merge_stable(execution::par_unseq, IteratorTag(),
-        user_defined_type(), rand_base);
-
+    test_inplace_merge_stable(execution::seq, IteratorTag(), int(), rand_base);
+    test_inplace_merge_stable(execution::par, IteratorTag(), int(), rand_base);
+    test_inplace_merge_stable(
+        execution::par_unseq, IteratorTag(), int(), rand_base);
+    test_inplace_merge_stable(
+        execution::seq, IteratorTag(), user_defined_type(), rand_base);
+    test_inplace_merge_stable(
+        execution::par, IteratorTag(), user_defined_type(), rand_base);
+    test_inplace_merge_stable(
+        execution::par_unseq, IteratorTag(), user_defined_type(), rand_base);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -598,10 +596,10 @@ void test_inplace_merge_exception()
     test_inplace_merge_exception(execution::seq, IteratorTag());
     test_inplace_merge_exception(execution::par, IteratorTag());
 
-    test_inplace_merge_exception_async(execution::seq(execution::task),
-        IteratorTag());
-    test_inplace_merge_exception_async(execution::par(execution::task),
-        IteratorTag());
+    test_inplace_merge_exception_async(
+        execution::seq(execution::task), IteratorTag());
+    test_inplace_merge_exception_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -616,10 +614,10 @@ void test_inplace_merge_bad_alloc()
     test_inplace_merge_bad_alloc(execution::seq, IteratorTag());
     test_inplace_merge_bad_alloc(execution::par, IteratorTag());
 
-    test_inplace_merge_bad_alloc_async(execution::seq(execution::task),
-        IteratorTag());
-    test_inplace_merge_bad_alloc_async(execution::par(execution::task),
-        IteratorTag());
+    test_inplace_merge_bad_alloc_async(
+        execution::seq(execution::task), IteratorTag());
+    test_inplace_merge_bad_alloc_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 #endif

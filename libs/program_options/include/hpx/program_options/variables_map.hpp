@@ -211,7 +211,7 @@ namespace hpx { namespace program_options {
 
     inline bool variable_value::empty() const
     {
-        return v.empty();
+        return !v.has_value();
     }
 
     inline bool variable_value::defaulted() const

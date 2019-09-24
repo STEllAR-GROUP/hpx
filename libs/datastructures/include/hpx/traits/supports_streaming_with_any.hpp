@@ -10,15 +10,14 @@
 
 #include <type_traits>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for streaming with util::any
     template <typename T, typename Enable = void>
     struct supports_streaming_with_any
-      : std::true_type       // the default is to support streaming
-    {};
-}}
+      : std::true_type    // the default is to support streaming
+    {
+    };
+}}    // namespace hpx::traits
 
 #endif
-

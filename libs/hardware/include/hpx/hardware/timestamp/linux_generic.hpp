@@ -14,20 +14,17 @@
 
 #include <time.h>
 
-namespace hpx { namespace util { namespace hardware
-{
+namespace hpx { namespace util { namespace hardware {
 
-inline std::uint64_t timestamp()
-{
-    struct timespec res;
-    clock_gettime(CLOCK_MONOTONIC, &res);
-    return 1000*res.tv_sec + res.tv_nsec/1000000;
+    inline std::uint64_t timestamp()
+    {
+        struct timespec res;
+        clock_gettime(CLOCK_MONOTONIC, &res);
+        return 1000 * res.tv_sec + res.tv_nsec / 1000000;
+    }
 
-}
-
-}}}
+}}}    // namespace hpx::util::hardware
 
 #endif
 
-#endif // HPX_UTIL_HARDWARE_TIMESTAMP_LINUX_GENERIC_HPP
-
+#endif    // HPX_UTIL_HARDWARE_TIMESTAMP_LINUX_GENERIC_HPP

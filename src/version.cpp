@@ -145,6 +145,8 @@ namespace hpx
     {
         std::ostringstream strm;
 
+        strm << "Core library:\n";
+
         char const* const* p = hpx::config_strings;
         while (*p)
             strm << "  " << *p++ << "\n";
@@ -180,6 +182,20 @@ namespace hpx
             strm << "  HPX_PREFIX=" << util::find_prefix() << "\n";
 #endif
         }
+        strm << "\n";
+
+        // print module configurations
+        module_config_strings const* ms = hpx::config_strings_modules;
+        while (ms->name)
+        {
+            strm << "Module " << ms->name << ":\n";
+            char const* const* p = ms->config_strings;
+            while (*p)
+                strm << "  " << *p++ << "\n";
+            strm << "\n";
+            ++ms;
+        }
+
         return strm.str();
     }
 

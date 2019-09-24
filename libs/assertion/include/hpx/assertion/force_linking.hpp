@@ -12,8 +12,7 @@
 
 #include <string>
 
-namespace hpx { namespace assertion
-{
+namespace hpx { namespace assertion {
     struct force_linking_helper
     {
         void (*handle_assert)(
@@ -21,6 +20,6 @@ namespace hpx { namespace assertion
     };
 
     force_linking_helper& force_linking();
-}}
+}}    // namespace hpx::assertion
 
 #endif

@@ -9,12 +9,10 @@
 
 #if defined(HPX_PLUGIN_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/plugin/dll.hpp is deprecated, \
+#pragma message("The header hpx/util/plugin/dll.hpp is deprecated, \
     please include hpx/plugin/dll.hpp instead")
 #else
-#warning \
-    "The header hpx/util/plugin/dll.hpp is deprecated, \
+#warning "The header hpx/util/plugin/dll.hpp is deprecated, \
     please include hpx/plugin/dll.hpp instead"
 #endif
 #endif

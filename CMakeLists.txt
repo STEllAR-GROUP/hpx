@@ -340,7 +340,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 endif()
 
 hpx_option(HPX_WITH_IO_COUNTERS BOOL
-  "Build HPX runtime (default: ${HPX_WITH_IO_COUNTERS_DEFAULT})"
+  "Enable IO counters (default: ${HPX_WITH_IO_COUNTERS_DEFAULT})"
   ${HPX_WITH_IO_COUNTERS_DEFAULT} ADVANCED CATEGORY "Build Targets")
 if(HPX_WITH_IO_COUNTERS)
   hpx_add_config_define(HPX_HAVE_IO_COUNTERS)
@@ -488,6 +488,9 @@ hpx_option(HPX_WITH_MAX_CPU_COUNT STRING
 if(HPX_WITH_MAX_CPU_COUNT)
   hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
 endif()
+if((NOT HPX_WITH_MAX_CPU_COUNT) OR (HPX_WITH_MAX_CPU_COUNT GREATER 64))
+  hpx_add_config_define(HPX_HAVE_MORE_THAN_64_THREADS)
+endif()
 
 set(HPX_MAX_NUMA_DOMAIN_COUNT_DEFAULT "8")
 hpx_option(HPX_WITH_MAX_NUMA_DOMAIN_COUNT STRING
@@ -496,18 +499,13 @@ hpx_option(HPX_WITH_MAX_NUMA_DOMAIN_COUNT STRING
   CATEGORY "Thread Manager" ADVANCED)
 hpx_add_config_define(HPX_HAVE_MAX_NUMA_DOMAIN_COUNT ${HPX_WITH_MAX_NUMA_DOMAIN_COUNT})
 
-set(HPX_MORE_THAN_64_THREADS_DEFAULT OFF)
-if((NOT HPX_WITH_MAX_CPU_COUNT) OR (HPX_WITH_MAX_CPU_COUNT GREATER 64))
-  set(HPX_MORE_THAN_64_THREADS_DEFAULT ON)
-endif()
+# Deprecated in 1.4.0
 hpx_option(HPX_WITH_MORE_THAN_64_THREADS BOOL
-  "HPX applications will be able to run on more than 64 cores (default: ${HPX_MORE_THAN_64_THREADS_DEFAULT})"
-  ${HPX_MORE_THAN_64_THREADS_DEFAULT}
-  CATEGORY "Thread Manager" ADVANCED)
+  "HPX applications will be able to run on more than 64 cores (This variable is deprecated. The value is derived from HPX_MAX_CPU_COUNT instead.)"
+  "" CATEGORY "Thread Manager" ADVANCED)
 if(HPX_WITH_MORE_THAN_64_THREADS)
-  hpx_add_config_define(HPX_HAVE_MORE_THAN_64_THREADS)
+  hpx_warn("HPX_WITH_MORE_THAN_64_THREADS is deprecated. Instead use HPX_WITH_MAX_CPU_COUNT directly. If HPX_WITH_MAX_CPU_COUNT is greater than 64, or empty, HPX_HAVE_MORE_THAN_64_THREADS will be automatically set.")
 endif()
-
 hpx_option(HPX_WITH_THREAD_STACK_MMAP BOOL
   "Use mmap for stack allocation on appropriate platforms"
   ON
@@ -600,6 +598,13 @@ hpx_option(HPX_WITH_THREAD_STEALING_COUNTS BOOL
 
 if(HPX_WITH_THREAD_STEALING_COUNTS)
   hpx_add_config_define(HPX_HAVE_THREAD_STEALING_COUNTS)
+endif()
+
+hpx_option(HPX_WITH_COROUTINE_COUNTERS BOOL
+  "Enable keeping track of coroutine creation and rebind counts (default: OFF)"
+   OFF CATEGORY "Thread Manager" ADVANCED)
+if(HPX_WITH_COROUTINE_COUNTERS)
+  hpx_add_config_define(HPX_HAVE_COROUTINE_COUNTERS)
 endif()
 
 hpx_option(HPX_WITH_THREAD_LOCAL_STORAGE BOOL
@@ -2126,6 +2131,12 @@ endif()
 ################################################################################
 # print overall configuration summary
 include(HPX_PrintSummary)
+create_configuration_summary("Configuration summary:" "hpx")
+
+foreach(_module ${HPX_LIBS})
+  create_configuration_summary(
+    "Module configuration summary (${_module}):" "${_module}")
+endforeach()
 
 ################################################################################
 # External build system support (FindHPX.cmake and pkg-config).

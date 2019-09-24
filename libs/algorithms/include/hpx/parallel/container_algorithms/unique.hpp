@@ -23,8 +23,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /// Eliminates all but the first element from every consecutive group of
     /// equivalent elements from the range \a rng and returns a
     /// past-the-end iterator for the new logical end of the range.
@@ -89,28 +88,20 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           The \a unique algorithm returns the iterator to the new end
     ///           of the range.
     ///
-    template <typename ExPolicy, typename Rng,
-        typename Pred = detail::equal_to,
+    template <typename ExPolicy, typename Rng, typename Pred = detail::equal_to,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Pred,
-            traits::projected_range<Proj, Rng>,
-            traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
-        typename hpx::traits::range_iterator<Rng>::type
-    >::type
-    unique(ExPolicy && policy, Rng && rng,
-        Pred && pred = Pred(), Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    Pred, traits::projected_range<Proj, Rng>,
+                    traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_iterator<Rng>::type>::type
+    unique(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
+        Proj&& proj = Proj())
     {
-        return unique(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng),
-            std::forward<Pred>(pred),
+        return unique(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), std::forward<Pred>(pred),
             std::forward<Proj>(proj));
     }
 
@@ -190,31 +181,23 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename Rng, typename FwdIter2,
         typename Pred = detail::equal_to,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        hpx::traits::is_iterator<FwdIter2>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Pred,
-            traits::projected_range<Proj, Rng>,
-            traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
+                    FwdIter2>::value&& traits::is_projected_range<Proj,
+                    Rng>::value&& traits::is_indirect_callable<ExPolicy, Pred,
+                    traits::projected_range<Proj, Rng>,
+                    traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<
             tag::in(typename hpx::traits::range_iterator<Rng>::type),
-            tag::out(FwdIter2)>
-    >::type
-    unique_copy(ExPolicy && policy, Rng && rng,
-        FwdIter2 dest, Pred && pred = Pred(),
-        Proj && proj = Proj())
+            tag::out(FwdIter2)>>::type
+    unique_copy(ExPolicy&& policy, Rng&& rng, FwdIter2 dest,
+        Pred&& pred = Pred(), Proj&& proj = Proj())
     {
         return unique_copy(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), hpx::util::end(rng), dest,
-            std::forward<Pred>(pred),
-            std::forward<Proj>(proj));
+            std::forward<Pred>(pred), std::forward<Proj>(proj));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

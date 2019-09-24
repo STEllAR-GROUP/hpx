@@ -4,9 +4,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/partitioned_vector_predef.hpp>
-#include <hpx/include/parallel_move.hpp>
 #include <hpx/include/parallel_for_each.hpp>
+#include <hpx/include/parallel_move.hpp>
+#include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/transfer.hpp>
 
 #include <hpx/testing.hpp>
@@ -111,16 +111,16 @@ void move_algo_tests_with_policy_async(std::size_t size, std::size_t localities,
     using hpx::parallel::execution::task;
 
     hpx::partitioned_vector<T> v3(size, policy);
-    auto f = hpx::parallel::move(move_policy(task),
-        v2.begin(), v2.end(), v3.begin());
+    auto f = hpx::parallel::move(
+        move_policy(task), v2.begin(), v2.end(), v3.begin());
 
     HPX_TEST(f.get().out() == v3.end());
     compare_vectors(v1, v3);
 }
 
 template <typename T, typename DistPolicy>
-void move_tests_with_policy(std::size_t size, std::size_t localities,
-    DistPolicy const& policy, T value)
+void move_tests_with_policy(
+    std::size_t size, std::size_t localities, DistPolicy const& policy, T value)
 {
     hpx::partitioned_vector<T> v1(size, policy);
 
@@ -177,9 +177,10 @@ void move_tests(T value, T other_value)
 
     move_tests_with_policy<T>(length, 1, hpx::container_layout, value);
     move_tests_with_policy<T>(length, 3, hpx::container_layout(3), value);
-    move_tests_with_policy<T>(length, 3, hpx::container_layout(3, localities), value);
-    move_tests_with_policy<T>(length, localities.size(),
-    hpx::container_layout(localities), value);
+    move_tests_with_policy<T>(
+        length, 3, hpx::container_layout(3, localities), value);
+    move_tests_with_policy<T>(
+        length, localities.size(), hpx::container_layout(localities), value);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -191,4 +192,3 @@ int main()
 
     return 0;
 }
-

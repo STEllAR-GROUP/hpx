@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_reduce.hpp>
 #include <hpx/testing.hpp>
 
@@ -36,13 +36,10 @@ void test_reduce1(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t val(42);
-    auto op =
-        [val](std::size_t v1, std::size_t v2) {
-            return v1 + v2 + val;
-        };
+    auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2 + val; };
 
-    std::size_t r1 = hpx::parallel::reduce(policy,
-        iterator(std::begin(c)), iterator(std::end(c)), val, op);
+    std::size_t r1 = hpx::parallel::reduce(
+        policy, iterator(std::begin(c)), iterator(std::end(c)), val, op);
 
     // verify values
     std::size_t r2 = std::accumulate(std::begin(c), std::end(c), val, op);
@@ -59,14 +56,10 @@ void test_reduce1_async(ExPolicy p, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t val(42);
-    auto op =
-        [val](std::size_t v1, std::size_t v2) {
-            return v1 + v2 + val;
-        };
+    auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2 + val; };
 
-    hpx::future<std::size_t> f =
-        hpx::parallel::reduce(p,
-            iterator(std::begin(c)), iterator(std::end(c)), val, op);
+    hpx::future<std::size_t> f = hpx::parallel::reduce(
+        p, iterator(std::begin(c)), iterator(std::end(c)), val, op);
     f.wait();
 
     // verify values
@@ -108,8 +101,8 @@ void test_reduce2(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t const val(42);
-    std::size_t r1 = hpx::parallel::reduce(policy,
-        iterator(std::begin(c)), iterator(std::end(c)), val);
+    std::size_t r1 = hpx::parallel::reduce(
+        policy, iterator(std::begin(c)), iterator(std::end(c)), val);
 
     // verify values
     std::size_t r2 = std::accumulate(std::begin(c), std::end(c), val);
@@ -126,9 +119,8 @@ void test_reduce2_async(ExPolicy p, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t const val(42);
-    hpx::future<std::size_t> f =
-        hpx::parallel::reduce(p,
-            iterator(std::begin(c)), iterator(std::end(c)), val);
+    hpx::future<std::size_t> f = hpx::parallel::reduce(
+        p, iterator(std::begin(c)), iterator(std::end(c)), val);
     f.wait();
 
     // verify values
@@ -169,11 +161,12 @@ void test_reduce3(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    std::size_t r1 = hpx::parallel::reduce(policy,
-        iterator(std::begin(c)), iterator(std::end(c)));
+    std::size_t r1 = hpx::parallel::reduce(
+        policy, iterator(std::begin(c)), iterator(std::end(c)));
 
     // verify values
-    std::size_t r2 = std::accumulate(std::begin(c), std::end(c), std::size_t(0));
+    std::size_t r2 =
+        std::accumulate(std::begin(c), std::end(c), std::size_t(0));
     HPX_TEST_EQ(r1, r2);
 }
 
@@ -186,13 +179,13 @@ void test_reduce3_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::future<std::size_t> f =
-        hpx::parallel::reduce(p,
-            iterator(std::begin(c)), iterator(std::end(c)));
+    hpx::future<std::size_t> f = hpx::parallel::reduce(
+        p, iterator(std::begin(c)), iterator(std::end(c)));
     f.wait();
 
     // verify values
-    std::size_t r2 = std::accumulate(std::begin(c), std::end(c), std::size_t(0));
+    std::size_t r2 =
+        std::accumulate(std::begin(c), std::end(c), std::size_t(0));
     HPX_TEST_EQ(f.get(), r2);
 }
 
@@ -230,21 +223,23 @@ void test_reduce_exception(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
-    try {
-        hpx::parallel::reduce(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            std::size_t(42),
+    try
+    {
+        hpx::parallel::reduce(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), v1 + v2;
             });
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -262,24 +257,25 @@ void test_reduce_exception_async(ExPolicy p, IteratorTag)
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        hpx::future<void> f =
-            hpx::parallel::reduce(p,
-                iterator(std::begin(c)), iterator(std::end(c)),
-                std::size_t(42),
-                [](std::size_t v1, std::size_t v2) {
-                    return throw std::runtime_error("test"), v1 + v2;
-                });
+    try
+    {
+        hpx::future<void> f = hpx::parallel::reduce(p, iterator(std::begin(c)),
+            iterator(std::end(c)), std::size_t(42),
+            [](std::size_t v1, std::size_t v2) {
+                return throw std::runtime_error("test"), v1 + v2;
+            });
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -323,20 +319,22 @@ void test_reduce_bad_alloc(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
-    try {
-        hpx::parallel::reduce(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            std::size_t(42),
+    try
+    {
+        hpx::parallel::reduce(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), v1 + v2;
             });
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_exception = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -354,23 +352,24 @@ void test_reduce_bad_alloc_async(ExPolicy p, IteratorTag)
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        hpx::future<void> f =
-            hpx::parallel::reduce(p,
-                iterator(std::begin(c)), iterator(std::end(c)),
-                std::size_t(42),
-                [](std::size_t v1, std::size_t v2) {
-                    return throw std::bad_alloc(), v1 + v2;
-                });
+    try
+    {
+        hpx::future<void> f = hpx::parallel::reduce(p, iterator(std::begin(c)),
+            iterator(std::end(c)), std::size_t(42),
+            [](std::size_t v1, std::size_t v2) {
+                return throw std::bad_alloc(), v1 + v2;
+            });
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_exception = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -402,7 +401,7 @@ void reduce_bad_alloc_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -425,14 +424,10 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

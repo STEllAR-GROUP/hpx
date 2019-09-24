@@ -9,12 +9,10 @@
 
 #if defined(HPX_CACHE_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/cache/entries/entry.hpp is deprecated, \
+#pragma message("The header hpx/util/cache/entries/entry.hpp is deprecated, \
     please include hpx/cache/entries/entry.hpp instead")
 #else
-#warning \
-    "The header hpx/util/cache/entries/entry.hpp is deprecated, \
+#warning "The header hpx/util/cache/entries/entry.hpp is deprecated, \
     please include hpx/cache/entries/entry.hpp instead"
 #endif
 #endif

@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_adjacent_find.hpp>
 #include <hpx/testing.hpp>
 
@@ -20,8 +20,8 @@
 ////////////////////////////////////////////////////////////////////////////
 unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
-std::uniform_int_distribution<> dis(2,101);
-std::uniform_int_distribution<> dist(2,10005);
+std::uniform_int_distribution<> dis(2, 101);
+std::uniform_int_distribution<> dist(2, 10005);
 
 template <typename ExPolicy, typename IteratorTag>
 void test_adjacent_find(ExPolicy policy, IteratorTag)
@@ -37,13 +37,13 @@ void test_adjacent_find(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), dis(gen));
 
-    std::size_t random_pos = dist(gen); //-V101
+    std::size_t random_pos = dist(gen);    //-V101
 
     c[random_pos] = 1;
     c[random_pos + 1] = 1;
 
-    iterator index = hpx::parallel::adjacent_find(policy,
-        iterator(std::begin(c)), iterator(std::end(c)));
+    iterator index = hpx::parallel::adjacent_find(
+        policy, iterator(std::begin(c)), iterator(std::end(c)));
 
     base_iterator test_index = std::begin(c) + random_pos;
 
@@ -60,14 +60,13 @@ void test_adjacent_find_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), dis(gen));
 
-    std::size_t random_pos = dist(gen); //-V101
+    std::size_t random_pos = dist(gen);    //-V101
 
     c[random_pos] = 1;
     c[random_pos + 1] = 1;
 
-    hpx::future<iterator> f =
-        hpx::parallel::adjacent_find(p,
-            iterator(std::begin(c)), iterator(std::end(c)));
+    hpx::future<iterator> f = hpx::parallel::adjacent_find(
+        p, iterator(std::begin(c)), iterator(std::end(c)));
     f.wait();
 
     // create iterator at position of value to be found
@@ -113,15 +112,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

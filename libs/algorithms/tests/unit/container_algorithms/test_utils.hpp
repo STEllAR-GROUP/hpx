@@ -18,44 +18,54 @@
 #include <utility>
 #include <vector>
 
-namespace test
-{
+namespace test {
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseIterator, typename IteratorTag>
     struct test_iterator
-      : hpx::util::iterator_adaptor<
-            test_iterator<BaseIterator, IteratorTag>,
+      : hpx::util::iterator_adaptor<test_iterator<BaseIterator, IteratorTag>,
             BaseIterator, void, IteratorTag>
     {
     private:
         typedef hpx::util::iterator_adaptor<
-            test_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, void, IteratorTag>
-        base_type;
+            test_iterator<BaseIterator, IteratorTag>, BaseIterator, void,
+            IteratorTag>
+            base_type;
 
     public:
-        test_iterator() : base_type() {}
-        test_iterator(BaseIterator base) : base_type(base) {}
+        test_iterator()
+          : base_type()
+        {
+        }
+        test_iterator(BaseIterator base)
+          : base_type(base)
+        {
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseContainer, typename IteratorTag>
     struct test_container : BaseContainer
     {
-        template <typename ... Ts>
-        test_container(Ts && ...ts)
+        template <typename... Ts>
+        test_container(Ts&&... ts)
           : BaseContainer(std::forward<Ts>(ts)...)
-        {}
+        {
+        }
 
-        BaseContainer& base() { return *this; }
-        BaseContainer const& base() const { return *this; }
+        BaseContainer& base()
+        {
+            return *this;
+        }
+        BaseContainer const& base() const
+        {
+            return *this;
+        }
 
-        typedef test_iterator<
-                typename BaseContainer::iterator, IteratorTag
-            > iterator;
-        typedef test_iterator<
-                typename BaseContainer::const_iterator, IteratorTag
-            > const_iterator;
+        typedef test_iterator<typename BaseContainer::iterator, IteratorTag>
+            iterator;
+        typedef test_iterator<typename BaseContainer::const_iterator,
+            IteratorTag>
+            const_iterator;
 
         iterator begin()
         {
@@ -88,26 +98,28 @@ namespace test
     template <typename BaseIterator, typename IteratorTag>
     struct decorated_iterator
       : hpx::util::iterator_adaptor<
-            decorated_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, void, IteratorTag>
+            decorated_iterator<BaseIterator, IteratorTag>, BaseIterator, void,
+            IteratorTag>
     {
     private:
         typedef hpx::util::iterator_adaptor<
-            decorated_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, void, IteratorTag>
-        base_type;
+            decorated_iterator<BaseIterator, IteratorTag>, BaseIterator, void,
+            IteratorTag>
+            base_type;
 
     public:
-        decorated_iterator()
-        {}
+        decorated_iterator() {}
 
         decorated_iterator(BaseIterator base)
           : base_type(base)
-        {}
+        {
+        }
 
         decorated_iterator(BaseIterator base, std::function<void()> f)
-          : base_type(base), m_callback(f)
-        {}
+          : base_type(base)
+          , m_callback(f)
+        {
+        }
 
     private:
         friend class hpx::util::iterator_core_access;
@@ -172,8 +184,8 @@ namespace test
     };
 
     template <typename IteratorTag>
-    struct test_num_exceptions<
-        hpx::parallel::execution::sequenced_policy, IteratorTag>
+    struct test_num_exceptions<hpx::parallel::execution::sequenced_policy,
+        IteratorTag>
     {
         static void call(hpx::parallel::execution::sequenced_policy const&,
             hpx::exception_list const& e)
@@ -192,8 +204,8 @@ namespace test
     };
 
     template <>
-    struct test_num_exceptions<
-        hpx::parallel::execution::sequenced_policy, std::input_iterator_tag>
+    struct test_num_exceptions<hpx::parallel::execution::sequenced_policy,
+        std::input_iterator_tag>
     {
         static void call(hpx::parallel::execution::sequenced_policy const&,
             hpx::exception_list const& e)
@@ -239,32 +251,26 @@ namespace test
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void make_ready(std::vector<hpx::promise<std::size_t> >& p,
+    inline void make_ready(std::vector<hpx::promise<std::size_t>>& p,
         std::vector<std::size_t>& idx)
     {
         std::for_each(std::begin(idx), std::end(idx),
-            [&p](std::size_t i)
-            {
-                p[i].set_value(i);
-            });
+            [&p](std::size_t i) { p[i].set_value(i); });
     }
 
-    inline std::vector<hpx::future<std::size_t> > fill_with_futures(
-        std::vector<hpx::promise<std::size_t> >& p)
+    inline std::vector<hpx::future<std::size_t>> fill_with_futures(
+        std::vector<hpx::promise<std::size_t>>& p)
     {
-        std::vector<hpx::future<std::size_t> > f;
+        std::vector<hpx::future<std::size_t>> f;
         std::transform(std::begin(p), std::end(p), std::back_inserter(f),
-            [](hpx::promise<std::size_t>& pr)
-            {
-                return pr.get_future();
-            });
+            [](hpx::promise<std::size_t>& pr) { return pr.get_future(); });
 
         return f;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline std::vector<std::size_t>
-    fill_all_any_none(std::size_t size, std::size_t num_filled)
+    inline std::vector<std::size_t> fill_all_any_none(
+        std::size_t size, std::size_t num_filled)
     {
         if (num_filled == 0)
             return std::vector<std::size_t>(size, 0);
@@ -275,7 +281,7 @@ namespace test
         std::vector<std::size_t> c(size, 0);
         for (std::size_t i = 0; i < num_filled; /**/)
         {
-            std::size_t pos = std::rand() % c.size(); //-V104
+            std::size_t pos = std::rand() % c.size();    //-V104
             if (c[pos])
                 continue;
 
@@ -287,14 +293,14 @@ namespace test
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename InputIter1, typename InputIter2>
-    bool equal(InputIter1 first1, InputIter1 last1,
-        InputIter2 first2, InputIter2 last2)
+    bool equal(InputIter1 first1, InputIter1 last1, InputIter2 first2,
+        InputIter2 last2)
     {
         if (std::distance(first1, last1) != std::distance(first2, last2))
             return false;
 
         return std::equal(first1, last1, first2);
     }
-}
+}    // namespace test
 
 #endif

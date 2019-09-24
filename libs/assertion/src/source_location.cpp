@@ -14,4 +14,4 @@ namespace hpx { namespace assertion {
            << loc.function_name;
         return os;
     }
-}}
+}}    // namespace hpx::assertion

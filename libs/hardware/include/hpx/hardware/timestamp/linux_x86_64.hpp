@@ -10,30 +10,30 @@
 
 #include <cstdint>
 
-namespace hpx { namespace util { namespace hardware
-{
+namespace hpx { namespace util { namespace hardware {
 
-inline std::uint64_t timestamp()
-{
-    std::uint32_t lo = 0, hi = 0;
-    #if defined(HPX_HAVE_RDTSCP)
-        __asm__ __volatile__ (
-            "rdtscp ;\n"
-            : "=a" (lo), "=d" (hi)
-            :
-            : "rcx");
-    #elif defined(HPX_HAVE_RDTSC)
-        __asm__ __volatile__ (
-            "cpuid ;\n"
-            "rdtsc ;\n"
-            : "=a" (lo), "=d" (hi)
-            :
-            : "rbx", "rcx");
-    #endif
-    return ((static_cast<std::uint64_t>(hi)) << 32) | lo;
-}
+    // clang-format off
+    inline std::uint64_t timestamp()
+    {
+        std::uint32_t lo = 0, hi = 0;
+        #if defined(HPX_HAVE_RDTSCP)
+            __asm__ __volatile__(
+                "rdtscp ;\n"
+                : "=a"(lo), "=d"(hi)
+                :
+                : "rcx");
+        #elif defined(HPX_HAVE_RDTSC)
+            __asm__ __volatile__(
+                "cpuid ;\n"
+                "rdtsc ;\n"
+                : "=a"(lo), "=d"(hi)
+                :
+                : "rbx", "rcx");
+        #endif
+        return ((static_cast<std::uint64_t>(hi)) << 32) | lo;
+    }
+    // clang-format on
 
-}}}
+}}}    // namespace hpx::util::hardware
 
-#endif // HPX_E0A61B00_A571_48EF_8516_ECB48CDDBC00
-
+#endif    // HPX_E0A61B00_A571_48EF_8516_ECB48CDDBC00

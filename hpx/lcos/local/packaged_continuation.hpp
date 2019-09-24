@@ -313,8 +313,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     protected:
-        threads::thread_result_type
-        async_impl(
+        void async_impl(
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f)
@@ -323,12 +322,9 @@ namespace hpx { namespace lcos { namespace detail
 
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation(f_, std::move(future), *this);
-            return threads::thread_result_type(threads::terminated,
-                    threads::invalid_thread_id);
         }
 
-        threads::thread_result_type
-        async_impl_nounwrap(
+        void async_impl_nounwrap(
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f)
@@ -341,12 +337,9 @@ namespace hpx { namespace lcos { namespace detail
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation_nounwrap(
                 f_, std::move(future), *this, is_void{});
-            return threads::thread_result_type(threads::terminated,
-                    threads::invalid_thread_id);
         }
 
-        threads::thread_result_type
-        async_exec_impl(
+        void async_exec_impl(
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f)
@@ -359,8 +352,6 @@ namespace hpx { namespace lcos { namespace detail
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation_nounwrap(
                 f_, std::move(future), *this, is_void{});
-            return threads::thread_result_type(threads::terminated,
-                threads::invalid_thread_id);
         }
 
     public:
@@ -393,8 +384,8 @@ namespace hpx { namespace lcos { namespace detail
                 >::call(desc, hpx::launch::async,
                     [HPX_CAPTURE_MOVE(this_),
                         HPX_CAPTURE_MOVE(f)
-                    ]() mutable -> threads::thread_result_type {
-                        return this_->async_impl(std::move(f));
+                    ]() mutable -> void {
+                        this_->async_impl(std::move(f));
                     });
 
             if (&ec != &throws)
@@ -439,8 +430,8 @@ namespace hpx { namespace lcos { namespace detail
                 >::call(desc, hpx::launch::async,
                     [HPX_CAPTURE_MOVE(this_),
                         HPX_CAPTURE_MOVE(f)
-                    ]() mutable -> threads::thread_result_type {
-                        return this_->async_impl_nounwrap(std::move(f));
+                    ]() mutable -> void {
+                        this_->async_impl_nounwrap(std::move(f));
                     });
 
             if (&ec != &throws)
@@ -480,8 +471,8 @@ namespace hpx { namespace lcos { namespace detail
             parallel::execution::post(std::forward<Executor>(exec),
                 [HPX_CAPTURE_MOVE(this_),
                     HPX_CAPTURE_MOVE(f)
-                ]() mutable -> threads::thread_result_type {
-                    return this_->async_exec_impl(std::move(f));
+                ]() mutable -> void {
+                    this_->async_exec_impl(std::move(f));
                 });
 
             if (&ec != &throws)

@@ -8,6 +8,5 @@
 // suppress warnings about dependent classes not being exported from the dll
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
-#pragma warning(disable: 4251 4231 4275 4660)
+#pragma warning(disable : 4251 4231 4275 4660)
 #endif
-

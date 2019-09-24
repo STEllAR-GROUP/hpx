@@ -47,6 +47,8 @@
 #define _WINSOCKAPI_
 #endif
 
+// clang-format off
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the default ip/port number used by the parcel subsystem
 #define HPX_INITIAL_IP_PORT         7910
@@ -494,5 +496,7 @@
 #define HPX_AGAS_SYMBOL_NS_LSB                       0x0000000000000003ULL
 #define HPX_AGAS_LOCALITY_NS_MSB                     0x0000000100000001ULL
 #define HPX_AGAS_LOCALITY_NS_LSB                     0x0000000000000004ULL
+
+// clang-format on
 
 #endif

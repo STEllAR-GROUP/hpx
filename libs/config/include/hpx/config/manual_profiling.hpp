@@ -8,6 +8,7 @@
 #if !defined(HPX_8877B5FB_1967_43B9_AF98_1A01F162B725)
 #define HPX_8877B5FB_1967_43B9_AF98_1A01F162B725
 
+// clang-format off
 #if defined(__GNUC__)
   #define HPX_SUPER_PURE  __attribute__((const))
   #define HPX_PURE        __attribute__((pure))
@@ -19,6 +20,6 @@
   #define HPX_HOT
   #define HPX_COLD
 #endif
+// clang-format on
 
-#endif // HPX_8877B5FB_1967_43B9_AF98_1A01F162B725
-
+#endif    // HPX_8877B5FB_1967_43B9_AF98_1A01F162B725

@@ -37,15 +37,18 @@ set(type_support_sources)
 
 include(HPX_AddModule)
 add_hpx_module(type_support
-    COMPATIBILITY_HEADERS ON
-    DEPRECATION_WARNINGS
-    FORCE_LINKING_GEN
-    GLOBAL_HEADER_GEN ON
-    EXCLUDE_FROM_GLOBAL_HEADER
-      "traits/detail/wrap_int.hpp"
-    SOURCES ${type_support_sources}
-    HEADERS ${type_support_headers}
-    COMPAT_HEADERS ${type_support_compat_headers}
-    DEPENDENCIES hpx_config
-    CMAKE_SUBDIRS examples tests
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
+  FORCE_LINKING_GEN
+  GLOBAL_HEADER_GEN ON
+  EXCLUDE_FROM_GLOBAL_HEADER
+    "traits/detail/wrap_int.hpp"
+  SOURCES ${type_support_sources}
+  HEADERS ${type_support_headers}
+  COMPAT_HEADERS ${type_support_compat_headers}
+  DEPENDENCIES
+    hpx_assertion
+    hpx_config
+    hpx_concepts
+  CMAKE_SUBDIRS examples tests
 )

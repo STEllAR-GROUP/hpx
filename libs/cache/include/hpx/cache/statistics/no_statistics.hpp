@@ -11,8 +11,7 @@
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache { namespace statistics
-{
+namespace hpx { namespace util { namespace cache { namespace statistics {
     ///////////////////////////////////////////////////////////////////////////
     enum method
     {
@@ -109,7 +108,6 @@ namespace hpx { namespace util { namespace cache { namespace statistics
             return 0;
         }
     };
-}}}}
+}}}}    // namespace hpx::util::cache::statistics
 
 #endif
-

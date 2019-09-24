@@ -56,6 +56,6 @@ namespace hpx { namespace util {
         std::uint64_t started_at_;
         T* t_;
     };
-}}
+}}    // namespace hpx::util
 
 #endif

@@ -12,28 +12,25 @@
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/type_support/always_void.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/type_support/always_void.hpp>
 
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
 
-namespace tests
-{
-    class dummy_constructor {};
+namespace tests {
+    class dummy_constructor
+    {
+    };
 
     // use this for the value type
     struct dummy_type
     {
-        dummy_type()
-        {
-        }
+        dummy_type() {}
 
-        dummy_type(dummy_constructor)
-        {
-        }
+        dummy_type(dummy_constructor) {}
 
         dummy_type(int x)
           : x_(x)
@@ -89,10 +86,10 @@ namespace tests
         // The following works for istream_iterator but is not
         // guaranteed to work for arbitrary input iterators.
         //
-        //   Iterator i2;
+        //Iterator i2;
         //
-        //   HPX_TEST(i != i2);
-        //   HPX_TEST(!(i == i2));
+        //HPX_TEST(i != i2);
+        //HPX_TEST(!(i == i2));
 
         HPX_TEST(*i1 == v1);
         HPX_TEST(*i == v1);
@@ -115,34 +112,31 @@ namespace tests
         // how to test for operator-> ?
     }
 
-    namespace traits
-    {
+    namespace traits {
         template <typename T, typename Enable = void>
-        struct is_incrementable
-          : std::false_type
-        {};
+        struct is_incrementable : std::false_type
+        {
+        };
 
         template <typename T>
         struct is_incrementable<T,
-                typename hpx::util::always_void<
-                    decltype(++std::declval<T&>())
-                >::type>
-          : std::true_type
-        {};
+            typename hpx::util::always_void<decltype(
+                ++std::declval<T&>())>::type> : std::true_type
+        {
+        };
 
         template <typename T, typename Enable = void>
-        struct is_postfix_incrementable
-          : std::false_type
-        {};
+        struct is_postfix_incrementable : std::false_type
+        {
+        };
 
         template <typename T>
         struct is_postfix_incrementable<T,
-                typename hpx::util::always_void<
-                    decltype(std::declval<T&>()++)
-                >::type>
-          : std::true_type
-        {};
-    }
+            typename hpx::util::always_void<decltype(
+                std::declval<T&>()++)>::type> : std::true_type
+        {
+        };
+    }    // namespace traits
 
     // Preconditions: *i == v
     // Do separate tests for *i++ so we can treat, e.g., smart pointers,
@@ -155,7 +149,8 @@ namespace tests
     }
 
     template <typename Iterator, typename T>
-    void readable_iterator_traversal_test(const Iterator i1, T v, std::false_type)
+    void readable_iterator_traversal_test(
+        const Iterator i1, T v, std::false_type)
     {
     }
 
@@ -164,7 +159,7 @@ namespace tests
     {
         typedef typename std::iterator_traits<Iterator>::reference ref_t;
 
-        Iterator i2(i1); // Copy Constructible
+        Iterator i2(i1);    // Copy Constructible
         ref_t r1 = *i1;
         ref_t r2 = *i2;
         T v1 = r1;
@@ -172,11 +167,10 @@ namespace tests
         HPX_TEST(v1 == v);
         HPX_TEST(v2 == v);
 
-        readable_iterator_traversal_test(
-            i1, v,
+        readable_iterator_traversal_test(i1, v,
             typename std::integral_constant<bool,
-                tests::traits::is_postfix_incrementable<Iterator>::value
-            >::type());
+                tests::traits::is_postfix_incrementable<Iterator>::value>::
+                type());
 
         // I think we don't really need this as it checks the same things as
         // the above code.
@@ -205,7 +199,7 @@ namespace tests
         trivial_iterator_test(i, i1, v2);
         trivial_iterator_test(i, i2, v2);
 
-//         lvalue_test<(std::is_pointer<Iterator>::value)>::check_(i);
+        //lvalue_test<(std::is_pointer<Iterator>::value)>::check_(i);
     }
 
     template <typename Iterator, typename T>
@@ -285,8 +279,7 @@ namespace tests
         readable_iterator_test(i2, v2);
     }
 
-    namespace detail
-    {
+    namespace detail {
         template <typename T>
         struct identity
         {
@@ -303,7 +296,7 @@ namespace tests
         {
             return x;
         }
-    }
+    }    // namespace detail
 
     // Preconditions: [i,i+N) is a valid range
     template <typename Iterator, typename TrueVals>
@@ -375,7 +368,8 @@ namespace tests
         {
             HPX_TEST(i == k - c);
             HPX_TEST(*i == vals[N - 1 - c]);
-            typename std::iterator_traits<Iterator>::value_type x = j[N - 1 - c];
+            typename std::iterator_traits<Iterator>::value_type x =
+                j[N - 1 - c];
             HPX_TEST(*i == x);
             Iterator q = k - c;
             HPX_TEST(*i == *q);
@@ -396,8 +390,8 @@ namespace tests
         HPX_TEST((std::is_same<const value_type&, reference>::value));
         const T& v2 = *i2;
         HPX_TEST(v1 == v2);
-    //     HPX_TEST(is_lvalue_iterator<Iterator>::value);
-    //     HPX_TEST(!is_non_const_lvalue_iterator<Iterator>::value);
+        //HPX_TEST(is_lvalue_iterator<Iterator>::value);
+        //HPX_TEST(!is_non_const_lvalue_iterator<Iterator>::value);
     }
 
     template <typename Iterator, typename T>
@@ -416,8 +410,8 @@ namespace tests
 
         T& v4 = *i2;
         HPX_TEST(v2 == v4);
-    //     HPX_TEST(is_lvalue_iterator<Iterator>::value);
-    //     HPX_TEST(is_non_const_lvalue_iterator<Iterator>::value);
+        //HPX_TEST(is_lvalue_iterator<Iterator>::value);
+        //HPX_TEST(is_non_const_lvalue_iterator<Iterator>::value);
     }
 
     // Precondition: i != j
@@ -439,30 +433,30 @@ namespace tests
     template <typename Iterator, typename T>
     void writable_iterator_traversal_test(Iterator i1, T v, std::true_type)
     {
-        ++i1;           // we just wrote into that position
+        ++i1;    // we just wrote into that position
         *i1++ = v;
 
         Iterator x(i1++);
-        (void)x;
+        (void) x;
     }
 
     template <class Iterator, class T>
-    void writable_iterator_traversal_test(const Iterator i1, T v, std::false_type)
+    void writable_iterator_traversal_test(
+        const Iterator i1, T v, std::false_type)
     {
     }
 
     template <class Iterator, class T>
     void writable_iterator_test(Iterator i, T v, T v2)
     {
-        Iterator i2(i); // Copy Constructible
+        Iterator i2(i);    // Copy Constructible
         *i2 = v;
 
-        writable_iterator_traversal_test(
-            i, v2,
-            typename std::integral_constant<bool,
-                tests::traits::is_incrementable<Iterator>::value &&
-                tests::traits::is_postfix_incrementable<Iterator>::value
-            >());
+        writable_iterator_traversal_test(i, v2,
+            typename std::integral_constant < bool,
+            tests::traits::is_incrementable<Iterator>::value&&
+                    tests::traits::is_postfix_incrementable<Iterator>::value >
+                ());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -483,7 +477,8 @@ namespace tests
     private:
         typedef input_output_iterator_archetype self;
         struct in_out_tag
-          : public std::input_iterator_tag, public std::output_iterator_tag
+          : public std::input_iterator_tag
+          , public std::output_iterator_tag
         {
         };
 
@@ -505,9 +500,7 @@ namespace tests
         typedef const T* pointer;
         typedef std::ptrdiff_t difference_type;
 
-        input_output_iterator_archetype()
-        {
-        }
+        input_output_iterator_archetype() {}
         self& operator=(const self&)
         {
             return *this;
@@ -546,10 +539,9 @@ namespace tests
         typedef const T& reference;
         typedef const T* pointer;
         typedef std::ptrdiff_t difference_type;
-        input_iterator_archetype_no_proxy()
-        {
-        }
-        input_iterator_archetype_no_proxy(input_iterator_archetype_no_proxy const&)
+        input_iterator_archetype_no_proxy() {}
+        input_iterator_archetype_no_proxy(
+            input_iterator_archetype_no_proxy const&)
         {
         }
         self& operator=(const self&)
@@ -590,12 +582,8 @@ namespace tests
         typedef const T& reference;
         typedef T const* pointer;
         typedef std::ptrdiff_t difference_type;
-        forward_iterator_archetype()
-        {
-        }
-        forward_iterator_archetype(forward_iterator_archetype const&)
-        {
-        }
+        forward_iterator_archetype() {}
+        forward_iterator_archetype(forward_iterator_archetype const&) {}
         self& operator=(const self&)
         {
             return *this;
@@ -621,6 +609,6 @@ namespace tests
             return *this;
         }
     };
-}
+}    // namespace tests
 
 #endif

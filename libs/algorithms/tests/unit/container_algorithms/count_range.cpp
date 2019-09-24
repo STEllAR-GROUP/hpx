@@ -6,28 +6,30 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_count.hpp>
-#include <hpx/testing.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/testing.hpp>
 
+#include <algorithm>
+#include <cstddef>
+#include <iostream>
+#include <iterator>
 #include <random>
 #include <string>
 #include <vector>
-#include <cstddef>
-#include <iterator>
-#include <iostream>
-#include <algorithm>
 
 #include "test_utils.hpp"
 
 struct user_defined_struct
 {
     user_defined_struct() = default;
-    user_defined_struct(int val) : val(val)
-    {}
+    user_defined_struct(int val)
+      : val(val)
+    {
+    }
 
     ~user_defined_struct() = default;
 
-    bool operator==(const user_defined_struct & rhs) const
+    bool operator==(const user_defined_struct& rhs) const
     {
         return val == rhs.val;
     }
@@ -38,9 +40,10 @@ struct user_defined_struct
 struct random_fill
 {
     random_fill(int rand_base, int range)
-      : gen(std::rand()),
-        dist(rand_base - range / 2, rand_base + range / 2)
-    {}
+      : gen(std::rand())
+      , dist(rand_base - range / 2, rand_base + range / 2)
+    {
+    }
 
     int operator()()
     {
@@ -51,7 +54,7 @@ struct random_fill
     std::uniform_int_distribution<> dist;
 };
 
-template<typename ExPolicy, typename IteratorTag, typename DataType>
+template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_count(ExPolicy policy, IteratorTag, DataType)
 {
     static_assert(
@@ -69,7 +72,7 @@ void test_count(ExPolicy policy, IteratorTag, DataType)
     HPX_TEST_EQ(expected, result);
 }
 
-template<typename ExPolicy, typename IteratorTag, typename DataType>
+template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_count_async(ExPolicy policy, IteratorTag, DataType)
 {
     static_assert(
@@ -102,10 +105,10 @@ void test_count()
     test_count(par, IteratorTag(), DataType());
     test_count(par_unseq, IteratorTag(), DataType());
 
-    test_count_async(execution::seq(execution::task),
-                     IteratorTag(), DataType());
-    test_count_async(execution::par(execution::task),
-                     IteratorTag(), DataType());
+    test_count_async(
+        execution::seq(execution::task), IteratorTag(), DataType());
+    test_count_async(
+        execution::par(execution::task), IteratorTag(), DataType());
 }
 
 void count_test()
@@ -117,7 +120,7 @@ void count_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -135,15 +138,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

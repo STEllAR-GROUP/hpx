@@ -3,11 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/parallel/container_algorithms/transform.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -35,12 +35,8 @@ void test_transform(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto result =
-        hpx::parallel::transform(policy,
-            c, std::begin(d),
-            [](std::size_t v) {
-                return v + 1;
-            });
+    auto result = hpx::parallel::transform(
+        policy, c, std::begin(d), [](std::size_t v) { return v + 1; });
 
     HPX_TEST(hpx::util::get<0>(result) == std::end(c));
     HPX_TEST(hpx::util::get<1>(result) == std::end(d));
@@ -62,20 +58,15 @@ void test_transform_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    typedef test::test_container<
-            std::vector<std::size_t>, IteratorTag
-        > test_vector;
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
 
     test_vector c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto f =
-        hpx::parallel::transform(p,
-            c, std::begin(d),
-            [](std::size_t& v) {
-                return v + 1;
-            });
+    auto f = hpx::parallel::transform(
+        p, c, std::begin(d), [](std::size_t& v) { return v + 1; });
     f.wait();
 
     auto result = f.get();
@@ -128,23 +119,23 @@ void test_transform_exception(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::parallel::transform(policy,
             hpx::util::make_iterator_range(
-                iterator(std::begin(c)), iterator(std::end(c))
-            ),
+                iterator(std::begin(c)), iterator(std::end(c))),
             std::begin(d),
-            [](std::size_t v) {
-                return throw std::runtime_error("test"), v;
-            });
+            [](std::size_t v) { return throw std::runtime_error("test"), v; });
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -163,26 +154,25 @@ void test_transform_exception_async(ExPolicy p, IteratorTag)
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f =
-            hpx::parallel::transform(p,
-                hpx::util::make_iterator_range(
-                    iterator(std::begin(c)), iterator(std::end(c))
-                ),
-                std::begin(d),
-                [](std::size_t v) {
-                    return throw std::runtime_error("test"), v;
-                });
+    try
+    {
+        auto f = hpx::parallel::transform(p,
+            hpx::util::make_iterator_range(
+                iterator(std::begin(c)), iterator(std::end(c))),
+            std::begin(d),
+            [](std::size_t v) { return throw std::runtime_error("test"), v; });
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -201,10 +191,10 @@ void test_transform_exception()
     test_transform_exception(execution::seq, IteratorTag());
     test_transform_exception(execution::par, IteratorTag());
 
-    test_transform_exception_async(execution::seq(execution::task),
-        IteratorTag());
-    test_transform_exception_async(execution::par(execution::task),
-        IteratorTag());
+    test_transform_exception_async(
+        execution::seq(execution::task), IteratorTag());
+    test_transform_exception_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void transform_exception_test()
@@ -229,22 +219,22 @@ void test_transform_bad_alloc(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
-    try {
+    try
+    {
         hpx::parallel::transform(policy,
             hpx::util::make_iterator_range(
-                iterator(std::begin(c)), iterator(std::end(c))
-            ),
+                iterator(std::begin(c)), iterator(std::end(c))),
             std::begin(d),
-            [](std::size_t v) {
-                return throw std::bad_alloc(), v;
-            });
+            [](std::size_t v) { return throw std::bad_alloc(), v; });
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -263,25 +253,24 @@ void test_transform_bad_alloc_async(ExPolicy p, IteratorTag)
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f =
-            hpx::parallel::transform(p,
-                hpx::util::make_iterator_range(
-                    iterator(std::begin(c)), iterator(std::end(c))
-                ),
-                std::begin(d),
-                [](std::size_t v) {
-                    return throw std::bad_alloc(), v;
-                });
+    try
+    {
+        auto f = hpx::parallel::transform(p,
+            hpx::util::make_iterator_range(
+                iterator(std::begin(c)), iterator(std::end(c))),
+            std::begin(d),
+            [](std::size_t v) { return throw std::bad_alloc(), v; });
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -300,10 +289,10 @@ void test_transform_bad_alloc()
     test_transform_bad_alloc(execution::seq, IteratorTag());
     test_transform_bad_alloc(execution::par, IteratorTag());
 
-    test_transform_bad_alloc_async(execution::seq(execution::task),
-        IteratorTag());
-    test_transform_bad_alloc_async(execution::par(execution::task),
-        IteratorTag());
+    test_transform_bad_alloc_async(
+        execution::seq(execution::task), IteratorTag());
+    test_transform_bad_alloc_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void transform_bad_alloc_test()
@@ -315,7 +304,7 @@ void transform_bad_alloc_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -323,8 +312,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::srand(seed);
 
     transform_test();
-//     transform_exception_test();
-//     transform_bad_alloc_test();
+    //     transform_exception_test();
+    //     transform_bad_alloc_test();
     return hpx::finalize();
 }
 
@@ -335,15 +324,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
@@ -351,5 +336,3 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
-
-

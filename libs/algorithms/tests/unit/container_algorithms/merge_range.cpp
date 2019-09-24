@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_merge.hpp>
 #include <hpx/testing.hpp>
 
@@ -24,9 +24,10 @@ struct user_defined_type
 {
     user_defined_type() = default;
     user_defined_type(int rand_no)
-      : val(rand_no),
-        name(name_list[std::rand() % name_list.size()])
-    {}
+      : val(rand_no)
+      , name(name_list[std::rand() % name_list.size()])
+    {
+    }
 
     bool operator<(user_defined_type const& t) const
     {
@@ -67,15 +68,15 @@ struct user_defined_type
 };
 
 const std::vector<std::string> user_defined_type::name_list{
-    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"
-};
+    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill
 {
     random_fill(int rand_base, int range)
-      : gen(std::rand()),
-        dist(rand_base - range / 2, rand_base + range / 2)
-    {}
+      : gen(std::rand())
+      , dist(rand_base - range / 2, rand_base + range / 2)
+    {
+    }
 
     int operator()()
     {
@@ -97,27 +98,24 @@ void test_merge(ExPolicy policy, DataType)
     using hpx::util::get;
 
     std::size_t const size1 = 300007, size2 = 123456;
-    std::vector<DataType> src1(size1), src2(size2),
-        dest_res(size1 + size2), dest_sol(size1 + size2);
+    std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
+        dest_sol(size1 + size2);
 
     std::generate(std::begin(src1), std::end(src1), random_fill(0, 6));
     std::generate(std::begin(src2), std::end(src2), random_fill(0, 8));
     std::sort(std::begin(src1), std::end(src1));
     std::sort(std::begin(src2), std::end(src2));
 
-    auto result = hpx::parallel::merge(policy,
-        src1, src2, std::begin(dest_res));
-    auto solution = std::merge(
-        std::begin(src1), std::end(src1),
-        std::begin(src2), std::end(src2),
-        std::begin(dest_sol));
+    auto result =
+        hpx::parallel::merge(policy, src1, src2, std::begin(dest_res));
+    auto solution = std::merge(std::begin(src1), std::end(src1),
+        std::begin(src2), std::end(src2), std::begin(dest_sol));
 
     HPX_TEST(get<0>(result) == std::end(src1));
     HPX_TEST(get<1>(result) == std::end(src2));
 
     bool equality = test::equal(
-        std::begin(dest_res), get<2>(result),
-        std::begin(dest_sol), solution);
+        std::begin(dest_res), get<2>(result), std::begin(dest_sol), solution);
 
     HPX_TEST(equality);
 }
@@ -132,28 +130,24 @@ void test_merge_async(ExPolicy policy, DataType)
     using hpx::util::get;
 
     std::size_t const size1 = 300007, size2 = 123456;
-    std::vector<DataType> src1(size1), src2(size2),
-        dest_res(size1 + size2), dest_sol(size1 + size2);
+    std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
+        dest_sol(size1 + size2);
 
     std::generate(std::begin(src1), std::end(src1), random_fill(0, 6));
     std::generate(std::begin(src2), std::end(src2), random_fill(0, 8));
     std::sort(std::begin(src1), std::end(src1));
     std::sort(std::begin(src2), std::end(src2));
 
-    auto f = hpx::parallel::merge(policy,
-        src1, src2, std::begin(dest_res));
+    auto f = hpx::parallel::merge(policy, src1, src2, std::begin(dest_res));
     auto result = f.get();
-    auto solution = std::merge(
-        std::begin(src1), std::end(src1),
-        std::begin(src2), std::end(src2),
-        std::begin(dest_sol));
+    auto solution = std::merge(std::begin(src1), std::end(src1),
+        std::begin(src2), std::end(src2), std::begin(dest_sol));
 
     HPX_TEST(get<0>(result) == std::end(src1));
     HPX_TEST(get<1>(result) == std::end(src2));
 
     bool equality = test::equal(
-        std::begin(dest_res), get<2>(result),
-        std::begin(dest_sol), solution);
+        std::begin(dest_res), get<2>(result), std::begin(dest_sol), solution);
 
     HPX_TEST(equality);
 }
@@ -180,7 +174,7 @@ void test_merge()
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -198,15 +192,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

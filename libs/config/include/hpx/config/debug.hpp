@@ -14,6 +14,7 @@
 #define HPX_BUILD_TYPE
 #else
 
+// clang-format off
 // Make sure DEBUG macro is defined consistently across platforms
 #if defined(_DEBUG) && !defined(DEBUG)
 #  define DEBUG
@@ -29,5 +30,6 @@
 #  define HPX_BUILD_TYPE release
 #endif
 #endif
+// clang-format on
 
 #endif

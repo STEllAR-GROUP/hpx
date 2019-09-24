@@ -22,8 +22,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail
-{
+namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
@@ -34,10 +33,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         class rewritable_ref
         {
         public:
-            rewritable_ref() : item_(0) {}
-            rewritable_ref(T const& item) : item_(item) {}
+            rewritable_ref()
+              : item_(0)
+            {
+            }
+            rewritable_ref(T const& item)
+              : item_(item)
+            {
+            }
 
-            rewritable_ref& operator= (T const& item)
+            rewritable_ref& operator=(T const& item)
             {
                 item_ = &item;
                 return *this;
@@ -54,15 +59,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         };
 
         typedef typename std::iterator_traits<FwdIter>::value_type value_type;
-        typedef typename std::conditional<
-            std::is_scalar<value_type>::value,
-            value_type, rewritable_ref<value_type>
-        >::type type;
+        typedef typename std::conditional<std::is_scalar<value_type>::value,
+            value_type, rewritable_ref<value_type>>::type type;
     };
 
     struct set_chunk_data
     {
-        set_chunk_data() { start = len = start_index = (std::size_t)(-1); }
+        set_chunk_data()
+        {
+            start = len = start_index = (std::size_t)(-1);
+        }
         std::size_t start;
         std::size_t len;
         std::size_t start_index;
@@ -72,9 +78,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
     template <typename ExPolicy, typename RanIter1, typename RanIter2,
         typename FwdIter, typename F, typename Combiner, typename SetOp>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    set_operation(ExPolicy policy,
-        RanIter1 first1, RanIter1 last1, RanIter2 first2, RanIter2 last2,
-        FwdIter dest, F && f, Combiner && combiner, SetOp && setop)
+    set_operation(ExPolicy policy, RanIter1 first1, RanIter1 last1,
+        RanIter2 first2, RanIter2 last2, FwdIter dest, F&& f,
+        Combiner&& combiner, SetOp&& setop)
     {
         typedef typename std::iterator_traits<RanIter1>::difference_type
             difference_type1;
@@ -169,20 +175,23 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
 
             // finally, copy data to destination
             parallel::util::foreach_partitioner<
-                hpx::parallel::execution::parallel_policy>::call(execution::par,
-                chunks.get(), cores,
-                [buffer, dest](
-                    set_chunk_data* chunk, std::size_t, std::size_t) {
-                    if (chunk->start == (size_t)(-1) ||
-                        chunk->start_index == (size_t)(-1) ||
-                        chunk->len == (size_t)(-1))
-                        return;
+                hpx::parallel::execution::parallel_policy>::
+                call(
+                    execution::par, chunks.get(), cores,
+                    [buffer, dest](
+                        set_chunk_data* chunk, std::size_t, std::size_t) {
+                        if (chunk->start == (size_t)(-1) ||
+                            chunk->start_index == (size_t)(-1) ||
+                            chunk->len == (size_t)(-1))
+                            return;
 
-                    std::copy(buffer.get() + chunk->start,
-                        buffer.get() + chunk->start + chunk->len,
-                        dest + chunk->start_index);
-                },
-                [](set_chunk_data* last) -> set_chunk_data* { return last; });
+                        std::copy(buffer.get() + chunk->start,
+                            buffer.get() + chunk->start + chunk->len,
+                            dest + chunk->start_index);
+                    },
+                    [](set_chunk_data* last) -> set_chunk_data* {
+                        return last;
+                    });
 
             return dest;
         };
@@ -193,6 +202,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
     }
 
     /// \endcond
-}}}}
+}}}}    // namespace hpx::parallel::v1::detail
 
 #endif

@@ -28,18 +28,16 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // equal (binary)
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // Our own version of the C++14 equal (_binary).
         template <typename InIter1, typename InIter2, typename F>
-        bool sequential_equal_binary(InIter1 first1, InIter1 last1,
-            InIter2 first2, InIter2 last2, F && f)
+        bool sequential_equal_binary(
+            InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2, F&& f)
         {
             for (/* */; first1 != last1 && first2 != last2;
                  (void) ++first1, ++first2)
@@ -55,23 +53,23 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             equal_binary()
               : equal_binary::algorithm("equal_binary")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
-            static bool
-            sequential(ExPolicy, InIter1 first1, InIter1 last1,
-                InIter2 first2, InIter2 last2, F && f)
+            static bool sequential(ExPolicy, InIter1 first1, InIter1 last1,
+                InIter2 first2, InIter2 last2, F&& f)
             {
-                return sequential_equal_binary(first1, last1, first2, last2,
-                    std::forward<F>(f));
+                return sequential_equal_binary(
+                    first1, last1, first2, last2, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, FwdIter2 last2, F && f)
+            parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+                FwdIter2 first2, FwdIter2 last2, F&& f)
             {
                 typedef typename std::iterator_traits<FwdIter1>::difference_type
                     difference_type1;
@@ -106,46 +104,38 @@ namespace hpx { namespace parallel { inline namespace v1
                         false);
                 }
 
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
+                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
+                    zip_iterator;
                 typedef typename zip_iterator::reference reference;
 
                 util::cancellation_token<> tok;
-                auto f1 =
-                    [f, tok](
-                        zip_iterator it, std::size_t part_count
-                    ) mutable -> bool
-                    {
-                        util::loop_n<ExPolicy>(
-                            it, part_count, tok,
-                            [&f, &tok](zip_iterator const& curr)
+                auto f1 = [f, tok](zip_iterator it,
+                              std::size_t part_count) mutable -> bool {
+                    util::loop_n<ExPolicy>(it, part_count, tok,
+                        [&f, &tok](zip_iterator const& curr) {
+                            reference t = *curr;
+                            if (!hpx::util::invoke(f, hpx::util::get<0>(t),
+                                    hpx::util::get<1>(t)))
                             {
-                                reference t = *curr;
-                                if (!hpx::util::invoke(f, hpx::util::get<0>(t),
-                                        hpx::util::get<1>(t)))
-                                {
-                                    tok.cancel();
-                                }
-                            });
-                        return !tok.was_cancelled();
-                    };
+                                tok.cancel();
+                            }
+                        });
+                    return !tok.was_cancelled();
+                };
 
                 return util::partitioner<ExPolicy, bool>::call(
                     std::forward<ExPolicy>(policy),
                     hpx::util::make_zip_iterator(first1, first2), count1,
                     std::move(f1),
-                    [](std::vector<hpx::future<bool> > && results)
-                    {
-                        return std::all_of(
-                            hpx::util::begin(results), hpx::util::end(results),
-                            [](hpx::future<bool>& val)
-                            {
-                                return val.get();
-                            });
+                    [](std::vector<hpx::future<bool>>&& results) {
+                        return std::all_of(hpx::util::begin(results),
+                            hpx::util::end(results),
+                            [](hpx::future<bool>& val) { return val.get(); });
                     });
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Returns true if the range [first1, last1) is equal to the range
     /// [first2, last2), and false otherwise.
@@ -222,43 +212,38 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::equal_to>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-    >::type
-    equal(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter2 last2, Pred && op = Pred())
+    inline
+        typename std::enable_if<execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
+        equal(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::equal_binary().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2, std::forward<Pred>(op));
+        return detail::equal_binary().call(std::forward<ExPolicy>(policy),
+            is_seq(), first1, last1, first2, last2, std::forward<Pred>(op));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // equal
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         struct equal : public detail::algorithm<equal, bool>
         {
             equal()
               : equal::algorithm("equal")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
-            static bool
-            sequential(ExPolicy, InIter1 first1, InIter1 last1,
-                InIter2 first2, F && f)
+            static bool sequential(
+                ExPolicy, InIter1 first1, InIter1 last1, InIter2 first2, F&& f)
             {
                 return std::equal(first1, last1, first2, std::forward<F>(f));
             }
@@ -266,8 +251,8 @@ namespace hpx { namespace parallel { inline namespace v1
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, F && f)
+            parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+                FwdIter2 first2, F&& f)
             {
                 if (first1 == last1)
                 {
@@ -279,46 +264,38 @@ namespace hpx { namespace parallel { inline namespace v1
                     difference_type;
                 difference_type count = std::distance(first1, last1);
 
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
+                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
+                    zip_iterator;
                 typedef typename zip_iterator::reference reference;
 
                 util::cancellation_token<> tok;
-                auto f1 =
-                    [f, tok](
-                        zip_iterator it, std::size_t part_count
-                    ) mutable -> bool
-                    {
-                        util::loop_n<ExPolicy>(
-                            it, part_count, tok,
-                            [&f, &tok](zip_iterator const& curr)
+                auto f1 = [f, tok](zip_iterator it,
+                              std::size_t part_count) mutable -> bool {
+                    util::loop_n<ExPolicy>(it, part_count, tok,
+                        [&f, &tok](zip_iterator const& curr) {
+                            reference t = *curr;
+                            if (!hpx::util::invoke(f, hpx::util::get<0>(t),
+                                    hpx::util::get<1>(t)))
                             {
-                                reference t = *curr;
-                                if (!hpx::util::invoke(f, hpx::util::get<0>(t),
-                                        hpx::util::get<1>(t)))
-                                {
-                                    tok.cancel();
-                                }
-                            });
-                        return !tok.was_cancelled();
-                    };
+                                tok.cancel();
+                            }
+                        });
+                    return !tok.was_cancelled();
+                };
 
                 return util::partitioner<ExPolicy, bool>::call(
                     std::forward<ExPolicy>(policy),
                     hpx::util::make_zip_iterator(first1, first2), count,
                     std::move(f1),
-                    [](std::vector<hpx::future<bool> > && results)
-                    {
-                        return std::all_of(
-                            hpx::util::begin(results), hpx::util::end(results),
-                            [](hpx::future<bool>& val)
-                            {
-                                return val.get();
-                            });
+                    [](std::vector<hpx::future<bool>>&& results) {
+                        return std::all_of(hpx::util::begin(results),
+                            hpx::util::end(results),
+                            [](hpx::future<bool>& val) { return val.get(); });
                     });
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Returns true if the range [first1, last1) is equal to the range
     /// starting at first2, and false otherwise.
@@ -391,26 +368,22 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::equal_to>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-    >::type
-    equal(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
-        Pred && op = Pred())
+    inline
+        typename std::enable_if<execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
+        equal(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, Pred&& op = Pred())
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::equal().call(
-            std::forward<ExPolicy>(policy), is_seq(),
+        return detail::equal().call(std::forward<ExPolicy>(policy), is_seq(),
             first1, last1, first2, std::forward<Pred>(op));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

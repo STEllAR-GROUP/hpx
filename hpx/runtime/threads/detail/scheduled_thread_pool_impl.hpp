@@ -26,8 +26,6 @@
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/functional/deferred_call.hpp>

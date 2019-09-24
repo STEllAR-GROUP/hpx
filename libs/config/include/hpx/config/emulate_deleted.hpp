@@ -7,11 +7,10 @@
 #define HPX_CONFIG_EMULATE_DELETED_JAN_06_2013_0919PM
 
 /// Marks a class as non-copyable and non-movable.
-#define HPX_NON_COPYABLE(cls)                                                 \
-    cls(cls const&) = delete;                                                 \
-    cls(cls&&) = delete;                                                      \
-    cls& operator=(cls const&) = delete;                                      \
-    cls& operator=(cls&&) = delete                                            \
-/**/
+#define HPX_NON_COPYABLE(cls)                                                  \
+    cls(cls const&) = delete;                                                  \
+    cls(cls&&) = delete;                                                       \
+    cls& operator=(cls const&) = delete;                                       \
+    cls& operator=(cls&&) = delete /**/
 
 #endif

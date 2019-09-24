@@ -285,13 +285,13 @@ namespace hpx { namespace util
                 // here. Boost filesystem returns an empty path for
                 // "/".parent_path() whereas C++17 filesystem will keep
                 // returning "/".
-#if defined(HPX_HAVE_CXX17_FILESYSTEM)
+#if !defined(HPX_FILESYSTEM_HAVE_BOOST_FILESYSTEM_COMPATIBILITY)
                 auto dir_prev = dir;
-#endif
                 dir = dir.parent_path();    // chop off last directory part
-#if defined(HPX_HAVE_CXX17_FILESYSTEM)
                 if (dir_prev == dir)
                     break;
+#else
+                dir = dir.parent_path();    // chop off last directory part
 #endif
             }
         }

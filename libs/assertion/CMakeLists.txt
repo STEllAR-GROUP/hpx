@@ -30,12 +30,14 @@ set(assertion_sources
 
 include(HPX_AddModule)
 add_hpx_module(assertion
-    COMPATIBILITY_HEADERS ON    # Added in 1.4.0
-    DEPRECATION_WARNINGS
-    GLOBAL_HEADER_GEN OFF
-    SOURCES ${assertion_sources}
-    HEADERS ${assertion_headers}
-    COMPAT_HEADERS ${assertion_compat_headers}
-    DEPENDENCIES hpx_config hpx_preprocessor
-    CMAKE_SUBDIRS examples tests
+  COMPATIBILITY_HEADERS ON    # Added in 1.4.0
+  DEPRECATION_WARNINGS
+  GLOBAL_HEADER_GEN OFF
+  SOURCES ${assertion_sources}
+  HEADERS ${assertion_headers}
+  COMPAT_HEADERS ${assertion_compat_headers}
+  DEPENDENCIES
+    hpx_config
+    hpx_preprocessor
+  CMAKE_SUBDIRS examples tests
 )

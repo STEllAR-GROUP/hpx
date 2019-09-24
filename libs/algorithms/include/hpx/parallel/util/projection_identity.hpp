@@ -10,18 +10,16 @@
 
 #include <utility>
 
-namespace hpx { namespace parallel { namespace util
-{
+namespace hpx { namespace parallel { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     struct projection_identity
     {
         template <typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        T && operator()(T && val) const
+        HPX_HOST_DEVICE HPX_FORCEINLINE T&& operator()(T&& val) const
         {
             return std::forward<T>(val);
         }
     };
-}}}
+}}}    // namespace hpx::parallel::util
 
 #endif

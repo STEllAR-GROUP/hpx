@@ -25,8 +25,7 @@
 #include <mutex>
 #include <sstream>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     using test_failure_handler_type = std::function<void()>;
     HPX_EXPORT void set_test_failure_handler(test_failure_handler_type f);
 
@@ -36,8 +35,7 @@ namespace hpx { namespace util
         counter_test
     };
 
-    namespace detail
-    {
+    namespace detail {
         struct fixture
         {
         public:
@@ -185,13 +183,13 @@ namespace hpx { namespace util
 
         HPX_EXPORT extern fixture global_fixture;
 
-    }    // hpx::util::detail
+    }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
     HPX_EXPORT int report_errors(std::ostream& stream = std::cerr);
     HPX_EXPORT void print_cdash_timing(const char* name, double time);
     HPX_EXPORT void print_cdash_timing(const char* name, std::uint64_t time);
-}}    // hpx::util
+}}    // namespace hpx::util
 
 #define HPX_TEST(expr)                                                         \
     ::hpx::util::detail::global_fixture.check_(__FILE__, __LINE__,             \

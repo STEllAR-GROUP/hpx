@@ -27,7 +27,7 @@ namespace hpx { namespace assertion {
     /// set already once, the call to this function will be ignored.
     /// \note This function is not thread safe
     HPX_EXPORT void set_assertion_handler(assertion_handler handler);
-}}
+}}    // namespace hpx::assertion
 
 #if defined(DOXYGEN)
 /// \def HPX_ASSERT(expr, msg)
@@ -57,7 +57,7 @@ namespace hpx { namespace assertion {
         ::hpx::assertion::source_location{__FILE__,                            \
             static_cast<unsigned>(__LINE__), HPX_ASSERT_CURRENT_FUNCTION},     \
         HPX_PP_STRINGIZE(expr), [&]() { return msg; });                        \
-/**/
+    /**/
 
 #if defined(HPX_DEBUG)
 #define HPX_ASSERT(expr) HPX_ASSERT_(expr, std::string())

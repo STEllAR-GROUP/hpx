@@ -202,8 +202,9 @@ namespace hpx { namespace threads {
 #endif
 
     topology::topology()
-      : topo(nullptr), machine_affinity_mask_(0)
-    { // {{{
+      : topo(nullptr)
+      , machine_affinity_mask_(0)
+    {    // {{{
         int err = hwloc_topology_init(&topo);
         if (err != 0)
         {

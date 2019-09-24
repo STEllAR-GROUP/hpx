@@ -4,8 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/traits.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
+#include <hpx/include/traits.hpp>
 #include <hpx/testing.hpp>
 
 #include <algorithm>
@@ -24,8 +24,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void test_global_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
-    T const& val)
+void test_global_iteration(
+    hpx::partitioned_vector<T>& v, std::size_t size, T const& val)
 {
     typedef typename hpx::partitioned_vector<T>::iterator iterator;
     typedef hpx::traits::segmented_iterator_traits<iterator> traits;
@@ -36,11 +36,11 @@ void test_global_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     HPX_TEST(const_traits::is_segmented_iterator::value);
 
     HPX_TEST_EQ(v.size(), size);
-    for(std::size_t i = 0; i != size; ++i)
+    for (std::size_t i = 0; i != size; ++i)
     {
         HPX_TEST_EQ(v[i], val);
-        v[i] = T(i+1);
-        HPX_TEST_EQ(v[i], T(i+1));
+        v[i] = T(i + 1);
+        HPX_TEST_EQ(v[i], T(i + 1));
     }
 
     // test normal iteration
@@ -65,8 +65,8 @@ void test_global_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
 
 // test segmented iteration
 template <typename T>
-void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
-    std::size_t parts)
+void test_segmented_iteration(
+    hpx::partitioned_vector<T>& v, std::size_t size, std::size_t parts)
 {
     typedef typename hpx::partitioned_vector<T>::iterator iterator;
     typedef hpx::traits::segmented_iterator_traits<iterator> traits;
@@ -78,30 +78,25 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
     typedef hpx::traits::segmented_iterator_traits<const_iterator> const_traits;
     typedef typename const_traits::segment_iterator const_segment_iterator;
-    typedef typename const_traits::local_segment_iterator const_local_segment_iterator;
+    typedef typename const_traits::local_segment_iterator
+        const_local_segment_iterator;
     typedef typename const_traits::local_iterator const_local_iterator;
     typedef typename const_traits::local_raw_iterator const_local_raw_iterator;
 
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
-            segment_iterator
-        >::is_segmented_iterator::value);
+             segment_iterator>::is_segmented_iterator::value);
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
-            const_segment_iterator
-        >::is_segmented_iterator::value);
+             const_segment_iterator>::is_segmented_iterator::value);
 
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
-            local_segment_iterator
-        >::is_segmented_iterator::value);
+             local_segment_iterator>::is_segmented_iterator::value);
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
-            const_local_segment_iterator
-        >::is_segmented_iterator::value);
+             const_local_segment_iterator>::is_segmented_iterator::value);
 
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
-            local_iterator
-        >::is_segmented_iterator::value);
+             local_iterator>::is_segmented_iterator::value);
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
-            const_local_iterator
-        >::is_segmented_iterator::value);
+             const_local_iterator>::is_segmented_iterator::value);
 
     // test segmented and local iteration
     std::size_t seg_count = 0;
@@ -111,8 +106,8 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
          seg_it != seg_end; ++seg_it, ++seg_count)
     {
         local_iterator loc_end = traits::end(seg_it);
-        for (local_iterator lit = traits::begin(seg_it);
-             lit != loc_end; ++lit, ++count)
+        for (local_iterator lit = traits::begin(seg_it); lit != loc_end;
+             ++lit, ++count)
         {
         }
     }
@@ -160,13 +155,14 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     {
         std::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         const_iterator end = v.cend(locality_id);
-        for (const_iterator it = v.cbegin(locality_id); it != end; ++it, ++count)
+        for (const_iterator it = v.cbegin(locality_id); it != end;
+             ++it, ++count)
         {
             std::size_t i = 42;
             const_local_iterator loc_end =
                 const_traits::end(const_traits::segment(it));
             for (const_local_iterator lcit =
-                const_traits::begin(const_traits::segment(it));
+                     const_traits::begin(const_traits::segment(it));
                  lcit != loc_end; ++lcit, ++i)
             {
                 HPX_TEST_EQ(*lcit, T(i));
@@ -189,8 +185,8 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
                 continue;
 
             local_raw_iterator loc_end = traits::end(seg_it);
-            for (local_raw_iterator lit = traits::begin(seg_it);
-                 lit != loc_end; ++lit, ++count)
+            for (local_raw_iterator lit = traits::begin(seg_it); lit != loc_end;
+                 ++lit, ++count)
             {
             }
         }
@@ -202,7 +198,8 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     {
         std::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         const_local_segment_iterator seg_cend = v.segment_cend(locality_id);
-        for (const_local_segment_iterator seg_cit = v.segment_cbegin(locality_id);
+        for (const_local_segment_iterator seg_cit =
+                 v.segment_cbegin(locality_id);
              seg_cit != seg_cend; ++seg_cit, ++seg_count)
         {
             // local raw iterators are valid locally only
@@ -368,10 +365,10 @@ void trivial_tests()
 
     trivial_test_with_policy<T>(length, 1, hpx::container_layout, "test1");
     trivial_test_with_policy<T>(length, 3, hpx::container_layout(3), "test2");
-    trivial_test_with_policy<T>(length, 3,
-        hpx::container_layout(3, localities), "test3");
-    trivial_test_with_policy<T>(length, localities.size(),
-        hpx::container_layout(localities), "test4");
+    trivial_test_with_policy<T>(
+        length, 3, hpx::container_layout(3, localities), "test3");
+    trivial_test_with_policy<T>(
+        length, localities.size(), hpx::container_layout(localities), "test4");
 }
 
 int main()
@@ -381,4 +378,3 @@ int main()
 
     return 0;
 }
-

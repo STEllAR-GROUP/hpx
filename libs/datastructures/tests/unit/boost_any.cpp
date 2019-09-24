@@ -5,9 +5,9 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/datastructures/any.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/datastructures/any.hpp>
 
 #include "small_big_object.hpp"
 
@@ -36,8 +36,7 @@ namespace any_tests    // test suite
         void (*test_func)();
     };
 
-    const test_case test_cases[] = {
-        {"default construction", test_default_ctor},
+    const test_case test_cases[] = {{"default construction", test_default_ctor},
         {"single argument construction", test_converting_ctor},
         {"copy construction", test_copy_ctor},
         {"copy assignment operator", test_copy_assign},
@@ -105,18 +104,18 @@ namespace std {
 
 namespace any_tests    // test definitions
 {
-    using hpx::util::any_nonser;
     using hpx::util::any_cast;
+    using hpx::util::any_nonser;
 
     void test_default_ctor()
     {
         const any_nonser value;
 
-        HPX_TEST_MSG(value.empty(), "empty");
+        HPX_TEST_MSG(!value.has_value(), "empty");
         HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
             "any_cast<int>");
-        HPX_TEST_EQ_MSG(value.type(),
-            typeid(hpx::util::detail::any::empty), "type");
+        HPX_TEST_EQ_MSG(
+            value.type(), typeid(hpx::util::detail::any::empty), "type");
     }
 
     void test_converting_ctor()
@@ -124,7 +123,7 @@ namespace any_tests    // test definitions
         std::string text = "test message";
         any_nonser value = any_nonser(text);
 
-        HPX_TEST_EQ_MSG(false, value.empty(), "empty");
+        HPX_TEST_EQ_MSG(true, value.has_value(), "empty");
         HPX_TEST_EQ_MSG(value.type(), typeid(std::string), "type");
         HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
             "any_cast<int>");
@@ -141,7 +140,7 @@ namespace any_tests    // test definitions
         std::string text = "test message";
         any_nonser original = any_nonser(text), copy = any_nonser(original);
 
-        HPX_TEST_EQ_MSG(false, copy.empty(), "empty");
+        HPX_TEST_EQ_MSG(true, copy.has_value(), "empty");
         HPX_TEST_EQ_MSG(original.type(), copy.type(), "type");
         HPX_TEST_EQ_MSG(any_cast<std::string>(original),
             any_cast<std::string>(copy),
@@ -159,7 +158,7 @@ namespace any_tests    // test definitions
         any_nonser original = any_nonser(text), copy;
         any_nonser* assign_result = &(copy = original);
 
-        HPX_TEST_EQ_MSG(false, copy.empty(), "empty");
+        HPX_TEST_EQ_MSG(true, copy.has_value(), "empty");
         HPX_TEST_EQ_MSG(original.type(), copy.type(), "type");
         HPX_TEST_EQ_MSG(any_cast<std::string>(original),
             any_cast<std::string>(copy),
@@ -178,7 +177,7 @@ namespace any_tests    // test definitions
         any_nonser value;
         any_nonser* assign_result = &(value = text);
 
-        HPX_TEST_EQ_MSG(false, value.empty(), "type");
+        HPX_TEST_EQ_MSG(true, value.has_value(), "type");
         HPX_TEST_EQ_MSG(value.type(), typeid(std::string), "type");
         HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
             "any_cast<int>");
@@ -226,8 +225,8 @@ namespace any_tests    // test definitions
         small_object* original_ptr = any_cast<small_object>(&original);
         any_nonser* swap_result = &original.swap(swapped);
 
-        HPX_TEST_MSG(original.empty(), "empty on original");
-        HPX_TEST_EQ_MSG(false, swapped.empty(), "empty on swapped");
+        HPX_TEST_MSG(!original.has_value(), "empty on original");
+        HPX_TEST_EQ_MSG(true, swapped.has_value(), "empty on swapped");
         HPX_TEST_EQ_MSG(swapped.type(), typeid(small_object), "type");
         HPX_TEST_EQ_MSG(text, any_cast<small_object>(swapped),
             "comparing swapped copy against original text");
@@ -257,8 +256,8 @@ namespace any_tests    // test definitions
         big_object* original_ptr = any_cast<big_object>(&original);
         any_nonser* swap_result = &original.swap(swapped);
 
-        HPX_TEST_MSG(original.empty(), "empty on original");
-        HPX_TEST_EQ_MSG(false, swapped.empty(), "empty on swapped");
+        HPX_TEST_MSG(!original.has_value(), "empty on original");
+        HPX_TEST_EQ_MSG(true, swapped.has_value(), "empty on swapped");
         HPX_TEST_EQ_MSG(swapped.type(), typeid(big_object), "type");
         HPX_TEST_EQ_MSG(text, any_cast<big_object>(swapped),
             "comparing swapped copy against original text");
@@ -282,9 +281,9 @@ namespace any_tests    // test definitions
         any_nonser copied = null, assigned;
         assigned = null;
 
-        HPX_TEST_MSG(null.empty(), "empty on null");
-        HPX_TEST_MSG(copied.empty(), "empty on copied");
-        HPX_TEST_MSG(assigned.empty(), "empty on copied");
+        HPX_TEST_MSG(!null.has_value(), "empty on null");
+        HPX_TEST_MSG(!copied.has_value(), "empty on copied");
+        HPX_TEST_MSG(!assigned.has_value(), "empty on copied");
     }
 
     void test_cast_to_reference()
