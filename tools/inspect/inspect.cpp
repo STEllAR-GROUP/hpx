@@ -723,7 +723,7 @@ namespace boost
       register_signature( ".pl" );
       register_signature( ".py" );
       register_signature( ".sh" );
-      register_signature( "CMakeText.txt" );
+      register_signature( "CMakeLists.txt" );
       register_signature( ".cmake" );
       register_signature( ".yml" );
 
