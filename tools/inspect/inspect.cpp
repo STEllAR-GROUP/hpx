@@ -240,8 +240,8 @@ namespace
   {
     string local( boost::inspect::relative_to( pth, search_root_path() ) );
     string leaf( pth.filename().string() );
-    if (leaf[0] == '.')  // ignore hidden by convention directories such as
-      return false;      //  .htaccess, .git, .svn, .bzr, .DS_Store, etc.
+    if (leaf == ".git")  // ignore .git, but not the other directories
+      return false;
 
     return
       // so we can inspect a GIT checkout

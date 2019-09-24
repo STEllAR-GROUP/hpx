@@ -26,7 +26,7 @@ using std::string;
 namespace
 {
   const char allowable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-.";
-  const char initial_char[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
+  const char initial_char[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.";
 }
 
 namespace boost
@@ -63,16 +63,18 @@ namespace boost
             + " file or directory name begins with an unacceptable character" );
       }
 
-      //  rules for dot characters differ slightly for directories and files
-      if ( hpx::filesystem::is_directory( full_path ) )
-      {
-        if ( std::strchr( leaf.c_str(), '.' ) )
-        {
-          ++m_name_errors;
-          error( library_name, full_path, loclink(full_path, string(name()))
-              + " directory name contains a dot character ('.')" );
-        }
-      }
+      // We want to inspect some of the hidden dirs
+
+      ////  rules for dot characters differ slightly for directories and files
+      //if ( hpx::filesystem::is_directory( full_path ) )
+      //{
+      //  if ( std::strchr( leaf.c_str(), '.' ) )
+      //  {
+      //    ++m_name_errors;
+      //    error( library_name, full_path, loclink(full_path, string(name()))
+      //        + " directory name contains a dot character ('.')" );
+      //  }
+      //}
       //else // not a directory
       //{
       //  //  includes at most one dot character
