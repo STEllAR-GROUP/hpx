@@ -53,13 +53,12 @@ hpx::future<void> send_async(
     using hpx::parallel::execution::par;
     using hpx::parallel::execution::task;
 
-    return for_loop(
-        par(task), 0, window_size, [dest, size](std::uint64_t j) {
-            // Note: The original benchmark uses MPI_Isend which does not
-            //       create a copy of the passed buffer.
-            isend_action send;
-            send(dest, buffer_type(send_buffer, size, buffer_type::reference));
-        });
+    return for_loop(par(task), 0, window_size, [dest, size](std::uint64_t j) {
+        // Note: The original benchmark uses MPI_Isend which does not
+        //       create a copy of the passed buffer.
+        isend_action send;
+        send(dest, buffer_type(send_buffer, size, buffer_type::reference));
+    });
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -78,11 +77,10 @@ void recv_async(hpx::id_type dest, std::size_t size, std::size_t window_size)
     using hpx::parallel::for_loop;
     using hpx::parallel::execution::par;
 
-    for_loop(
-        par, 0, window_size, [dest, size](std::uint64_t j) {
-            irecv_action recv;
-            recv(dest, size);
-        });
+    for_loop(par, 0, window_size, [dest, size](std::uint64_t j) {
+        irecv_action recv;
+        recv(dest, size);
+    });
 }
 
 ///////////////////////////////////////////////////////////////////////////////

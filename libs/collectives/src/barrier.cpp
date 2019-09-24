@@ -24,36 +24,38 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     bool is_stopped_or_shutting_down();
 }
 
 namespace hpx { namespace lcos {
     barrier::barrier(std::string const& base_name)
       : node_(new (hpx::components::component_heap<wrapping_type>().alloc())
-            wrapping_type(new wrapped_type(base_name,
-                hpx::get_num_localities(hpx::launch::sync),
-                hpx::get_locality_id())))
+                wrapping_type(new wrapped_type(base_name,
+                    hpx::get_num_localities(hpx::launch::sync),
+                    hpx::get_locality_id())))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
             register_with_basename(
-                base_name, node_->get_unmanaged_id(), (*node_)->rank_).get();
+                base_name, node_->get_unmanaged_id(), (*node_)->rank_)
+                .get();
     }
 
     barrier::barrier(std::string const& base_name, std::size_t num)
       : node_(new (hpx::components::component_heap<wrapping_type>().alloc())
-            wrapping_type(new wrapped_type(base_name, num, hpx::get_locality_id()
-        )))
+                wrapping_type(
+                    new wrapped_type(base_name, num, hpx::get_locality_id())))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
             register_with_basename(
-                base_name, node_->get_unmanaged_id(), (*node_)->rank_).get();
+                base_name, node_->get_unmanaged_id(), (*node_)->rank_)
+                .get();
     }
 
-    barrier::barrier(std::string const& base_name, std::size_t num, std::size_t rank)
+    barrier::barrier(
+        std::string const& base_name, std::size_t num, std::size_t rank)
       : node_(new (hpx::components::component_heap<wrapping_type>().alloc())
-            wrapping_type(new wrapped_type(base_name, num, rank)))
+                wrapping_type(new wrapped_type(base_name, num, rank)))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
             register_with_basename(
@@ -79,8 +81,7 @@ namespace hpx { namespace lcos {
                 .get();
     }
 
-    barrier::barrier()
-    {}
+    barrier::barrier() {}
 
     barrier::barrier(barrier&& other)
       : node_(std::move(other.node_))
@@ -127,7 +128,8 @@ namespace hpx { namespace lcos {
                 }
 
                 hpx::future<void> f;
-                if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+                if ((*node_)->num_ >= (*node_)->cut_off_ ||
+                    (*node_)->rank_ == 0)
                 {
                     f = hpx::unregister_with_basename(
                         (*node_)->base_name_, (*node_)->rank_);
@@ -136,14 +138,13 @@ namespace hpx { namespace lcos {
                 // we need to wait on everyone to have its name unregistered,
                 // and hold on to our node long enough...
                 boost::intrusive_ptr<wrapping_type> node = node_;
-                hpx::when_all(f, wait(hpx::launch::async)).then(
-                    hpx::launch::sync,
-                    [HPX_CAPTURE_MOVE(node)](hpx::future<void> f)
-                    {
-                        HPX_UNUSED(node);
-                        f.get();
-                    }
-                ).get();
+                hpx::when_all(f, wait(hpx::launch::async))
+                    .then(hpx::launch::sync,
+                        [HPX_CAPTURE_MOVE(node)](hpx::future<void> f) {
+                            HPX_UNUSED(node);
+                            f.get();
+                        })
+                    .get();
             }
             intrusive_ptr_release(node_->get());
             node_.reset();
@@ -158,7 +159,8 @@ namespace hpx { namespace lcos {
                 hpx::threads::threadmanager_is(state_running) &&
                 !hpx::is_stopped_or_shutting_down())
             {
-                if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+                if ((*node_)->num_ >= (*node_)->cut_off_ ||
+                    (*node_)->rank_ == 0)
                     hpx::unregister_with_basename(
                         (*node_)->base_name_, (*node_)->rank_);
             }
@@ -186,4 +188,4 @@ namespace hpx { namespace lcos {
         HPX_ASSERT(b.node_);
         b.wait();
     }
-}}
+}}    // namespace hpx::lcos

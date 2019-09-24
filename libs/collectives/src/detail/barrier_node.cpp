@@ -20,33 +20,37 @@
 #include <utility>
 #include <vector>
 
-typedef hpx::components::managed_component<hpx::lcos::detail::barrier_node> barrier_type;
+typedef hpx::components::managed_component<hpx::lcos::detail::barrier_node>
+    barrier_type;
 
 HPX_REGISTER_COMPONENT_HEAP(barrier_type)
-HPX_DEFINE_COMPONENT_NAME(hpx::lcos::detail::barrier_node, hpx_lcos_barrier_node);
+HPX_DEFINE_COMPONENT_NAME(
+    hpx::lcos::detail::barrier_node, hpx_lcos_barrier_node);
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::detail::barrier_node, hpx::components::component_barrier)
 
-HPX_REGISTER_ACTION(hpx::lcos::detail::barrier_node::gather_action,
-    barrier_node_gather_action);
+HPX_REGISTER_ACTION(
+    hpx::lcos::detail::barrier_node::gather_action, barrier_node_gather_action);
 
 namespace hpx { namespace lcos { namespace detail {
     barrier_node::barrier_node()
-      : count_(0),
-        local_barrier_(0)
+      : count_(0)
+      , local_barrier_(0)
     {
         HPX_ASSERT(false);
     }
 
-    barrier_node::barrier_node(std::string base_name, std::size_t num, std::size_t rank)
-      : count_(0),
-        base_name_(base_name),
-        rank_(rank),
-        num_(num),
-        arity_(std::stol(get_config_entry("hpx.lcos.collectives.arity", 32))),
-        cut_off_(std::stol(get_config_entry("hpx.lcos.collectives.cut_off", -1))),
-        local_barrier_(num)
+    barrier_node::barrier_node(
+        std::string base_name, std::size_t num, std::size_t rank)
+      : count_(0)
+      , base_name_(base_name)
+      , rank_(rank)
+      , num_(num)
+      , arity_(std::stol(get_config_entry("hpx.lcos.collectives.arity", 32)))
+      , cut_off_(
+            std::stol(get_config_entry("hpx.lcos.collectives.cut_off", -1)))
+      , local_barrier_(num)
     {
         if (num_ >= cut_off_)
         {
@@ -56,12 +60,13 @@ namespace hpx { namespace lcos { namespace detail {
             for (std::size_t i = 1; i <= arity_; ++i)
             {
                 std::size_t id = (arity_ * rank_) + i;
-                if (id >= num) break;
+                if (id >= num)
+                    break;
                 ids.push_back(id);
             }
 
-            children_ = hpx::util::unwrap(
-                hpx::find_from_basename(base_name_, ids));
+            children_ =
+                hpx::util::unwrap(hpx::find_from_basename(base_name_, ids));
 
             return;
         }
@@ -102,9 +107,9 @@ namespace hpx { namespace lcos { namespace detail {
             // The root process calls the gather action on its children
             // once all those return, we know that everyone entered the
             // barrier
-            std::vector<hpx::future<void> > futures;
+            std::vector<hpx::future<void>> futures;
             futures.reserve(children_.size());
-            for(hpx::id_type& id : children_)
+            for (hpx::id_type& id : children_)
             {
                 barrier_node::gather_action action;
                 futures.push_back(hpx::async(action, id));
@@ -126,24 +131,23 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     template <typename This>
-    hpx::future<void> barrier_node::do_wait(This this_,
-        hpx::future<void> future)
+    hpx::future<void> barrier_node::do_wait(
+        This this_, hpx::future<void> future)
     {
         if (rank_ == 0)
         {
             return future.then(hpx::launch::sync,
-                [HPX_CAPTURE_MOVE(this_)](hpx::future<void>&& f)
-                {
+                [HPX_CAPTURE_MOVE(this_)](hpx::future<void>&& f) {
                     // Trigger possible errors...
                     f.get();
 
-                    std::vector<hpx::future<void> > futures;
+                    std::vector<hpx::future<void>> futures;
                     futures.reserve(this_->children_.size());
 
                     // After the root process received the notification that
                     // everyone entered the barrier, it will broadcast to
                     // everyone that they can leave the barrier
-                    for(hpx::id_type& id : this_->children_)
+                    for (hpx::id_type& id : this_->children_)
                     {
                         base_lco::set_event_action action;
                         futures.push_back(hpx::async(action, id));
@@ -154,8 +158,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         return future.then(hpx::launch::sync,
-            [HPX_CAPTURE_MOVE(this_)](hpx::future<void>&& f)
-            {
+            [HPX_CAPTURE_MOVE(this_)](hpx::future<void>&& f) {
                 // Trigger possible errors...
                 f.get();
 
@@ -167,21 +170,19 @@ namespace hpx { namespace lcos { namespace detail {
             });
     }
 
-    template hpx::future<void>
-        barrier_node::do_wait(
-            boost::intrusive_ptr<barrier_node>, hpx::future<void>);
-    template hpx::future<void>
-        barrier_node::do_wait(
-            barrier_node*, hpx::future<void>);
+    template hpx::future<void> barrier_node::do_wait(
+        boost::intrusive_ptr<barrier_node>, hpx::future<void>);
+    template hpx::future<void> barrier_node::do_wait(
+        barrier_node*, hpx::future<void>);
 
     hpx::future<void> barrier_node::gather()
     {
         // We recursively gather the information that everyone entered the
         // barrier. The recursion is started from the root node.
         HPX_ASSERT(rank_ != 0);
-        std::vector<hpx::future<void> > futures;
+        std::vector<hpx::future<void>> futures;
         futures.reserve(children_.size());
-        for(hpx::id_type& id : children_)
+        for (hpx::id_type& id : children_)
         {
             barrier_node::gather_action action;
             futures.push_back(hpx::async(action, id));
@@ -208,9 +209,9 @@ namespace hpx { namespace lcos { namespace detail {
         // We recursively broadcast the information that everyone entered the
         // barrier. The recursion is started from the root node.
         HPX_ASSERT(rank_ != 0);
-        std::vector<hpx::future<void> > futures;
+        std::vector<hpx::future<void>> futures;
         futures.reserve(children_.size());
-        for(hpx::id_type& id : children_)
+        for (hpx::id_type& id : children_)
         {
             base_lco::set_event_action action;
             futures.push_back(hpx::async(action, id));
@@ -225,4 +226,4 @@ namespace hpx { namespace lcos { namespace detail {
                 this_->broadcast_promise_.set_value();
             });
     }
-}}}
+}}}    // namespace hpx::lcos::detail
