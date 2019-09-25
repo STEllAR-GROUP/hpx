@@ -300,30 +300,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             return continuation_recursion_count_;
         }
 
-        //static std::uint64_t get_allocation_count_all(bool reset)
-        //{
-        //    std::uint64_t count = 0;
-        //    for (std::size_t i = 0; i < HPX_COROUTINE_NUM_ALL_HEAPS; ++i) {
-        //        count += m_allocation_counters.get(i).load();
-        //        if (reset)
-        //            m_allocation_counters.get(i).store(0);
-        //    }
-        //    return count;
-        //}
-        //static std::uint64_t get_allocation_count(std::size_t heap_num, bool reset)
-        //{
-        //    std::uint64_t result = m_allocation_counters.get(heap_num).load();
-        //
-        //    if (reset)
-        //        m_allocation_counters.get(heap_num).store(0);
-        //    return result;
-        //}
-        //
-        //static std::uint64_t increment_allocation_count(std::size_t heap_num)
-        //{
-        //    return ++m_allocation_counters.get(heap_num);
-        //}
-
     public:
         // global coroutine state
         enum context_state
@@ -396,7 +372,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
         // Nothrow.
-        void do_invoke() throw()
+        void do_invoke() noexcept
         {
             HPX_ASSERT(is_ready());
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
