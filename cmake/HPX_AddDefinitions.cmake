@@ -80,7 +80,21 @@ function(write_config_defines_file)
 
   set(hpx_config_defines "\n")
   foreach(def ${DEFINITIONS_VAR})
-    set(hpx_config_defines "${hpx_config_defines}#define ${def}\n")#"
+    # C++17 specific variable
+    string(FIND ${def} "HAVE_CXX17" _pos)
+    if(NOT ${_pos} EQUAL -1)
+      set(hpx_config_defines
+         "${hpx_config_defines}#if __cplusplus >= 201500\n#define ${def}\n#endif\n")
+    else()
+      # C++14 specific variable
+      string(FIND ${def} "HAVE_CXX14" _pos)
+      if(NOT ${_pos} EQUAL -1)
+        set(hpx_config_defines
+           "${hpx_config_defines}#if __cplusplus >= 201402\n#define ${def}\n#endif\n")
+      else()
+        set(hpx_config_defines "${hpx_config_defines}#define ${def}\n")
+      endif()
+    endif()
   endforeach()
 
   if(DEFINED COND_DEFINITIONS_VAR)
@@ -96,8 +110,21 @@ function(write_config_defines_file)
       set(defname ${def})
       string(STRIP ${defname} defname)
     endif()
-    set(hpx_config_defines
-        "${hpx_config_defines}#if !defined(${defname})\n#define ${def}\n#endif\n")#"
+    string(FIND ${def} "HAVE_CXX17" _pos)
+    if(NOT ${_pos} EQUAL -1)
+      set(hpx_config_defines
+         "${hpx_config_defines}#if __cplusplus >= 201500 && !defined(${defname})\n#define ${def}\n#endif\n")
+    else()
+      # C++14 specific variable
+      string(FIND ${def} "HAVE_CXX14" _pos)
+      if(NOT ${_pos} EQUAL -1)
+        set(hpx_config_defines
+           "${hpx_config_defines}#if __cplusplus >= 201402 && !defined(${defname})\n#define ${def}\n#endif\n")
+      else()
+        set(hpx_config_defines
+          "${hpx_config_defines}#if !defined(${defname})\n#define ${def}\n#endif\n")
+      endif()
+    endif()
   endforeach()
 
   # if the user has not specified a template, generate a proper header file
