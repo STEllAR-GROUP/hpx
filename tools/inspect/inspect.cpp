@@ -5,6 +5,7 @@
 //  Copyright Gennaro Prota 2006.
 //  Copyright Hartmut Kaiser 2014-2016.
 
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -57,6 +58,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include "crlf_check.hpp"
 #include "end_check.hpp"
 #include "license_check.hpp"
+#include "spdx_license_check.hpp"
 #include "link_check.hpp"
 #include "path_name_check.hpp"
 #include "tab_check.hpp"
@@ -238,8 +240,8 @@ namespace
   {
     string local( boost::inspect::relative_to( pth, search_root_path() ) );
     string leaf( pth.filename().string() );
-    if (leaf[0] == '.')  // ignore hidden by convention directories such as
-      return false;      //  .htaccess, .git, .svn, .bzr, .DS_Store, etc.
+    if (leaf == ".git")  // ignore .git, but not the other directories
+      return false;
 
     return
       // so we can inspect a GIT checkout
@@ -721,7 +723,7 @@ namespace boost
       register_signature( ".pl" );
       register_signature( ".py" );
       register_signature( ".sh" );
-      register_signature( "CMakeText.txt" );
+      register_signature( "CMakeLists.txt" );
       register_signature( ".cmake" );
       register_signature( ".yml" );
 
@@ -795,6 +797,7 @@ int cpp_main( int argc_param, char * argv_param[] )
         "Usage: inspect [dir [dir ...]] [options]");
 
     bool license_ck = false;
+    bool spdx_license_ck = false;
     bool copyright_ck = false;
     bool crlf_ck = false;
     bool end_ck = false;
@@ -824,6 +827,8 @@ int cpp_main( int argc_param, char * argv_param[] )
 
         ("license", value<bool>(&license_ck)->implicit_value(false),
             "check for Boost license violations (default: off)")
+        ("spdx_license", value<bool>(&spdx_license_ck)->implicit_value(false),
+            "check for SPDX license violations (default: off)")
         ("copyright", value<bool>(&copyright_ck)->implicit_value(false),
             "check for copyright violations (default: off)")
         ("crlf", value<bool>(&crlf_ck)->implicit_value(false),
@@ -922,6 +927,7 @@ int cpp_main( int argc_param, char * argv_param[] )
     if (vm.count("all"))
     {
         license_ck = true;
+        spdx_license_ck = true;
         copyright_ck = true;
         crlf_ck = true;
         end_ck = true;
@@ -953,6 +959,9 @@ int cpp_main( int argc_param, char * argv_param[] )
   if ( license_ck )
     inspectors.push_back( inspector_element(
         new boost::inspect::license_check ) );
+  if ( spdx_license_ck )
+    inspectors.push_back( inspector_element(
+        new boost::inspect::spdx_license_check ) );
   if ( copyright_ck )
     inspectors.push_back( inspector_element(
         new boost::inspect::copyright_check ) );

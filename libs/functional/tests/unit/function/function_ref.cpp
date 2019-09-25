@@ -4,6 +4,7 @@
 //  Copyright 2013 Hartmut Kaiser
 //  Copyright 2019 Agustin Berge
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Use, modification and
 //  distribution is subject to the Boost Software License, Version
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
