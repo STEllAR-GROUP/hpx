@@ -839,11 +839,11 @@ The merge operation itself conforms to the rules as described in the section
    property ``hpx.component_path`` and retrieve their default configuration
    information (see section :ref:`loading_components` for more details). This
    property can refer to a list of directories separated by ``':'`` (Linux,
-   Android, and MacOS) or using ``';'`` (Windows).
+   Android, and MacOS) or by ``';'`` (Windows).
 #. Load all files named ``hpx.ini`` in the directories referenced by the property
    ``hpx.master_ini_path`` This property can refer to a list of directories
-   separated by ``':'`` (Linux, Android, and MacOS) or using ``';'`` (Windows).
-#. Load a file named ``.hpx.ini`` in the current working directory, e.g. the
+   separated by ``':'`` (Linux, Android, and MacOS) or by ``';'`` (Windows).
+#. Load a file named ``.hpx.ini`` in the current working directory, e.g., the
    directory the application was invoked from.
 #. Load a file referenced by the environment variable ``HPX_INI``. This variable
    is expected to provide the full path name of the ini configuration file (if
@@ -851,7 +851,7 @@ The merge operation itself conforms to the rules as described in the section
 #. Load a file named ``/etc/hpx.ini``. This lookup is done on non-Windows systems
    only.
 #. Load a file named ``.hpx.ini`` in the home directory of the current user,
-   e.g. the directory referenced by the environment variable ``HOME``.
+   e.g., the directory referenced by the environment variable ``HOME``.
 #. Load a file named ``.hpx.ini`` in the directory referenced by the environment
    variable ``PWD``.
 #. Load the file specified on the command line using the option
@@ -859,7 +859,7 @@ The merge operation itself conforms to the rules as described in the section
 #. Load all properties specified on the command line using the option
    :option:`--hpx:ini`. The properties will be added to the database in the
    same sequence as they are specified on the command line. The format for those
-   options is for instance :option:`--hpx:ini`\ ``=hpx.default_stack_size=0x4000``. In
+   options is, for instance, :option:`--hpx:ini`\ ``=hpx.default_stack_size=0x4000``. In
    addition to the explicit command line options, this will set the following
    properties as implied from other settings:
 
@@ -874,7 +874,7 @@ The merge operation itself conforms to the rules as described in the section
    * ``hpx.runtime_mode`` will be derived from any explicit
      :option:`--hpx:console`, :option:`--hpx:worker`, or :option:`--hpx:connect`,
      or it will be derived from other settings, such as :option:`--hpx:node`
-     ``=0`` which implies :option:`--hpx:console`
+     ``=0``, which implies :option:`--hpx:console`.
 #. Load files based on the pattern ``*.ini`` in all directories listed by the
    property ``hpx.ini_path``. All files found during this search will be merged.
    The property ``hpx.ini_path`` can hold a list of directories separated by
@@ -887,7 +887,7 @@ The merge operation itself conforms to the rules as described in the section
 
    Any changes made to the configuration database caused by one of the steps
    will influence the loading process for all subsequent steps. For instance, if
-   one of the ini files loaded changes the property ``hpx.ini_path`` this will
+   one of the ini files loaded changes the property ``hpx.ini_path``, this will
    influence the directories searched in step 9 as described above.
 
 .. important::
@@ -898,10 +898,10 @@ The merge operation itself conforms to the rules as described in the section
    configuration settings. This is to protect the user from unintentional typos
    while specifying those settings. This behavior can be overwritten by
    appending a ``'!'`` to the configuration key, thus forcing the setting to be
-   entered into the configuration database, for instance: :option:`--hpx:ini`\
+   entered into the configuration database. For instance: :option:`--hpx:ini`\
    ``=hpx.foo! = 1``
 
-If any of the environment variables or files listed above is not found the
+If any of the environment variables or files listed above are not found, the
 corresponding loading step will be silently skipped.
 
 .. _loading_components:
@@ -914,14 +914,14 @@ application. Moreover, |hpx| comes with a set of preinstalled components
 supporting basic functionalities useful for almost every application. Any
 component in |hpx| is loaded from a shared library, where any of the shared
 libraries can contain more than one component type. During startup, |hpx| tries
-to locate all available components (e.g. their corresponding shared libraries)
+to locate all available components (e.g., their corresponding shared libraries)
 and creates an internal component registry for later use. This section describes
 the algorithm used by |hpx| to locate all relevant shared libraries on a system.
 As described, this algorithm is customizable by the configuration properties
 loaded from the ini files (see section :ref:`loading_ini_files`).
 
-Loading components is a two stage process. First |hpx| tries to locate all
-component shared libraries, loads those, and generates default configuration
+Loading components is a two-stage process. First |hpx| tries to locate all
+component shared libraries, loads those, and generates a default configuration
 section in the internal configuration database for each component found. For
 each found component the following information is generated:
 
@@ -950,8 +950,8 @@ second step in terms of loading components. During this step, |hpx| scans all
 existing configuration sections
 ``[hpx.component.<some_component_instance_name>]`` and instantiates a special
 factory object for each of the successfully located and loaded components.
-During the application's life time, these factory objects will be responsible to
-create new and discard old instances of the component they are associated with.
+During the application's life time, these factory objects are responsible for
+creating new and discarding old instances of the component they are associated with.
 This step is performed after step 11) of the process of filling the internal
 configuration database with default information as described in section
 :ref:`loading_ini_files`.
@@ -964,7 +964,7 @@ Application specific component example
 In this section we assume to have a simple application component which exposes
 one member function as a component action. The header file ``app_server.hpp``
 declares the C++ type to be exposed as a component. This type has a member
-function ``print_greeting()`` which is exposed as an action
+function ``print_greeting()``, which is exposed as an action
 ``print_greeting_action``. We assume the source files for this example are
 located in a directory referenced by ``$APP_ROOT``:
 
@@ -994,7 +994,7 @@ located in a directory referenced by ``$APP_ROOT``:
    // Declare boilerplate code required for each of the component actions.
    HPX_REGISTER_ACTION_DECLARATION(app::server::print_greeting_action);
 
-The corresponding source file contains mainly macro invocations which define
+The corresponding source file contains mainly macro invocations that define the
 boilerplate code needed for |hpx| to function properly:
 
 .. code-block:: c++
@@ -1015,7 +1015,7 @@ boilerplate code needed for |hpx| to function properly:
 The following gives an example of how the component can be used. We create one
 instance of the ``app::server`` component on the current :term:`locality` and
 invoke the exposed action ``print_greeting_action`` using the global id of the
-newly created instance. Note, that no special code is required to delete the
+newly created instance. Note that no special code is required to delete the
 component instance after it is not needed anymore. It will be deleted
 automatically when its last reference goes out of scope, here at the closing
 brace of the block surrounding the code:
@@ -1049,8 +1049,8 @@ brace of the block surrounding the code:
 
 In order to make sure that the application will be able to use the component
 ``app::server``, special configuration information must be passed to |hpx|. The
-simples way to allow |hpx| to 'find' the component is to provide special ini
-configuration files, which add the necessary information to the internal
+simplest way to allow |hpx| to 'find' the component is to provide special ini
+configuration files that add the necessary information to the internal
 configuration database. The component should have a special ini file containing
 the information specific to the component ``app_server``.
 
@@ -1061,14 +1061,14 @@ the information specific to the component ``app_server``.
     name = app_server
     path = $APP_LOCATION/
 
-Here ``$APP_LOCATION`` is the directory where the (binary) component shared
+Here, ``$APP_LOCATION`` is the directory where the (binary) component shared
 library is located. |hpx| will attempt to load the shared library from there.
 The section name ``hpx.components.app_server`` reflects the instance name of the
 component (``app_server`` is an arbitrary, but unique name). The property value
 for ``hpx.components.app_server.name`` should be the same as used for the second
 argument to the macro :c:macro:`HPX_REGISTER_COMPONENT` above.
 
-Additionally a file ``.hpx.ini`` which could be located in the current working
+Additionally, a file ``.hpx.ini`` which could be located in the current working
 directory (see step 3 as described in the section :ref:`loading_ini_files`) can
 be used to add to the ini search path for components:
 
@@ -1093,10 +1093,10 @@ the directory ``$APP_ROOT``.
 Logging
 =======
 
-|hpx| uses a sophisticated logging framework allowing to follow in detail
+|hpx| uses a sophisticated logging framework, allowing users to follow in detail
 what operations have been performed inside the |hpx| library in what sequence.
 This information proves to be very useful for diagnosing problems or just for
-improving the understanding what is happening in |hpx| as a consequence of
+improving the understanding of what is happening in |hpx| as a consequence of
 invoking |hpx| API functionality.
 
 Default logging
@@ -1106,14 +1106,14 @@ Enabling default logging is a simple process. The detailed description in the
 remainder of this section explains different ways to customize the defaults.
 Default logging can be enabled by using one of the following:
 
-* a command line switch :option:`--hpx:debug-hpx-log`, which will enable
-  logging to the console terminal
-* the command line switch :option:`--hpx:debug-hpx-log`\ ``=<filename>``, which
-  enables logging to a given file ``<filename>``, or
-* setting an environment variable ``HPX_LOGLEVEL=<loglevel>`` while running the
+* A command line switch :option:`--hpx:debug-hpx-log`, which will enable
+  logging to the console terminal.
+* The command line switch :option:`--hpx:debug-hpx-log`\ ``=<filename>``, which
+  enables logging to a given file ``<filename>``.
+* Setting an environment variable ``HPX_LOGLEVEL=<loglevel>`` while running the
   |hpx| application. In this case ``<loglevel>`` should be a number between (or
   equal to) ``1`` and ``5`` where ``1`` means minimal logging and ``5`` causes
-  to log all available messages. When setting the environment variable the logs
+  all available messages to be logged. When setting the environment variable, the logs
   will be written to a file named ``hpx.<PID>.lo`` in the current working
   directory, where ``<PID>`` is the process id of the console instance of the
   application.
