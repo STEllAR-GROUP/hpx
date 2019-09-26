@@ -12,7 +12,7 @@
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
-#include <hpx/lcos/spmd_block.hpp>
+#include <hpx/collectives/spmd_block.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
 
 #include <algorithm>

@@ -22,22 +22,16 @@ set(tests
     async_remote
     async_remote_client
     async_unwrap_result
-    barrier
-    broadcast
-    broadcast_component
-    broadcast_apply
     channel
     channel_local
     client_then
     condition_variable
     counting_semaphore
-    fold
     future
     future_ref
     future_then
     future_then_executor
     future_wait
-    global_spmd_block
     local_latch
     local_barrier
     local_barrier_count_up
@@ -55,9 +49,7 @@ set(tests
     promise
     promise_allocator
     promise_emplace
-    reduce
     remote_dataflow
-    remote_latch
     run_guarded
     shared_future
     sliding_semaphore
@@ -98,9 +90,6 @@ set(async_remote_client_PARAMETERS LOCALITIES 2)
 set(async_cb_remote_PARAMETERS LOCALITIES 2)
 set(async_cb_remote_client_PARAMETERS LOCALITIES 2)
 
-set(broadcast_PARAMETERS LOCALITIES 2)
-set(broadcast_apply_PARAMETERS LOCALITIES 2)
-
 set(future_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_then_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -111,7 +100,6 @@ set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
 set(sliding_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(local_latch_PARAMETERS THREADS_PER_LOCALITY 4)
-set(remote_latch_PARAMETERS LOCALITIES 2)
 
 set(local_dataflow_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_dataflow_executor_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -126,8 +114,6 @@ set(local_mutex_PARAMETERS THREADS_PER_LOCALITY 4)
 set(packaged_action_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(promise_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(reduce_PARAMETERS LOCALITIES 2)
 
 set(run_guarded_PARAMETERS THREADS_PER_LOCALITY 4)
 

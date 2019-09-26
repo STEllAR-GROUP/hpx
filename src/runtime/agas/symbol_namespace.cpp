@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
+#include <hpx/collectives.hpp>
 #include <hpx/format.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/lcos/broadcast.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>

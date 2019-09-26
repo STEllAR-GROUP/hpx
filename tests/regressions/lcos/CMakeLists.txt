@@ -11,9 +11,6 @@ set(tests
     async_callback_with_bound_callback
     async_callback_non_deduced_context
     async_unwrap_1037
-    barrier_hang
-    broadcast_unwrap_future_2885
-    broadcast_wait_for_2822
     call_promise_get_gid_more_than_once
     channel_2916
     channel_not_empty_2890
@@ -39,7 +36,6 @@ set(tests
     ignore_while_locked_1485
     lifetime_588
     lifetime_588_1
-    multiple_gather_ops_2001
     promise_leak_996
     promise_1620
     receive_buffer_1733
@@ -65,8 +61,6 @@ set(after_588_PARAMETERS LOCALITIES 2)
 set(async_action_1813_PARAMETERS LOCALITIES 2)
 set(async_callback_with_bound_callback_PARAMETERS LOCALITIES 2)
 set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
-set(broadcast_unwrap_future_2885_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 4)
-set(broadcast_wait_for_2822_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 4)
 set(channel_2916_FLAGS DEPENDENCIES iostreams_component)
 set(channel_2916_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
@@ -78,7 +72,6 @@ set(future_hang_on_wait_with_callback_629_PARAMETERS THREADS_PER_LOCALITY 4)
 set(ignore_while_locked_1485_PARAMETERS THREADS_PER_LOCALITY 2)
 set(lifetime_588_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
-set(multiple_gather_ops_2001_PARAMETERS LOCALITIES 2)
 set(receive_buffer_1733_PARAMETERS LOCALITIES 2)
 set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
 set(shared_mutex_1702_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -86,11 +79,6 @@ set(sliding_semaphore_2338_PARAMETERS THREADS_PER_LOCALITY 2)
 set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
 set(wait_all_hang_1946_PARAMETERS THREADS_PER_LOCALITY 8)
 set(wait_all_hang_1946_FLAGS DEPENDENCIES iostreams_component)
-
-if(HPX_WITH_NETWORKING)
-  set(tests ${tests} barrier_3792)
-  set(barrier_3792_PARAMETERS LOCALITIES 3 THREADS_PER_LOCALITY 1)
-endif()
 
 # Create test cases
 foreach(test ${tests})

@@ -10,9 +10,10 @@
 
 #include <hpx/runtime.hpp>
 
+#include <hpx/collectives.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/barrier.hpp>
-#include <hpx/lcos/detail/barrier_node.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
@@ -24,9 +25,7 @@
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/threadmanager_counters.hpp>
-#include <hpx/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/datastructures/tuple.hpp>
 
 #include <cstddef>
 #include <string>

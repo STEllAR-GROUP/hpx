@@ -606,7 +606,7 @@ namespace hpx { namespace parallel { namespace execution {
                     typename bulk_function_result<F, Shape, Ts...>::type,
                     Ts...>::type>
                     results;
-                results.reserve(util::size(shape));
+                results.reserve(hpx::util::size(shape));
 
                 for (auto const& elem : shape)
                 {
@@ -749,7 +749,7 @@ namespace hpx { namespace parallel { namespace execution {
                 {
                     typename bulk_execute_result_impl<F, Shape, false,
                         Ts...>::type results;
-                    results.reserve(util::size(shape));
+                    results.reserve(hpx::util::size(shape));
 
                     for (auto const& elem : shape)
                     {
@@ -854,7 +854,7 @@ namespace hpx { namespace parallel { namespace execution {
                 try
                 {
                     result_type results;
-                    results.reserve(util::size(shape));
+                    results.reserve(hpx::util::size(shape));
                     for (auto const& elem : shape)
                     {
                         results.push_back(
@@ -885,7 +885,7 @@ namespace hpx { namespace parallel { namespace execution {
                 try
                 {
                     result_type results;
-                    results.reserve(util::size(shape));
+                    results.reserve(hpx::util::size(shape));
 
                     for (auto const& elem : shape)
                     {
