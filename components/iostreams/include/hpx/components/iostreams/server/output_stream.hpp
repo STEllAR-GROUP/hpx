@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/vector.hpp>
 
 #include <hpx/components/iostreams/export_definitions.hpp>
 #include <hpx/components/iostreams/server/buffer.hpp>

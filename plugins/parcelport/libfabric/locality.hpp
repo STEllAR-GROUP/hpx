@@ -8,8 +8,8 @@
 #define HPX_PARCELSET_POLICIES_LIBFABRIC_LOCALITY_HPP
 
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/array.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/array.hpp>
 //
 #include <utility>
 #include <cstring>

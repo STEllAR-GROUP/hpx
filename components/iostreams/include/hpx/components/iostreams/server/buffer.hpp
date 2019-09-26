@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/recursive_mutex.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <hpx/components/iostreams/export_definitions.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>

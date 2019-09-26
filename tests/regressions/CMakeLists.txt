@@ -14,7 +14,6 @@ set(subdirs
     computeapi
     lcos
     performance_counters
-    serialization
     threads
     traits
     util

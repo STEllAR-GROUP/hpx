@@ -42,8 +42,8 @@
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>

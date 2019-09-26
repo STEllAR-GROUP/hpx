@@ -11,7 +11,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
 namespace hpx { namespace traits
 {

@@ -11,7 +11,7 @@
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 

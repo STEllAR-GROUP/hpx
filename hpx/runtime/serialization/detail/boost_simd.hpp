@@ -10,9 +10,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_BOOST_SIMD)
-#include <hpx/runtime/serialization/array.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/array.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -21,6 +21,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace serialization {
+
     template <typename T, std::size_t N, typename Abi>
     void serialize(input_archive& ar, boost::simd::pack<T, N, Abi>& v, unsigned)
     {
@@ -36,6 +37,7 @@ namespace hpx { namespace serialization {
 }}    // namespace hpx::serialization
 
 namespace hpx { namespace traits {
+
     template <typename T, std::size_t N, typename Abi>
     struct is_bitwise_serializable<boost::simd::pack<T, N, Abi>>
       : is_bitwise_serializable<typename std::remove_const<T>::type>

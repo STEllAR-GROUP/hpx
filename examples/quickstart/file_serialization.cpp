@@ -9,7 +9,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/traits/serialization_access_data.hpp>
+#include <hpx/serialization/traits/serialization_access_data.hpp>
 
 #include <cstddef>
 #include <cstring>

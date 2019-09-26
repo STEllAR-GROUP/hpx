@@ -15,8 +15,8 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <hpx/compute/cuda/target.hpp>

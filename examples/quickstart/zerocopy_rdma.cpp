@@ -7,7 +7,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <cstddef>
 #include <iostream>

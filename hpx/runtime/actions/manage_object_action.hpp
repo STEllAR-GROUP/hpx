@@ -11,9 +11,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/serialization/array.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/runtime/serialization/serialize_buffer.hpp>
+#include <hpx/serialization/array.hpp>
+#include <hpx/serialization/base_object.hpp>
+#include <hpx/serialization/serialize_buffer.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <cstddef>

@@ -11,7 +11,7 @@
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/functional/function.hpp>
 
 #include <cstddef>

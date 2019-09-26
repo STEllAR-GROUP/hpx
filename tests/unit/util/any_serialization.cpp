@@ -25,7 +25,7 @@ namespace std
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/serializable_any.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include "small_big_object.hpp"
 

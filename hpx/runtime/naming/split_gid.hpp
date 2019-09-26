@@ -9,16 +9,21 @@
 #ifndef HPX_NAMING_SPLIT_GID_HPP
 #define HPX_NAMING_SPLIT_GID_HPP
 
+#include <hpx/datastructures/any.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/serialization/extra_output_data.hpp>
 
+#include <map>
 #include <mutex>
 
-namespace hpx { namespace naming { namespace detail
-{
+namespace hpx { namespace naming { namespace detail {
+
     HPX_EXPORT hpx::future<gid_type> split_gid_if_needed(gid_type& id);
     HPX_EXPORT hpx::future<gid_type> split_gid_if_needed_locked(
-        std::unique_lock<gid_type::mutex_type> &l, gid_type& gid);
-}}}
+        std::unique_lock<gid_type::mutex_type>& l, gid_type& gid);
+
+}}}    // namespace hpx::naming::detail
 
 #endif

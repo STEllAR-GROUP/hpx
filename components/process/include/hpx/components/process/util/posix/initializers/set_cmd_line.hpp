@@ -15,8 +15,8 @@
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
-#include <hpx/runtime/serialization/string.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/string.hpp>
+#include <hpx/serialization/vector.hpp>
 
 #include <boost/shared_array.hpp>
 #include <boost/tokenizer.hpp>

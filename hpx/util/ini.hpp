@@ -10,9 +10,10 @@
 #define HPX_UTIL_SECTION_SEP_17_2008_022PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util_fwd.hpp> // this needs to go first
+
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/functional/function.hpp>
 
 #include <boost/lexical_cast.hpp>

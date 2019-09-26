@@ -8,7 +8,7 @@
 #define HPX_TEST_ACTION_MOVE_SEMANTICS_FEB_23_2012_0947AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/access.hpp>
+#include <hpx/serialization/access.hpp>
 
 #include <cstddef>
 
