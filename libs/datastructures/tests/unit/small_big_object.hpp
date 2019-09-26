@@ -9,8 +9,6 @@
 #ifndef HPX_SMALL_BIG_OBJECT_HPP
 #define HPX_SMALL_BIG_OBJECT_HPP
 
-#include <hpx/runtime/serialization/serialize.hpp>
-
 #include <cstdint>
 #include <iostream>
 
@@ -22,8 +20,7 @@ struct small_object
 private:
     std::uint64_t x_;
 
-    friend class hpx::serialization::access;
-
+public:
     template <typename Archive>
     void serialize(Archive& ar, unsigned const)
     {
@@ -130,8 +127,7 @@ private:
     std::uint64_t x_;
     std::uint64_t y_;
 
-    friend class hpx::serialization::access;
-
+public:
     template <typename Archive>
     void serialize(Archive& ar, unsigned const)
     {

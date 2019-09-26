@@ -6,12 +6,24 @@
 
 cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
+# Compatibility with using Boost.FileSystem, introduced in V1.4.0
+hpx_option(HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE
+  BOOL "Enable compatibility of hpx::util::tuple with std::tuple. (default: ON)"
+  ON ADVANCED CATEGORY "Modules")
+
+if(HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE
+    NAMESPACE DATASTRUCTURES)
+endif()
+
 set(datastructures_headers
   hpx/datastructures/any.hpp
   hpx/datastructures/tuple.hpp
   hpx/datastructures/optional.hpp
   hpx/datastructures/detail/pack.hpp
   hpx/traits/supports_streaming_with_any.hpp
+  hpx/traits/is_tuple_like.hpp
 )
 
 set(datastructures_compat_headers
@@ -41,3 +53,7 @@ add_hpx_module(datastructures
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )
+
+if(HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE)
+  hpx_info("    Adapted hpx::util::tuple to be usable with std::tuple")
+endif()
