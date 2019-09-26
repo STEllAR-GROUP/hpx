@@ -745,6 +745,9 @@ namespace hpx
     inline int init(std::nullptr_t f, int argc, char** argv,
         std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    inline int init(std::nullptr_t f, std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
 /// \endcond
 }
 
