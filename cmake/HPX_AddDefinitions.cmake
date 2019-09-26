@@ -106,7 +106,7 @@ function(write_config_defines_file)
     set(PREAMBLE
       "//  Copyright (c) 2019 STE||AR Group\n"
       "//\n"
-# SPDX-License-Identifier: BSL-1.0
+      "//  SPDX-License-Identifier: BSL-1.0\n"
       "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
       "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"
       "\n"

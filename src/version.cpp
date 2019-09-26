@@ -3,7 +3,6 @@
 //  Copyright (c) 2011-2017 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
-//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,7 +110,6 @@ namespace hpx
             "of any scale).\n\n"
             "Copyright (c) 2007-2019, The STE||AR Group,\n"
             "http://stellar-group.org, email:hpx-users@stellar.cct.lsu.edu\n\n"
-//  SPDX-License-Identifier: BSL-1.0
 //  SPDX-License-Identifier: BSL-1.0
             "Distributed under the Boost Software License, "
             "Version 1.0. (See accompanying\n"
