@@ -735,6 +735,44 @@ namespace hpx
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main entry point, which can be used to set up the
+    /// runtime for an HPX application (the runtime system will be set up in
+    /// console mode or worker mode depending on the command line settings). It
+    /// will schedule the function given by \p f as a HPX thread. This overload
+    /// will not call `hpx_main`.
+    ///
+    /// \param f            [in] The function to be scheduled as an HPX
+    ///                     thread. Usually this function represents the main
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
+    /// \param cfg          A list of configuration settings which will be added
+    ///                     to the system configuration before the runtime
+    ///                     instance is run. Each of the entries in this list
+    ///                     must have the format of a fully defined key/value
+    ///                     pair from an ini-file (for instance
+    ///                     'hpx.component.enabled=1')
+    /// \param mode         [in] The mode the created runtime environment
+    ///                     should be initialized in. There has to be exactly
+    ///                     one locality in each HPX application which is
+    ///                     executed in console mode (\a hpx::runtime_mode_console),
+    ///                     all other localities have to be run in worker mode
+    ///                     (\a hpx::runtime_mode_worker). Normally this is
+    ///                     set up automatically, but sometimes it is necessary
+    ///                     to explicitly specify the mode.
+    ///
+    /// \returns            The function returns the value, which has been
+    ///                     returned from the user supplied function \p f.
+    ///
+    /// \note               The created runtime system instance will be
+    ///                     executed in console or worker mode depending on the
+    ///                     configuration passed in `cfg`.
+    inline int init(util::function_nonser<int(int, char**)> const& f,
+        std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+
 /// \cond NOINTERNAL
     inline int init(std::nullptr_t f, std::string const& app_name, int argc,
         char** argv, hpx::runtime_mode mode = hpx::runtime_mode_default);
@@ -744,6 +782,9 @@ namespace hpx
 
     inline int init(std::nullptr_t f, int argc, char** argv,
         std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    inline int init(std::nullptr_t f, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 /// \endcond
 }

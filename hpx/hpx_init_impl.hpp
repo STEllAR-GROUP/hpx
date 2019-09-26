@@ -327,6 +327,16 @@ namespace hpx
     }
 
     inline int
+        init(util::function_nonser<int(int, char**)> const& f,
+        std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode)
+    {
+        char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), nullptr };
+
+        return init(f, 1, dummy_argv, cfg, mode);
+    }
+
+    inline int
     init(std::nullptr_t, std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
@@ -371,6 +381,15 @@ namespace hpx
 
         return init(main_f, desc_commandline, argc, argv, cfg,
             startup_function_type(), shutdown_function_type(), mode);
+    }
+
+    inline int
+    init(std::nullptr_t, std::vector<std::string> const& cfg,
+         hpx::runtime_mode mode)
+    {
+      char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), nullptr };
+
+      return init(nullptr, 1, dummy_argv, cfg, mode);
     }
 }
 
