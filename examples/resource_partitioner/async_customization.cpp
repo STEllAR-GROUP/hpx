@@ -80,8 +80,8 @@ struct test_async_executor
     // --------------------------------------------------------------------
     struct future_extract_value
     {
-        template<typename T, template <typename> typename Future>
-        const T& operator()(const Future<T> &el) const
+        template <typename T, template <typename> class Future>
+        const T& operator()(const Future<T>& el) const
         {
             typedef typename traits::detail::shared_state_ptr_for<Future<T>>::type
                 shared_state_ptr;
@@ -174,21 +174,16 @@ struct test_async_executor
     // .then() execute specialized for a when_all dispatch for any future types
     // future< tuple< is_future<a>::type, is_future<b>::type, ...> >
     // --------------------------------------------------------------------
-    template <typename F,
-              template <typename> typename  OuterFuture,
-              typename ... InnerFutures,
-              typename ... Ts,
-              typename = enable_if_t<is_future_of_tuple_of_futures<
-                OuterFuture<util::tuple<InnerFutures...>>>::value>,
-              typename = enable_if_t<is_tuple_of_futures<
-                util::tuple<InnerFutures...>>::value>
-              >
-    auto
-    then_execute(F && f,
-                 OuterFuture<util::tuple<InnerFutures... > >&& predecessor,
-                 Ts &&... ts)
-    ->  future<typename util::detail::invoke_deferred_result<
-        F, OuterFuture<util::tuple<InnerFutures... >>, Ts...>::type>
+    template <typename F, template <typename> class OuterFuture,
+        typename... InnerFutures, typename... Ts,
+        typename = enable_if_t<is_future_of_tuple_of_futures<
+            OuterFuture<util::tuple<InnerFutures...>>>::value>,
+        typename = enable_if_t<
+            is_tuple_of_futures<util::tuple<InnerFutures...>>::value>>
+    auto then_execute(F&& f,
+        OuterFuture<util::tuple<InnerFutures...>>&& predecessor, Ts&&... ts)
+        -> future<typename util::detail::invoke_deferred_result<F,
+            OuterFuture<util::tuple<InnerFutures...>>, Ts...>::type>
     {
         typedef typename util::detail::invoke_deferred_result<
             F, OuterFuture<util::tuple<InnerFutures... >>, Ts...>::type
