@@ -57,8 +57,8 @@ namespace hpx { namespace threads { namespace executors
     // --------------------------------------------------------------------
     struct future_extract_value
     {
-        template<typename T, template <typename> typename Future>
-        const T& operator()(const Future<T> &el) const
+        template <typename T, template <typename> class Future>
+        const T& operator()(const Future<T>& el) const
         {
             const auto & state = traits::detail::get_shared_state(el);
             return *state->get_result();
@@ -324,21 +324,16 @@ namespace hpx { namespace threads { namespace executors
         // .then() execute specialized for a when_all dispatch for any future types
         // future< tuple< is_future<a>::type, is_future<b>::type, ...> >
         // --------------------------------------------------------------------
-        template <typename F,
-                  template <typename> typename  OuterFuture,
-                  typename ... InnerFutures,
-                  typename ... Ts,
-                  typename = enable_if_t<is_future_of_tuple_of_futures<
-                    OuterFuture<util::tuple<InnerFutures...>>>::value>,
-                  typename = enable_if_t<traits::is_future_tuple<
-                    util::tuple<InnerFutures...>>::value>
-                  >
-        auto
-        then_execute(F && f,
-                     OuterFuture<util::tuple<InnerFutures... > > && predecessor,
-                     Ts &&... ts)
-        ->  future<typename util::detail::invoke_deferred_result<
-            F, OuterFuture<util::tuple<InnerFutures... >>, Ts...>::type>
+        template <typename F, template <typename> class OuterFuture,
+            typename... InnerFutures, typename... Ts,
+            typename = enable_if_t<is_future_of_tuple_of_futures<
+                OuterFuture<util::tuple<InnerFutures...>>>::value>,
+            typename = enable_if_t<
+                traits::is_future_tuple<util::tuple<InnerFutures...>>::value>>
+        auto then_execute(F&& f,
+            OuterFuture<util::tuple<InnerFutures...>>&& predecessor, Ts&&... ts)
+            -> future<typename util::detail::invoke_deferred_result<F,
+                OuterFuture<util::tuple<InnerFutures...>>, Ts...>::type>
         {
 #ifdef GUIDED_EXECUTOR_DEBUG
             // get the tuple of futures from the predecessor future <tuple of futures>
