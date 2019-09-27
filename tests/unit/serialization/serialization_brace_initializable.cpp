@@ -97,6 +97,6 @@ int main()
 #else
 int main()
 {
-    return hpx::util::report_errors();
+    return 0;
 }
 #endif
