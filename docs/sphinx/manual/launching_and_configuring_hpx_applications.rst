@@ -1012,13 +1012,13 @@ boilerplate code needed for |hpx| to function properly:
    // same argument as used for HPX_REGISTER_ACTION_DECLARATION above.
    HPX_REGISTER_ACTION(app::server::print_greeting_action);
 
-The following gives an example of how the component can be used. We create one
-instance of the ``app::server`` component on the current :term:`locality` and
-invoke the exposed action ``print_greeting_action`` using the global id of the
+The following gives an example of how the component can be used. Here, one
+instance of the ``app::server`` component is created on the current :term:`locality` and
+the exposed action ``print_greeting_action`` is invoked using the global id of the
 newly created instance. Note that no special code is required to delete the
 component instance after it is not needed anymore. It will be deleted
-automatically when its last reference goes out of scope, here at the closing
-brace of the block surrounding the code:
+automatically when its last reference goes out of scope (shown in the example below at
+the closing brace of the block surrounding the code):
 
 .. code-block:: c++
 
@@ -1124,7 +1124,7 @@ Customizing logging
 Generally, logging can be customized either using environment variable settings
 or using by an ini configuration file. Logging is generated in several
 categories, each of which can be customized independently. All customizable
-configuration parameters have reasonable defaults, allowing to use logging
+configuration parameters have reasonable defaults, allowing for the use of logging
 without any additional configuration effort. The following table lists the
 available categories.
 
@@ -1152,7 +1152,7 @@ By default, all logging output is redirected to the console instance of an
 application, where it is collected and written to a file, one file for each
 logging category.
 
-Each logging category can be customized at two levels, the parameters for each
+Each logging category can be customized at two levels. The parameters for each
 are stored in the ini configuration sections ``hpx.logging.CATEGORY`` and
 ``hpx.logging.console.CATEGORY`` (where ``CATEGORY`` is the category shortcut as
 listed in the table above). The former influences logging at the source
@@ -1163,10 +1163,10 @@ Levels
 ------
 
 All |hpx| logging output has seven different logging levels. These levels can
-be set explicitly or through environmental variables in the main |hpx| ini file
+be set explicitly or through environment variables in the main |hpx| ini file
 as shown below. The logging levels and their associated integral values are
 shown in the table below, ordered from most verbose to least verbose. By
-default, all |hpx| logs are set to 0, e.g. all logging output is disabled by
+default, all |hpx| logs are set to 0, e.g., all logging output is disabled by
 default.
 
 .. table:: Logging levels
@@ -1210,9 +1210,9 @@ general logging category are shown here (the syntax is described in the section
     format = ${HPX_LOGFORMAT:(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) P%parentloc%/%hpxparent%.%hpxparentphase% %time%($hh:$mm.$ss.$mili) [%idx%]|\\n}
 
 The logging level is taken from the environment variable ``HPX_LOGLEVEL`` and
-defaults to zero, e.g. no logging. The default logging destination is read from
+defaults to zero, e.g., no logging. The default logging destination is read from
 the environment variable ``HPX_LOGDESTINATION`` On any of the localities it
-defaults to ``console`` which redirects all generated logging output to the
+defaults to ``console``, which redirects all generated logging output to the
 console instance of an application. The following table lists the possible
 destinations for any logging output. It is possible to specify more than one
 destination separated by whitespace.
@@ -1222,21 +1222,21 @@ destination separated by whitespace.
    * * Logging destination
      * Description
    * * file(``<filename>``)
-     * Direct all output to a file with the given <filename>.
+     * Directs all output to a file with the given <filename>.
    * * cout
-     * Direct all output to the local standard output of the application
+     * Directs all output to the local standard output of the application
        instance on this :term:`locality`.
    * * cerr
-     * Direct all output to the local standard error output of the application
+     * Directs all output to the local standard error output of the application
        instance on this :term:`locality`.
    * * console
-     * Direct all output to the console instance of the application. The console
+     * Directs all output to the console instance of the application. The console
        instance has its logging destinations configured separately.
    * * android_log
-     * Direct all output to the (Android) system log (available on Android
+     * Directs all output to the (Android) system log (available on Android
        systems only).
 
-The logging format is read from the environment variable ``HPX_LOGFORMAT`` and
+The logging format is read from the environment variable ``HPX_LOGFORMAT``, and
 it defaults to a complex format description. This format consists of several
 placeholder fields (for instance ``%locality%`` which will be replaced by
 concrete values when the logging output is generated. All other information is
@@ -1253,22 +1253,22 @@ separator.
      * The id of the :term:`locality` on which the logging message was
        generated.
    * * hpxthread
-     * The id of the |hpx|-thread generating this logging output.
+     * The id of the |hpx| thread generating this logging output.
    * * hpxphase
-     * The phase [#]_ of the |hpx|-thread generating this logging output.
+     * The phase [#]_ of the |hpx| thread generating this logging output.
    * * hpxcomponent
-     * The local virtual address of the component which the current |hpx|-thread
+     * The local virtual address of the component which the current |hpx| thread
        is accessing.
    * * parentloc
-     * The id of the :term:`locality` where the |hpx| thread was running which
-       initiated the current |hpx|-thread. The current |hpx|-thread is
+     * The id of the :term:`locality` where the |hpx| thread was running that
+       initiated the current |hpx| thread. The current |hpx| thread is
        generating this logging output.
    * * hpxparent
-     * The id of the |hpx|-thread which initiated the current |hpx|-thread. The
-       current |hpx|-thread is generating this logging output.
+     * The id of the |hpx| thread that initiated the current |hpx| thread. The
+       current |hpx| thread is generating this logging output.
    * * hpxparentphase
-     * The phase of the |hpx|-thread when it initiated the current |hpx|-thread.
-       The current |hpx|-thread is generating this logging output.
+     * The phase of the |hpx| thread when it initiated the current |hpx| thread.
+       The current |hpx| thread is generating this logging output.
    * * time
      * The time stamp for this logging outputline as generated by the source
        :term:`locality`.
@@ -1276,17 +1276,17 @@ separator.
      * The sequence number of the logging output line as generated on the source
        :term:`locality`.
    * * osthread
-     * The sequence number of the OS-thread which executes the current
-       |hpx|-thread.
+     * The sequence number of the OS thread that executes the current
+       |hpx| thread.
 
 .. note::
 
    Not all of the field placeholder may be expanded for all generated logging
-   output. If no value is available for a particular field it is replaced with a
-   sequence of ``'-'`` characters.]
+   output. If no value is available for a particular field, it is replaced with a
+   sequence of ``'-'`` characters.
 
 Here is an example line from a logging output generated by one of the |hpx|
-examples (please note that this is generated on a single line, without line
+examples (please note that this is generated on a single line, without a line
 break):
 
 .. code-block:: text
@@ -1309,7 +1309,7 @@ received by the console instance of an application. The logging level is read
 from the environment variable ``HPX_LOGLEVEL`` (as set for the console instance
 of the application). The level defaults to the same values as the corresponding
 settings in the general logging configuration shown before. The destination on
-the console instance is set to be a file which name is generated based from its
+the console instance is set to be a file that's name is generated based on its
 OS process id. Setting the environment variable ``HPX_CONSOLE_LOGDESTINATION``
 allows customization of the naming scheme for the output file. The logging
 format is set to leave the original logging output unchanged, as received from
@@ -1330,118 +1330,118 @@ The predefined command line options for any application using
 
 .. option:: --hpx:help
 
-   print out program usage (default: this message), possible values: ``full``
-   (additionally prints options from components)
+   Print out program usage (default: this message). Possible values: ``full``
+   (additionally prints options from components).
 
 .. option:: --hpx:version
 
-   print out |hpx| version and copyright information
+   Print out |hpx| version and copyright information.
 
 .. option:: --hpx:info
 
-   print out |hpx| configuration information
+   Print out |hpx| configuration information.
 
 .. option:: --hpx:options-file arg
 
-   specify a file containing command line options (alternatively: @filepath)
+   Specify a file containing command line options (alternatively: @filepath).
 
 |hpx| options (additionally allowed in an options file)
 -------------------------------------------------------
 
 .. option:: --hpx:worker
 
-   run this instance in worker mode
+   Run this instance in worker mode.
 
 .. option:: --hpx:console
 
-   run this instance in console mode
+   Run this instance in console mode.
 
 .. option:: --hpx:connect
 
-   run this instance in worker mode, but connecting late
+   Run this instance in worker mode, but connecting late.
 
 .. option:: --hpx:run-agas-server
 
-   run :term:`AGAS` server as part of this runtime instance
+   Run :term:`AGAS` server as part of this runtime instance.
 
 .. option:: --hpx:run-hpx-main
 
-   run the hpx_main function, regardless of :term:`locality` mode
+   Run the hpx_main function, regardless of :term:`locality` mode.
 
 .. option:: --hpx:hpx arg
 
-   the IP address the |hpx| parcelport is listening on, expected format:
-   ``address:port`` (default: ``127.0.0.1:7910``)
+   The IP address the |hpx| parcelport is listening on, expected format:
+   ``address:port`` (default: ``127.0.0.1:7910``).
 
 .. option:: --hpx:agas arg
 
-   the IP address the :term:`AGAS` root server is running on, expected format:
-   ``address:port`` (default: ``127.0.0.1:7910``)
+   The IP address the :term:`AGAS` root server is running on, expected format:
+   ``address:port`` (default: ``127.0.0.1:7910``).
 
 .. option:: --hpx:run-agas-server-only
 
-   run only the :term:`AGAS` server
+   Run only the :term:`AGAS` server.
 
 .. option:: --hpx:nodefile arg
 
-   the file name of a node file to use (list of nodes, one node name per line
-   and core)
+   The file name of a node file to use (list of nodes, one node name per line
+   and core).
 
 .. option:: --hpx:nodes arg
 
-   the (space separated) list of the nodes to use (usually this is extracted
-   from a node file)
+   The (space separated) list of the nodes to use (usually this is extracted
+   from a node file).
 
 .. option:: --hpx:endnodes
 
-   this can be used to end the list of nodes specified using the option
-   :option:`--hpx:nodes`
+   This can be used to end the list of nodes specified using the option
+   :option:`--hpx:nodes`.
 
 .. option:: --hpx:ifsuffix arg
 
-   suffix to append to host names in order to resolve them to the proper network
-   interconnect
+   Suffix to append to host names in order to resolve them to the proper network
+   interconnect.
 
 .. option:: --hpx:ifprefix arg
 
-   prefix to prepend to host names in order to resolve them to the proper
-   network interconnect
+   Prefix to prepend to host names in order to resolve them to the proper
+   network interconnect.
 
 .. option:: --hpx:iftransform arg
 
-   sed-style search and replace (``s/search/replace/``) used to transform host
-   names to the proper network interconnect
+   Sed-style search and replace (``s/search/replace/``) used to transform host
+   names to the proper network interconnect.
 
 .. option:: --hpx:localities arg
 
-   the number of localities to wait for at application startup (default: ``1``)
+   The number of localities to wait for at application startup (default: ``1``).
 
 .. option:: --hpx:node arg
 
-   number of the node this :term:`locality` is run on (must be unique)
+   Number of the node this :term:`locality` is run on (must be unique).
 
 .. option:: --hpx:ignore-batch-env
 
-   ignore batch environment variables
+   Ignore batch environment variables.
 
 .. option:: --hpx:expect-connecting-localities
 
-   this :term:`locality` expects other localities to dynamically connect (this
-   is implied if the number of initial localities is larger than 1)
+   This :term:`locality` expects other localities to dynamically connect (this
+   is implied if the number of initial localities is larger than 1).
 
 .. option:: --hpx:pu-offset
 
-   the first processing unit this instance of |hpx| should be run on (default:
-   ``0``)
+   The first processing unit this instance of |hpx| should be run on (default:
+   ``0``).
 
 .. option:: --hpx:pu-step
 
-   the step between used processing unit numbers for this instance of |hpx|
-   (default: ``1``)
+   The step between used processing unit numbers for this instance of |hpx|
+   (default: ``1``).
 
 .. option:: --hpx:threads arg
 
-   the number of operating system threads to spawn for this |hpx|
+   The number of operating system threads to spawn for this |hpx|
    :term:`locality`. Possible values are: numeric values ``1``, ``2``, ``3`` and
    so on, ``all`` (which spawns one thread per processing unit, includes
    hyperthreads), or ``cores`` (which spawns one thread per core) (default:
@@ -1449,18 +1449,18 @@ The predefined command line options for any application using
 
 .. option:: --hpx:cores arg
 
-   the number of cores to utilize for this |hpx| :term:`locality` (default:
-   ``all``, i.e. the number of cores is based on the number of threads
-   :option:`--hpx:threads` assuming :option:`--hpx:bind`\ ``=compact``
+   The number of cores to utilize for this |hpx| :term:`locality` (default:
+   ``all``, i.e., the number of cores is based on the number of threads
+   :option:`--hpx:threads` assuming :option:`--hpx:bind`\ ``=compact``.
 
 .. option:: --hpx:affinity arg
 
-   the affinity domain the OS threads will be confined to, possible values:
-   ``pu``, ``core``, ``numa``, ``machine`` (default: ``pu``)
+   The affinity domain the OS threads will be confined to, possible values:
+   ``pu``, ``core``, ``numa``, ``machine`` (default: ``pu``).
 
 .. option:: --hpx:bind arg
 
-   the detailed affinity description for the OS threads, see :ref:`details` for
+   he detailed affinity description for the OS threads, see :ref:`details` for
    a detailed description of possible values. Do not use with
    :option:`--hpx:pu-step`, :option:`--hpx:pu-offset` or
    :option:`--hpx:affinity` options. Implies :option:`--hpx:numa-sensitive`
@@ -1468,31 +1468,31 @@ The predefined command line options for any application using
 
 .. option:: --hpx:use-process-mask
 
-   use the process mask to restrict available hardware resources (implies
-   :option:`--hpx:ignore-batch-env`)
+   Use the process mask to restrict available hardware resources (implies
+   :option:`--hpx:ignore-batch-env`).
 
 .. option:: --hpx:print-bind
 
-   print to the console the bit masks calculated from the arguments specified to
+   Print to the console the bit masks calculated from the arguments specified to
    all :option:`--hpx:bind` options.
 
 .. option:: --hpx:queuing arg
 
-   the queue scheduling policy to use, options are ``local``,
+   The queue scheduling policy to use. Options are ``local``,
    ``local-priority-fifo``, ``local-priority-lifo``, ``static``,
    ``static-priority``, ``abp-priority-fifo`` and ``abp-priority-lifo``
-   (default: ``local-priority-fifo``)
+   (default: ``local-priority-fifo``).
 
 .. option:: --hpx:high-priority-threads arg
 
-   the number of operating system threads maintaining a high priority queue
+   The number of operating system threads maintaining a high priority queue
    (default: number of OS threads), valid for :option:`--hpx:queuing`\
    ``=abp-priority``, :option:`--hpx:queuing`\ ``=static-priority`` and
-   :option:`--hpx:queuing`\ ``=local-priority`` only
+   :option:`--hpx:queuing`\ ``=local-priority`` only.
 
 .. option:: --hpx:numa-sensitive
 
-   makes the scheduler NUMA sensitive
+   Makes the scheduler NUMA sensitive.
 
 
 |hpx| configuraton options
@@ -1500,71 +1500,71 @@ The predefined command line options for any application using
 
 .. option:: --hpx:app-config arg
 
-   load the specified application configuration (ini) file
+   Load the specified application configuration (ini) file.
 
 .. option:: --hpx:config arg
 
-   load the specified hpx configuration (ini) file
+   Load the specified |HPX| configuration (ini) file.
 
 .. option:: --hpx:ini arg
 
-   add a configuration definition to the default runtime configuration
+   Add a configuration definition to the default runtime configuration.
 
 .. option:: --hpx:exit
 
-   exit after configuring the runtime
+   Exit after configuring the runtime.
 
 |hpx| debugging options
 -----------------------
 
 .. option:: --hpx:list-symbolic-names
 
-   list all registered symbolic names after startup
+   List all registered symbolic names after startup.
 
 .. option:: --hpx:list-component-types
 
-   list all dynamic component types after startup
+   List all dynamic component types after startup.
 
 .. option:: --hpx:dump-config-initial
 
-   print the initial runtime configuration
+   Print the initial runtime configuration.
 
 .. option:: --hpx:dump-config
 
-   print the final runtime configuration
+   Print the final runtime configuration.
 
 .. option:: --hpx:debug-hpx-log [arg]
 
-   enable all messages on the |hpx| log channel and send all |hpx| logs to the
-   target destination (default: ``cout``)
+   Enable all messages on the |hpx| log channel and send all |hpx| logs to the
+   target destination (default: ``cout``).
 
 .. option:: --hpx:debug-agas-log [arg]
 
-   enable all messages on the :term:`AGAS` log channel and send all :term:`AGAS`
-   logs to the target destination (default: ``cout``)
+   Enable all messages on the :term:`AGAS` log channel and send all :term:`AGAS`
+   logs to the target destination (default: ``cout``).
 
 .. option:: --hpx:debug-parcel-log [arg]
 
-   enable all messages on the parcel transport log channel and send all parcel
-   transport logs to the target destination (default: ``cout``)
+   Enable all messages on the parcel transport log channel and send all parcel
+   transport logs to the target destination (default: ``cout``).
 
 .. option:: --hpx:debug-timing-log [arg]
 
-   enable all messages on the timing log channel and send all timing logs to the
-   target destination (default: ``cout``)
+   Enable all messages on the timing log channel and send all timing logs to the
+   target destination (default: ``cout``).
 
 .. option:: --hpx:debug-app-log [arg]
 
-   enable all messages on the application log channel and send all application
-   logs to the target destination (default: ``cout``)
+   Enable all messages on the application log channel and send all application
+   logs to the target destination (default: ``cout``).
 
 .. option:: --hpx:debug-clp
 
-   debug command line processing
+   Debug command line processing.
 
 .. option:: --hpx:attach-debugger arg
 
-   wait for a debugger to be attached, possible arg values: ``startup`` or
+   Wait for a debugger to be attached, possible arg values: ``startup`` or
    ``exception`` (default: ``startup``)
 
 |hpx| options related to performance counters
@@ -1572,42 +1572,42 @@ The predefined command line options for any application using
 
 .. option:: --hpx:print-counter
 
-   print the specified performance counter either repeatedly and/or at the times
+   Print the specified performance counter either repeatedly and/or at the times
    specified by :option:`--hpx:print-counter-at` (see also option
-   :option:`--hpx:print-counter-interval`)
+   :option:`--hpx:print-counter-interval`).
 
 .. option:: --hpx:print-counter-reset
 
-   print the specified performance counter either repeatedly and/or at the times
-   specified by :option:`--hpx:print-counter-at` reset the counter after the
-   value is queried. (see also option :option:`--hpx:print-counter-interval`)
+   Print the specified performance counter either repeatedly and/or at the times
+   specified by :option:`--hpx:print-counter-at`. Reset the counter after the
+   value is queried (see also option :option:`--hpx:print-counter-interval`).
 
 .. option:: --hpx:print-counter-interval
 
-   print the performance counter(s) specified with :option:`--hpx:print-counter`
+   Print the performance counter(s) specified with :option:`--hpx:print-counter`
    repeatedly after the time interval (specified in milliseconds), (default:
-   ``0``, which means print once at shutdown)
+   ``0``, which means print once at shutdown).
 
 .. option:: --hpx:print-counter-destination
 
-   print the performance counter(s) specified with :option:`--hpx:print-counter` to
-   the given file (default: ``console``)
+   Print the performance counter(s) specified with :option:`--hpx:print-counter` to
+   the given file (default: ``console``).
 
 .. option:: --hpx:list-counters
 
-   list the names of all registered performance counters, possible values:
+   List the names of all registered performance counters, possible values:
    ``minimal`` (prints counter name skeletons), ``full`` (prints all available
-   counter names)
+   counter names).
 
 .. option:: --hpx:list-counter-infos
 
-   list the description of all registered performance counters, possible values:
+   List the description of all registered performance counters, possible values:
    ``minimal`` (prints info for counter name skeletons), ``full`` (prints all
-   available counter infos)
+   available counter infos).
 
 .. option:: --hpx:print-counter-format
 
-   print the performance counter(s) specified with :option:`--hpx:print-counter`
+   Print the performance counter(s) specified with :option:`--hpx:print-counter`
    possible formats in csv format with header or without any header (see option
    :option:`--hpx:no-csv-header`, possible values: ``csv`` (prints counter
    values in CSV format with full names as header), ``csv-short`` (prints
@@ -1617,19 +1617,19 @@ The predefined command line options for any application using
 
 .. option:: --hpx:no-csv-header
 
-   print the performance counter(s) specified with :option:`--hpx:print-counter`
+   Print the performance counter(s) specified with :option:`--hpx:print-counter`
    and ``csv`` or ``csv-short`` format specified with
-   :option:`--hpx:print-counter-format` without header
+   :option:`--hpx:print-counter-format` without header.
 
 .. option:: --hpx:print-counter-at arg
 
-   print the performance counter(s) specified with :option:`--hpx:print-counter`
+   Print the performance counter(s) specified with :option:`--hpx:print-counter`
    (or :option:`--hpx:print-counter-reset` at the given point in time, possible
-   argument values: ``startup``, ``shutdown`` (default), ``noshutdown``
+   argument values: ``startup``, ``shutdown`` (default), ``noshutdown``.
 
 .. option:: --hpx:reset-counters
 
-   reset all performance counter(s) specified with :option:`--hpx:print-counter`
+   Reset all performance counter(s) specified with :option:`--hpx:print-counter`
    after they have been evaluated.
 
 .. option:: --hpx:print-counters-locally
