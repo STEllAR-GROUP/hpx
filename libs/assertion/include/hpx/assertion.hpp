@@ -58,16 +58,27 @@ namespace hpx { namespace assertion {
             __FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION},                  \
         HPX_PP_STRINGIZE(expr), [&]() { return msg; });                        \
 /**/
+#define HPX_ASSERT_EQ(x, count)
+#define HPX_ASSERT_EQ_(x, count)
+    ::hpx:assertion::detail::evaluate_count_assert(
+        [&](x) -> bool {return !!(count); },
+        ::hpx::assertion::source_location{
+           _FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION},
+           HPX_PP_STRINGIZE(x!=count), [&]() {return x;});
 
 #if defined(HPX_DEBUG)
 #define HPX_ASSERT(expr) HPX_ASSERT_(expr, std::string())
 #define HPX_ASSERT_MSG(expr, msg) HPX_ASSERT_(expr, msg)
+#define HPX_ASSERT_EQ(x, count) HPX_ASSERT_EQ_(x, count)
 #else
 #define HPX_ASSERT(expr)                                                       \
     {                                                                          \
     }
 #define HPX_ASSERT_MSG(expr, msg)                                              \
     {                                                                          \
+    }
+#define HPX_ASSERT_EQ(x, count)
+    {
     }
 #endif
 #endif
