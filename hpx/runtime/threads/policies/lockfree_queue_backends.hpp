@@ -34,7 +34,11 @@ namespace hpx { namespace threads { namespace policies {
     template <typename T>
     struct lockfree_fifo_backend
     {
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+        using container_type = boost::lockfree::deque<T>;
+#else
         using container_type = boost::lockfree::queue<T>;
+#endif
 
         using value_type = T;
         using reference = T&;
@@ -49,12 +53,20 @@ namespace hpx { namespace threads { namespace policies {
 
         bool push(const_reference val, bool /*other_end*/ = false)
         {
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+            return queue_.push_left(val);
+#else
             return queue_.push(val);
+#endif
         }
 
         bool pop(reference val, bool steal = true)
         {
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+            return queue_.pop_right(val);
+#else
             return queue_.pop(val);
+#endif
         }
 
         bool empty()
