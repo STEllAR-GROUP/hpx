@@ -10,58 +10,58 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/binary_filter.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <type_traits>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename Container>
     struct default_serialization_access_data
     {
         typedef std::false_type preprocessing_only;
 
-        HPX_CONSTEXPR static bool is_preprocessing() { return false; }
-
-        // functions related to output operations
-        static void await_future(
-            Container& cont
-          , hpx::lcos::detail::future_data_refcnt_base & future_data)
-        {}
-
-        static void add_gid(Container& cont,
-            naming::gid_type const & gid,
-            naming::gid_type const & split_gid)
-        {}
-
-        HPX_CONSTEXPR static bool has_gid(Container& cont,
-            naming::gid_type const& gid)
+        HPX_CONSTEXPR static bool is_preprocessing()
         {
             return false;
         }
 
-        static void
-        write(Container& cont, std::size_t count,
+        // functions related to output operations
+        static void await_future(Container& cont,
+            hpx::lcos::detail::future_data_refcnt_base& future_data)
+        {
+        }
+
+        static void add_gid(Container& cont, naming::gid_type const& gid,
+            naming::gid_type const& split_gid)
+        {
+        }
+
+        HPX_CONSTEXPR static bool has_gid(
+            Container& cont, naming::gid_type const& gid)
+        {
+            return false;
+        }
+
+        static void write(Container& cont, std::size_t count,
             std::size_t current, void const* address)
         {
         }
 
-        static bool flush(serialization::binary_filter* filter,
-            Container& cont, std::size_t current, std::size_t size,
-            std::size_t& written)
+        static bool flush(serialization::binary_filter* filter, Container& cont,
+            std::size_t current, std::size_t size, std::size_t& written)
         {
             written = size;
             return true;
         }
 
         // functions related to input operations
-        static void read(Container const& cont,
-            std::size_t count, std::size_t current, void* address)
+        static void read(Container const& cont, std::size_t count,
+            std::size_t current, void* address)
         {
         }
 
@@ -72,8 +72,7 @@ namespace hpx { namespace traits
             return decompressed_size;
         }
 
-        static void reset(Container& cont)
-        {}
+        static void reset(Container& cont) {}
     };
 
     ///////////////////////////////////////////////////////////////////////
@@ -168,18 +167,16 @@ namespace hpx { namespace traits
             serialization::binary_filter* filter, std::size_t current,
             std::size_t decompressed_size)
         {
-            return filter->init_data(&cont[current], cont.size()-current,
-                decompressed_size);
+            return filter->init_data(
+                &cont[current], cont.size() - current, decompressed_size);
         }
     };
 
     template <typename Container>
     struct serialization_access_data<Container const>
       : serialization_access_data<Container>
-    {};
-}}
+    {
+    };
+}}    // namespace hpx::traits
 
 #endif
-
-
-

@@ -5,8 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -24,10 +24,10 @@ struct Base
 
     explicit Base(std::string const& prefix)
       : prefix_(prefix)
-    {}
+    {
+    }
 
-    virtual ~Base()
-    {}
+    virtual ~Base() {}
 
     virtual std::size_t size() = 0;
     virtual std::string print() = 0;
@@ -38,20 +38,24 @@ struct Base
 HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE((template <class T>), Base<T>)
 
 template <typename Archive, typename T>
-void serialize(Archive & ar, Base<T> & b, unsigned)
+void serialize(Archive& ar, Base<T>& b, unsigned)
 {
-    ar & b.prefix_;
+    ar& b.prefix_;
 }
 
 template <typename T>
 struct Derived1 : Base<T>
 {
-    Derived1() : size_(0) {}
+    Derived1()
+      : size_(0)
+    {
+    }
 
     Derived1(std::string const& prefix, std::size_t size)
       : Base<T>(prefix)
       , size_(size)
-    {}
+    {
+    }
 
     std::size_t size() override
     {
@@ -64,20 +68,22 @@ struct Derived1 : Base<T>
 HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE((template <class T>), Derived1<T>)
 
 template <typename Archive, typename T>
-void serialize(Archive & ar, Derived1<T> & d1, unsigned)
+void serialize(Archive& ar, Derived1<T>& d1, unsigned)
 {
-    ar & hpx::serialization::base_object<Base<T> >(d1);
-    ar & d1.size_;
+    ar& hpx::serialization::base_object<Base<T>>(d1);
+    ar& d1.size_;
 }
 
 struct Derived2 : Derived1<double>
 {
     Derived2() {}
 
-    Derived2(std::string const& message, std::string const& prefix, std::size_t size)
+    Derived2(
+        std::string const& message, std::string const& prefix, std::size_t size)
       : Derived1<double>(prefix, size)
       , message_(message)
-    {}
+    {
+    }
 
     std::string print() override
     {
@@ -90,18 +96,18 @@ struct Derived2 : Derived1<double>
 HPX_SERIALIZATION_REGISTER_CLASS(Derived2);
 
 template <typename Archive>
-void serialize(Archive & ar, Derived2 & d2, unsigned)
+void serialize(Archive& ar, Derived2& d2, unsigned)
 {
-    ar & hpx::serialization::base_object<Derived1<double> >(d2);
-    ar & d2.message_;
+    ar& hpx::serialization::base_object<Derived1<double>>(d2);
+    ar& d2.message_;
 }
 
 int main()
 {
     std::vector<char> buffer;
     Derived2 d("/tmp", "fancy", 10);
-    Base<double> & b = d;
-    Base<double> * b_ptr = &d;
+    Base<double>& b = d;
+    Base<double>* b_ptr = &d;
     HPX_TEST_EQ(d.print(), b.print());
     HPX_TEST_EQ(d.size(), b.size());
     HPX_TEST_EQ(d.prefix_, b.prefix_);
@@ -110,7 +116,6 @@ int main()
     HPX_TEST_EQ(d.prefix_, b_ptr->prefix_);
 
     {
-
         hpx::serialization::output_archive oarchive(buffer);
         oarchive << b;
         oarchive << hpx::serialization::detail::raw_ptr(b_ptr);
@@ -119,8 +124,8 @@ int main()
     {
         Derived2 d1;
         Derived2 d2;
-        Base<double> & b1 = d1;
-        Base<double> * b2 = nullptr;
+        Base<double>& b1 = d1;
+        Base<double>* b2 = nullptr;
 
         hpx::serialization::input_archive iarchive(buffer);
         iarchive >> b1;

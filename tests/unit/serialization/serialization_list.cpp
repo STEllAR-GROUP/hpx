@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/list.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -21,15 +21,22 @@ struct A
 {
     A() {}
 
-    explicit A(T t) : t_(t) {}
+    explicit A(T t)
+      : t_(t)
+    {
+    }
     T t_;
 
-    A & operator=(T t) { t_ = t; return *this; }
+    A& operator=(T t)
+    {
+        t_ = t;
+        return *this;
+    }
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned)
+    void serialize(Archive& ar, unsigned)
     {
-        ar & t_;
+        ar& t_;
     }
 };
 
@@ -41,12 +48,15 @@ struct B
 
 public:
     B() = delete;
-    B(int a): a(a) {}
+    B(int a)
+      : a(a)
+    {
+    }
 
     template <class Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar & b;
+        ar& b;
     }
 
     int get_a() const
@@ -96,8 +106,7 @@ void test_bool()
         std::list<bool> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (auto ot = os.begin(), it = is.begin();
-             ot != os.end(); ++ot, ++it)
+        for (auto ot = os.begin(), it = is.begin(); ot != os.end(); ++ot, ++it)
         {
             HPX_TEST_EQ(*ot, *it);
         }
@@ -106,7 +115,7 @@ void test_bool()
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
 
-        std::list<A<bool> > os;
+        std::list<A<bool>> os;
         os.emplace_back(true);
         os.emplace_back(false);
         os.emplace_back(false);
@@ -114,11 +123,10 @@ void test_bool()
         oarchive << os;
 
         hpx::serialization::input_archive iarchive(buffer);
-        std::list<A<bool> > is;
+        std::list<A<bool>> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (auto ot = os.begin(), it = is.begin();
-             ot != os.end(); ++ot, ++it)
+        for (auto ot = os.begin(), it = is.begin(); ot != os.end(); ++ot, ++it)
         {
             HPX_TEST_EQ(ot->t_, it->t_);
         }
@@ -141,8 +149,7 @@ void test(T min, T max)
         std::list<T> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (auto ot = os.begin(), it = is.begin();
-             ot != os.end(); ++ot, ++it)
+        for (auto ot = os.begin(), it = is.begin(); ot != os.end(); ++ot, ++it)
         {
             HPX_TEST_EQ(*ot, *it);
         }
@@ -150,18 +157,17 @@ void test(T min, T max)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
-        std::list<A<T> > os;
+        std::list<A<T>> os;
         for (T c = min; c < max; ++c)
         {
             os.emplace_back(c);
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
-        std::list<A<T> > is;
+        std::list<A<T>> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (auto ot = os.begin(), it = is.begin();
-             ot != os.end(); ++ot, ++it)
+        for (auto ot = os.begin(), it = is.begin(); ot != os.end(); ++ot, ++it)
         {
             HPX_TEST_EQ(ot->t_, it->t_);
         }
@@ -184,8 +190,7 @@ void test_fp(T min, T max)
         std::list<T> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (auto ot = os.begin(), it = is.begin();
-             ot != os.end(); ++ot, ++it)
+        for (auto ot = os.begin(), it = is.begin(); ot != os.end(); ++ot, ++it)
         {
             HPX_TEST_EQ(*ot++, *it++);
         }
@@ -193,18 +198,17 @@ void test_fp(T min, T max)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
-        std::list<A<T> > os;
+        std::list<A<T>> os;
         for (T c = min; c < max; c += static_cast<T>(0.5))
         {
             os.emplace_back(c);
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
-        std::list<A<T> > is;
+        std::list<A<T>> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (auto ot = os.begin(), it = is.begin();
-             ot != os.end(); ++ot, ++it)
+        for (auto ot = os.begin(), it = is.begin(); ot != os.end(); ++ot, ++it)
         {
             HPX_TEST_EQ(ot->t_, it->t_);
         }
@@ -223,7 +227,8 @@ void test_non_default_constructible()
     os.emplace_back(4);
 
     short b = 1;
-    for (auto& i: os) {
+    for (auto& i : os)
+    {
         i.set_b(b);
         ++b;
     }
@@ -234,8 +239,7 @@ void test_non_default_constructible()
     std::list<B> is;
     iarchive >> is;
     HPX_TEST_EQ(os.size(), is.size());
-    for (auto ot = os.begin(), it = is.begin();
-         ot != os.end(); ++ot, ++it)
+    for (auto ot = os.begin(), it = is.begin(); ot != os.end(); ++ot, ++it)
     {
         HPX_TEST_EQ(ot->get_a(), it->get_a());
         HPX_TEST_EQ(ot->get_b(), it->get_b());
@@ -245,8 +249,8 @@ void test_non_default_constructible()
 int main()
 {
     test_bool();
-    test<char>((std::numeric_limits<char>::min)(),
-        (std::numeric_limits<char>::max)());
+    test<char>(
+        (std::numeric_limits<char>::min)(), (std::numeric_limits<char>::max)());
     test<int>((std::numeric_limits<int>::min)(),
         (std::numeric_limits<int>::min)() + 100);
     test<int>((std::numeric_limits<int>::max)() - 100,
@@ -268,14 +272,14 @@ int main()
     test_fp<float>((std::numeric_limits<float>::min)(),
         (std::numeric_limits<float>::min)() + 100);
     test_fp<float>((std::numeric_limits<float>::max)() - 100,
-        (std::numeric_limits<float>::max)()); //it's incorrect
+        (std::numeric_limits<float>::max)());    //it's incorrect
     // because floatmax() - 100 causes cancellations error,
     // digits are not affected
     test_fp<float>(-100, 100);
     test<double>((std::numeric_limits<double>::min)(),
         (std::numeric_limits<double>::min)() + 100);
     test<double>((std::numeric_limits<double>::max)() - 100,
-        (std::numeric_limits<double>::max)()); //it's the same
+        (std::numeric_limits<double>::max)());    //it's the same
     test<double>(-100, 100);
 
     test_non_default_constructible();

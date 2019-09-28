@@ -9,8 +9,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/testing.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -27,8 +27,7 @@ HPX_PLAIN_ACTION(bounce_plain);
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     buffer_plain_type, serialization_buffer_char);
-HPX_REGISTER_BASE_LCO_WITH_VALUE(
-    buffer_plain_type, serialization_buffer_char);
+HPX_REGISTER_BASE_LCO_WITH_VALUE(buffer_plain_type, serialization_buffer_char);
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Buffer, typename Action>
@@ -37,14 +36,14 @@ void test(hpx::id_type dest, char* send_buffer, std::size_t size)
     typedef Buffer buffer_type;
     buffer_type recv_buffer;
 
-    std::vector<hpx::future<buffer_type> > recv_buffers;
+    std::vector<hpx::future<buffer_type>> recv_buffers;
     recv_buffers.reserve(10);
 
     Action act;
-    for(std::size_t j = 0; j != 10; ++j)
+    for (std::size_t j = 0; j != 10; ++j)
     {
-        recv_buffers.push_back(hpx::async(act, dest,
-            buffer_type(send_buffer, size, buffer_type::reference)));
+        recv_buffers.push_back(hpx::async(
+            act, dest, buffer_type(send_buffer, size, buffer_type::reference)));
     }
     hpx::wait_all(recv_buffers);
 
@@ -63,11 +62,11 @@ void test_stateful_allocator(hpx::id_type dest, char* send_buffer,
     typedef buffer_plain_type buffer_type;
     buffer_type recv_buffer;
 
-    std::vector<hpx::future<buffer_type> > recv_buffers;
+    std::vector<hpx::future<buffer_type>> recv_buffers;
     recv_buffers.reserve(10);
 
     bounce_plain_action act;
-    for(std::size_t j = 0; j != 10; ++j)
+    for (std::size_t j = 0; j != 10; ++j)
     {
         recv_buffers.push_back(hpx::async(act, dest,
             buffer_type(send_buffer, size, buffer_type::reference, alloc)));
@@ -90,7 +89,8 @@ void test_fixed_size_initialization_for_persistent_buffers(std::size_t max_size)
         std::vector<T> send_vec;
         std::vector<T> recv_vec;
         send_vec.reserve(size);
-        for (std::size_t i = 0; i < size; ++i) {
+        for (std::size_t i = 0; i < size; ++i)
+        {
             send_vec.push_back(static_cast<int>(size - i));
         }
 
@@ -99,7 +99,8 @@ void test_fixed_size_initialization_for_persistent_buffers(std::size_t max_size)
         std::copy(send_vec.begin(), send_vec.end(), send_buffer.begin());
         recv_buffer = send_buffer;
 
-        std::copy(recv_buffer.begin(), recv_buffer.end(), std::back_inserter(recv_vec));
+        std::copy(recv_buffer.begin(), recv_buffer.end(),
+            std::back_inserter(recv_vec));
         HPX_TEST(send_vec == recv_vec);
     }
 }
@@ -112,7 +113,8 @@ void test_initialization_from_vector(std::size_t max_size)
         std::vector<T> send_vec;
         std::vector<T> recv_vec;
         send_vec.reserve(size);
-        for (std::size_t i = 0; i < size; ++i) {
+        for (std::size_t i = 0; i < size; ++i)
+        {
             send_vec.push_back(size - i);
         }
 

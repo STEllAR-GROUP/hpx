@@ -13,66 +13,67 @@
 
 #include <type_traits>
 
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     class access;
     struct input_archive;
     struct output_archive;
     struct binary_filter;
 
     template <typename T>
-    output_archive & operator<<(output_archive & ar, T const & t);
+    output_archive& operator<<(output_archive& ar, T const& t);
 
     template <typename T>
-    input_archive & operator>>(input_archive & ar, T & t);
+    input_archive& operator>>(input_archive& ar, T& t);
 
     template <typename T>
-    output_archive & operator&(output_archive & ar, T const & t);
+    output_archive& operator&(output_archive& ar, T const& t);
 
     template <typename T>
-    input_archive & operator&(input_archive & ar, T & t);
-}}
+    input_archive& operator&(input_archive& ar, T& t);
+}}    // namespace hpx::serialization
 
-#define HPX_SERIALIZATION_SPLIT_MEMBER()                                      \
-    void serialize(hpx::serialization::input_archive & ar, unsigned)          \
-    {                                                                         \
-        load(ar, 0);                                                          \
-    }                                                                         \
-    void serialize(hpx::serialization::output_archive & ar, unsigned) const   \
-    {                                                                         \
-        save(ar, 0);                                                          \
-    }                                                                         \
-/**/
+#define HPX_SERIALIZATION_SPLIT_MEMBER()                                       \
+    void serialize(hpx::serialization::input_archive& ar, unsigned)            \
+    {                                                                          \
+        load(ar, 0);                                                           \
+    }                                                                          \
+    void serialize(hpx::serialization::output_archive& ar, unsigned) const     \
+    {                                                                          \
+        save(ar, 0);                                                           \
+    }                                                                          \
+    /**/
 
-#define HPX_SERIALIZATION_SPLIT_FREE(T)                                       \
-    HPX_FORCEINLINE                                                           \
-    void serialize(hpx::serialization::input_archive & ar, T & t, unsigned)   \
-    {                                                                         \
-        load(ar, t, 0);                                                       \
-    }                                                                         \
-    HPX_FORCEINLINE                                                           \
-    void serialize(hpx::serialization::output_archive & ar, T & t, unsigned)  \
-    {                                                                         \
-        save(ar, const_cast<std::add_const<T>::type &>(t), 0);                \
-    }                                                                         \
-/**/
+#define HPX_SERIALIZATION_SPLIT_FREE(T)                                        \
+    HPX_FORCEINLINE                                                            \
+    void serialize(hpx::serialization::input_archive& ar, T& t, unsigned)      \
+    {                                                                          \
+        load(ar, t, 0);                                                        \
+    }                                                                          \
+    HPX_FORCEINLINE                                                            \
+    void serialize(hpx::serialization::output_archive& ar, T& t, unsigned)     \
+    {                                                                          \
+        save(ar, const_cast<std::add_const<T>::type&>(t), 0);                  \
+    }                                                                          \
+    /**/
 
-#define HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(TEMPLATE, ARGS)                 \
-    HPX_PP_STRIP_PARENS(TEMPLATE)                                             \
-    HPX_FORCEINLINE                                                           \
-    void serialize(hpx::serialization::input_archive & ar,                    \
-            HPX_PP_STRIP_PARENS(ARGS) & t, unsigned)                          \
-    {                                                                         \
-        load(ar, t, 0);                                                       \
-    }                                                                         \
-    HPX_PP_STRIP_PARENS(TEMPLATE)                                             \
-    HPX_FORCEINLINE                                                           \
-    void serialize(hpx::serialization::output_archive & ar,                   \
-            HPX_PP_STRIP_PARENS(ARGS) & t, unsigned)                          \
-    {                                                                         \
-        save(ar, const_cast<typename std::add_const                           \
-                <HPX_PP_STRIP_PARENS(ARGS)>::type &>(t), 0);                  \
-    }                                                                         \
-/**/
+#define HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(TEMPLATE, ARGS)                  \
+    HPX_PP_STRIP_PARENS(TEMPLATE)                                              \
+    HPX_FORCEINLINE                                                            \
+    void serialize(hpx::serialization::input_archive& ar,                      \
+        HPX_PP_STRIP_PARENS(ARGS) & t, unsigned)                               \
+    {                                                                          \
+        load(ar, t, 0);                                                        \
+    }                                                                          \
+    HPX_PP_STRIP_PARENS(TEMPLATE)                                              \
+    HPX_FORCEINLINE                                                            \
+    void serialize(hpx::serialization::output_archive& ar,                     \
+        HPX_PP_STRIP_PARENS(ARGS) & t, unsigned)                               \
+    {                                                                          \
+        save(ar,                                                               \
+            const_cast<                                                        \
+                typename std::add_const<HPX_PP_STRIP_PARENS(ARGS)>::type&>(t), \
+            0);                                                                \
+    }                                                                          \
+    /**/
 
-#endif // HPX_SERIALIZATION_FWD_HPP
+#endif    // HPX_SERIALIZATION_FWD_HPP

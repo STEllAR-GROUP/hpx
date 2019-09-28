@@ -13,36 +13,35 @@
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     template <typename T>
-    output_archive & operator<<(output_archive & ar, T const & t)
+    output_archive& operator<<(output_archive& ar, T const& t)
     {
         ar.invoke(t);
         return ar;
     }
 
     template <typename T>
-    input_archive & operator>>(input_archive & ar, T & t)
+    input_archive& operator>>(input_archive& ar, T& t)
     {
         ar.invoke(t);
         return ar;
     }
 
     template <typename T>
-    output_archive & operator&(output_archive & ar, T const & t) //-V524
+    output_archive& operator&(output_archive& ar, T const& t)    //-V524
     {
         ar.invoke(t);
         return ar;
     }
 
     template <typename T>
-    input_archive & operator&(input_archive & ar, T & t) //-V524
+    input_archive& operator&(input_archive& ar, T& t)    //-V524
     {
         ar.invoke(t);
         return ar;
     }
-}}
+}}    // namespace hpx::serialization
 
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp>
 

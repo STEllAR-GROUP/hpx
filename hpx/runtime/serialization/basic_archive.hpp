@@ -17,29 +17,26 @@
 #include <map>
 #include <type_traits>
 
-namespace hpx { namespace serialization
-{
-    namespace detail
-    {
+namespace hpx { namespace serialization {
+    namespace detail {
         struct ptr_helper
         {
             virtual ~ptr_helper() {}
         };
-    }
+    }    // namespace detail
 
     enum archive_flags
     {
-        no_archive_flags            = 0x00000000,
-        enable_compression          = 0x00002000,
-        endian_big                  = 0x00004000,
-        endian_little               = 0x00008000,
-        disable_array_optimization  = 0x00010000,
-        disable_data_chunking       = 0x00020000,
-        all_archive_flags           = 0x0003e000    // all of the above
+        no_archive_flags = 0x00000000,
+        enable_compression = 0x00002000,
+        endian_big = 0x00004000,
+        endian_little = 0x00008000,
+        disable_array_optimization = 0x00010000,
+        disable_data_chunking = 0x00020000,
+        all_archive_flags = 0x0003e000    // all of the above
     };
 
-    void HPX_FORCEINLINE
-    reverse_bytes(std::size_t size, char* address)
+    void HPX_FORCEINLINE reverse_bytes(std::size_t size, char* address)
     {
         std::reverse(address, address + size);
     }
@@ -52,25 +49,25 @@ namespace hpx { namespace serialization
         basic_archive(std::uint32_t flags)
           : flags_(flags)
           , size_(0)
-        {}
+        {
+        }
 
-        virtual ~basic_archive()
-        {}
+        virtual ~basic_archive() {}
 
         template <typename T>
-        void invoke(T & t)
+        void invoke(T& t)
         {
             static_assert(!std::is_pointer<T>::value,
                 "HPX does not support serialization of raw pointers. "
                 "Please use smart pointers.");
 
-            static_cast<Archive *>(this)->invoke_impl(t);
+            static_cast<Archive*>(this)->invoke_impl(t);
         }
 
         bool enable_compression() const
         {
-            return (flags_ & hpx::serialization::enable_compression) ?
-                true : false;
+            return (flags_ & hpx::serialization::enable_compression) ? true :
+                                                                       false;
         }
 
         bool endian_big() const
@@ -86,13 +83,14 @@ namespace hpx { namespace serialization
         bool disable_array_optimization() const
         {
             return (flags_ & hpx::serialization::disable_array_optimization) ?
-                true : false;
+                true :
+                false;
         }
 
         bool disable_data_chunking() const
         {
-            return (flags_ & hpx::serialization::disable_data_chunking) ?
-                true : false;
+            return (flags_ & hpx::serialization::disable_data_chunking) ? true :
+                                                                          false;
         }
 
         std::uint32_t flags() const
@@ -134,25 +132,22 @@ namespace hpx { namespace serialization
     };
 
     template <typename Archive>
-    inline
-    void save_binary(Archive & ar, void const * address, std::size_t count)
+    inline void save_binary(Archive& ar, void const* address, std::size_t count)
     {
         return ar.basic_archive<Archive>::save_binary(address, count);
     }
 
     template <typename Archive>
-    inline
-    void load_binary(Archive & ar, void * address, std::size_t count)
+    inline void load_binary(Archive& ar, void* address, std::size_t count)
     {
         return ar.basic_archive<Archive>::load_binary(address, count);
     }
 
     template <typename Archive>
-    inline
-    std::size_t current_pos(const Archive& ar)
+    inline std::size_t current_pos(const Archive& ar)
     {
         return ar.current_pos();
     }
-}}
+}}    // namespace hpx::serialization
 
 #endif

@@ -12,8 +12,7 @@
 
 #include <memory>
 
-namespace hpx { namespace serialization { namespace detail
-{
+namespace hpx { namespace serialization { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     // default fall-backs for serializing non-default-constructible types
     template <typename Archive, typename T>
@@ -27,6 +26,6 @@ namespace hpx { namespace serialization { namespace detail
     {
         ::new (t) T;
     }
-}}}
+}}}    // namespace hpx::serialization::detail
 
 #endif

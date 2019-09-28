@@ -18,8 +18,7 @@
 
 #include <memory>
 
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     template <typename T>
     void load(input_archive& ar, boost::shared_ptr<T>& ptr, unsigned)
     {
@@ -32,8 +31,8 @@ namespace hpx { namespace serialization
         detail::serialize_pointer_tracked(ar, ptr);
     }
 
-    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE((template <typename T>),
-            (boost::shared_ptr<T>))
+    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
+        (template <typename T>), (boost::shared_ptr<T>) )
 
     template <typename T>
     void load(input_archive& ar, std::shared_ptr<T>& ptr, unsigned)
@@ -47,8 +46,8 @@ namespace hpx { namespace serialization
         detail::serialize_pointer_tracked(ar, ptr);
     }
 
-    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE((template <typename T>),
-            (std::shared_ptr<T>))
-}}
+    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
+        (template <typename T>), (std::shared_ptr<T>) )
+}}    // namespace hpx::serialization
 
 #endif

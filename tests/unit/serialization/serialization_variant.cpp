@@ -21,10 +21,17 @@ struct A
 {
     A() {}
 
-    explicit A(T t) : t_(t) {}
+    explicit A(T t)
+      : t_(t)
+    {
+    }
     T t_;
 
-    A & operator=(T t) { t_ = t; return *this; }
+    A& operator=(T t)
+    {
+        t_ = t;
+        return *this;
+    }
 
     friend bool operator==(A a, A b)
     {
@@ -38,9 +45,9 @@ struct A
     }
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned)
+    void serialize(Archive& ar, unsigned)
     {
-        ar & t_;
+        ar& t_;
     }
 };
 
@@ -50,8 +57,9 @@ int main()
     hpx::serialization::output_archive oar(buf);
     hpx::serialization::input_archive iar(buf);
 
-    boost::variant<int, std::string, double, A<int> > ovar = std::string("dfsdf");
-    boost::variant<int, std::string, double, A<int> > ivar;
+    boost::variant<int, std::string, double, A<int>> ovar =
+        std::string("dfsdf");
+    boost::variant<int, std::string, double, A<int>> ivar;
     oar << ovar;
     iar >> ivar;
 

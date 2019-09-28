@@ -16,8 +16,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace serialization { namespace detail
-{
+namespace hpx { namespace serialization { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     id_registry& id_registry::instance()
     {
@@ -27,14 +26,14 @@ namespace hpx { namespace serialization { namespace detail
 
     void id_registry::cache_id(std::uint32_t id, ctor_t ctor)
     {
-        if (id >= cache.size()) //-V104
+        if (id >= cache.size())    //-V104
         {
-            cache.resize(id + 1, nullptr); //-V106
-            cache[id] = ctor; //-V108
+            cache.resize(id + 1, nullptr);    //-V106
+            cache[id] = ctor;                 //-V108
         }
         else if (cache[id] == nullptr)
         {
-            cache[id] = ctor; //-V108
+            cache[id] = ctor;    //-V108
         }
     }
 
@@ -46,8 +45,7 @@ namespace hpx { namespace serialization { namespace detail
         typename_to_ctor.emplace(type_name, ctor);
 
         // populate cache
-        typename_to_id_t::const_iterator it =
-            typename_to_id.find(type_name);
+        typename_to_id_t::const_iterator it = typename_to_id.find(type_name);
         if (it != typename_to_id.end())
             cache_id(it->second, ctor);
     }
@@ -65,7 +63,7 @@ namespace hpx { namespace serialization { namespace detail
             HPX_THROW_EXCEPTION(invalid_status,
                 "polymorphic_id_factory::register_typename",
                 "failed to insert " + type_name +
-                " into typename_to_id_t registry");
+                    " into typename_to_id_t registry");
             return;
         }
 
@@ -75,7 +73,8 @@ namespace hpx { namespace serialization { namespace detail
         if (it != typename_to_ctor.end())
             cache_id(id, it->second);
 
-        if (id > max_id) max_id = id;
+        if (id > max_id)
+            max_id = id;
     }
 
     // This makes sure that the registries are consistent.
@@ -99,8 +98,7 @@ namespace hpx { namespace serialization { namespace detail
         // constructors and fill in missing id to constructor mappings.
         for (auto const& d : typename_to_ctor)
         {
-            typename_to_id_t::const_iterator it =
-                typename_to_id.find(d.first);
+            typename_to_id_t::const_iterator it = typename_to_id.find(d.first);
             HPX_ASSERT(it != typename_to_id.end());
             cache_id(it->second, d.second);
         }
@@ -108,8 +106,7 @@ namespace hpx { namespace serialization { namespace detail
 
     std::uint32_t id_registry::try_get_id(const std::string& type_name) const
     {
-        typename_to_id_t::const_iterator it =
-            typename_to_id.find(type_name);
+        typename_to_id_t::const_iterator it = typename_to_id.find(type_name);
         if (it == typename_to_id.end())
             return invalid_id;
 
@@ -143,9 +140,9 @@ namespace hpx { namespace serialization { namespace detail
 
         if (id == id_registry::invalid_id)
         {
-            HPX_THROW_EXCEPTION(serialization_error
-                , "polymorphic_id_factory::get_id"
-                , "Unknown typename: " + type_name);
+            HPX_THROW_EXCEPTION(serialization_error,
+                "polymorphic_id_factory::get_id",
+                "Unknown typename: " + type_name);
         }
 
         return id;
@@ -173,4 +170,4 @@ namespace hpx { namespace serialization { namespace detail
         return std::string();
 #endif
     }
-}}}
+}}}    // namespace hpx::serialization::detail

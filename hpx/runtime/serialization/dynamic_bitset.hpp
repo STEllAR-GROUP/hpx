@@ -15,8 +15,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     template <typename Block, typename Alloc>
     void serialize(output_archive& ar,
         boost::dynamic_bitset<Block, Alloc> const& bs, unsigned)
@@ -30,8 +29,8 @@ namespace hpx { namespace serialization
     }
 
     template <typename Block, typename Alloc>
-    void serialize(input_archive& ar,
-        boost::dynamic_bitset<Block, Alloc>& bs, unsigned)
+    void serialize(
+        input_archive& ar, boost::dynamic_bitset<Block, Alloc>& bs, unsigned)
     {
         std::size_t num_bits;
         std::vector<Block> blocks;
@@ -42,6 +41,6 @@ namespace hpx { namespace serialization
         boost::from_block_range(blocks.begin(), blocks.end(), bs);
         bs.resize(num_bits);
     }
-}}
+}}    // namespace hpx::serialization
 
 #endif

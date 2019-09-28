@@ -14,23 +14,30 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <vector>
 #include <numeric>
+#include <vector>
 
 template <typename T>
 struct A
 {
     A() {}
 
-    explicit A(T t) : t_(t) {}
+    explicit A(T t)
+      : t_(t)
+    {
+    }
     T t_;
 
-    A & operator=(T t) { t_ = t; return *this; }
+    A& operator=(T t)
+    {
+        t_ = t;
+        return *this;
+    }
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned)
+    void serialize(Archive& ar, unsigned)
     {
-        ar & t_;
+        ar& t_;
     }
 };
 
@@ -42,12 +49,16 @@ struct B
 
 public:
     B() = delete;
-    explicit B(int a): a(a), b(0) {}
+    explicit B(int a)
+      : a(a)
+      , b(0)
+    {
+    }
 
     template <class Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar & b;
+        ar& b;
     }
 
     int get_a() const
@@ -97,7 +108,7 @@ void test_bool()
         std::vector<bool> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for(std::size_t i = 0; i < os.size(); ++i)
+        for (std::size_t i = 0; i < os.size(); ++i)
         {
             HPX_TEST_EQ(os[i], is[i]);
         }
@@ -106,7 +117,7 @@ void test_bool()
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
 
-        std::vector<A<bool> > os;
+        std::vector<A<bool>> os;
         os.emplace_back(true);
         os.emplace_back(false);
         os.emplace_back(false);
@@ -114,10 +125,10 @@ void test_bool()
         oarchive << os;
 
         hpx::serialization::input_archive iarchive(buffer);
-        std::vector<A<bool> > is;
+        std::vector<A<bool>> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for(std::size_t i = 0; i < os.size(); ++i)
+        for (std::size_t i = 0; i < os.size(); ++i)
         {
             HPX_TEST_EQ(os[i].t_, is[i].t_);
         }
@@ -132,7 +143,7 @@ void test(T min, T max)
         std::vector<hpx::serialization::serialization_chunk> chunks;
         hpx::serialization::output_archive oarchive(buffer, 0, &chunks);
         std::vector<T> os;
-        for(T c = min; c < max; ++c)
+        for (T c = min; c < max; ++c)
         {
             os.emplace_back(c);
         }
@@ -143,7 +154,7 @@ void test(T min, T max)
         std::vector<T> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for(std::size_t i = 0; i < os.size(); ++i)
+        for (std::size_t i = 0; i < os.size(); ++i)
         {
             HPX_TEST_EQ(os[i], is[i]);
         }
@@ -152,8 +163,8 @@ void test(T min, T max)
         std::vector<char> buffer;
         std::vector<hpx::serialization::serialization_chunk> chunks;
         hpx::serialization::output_archive oarchive(buffer, 0, &chunks);
-        std::vector<A<T> > os;
-        for(T c = min; c < max; ++c)
+        std::vector<A<T>> os;
+        for (T c = min; c < max; ++c)
         {
             os.emplace_back(c);
         }
@@ -161,10 +172,10 @@ void test(T min, T max)
         std::size_t size = oarchive.bytes_written();
 
         hpx::serialization::input_archive iarchive(buffer, size, &chunks);
-        std::vector<A<T> > is;
+        std::vector<A<T>> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for(std::size_t i = 0; i < os.size(); ++i)
+        for (std::size_t i = 0; i < os.size(); ++i)
         {
             HPX_TEST_EQ(os[i].t_, is[i].t_);
         }
@@ -179,7 +190,7 @@ void test_fp(T min, T max)
         std::vector<hpx::serialization::serialization_chunk> chunks;
         hpx::serialization::output_archive oarchive(buffer, 0, &chunks);
         std::vector<T> os;
-        for(T c = min; c < max; c += static_cast<T>(0.5))
+        for (T c = min; c < max; c += static_cast<T>(0.5))
         {
             os.emplace_back(c);
         }
@@ -190,7 +201,7 @@ void test_fp(T min, T max)
         std::vector<T> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for(std::size_t i = 0; i < os.size(); ++i)
+        for (std::size_t i = 0; i < os.size(); ++i)
         {
             HPX_TEST_EQ(os[i], is[i]);
         }
@@ -199,8 +210,8 @@ void test_fp(T min, T max)
         std::vector<char> buffer;
         std::vector<hpx::serialization::serialization_chunk> chunks;
         hpx::serialization::output_archive oarchive(buffer, 0, &chunks);
-        std::vector<A<T> > os;
-        for(T c = min; c < max; c += static_cast<T>(0.5))
+        std::vector<A<T>> os;
+        for (T c = min; c < max; c += static_cast<T>(0.5))
         {
             os.emplace_back(c);
         }
@@ -208,10 +219,10 @@ void test_fp(T min, T max)
         std::size_t size = oarchive.bytes_written();
 
         hpx::serialization::input_archive iarchive(buffer, size, &chunks);
-        std::vector<A<T> > is;
+        std::vector<A<T>> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for(std::size_t i = 0; i < os.size(); ++i)
+        for (std::size_t i = 0; i < os.size(); ++i)
         {
             HPX_TEST_EQ(os[i].t_, is[i].t_);
         }
@@ -221,8 +232,7 @@ void test_fp(T min, T max)
 template <class T>
 void test_long_vector_serialization()
 {
-    std::vector<T> os(
-            (HPX_ZERO_COPY_SERIALIZATION_THRESHOLD / sizeof(T)) + 1);
+    std::vector<T> os((HPX_ZERO_COPY_SERIALIZATION_THRESHOLD / sizeof(T)) + 1);
     std::iota(os.begin(), os.end(), T());
 
     std::vector<char> buffer;
@@ -249,7 +259,8 @@ void test_non_default_constructible()
     os.emplace_back(4);
 
     short b = 1;
-    for (auto& i: os) {
+    for (auto& i : os)
+    {
         i.set_b(b);
         ++b;
     }
@@ -270,8 +281,8 @@ void test_non_default_constructible()
 int main()
 {
     test_bool();
-    test<char>((std::numeric_limits<char>::min)(),
-        (std::numeric_limits<char>::max)());
+    test<char>(
+        (std::numeric_limits<char>::min)(), (std::numeric_limits<char>::max)());
     test<int>((std::numeric_limits<int>::min)(),
         (std::numeric_limits<int>::min)() + 100);
     test<int>((std::numeric_limits<int>::max)() - 100,
@@ -293,13 +304,13 @@ int main()
     test_fp<float>((std::numeric_limits<float>::min)(),
         (std::numeric_limits<float>::min)() + 100);
     test_fp<float>((std::numeric_limits<float>::max)() - 100,
-        (std::numeric_limits<float>::max)()); //it's incorrect
+        (std::numeric_limits<float>::max)());    //it's incorrect
     // because floatmax() - 100 causes cancellations error, digits are not affected
     test_fp<float>(-100, 100);
     test<double>((std::numeric_limits<double>::min)(),
         (std::numeric_limits<double>::min)() + 100);
     test<double>((std::numeric_limits<double>::max)() - 100,
-        (std::numeric_limits<double>::max)()); //it's the same
+        (std::numeric_limits<double>::max)());    //it's the same
     test<double>(-100, 100);
 
     test_long_vector_serialization<int>();

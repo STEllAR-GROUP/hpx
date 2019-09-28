@@ -13,10 +13,9 @@
 #include <cstddef>
 #include <string>
 
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     template <std::size_t N>
-    void serialize(input_archive & ar, std::bitset<N> & d, unsigned)
+    void serialize(input_archive& ar, std::bitset<N>& d, unsigned)
     {
         std::string bits;
         ar >> bits;
@@ -24,11 +23,11 @@ namespace hpx { namespace serialization
     }
 
     template <std::size_t N>
-    void serialize(output_archive & ar, const std::bitset<N> & bs, unsigned)
+    void serialize(output_archive& ar, const std::bitset<N>& bs, unsigned)
     {
         std::string const bits = bs.to_string();
         ar << bits;
     }
-}}
+}}    // namespace hpx::serialization
 
 #endif

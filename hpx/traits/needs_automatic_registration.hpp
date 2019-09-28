@@ -10,14 +10,13 @@
 
 #include <type_traits>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     // This trait is used to decide whether a class (or specialization) is
     // required to automatically register to the action factory
     template <typename T, typename Enable = void>
-    struct needs_automatic_registration
-      : std::true_type
-    {};
-}}
+    struct needs_automatic_registration : std::true_type
+    {
+    };
+}}    // namespace hpx::traits
 
 #endif

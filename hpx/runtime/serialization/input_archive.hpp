@@ -31,23 +31,19 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace serialization
-{
-    struct HPX_EXPORT input_archive
-      : basic_archive<input_archive>
+namespace hpx { namespace serialization {
+    struct HPX_EXPORT input_archive : basic_archive<input_archive>
     {
         typedef basic_archive<input_archive> base_type;
 
-        typedef
-            std::map<std::uint64_t, detail::ptr_helper_ptr>
-            pointer_tracker;
+        typedef std::map<std::uint64_t, detail::ptr_helper_ptr> pointer_tracker;
 
         template <typename Container>
-        input_archive(Container & buffer,
-                std::size_t inbound_data_size = 0,
-                const std::vector<serialization_chunk>* chunks = nullptr)
+        input_archive(Container& buffer, std::size_t inbound_data_size = 0,
+            const std::vector<serialization_chunk>* chunks = nullptr)
           : base_type(0U)
-          , buffer_(new input_container<Container>(buffer, chunks, inbound_data_size))
+          , buffer_(new input_container<Container>(
+                buffer, chunks, inbound_data_size))
         {
             // endianness needs to be saves separately as it is needed to
             // properly interpret the flags
@@ -76,16 +72,15 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        void invoke_impl(T & t)
+        void invoke_impl(T& t)
         {
             load(t);
         }
 
         template <typename T>
-        typename std::enable_if<
-            !std::is_integral<T>::value && !std::is_enum<T>::value
-        >::type
-        load(T & t)
+        typename std::enable_if<!std::is_integral<T>::value &&
+            !std::is_enum<T>::value>::type
+        load(T& t)
         {
             typedef hpx::traits::is_bitwise_serializable<T> use_optimized;
 
@@ -93,30 +88,29 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        typename std::enable_if<
-            std::is_integral<T>::value || std::is_enum<T>::value
-        >::type
-        load(T & t) //-V659
+        typename std::enable_if<std::is_integral<T>::value ||
+            std::is_enum<T>::value>::type
+        load(T& t)    //-V659
         {
             load_integral(t, std::is_unsigned<T>());
         }
 
-        void load(float & f)
+        void load(float& f)
         {
             load_binary(&f, sizeof(float));
         }
 
-        void load(double & d)
+        void load(double& d)
         {
             load_binary(&d, sizeof(double));
         }
 
-        void load(char & c)
+        void load(char& c)
         {
             load_binary(&c, sizeof(char));
         }
 
-        void load(bool & b)
+        void load(bool& b)
         {
             load_binary(&b, sizeof(bool));
             HPX_ASSERT(0 == static_cast<int>(b) || 1 == static_cast<int>(b));
@@ -139,18 +133,18 @@ namespace hpx { namespace serialization
         friend class array;
 
         template <typename T>
-        void load_bitwise(T & t, std::false_type)
+        void load_bitwise(T& t, std::false_type)
         {
-            load_nonintrusively_polymorphic(t,
-                hpx::traits::is_nonintrusive_polymorphic<T>());
+            load_nonintrusively_polymorphic(
+                t, hpx::traits::is_nonintrusive_polymorphic<T>());
         }
 
         template <typename T>
-        void load_bitwise(T & t, std::true_type)
+        void load_bitwise(T& t, std::true_type)
         {
             static_assert(!std::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
-            if(disable_array_optimization())
+            if (disable_array_optimization())
             {
                 access::serialize(*this, t, 0);
             }
@@ -173,7 +167,7 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        void load_integral(T & val, std::false_type)
+        void load_integral(T& val, std::false_type)
         {
             std::int64_t l;
             load_integral_impl(l);
@@ -181,15 +175,14 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        void load_integral(T & val, std::true_type)
+        void load_integral(T& val, std::true_type)
         {
             std::uint64_t ul;
             load_integral_impl(ul);
             val = static_cast<T>(ul);
         }
 
-#if defined(BOOST_HAS_INT128) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if defined(BOOST_HAS_INT128) && !defined(__NVCC__) && !defined(__CUDACC__)
         void load_integral(boost::int128_type& t, std::false_type)
         {
             load_integral_impl(t);
@@ -227,7 +220,7 @@ namespace hpx { namespace serialization
         void load_integral_impl(Promoted& l)
         {
             const std::size_t size = sizeof(Promoted);
-            char* cptr = reinterpret_cast<char *>(&l); //-V206
+            char* cptr = reinterpret_cast<char*>(&l);    //-V206
             load_binary(cptr, static_cast<std::size_t>(size));
 
 #if BOOST_ENDIAN_BIG_BYTE
@@ -239,20 +232,22 @@ namespace hpx { namespace serialization
 #endif
         }
 
-        void load_binary(void * address, std::size_t count)
+        void load_binary(void* address, std::size_t count)
         {
-            if (0 == count) return;
+            if (0 == count)
+                return;
 
             buffer_->load_binary(address, count);
 
             size_ += count;
         }
 
-        void load_binary_chunk(void * address, std::size_t count)
+        void load_binary_chunk(void* address, std::size_t count)
         {
-            if (0 == count) return;
+            if (0 == count)
+                return;
 
-            if(disable_data_chunking())
+            if (disable_data_chunking())
                 buffer_->load_binary(address, count);
             else
                 buffer_->load_binary_chunk(address, count);
@@ -261,8 +256,8 @@ namespace hpx { namespace serialization
         }
 
         // make functions visible through adl
-        friend void register_pointer(input_archive& ar,
-                std::uint64_t pos, detail::ptr_helper_ptr helper)
+        friend void register_pointer(
+            input_archive& ar, std::uint64_t pos, detail::ptr_helper_ptr helper)
         {
             pointer_tracker& tracker = ar.pointer_tracker_;
             HPX_ASSERT(tracker.find(pos) == tracker.end());
@@ -271,21 +266,21 @@ namespace hpx { namespace serialization
         }
 
         template <typename Helper>
-        friend Helper & tracked_pointer(input_archive& ar, std::uint64_t pos)
+        friend Helper& tracked_pointer(input_archive& ar, std::uint64_t pos)
         {
             // gcc has some lookup problems when using
             // nested type inside friend function
-            std::map<std::uint64_t, detail::ptr_helper_ptr>::iterator
-                it = ar.pointer_tracker_.find(pos);
+            std::map<std::uint64_t, detail::ptr_helper_ptr>::iterator it =
+                ar.pointer_tracker_.find(pos);
             HPX_ASSERT(it != ar.pointer_tracker_.end());
 
-            return static_cast<Helper &>(*it->second);
+            return static_cast<Helper&>(*it->second);
         }
 
         std::unique_ptr<erased_input_container> buffer_;
         pointer_tracker pointer_tracker_;
     };
-}}
+}}    // namespace hpx::serialization
 
 #include <hpx/config/warnings_suffix.hpp>
 

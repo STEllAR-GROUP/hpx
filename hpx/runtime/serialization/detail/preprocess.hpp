@@ -27,23 +27,30 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace serialization { namespace detail
-{
+namespace hpx { namespace serialization { namespace detail {
     class preprocess
     {
         typedef hpx::lcos::local::spinlock mutex_type;
 
     public:
-        typedef std::map<const naming::gid_type*, naming::gid_type> split_gids_map;
+        typedef std::map<const naming::gid_type*, naming::gid_type>
+            split_gids_map;
         preprocess()
           : size_(0)
           , done_(false)
           , num_futures_(0)
           , triggered_futures_(0)
-        {}
+        {
+        }
 
-        std::size_t size() const { return size_; }
-        void resize(std::size_t size) { size_ = size; }
+        std::size_t size() const
+        {
+            return size_;
+        }
+        void resize(std::size_t size)
+        {
+            size_ = size;
+        }
 
         void trigger()
         {
@@ -56,36 +63,31 @@ namespace hpx { namespace serialization { namespace detail
                 ++triggered_futures_;
                 set_value = (done_ && num_futures_ == triggered_futures_);
             }
-            if(set_value)
+            if (set_value)
             {
                 promise_.set_value();
             }
         }
 
-        void await_future(hpx::lcos::detail::future_data_refcnt_base & future_data)
+        void await_future(
+            hpx::lcos::detail::future_data_refcnt_base& future_data)
         {
             {
                 std::lock_guard<mutex_type> l(mtx_);
                 ++num_futures_;
             }
-            future_data.set_on_completed(
-                [this]()
-                {
-                    this->trigger();
-                }
-            );
+            future_data.set_on_completed([this]() { this->trigger(); });
         }
 
         void add_gid(
-            naming::gid_type const & gid,
-            naming::gid_type const & split_gid)
+            naming::gid_type const& gid, naming::gid_type const& split_gid)
         {
             std::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(split_gids_[&gid] == naming::invalid_gid);
             split_gids_[&gid] = split_gid;
         }
 
-        bool has_gid(naming::gid_type const & gid)
+        bool has_gid(naming::gid_type const& gid)
         {
             std::lock_guard<mutex_type> l(mtx_);
             return split_gids_.find(&gid) != split_gids_.end();
@@ -102,7 +104,7 @@ namespace hpx { namespace serialization { namespace detail
 
         bool has_futures()
         {
-            if(num_futures_ == 0)
+            if (num_futures_ == 0)
             {
                 promise_.set_value();
             }
@@ -125,8 +127,9 @@ namespace hpx { namespace serialization { namespace detail
 
             hpx::future<void> fut = promise_.get_future();
             // we don't call f directly to avoid possible stack overflow.
-            auto shared_state_ = hpx::traits::future_access<hpx::future<void> >::
-                get_shared_state(fut);
+            auto shared_state_ =
+                hpx::traits::future_access<hpx::future<void>>::get_shared_state(
+                    fut);
             shared_state_->set_on_completed(std::move(f));
         }
 
@@ -141,40 +144,40 @@ namespace hpx { namespace serialization { namespace detail
 
         hpx::lcos::local::promise<void> promise_;
     };
-}}}
+}}}    // namespace hpx::serialization::detail
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <>
     struct serialization_access_data<serialization::detail::preprocess>
       : default_serialization_access_data<serialization::detail::preprocess>
     {
         typedef std::true_type preprocessing_only;
 
-        HPX_CONSTEXPR static bool is_preprocessing() { return true; }
+        HPX_CONSTEXPR static bool is_preprocessing()
+        {
+            return true;
+        }
 
         static std::size_t size(serialization::detail::preprocess const& cont)
         {
             return cont.size();
         }
 
-        static void resize(serialization::detail::preprocess& cont,
-            std::size_t count)
+        static void resize(
+            serialization::detail::preprocess& cont, std::size_t count)
         {
             return cont.resize(cont.size() + count);
         }
 
         // functions related to output operations
-        static void await_future(
-            serialization::detail::preprocess& cont
-          , hpx::lcos::detail::future_data_refcnt_base & future_data)
+        static void await_future(serialization::detail::preprocess& cont,
+            hpx::lcos::detail::future_data_refcnt_base& future_data)
         {
             cont.await_future(future_data);
         }
 
         static void add_gid(serialization::detail::preprocess& cont,
-                naming::gid_type const & gid,
-                naming::gid_type const & split_gid)
+            naming::gid_type const& gid, naming::gid_type const& split_gid)
         {
             cont.add_gid(gid, split_gid);
         }
@@ -190,6 +193,6 @@ namespace hpx { namespace traits
             cont.reset();
         }
     };
-}}
+}}    // namespace hpx::traits
 
 #endif

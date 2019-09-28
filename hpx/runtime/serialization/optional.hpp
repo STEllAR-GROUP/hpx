@@ -13,8 +13,7 @@
 
 #include <utility>
 
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     template <typename T>
     void save(output_archive& ar, hpx::util::optional<T> const& o, unsigned)
     {
@@ -43,7 +42,7 @@ namespace hpx { namespace serialization
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (template <typename T>), (hpx::util::optional<T>));
-}}
+        (template <typename T>), (hpx::util::optional<T>) );
+}}    // namespace hpx::serialization
 
-#endif // HPX_OPTIONAL_SERIALIZATION_HPP
+#endif    // HPX_OPTIONAL_SERIALIZATION_HPP

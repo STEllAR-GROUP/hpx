@@ -6,7 +6,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
@@ -24,7 +23,10 @@
  */
 struct A
 {
-    explicit A(int a) : a(a) {}
+    explicit A(int a)
+      : a(a)
+    {
+    }
     virtual ~A() {}
 
     int a;
@@ -33,12 +35,12 @@ struct A
 template <typename Archive>
 void serialize(Archive& ar, A& a, unsigned)
 {
-    ar & a.a;
+    ar& a.a;
 }
 
-A *a_factory(hpx::serialization::input_archive& ar)
+A* a_factory(hpx::serialization::input_archive& ar)
 {
-    A *a = new A(123);
+    A* a = new A(123);
     ar >> *a;
     return a;
 }
@@ -54,10 +56,11 @@ HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(A, a_factory);
  */
 struct B
 {
-    B(double b, bool flag) :
-        b(b)
+    B(double b, bool flag)
+      : b(b)
     {
-        if (flag) {
+        if (flag)
+        {
             std::cout << "B(" << b << ")\n";
         }
     }
@@ -70,13 +73,13 @@ struct B
 template <typename Archive>
 void serialize(Archive& ar, B& b, unsigned)
 {
-    ar & b.b;
+    ar& b.b;
 }
 
-B *b_factory(hpx::serialization::input_archive& ar)
+B* b_factory(hpx::serialization::input_archive& ar)
 {
     double b;
-    ar & b;
+    ar& b;
 
     bool flag = (b < 8);
     return new B(b, flag);
@@ -88,32 +91,33 @@ HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(B, b_factory);
 /**
  * Obviously we need to check templates, too.
  */
-template<typename T>
+template <typename T>
 struct C
 {
-    C(T c) :
-        c(c)
-    {}
+    C(T c)
+      : c(c)
+    {
+    }
 
     T c;
 };
 
-template<typename Archive, typename T>
+template <typename Archive, typename T>
 void serialize(Archive& ar, C<T>& c, unsigned)
 {
-    ar & c.c;
+    ar& c.c;
 }
 
-template<typename T>
-C<T> *c_factory(hpx::serialization::input_archive& ar, C<T> * /*unused*/)
+template <typename T>
+C<T>* c_factory(hpx::serialization::input_archive& ar, C<T>* /*unused*/)
 {
-    C<T> *c = new C<T>(666);
+    C<T>* c = new C<T>(666);
     ar >> *c;
     return c;
 }
 
-HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE((template<typename T>),
-    (C<T>), c_factory);
+HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE(
+    (template <typename T>), (C<T>), c_factory);
 
 void test_delegate()
 {
@@ -152,12 +156,12 @@ void test_template()
 {
     std::vector<char> buffer;
     {
-        std::shared_ptr<C<float> > struct_a(new C<float>(777));
+        std::shared_ptr<C<float>> struct_a(new C<float>(777));
         hpx::serialization::output_archive oarchive(buffer);
         oarchive << struct_a;
     }
     {
-        std::shared_ptr<C<float> > struct_b;
+        std::shared_ptr<C<float>> struct_b;
         hpx::serialization::input_archive iarchive(buffer);
         iarchive >> struct_b;
         HPX_TEST_EQ(struct_b->c, 777);

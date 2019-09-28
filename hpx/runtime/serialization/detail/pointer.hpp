@@ -28,31 +28,28 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace serialization
-{
-    namespace detail
-    {
+namespace hpx { namespace serialization {
+    namespace detail {
         struct ptr_helper;
 
         typedef std::unique_ptr<ptr_helper> ptr_helper_ptr;
-    }
+    }    // namespace detail
 
     HPX_FORCEINLINE
-        void register_pointer(input_archive & ar, std::uint64_t pos,
-            detail::ptr_helper_ptr helper);
+    void register_pointer(
+        input_archive& ar, std::uint64_t pos, detail::ptr_helper_ptr helper);
 
     template <typename Helper>
-    Helper & tracked_pointer(input_archive & ar, std::uint64_t pos);
+    Helper& tracked_pointer(input_archive& ar, std::uint64_t pos);
 
-    namespace detail
-    {
+    namespace detail {
         template <class Pointer>
         struct erase_ptr_helper : ptr_helper
         {
             typedef typename Pointer::element_type referred_type;
 
             erase_ptr_helper(Pointer&& t, Pointer& ptr)
-                : t_(std::move(t))
+              : t_(std::move(t))
             {
                 ptr = t_;
             }
@@ -72,8 +69,8 @@ namespace hpx { namespace serialization
                     std::string name;
                     ar >> name;
 
-                    Pointer t(polymorphic_intrusive_factory::instance().
-                        create<referred_type>(name));
+                    Pointer t(polymorphic_intrusive_factory::instance()
+                                  .create<referred_type>(name));
                     ar >> *t;
                     return t;
                 }
@@ -87,7 +84,8 @@ namespace hpx { namespace serialization
                     std::uint32_t id;
                     ar >> id;
 
-                    Pointer t(polymorphic_id_factory::create<referred_type>(id));
+                    Pointer t(
+                        polymorphic_id_factory::create<referred_type>(id));
                     ar >> *t;
                     return t;
 #else
@@ -96,8 +94,8 @@ namespace hpx { namespace serialization
                     ar >> name;
                     ar >> id;
 
-                    Pointer t(
-                        polymorphic_id_factory::create<referred_type>(id, &name));
+                    Pointer t(polymorphic_id_factory::create<referred_type>(
+                        id, &name));
                     ar >> *t;
                     return t;
 #endif
@@ -108,8 +106,8 @@ namespace hpx { namespace serialization
             {
                 static Pointer call(input_archive& ar)
                 {
-                    return Pointer(polymorphic_nonintrusive_factory::
-                        instance().load<referred_type>(ar));
+                    return Pointer(polymorphic_nonintrusive_factory::instance()
+                                       .load<referred_type>(ar));
                 }
             };
 
@@ -130,12 +128,9 @@ namespace hpx { namespace serialization
                     hpx::traits::is_intrusive_polymorphic<referred_type>::value,
                     intrusive_polymorphic,
                     typename std::conditional<
-                        hpx::traits::is_nonintrusive_polymorphic<referred_type>::value,
-                        nonintrusive_polymorphic,
-                        usual
-                    >::type
-                >
-            >::type type;
+                        hpx::traits::is_nonintrusive_polymorphic<
+                            referred_type>::value,
+                        nonintrusive_polymorphic, usual>::type>>::type type;
         };
 
         template <class Pointer>
@@ -158,9 +153,8 @@ namespace hpx { namespace serialization
                 static void call(output_archive& ar, const Pointer& ptr)
                 {
 #if !defined(HPX_DEBUG)
-                    const std::uint32_t id =
-                        polymorphic_id_factory::get_id(
-                            access::get_name(ptr.get()));
+                    const std::uint32_t id = polymorphic_id_factory::get_id(
+                        access::get_name(ptr.get()));
                     ar << id;
                     ar << *ptr;
 #else
@@ -183,8 +177,7 @@ namespace hpx { namespace serialization
 
                 template <typename T>
                 static typename std::enable_if<
-                    !std::is_constructible<T>::value
-                >::type
+                    !std::is_constructible<T>::value>::type
                 call(output_archive& ar, T const& val)
                 {
                     save_construct_data(ar, &val, 0);
@@ -193,8 +186,7 @@ namespace hpx { namespace serialization
 
                 template <typename T>
                 static typename std::enable_if<
-                    std::is_constructible<T>::value
-                >::type
+                    std::is_constructible<T>::value>::type
                 call(output_archive& ar, T const& val)
                 {
                     ar << val;
@@ -207,82 +199,86 @@ namespace hpx { namespace serialization
                 polymorphic_with_id,
                 typename std::conditional<
                     hpx::traits::is_intrusive_polymorphic<referred_type>::value,
-                    intrusive_polymorphic,
-                    usual
-                >::type
-            >::type type;
+                    intrusive_polymorphic, usual>::type>::type type;
         };
 
         // forwarded serialize pointer functions
-        template <typename Pointer> HPX_FORCEINLINE
-        void serialize_pointer_tracked(output_archive & ar, const Pointer& ptr)
+        template <typename Pointer>
+        HPX_FORCEINLINE void serialize_pointer_tracked(
+            output_archive& ar, const Pointer& ptr)
         {
             bool valid = static_cast<bool>(ptr);
             ar << valid;
-            if(valid)
+            if (valid)
             {
                 std::uint64_t cur_pos = current_pos(ar);
                 std::uint64_t pos = track_pointer(ar, ptr.get());
                 ar << pos;
-                if(pos == std::uint64_t(-1))
+                if (pos == std::uint64_t(-1))
                 {
                     ar << cur_pos;
-                    detail::pointer_output_dispatcher<Pointer>::type::call(ar, ptr);
+                    detail::pointer_output_dispatcher<Pointer>::type::call(
+                        ar, ptr);
                 }
             }
         }
 
-        template <class Pointer> HPX_FORCEINLINE
-        void serialize_pointer_tracked(input_archive& ar, Pointer& ptr)
+        template <class Pointer>
+        HPX_FORCEINLINE void serialize_pointer_tracked(
+            input_archive& ar, Pointer& ptr)
         {
             bool valid = false;
             ar >> valid;
-            if(valid)
+            if (valid)
             {
                 std::uint64_t pos = 0;
                 ar >> pos;
-                if(pos == std::uint64_t(-1))
+                if (pos == std::uint64_t(-1))
                 {
                     pos = 0;
                     ar >> pos;
-                    Pointer temp = detail::pointer_input_dispatcher<
-                        Pointer>::type::call(ar);
-                    register_pointer(ar, pos, ptr_helper_ptr(
-                            new detail::erase_ptr_helper<Pointer>
-                                (std::move(temp), ptr)));
+                    Pointer temp =
+                        detail::pointer_input_dispatcher<Pointer>::type::call(
+                            ar);
+                    register_pointer(ar, pos,
+                        ptr_helper_ptr(new detail::erase_ptr_helper<Pointer>(
+                            std::move(temp), ptr)));
                 }
                 else
                 {
-                    detail::erase_ptr_helper<Pointer> & helper =
-                        tracked_pointer<detail::erase_ptr_helper<Pointer> >(ar, pos);
+                    detail::erase_ptr_helper<Pointer>& helper =
+                        tracked_pointer<detail::erase_ptr_helper<Pointer>>(
+                            ar, pos);
                     ptr = helper.t_;
                 }
             }
         }
 
-        template <typename Pointer> HPX_FORCEINLINE
-        void serialize_pointer_untracked(output_archive & ar, const Pointer& ptr)
+        template <typename Pointer>
+        HPX_FORCEINLINE void serialize_pointer_untracked(
+            output_archive& ar, const Pointer& ptr)
         {
             bool valid = static_cast<bool>(ptr);
             ar << valid;
-            if(valid)
+            if (valid)
             {
                 detail::pointer_output_dispatcher<Pointer>::type::call(ar, ptr);
             }
         }
 
-        template <class Pointer> HPX_FORCEINLINE
-        void serialize_pointer_untracked(input_archive& ar, Pointer& ptr)
+        template <class Pointer>
+        HPX_FORCEINLINE void serialize_pointer_untracked(
+            input_archive& ar, Pointer& ptr)
         {
             bool valid = false;
             ar >> valid;
-            if(valid)
+            if (valid)
             {
                 ptr = detail::pointer_input_dispatcher<Pointer>::type::call(ar);
             }
         }
 
-    } // detail
-}}
+    }    // namespace detail
+}}       // namespace hpx::serialization
 
-#endif // HPX_SERIALIZATION_DETAIL_POINTER_HPP
+#endif    // HPX_SERIALIZATION_DETAIL_POINTER_HPP

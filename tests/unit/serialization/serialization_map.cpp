@@ -5,8 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/map.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
@@ -26,16 +26,26 @@ struct A
 {
     A() {}
 
-    explicit A(T t) : t_(t) {}
+    explicit A(T t)
+      : t_(t)
+    {
+    }
     T t_;
 
-    A & operator=(T t) { t_ = t; return *this; }
-    bool operator==(const A& a) const { return t_ == a.t_; }
+    A& operator=(T t)
+    {
+        t_ = t;
+        return *this;
+    }
+    bool operator==(const A& a) const
+    {
+        return t_ == a.t_;
+    }
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned)
+    void serialize(Archive& ar, unsigned)
     {
-        ar & t_;
+        ar& t_;
     }
 };
 
@@ -51,17 +61,17 @@ void test(T min, T max)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
-        std::map<T, A<T> > os;
-        for(T c = min; c < max; ++c)
+        std::map<T, A<T>> os;
+        for (T c = min; c < max; ++c)
         {
             os.insert(std::make_pair(c, A<T>(c)));
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
-        std::map<T, A<T> > is;
+        std::map<T, A<T>> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (const auto& v: os)
+        for (const auto& v : os)
         {
             HPX_TEST_EQ(os[v.first], is[v.first]);
         }
@@ -74,17 +84,17 @@ void test_fp(T min, T max)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
-        std::map<T, A<T> > os;
-        for(T c = min; c < max; c += static_cast<T>(0.5))
+        std::map<T, A<T>> os;
+        for (T c = min; c < max; c += static_cast<T>(0.5))
         {
             os.insert(std::make_pair(c, A<T>(c)));
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
-        std::map<T, A<T> > is;
+        std::map<T, A<T>> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (const auto& v: os)
+        for (const auto& v : os)
         {
             HPX_TEST_EQ(os[v.first], is[v.first]);
         }
@@ -92,20 +102,19 @@ void test_fp(T min, T max)
 }
 
 // prohibited, but for adl
-namespace std
-{
+namespace std {
     std::ostream& operator<<(std::ostream& os, const std::vector<int>& vec)
     {
         std::copy(vec.begin(), vec.end(), std::ostream_iterator<int>(os, " "));
         return os;
     }
-}
+}    // namespace std
 
 void test_vector_as_value()
 {
     std::vector<char> buffer;
     hpx::serialization::output_archive oarchive(buffer);
-    std::map<size_t, std::vector<int> > os;
+    std::map<size_t, std::vector<int>> os;
     for (int k = 0; k < 10; ++k)
     {
         std::vector<int> vec(10);
@@ -114,10 +123,10 @@ void test_vector_as_value()
     }
     oarchive << os;
     hpx::serialization::input_archive iarchive(buffer);
-    std::map<size_t, std::vector<int> > is;
+    std::map<size_t, std::vector<int>> is;
     iarchive >> is;
     HPX_TEST_EQ(os.size(), is.size());
-    for (const auto& v: os)
+    for (const auto& v : os)
     {
         HPX_TEST_EQ(os[v.first], is[v.first]);
     }
@@ -125,8 +134,8 @@ void test_vector_as_value()
 
 int main()
 {
-    test<char>((std::numeric_limits<char>::min)(),
-        (std::numeric_limits<char>::max)());
+    test<char>(
+        (std::numeric_limits<char>::min)(), (std::numeric_limits<char>::max)());
     test<int>((std::numeric_limits<int>::min)(),
         (std::numeric_limits<int>::min)() + 100);
     test<int>((std::numeric_limits<int>::max)() - 100,

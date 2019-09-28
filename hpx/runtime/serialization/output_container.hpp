@@ -18,17 +18,15 @@
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
 #include <hpx/traits/serialization_access_data.hpp>
 
-#include <cstddef> // for size_t
+#include <cstddef>    // for size_t
 #include <cstdint>
-#include <cstring> // for memcpy
+#include <cstring>    // for memcpy
 #include <memory>
 #include <type_traits>
 #include <vector>
 
-namespace hpx { namespace serialization
-{
-    namespace detail
-    {
+namespace hpx { namespace serialization {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         struct basic_chunker
         {
@@ -39,9 +37,7 @@ namespace hpx { namespace serialization
                 return 0;
             }
 
-            static void set_chunk_size(std::size_t)
-            {
-            }
+            static void set_chunk_size(std::size_t) {}
 
             HPX_CONSTEXPR static std::uint8_t get_chunk_type()
             {
@@ -58,7 +54,7 @@ namespace hpx { namespace serialization
                 return 1;
             }
 
-            static void push_back(serialization_chunk && /*chunk*/) {}
+            static void push_back(serialization_chunk&& /*chunk*/) {}
 
             static void reset() {}
         };
@@ -67,7 +63,8 @@ namespace hpx { namespace serialization
         {
             vector_chunker(std::vector<serialization_chunk>* chunks)
               : chunks_(chunks)
-            {}
+            {
+            }
 
             std::size_t get_chunk_size() const
             {
@@ -94,7 +91,7 @@ namespace hpx { namespace serialization
                 return chunks_->size();
             }
 
-            void push_back(serialization_chunk && chunk)
+            void push_back(serialization_chunk&& chunk)
             {
                 chunks_->push_back(chunk);
             }
@@ -112,7 +109,8 @@ namespace hpx { namespace serialization
         {
             counting_chunker(std::vector<serialization_chunk>*)
               : num_chunks_(0)
-            {}
+            {
+            }
 
             std::size_t get_chunk_size() const
             {
@@ -139,7 +137,7 @@ namespace hpx { namespace serialization
                 return num_chunks_;
             }
 
-            void push_back(serialization_chunk && chunk)
+            void push_back(serialization_chunk&& chunk)
             {
                 chunk_ = chunk;
                 ++num_chunks_;
@@ -154,7 +152,7 @@ namespace hpx { namespace serialization
             serialization_chunk chunk_;
             std::size_t num_chunks_;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Container, typename Chunker>
@@ -162,20 +160,20 @@ namespace hpx { namespace serialization
     {
         typedef traits::serialization_access_data<Container> access_traits;
 
-        output_container(Container& cont,
-                std::vector<serialization_chunk>* chunks = nullptr)
-          : cont_(cont), current_(0), chunker_(chunks)
+        output_container(
+            Container& cont, std::vector<serialization_chunk>* chunks = nullptr)
+          : cont_(cont)
+          , current_(0)
+          , chunker_(chunks)
         {
             chunker_.reset();
         }
 
-        ~output_container()
-        {}
+        ~output_container() {}
 
         void flush()
         {
-            HPX_ASSERT(
-                chunker_.get_chunk_type() == chunk_type_index ||
+            HPX_ASSERT(chunker_.get_chunk_type() == chunk_type_index ||
                 chunker_.get_chunk_size() != 0);
 
             // complement current serialization_chunk by setting its length
@@ -194,19 +192,18 @@ namespace hpx { namespace serialization
         }
 
         void await_future(
-            hpx::lcos::detail::future_data_refcnt_base & future_data)
+            hpx::lcos::detail::future_data_refcnt_base& future_data)
         {
             access_traits::await_future(cont_, future_data);
         }
 
         void add_gid(
-            naming::gid_type const & gid,
-            naming::gid_type const & split_gid)
+            naming::gid_type const& gid, naming::gid_type const& split_gid)
         {
             access_traits::add_gid(cont_, gid, split_gid);
         }
 
-        bool has_gid(naming::gid_type const & gid)
+        bool has_gid(naming::gid_type const& gid)
         {
             return access_traits::has_gid(cont_, gid);
         }
@@ -222,14 +219,14 @@ namespace hpx { namespace serialization
             access_traits::reset(cont_);
         }
 
-        void set_filter(binary_filter* filter) // override
+        void set_filter(binary_filter* filter)    // override
         {
             HPX_ASSERT(chunker_.get_num_chunks() == 1 &&
                 chunker_.get_chunk_size() == 0);
             chunker_.reset();
         }
 
-        void save_binary(void const* address, std::size_t count) // override
+        void save_binary(void const* address, std::size_t count)    // override
         {
             HPX_ASSERT(count != 0);
 
@@ -252,7 +249,8 @@ namespace hpx { namespace serialization
             current_ = new_current;
         }
 
-        std::size_t save_binary_chunk(void const* address, std::size_t count) // override
+        std::size_t save_binary_chunk(
+            void const* address, std::size_t count)    // override
         {
             if (count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
             {
@@ -261,9 +259,9 @@ namespace hpx { namespace serialization
                 // the container has grown by count bytes
                 return count;
             }
-            else {
-                HPX_ASSERT(
-                    chunker_.get_chunk_type() == chunk_type_index ||
+            else
+            {
+                HPX_ASSERT(chunker_.get_chunk_type() == chunk_type_index ||
                     chunker_.get_chunk_size() != 0);
 
                 // complement current serialization_chunk by setting its length
@@ -296,14 +294,15 @@ namespace hpx { namespace serialization
         typedef traits::serialization_access_data<Container> access_traits;
         typedef output_container<Container, Chunker> base_type;
 
-        filtered_output_container(Container& cont,
-                std::vector<serialization_chunk>* chunks = nullptr)
-          : output_container<Container, Chunker>(cont, chunks),
-            start_compressing_at_(0), filter_(nullptr)
-        {}
+        filtered_output_container(
+            Container& cont, std::vector<serialization_chunk>* chunks = nullptr)
+          : output_container<Container, Chunker>(cont, chunks)
+          , start_compressing_at_(0)
+          , filter_(nullptr)
+        {
+        }
 
-        ~filtered_output_container()
-        {}
+        ~filtered_output_container() {}
 
         void flush()
         {
@@ -314,10 +313,11 @@ namespace hpx { namespace serialization
 
             this->current_ = start_compressing_at_;
 
-            do {
-                bool flushed = access_traits::flush(
-                    filter_, this->cont_, this->current_,
-                    access_traits::size(this->cont_)-this->current_, written);
+            do
+            {
+                bool flushed = access_traits::flush(filter_, this->cont_,
+                    this->current_,
+                    access_traits::size(this->cont_) - this->current_, written);
 
                 this->current_ += written;
                 if (flushed)
@@ -333,7 +333,7 @@ namespace hpx { namespace serialization
             access_traits::resize(this->cont_, this->current_);
         }
 
-        void set_filter(binary_filter* filter) // override
+        void set_filter(binary_filter* filter)    // override
         {
             HPX_ASSERT(nullptr == filter_ && filter != nullptr);
             filter_ = filter;
@@ -342,7 +342,7 @@ namespace hpx { namespace serialization
             this->base_type::set_filter(nullptr);
         }
 
-        void save_binary(void const* address, std::size_t count) // override
+        void save_binary(void const* address, std::size_t count)    // override
         {
             HPX_ASSERT(count != 0);
 
@@ -352,7 +352,8 @@ namespace hpx { namespace serialization
             this->current_ += count;
         }
 
-        std::size_t save_binary_chunk(void const* address, std::size_t count) // override
+        std::size_t save_binary_chunk(
+            void const* address, std::size_t count)    // override
         {
             if (count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
             {
@@ -362,7 +363,8 @@ namespace hpx { namespace serialization
                 this->current_ += count;
                 return count;
             }
-            else {
+            else
+            {
                 return this->base_type::save_binary_chunk(address, count);
             }
         }
@@ -371,6 +373,6 @@ namespace hpx { namespace serialization
         std::size_t start_compressing_at_;
         binary_filter* filter_;
     };
-}}
+}}    // namespace hpx::serialization
 
 #endif

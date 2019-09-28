@@ -14,15 +14,17 @@ struct A
     double a;
     int p;
 
-    void serialize(int, unsigned) {
+    void serialize(int, unsigned)
+    {
         // 3rd-party logic...
     }
 };
 
 template <class Ar>
-void serialize(Ar& ar, A& a, unsigned) {
-    ar & a.a;
-    ar & a.p;
+void serialize(Ar& ar, A& a, unsigned)
+{
+    ar& a.a;
+    ar& a.p;
 }
 
 int main()

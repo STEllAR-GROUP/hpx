@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/complex.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -19,15 +19,22 @@ struct A
 {
     A() {}
 
-    explicit A(T const& t) : t_(t) {}
+    explicit A(T const& t)
+      : t_(t)
+    {
+    }
     T t_;
 
-    A & operator=(T const& t) { t_ = t; return *this; }
+    A& operator=(T const& t)
+    {
+        t_ = t;
+        return *this;
+    }
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned)
+    void serialize(Archive& ar, unsigned)
     {
-        ar & t_;
+        ar& t_;
     }
 };
 
@@ -49,11 +56,11 @@ void test_complex(T real, T imag)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
-        A<std::complex<T> > ocomplex(std::complex<T>(real, imag));
+        A<std::complex<T>> ocomplex(std::complex<T>(real, imag));
         oarchive << ocomplex;
 
         hpx::serialization::input_archive iarchive(buffer);
-        A<std::complex<T> > icomplex;
+        A<std::complex<T>> icomplex;
         iarchive >> icomplex;
         HPX_TEST_EQ(ocomplex.t_.real(), icomplex.t_.real());
         HPX_TEST_EQ(ocomplex.t_.imag(), icomplex.t_.imag());

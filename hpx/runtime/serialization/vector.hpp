@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/array.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/detail/serialize_collection.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <cstddef>
@@ -18,28 +18,27 @@
 #include <type_traits>
 #include <vector>
 
-namespace hpx { namespace serialization
-{
-    namespace detail
-    {
+namespace hpx { namespace serialization {
+    namespace detail {
         // load vector<T>
         template <typename T, typename Allocator>
-        void load_impl(input_archive & ar, std::vector<T, Allocator> & vs,
-            std::false_type)
+        void load_impl(
+            input_archive& ar, std::vector<T, Allocator>& vs, std::false_type)
         {
             // normal load ...
             std::uint64_t size;
-            ar >> size; //-V128
-            if (size == 0) return;
+            ar >> size;    //-V128
+            if (size == 0)
+                return;
 
             detail::load_collection(ar, vs, size);
         }
 
         template <typename T, typename Allocator>
-        void load_impl(input_archive & ar, std::vector<T, Allocator> & v,
-            std::true_type)
+        void load_impl(
+            input_archive& ar, std::vector<T, Allocator>& v, std::true_type)
         {
-            if(ar.disable_array_optimization())
+            if (ar.disable_array_optimization())
             {
                 load_impl(ar, v, std::false_type());
                 return;
@@ -47,27 +46,29 @@ namespace hpx { namespace serialization
 
             // bitwise load ...
             std::uint64_t size;
-            ar >> size; //-V128
-            if(size == 0) return;
+            ar >> size;    //-V128
+            if (size == 0)
+                return;
 
             if (v.size() < size)
                 v.resize(size);
             ar >> hpx::serialization::make_array(v.data(), v.size());
         }
-    }
+    }    // namespace detail
 
     template <typename Allocator>
-    void serialize(input_archive & ar, std::vector<bool, Allocator> & v, unsigned)
+    void serialize(input_archive& ar, std::vector<bool, Allocator>& v, unsigned)
     {
         std::uint64_t size = 0;
-        ar >> size; //-V128
+        ar >> size;    //-V128
 
         v.clear();
-        if(size == 0) return;
+        if (size == 0)
+            return;
 
         v.reserve(size);
         // normal load ... no chance of doing bitwise here ...
-        for(std::size_t i = 0; i != size; ++i)
+        for (std::size_t i = 0; i != size; ++i)
         {
             bool b = false;
             ar >> b;
@@ -76,24 +77,21 @@ namespace hpx { namespace serialization
     }
 
     template <typename T, typename Allocator>
-    void serialize(input_archive & ar, std::vector<T, Allocator> & v, unsigned)
+    void serialize(input_archive& ar, std::vector<T, Allocator>& v, unsigned)
     {
         typedef std::integral_constant<bool,
-            hpx::traits::is_bitwise_serializable<
-                typename std::remove_const<
-                    typename std::vector<T, Allocator>::value_type
-                >::type
-            >::value> use_optimized;
+            hpx::traits::is_bitwise_serializable<typename std::remove_const<
+                typename std::vector<T, Allocator>::value_type>::type>::value>
+            use_optimized;
 
         v.clear();
         detail::load_impl(ar, v, use_optimized());
     }
 
     // save vector<T>
-    namespace detail
-    {
+    namespace detail {
         template <typename T, typename Allocator>
-        void save_impl(output_archive & ar, const std::vector<T, Allocator> & vs,
+        void save_impl(output_archive& ar, const std::vector<T, Allocator>& vs,
             std::false_type)
         {
             // normal save ...
@@ -101,10 +99,10 @@ namespace hpx { namespace serialization
         }
 
         template <typename T, typename Allocator>
-        void save_impl(output_archive & ar, const std::vector<T, Allocator> & v,
+        void save_impl(output_archive& ar, const std::vector<T, Allocator>& v,
             std::true_type)
         {
-            if(ar.disable_array_optimization())
+            if (ar.disable_array_optimization())
             {
                 save_impl(ar, v, std::false_type());
                 return;
@@ -113,17 +111,18 @@ namespace hpx { namespace serialization
             // bitwise (zero-copy) save ...
             ar << hpx::serialization::make_array(v.data(), v.size());
         }
-    }
+    }    // namespace detail
 
     template <typename Allocator>
-    void serialize(output_archive & ar, const std::vector<bool, Allocator> & v,
-        unsigned)
+    void serialize(
+        output_archive& ar, const std::vector<bool, Allocator>& v, unsigned)
     {
         std::uint64_t size = v.size();
         ar << size;
-        if(v.empty()) return;
+        if (v.empty())
+            return;
         // normal save ... no chance of doing bitwise here ...
-        for(std::size_t i = 0; i < v.size(); ++i)
+        for (std::size_t i = 0; i < v.size(); ++i)
         {
             bool b = v[i];
             ar << b;
@@ -131,21 +130,20 @@ namespace hpx { namespace serialization
     }
 
     template <typename T, typename Allocator>
-    void serialize(output_archive & ar, const std::vector<T, Allocator> & v,
-        unsigned)
+    void serialize(
+        output_archive& ar, const std::vector<T, Allocator>& v, unsigned)
     {
         typedef std::integral_constant<bool,
-            hpx::traits::is_bitwise_serializable<
-                typename std::remove_const<
-                    typename std::vector<T, Allocator>::value_type
-                >::type
-            >::value> use_optimized;
+            hpx::traits::is_bitwise_serializable<typename std::remove_const<
+                typename std::vector<T, Allocator>::value_type>::type>::value>
+            use_optimized;
 
         std::uint64_t size = v.size();
         ar << size;
-        if(v.empty()) return;
+        if (v.empty())
+            return;
         detail::save_impl(ar, v, use_optimized());
     }
-}}
+}}    // namespace hpx::serialization
 
 #endif

@@ -7,10 +7,10 @@
 // hpxinspect:nodeprecatedinclude:boost/shared_ptr.hpp
 // hpxinspect:nodeprecatedname:boost::shared_ptr
 
+#include <hpx/runtime/serialization/intrusive_ptr.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/runtime/serialization/unique_ptr.hpp>
-#include <hpx/runtime/serialization/intrusive_ptr.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -83,22 +83,26 @@ void test_unique()
     }
     HPX_TEST_NEQ(op1.get(), ip.get());
     HPX_TEST_NEQ(op2.get(), ip.get());
-    HPX_TEST_NEQ(op1.get(), op2.get()); //untracked
+    HPX_TEST_NEQ(op1.get(), op2.get());    //untracked
     HPX_TEST_EQ(*op1, *ip);
     HPX_TEST_EQ(*op2, *ip);
 }
 
 struct A
 {
-    A() : i(7), count(0) {}
+    A()
+      : i(7)
+      , count(0)
+    {
+    }
     int i;
 
     int count;
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned)
+    void serialize(Archive& ar, unsigned)
     {
-        ar & i;
+        ar& i;
     }
 };
 
@@ -109,7 +113,7 @@ void intrusive_ptr_add_ref(A* a)
 
 void intrusive_ptr_release(A* a)
 {
-    if(--a->count == 0)
+    if (--a->count == 0)
     {
         delete a;
     }

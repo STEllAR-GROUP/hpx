@@ -11,20 +11,20 @@
 #define HPX_SERIALIZATION_VARIANT_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <boost/variant.hpp>
 
 #include <utility>
 
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     struct variant_save_visitor : boost::static_visitor<>
     {
         variant_save_visitor(output_archive& ar)
           : m_ar(ar)
-        {}
+        {
+        }
 
         template <typename T>
         void operator()(T const& value) const
@@ -33,13 +33,13 @@ namespace hpx { namespace serialization
         }
 
     private:
-        output_archive & m_ar;
+        output_archive& m_ar;
     };
 
-    template <typename ... Ts>
+    template <typename... Ts>
     struct variant_impl;
 
-    template <typename T, typename ... Ts>
+    template <typename T, typename... Ts>
     struct variant_impl<T, Ts...>
     {
         template <typename V>
@@ -47,10 +47,10 @@ namespace hpx { namespace serialization
         {
             if (which == 0)
             {
-            // note: A non-intrusive implementation (such as this one)
-            // necessary has to copy the value.  This wouldn't be necessary
-            // with an implementation that de-serialized to the address of the
-            // aligned storage included in the variant.
+                // note: A non-intrusive implementation (such as this one)
+                // necessary has to copy the value.  This wouldn't be necessary
+                // with an implementation that de-serialized to the address of the
+                // aligned storage included in the variant.
                 T value;
                 ar >> value;
                 v = std::move(value);
@@ -69,7 +69,7 @@ namespace hpx { namespace serialization
         }
     };
 
-    template <typename ... T>
+    template <typename... T>
     void save(output_archive& ar, boost::variant<T...> const& v, unsigned)
     {
         int which = v.which();
@@ -78,7 +78,7 @@ namespace hpx { namespace serialization
         v.apply_visitor(visitor);
     }
 
-    template <typename ... T>
+    template <typename... T>
     void load(input_archive& ar, boost::variant<T...>& v, unsigned)
     {
         int which;
@@ -87,15 +87,15 @@ namespace hpx { namespace serialization
         {
             // this might happen if a type was removed from the list of variant
             // types
-            HPX_THROW_EXCEPTION(serialization_error
-              , "load<Archive, Variant, version>"
-              , "type was removed from the list of variant types");
+            HPX_THROW_EXCEPTION(serialization_error,
+                "load<Archive, Variant, version>",
+                "type was removed from the list of variant types");
         }
         variant_impl<T...>::load(ar, which, v);
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (template<typename ... T>), (boost::variant<T...>));
-}}
+        (template <typename... T>), (boost::variant<T...>) );
+}}    // namespace hpx::serialization
 
-#endif //HPX_SERIALIZATION_VARIANT_HPP
+#endif    //HPX_SERIALIZATION_VARIANT_HPP

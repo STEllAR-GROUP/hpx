@@ -12,13 +12,12 @@
 #include <iostream>
 #include <vector>
 
-namespace foo
-{
+namespace foo {
     class bar
     {
         friend class hpx::serialization::access;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        void serialize(Archive& ar, unsigned)
         {
             std::cout << "serialize bar\n";
         }
@@ -29,7 +28,7 @@ namespace foo
     };
 
     template <typename Archive>
-    void serialize(Archive & ar, baz &, unsigned)
+    void serialize(Archive& ar, baz&, unsigned)
     {
         std::cout << "serialize baz\n";
     }
@@ -37,13 +36,13 @@ namespace foo
     struct baq
     {
         template <typename Archive>
-        void save(Archive & ar, unsigned) const
+        void save(Archive& ar, unsigned) const
         {
             std::cout << "saving baq\n";
         }
 
         template <typename Archive>
-        void load(Archive & ar, unsigned)
+        void load(Archive& ar, unsigned)
         {
             std::cout << "loading baq\n";
         }
@@ -55,18 +54,18 @@ namespace foo
     };
 
     template <typename Archive>
-    void save(Archive & ar, bap const &, unsigned)
+    void save(Archive& ar, bap const&, unsigned)
     {
         std::cout << "saving bap\n";
     }
 
     template <typename Archive>
-    void load(Archive & ar, bap &, unsigned)
+    void load(Archive& ar, bap&, unsigned)
     {
         std::cout << "loading bap\n";
     }
     HPX_SERIALIZATION_SPLIT_FREE(bap)
-}
+}    // namespace foo
 
 HPX_IS_BITWISE_SERIALIZABLE(foo::bap);
 
@@ -80,9 +79,9 @@ int main()
     foo::baq b3;
     foo::bap b4;
     oarchive << b1 << b2 << b3 << b4;
-    oarchive & b1 & b2 & b3 & b4;
+    oarchive& b1& b2& b3& b4;
 
     hpx::serialization::input_archive iarchive(buffer);
     iarchive >> b1 >> b2 >> b3 >> b4;
-    iarchive & b1 & b2 & b3 & b4;
+    iarchive& b1& b2& b3& b4;
 }

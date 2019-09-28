@@ -10,25 +10,24 @@
 
 #include <list>
 
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     void output_archive::add_gid(
-        naming::gid_type const & gid,
-        naming::gid_type const & split_gid)
+        naming::gid_type const& gid, naming::gid_type const& split_gid)
     {
         HPX_ASSERT(is_preprocessing());
         buffer_->add_gid(gid, split_gid);
     }
 
-    bool output_archive::has_gid(naming::gid_type const & gid)
+    bool output_archive::has_gid(naming::gid_type const& gid)
     {
         HPX_ASSERT(is_preprocessing());
         return buffer_->has_gid(gid);
     }
 
-    naming::gid_type output_archive::get_new_gid(naming::gid_type const & gid)
+    naming::gid_type output_archive::get_new_gid(naming::gid_type const& gid)
     {
-        if(!split_gids_) return naming::gid_type();
+        if (!split_gids_)
+            return naming::gid_type();
 
         split_gids_type::iterator it = split_gids_->find(&gid);
         HPX_ASSERT(it != split_gids_->end());
@@ -40,4 +39,4 @@ namespace hpx { namespace serialization
         return new_gid;
     }
 
-}}
+}}    // namespace hpx::serialization

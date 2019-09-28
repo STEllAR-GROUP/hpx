@@ -10,10 +10,10 @@
 #if !defined(HPX_RUNTIME_SERIALIZATION_TUPLE_HPP)
 #define HPX_RUNTIME_SERIALIZATION_TUPLE_HPP
 
-#include <hpx/runtime/serialization/detail/non_default_constructible.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/runtime/serialization/detail/non_default_constructible.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -25,7 +25,7 @@ namespace hpx { namespace traits {
             typename std::remove_const<Ts>::type>...>
     {
     };
-}}
+}}    // namespace hpx::traits
 
 namespace hpx { namespace util { namespace detail {
     template <typename Archive, typename Is, typename... Ts>
@@ -77,7 +77,7 @@ namespace hpx { namespace util { namespace detail {
             (void) _sequencer;
         }
     };
-}}}
+}}}    // namespace hpx::util::detail
 
 namespace hpx { namespace serialization {
     template <typename Archive, typename... Ts>
@@ -114,6 +114,6 @@ namespace hpx { namespace serialization {
         hpx::util::detail::save_construct_data_with_index_pack<Archive, Is,
             Ts...>::call(ar, *t, version);
     }
-}}
+}}    // namespace hpx::serialization
 
 #endif

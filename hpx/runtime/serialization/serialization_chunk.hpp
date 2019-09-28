@@ -16,17 +16,16 @@
 #include <cstring>
 
 #if CHAR_BIT != 8
-#  error This code assumes an eight-bit byte.
+#error This code assumes an eight-bit byte.
 #endif
 
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     ///////////////////////////////////////////////////////////////////////
     union chunk_data
     {
-        std::size_t index_;     // position inside the data buffer //-V117
-        void const* cpos_;      // const pointer to external data buffer //-V117
-        void* pos_;             // pointer to external data buffer //-V117
+        std::size_t index_;    // position inside the data buffer //-V117
+        void const* cpos_;     // const pointer to external data buffer //-V117
+        void* pos_;            // pointer to external data buffer //-V117
     };
 
     enum chunk_type
@@ -37,33 +36,34 @@ namespace hpx { namespace serialization
 
     struct serialization_chunk
     {
-        chunk_data    data_; // index or pointer
-        std::size_t   size_; // size of the serialization_chunk starting index_/pos_
-        std::uint64_t rkey_; // optional RDMA remote key for parcelport put/get
-                             // operations
-        std::uint8_t  type_; // chunk_type
+        chunk_data data_;    // index or pointer
+        std::size_t
+            size_;    // size of the serialization_chunk starting index_/pos_
+        std::uint64_t
+            rkey_;    // optional RDMA remote key for parcelport put/get
+                      // operations
+        std::uint8_t type_;    // chunk_type
     };
 
     ///////////////////////////////////////////////////////////////////////
-    inline serialization_chunk create_index_chunk(std::size_t index, std::size_t size)
+    inline serialization_chunk create_index_chunk(
+        std::size_t index, std::size_t size)
     {
         serialization_chunk retval = {
-            { 0 }, size, 0, static_cast<std::uint8_t>(chunk_type_index)
-        };
+            {0}, size, 0, static_cast<std::uint8_t>(chunk_type_index)};
         retval.data_.index_ = index;
         return retval;
     }
 
     inline serialization_chunk create_pointer_chunk(
-        void const* pos, std::size_t size, std::uint64_t rkey=0)
+        void const* pos, std::size_t size, std::uint64_t rkey = 0)
     {
         serialization_chunk retval = {
-            { 0 }, size, rkey, static_cast<std::uint8_t>(chunk_type_pointer)
-        };
+            {0}, size, rkey, static_cast<std::uint8_t>(chunk_type_pointer)};
         retval.data_.cpos_ = pos;
         return retval;
     }
 
-}}
+}}    // namespace hpx::serialization
 
 #endif

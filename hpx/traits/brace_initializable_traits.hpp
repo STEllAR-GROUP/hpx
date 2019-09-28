@@ -9,37 +9,32 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) && defined (HPX_HAVE_CXX17_IF_CONSTEXPR)
+#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) &&                             \
+    defined(HPX_HAVE_CXX17_IF_CONSTEXPR)
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace traits
-{
-    namespace detail
-    {
+namespace hpx { namespace traits {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         struct wildcard
         {
             // Excluded hpx::util::unused_type from wildcard conversions
             // due to ambiguity (unused_type has own conversion to every type).
-            template <typename T, typename Enable =
-                typename std::enable_if<
-                   !std::is_lvalue_reference<T>::value &&
-                   !std::is_same<
-                        typename std::decay<T>::type, hpx::util::unused_type
-                    >::value
-                >::type>
+            template <typename T,
+                typename Enable = typename std::enable_if<
+                    !std::is_lvalue_reference<T>::value &&
+                    !std::is_same<typename std::decay<T>::type,
+                        hpx::util::unused_type>::value>::type>
             operator T &&() const;
 
-            template <typename T, typename Enable =
-                typename std::enable_if<
+            template <typename T,
+                typename Enable = typename std::enable_if<
                     std::is_copy_constructible<T>::value &&
-                   !std::is_same<
-                        typename std::decay<T>::type, hpx::util::unused_type
-                    >::value
-                >::type>
+                    !std::is_same<typename std::decay<T>::type,
+                        hpx::util::unused_type>::value>::type>
             operator T&() const;
         };
 
@@ -47,76 +42,71 @@ namespace hpx { namespace traits
         static constexpr const wildcard _wildcard{};
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, std::size_t ... I>
-        inline constexpr auto
-        is_brace_constructible(std::index_sequence<I...>, T *)
-            -> decltype(T{_wildcard<I>...}, std::true_type{})
+        template <typename T, std::size_t... I>
+        inline constexpr auto is_brace_constructible(std::index_sequence<I...>,
+            T*) -> decltype(T{_wildcard<I>...}, std::true_type{})
         {
             return {};
         }
 
-        template <std::size_t ... I>
-        inline constexpr std::false_type
-        is_brace_constructible(std::index_sequence<I...>, ...)
+        template <std::size_t... I>
+        inline constexpr std::false_type is_brace_constructible(
+            std::index_sequence<I...>, ...)
         {
             return {};
         }
-    }
+    }    // namespace detail
 
     template <typename T, std::size_t N>
     constexpr auto is_brace_constructible()
-    ->  decltype(detail::is_brace_constructible(
+        -> decltype(detail::is_brace_constructible(
             std::make_index_sequence<N>{}, static_cast<T*>(nullptr)))
     {
         return {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <typename T, typename U>
         struct is_paren_constructible;
 
-        template <typename T, std::size_t ... I>
+        template <typename T, std::size_t... I>
         struct is_paren_constructible<T, std::index_sequence<I...>>
-            : std::is_constructible<T, decltype(_wildcard<I>)...>
+          : std::is_constructible<T, decltype(_wildcard<I>)...>
         {
         };
-    }
+    }    // namespace detail
 
     template <typename T, std::size_t N>
     constexpr auto is_paren_constructible()
-    -> detail::is_paren_constructible<T, std::make_index_sequence<N>>
+        -> detail::is_paren_constructible<T, std::make_index_sequence<N>>
     {
         return {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <std::size_t N>
         using size = std::integral_constant<std::size_t, N>;
 
-        template <typename T, typename Enable =
-            typename std::enable_if<
-                std::is_class<T>::value && std::is_empty<T>::value
-            >::type>
+        template <typename T,
+            typename Enable = typename std::enable_if<std::is_class<T>::value &&
+                std::is_empty<T>::value>::type>
         constexpr size<0> arity()
         {
             return {};
         }
 
 #define MAKE_ARITY_FUNC(count)                                                 \
-        template <typename T, typename Enable =                                \
-            typename std::enable_if<                                           \
-                traits::is_brace_constructible<T, count>() &&                  \
-               !traits::is_brace_constructible<T, count + 1>() &&              \
-               !traits::is_paren_constructible<T, count>()                     \
-            >::type>                                                           \
-        constexpr size<count> arity()                                          \
-        {                                                                      \
-            return {};                                                         \
-        }
+    template <typename T,                                                      \
+        typename Enable = typename std::enable_if<                             \
+            traits::is_brace_constructible<T, count>() &&                      \
+            !traits::is_brace_constructible<T, count + 1>() &&                 \
+            !traits::is_paren_constructible<T, count>()>::type>                \
+    constexpr size<count> arity()                                              \
+    {                                                                          \
+        return {};                                                             \
+    }
 
         MAKE_ARITY_FUNC(1)
         MAKE_ARITY_FUNC(2)
@@ -135,8 +125,8 @@ namespace hpx { namespace traits
         MAKE_ARITY_FUNC(15)
 
 #undef MAKE_ARITY_FUNC
-    }
-}}
+    }    // namespace detail
+}}       // namespace hpx::traits
 #endif
 
 #endif

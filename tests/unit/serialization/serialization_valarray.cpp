@@ -6,9 +6,9 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/runtime/serialization/multi_array.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/valarray.hpp>
-#include <hpx/runtime/serialization/multi_array.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
@@ -26,15 +26,22 @@ struct A
 {
     A() {}
 
-    explicit A(T t) : t_(t) {}
+    explicit A(T t)
+      : t_(t)
+    {
+    }
     T t_;
 
-    A & operator=(T t) { t_ = t; return *this; }
+    A& operator=(T t)
+    {
+        t_ = t;
+        return *this;
+    }
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned)
+    void serialize(Archive& ar, unsigned)
     {
-        ar & t_;
+        ar& t_;
     }
 };
 
@@ -43,40 +50,42 @@ void test(T minval, T maxval)
 {
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer,
-            hpx::serialization::disable_data_chunking);
+        hpx::serialization::output_archive oarchive(
+            buffer, hpx::serialization::disable_data_chunking);
         std::vector<T> os;
-        for(T c = minval; c < maxval; ++c)
+        for (T c = minval; c < maxval; ++c)
         {
             os.push_back(c);
         }
         oarchive << hpx::serialization::make_array(&os[0], os.size());
 
         hpx::serialization::input_archive iarchive(buffer);
-        std::vector<T> is; is.resize(os.size());
+        std::vector<T> is;
+        is.resize(os.size());
         iarchive >> hpx::serialization::make_array(&is[0], is.size());
         HPX_TEST_EQ(os.size(), is.size());
-        for(std::size_t i = 0; i < os.size(); ++i)
+        for (std::size_t i = 0; i < os.size(); ++i)
         {
             HPX_TEST_EQ(os[i], is[i]);
         }
     }
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer,
-            hpx::serialization::disable_data_chunking);
-        std::vector<A<T> > os;
-        for(T c = minval; c < maxval; ++c)
+        hpx::serialization::output_archive oarchive(
+            buffer, hpx::serialization::disable_data_chunking);
+        std::vector<A<T>> os;
+        for (T c = minval; c < maxval; ++c)
         {
             os.emplace_back(c);
         }
         oarchive << hpx::serialization::make_array(&os[0], os.size());
 
         hpx::serialization::input_archive iarchive(buffer);
-        std::vector<A<T> > is; is.resize(os.size());
+        std::vector<A<T>> is;
+        is.resize(os.size());
         iarchive >> hpx::serialization::make_array(&is[0], is.size());
         HPX_TEST_EQ(os.size(), is.size());
-        for(std::size_t i = 0; i < os.size(); ++i)
+        for (std::size_t i = 0; i < os.size(); ++i)
         {
             HPX_TEST_EQ(os[i].t_, is[i].t_);
         }
@@ -88,40 +97,42 @@ void test_fp(T minval, T maxval)
 {
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer,
-            hpx::serialization::disable_data_chunking);
+        hpx::serialization::output_archive oarchive(
+            buffer, hpx::serialization::disable_data_chunking);
         std::vector<T> os;
-        for(T c = minval; c < maxval; c += static_cast<T>(0.5))
+        for (T c = minval; c < maxval; c += static_cast<T>(0.5))
         {
             os.emplace_back(c);
         }
         oarchive << hpx::serialization::make_array(&os[0], os.size());
 
         hpx::serialization::input_archive iarchive(buffer);
-        std::vector<T> is; is.resize(os.size());
+        std::vector<T> is;
+        is.resize(os.size());
         iarchive >> hpx::serialization::make_array(&is[0], is.size());
         HPX_TEST_EQ(os.size(), is.size());
-        for(std::size_t i = 0; i < os.size(); ++i)
+        for (std::size_t i = 0; i < os.size(); ++i)
         {
             HPX_TEST_EQ(os[i], is[i]);
         }
     }
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer,
-            hpx::serialization::disable_data_chunking);
-        std::vector<A<T> > os;
-        for(T c = minval; c < maxval; c += static_cast<T>(0.5))
+        hpx::serialization::output_archive oarchive(
+            buffer, hpx::serialization::disable_data_chunking);
+        std::vector<A<T>> os;
+        for (T c = minval; c < maxval; c += static_cast<T>(0.5))
         {
             os.emplace_back(c);
         }
         oarchive << hpx::serialization::make_array(&os[0], os.size());
 
         hpx::serialization::input_archive iarchive(buffer);
-        std::vector<A<T> > is; is.resize(os.size());
+        std::vector<A<T>> is;
+        is.resize(os.size());
         iarchive >> hpx::serialization::make_array(&is[0], is.size());
         HPX_TEST_EQ(os.size(), is.size());
-        for(std::size_t i = 0; i < os.size(); ++i)
+        for (std::size_t i = 0; i < os.size(); ++i)
         {
             HPX_TEST_EQ(os[i].t_, is[i].t_);
         }
@@ -133,8 +144,8 @@ void test_std_valarray(T first)
 {
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer,
-            hpx::serialization::disable_data_chunking);
+        hpx::serialization::output_archive oarchive(
+            buffer, hpx::serialization::disable_data_chunking);
         std::valarray<T> oarray(N);
         std::iota(std::begin(oarray), std::end(oarray), first);
         oarchive << oarray;
@@ -142,15 +153,15 @@ void test_std_valarray(T first)
         hpx::serialization::input_archive iarchive(buffer);
         std::valarray<T> iarray;
         iarchive >> iarray;
-        for(std::size_t i = 0; i < oarray.size(); ++i)
+        for (std::size_t i = 0; i < oarray.size(); ++i)
         {
             HPX_TEST_EQ(oarray[i], iarray[i]);
         }
     }
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer,
-            hpx::serialization::disable_data_chunking);
+        hpx::serialization::output_archive oarchive(
+            buffer, hpx::serialization::disable_data_chunking);
         std::valarray<A<T>> oarray(N);
         std::iota(std::begin(oarray), std::end(oarray), first);
         oarchive << oarray;
@@ -158,7 +169,7 @@ void test_std_valarray(T first)
         hpx::serialization::input_archive iarchive(buffer);
         std::valarray<A<T>> iarray;
         iarchive >> iarray;
-        for(std::size_t i = 0; i < oarray.size(); ++i)
+        for (std::size_t i = 0; i < oarray.size(); ++i)
         {
             HPX_TEST_EQ(oarray[i].t_, iarray[i].t_);
         }
@@ -198,4 +209,3 @@ int main()
 
     return hpx::util::report_errors();
 }
-

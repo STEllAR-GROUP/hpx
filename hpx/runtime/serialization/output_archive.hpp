@@ -36,14 +36,11 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace serialization
-{
-    namespace detail
-    {
+namespace hpx { namespace serialization {
+    namespace detail {
         template <typename Container>
-        inline std::unique_ptr<erased_output_container>
-        create_output_container(Container& buffer,
-            std::vector<serialization_chunk>* chunks,
+        inline std::unique_ptr<erased_output_container> create_output_container(
+            Container& buffer, std::vector<serialization_chunk>* chunks,
             binary_filter* filter, std::false_type)
         {
             std::unique_ptr<erased_output_container> res;
@@ -51,8 +48,8 @@ namespace hpx { namespace serialization
             {
                 if (chunks == nullptr)
                 {
-                    res.reset(new output_container<Container, basic_chunker>(
-                        buffer));
+                    res.reset(
+                        new output_container<Container, basic_chunker>(buffer));
                 }
                 else
                 {
@@ -70,18 +67,16 @@ namespace hpx { namespace serialization
                 }
                 else
                 {
-                    res.reset(
-                        new filtered_output_container<Container, vector_chunker>(
-                            buffer, chunks));
+                    res.reset(new filtered_output_container<Container,
+                        vector_chunker>(buffer, chunks));
                 }
             }
             return res;
         }
 
         template <typename Container>
-        inline std::unique_ptr<erased_output_container>
-        create_output_container(Container& buffer,
-            std::vector<serialization_chunk>* chunks,
+        inline std::unique_ptr<erased_output_container> create_output_container(
+            Container& buffer, std::vector<serialization_chunk>* chunks,
             binary_filter* filter, std::true_type)
         {
             std::unique_ptr<erased_output_container> res;
@@ -98,42 +93,41 @@ namespace hpx { namespace serialization
             }
             return res;
         }
-    }
+    }    // namespace detail
 
-    struct HPX_EXPORT output_archive
-      : basic_archive<output_archive>
+    struct HPX_EXPORT output_archive : basic_archive<output_archive>
     {
     private:
-        static std::uint32_t make_flags(std::uint32_t flags,
-            std::vector<serialization_chunk>* chunks)
+        static std::uint32_t make_flags(
+            std::uint32_t flags, std::vector<serialization_chunk>* chunks)
         {
             return flags |
-                (chunks == nullptr ?
-                    archive_flags::disable_data_chunking :
-                    archive_flags::no_archive_flags);
+                (chunks == nullptr ? archive_flags::disable_data_chunking :
+                                     archive_flags::no_archive_flags);
         }
 
     public:
         typedef basic_archive<output_archive> base_type;
 
-        typedef std::map<const naming::gid_type*, naming::gid_type> split_gids_type;
+        typedef std::map<const naming::gid_type*, naming::gid_type>
+            split_gids_type;
 
         template <typename Container>
-        output_archive(Container & buffer,
-                std::uint32_t flags = 0U,
-                std::vector<serialization_chunk>* chunks = nullptr,
-                binary_filter* filter = nullptr)
+        output_archive(Container& buffer, std::uint32_t flags = 0U,
+            std::vector<serialization_chunk>* chunks = nullptr,
+            binary_filter* filter = nullptr)
           : base_type(make_flags(flags, chunks))
           , buffer_(detail::create_output_container(buffer, chunks, filter,
-                typename traits::serialization_access_data<Container>::
-                    preprocessing_only()))
+                typename traits::serialization_access_data<
+                    Container>::preprocessing_only()))
           , split_gids_(nullptr)
         {
             // endianness needs to be saves separately as it is needed to
             // properly interpret the flags
 
             // FIXME: make bool once integer compression is implemented
-            std::uint64_t endianess = this->base_type::endian_big() ? ~0ul : 0ul;
+            std::uint64_t endianess =
+                this->base_type::endian_big() ? ~0ul : 0ul;
             save(endianess);
 
             // send flags sent by the other end to make sure both ends have
@@ -161,7 +155,7 @@ namespace hpx { namespace serialization
         }
 
         template <typename Future>
-        void await_future(Future const & f)
+        void await_future(Future const& f)
         {
             buffer_->await_future(
                 *hpx::traits::future_access<Future>::get_shared_state(f));
@@ -172,12 +166,12 @@ namespace hpx { namespace serialization
             return size_;
         }
 
-        void add_gid(naming::gid_type const & gid,
-            naming::gid_type const & split_gid);
+        void add_gid(
+            naming::gid_type const& gid, naming::gid_type const& split_gid);
 
-        bool has_gid(naming::gid_type const & gid);
+        bool has_gid(naming::gid_type const& gid);
 
-        naming::gid_type get_new_gid(naming::gid_type const & gid);
+        naming::gid_type get_new_gid(naming::gid_type const& gid);
 
         std::size_t get_num_chunks() const
         {
@@ -209,16 +203,15 @@ namespace hpx { namespace serialization
         friend class array;
 
         template <typename T>
-        void invoke_impl(T const & t)
+        void invoke_impl(T const& t)
         {
             save(t);
         }
 
         template <typename T>
-        typename std::enable_if<
-            !std::is_integral<T>::value && !std::is_enum<T>::value
-        >::type
-        save(T const & t)
+        typename std::enable_if<!std::is_integral<T>::value &&
+            !std::is_enum<T>::value>::type
+        save(T const& t)
         {
             typedef hpx::traits::is_bitwise_serializable<T> use_optimized;
 
@@ -226,10 +219,9 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        typename std::enable_if<
-            std::is_integral<T>::value || std::is_enum<T>::value
-        >::type
-        save(T t) //-V659
+        typename std::enable_if<std::is_integral<T>::value ||
+            std::is_enum<T>::value>::type
+        save(T t)    //-V659
         {
             save_integral(t, std::is_unsigned<T>());
         }
@@ -256,20 +248,20 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        void save_bitwise(T const & t, std::false_type)
+        void save_bitwise(T const& t, std::false_type)
         {
-            save_nonintrusively_polymorphic(t,
-                hpx::traits::is_nonintrusive_polymorphic<T>());
+            save_nonintrusively_polymorphic(
+                t, hpx::traits::is_nonintrusive_polymorphic<T>());
         }
 
         // FIXME: think about removing this commented stuff below
         // and adding new free function save_bitwise
         template <typename T>
-        void save_bitwise(T const & t, std::true_type)
+        void save_bitwise(T const& t, std::true_type)
         {
             static_assert(!std::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
-            if(disable_array_optimization())
+            if (disable_array_optimization())
             {
                 access::serialize(*this, t, 0);
             }
@@ -280,13 +272,13 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        void save_nonintrusively_polymorphic(T const & t, std::false_type)
+        void save_nonintrusively_polymorphic(T const& t, std::false_type)
         {
             access::serialize(*this, t, 0);
         }
 
         template <typename T>
-        void save_nonintrusively_polymorphic(T const & t, std::true_type)
+        void save_nonintrusively_polymorphic(T const& t, std::true_type)
         {
             detail::polymorphic_nonintrusive_factory::instance().save(*this, t);
         }
@@ -342,39 +334,43 @@ namespace hpx { namespace serialization
         void save_integral_impl(Promoted l)
         {
             const std::size_t size = sizeof(Promoted);
-            char* cptr = reinterpret_cast<char *>(&l); //-V206
+            char* cptr = reinterpret_cast<char*>(&l);    //-V206
 #if BOOST_ENDIAN_BIG_BYTE
-            if(endian_little())
+            if (endian_little())
                 reverse_bytes(size, cptr);
 #else
-            if(endian_big())
+            if (endian_big())
                 reverse_bytes(size, cptr);
 #endif
 
             save_binary(cptr, size);
         }
 
-        void save_binary(void const * address, std::size_t count)
+        void save_binary(void const* address, std::size_t count)
         {
-            if(count == 0) return;
+            if (count == 0)
+                return;
             size_ += count;
             buffer_->save_binary(address, count);
         }
 
-        void save_binary_chunk(void const * address, std::size_t count)
+        void save_binary_chunk(void const* address, std::size_t count)
         {
-            if(count == 0) return;
-            if (disable_data_chunking()) {
+            if (count == 0)
+                return;
+            if (disable_data_chunking())
+            {
                 size_ += count;
                 buffer_->save_binary(address, count);
             }
-            else {
+            else
+            {
                 // the size might grow if optimizations are not used
                 size_ += buffer_->save_binary_chunk(address, count);
             }
         }
 
-        typedef std::map<const void *, std::uint64_t> pointer_tracker;
+        typedef std::map<const void*, std::uint64_t> pointer_tracker;
 
         // FIXME: make this function capable for ADL lookup and hence if used
         // as a dependent name it doesn't require output_archive to be complete
@@ -382,7 +378,7 @@ namespace hpx { namespace serialization
         friend std::uint64_t track_pointer(output_archive& ar, const void* pos)
         {
             pointer_tracker::iterator it = ar.pointer_tracker_.find(pos);
-            if(it == ar.pointer_tracker_.end())
+            if (it == ar.pointer_tracker_.end())
             {
                 ar.pointer_tracker_.insert(std::make_pair(pos, ar.size_));
                 return npos;
@@ -392,9 +388,9 @@ namespace hpx { namespace serialization
 
         std::unique_ptr<erased_output_container> buffer_;
         pointer_tracker pointer_tracker_;
-        split_gids_type * split_gids_;
+        split_gids_type* split_gids_;
     };
-}}
+}}    // namespace hpx::serialization
 
 #include <hpx/config/warnings_suffix.hpp>
 

@@ -9,15 +9,14 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) && defined (HPX_HAVE_CXX17_IF_CONSTEXPR)
+#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) &&                             \
+    defined(HPX_HAVE_CXX17_IF_CONSTEXPR)
 
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/runtime/serialization/brace_initializable_fwd.hpp>
 #include <hpx/traits/brace_initializable_traits.hpp>
-#include <hpx/datastructures/tuple.hpp>
 
-
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     template <typename Archive, typename T>
     void serialize_struct(Archive& archive, T& t, const unsigned int version,
         hpx::traits::detail::size<0>)
@@ -162,10 +161,11 @@ namespace hpx { namespace serialization
     void serialize_struct(Archive& archive, T& t, const unsigned int version,
         hpx::traits::detail::size<15>)
     {
-        auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13,
-            p14, p15] = t;
-        auto&& data = hpx::util::forward_as_tuple(p1, p2, p3, p4, p5,
-            p6, p7, p8, p9, p10, p11, p12, p13, p14, p15);
+        auto&
+            [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15] =
+            t;
+        auto&& data = hpx::util::forward_as_tuple(
+            p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15);
         serialize(archive, data, version);
     }
 
@@ -174,7 +174,7 @@ namespace hpx { namespace serialization
     {
         serialize_struct(ar, t, version, hpx::traits::detail::arity<T>());
     }
-}}
+}}    // namespace hpx::serialization
 #endif
 
 #endif

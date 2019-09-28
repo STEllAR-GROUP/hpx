@@ -37,8 +37,8 @@ static_assert(!hpx::serialization::has_serialize_adl<A>::value,
 
 bool operator==(const A& a1, const A& a2)
 {
-    return std::tie(a1.str, a1.floating_number, a1.int_number)
-        == std::tie(a2.str, a2.floating_number, a2.int_number);
+    return std::tie(a1.str, a1.floating_number, a1.int_number) ==
+        std::tie(a2.str, a2.floating_number, a2.int_number);
 }
 
 struct B
@@ -63,8 +63,7 @@ static_assert(!hpx::serialization::has_serialize_adl<B>::value,
 
 bool operator==(const B& b1, const B& b2)
 {
-    return std::tie(b1.a, b1.sign)
-        == std::tie(b2.a, b2.sign);
+    return std::tie(b1.a, b1.sign) == std::tie(b2.a, b2.sign);
 }
 
 int main()

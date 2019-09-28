@@ -15,6 +15,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/timing.hpp>
 
 #include <boost/predef/other/endian.h>
@@ -23,16 +24,23 @@
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <utility>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 struct data_buffer
 {
-    data_buffer() : flag_(false) {}
-    explicit data_buffer(std::size_t size) : data_(size, 0), flag_(false) {}
+    data_buffer()
+      : flag_(false)
+    {
+    }
+    explicit data_buffer(std::size_t size)
+      : data_(size, 0)
+      , flag_(false)
+    {
+    }
 
     std::vector<T> data_;
     bool flag_;
@@ -41,19 +49,19 @@ struct data_buffer
     void save(Archive& ar, unsigned) const
     {
         std::uint64_t size = data_.size();
-        ar & size;
-        ar & hpx::serialization::make_array(data_.data(), size);
-        ar & flag_;
+        ar& size;
+        ar& hpx::serialization::make_array(data_.data(), size);
+        ar& flag_;
     }
 
     template <typename Archive>
     void load(Archive& ar, unsigned)
     {
         std::uint64_t size = 0;
-        ar & size;
+        ar& size;
         data_.resize(size);
-        ar & hpx::serialization::make_array(data_.data(), size);
-        ar & flag_;
+        ar& hpx::serialization::make_array(data_.data(), size);
+        ar& flag_;
     }
 
     HPX_SERIALIZATION_SPLIT_MEMBER()
@@ -100,13 +108,13 @@ std::size_t get_archive_size(hpx::parcelset::parcel const& p,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_parcel_serialization(hpx::parcelset::parcel outp,
-    int out_archive_flags, bool zero_copy)
+void test_parcel_serialization(
+    hpx::parcelset::parcel outp, int out_archive_flags, bool zero_copy)
 {
     // serialize data
     std::vector<hpx::serialization::serialization_chunk> out_chunks;
-    std::size_t arg_size = get_archive_size(outp, out_archive_flags,
-        zero_copy ? &out_chunks : nullptr);
+    std::size_t arg_size = get_archive_size(
+        outp, out_archive_flags, zero_copy ? &out_chunks : nullptr);
     std::vector<char> out_buffer;
 
     out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
@@ -114,8 +122,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     {
         // create an output archive and serialize the parcel
         hpx::serialization::output_archive archive(
-            out_buffer, out_archive_flags,
-            zero_copy ? &out_chunks : nullptr);
+            out_buffer, out_archive_flags, zero_copy ? &out_chunks : nullptr);
         archive << outp;
 
         arg_size = archive.bytes_written();
@@ -139,18 +146,23 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     HPX_TEST_EQ(outp.destination_locality(), inp.destination_locality());
     HPX_TEST_EQ(outp.start_time(), inp.start_time());
 
-    hpx::actions::base_action *outact = outp.get_action();
-    hpx::actions::base_action *inact = inp.get_action();
+    hpx::actions::base_action* outact = outp.get_action();
+    hpx::actions::base_action* inact = inp.get_action();
 
     HPX_TEST_EQ(outact->get_component_type(), inact->get_component_type());
     HPX_TEST_EQ(outact->get_action_name(), inact->get_action_name());
     HPX_TEST_EQ(int(outact->get_action_type()), int(inact->get_action_type()));
-    HPX_TEST_EQ(outact->get_parent_locality_id(), inact->get_parent_locality_id());
+    HPX_TEST_EQ(
+        outact->get_parent_locality_id(), inact->get_parent_locality_id());
     HPX_TEST_EQ(outact->get_parent_thread_id(), inact->get_parent_thread_id());
-    HPX_TEST_EQ(outact->get_parent_thread_phase(), inact->get_parent_thread_phase());
-    HPX_TEST_EQ(int(outact->get_thread_priority()), int(inact->get_thread_priority()));
-    HPX_TEST_EQ(int(outact->get_thread_stacksize()), int(inact->get_thread_stacksize()));
-    HPX_TEST_EQ(outact->get_parent_thread_phase(), inact->get_parent_thread_phase());
+    HPX_TEST_EQ(
+        outact->get_parent_thread_phase(), inact->get_parent_thread_phase());
+    HPX_TEST_EQ(
+        int(outact->get_thread_priority()), int(inact->get_thread_priority()));
+    HPX_TEST_EQ(int(outact->get_thread_stacksize()),
+        int(inact->get_thread_stacksize()));
+    HPX_TEST_EQ(
+        outact->get_parent_thread_phase(), inact->get_parent_thread_phase());
 
     //// invoke action encapsulated in inp
     //naming::address const* inaddrs = pin.get_destination_addrs();
@@ -179,12 +191,9 @@ void test_normal_serialization(T& arg)
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(
-            std::move(dest), std::move(addr),
-            hpx::actions::typed_continuation<int>(here),
-            Action(), hpx::threads::thread_priority_normal, arg
-        )
-    );
+        hpx::parcelset::detail::create_parcel::call(std::move(dest),
+            std::move(addr), hpx::actions::typed_continuation<int>(here),
+            Action(), hpx::threads::thread_priority_normal, arg));
 
     outp.set_source_id(here);
 
@@ -210,12 +219,9 @@ void test_normal_serialization(T1& arg1, T2& arg2)
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(
-            std::move(dest), std::move(addr),
-            hpx::actions::typed_continuation<int>(here),
-            test_action2(), hpx::threads::thread_priority_normal, arg1, arg2
-        )
-    );
+        hpx::parcelset::detail::create_parcel::call(std::move(dest),
+            std::move(addr), hpx::actions::typed_continuation<int>(here),
+            test_action2(), hpx::threads::thread_priority_normal, arg1, arg2));
 
     outp.set_source_id(here);
 
@@ -223,8 +229,8 @@ void test_normal_serialization(T1& arg1, T2& arg2)
 }
 
 template <typename T1, typename T2>
-void test_normal_serialization(double d, T1& arg1, std::string const& s,
-    int i, T2& arg2)
+void test_normal_serialization(
+    double d, T1& arg1, std::string const& s, int i, T2& arg2)
 {
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
@@ -241,14 +247,10 @@ void test_normal_serialization(double d, T1& arg1, std::string const& s,
 
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
-    hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(
-            std::move(dest), std::move(addr),
-            hpx::actions::typed_continuation<int>(here),
-            test_action3(),
-            hpx::threads::thread_priority_normal, d, arg1, s, i, arg2
-        )
-    );
+    hpx::parcelset::parcel outp(hpx::parcelset::detail::create_parcel::call(
+        std::move(dest), std::move(addr),
+        hpx::actions::typed_continuation<int>(here), test_action3(),
+        hpx::threads::thread_priority_normal, d, arg1, s, i, arg2));
 
     outp.set_source_id(here);
 
@@ -275,12 +277,9 @@ void test_zero_copy_serialization(T& arg)
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(
-            std::move(dest), std::move(addr),
-            hpx::actions::typed_continuation<int>(here),
-            Action(), hpx::threads::thread_priority_normal, arg
-        )
-    );
+        hpx::parcelset::detail::create_parcel::call(std::move(dest),
+            std::move(addr), hpx::actions::typed_continuation<int>(here),
+            Action(), hpx::threads::thread_priority_normal, arg));
 
     outp.set_source_id(here);
 
@@ -306,12 +305,9 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(
-            std::move(dest), std::move(addr),
-            hpx::actions::typed_continuation<int>(here),
-            test_action2(), hpx::threads::thread_priority_normal, arg1, arg2
-        )
-    );
+        hpx::parcelset::detail::create_parcel::call(std::move(dest),
+            std::move(addr), hpx::actions::typed_continuation<int>(here),
+            test_action2(), hpx::threads::thread_priority_normal, arg1, arg2));
 
     outp.set_source_id(here);
 
@@ -319,8 +315,8 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
 }
 
 template <typename T1, typename T2>
-void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
-    int i, T2& arg2)
+void test_zero_copy_serialization(
+    double d, T1& arg1, std::string const& s, int i, T2& arg2)
 {
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
@@ -337,13 +333,10 @@ void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
 
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
-    hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(
-            std::move(dest), std::move(addr),
-            hpx::actions::typed_continuation<int>(here),
-            test_action3(), hpx::threads::thread_priority_normal, d, arg1, s, i, arg2
-        )
-    );
+    hpx::parcelset::parcel outp(hpx::parcelset::detail::create_parcel::call(
+        std::move(dest), std::move(addr),
+        hpx::actions::typed_continuation<int>(here), test_action3(),
+        hpx::threads::thread_priority_normal, d, arg1, s, i, arg2));
 
     outp.set_source_id(here);
 
@@ -354,12 +347,14 @@ void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t size = 1;
-    for (std::size_t i = 0; i != 20; ++i) {
+    for (std::size_t i = 0; i != 20; ++i)
+    {
         // create argument for action
         std::vector<double> data1;
         data1.resize(size << i);
 
-        hpx::serialization::serialize_buffer<double> buffer1(data1.data(), data1.size(),
+        hpx::serialization::serialize_buffer<double> buffer1(data1.data(),
+            data1.size(),
             hpx::serialization::serialize_buffer<double>::reference);
 
         test_normal_serialization<test_action1>(buffer1);
@@ -368,8 +363,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::vector<int> data2;
         data2.resize(size << i);
 
-        hpx::serialization::serialize_buffer<int> buffer2(data2.data(), data2.size(),
-            hpx::serialization::serialize_buffer<int>::reference);
+        hpx::serialization::serialize_buffer<int> buffer2(data2.data(),
+            data2.size(), hpx::serialization::serialize_buffer<int>::reference);
 
         test_normal_serialization(buffer1, buffer2);
         test_zero_copy_serialization(buffer1, buffer2);
@@ -389,4 +384,3 @@ int main(int argc, char* argv[])
     HPX_TEST_EQ(hpx::init(argc, argv), 0);
     return hpx::util::report_errors();
 }
-

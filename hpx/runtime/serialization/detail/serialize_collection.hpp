@@ -15,8 +15,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace serialization { namespace detail
-{
+namespace hpx { namespace serialization { namespace detail {
     template <class Value>
     class save_collection_impl
     {
@@ -25,7 +24,7 @@ namespace hpx { namespace serialization { namespace detail
             template <class Archive, class Collection>
             static void call(Archive& ar, const Collection& collection)
             {
-                for (const auto& i: collection)
+                for (const auto& i : collection)
                     ar << i;
             }
         };
@@ -38,7 +37,7 @@ namespace hpx { namespace serialization { namespace detail
                 // for non-default constructible types we also provide
                 // a customization point to save any external data
                 // (in the same way as Boost.Serialization does)
-                for (const auto& i: collection)
+                for (const auto& i : collection)
                 {
                     save_construct_data(ar, &i, 0);
                     ar << i;
@@ -48,8 +47,8 @@ namespace hpx { namespace serialization { namespace detail
 
     public:
         using type = typename std::conditional<
-            std::is_default_constructible<Value>::value,
-                default_, non_default_>::type;
+            std::is_default_constructible<Value>::value, default_,
+            non_default_>::type;
     };
 
     template <class Value>
@@ -59,10 +58,10 @@ namespace hpx { namespace serialization { namespace detail
         {
             template <class Archive, class Collection>
             static void call(Archive& ar, Collection& collection,
-                    typename Collection::size_type size)
+                typename Collection::size_type size)
             {
                 collection.resize(size);
-                for (auto& i: collection)
+                for (auto& i : collection)
                     ar >> i;
             }
         };
@@ -71,7 +70,7 @@ namespace hpx { namespace serialization { namespace detail
         {
             template <class Archive, class Collection>
             static void call(Archive& ar, Collection& collection,
-                    typename Collection::size_type size)
+                typename Collection::size_type size)
             {
                 using value_type = typename Collection::value_type;
 
@@ -89,8 +88,8 @@ namespace hpx { namespace serialization { namespace detail
 
     public:
         using type = typename std::conditional<
-            std::is_default_constructible<Value>::value,
-                default_, non_default_>::type;
+            std::is_default_constructible<Value>::value, default_,
+            non_default_>::type;
     };
 
     template <class Archive, class Collection>
@@ -102,12 +101,12 @@ namespace hpx { namespace serialization { namespace detail
 
     template <class Archive, class Collection>
     void load_collection(Archive& ar, Collection& collection,
-            typename Collection::size_type size)
+        typename Collection::size_type size)
     {
         using value_type = typename Collection::value_type;
         load_collection_impl<value_type>::type::call(ar, collection, size);
     }
 
-}}} // hpx::serialization::detail
+}}}    // namespace hpx::serialization::detail
 
-#endif // HPX_SERIALIZATION_DETAIL_SERIALIZE_COLLECTION_HPP
+#endif    // HPX_SERIALIZATION_DETAIL_SERIALIZE_COLLECTION_HPP

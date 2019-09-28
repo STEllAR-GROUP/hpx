@@ -59,14 +59,14 @@ struct B : A
     template <class Archive>
     void load(Archive& ar, unsigned)
     {
-        ar & hpx::serialization::base_object<A>(*this);
-        ar & b;
+        ar& hpx::serialization::base_object<A>(*this);
+        ar& b;
     }
     template <class Archive>
     void save(Archive& ar, unsigned) const
     {
-        ar & hpx::serialization::base_object<A>(*this);
-        ar & b;
+        ar& hpx::serialization::base_object<A>(*this);
+        ar& b;
     }
     HPX_SERIALIZATION_SPLIT_MEMBER();
     HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(B);
@@ -80,8 +80,8 @@ class C : public B
     template <class Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar & hpx::serialization::base_object<B>(*this);
-        ar & c;
+        ar& hpx::serialization::base_object<B>(*this);
+        ar& c;
     }
     HPX_SERIALIZATION_POLYMORPHIC(C)
 
@@ -152,12 +152,12 @@ private:
     template <class Archive>
     void load(Archive& ar, unsigned)
     {
-        ar & a;
+        ar& a;
     }
     template <class Archive>
     void save(Archive& ar, unsigned) const
     {
-        ar & a;
+        ar& a;
     }
     HPX_SERIALIZATION_SPLIT_MEMBER();
     HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT_SPLITTED(D);
@@ -193,14 +193,14 @@ struct E : D
     template <class Archive>
     void load(Archive& ar, unsigned)
     {
-        ar & hpx::serialization::base_object<D>(*this);
-        ar & b;
+        ar& hpx::serialization::base_object<D>(*this);
+        ar& b;
     }
     template <class Archive>
     void save(Archive& ar, unsigned) const
     {
-        ar & hpx::serialization::base_object<D>(*this);
-        ar & b;
+        ar& hpx::serialization::base_object<D>(*this);
+        ar& b;
     }
     HPX_SERIALIZATION_SPLIT_MEMBER();
     HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(E);
@@ -214,8 +214,8 @@ class F : public E
     template <class Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar & hpx::serialization::base_object<E>(*this);
-        ar & c;
+        ar& hpx::serialization::base_object<E>(*this);
+        ar& c;
     }
     HPX_SERIALIZATION_POLYMORPHIC(F)
 

@@ -14,8 +14,7 @@
 
 #include <cstddef>
 
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     ///////////////////////////////////////////////////////////////////////////
     // Base class for all serialization filters.
     struct binary_filter
@@ -23,19 +22,22 @@ namespace hpx { namespace serialization
         // compression API
         virtual void set_max_length(std::size_t size) = 0;
         virtual void save(void const* src, std::size_t src_count) = 0;
-        virtual bool flush(void* dst, std::size_t dst_count,
-            std::size_t& written) = 0;
+        virtual bool flush(
+            void* dst, std::size_t dst_count, std::size_t& written) = 0;
 
         // decompression API
-        virtual std::size_t init_data(char const* buffer,
-            std::size_t size, std::size_t buffer_size) = 0;
+        virtual std::size_t init_data(
+            char const* buffer, std::size_t size, std::size_t buffer_size) = 0;
         virtual void load(void* dst, std::size_t dst_count) = 0;
 
-        template <class T> void serialize(T& /*ar*/, unsigned){}
+        template <class T>
+        void serialize(T& /*ar*/, unsigned)
+        {
+        }
         HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(binary_filter);
 
         virtual ~binary_filter() {}
     };
-}}
+}}    // namespace hpx::serialization
 
 #endif

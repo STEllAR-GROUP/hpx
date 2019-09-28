@@ -21,15 +21,22 @@ struct A
 {
     A() {}
 
-    explicit A(T t) : t_(t) {}
+    explicit A(T t)
+      : t_(t)
+    {
+    }
     T t_;
 
-    A & operator=(T t) { t_ = t; return *this; }
+    A& operator=(T t)
+    {
+        t_ = t;
+        return *this;
+    }
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned)
+    void serialize(Archive& ar, unsigned)
     {
-        ar & t_;
+        ar& t_;
     }
 };
 
@@ -72,10 +79,14 @@ void test_bool()
 
         hpx::serialization::input_archive iarchive(buffer);
         b = false;
-        iarchive >> b; HPX_TEST_EQ(b, true);
-        iarchive >> b; HPX_TEST_EQ(b, false);
-        iarchive >> b; HPX_TEST_EQ(b, false);
-        iarchive >> b; HPX_TEST_EQ(b, true);
+        iarchive >> b;
+        HPX_TEST_EQ(b, true);
+        iarchive >> b;
+        HPX_TEST_EQ(b, false);
+        iarchive >> b;
+        HPX_TEST_EQ(b, false);
+        iarchive >> b;
+        HPX_TEST_EQ(b, true);
     }
     {
         std::vector<char> buffer;
@@ -92,10 +103,14 @@ void test_bool()
 
         hpx::serialization::input_archive iarchive(buffer);
         b = false;
-        iarchive >> b; HPX_TEST_EQ(b.t_, true);
-        iarchive >> b; HPX_TEST_EQ(b.t_, false);
-        iarchive >> b; HPX_TEST_EQ(b.t_, false);
-        iarchive >> b; HPX_TEST_EQ(b.t_, true);
+        iarchive >> b;
+        HPX_TEST_EQ(b.t_, true);
+        iarchive >> b;
+        HPX_TEST_EQ(b.t_, false);
+        iarchive >> b;
+        HPX_TEST_EQ(b.t_, false);
+        iarchive >> b;
+        HPX_TEST_EQ(b.t_, true);
     }
 }
 
@@ -105,30 +120,32 @@ void test(T min, T max)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
-        for(T c = min; c < max; ++c)
+        for (T c = min; c < max; ++c)
         {
             oarchive << c;
         }
         hpx::serialization::input_archive iarchive(buffer);
-        for(T c = min; c < max; ++c)
+        for (T c = min; c < max; ++c)
         {
             T cc = 0;
-            iarchive >> cc; HPX_TEST(c == cc);
+            iarchive >> cc;
+            HPX_TEST(c == cc);
         }
     }
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
-        for(T c = min; c < max; ++c)
+        for (T c = min; c < max; ++c)
         {
             auto cc = A<T>(c);
             oarchive << cc;
         }
         hpx::serialization::input_archive iarchive(buffer);
-        for(T c = min; c < max; ++c)
+        for (T c = min; c < max; ++c)
         {
             auto cc = A<T>(0);
-            iarchive >> cc; HPX_TEST(c == cc.t_);
+            iarchive >> cc;
+            HPX_TEST(c == cc.t_);
         }
     }
 }
@@ -139,30 +156,32 @@ void test_fp(T min, T max)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
-        for(T c = min; c < max; c += static_cast<T>(0.5))
+        for (T c = min; c < max; c += static_cast<T>(0.5))
         {
             oarchive << c;
         }
         hpx::serialization::input_archive iarchive(buffer);
-        for(T c = min; c < max; c += static_cast<T>(0.5))
+        for (T c = min; c < max; c += static_cast<T>(0.5))
         {
             T cc = 0;
-            iarchive >> cc; HPX_TEST(c == cc);
+            iarchive >> cc;
+            HPX_TEST(c == cc);
         }
     }
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
-        for(T c = min; c < max; c += static_cast<T>(0.5))
+        for (T c = min; c < max; c += static_cast<T>(0.5))
         {
-            auto cc = A<T> (c);
+            auto cc = A<T>(c);
             oarchive << cc;
         }
         hpx::serialization::input_archive iarchive(buffer);
-        for(T c = min; c < max; c += static_cast<T>(0.5))
+        for (T c = min; c < max; c += static_cast<T>(0.5))
         {
             auto cc = A<T>(0);
-            iarchive >> cc; HPX_TEST(c == cc.t_);
+            iarchive >> cc;
+            HPX_TEST(c == cc.t_);
         }
     }
 }
@@ -170,8 +189,8 @@ void test_fp(T min, T max)
 int main()
 {
     test_bool();
-    test<char>((std::numeric_limits<char>::min)(),
-        (std::numeric_limits<char>::max)());
+    test<char>(
+        (std::numeric_limits<char>::min)(), (std::numeric_limits<char>::max)());
     test<int>((std::numeric_limits<int>::min)(),
         (std::numeric_limits<int>::min)() + 100);
     test<int>((std::numeric_limits<int>::max)() - 100,
@@ -191,9 +210,11 @@ int main()
     test<unsigned long>((std::numeric_limits<unsigned long>::max)() - 100,
         (std::numeric_limits<unsigned long>::max)());
 #if defined(BOOST_HAS_INT128)
-    test<boost::int128_type>((std::numeric_limits<boost::int128_type>::max)() - 100,\
+    test<boost::int128_type>(
+        (std::numeric_limits<boost::int128_type>::max)() - 100,
         (std::numeric_limits<boost::int128_type>::max)());
-    test<boost::uint128_type>((std::numeric_limits<boost::uint128_type>::max)() - 100,\
+    test<boost::uint128_type>(
+        (std::numeric_limits<boost::uint128_type>::max)() - 100,
         (std::numeric_limits<boost::uint128_type>::max)());
 #endif
     test_fp<float>((std::numeric_limits<float>::min)(),

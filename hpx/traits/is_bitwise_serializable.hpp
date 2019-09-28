@@ -11,21 +11,21 @@
 
 #include <type_traits>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <typename T>
-    struct is_bitwise_serializable
-      : std::is_arithmetic<T>
-    {};
-}}
+    struct is_bitwise_serializable : std::is_arithmetic<T>
+    {
+    };
+}}    // namespace hpx::traits
 
-#define HPX_IS_BITWISE_SERIALIZABLE(T)                                        \
-namespace hpx { namespace traits {                                            \
-    template <>                                                               \
-    struct is_bitwise_serializable< T >                                       \
-      : std::true_type                                                        \
-    {};                                                                       \
-}}                                                                            \
-/**/
+#define HPX_IS_BITWISE_SERIALIZABLE(T)                                         \
+    namespace hpx { namespace traits {                                         \
+            template <>                                                        \
+            struct is_bitwise_serializable<T> : std::true_type                 \
+            {                                                                  \
+            };                                                                 \
+        }                                                                      \
+    }                                                                          \
+    /**/
 
 #endif /*HPX_TRAITS_IS_BITWISE_SERIALIZABLE_HPP*/
