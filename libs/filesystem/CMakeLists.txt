@@ -14,7 +14,7 @@ endif()
 # Compatibility with using Boost.FileSystem, introduced in V1.4.0
 hpx_option(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY
   BOOL "Enable Boost.FileSystem compatibility. (default: ${__filesystem_compatibility_default})"
-  ON ADVANCED CATEGORY "Modules")
+  ${__filesystem_compatibility_default} ADVANCED CATEGORY "Modules")
 
 set(__boost_filesystem)
 if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)

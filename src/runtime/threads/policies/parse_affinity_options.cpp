@@ -43,6 +43,7 @@ BOOST_FUSION_ADAPT_STRUCT(
     (hpx::threads::detail::spec_type::type, type_)
 )
 
+
 namespace hpx { namespace threads { namespace detail
 {
     static char const* const type_names[] =
@@ -1038,9 +1039,8 @@ namespace hpx { namespace threads { namespace detail
         std::size_t pus_t2 = 0;
         for (std::size_t n = 0; n < num_numas; ++n)
         {
-            std::size_t temp = static_cast<std::size_t>(std::floor(0.5 +
-                static_cast<double>(num_threads) * num_pus_numa[n] /
-                    pus_t));
+            std::size_t temp = static_cast<std::size_t>(std::round(
+                static_cast<double>(num_threads * num_pus_numa[n]) / pus_t));
 
             // due to rounding up, we might have too many threads
             if ((pus_t2 + temp) > num_threads)
@@ -1130,6 +1130,7 @@ namespace hpx { namespace threads { namespace detail
             }
             core_offset += num_cores_numa[n];
         }
+
     }
 
     ///////////////////////////////////////////////////////////////////////////

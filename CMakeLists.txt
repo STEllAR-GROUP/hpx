@@ -1037,7 +1037,7 @@ if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
 endif()
 
 if(MSVC)
-  if(NOT (MSVC14))
+  if(MSVC_VERSION LESS 1900)
     hpx_error("MSVC x64 2015 or higher is required.")
   elseif(NOT CMAKE_CL_64)
     hpx_warn("MSVC (32Bit) will compile but will fail running larger applications because of limitations in the Windows OS.")
@@ -1061,7 +1061,7 @@ elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_info("Compiling for BlueGene/Q")
 endif()
 
-if((MSVC14 AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+if(((MSVC_VERSION GREATER_EQUAL 1900) AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
   hpx_option(HPX_WITH_AWAIT BOOL
       "Enable the use of experimental co_await functionality"
       OFF ADVANCED CATEGORY "LCOs")
@@ -1076,7 +1076,7 @@ if((MSVC14 AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
       hpx_add_config_define(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
     endif()
 
-    if(MSVC14 AND CMAKE_CL_64)
+    if((MSVC_VERSION GREATER_EQUAL 1900) AND CMAKE_CL_64)
       hpx_add_target_compile_option(-await PUBLIC)
     endif()
 
@@ -1249,8 +1249,8 @@ if(WIN32)
     # even VS2017 has an ICE when compiling with -Ob2
     hpx_add_target_compile_option(-Ob1 PUBLIC CONFIGURATIONS Release)
 
+    # /RTC1 is incompatible with /await
     if(NOT HPX_WITH_AWAIT)
-      # /RTC1 is incompatible with /await
       hpx_add_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
     else()
       hpx_remove_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
@@ -1274,7 +1274,7 @@ if(WIN32)
 
     # Exceptions
     hpx_add_target_compile_option(-EHsc)
-    if(MSVC14)
+    if(MSVC_VERSION GREATER_EQUAL 1900)
       # assume conforming (throwing) operator new implementations
       hpx_add_target_compile_option(-Zc:throwingNew PUBLIC)
 
@@ -1295,6 +1295,9 @@ if(WIN32)
       # Update 8 requires to set _ENABLE_EXTENDED_ALIGNED_STORAGE for it to
       # compile atomics
       hpx_add_config_cond_define(_ENABLE_EXTENDED_ALIGNED_STORAGE)
+
+      # Make sure that __cplusplus is properly defined
+      hpx_add_target_compile_option(-Zc:__cplusplus)
     endif()
 
     # Runtime type information

@@ -321,6 +321,15 @@ namespace hpx
             startup_function_type(), shutdown_function_type(), mode);
     }
 
+    inline bool start(util::function_nonser<int(int, char**)> const& f,
+        std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode)
+    {
+        char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), nullptr };
+
+        return start(f, 1, dummy_argv, cfg, mode);
+    }
+
     inline bool start(std::nullptr_t f, std::string const& app_name, int argc,
         char** argv, hpx::runtime_mode mode)
     {
@@ -362,6 +371,14 @@ namespace hpx
 
         return start(main_f, desc_commandline, argc, argv, cfg,
             startup_function_type(), shutdown_function_type(), mode);
+    }
+
+    inline bool start(std::nullptr_t f, std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode)
+    {
+      char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), nullptr };
+
+      return start(nullptr, 1, dummy_argv, cfg, mode);
     }
 }
 

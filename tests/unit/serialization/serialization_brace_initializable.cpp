@@ -94,4 +94,9 @@ int main()
 
     return hpx::util::report_errors();
 }
+#else
+int main()
+{
+    return 0;
+}
 #endif

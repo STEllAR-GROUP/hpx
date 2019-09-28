@@ -2,7 +2,6 @@
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
-//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,12 +9,11 @@
 #include <hpx/performance_counters/counters.hpp>
 
 #include <hpx/assertion.hpp>
+#include <hpx/collectives.hpp>
 #include <hpx/concurrency/thread_name.hpp>
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/lcos/barrier.hpp>
-#include <hpx/lcos/latch.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/interface.hpp>

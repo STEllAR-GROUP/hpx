@@ -7,10 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/datastructures/any.hpp>
-#include <hpx/hpx_init.hpp>
 #include <hpx/testing.hpp>
-
-#include <hpx/util/storage/tuple.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -24,11 +21,8 @@ using hpx::util::any_cast;
 using hpx::util::any_nonser;
 using hpx::util::streamable_any_nonser;
 
-using hpx::finalize;
-using hpx::init;
-
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main()
+int main()
 {
     {
         streamable_any_nonser any1(big_object(30, 40));
@@ -134,13 +128,5 @@ int hpx_main()
         }
     }
 
-    finalize();
     return hpx::util::report_errors();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
-{
-    // Initialize and run HPX
-    return init(argc, argv);
 }

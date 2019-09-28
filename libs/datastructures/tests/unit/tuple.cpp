@@ -21,7 +21,6 @@
 // clang-format on
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_init.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/testing.hpp>
 
@@ -537,6 +536,48 @@ void tuple_swap_test()
     HPX_TEST(j == 1);
 }
 
+void tuple_std_test()
+{
+#if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
+    hpx::util::tuple<int, float, double> t1(1, 2.0f, 3.0);
+    std::tuple<int, float, double> t2 = t1;
+    hpx::util::tuple<int, float, double> t3 = t2;
+    HPX_TEST(std::get<0>(t1) == 1);
+    HPX_TEST(std::get<0>(t2) == 1);
+    HPX_TEST(std::get<0>(t3) == 1);
+
+    HPX_TEST(hpx::util::get<0>(t1) == 1);
+    HPX_TEST(hpx::util::get<0>(t2) == 1);
+    HPX_TEST(hpx::util::get<0>(t3) == 1);
+
+    HPX_TEST(std::get<1>(t1) == 2.0f);
+    HPX_TEST(std::get<1>(t2) == 2.0f);
+    HPX_TEST(std::get<1>(t3) == 2.0f);
+
+    HPX_TEST(hpx::util::get<1>(t1) == 2.0f);
+    HPX_TEST(hpx::util::get<1>(t2) == 2.0f);
+    HPX_TEST(hpx::util::get<1>(t3) == 2.0f);
+
+    HPX_TEST(std::get<2>(t1) == 3.0);
+    HPX_TEST(std::get<2>(t2) == 3.0);
+    HPX_TEST(std::get<2>(t3) == 3.0);
+
+    HPX_TEST(hpx::util::get<2>(t1) == 3.0);
+    HPX_TEST(hpx::util::get<2>(t2) == 3.0);
+    HPX_TEST(hpx::util::get<2>(t3) == 3.0);
+#endif
+}
+
+void tuple_structured_binding_test()
+{
+#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS)
+    auto [a1, a2] = hpx::util::make_tuple(1, '2');
+
+    HPX_TEST_EQ(a1, 1);
+    HPX_TEST_EQ(a2, '2');
+#endif
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
@@ -553,6 +594,7 @@ int main(int argc, char* argv[])
         const_tuple_test();
         tuple_length_test();
         tuple_swap_test();
+        tuple_structured_binding_test();
     }
 
     return hpx::util::report_errors();
