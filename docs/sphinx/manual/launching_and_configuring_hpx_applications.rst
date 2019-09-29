@@ -351,9 +351,9 @@ The ``hpx.thread_queue`` configuration section
        that have to be available before neighboring cores are allowed to steal
        work. The default is to allow stealing always.
    * * ``hpx.thread_queue.min_tasks_to_steal_staged``
-     * The value of this property defines the number of staged |hpx| tasks have
-       which to be available before neighboring cores are allowed to steal work.
-       The default is to allow stealing only if there are more tan 10 tasks
+     * The value of this property defines the number of staged |hpx| tasks that
+       need to be available before neighboring cores are allowed to steal work.
+       The default is to allow stealing only if there are more than 10 tasks
        available.
    * * ``hpx.thread_queue.min_add_new_count``
      * The value of this property defines the minimal number of tasks to be
@@ -961,7 +961,7 @@ configuration database with default information as described in section
 Application specific component example
 --------------------------------------
 
-In this section we assume to have a simple application component which exposes
+This section assumes there is a simple application component that exposes
 one member function as a component action. The header file ``app_server.hpp``
 declares the C++ type to be exposed as a component. This type has a member
 function ``print_greeting()``, which is exposed as an action
@@ -1068,8 +1068,8 @@ component (``app_server`` is an arbitrary, but unique name). The property value
 for ``hpx.components.app_server.name`` should be the same as used for the second
 argument to the macro :c:macro:`HPX_REGISTER_COMPONENT` above.
 
-Additionally, a file ``.hpx.ini`` which could be located in the current working
-directory (see step 3 as described in the section :ref:`loading_ini_files`) can
+Additionally, a file ``.hpx.ini``, which could be located in the current working
+directory (see step 3 as described in the section :ref:`loading_ini_files`), can
 be used to add to the ini search path for components:
 
 .. code-block:: ini
@@ -1238,7 +1238,7 @@ destination separated by whitespace.
 
 The logging format is read from the environment variable ``HPX_LOGFORMAT``, and
 it defaults to a complex format description. This format consists of several
-placeholder fields (for instance ``%locality%`` which will be replaced by
+placeholder fields (for instance ``%locality%``), which will be replaced by
 concrete values when the logging output is generated. All other information is
 transferred verbatim to the output. The table below describes the available
 field placeholders. The separator character ``|`` separates the logging message
@@ -1607,13 +1607,13 @@ The predefined command line options for any application using
 
 .. option:: --hpx:print-counter-format
 
-   Print the performance counter(s) specified with :option:`--hpx:print-counter`
-   possible formats in csv format with header or without any header (see option
-   :option:`--hpx:no-csv-header`, possible values: ``csv`` (prints counter
+   Print the performance counter(s) specified with :option:`--hpx:print-counter`.
+   Possible formats in CSV include a format with a header or without any header (see option
+   :option:`--hpx:no-csv-header`). Possible values: ``csv`` (prints counter
    values in CSV format with full names as header), ``csv-short`` (prints
-   counter values in CSV format with shortnames provided with
+   counter values in CSV format with short names provided with
    :option:`--hpx:print-counter` as :option:`--hpx:print-counter`
-   ``shortname,full-countername``
+   ``shortname, full-countername``
 
 .. option:: --hpx:no-csv-header
 
@@ -1624,7 +1624,7 @@ The predefined command line options for any application using
 .. option:: --hpx:print-counter-at arg
 
    Print the performance counter(s) specified with :option:`--hpx:print-counter`
-   (or :option:`--hpx:print-counter-reset` at the given point in time, possible
+   (or :option:`--hpx:print-counter-reset`) at the given point in time, possible
    argument values: ``startup``, ``shutdown`` (default), ``noshutdown``.
 
 .. option:: --hpx:reset-counters
