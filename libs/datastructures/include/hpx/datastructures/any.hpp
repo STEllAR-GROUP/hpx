@@ -18,7 +18,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/traits/supports_streaming_with_any.hpp>
+#include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 
 #include <algorithm>
 #include <cstddef>

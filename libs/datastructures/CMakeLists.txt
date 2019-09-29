@@ -19,11 +19,11 @@ endif()
 
 set(datastructures_headers
   hpx/datastructures/any.hpp
-  hpx/datastructures/tuple.hpp
   hpx/datastructures/optional.hpp
+  hpx/datastructures/tuple.hpp
   hpx/datastructures/detail/pack.hpp
-  hpx/traits/supports_streaming_with_any.hpp
-  hpx/traits/is_tuple_like.hpp
+  hpx/datastructures/traits/supports_streaming_with_any.hpp
+  hpx/datastructures/traits/is_tuple_like.hpp
 )
 
 set(datastructures_compat_headers
@@ -31,6 +31,8 @@ set(datastructures_compat_headers
   hpx/util/any.hpp
   hpx/util/optional.hpp
   hpx/util/tuple.hpp
+  hpx/traits/supports_streaming_with_any.hpp
+  hpx/traits/is_tuple_like.hpp
 )
 
 set(datastructures_sources)
@@ -43,7 +45,7 @@ add_hpx_module(datastructures
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER
     "hpx/datastructures/detail/pack.hpp"
-    "hpx/traits/supports_streaming_with_any.hpp"
+    "hpx/datastructures/traits/supports_streaming_with_any.hpp"
   SOURCES ${datastructures_sources}
   HEADERS ${datastructures_headers}
   COMPAT_HEADERS ${datastructures_compat_headers}

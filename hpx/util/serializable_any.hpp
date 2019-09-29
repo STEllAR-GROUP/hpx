@@ -22,7 +22,7 @@
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/traits/supports_streaming_with_any.hpp>
+#include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 
 #include <algorithm>
 #include <cstddef>

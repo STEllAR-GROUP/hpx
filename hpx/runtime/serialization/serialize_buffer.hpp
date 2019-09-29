@@ -12,7 +12,7 @@
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/traits/supports_streaming_with_any.hpp>
+#include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 #include <hpx/functional/bind_back.hpp>
 
 #include <boost/shared_array.hpp>
