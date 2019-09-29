@@ -43,9 +43,6 @@ add_hpx_module(datastructures
   DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
-  EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/datastructures/detail/pack.hpp"
-    "hpx/datastructures/traits/supports_streaming_with_any.hpp"
   SOURCES ${datastructures_sources}
   HEADERS ${datastructures_headers}
   COMPAT_HEADERS ${datastructures_compat_headers}
