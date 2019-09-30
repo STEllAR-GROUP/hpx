@@ -63,6 +63,7 @@ add_hpx_module(collectives
       hpx_execution
       hpx_format
       hpx_functional
+      hpx_hardware
       hpx_hashing
       hpx_iterator_support
       hpx_logging
