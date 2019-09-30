@@ -27,10 +27,8 @@
 #include <ctime>
 #include <string>
 
-#if defined(__linux) || defined(linux) || defined(__linux__) ||                \
-    defined(__FreeBSD__)
-#elif defined(HPX_MSVC)
-#else
+#if !(defined(__linux) || defined(linux) || defined(__linux__) ||              \
+    defined(__FreeBSD__) || defined(__APPLE__) || defined(HPX_MSVC))
 #include <boost/smart_ptr/detail/spinlock.hpp>
 #include <mutex>
 #endif
@@ -96,7 +94,7 @@ For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_
             std::time_t tt = std::chrono::system_clock::to_time_t(val);
 
 #if defined(__linux) || defined(linux) || defined(__linux__) ||                \
-    defined(__FreeBSD__)
+    defined(__FreeBSD__) || defined(__APPLE__)
             std::tm local_tm;
             localtime_r(&tt, &local_tm);
 #elif defined(HPX_MSVC)
