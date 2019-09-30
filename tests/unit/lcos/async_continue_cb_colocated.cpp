@@ -60,11 +60,18 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<int> callback_called(0);
 
+#if defined(HPX_HAVE_NETWORKING)
 void cb(boost::system::error_code const& ec,
     hpx::parcelset::parcel const& p)
 {
     ++callback_called;
 }
+#else
+void cb()
+{
+    ++callback_called;
+}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 int test_async_continue_cb_colocated(test_client const& target)

@@ -8,6 +8,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing.hpp>
 
 #include <atomic>
 #include <cstdint>

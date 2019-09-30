@@ -4,11 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/plain_actions.hpp>
-#include <hpx/include/async.hpp>
-#include <hpx/testing.hpp>
 #include <hpx/config/compiler_specific.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/include/async.hpp>
+#include <hpx/include/plain_actions.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <string>
@@ -86,95 +86,95 @@ void test_actions()
         // test std::size_t(movable_object const& obj)
         if (is_local)
         {
-            HPX_TEST_EQ((
-                pass_object<
-                    action_move_semantics::test_movable_action, movable_object
-                >(id)
-            ), 1u); // bind
+            HPX_TEST_EQ((pass_object<action_move_semantics::test_movable_action,
+                            movable_object>(id)),
+                1u);    // bind
 
-            HPX_TEST_EQ((
-                move_object<
-                    action_move_semantics::test_movable_action, movable_object
-                >(id)
-            ), 0u);
-        } else {
-            HPX_TEST_EQ((
-                pass_object<
-                    action_move_semantics::test_movable_action, movable_object
-                >(id)
-            ), 1u); // transfer_action
-
-            HPX_TEST_EQ((
-                move_object<
-                    action_move_semantics::test_movable_action, movable_object
-                >(id)
-            ), 0u);
+            HPX_TEST_EQ((move_object<action_move_semantics::test_movable_action,
+                            movable_object>(id)),
+                0u);
         }
+#if defined(HPX_HAVE_NETWORKING)
+        else
+        {
+            HPX_TEST_EQ((pass_object<action_move_semantics::test_movable_action,
+                            movable_object>(id)),
+                1u);    // transfer_action
+
+            HPX_TEST_EQ((move_object<action_move_semantics::test_movable_action,
+                            movable_object>(id)),
+                0u);
+        }
+#endif
 
         // test std::size_t(non_movable_object const& obj)
         if (is_local)
         {
-            HPX_TEST_EQ((
-                pass_object<
-                    action_move_semantics::test_non_movable_action, non_movable_object
-                >(id)
-            ), 2u); // bind + function
+            HPX_TEST_EQ(
+                (pass_object<action_move_semantics::test_non_movable_action,
+                    non_movable_object>(id)),
+                2u);    // bind + function
 
-            HPX_TEST_EQ((
-                move_object<
-                    action_move_semantics::test_non_movable_action, non_movable_object
-                >(id)
-            ), 2u); // bind + function
-        } else {
-            HPX_TEST_EQ((
-                pass_object<
-                    action_move_semantics::test_non_movable_action, non_movable_object
-                >(id)
-            ), 3u); // transfer_action + bind + function
-
-            HPX_TEST_EQ((
-                move_object<
-                    action_move_semantics::test_non_movable_action, non_movable_object
-                >(id)
-            ), 3u); // transfer_action + bind + function
+            HPX_TEST_EQ(
+                (move_object<action_move_semantics::test_non_movable_action,
+                    non_movable_object>(id)),
+                2u);    // bind + function
         }
+#if defined(HPX_HAVE_NETWORKING)
+        else
+        {
+            HPX_TEST_EQ(
+                (pass_object<action_move_semantics::test_non_movable_action,
+                    non_movable_object>(id)),
+                3u);    // transfer_action + bind + function
+
+            HPX_TEST_EQ(
+                (move_object<action_move_semantics::test_non_movable_action,
+                    non_movable_object>(id)),
+                3u);    // transfer_action + bind + function
+        }
+#endif
 
         // test movable_object()
         if (is_local)
         {
-            HPX_TEST_EQ((
-                return_object<
-                    action_move_semantics::return_test_movable_action, movable_object
-                >(id)
-            ), 0u);
-        } else {
-            HPX_TEST_EQ((
-                return_object<
-                    action_move_semantics::return_test_movable_action, movable_object
-                >(id)
-            ), 0u);
+            HPX_TEST_EQ((return_object<
+                            action_move_semantics::return_test_movable_action,
+                            movable_object>(id)),
+                0u);
         }
+#if defined(HPX_HAVE_NETWORKING)
+        else
+        {
+            HPX_TEST_EQ((return_object<
+                            action_move_semantics::return_test_movable_action,
+                            movable_object>(id)),
+                0u);
+        }
+#endif
 
         // test non_movable_object()
         if (is_local)
         {
             //FIXME: bumped number for intel compiler
-            HPX_TEST_RANGE((
-                return_object<
+            HPX_TEST_RANGE(
+                (return_object<
                     action_move_semantics::return_test_non_movable_action,
-                non_movable_object
-                >(id)
-            ), 1u, 5u); // ?call + set_value + ?return
-        } else {
-            //FIXME: bumped number for intel compiler
-            HPX_TEST_RANGE((
-                return_object<
-                    action_move_semantics::return_test_non_movable_action,
-                non_movable_object
-                >(id)
-            ), 3u, 8u); // transfer_action + function + ?call +
-                    // set_value + ?return
+                    non_movable_object>(id)),
+                1u, 5u);    // ?call + set_value + ?return
         }
+#if defined(HPX_HAVE_NETWORKING)
+        else
+        {
+            //FIXME: bumped number for intel compiler
+            HPX_TEST_RANGE(
+                (return_object<
+                    action_move_semantics::return_test_non_movable_action,
+                    non_movable_object>(id)),
+                3u, 8u);    // transfer_action + function + ?call +
+                            // set_value + ?return
+        }
+#endif
     }
 }
 
@@ -191,102 +191,106 @@ void test_direct_actions()
         // test std::size_t(movable_object const& obj)
         if (is_local)
         {
-            HPX_TEST_EQ((
-                pass_object<
-                    action_move_semantics::test_movable_direct_action, movable_object
-                >(id)
-            ), 0u);
+            HPX_TEST_EQ(
+                (pass_object<action_move_semantics::test_movable_direct_action,
+                    movable_object>(id)),
+                0u);
 
-            HPX_TEST_EQ((
-                move_object<
-                    action_move_semantics::test_movable_direct_action, movable_object
-                >(id)
-            ), 0u);
-        } else {
-            HPX_TEST_EQ((
-                pass_object<
-                    action_move_semantics::test_movable_direct_action, movable_object
-                >(id)
-            ), 1u); // transfer_action
-
-            HPX_TEST_EQ((
-                move_object<
-                    action_move_semantics::test_movable_direct_action, movable_object
-                >(id)
-            ), 0u);
+            HPX_TEST_EQ(
+                (move_object<action_move_semantics::test_movable_direct_action,
+                    movable_object>(id)),
+                0u);
         }
+#if defined(HPX_HAVE_NETWORKING)
+        else
+        {
+            HPX_TEST_EQ(
+                (pass_object<action_move_semantics::test_movable_direct_action,
+                    movable_object>(id)),
+                1u);    // transfer_action
+
+            HPX_TEST_EQ(
+                (move_object<action_move_semantics::test_movable_direct_action,
+                    movable_object>(id)),
+                0u);
+        }
+#endif
 
         // test std::size_t(non_movable_object const& obj)
         if (is_local)
         {
-            HPX_TEST_EQ((
-                pass_object<
+            HPX_TEST_EQ(
+                (pass_object<
                     action_move_semantics::test_non_movable_direct_action,
-                non_movable_object
-                >(id)
-            ), 0u);
+                    non_movable_object>(id)),
+                0u);
 
-            HPX_TEST_EQ((
-                move_object<
+            HPX_TEST_EQ(
+                (move_object<
                     action_move_semantics::test_non_movable_direct_action,
-                non_movable_object
-                >(id)
-            ), 0u);
-        } else {
-            HPX_TEST_RANGE((
-                pass_object<
-                    action_move_semantics::test_non_movable_direct_action,
-                non_movable_object
-                >(id)
-            ), 1u, 3u); // transfer_action (if parcel is being routed)
-                        // transfer_action, function + call (otherwise)
-
-            HPX_TEST_RANGE((
-                move_object<
-                    action_move_semantics::test_non_movable_direct_action,
-                non_movable_object
-                >(id)
-            ), 1u, 3u); // transfer_action (if parcel is being routed)
-                        // transfer_action, function + call (otherwise)
+                    non_movable_object>(id)),
+                0u);
         }
+#if defined(HPX_HAVE_NETWORKING)
+        else
+        {
+            HPX_TEST_RANGE(
+                (pass_object<
+                    action_move_semantics::test_non_movable_direct_action,
+                    non_movable_object>(id)),
+                1u, 3u);    // transfer_action (if parcel is being routed)
+                            // transfer_action, function + call (otherwise)
+
+            HPX_TEST_RANGE(
+                (move_object<
+                    action_move_semantics::test_non_movable_direct_action,
+                    non_movable_object>(id)),
+                1u, 3u);    // transfer_action (if parcel is being routed)
+                            // transfer_action, function + call (otherwise)
+        }
+#endif
 
         // test movable_object()
         if (is_local)
         {
-            HPX_TEST_EQ((
-                return_object<
+            HPX_TEST_EQ(
+                (return_object<
                     action_move_semantics::return_test_movable_direct_action,
-                movable_object
-                >(id)
-            ), 0u);
-        } else {
-            HPX_TEST_EQ((
-                return_object<
-                    action_move_semantics::return_test_movable_direct_action,
-                movable_object
-                >(id)
-            ), 0u);
+                    movable_object>(id)),
+                0u);
         }
+#if defined(HPX_HAVE_NETWORKING)
+        else
+        {
+            HPX_TEST_EQ(
+                (return_object<
+                    action_move_semantics::return_test_movable_direct_action,
+                    movable_object>(id)),
+                0u);
+        }
+#endif
 
         // test non_movable_object()
         if (is_local)
         {
-            HPX_TEST_RANGE((
-                return_object<
-                    action_move_semantics::return_test_non_movable_direct_action,
-                non_movable_object
-                >(id)
-            ), 1u, 3u); // ?call + set_value + ?return
-        } else {
-            //FIXME: bumped number for intel compiler
-            HPX_TEST_RANGE((
-                return_object<
-                    action_move_semantics::return_test_non_movable_direct_action,
-                non_movable_object
-                >(id)
-            ), 3u, 8u); // transfer_action + function + ?call +
-                    // set_value + ?return
+            HPX_TEST_RANGE(
+                (return_object<action_move_semantics::
+                                   return_test_non_movable_direct_action,
+                    non_movable_object>(id)),
+                1u, 3u);    // ?call + set_value + ?return
         }
+#if defined(HPX_HAVE_NETWORKING)
+        else
+        {
+            //FIXME: bumped number for intel compiler
+            HPX_TEST_RANGE(
+                (return_object<action_move_semantics::
+                                   return_test_non_movable_direct_action,
+                    non_movable_object>(id)),
+                3u, 8u);    // transfer_action + function + ?call +
+                            // set_value + ?return
+        }
+#endif
     }
 }
 
@@ -309,8 +313,7 @@ int main(int argc, char* argv[])
 
     // we need to explicitly enable the test components used by this test
     std::vector<std::string> const cfg = {
-        "hpx.components.action_move_semantics.enabled! = 1"
-    };
+        "hpx.components.action_move_semantics.enabled! = 1"};
 
     // Initialize and run HPX.
     return hpx::init(desc_commandline, argc, argv, cfg);

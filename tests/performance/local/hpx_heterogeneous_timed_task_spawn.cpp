@@ -9,8 +9,7 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
-
+#include <hpx/timing.hpp>
 
 #include <cstdint>
 #include <functional>

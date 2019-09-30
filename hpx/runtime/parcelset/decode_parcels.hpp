@@ -9,6 +9,8 @@
 #define HPX_PARCELSET_DECODE_PARCELS_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
@@ -323,4 +325,5 @@ namespace hpx { namespace parcelset
 
 }}
 
+#endif
 #endif

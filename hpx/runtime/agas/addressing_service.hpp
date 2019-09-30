@@ -49,7 +49,9 @@
 
 namespace hpx { namespace agas
 {
+#if defined(HPX_HAVE_NETWORKING)
 HPX_EXPORT void destroy_big_boot_barrier();
+#endif
 
 struct HPX_EXPORT addressing_service
 {
@@ -129,17 +131,26 @@ public:
       , runtime_mode runtime_type_
         );
 
+#if defined(HPX_HAVE_NETWORKING)
     ~addressing_service()
     {
         // TODO: Free the future pools?
         destroy_big_boot_barrier();
     }
+#else
+    ~addressing_service() = default;
+#endif
 
+#if defined(HPX_HAVE_NETWORKING)
     void bootstrap(
         parcelset::parcelhandler& ph, util::runtime_configuration const& ini);
 
     void initialize(parcelset::parcelhandler& ph, std::uint64_t rts_lva,
         std::uint64_t mem_lva);
+#else
+    void bootstrap(util::runtime_configuration const& ini);
+    void initialize(std::uint64_t rts_lva, std::uint64_t mem_lva);
+#endif
 
     /// \brief Adjust the size of the local AGAS Address resolution cache
     void adjust_local_cache_size(std::size_t);
@@ -217,11 +228,18 @@ public:
     }
 
 protected:
+#if defined(HPX_HAVE_NETWORKING)
     void launch_bootstrap(
         std::shared_ptr<parcelset::parcelport> const& pp
       , parcelset::endpoints_type const & endpoints
       , util::runtime_configuration const& ini_
         );
+#else
+    void launch_bootstrap(
+        parcelset::endpoints_type const & endpoints
+      , util::runtime_configuration const& ini_
+        );
+#endif
 
     void launch_hosted();
 
@@ -1100,6 +1118,7 @@ public:
       , error_code& ec = throws
         );
 
+#if defined(HPX_HAVE_NETWORKING)
     /// \brief Route the given parcel to the appropriate AGAS service instance
     ///
     /// This function sends the given parcel to the AGAS service instance which
@@ -1119,6 +1138,7 @@ public:
             parcelset::parcel const&)> &&
       , threads::thread_priority local_priority =
             threads::thread_priority_default);
+#endif
 
     /// \brief Increment the global reference count for the given id
     ///

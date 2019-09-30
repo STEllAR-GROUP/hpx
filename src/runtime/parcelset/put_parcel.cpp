@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
 
@@ -36,3 +38,5 @@ namespace hpx { namespace parcelset
         ph.sync_put_parcel(std::move(p));
     }
 }}
+
+#endif

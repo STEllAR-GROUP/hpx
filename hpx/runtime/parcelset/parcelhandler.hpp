@@ -10,6 +10,8 @@
 #define HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -510,5 +512,5 @@ namespace hpx { namespace parcelset
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-
+#endif
 

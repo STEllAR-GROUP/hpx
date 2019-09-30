@@ -7,7 +7,12 @@
 #ifndef HPX_PARCELSET_PUT_PARCEL_HPP
 #define HPX_PARCELSET_PUT_PARCEL_HPP
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
+
 #include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
@@ -206,4 +211,5 @@ namespace hpx { namespace parcelset
     }
 }}
 
+#endif
 #endif

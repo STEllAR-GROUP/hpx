@@ -13,15 +13,13 @@ set(tests
     returned_client_2150
    )
 
-set(bulk_new_3054_PARAMETERS LOCALITIES 2)
-set(new_2848_PARAMETERS LOCALITIES 2)
-
 if(HPX_WITH_NETWORKING)
-    set(tests ${tests}
-        create_remote_component_2334
-       )
-
+  set(tests ${tests}
+      create_remote_component_2334
+  )
+  set(bulk_new_3054_PARAMETERS LOCALITIES 2)
   set(create_remote_component_2334_PARAMETERS LOCALITIES 2)
+  set(new_2848_PARAMETERS LOCALITIES 2)
 endif()
 
 foreach(test ${tests})

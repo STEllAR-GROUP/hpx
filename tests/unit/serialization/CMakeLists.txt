@@ -22,8 +22,13 @@ set(tests
     serialization_variant
     serialize_buffer
     serialize_with_incompatible_signature
-    zero_copy_serialization
 )
+
+if(HPX_WITH_NETWORKING)
+    set(tests ${tests}
+        zero_copy_serialization
+)
+endif()
 
 if(HPX_WITH_CXX17_STRUCTURED_BINDINGS)
     set(tests ${tests}

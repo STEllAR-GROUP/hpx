@@ -37,11 +37,18 @@ HPX_REGISTER_ACTION(call_action);
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<int> callback_called(0);
 
+#if defined(HPX_HAVE_NETWORKING)
 void cb(boost::system::error_code const& ec,
     hpx::parcelset::parcel const& p)
 {
     ++callback_called;
 }
+#else
+void cb()
+{
+    ++callback_called;
+}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_remote_async_cb(hpx::id_type const& target)

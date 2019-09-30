@@ -12,7 +12,7 @@
 
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/format.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/timing.hpp>
 
 #include <boost/lockfree/stack.hpp>
 #include <hpx/program_options.hpp>

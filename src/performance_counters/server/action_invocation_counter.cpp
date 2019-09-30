@@ -47,6 +47,7 @@ namespace hpx { namespace performance_counters
             invocation_count_registry::local_instance(), ec);
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     bool remote_action_invocation_counter_discoverer(counter_info const& info,
         discover_counter_func const& f, discover_counters_mode mode,
         error_code& ec)
@@ -55,6 +56,7 @@ namespace hpx { namespace performance_counters
         return action_invocation_counter_discoverer(info, f, mode,
             invocation_count_registry::remote_instance(), ec);
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // Creation function for action invocation counter
@@ -109,6 +111,7 @@ namespace hpx { namespace performance_counters
             invocation_count_registry::local_instance(), ec);
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     naming::gid_type remote_action_invocation_counter_creator(
         counter_info const& info, error_code& ec)
     {
@@ -116,5 +119,6 @@ namespace hpx { namespace performance_counters
         return action_invocation_counter_creator(info,
             invocation_count_registry::remote_instance(), ec);
     }
+#endif
 }}
 

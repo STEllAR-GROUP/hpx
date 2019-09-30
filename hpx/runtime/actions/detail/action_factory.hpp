@@ -9,35 +9,36 @@
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
 
 #include <cstdint>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-namespace hpx { namespace actions { namespace detail
-{
+namespace hpx { namespace actions { namespace detail {
+
     struct action_registry
     {
     public:
         HPX_NON_COPYABLE(action_registry);
 
     public:
-        typedef base_action* (*ctor_t)(bool);
-        typedef std::unordered_map<std::string, ctor_t> typename_to_ctor_t;
-        typedef std::unordered_map<std::string, std::uint32_t> typename_to_id_t;
-        typedef std::vector<ctor_t> cache_t;
+        using ctor_t = base_action* (*) (bool);
+        using typename_to_ctor_t = std::unordered_map<std::string, ctor_t>;
+        using typename_to_id_t = std::unordered_map<std::string, std::uint32_t>;
+        using cache_t = std::vector<ctor_t>;
 
         HPX_STATIC_CONSTEXPR std::uint32_t invalid_id = ~0;
 
         HPX_EXPORT action_registry();
-        HPX_EXPORT void register_factory(std::string const& type_name,
-            ctor_t ctor);
-        HPX_EXPORT void register_typename(std::string const& type_name,
-            std::uint32_t id);
+        HPX_EXPORT void register_factory(
+            std::string const& type_name, ctor_t ctor);
+        HPX_EXPORT void register_typename(
+            std::string const& type_name, std::uint32_t id);
         HPX_EXPORT void fill_missing_typenames();
         HPX_EXPORT std::uint32_t try_get_id(std::string const& type_name) const;
         HPX_EXPORT std::vector<std::string> get_unassigned_typenames() const;
@@ -65,7 +66,9 @@ namespace hpx { namespace actions { namespace detail
 
     public:
         register_action();
+
         static base_action* create(bool);
+
         register_action& instantiate();
 
         static register_action instance;
@@ -78,8 +81,7 @@ namespace hpx { namespace actions { namespace detail
     register_action<Action>::register_action()
     {
         action_registry::instance().register_factory(
-            hpx::actions::detail::get_action_name<Action>(),
-            &create);
+            hpx::actions::detail::get_action_name<Action>(), &create);
     }
 
     template <typename Action>
@@ -120,16 +122,23 @@ namespace hpx { namespace actions { namespace detail
         action_registry::instance().register_typename(
             get_action_name_id<Id>(), Id);
     }
-}}}
+}}}    // namespace hpx::actions::detail
 
-#define HPX_REGISTER_ACTION_FACTORY_ID(Name, Id)                              \
-    namespace hpx { namespace actions { namespace detail {                    \
-        template <> HPX_ALWAYS_EXPORT std::string get_action_name_id< Id>()   \
-        {                                                                     \
-            return HPX_PP_STRINGIZE(Name);                                    \
-        }                                                                     \
-        template add_constant_entry< Id> add_constant_entry< Id>::instance;   \
-    }}}                                                                       \
-/**/
+#define HPX_REGISTER_ACTION_FACTORY_ID(Name, Id)                               \
+    namespace hpx { namespace actions { namespace detail {                     \
+        template <>                                                            \
+        HPX_ALWAYS_EXPORT std::string get_action_name_id<Id>()                 \
+        {                                                                      \
+            return HPX_PP_STRINGIZE(Name);                                     \
+        }                                                                      \
+        template add_constant_entry<Id>                                        \
+            add_constant_entry<Id>::instance;                                  \
+    }}}                                                                        \
+    /**/
 
+#else
+
+#define HPX_REGISTER_ACTION_FACTORY_ID(Name, Id) /**/
+
+#endif
 #endif

@@ -9,7 +9,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/timing.hpp>
 #include <hpx/util/transform_iterator.hpp>
 
 #include <cstddef>

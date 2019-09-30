@@ -7,6 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
@@ -22,14 +23,21 @@ namespace hpx { namespace parcelset
 {
     void locality::save(serialization::output_archive& ar, const unsigned int) const
     {
+#if defined(HPX_HAVE_NETWORKING)
         std::string t = type();
         ar << t;
         if(t.empty()) return;
         impl_->save(ar);
+#else
+        HPX_THROW_EXCEPTION(invalid_status,
+            "locality::save",
+            "this shouldn't be called if networking is disabled");
+#endif
     }
 
     void locality::load(serialization::input_archive& ar, const unsigned int)
     {
+#if defined(HPX_HAVE_NETWORKING)
         std::string t;
         ar >> t;
         if(t.empty()) return;
@@ -37,6 +45,11 @@ namespace hpx { namespace parcelset
         impl_ = get_runtime().get_parcel_handler().create_locality(t).impl_;
         impl_->load(ar);
         HPX_ASSERT(impl_->valid());
+#else
+        HPX_THROW_EXCEPTION(invalid_status,
+            "locality::load",
+            "this shouldn't be called if networking is disabled");
+#endif
     }
 
     std::ostream& operator<< (std::ostream& os, endpoints_type const& endpoints)

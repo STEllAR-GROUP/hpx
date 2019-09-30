@@ -16,7 +16,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/timing.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/yield_while.hpp>
 

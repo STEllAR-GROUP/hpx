@@ -26,6 +26,7 @@
 
 namespace hpx
 {
+#if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
     {
@@ -50,6 +51,7 @@ namespace hpx
                 std::forward<Ts>(vs)...);
         }
     }}
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename ...Ts>
@@ -117,6 +119,7 @@ namespace hpx
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
     {
@@ -146,6 +149,7 @@ namespace hpx
                 std::forward<Ts>(vs)...);
         }
     }}
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Continuation, typename Callback, typename ...Ts>
@@ -170,14 +174,24 @@ namespace hpx
                 std::move(addr), priority, std::forward<Ts>(vs)...);
 
             // invoke callback
+#if defined(HPX_HAVE_NETWORKING)
             cb(boost::system::error_code(), parcelset::parcel());
+#else
+            cb();
+#endif
             return result;
         }
 
+#if defined(HPX_HAVE_NETWORKING)
         // apply remotely
         return applier::detail::apply_r_p_cb<Action>(std::move(addr),
             std::forward<Continuation>(c), gid,
             priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+#else
+        HPX_THROW_EXCEPTION(invalid_status,
+            "hpx::apply_cb",
+            "unexpected attempt to send a parcel with networking disabled");
+#endif
     }
 
     template <typename Action, typename Continuation, typename Callback, typename ...Ts>
@@ -257,6 +271,7 @@ namespace hpx
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
     {
@@ -300,6 +315,7 @@ namespace hpx
                 std::forward<Ts>(vs)...);
         }
     }}
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename ...Ts>

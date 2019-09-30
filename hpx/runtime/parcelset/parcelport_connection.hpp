@@ -8,6 +8,9 @@
 #ifndef HPX_PARCELSET_PARCELPORT_CONNECTION_HPP
 #define HPX_PARCELSET_PARCELPORT_CONNECTION_HPP
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 
@@ -100,4 +103,5 @@ namespace hpx { namespace parcelset {
     };
 }}
 
+#endif
 #endif

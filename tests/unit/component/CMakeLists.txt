@@ -121,5 +121,5 @@ foreach(test ${tests})
 endforeach()
 
 if(HPX_WITH_NETWORKING)
-    add_hpx_pseudo_dependencies(tests.unit.component.launch_process launched_process_test)
+  add_hpx_pseudo_dependencies(tests.unit.component.launch_process launched_process_test)
 endif()

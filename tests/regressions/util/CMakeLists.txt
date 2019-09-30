@@ -38,7 +38,6 @@ if(HPX_WITH_NETWORKING)
     set(tests ${tests}
         zero_copy_parcels_1001
        )
-
   set(zero_copy_parcels_1001_PARAMETERS LOCALITIES 2)
 endif()
 

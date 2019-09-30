@@ -12,6 +12,8 @@
 #define HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -192,4 +194,5 @@ HPX_IS_BITWISE_SERIALIZABLE(hpx::parcelset::detail::parcel_data)
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif

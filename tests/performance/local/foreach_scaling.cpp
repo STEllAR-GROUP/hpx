@@ -6,10 +6,10 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/timing.hpp>
 
 #include <hpx/parallel/executors/parallel_executor_aggregated.hpp>
 

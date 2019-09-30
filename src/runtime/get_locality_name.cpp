@@ -18,6 +18,7 @@ namespace hpx { namespace detail
 {
     std::string get_locality_base_name()
     {
+#if defined(HPX_HAVE_NETWORKING)
         runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
         {
@@ -27,6 +28,9 @@ namespace hpx { namespace detail
             return "";
         }
         return rt->get_parcel_handler().get_locality_name();
+#else
+        return "console";
+#endif
     }
 
     std::string get_locality_name()

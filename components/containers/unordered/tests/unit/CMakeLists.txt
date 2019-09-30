@@ -11,6 +11,7 @@ set(tests
 
 set(unordered_map_FLAGS
     COMPONENT_DEPENDENCIES unordered)
+
 set(unordered_map_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 2)

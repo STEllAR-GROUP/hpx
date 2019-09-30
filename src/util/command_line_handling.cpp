@@ -199,6 +199,16 @@ namespace hpx { namespace util
                 }
                 num_localities = localities;
             }
+
+#if !defined(HPX_HAVE_NETWORKING)
+            if (num_localities != 1)
+            {
+                throw hpx::detail::command_line_error(
+                    "Number of --hpx:localities must be equal to 1, please "
+                    "enable networking to run distributed HPX applications "
+                    "(use -DHPX_WITH_NETWORKING=On during configuration)");
+            }
+#endif
             return num_localities;
         }
 

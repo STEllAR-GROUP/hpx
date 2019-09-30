@@ -9,7 +9,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/timing.hpp>
 
 #include <boost/function.hpp>
 #include <hpx/program_options.hpp>

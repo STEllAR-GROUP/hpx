@@ -36,6 +36,7 @@
 #include <hpx/include/parallel_executor_parameters.hpp>
 //
 #include <hpx/include/compute.hpp>
+#include <hpx/timing.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
 # include <hpx/compute/cuda/allocator.hpp>

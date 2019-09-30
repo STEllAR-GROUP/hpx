@@ -8,6 +8,9 @@
 #ifndef HPX_RUNTIME_PARCELSET_DETAIL_CALL_FOR_EACH_HPP
 #define HPX_RUNTIME_PARCELSET_DETAIL_CALL_FOR_EACH_HPP
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 
@@ -59,4 +62,5 @@ namespace hpx { namespace parcelset
     }
 }}
 
+#endif
 #endif

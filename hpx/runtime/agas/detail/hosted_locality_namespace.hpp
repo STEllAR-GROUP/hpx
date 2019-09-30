@@ -13,6 +13,7 @@
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
@@ -79,4 +80,5 @@ namespace hpx { namespace agas { namespace detail
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::parcelset::endpoints_type, parcelset_endpoints_type)
 
+#endif
 #endif
