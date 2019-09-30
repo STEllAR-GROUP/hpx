@@ -98,7 +98,6 @@ add_hpx_module(logging
   COMPAT_HEADERS ${logging_compat_headers}
   DEPENDENCIES
     hpx_assertion
-    hpx_concurrency
     hpx_config
     hpx_filesystem
     hpx_timing

@@ -31,7 +31,7 @@
     defined(__FreeBSD__)
 #elif defined(HPX_MSVC)
 #else
-#include <hpx/lcos/local/spinlock.hpp>
+#include <boost/smart_ptr/detail/spinlock.hpp>
 #include <mutex>
 #endif
 
@@ -106,8 +106,9 @@ For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_
             // fall back to non-thread-safe version on other platforms
             std::tm local_tm;
             {
-                static hpx::lcos::local::spinlock mutex;
-                std::unique_lock<hpx::lcos::local::spinlock> ul(mutex);
+                static boost::detail::spinlock mutex =
+                    BOOST_DETAIL_SPINLOCK_INIT;
+                std::unique_lock<boost::detail::spinlock> ul(mutex);
                 local_tm = *std::localtime(&tt);
             }
 #endif
