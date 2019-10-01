@@ -88,9 +88,6 @@ endfunction()
 
 function(hpx_detect_cpp_dialect)
 
-  # the default should be C++14
-  set(HPX_CXX_STANDARD 14)
-
   if(MSVC)
     set(CXX_FLAG)
 
