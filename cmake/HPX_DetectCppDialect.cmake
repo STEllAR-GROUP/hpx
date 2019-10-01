@@ -83,6 +83,8 @@ function(hpx_detect_cpp_dialect_non_msvc)
       endif()
     endif()
   endif()
+  set(HPX_CXX_STANDARD ${HPX_CXX_STANDARD} PARENT_SCOPE)
+  set(CXX_FLAG ${CXX_FLAG} PARENT_SCOPE)
 endfunction()
 
 function(hpx_detect_cpp_dialect)
@@ -175,6 +177,6 @@ function(hpx_detect_cpp_dialect)
   endif()
 
   # Re-export the local CXX_FLAG varaible.
-  set(CXX_FLAG ${CXX_FLAG})
+  set(CXX_FLAG ${CXX_FLAG} PARENT_SCOPE)
 
 endfunction()
