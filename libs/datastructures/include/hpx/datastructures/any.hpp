@@ -1451,7 +1451,7 @@ namespace hpx { namespace util {
                 return obj.table->stream_out(o, &obj.object);
             }
         };
-    }}
+    }}    // namespace detail::any
 
     template <typename IArch, typename OArch, typename Char, typename Copyable,
         typename Enable =
