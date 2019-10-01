@@ -22,8 +22,8 @@
 #include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 

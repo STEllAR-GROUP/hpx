@@ -10,8 +10,7 @@
 
 #if defined(HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/runtime/serialization/map.hpp is deprecated, \
+#pragma message("The header hpx/runtime/serialization/map.hpp is deprecated, \
     please include hpx/serialization/map.hpp instead")
 #else
 #warning "The header hpx/runtime/serialization/map.hpp is deprecated, \

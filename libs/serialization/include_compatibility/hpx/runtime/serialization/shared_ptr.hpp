@@ -14,8 +14,7 @@
     "The header hpx/runtime/serialization/shared_ptr.hpp is deprecated, \
     please include hpx/serialization/shared_ptr.hpp instead")
 #else
-#warning                                                                       \
-    "The header hpx/runtime/serialization/shared_ptr.hpp is deprecated, \
+#warning "The header hpx/runtime/serialization/shared_ptr.hpp is deprecated, \
     please include hpx/serialization/shared_ptr.hpp instead"
 #endif
 #endif

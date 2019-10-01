@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/testing.hpp>
 #include <hpx/testing/config/defines.hpp>
+#include <hpx/testing.hpp>
 
 #if defined(HPX_TESTING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)

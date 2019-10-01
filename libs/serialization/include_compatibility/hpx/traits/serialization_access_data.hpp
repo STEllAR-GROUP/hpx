@@ -14,8 +14,7 @@
     "The header hpx/traits/serialization_access_data.hpp is deprecated, \
     please include hpx/serialization/traits/serialization_access_data.hpp instead")
 #else
-#warning                                                                       \
-    "The header hpx/traits/serialization_access_data.hpp is deprecated, \
+#warning "The header hpx/traits/serialization_access_data.hpp is deprecated, \
     please include hpx/serialization/traits/serialization_access_data.hpp instead"
 #endif
 #endif

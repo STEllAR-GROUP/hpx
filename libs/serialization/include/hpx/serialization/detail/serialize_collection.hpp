@@ -8,8 +8,8 @@
 #define HPX_SERIALIZATION_DETAIL_SERIALIZE_COLLECTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/util/detail/reserve.hpp>
 
 #include <memory>
