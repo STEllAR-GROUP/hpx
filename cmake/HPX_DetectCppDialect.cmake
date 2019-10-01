@@ -74,7 +74,6 @@ function(hpx_detect_cpp_dialect_non_msvc)
               # ... otherwise try -std=c++0x
               check_cxx_compiler_flag(-std=c++0x HPX_WITH_CXX0X)
               if(HPX_WITH_CXX0X)
-                set(HPX_CXX_STANDARD 0x)
                 hpx_error("HPX requires at least C++11 while C+0x was enforced")
               endif()
             endif()
@@ -83,12 +82,11 @@ function(hpx_detect_cpp_dialect_non_msvc)
       endif()
     endif()
   endif()
+  set(HPX_CXX_STANDARD ${HPX_CXX_STANDARD} PARENT_SCOPE)
+  set(CXX_FLAG ${CXX_FLAG} PARENT_SCOPE)
 endfunction()
 
 function(hpx_detect_cpp_dialect)
-
-  # the default should be C++14
-  set(HPX_CXX_STANDARD 14)
 
   if(MSVC)
     set(CXX_FLAG)
@@ -122,7 +120,6 @@ function(hpx_detect_cpp_dialect)
       set(HPX_CXX_STANDARD 11)
       hpx_warn("Compiling in C++11 mode is dprecated. HPX will require C++14 support in future releases. Set HPX_WITH_CXX14 (or newer) to ON during CMake configuration to enable C++14 support.")
     elseif(HPX_WITH_CXX0X)
-      set(HPX_CXX_STANDARD 0x)
       hpx_error("HPX requires at least C++11 while C+0x was enforced")
     endif()
 
@@ -157,8 +154,6 @@ function(hpx_detect_cpp_dialect)
       set(HPX_CXX_STANDARD 11)
       hpx_warn("Compiling in C++11 mode is deprecated. HPX will require C++14 support in future releases. Set HPX_WITH_CXX14 (or newer) to ON during CMake configuration to enable C++14 support.")
     elseif(HPX_WITH_CXX0X)
-      set(CXX_FLAG -std=c++0x)
-      set(HPX_CXX_STANDARD 0x)
       hpx_error("HPX requires at least C++11 while C+0x was enforced")
     else()
       # if no C++ mode is enforced, try to detect which one to use
@@ -175,6 +170,6 @@ function(hpx_detect_cpp_dialect)
   endif()
 
   # Re-export the local CXX_FLAG varaible.
-  set(CXX_FLAG ${CXX_FLAG})
+  set(CXX_FLAG ${CXX_FLAG} PARENT_SCOPE)
 
 endfunction()
