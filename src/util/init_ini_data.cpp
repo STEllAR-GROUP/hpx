@@ -17,6 +17,7 @@
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/init_ini_data.hpp>
+#include <hpx/version.hpp>
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/tokenizer.hpp>

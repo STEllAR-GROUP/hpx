@@ -28,11 +28,9 @@
 #include <ctime>
 #include <string>
 
-#if defined(__linux) || defined(linux) || defined(__linux__) ||                \
-    defined(__FreeBSD__)
-#elif defined(HPX_MSVC)
-#else
-#include <hpx/lcos/local/spinlock.hpp>
+#if !(defined(__linux) || defined(linux) || defined(__linux__) ||              \
+    defined(__FreeBSD__) || defined(__APPLE__) || defined(HPX_MSVC))
+#include <boost/smart_ptr/detail/spinlock.hpp>
 #include <mutex>
 #endif
 
@@ -97,7 +95,7 @@ For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_
             std::time_t tt = std::chrono::system_clock::to_time_t(val);
 
 #if defined(__linux) || defined(linux) || defined(__linux__) ||                \
-    defined(__FreeBSD__)
+    defined(__FreeBSD__) || defined(__APPLE__)
             std::tm local_tm;
             localtime_r(&tt, &local_tm);
 #elif defined(HPX_MSVC)
@@ -107,8 +105,9 @@ For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_
             // fall back to non-thread-safe version on other platforms
             std::tm local_tm;
             {
-                static hpx::lcos::local::spinlock mutex;
-                std::unique_lock<hpx::lcos::local::spinlock> ul(mutex);
+                static boost::detail::spinlock mutex =
+                    BOOST_DETAIL_SPINLOCK_INIT;
+                std::unique_lock<boost::detail::spinlock> ul(mutex);
                 local_tm = *std::localtime(&tt);
             }
 #endif
