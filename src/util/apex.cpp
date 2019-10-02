@@ -6,7 +6,6 @@
 //
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/apex.hpp>
 
 #include <cstddef>
