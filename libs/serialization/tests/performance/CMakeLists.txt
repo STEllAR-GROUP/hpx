@@ -7,7 +7,7 @@
 set(benchmarks
   serialization_performance
 )
-set(serialization_performance_PARAMETERS NO_HPX_MAIN)
+set(serialization_performance_PARAMETERS 100)
 
 if(HPX_WITH_NETWORKING)
   set(benchmarks ${benchmarks}

@@ -102,6 +102,7 @@ set(serialization_compat_headers
   hpx/runtime/serialization/intrusive_ptr.hpp
   hpx/runtime/serialization/shared_ptr.hpp
   hpx/runtime/serialization/unique_ptr.hpp
+  hpx/runtime/serialization/unordered_map.hpp
   hpx/runtime/serialization/access.hpp
   hpx/runtime/serialization/base_object.hpp
   hpx/runtime/serialization/basic_archive.hpp

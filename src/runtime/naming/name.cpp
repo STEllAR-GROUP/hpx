@@ -252,22 +252,15 @@ namespace hpx { namespace naming
             if (handle_futures == nullptr)
                 return;
 
-            if (split_gids != nullptr)
-            {
-                auto f = split_gid_if_needed(gid).then(hpx::launch::sync,
-                    [split_gids, &gid](hpx::future<gid_type>&& gid_future) {
-                        split_gids->add_gid(gid, gid_future.get());
-                    });
+            HPX_ASSERT(split_gids != nullptr);
 
-                handle_futures->await_future(
-                    *traits::future_access<decltype(f)>::get_shared_state(f));
-            }
-            else
-            {
-                auto f = split_gid_if_needed(gid);
-                handle_futures->await_future(
-                    *traits::future_access<decltype(f)>::get_shared_state(f));
-            }
+            auto f = split_gid_if_needed(gid).then(hpx::launch::sync,
+                [split_gids, &gid](hpx::future<gid_type>&& gid_future) {
+                    split_gids->add_gid(gid, gid_future.get());
+                });
+
+            handle_futures->await_future(
+                *traits::future_access<decltype(f)>::get_shared_state(f));
         }
 
         void id_type_impl::preprocess_gid(serialization::output_archive& ar) const

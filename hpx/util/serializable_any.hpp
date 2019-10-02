@@ -152,10 +152,10 @@ namespace hpx { namespace util {
         // Perfect forwarding of T
         template <typename T>
         basic_any(T&& x,
-            typename std::enable_if<
-                !std::is_same<basic_any, typename std::decay<T>::type>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type* = nullptr)
+            typename std::enable_if<!std::is_same<basic_any,
+                typename std::decay<T>::type>::value>::type* = nullptr,
+            typename std::enable_if<std::is_copy_constructible<
+                typename std::decay<T>::type>::value>::type* = nullptr)
           : table(detail::any::get_table<typename util::decay<T>::type>::
                     template get<IArch, OArch, Char, std::true_type>())
           , object(nullptr)

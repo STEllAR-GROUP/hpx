@@ -164,8 +164,9 @@ namespace hpx { namespace serialization {
     void serialize_struct(Archive& archive, T& t, const unsigned int version,
         hpx::traits::detail::size<15>)
     {
-        auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14,
-            p15] = t;
+        auto&
+            [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15] =
+            t;
         auto&& data = hpx::util::forward_as_tuple(
             p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15);
         serialize(archive, data, version);
