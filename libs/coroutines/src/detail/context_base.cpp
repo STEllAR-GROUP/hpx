@@ -19,23 +19,11 @@
 #endif
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
+
     template class context_base<coroutine_impl>;
 
     // initialize static allocation counter
     template <typename CoroutineImpl>
     allocation_counters context_base<CoroutineImpl>::m_allocation_counters;
 
-#if defined(HPX_HAVE_APEX)
-    // adding this here, because the thread_id_type and thread_data types
-    // aren't fully defined in the header.
-    HPX_EXPORT apex_task_wrapper rebind_base_apex(thread_id_type id)
-    {
-        if (id.get()->get_apex_data() == nullptr)
-        {
-            return ::hpx::util::apex_new_task(id.get()->get_description(),
-                id.get()->get_parent_thread_id());
-        }
-        return id.get()->get_apex_data();
-    }
-#endif
 }}}}    // namespace hpx::threads::coroutines::detail
