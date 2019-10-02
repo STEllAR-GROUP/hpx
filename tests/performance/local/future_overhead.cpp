@@ -1,4 +1,5 @@
-//  Copyright (c) 2018 Mikael Simberg
+//  Copyright (c) 2018=2019 Mikael Simberg
+//  Copyright (c) 2018-2019 John Biddiscombe
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -64,25 +65,25 @@ static std::string info_string = "";
 void print_stats(const char* title, const char* wait, const char* exec,
     std::int64_t count, double duration, bool csv)
 {
+    std::ostringstream temp;
     double us = 1e6 * duration / count;
     if (csv)
     {
-        hpx::util::format_to(cout,
+        hpx::util::format_to(temp,
             "{1}, {:27}, {:15}, {:18}, {:8}, {:8}, {:20}, {:4}, {:4}, "
             "{:20}\n",
             count, title, wait, exec, duration, us, queuing, numa_sensitive,
-            num_threads, info_string)
-            << flush;
+            num_threads, info_string);
     }
     else
     {
-        hpx::util::format_to(cout,
+        hpx::util::format_to(temp,
             "invoked {:1}, futures {:27} {:15} {:18} in {:8} seconds : {:8} "
             "us/future, queue {:20}, numa {:4}, threads {:4}, info {:20}\n",
             count, title, wait, exec, duration, us, queuing, numa_sensitive,
-            num_threads, info_string)
-            << flush;
+            num_threads, info_string);
     }
+    std::cout << temp.str() << std::endl;
     // CDash graph plotting
     //hpx::util::print_cdash_timing(title, duration);
 }
@@ -248,8 +249,16 @@ void measure_function_futures_limiting_executor(
     std::uint64_t const tasks = num_threads * 2000;
     std::atomic<std::uint64_t> sanity_check(count);
 
+    auto const sched = hpx::threads::get_self_id_data()->get_scheduler_base();
+    if (std::string("core-shared_priority_queue_scheduler") == sched->get_description()) {
+        sched->add_scheduler_mode(
+            hpx::threads::policies::scheduler_mode(
+              hpx::threads::policies::enable_stealing |
+              hpx::threads::policies::enable_stealing_numa));
+    }
+
     // test a parallel algorithm on custom pool with high priority
-    auto const chunk_size = count/num_threads;
+    auto const chunk_size = count/(num_threads*2);
     hpx::parallel::execution::static_chunk_size fixed(chunk_size);
 
     // start the clock
@@ -305,7 +314,7 @@ struct unlimited_number_of_chunks
 {
     template <typename Executor>
     std::size_t maximal_number_of_chunks(
-        Executor&& executor, std::size_t cores, std::size_t num_tasks)
+        Executor&& /*executor*/, std::size_t /*cores*/, std::size_t num_tasks)
     {
         return num_tasks;
     }
@@ -394,6 +403,13 @@ void measure_function_futures_create_thread_hierarchical_placement(
     hpx::lcos::local::latch l(count);
 
     auto sched = hpx::threads::get_self_id_data()->get_scheduler_base();
+
+    if (std::string("core-shared_priority_queue_scheduler") == sched->get_description()) {
+        sched->remove_scheduler_mode(
+            hpx::threads::policies::scheduler_mode(
+              hpx::threads::policies::enable_stealing |
+              hpx::threads::policies::enable_stealing_numa));
+    }
     auto const func = [&l]() {
         null_function();
         l.count_down(1);
@@ -560,7 +576,7 @@ int main(int argc, char* argv[])
         ("repetitions", value<int>()->default_value(1),
          "number of repetitions of the full benchmark")
 
-        ("info", value<std::string>()->default_value("none"),
+        ("info", value<std::string>()->default_value("no-info"),
          "extra info for plot output (e.g. branch name)");
     // clang-format on
 

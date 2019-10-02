@@ -4,6 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#define SHARED_PRIORITY_SCHEDULER_DEBUG     true
+#define THREAD_QUEUE_MC_DEBUG               true
+#define GUIDED_POOL_EXECUTOR_DEBUG          true
+#define QUEUE_HOLDER_NUMA_DEBUG             true
+#define QUEUE_HOLDER_THREAD_DEBUG           true
+#define NUMA_BINDING_ALLOCATOR_DEBUG        true
+#define NUMA_BINDING_ALLOCATOR_INIT_MEMORY  true
+
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 //

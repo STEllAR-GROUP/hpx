@@ -18,6 +18,7 @@
 #include <hpx/util/pack_traversal.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
+#include <hpx/debugging/print.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -25,14 +26,17 @@
 #include <type_traits>
 #include <utility>
 
-//#define GUIDED_EXECUTOR_DEBUG 1
 //#define GUIDED_POOL_EXECUTOR_FAKE_NOOP
 
-#ifdef GUIDED_EXECUTOR_DEBUG
-#include <iostream>
+#include <hpx/config/warnings_prefix.hpp>
+
+#if !defined(GUIDED_POOL_EXECUTOR_DEBUG)
+# define GUIDED_POOL_EXECUTOR_DEBUG false
 #endif
 
-#include <hpx/config/warnings_prefix.hpp>
+namespace hpx {
+  static hpx::debug::enable_print<GUIDED_POOL_EXECUTOR_DEBUG> gpx_deb("GP_EXEC");
+}
 
 // --------------------------------------------------------------------
 // pool_numa_hint
@@ -98,11 +102,8 @@ namespace hpx { namespace threads { namespace executors
 #else
             int domain = numa_function_(ts...);
 #endif
+            gpx_deb.debug(debug::str<>("async_schedule"), "domain ", domain);
 
-#ifdef GUIDED_EXECUTOR_DEBUG
-            std::cout << "pre_execution_async_domain_schedule : domain "
-                      << domain << std::endl;
-#endif
             // now we must forward the task+hint on to the correct dispatch function
             typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
                 result_type;
@@ -111,7 +112,7 @@ namespace hpx { namespace threads { namespace executors
                 const_cast<Executor&>(executor_),
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
-            if (hp_sync_ &&
+            if 0 && (hp_sync_ &&
                 executor_.get_priority() == hpx::threads::thread_priority_high)
             {
                 p.apply("guided async", hpx::launch::sync, executor_.get_priority(),
@@ -121,6 +122,7 @@ namespace hpx { namespace threads { namespace executors
             }
             else
             {
+                gpx_deb.debug(debug::str<>("triggering apply"), "domain ", domain);
                 p.apply("guided async", hpx::launch::async, executor_.get_priority(),
                     executor_.get_stacksize(),
                     threads::thread_schedule_hint(
@@ -155,10 +157,8 @@ namespace hpx { namespace threads { namespace executors
             int domain = numa_function_(predecessor_value, ts...);
 #endif
 
-#ifdef GUIDED_EXECUTOR_DEBUG
-            std::cout << "pre_execution_then_domain_schedule : domain "
-                      << domain << std::endl;
-#endif
+            gpx_deb.debug(debug::str<>("then_schedule"), "domain ", domain);
+
             // now we must forward the task+hint on to the correct dispatch function
             typedef typename
                 util::detail::invoke_deferred_result<F, Future, Ts...>::type
@@ -235,16 +235,15 @@ namespace hpx { namespace threads { namespace executors
             typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
                 result_type;
 
-#ifdef GUIDED_EXECUTOR_DEBUG
-            std::cout << "async_execute : Function    : "
-                      << util::debug::print_type<F>() << "\n"
-                      << "async_execute : Arguments   : "
-                      << util::debug::print_type<Ts...>(" | ") << "\n"
-                      << "async_execute : Result      : "
-                      << util::debug::print_type<result_type>() << "\n"
-                      << "async_execute : Numa Hint   : "
-                      << util::debug::print_type<pool_numa_hint<Tag>>() << "\n";
-#endif
+            gpx_deb.debug(debug::str<>("async execute")
+                , "\n\t", "Function    : "
+                , util::debug::print_type<F>()
+                , "\n\t", "Arguments   : "
+                , util::debug::print_type<Ts...>(" | ")
+                , "\n\t", "Result      : "
+                , util::debug::print_type<result_type>()
+                , "\n\t", "Numa Hint   : "
+                , util::debug::print_type<pool_numa_hint<Tag>>());
 
             // hold onto the function until all futures have become ready
             // by using a dataflow operation, then call the scheduling hint
@@ -277,19 +276,20 @@ namespace hpx { namespace threads { namespace executors
             typedef typename util::detail::invoke_deferred_result<
                     F, Future, Ts...>::type result_type;
 
-#ifdef GUIDED_EXECUTOR_DEBUG
-            std::cout << "then_execute : Function     : "
-                      << util::debug::print_type<F>() << "\n"
-                      << "then_execute : Predecessor  : "
-                      << util::debug::print_type<Future>() << "\n"
-                      << "then_execute : Future       : "
-                      << util::debug::print_type<typename
-                         traits::future_traits<Future>::result_type>() << "\n"
-                      << "then_execute : Arguments    : "
-                      << util::debug::print_type<Ts...>(" | ") << "\n"
-                      << "then_execute : Result       : "
-                      << util::debug::print_type<result_type>() << "\n";
-#endif
+            gpx_deb.debug(debug::str<>("then execute")
+                , "\n\t", "Function    : "
+                , util::debug::print_type<F>()
+                , "\n\t", "Predecessor  : "
+                , util::debug::print_type<Future>()
+                , "\n\t", "Future       : "
+                , util::debug::print_type<typename
+                  traits::future_traits<Future>::result_type>()
+                , "\n\t", "Arguments   : "
+                , util::debug::print_type<Ts...>(" | ")
+                , "\n\t", "Result      : "
+                , util::debug::print_type<result_type>()
+                , "\n\t", "Numa Hint   : "
+                , util::debug::print_type<pool_numa_hint<Tag>>());
 
             // Note 1 : The Ts &&... args are not actually used in a continuation since
             // only the future becoming ready (predecessor) is actually passed onwards.

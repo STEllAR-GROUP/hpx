@@ -35,6 +35,18 @@
 #include <string>
 #include <utility>
 
+#ifndef NDEBUG
+# define QUEUE_HOLDER_NUMA_DEBUG true
+#else
+# if !defined(QUEUE_HOLDER_NUMA_DEBUG)
+#  define QUEUE_HOLDER_NUMA_DEBUG false
+# endif
+#endif
+
+namespace hpx {
+    static hpx::debug::enable_print<QUEUE_HOLDER_NUMA_DEBUG> nq_deb("QH_NUMA");
+}
+
 // ------------------------------------------------------------////////
 namespace hpx { namespace threads { namespace policies
 {
@@ -46,9 +58,10 @@ namespace hpx { namespace threads { namespace policies
     {
         // ----------------------------------------------------------------
         using ThreadQueue = queue_holder_thread<QueueType>;
+        using mutex_type  = typename QueueType::mutex_type;
 
         // ----------------------------------------------------------------
-        queue_holder_numa() : num_queues_(0) {}
+        queue_holder_numa() : num_queues_(0), domain_(0) {}
 
         // ----------------------------------------------------------------
         ~queue_holder_numa() {
@@ -57,9 +70,10 @@ namespace hpx { namespace threads { namespace policies
         }
 
         // ----------------------------------------------------------------
-        void init(std::size_t queues)
+        void init(std::uint16_t domain, std::uint16_t queues)
         {
             num_queues_ = queues;
+            domain_     = domain;
             // start with unset queue pointers
             queues_.resize(num_queues_, nullptr);
         }
@@ -70,58 +84,119 @@ namespace hpx { namespace threads { namespace policies
         }
 
         // ----------------------------------------------------------------
-        inline ThreadQueue* thread_queue(std::size_t id) const
+        inline ThreadQueue* thread_queue(std::uint16_t id) const
         {
             return queues_[id];
         }
 
         // ----------------------------------------------------------------
-        inline bool get_next_thread(std::size_t qidx,
-            threads::thread_data*& thrd, bool steal)
+        inline bool get_next_thread_HP(std::uint16_t qidx,
+            threads::thread_data*& thrd, bool stealing, bool core_stealing)
         {
             // loop over queues and take one task,
-            // starting with the requested queue
-            for (std::size_t i=0; i<num_queues_; ++i) {
-                std::size_t q = fast_mod((qidx + i), num_queues_);
-                // if we got a thread, return it, only allow stealing if i>0
-                if (queues_[q]->get_next_thread(thrd, (i>0), steal)) {
-//                    if (i>0) queues_[q]->debug("stolen    ", q,
-//                        queues_[q]->np_queue_->new_tasks_count_,
-//                        queues_[q]->np_queue_->work_items_count_, thrd);
-//                    else queues_[q]->debug("normal    ", q,
-//                        queues_[q]->np_queue_->new_tasks_count_,
-//                        queues_[q]->np_queue_->work_items_count_, thrd);
+            std::uint16_t q = qidx;
+            for (std::uint16_t i=0; i<num_queues_;
+                 ++i, q = fast_mod((qidx + i), num_queues_))
+            {
+                if (queues_[q]->get_next_thread_HP(thrd, (stealing || (i>0)))) {
+                    nq_deb.debug(debug::str<>("HP/BP get_next")
+                         , "D", debug::dec<2>(domain_)
+                         , "Q",  debug::dec<3>(q)
+                         , "Qidx",  debug::dec<3>(qidx)
+                         , ((i==0 && !stealing) ? "taken" : "stolen from")
+                         , typename ThreadQueue::queue_data_print(queues_[q])
+                         , debug::threadinfo<threads::thread_data*>(thrd));
                     return true;
                 }
-//                else {
-//                    queues_[q]->debug_timed(1, "empty     ", q,
-//                        queues_[q]->np_queue_->new_tasks_count_,
-//                        queues_[q]->np_queue_->work_items_count_, thrd);
-//                }
                 // if stealing disabled, do not check other queues
-                if (!steal) return false;
+                if (!core_stealing) return false;
             }
             return false;
         }
 
         // ----------------------------------------------------------------
-        inline bool wait_or_add_new(std::size_t id, bool running,
-           std::int64_t& idle_loop_count, std::size_t& added, bool steal)
+        inline bool get_next_thread(std::uint16_t qidx,
+            threads::thread_data*& thrd, bool stealing, bool core_stealing)
         {
-            // loop over all queues and take one task,
+            // loop over queues and take one task,
             // starting with the requested queue
-            // then stealing from any other one in the container
-            bool result = true;
-            for (std::size_t i=0; i<num_queues_; ++i) {
-                std::size_t q = fast_mod((id + i), num_queues_);
-                result = queues_[q]->wait_or_add_new(running, idle_loop_count, added)
-                        && result;
-                if (0 != added) {
-                    return result;
+            std::uint16_t q = qidx;
+            for (std::uint16_t i=0; i<num_queues_;
+                ++i, q = fast_mod((qidx + i), num_queues_))
+            {
+                // if we got a thread, return it, only allow stealing if i>0
+                if (queues_[q]->get_next_thread(thrd, (stealing || (i>0)))) {
+                    nq_deb.debug(debug::str<>("get_next")
+                         , "D", debug::dec<2>(domain_)
+                         , "Q",  debug::dec<3>(q)
+                         , "Qidx",  debug::dec<3>(qidx)
+                         , ((i==0 && !stealing) ? "taken" : "stolen from")
+                         , typename ThreadQueue::queue_data_print(queues_[q])
+                         , debug::threadinfo<threads::thread_data*>(thrd));
+                    return true;
                 }
-                if (!steal) break;
+                // if stealing disabled, do not check other queues
+                if (!core_stealing) return false;
             }
-            return result;
+            return false;
+        }
+
+        // ----------------------------------------------------------------
+        bool add_new_HP(
+                ThreadQueue *origin,
+                std::uint16_t qidx,
+                std::size_t &added,
+                bool stealing, bool allow_stealing)
+        {
+            // loop over queues and take one task,
+            std::uint16_t q = qidx;
+            for (std::uint16_t i=0; i<num_queues_;
+                 ++i, q = fast_mod((qidx + i), num_queues_))
+            {
+                std::size_t added = origin->add_new_HP(8, queues_[q], (stealing || (i>0)));
+                if (added>0) {
+                    nq_deb.debug(debug::str<>("HP/BP add_new")
+                        , "added", debug::dec<>(added)
+                        , "D", debug::dec<2>(domain_)
+                        , "Q",  debug::dec<3>(q)
+                        , "Qidx",  debug::dec<3>(qidx)
+                        , ((i==0 && !stealing) ? "taken" : "stolen from")
+                        , typename ThreadQueue::queue_data_print(queues_[q]));
+                    return true;
+                }
+                // if stealing disabled, do not check other queues
+                if (!allow_stealing) return false;
+            }
+            return false;
+        }
+
+        // ----------------------------------------------------------------
+        bool add_new(
+                ThreadQueue *origin,
+                std::uint16_t qidx,
+                std::size_t &added,
+                bool stealing, bool allow_stealing)
+        {
+            // loop over queues and take one task,
+            std::uint16_t q = qidx;
+            for (std::uint16_t i=0; i<num_queues_;
+                 ++i, q = fast_mod((qidx + i), num_queues_))
+            {
+                std::size_t added = origin->add_new(8, queues_[q], (stealing || (i>0)));
+                if (added>0) {
+                    nq_deb.debug(debug::str<>("add_new")
+                         , "added", debug::dec<>(added)
+                         , "D", debug::dec<2>(domain_)
+                         , "Q",  debug::dec<3>(q)
+                         , "Qidx",  debug::dec<3>(qidx)
+                         , ((i==0 && !stealing) ? "taken" : "stolen from")
+                         , typename ThreadQueue::queue_data_print(queues_[q]));
+                    return true;
+                }
+                // if stealing disabled, do not check other queues
+                if (!allow_stealing) return false;
+            }
+            return false;
         }
 
         // ----------------------------------------------------------------
@@ -161,7 +236,8 @@ namespace hpx { namespace threads { namespace policies
         // ----------------------------------------------------------------
         // ----------------------------------------------------------------
         // ----------------------------------------------------------------
-        std::size_t                         num_queues_;
+        std::uint16_t                       num_queues_;
+        std::uint16_t                       domain_;
         std::vector<ThreadQueue*>           queues_;
 
     public:
@@ -192,6 +268,12 @@ namespace hpx { namespace threads { namespace policies
           , std::int64_t& idle_loop_count, bool running)
         {
             return false;
+        }
+
+        // ------------------------------------------------------------
+        void debug_info()
+        {
+            for (auto &q : queues_) q->debug_info();
         }
 
         // ------------------------------------------------------------

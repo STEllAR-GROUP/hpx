@@ -18,6 +18,7 @@
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/thread_data_stackful.hpp>
 #include <hpx/runtime/threads/thread_data_stackless.hpp>
+#include <hpx/debugging/print.hpp>
 
 #include <cmath>
 #include <cstddef>
@@ -36,69 +37,21 @@
 #include <string>
 #include <utility>
 
-// ------------------------------------------------------------
-// ------------------------------------------------------------
-// ------------------------------------------------------------
-#if !defined(HPX_MSVC) && defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
-#include <plugins/parcelport/parcelport_logging.hpp>
-
-static std::chrono::high_resolution_clock::time_point log_t_start =
-    std::chrono::high_resolution_clock::now();
-
-#define COMMA ,
-#define LOG_CUSTOM_VAR(x) x
-
-#define LOG_CUSTOM_WORKER(x)                                                   \
-    dummy << "<CUSTOM> " << THREAD_ID << " time " << decimal(16) << nowt       \
-          << ' ';                                                              \
-        dummy << "pool (unset) " << x << std::endl;                            \
-    std::cout << dummy.str().c_str();
-
-#define LOG_CUSTOM_MSG(x)                                                      \
-    std::stringstream dummy;                                                   \
-    auto now = std::chrono::high_resolution_clock::now();                      \
-    auto nowt = std::chrono::duration_cast<std::chrono::microseconds>(         \
-        now - log_t_start)                                                     \
-                    .count();                                                  \
-    LOG_CUSTOM_WORKER(x);
-
-#define LOG_CUSTOM_MSG2(x)                                                     \
-    dummy.str(std::string());                                                  \
-    LOG_CUSTOM_WORKER(x);
-
-#define THREAD_DESC(thrd)                                                      \
-    "Desc: \"" << (thrd ? thrd->get_description().get_description() : "") << "\" "
-
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#define THREAD_DESC2(data, thrd)                                               \
-    "Desc: \"" << data.description.get_description() << "\""
+#ifndef NDEBUG
+# define QUEUE_HOLDER_THREAD_DEBUG true
 #else
-#define THREAD_DESC2(data, thrd)                                               \
-    hexpointer(thrd ? thrd : 0)
+# if !defined(QUEUE_HOLDER_THREAD_DEBUG)
+#  define QUEUE_HOLDER_THREAD_DEBUG false
+# endif
 #endif
 
-#else
-#define LOG_CUSTOM_VAR(x)
-#define LOG_CUSTOM_MSG(x)
-#define LOG_CUSTOM_MSG2(x)
-#define LOG_ERROR_MSG(x)
-#define THREAD_DESC(x)
-#endif
-
-#if defined(HPX_MSVC)
-#undef SHARED_PRIORITY_SCHEDULER_DEBUG
-#undef LOG_CUSTOM_MSG
-#undef LOG_CUSTOM_MSG2
-#define LOG_CUSTOM_MSG(x)
-#define LOG_CUSTOM_MSG2(x)
-#endif
-// ------------------------------------------------------------
-// ------------------------------------------------------------
-// ------------------------------------------------------------
+namespace hpx {
+    static hpx::debug::enable_print<QUEUE_HOLDER_THREAD_DEBUG> tq_deb("QH_THRD");
+}
 
 // ------------------------------------------------------------
-namespace hpx { namespace threads { namespace policies
-{
+namespace hpx { namespace threads { namespace policies {
+
     // apply the modulo operator only when needed
     // (i.e. when the input is greater than the ceiling)
     // NB: the numbers must be positive
@@ -107,7 +60,7 @@ namespace hpx { namespace threads { namespace policies
     }
 
     enum : std::size_t { max_thread_count = 1000 };
-    enum : std::size_t { round_robin_rollover = 2 };
+    enum : std::size_t { round_robin_rollover = 1 };
 
     // ----------------------------------------------------------------
     // Helper class to hold a set of queues.
@@ -115,23 +68,29 @@ namespace hpx { namespace threads { namespace policies
     template <typename QueueType>
     struct queue_holder_thread
     {
+        using thread_holder_type = queue_holder_thread<QueueType> ;
+
         // Queues that will store actual work for this thread
         // They might be shared between cores, so we use a pointer to
         // reference them
-        QueueType *hp_queue_;
-        QueueType *np_queue_;
-        QueueType *lp_queue_;
+        QueueType * const bp_queue_;
+        QueueType * const hp_queue_;
+        QueueType * const np_queue_;
+        QueueType * const lp_queue_;
 
-        const std::int16_t  owner_mask_;
-        const std::int16_t queue_index_;
+        const std::int16_t   owner_mask_;
+        const std::int16_t  queue_index_;
+        const std::int16_t domain_index_;
 
         // we must use OS mutexes here because we cannot suspend an HPX
         // thread whilst processing the Queues for that thread, this code
         // is running at the OS level in effect.
-        typedef std::mutex mutex_type;
+        using mutex_type = std::mutex;
 
-        // mutex protecting the members
-        mutable mutex_type mtx_;
+        // mutex protecting the thread map
+        mutable util::cache_line_data<
+            mutex_type
+        > thread_map_mtx_;
 
         // every thread maintains lists of free thread data objects
         // sorted by their stack sizes
@@ -145,6 +104,7 @@ namespace hpx { namespace threads { namespace policies
         thread_heap_type thread_heap_nostack_;
 
         // number of terminated threads to discard
+        const int min_delete_count_;
         const int max_delete_count_;
 
         // number of terminated threads to collect before cleaning them up
@@ -186,25 +146,76 @@ namespace hpx { namespace threads { namespace policies
             std::atomic<std::int32_t>
         > terminated_items_count_;
 
+        // ------------------------------------------------------------
+        struct queue_mc_print
+        {
+            const QueueType * const q_;
+            queue_mc_print(const QueueType * const q) : q_(q) {}
+            //
+            friend std::ostream & operator <<
+                (std::ostream &os, const queue_mc_print& d)
+            {
+                os  << "n "  << debug::dec<3>(d.q_->new_tasks_count_.data_)
+                    << " w " << debug::dec<3>(d.q_->work_items_count_.data_);
+                return os;
+            }
+        };
+
+        struct queue_data_print
+        {
+            const queue_holder_thread *q_;
+            queue_data_print(const queue_holder_thread* q) : q_(q) {}
+            //
+            friend std::ostream & operator <<
+                (std::ostream &os, const queue_data_print& d)
+            {
+                os  << "D "
+                    << debug::dec<2>(d.q_->domain_index_)
+                    << " Q "
+                    << debug::dec<3>(d.q_->queue_index_)
+                    << " TM "
+                    << debug::dec<3>(d.q_->thread_map_count_.data_)
+                    << " [BP "  << queue_mc_print(d.q_->bp_queue_)
+                    << "] [HP " << queue_mc_print(d.q_->hp_queue_)
+                    << "] [NP " << queue_mc_print(d.q_->np_queue_)
+                    << "] [LP " << queue_mc_print(d.q_->lp_queue_)
+                    << "] T "
+                    << debug::dec<3>(d.q_->terminated_items_count_.data_);
+                return os;
+            }
+        };
+        // ------------------------------------------------------------
+
         // ----------------------------------------------------------------
         // ----------------------------------------------------------------
         // ----------------------------------------------------------------
         queue_holder_thread(
-                QueueType *hp_queue, QueueType *np_queue, QueueType *lp_queue,
-                int owner, int id,
+                QueueType *bp_queue, QueueType *hp_queue,
+                QueueType *np_queue, QueueType *lp_queue,
+                int owner, int id, int did,
                 const thread_queue_init_parameters &init)
-            : hp_queue_(hp_queue)
+            : bp_queue_(bp_queue)
+            , hp_queue_(hp_queue)
             , np_queue_(np_queue)
             , lp_queue_(lp_queue)
             , owner_mask_(owner)
             , queue_index_(id)
+            , domain_index_(did)
+            , min_delete_count_(init.min_delete_count_)
             , max_delete_count_(init.max_delete_count_)
             , max_terminated_threads_(init.max_terminated_threads_)
             , terminated_items_(max_thread_count)
         {
-            rollover_counters_.data_      = std::make_tuple(id, round_robin_rollover);
+            rollover_counters_.data_ = std::make_tuple(id, round_robin_rollover);
+            tq_deb.debug(debug::str<>("construct")
+                         , "D" , debug::dec<2>(domain_index_)
+                         , "Q" , debug::dec<3>(queue_index_)
+                         , "Rollover counter",
+                           debug::dec<>(std::get<0>(rollover_counters_.data_)),
+                           debug::dec<>(std::get<1>(rollover_counters_.data_)));
             thread_map_count_.data_       = 0;
             terminated_items_count_.data_ = 0;
+            if (bp_queue_) bp_queue_->set_holder(this);
             if (hp_queue_) hp_queue_->set_holder(this);
             if (np_queue_) np_queue_->set_holder(this);
             if (lp_queue_) lp_queue_->set_holder(this);
@@ -213,6 +224,7 @@ namespace hpx { namespace threads { namespace policies
         // ----------------------------------------------------------------
         ~queue_holder_thread()
         {
+            if (owns_bp_queue()) delete bp_queue_;
             if (owns_hp_queue()) delete hp_queue_;
             if (owns_np_queue()) delete np_queue_;
             if (owns_lp_queue()) delete lp_queue_;
@@ -234,54 +246,34 @@ namespace hpx { namespace threads { namespace policies
         }
 
         // ----------------------------------------------------------------
+        inline bool owns_bp_queue() const {
+            return bp_queue_ && ((owner_mask_ & 1) != 0);
+        }
+
+        // ----------------------------------------------------------------
         inline bool owns_hp_queue() const {
-            return hp_queue_ && ((owner_mask_ & 1) != 0);
+            return hp_queue_ && ((owner_mask_ & 2) != 0);
         }
 
         // ----------------------------------------------------------------
         inline bool owns_np_queue() const {
-            return ((owner_mask_ & 2) != 0);
+            return ((owner_mask_ & 4) != 0);
         }
 
         // ----------------------------------------------------------------
         inline bool owns_lp_queue() const {
-            return lp_queue_ && ((owner_mask_ & 4) != 0);
-        }
-
-        // ----------------------------------------------------------------
-        void debug(const char *txt, int idx, int new_tasks, int work_items, threads::thread_data* thrd)
-        {
-            LOG_CUSTOM_MSG(txt
-                           << " queue " << dec4(idx)
-                           << " new " << dec4(new_tasks)
-                           << " work " << dec4(work_items)
-                           << " map " << dec4(thread_map_count_.data_)
-                           << " terminated " << dec4(terminated_items_count_.data_)
-                           << THREAD_DESC(thrd)
-                           );
-        }
-
-        // ----------------------------------------------------------------
-        void debug_timed(int delay, const char *txt, int idx, int new_tasks, int work_items, threads::thread_data* thrd)
-        {
-//            static int counter = 0;
-//            if (counter++ % 100000 == 0 ) {
-                LOG_CUSTOM_MSG(txt
-                               << " queue " << dec4(idx)
-                               << " new " << dec4(new_tasks)
-                               << " work " << dec4(work_items)
-                               << " map " << dec4(thread_map_count_.data_)
-                               << " terminated " << dec4(terminated_items_count_.data_)
-                               << THREAD_DESC(thrd)
-                               );
-//            }
+            return lp_queue_ && ((owner_mask_ & 8) != 0);
         }
 
         // ------------------------------------------------------------
         // return the next round robin thread index across all workers
-        // using a batching of 10 per worker before incrementing
+        // using a batching of N per worker before incrementing
         inline unsigned int worker_next(const unsigned int workers) const
         {
+            tq_deb.debug(debug::str<>("worker_next"), "Rollover counter "
+                , debug::dec<4>(std::get<0>(rollover_counters_.data_))
+                , debug::dec<4>(std::get<1>(rollover_counters_.data_))
+                , "workers", debug::dec<4>(workers));
             if (--std::get<1>(rollover_counters_.data_) == 0) {
                 std::get<1>(rollover_counters_.data_) = round_robin_rollover;
                 std::get<0>(rollover_counters_.data_) =
@@ -291,93 +283,76 @@ namespace hpx { namespace threads { namespace policies
         }
 
         // ------------------------------------------------------------
-        // return the next round robin thread index in the same numa domain
-        // using a batching of 10 per worker before incrementing
-        inline unsigned int numa_next(const unsigned int numacount) const
-        {
-            if (--std::get<1>(rollover_counters_.data_) == 0) {
-                std::get<1>(rollover_counters_.data_) = round_robin_rollover;
-                std::get<0>(rollover_counters_.data_) =
-                    fast_mod(std::get<0>(rollover_counters_.data_)+1, numacount);
-                return std::get<0>(rollover_counters_.data_);
-            }
-            // we have to take the modulus just in case the last thread used
-            // in worker_next() was on another domain and has an index too high
-            std::get<0>(rollover_counters_.data_) =
-                fast_mod(std::get<0>(rollover_counters_.data_), numacount);
-            return std::get<0>(rollover_counters_.data_);
-        }
-
-        // ------------------------------------------------------------
         void schedule_thread(threads::thread_data* thrd,
                              thread_priority priority, bool other_end=false)
         {
-            if (hp_queue_ &&
+            if (bp_queue_ &&
+                     (priority == thread_priority_bound))
+            {
+                tq_deb.debug(debug::str<>("schedule_thread")
+                             , queue_data_print(this)
+                             , debug::threadinfo<threads::thread_data*>(thrd)
+                             , "queing thread_priority_bound");
+                bp_queue_->schedule_work(thrd, other_end);
+            }
+            else if (hp_queue_ &&
                      (priority == thread_priority_high ||
                       priority == thread_priority_high_recursive ||
                       priority == thread_priority_boost))
             {
-                hp_queue_->schedule_thread(thrd, other_end);
+                tq_deb.debug(debug::str<>("schedule_thread")
+                             , queue_data_print(this)
+                             , debug::threadinfo<threads::thread_data*>(thrd)
+                             , "queing thread_priority_high");
+                hp_queue_->schedule_work(thrd, other_end);
             }
             else if (lp_queue_ &&
                      (priority == thread_priority_low))
             {
-                lp_queue_->schedule_thread(thrd, other_end);
+                tq_deb.debug(debug::str<>("schedule_thread")
+                             , queue_data_print(this)
+                             , debug::threadinfo<threads::thread_data*>(thrd)
+                             , "queing thread_priority_low");
+                lp_queue_->schedule_work(thrd, other_end);
             }
             else
             {
-                np_queue_->schedule_thread(thrd, other_end);
+                tq_deb.debug(debug::str<>("schedule_thread")
+                             , queue_data_print(this)
+                             , debug::threadinfo<threads::thread_data*>(thrd)
+                             , "queing thread_priority_normal");
+                np_queue_->schedule_work(thrd, other_end);
             }
         }
 
         // ----------------------------------------------------------------
         bool cleanup_terminated(bool delete_all = false)
         {
-            if (terminated_items_count_.data_ == 0) return true;
-
-            if (delete_all) {
-                // do not lock mutex while deleting all threads, do it piece-wise
-                while (true)
-                {
-                    std::lock_guard<mutex_type> lk(mtx_);
-                    if (cleanup_terminated_locked(false))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            std::lock_guard<mutex_type> lk(mtx_);
-            return cleanup_terminated_locked(false);
-        }
-
-        // ----------------------------------------------------------------
-        bool cleanup_terminated_locked(bool delete_all = false)
-        {
-            if (terminated_items_count_.data_ == 0)
+            if (terminated_items_count_.data_.load(std::memory_order_relaxed)==0)
                 return true;
+
+            std::scoped_lock lk(thread_map_mtx_.data_);
 
             if (delete_all) {
                 // delete all threads
                 thread_data* todelete;
                 while (terminated_items_.pop(todelete))
                 {
-                    thread_id_type tid(todelete);
                     --terminated_items_count_.data_;
+                    tq_deb.debug(debug::str<>("cleanup"), "delete"
+                        , queue_data_print(this)
+                        , debug::threadinfo<thread_data*>(todelete));
+                    thread_id_type tid(todelete);
                     remove_from_thread_map(tid, true);
-                    debug("deallocate", queue_index_,
-                          np_queue_->new_tasks_count_.data_,
-                          np_queue_->work_items_count_.data_,
-                          nullptr);
                 }
             }
             else {
                 // delete only this many threads
                 std::int64_t delete_count =
-                    (std::max)(
-                        static_cast<std::int64_t>(terminated_items_count_.data_ / 10),
-                        static_cast<std::int64_t>(max_delete_count_));
+                    static_cast<std::int64_t>(terminated_items_count_.data_.load(std::memory_order_relaxed) / 2);
+
+                tq_deb.debug(debug::str<>("cleanup"), "recycle"
+                    , "delete_count", debug::dec<3>(delete_count));
 
                 thread_data* todelete;
                 while (delete_count && terminated_items_.pop(todelete))
@@ -385,16 +360,14 @@ namespace hpx { namespace threads { namespace policies
                     thread_id_type tid(todelete);
                     --terminated_items_count_.data_;
                     remove_from_thread_map(tid, false);
+                    tq_deb.debug(debug::str<>("cleanup"), "recycle"
+                        , queue_data_print(this)
+                        , debug::threadinfo<thread_id_type*>(&tid));
                     recycle_thread(tid);
-                    debug("recycle   ", queue_index_,
-                          np_queue_->new_tasks_count_.data_,
-                          np_queue_->work_items_count_.data_,
-                          todelete);
                     --delete_count;
-
                 }
             }
-            return terminated_items_count_.data_ == 0;
+            return terminated_items_count_.data_.load(std::memory_order_relaxed) == 0;
         }
 
         // ----------------------------------------------------------------
@@ -402,7 +375,24 @@ namespace hpx { namespace threads { namespace policies
                            thread_state_enum state, bool run_now, error_code& ec)
         {
             // create the thread using priority to select queue
-            if (hp_queue_ &&
+            if (data.priority == thread_priority_normal)
+            {
+                tq_deb.debug(debug::str<>("create_thread ")
+                             , queue_data_print(this)
+                             , "thread_priority_normal"
+                             , "run_now ", run_now);
+                return np_queue_->create_thread(data, tid, state, run_now, ec);
+            }
+            else if (bp_queue_ &&
+                (data.priority == thread_priority_bound))
+            {
+                tq_deb.debug(debug::str<>("create_thread ")
+                             , queue_data_print(this)
+                             , "thread_priority_bound"
+                             , "run_now ", run_now);
+                return bp_queue_->create_thread(data, tid, state, run_now, ec);
+            }
+            else if (hp_queue_ &&
                 (data.priority == thread_priority_high ||
                  data.priority == thread_priority_high_recursive ||
                  data.priority == thread_priority_boost))
@@ -411,31 +401,30 @@ namespace hpx { namespace threads { namespace policies
                 if (data.priority == thread_priority_boost) {
                     data.priority = thread_priority_normal;
                 }
-
+                tq_deb.debug(debug::str<>("create_thread ")
+                             , queue_data_print(this)
+                             , "thread_priority_high"
+                             , "run_now ", run_now);
                 return hp_queue_->create_thread(data, tid, state, run_now, ec);
             }
-
-            if (lp_queue_ &&
+            else if (lp_queue_ &&
                 (data.priority == thread_priority_low))
             {
+                tq_deb.debug(debug::str<>("create_thread ")
+                             , queue_data_print(this)
+                             , "thread_priority_low"
+                             , "run_now ", run_now);
                 return lp_queue_->create_thread(data, tid, state, run_now, ec);
             }
 
-            // normal priority + anything unassigned above (no hp queues etc)
-            np_queue_->create_thread(data, tid, state, run_now, ec);
-//            LOG_CUSTOM_MSG2("create_thread thread_priority_normal "
-//                            << "queue " << decnumber(q_index)
-//                            << "domain " << decnumber(domain_num)
-//                            << THREAD_DESC2(data, thrd)
-//                            << "scheduler " << hexpointer(data.scheduler_base));
+            tq_deb.error(debug::str<>("create_thread "), "priority?");
+            std::terminate();
         }
 
         // ----------------------------------------------------------------
-        template <typename Lock>
         void create_thread_object(threads::thread_id_type& tid,
-            threads::thread_init_data& data, thread_state_enum state, Lock& lk)
+            threads::thread_init_data& data, thread_state_enum state)
         {
-            HPX_ASSERT(lk.owns_lock());
             HPX_ASSERT(data.stacksize != 0);
 
             std::ptrdiff_t stacksize = data.stacksize;
@@ -478,8 +467,6 @@ namespace hpx { namespace threads { namespace policies
             }
             else
             {
-                hpx::util::unlock_guard<Lock> ull(lk);
-
                 // Allocate a new thread object.
                 threads::thread_data* p = nullptr;
                 if (stacksize == get_stack_size(thread_stacksize_nostack))
@@ -538,27 +525,37 @@ namespace hpx { namespace threads { namespace policies
 
         // ----------------------------------------------------------------
         void add_to_thread_map(
-                threads::thread_id_type tid,
-                std::unique_lock<mutex_type> &lk)
+                threads::thread_id_type tid)
         {
-            HPX_ASSERT(lk.owns_lock());
+            std::unique_lock lk(thread_map_mtx_.data_);
 
             // add a new entry in the map for this thread
             std::pair<thread_map_type::iterator, bool> p =
                 thread_map_.insert(tid);
 
             if (/*HPX_UNLIKELY*/(!p.second)) {
+                std::string map_size = std::to_string(thread_map_.size());
+                threads::thread_id_type tid2 = *(p.first);
+                threads::thread_data *td = get_thread_id_data(tid2);
+
+                std::ostringstream address;
+                address << (void const *)td;
+                std::string prev = address.str();
+
                 lk.unlock();
                 HPX_THROW_EXCEPTION(hpx::out_of_memory,
-                    "queue_helper::add_to_thread_map",
-                    "Couldn't add new thread to the thread map");
+                    "queue_holder_thread::add_to_thread_map",
+                    "Couldn't add new thread to the thread map " + map_size + " " + prev);
             }
 
             ++thread_map_count_.data_;
 
+            tq_deb.debug(debug::str<>("map add")
+                         , queue_data_print(this)
+                         , debug::threadinfo<thread_id_type*>(&tid));
+
             // this thread has to be in the map now
             HPX_ASSERT(thread_map_.find(tid)!=thread_map_.end());
-//            HPX_ASSERT(&thrd->get_queue<queue_holder_thread>() == this);
         }
 
         // ----------------------------------------------------------------
@@ -574,6 +571,10 @@ namespace hpx { namespace threads { namespace policies
             HPX_ASSERT(deleted);
             (void)deleted;
 
+            tq_deb.debug(debug::str<>("map remove")
+                         , queue_data_print(this)
+                         , debug::threadinfo<thread_id_type*>(&tid));
+
             if (dealloc) {
                 deallocate(get_thread_id_data(tid));
             }
@@ -581,49 +582,112 @@ namespace hpx { namespace threads { namespace policies
         }
 
         // ----------------------------------------------------------------
-        bool get_next_thread(threads::thread_data*& thrd,
-            bool allow_stealing, bool other_end) HPX_HOT
+        bool get_next_thread_HP(threads::thread_data*& thrd, bool stealing) HPX_HOT
         {
-            if (owns_hp_queue() &&
-                    hp_queue_->get_next_thread(thrd, allow_stealing, other_end))
+            // only take from BP queue if we are not stealing
+            if (!stealing && bp_queue_ &&
+                    bp_queue_->get_next_thread(thrd, stealing))
+            {
+                tq_deb.debug(debug::str<>("next_thread_BP")
+                             , queue_data_print(this)
+                             , debug::threadinfo<threads::thread_data*>(thrd)
+                             , "thread_priority_bound");
                 return true;
+            }
 
-            if (np_queue_->get_next_thread(thrd, allow_stealing, other_end))
+            if (hp_queue_ &&
+                    hp_queue_->get_next_thread(thrd, stealing))
+            {
+                tq_deb.debug(debug::str<>("get_next_thread_HP")
+                             , queue_data_print(this)
+                             , debug::threadinfo<threads::thread_data*>(thrd)
+                             , "thread_priority_high");
                 return true;
-
-            if (owns_lp_queue() &&
-                    lp_queue_->get_next_thread(thrd, allow_stealing, other_end))
-                return true;
-
+            }
+            // if we're out of work in the main queues,
+            debug_queues("get_next_thread");
             return false;
         }
 
         // ----------------------------------------------------------------
-        bool wait_or_add_new(
-            bool running, std::int64_t& idle_loop_count, std::size_t& added, bool steal)
+        bool get_next_thread(threads::thread_data*& thrd, bool stealing) HPX_HOT
         {
-            bool result = true;
-            if (owns_hp_queue()) {
-                result = hp_queue_->wait_or_add_new(running, added) && result;
+            if (np_queue_->get_next_thread(thrd, stealing))
+            {
+                tq_deb.debug(debug::str<>("next_thread_NP")
+                             , queue_data_print(this)
+                             , debug::threadinfo<threads::thread_data*>(thrd)
+                             , "thread_priority_normal");
+                return true;
             }
 
+            if (lp_queue_ &&
+                    lp_queue_->get_next_thread(thrd, stealing))
+            {
+                tq_deb.debug(debug::str<>("next_thread_LP")
+                             , queue_data_print(this)
+                             , debug::threadinfo<threads::thread_data*>(thrd)
+                             , "thread_priority_low");
+                return true;
+            }
+            // if we're out of work in the main queues,
+            debug_queues("get_next_thread");
+            return false;
+        }
+
+        // ----------------------------------------------------------------
+        std::size_t add_new_HP(std::int64_t add_count, thread_holder_type* addfrom,
+            /*std::unique_lock<mutex_type>& lk, */bool stealing)
+        {
+            std::size_t added = 0;
+            if (owns_bp_queue()) {
+                added = bp_queue_->add_new(add_count, addfrom->bp_queue_, /*lk, */stealing);
+                if (added>0) return added;
+            }
+
+            if (owns_hp_queue()) {
+                added = hp_queue_->add_new(add_count, addfrom->hp_queue_, /*lk, */stealing);
+                if (added>0) return added;
+            }
+            return 0;
+        }
+
+        // ----------------------------------------------------------------
+        std::size_t add_new(std::int64_t add_count, thread_holder_type* addfrom,
+            /*std::unique_lock<mutex_type>& lk, */bool stealing)
+        {
+            std::size_t added = 0;
             if (owns_np_queue()) {
-                result = np_queue_->wait_or_add_new(running, added) && result;
+                added = np_queue_->add_new(add_count, addfrom->np_queue_, /*lk, */stealing);
+                if (added>0) return added;
             }
 
             if (owns_lp_queue()) {
-                result = lp_queue_->wait_or_add_new(running, added) && result;
+                added = lp_queue_->add_new(add_count, addfrom->lp_queue_, /*lk, */stealing);
+                if (added>0) return added;
             }
-            return result;
+            //
+            static auto an_timed = tq_deb.make_timer(1,
+                debug::str<>("add_new"));
+            tq_deb.timed(an_timed
+                         , "add", debug::dec<3>(add_count)
+                         , "owns bp, hp, np, lp", owns_bp_queue(), owns_hp_queue()
+                         , owns_np_queue(), owns_lp_queue()
+                         , "this", queue_data_print(this)
+                         , "from", queue_data_print(addfrom));
+            //
+            return 0;
         }
 
         // ----------------------------------------------------------------
         inline std::size_t get_queue_length()
         {
             std::size_t count = 0;
+            count += owns_bp_queue() ? bp_queue_->get_queue_length() : 0;
             count += owns_hp_queue() ? hp_queue_->get_queue_length() : 0;
             count += owns_np_queue() ? np_queue_->get_queue_length() : 0;
             count += owns_lp_queue() ? lp_queue_->get_queue_length() : 0;
+            debug_queues("get_queue_length");
             return count;
         }
 
@@ -634,10 +698,14 @@ namespace hpx { namespace threads { namespace policies
             switch (priority) {
                 case thread_priority_default: {
                     std::int64_t count = 0;
+                    count += owns_bp_queue() ? bp_queue_->get_queue_length_staged() : 0;
                     count += owns_hp_queue() ? hp_queue_->get_queue_length_staged() : 0;
                     count += owns_np_queue() ? np_queue_->get_queue_length_staged() : 0;
                     count += owns_lp_queue() ? lp_queue_->get_queue_length_staged() : 0;
                     return count;
+                }
+                case thread_priority_bound: {
+                    return owns_bp_queue() ? bp_queue_->get_queue_length_staged() : 0;
                 }
                 case thread_priority_low: {
                     return owns_lp_queue() ? lp_queue_->get_queue_length_staged() : 0;
@@ -672,6 +740,9 @@ namespace hpx { namespace threads { namespace policies
                     count += owns_lp_queue() ? lp_queue_->get_queue_length_pending() : 0;
                     return count;
                 }
+                case thread_priority_bound: {
+                    return owns_bp_queue() ? bp_queue_->get_queue_length_pending() : 0;
+                }
                 case thread_priority_low: {
                     return owns_lp_queue() ? lp_queue_->get_queue_length_pending() : 0;
                 }
@@ -698,7 +769,7 @@ namespace hpx { namespace threads { namespace policies
             thread_priority priority = thread_priority_default) const
         {
             if (terminated == state)
-                return terminated_items_count_.data_;
+                return terminated_items_count_.data_.load(std::memory_order_relaxed);
 
             if (staged == state)
                 return get_thread_count_staged(priority);
@@ -707,12 +778,12 @@ namespace hpx { namespace threads { namespace policies
                 return get_thread_count_pending(priority);
 
             if (unknown == state)
-                return thread_map_count_.data_ +
+                return thread_map_count_.data_.load(std::memory_order_relaxed) +
                         get_thread_count_staged(priority) -
-                        terminated_items_count_.data_;
+                        terminated_items_count_.data_.load(std::memory_order_relaxed);
 
             // acquire lock only if absolutely necessary
-            std::lock_guard<mutex_type> lk(mtx_);
+            std::scoped_lock lk(thread_map_mtx_.data_);
 
             std::int64_t num_threads = 0;
             thread_map_type::const_iterator end = thread_map_.end();
@@ -727,26 +798,29 @@ namespace hpx { namespace threads { namespace policies
 
         // ------------------------------------------------------------
         /// Destroy the passed thread as it has been terminated
-        void destroy_thread(threads::thread_data* thrd, std::int64_t& busy_count)
+        void destroy_thread(threads::thread_data* thrd, bool xthread)
         {
+            // the thread must be destroyed by the same queue holder that owns it
             HPX_ASSERT(&thrd->get_queue<queue_holder_thread>() == this);
+            //
+            tq_deb.debug(debug::str<>("destroy"), "terminated_items push"
+                         , "xthread", xthread
+                         , queue_data_print(this)
+                         , debug::threadinfo<threads::thread_data*>(thrd));
             terminated_items_.push(thrd);
             std::int64_t count = ++terminated_items_count_.data_;
-            if (count > max_terminated_threads_)
+
+            if (!xthread && (count > max_terminated_threads_))
             {
                 cleanup_terminated(false);   // clean up all terminated threads
             }
-            debug("destroy   ", queue_index_,
-                  np_queue_->new_tasks_count_.data_,
-                  np_queue_->work_items_count_.data_,
-                  thrd);
         }
 
         // ------------------------------------------------------------
         void abort_all_suspended_threads()
         {
             throw std::runtime_error("This function needs to be reimplemented");
-            std::lock_guard<mutex_type> lk(mtx_);
+            std::scoped_lock lk(thread_map_mtx_.data_);
             thread_map_type::iterator end =  thread_map_.end();
             for (thread_map_type::iterator it = thread_map_.begin();
                  it != end; ++it)
@@ -755,7 +829,7 @@ namespace hpx { namespace threads { namespace policies
                 {
                     get_thread_id_data(*it)->set_state(pending, wait_abort);
                     // np queue always exists so use that as priority doesn't matter
-                    np_queue_->schedule_thread(get_thread_id_data(*it), true);
+                    np_queue_->schedule_work(get_thread_id_data(*it), true);
                 }
             }
         }
@@ -783,7 +857,7 @@ namespace hpx { namespace threads { namespace policies
 
             if (state == unknown)
             {
-                std::lock_guard<mutex_type> lk(mtx_);
+                std::scoped_lock lk(thread_map_mtx_.data_);
                 thread_map_type::const_iterator end =  thread_map_.end();
                 for (thread_map_type::const_iterator it = thread_map_.begin();
                      it != end; ++it)
@@ -793,7 +867,7 @@ namespace hpx { namespace threads { namespace policies
             }
             else
             {
-                std::lock_guard<mutex_type> lk(mtx_);
+                std::scoped_lock lk(thread_map_mtx_.data_);
                 thread_map_type::const_iterator end =  thread_map_.end();
                 for (thread_map_type::const_iterator it = thread_map_.begin();
                      it != end; ++it)
@@ -812,6 +886,43 @@ namespace hpx { namespace threads { namespace policies
 
             return true;
         }
+
+        // ------------------------------------------------------------
+        void debug_info()
+        {
+            tq_deb.debug(debug::str<>("details")
+                , "owner_mask_", debug::bin<8>(owner_mask_)
+                , "queue_index_", debug::dec<3>(queue_index_)
+                , "domain_index_", debug::dec<2>(domain_index_)
+            );
+            tq_deb.debug(debug::str<>("bp_queue")
+                    , debug::hex<12,void*>(bp_queue_)
+                    , "holder", debug::hex<12,void*>(bp_queue_->holder_ ?
+                        bp_queue_->holder_ : nullptr));
+            tq_deb.debug(debug::str<>("hp_queue")
+                    , debug::hex<12,void*>(hp_queue_)
+                    , "holder", debug::hex<12,void*>(hp_queue_->holder_ ?
+                        hp_queue_->holder_ : nullptr));
+            tq_deb.debug(debug::str<>("np_queue")
+                    , debug::hex<12,void*>(np_queue_)
+                    , "holder", debug::hex<12,void*>(np_queue_->holder_ ?
+                        np_queue_->holder_ : nullptr));
+            tq_deb.debug(debug::str<>("lp_queue")
+                    , debug::hex<12,void*>(lp_queue_)
+                    , "holder", debug::hex<12,void*>(lp_queue_->holder_ ?
+                        lp_queue_->holder_ : nullptr));
+        }
+
+
+        // ------------------------------------------------------------
+        void debug_queues(const char *prefix)
+        {
+            static auto deb_queues = tq_deb.make_timer(1,
+                debug::str<>("debug_queues"));
+            //
+            tq_deb.timed(deb_queues, prefix, queue_data_print(this));
+        }
+
     };
 
     template <typename QueueType>
@@ -819,16 +930,15 @@ namespace hpx { namespace threads { namespace policies
         queue_holder_thread<QueueType>::thread_alloc_;
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-    // ------------------------------------------------------------////
+    // ------------------------------------------------------------
     // We globally control whether to do minimal deadlock detection using this
     // global bool variable. It will be set once by the runtime configuration
     // startup code
     extern bool minimal_deadlock_detection;
 #endif
 
-// ------------------------------------------------------------////////
+// ------------------------------------------------------------
 
 }}}
 
 #endif
-

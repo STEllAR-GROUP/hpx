@@ -45,12 +45,26 @@
 #include <utility>
 #include <vector>
 
+#ifndef NDEBUG
+# define THREAD_QUEUE_MC_DEBUG true
+#else
+# if !defined(THREAD_QUEUE_MC_DEBUG)
+#  define THREAD_QUEUE_MC_DEBUG false
+# endif
+#endif
+
+//#define DEBUG_QUEUE_EXTRA 1
+
+namespace hpx {
+    static hpx::debug::enable_print<THREAD_QUEUE_MC_DEBUG> tqmc_deb("_TQ_MC_");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
     template <typename Mutex = std::mutex,
-              typename PendingQueuing = lockfree_fifo,
-              typename StagedQueuing = lockfree_lifo,
+              typename PendingQueuing    = lockfree_fifo,
+              typename StagedQueuing     = lockfree_fifo,
               typename TerminatedQueuing = lockfree_fifo>
     class thread_queue_mc
     {
@@ -59,7 +73,7 @@ namespace hpx { namespace threads { namespace policies
         typedef Mutex mutex_type;
 
         using thread_queue_type =
-            thread_queue_mc<std::mutex, PendingQueuing, StagedQueuing, TerminatedQueuing>;
+            thread_queue_mc<Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing>;
 
         using thread_heap_type =
             std::list<thread_id_type, util::internal_allocator<thread_id_type>>;
@@ -74,97 +88,54 @@ namespace hpx { namespace threads { namespace policies
         typedef concurrentqueue_fifo::
             apply<task_description>::type task_items_type;
 
-    protected:
+    public:
+        // ----------------------------------------------------------------
         // add new threads if there is some amount of work available
         std::size_t add_new(std::int64_t add_count, thread_queue_type* addfrom,
-            std::unique_lock<mutex_type>& lk, bool steal = false)
+            /*std::unique_lock<mutex_type>& lk, */bool stealing)
         {
-            HPX_ASSERT(lk.owns_lock());
-            LOG_CUSTOM_MSG("thread_queue_mc::add_new steal " << steal);
-
-            if (HPX_UNLIKELY(0 == add_count))
+            if (new_tasks_count_.data_.load(std::memory_order_relaxed)==0)
+            {
                 return 0;
+            }
+            //
+//            if (lk.owns_lock())
+//                return 0;
+
+//            lk.try_lock();
+//            if (!lk.owns_lock()) {
+//                tqmc_deb.debug(debug::str<>("add_new"), "try_lock failed");
+//                return 0;
+//            }
 
             std::size_t added = 0;
             task_description task;
-            while (add_count-- && addfrom->new_task_items_.pop(task, steal))
+            while (add_count-- && addfrom->new_task_items_.pop(task, stealing))
             {
                 // create the new thread
                 threads::thread_init_data& data = util::get<0>(task);
                 thread_state_enum state = util::get<1>(task);
                 threads::thread_id_type tid;
 
-                holder_->debug("add_new 1 ", queue_index, new_tasks_count_.data_, work_items_count_.data_, get_thread_id_data(tid));
-                holder_->create_thread_object(tid, data, state, lk);
-                holder_->add_to_thread_map(tid, lk);
+                holder_->create_thread_object(tid, data, state);
+                holder_->add_to_thread_map(tid);
                 // Decrement only after thread_map_count_ has been incremented
                 --addfrom->new_tasks_count_.data_;
 
-                holder_->debug("add_new 2 ", queue_index, new_tasks_count_.data_, work_items_count_.data_, get_thread_id_data(tid));
-                // only insert the thread into the work-items queue if it is in
-                // pending state
+                tqmc_deb.debug(debug::str<>("add_new")
+                    , "stealing", stealing
+                    , debug::threadinfo<threads::thread_id_type*>(&tid));
+
+                // insert the thread into work-items queue if in pending state
                 if (state == pending) {
                     // pushing the new thread into the pending queue of the
                     // specified thread_queue
                     ++added;
-                    schedule_thread(get_thread_id_data(tid), false);
+                    schedule_work(get_thread_id_data(tid), stealing);
                 }
-
-                HPX_ASSERT(&get_thread_id_data(tid)->
-                    get_queue<queue_holder_thread<thread_queue_type>>() == holder_);
             }
 
-            if (added) {
-                LTM_(debug) << "add_new: added " << added << " tasks to queues"; //-V128
-            }
             return added;
-        }
-
-        // ----------------------------------------------------------------
-        bool add_new_always(std::size_t& added, thread_queue_type* addfrom,
-            std::unique_lock<mutex_type>& lk, bool steal = false)
-        {
-            HPX_ASSERT(lk.owns_lock());
-            LOG_CUSTOM_MSG("thread_queue_mc::add_new_always steal " << steal);
-
-            // create new threads from pending tasks (if appropriate)
-            std::int64_t add_count = -1;    // default is no constraint
-
-            // if we are desperate (no work in the queues), add some even if the
-            // map holds more than max_count
-            if (HPX_LIKELY(parameters_.max_thread_count_)) {
-                std::size_t count = holder_->thread_map_.size();
-                if (parameters_.max_thread_count_ >=
-                    std::int64_t(count + parameters_.min_add_new_count_))
-                { //-V104
-                    HPX_ASSERT(parameters_.max_thread_count_ - count <
-                        static_cast<std::size_t>(
-                            (std::numeric_limits<std::int64_t>::max)()
-                        ));
-                    add_count = static_cast<std::int64_t>(parameters_.max_thread_count_ - count);
-                    if (add_count < parameters_.min_add_new_count_)
-                        add_count = parameters_.min_add_new_count_;
-                    if (add_count > parameters_.max_add_new_count_)
-                        add_count = parameters_.max_add_new_count_;
-                }
-                else if (work_items_.empty())
-                {
-                    add_count =
-                        parameters_
-                            .min_add_new_count_;    // add this number of threads
-                    parameters_.max_thread_count_ +=
-                        parameters_
-                            .min_add_new_count_;    // increase max_thread_count //-V101
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            std::size_t addednew = add_new(add_count, addfrom, lk, steal);
-            added += addednew;
-            return addednew != 0;
         }
 
     public:
@@ -173,10 +144,10 @@ namespace hpx { namespace threads { namespace policies
             const thread_queue_init_parameters &parameters,
             std::size_t queue_num = std::size_t(-1))
           : parameters_(parameters)
-          , queue_index(queue_num)
+          , queue_index_(queue_num)
           , holder_(nullptr)
-          , new_task_items_(128)
-          , work_items_(128)
+          , new_task_items_(1024)
+          , work_items_(1024)
         {
             new_tasks_count_.data_ = 0;
             work_items_count_.data_ = 0;
@@ -186,6 +157,9 @@ namespace hpx { namespace threads { namespace policies
         void set_holder(queue_holder_thread<thread_queue_type> *holder)
         {
             holder_ = holder;
+            tqmc_deb.debug(debug::str<>("set_holder")
+                           , "D" , debug::dec<2>(holder_->domain_index_)
+                           , "Q" , debug::dec<3>(queue_index_));
         }
 
         // ----------------------------------------------------------------
@@ -197,14 +171,15 @@ namespace hpx { namespace threads { namespace policies
         // This returns the current length of the queues (work items and new items)
         std::int64_t get_queue_length() const
         {
-            return work_items_count_.data_ + new_tasks_count_.data_;
+            return work_items_count_.data_.load(std::memory_order_relaxed)
+                    + new_tasks_count_.data_.load(std::memory_order_relaxed);
         }
 
         // ----------------------------------------------------------------
         // This returns the current length of the pending queue
         std::int64_t get_queue_length_pending() const
         {
-            return work_items_count_.data_;
+            return work_items_count_.data_.load(std::memory_order_relaxed);
         }
 
         // ----------------------------------------------------------------
@@ -212,7 +187,7 @@ namespace hpx { namespace threads { namespace policies
         std::int64_t get_queue_length_staged(
             std::memory_order order = std::memory_order_seq_cst) const
         {
-            return new_tasks_count_.data_.load(order);
+            return new_tasks_count_.data_.load(std::memory_order_relaxed);
         }
 
         // ----------------------------------------------------------------
@@ -220,7 +195,7 @@ namespace hpx { namespace threads { namespace policies
         std::int64_t get_thread_count() const
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "thread_queue_mc::get_thread_count",
+                "get_thread_count",
                 "use get_queue_length_staged/get_queue_length_pending");
             return 0;
         }
@@ -234,21 +209,22 @@ namespace hpx { namespace threads { namespace policies
             // thread has not been created yet
             if (id) *id = invalid_thread_id;
 
-            LOG_CUSTOM_MSG("thread_queue_mc::create_thread run_now " << run_now);
-
             if (run_now)
             {
                 threads::thread_id_type tid;
-                std::unique_lock<mutex_type> lk(holder_->mtx_);
+                std::unique_lock<mutex_type> lk(holder_->thread_map_mtx_.data_);
 
-                holder_->create_thread_object(tid, data, initial_state, lk);
-                holder_->add_to_thread_map(tid, lk);
-                holder_->debug("create run", queue_index, new_tasks_count_.data_, work_items_count_.data_, get_thread_id_data(tid));
+                // The mutex can not be locked while a new thread is getting
+                // created, as it might be that the current HPX thread gets
+                // suspended.
+                {
+                    holder_->create_thread_object(tid, data, initial_state);
+                    holder_->add_to_thread_map(tid);
+                }
 
                 // push the new thread in the pending queue thread
                 if (initial_state == pending)
-                    schedule_thread(get_thread_id_data(tid), false);
-
+                    schedule_work(get_thread_id_data(tid), false);
 
                 // return the thread_id of the newly created thread
                 if (id)
@@ -264,27 +240,29 @@ namespace hpx { namespace threads { namespace policies
             ++new_tasks_count_.data_;
 
             new_task_items_.push(task_description(std::move(data), initial_state));
+
             if (&ec != &throws)
                 ec = make_success_code();
-
-            holder_->debug("create    ", queue_index, new_tasks_count_.data_, work_items_count_.data_, nullptr);
         }
 
         // ----------------------------------------------------------------
         /// Return the next thread to be executed, return false if none is
         /// available
-        bool get_next_thread(threads::thread_data*& thrd,
-            bool allow_stealing, bool other_end) HPX_HOT
+        bool get_next_thread(threads::thread_data*& thrd, bool other_end) HPX_HOT
         {
-            LOG_CUSTOM_MSG("thread_queue_mc::get_next_thread allow_stealing " << allow_stealing);
-
             std::int64_t work_items_count_count =
                 work_items_count_.data_.load(std::memory_order_relaxed);
 
             if (0 != work_items_count_count && work_items_.pop(thrd, other_end))
             {
                 --work_items_count_.data_;
-                holder_->debug("get       ", queue_index, new_tasks_count_.data_, work_items_count_.data_, thrd);
+                tqmc_deb.debug(debug::str<>("get_next_thread")
+                    , "stealing" , other_end
+                    , "D" , debug::dec<2>(holder_->domain_index_)
+                    , "Q" , debug::dec<3>(queue_index_)
+                    , "n" , debug::dec<4>(new_tasks_count_.data_)
+                    , "w" , debug::dec<4>(work_items_count_.data_)
+                    , debug::threadinfo<threads::thread_data*>(thrd));
                 return true;
             }
             return false;
@@ -292,48 +270,21 @@ namespace hpx { namespace threads { namespace policies
 
         // ----------------------------------------------------------------
         /// Schedule the passed thread (put it on the ready work queue)
-        void schedule_thread(threads::thread_data* thrd, bool other_end)
+        void schedule_work(threads::thread_data* thrd, bool other_end)
         {
-            LOG_CUSTOM_MSG("thread_queue_mc::schedule_thread other_end " << other_end);
-
-            int t = ++work_items_count_.data_;
-            holder_->debug("schedule  ", queue_index, new_tasks_count_.data_, t, thrd);
-            work_items_.push(thrd, other_end);
-#ifdef SHARED_PRIORITY_SCHEDULER_DEBUG
-//            debug_queue(work_items_count_);
-#endif
-        }
-
-        // ----------------------------------------------------------------
-        /// This is a function which gets called periodically by the thread
-        /// manager to allow for maintenance tasks to be executed in the
-        /// scheduler. Returns true if the OS thread calling this function
-        /// can be terminated (i.e. no more work has to be done).
-        inline bool wait_or_add_new(bool running,
-            std::size_t& added, bool steal = false) HPX_HOT
-        {
-            LOG_CUSTOM_MSG("thread_queue_mc::wait_or_add_new steal " << steal);
-
-            if (0 == new_tasks_count_.data_.load(std::memory_order_relaxed))
-            {
-                return true;
-            }
-
-            // No obvious work has to be done, so a lock won't hurt too much.
+            ++work_items_count_.data_;
+            tqmc_deb.debug(debug::str<>("schedule_work")
+                , "stealing" , other_end
+                , "D" , debug::dec<2>(holder_->domain_index_)
+                , "Q" , debug::dec<3>(queue_index_)
+                , "n" , debug::dec<4>(new_tasks_count_.data_)
+                , "w" , debug::dec<4>(work_items_count_.data_)
+                , debug::threadinfo<threads::thread_data*>(thrd));
             //
-            // We prefer to exit this function (some kind of very short
-            // busy waiting) to blocking on this lock. Locking fails either
-            // when a thread is currently doing thread maintenance, which
-            // means there might be new work, or the thread owning the lock
-            // just falls through to the cleanup work below (no work is available)
-            // in which case the current thread (which failed to acquire
-            // the lock) will just retry to enter this loop.
-            std::unique_lock<mutex_type> lk(holder_->mtx_, std::try_to_lock);
-            if (!lk.owns_lock())
-                return false;    // avoid long wait on lock
-
-            // stop running after all HPX threads have been terminated
-            return add_new_always(added, this, lk);
+            work_items_.push(thrd, other_end);
+#ifdef DEBUG_QUEUE_EXTRA
+            debug_queue(work_items_);
+#endif
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -343,43 +294,47 @@ namespace hpx { namespace threads { namespace policies
 
         // pops all tasks off the queue, prints info and pushes them back on
         // just because we can't iterate over the queue/stack in general
-#if defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
+#if defined(DEBUG_QUEUE_EXTRA)
         void debug_queue(work_items_type &q) {
-            std::unique_lock<std::mutex> Lock(special_mtx_);
+            std::unique_lock<std::mutex> Lock(debug_mtx_);
             //
             work_items_type work_items_copy_;
             int x = 0;
             thread_description *thrd;
+            tqmc_deb.debug(debug::str<>("debug_queue"), "Pop work items");
             while (q.pop(thrd)) {
-                LOG_CUSTOM_MSG("thread_queue_mc::\t" << x++ << " " << THREAD_DESC(thrd));
+                tqmc_deb.debug(debug::str<>("debug_queue")
+                    , x++ , debug::threadinfo<threads::thread_data*>(thrd));
                 work_items_copy_.push(thrd);
             }
-            LOG_CUSTOM_MSG("thread_queue_mc::\tPushing to old queue");
+            tqmc_deb.debug(debug::str<>("debug_queue"), "Push work items");
             while (work_items_copy_.pop(thrd)) {
                 q.push(thrd);
-                LOG_CUSTOM_MSG("thread_queue_mc::\t" << --x << " " << THREAD_DESC(thrd));
+                tqmc_deb.debug(debug::str<>("debug_queue")
+                    , --x , debug::threadinfo<threads::thread_data*>(thrd));
             }
+            tqmc_deb.debug(debug::str<>("debug_queue"), "Finished");
         }
 #endif
 
     public:
-        thread_queue_init_parameters parameters_;
+        /*const*/ thread_queue_init_parameters parameters_;
 
-        int const queue_index;
+        int const queue_index_;
 
         queue_holder_thread<thread_queue_type> *holder_;
 
         // count of new tasks to run, separate to new cache line to avoid false
         // sharing
-        util::cache_line_data<std::atomic<std::int32_t>> new_tasks_count_;
 
         task_items_type new_task_items_;
+        work_items_type work_items_;
 
+        util::cache_line_data<std::atomic<std::int32_t>> new_tasks_count_;
         util::cache_line_data<std::atomic<std::int32_t>> work_items_count_;
 
-        work_items_type work_items_;
-#ifdef SHARED_PRIORITY_SCHEDULER_DEBUG
-        std::mutex special_mtx_;
+#ifdef DEBUG_QUEUE_EXTRA
+        std::mutex debug_mtx_;
 #endif
 
     };
