@@ -128,7 +128,7 @@ jobs:
           command: |
               cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
               clang-format-8 -i **/*.{cpp,hpp}
-              git diff --exit-code --name-status > /tmp/modified_format_files.txt
+              git diff --exit-code > /tmp/modified_format_files.txt
       - store_artifacts:
           path: /tmp/modified_format_files.txt
           destination: /hpx/artifacts/modified_format_files.txt
