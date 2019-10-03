@@ -56,7 +56,7 @@
 #include <hpx/functional/traits/is_placeholder.hpp>
 #include <hpx/iterator_support/is_range.hpp>
 #include <hpx/traits/is_timed_executor.hpp>
-#include <hpx/traits/is_tuple_like.hpp>
+#include <hpx/datastructures/traits/is_tuple_like.hpp>
 #include <hpx/traits/is_valid_action.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>
@@ -66,7 +66,7 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/traits/supports_streaming_with_any.hpp>
+#include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 
 #endif
 
