@@ -10,6 +10,7 @@
 #define HPX_PARALLEL_EXECUTORS_THREAD_EXECUTION_JAN_03_2017_1145AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/lcos/dataflow.hpp>
 #endif
@@ -177,6 +178,10 @@ namespace hpx { namespace threads {
     bulk_then_execute(Executor&& exec, F&& f, Shape const& shape,
         Future&& predecessor, Ts&&... ts)
     {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_ASSERT(false);
+        return hpx::make_ready_future();
+#else
         typedef
             typename parallel::execution::detail::then_bulk_function_result<F,
                 Shape, Future, Ts...>::type func_result_type;
@@ -216,6 +221,7 @@ namespace hpx { namespace threads {
 
         return hpx::traits::future_access<result_future_type>::create(
             std::move(p));
+#endif
     }
 }}    // namespace hpx::threads
 

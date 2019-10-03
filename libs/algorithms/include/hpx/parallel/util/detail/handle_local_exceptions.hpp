@@ -29,11 +29,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     {
         ///////////////////////////////////////////////////////////////////////
         // std::bad_alloc has to be handled separately
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        static void call(std::exception_ptr const& e)
+        {
+            HPX_ASSERT(false);
+        }
+#else
         HPX_NORETURN static void call(std::exception_ptr const& e)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_ASSERT(false);
-#else
             try
             {
                 std::rethrow_exception(e);
@@ -46,8 +49,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             {
                 throw exception_list(e);
             }
-#endif
         }
+#endif
 
         static void call(
             std::exception_ptr const& e, std::list<std::exception_ptr>& errors)
@@ -163,24 +166,31 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     struct handle_local_exceptions<execution::parallel_unsequenced_policy>
     {
         ///////////////////////////////////////////////////////////////////////
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        static void call(std::exception_ptr const&)
+        {
+            HPX_ASSERT(false);
+        }
+#else
         HPX_NORETURN static void call(std::exception_ptr const&)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_ASSERT(false);
-#else
             hpx::terminate();
-#endif
         }
+#endif
 
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        static void call(
+            std::exception_ptr const&, std::list<std::exception_ptr>&)
+        {
+            HPX_ASSERT(false);
+        }
+#else
         HPX_NORETURN static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_ASSERT(false);
-#else
             hpx::terminate();
-#endif
         }
+#endif
 
         template <typename T>
         static void call(std::vector<hpx::future<T>> const& workitems,

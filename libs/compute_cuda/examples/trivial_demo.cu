@@ -9,7 +9,7 @@
 // Here is a trivial kernel that can be invoked on the GPU
 template <typename T>
 __global__ void trivial_kernel(T val) {
-  printf("hello from gpu with value %f\n", val);
+  printf("hello from gpu with value %f\n", static_cast<double>(val));
 }
 
 // here is a wrapper that can call the kernel from C++ outside of the .cu file

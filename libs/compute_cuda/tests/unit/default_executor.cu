@@ -22,7 +22,7 @@ auto seed = std::random_device{}();
 std::mt19937 gen(seed);
 struct test
 {
-    __device__ void operator()() {}
+    HPX_HOST_DEVICE void operator()() {}
 };
 
 void test_sync()
