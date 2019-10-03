@@ -18,7 +18,7 @@
 #include <hpx/runtime_fwd.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_MORE_THAN_64_THREADS)
+#if defined(HPX_HAVE_MORE_THAN_64_THREADS)
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
 #include <hpx/serialization/bitset.hpp>
 #else
@@ -312,6 +312,11 @@ namespace hpx { namespace compute { namespace cuda {
         p->init(handle_.get_stream());
         return hpx::traits::future_access<hpx::future<void>>::create(
             std::move(p));
+    }
+
+    target& get_default_target() {
+        static target target_;
+        return target_;
     }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)

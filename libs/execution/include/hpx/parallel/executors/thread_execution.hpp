@@ -177,6 +177,10 @@ namespace hpx { namespace threads {
     bulk_then_execute(Executor&& exec, F&& f, Shape const& shape,
         Future&& predecessor, Ts&&... ts)
     {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        HPX_ASSERT(false);
+        return hpx::make_ready_future();
+#else
         typedef
             typename parallel::execution::detail::then_bulk_function_result<F,
                 Shape, Future, Ts...>::type func_result_type;
@@ -216,6 +220,7 @@ namespace hpx { namespace threads {
 
         return hpx::traits::future_access<result_future_type>::create(
             std::move(p));
+#endif
     }
 }}    // namespace hpx::threads
 

@@ -28,6 +28,10 @@ namespace hpx { namespace components { namespace server
     template <typename Component, typename...Ts>
     naming::gid_type create(Ts&&...ts)
     {
+//#if defined(HPX_COMPUTE_DEVICE_CODE)
+        //HPX_ASSERT(false);
+        //return naming::invalid_gid;
+//#else
         component_type type = get_component_type<typename Component::wrapped_type>();
         if(!enabled(type))
         {
@@ -63,6 +67,7 @@ namespace hpx { namespace components { namespace server
         ++instance_count(type);
 
         return gid;
+//#endif
     }
 
     template <typename Component, typename...Ts>

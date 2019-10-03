@@ -16,6 +16,16 @@
 #include <string>
 #include <vector>
 
+struct kernel {
+    kernel(int const N) : N(N) {};
+    int const N;
+    HPX_HOST_DEVICE void operator()(int* A, int *B, int* C) {
+        int i = blockDim.x * blockIdx.x + threadIdx.x;
+        if(i < N)
+            C[i] = A[i] + B[i];
+    }
+};
+
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     unsigned int seed = std::random_device{}();
@@ -56,14 +66,23 @@ int hpx_main(hpx::program_options::variables_map& vm)
     int threadsPerBlock = 256;
     int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
 
-    hpx::compute::cuda::detail::launch(target, blocksPerGrid, threadsPerBlock,
-        [=] __device__ (int* A, int* B, int* C) mutable
-        {
-            int i = blockDim.x * blockIdx.x + threadIdx.x;
-            if(i < N)
-                C[i] = A[i] + B[i];
-        }, d_A.data(), d_B.data(), d_C.data());
+    //hpx::compute::cuda::detail::launch(target, blocksPerGrid, threadsPerBlock,
+    //    [=] HPX_HOST_DEVICE (int* A, int* B, int* C) mutable
+    //    {
+    //        int i = blockDim.x * blockIdx.x + threadIdx.x;
+    //        if(i < N)
+    //            C[i] = A[i] + B[i];
+    //    }, d_A.data(), d_B.data(), d_C.data());
 
+    hpx::compute::cuda::detail::launch(target, blocksPerGrid, threadsPerBlock,
+        kernel{N}, d_A.data(), d_B.data(), d_C.data());
+
+    //hpx::util::invoke_fused_r<void>([] HPX_HOST_DEVICE (int){}, hpx::util::tuple<int>(1));
+    //hpx::util::invoke_fused_r<void>([] HPX_HOST_DEVICE (int, int){}, hpx::util::tuple<int, int>(1, 2));
+    //hpx::util::invoke_fused_r<void>([] HPX_HOST_DEVICE (int, int, int){}, hpx::util::tuple<int, int, int>(1, 2, 3));
+    //hpx::util::invoke_fused_r<void>([] HPX_HOST_DEVICE (int*){}, hpx::util::tuple<int*>(nullptr));
+    //hpx::util::invoke_fused_r<void>([] HPX_HOST_DEVICE (int*, int*, int*){}, hpx::util::tuple<int*, int*, int*>(nullptr, nullptr, nullptr));
+    //hpx::util::invoke_fused_r<void>(kernel{N},                               hpx::util::tuple<int*, int*, int*>(nullptr, nullptr, nullptr));
 
     hpx::parallel::copy(
         hpx::parallel::execution::seq,

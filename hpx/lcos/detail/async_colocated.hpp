@@ -99,6 +99,8 @@ namespace hpx { namespace detail
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(false);
+        // TODO: Return a value?
+        //return hpx::make_ready_future();
 #else
         typedef
             typename hpx::traits::extract_action<Action>::remote_result_type
@@ -144,6 +146,7 @@ namespace hpx { namespace detail
     {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(false);
+        return hpx::make_ready_future();
 #else
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.

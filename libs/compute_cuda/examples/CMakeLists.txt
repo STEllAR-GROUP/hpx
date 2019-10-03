@@ -20,27 +20,26 @@ else()
   return()
 endif()
 
-set(example_programs)
-
-set(example_programs ${example_programs}
+set(example_programs
     cublas_matmul
     cuda_future
     data_copy
-    hello_compute
-  )
+    hello_compute)
+
+# TODO: Check if this fails with Cray clang or also vanilla clang
+#if(NOT HPX_WITH_CUDA_CLANG)
+  # This example does not comp
+  #set(example_programs ${example_programs} hello_compute)
+#endif()
 
 set(cublas_matmul_PARAMETERS THREADS_PER_LOCALITY 4)
 set(cuda_future_PARAMETERS THREADS_PER_LOCALITY 4)
 set(data_copy_PARAMETERS THREADS_PER_LOCALITY 4)
 set(hello_compute_PARAMETERS THREADS_PER_LOCALITY 4)
 
-# Append example programs that only compiles with Cuda Clang
-if(HPX_WITH_CUDA_CLANG)
-  list(APPEND example_programs
-       partitioned_vector
-      )
-  set(partitioned_vector_PARAMETERS THREADS_PER_LOCALITY 4)
-endif()
+# TODO: The partitioned_vector example works with neither with clang nor nvcc
+#list(APPEND example_programs partitioned_vector)
+#set(partitioned_vector_PARAMETERS THREADS_PER_LOCALITY 4)
 
 include_directories(${CUDA_INCLUDE_DIRS})
 
@@ -53,7 +52,7 @@ set(hello_compute_CUDA ON)
 set(cuda_future_CUDA OFF)
 set(cuda_future_CUDA_SOURCE saxpy trivial_demo )
 set(partitioned_vector_CUDA ON)
-set(partitioned_vector_FLAGS COMPONENT_DEPENDENCIES partitioned_vector)
+set(partitioned_vector_FLAGS DEPENDENCIES partitioned_vector_component)
 
 foreach(example_program ${example_programs})
   if(${${example_program}_CUDA})
