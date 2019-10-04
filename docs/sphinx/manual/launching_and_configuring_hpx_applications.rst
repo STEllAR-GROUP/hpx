@@ -1682,10 +1682,10 @@ differently as well.
 Shortcut options are obtained from the internal configuration database. They are
 stored as key-value properties in a special properties section named
 ``hpx.commandline``. You can define your own shortcuts by adding the
-corresponding definitions to one of the ``ini`` configuration files as described
+corresponding definitions to one of the ini configuration files as described
 in the section :ref:`configuration`. For instance, in order to define a command
-line shortcut ``--p`` which should expand to ``-hpx:print-counter``, the
-following configuration information needs to be added to one of the ``ini``
+line shortcut ``--p``, which should expand to ``-hpx:print-counter``, the
+following configuration information needs to be added to one of the ini
 configuration files:
 
 .. code-block:: ini
@@ -1713,21 +1713,21 @@ configuration files:
 
    Any shortcut option should either start with a single ``'-'`` or with two
    ``'--'`` characters. Shortcuts starting with a single ``'-'`` are interpreted
-   as short options (i.e. everything after the first character following the
+   as short options (i.e., everything after the first character following the
    ``'-'`` is treated as the argument). Shortcuts starting with ``'--'`` are
    interpreted as long options. No other shortcut formats are supported.
 
 Specifying options for single localities only
 ---------------------------------------------
 
-For runs involving more than one :term:`locality` it is sometimes desirable to
+For runs involving more than one :term:`locality`, it is sometimes desirable to
 supply specific command line options to single localities only. When the |hpx|
-application is launched using a scheduler (like PBS, for more details see
+application is launched using a scheduler (like PBS; for more details see
 section :ref:`unix_pbs`), specifying dedicated command line options for single
 localities may be desirable. For this reason all of the command line options
-which have the general format ``--hpx:<some_key>`` can be used in a more general
+that have the general format ``--hpx:<some_key>`` can be used in a more general
 form: ``--hpx:<N>:<some_key>``, where <N> is the number of the :term:`locality`
-this command line options will be applied to, all other localities will simply
+this command line option will be applied to; all other localities will simply
 ignore the option. For instance, the following PBS script passes the option
 :option:`--hpx:pu-offset`\ ``=4`` to the :term:`locality` ``'1'`` only.
 
@@ -1744,8 +1744,8 @@ ignore the option. For instance, the following PBS script passes the option
 
 .. caution::
 
-   If the first application specific argument (inside ``$APP_OPTIONS`` is a
-   non-option (i.e. does not start with a ``-`` or a ``--``, then it must be
+   If the first application specific argument (inside ``$APP_OPTIONS``) is a
+   non-option (i.e., does not start with a ``-`` or a ``--``), then it must be
    placed before the option :option:`--hpx:nodes`, which, in this case,
    should be the last option on the command line.
 
@@ -1778,20 +1778,20 @@ bind specification. The affinity settings are to be specified using
 :option:`--hpx:bind`\ ``=<BINDINGS>``, where ``<BINDINGS>`` have to be formatted as
 described below.
 
-In addition to the syntax described below one can use :option:`--hpx:bind`\
+In addition to the syntax described below, one can use :option:`--hpx:bind`\
 ``=none`` to disable all binding of any threads to a particular core. This is
 mostly supported for debugging purposes.
 
 The specified affinities refer to specific regions within a machine hardware
-topology. In order to understand the hardware topology of a particular machine
-it may be useful to run the lstopo tool which is part of |hwloc| to see the
+topology. In order to understand the hardware topology of a particular machine,
+it may be useful to run the lstopo tool, which is part of |hwloc|, to see the
 reported topology tree. Seeing and understanding a topology tree will definitely
 help in understanding the concepts that are discussed below.
 
-Affinities can be specified using HWLOC (|hwloc|) tuples. Tuples of HWLOC
-*objects* and associated *indexes* can be specified in the form
-``object:index``, ``object:index-index`` or ``object:index,...,index``. HWLOC
-objects represent types of mapped items in a topology tree. Possible values for
+Affinities can be specified using hwloc tuples. Tuples of hwloc *objects* and
+associated *indexes* can be specified in the form ``object:index``,
+``object:index-index`` or ``object:index,...,index``. Hwloc objects
+represent types of mapped items in a topology tree. Possible values for
 objects are ``socket``, ``numanode``, ``core`` and ``pu`` (processing unit).
 Indexes are non-negative integers that specify a unique physical object in a
 topology tree using its logical sequence number.
@@ -1806,7 +1806,7 @@ object. For example, ``socket:0.core:1`` refers to the second core in the first
 socket (all indices are zero based).
 
 Multiple affinities can be specified using several :option:`--hpx:bind` command
-line options or by appending several affinities separated by a ``';'`` By
+line options or by appending several affinities separated by a ``';'``. By
 default, if multiple affinities are specified, they are added.
 
 .. If prefixed with``"~"`` the given affinity will be cleared instead of added
@@ -1818,8 +1818,8 @@ default, if multiple affinities are specified, they are added.
 
 .. note::
 
-   All 'names' in an affinity specification, such as ``thread``, ``socket``,
-   ``numanode``, ``pu`` or ``all`` can be abbreviated. Thus the affinity
+   All "names" in an affinity specification, such as ``thread``, ``socket``,
+   ``numanode``, ``pu`` or ``all``, can be abbreviated. Thus, the affinity
    specification ``threads:0-3=socket:0.core:1.pu:1`` is fully equivalent to its
    shortened form ``t:0-3=s:0.c:1.p:1``.
 
@@ -1838,7 +1838,7 @@ Here is a full grammar describing the possible format of mappings:
 
 The following example assumes a system with at least 4 cores, where each core
 has more than 1 processing unit (hardware threads). Running
-``hello_world_distributed`` with 4 OS-threads (on 4 processing units), where
+``hello_world_distributed`` with 4 OS threads (on 4 processing units), where
 each of those threads is bound to the first processing unit of each of the
 cores, can be achieved by invoking:
 
@@ -1846,7 +1846,7 @@ cores, can be achieved by invoking:
 
    hello_world_distributed -t4 --hpx:bind=thread:0-3=core:0-3.pu:0
 
-Here ``thread:0-3`` specifies the OS threads for which to define affinity
+Here, ``thread:0-3`` specifies the OS threads used to define affinity
 bindings, and ``core:0-3.pu:`` defines that for each of the cores (``core:0-3``)
 only their first processing unit ``pu:0`` should be used.
 
