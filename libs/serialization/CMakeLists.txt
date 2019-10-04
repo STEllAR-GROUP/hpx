@@ -21,6 +21,7 @@ endif()
 
 # Default location is $HPX_ROOT/libs/serialization/include
 set(serialization_headers
+  hpx/serialization/detail/extra_archive_data.hpp
   hpx/serialization/detail/non_default_constructible.hpp
   hpx/serialization/detail/pointer.hpp
   hpx/serialization/detail/polymorphic_id_factory.hpp
@@ -56,9 +57,6 @@ set(serialization_headers
   hpx/serialization/brace_initializable.hpp
   hpx/serialization/brace_initializable_fwd.hpp
   hpx/serialization/container.hpp
-  hpx/serialization/extra_archive_data.hpp
-  hpx/serialization/extra_input_data.hpp
-  hpx/serialization/extra_output_data.hpp
   hpx/serialization/input_archive.hpp
   hpx/serialization/input_container.hpp
   hpx/serialization/output_archive.hpp

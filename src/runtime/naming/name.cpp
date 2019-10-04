@@ -241,25 +241,19 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         // prepare the given id, note: this function modifies the passed id
-        void handle_credit_splitting(
-            serialization::output_archive& ar, id_type_impl& gid,
-            serialization::detail::preprocess_gid_types* split_gids)
+        void handle_credit_splitting(serialization::output_archive& ar,
+            id_type_impl& gid,
+            serialization::detail::preprocess_gid_types& split_gids)
         {
-            auto* handle_futures = ar.try_get_extra_data<
-                serialization::detail::preprocess_futures>(
-                serialization::extra_output_handle_futures);
-
-            if (handle_futures == nullptr)
-                return;
-
-            HPX_ASSERT(split_gids != nullptr);
+            auto& handle_futures =
+                ar.get_extra_data<serialization::detail::preprocess_futures>();
 
             auto f = split_gid_if_needed(gid).then(hpx::launch::sync,
-                [split_gids, &gid](hpx::future<gid_type>&& gid_future) {
-                    split_gids->add_gid(gid, gid_future.get());
+                [&split_gids, &gid](hpx::future<gid_type>&& gid_future) {
+                    split_gids.add_gid(gid, gid_future.get());
                 });
 
-            handle_futures->await_future(
+            handle_futures.await_future(
                 *traits::future_access<decltype(f)>::get_shared_state(f));
         }
 
@@ -271,11 +265,10 @@ namespace hpx { namespace naming
                 return;
             }
 
-            auto* split_gids = ar.try_get_extra_data<
-                serialization::detail::preprocess_gid_types>(
-                serialization::extra_output_split_credits);
+            auto& split_gids = ar.get_extra_data<
+                serialization::detail::preprocess_gid_types>();
 
-            if (split_gids != nullptr && split_gids->has_gid(*this))
+            if (split_gids.has_gid(*this))
             {
                 return;
             }
@@ -562,8 +555,7 @@ namespace hpx { namespace naming
             else
             {
                 auto& split_gids = ar.get_extra_data<
-                    serialization::detail::preprocess_gid_types&>(
-                    serialization::extra_output_split_credits);
+                    serialization::detail::preprocess_gid_types>();
 
                 new_gid = split_gids.get_new_gid(*this);
                 HPX_ASSERT(new_gid != invalid_gid);

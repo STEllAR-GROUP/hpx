@@ -42,10 +42,20 @@ namespace hpx { namespace serialization {
               , split_gids_(std::move(rhs.split_gids_))
             {}
 
+            ~preprocess_gid_types()
+            {
+                HPX_ASSERT(split_gids_.empty());
+            }
+
             preprocess_gid_types& operator=(preprocess_gid_types&& rhs) noexcept
             {
                 split_gids_ = std::move(rhs.split_gids_);
                 return *this;
+            }
+
+            void reset()
+            {
+                split_gids_.clear();
             }
 
             void add_gid(
@@ -64,17 +74,13 @@ namespace hpx { namespace serialization {
 
             naming::gid_type get_new_gid(naming::gid_type const& gid)
             {
-                std::lock_guard<mutex_type> l(mtx_);
-                if (split_gids_.empty())
-                    return naming::gid_type();
-
                 auto it = split_gids_.find(&gid);
                 HPX_ASSERT(it != split_gids_.end());
                 HPX_ASSERT(it->second != naming::invalid_gid);
 
                 naming::gid_type new_gid = it->second;
 #if defined(HPX_DEBUG)
-                it->second = naming::invalid_gid;
+                split_gids_.erase(it);
 #endif
                 return new_gid;
             }
@@ -88,40 +94,11 @@ namespace hpx { namespace serialization {
                 split_gids_ = std::move(gids);
             }
 
-            // We add this solely for the purpose of making unique_any compile.
-            // Comparing instances of this type does not make any sense,
-            // conceptually.
-            friend bool operator==(
-                preprocess_gid_types const&, preprocess_gid_types const&)
-            {
-                HPX_ASSERT(false);    // shouldn't ever be called
-                return false;
-            }
-
         private:
             mutex_type mtx_;
             split_gids_map split_gids_;
         };
     }    // namespace detail
-
-    ////////////////////////////////////////////////////////////////////////////
-    // serialization support for gid_type (handles credit-splitting)
-    constexpr std::size_t extra_output_split_credits = 1;
-    constexpr std::size_t encode_parcel_extra_output_data_size = 2;
-
-    template <>
-    inline util::unique_any_nonser
-    init_extra_output_data_item<extra_output_split_credits>()
-    {
-        return util::unique_any_nonser{detail::preprocess_gid_types{}};
-    }
-
-    template <>
-    inline void reset_extra_output_data_item<extra_output_split_credits>(
-        extra_archive_data_type& data)
-    {
-        // nothing to do
-    }
 }}    // namespace hpx::serialization
 
 #endif

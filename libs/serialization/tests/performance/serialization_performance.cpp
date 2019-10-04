@@ -5,10 +5,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/datastructures.hpp>
+#include <hpx/runtime/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/version.hpp>
+#include <type_traits>
 
 #include <chrono>
 #include <cstddef>
@@ -150,6 +153,12 @@ namespace hpx_test {
 
     void to_string(const Record& record, std::string& data)
     {
+        {
+            hpx::serialization::detail::preprocess_container p;
+            hpx::serialization::output_archive archiver(p);
+            archiver << record;
+            data.resize(p.size());
+        }
         hpx::serialization::output_archive archiver(data);
         archiver << record;
     }

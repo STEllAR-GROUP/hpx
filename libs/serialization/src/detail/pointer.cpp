@@ -8,8 +8,6 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/serialization/detail/pointer.hpp>
-#include <hpx/serialization/extra_input_data.hpp>
-#include <hpx/serialization/extra_output_data.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 
@@ -22,8 +20,7 @@ namespace hpx { namespace serialization {
     void register_pointer(
         input_archive& ar, std::uint64_t pos, detail::ptr_helper_ptr helper)
     {
-        auto& tracker = ar.get_extra_data<detail::input_pointer_tracker>(
-            extra_input_pointer_tracker);
+        auto& tracker = ar.get_extra_data<detail::input_pointer_tracker>();
         HPX_ASSERT(tracker.find(pos) == tracker.end());
 
         tracker.insert(std::make_pair(pos, std::move(helper)));
@@ -31,8 +28,7 @@ namespace hpx { namespace serialization {
 
     detail::ptr_helper& tracked_pointer(input_archive& ar, std::uint64_t pos)
     {
-        auto& tracker = ar.get_extra_data<detail::input_pointer_tracker>(
-            extra_input_pointer_tracker);
+        auto& tracker = ar.get_extra_data<detail::input_pointer_tracker>();
 
         auto it = tracker.find(pos);
         HPX_ASSERT(it != tracker.end());
@@ -42,8 +38,7 @@ namespace hpx { namespace serialization {
 
     std::uint64_t track_pointer(output_archive& ar, void const* pos)
     {
-        auto& tracker = ar.get_extra_data<detail::output_pointer_tracker>(
-            extra_output_pointer_tracker);
+        auto& tracker = ar.get_extra_data<detail::output_pointer_tracker>();
 
         auto it = tracker.find(pos);
         if (it == tracker.end())

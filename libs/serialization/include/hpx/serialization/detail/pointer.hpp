@@ -16,8 +16,6 @@
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
-#include <hpx/serialization/extra_input_data.hpp>
-#include <hpx/serialization/extra_output_data.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
@@ -46,30 +44,6 @@ namespace hpx { namespace serialization {
         using output_pointer_tracker = std::map<void const*, std::uint64_t>;
 
     }    // namespace detail
-
-    ////////////////////////////////////////////////////////////////////////////
-    template <>
-    inline util::unique_any_nonser
-    init_extra_input_data_item<extra_input_pointer_tracker>()
-    {
-        return util::unique_any_nonser{detail::input_pointer_tracker{}};
-    }
-
-    template <>
-    inline util::unique_any_nonser
-    init_extra_output_data_item<extra_output_pointer_tracker>()
-    {
-        return util::unique_any_nonser{detail::output_pointer_tracker{}};
-    }
-
-    template <>
-    inline void reset_extra_output_data_item<extra_output_pointer_tracker>(
-        extra_archive_data_type& data)
-    {
-        util::any_cast<detail::output_pointer_tracker&>(
-            data[extra_output_pointer_tracker])
-            .clear();
-    }
 
     ////////////////////////////////////////////////////////////////////////////
     HPX_EXPORT void register_pointer(
