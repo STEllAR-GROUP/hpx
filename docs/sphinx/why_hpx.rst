@@ -57,8 +57,8 @@ What is |hpx|?
 
 High Performance ParalleX (|hpx|) is the first runtime system implementation of
 the ParalleX execution model. The |hpx| runtime software package is a modular,
-feature-complete, and performance oriented representation of the ParalleX
-execution model targeted at conventional parallel computing architectures such
+feature-complete, and performance-oriented representation of the ParalleX
+execution model targeted at conventional parallel computing architectures, such
 as SMP nodes and commodity clusters. It is academically developed and freely
 available under an open source license. We provide |hpx| to the community for
 experimentation and application to achieve high efficiency and scalability for
@@ -69,7 +69,7 @@ address space. It is solidly based on many years of experience in writing highly
 parallel applications for HPC systems.
 
 The two-decade success of the communicating sequential processes (CSP) execution
-model and its message passing interface (MPI) programming model has been
+model and its message passing interface (MPI) programming model have been
 seriously eroded by challenges of power, processor core complexity, multi-core
 sockets, and heterogeneous structures of GPUs. Both efficiency and scalability
 for some current (strong scaled) applications and future Exascale applications
@@ -95,7 +95,7 @@ For more information about the |stellar|_ Group, see :ref:`people`.
 What makes our systems slow?
 ----------------------------
 
-Estimates say that we currently run our computers at way below 100% efficiency.
+Estimates say that we currently run our computers at well below 100% efficiency.
 The theoretical peak performance (usually measured in
 `FLOPS <http://en.wikipedia.org/wiki/FLOPS>`_---floating point operations per
 second) is much higher than any practical peak performance reached by any
@@ -106,41 +106,41 @@ speaking, we distinguish two forms of scalability: strong scaling (see
 `Amdahl's Law <http://en.wikipedia.org/wiki/Amdahl%27s_law>`_) and weak scaling
 (see `Gustafson's Law <http://en.wikipedia.org/wiki/Gustafson%27s_law>`_). Strong
 scaling is defined as how the solution time varies with the number of processors
-for a fixed **total** problem size. It gives an estimate of how much faster can
-we solve a particular problem by throwing more resources at it. Weak scaling is
+for a fixed **total** problem size. It gives an estimate of how much faster we
+can solve a particular problem by throwing more resources at it. Weak scaling is
 defined as how the solution time varies with the number of processors for a
 fixed problem size **per processor**. In other words, it defines how much more
 data can we process by using more hardware resources.
 
 In order to utilize as much hardware parallelism as possible an application must
 exhibit excellent strong and weak scaling characteristics, which requires a high
-percentage of work executed in parallel, i.e. using multiple threads of
+percentage of work executed in parallel, i.e., using multiple threads of
 execution. Optimally, if you execute an application on a hardware resource with
 N processors it either runs N times faster or it can handle N times more data.
 Both cases imply 100% of the work is executed on all available processors in
 parallel. However, this is just a theoretical limit. Unfortunately, there are
-more things which limit scalability, mostly inherent to the hardware
+more things that limit scalability, mostly inherent to the hardware
 architectures and the programming models we use. We break these limitations into
-four fundamental factors which make our systems *SLOW*:
+four fundamental factors that make our systems *SLOW*:
 
 * **S**\ tarvation occurs when there is insufficient concurrent work available to
   maintain high utilization of all resources.
 * **L**\ atencies are imposed by the time-distance delay intrinsic to accessing
   remote resources and services.
 * **O**\ verhead is work required for the management of parallel actions and
-  resources on the critical execution path which is not necessary in a
+  resources on the critical execution path, which is not necessary in a
   sequential variant.
 * **W**\ aiting for contention resolution is the delay due to the lack of
   availability of oversubscribed shared resources.
 
 Each of those four factors manifests itself in multiple and different ways; each
 of the hardware architectures and programming models expose specific forms.
-However the interesting part is that all of them are limiting the scalability of
+However, the interesting part is that all of them are limiting the scalability of
 applications no matter what part of the hardware jungle we look at. Hand-helds,
 PCs, supercomputers, or the cloud, all suffer from the reign of the 4 horsemen:
 **S**\ tarvation, **L**\ atency, **O**\ verhead, and **C**\ ontention. This
 realization is very important as it allows us to derive the criteria for
-solutions to the scalability problem from first principles, it allows us to
+solutions to the scalability problem from first principles, and it allows us to
 focus our analysis on very concrete patterns and measurable metrics. Moreover,
 any derived results will be applicable to a wide variety of targets.
 
@@ -151,46 +151,46 @@ Today's computer systems are designed based on the initial ideas of
 `John von Neumann <http://qss.stanford.edu/~godfrey/vonNeumann/vnedvac.pdf>`_, as
 published back in 1945, and later extended by the
 `Harvard architecture <http://en.wikipedia.org/wiki/Harvard_architecture>`_. These
-ideas form the foundation, the execution model of computer systems we use
-currently. But apparently a new response is required in the light of the demands
+ideas form the foundation, the execution model, of computer systems we use
+currently. However, a new response is required in the light of the demands
 created by today's technology.
 
 So, what are the overarching objectives for designing systems allowing for
 applications to scale as they should? In our opinion, the main objectives are:
 
-* Performance: as mentioned, scalability and efficiency are the main criteria
-  people are interested in
+* Performance: as previously mentioned, scalability and efficiency are the main criteria
+  people are interested in.
 * Fault tolerance: the low expected mean time between failures (`MTBF
   <http://en.wikipedia.org/wiki/Mean_time_between_failures>`_) of future systems
-  requires embracing faults, not trying to avoid them
+  requires embracing faults, not trying to avoid them.
 * Power: minimizing energy consumption is a must as it is one of the major cost
-  factors today, even more so in the future
-* Generality: any system should be usable for a broad set of use cases
-* Programmability: for me as a programmer this is a very important objective,
-  ensuring long term platform stability and portability
+  factors today, and will continue to rise in the future.
+* Generality: any system should be usable for a broad set of use cases.
+* Programmability: for programmer this is a very important objective,
+  ensuring long term platform stability and portability.
 
 What needs to be done to meet those objectives, to make applications scale
 better on tomorrow's architectures? Well, the answer is almost obvious: we need
 to devise a new execution model---a set of governing principles for the holistic
 design of future systems---targeted at minimizing the effect of the outlined
 **SLOW** factors. Everything we create for future systems, every design decision
-we make, every criteria we apply, has to be validated against this single,
+we make, every criteria we apply, have to be validated against this single,
 uniform metric. This includes changes in the hardware architecture we
 prevalently use today, and it certainly involves new ways of writing software,
 starting from the operating system, runtime system, compilers, and at the
-application level. However the key point is that all those layers have to be
-co-designed, they are interdependent and cannot be seen as separate facets. The
+application level. However, the key point is that all those layers have to be
+co-designed; they are interdependent and cannot be seen as separate facets. The
 systems we have today have been evolving for over 50 years now. All layers
-function in a certain way relying on the other layers to do so as well. However,
-we do not have the time to wait for a coherent system to evolve for another 50
-years. The new paradigms are needed now---therefore, co-design is the key.
+function in a certain way, relying on the other layers to do so. But we do not
+have the time to wait another 50 years for a new coherent system to evolve.
+The new paradigms are needed now---therefore, co-design is the key.
 
 Governing principles applied while developing |hpx|
 ---------------------------------------------------
 
 As it turn out, we do not have to start from scratch. Not everything has to be
 invented and designed anew. Many of the ideas needed to combat the 4 horsemen
-have already been had, often more than 30 years ago. All it takes is to gather
+already exist, many for more than 30 years. All it takes is to gather
 them into a coherent approach. We'll highlight some of the derived principles we
 think to be crucial for defeating **SLOW**. Some of those are focused on
 high-performance computing, others are more general.
