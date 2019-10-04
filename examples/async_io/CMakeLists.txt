@@ -8,10 +8,10 @@ set(example_programs
     async_io_action
     async_io_external
     async_io_low_level
-		async
-		then
-		wait
-		wait_all)
+    async
+    then
+    wait
+    wait_all)
 
 set(async_io_simple_PARAMETERS THREADS_PER_LOCALITY 4)
 set(async_io_action_PARAMETERS THREADS_PER_LOCALITY 4)
