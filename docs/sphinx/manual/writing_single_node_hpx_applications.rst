@@ -1053,7 +1053,7 @@ Implementing ``hpx::async`` functions should have input parameters as
 
 ``hpx::async`` functions return value is ``hpx::future``.
 
-.. literalinclude:: ../../examples/async_io/async.cpp
+:cpp:func:`hpx::wait_all`
 
 Throws ``hpx::system_error`` with error condition
 ``hpx::errc::resource_unavailable_try_again`` if the launch policy equals
