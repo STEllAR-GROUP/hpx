@@ -1041,14 +1041,13 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
      Example CMake adding entry.
 
-  Alternatively, you could provide ``BOOST_LIBRARYDIR`` instead of
+  Alternatively, users could provide ``BOOST_LIBRARYDIR`` instead of
   ``BOOST_ROOT``; the difference is that ``BOOST_LIBRARYDIR`` should point to
-  the subdirectory inside Boost root where all the compiled DLLs/LIBs are. I
-  myself have used ``BOOST_LIBRARYDIR`` which pointed to the ``bin.v2``
-  subdirectory under the Boost rootdir. It is important to keep the meanings of
-  these two variables separated from each other: ``BOOST_DIR`` points to the
-  ROOT folder of the Boost library. ``BOOST_LIBRARYDIR`` points to the subdir
-  inside the Boost root folder where the compiled binaries are.
+  the subdirectory inside Boost root where all the compiled DLLs/LIBs are. For example,
+ ``BOOST_LIBRARYDIR`` may point to the ``bin.v2`` subdirectory under the Boost rootdir.
+  It is important to keep the meanings of these two variables separated from each other:
+ ``BOOST_DIR`` points to the ROOT folder of the Boost library. ``BOOST_LIBRARYDIR``
+  points to the subdir inside the Boost root folder where the compiled binaries are.
 
 * Click the 'Configure' button of CMake-GUI. You will be immediately presented with a
   small window where you can select the C++ compiler to be used within Visual
