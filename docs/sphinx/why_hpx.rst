@@ -200,13 +200,13 @@ Focus on latency hiding instead of latency avoidance
 
 It is impossible to design a system exposing zero latencies. In an effort to
 come as close as possible to this goal many optimizations are mainly targeted
-towards minimizing latencies. Examples for this can be seen everywhere, for
-instance low latency network technologies like `InfiniBand
+towards minimizing latencies. Examples for this can be seen everywhere, such as
+low latency network technologies like `InfiniBand
 <http://en.wikipedia.org/wiki/InfiniBand>`_, caching memory hierarchies in all
 modern processors, the constant optimization of existing |mpi|_ implementations
 to reduce related latencies, or the data transfer latencies intrinsic to the way
 we use `GPGPUs <http://en.wikipedia.org/wiki/GPGPU>`_ today. It is important to
-note, that existing latencies are often tightly related to some resource having
+note that existing latencies are often tightly related to some resource having
 to wait for the operation to be completed. At the same time it would be
 perfectly fine to do some other, unrelated work in the meantime, allowing the
 system to hide the latencies by filling the idle-time with useful work. Modern
@@ -222,9 +222,9 @@ If we plan to hide latencies even for very short operations, such as fetching
 the contents of a memory cell from main memory (if it is not already cached), we
 need to have very lightweight threads with extremely short context switching
 times, optimally executable within one cycle. Granted, for mainstream
-architectures this is not possible today (even if we already have special
+architectures, this is not possible today (even if we already have special
 machines supporting this mode of operation, such as the `Cray XMT
-<http://en.wikipedia.org/wiki/Cray_XMT>`_). For conventional systems however,
+<http://en.wikipedia.org/wiki/Cray_XMT>`_). For conventional systems, however,
 the smaller the overhead of a context switch and the finer the granularity of
 the threading system, the better will be the overall system utilization and its
 efficiency. For today's architectures we already see a flurry of libraries
