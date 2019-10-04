@@ -1053,7 +1053,7 @@ Implementing ``hpx::async`` functions should have input parameters as
 
 ``hpx::async`` functions return value is ``hpx::future``.
 
-.. literalinclude:: ../../examples/hpx_functions/async.cpp
+.. literalinclude:: ../../examples/async_io/async.cpp
 
 Throws ``hpx::system_error`` with error condition
 ``hpx::errc::resource_unavailable_try_again`` if the launch policy equals
@@ -1076,7 +1076,7 @@ can have then chained implementations. With then the antecedent future is ready
 (has a value or exception stored) before the continuation starts as instructed
 by lambda function. Example implementation using |hpx| is
 
-.. literalinclude:: ../../examples/then.cpp
+.. literalinclude:: ../../examples/async_io/then.cpp
 
 If implicit unwrapping takes place and the continuation returns an invalid future,
 then the shared state is made ready with an exception of type ``hpx::future_error``
@@ -1089,7 +1089,7 @@ wait
 available. This function call can be checked using ``valid() == true``. Example
 implementation using |hpx| is
 
-.. literalinclude:: ../../examples/wait.cpp
+.. literalinclude:: ../../examples/async_io/wait.cpp
 
 wait_all
 ---------
@@ -1102,5 +1102,5 @@ become ready. All input futures are still valid after wait all returns.
 .. literalinclude:: ../../hpx/lcos/wait_all.hpp
    :lines: 48-91
 
-.. literalinclude:: ../../examples/wait_all.cpp
+.. literalinclude:: ../../examples/async_io/wait_all.cpp
 
