@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,9 +63,11 @@ struct HPX_EXPORT primary_namespace
     bool bind_gid(gva g, naming::gid_type id, naming::gid_type locality);
     future<bool> bind_gid_async(gva g, naming::gid_type id, naming::gid_type locality);
 
+#if defined(HPX_HAVE_NETWORKING)
     void route(parcelset::parcel && p,
         util::function_nonser<void(boost::system::error_code const&,
         parcelset::parcel const&)> && f);
+#endif
 
     resolved_type resolve_gid(naming::gid_type id);
     future<resolved_type> resolve_full(naming::gid_type id);

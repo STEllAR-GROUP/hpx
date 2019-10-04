@@ -1,5 +1,6 @@
 //  Copyright (c) 2017-2018 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -35,6 +36,7 @@
 #include <hpx/include/parallel_executor_parameters.hpp>
 //
 #include <hpx/include/compute.hpp>
+#include <hpx/timing.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
 # include <hpx/compute/cuda/allocator.hpp>

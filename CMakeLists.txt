@@ -9,6 +9,7 @@
 # Copyright (c) 2017      Google
 # Copyright (c) 2017      Taeguk Kwon
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -169,7 +170,6 @@ endif()
 set(DEFAULT_MALLOC "system")
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
   set(DEFAULT_MALLOC "tcmalloc")
-#    set(DEFAULT_MALLOC "jemalloc")
 endif()
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
@@ -189,9 +189,9 @@ endif()
 
 hpx_option(HPX_WITH_MALLOC
   STRING
-  "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"
+  "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, mimalloc, tbbmalloc, and custom (default is: tcmalloc)"
   ${DEFAULT_MALLOC}
-  STRINGS "system;tcmalloc;jemalloc;tbbmalloc;custom")
+  STRINGS "system;tcmalloc;jemalloc;mimalloc;tbbmalloc;custom")
 
 # On some systems jemalloc requires an explicit prefix for the API functions
 # (i.e. 'malloc' is called 'je_malloc', etc.)
@@ -340,7 +340,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 endif()
 
 hpx_option(HPX_WITH_IO_COUNTERS BOOL
-  "Build HPX runtime (default: ${HPX_WITH_IO_COUNTERS_DEFAULT})"
+  "Enable IO counters (default: ${HPX_WITH_IO_COUNTERS_DEFAULT})"
   ${HPX_WITH_IO_COUNTERS_DEFAULT} ADVANCED CATEGORY "Build Targets")
 if(HPX_WITH_IO_COUNTERS)
   hpx_add_config_define(HPX_HAVE_IO_COUNTERS)
@@ -488,6 +488,9 @@ hpx_option(HPX_WITH_MAX_CPU_COUNT STRING
 if(HPX_WITH_MAX_CPU_COUNT)
   hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
 endif()
+if((NOT HPX_WITH_MAX_CPU_COUNT) OR (HPX_WITH_MAX_CPU_COUNT GREATER 64))
+  hpx_add_config_define(HPX_HAVE_MORE_THAN_64_THREADS)
+endif()
 
 set(HPX_MAX_NUMA_DOMAIN_COUNT_DEFAULT "8")
 hpx_option(HPX_WITH_MAX_NUMA_DOMAIN_COUNT STRING
@@ -496,18 +499,13 @@ hpx_option(HPX_WITH_MAX_NUMA_DOMAIN_COUNT STRING
   CATEGORY "Thread Manager" ADVANCED)
 hpx_add_config_define(HPX_HAVE_MAX_NUMA_DOMAIN_COUNT ${HPX_WITH_MAX_NUMA_DOMAIN_COUNT})
 
-set(HPX_MORE_THAN_64_THREADS_DEFAULT OFF)
-if((NOT HPX_WITH_MAX_CPU_COUNT) OR (HPX_WITH_MAX_CPU_COUNT GREATER 64))
-  set(HPX_MORE_THAN_64_THREADS_DEFAULT ON)
-endif()
+# Deprecated in 1.4.0
 hpx_option(HPX_WITH_MORE_THAN_64_THREADS BOOL
-  "HPX applications will be able to run on more than 64 cores (default: ${HPX_MORE_THAN_64_THREADS_DEFAULT})"
-  ${HPX_MORE_THAN_64_THREADS_DEFAULT}
-  CATEGORY "Thread Manager" ADVANCED)
+  "HPX applications will be able to run on more than 64 cores (This variable is deprecated. The value is derived from HPX_MAX_CPU_COUNT instead.)"
+  "" CATEGORY "Thread Manager" ADVANCED)
 if(HPX_WITH_MORE_THAN_64_THREADS)
-  hpx_add_config_define(HPX_HAVE_MORE_THAN_64_THREADS)
+  hpx_warn("HPX_WITH_MORE_THAN_64_THREADS is deprecated. Instead use HPX_WITH_MAX_CPU_COUNT directly. If HPX_WITH_MAX_CPU_COUNT is greater than 64, or empty, HPX_HAVE_MORE_THAN_64_THREADS will be automatically set.")
 endif()
-
 hpx_option(HPX_WITH_THREAD_STACK_MMAP BOOL
   "Use mmap for stack allocation on appropriate platforms"
   ON
@@ -600,6 +598,13 @@ hpx_option(HPX_WITH_THREAD_STEALING_COUNTS BOOL
 
 if(HPX_WITH_THREAD_STEALING_COUNTS)
   hpx_add_config_define(HPX_HAVE_THREAD_STEALING_COUNTS)
+endif()
+
+hpx_option(HPX_WITH_COROUTINE_COUNTERS BOOL
+  "Enable keeping track of coroutine creation and rebind counts (default: OFF)"
+   OFF CATEGORY "Thread Manager" ADVANCED)
+if(HPX_WITH_COROUTINE_COUNTERS)
+  hpx_add_config_define(HPX_HAVE_COROUTINE_COUNTERS)
 endif()
 
 hpx_option(HPX_WITH_THREAD_LOCAL_STORAGE BOOL
@@ -1032,7 +1037,7 @@ if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
 endif()
 
 if(MSVC)
-  if(NOT (MSVC14))
+  if(MSVC_VERSION LESS 1900)
     hpx_error("MSVC x64 2015 or higher is required.")
   elseif(NOT CMAKE_CL_64)
     hpx_warn("MSVC (32Bit) will compile but will fail running larger applications because of limitations in the Windows OS.")
@@ -1056,7 +1061,7 @@ elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_info("Compiling for BlueGene/Q")
 endif()
 
-if((MSVC14 AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+if(((MSVC_VERSION GREATER_EQUAL 1900) AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
   hpx_option(HPX_WITH_AWAIT BOOL
       "Enable the use of experimental co_await functionality"
       OFF ADVANCED CATEGORY "LCOs")
@@ -1071,7 +1076,7 @@ if((MSVC14 AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
       hpx_add_config_define(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
     endif()
 
-    if(MSVC14 AND CMAKE_CL_64)
+    if((MSVC_VERSION GREATER_EQUAL 1900) AND CMAKE_CL_64)
       hpx_add_target_compile_option(-await PUBLIC)
     endif()
 
@@ -1244,8 +1249,8 @@ if(WIN32)
     # even VS2017 has an ICE when compiling with -Ob2
     hpx_add_target_compile_option(-Ob1 PUBLIC CONFIGURATIONS Release)
 
+    # /RTC1 is incompatible with /await
     if(NOT HPX_WITH_AWAIT)
-      # /RTC1 is incompatible with /await
       hpx_add_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
     else()
       hpx_remove_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
@@ -1269,7 +1274,7 @@ if(WIN32)
 
     # Exceptions
     hpx_add_target_compile_option(-EHsc)
-    if(MSVC14)
+    if(MSVC_VERSION GREATER_EQUAL 1900)
       # assume conforming (throwing) operator new implementations
       hpx_add_target_compile_option(-Zc:throwingNew PUBLIC)
 
@@ -1290,6 +1295,9 @@ if(WIN32)
       # Update 8 requires to set _ENABLE_EXTENDED_ALIGNED_STORAGE for it to
       # compile atomics
       hpx_add_config_cond_define(_ENABLE_EXTENDED_ALIGNED_STORAGE)
+
+      # Make sure that __cplusplus is properly defined
+      hpx_add_target_compile_option(-Zc:__cplusplus)
     endif()
 
     # Runtime type information
@@ -1437,7 +1445,7 @@ if(MSVC)
   if(CMAKE_CL_64)
     set(__target_arch "x86_64")
   else()
-    set(__target_arch "x84")
+    set(__target_arch "x86")
   endif()
   hpx_info("Architecture detected: ${__target_arch}")
 else()
@@ -1560,6 +1568,9 @@ else()
     hpx_warn("No timestamp support is available; some performance counters may report incorrect results")
   endif()
 endif()
+
+# store target architecture for later use
+set(HPX_WITH_TARGET_ARCHITECTURE ${__target_arch} CACHE INTERNAL "" FORCE)
 
 ################################################################################
 
@@ -2123,6 +2134,12 @@ endif()
 ################################################################################
 # print overall configuration summary
 include(HPX_PrintSummary)
+create_configuration_summary("Configuration summary:" "hpx")
+
+foreach(_module ${HPX_LIBS})
+  create_configuration_summary(
+    "Module configuration summary (${_module}):" "${_module}")
+endforeach()
 
 ################################################################################
 # External build system support (FindHPX.cmake and pkg-config).

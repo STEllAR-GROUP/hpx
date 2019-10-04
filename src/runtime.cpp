@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -383,6 +384,7 @@ namespace hpx
             active_counters_->stop_evaluating_counters();
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     void runtime::register_message_handler(char const* message_handler_type,
         char const* action, error_code& ec)
     {
@@ -406,6 +408,7 @@ namespace hpx
         return runtime_support_->create_binary_filter(binary_filter_type,
             compress, next_filter, ec);
     }
+#endif
 
     /// \brief Register all performance counter types related to this runtime
     ///        instance
@@ -543,7 +546,7 @@ namespace hpx
               &performance_counters::local_action_invocation_counter_discoverer,
               ""
             },
-
+#if defined(HPX_HAVE_NETWORKING)
             { "/runtime/count/remote-action-invocation",
               performance_counters::counter_raw,
               "returns the number of (remote) invocations of a specific action "
@@ -554,6 +557,7 @@ namespace hpx
               &performance_counters::remote_action_invocation_counter_discoverer,
               ""
             }
+#endif
         };
         performance_counters::install_counter_types(
             statistic_counter_types,
@@ -1358,6 +1362,7 @@ namespace hpx { namespace naming
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
 namespace hpx { namespace parcelset
 {
     bool do_background_work(
@@ -1367,6 +1372,7 @@ namespace hpx { namespace parcelset
             num_thread, mode);
     }
 }}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -1519,6 +1525,7 @@ namespace hpx
         }
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     // Create an instance of a message handler plugin
     void register_message_handler(char const* message_handler_type,
@@ -1564,6 +1571,7 @@ namespace hpx
             "the runtime system is not available at this time");
         return nullptr;
     }
+#endif
 
     // helper function to stop evaluating counters during shutdown
     void stop_evaluating_counters()

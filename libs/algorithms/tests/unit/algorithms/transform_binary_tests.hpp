@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -58,16 +59,14 @@ void test_transform_binary(ExPolicy policy, IteratorTag)
 
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
-    std::vector<int> d1(c1.size()); //-V656
+    std::vector<int> d1(c1.size());    //-V656
     std::iota(std::begin(c1), std::end(c1),
-        std::rand() % ((std::numeric_limits<int>::max)()/2));
+        std::rand() % ((std::numeric_limits<int>::max)() / 2));
     std::iota(std::begin(c2), std::end(c2),
-        std::rand() % ((std::numeric_limits<int>::max)()/2));
+        std::rand() % ((std::numeric_limits<int>::max)() / 2));
 
-    auto result =
-        hpx::parallel::transform(policy,
-            iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), std::begin(d1), add());
+    auto result = hpx::parallel::transform(policy, iterator(std::begin(c1)),
+        iterator(std::end(c1)), std::begin(c2), std::begin(d1), add());
 
     HPX_TEST(hpx::util::get<0>(result) == iterator(std::end(c1)));
     HPX_TEST(hpx::util::get<1>(result) == std::end(c2));
@@ -75,8 +74,8 @@ void test_transform_binary(ExPolicy policy, IteratorTag)
 
     // verify values
     std::vector<int> d2(c1.size());
-    std::transform(std::begin(c1), std::end(c1),
-        std::begin(c2), std::begin(d2), add());
+    std::transform(
+        std::begin(c1), std::end(c1), std::begin(c2), std::begin(d2), add());
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(d1), std::end(d1), std::begin(d2),
@@ -96,16 +95,14 @@ void test_transform_binary_async(ExPolicy p, IteratorTag)
 
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
-    std::vector<int> d1(c1.size()); //-V656
+    std::vector<int> d1(c1.size());    //-V656
     std::iota(std::begin(c1), std::end(c1),
-        std::rand() % ((std::numeric_limits<int>::max)()/2));
+        std::rand() % ((std::numeric_limits<int>::max)() / 2));
     std::iota(std::begin(c2), std::end(c2),
-        std::rand() % ((std::numeric_limits<int>::max)()/2));
+        std::rand() % ((std::numeric_limits<int>::max)() / 2));
 
-    auto f =
-        hpx::parallel::transform(p,
-            iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), std::begin(d1), add());
+    auto f = hpx::parallel::transform(p, iterator(std::begin(c1)),
+        iterator(std::end(c1)), std::begin(c2), std::begin(d1), add());
     f.wait();
 
     hpx::util::tuple<iterator, base_iterator, base_iterator> result = f.get();
@@ -115,8 +112,8 @@ void test_transform_binary_async(ExPolicy p, IteratorTag)
 
     // verify values
     std::vector<int> d2(c1.size());
-    std::transform(std::begin(c1), std::end(c1),
-        std::begin(c2), std::begin(d2), add());
+    std::transform(
+        std::begin(c1), std::end(c1), std::begin(c2), std::begin(d2), add());
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(d1), std::end(d1), std::begin(d2),
@@ -141,24 +138,26 @@ void test_transform_binary_exception(ExPolicy policy, IteratorTag)
 
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
-    std::vector<int> d1(c1.size()); //-V656
+    std::vector<int> d1(c1.size());    //-V656
     std::iota(std::begin(c1), std::end(c1), std::rand());
     std::iota(std::begin(c2), std::end(c2), std::rand());
 
     bool caught_exception = false;
-    try {
-        hpx::parallel::transform(policy,
-            iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), std::begin(d1),
+    try
+    {
+        hpx::parallel::transform(policy, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::begin(d1),
             throw_always());
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -173,28 +172,29 @@ void test_transform_binary_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
-    std::vector<int> d1(c1.size()); //-V656
+    std::vector<int> d1(c1.size());    //-V656
     std::iota(std::begin(c1), std::end(c1), std::rand());
     std::iota(std::begin(c2), std::end(c2), std::rand());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f =
-            hpx::parallel::transform(p,
-                iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), std::begin(d1),
-                throw_always());
+    try
+    {
+        auto f = hpx::parallel::transform(p, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::begin(d1),
+            throw_always());
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -215,23 +215,25 @@ void test_transform_binary_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
-    std::vector<int> d1(c1.size()); //-V656
+    std::vector<int> d1(c1.size());    //-V656
     std::iota(std::begin(c1), std::end(c1), std::rand());
     std::iota(std::begin(c2), std::end(c2), std::rand());
 
     bool caught_bad_alloc = false;
-    try {
-        hpx::parallel::transform(policy,
-            iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), std::begin(d1),
+    try
+    {
+        hpx::parallel::transform(policy, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::begin(d1),
             throw_bad_alloc());
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -246,27 +248,28 @@ void test_transform_binary_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
-    std::vector<int> d1(c1.size()); //-V656
+    std::vector<int> d1(c1.size());    //-V656
     std::iota(std::begin(c1), std::end(c1), std::rand());
     std::iota(std::begin(c2), std::end(c2), std::rand());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f =
-            hpx::parallel::transform(p,
-                iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), std::begin(d1),
-                throw_bad_alloc());
+    try
+    {
+        auto f = hpx::parallel::transform(p, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::begin(d1),
+            throw_bad_alloc());
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 

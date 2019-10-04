@@ -1,7 +1,8 @@
-// Copyright Vladimir Prus 2004.
-// Distributed under the Boost Software License, Version 1.0.
-// (See accomphpx::util::any_nonsering file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright Vladimir Prus 2004.
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accomphpx::util::any_nonsering file LICENSE_1_0.txt
+//  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
 
@@ -109,7 +110,7 @@ namespace hpx { namespace program_options {
     void untyped_value::xparse(hpx::util::any_nonser& value_store,
         const std::vector<std::string>& new_tokens) const
     {
-        if (!value_store.empty())
+        if (value_store.has_value())
             throw multiple_occurrences();
         if (new_tokens.size() > 1)
             throw multiple_values();
@@ -196,7 +197,7 @@ namespace hpx { namespace program_options {
         HPX_EXPORT
         void check_first_occurrence(const hpx::util::any_nonser& value)
         {
-            if (!value.empty())
+            if (value.has_value())
                 throw multiple_occurrences();
         }
     }    // namespace validators

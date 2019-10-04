@@ -1,6 +1,7 @@
 #  Copyright (c) 2017-2018 Thomas Heller
 #  Copyright (c) 2015 Martin Stumpf
 #
+#  SPDX-License-Identifier: BSL-1.0
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -115,6 +116,22 @@ jobs:
       - store_artifacts:
           path: /tmp/circular_deps.svg
           destination: /hpx/artifacts/circular_deps.svg
+
+  # Insure that the modules stay clang-formatted
+  clang_format:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Check that the modules are well clang-formatted
+          command: |
+              cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
+              clang-format-8 -i **/*.{cpp,hpp}
+              git diff --exit-code > /tmp/modified_format_files.txt
+      - store_artifacts:
+          path: /tmp/modified_format_files.txt
+          destination: /hpx/artifacts/modified_format_files.txt
 
   configure:
     <<: *defaults
@@ -812,7 +829,7 @@ jobs:
       - store_artifacts:
           path: tests.unit.modules.algorithms
 
-  tests.unit.modules.parallel_executors:
+  tests.unit.modules.execution:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -820,13 +837,13 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.modules.parallel_executors
+              ninja -j2 -k 0 tests.unit.modules.execution
       - run:
           name: Running Unit Tests
           when: always
           command: |
               ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.parallel_executors
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.execution
       - run:
           <<: *convert_xml
       - run:
@@ -834,9 +851,9 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.unit.modules.parallel_executors
+          path: tests.unit.modules.execution
       - store_artifacts:
-          path: tests.unit.modules.parallel_executors
+          path: tests.unit.modules.execution
 
   tests.unit.modules.segmented_algorithms:
     <<: *defaults
@@ -1016,6 +1033,10 @@ workflows:
           requires:
             - checkout_code
           <<: *gh_pages_filter
+      - clang_format:
+          requires:
+            - checkout_code
+          <<: *gh_pages_filter
       - configure:
           requires:
             - checkout_code
@@ -1081,7 +1102,7 @@ workflows:
           <<: *core_dependency
       - tests.unit.modules.algorithms:
           <<: *core_dependency
-      - tests.unit.modules.parallel_executors:
+      - tests.unit.modules.execution:
           <<: *core_dependency
       - tests.unit.modules.segmented_algorithms:
           <<: *core_dependency
@@ -1122,7 +1143,7 @@ workflows:
             - tests.unit.util
             - tests.unit.modules
             - tests.unit.modules.algorithms
-            - tests.unit.modules.parallel_executors
+            - tests.unit.modules.execution
             - tests.unit.modules.segmented_algorithms
             - tests.headers
             - tests.performance

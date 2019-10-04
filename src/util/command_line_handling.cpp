@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,19 +9,19 @@
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/detail/reset_function.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/topology/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/batch_environment.hpp>
 #include <hpx/util/debugging.hpp>
-#include <hpx/util/detail/reset_function.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
@@ -198,6 +199,16 @@ namespace hpx { namespace util
                 }
                 num_localities = localities;
             }
+
+#if !defined(HPX_HAVE_NETWORKING)
+            if (num_localities != 1)
+            {
+                throw hpx::detail::command_line_error(
+                    "Number of --hpx:localities must be equal to 1, please "
+                    "enable networking to run distributed HPX applications "
+                    "(use -DHPX_WITH_NETWORKING=On during configuration)");
+            }
+#endif
             return num_localities;
         }
 

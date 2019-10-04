@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -25,7 +26,7 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/util/serializable_unique_function.hpp>
 
 #include <exception>
 #include <type_traits>

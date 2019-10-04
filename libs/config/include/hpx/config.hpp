@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -46,6 +47,8 @@
 // included before winsock2.h
 #define _WINSOCKAPI_
 #endif
+
+// clang-format off
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the default ip/port number used by the parcel subsystem
@@ -494,5 +497,7 @@
 #define HPX_AGAS_SYMBOL_NS_LSB                       0x0000000000000003ULL
 #define HPX_AGAS_LOCALITY_NS_MSB                     0x0000000100000001ULL
 #define HPX_AGAS_LOCALITY_NS_LSB                     0x0000000000000004ULL
+
+// clang-format on
 
 #endif

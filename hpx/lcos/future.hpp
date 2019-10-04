@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -13,6 +14,10 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/function.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/result_of.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/lcos_fwd.hpp>
@@ -24,7 +29,7 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
@@ -33,10 +38,6 @@
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_enable_if.hpp>
 #include <hpx/type_support/void_guard.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/util/result_of.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
 #if defined(HPX_HAVE_AWAIT)

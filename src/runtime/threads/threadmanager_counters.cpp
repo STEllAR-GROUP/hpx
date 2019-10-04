@@ -4,19 +4,20 @@
 //  Copyright (c) 2015 Patricia Grubel
 //  Copyright (c) 2017 Shoshana Jakobovits
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/threadmanager_counters.hpp>
-#include <hpx/util/bind_back.hpp>
-#include <hpx/util/bind_front.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -371,6 +372,7 @@ namespace hpx { namespace threads {
 
         ///////////////////////////////////////////////////////////////////////////
         // thread counts counter creation function
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
         naming::gid_type thread_counts_counter_creator(
             performance_counters::counter_info const& info, error_code& ec)
         {
@@ -420,13 +422,16 @@ namespace hpx { namespace threads {
                 "invalid counter instance name: " + paths.instancename_);
             return naming::invalid_gid;
         }
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void register_counter_types(threadmanager& tm)
     {
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
         performance_counters::create_counter_func counts_creator(
             util::bind_front(&detail::thread_counts_counter_creator));
+#endif
 
         performance_counters::generic_counter_type_data counter_types[] = {
             // length of thread queue(s)
@@ -699,6 +704,7 @@ namespace hpx { namespace threads {
                     &thread_pool_base::get_thread_count_staged),
                 &performance_counters::locality_pool_thread_counter_discoverer,
                 ""},
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
             {"/threads/count/stack-recycles", performance_counters::counter_raw,
                 "returns the total number of HPX-thread recycling operations "
                 "performed for the referenced locality",
@@ -716,6 +722,7 @@ namespace hpx { namespace threads {
                 "the referenced locality",
                 HPX_PERFORMANCE_COUNTER_V1, counts_creator,
                 &detail::locality_allocator_counter_discoverer, ""},
+#endif
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
             {"/threads/count/pending-misses", performance_counters::counter_raw,
                 "returns the number of times that the referenced worker-thread "

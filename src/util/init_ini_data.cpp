@@ -1,6 +1,7 @@
 //  Copyright (c) 2005-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,14 +9,15 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/logging.hpp>
+#include <hpx/plugin.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/init_ini_data.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/util/plugin.hpp>
+#include <hpx/version.hpp>
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/tokenizer.hpp>

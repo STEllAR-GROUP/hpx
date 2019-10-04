@@ -1,14 +1,15 @@
 //  Copyright (c) 2017 Antoine Tran Tan
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
+#include <hpx/collectives/spmd_block.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_local_view.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/partitioned_vector_view.hpp>
-#include <hpx/lcos/spmd_block.hpp>
 
 #include <hpx/testing.hpp>
 

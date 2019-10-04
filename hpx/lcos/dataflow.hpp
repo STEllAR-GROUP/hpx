@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -21,6 +22,8 @@
 #ifndef HPX_LCOS_DATAFLOW_HPP
 #define HPX_LCOS_DATAFLOW_HPP
 
+#include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/functional/invoke_fused.hpp>
 #include <hpx/lcos/detail/future_transforms.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -28,16 +31,14 @@
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_access.hpp>
-#include <hpx/traits/is_action.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/util/invoke_fused.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/datastructures/tuple.hpp>

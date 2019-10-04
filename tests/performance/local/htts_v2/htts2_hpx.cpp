@@ -3,6 +3,7 @@
 //  Copyright (c) 2013-2014 Thomas Heller
 //  Copyright (c) 2013-2014 Patricia Grubel
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,7 +11,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/format.hpp>
 
 #include "htts2.hpp"

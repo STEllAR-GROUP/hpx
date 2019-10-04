@@ -2,6 +2,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -119,10 +120,17 @@ namespace hpx { namespace applier
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    applier::applier(parcelset::parcelhandler &ph, threads::threadmanager& tm)
+#if defined(HPX_HAVE_NETWORKING)
+    applier::applier(parcelset::parcelhandler &ph,threads::threadmanager& tm)
       : parcel_handler_(ph), thread_manager_(tm)
     {
     }
+#else
+    applier::applier(threads::threadmanager& tm)
+      : thread_manager_(tm)
+    {
+    }
+#endif
 
     void applier::initialize(std::uint64_t rts, std::uint64_t mem)
     {
@@ -140,10 +148,12 @@ namespace hpx { namespace applier
         return hpx::naming::get_agas_client();
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     parcelset::parcelhandler& applier::get_parcel_handler()
     {
         return parcel_handler_;
     }
+#endif
 
     threads::threadmanager& applier::get_thread_manager()
     {
@@ -164,52 +174,70 @@ namespace hpx { namespace applier
         std::vector<naming::gid_type>& prefixes,
         components::component_type type, error_code& ec) const
     {
+#if defined(HPX_HAVE_NETWORKING)
         return parcel_handler_.get_raw_remote_localities(prefixes, type, ec);
+#else
+        return true;
+#endif
     }
 
     bool applier::get_remote_localities(std::vector<naming::id_type>& prefixes,
         components::component_type type, error_code& ec) const
     {
+#if defined(HPX_HAVE_NETWORKING)
         std::vector<naming::gid_type> raw_prefixes;
         if (!parcel_handler_.get_raw_remote_localities(raw_prefixes, type, ec))
             return false;
 
         for (naming::gid_type& gid : raw_prefixes)
-            prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
-
+            prefixes.emplace_back(gid, naming::id_type::unmanaged);
+#endif
         return true;
     }
 
     bool applier::get_raw_localities(std::vector<naming::gid_type>& prefixes,
         components::component_type type) const
     {
+#if defined(HPX_HAVE_NETWORKING)
         return parcel_handler_.get_raw_localities(prefixes, type);
+#else
+        naming::gid_type id;
+        naming::get_agas_client().get_console_locality(id);
+        prefixes.emplace_back(id);
+        return true;
+#endif
     }
 
     bool applier::get_localities(std::vector<naming::id_type>& prefixes,
         error_code& ec) const
     {
         std::vector<naming::gid_type> raw_prefixes;
+#if defined(HPX_HAVE_NETWORKING)
         if (!parcel_handler_.get_raw_localities(raw_prefixes,
             components::component_invalid, ec))
             return false;
 
         for (naming::gid_type& gid : raw_prefixes)
-            prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
-
+            prefixes.emplace_back(gid, naming::id_type::unmanaged);
+#else
+        prefixes.emplace_back(agas::get_console_locality());
+#endif
         return true;
     }
 
     bool applier::get_localities(std::vector<naming::id_type>& prefixes,
         components::component_type type, error_code& ec) const
     {
+#if defined(HPX_HAVE_NETWORKING)
         std::vector<naming::gid_type> raw_prefixes;
         if (!parcel_handler_.get_raw_localities(raw_prefixes, type, ec))
             return false;
 
         for (naming::gid_type& gid : raw_prefixes)
-            prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
-
+            prefixes.emplace_back(gid, naming::id_type::unmanaged);
+#else
+        prefixes.emplace_back(agas::get_console_locality());
+#endif
         return true;
     }
 

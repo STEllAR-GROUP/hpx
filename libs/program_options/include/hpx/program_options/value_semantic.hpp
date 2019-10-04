@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -357,7 +358,7 @@ namespace hpx { namespace program_options {
 
         unsigned min_tokens() const override
         {
-            if (m_zero_tokens || !m_implicit_value.empty())
+            if (m_zero_tokens || m_implicit_value.has_value())
             {
                 return 0;
             }
@@ -401,7 +402,7 @@ namespace hpx { namespace program_options {
         virtual bool apply_default(
             hpx::util::any_nonser& value_store) const override
         {
-            if (m_default_value.empty())
+            if (!m_default_value.has_value())
             {
                 return false;
             }

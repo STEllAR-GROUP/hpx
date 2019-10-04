@@ -3,14 +3,15 @@
 //  Copyright (c) 2018-2019 Hartmut Kaiser
 //  Copyright (c) 2018-2019 Adrian Serio
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_RESILIENCY_DATAFLOW_REPLAY_HPP_2019_FEB_04_0449PM)
 #define HPX_RESILIENCY_DATAFLOW_REPLAY_HPP_2019_FEB_04_0449PM
 
-#include <hpx/resiliency/async_replay.hpp>
 #include <hpx/resiliency/config.hpp>
+#include <hpx/resiliency/async_replay.hpp>
 
 #include <hpx/async.hpp>
 #include <hpx/dataflow.hpp>

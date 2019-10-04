@@ -1,10 +1,11 @@
 //  Copyright (c) 2014 Grant Mercer
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/testing.hpp>
 
@@ -35,8 +36,8 @@ void test_copy(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
-    hpx::parallel::copy(policy,
-        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
+    hpx::parallel::copy(
+        policy, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
@@ -58,10 +59,8 @@ void test_copy_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
 
-    auto f =
-        hpx::parallel::copy(p,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            std::begin(d));
+    auto f = hpx::parallel::copy(
+        p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
     f.wait();
 
     std::size_t count = 0;
@@ -109,20 +108,21 @@ void test_copy_exception(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::parallel::copy(policy,
             decorated_iterator(
-                std::begin(c),
-                [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(std::end(c)),
-            std::begin(d));
+                std::begin(c), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(std::end(c)), std::begin(d));
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -142,24 +142,24 @@ void test_copy_exception_async(ExPolicy p, IteratorTag)
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f =
-            hpx::parallel::copy(p,
-                decorated_iterator(
-                    std::begin(c),
-                    [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c)),
-                std::begin(d));
+    try
+    {
+        auto f = hpx::parallel::copy(p,
+            decorated_iterator(
+                std::begin(c), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(std::end(c)), std::begin(d));
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -205,19 +205,19 @@ void test_copy_bad_alloc(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
-    try {
+    try
+    {
         hpx::parallel::copy(policy,
-            decorated_iterator(
-                std::begin(c),
-                [](){ throw std::bad_alloc(); }),
-            decorated_iterator(std::end(c)),
-            std::begin(d));
+            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
+            decorated_iterator(std::end(c)), std::begin(d));
         HPX_TEST(false);
     }
-    catch (std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -237,23 +237,22 @@ void test_copy_bad_alloc_async(ExPolicy p, IteratorTag)
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f =
-            hpx::parallel::copy(p,
-                decorated_iterator(
-                    std::begin(c),
-                    [](){ throw std::bad_alloc(); }),
-                decorated_iterator(std::end(c)),
-                std::begin(d));
+    try
+    {
+        auto f = hpx::parallel::copy(p,
+            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
+            decorated_iterator(std::end(c)), std::begin(d));
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -303,15 +302,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

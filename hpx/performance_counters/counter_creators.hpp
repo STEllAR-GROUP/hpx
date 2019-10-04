@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstdint>
 #include <string>
@@ -139,6 +140,7 @@ namespace hpx { namespace performance_counters
         counter_info const&, discover_counter_func const&,
         discover_counters_mode, error_code&);
 
+#if defined(HPX_HAVE_NETWORKING)
     HPX_API_EXPORT naming::gid_type remote_action_invocation_counter_creator(
         counter_info const&, error_code&);
 
@@ -161,6 +163,7 @@ namespace hpx { namespace performance_counters
     HPX_API_EXPORT bool per_action_data_counter_discoverer(
         counter_info const& info, discover_counter_func const& f,
         discover_counters_mode mode, error_code& ec);
+#endif
 #endif
 }}
 

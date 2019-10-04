@@ -4,6 +4,7 @@
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -15,6 +16,9 @@
 #include <hpx/concurrency/register_locks.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/logging.hpp>
@@ -43,9 +47,6 @@
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_back.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
@@ -155,23 +156,18 @@ addressing_service::addressing_service(
         gva_cache_->reserve(ini_.get_agas_local_cache_size());
 }
 
+#if defined(HPX_HAVE_NETWORKING)
 void addressing_service::bootstrap(
     parcelset::parcelhandler& ph, util::runtime_configuration const& ini)
 { // {{{
     LPROGRESS_;
 
-#if defined(HPX_HAVE_NETWORKING)
     std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
     create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini);
     if (service_type == service_mode_bootstrap)
     {
         launch_bootstrap(pp, ph.endpoints(), ini);
     }
-#else
-    create_big_boot_barrier(nullptr, ph.endpoints(), ini);
-    HPX_ASSERT(service_type == service_mode_bootstrap);
-    launch_bootstrap(nullptr, ph.endpoints(), ini);
-#endif
 } // }}}
 
 void addressing_service::initialize(parcelset::parcelhandler& ph,
@@ -180,7 +176,6 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
     rts_lva_ = rts_lva;
     mem_lva_ = mem_lva;
 
-#if defined(HPX_HAVE_NETWORKING)
     // now, boot the parcel port
     std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
     if(pp)
@@ -197,19 +192,40 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
             pp ? pp->get_locality_name() : "<console>",
             primary_ns_.ptr(), symbol_ns_.ptr());
     }
-#else
-    HPX_ASSERT(service_type == service_mode_bootstrap);
-    get_big_boot_barrier().wait_bootstrap();
-#endif
 
     set_status(state_running);
 } // }}}
+
+#else
+
+void addressing_service::bootstrap(util::runtime_configuration const& ini)
+{ // {{{
+    LPROGRESS_;
+
+    HPX_ASSERT(service_type == service_mode_bootstrap);
+    parcelset::endpoints_type endpoints;
+    endpoints.insert(parcelset::endpoints_type::value_type(
+        "local-loopback", parcelset::locality{}));
+    launch_bootstrap(endpoints, ini);
+} // }}}
+
+void addressing_service::initialize(std::uint64_t rts_lva, std::uint64_t mem_lva)
+{ // {{{
+    rts_lva_ = rts_lva;
+    mem_lva_ = mem_lva;
+
+    HPX_ASSERT(service_type == service_mode_bootstrap);
+    set_status(state_running);
+} // }}}
+
+#endif
 
 namespace detail
 {
     std::uint32_t get_number_of_pus_in_cores(std::uint32_t num_cores);
 }
 
+#if defined(HPX_HAVE_NETWORKING)
 void addressing_service::launch_bootstrap(
     std::shared_ptr<parcelset::parcelport> const& pp
   , parcelset::endpoints_type const & endpoints
@@ -280,6 +296,76 @@ void addressing_service::launch_bootstrap(
     if (is_console())
         register_name("/0/locality#console", here);
 } // }}}
+
+#else // HPX_HAVE_NETWORKING
+
+void addressing_service::launch_bootstrap(
+    parcelset::endpoints_type const & endpoints
+  , util::runtime_configuration const& ini_
+    )
+{ // {{{
+    component_ns_.reset(new detail::bootstrap_component_namespace);
+    locality_ns_.reset(new detail::bootstrap_locality_namespace(
+        reinterpret_cast<server::primary_namespace *>(primary_ns_.ptr())));
+
+    runtime& rt = get_runtime();
+
+    naming::gid_type const here =
+        naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
+    set_local_locality(here);
+
+    // store number of cores used by other processes
+    std::uint32_t cores_needed = rt.assign_cores();
+    std::uint32_t first_used_core = rt.assign_cores("<console>", cores_needed);
+
+    util::runtime_configuration& cfg = rt.get_config();
+    cfg.set_first_used_core(first_used_core);
+
+    naming::id_type const locality_gid = locality_ns_->gid();
+    gva locality_gva(here,
+        hpx::components::component_agas_locality_namespace, 1U,
+            locality_ns_->ptr());
+
+    naming::id_type const primary_gid = primary_ns_.gid();
+    gva primary_gva(here,
+        hpx::components::component_agas_primary_namespace, 1U,
+            primary_ns_.ptr());
+
+    naming::id_type const component_gid = component_ns_->gid();
+    gva component_gva(here,
+         hpx::components::component_agas_component_namespace, 1U,
+            component_ns_->ptr());
+
+    naming::id_type const symbol_gid = symbol_ns_.gid();
+    gva symbol_gva(here,
+        hpx::components::component_agas_symbol_namespace, 1U,
+            symbol_ns_.ptr());
+
+    rt.get_config().parse("assigned locality",
+        hpx::util::format("hpx.locality!={1}",
+            naming::get_locality_id_from_gid(here)));
+
+    std::uint32_t num_threads = hpx::util::get_entry_as<std::uint32_t>(
+        ini_, "hpx.os_threads", 1u);
+    locality_ns_->allocate(endpoints, 0, num_threads, naming::invalid_gid);
+
+    naming::gid_type runtime_support_gid1(here);
+    runtime_support_gid1.set_lsb(rt.get_runtime_support_lva());
+    naming::gid_type runtime_support_gid2(here);
+    runtime_support_gid2.set_lsb(std::uint64_t(0));
+
+    gva runtime_support_address(here
+      , components::get_component_type<components::server::runtime_support>()
+      , 1U, rt.get_runtime_support_lva());
+
+    naming::gid_type lower, upper;
+    get_id_range(HPX_INITIAL_GID_RANGE, lower, upper);
+    rt.get_id_pool().set_range(lower, upper);
+
+    register_name("/0/agas/locality#0", here);
+    register_name("/0/locality#console", here);
+} // }}}
+#endif
 
 void addressing_service::launch_hosted()
 {
@@ -1406,6 +1492,7 @@ bool addressing_service::resolve_cached(
     return resolved == count;   // returns whether all have been resolved
 }
 
+#if defined(HPX_HAVE_NETWORKING)
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::route(
     parcelset::parcel p
@@ -1436,6 +1523,7 @@ void addressing_service::route(
 
     primary_ns_.route(std::move(p), std::move(f));
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // The parameter 'compensated_credit' holds the amount of credits to be added

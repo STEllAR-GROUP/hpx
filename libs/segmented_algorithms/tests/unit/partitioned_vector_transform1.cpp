@@ -1,12 +1,13 @@
 //  Copyright (c) 2017 Ajai V George
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/partitioned_vector_predef.hpp>
-#include <hpx/include/parallel_transform.hpp>
 #include <hpx/include/parallel_count.hpp>
+#include <hpx/include/parallel_transform.hpp>
+#include <hpx/include/partitioned_vector_predef.hpp>
 
 #include <hpx/testing.hpp>
 
@@ -20,7 +21,7 @@ struct pfo
     template <typename T>
     U operator()(T& val) const
     {
-        return U((T(2)*val));
+        return U((T(2) * val));
     }
 };
 
@@ -37,7 +38,10 @@ struct add
 template <typename T>
 struct cmp
 {
-    cmp(T const& val = T()) : value_(val) {}
+    cmp(T const& val = T())
+      : value_(val)
+    {
+    }
 
     template <typename T_>
     bool operator()(T_ const& val) const
@@ -50,14 +54,14 @@ struct cmp
     template <typename Archive>
     void serialize(Archive& ar, unsigned version)
     {
-        ar & value_;
+        ar& value_;
     }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename T, typename U=T>
-void verify_values(ExPolicy && policy, hpx::partitioned_vector<T> const& v,
-    U const& val)
+template <typename ExPolicy, typename T, typename U = T>
+void verify_values(
+    ExPolicy&& policy, hpx::partitioned_vector<T> const& v, U const& val)
 {
     typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
 
@@ -72,22 +76,20 @@ void verify_values(ExPolicy && policy, hpx::partitioned_vector<T> const& v,
     HPX_TEST_EQ(size, v.size());
 }
 
-template <typename ExPolicy, typename T, typename U=T>
-void verify_values_count(ExPolicy && policy,
-    hpx::partitioned_vector<T> const& v, U const& val)
+template <typename ExPolicy, typename T, typename U = T>
+void verify_values_count(
+    ExPolicy&& policy, hpx::partitioned_vector<T> const& v, U const& val)
 {
     HPX_TEST_EQ(
-        std::size_t(hpx::parallel::count(
-            policy, v.begin(), v.end(), val)),
+        std::size_t(hpx::parallel::count(policy, v.begin(), v.end(), val)),
         v.size());
-    HPX_TEST_EQ(
-        std::size_t(hpx::parallel::count_if(
-            policy, v.begin(), v.end(), cmp<T>(val))),
+    HPX_TEST_EQ(std::size_t(hpx::parallel::count_if(
+                    policy, v.begin(), v.end(), cmp<T>(val))),
         v.size());
 }
 
-template <typename ExPolicy, typename T, typename U=T>
-void test_transform(ExPolicy && policy, hpx::partitioned_vector<T>& v,
+template <typename ExPolicy, typename T, typename U = T>
+void test_transform(ExPolicy&& policy, hpx::partitioned_vector<T>& v,
     hpx::partitioned_vector<U>& w, U val)
 {
     verify_values(policy, v, val);
@@ -95,70 +97,73 @@ void test_transform(ExPolicy && policy, hpx::partitioned_vector<T>& v,
 
     hpx::parallel::transform(policy, v.begin(), v.end(), w.begin(), pfo<U>());
 
-    verify_values(policy, w, 2*val);
-    verify_values_count(policy, w, 2*val);
+    verify_values(policy, w, 2 * val);
+    verify_values_count(policy, w, 2 * val);
 }
 
-template <typename ExPolicy, typename T, typename U=T>
-void verify_values_count_async(ExPolicy && policy,
-    hpx::partitioned_vector<T> const& v, U const& val)
+template <typename ExPolicy, typename T, typename U = T>
+void verify_values_count_async(
+    ExPolicy&& policy, hpx::partitioned_vector<T> const& v, U const& val)
 {
     HPX_TEST_EQ(
-        std::size_t(hpx::parallel::count(
-            policy, v.begin(), v.end(), val).get()),
+        std::size_t(
+            hpx::parallel::count(policy, v.begin(), v.end(), val).get()),
         v.size());
-    HPX_TEST_EQ(
-        std::size_t(hpx::parallel::count_if(
-            policy, v.begin(), v.end(), cmp<T>(val)).get()),
+    HPX_TEST_EQ(std::size_t(hpx::parallel::count_if(
+                    policy, v.begin(), v.end(), cmp<T>(val))
+                                .get()),
         v.size());
 }
 
-template <typename ExPolicy, typename T, typename U=T>
-void test_transform_async(ExPolicy && policy, hpx::partitioned_vector<T>& v,
+template <typename ExPolicy, typename T, typename U = T>
+void test_transform_async(ExPolicy&& policy, hpx::partitioned_vector<T>& v,
     hpx::partitioned_vector<U>& w, U val)
 {
     verify_values(policy, v, val);
     verify_values_count_async(policy, v, val);
 
-    hpx::parallel::transform(policy, v.begin(), v.end(),
-        w.begin(), pfo<U>()).get();
+    hpx::parallel::transform(policy, v.begin(), v.end(), w.begin(), pfo<U>())
+        .get();
 
-    verify_values(policy, w, 2*val);
-    verify_values_count_async(policy, w, 2*val);
+    verify_values(policy, w, 2 * val);
+    verify_values_count_async(policy, w, 2 * val);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename T, typename U=T>
-void transform_tests(std::vector<hpx::id_type> &localities)
+template <typename T, typename U = T>
+void transform_tests(std::vector<hpx::id_type>& localities)
 {
     std::size_t const length = 12;
 
     {
         hpx::partitioned_vector<T> v;
         hpx::partitioned_vector<U> w;
-        hpx::parallel::transform(hpx::parallel::execution::seq,
-            v.begin(), v.end(), w.begin(), pfo<U>());
-        hpx::parallel::transform(hpx::parallel::execution::par,
-            v.begin(), v.end(), w.begin(), pfo<U>());
+        hpx::parallel::transform(hpx::parallel::execution::seq, v.begin(),
+            v.end(), w.begin(), pfo<U>());
+        hpx::parallel::transform(hpx::parallel::execution::par, v.begin(),
+            v.end(), w.begin(), pfo<U>());
         hpx::parallel::transform(
             hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            v.begin(), v.end(), w.begin(), pfo<U>()).get();
+            v.begin(), v.end(), w.begin(), pfo<U>())
+            .get();
         hpx::parallel::transform(
             hpx::parallel::execution::par(hpx::parallel::execution::task),
-            v.begin(), v.end(), w.begin(), pfo<U>()).get();
+            v.begin(), v.end(), w.begin(), pfo<U>())
+            .get();
     }
 
     {
-        hpx::partitioned_vector<T> v(length,T(1),hpx::container_layout(localities));
-        hpx::partitioned_vector<U> w(length,hpx::container_layout(localities));
+        hpx::partitioned_vector<T> v(
+            length, T(1), hpx::container_layout(localities));
+        hpx::partitioned_vector<U> w(length, hpx::container_layout(localities));
         test_transform(hpx::parallel::execution::seq, v, w, U(1));
         test_transform(hpx::parallel::execution::par, v, w, U(1));
         test_transform_async(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            v, w, U(1));
+            hpx::parallel::execution::seq(hpx::parallel::execution::task), v, w,
+            U(1));
         test_transform_async(
-            hpx::parallel::execution::par(hpx::parallel::execution::task),
-            v, w, U(1));
+            hpx::parallel::execution::par(hpx::parallel::execution::task), v, w,
+            U(1));
     }
 }
 

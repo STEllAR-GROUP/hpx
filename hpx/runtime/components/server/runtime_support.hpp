@@ -2,6 +2,7 @@
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011-2017 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -15,6 +16,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/plugin.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -26,7 +28,6 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/is_component.hpp>
-#include <hpx/util/plugin.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <atomic>
@@ -246,9 +247,11 @@ namespace hpx { namespace components { namespace server
         void remove_here_from_connection_cache();
         void remove_here_from_console_connection_cache();
 
+#if defined(HPX_HAVE_NETWORKING)
         ///////////////////////////////////////////////////////////////////////
         void register_message_handler(char const* message_handler_type,
             char const* action, error_code& ec);
+
         parcelset::policies::message_handler* create_message_handler(
             char const* message_handler_type, char const* action,
             parcelset::parcelport* pp, std::size_t num_messages,
@@ -256,6 +259,7 @@ namespace hpx { namespace components { namespace server
         serialization::binary_filter* create_binary_filter(
             char const* binary_filter_type, bool compress,
             serialization::binary_filter* next_filter, error_code& ec);
+#endif
 
         // notify of message being sent
         void dijkstra_make_black();

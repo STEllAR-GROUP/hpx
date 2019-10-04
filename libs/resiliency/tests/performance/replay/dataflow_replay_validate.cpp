@@ -4,6 +4,7 @@
 //  Copyright (c) 2014 Patricia Grubel
 //  Copyright (c) 2019 Nikunj Gupta
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -329,9 +330,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
               << std::endl;
     std::cout << "Errors occurred: " << counter << std::endl;
 
-//     for (std::size_t i = 0; i != subdomains; ++i)
-//         std::cout << solution[i].get() << " ";
-//     std::cout << std::endl;
+    //     for (std::size_t i = 0; i != subdomains; ++i)
+    //         std::cout << solution[i].get() << " ";
+    //     std::cout << std::endl;
 
     return hpx::finalize();
 }

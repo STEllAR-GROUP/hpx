@@ -4,6 +4,7 @@
     Copyright (C) 2014 Thomas Heller
     Copyright (C) 2007-2013 Hartmut Kaiser
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -345,6 +346,10 @@ listed below.
    * * |jemalloc|_
      * 2.1.2
      * 2.1.0
+     * Used as a replacement for the system allocator.
+   * * |mimalloc|_
+     * latest
+     * 1.0.0
      * Used as a replacement for the system allocator.
    * * |hdf5|_
      * 1.8.7

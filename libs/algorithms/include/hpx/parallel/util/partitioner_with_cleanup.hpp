@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -34,11 +35,9 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace util
-{
+namespace hpx { namespace parallel { namespace util {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         // The static partitioner with cleanup spawns several chunks of
         // iterations for each available core. The number of iterations is
@@ -51,18 +50,16 @@ namespace hpx { namespace parallel { namespace util
             using executor_type = typename ExPolicy::executor_type;
 
             using scoped_executor_parameters =
-                detail::scoped_executor_parameters_ref<
-                    parameters_type, executor_type>;
+                detail::scoped_executor_parameters_ref<parameters_type,
+                    executor_type>;
 
-            using handle_local_exceptions = detail::handle_local_exceptions<ExPolicy>;
+            using handle_local_exceptions =
+                detail::handle_local_exceptions<ExPolicy>;
 
-            template <
-                typename ExPolicy_,
-                typename FwdIter, typename F1, typename F2, typename Cleanup>
-            static R call(
-                ExPolicy_ && policy,
-                FwdIter first, std::size_t count,
-                F1 && f1, F2 && f2, Cleanup && cleanup)
+            template <typename ExPolicy_, typename FwdIter, typename F1,
+                typename F2, typename Cleanup>
+            static R call(ExPolicy_&& policy, FwdIter first, std::size_t count,
+                F1&& f1, F2&& f2, Cleanup&& cleanup)
             {
                 // inform parameter traits
                 scoped_executor_parameters scoped_params(
@@ -73,27 +70,25 @@ namespace hpx { namespace parallel { namespace util
                 try
                 {
                     workitems = detail::partition<Result>(
-                        std::forward<ExPolicy_>(policy),
-                        first, count,
+                        std::forward<ExPolicy_>(policy), first, count,
                         std::forward<F1>(f1));
 
                     scoped_params.mark_end_of_scheduling();
-
-                } catch (...) {
+                }
+                catch (...)
+                {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(
-                    std::move(workitems), std::move(errors),
+                return reduce(std::move(workitems), std::move(errors),
                     std::forward<F2>(f2), std::forward<Cleanup>(cleanup));
             }
 
         private:
             template <typename F, typename Cleanup>
-            static R reduce(
-                std::vector<hpx::future<Result>>&& workitems,
-                std::list<std::exception_ptr>&& errors,
-                F && f, Cleanup && cleanup)
+            static R reduce(std::vector<hpx::future<Result>>&& workitems,
+                std::list<std::exception_ptr>&& errors, F&& f,
+                Cleanup&& cleanup)
             {
                 // wait for all tasks to finish
                 hpx::wait_all(workitems);
@@ -106,7 +101,9 @@ namespace hpx { namespace parallel { namespace util
                 try
                 {
                     return f(std::move(workitems));
-                } catch (...) {
+                }
+                catch (...)
+                {
                     // rethrow either bad_alloc or exception_list
                     handle_local_exceptions::call(std::current_exception());
                 }
@@ -121,18 +118,16 @@ namespace hpx { namespace parallel { namespace util
             using executor_type = typename ExPolicy::executor_type;
 
             using scoped_executor_parameters =
-                detail::scoped_executor_parameters<
-                    parameters_type, executor_type>;
+                detail::scoped_executor_parameters<parameters_type,
+                    executor_type>;
 
-            using handle_local_exceptions = detail::handle_local_exceptions<ExPolicy>;
+            using handle_local_exceptions =
+                detail::handle_local_exceptions<ExPolicy>;
 
-            template <
-                typename ExPolicy_,
-                typename FwdIter, typename F1, typename F2, typename Cleanup>
-            static hpx::future<R> call(
-                ExPolicy_ && policy,
-                FwdIter first, std::size_t count,
-                F1 && f1, F2 && f2, Cleanup && cleanup)
+            template <typename ExPolicy_, typename FwdIter, typename F1,
+                typename F2, typename Cleanup>
+            static hpx::future<R> call(ExPolicy_&& policy, FwdIter first,
+                std::size_t count, F1&& f1, F2&& f2, Cleanup&& cleanup)
             {
                 // inform parameter traits
                 std::shared_ptr<scoped_executor_parameters> scoped_params =
@@ -144,23 +139,24 @@ namespace hpx { namespace parallel { namespace util
                 try
                 {
                     workitems = detail::partition<Result>(
-                        std::forward<ExPolicy_>(policy),
-                        first, count,
+                        std::forward<ExPolicy_>(policy), first, count,
                         std::forward<F1>(f1));
 
                     scoped_params->mark_end_of_scheduling();
-
-                } catch (std::bad_alloc const&) {
+                }
+                catch (std::bad_alloc const&)
+                {
                     return hpx::make_exceptional_future<R>(
                         std::current_exception());
-                } catch (...) {
+                }
+                catch (...)
+                {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(
-                    std::move(scoped_params),
-                    std::move(workitems), std::move(errors),
-                    std::forward<F2>(f2), std::forward<Cleanup>(cleanup));
+                return reduce(std::move(scoped_params), std::move(workitems),
+                    std::move(errors), std::forward<F2>(f2),
+                    std::forward<Cleanup>(cleanup));
             }
 
         private:
@@ -168,17 +164,14 @@ namespace hpx { namespace parallel { namespace util
             static hpx::future<R> reduce(
                 std::shared_ptr<scoped_executor_parameters>&& scoped_params,
                 std::vector<hpx::future<Result>>&& workitems,
-                std::list<std::exception_ptr>&& errors,
-                F && f, Cleanup && cleanup)
+                std::list<std::exception_ptr>&& errors, F&& f,
+                Cleanup&& cleanup)
             {
                 // wait for all tasks to finish
                 return hpx::dataflow(
-                    [HPX_CAPTURE_MOVE(errors),
-                        HPX_CAPTURE_MOVE(scoped_params),
-                        HPX_CAPTURE_FORWARD(f),
-                        HPX_CAPTURE_FORWARD(cleanup)
-                    ](std::vector<hpx::future<Result> > && r) mutable -> R
-                    {
+                    [HPX_CAPTURE_MOVE(errors), HPX_CAPTURE_MOVE(scoped_params),
+                        HPX_CAPTURE_FORWARD(f), HPX_CAPTURE_FORWARD(cleanup)](
+                        std::vector<hpx::future<Result>>&& r) mutable -> R {
                         HPX_UNUSED(scoped_params);
 
                         handle_local_exceptions::call(
@@ -188,7 +181,7 @@ namespace hpx { namespace parallel { namespace util
                     std::move(workitems));
             }
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // ExPolicy: execution policy
@@ -196,12 +189,12 @@ namespace hpx { namespace parallel { namespace util
     // Result:   intermediate result type of first step
     template <typename ExPolicy, typename R = void, typename Result = R>
     struct partitioner_with_cleanup
-      : detail::select_partitioner<
-            typename std::decay<ExPolicy>::type,
+      : detail::select_partitioner<typename std::decay<ExPolicy>::type,
             detail::static_partitioner_with_cleanup,
-            detail::task_static_partitioner_with_cleanup
-        >::template apply<R, Result>
-    {};
-}}}
+            detail::task_static_partitioner_with_cleanup>::template apply<R,
+            Result>
+    {
+    };
+}}}    // namespace hpx::parallel::util
 
 #endif

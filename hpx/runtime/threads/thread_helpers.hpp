@@ -3,6 +3,7 @@
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,6 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/register_locks.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
@@ -20,7 +22,6 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util_fwd.hpp>
-#include <hpx/util/unique_function.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <atomic>

@@ -4,6 +4,7 @@
 # Copyright (c) 2017 Google
 # Copyright (c) 2017 Taeguk Kwon
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -521,6 +522,13 @@ function(hpx_check_for_cxx11_std_shared_ptr)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx11_std_shared_ptr_lwg3018)
+  add_hpx_config_test(HPX_WITH_CXX11_SHARED_PTR_LWG3018
+    SOURCE cmake/tests/cxx11_std_shared_ptr_lwg3018.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_cxx11_std_shuffle)
   add_hpx_config_test(HPX_WITH_CXX11_SHUFFLE
     SOURCE cmake/tests/cxx11_std_shuffle.cpp
@@ -719,6 +727,13 @@ endfunction()
 function(hpx_check_for_cxx17_hardware_destructive_interference_size)
   add_hpx_config_test(HPX_WITH_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE
     SOURCE cmake/tests/cxx17_hardware_destructive_interference_size.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
+function(hpx_check_for_cxx17_std_in_place_type_t)
+  add_hpx_config_test(HPX_WITH_CXX17_STD_IN_PLACE_TYPE_T
+    SOURCE cmake/tests/cxx17_std_in_place_type_t.cpp
     FILE ${ARGN})
 endfunction()
 

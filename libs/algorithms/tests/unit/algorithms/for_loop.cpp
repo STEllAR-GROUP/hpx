@@ -1,10 +1,11 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/testing.hpp>
 
 #include <hpx/include/parallel_for_loop.hpp>
@@ -25,7 +26,7 @@ unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename ExPolicy, typename IteratorTag>
-void test_for_loop(ExPolicy && policy, IteratorTag)
+void test_for_loop(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -37,27 +38,21 @@ void test_for_loop(ExPolicy && policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::parallel::for_loop(
-        std::forward<ExPolicy>(policy),
+    hpx::parallel::for_loop(std::forward<ExPolicy>(policy),
         iterator(std::begin(c)), iterator(std::end(c)),
-        [](iterator it)
-        {
-            *it = 42;
-        });
+        [](iterator it) { *it = 42; });
 
     // verify values
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c),
-        [&count](std::size_t v) -> void
-        {
-            HPX_TEST_EQ(v, std::size_t(42));
-            ++count;
-        });
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, std::size_t(42));
+        ++count;
+    });
     HPX_TEST_EQ(count, c.size());
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_for_loop_async(ExPolicy && p, IteratorTag)
+void test_for_loop_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -65,24 +60,17 @@ void test_for_loop_async(ExPolicy && p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    auto f =
-        hpx::parallel::for_loop(
-            std::forward<ExPolicy>(p),
-            iterator(std::begin(c)), iterator(std::end(c)),
-            [](iterator it)
-            {
-                *it = 42;
-            });
+    auto f = hpx::parallel::for_loop(std::forward<ExPolicy>(p),
+        iterator(std::begin(c)), iterator(std::end(c)),
+        [](iterator it) { *it = 42; });
     f.wait();
 
     // verify values
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c),
-        [&count](std::size_t v) -> void
-        {
-            HPX_TEST_EQ(v, std::size_t(42));
-            ++count;
-        });
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, std::size_t(42));
+        ++count;
+    });
     HPX_TEST_EQ(count, c.size());
 }
 
@@ -107,7 +95,7 @@ void for_loop_test()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy>
-void test_for_loop_idx(ExPolicy && policy)
+void test_for_loop_idx(ExPolicy&& policy)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -116,51 +104,36 @@ void test_for_loop_idx(ExPolicy && policy)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::parallel::for_loop(
-        std::forward<ExPolicy>(policy),
-        0, c.size(),
-        [&c](std::size_t i)
-        {
-            c[i] = 42;
-        });
+    hpx::parallel::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
+        [&c](std::size_t i) { c[i] = 42; });
 
     // verify values
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c),
-        [&count](std::size_t v) -> void
-        {
-            HPX_TEST_EQ(v, std::size_t(42));
-            ++count;
-        });
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, std::size_t(42));
+        ++count;
+    });
     HPX_TEST_EQ(count, c.size());
 }
 
 template <typename ExPolicy>
-void test_for_loop_idx_async(ExPolicy && p)
+void test_for_loop_idx_async(ExPolicy&& p)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    auto f =
-        hpx::parallel::for_loop(
-            std::forward<ExPolicy>(p),
-            0, c.size(),
-            [&c](std::size_t i)
-            {
-                c[i] = 42;
-            });
+    auto f = hpx::parallel::for_loop(std::forward<ExPolicy>(p), 0, c.size(),
+        [&c](std::size_t i) { c[i] = 42; });
     f.wait();
 
     // verify values
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c),
-        [&count](std::size_t v) -> void
-        {
-            HPX_TEST_EQ(v, std::size_t(42));
-            ++count;
-        });
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, std::size_t(42));
+        ++count;
+    });
     HPX_TEST_EQ(count, c.size());
 }
 
@@ -198,15 +171,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

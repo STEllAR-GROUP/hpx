@@ -3,10 +3,13 @@
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
@@ -28,9 +31,9 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/apex.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_front.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
@@ -1627,3 +1630,4 @@ namespace hpx { namespace parcelset
     }
 }}
 
+#endif

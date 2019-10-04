@@ -1,12 +1,18 @@
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef HPX_PARCELSET_PUT_PARCEL_HPP
 #define HPX_PARCELSET_PUT_PARCEL_HPP
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
+
 #include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
@@ -22,7 +28,7 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
-#include <hpx/traits/is_action.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -205,4 +211,5 @@ namespace hpx { namespace parcelset
     }
 }}
 
+#endif
 #endif

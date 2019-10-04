@@ -1,5 +1,6 @@
 # Copyright (c) 2014 Thomas Heller
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -83,18 +84,6 @@ if(UNIX AND NOT CYGWIN)
 endif()
 
 set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
-
-if(NOT HPX_WITH_CXX17_FILESYSTEM)
-  find_package(Boost ${Boost_MINIMUM_VERSION}
-    QUIET MODULE
-    COMPONENTS filesystem)
-  if(Boost_FILESYSTEM_FOUND)
-    hpx_info("  filesystem")
-  else()
-    hpx_error("Could not find Boost.Filesystem. Either use a compiler with support for C++17 filesystem or provide a boost installation including the filesystem library")
-  endif()
-  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
-endif()
 
 if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
   find_package(Boost 1.61 QUIET MODULE COMPONENTS iostreams)

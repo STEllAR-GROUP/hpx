@@ -1,7 +1,9 @@
-// Copyright Vladimir Prus 2002-2004.
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright Vladimir Prus 2002-2004.
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accompanying file LICENSE_1_0.txt
+//  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
 #include <hpx/hpx_main.hpp>
@@ -597,7 +599,9 @@ void test_implicit_value()
         //     options
         // For --biz, an exception is thrown between 1 and 2.
         // We might want to fix that in future.
-        {"--foo --biz", s_unknown_option, ""}, {nullptr, 0, nullptr}};
+        {"--foo --biz", s_unknown_option, ""},
+        {nullptr, 0, nullptr}
+    };
 
     test_cmdline("foo? bar?", style, test_cases1);
 }

@@ -1,5 +1,6 @@
 # Copyright (c) 2019 Auriane Reverdell
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -33,30 +34,34 @@ function(add_hpx_module name)
     ${HPX_WITH_TESTS} ADVANCED
     CATEGORY "Modules")
 
-  if(${name}_DEPRECATION_WARNINGS)
-    hpx_option(HPX_${name_upper}_WITH_DEPRECATION_WARNINGS
-      BOOL
-      "Enable warnings for deprecated facilities. (default: ${HPX_WITH_DEPRECATION_WARNINGS})"
-      ${HPX_WITH_DEPRECATION_WARNINGS} ADVANCED
-      CATEGORY "Modules")
-    if(HPX_${name_upper}_WITH_DEPRECATION_WARNINGS)
-      hpx_add_config_define_namespace(
-          DEFINE HPX_${name_upper}_HAVE_DEPRECATION_WARNINGS
-          NAMESPACE ${name_upper})
-    endif()
+  set(_deprecation_warnings_default OFF)
+  if(${HPX_WITH_DEPRECATION_WARNINGS} AND ${name}_DEPRECATION_WARNINGS)
+    set(_deprecation_warnings_default ON)
+  endif()
+  hpx_option(HPX_${name_upper}_WITH_DEPRECATION_WARNINGS
+    BOOL
+    "Enable warnings for deprecated facilities. (default: ${HPX_WITH_DEPRECATION_WARNINGS})"
+    ${_deprecation_warnings_default} ADVANCED
+    CATEGORY "Modules")
+  if(${HPX_${name_upper}_WITH_DEPRECATION_WARNINGS})
+    hpx_add_config_define_namespace(
+      DEFINE HPX_${name_upper}_HAVE_DEPRECATION_WARNINGS
+      NAMESPACE ${name_upper})
   endif()
 
+  set(_compatibility_headers_default OFF)
   if(${name}_COMPATIBILITY_HEADERS)
-    hpx_option(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS
-      BOOL
-      "Enable compatibility headers for old headers"
-      ON ADVANCED
-      CATEGORY "Modules")
-    if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
-      hpx_add_config_define_namespace(
-          DEFINE HPX_${name_upper}_HAVE_COMPATIBILITY_HEADERS
-          NAMESPACE ${name_upper})
-    endif()
+    set(_compatibility_headers_default ON)
+  endif()
+  hpx_option(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS
+    BOOL
+    "Enable compatibility headers for old headers. (default: ${_compatibility_headers_default})"
+    ${_compatibility_headers_default} ADVANCED
+    CATEGORY "Modules")
+  if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
+    hpx_add_config_define_namespace(
+      DEFINE HPX_${name_upper}_HAVE_COMPATIBILITY_HEADERS
+      NAMESPACE ${name_upper})
   endif()
 
   # Main directories of the module
@@ -79,77 +84,46 @@ function(add_hpx_module name)
     prepend(compat_headers ${COMPAT_HEADER_ROOT} ${${name}_COMPAT_HEADERS})
   endif()
 
-  set(copyright
-    "//  Copyright (c) 2019 The STE||AR GROUP\n"
-    "//\n"
-    "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
-    "//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"
-    "\n"
-  )
-
   # This header generation is disabled for config module specific generated
   # headers are included
   if (${name}_GLOBAL_HEADER_GEN)
-    set(global_header "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}.hpp")
     # Add a global include file that include all module headers
-    FILE(WRITE ${global_header}
-        ${copyright}
-        "#ifndef HPX_${name_upper}_HPP\n"
-        "#define HPX_${name_upper}_HPP\n\n"
-    )
+    set(global_header "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}.hpp")
+    set(module_headers)
     foreach(header_file ${${name}_HEADERS})
       # Exclude the files specified
       if (NOT (${header_file} IN_LIST ${name}_EXCLUDE_FROM_GLOBAL_HEADER))
-        FILE(APPEND ${global_header}
-          "#include <${header_file}>\n"
-        )
+        set(module_headers "${module_headers}#include <${header_file}>\n")
       endif()
     endforeach(header_file)
-    FILE(APPEND ${global_header}
-      "\n#endif\n"
-    )
+    configure_file("${CMAKE_SOURCE_DIR}/cmake/templates/global_module_header.hpp.in"
+      "${global_header}")
   endif()
 
   if(${name}_FORCE_LINKING_GEN)
       # Add a header to force linking of modules on Windows
       set(force_linking_header "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}/force_linking.hpp")
-      FILE(WRITE ${force_linking_header}
-          ${copyright}
-          "#if !defined(HPX_${name_upper}_FORCE_LINKING_HPP)\n"
-          "#define HPX_${name_upper}_FORCE_LINKING_HPP\n"
-          "\n"
-          "namespace hpx { namespace ${name}\n"
-          "{\n"
-          "    void force_linking();\n"
-          "}}\n"
-          "\n"
-          "#endif\n"
-      )
+      configure_file("${CMAKE_SOURCE_DIR}/cmake/templates/force_linking.hpp.in"
+        "${force_linking_header}")
 
       # Add a source file implementing the above function
       set(force_linking_source "${CMAKE_CURRENT_BINARY_DIR}/src/force_linking.cpp")
-      FILE(WRITE ${force_linking_source}
-          ${copyright}
-          "#include <hpx/${name}/force_linking.hpp>\n"
-          "\n"
-          "namespace hpx { namespace ${name}\n"
-          "{\n"
-          "    void force_linking() {}\n"
-          "}}\n"
-          "\n"
-      )
+      configure_file("${CMAKE_SOURCE_DIR}/cmake/templates/force_linking.cpp.in"
+        "${force_linking_source}")
   endif()
 
+  # generate configuration header for this module
   set(config_header
     "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}/config/defines.hpp")
-  write_config_defines_file(
-    NAMESPACE ${name_upper}
-    FILENAME ${config_header})
 
+  write_config_defines_file(NAMESPACE ${name_upper} FILENAME ${config_header})
+
+  # list all specified headers
   foreach(header_file ${headers})
     hpx_debug(${header_file})
   endforeach(header_file)
 
+  # create library modules
   add_library(hpx_${name} STATIC
     ${sources} ${force_linking_source}
     ${headers} ${global_header} ${compat_headers}

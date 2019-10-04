@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,10 +8,10 @@
 #define HPX_UTIL_TRANSFORM_ITERATOR_MAR_19_2015_0813AM
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/identity.hpp>
+#include <hpx/functional/result_of.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
+#include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
-#include <hpx/util/result_of.hpp>
 
 #include <iterator>
 #include <type_traits>

@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -53,31 +54,36 @@ namespace hpx {
                           // to take its address for comparison purposes.
 
     exception_list::exception_list()
-      : hpx::exception(hpx::success), mtx_()
+      : hpx::exception(hpx::success)
+      , mtx_()
     {
     }
 
     exception_list::exception_list(std::exception_ptr const& e)
-      : hpx::exception(hpx::get_error(e), hpx::get_error_what(e)), mtx_()
+      : hpx::exception(hpx::get_error(e), hpx::get_error_what(e))
+      , mtx_()
     {
         add(e);
     }
 
     exception_list::exception_list(exception_list_type&& l)
       : hpx::exception(l.size() ? hpx::get_error(l.front()) : success)
-      , exceptions_(std::move(l)), mtx_()
+      , exceptions_(std::move(l))
+      , mtx_()
     {
     }
 
     exception_list::exception_list(exception_list const& l)
       : hpx::exception(static_cast<hpx::exception const&>(l))
-      , exceptions_(l.exceptions_), mtx_()
+      , exceptions_(l.exceptions_)
+      , mtx_()
     {
     }
 
     exception_list::exception_list(exception_list&& l)
       : hpx::exception(std::move(static_cast<hpx::exception&>(l)))
-      , exceptions_(std::move(l.exceptions_)), mtx_()
+      , exceptions_(std::move(l.exceptions_))
+      , mtx_()
     {
     }
 

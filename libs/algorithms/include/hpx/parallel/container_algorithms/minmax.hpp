@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -23,8 +24,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /// Finds the smallest element in the range [first, last) using the given
     /// comparison function \a f.
     ///
@@ -89,26 +89,19 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           if the range is empty.
     ///
     template <typename ExPolicy, typename Rng,
-        typename Proj = util::projection_identity,
-        typename F = detail::less,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F,
-                traits::projected_range<Proj, Rng>,
-                traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, typename hpx::traits::range_traits<Rng>::iterator_type
-    >::type
-    min_element(ExPolicy && policy, Rng && rng, F && f = F(),
-        Proj && proj = Proj())
+        typename Proj = util::projection_identity, typename F = detail::less,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    F, traits::projected_range<Proj, Rng>,
+                    traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_traits<Rng>::iterator_type>::type
+    min_element(ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj())
     {
         return min_element(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng),
-            std::forward<F>(f), std::forward<Proj>(proj));
+            hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
+            std::forward<Proj>(proj));
     }
 
     /// Finds the greatest element in the range [first, last) using the given
@@ -176,26 +169,19 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           if the range is empty.
     ///
     template <typename ExPolicy, typename Rng,
-        typename Proj = util::projection_identity,
-        typename F = detail::less,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F,
-                traits::projected_range<Proj, Rng>,
-                traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, typename hpx::traits::range_traits<Rng>::iterator_type
-    >::type
-    max_element(ExPolicy && policy, Rng && rng, F && f = F(),
-        Proj && proj = Proj())
+        typename Proj = util::projection_identity, typename F = detail::less,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    F, traits::projected_range<Proj, Rng>,
+                    traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_traits<Rng>::iterator_type>::type
+    max_element(ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj())
     {
         return max_element(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng),
-            std::forward<F>(f), std::forward<Proj>(proj));
+            hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
+            std::forward<Proj>(proj));
     }
 
     /// Finds the greatest element in the range [first, last) using the given
@@ -276,35 +262,29 @@ namespace hpx { namespace parallel { inline namespace v1
 #endif
 
     template <typename ExPolicy, typename Rng,
-        typename Proj = util::projection_identity,
-        typename F = detail::less,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F,
-                traits::projected_range<Proj, Rng>,
-                traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        typename Proj = util::projection_identity, typename F = detail::less,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    F, traits::projected_range<Proj, Rng>,
+                    traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<
             tag::min(typename hpx::traits::range_traits<Rng>::iterator_type),
-            tag::max(typename hpx::traits::range_traits<Rng>::iterator_type)>
-    >::type
-    minmax_element(ExPolicy && policy, Rng && rng, F && f = F(),
-        Proj && proj = Proj())
+            tag::max(typename hpx::traits::range_traits<Rng>::iterator_type)>>::
+        type
+        minmax_element(
+            ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj())
     {
         return minmax_element(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng),
-            std::forward<F>(f), std::forward<Proj>(proj));
+            hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
+            std::forward<Proj>(proj));
     }
 
 #if defined(HPX_MSVC)
 #pragma pop_macro("min")
 #pragma pop_macro("max")
 #endif
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

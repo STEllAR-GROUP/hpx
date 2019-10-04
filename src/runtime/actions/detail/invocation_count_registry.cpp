@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -23,11 +24,13 @@ namespace hpx { namespace actions { namespace detail
         return registry.get();
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     invocation_count_registry& invocation_count_registry::remote_instance()
     {
         hpx::util::static_<invocation_count_registry, remote_tag> registry;
         return registry.get();
     }
+#endif
 
     void invocation_count_registry::register_class(std::string const& name,
         get_invocation_count_type fun)

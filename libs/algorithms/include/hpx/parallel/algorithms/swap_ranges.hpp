@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Grant Mercer
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -23,12 +24,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // swap ranges
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         template <typename FwdIter2>
         struct swap_ranges
@@ -36,45 +35,41 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             swap_ranges()
               : swap_ranges::algorithm("swap_ranges")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename FwdIter1>
-            static FwdIter2
-            sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2)
+            static FwdIter2 sequential(
+                ExPolicy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
             {
                 return std::swap_ranges(first1, last1, first2);
             }
 
             template <typename ExPolicy, typename FwdIter1>
-            static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter2
-            >::type
-            parallel(ExPolicy && policy, FwdIter1 first1,
-                FwdIter1 last1, FwdIter2 first2)
+            static typename util::detail::algorithm_result<ExPolicy,
+                FwdIter2>::type
+            parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+                FwdIter2 first2)
             {
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
                     zip_iterator;
                 typedef typename zip_iterator::reference reference;
-                typedef typename util::detail::algorithm_result<
-                        ExPolicy, FwdIter2
-                    >::type result_type;
+                typedef typename util::detail::algorithm_result<ExPolicy,
+                    FwdIter2>::type result_type;
 
-                return get_iter<1, result_type>(
-                    for_each_n<zip_iterator>().call(
-                        std::forward<ExPolicy>(policy), std::false_type(),
-                        hpx::util::make_zip_iterator(first1, first2),
-                        std::distance(first1, last1),
-                        [](reference t) -> void
-                        {
-                            using hpx::util::get;
-                            std::swap(get<0>(t), get<1>(t));
-                        },
-                        util::projection_identity()));
+                return get_iter<1, result_type>(for_each_n<zip_iterator>().call(
+                    std::forward<ExPolicy>(policy), std::false_type(),
+                    hpx::util::make_zip_iterator(first1, first2),
+                    std::distance(first1, last1),
+                    [](reference t) -> void {
+                        using hpx::util::get;
+                        std::swap(get<0>(t), get<1>(t));
+                    },
+                    util::projection_identity()));
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Exchanges elements between range [first1, last1) and another range
     /// starting at \a first2.
@@ -125,24 +120,20 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    >::type
-    swap_ranges(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2)
+        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
+    swap_ranges(
+        ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::swap_ranges<FwdIter2>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2);
+            std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2);
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

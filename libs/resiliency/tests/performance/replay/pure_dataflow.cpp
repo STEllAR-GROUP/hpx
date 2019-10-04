@@ -4,6 +4,7 @@
 //  Copyright (c) 2014 Patricia Grubel
 //  Copyright (c) 2019 Nikunj Gupta
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -123,7 +124,7 @@ struct stepper
         partition_data workspace(3 * size + 1);
 
         int j = 0;
-        for (std::size_t  i = 0; i != size - 2; ++i, ++j)
+        for (std::size_t i = 0; i != size - 2; ++i, ++j)
             workspace[j] =
                 stencil(left_input[i], left_input[i + 1], left_input[i + 2]);
 
@@ -143,7 +144,7 @@ struct stepper
             stencil(center_input[size - 1], right_input[0], right_input[1]);
         j += 2;
 
-        for (std::size_t  i = 0; i != size - 1; ++i, ++j)
+        for (std::size_t i = 0; i != size - 1; ++i, ++j)
             workspace[j] =
                 stencil(right_input[i], right_input[i + 1], right_input[i + 2]);
 

@@ -1,5 +1,6 @@
 //  Copyright (c) 2017-2018 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -767,8 +768,10 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             {
                 // Create thread on this worker thread if possible
                 LOG_CUSTOM_VAR(msg = msgs[0]);
-                std::size_t global_thread_num = hpx::get_worker_thread_num();
-                thread_num = this->global_to_local_thread_index(global_thread_num);
+                std::size_t global_thread_num =
+                    threads::detail::get_thread_num_tss();
+                thread_num =
+                    this->global_to_local_thread_index(global_thread_num);
                 if (thread_num>=num_workers_) {
                     // This is a task being injected from a thread on another pool.
                     // Reset thread_num to first queue.
@@ -797,8 +800,10 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                 domain_num = data.schedulehint.hint % num_domains_;
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
-                std::size_t global_thread_num = hpx::get_worker_thread_num();
-                thread_num = this->global_to_local_thread_index(global_thread_num);
+                std::size_t global_thread_num =
+                    threads::detail::get_thread_num_tss();
+                thread_num =
+                    this->global_to_local_thread_index(global_thread_num);
                 if (d_lookup_[thread_num] == domain_num) {
                     q_index = q_lookup_[thread_num];
                 }
@@ -966,8 +971,10 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             {
                 // Create thread on this worker thread if possible
                 LOG_CUSTOM_VAR(msg = msgs[0]);
-                std::size_t global_thread_num = hpx::get_worker_thread_num();
-                thread_num = this->global_to_local_thread_index(global_thread_num);
+                std::size_t global_thread_num =
+                    threads::detail::get_thread_num_tss();
+                thread_num =
+                    this->global_to_local_thread_index(global_thread_num);
                 if (thread_num>=num_workers_) {
                     // This is a task being injected from a thread on another pool.
                     // Reset thread_num to first queue.
@@ -997,8 +1004,10 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                 domain_num = schedulehint.hint % num_domains_;
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
-                std::size_t global_thread_num = hpx::get_worker_thread_num();
-                thread_num = this->global_to_local_thread_index(global_thread_num);
+                std::size_t global_thread_num =
+                    threads::detail::get_thread_num_tss();
+                thread_num =
+                    this->global_to_local_thread_index(global_thread_num);
                 if (d_lookup_[thread_num] == domain_num) {
                     q_index = q_lookup_[thread_num];
                 }
@@ -1066,8 +1075,10 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             {
                 // Create thread on this worker thread if possible
                 LOG_CUSTOM_VAR(msg = msgs[0]);
-                std::size_t global_thread_num = hpx::get_worker_thread_num();
-                thread_num = this->global_to_local_thread_index(global_thread_num);
+                std::size_t global_thread_num =
+                    threads::detail::get_thread_num_tss();
+                thread_num =
+                    this->global_to_local_thread_index(global_thread_num);
                 if (thread_num>=num_workers_) {
                     // This is a task being injected from a thread on another pool.
                     // Reset thread_num to first queue.
@@ -1097,8 +1108,10 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                 domain_num = schedulehint.hint % num_domains_;
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
-                std::size_t global_thread_num = hpx::get_worker_thread_num();
-                thread_num = this->global_to_local_thread_index(global_thread_num);
+                std::size_t global_thread_num =
+                    threads::detail::get_thread_num_tss();
+                thread_num =
+                    this->global_to_local_thread_index(global_thread_num);
                 if (d_lookup_[thread_num] == domain_num) {
                     q_index = q_lookup_[thread_num];
                 }

@@ -1,6 +1,7 @@
 //  Copyright (c) 2014 Anton Bikineev
 //  Copyright (c) 2014 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -11,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/util/debug/demangle_helper.hpp>
+#include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
 
 #include <string>

@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,10 +79,12 @@ HPX_REGISTER_ACTION_ID(
     primary_namespace_unbind_gid_action,
     hpx::actions::primary_namespace_unbind_gid_action_id)
 
+#if defined(HPX_HAVE_NETWORKING)
 HPX_REGISTER_ACTION_ID(
     primary_namespace::route_action,
     primary_namespace_route_action,
     hpx::actions::primary_namespace_route_action_id)
+#endif
 
 HPX_REGISTER_ACTION_ID(
     primary_namespace::statistics_counter_action,
@@ -211,6 +214,7 @@ namespace hpx { namespace agas {
         return hpx::async(action, std::move(dest), g, id, locality);
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     void primary_namespace::route(parcelset::parcel && p,
         util::function_nonser<void(boost::system::error_code const&,
         parcelset::parcel const&)> && f)
@@ -233,6 +237,7 @@ namespace hpx { namespace agas {
         server::primary_namespace::route_action action;
         hpx::apply_cb(action, std::move(dest), std::move(f), std::move(p));
     }
+#endif
 
     primary_namespace::resolved_type
     primary_namespace::resolve_gid(naming::gid_type id)

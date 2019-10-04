@@ -1,10 +1,18 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#include <cstdint>
+#include <string>
+
+#include <boost/lexical_cast.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
@@ -15,17 +23,14 @@
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/asio/ip/address_v6.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/system/error_code.hpp>
 
-#include <cstdint>
 #include <ctime>
 #include <exception>
 #include <sstream>
-#include <string>
 
 #if defined(HPX_WINDOWS)
-// Prevent asio from initialising Winsock, the object must be constructed
+// Prevent asio from initializing Winsock, the object must be constructed
 // before any Asio's own global objects. With MSVC, this may be accomplished
 // by adding the following code to the DLL:
 
@@ -147,46 +152,13 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////
-    // Addresses are supposed to have the format <hostname>[:port]
-    bool split_ip_address(std::string const& v, std::string& host,
-        std::uint16_t& port)
-    {
-        std::string::size_type p = v.find_first_of(":");
-
-        std::string tmp_host;
-        std::uint16_t tmp_port = 0;
-
-        try {
-            if (p != std::string::npos) {
-                tmp_host = v.substr(0, p);
-                tmp_port = boost::lexical_cast<std::uint16_t>(v.substr(p+1));
-            }
-            else {
-                tmp_host = v;
-            }
-
-            if (!tmp_host.empty()) {
-                host = tmp_host;
-                if (tmp_port)
-                    port = tmp_port;
-            }
-        }
-        catch (boost::bad_lexical_cast const& /*e*/) {
-            // port number is invalid
-            return false;
-        }
-        return true;
-    }
-
-
-    ///////////////////////////////////////////////////////////////////////
     // Take an ip v4 or v6 address and "standardize" it for comparison checks
     // note that this code doesn't work as expected if we use the boost
     // inet_pton functions on linux. see issue #2177 for further info
     std::string cleanup_ip_address(const std::string &addr)
     {
         char buf[sizeof(struct in6_addr)];
-        int i=0, domain[2] = {AF_INET, AF_INET6};
+        int i = 0, domain[2] = {AF_INET, AF_INET6};
         char str[INET6_ADDRSTRLEN];
 
 #if defined(HPX_WINDOWS)
@@ -194,24 +166,28 @@ namespace hpx { namespace util
         boost::system::error_code ec;
 #endif
 
-        for (i=0; i<2; ++i) {
+        for (i = 0; i < 2; ++i)
+        {
 #if defined(HPX_WINDOWS)
             int s = boost::asio::detail::socket_ops::inet_pton(
-              domain[i], &addr[0], buf, &scope_id, ec);
-            if (s>0 && !ec) break;
+                domain[i], &addr[0], buf, &scope_id, ec);
+            if (s > 0 && !ec)
+                break;
 #else
             int s = inet_pton(domain[i], &addr[0], buf);
-            if (s>0) break;
+            if (s > 0)
+                break;
 #endif
         }
-        if (i==2) {
+        if (i == 2)
+        {
             HPX_THROW_EXCEPTION(bad_parameter, "cleanup_ip_address",
                 "Invalid IP address string");
         }
 
 #if defined(HPX_WINDOWS)
        if (boost::asio::detail::socket_ops::inet_ntop(
-            domain[i], buf, str, INET6_ADDRSTRLEN, scope_id, ec) == 0) {
+            domain[i], buf, str, INET6_ADDRSTRLEN, scope_id, ec) == nullptr) {
 #else
        if (inet_ntop(domain[i], buf, str, INET6_ADDRSTRLEN) == nullptr) {
 #endif
@@ -342,3 +318,42 @@ namespace hpx { namespace util
         return endpoint_iterator_type();
     }
 }}
+
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace util
+{
+    ///////////////////////////////////////////////////////////////////////
+    // Addresses are supposed to have the format <hostname>[:port]
+    bool split_ip_address(std::string const& v, std::string& host,
+        std::uint16_t& port)
+    {
+        std::string::size_type p = v.find_first_of(":");
+
+        std::string tmp_host;
+        std::uint16_t tmp_port = 0;
+
+        try {
+            if (p != std::string::npos) {
+                tmp_host = v.substr(0, p);
+                tmp_port = boost::lexical_cast<std::uint16_t>(v.substr(p+1));
+            }
+            else {
+                tmp_host = v;
+            }
+
+            if (!tmp_host.empty()) {
+                host = tmp_host;
+                if (tmp_port)
+                    port = tmp_port;
+            }
+        }
+        catch (boost::bad_lexical_cast const& /*e*/) {
+            // port number is invalid
+            return false;
+        }
+        return true;
+    }
+}}
+

@@ -1,11 +1,13 @@
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // utf8_codecvt_facet.ipp
 
-// Copyright (c) 2001 Ronald Garcia, Indiana University (garcia@osl.iu.edu)
-// Andrew Lumsdaine, Indiana University (lums@osl.iu.edu).
-// Use, modification and distribution is subject to the Boost Software
-// License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright (c) 2001 Ronald Garcia, Indiana University (garcia@osl.iu.edu)
+//  Andrew Lumsdaine, Indiana University (lums@osl.iu.edu).
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Use, modification and distribution is subject to the Boost Software
+//  License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
 
 // Please see the comments in <boost/detail/utf8_codecvt_facet.hpp> to
 // learn how this file should be used.

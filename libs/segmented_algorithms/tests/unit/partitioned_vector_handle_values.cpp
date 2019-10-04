@@ -1,11 +1,12 @@
 //  Copyright (c) 2014-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/parallel_for_each.hpp>
+#include <hpx/include/partitioned_vector_predef.hpp>
 
 #include <hpx/testing.hpp>
 
@@ -40,8 +41,8 @@ void fill_vector(Vector& v, T1 val, T1 dist)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Vector>
-void compare_vectors(Vector const& v1, Vector const& v2,
-    bool must_be_equal = true)
+void compare_vectors(
+    Vector const& v1, Vector const& v2, bool must_be_equal = true)
 {
     typedef typename Vector::const_iterator const_iterator;
 
@@ -83,7 +84,7 @@ void handle_values_tests(hpx::partitioned_vector<T>& v)
 template <typename T>
 void handle_values_tests_distributed_access(hpx::partitioned_vector<T>& v)
 {
-    fill_vector (v, T(42));
+    fill_vector(v, T(42));
 
     std::vector<std::size_t> positions(5);
     fill_vector(positions, 0, 2);
@@ -96,18 +97,18 @@ void handle_values_tests_distributed_access(hpx::partitioned_vector<T>& v)
     fill_vector(values2, T(42), T(0));
 
     v.set_values(positions, values);
-    std::vector<T> result  = v.get_values(hpx::launch::sync, positions);
+    std::vector<T> result = v.get_values(hpx::launch::sync, positions);
     std::vector<T> result2 = v.get_values(hpx::launch::sync, positions2);
 
-    compare_vectors(values , result);
+    compare_vectors(values, result);
     compare_vectors(values2, result2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T, typename DistPolicy>
-void handle_values_tests_with_policy(std::size_t size, std::size_t localities,
-    DistPolicy const& policy)
+void handle_values_tests_with_policy(
+    std::size_t size, std::size_t localities, DistPolicy const& policy)
 {
     {
         hpx::partitioned_vector<T> v(size, policy);
@@ -141,10 +142,10 @@ void handle_values_tests()
 
     handle_values_tests_with_policy<T>(length, 1, hpx::container_layout);
     handle_values_tests_with_policy<T>(length, 3, hpx::container_layout(3));
-    handle_values_tests_with_policy<T>(length, 3,
-        hpx::container_layout(3, localities));
-    handle_values_tests_with_policy<T>(length, localities.size(),
-        hpx::container_layout(localities));
+    handle_values_tests_with_policy<T>(
+        length, 3, hpx::container_layout(3, localities));
+    handle_values_tests_with_policy<T>(
+        length, localities.size(), hpx::container_layout(localities));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -155,4 +156,3 @@ int main()
 
     return 0;
 }
-

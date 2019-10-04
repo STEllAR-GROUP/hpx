@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2013 Shuangyang Yang
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -10,8 +11,6 @@
 #include <hpx/testing.hpp>
 
 #include <hpx/util/storage/tuple.hpp>
-
-#include <boost/any.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -27,6 +26,14 @@ using hpx::util::any_cast;
 using hpx::init;
 using hpx::finalize;
 
+struct compare_any
+{
+    bool operator()(hpx::util::any const& lhs, hpx::util::any const& rhs) const
+    {
+        return lhs.equal_to(rhs);
+    }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
@@ -41,13 +48,13 @@ int hpx_main()
         }
 
         {
-            typedef uint64_t index_type;
-            typedef hpx::util::any elem_type;
-            typedef hpx::util::hash_any hash_elem_functor;
+            using index_type = uint64_t;
+            using elem_type = hpx::util::any;
+            using hash_elem_functor = hpx::util::hash_any;
 
-            typedef std::unordered_multimap<elem_type, index_type,
-                hash_elem_functor> field_index_map_type;
-            typedef field_index_map_type::iterator field_index_map_iterator_type;
+            using field_index_map_type = std::unordered_multimap<elem_type,
+                index_type, hash_elem_functor, compare_any>;
+            using field_index_map_iterator_type = field_index_map_type::iterator;
 
             field_index_map_type field_index_map_;
             field_index_map_iterator_type it;
@@ -62,13 +69,13 @@ int hpx_main()
         {
             any any1(7), any2(7), any3(10), any4(std::string("seven"));
 
-            HPX_TEST_EQ(any1, 7);
-            HPX_TEST_NEQ(any1, 10);
-            HPX_TEST_NEQ(any1, 10.0f);
-            HPX_TEST_EQ(any1, any1);
-            HPX_TEST_EQ(any1, any2);
-            HPX_TEST_NEQ(any1, any3);
-            HPX_TEST_NEQ(any1, any4);
+            HPX_TEST(any_cast<int>(any1) == 7);
+            HPX_TEST(any_cast<int>(any1) != 10);
+            HPX_TEST(any_cast<int>(any1) != 10.0f);
+            HPX_TEST(any_cast<int>(any1) == any_cast<int>(any1));
+            HPX_TEST(any_cast<int>(any1) == any_cast<int>(any2));
+            HPX_TEST(any1.type() == any3.type());
+            HPX_TEST(any1.type() != any4.type());
 
             std::string long_str =
                 std::string("This is a looooooooooooooooooooooooooong string");
@@ -78,13 +85,15 @@ int hpx_main()
             any3 = other_str;
             any4 = 10.0f;
 
-            HPX_TEST_EQ(any1, long_str);
-            HPX_TEST_NEQ(any1, other_str);
-            HPX_TEST_NEQ(any1, 10.0f);
-            HPX_TEST_EQ(any1, any1);
-            HPX_TEST_EQ(any1, any2);
-            HPX_TEST_NEQ(any1, any3);
-            HPX_TEST_NEQ(any1, any4);
+            HPX_TEST(any_cast<std::string>(any1) == long_str);
+            HPX_TEST(any_cast<std::string>(any1) != other_str);
+            HPX_TEST(any1.type() == typeid(std::string));
+            HPX_TEST(
+                any_cast<std::string>(any1) == any_cast<std::string>(any1));
+            HPX_TEST(
+                any_cast<std::string>(any1) == any_cast<std::string>(any2));
+            HPX_TEST(any1.type() == any3.type());
+            HPX_TEST(any1.type() != any4.type());
         }
 
         {
@@ -125,21 +134,21 @@ int hpx_main()
         // move semantics
         {
             any any1(5);
-            HPX_TEST(!any1.empty());
+            HPX_TEST(any1.has_value());
             any any2(std::move(any1));
-            HPX_TEST(!any2.empty());
-            HPX_TEST(any1.empty()); // NOLINT
+            HPX_TEST(any2.has_value());
+            HPX_TEST(!any1.has_value()); // NOLINT
         }
 
         {
             any any1(5);
-            HPX_TEST(!any1.empty());
+            HPX_TEST(any1.has_value());
             any any2;
-            HPX_TEST(any2.empty());
+            HPX_TEST(!any2.has_value());
 
             any2 = std::move(any1);
-            HPX_TEST(!any2.empty());
-            HPX_TEST(any1.empty()); // NOLINT
+            HPX_TEST(any2.has_value());
+            HPX_TEST(!any1.has_value()); // NOLINT
         }
     }
 

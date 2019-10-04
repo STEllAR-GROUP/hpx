@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -30,31 +31,33 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // uninitialized_move
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // provide our own implementation of std::uninitialized_move as some
         // versions of MSVC horribly fail at compiling it for some types T
         template <typename InIter1, typename InIter2>
-        InIter2 std_uninitialized_move(InIter1 first, InIter1 last, InIter2 d_first)
+        InIter2 std_uninitialized_move(
+            InIter1 first, InIter1 last, InIter2 d_first)
         {
-            typedef typename std::iterator_traits<InIter2>::value_type
-                value_type;
+            typedef
+                typename std::iterator_traits<InIter2>::value_type value_type;
 
             InIter2 current = d_first;
-            try {
+            try
+            {
                 for (/* */; first != last; ++first, (void) ++current)
                 {
-                    ::new (std::addressof(*current)) value_type(std::move(*first));
+                    ::new (std::addressof(*current))
+                        value_type(std::move(*first));
                 }
                 return current;
             }
-            catch (...) {
+            catch (...)
+            {
                 for (/* */; d_first != current; ++d_first)
                 {
                     (*d_first).~value_type();
@@ -65,75 +68,66 @@ namespace hpx { namespace parallel { inline namespace v1
 
         ///////////////////////////////////////////////////////////////////////
         template <typename InIter1, typename InIter2>
-        InIter2 sequential_uninitialized_move_n(InIter1 first, std::size_t count,
-            InIter2 dest, util::cancellation_token<util::detail::no_data>& tok)
+        InIter2 sequential_uninitialized_move_n(InIter1 first,
+            std::size_t count, InIter2 dest,
+            util::cancellation_token<util::detail::no_data>& tok)
         {
-            typedef typename std::iterator_traits<InIter2>::value_type
-                value_type;
+            typedef
+                typename std::iterator_traits<InIter2>::value_type value_type;
 
-            return
-                util::loop_with_cleanup_n_with_token(
-                    first, count, dest, tok,
-                    [](InIter1 it, InIter2 dest) -> void
-                    {
-                        ::new (std::addressof(*dest)) value_type(std::move(*it));
-                    },
-                    [](InIter2 dest) -> void
-                    {
-                        (*dest).~value_type();
-                    });
+            return util::loop_with_cleanup_n_with_token(
+                first, count, dest, tok,
+                [](InIter1 it, InIter2 dest) -> void {
+                    ::new (std::addressof(*dest)) value_type(std::move(*it));
+                },
+                [](InIter2 dest) -> void { (*dest).~value_type(); });
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter, typename FwdIter2>
-        typename util::detail::algorithm_result<
-            ExPolicy, std::pair<Iter, FwdIter2>
-        >::type
-        parallel_sequential_uninitialized_move_n(ExPolicy && policy,
-            Iter first, std::size_t count, FwdIter2 dest)
+        typename util::detail::algorithm_result<ExPolicy,
+            std::pair<Iter, FwdIter2>>::type
+        parallel_sequential_uninitialized_move_n(
+            ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
         {
             if (count == 0)
             {
-                return util::detail::algorithm_result<
-                        ExPolicy, std::pair<Iter, FwdIter2>
-                    >::get(std::make_pair(first, dest));
+                return util::detail::algorithm_result<ExPolicy,
+                    std::pair<Iter, FwdIter2>>::get(std::make_pair(first,
+                    dest));
             }
 
             typedef hpx::util::zip_iterator<Iter, FwdIter2> zip_iterator;
             typedef std::pair<FwdIter2, FwdIter2> partition_result_type;
-            typedef typename std::iterator_traits<FwdIter2>::value_type
-                value_type;
+            typedef
+                typename std::iterator_traits<FwdIter2>::value_type value_type;
 
             util::cancellation_token<util::detail::no_data> tok;
-            return util::partitioner_with_cleanup<
-                    ExPolicy, std::pair<Iter, FwdIter2>, partition_result_type
-                >::call(
+            return util::partitioner_with_cleanup<ExPolicy,
+                std::pair<Iter, FwdIter2>, partition_result_type>::
+                call(
                     std::forward<ExPolicy>(policy),
                     hpx::util::make_zip_iterator(first, dest), count,
-                    [tok](zip_iterator t, std::size_t part_size)
-                        mutable -> partition_result_type
-                    {
+                    [tok](zip_iterator t, std::size_t part_size) mutable
+                    -> partition_result_type {
                         using hpx::util::get;
                         auto iters = t.get_iterator_tuple();
                         FwdIter2 dest = get<1>(iters);
                         return std::make_pair(dest,
                             sequential_uninitialized_move_n(
-                                get<0>(iters), part_size,
-                                dest, tok));
+                                get<0>(iters), part_size, dest, tok));
                     },
                     // finalize, called once if no error occurred
-                    [first, dest, count](
-                        std::vector<hpx::future<partition_result_type> > &&)
-                            mutable -> std::pair<Iter, FwdIter2>
-                    {
+                    [first, dest, count](std::vector<
+                        hpx::future<partition_result_type>>&&) mutable
+                    -> std::pair<Iter, FwdIter2> {
                         std::advance(first, count);
                         std::advance(dest, count);
                         return std::make_pair(first, dest);
                     },
                     // cleanup function, called for each partition which
                     // didn't fail, but only if at least one failed
-                    [](partition_result_type && r) -> void
-                    {
+                    [](partition_result_type&& r) -> void {
                         while (r.first != r.second)
                         {
                             (*r.first).~value_type();
@@ -149,34 +143,32 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             uninitialized_move()
               : uninitialized_move::algorithm("uninitialized_move")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter1>
-            static FwdIter2
-            sequential(ExPolicy, InIter1 first, InIter1 last, FwdIter2 dest)
+            static FwdIter2 sequential(
+                ExPolicy, InIter1 first, InIter1 last, FwdIter2 dest)
             {
                 return std_uninitialized_move(first, last, dest);
             }
 
             template <typename ExPolicy, typename Iter>
-            static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter2
-            >::type
-            parallel(ExPolicy && policy, Iter first, Iter last, FwdIter2 dest)
+            static typename util::detail::algorithm_result<ExPolicy,
+                FwdIter2>::type
+            parallel(ExPolicy&& policy, Iter first, Iter last, FwdIter2 dest)
             {
                 return util::detail::convert_to_result(
                     parallel_sequential_uninitialized_move_n(
                         std::forward<ExPolicy>(policy), first,
-                        std::distance(first, last), dest
-                    ),
-                    [](std::pair<Iter, FwdIter2> const& p) -> FwdIter2
-                    {
+                        std::distance(first, last), dest),
+                    [](std::pair<Iter, FwdIter2> const& p) -> FwdIter2 {
                         return p.second;
                     });
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Moves the elements in the range, defined by [first, last), to an
     /// uninitialized memory area beginning at \a dest. If an exception is
@@ -225,52 +217,50 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the last element moved.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter1>::value &&
-        hpx::traits::is_iterator<FwdIter2>::value)>
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter1>::value&&
+                    hpx::traits::is_iterator<FwdIter2>::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    uninitialized_move(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest)
+    uninitialized_move(
+        ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Required at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::uninitialized_move<FwdIter2>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest);
+            std::forward<ExPolicy>(policy), is_seq(), first, last, dest);
     }
 
     /////////////////////////////////////////////////////////////////////////////
     // uninitialized_move_n
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // provide our own implementation of std::uninitialized_move_n as some
         // versions of MSVC horribly fail at compiling it for some types T
         template <typename InIter1, typename InIter2>
-        std::pair<InIter1, InIter2>
-        std_uninitialized_move_n(InIter1 first, std::size_t count, InIter2 d_first)
+        std::pair<InIter1, InIter2> std_uninitialized_move_n(
+            InIter1 first, std::size_t count, InIter2 d_first)
         {
-            typedef typename std::iterator_traits<InIter2>::value_type
-                value_type;
+            typedef
+                typename std::iterator_traits<InIter2>::value_type value_type;
 
             InIter2 current = d_first;
-            try {
+            try
+            {
                 for (/* */; count != 0; ++first, (void) ++current, --count)
                 {
-                    ::new (std::addressof(*current)) value_type(std::move(*first));
+                    ::new (std::addressof(*current))
+                        value_type(std::move(*first));
                 }
                 return std::make_pair(first, current);
             }
-            catch (...) {
+            catch (...)
+            {
                 for (/* */; d_first != current; ++d_first)
                 {
                     (*d_first).~value_type();
@@ -285,28 +275,28 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             uninitialized_move_n()
               : uninitialized_move_n::algorithm("uninitialized_move_n")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter1, typename InIter2>
-            static IterPair
-            sequential(ExPolicy, InIter1 first, std::size_t count, InIter2 dest)
+            static IterPair sequential(
+                ExPolicy, InIter1 first, std::size_t count, InIter2 dest)
             {
                 return std_uninitialized_move_n(first, count, dest);
             }
 
             template <typename ExPolicy, typename Iter, typename FwdIter2>
-            static typename util::detail::algorithm_result<
-                ExPolicy, IterPair
-            >::type
-            parallel(ExPolicy && policy, Iter first, std::size_t count,
-                FwdIter2 dest)
+            static typename util::detail::algorithm_result<ExPolicy,
+                IterPair>::type
+            parallel(
+                ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
             {
                 return parallel_sequential_uninitialized_move_n(
                     std::forward<ExPolicy>(policy), first, count, dest);
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Moves the elements in the range [first, first + count), starting from
     /// first and proceeding to first + count - 1., to another range beginning
@@ -361,22 +351,19 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           and an output iterator to the element in the destination
     ///           range, one past the last element moved.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Size, typename FwdIter2,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter1>::value &&
-        hpx::traits::is_iterator<FwdIter2>::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
-    >::type
-    uninitialized_move_n(ExPolicy && policy, FwdIter1 first, Size count,
-        FwdIter2 dest)
+    template <typename ExPolicy, typename FwdIter1, typename Size,
+        typename FwdIter2,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter1>::value&&
+                    hpx::traits::is_iterator<FwdIter2>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
+    uninitialized_move_n(
+        ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest)
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Required at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
@@ -385,16 +372,16 @@ namespace hpx { namespace parallel { inline namespace v1
         if (detail::is_negative(count))
         {
             return hpx::util::make_tagged_pair<tag::in, tag::out>(
-                    util::detail::algorithm_result<
-                            ExPolicy, std::pair<FwdIter1, FwdIter2>
-                        >::get(std::make_pair(first, dest)));
+                util::detail::algorithm_result<ExPolicy,
+                    std::pair<FwdIter1, FwdIter2>>::get(std::make_pair(first,
+                    dest)));
         }
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
-            detail::uninitialized_move_n<std::pair<FwdIter1, FwdIter2> >().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, std::size_t(count), dest));
+            detail::uninitialized_move_n<std::pair<FwdIter1, FwdIter2>>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first,
+                std::size_t(count), dest));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

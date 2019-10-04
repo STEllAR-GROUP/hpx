@@ -1,10 +1,11 @@
 //  copyright (c) 2014 Grant Mercer
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_find.hpp>
 #include <hpx/testing.hpp>
 
@@ -20,7 +21,7 @@
 ////////////////////////////////////////////////////////////////////////////
 unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
-std::uniform_int_distribution<> dis(2,101);
+std::uniform_int_distribution<> dis(2, 101);
 
 template <typename ExPolicy, typename IteratorTag>
 void test_find_if_not(ExPolicy policy, IteratorTag)
@@ -35,15 +36,13 @@ void test_find_if_not(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill vector with random values about 1
     std::fill(std::begin(c), std::end(c), dis(gen));
-    c.at(c.size()/2) = 1;
+    c.at(c.size() / 2) = 1;
 
-    iterator index = hpx::parallel::find_if_not(policy,
-        iterator(std::begin(c)), iterator(std::end(c)),
-        [](std::size_t v) {
-            return v != std::size_t(1);
-        });
+    iterator index = hpx::parallel::find_if_not(policy, iterator(std::begin(c)),
+        iterator(std::end(c)),
+        [](std::size_t v) { return v != std::size_t(1); });
 
-    base_iterator test_index = std::begin(c) + c.size()/2;
+    base_iterator test_index = std::begin(c) + c.size() / 2;
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -57,18 +56,15 @@ void test_find_if_not_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill vector with random values above 1
     std::fill(std::begin(c), std::end(c), dis(gen));
-    c.at(c.size()/2) = 1;
+    c.at(c.size() / 2) = 1;
 
-    hpx::future<iterator> f =
-        hpx::parallel::find_if_not(p,
-            iterator(std::begin(c)), iterator(std::end(c)),
-        [](std::size_t v) {
-            return v != std::size_t(1);
-        });
+    hpx::future<iterator> f = hpx::parallel::find_if_not(p,
+        iterator(std::begin(c)), iterator(std::end(c)),
+        [](std::size_t v) { return v != std::size_t(1); });
     f.wait();
 
     //create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size()/2;
+    base_iterator test_index = std::begin(c) + c.size() / 2;
 
     HPX_TEST(f.get() == iterator(test_index));
 }
@@ -110,15 +106,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

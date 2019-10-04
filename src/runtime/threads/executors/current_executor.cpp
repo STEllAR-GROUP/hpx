@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,7 +9,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/register_locks.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -16,7 +18,6 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/state.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util/bind.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -147,7 +148,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     hpx::state current_executor::get_state() const
     {
-        return scheduler_base_->get_state(hpx::get_worker_thread_num());
+        return scheduler_base_->get_state(
+            threads::detail::get_thread_num_tss());
     }
 
     void current_executor::set_scheduler_mode(

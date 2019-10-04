@@ -1,5 +1,6 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,12 +9,12 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_PARCEL_COALESCING)
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
 
+#include <hpx/functional/function.hpp>
+#include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
-#include <hpx/hashing/jenkins_hash.hpp>
-#include <hpx/util/function.hpp>
 #include <hpx/type_support/static.hpp>
 
 #include <cstdint>

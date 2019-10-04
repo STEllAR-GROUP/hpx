@@ -1,6 +1,7 @@
 //  Copyright (c)      2014 Thomas Heller
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -21,8 +22,9 @@
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/assign/std/vector.hpp>
 
+#include <algorithm>
+#include <cctype>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -34,7 +36,7 @@ namespace hpx { namespace plugins
     /// The \a parcelport_factory provides a minimal implementation of a
     /// parcelport's factory. If no additional functionality is required
     /// this type can be used to implement the full set of minimally required
-    /// functions to be exposed by a parcelports's factory instance.
+    /// functions to be exposed by a parcelport's factory instance.
     ///
     /// \tparam Parcelport The parcelport type this factory should be
     ///                        responsible for.
@@ -73,41 +75,46 @@ namespace hpx { namespace plugins
 
         void get_plugin_info(std::vector<std::string> & fillini) override
         {
-            using namespace boost::assign;
             std::string name = unique_plugin_name<parcelport_factory>::call();
-            fillini += std::string("[hpx.parcel.") + name + "]";
-            fillini += "name = " HPX_PLUGIN_STRING;
-            fillini += std::string("path = ") +
-                util::find_prefixes("/hpx", HPX_PLUGIN_STRING);
-            fillini += "enable = $[hpx.parcel.enable]";
+            fillini.emplace_back(std::string("[hpx.parcel.") + name + "]");
+            fillini.emplace_back("name = " HPX_PLUGIN_STRING);
+            fillini.emplace_back(std::string("path = ") +
+                util::find_prefixes("/hpx", HPX_PLUGIN_STRING));
+            fillini.emplace_back("enable = $[hpx.parcel.enable]");
 
-            std::string name_uc = boost::to_upper_copy(name);
+            std::string name_uc;
+            name_uc.reserve(name.size());
+            std::transform(name.begin(), name.end(), std::back_inserter(name_uc),
+                [](char c) { return std::toupper(c); });
+
             // basic parcelport configuration ...
-            fillini +=
-                "parcel_pool_size = ${HPX_PARCEL_" + name_uc + "_PARCEL_POOL_SIZE:"
-                    "$[hpx.threadpools.parcel_pool_size]}",
-                "max_connections =  ${HPX_PARCEL_" + name_uc + "_MAX_CONNECTIONS:"
-                    "$[hpx.parcel.max_connections]}",
-                "max_connections_per_locality = "
-                    "${HPX_PARCEL_" + name_uc + "_MAX_CONNECTIONS_PER_LOCALITY:"
-                    "$[hpx.parcel.max_connections_per_locality]}",
-                "max_message_size =  ${HPX_PARCEL_" + name_uc +
-                    "_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}",
-                "max_outbound_message_size =  ${HPX_PARCEL_" + name_uc +
-                    "_MAX_OUTBOUND_MESSAGE_SIZE"
-                    + ":$[hpx.parcel.max_outbound_message_size]}",
-                "array_optimization = ${HPX_PARCEL_" + name_uc +
-                    "_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}",
-                "zero_copy_optimization = ${HPX_PARCEL_" + name_uc +
-                    "_ZERO_COPY_OPTIMIZATION:"
-                    "$[hpx.parcel.zero_copy_optimization]}",
-                "async_serialization = ${HPX_PARCEL_" + name_uc +
-                    "_ASYNC_SERIALIZATION:"
-                    "$[hpx.parcel.async_serialization]}",
-                "priority = ${HPX_PARCEL_" + name_uc +
-                    "_PRIORITY:" + traits::plugin_config_data<Parcelport>::priority()
-                                 + "}"
-                ;
+            fillini.emplace_back("parcel_pool_size = ${HPX_PARCEL_" + name_uc +
+                "_PARCEL_POOL_SIZE:"
+                "$[hpx.threadpools.parcel_pool_size]}");
+            fillini.emplace_back("max_connections =  ${HPX_PARCEL_" + name_uc +
+                "_MAX_CONNECTIONS:"
+                "$[hpx.parcel.max_connections]}");
+            fillini.emplace_back(
+                "max_connections_per_locality = ${HPX_PARCEL_" + name_uc +
+                "_MAX_CONNECTIONS_PER_LOCALITY:"
+                "$[hpx.parcel.max_connections_per_locality]}");
+            fillini.emplace_back("max_message_size =  ${HPX_PARCEL_" + name_uc +
+                "_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}");
+            fillini.emplace_back("max_outbound_message_size =  ${HPX_PARCEL_" +
+                name_uc + "_MAX_OUTBOUND_MESSAGE_SIZE" +
+                ":$[hpx.parcel.max_outbound_message_size]}");
+            fillini.emplace_back("array_optimization = ${HPX_PARCEL_" +
+                name_uc +
+                "_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}");
+            fillini.emplace_back("zero_copy_optimization = ${HPX_PARCEL_" +
+                name_uc + "_ZERO_COPY_OPTIMIZATION:"
+                "$[hpx.parcel.zero_copy_optimization]}");
+            fillini.emplace_back("async_serialization = ${HPX_PARCEL_" +
+                name_uc + "_ASYNC_SERIALIZATION:"
+                "$[hpx.parcel.async_serialization]}");
+            fillini.emplace_back("priority = ${HPX_PARCEL_" + name_uc +
+                "_PRIORITY:" +
+                traits::plugin_config_data<Parcelport>::priority() + "}");
 
             // get the parcelport specific information ...
             char const* more = traits::plugin_config_data<Parcelport>::call();
@@ -141,24 +148,25 @@ namespace hpx { namespace plugins
 ///////////////////////////////////////////////////////////////////////////////
 /// This macro is used create and to register a minimal component factory with
 /// Hpx.Plugin.
-#define HPX_REGISTER_PARCELPORT_(Parcelport, pluginname, pp)                  \
-    typedef hpx::plugins::parcelport_factory<Parcelport>                      \
-        HPX_PP_CAT(pluginname, _plugin_factory_type);                         \
-    HPX_DEF_UNIQUE_PLUGIN_NAME(                                               \
-        HPX_PP_CAT(pluginname, _plugin_factory_type), pp)                     \
-    template struct hpx::plugins::parcelport_factory<Parcelport>;             \
-    HPX_EXPORT hpx::plugins::parcelport_factory_base*                         \
-    HPX_PP_CAT(pluginname, _factory_init)                                     \
-    (std::vector<hpx::plugins::parcelport_factory_base *>& factories)         \
-    {                                                                         \
-        static HPX_PP_CAT(pluginname, _plugin_factory_type) factory(factories);\
-        return &factory;                                                      \
-    }                                                                         \
-/**/
+#define HPX_REGISTER_PARCELPORT_(Parcelport, pluginname, pp)                   \
+    typedef hpx::plugins::parcelport_factory<Parcelport> HPX_PP_CAT(           \
+        pluginname, _plugin_factory_type);                                     \
+    HPX_DEF_UNIQUE_PLUGIN_NAME(                                                \
+        HPX_PP_CAT(pluginname, _plugin_factory_type), pp)                      \
+    template struct hpx::plugins::parcelport_factory<Parcelport>;              \
+    HPX_EXPORT hpx::plugins::parcelport_factory_base* HPX_PP_CAT(              \
+        pluginname, _factory_init)(                                            \
+        std::vector<hpx::plugins::parcelport_factory_base*> & factories)       \
+    {                                                                          \
+        static HPX_PP_CAT(pluginname, _plugin_factory_type)                    \
+            factory(factories);                                                \
+        return &factory;                                                       \
+    }                                                                          \
+    /**/
 
-#define HPX_REGISTER_PARCELPORT(Parcelport, pluginname)                       \
-        HPX_REGISTER_PARCELPORT_(Parcelport,                                  \
-            HPX_PP_CAT(parcelport_, pluginname), pluginname)                  \
+#define HPX_REGISTER_PARCELPORT(Parcelport, pluginname)                        \
+    HPX_REGISTER_PARCELPORT_(                                                  \
+        Parcelport, HPX_PP_CAT(parcelport_, pluginname), pluginname)
 
 #endif
 

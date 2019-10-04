@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -375,8 +376,7 @@ namespace hpx {
     /// Return the function name from which the exception was thrown.
     std::string get_error_function_name(hpx::exception_info const& xi)
     {
-        std::string const* function =
-            xi.get<hpx::detail::throw_function>();
+        std::string const* function = xi.get<hpx::detail::throw_function>();
         if (function)
             return *function;
 
@@ -387,21 +387,18 @@ namespace hpx {
     /// exception was thrown.
     std::string get_error_file_name(hpx::exception_info const& xi)
     {
-        std::string const* file =
-            xi.get<hpx::detail::throw_file>();
+        std::string const* file = xi.get<hpx::detail::throw_file>();
         if (file)
             return *file;
 
         return "<unknown>";
     }
 
-
     /// Return the line number in the (source code) file of the function from
     /// which the exception was thrown.
     long get_error_line_number(hpx::exception_info const& xi)
     {
-        long const* line =
-            xi.get<hpx::detail::throw_line>();
+        long const* line = xi.get<hpx::detail::throw_line>();
         if (line)
             return *line;
         return -1;

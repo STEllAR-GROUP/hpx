@@ -1,10 +1,11 @@
 //  Copyright (c) 2015-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_set_operations.hpp>
 #include <hpx/testing.hpp>
 
@@ -33,14 +34,13 @@ void test_set_union1(ExPolicy policy, IteratorTag)
     std::sort(std::begin(c1), std::end(c1));
     std::sort(std::begin(c2), std::end(c2));
 
-    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size()); //-V656
+    std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::parallel::set_union(policy,
-        iterator(std::begin(c1)), iterator(std::end(c1)),
-        std::begin(c2), std::end(c2), std::begin(c3));
+    hpx::parallel::set_union(policy, iterator(std::begin(c1)),
+        iterator(std::end(c1)), std::begin(c2), std::end(c2), std::begin(c3));
 
-    std::set_union(std::begin(c1), std::end(c1),
-        std::begin(c2), std::end(c2), std::begin(c4));
+    std::set_union(std::begin(c1), std::end(c1), std::begin(c2), std::end(c2),
+        std::begin(c4));
 
     // verify values
     HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
@@ -58,16 +58,15 @@ void test_set_union1_async(ExPolicy p, IteratorTag)
     std::sort(std::begin(c1), std::end(c1));
     std::sort(std::begin(c2), std::end(c2));
 
-    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size()); //-V656
+    std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::future<void> result =
-        hpx::parallel::set_union(p,
-            iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), std::end(c2), std::begin(c3));
+    hpx::future<void> result = hpx::parallel::set_union(p,
+        iterator(std::begin(c1)), iterator(std::end(c1)), std::begin(c2),
+        std::end(c2), std::begin(c3));
     result.wait();
 
-    std::set_union(std::begin(c1), std::end(c1),
-        std::begin(c2), std::end(c2), std::begin(c4));
+    std::set_union(std::begin(c1), std::end(c1), std::begin(c2), std::end(c2),
+        std::begin(c4));
 
     // verify values
     HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
@@ -111,14 +110,14 @@ void test_set_union2(ExPolicy policy, IteratorTag)
     std::sort(std::begin(c1), std::end(c1), comp);
     std::sort(std::begin(c2), std::end(c2), comp);
 
-    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size()); //-V656
+    std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::parallel::set_union(policy,
-        iterator(std::begin(c1)), iterator(std::end(c1)),
-        std::begin(c2), std::end(c2), std::begin(c3), comp);
+    hpx::parallel::set_union(policy, iterator(std::begin(c1)),
+        iterator(std::end(c1)), std::begin(c2), std::end(c2), std::begin(c3),
+        comp);
 
-    std::set_union(std::begin(c1), std::end(c1),
-        std::begin(c2), std::end(c2), std::begin(c4), comp);
+    std::set_union(std::begin(c1), std::end(c1), std::begin(c2), std::end(c2),
+        std::begin(c4), comp);
 
     // verify values
     HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
@@ -142,16 +141,15 @@ void test_set_union2_async(ExPolicy p, IteratorTag)
     std::sort(std::begin(c1), std::end(c1), comp);
     std::sort(std::begin(c2), std::end(c2), comp);
 
-    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size()); //-V656
+    std::vector<std::size_t> c3(2 * c1.size()), c4(2 * c1.size());    //-V656
 
-    hpx::future<void> result =
-        hpx::parallel::set_union(p,
-            iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), std::end(c2), std::begin(c3), comp);
+    hpx::future<void> result = hpx::parallel::set_union(p,
+        iterator(std::begin(c1)), iterator(std::end(c1)), std::begin(c2),
+        std::end(c2), std::begin(c3), comp);
     result.wait();
 
-    std::set_union(std::begin(c1), std::end(c1),
-        std::begin(c2), std::end(c2), std::begin(c4), comp);
+    std::set_union(std::begin(c1), std::end(c1), std::begin(c2), std::end(c2),
+        std::begin(c4), comp);
 
     // verify values
     HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
@@ -194,25 +192,26 @@ void test_set_union_exception(ExPolicy policy, IteratorTag)
     std::sort(std::begin(c1), std::end(c1));
     std::sort(std::begin(c2), std::end(c2));
 
-    std::vector<std::size_t> c3(2*c1.size());
+    std::vector<std::size_t> c3(2 * c1.size());
 
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::parallel::set_union(policy,
             decorated_iterator(
-                std::begin(c1),
-                [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(std::end(c1)),
-            std::begin(c2), std::end(c2),
+                std::begin(c1), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
             std::begin(c3));
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -236,30 +235,30 @@ void test_set_union_exception_async(ExPolicy p, IteratorTag)
     std::sort(std::begin(c1), std::end(c1));
     std::sort(std::begin(c2), std::end(c2));
 
-    std::vector<std::size_t> c3(2*c1.size());
+    std::vector<std::size_t> c3(2 * c1.size());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        hpx::future<void> f =
-            hpx::parallel::set_union(p,
-                decorated_iterator(
-                    std::begin(c1),
-                    [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c1)),
-                std::begin(c2), std::end(c2),
-                std::begin(c3));
+    try
+    {
+        hpx::future<void> f = hpx::parallel::set_union(p,
+            decorated_iterator(
+                std::begin(c1), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
+            std::begin(c3));
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -278,10 +277,10 @@ void test_set_union_exception()
     test_set_union_exception(execution::seq, IteratorTag());
     test_set_union_exception(execution::par, IteratorTag());
 
-    test_set_union_exception_async(execution::seq(execution::task),
-        IteratorTag());
-    test_set_union_exception_async(execution::par(execution::task),
-        IteratorTag());
+    test_set_union_exception_async(
+        execution::seq(execution::task), IteratorTag());
+    test_set_union_exception_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void set_union_exception_test()
@@ -308,24 +307,25 @@ void test_set_union_bad_alloc(ExPolicy policy, IteratorTag)
     std::sort(std::begin(c1), std::end(c1));
     std::sort(std::begin(c2), std::end(c2));
 
-    std::vector<std::size_t> c3(2*c1.size());
+    std::vector<std::size_t> c3(2 * c1.size());
 
     bool caught_bad_alloc = false;
-    try {
+    try
+    {
         hpx::parallel::set_union(policy,
             decorated_iterator(
-                std::begin(c1),
-                [](){ throw std::bad_alloc(); }),
-            decorated_iterator(std::end(c1)),
-            std::begin(c2), std::end(c2),
+                std::begin(c1), []() { throw std::bad_alloc(); }),
+            decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
             std::begin(c3));
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -349,29 +349,29 @@ void test_set_union_bad_alloc_async(ExPolicy p, IteratorTag)
     std::sort(std::begin(c1), std::end(c1));
     std::sort(std::begin(c2), std::end(c2));
 
-    std::vector<std::size_t> c3(2*c1.size());
+    std::vector<std::size_t> c3(2 * c1.size());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
-    try {
-        hpx::future<void> f =
-            hpx::parallel::set_union(p,
-                decorated_iterator(
-                    std::begin(c1),
-                    [](){ throw std::bad_alloc(); }),
-                decorated_iterator(std::end(c1)),
-                std::begin(c2), std::end(c2),
-                std::begin(c3));
+    try
+    {
+        hpx::future<void> f = hpx::parallel::set_union(p,
+            decorated_iterator(
+                std::begin(c1), []() { throw std::bad_alloc(); }),
+            decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
+            std::begin(c3));
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -390,10 +390,10 @@ void test_set_union_bad_alloc()
     test_set_union_bad_alloc(execution::seq, IteratorTag());
     test_set_union_bad_alloc(execution::par, IteratorTag());
 
-    test_set_union_bad_alloc_async(execution::seq(execution::task),
-        IteratorTag());
-    test_set_union_bad_alloc_async(execution::par(execution::task),
-        IteratorTag());
+    test_set_union_bad_alloc_async(
+        execution::seq(execution::task), IteratorTag());
+    test_set_union_bad_alloc_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void set_union_bad_alloc_test()
@@ -405,7 +405,7 @@ void set_union_bad_alloc_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -426,15 +426,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
@@ -442,5 +438,3 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
-
-

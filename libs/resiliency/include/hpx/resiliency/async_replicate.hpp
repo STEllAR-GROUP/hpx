@@ -4,6 +4,7 @@
 //  Copyright (c) 2018-2019 Adrian Serio
 //  Copyright (c) 2019 Nikunj Gupta
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -101,7 +102,7 @@ namespace hpx { namespace resiliency {
             hpx::launch::sync,    // do not schedule new thread for the lambda
             [HPX_CAPTURE_FORWARD(pred), HPX_CAPTURE_FORWARD(vote), n](
                 std::vector<hpx::future<result_type>>&& results) mutable
-                -> result_type {
+            -> result_type {
                 // Store all valid results
                 std::vector<result_type> valid_results;
                 valid_results.reserve(n);

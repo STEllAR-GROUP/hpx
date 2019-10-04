@@ -1,5 +1,6 @@
 //  Copyright (c) 2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -22,8 +23,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /// Replaces all elements satisfying specific criteria with \a new_value
     /// in the range [first, last).
     ///
@@ -74,23 +74,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename T1, typename T2,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, std::equal_to<T1>,
-                traits::projected_range<Proj, Rng>,
-                traits::projected<Proj, T1 const*>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, typename hpx::traits::range_traits<Rng>::iterator_type
-    >::type
-    replace(ExPolicy && policy, Rng && rng, T1 const& old_value,
-        T2 const& new_value, Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    std::equal_to<T1>, traits::projected_range<Proj, Rng>,
+                    traits::projected<Proj, T1 const*>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_traits<Rng>::iterator_type>::type
+    replace(ExPolicy&& policy, Rng&& rng, T1 const& old_value,
+        T2 const& new_value, Proj&& proj = Proj())
     {
-        return replace(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), old_value, new_value,
+        return replace(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), old_value, new_value,
             std::forward<Proj>(proj));
     }
 
@@ -164,22 +159,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename F, typename T,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F, traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, typename hpx::traits::range_traits<Rng>::iterator_type
-    >::type
-    replace_if(ExPolicy && policy, Rng && rng, F && f, T const& new_value,
-        Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    F, traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_traits<Rng>::iterator_type>::type
+    replace_if(ExPolicy&& policy, Rng&& rng, F&& f, T const& new_value,
+        Proj&& proj = Proj())
     {
-        return replace_if(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng),
-            std::forward<F>(f), new_value, std::forward<Proj>(proj));
+        return replace_if(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), std::forward<F>(f), new_value,
+            std::forward<Proj>(proj));
     }
 
     /// Copies the all elements from the range [first, last) to another range
@@ -247,28 +238,21 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename OutIter, typename T1,
         typename T2, typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, std::equal_to<T1>,
-                traits::projected_range<Proj, Rng>,
-                traits::projected<Proj, T1 const*>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    std::equal_to<T1>, traits::projected_range<Proj, Rng>,
+                    traits::projected<Proj, T1 const*>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<
             tag::in(typename hpx::traits::range_traits<Rng>::iterator_type),
-            tag::out(OutIter)
-        >
-    >::type
-    replace_copy(ExPolicy && policy, Rng && rng, OutIter dest,
-        T1 const& old_value, T2 const& new_value, Proj && proj = Proj())
+            tag::out(OutIter)>>::type
+    replace_copy(ExPolicy&& policy, Rng&& rng, OutIter dest,
+        T1 const& old_value, T2 const& new_value, Proj&& proj = Proj())
     {
         return replace_copy(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), dest, old_value, new_value,
-            std::forward<Proj>(proj));
+            hpx::util::begin(rng), hpx::util::end(rng), dest, old_value,
+            new_value, std::forward<Proj>(proj));
     }
 
     /// Copies the all elements from the range [first, last) to another range
@@ -354,27 +338,21 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename T, typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F, traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    F, traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<
             tag::in(typename hpx::traits::range_traits<Rng>::iterator_type),
-            tag::out(OutIter)
-        >
-    >::type
-    replace_copy_if(ExPolicy && policy, Rng && rng, OutIter dest,
-        F && f, T const& new_value, Proj && proj = Proj())
+            tag::out(OutIter)>>::type
+    replace_copy_if(ExPolicy&& policy, Rng&& rng, OutIter dest, F&& f,
+        T const& new_value, Proj&& proj = Proj())
     {
         return replace_copy_if(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), dest, std::forward<F>(f),
-            new_value, std::forward<Proj>(proj));
+            hpx::util::begin(rng), hpx::util::end(rng), dest,
+            std::forward<F>(f), new_value, std::forward<Proj>(proj));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif
