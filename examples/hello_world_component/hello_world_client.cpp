@@ -1,5 +1,6 @@
 //  Copyright (c) 2012 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,7 +8,7 @@
 #include "hello_world_component.hpp"
 #include <hpx/hpx_init.hpp>
 
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main(hpx::program_options::variables_map&)
 {
     {
         // Create a single instance of the component on this locality.

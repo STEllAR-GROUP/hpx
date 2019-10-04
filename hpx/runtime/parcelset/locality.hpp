@@ -2,6 +2,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,7 +12,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/serialization/map.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>

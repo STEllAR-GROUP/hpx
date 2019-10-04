@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -22,10 +23,10 @@
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -46,18 +47,22 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     thread_pool_executor<Scheduler>::thread_pool_executor(
-            std::size_t max_punits, std::size_t min_punits,
-            char const* description)
-      : scheduler_(
-            typename Scheduler::init_parameter_type(max_punits, description),
-            false
-        ),
-        shutdown_sem_(0),
-        current_concurrency_(0), max_current_concurrency_(0),
-        tasks_scheduled_(0), tasks_completed_(0),
-        max_punits_(max_punits), min_punits_(min_punits), curr_punits_(0),
-        cookie_(0),
-        self_(max_punits)
+        std::size_t max_punits, std::size_t min_punits, char const* description,
+        policies::detail::affinity_data const& affinity_data)
+      : scheduler_(typename Scheduler::init_parameter_type(
+                       max_punits, affinity_data, description),
+            false)
+      , shutdown_sem_(0)
+      , current_concurrency_(0)
+      , max_current_concurrency_(0)
+      , tasks_scheduled_(0)
+      , tasks_completed_(0)
+      , max_punits_(max_punits)
+      , min_punits_(min_punits)
+      , curr_punits_(0)
+      , cookie_(0)
+      , self_(max_punits)
+      , affinity_data_(affinity_data)
     {
         if (max_punits < min_punits)
         {
@@ -74,6 +79,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 "OS-threads");
             return;
         }
+
         scheduler_.set_parent_pool(this_thread::get_pool());
 
         // Inform the resource manager about this new executor. This causes the
@@ -165,7 +171,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_init_data data(util::one_shot(util::bind(
             &thread_pool_executor::thread_function_nullary,
             this, std::move(f))), desc);
-        data.stacksize = threads::get_stack_size(stacksize);
+        data.stacksize = scheduler_.get_stack_size(stacksize);
 
         // update statistics
         ++tasks_scheduled_;
@@ -195,7 +201,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_init_data data(util::one_shot(util::bind(
             &thread_pool_executor::thread_function_nullary,
             this, std::move(f))), desc);
-        data.stacksize = threads::get_stack_size(stacksize);
+        data.stacksize = scheduler_.get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread( //-V601
@@ -327,13 +333,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         if (state.compare_exchange_strong(expected, state_running))
         {
             ++max_current_concurrency_;
-
-//             {
-//                 std::lock_guard<mutex_type> l(mtx_);
-//                 resource::get_partitioner().get_affinity_data().add_punit(
-//                     virt_core, thread_num);
-//                 scheduler_.on_start_thread(virt_core);
-//             }
 
             self_[virt_core] = threads::get_self_ptr();
 

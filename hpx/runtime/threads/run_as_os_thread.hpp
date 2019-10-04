@@ -1,5 +1,6 @@
 //  Copyright (c) 2016-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,8 +12,8 @@
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/service_executors.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/result_of.hpp>
 
 #include <type_traits>
 #include <utility>

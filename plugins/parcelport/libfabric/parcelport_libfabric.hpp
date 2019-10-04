@@ -1,5 +1,6 @@
 //  Copyright (c) 2015-2016 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -149,8 +150,7 @@ namespace libfabric
         // Constructor : mostly just initializes the superclass with 'here'
         // --------------------------------------------------------------------
         parcelport(util::runtime_configuration const& ini,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void(std::size_t, char const*)> const& on_stop_thread);
+            threads::policies::callback_notifier const& notifier);
 
         // Start the handling of connections.
         bool do_run();

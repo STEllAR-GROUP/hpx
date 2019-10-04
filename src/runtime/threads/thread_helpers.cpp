@@ -1,14 +1,14 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
@@ -16,12 +16,11 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
-#include <hpx/throw_exception.hpp>
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS
-#  include <hpx/util/register_locks.hpp>
+#  include <hpx/concurrency/register_locks.hpp>
 #endif
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
@@ -90,7 +89,6 @@ namespace hpx { namespace threads
         return id ? id->get_priority() : thread_priority_unknown;
     }
 
-    /// The get_stack_size function is part of the thread related API. It
     std::ptrdiff_t get_stack_size(thread_id_type const& id, error_code& ec)
     {
         return id ? id->get_stack_size() :

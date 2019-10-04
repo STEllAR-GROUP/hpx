@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -21,7 +22,7 @@ struct A
 {
     A() {}
 
-    A(T t) : t_(t) {}
+    explicit A(T t) : t_(t) {}
     T t_;
 
     A & operator=(T t) { t_ = t; return *this; }
@@ -41,7 +42,7 @@ struct B
 
 public:
     B() = delete;
-    B(int a): a(a) {}
+    explicit B(int a): a(a), b(0) {}
 
     template <class Archive>
     void serialize(Archive& ar, unsigned)
@@ -106,10 +107,10 @@ void test_bool()
         hpx::serialization::output_archive oarchive(buffer);
 
         std::vector<A<bool> > os;
-        os.push_back(true);
-        os.push_back(false);
-        os.push_back(false);
-        os.push_back(true);
+        os.emplace_back(true);
+        os.emplace_back(false);
+        os.emplace_back(false);
+        os.emplace_back(true);
         oarchive << os;
 
         hpx::serialization::input_archive iarchive(buffer);
@@ -133,7 +134,7 @@ void test(T min, T max)
         std::vector<T> os;
         for(T c = min; c < max; ++c)
         {
-            os.push_back(c);
+            os.emplace_back(c);
         }
         oarchive << os;
         std::size_t size = oarchive.bytes_written();
@@ -154,7 +155,7 @@ void test(T min, T max)
         std::vector<A<T> > os;
         for(T c = min; c < max; ++c)
         {
-            os.push_back(c);
+            os.emplace_back(c);
         }
         oarchive << os;
         std::size_t size = oarchive.bytes_written();
@@ -180,7 +181,7 @@ void test_fp(T min, T max)
         std::vector<T> os;
         for(T c = min; c < max; c += static_cast<T>(0.5))
         {
-            os.push_back(c);
+            os.emplace_back(c);
         }
         oarchive << os;
         std::size_t size = oarchive.bytes_written();
@@ -201,7 +202,7 @@ void test_fp(T min, T max)
         std::vector<A<T> > os;
         for(T c = min; c < max; c += static_cast<T>(0.5))
         {
-            os.push_back(c);
+            os.emplace_back(c);
         }
         oarchive << os;
         std::size_t size = oarchive.bytes_written();
@@ -242,10 +243,10 @@ void test_non_default_constructible()
     hpx::serialization::output_archive oarchive(buffer);
 
     std::vector<B> os;
-    os.push_back(1);
-    os.push_back(2);
-    os.push_back(3);
-    os.push_back(4);
+    os.emplace_back(1);
+    os.emplace_back(2);
+    os.emplace_back(3);
+    os.emplace_back(4);
 
     short b = 1;
     for (auto& i: os) {

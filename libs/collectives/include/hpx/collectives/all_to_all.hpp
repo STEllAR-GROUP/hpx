@@ -1,5 +1,6 @@
 //  Copyright (c) 2019 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,8 +10,9 @@
 #define HPX_COLLECTIVES_ALL_TO_ALL_JUN_23_2019_0900AM
 
 #if defined(DOXYGEN)
-namespace hpx { namespace lcos
-{
+// clang-format off
+namespace hpx { namespace lcos {
+
     /// AllToAll a set of values from different call sites
     ///
     /// This function receives a set of values from all call sites operating on
@@ -42,12 +44,10 @@ namespace hpx { namespace lcos
     ///             ready once the all_to_all operation has been completed.
     ///
     template <typename T>
-    hpx::future<std::vector<T> >
-    all_to_all(char const* basename, hpx::future<T> result,
-        std::size_t num_sites = std::size_t(-1),
+    hpx::future<std::vector<T>> all_to_all(char const* basename,
+        hpx::future<T> result, std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0);
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
 
     /// AllToAll a set of values from different call sites
     ///
@@ -80,53 +80,53 @@ namespace hpx { namespace lcos
     ///             ready once the all_to_all operation has been completed.
     ///
     template <typename T>
-    hpx::future<std::vector<typename std::decay<T>::type> >
-    all_to_all(char const* basename, T && result,
+    hpx::future<std::vector<typename std::decay<T>::type>> all_to_all(
+        char const* basename, T&& result,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0);
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
 
-    /// \def HPX_REGISTER_ALLTOALL_DECLARATION(type, name)
-    ///
-    /// \brief Declare a all_to_all object named \a name for a given data type \a type.
-    ///
-    /// The macro \a HPX_REGISTER_ALLTOALL_DECLARATION can be used to declare
-    /// all facilities necessary for a (possibly remote) all_to_all operation.
-    ///
-    /// The parameter \a type specifies for which data type the all_to_all
-    /// operations should be enabled.
-    ///
-    /// The (optional) parameter \a name should be a unique C-style identifier
-    /// that will be internally used to identify a particular all_to_all operation.
-    /// If this defaults to \a \<type\>_all_to_all if not specified.
-    ///
-    /// \note The macro \a HPX_REGISTER_ALLTOALL_DECLARATION can be used with 1
-    ///       or 2 arguments. The second argument is optional and defaults to
-    ///       \a \<type\>_all_to_all.
-    ///
-    #define HPX_REGISTER_ALLTOALL_DECLARATION(type, name)
+/// \def HPX_REGISTER_ALLTOALL_DECLARATION(type, name)
+///
+/// \brief Declare a all_to_all object named \a name for a given data type \a type.
+///
+/// The macro \a HPX_REGISTER_ALLTOALL_DECLARATION can be used to declare
+/// all facilities necessary for a (possibly remote) all_to_all operation.
+///
+/// The parameter \a type specifies for which data type the all_to_all
+/// operations should be enabled.
+///
+/// The (optional) parameter \a name should be a unique C-style identifier
+/// that will be internally used to identify a particular all_to_all operation.
+/// If this defaults to \a \<type\>_all_to_all if not specified.
+///
+/// \note The macro \a HPX_REGISTER_ALLTOALL_DECLARATION can be used with 1
+///       or 2 arguments. The second argument is optional and defaults to
+///       \a \<type\>_all_to_all.
+///
+#define HPX_REGISTER_ALLTOALL_DECLARATION(type, name)
 
-    /// \def HPX_REGISTER_ALLTOALL(type, name)
-    ///
-    /// \brief Define a all_to_all object named \a name for a given data type \a type.
-    ///
-    /// The macro \a HPX_REGISTER_ALLTOALL can be used to define
-    /// all facilities necessary for a (possibly remote) all_to_all operation.
-    ///
-    /// The parameter \a type specifies for which data type the all_to_all
-    /// operations should be enabled.
-    ///
-    /// The (optional) parameter \a name should be a unique C-style identifier
-    /// that will be internally used to identify a particular all_to_all operation.
-    /// If this defaults to \a \<type\>_all_to_all if not specified.
-    ///
-    /// \note The macro \a HPX_REGISTER_ALLTOALL can be used with 1
-    ///       or 2 arguments. The second argument is optional and defaults to
-    ///       \a \<type\>_all_to_all.
-    ///
-    #define HPX_REGISTER_ALLTOALL(type, name)
-}}
+/// \def HPX_REGISTER_ALLTOALL(type, name)
+///
+/// \brief Define a all_to_all object named \a name for a given data type \a type.
+///
+/// The macro \a HPX_REGISTER_ALLTOALL can be used to define
+/// all facilities necessary for a (possibly remote) all_to_all operation.
+///
+/// The parameter \a type specifies for which data type the all_to_all
+/// operations should be enabled.
+///
+/// The (optional) parameter \a name should be a unique C-style identifier
+/// that will be internally used to identify a particular all_to_all operation.
+/// If this defaults to \a \<type\>_all_to_all if not specified.
+///
+/// \note The macro \a HPX_REGISTER_ALLTOALL can be used with 1
+///       or 2 arguments. The second argument is optional and defaults to
+///       \a \<type\>_all_to_all.
+///
+#define HPX_REGISTER_ALLTOALL(type, name)
+}}    // namespace hpx::lcos
+// clang-format on
 #else
 
 #include <hpx/config.hpp>
@@ -135,6 +135,8 @@ namespace hpx { namespace lcos
 
 #include <hpx/assertion.hpp>
 #include <hpx/dataflow.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/and_gate.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -148,7 +150,6 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
-#include <hpx/util/bind_back.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -159,62 +160,62 @@ namespace hpx { namespace lcos
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace lcos
-{
-    namespace detail
-    {
+namespace hpx { namespace lcos {
+
+    namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         class all_to_all_server
-          : public hpx::components::component_base<all_to_all_server<T> >
+          : public hpx::components::component_base<all_to_all_server<T>>
         {
             using mutex_type = lcos::local::spinlock;
 
         public:
-            all_to_all_server() //-V730
+            all_to_all_server()    //-V730
             {
-                HPX_ASSERT(false);  // shouldn't ever be called
+                HPX_ASSERT(false);    // shouldn't ever be called
             }
 
             all_to_all_server(std::size_t num_sites, std::string const& name,
-                    std::size_t site)
+                std::size_t site)
               : num_sites_(num_sites)
               , data_(num_sites)
               , gate_(num_sites)
               , name_(name)
               , site_(site)
-            {}
+            {
+            }
 
-            hpx::future<std::vector<T> > get_result(std::size_t which, T t)
+            hpx::future<std::vector<T>> get_result(std::size_t which, T t)
             {
                 std::unique_lock<mutex_type> l(mtx_);
 
-                auto on_ready =
-                    [this](shared_future<void>&& f) -> std::vector<T>
+                auto on_ready = [this](
+                                    shared_future<void>&& f) -> std::vector<T> {
+                    f.get();    // propagate any exceptions
+
+                    std::vector<T> data;
+                    std::string name;
+
                     {
-                        f.get();       // propagate any exceptions
+                        std::unique_lock<mutex_type> l(mtx_);
+                        data = data_;
+                        std::swap(name, name_);
+                    }
 
-                        std::vector<T> data;
-                        std::string name;
+                    // this is a one-shot object (generations counters are not
+                    // supported), unregister ourselves (but only once)
+                    if (!name.empty())
+                    {
+                        hpx::unregister_with_basename(name, site_).get();
+                    }
 
-                        {
-                            std::unique_lock<mutex_type> l(mtx_);
-                            data = data_;
-                            std::swap(name, name_);
-                        }
+                    return data;
+                };
 
-                        // this is a one-shot object (generations counters are not
-                        // supported), unregister ourselves (but only once)
-                        if (!name.empty())
-                        {
-                            hpx::unregister_with_basename(name, site_).get();
-                        }
-
-                        return data;
-                    };
-
-                hpx::future<std::vector<T>> f =
-                    gate_.get_shared_future(l).then(hpx::launch::async, on_ready);
+                hpx::future<std::vector<T>> f = gate_.get_shared_future(l).then(
+                    hpx::launch::async, on_ready);
 
                 gate_.synchronize(1, l);
                 data_[which] = std::move(t);
@@ -249,26 +250,24 @@ namespace hpx { namespace lcos
 
             return result.then(hpx::launch::sync,
                 [HPX_CAPTURE_MOVE(target), HPX_CAPTURE_MOVE(basename)](
-                    hpx::future<bool>&& f)
-                -> hpx::id_type
-                {
+                    hpx::future<bool>&& f) -> hpx::id_type {
                     bool result = f.get();
                     if (!result)
                     {
                         HPX_THROW_EXCEPTION(bad_parameter,
                             "hpx::lcos::detail::register_all_to_all_name",
                             "the given base name for the all_to_all operation "
-                            "was already registered: " + basename);
+                            "was already registered: " +
+                                basename);
                     }
                     return target;
                 });
         }
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    hpx::future<hpx::id_type>
-    create_all_to_all(char const* basename,
+    hpx::future<hpx::id_type> create_all_to_all(char const* basename,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1))
@@ -285,57 +284,52 @@ namespace hpx { namespace lcos
         // create a new all_to_all_server
         using result_type = typename util::decay<T>::type;
         hpx::future<hpx::id_type> id =
-            hpx::new_<detail::all_to_all_server<result_type> >(
+            hpx::new_<detail::all_to_all_server<result_type>>(
                 hpx::find_here(), num_sites, name, this_site);
 
         // register the all_to_all's id using the given basename
-        return id.then(hpx::launch::sync, util::bind_back(
-            &detail::register_all_to_all_name, std::move(name), this_site));
+        return id.then(hpx::launch::sync,
+            util::bind_back(
+                &detail::register_all_to_all_name, std::move(name), this_site));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // destination site needs to be handled differently
     template <typename T>
-    hpx::future<std::vector<T>>
-    all_to_all(hpx::future<hpx::id_type>&& f, hpx::future<T>&& local_result,
-        std::size_t this_site = std::size_t(-1))
+    hpx::future<std::vector<T>> all_to_all(hpx::future<hpx::id_type>&& f,
+        hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         auto all_to_all_data =
-            [this_site](
-                    hpx::future<hpx::id_type>&& f, hpx::future<T>&& local_result)
-            -> hpx::future<std::vector<T> >
-            {
-                using action_type =
-                    typename detail::all_to_all_server<T>::get_result_action;
+            [this_site](hpx::future<hpx::id_type>&& f,
+                hpx::future<T>&& local_result) -> hpx::future<std::vector<T>> {
+            using action_type =
+                typename detail::all_to_all_server<T>::get_result_action;
 
-                // make sure id is kept alive as long as the returned future
-                hpx::id_type id = f.get();
-                auto result =
-                    async(action_type(), id, this_site, local_result.get());
+            // make sure id is kept alive as long as the returned future
+            hpx::id_type id = f.get();
+            auto result =
+                async(action_type(), id, this_site, local_result.get());
 
-                return result.then(hpx::launch::sync,
-                    [HPX_CAPTURE_MOVE(id)](hpx::future<std::vector<T>>&& f)
-                    -> std::vector<T>
-                    {
-                        HPX_UNUSED(id);
-                        return f.get();
-                    });
-            };
+            return result.then(hpx::launch::sync,
+                [HPX_CAPTURE_MOVE(id)](
+                    hpx::future<std::vector<T>>&& f) -> std::vector<T> {
+                    HPX_UNUSED(id);
+                    return f.get();
+                });
+        };
 
         return dataflow(hpx::launch::sync, std::move(all_to_all_data),
             std::move(f), std::move(local_result));
     }
 
     template <typename T>
-    hpx::future<std::vector<T> >
-    all_to_all(char const* basename, hpx::future<T>&& local_result,
-        std::size_t num_sites = std::size_t(-1),
+    hpx::future<std::vector<T>> all_to_all(char const* basename,
+        hpx::future<T>&& local_result, std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0)
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
         if (num_sites == std::size_t(-1))
             num_sites = hpx::get_num_localities(hpx::launch::sync);
@@ -344,8 +338,8 @@ namespace hpx { namespace lcos
 
         if (this_site == 0)
         {
-            return all_to_all(
-                create_all_to_all<T>(basename, num_sites, generation, root_site),
+            return all_to_all(create_all_to_all<T>(
+                                  basename, num_sites, generation, root_site),
                 std::move(local_result), this_site);
         }
 
@@ -353,16 +347,15 @@ namespace hpx { namespace lcos
         if (generation != std::size_t(-1))
             name += std::to_string(generation) + "/";
 
-        return all_to_all(
-            hpx::find_from_basename(std::move(name), root_site),
+        return all_to_all(hpx::find_from_basename(std::move(name), root_site),
             std::move(local_result), this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // all_to_all plain values
     template <typename T>
-    hpx::future<std::vector<typename util::decay<T>::type> >
-    all_to_all(hpx::future<hpx::id_type>&& f, T&& local_result,
+    hpx::future<std::vector<typename util::decay<T>::type>> all_to_all(
+        hpx::future<hpx::id_type>&& f, T&& local_result,
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -370,41 +363,36 @@ namespace hpx { namespace lcos
 
         using arg_type = typename util::decay<T>::type;
 
-        auto all_to_all_data_direct =
-            [HPX_CAPTURE_FORWARD(local_result), this_site](
-                    hpx::future<hpx::id_type>&& f)
-            -> hpx::future<std::vector<arg_type> >
-            {
-                using action_type =
-                    typename detail::all_to_all_server<arg_type>::
-                        get_result_action;
+        auto all_to_all_data_direct = [HPX_CAPTURE_FORWARD(local_result),
+                                          this_site](
+                                          hpx::future<hpx::id_type>&& f)
+            -> hpx::future<std::vector<arg_type>> {
+            using action_type =
+                typename detail::all_to_all_server<arg_type>::get_result_action;
 
-                // make sure id is kept alive as long as the returned future
-                hpx::id_type id = f.get();
-                auto result =
-                    async(action_type(), id, this_site, std::move(local_result));
+            // make sure id is kept alive as long as the returned future
+            hpx::id_type id = f.get();
+            auto result =
+                async(action_type(), id, this_site, std::move(local_result));
 
-                return result.then(hpx::launch::sync,
-                    [HPX_CAPTURE_MOVE(id)](
-                            hpx::future<std::vector<arg_type>> && f)
-                    -> std::vector<arg_type>
-                    {
-                        HPX_UNUSED(id);
-                        return f.get();
-                    });
-            };
+            return result.then(hpx::launch::sync,
+                [HPX_CAPTURE_MOVE(id)](hpx::future<std::vector<arg_type>>&& f)
+                    -> std::vector<arg_type> {
+                    HPX_UNUSED(id);
+                    return f.get();
+                });
+        };
 
-        return dataflow(hpx::launch::sync, std::move(all_to_all_data_direct),
-            std::move(f));
+        return dataflow(
+            hpx::launch::sync, std::move(all_to_all_data_direct), std::move(f));
     }
 
     template <typename T>
-    hpx::future<std::vector<typename util::decay<T>::type> >
-    all_to_all(char const* basename, T&& local_result,
+    hpx::future<std::vector<typename util::decay<T>::type>> all_to_all(
+        char const* basename, T&& local_result,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0)
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
         if (num_sites == std::size_t(-1))
             num_sites = hpx::get_num_localities(hpx::launch::sync);
@@ -413,8 +401,8 @@ namespace hpx { namespace lcos
 
         if (this_site == root_site)
         {
-            return all_to_all(
-                create_all_to_all<T>(basename, num_sites, generation, root_site),
+            return all_to_all(create_all_to_all<T>(
+                                  basename, num_sites, generation, root_site),
                 std::forward<T>(local_result), this_site);
         }
 
@@ -422,18 +410,16 @@ namespace hpx { namespace lcos
         if (generation != std::size_t(-1))
             name += std::to_string(generation) + "/";
 
-        return all_to_all(
-            hpx::find_from_basename(std::move(name), root_site),
+        return all_to_all(hpx::find_from_basename(std::move(name), root_site),
             std::forward<T>(local_result), this_site);
     }
-}}
+}}    // namespace hpx::lcos
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
-    using lcos::create_all_to_all;
+namespace hpx {
     using lcos::all_to_all;
-}
+    using lcos::create_all_to_all;
+}    // namespace hpx
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ALLTOALL_DECLARATION(...)                                 \
@@ -441,9 +427,8 @@ namespace hpx
     /**/
 
 #define HPX_REGISTER_ALLTOALL_DECLARATION_(...)                                \
-    HPX_PP_EXPAND(HPX_PP_CAT(                                                  \
-        HPX_REGISTER_ALLTOALL_DECLARATION_, HPX_PP_NARGS(__VA_ARGS__)          \
-    )(__VA_ARGS__))                                                            \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_ALLTOALL_DECLARATION_,               \
+        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
     /**/
 
 #define HPX_REGISTER_ALLTOALL_DECLARATION_1(type)                              \
@@ -463,8 +448,7 @@ namespace hpx
 
 #define HPX_REGISTER_ALLTOALL_(...)                                            \
     HPX_PP_EXPAND(HPX_PP_CAT(                                                  \
-        HPX_REGISTER_ALLTOALL_, HPX_PP_NARGS(__VA_ARGS__)                      \
-    )(__VA_ARGS__))                                                            \
+        HPX_REGISTER_ALLTOALL_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))       \
     /**/
 
 #define HPX_REGISTER_ALLTOALL_1(type)                                          \
@@ -476,11 +460,11 @@ namespace hpx
         hpx::lcos::detail::all_to_all_server<type>::get_result_action,         \
         HPX_PP_CAT(gather_get_result_action_, name));                          \
     typedef hpx::components::component<                                        \
-        hpx::lcos::detail::all_to_all_server<type>                             \
-    > HPX_PP_CAT(all_to_all_, name);                                           \
+        hpx::lcos::detail::all_to_all_server<type>>                            \
+        HPX_PP_CAT(all_to_all_, name);                                         \
     HPX_REGISTER_COMPONENT(HPX_PP_CAT(all_to_all_, name))                      \
     /**/
 
-#endif // COMPUTE_HOST_CODE
-#endif // DOXYGEN
+#endif    // COMPUTE_HOST_CODE
+#endif    // DOXYGEN
 #endif

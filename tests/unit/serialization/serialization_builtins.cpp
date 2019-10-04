@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -20,7 +21,7 @@ struct A
 {
     A() {}
 
-    A(T t) : t_(t) {}
+    explicit A(T t) : t_(t) {}
     T t_;
 
     A & operator=(T t) { t_ = t; return *this; }
@@ -80,7 +81,7 @@ void test_bool()
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
 
-        A<bool> b = true;
+        auto b = A<bool>(true);
         oarchive << b;
         b = false;
         oarchive << b;
@@ -120,13 +121,13 @@ void test(T min, T max)
         hpx::serialization::output_archive oarchive(buffer);
         for(T c = min; c < max; ++c)
         {
-            A<T> cc = c;
+            auto cc = A<T>(c);
             oarchive << cc;
         }
         hpx::serialization::input_archive iarchive(buffer);
         for(T c = min; c < max; ++c)
         {
-            A<T> cc = 0;
+            auto cc = A<T>(0);
             iarchive >> cc; HPX_TEST(c == cc.t_);
         }
     }
@@ -154,13 +155,13 @@ void test_fp(T min, T max)
         hpx::serialization::output_archive oarchive(buffer);
         for(T c = min; c < max; c += static_cast<T>(0.5))
         {
-            A<T> cc = c;
+            auto cc = A<T> (c);
             oarchive << cc;
         }
         hpx::serialization::input_archive iarchive(buffer);
         for(T c = min; c < max; c += static_cast<T>(0.5))
         {
-            A<T> cc = 0;
+            auto cc = A<T>(0);
             iarchive >> cc; HPX_TEST(c == cc.t_);
         }
     }

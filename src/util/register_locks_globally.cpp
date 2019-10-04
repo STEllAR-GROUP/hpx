@@ -1,9 +1,10 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #include <hpx/type_support/static.hpp>
@@ -25,8 +26,8 @@ namespace hpx { namespace util
         {
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
             global_lock_data()
+              : backtrace_(hpx::detail::backtrace_direct(75))
             {
-                backtrace_ = hpx::detail::backtrace_direct(75);
             }
 
             std::string backtrace_;

@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,14 +8,16 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_OS_EXECUTORS_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/optional.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -26,10 +29,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace threads { namespace executors
-{
-    namespace detail
-    {
+namespace hpx { namespace threads { namespace executors {
+    namespace detail {
         //////////////////////////////////////////////////////////////////////
         template <typename Scheduler>
         class HPX_EXPORT thread_pool_os_executor
@@ -37,13 +38,15 @@ namespace hpx { namespace threads { namespace executors
         {
         public:
             thread_pool_os_executor(std::size_t num_threads,
-                std::string const& affinity_desc = "");
+                policies::detail::affinity_data const& affinity_data,
+                util::optional<policies::callback_notifier> notifier =
+                    util::nullopt);
             ~thread_pool_os_executor();
 
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
             // situations.
-            void add(closure_type && f,
+            void add(closure_type&& f,
                 util::thread_description const& description,
                 threads::thread_state_enum initial_state, bool run_now,
                 threads::thread_stacksize stacksize,
@@ -53,17 +56,15 @@ namespace hpx { namespace threads { namespace executors
             // Schedule given function for execution in this executor no sooner
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
-            void add_at(
-                util::steady_clock::time_point const& abs_time,
-                closure_type && f, util::thread_description const& description,
+            void add_at(util::steady_clock::time_point const& abs_time,
+                closure_type&& f, util::thread_description const& description,
                 threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Schedule given function for execution in this executor no sooner
             // than time rel_time from now. This call never blocks, and may
             // violate bounds on the executor's queue size.
-            void add_after(
-                util::steady_clock::duration const& rel_time,
-                closure_type && f, util::thread_description const& description,
+            void add_after(util::steady_clock::duration const& rel_time,
+                closure_type&& f, util::thread_description const& description,
                 threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Return an estimate of the number of waiting tasks.
@@ -98,12 +99,15 @@ namespace hpx { namespace threads { namespace executors
 
         private:
             // the scheduler used by this executor
-            Scheduler *scheduler_;
+            Scheduler* scheduler_;
             std::string executor_name_;
             threads::policies::callback_notifier notifier_;
-            std::unique_ptr<threads::detail::scheduled_thread_pool<Scheduler>> pool_;
+            std::unique_ptr<threads::detail::scheduled_thread_pool<Scheduler>>
+                pool_;
+            threads::detail::network_background_callback_type
+                network_background_callback_;
 
-            std::size_t num_threads_;
+            threads::thread_pool_init_parameters thread_pool_init_;
 
             static std::atomic<std::size_t> os_executor_count_;
             static std::string get_unique_name();
@@ -112,51 +116,49 @@ namespace hpx { namespace threads { namespace executors
             typedef std::mutex mutex_type;
             mutable mutex_type mtx_;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
-    struct HPX_EXPORT local_queue_os_executor
-      : public scheduled_executor
+    struct HPX_EXPORT local_queue_os_executor : public scheduled_executor
     {
-        local_queue_os_executor();
-
-        explicit local_queue_os_executor(std::size_t num_threads,
-            std::string const& affinity_desc = "");
+        local_queue_os_executor(std::size_t num_threads,
+            policies::detail::affinity_data const& affinity_data,
+            util::optional<policies::callback_notifier> notifier =
+                util::nullopt);
     };
 #endif
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
-    struct HPX_EXPORT static_queue_os_executor
-      : public scheduled_executor
+    struct HPX_EXPORT static_queue_os_executor : public scheduled_executor
     {
-        static_queue_os_executor();
-
-        explicit static_queue_os_executor(std::size_t num_threads,
-            std::string const& affinity_desc = "");
+        static_queue_os_executor(std::size_t num_threads,
+            policies::detail::affinity_data const& affinity_data,
+            util::optional<policies::callback_notifier> notifier =
+                util::nullopt);
     };
 #endif
 
     struct HPX_EXPORT local_priority_queue_os_executor
       : public scheduled_executor
     {
-        local_priority_queue_os_executor();
-
-        explicit local_priority_queue_os_executor(std::size_t num_threads,
-            std::string const& affinity_desc = "");
+        local_priority_queue_os_executor(std::size_t num_threads,
+            policies::detail::affinity_data const& affinity_data,
+            util::optional<policies::callback_notifier> notifier =
+                util::nullopt);
     };
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     struct HPX_EXPORT static_priority_queue_os_executor
       : public scheduled_executor
     {
-        static_priority_queue_os_executor();
-
-        explicit static_priority_queue_os_executor(std::size_t num_threads,
-            std::string const& affinity_desc = "");
+        static_priority_queue_os_executor(std::size_t num_threads,
+            policies::detail::affinity_data const& affinity_data,
+            util::optional<policies::callback_notifier> notifier =
+                util::nullopt);
     };
 #endif
-}}}
+}}}    // namespace hpx::threads::executors
 
 #include <hpx/config/warnings_suffix.hpp>
 

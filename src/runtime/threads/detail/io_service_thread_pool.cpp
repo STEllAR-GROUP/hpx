@@ -1,14 +1,16 @@
 //  Copyright (c) 2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/concurrency/barrier.hpp>
 #include <hpx/runtime/threads/detail/io_service_thread_pool.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/util/barrier.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <cstddef>
@@ -17,11 +19,9 @@
 namespace hpx { namespace threads { namespace detail
 {
     io_service_thread_pool::io_service_thread_pool(
-            threads::policies::callback_notifier& notifier, std::size_t index,
-            char const* pool_name, policies::scheduler_mode m,
-            std::size_t thread_offset)
-      : thread_pool_base(notifier, index, pool_name, m, thread_offset)
-      , threads_(notifier.on_start_thread_, notifier.on_stop_thread_, pool_name)
+        hpx::threads::thread_pool_init_parameters const& init)
+      : thread_pool_base(init)
+      , threads_(init.notifier_, init.name_.c_str())
     {
     }
 
@@ -87,38 +87,10 @@ namespace hpx { namespace threads { namespace detail
     {
     }
 
-    hpx::future<void> io_service_thread_pool::resume()
-    {
-        HPX_ASSERT_MSG(false,
-            "Resuming io_service_thread_pool is not supported");
-        return hpx::make_ready_future();
-    }
-
-    void io_service_thread_pool::resume_cb(std::function<void(void)> callback,
-        error_code& ec)
-    {
-        HPX_ASSERT_MSG(false,
-            "Resuming io_service_thread_pool is not supported");
-    }
-
     void io_service_thread_pool::resume_direct(error_code& ec)
     {
         HPX_ASSERT_MSG(false,
             "Resuming io_service_thread_pool is not supported");
-    }
-
-    hpx::future<void> io_service_thread_pool::suspend()
-    {
-        HPX_ASSERT_MSG(false,
-            "Suspending io_service_thread_pool is not supported");
-        return hpx::make_ready_future();
-    }
-
-    void io_service_thread_pool::suspend_cb(std::function<void(void)> callback,
-        error_code& ec)
-    {
-        HPX_ASSERT_MSG(false,
-            "Suspending io_service_thread_pool is not supported");
     }
 
     void io_service_thread_pool::suspend_direct(error_code& ec)
@@ -127,38 +99,19 @@ namespace hpx { namespace threads { namespace detail
             "Suspending io_service_thread_pool is not supported");
     }
 
-    hpx::future<void> io_service_thread_pool::suspend_processing_unit(
-        std::size_t virt_core)
-    {
-        HPX_ASSERT_MSG(false,
-            "Suspending threads on io_service_thread_pool is not supported");
-        return hpx::future<void>();
-    }
-
-    void io_service_thread_pool::suspend_processing_unit_cb(
-        std::function<void(void)> callback, std::size_t virt_core,
-        error_code& ec)
+    void io_service_thread_pool::suspend_processing_unit_direct(
+        std::size_t virt_core, error_code& ec)
     {
         HPX_ASSERT_MSG(false,
             "Suspending threads on io_service_thread_pool is not supported");
     }
 
-    hpx::future<void> io_service_thread_pool::resume_processing_unit(
-        std::size_t virt_core)
+    void io_service_thread_pool::resume_processing_unit_direct(
+        std::size_t virt_core, error_code& ec)
     {
         HPX_ASSERT_MSG(false,
             "Suspending threads on io_service_thread_pool is not supported");
-        return hpx::future<void>();
     }
-
-    void io_service_thread_pool::resume_processing_unit_cb(
-        std::function<void(void)> callback, std::size_t virt_core,
-        error_code& ec)
-    {
-        HPX_ASSERT_MSG(false,
-            "Resuming threads on io_service_thread_pool is not supported");
-    }
-
 
     std::thread& io_service_thread_pool::get_os_thread_handle(
         std::size_t global_thread_num)

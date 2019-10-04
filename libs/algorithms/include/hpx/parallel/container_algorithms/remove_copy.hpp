@@ -1,5 +1,6 @@
 //  Copyright (c) 2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -24,8 +25,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest. Copies only the elements for which the
     /// comparison operator returns false when compare to val.
@@ -91,25 +91,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename OutIter, typename T,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, std::equal_to<T>,
-                traits::projected_range<Proj, Rng>,
-                traits::projected<Proj, T const*>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
+                    OutIter>::value&& traits::is_projected_range<Proj,
+                    Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    std::equal_to<T>, traits::projected_range<Proj, Rng>,
+                    traits::projected<Proj, T const*>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<
             tag::in(typename hpx::traits::range_traits<Rng>::iterator_type),
-            tag::out(OutIter)
-        >
-    >::type
-    remove_copy(ExPolicy && policy, Rng && rng, OutIter dest, T const& val,
-        Proj && proj = Proj())
+            tag::out(OutIter)>>::type
+    remove_copy(ExPolicy&& policy, Rng&& rng, OutIter dest, T const& val,
+        Proj&& proj = Proj())
     {
         return remove_copy(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), hpx::util::end(rng), dest, val,
@@ -198,28 +191,22 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F, traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
+                    OutIter>::value&& traits::is_projected_range<Proj,
+                    Rng>::value&& traits::is_indirect_callable<ExPolicy, F,
+                    traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<
             tag::in(typename hpx::traits::range_traits<Rng>::iterator_type),
-            tag::out(OutIter)
-        >
-    >::type
-    remove_copy_if(ExPolicy && policy, Rng && rng, OutIter dest, F && f,
-        Proj && proj = Proj())
+            tag::out(OutIter)>>::type
+    remove_copy_if(
+        ExPolicy&& policy, Rng&& rng, OutIter dest, F&& f, Proj&& proj = Proj())
     {
         return remove_copy_if(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), dest, std::forward<F>(f),
-            std::forward<Proj>(proj));
+            hpx::util::begin(rng), hpx::util::end(rng), dest,
+            std::forward<F>(f), std::forward<Proj>(proj));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

@@ -1,5 +1,6 @@
 //  Copyright (c) 2011-2012 Maciej Brodowicz
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,7 +9,7 @@
 #if defined(HPX_HAVE_PAPI)
 
 #include <hpx/config/asio.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -60,7 +61,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     // return options_description object for PAPI counters
     options_description get_options_description()
     {
-        using boost::program_options::value;
+        using hpx::program_options::value;
 
         // description of PAPI counter specific options
         options_description papi_opts("PAPI counter options");
@@ -109,7 +110,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             std::vector<std::string> names =
                 vm["hpx:print-counter"].as<std::vector<std::string> >();
             std::vector<std::string>::iterator it;
-            for (it = names.begin(); it != names.end(); it++)
+            for (it = names.begin(); it != names.end(); ++it)
                 if (it->substr(0, 5) == "/papi")
                     return true;
         }
@@ -118,7 +119,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             std::vector<std::string> names =
                 vm["hpx:print-counter-reset"].as<std::vector<std::string> >();
             std::vector<std::string>::iterator it;
-            for (it = names.begin(); it != names.end(); it++)
+            for (it = names.begin(); it != names.end(); ++it)
                 if (it->substr(0, 5) == "/papi")
                     return true;
         }
@@ -216,8 +217,9 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
                 dependencies(**it),
                 (*it)->long_descr);
 
-            if (strlen((*it)->note) > 0)
-            { // is this actually provided anywhere??
+            if (strnlen((*it)->note, PAPI_HUGE_STR_LEN) > 0)
+            {
+                // is this actually provided anywhere??
                 std::cout << "Note:\n" << (*it)->note << "\n";
             }
 
@@ -255,7 +257,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             registers(info),
             info.long_descr);
 
-        if (strlen(info.note) > 0)
+        if (strnlen(info.note, PAPI_HUGE_STR_LEN) > 0)
         {
             std::cout << "Note:\n" << info.note << "\n";
         }

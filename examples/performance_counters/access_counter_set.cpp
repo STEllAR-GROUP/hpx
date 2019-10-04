@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,14 +11,14 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/performance_counters.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstddef>
 #include <iomanip>
 #include <string>
 #include <vector>
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     // extract the counter name (pattern) from command line
     std::string name;
@@ -65,11 +66,11 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Define application-specific command-line options.
-    boost::program_options::options_description opts(
+    hpx::program_options::options_description opts(
         "usage: access_counter_set [options]");
 
     opts.add_options()
-        ("counter", boost::program_options::value<std::string>(),
+        ("counter", hpx::program_options::value<std::string>(),
          "name (pattern) representing the of the performance counter(s) to query")
         ;
 

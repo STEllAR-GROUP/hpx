@@ -5,6 +5,7 @@
 // Copyright (c) 2011, 2012 Jeff Flinn, Boris Schaeling
 // Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -15,8 +16,9 @@
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
+#include <hpx/filesystem.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <boost/filesystem/path.hpp>
+
 #include <string>
 
 namespace hpx { namespace components { namespace process { namespace windows {
@@ -60,7 +62,7 @@ inline start_in_dir_<std::wstring> start_in_dir(const std::wstring &ws)
     return start_in_dir_<std::wstring>(ws);
 }
 
-inline start_in_dir_<std::wstring> start_in_dir(const boost::filesystem::path &p)
+inline start_in_dir_<std::wstring> start_in_dir(const filesystem::path &p)
 {
     return start_in_dir_<std::wstring>(p.wstring());
 }
@@ -75,7 +77,7 @@ inline start_in_dir_<std::string> start_in_dir(const std::string &s)
     return start_in_dir_<std::string>(s);
 }
 
-inline start_in_dir_<std::string> start_in_dir(const boost::filesystem::path &p)
+inline start_in_dir_<std::string> start_in_dir(const filesystem::path &p)
 {
     return start_in_dir_<std::string>(p.string());
 }

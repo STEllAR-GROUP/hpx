@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,7 +8,7 @@
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/performance_counters.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 
 #include <cstdint>
 
@@ -41,9 +42,9 @@ namespace performance_counters { namespace sine
     ///////////////////////////////////////////////////////////////////////////
     // This will be called to return special command line options supported by
     // this component.
-    boost::program_options::options_description command_line_options()
+    hpx::program_options::options_description command_line_options()
     {
-        boost::program_options::options_description opts(
+        hpx::program_options::options_description opts(
             "Additional command line options for the sine component");
         opts.add_options()
             ("sine", "enables the performance counters implemented by the "
@@ -57,8 +58,8 @@ namespace performance_counters { namespace sine
     // counters need to be created.
     bool need_perf_counters()
     {
-        using boost::program_options::options_description;
-        using boost::program_options::variables_map;
+        using hpx::program_options::options_description;
+        using hpx::program_options::variables_map;
         using hpx::util::retrieve_commandline_arguments;
 
         // Retrieve command line using the Boost.ProgramOptions library.

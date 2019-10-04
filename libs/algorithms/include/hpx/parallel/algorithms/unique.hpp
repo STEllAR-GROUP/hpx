@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Taeguk Kwon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/util/tagged_pair.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
@@ -40,24 +41,20 @@
 
 #include <boost/shared_array.hpp>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /////////////////////////////////////////////////////////////////////////////
     // unique
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // sequential unique with projection function
         template <typename FwdIter, typename Pred, typename Proj>
-        FwdIter
-        sequential_unique(FwdIter first, FwdIter last,
-            Pred && pred, Proj && proj)
+        FwdIter sequential_unique(
+            FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
         {
             return std::unique(first, last,
                 util::compare_projected<Pred, Proj>(
-                    std::forward<Pred>(pred),
-                    std::forward<Proj>(proj)));
+                    std::forward<Pred>(pred), std::forward<Proj>(proj)));
         }
 
         template <typename Iter>
@@ -65,30 +62,28 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             unique()
               : unique::algorithm("unique")
-            {}
-
-            template <typename ExPolicy, typename InIter,
-                typename Pred, typename Proj>
-            static InIter
-            sequential(ExPolicy, InIter first, InIter last,
-                Pred && pred, Proj && proj)
             {
-                return sequential_unique(first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
             }
 
-            template <typename ExPolicy, typename FwdIter,
-                typename Pred, typename Proj>
-            static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter
-            >::type
-            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
-                Pred && pred, Proj && proj)
+            template <typename ExPolicy, typename InIter, typename Pred,
+                typename Proj>
+            static InIter sequential(
+                ExPolicy, InIter first, InIter last, Pred&& pred, Proj&& proj)
+            {
+                return sequential_unique(first, last, std::forward<Pred>(pred),
+                    std::forward<Proj>(proj));
+            }
+
+            template <typename ExPolicy, typename FwdIter, typename Pred,
+                typename Proj>
+            static
+                typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+                parallel(ExPolicy&& policy, FwdIter first, FwdIter last,
+                    Pred&& pred, Proj&& proj)
             {
                 typedef hpx::util::zip_iterator<FwdIter, bool*> zip_iterator;
-                typedef util::detail::algorithm_result<
-                    ExPolicy, FwdIter
-                > algorithm_result;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter>
+                    algorithm_result;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
 
@@ -104,100 +99,87 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 using hpx::util::get;
                 using hpx::util::make_zip_iterator;
-                typedef util::scan_partitioner<
-                        ExPolicy, FwdIter, std::size_t, void,
-                        util::scan_partitioner_sequential_f3_tag
-                    > scan_partitioner_type;
+                typedef util::scan_partitioner<ExPolicy, FwdIter, std::size_t,
+                    void, util::scan_partitioner_sequential_f3_tag>
+                    scan_partitioner_type;
 
-                auto f1 =
-                    [HPX_CAPTURE_FORWARD(pred),
-                        HPX_CAPTURE_FORWARD(proj)
-                    ](zip_iterator part_begin, std::size_t part_size)
-                    -> std::size_t
-                    {
-                        FwdIter base = get<0>(part_begin.get_iterator_tuple());
+                auto f1 = [HPX_CAPTURE_FORWARD(pred),
+                              HPX_CAPTURE_FORWARD(proj)](
+                              zip_iterator part_begin,
+                              std::size_t part_size) -> std::size_t {
+                    FwdIter base = get<0>(part_begin.get_iterator_tuple());
 
-                        // MSVC complains if pred or proj is captured by ref below
-                        util::loop_n<ExPolicy>(
-                            ++part_begin, part_size,
-                            [base, pred, proj](zip_iterator it) mutable
-                            {
-                                using hpx::util::invoke;
+                    // MSVC complains if pred or proj is captured by ref below
+                    util::loop_n<ExPolicy>(++part_begin, part_size,
+                        [base, pred, proj](zip_iterator it) mutable {
+                            using hpx::util::invoke;
 
-                                bool f = invoke(pred,
-                                    invoke(proj, *base),
-                                    invoke(proj, get<0>(*it)));
+                            bool f = invoke(pred, invoke(proj, *base),
+                                invoke(proj, get<0>(*it)));
 
-                                if (!(get<1>(*it) = f))
-                                    base = get<0>(it.get_iterator_tuple());
-                            });
+                            if (!(get<1>(*it) = f))
+                                base = get<0>(it.get_iterator_tuple());
+                        });
 
-                        // There is no need to return the partition result.
-                        // But, the scan_partitioner doesn't support 'void' as
-                        // Result1. So, unavoidably return non-meaning value.
-                        return 0u;
-                    };
+                    // There is no need to return the partition result.
+                    // But, the scan_partitioner doesn't support 'void' as
+                    // Result1. So, unavoidably return non-meaning value.
+                    return 0u;
+                };
 
-                std::shared_ptr<FwdIter> dest_ptr = std::make_shared<FwdIter>(first);
+                std::shared_ptr<FwdIter> dest_ptr =
+                    std::make_shared<FwdIter>(first);
                 auto f3 =
-                    [dest_ptr, flags](
-                        zip_iterator part_begin, std::size_t part_size,
+                    [dest_ptr, flags](zip_iterator part_begin,
+                        std::size_t part_size,
                         hpx::shared_future<std::size_t> curr,
-                        hpx::shared_future<std::size_t> next
-                    ) mutable -> void
+                        hpx::shared_future<std::size_t> next) mutable -> void {
+                    HPX_UNUSED(flags);
+
+                    curr.get();    // rethrow exceptions
+                    next.get();    // rethrow exceptions
+
+                    FwdIter& dest = *dest_ptr;
+
+                    if (dest == get<0>(part_begin.get_iterator_tuple()))
                     {
-                        HPX_UNUSED(flags);
-
-                        curr.get();     // rethrow exceptions
-                        next.get();     // rethrow exceptions
-
-                        FwdIter& dest = *dest_ptr;
-
-                        if (dest == get<0>(part_begin.get_iterator_tuple()))
-                        {
-                            // Self-assignment must be detected.
-                            util::loop_n<ExPolicy>(
-                                part_begin, part_size,
-                                [&dest](zip_iterator it)
+                        // Self-assignment must be detected.
+                        util::loop_n<ExPolicy>(
+                            part_begin, part_size, [&dest](zip_iterator it) {
+                                if (!get<1>(*it))
                                 {
-                                    if(!get<1>(*it))
-                                    {
-                                        if (dest != get<0>(it.get_iterator_tuple()))
-                                            *dest++ = std::move(get<0>(*it));
-                                        else
-                                            ++dest;
-                                    }
-                                });
-                        }
-                        else
-                        {
-                            // Self-assignment can't be performed.
-                            util::loop_n<ExPolicy>(
-                                part_begin, part_size,
-                                [&dest](zip_iterator it)
-                                {
-                                    if(!get<1>(*it))
+                                    if (dest != get<0>(it.get_iterator_tuple()))
                                         *dest++ = std::move(get<0>(*it));
-                                });
-                        }
-                    };
+                                    else
+                                        ++dest;
+                                }
+                            });
+                    }
+                    else
+                    {
+                        // Self-assignment can't be performed.
+                        util::loop_n<ExPolicy>(
+                            part_begin, part_size, [&dest](zip_iterator it) {
+                                if (!get<1>(*it))
+                                    *dest++ = std::move(get<0>(*it));
+                            });
+                    }
+                };
 
                 auto f4 =
                     [HPX_CAPTURE_MOVE(dest_ptr), first, count, flags](
-                        std::vector<hpx::shared_future<std::size_t> > &&,
-                        std::vector<hpx::future<void> > &&) mutable
-                    ->  FwdIter
+                        std::vector<hpx::shared_future<std::size_t>>&&,
+                        std::vector<hpx::future<void>>&&) mutable -> FwdIter {
+                    if (!flags[count - 1])
                     {
-                        if (!flags[count - 1])
-                        {
-                            std::advance(first, count - 1);
-                            if (first != (*dest_ptr))
-                                *(*dest_ptr)++ = std::move(*first);
-                            else
-                                ++(*dest_ptr);
-                        }
-                        return *dest_ptr;
-                    };
+                        std::advance(first, count - 1);
+                        if (first != (*dest_ptr))
+                            *(*dest_ptr)++ = std::move(*first);
+                        else
+                            ++(*dest_ptr);
+                    }
+                    return *dest_ptr;
+                };
 
                 return scan_partitioner_type::call(
                     std::forward<ExPolicy>(policy),
@@ -207,8 +189,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     // step 2 propagates the partition results from left
                     // to right
                     [](hpx::shared_future<std::size_t> fut1,
-                        hpx::shared_future<std::size_t>
-                            fut2) -> std::size_t {
+                        hpx::shared_future<std::size_t> fut2) -> std::size_t {
                         fut1.get();
                         fut2.get();    // propagate exceptions
                         // There is no need to propagate the partition
@@ -224,7 +205,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Eliminates all but the first element from every consecutive group of
     /// equivalent elements from the range [first, last) and returns a
@@ -296,44 +277,37 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename FwdIter,
         typename Pred = detail::equal_to,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter>::value &&
-        traits::is_projected<Proj, FwdIter>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Pred,
-            traits::projected<Proj, FwdIter>,
-            traits::projected<Proj, FwdIter>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, FwdIter
-    >::type
-    unique(ExPolicy&& policy, FwdIter first, FwdIter last,
-        Pred && pred = Pred(), Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter>::value&&
+                    traits::is_projected<Proj, FwdIter>::value&&
+                        traits::is_indirect_callable<ExPolicy, Pred,
+                            traits::projected<Proj, FwdIter>,
+                            traits::projected<Proj, FwdIter>>::value)>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type unique(
+        ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred = Pred(),
+        Proj&& proj = Proj())
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::unique<FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+        return detail::unique<FwdIter>().call(std::forward<ExPolicy>(policy),
+            is_seq(), first, last, std::forward<Pred>(pred),
+            std::forward<Proj>(proj));
     }
 
     /////////////////////////////////////////////////////////////////////////////
     // unique_copy
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // sequential unique_copy with projection function
-        template <typename FwdIter, typename OutIter, typename Pred, typename Proj>
-        std::pair<FwdIter, OutIter>
-        sequential_unique_copy(FwdIter first, FwdIter last, OutIter dest,
-            Pred && pred, Proj && proj, std::true_type)
+        template <typename FwdIter, typename OutIter, typename Pred,
+            typename Proj>
+        std::pair<FwdIter, OutIter> sequential_unique_copy(FwdIter first,
+            FwdIter last, OutIter dest, Pred&& pred, Proj&& proj,
+            std::true_type)
         {
             if (first == last)
                 return std::make_pair(std::move(last), std::move(dest));
@@ -344,9 +318,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
             while (++first != last)
             {
-                if (!hpx::util::invoke(pred,
-                    hpx::util::invoke(proj, *base),
-                    hpx::util::invoke(proj, *first)))
+                if (!hpx::util::invoke(pred, hpx::util::invoke(proj, *base),
+                        hpx::util::invoke(proj, *first)))
                 {
                     base = first;
                     *dest++ = *first;
@@ -356,10 +329,11 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // sequential unique_copy with projection function
-        template <typename InIter, typename OutIter, typename Pred, typename Proj>
-        std::pair<InIter, OutIter>
-        sequential_unique_copy(InIter first, InIter last, OutIter dest,
-            Pred && pred, Proj && proj, std::false_type)
+        template <typename InIter, typename OutIter, typename Pred,
+            typename Proj>
+        std::pair<InIter, OutIter> sequential_unique_copy(InIter first,
+            InIter last, OutIter dest, Pred&& pred, Proj&& proj,
+            std::false_type)
         {
             if (first == last)
                 return std::make_pair(std::move(last), std::move(dest));
@@ -370,9 +344,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
             while (++first != last)
             {
-                if (!hpx::util::invoke(pred,
-                    hpx::util::invoke(proj, base_val),
-                    hpx::util::invoke(proj, *first)))
+                if (!hpx::util::invoke(pred, hpx::util::invoke(proj, base_val),
+                        hpx::util::invoke(proj, *first)))
                 {
                     base_val = *first;
                     *dest++ = base_val;
@@ -382,17 +355,18 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         template <typename IterPair>
-        struct unique_copy : public detail::algorithm<unique_copy<IterPair>, IterPair>
+        struct unique_copy
+          : public detail::algorithm<unique_copy<IterPair>, IterPair>
         {
             unique_copy()
               : unique_copy::algorithm("unique_copy")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter, typename OutIter,
                 typename Pred, typename Proj>
-            static std::pair<InIter, OutIter>
-            sequential(ExPolicy, InIter first, InIter last, OutIter dest,
-                Pred && pred, Proj && proj)
+            static std::pair<InIter, OutIter> sequential(ExPolicy, InIter first,
+                InIter last, OutIter dest, Pred&& pred, Proj&& proj)
             {
                 return sequential_unique_copy(first, last, dest,
                     std::forward<Pred>(pred), std::forward<Proj>(proj),
@@ -401,16 +375,15 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename Pred, typename Proj>
-            static typename util::detail::algorithm_result<
-                ExPolicy, std::pair<FwdIter1, FwdIter2>
-            >::type
-            parallel(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
-                FwdIter2 dest, Pred && pred, Proj && proj)
+            static typename util::detail::algorithm_result<ExPolicy,
+                std::pair<FwdIter1, FwdIter2>>::type
+            parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+                FwdIter2 dest, Pred&& pred, Proj&& proj)
             {
                 typedef hpx::util::zip_iterator<FwdIter1, bool*> zip_iterator;
-                typedef util::detail::algorithm_result<
-                    ExPolicy, std::pair<FwdIter1, FwdIter2>
-                > algorithm_result;
+                typedef util::detail::algorithm_result<ExPolicy,
+                    std::pair<FwdIter1, FwdIter2>>
+                    algorithm_result;
                 typedef typename std::iterator_traits<FwdIter1>::difference_type
                     difference_type;
 
@@ -431,77 +404,66 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 using hpx::util::get;
                 using hpx::util::make_zip_iterator;
-                typedef util::scan_partitioner<
-                        ExPolicy, std::pair<FwdIter1, FwdIter2>, std::size_t
-                    > scan_partitioner_type;
+                typedef util::scan_partitioner<ExPolicy,
+                    std::pair<FwdIter1, FwdIter2>, std::size_t>
+                    scan_partitioner_type;
 
-                auto f1 =
-                    [HPX_CAPTURE_FORWARD(pred),
-                        HPX_CAPTURE_FORWARD(proj)
-                    ](zip_iterator part_begin, std::size_t part_size)
-                    -> std::size_t
-                    {
-                        FwdIter1 base = get<0>(part_begin.get_iterator_tuple());
-                        std::size_t curr = 0;
+                auto f1 = [HPX_CAPTURE_FORWARD(pred),
+                              HPX_CAPTURE_FORWARD(proj)](
+                              zip_iterator part_begin,
+                              std::size_t part_size) -> std::size_t {
+                    FwdIter1 base = get<0>(part_begin.get_iterator_tuple());
+                    std::size_t curr = 0;
 
-                        // MSVC complains if pred or proj is captured by ref below
-                        util::loop_n<ExPolicy>(
-                            ++part_begin, part_size,
-                            [base, pred, proj, &curr](zip_iterator it) mutable
+                    // MSVC complains if pred or proj is captured by ref below
+                    util::loop_n<ExPolicy>(++part_begin, part_size,
+                        [base, pred, proj, &curr](zip_iterator it) mutable {
+                            using hpx::util::invoke;
+
+                            bool f = invoke(pred, invoke(proj, *base),
+                                invoke(proj, get<0>(*it)));
+
+                            if (!(get<1>(*it) = f))
                             {
-                                using hpx::util::invoke;
+                                base = get<0>(it.get_iterator_tuple());
+                                ++curr;
+                            }
+                        });
 
-                                bool f = invoke(pred,
-                                    invoke(proj, *base),
-                                    invoke(proj, get<0>(*it)));
-
-                                if (!(get<1>(*it) = f))
-                                {
-                                    base = get<0>(it.get_iterator_tuple());
-                                    ++curr;
-                                }
-                            });
-
-                        return curr;
-                    };
+                    return curr;
+                };
                 auto f3 =
-                    [dest, flags](
-                        zip_iterator part_begin, std::size_t part_size,
+                    [dest, flags](zip_iterator part_begin,
+                        std::size_t part_size,
                         hpx::shared_future<std::size_t> curr,
-                        hpx::shared_future<std::size_t> next
-                    ) mutable -> void
-                    {
-                        HPX_UNUSED(flags);
+                        hpx::shared_future<std::size_t> next) mutable -> void {
+                    HPX_UNUSED(flags);
 
-                        next.get();     // rethrow exceptions
+                    next.get();    // rethrow exceptions
 
-                        std::advance(dest, curr.get());
-                        util::loop_n<ExPolicy>(
-                            ++part_begin, part_size,
-                            [&dest](zip_iterator it) mutable
-                            {
-                                if (!get<1>(*it))
-                                    *dest++ = get<0>(*it);
-                            });
-                    };
+                    std::advance(dest, curr.get());
+                    util::loop_n<ExPolicy>(++part_begin, part_size,
+                        [&dest](zip_iterator it) mutable {
+                            if (!get<1>(*it))
+                                *dest++ = get<0>(*it);
+                        });
+                };
 
                 auto f4 =
                     [last, dest, flags](
-                        std::vector<hpx::shared_future<std::size_t> > && items,
-                        std::vector<hpx::future<void> > &&) mutable
-                    ->  std::pair<FwdIter1, FwdIter2>
-                    {
-                        HPX_UNUSED(flags);
+                        std::vector<hpx::shared_future<std::size_t>>&& items,
+                        std::vector<hpx::future<void>>&&) mutable
+                    -> std::pair<FwdIter1, FwdIter2> {
+                    HPX_UNUSED(flags);
 
-                        std::advance(dest, items.back().get());
-                        return std::make_pair(std::move(last), std::move(dest));
-                    };
+                    std::advance(dest, items.back().get());
+                    return std::make_pair(std::move(last), std::move(dest));
+                };
 
                 return scan_partitioner_type::call(
                     std::forward<ExPolicy>(policy),
                     //make_zip_iterator(first, flags.get() - 1),
-                    make_zip_iterator(first, flags.get() - 1),
-                    count - 1, init,
+                    make_zip_iterator(first, flags.get() - 1), count - 1, init,
                     // step 1 performs first part of scan algorithm
                     std::move(f1),
                     // step 2 propagates the partition results from left
@@ -514,7 +476,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Copies the elements from the range [first, last),
     /// to another range beginning at \a dest in such a way that
@@ -595,28 +557,21 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::equal_to,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter1>::value &&
-        hpx::traits::is_iterator<FwdIter2>::value &&
-        traits::is_projected<Proj, FwdIter1>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Pred,
-            traits::projected<Proj, FwdIter1>,
-            traits::projected<Proj, FwdIter1>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, hpx::util::tagged_pair<
-        tag::in(FwdIter1), tag::out(FwdIter2)>
-    >::type
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter1>::value&&
+                    hpx::traits::is_iterator<FwdIter2>::value&&
+                        traits::is_projected<Proj, FwdIter1>::value&&
+                            traits::is_indirect_callable<ExPolicy, Pred,
+                                traits::projected<Proj, FwdIter1>,
+                                traits::projected<Proj, FwdIter1>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
     unique_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
-        Pred && pred = Pred(), Proj && proj = Proj())
+        Pred&& pred = Pred(), Proj&& proj = Proj())
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Required at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
@@ -624,10 +579,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
             detail::unique_copy<result_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, dest, std::forward<Pred>(pred),
-                std::forward<Proj>(proj)));
+                std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
+                std::forward<Pred>(pred), std::forward<Proj>(proj)));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

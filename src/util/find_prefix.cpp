@@ -2,13 +2,17 @@
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
 //  Copyright (c) 2012-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/filesystem.hpp>
+#include <hpx/plugin.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/find_prefix.hpp>
 
 #if defined(HPX_WINDOWS)
@@ -23,13 +27,11 @@
 #elif defined(__FreeBSD__)
 #  include <sys/types.h>
 #  include <sys/sysctl.h>
+#  include <algorithm>
+#  include <iterator>
 #  include <vector>
 #endif
 
-#include <hpx/util/plugin/dll.hpp>
-#include <hpx/type_support/unused.hpp>
-
-#include <boost/filesystem/path.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/tokenizer.hpp>
@@ -63,7 +65,7 @@ namespace hpx { namespace util
             dll.load_library(ec);
             if (ec) return hpx_prefix();
 
-            using boost::filesystem::path;
+            using hpx::filesystem::path;
 
             std::string const prefix =
                 path(dll.get_directory(ec)).parent_path().string();
@@ -115,7 +117,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////////
     std::string get_executable_prefix(char const* argv0)
     {
-        using boost::filesystem::path;
+        using hpx::filesystem::path;
         path p(get_executable_filename(argv0));
 
         return p.parent_path().parent_path().string();
@@ -235,7 +237,7 @@ namespace hpx { namespace util
         {
             std::vector<char> buf(cb);
             sysctl(mib, 4, &buf[0], &cb, nullptr, 0);
-            r = &buf[0];
+            std::copy(&buf[0], &buf[cb], std::back_inserter(r));
         }
 
 #else

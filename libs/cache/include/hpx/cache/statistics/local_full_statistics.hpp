@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -17,8 +18,7 @@
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache { namespace statistics
-{
+namespace hpx { namespace util { namespace cache { namespace statistics {
     ///////////////////////////////////////////////////////////////////////////
     class local_full_statistics : public local_statistics
     {
@@ -26,15 +26,18 @@ namespace hpx { namespace util { namespace cache { namespace statistics
         std::int64_t get_and_reset_value(std::int64_t& value, bool reset)
         {
             std::int64_t result = value;
-            if (reset) value = 0;
+            if (reset)
+                value = 0;
             return result;
         }
 
         struct api_counter_data
         {
             api_counter_data()
-              : count_(0), time_(0)
-            {}
+              : count_(0)
+              , time_(0)
+            {
+            }
 
             std::int64_t count_;
             std::int64_t time_;
@@ -48,7 +51,8 @@ namespace hpx { namespace util { namespace cache { namespace statistics
             static api_counter_data& get_api_counter_data(
                 local_full_statistics& stat, method m)
             {
-                switch(m) {
+                switch (m)
+                {
                 case method_get_entry:
                 default:
                     break;
@@ -79,8 +83,8 @@ namespace hpx { namespace util { namespace cache { namespace statistics
 
         public:
             update_on_exit(local_full_statistics& stat, method m)
-              : started_at_(now()),
-                data_(get_api_counter_data(stat, m))
+              : started_at_(now())
+              , data_(get_api_counter_data(stat, m))
             {
             }
 
@@ -158,7 +162,6 @@ namespace hpx { namespace util { namespace cache { namespace statistics
         api_counter_data update_entry_;
         api_counter_data erase_entry_;
     };
-}}}}
+}}}}    // namespace hpx::util::cache::statistics
 
 #endif
-

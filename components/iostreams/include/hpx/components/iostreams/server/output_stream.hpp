@@ -1,6 +1,7 @@
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -60,7 +61,7 @@ namespace hpx { namespace iostreams { namespace server
           : write_f(make_std_ostream_write_function(os))
         {}
 
-        output_stream(std::reference_wrapper<std::ostream> os)
+        output_stream(std::reference_wrapper<std::ostream> const& os)
           : write_f(make_std_ostream_write_function(os.get()))
         {}
 

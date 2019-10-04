@@ -1,5 +1,6 @@
 //  Copyright (c) 2017-2018 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -35,6 +36,7 @@
 #include <hpx/include/parallel_executor_parameters.hpp>
 //
 #include <hpx/include/compute.hpp>
+#include <hpx/timing.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
 # include <hpx/compute/cuda/allocator.hpp>
@@ -375,7 +377,7 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
 }
 
 // -------------------------------------------------------------------------
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t device     = vm["device"].as<std::size_t>();
     std::size_t sizeMult   = vm["sizemult"].as<std::size_t>();
@@ -425,23 +427,23 @@ int main(int argc, char **argv)
 {
     printf("[HPX Matrix Multiply CUBLAS] - Starting...\n");
 
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
     cmdline.add_options()
         (   "device",
-            boost::program_options::value<std::size_t>()->default_value(0),
+            hpx::program_options::value<std::size_t>()->default_value(0),
             "Device to use")
         (   "sizemult",
-            boost::program_options::value<std::size_t>()->default_value(5),
+            hpx::program_options::value<std::size_t>()->default_value(5),
             "Multiplier")
         (   "iterations",
-            boost::program_options::value<std::size_t>()->default_value(30),
+            hpx::program_options::value<std::size_t>()->default_value(30),
             "iterations")
         (   "no-cpu",
-            boost::program_options::value<bool>()->default_value(false),
+            hpx::program_options::value<bool>()->default_value(false),
             "disable CPU validation to save time")
         ("seed,s",
-            boost::program_options::value<unsigned int>(),
+            hpx::program_options::value<unsigned int>(),
             "the random number generator seed to use for this run")
         ;
 

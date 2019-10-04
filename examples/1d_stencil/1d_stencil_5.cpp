@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -291,7 +292,7 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::uint64_t np = vm["np"].as<std::uint64_t>();   // Number of partitions.
     std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
@@ -333,7 +334,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     options_description desc_commandline;
     desc_commandline.add_options()

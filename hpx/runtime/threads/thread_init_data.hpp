@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -32,9 +33,6 @@ namespace hpx { namespace threads
     public:
         thread_init_data()
           : func(),
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-            lva(0),
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             description(),
 #endif
@@ -46,7 +44,7 @@ namespace hpx { namespace threads
 #endif
             priority(thread_priority_normal),
             schedulehint(),
-            stacksize(get_default_stack_size()),
+            stacksize(HPX_SMALL_STACK_SIZE),
             scheduler_base(nullptr)
         {}
 
@@ -56,9 +54,6 @@ namespace hpx { namespace threads
             schedulehint    = rhs.schedulehint;
             stacksize       = rhs.stacksize;
             scheduler_base  = rhs.scheduler_base;
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-            lva = rhs.lva;
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             description = rhs.description;
 #endif
@@ -77,9 +72,6 @@ namespace hpx { namespace threads
 
         thread_init_data(thread_init_data&& rhs)
           : func(std::move(rhs.func)),
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-            lva(rhs.lva),
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             description(rhs.description),
 #endif
@@ -98,20 +90,16 @@ namespace hpx { namespace threads
             scheduler_base(rhs.scheduler_base)
         {
             if (stacksize == 0)
-                stacksize = get_default_stack_size();
+                stacksize = HPX_SMALL_STACK_SIZE;
         }
 
         template <typename F>
         thread_init_data(F && f, util::thread_description const& desc,
-                naming::address_type lva_ = 0,
                 thread_priority priority_ = thread_priority_normal,
                 thread_schedule_hint os_thread = thread_schedule_hint(),
-                std::ptrdiff_t stacksize_ = std::ptrdiff_t(-1),
+                std::ptrdiff_t stacksize_ = HPX_SMALL_STACK_SIZE,
                 policies::scheduler_base* scheduler_base_ = nullptr)
           : func(std::forward<F>(f)),
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-            lva(lva_),
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             description(desc),
 #endif
@@ -124,19 +112,15 @@ namespace hpx { namespace threads
             apex_data(apex_new_task(description,parent_locality_id,parent_id)),
 #endif
             priority(priority_), schedulehint(os_thread),
-            stacksize(stacksize_ == std::ptrdiff_t(-1) ?
-                get_default_stack_size() : stacksize_),
+            stacksize(stacksize_),
             scheduler_base(scheduler_base_)
         {
             if (stacksize == 0)
-                stacksize = get_default_stack_size();
+                stacksize = HPX_SMALL_STACK_SIZE;
         }
 
         threads::thread_function_type func;
 
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-        naming::address_type lva;
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
         util::thread_description description;
 #endif

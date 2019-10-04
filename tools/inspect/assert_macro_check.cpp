@@ -3,20 +3,22 @@
 //  Copyright Eric Niebler 2010.
 //  Based on the assert_macro_check checker by Marshall Clow
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+#include <hpx/filesystem.hpp>
 
 #include "assert_macro_check.hpp"
-#include <functional>
 #include "function_hyper.hpp"
 #include "boost/regex.hpp"
 #include "boost/lexical_cast.hpp"
-#include "boost/filesystem/operations.hpp"
 
-namespace fs = boost::filesystem;
+#include <functional>
+
+namespace fs = hpx::filesystem;
 
 namespace
 {

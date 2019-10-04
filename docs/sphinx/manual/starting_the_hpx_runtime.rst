@@ -2,6 +2,7 @@
     Copyright (C) 2018 Nikunj Gupta
     Copyright (C) 2007-2017 Hartmut Kaiser
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -154,7 +155,7 @@ additional configuration parameters while initializing the |hpx| runtime system.
 
        int hpx_main();
        int hpx_main(int argc, char* argv[]);
-       int hpx_main(boost::program_options::variables_map& vm);
+       int hpx_main(hpx::program_options::variables_map& vm);
 
    This is consistent with (and extends) the usually allowed prototypes for the
    function ``main()`` in C++ applications.
@@ -224,7 +225,7 @@ system has stopped.
 
        int hpx_main();
        int hpx_main(int argc, char* argv[]);
-       int hpx_main(boost::program_options::variables_map& vm);
+       int hpx_main(hpx::program_options::variables_map& vm);
 
    This is consistent with (and extends) the usually allowed prototypes for the
    function ``main()`` in C++ applications.

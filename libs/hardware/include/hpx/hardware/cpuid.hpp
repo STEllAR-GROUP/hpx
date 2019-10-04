@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -8,25 +9,25 @@
 #if !defined(HPX_7309AC21_1B92_4CC1_8ACC_CAA4E841DB3A)
 #define HPX_7309AC21_1B92_4CC1_8ACC_CAA4E841DB3A
 
-#if defined(__amd64__) || defined(__amd64) || defined(__x86_64__)   \
-   || defined(__x86_64) || defined(_M_X64) || defined(i386)         \
-   || defined(__i386__) || defined(__i486__) || defined(__i586__)   \
-   || defined(__i686__) || defined(__i386) || defined(_M_IX86)      \
-   || defined(__X86__) || defined(_X86_) || defined(__THW_INTEL__)  \
-   || defined(__I86__) || defined(__INTEL__)
+#if defined(__amd64__) || defined(__amd64) || defined(__x86_64__) ||           \
+    defined(__x86_64) || defined(_M_X64) || defined(i386) ||                   \
+    defined(__i386__) || defined(__i486__) || defined(__i586__) ||             \
+    defined(__i686__) || defined(__i386) || defined(_M_IX86) ||                \
+    defined(__X86__) || defined(_X86_) || defined(__THW_INTEL__) ||            \
+    defined(__I86__) || defined(__INTEL__)
 
-    #include <hpx/hardware/bit_manipulation.hpp>
+// clang-format off
+#include <hpx/hardware/bit_manipulation.hpp>
 
-    #if defined(HPX_MSVC)
-        #include <hpx/hardware/cpuid/msvc.hpp>
-    #else
-        #include <hpx/hardware/cpuid/linux_x86.hpp>
-    #endif
+#if defined(HPX_MSVC)
+    #include <hpx/hardware/cpuid/msvc.hpp>
+#else
+    #include <hpx/hardware/cpuid/linux_x86.hpp>
+#endif
 
-    #include <cstdint>
+#include <cstdint>
 
-    namespace hpx { namespace util { namespace hardware
-    {
+namespace hpx { namespace util { namespace hardware {
 
     typedef std::uint32_t cpu_info [4];
 
@@ -83,10 +84,11 @@
         {cpu_feature::fma,     "fma",     0x80000001, cpuid_register::edx, 16}
     };
 
-    }}}
+}}}     // hpx::util::hardware
+
+// clang-format on
 #else
-    #error Unsupported platform.
+#error Unsupported platform.
 #endif
 
-#endif // HPX_7309AC21_1B92_4CC1_8ACC_CAA4E841DB3A
-
+#endif    // HPX_7309AC21_1B92_4CC1_8ACC_CAA4E841DB3A

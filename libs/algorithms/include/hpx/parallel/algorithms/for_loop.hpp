@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,17 +13,17 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/functional/traits/get_function_address.hpp>
+#include <hpx/functional/traits/get_function_annotation.hpp>
 #endif
 #include <hpx/assertion.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/util/annotated_function.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
-#include <hpx/util/invoke.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/util/annotated_function.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -41,68 +42,59 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v2
-{
+namespace hpx { namespace parallel { inline namespace v2 {
     // for_loop
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ... Ts, std::size_t ... Is>
-        HPX_HOST_DEVICE
-        HPX_FORCEINLINE void init_iteration(hpx::util::tuple<Ts...>& args,
+        template <typename... Ts, std::size_t... Is>
+        HPX_HOST_DEVICE HPX_FORCEINLINE void init_iteration(
+            hpx::util::tuple<Ts...>& args,
             hpx::util::detail::pack_c<std::size_t, Is...>,
             std::size_t part_index)
         {
-            int const _sequencer[] =
-            {
-                0, (hpx::util::get<Is>(args).init_iteration(part_index), 0)...
-            };
-            (void)_sequencer;
+            int const _sequencer[] = {
+                0, (hpx::util::get<Is>(args).init_iteration(part_index), 0)...};
+            (void) _sequencer;
         }
 
-        template <typename ... Ts, std::size_t ... Is, typename F, typename B>
-        HPX_HOST_DEVICE
-        HPX_FORCEINLINE void invoke_iteration(hpx::util::tuple<Ts...>& args,
-            hpx::util::detail::pack_c<std::size_t, Is...>, F && f, B part_begin)
+        template <typename... Ts, std::size_t... Is, typename F, typename B>
+        HPX_HOST_DEVICE HPX_FORCEINLINE void invoke_iteration(
+            hpx::util::tuple<Ts...>& args,
+            hpx::util::detail::pack_c<std::size_t, Is...>, F&& f, B part_begin)
         {
             hpx::util::invoke(std::forward<F>(f), part_begin,
                 hpx::util::get<Is>(args).iteration_value()...);
         }
 
-        template <typename ... Ts, std::size_t ... Is>
-        HPX_HOST_DEVICE
-        HPX_FORCEINLINE void next_iteration(hpx::util::tuple<Ts...>& args,
+        template <typename... Ts, std::size_t... Is>
+        HPX_HOST_DEVICE HPX_FORCEINLINE void next_iteration(
+            hpx::util::tuple<Ts...>& args,
             hpx::util::detail::pack_c<std::size_t, Is...>,
             std::size_t part_index)
         {
-            int const _sequencer[] =
-            {
-                0, (hpx::util::get<Is>(args).next_iteration(part_index), 0)...
-            };
-            (void)_sequencer;
+            int const _sequencer[] = {
+                0, (hpx::util::get<Is>(args).next_iteration(part_index), 0)...};
+            (void) _sequencer;
         }
 
-        template <typename ... Ts, std::size_t ... Is>
-        HPX_HOST_DEVICE
-        HPX_FORCEINLINE void exit_iteration(hpx::util::tuple<Ts...>& args,
-            hpx::util::detail::pack_c<std::size_t, Is...>,
-            std::size_t size)
+        template <typename... Ts, std::size_t... Is>
+        HPX_HOST_DEVICE HPX_FORCEINLINE void exit_iteration(
+            hpx::util::tuple<Ts...>& args,
+            hpx::util::detail::pack_c<std::size_t, Is...>, std::size_t size)
         {
-            int const _sequencer[] =
-            {
-                0, (hpx::util::get<Is>(args).exit_iteration(size), 0)...
-            };
-            (void)_sequencer;
+            int const _sequencer[] = {
+                0, (hpx::util::get<Is>(args).exit_iteration(size), 0)...};
+            (void) _sequencer;
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename S, typename Tuple>
         struct part_iterations;
 
-        template <typename F, typename S, typename ...Ts>
-        struct part_iterations<F, S, hpx::util::tuple<Ts...> >
+        template <typename F, typename S, typename... Ts>
+        struct part_iterations<F, S, hpx::util::tuple<Ts...>>
         {
             typedef typename hpx::util::decay<F>::type fun_type;
 
@@ -115,15 +107,16 @@ namespace hpx { namespace parallel { inline namespace v2
               : f_(std::forward<F_>(f))
               , stride_(std::forward<S_>(stride))
               , args_(std::forward<Args>(args))
-            {}
+            {
+            }
 
             template <typename B>
-            HPX_HOST_DEVICE
-            void execute(B part_begin, std::size_t part_steps,
-                std::size_t part_index)
+            HPX_HOST_DEVICE void execute(
+                B part_begin, std::size_t part_steps, std::size_t part_index)
             {
-                auto pack = typename hpx::util::detail::make_index_pack<
-                    sizeof...(Ts)>::type();
+                auto pack =
+                    typename hpx::util::detail::make_index_pack<sizeof...(
+                        Ts)>::type();
                 detail::init_iteration(args_, pack, part_index);
 
                 while (part_steps != 0)
@@ -145,9 +138,8 @@ namespace hpx { namespace parallel { inline namespace v2
             }
 
             template <typename B>
-            HPX_HOST_DEVICE
-            void operator()(B part_begin, std::size_t part_steps,
-                std::size_t part_index)
+            HPX_HOST_DEVICE void operator()(
+                B part_begin, std::size_t part_steps, std::size_t part_index)
             {
                 hpx::util::annotate_function annotate(f_);
                 execute(part_begin, part_steps, part_index);
@@ -159,20 +151,19 @@ namespace hpx { namespace parallel { inline namespace v2
         {
             for_loop_algo()
               : for_loop_algo::algorithm("for_loop_algo")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter, typename Size,
                 typename S, typename F, typename... Args>
-            HPX_HOST_DEVICE
-            static hpx::util::unused_type
-            sequential(ExPolicy policy, InIter first, Size size, S stride,
-                F && f, Args &&... args)
+            HPX_HOST_DEVICE static hpx::util::unused_type sequential(
+                ExPolicy policy, InIter first, Size size, S stride, F&& f,
+                Args&&... args)
             {
                 std::size_t part_index = 0;
                 int const init_sequencer[] = {
-                    0, (args.init_iteration(0), 0)...
-                };
-                (void)init_sequencer;
+                    0, (args.init_iteration(0), 0)...};
+                (void) init_sequencer;
 
                 std::size_t count = size;
                 while (count != 0)
@@ -188,16 +179,14 @@ namespace hpx { namespace parallel { inline namespace v2
                     part_index += chunk;
 
                     int const next_sequencer[] = {
-                        0, (args.next_iteration(part_index), 0)...
-                    };
-                    (void)next_sequencer;
+                        0, (args.next_iteration(part_index), 0)...};
+                    (void) next_sequencer;
                 }
 
                 // make sure live-out variables are properly set on return
                 int const exit_sequencer[] = {
-                    0, (args.exit_iteration(size), 0)...
-                };
-                (void)exit_sequencer;
+                    0, (args.exit_iteration(size), 0)...};
+                (void) exit_sequencer;
 
                 return hpx::util::unused_type();
             }
@@ -205,16 +194,15 @@ namespace hpx { namespace parallel { inline namespace v2
             template <typename ExPolicy, typename B, typename Size, typename S,
                 typename F, typename... Ts>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy policy, B first, Size size, S stride, F && f,
-                Ts &&... ts)
+            parallel(ExPolicy policy, B first, Size size, S stride, F&& f,
+                Ts&&... ts)
             {
                 if (size == 0)
                     return util::detail::algorithm_result<ExPolicy>::get();
 
                 // we need to decay copy here to properly transport everything
                 // to a GPU device
-                typedef
-                    hpx::util::tuple<typename hpx::util::decay<Ts>::type...>
+                typedef hpx::util::tuple<typename hpx::util::decay<Ts>::type...>
                     args_type;
 
                 args_type args =
@@ -223,10 +211,8 @@ namespace hpx { namespace parallel { inline namespace v2
                 return util::partitioner<ExPolicy>::call_with_index(policy,
                     first, size, stride,
                     part_iterations<F, S, args_type>{
-                        std::forward<F>(f), stride, args
-                    },
-                    [=] (std::vector<hpx::future<void> > &&) mutable -> void
-                    {
+                        std::forward<F>(f), stride, args},
+                    [=](std::vector<hpx::future<void>>&&) mutable -> void {
                         auto pack = typename hpx::util::detail::make_index_pack<
                             sizeof...(Ts)>::type();
                         // make sure live-out variables are properly set on
@@ -239,9 +225,9 @@ namespace hpx { namespace parallel { inline namespace v2
         // reshuffle arguments, last argument is function object, will go first
         template <typename ExPolicy, typename B, typename E, typename S,
             std::size_t... Is, typename... Args>
-        typename util::detail::algorithm_result<ExPolicy>::type
-        for_loop(ExPolicy && policy, B first, E last, S stride,
-            hpx::util::detail::pack_c<std::size_t, Is...>, Args &&... args)
+        typename util::detail::algorithm_result<ExPolicy>::type for_loop(
+            ExPolicy&& policy, B first, E last, S stride,
+            hpx::util::detail::pack_c<std::size_t, Is...>, Args&&... args)
         {
             // stride shall not be zero
             HPX_ASSERT(stride != 0);
@@ -257,27 +243,28 @@ namespace hpx { namespace parallel { inline namespace v2
             // the for_loop should be executed sequentially if the
             // execution policy enforces sequential execution or if the
             // loop boundaries are integral types
-            static_assert(
-                (std::is_integral<B>::value ||
-                 hpx::traits::is_forward_iterator<B>::value),
-                "Requires at least forward iterator or integral loop boundaries.");
+            static_assert((std::is_integral<B>::value ||
+                              hpx::traits::is_forward_iterator<B>::value),
+                "Requires at least forward iterator or integral loop "
+                "boundaries.");
 
             typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             std::size_t size = parallel::v1::detail::distance(first, last);
-            auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
+            auto&& t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
 
-            return for_loop_algo().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, size, stride,
-                hpx::util::get<sizeof...(Args)-1>(t), hpx::util::get<Is>(t)...);
+            return for_loop_algo().call(std::forward<ExPolicy>(policy),
+                is_seq(), first, size, stride,
+                hpx::util::get<sizeof...(Args) - 1>(t),
+                hpx::util::get<Is>(t)...);
         }
 
         // reshuffle arguments, last argument is function object, will go first
         template <typename ExPolicy, typename B, typename Size, typename S,
             std::size_t... Is, typename... Args>
-        typename util::detail::algorithm_result<ExPolicy>::type
-        for_loop_n(ExPolicy && policy, B first, Size size, S stride,
-            hpx::util::detail::pack_c<std::size_t, Is...>, Args &&... args)
+        typename util::detail::algorithm_result<ExPolicy>::type for_loop_n(
+            ExPolicy&& policy, B first, Size size, S stride,
+            hpx::util::detail::pack_c<std::size_t, Is...>, Args&&... args)
         {
             // Size should be non-negative
             HPX_ASSERT(size >= 0);
@@ -293,21 +280,22 @@ namespace hpx { namespace parallel { inline namespace v2
                     hpx::traits::is_bidirectional_iterator<B>::value);
             }
 
-            static_assert(
-                (std::is_integral<B>::value ||
-                 hpx::traits::is_forward_iterator<B>::value),
-                "Requires at least forward iterator or integral loop boundaries.");
+            static_assert((std::is_integral<B>::value ||
+                              hpx::traits::is_forward_iterator<B>::value),
+                "Requires at least forward iterator or integral loop "
+                "boundaries.");
 
             typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-            auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
+            auto&& t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
 
-            return for_loop_algo().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, size, stride,
-                hpx::util::get<sizeof...(Args)-1>(t), hpx::util::get<Is>(t)...);
+            return for_loop_algo().call(std::forward<ExPolicy>(policy),
+                is_seq(), first, size, stride,
+                hpx::util::get<sizeof...(Args) - 1>(t),
+                hpx::util::get<Is>(t)...);
         }
         /// \endcond
-    }
+    }    // namespace detail
 
     /// The for_loop implements loop functionality over a range specified by
     /// integral or iterator bounds. For the iterator case, these algorithms
@@ -396,20 +384,18 @@ namespace hpx { namespace parallel { inline namespace v2
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename... Args,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value))>
-    typename util::detail::algorithm_result<ExPolicy>::type
-    for_loop(ExPolicy && policy,
-        typename std::decay<I>::type first, I last, Args &&... args)
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value &&
+            (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value))>
+    typename util::detail::algorithm_result<ExPolicy>::type for_loop(
+        ExPolicy&& policy, typename std::decay<I>::type first, I last,
+        Args&&... args)
     {
         static_assert(sizeof...(Args) >= 1,
             "for_loop must be called with at least a function object");
 
         using hpx::util::detail::make_index_pack;
-        return detail::for_loop(
-            std::forward<ExPolicy>(policy), first, last, 1,
-            typename make_index_pack<sizeof...(Args)-1>::type(),
+        return detail::for_loop(std::forward<ExPolicy>(policy), first, last, 1,
+            typename make_index_pack<sizeof...(Args) - 1>::type(),
             std::forward<Args>(args)...);
     }
 
@@ -491,16 +477,15 @@ namespace hpx { namespace parallel { inline namespace v2
     /// Remarks: If \a f returns a result, the result is ignored.
     ///
     template <typename I, typename... Args,
-    HPX_CONCEPT_REQUIRES_(
-        hpx::traits::is_iterator<I>::value || std::is_integral<I>::value)>
-    void for_loop(typename std::decay<I>::type first, I last,
-        Args &&... args)
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator<I>::value || std::is_integral<I>::value)>
+    void for_loop(typename std::decay<I>::type first, I last, Args&&... args)
     {
         static_assert(sizeof...(Args) >= 1,
             "for_loop must be called with at least a function object");
 
-        return for_loop(parallel::execution::seq, first, last,
-            std::forward<Args>(args)...);
+        return for_loop(
+            parallel::execution::seq, first, last, std::forward<Args>(args)...);
     }
 
     /// The for_loop_strided implements loop functionality over a range
@@ -596,21 +581,20 @@ namespace hpx { namespace parallel { inline namespace v2
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename S, typename... Args,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value) &&
-        std::is_integral<S>::value)>
-    typename util::detail::algorithm_result<ExPolicy>::type
-    for_loop_strided(ExPolicy && policy,
-        typename std::decay<I>::type first, I last, S stride, Args &&... args)
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value &&
+            (hpx::traits::is_iterator<I>::value ||
+                std::is_integral<I>::value) &&
+            std::is_integral<S>::value)>
+    typename util::detail::algorithm_result<ExPolicy>::type for_loop_strided(
+        ExPolicy&& policy, typename std::decay<I>::type first, I last, S stride,
+        Args&&... args)
     {
         static_assert(sizeof...(Args) >= 1,
             "for_loop_strided must be called with at least a function object");
 
         using hpx::util::detail::make_index_pack;
-        return detail::for_loop(
-            std::forward<ExPolicy>(policy), first, last, stride,
-            typename make_index_pack<sizeof...(Args)-1>::type(),
+        return detail::for_loop(std::forward<ExPolicy>(policy), first, last,
+            stride, typename make_index_pack<sizeof...(Args) - 1>::type(),
             std::forward<Args>(args)...);
     }
 
@@ -698,11 +682,11 @@ namespace hpx { namespace parallel { inline namespace v2
     /// Remarks: If \a f returns a result, the result is ignored.
     ///
     template <typename I, typename S, typename... Args,
-    HPX_CONCEPT_REQUIRES_(
-        (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value) &&
-        std::is_integral<S>::value)>
-    void for_loop_strided(typename std::decay<I>::type first, I last,
-        S stride, Args &&... args)
+        HPX_CONCEPT_REQUIRES_((hpx::traits::is_iterator<I>::value ||
+                                  std::is_integral<I>::value) &&
+            std::is_integral<S>::value)>
+    void for_loop_strided(
+        typename std::decay<I>::type first, I last, S stride, Args&&... args)
     {
         static_assert(sizeof...(Args) >= 1,
             "for_loop_strided must be called with at least a function object");
@@ -800,20 +784,19 @@ namespace hpx { namespace parallel { inline namespace v2
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename Size, typename... Args,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value) &&
-        std::is_integral<Size>::value)>
-    typename util::detail::algorithm_result<ExPolicy>::type
-    for_loop_n(ExPolicy && policy, I first, Size size, Args &&... args)
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value &&
+            (hpx::traits::is_iterator<I>::value ||
+                std::is_integral<I>::value) &&
+            std::is_integral<Size>::value)>
+    typename util::detail::algorithm_result<ExPolicy>::type for_loop_n(
+        ExPolicy&& policy, I first, Size size, Args&&... args)
     {
         static_assert(sizeof...(Args) >= 1,
             "for_loop_n must be called with at least a function object");
 
         using hpx::util::detail::make_index_pack;
-        return detail::for_loop_n(
-            std::forward<ExPolicy>(policy), first, size, 1,
-            typename make_index_pack<sizeof...(Args)-1>::type(),
+        return detail::for_loop_n(std::forward<ExPolicy>(policy), first, size,
+            1, typename make_index_pack<sizeof...(Args) - 1>::type(),
             std::forward<Args>(args)...);
     }
 
@@ -897,16 +880,16 @@ namespace hpx { namespace parallel { inline namespace v2
     /// Remarks: If \a f returns a result, the result is ignored.
     ///
     template <typename I, typename Size, typename... Args,
-    HPX_CONCEPT_REQUIRES_(
-        (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value) &&
-        std::is_integral<Size>::value)>
-    void for_loop_n(I first, Size size, Args &&... args)
+        HPX_CONCEPT_REQUIRES_((hpx::traits::is_iterator<I>::value ||
+                                  std::is_integral<I>::value) &&
+            std::is_integral<Size>::value)>
+    void for_loop_n(I first, Size size, Args&&... args)
     {
         static_assert(sizeof...(Args) >= 1,
             "for_loop_n must be called with at least a function object");
 
-        return for_loop_n(parallel::execution::seq, first, size,
-            std::forward<Args>(args)...);
+        return for_loop_n(
+            parallel::execution::seq, first, size, std::forward<Args>(args)...);
     }
 
     /// The for_loop_n_strided implements loop functionality over a range
@@ -1005,22 +988,20 @@ namespace hpx { namespace parallel { inline namespace v2
     ///
     template <typename ExPolicy, typename I, typename Size, typename S,
         typename... Args,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value) &&
-        std::is_integral<Size>::value &&
-        std::is_integral<S>::value)>
-    typename util::detail::algorithm_result<ExPolicy>::type
-    for_loop_n_strided(ExPolicy && policy, I first, Size size, S stride,
-        Args &&... args)
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value &&
+            (hpx::traits::is_iterator<I>::value ||
+                std::is_integral<I>::value) &&
+            std::is_integral<Size>::value && std::is_integral<S>::value)>
+    typename util::detail::algorithm_result<ExPolicy>::type for_loop_n_strided(
+        ExPolicy&& policy, I first, Size size, S stride, Args&&... args)
     {
         static_assert(sizeof...(Args) >= 1,
-            "for_loop_n_strided must be called with at least a function object");
+            "for_loop_n_strided must be called with at least a function "
+            "object");
 
         using hpx::util::detail::make_index_pack;
-        return detail::for_loop_n(
-            std::forward<ExPolicy>(policy), first, size, stride,
-            typename make_index_pack<sizeof...(Args)-1>::type(),
+        return detail::for_loop_n(std::forward<ExPolicy>(policy), first, size,
+            stride, typename make_index_pack<sizeof...(Args) - 1>::type(),
             std::forward<Args>(args)...);
     }
 
@@ -1110,67 +1091,62 @@ namespace hpx { namespace parallel { inline namespace v2
     /// Remarks: If \a f returns a result, the result is ignored.
     ///
     template <typename I, typename Size, typename S, typename... Args,
-    HPX_CONCEPT_REQUIRES_(
-        (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value) &&
-        std::is_integral<Size>::value &&
-        std::is_integral<S>::value)>
-    void for_loop_n_strided(I first, Size size, S stride, Args &&... args)
+        HPX_CONCEPT_REQUIRES_((hpx::traits::is_iterator<I>::value ||
+                                  std::is_integral<I>::value) &&
+            std::is_integral<Size>::value && std::is_integral<S>::value)>
+    void for_loop_n_strided(I first, Size size, S stride, Args&&... args)
     {
         static_assert(sizeof...(Args) >= 1,
-            "for_loop_n_strided must be called with at least a function object");
+            "for_loop_n_strided must be called with at least a function "
+            "object");
         return for_loop_strided_n(parallel::execution::seq, first, size, stride,
             std::forward<Args>(args)...);
     }
-}}}
+}}}    // namespace hpx::parallel::v2
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <typename F, typename S, typename Tuple>
     struct get_function_address<
-        parallel::v2::detail::part_iterations<F, S, Tuple> >
+        parallel::v2::detail::part_iterations<F, S, Tuple>>
     {
         static std::size_t call(
-            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
-                noexcept
+            parallel::v2::detail::part_iterations<F, S, Tuple> const&
+                f) noexcept
         {
             return get_function_address<
-                    typename hpx::util::decay<F>::type
-                >::call(f.f_);
+                typename hpx::util::decay<F>::type>::call(f.f_);
         }
     };
 
     template <typename F, typename S, typename Tuple>
     struct get_function_annotation<
-        parallel::v2::detail::part_iterations<F, S, Tuple> >
+        parallel::v2::detail::part_iterations<F, S, Tuple>>
     {
         static char const* call(
-            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
-                noexcept
+            parallel::v2::detail::part_iterations<F, S, Tuple> const&
+                f) noexcept
         {
             return get_function_annotation<
-                    typename hpx::util::decay<F>::type
-                >::call(f.f_);
+                typename hpx::util::decay<F>::type>::call(f.f_);
         }
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
     template <typename F, typename S, typename Tuple>
     struct get_function_annotation_itt<
-        parallel::v2::detail::part_iterations<F, S, Tuple> >
+        parallel::v2::detail::part_iterations<F, S, Tuple>>
     {
         static util::itt::string_handle call(
-            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
-                noexcept
+            parallel::v2::detail::part_iterations<F, S, Tuple> const&
+                f) noexcept
         {
             return get_function_annotation_itt<
-                    typename hpx::util::decay<F>::type
-                >::call(f.f_);
+                typename hpx::util::decay<F>::type>::call(f.f_);
         }
     };
 #endif
-}}
+}}    // namespace hpx::traits
 #endif
 
 #endif
-

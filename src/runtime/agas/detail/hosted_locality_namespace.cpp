@@ -3,12 +3,14 @@
 //  Copyright (c) 2012-2017 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/runtime/agas/detail/hosted_locality_namespace.hpp>
@@ -116,3 +118,5 @@ namespace hpx { namespace agas { namespace detail
         return action(gid_, name).get_gid();
     }
 }}}
+
+#endif

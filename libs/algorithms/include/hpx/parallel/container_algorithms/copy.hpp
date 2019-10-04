@@ -1,5 +1,6 @@
 //  Copyright (c) 2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -22,8 +23,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /// Copies the elements in the range \a rng to another
     /// range beginning at \a dest.
     ///
@@ -69,21 +69,17 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           destination range, one past the last element copied.
     ///
     template <typename ExPolicy, typename Rng, typename OutIter,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        hpx::traits::is_iterator<OutIter>::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&&
+                    hpx::traits::is_iterator<OutIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<
             tag::in(typename hpx::traits::range_traits<Rng>::iterator_type),
-            tag::out(OutIter)
-        >
-    >::type
-    copy(ExPolicy && policy, Rng && rng, OutIter dest)
+            tag::out(OutIter)>>::type
+    copy(ExPolicy&& policy, Rng&& rng, OutIter dest)
     {
-        return copy(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), dest);
+        return copy(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), dest);
     }
 
     /// Copies the elements in the range \a rng to another
@@ -160,31 +156,23 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F, traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& hpx::traits::is_iterator<OutIter>::
+                    value&& traits::is_indirect_callable<ExPolicy, F,
+                        traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<
             tag::in(typename hpx::traits::range_traits<Rng>::iterator_type),
-            tag::out(OutIter)
-        >
-    >::type
-    copy_if(ExPolicy && policy, Rng && rng, OutIter dest, F && f,
-        Proj && proj = Proj())
+            tag::out(OutIter)>>::type
+    copy_if(
+        ExPolicy&& policy, Rng&& rng, OutIter dest, F&& f, Proj&& proj = Proj())
     {
-        return copy_if(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), dest, std::forward<F>(f),
+        return copy_if(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), dest, std::forward<F>(f),
             std::forward<Proj>(proj));
     }
     /// \endcond
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif
-
-

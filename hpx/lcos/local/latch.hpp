@@ -1,5 +1,6 @@
 //  Copyright (c) 2015-2019 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,9 +10,9 @@
 #define HPX_LCOS_LATCH_APR_18_2015_0925PM
 
 #include <hpx/assertion.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/cache_aligned_data.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <atomic>

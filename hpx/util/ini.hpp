@@ -2,6 +2,7 @@
 //  Copyright (c) 2005-2018 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,7 +13,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util_fwd.hpp> // this needs to go first
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <boost/lexical_cast.hpp>
 

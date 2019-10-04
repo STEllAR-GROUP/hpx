@@ -1,6 +1,7 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2014 Anton Bikineev
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -61,7 +62,7 @@ struct D : B
     void serialize(Archive & ar, unsigned)
     {
         b = 4711;
-        ar & hpx::serialization::base_object<B>(*this);;
+        ar & hpx::serialization::base_object<B>(*this);
         ar & d;
     }
     HPX_SERIALIZATION_POLYMORPHIC(D);

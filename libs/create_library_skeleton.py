@@ -2,6 +2,7 @@
 '''
 Copyright (c) 2018 Thomas Heller
 
+SPDX-License-Identifier: BSL-1.0
 Distributed under the Boost Software License, Version 1.0. (See accompanying
 file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -25,16 +26,18 @@ cmake_version = '3.3.2'
 
 cmake_header = f'''# Copyright (c) 2019 The STE||AR-Group
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 '''
 
 readme_template = f'''
 ..
-   Copyright (c) 2019 The STE||AR-Group
+    Copyright (c) 2019 The STE||AR-Group
 
-   Distributed under the Boost Software License, Version 1.0. (See accompanying
-   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    SPDX-License-Identifier: BSL-1.0
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 {header_str}
 {lib_name}
@@ -47,10 +50,11 @@ Documentation can be found `here
 '''
 
 index_rst = f'''..
-   Copyright (c) 2019 The STE||AR-Group
+    Copyright (c) 2019 The STE||AR-Group
 
-   Distributed under the Boost Software License, Version 1.0. (See accompanying
-   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    SPDX-License-Identifier: BSL-1.0
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 .. _libs_{lib_name}:
 
@@ -62,6 +66,8 @@ index_rst = f'''..
 
 root_cmakelists_template = cmake_header + f'''
 cmake_minimum_required(VERSION {cmake_version} FATAL_ERROR)
+
+list(APPEND CMAKE_MODULE_PATH "${{CMAKE_CURRENT_SOURCE_DIR}}/cmake")
 
 set({lib_name}_headers)
 
@@ -95,6 +101,7 @@ endif()
 '''
 
 tests_cmakelists_template = cmake_header + f'''
+include(HPX_Message)
 include(HPX_Option)
 
 if (NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
@@ -102,7 +109,7 @@ if (NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
   return()
 endif()
 if (NOT HPX_{lib_name_upper}_WITH_TESTS)
-  message(STATUS "Tests for {lib_name} disabled")
+  hpx_info("    Tests for {lib_name} disabled")
   return()
 endif()
 
@@ -179,10 +186,6 @@ if lib_name != '--recreate-index':
     # Generate examples/CMakeLists.txt
     f = open(os.path.join(lib_name, 'examples', 'CMakeLists.txt'), 'w')
     f.write(examples_cmakelists_template)
-
-    # Generate src/CMakeLists.txt
-    f = open(os.path.join(lib_name, 'src', 'CMakeLists.txt'), 'w')
-    f.write(cmake_header)
 
     # Generate tests/CMakeLists.txt
     f = open(os.path.join(lib_name, 'tests', 'CMakeLists.txt'), 'w')
@@ -271,7 +274,7 @@ foreach(lib ${HPX_LIBS})
   add_subdirectory(${lib})
 
   set(MODULE_FORCE_LINKING_INCLUDES
-    "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\\n")
+    "${MODULE_FORCE_LINKING_INCLUDES}\\n#include <hpx/${lib}/force_linking.hpp>\\n")
 
   set(MODULE_FORCE_LINKING_CALLS
     "${MODULE_FORCE_LINKING_CALLS}\\n        ${lib}::force_linking();")
@@ -288,10 +291,11 @@ f.write(libs_cmakelists)
 
 # Adapting all_modules.rst
 all_modules_rst = f'''..
-   Copyright (c) 2018-2019 The STE||AR-Group
+    Copyright (c) 2018-2019 The STE||AR-Group
 
-   Distributed under the Boost Software License, Version 1.0. (See accompanying
-   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    SPDX-License-Identifier: BSL-1.0
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 .. _all_modules:
 

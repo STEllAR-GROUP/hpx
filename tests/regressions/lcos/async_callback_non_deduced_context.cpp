@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2012      Bryce Adelstein-Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -51,7 +52,7 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    boost::program_options::options_description cmdline(
+    hpx::program_options::options_description cmdline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX

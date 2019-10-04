@@ -1,5 +1,6 @@
 # Copyright (c) 2019 John Biddiscombe
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -14,7 +15,8 @@ if (HPX_WITH_SHARED_PRIORITY_SCHEDULER AND HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
     THREADS_PER_LOCALITY -2
     ARGS --size=128 --nb=512 --tiles-per-domain=2 --col-proc=1 --row-proc=1)
 endif()
-set(numa_allocator_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(numa_allocator_FLAGS
+  COMPONENT_DEPENDENCIES iostreams)
 
 ###############################################################################
 foreach(test ${tests})

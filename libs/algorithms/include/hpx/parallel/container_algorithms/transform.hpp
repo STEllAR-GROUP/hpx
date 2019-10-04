@@ -1,5 +1,6 @@
 //  Copyright (c) 2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -24,8 +25,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /// Applies the given function \a f to the given range \a rng and stores
     /// the result in another range, beginning at dest.
     ///
@@ -97,27 +97,21 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F, traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
+                    OutIter>::value&& traits::is_projected_range<Proj,
+                    Rng>::value&& traits::is_indirect_callable<ExPolicy, F,
+                    traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<
             tag::in(typename hpx::traits::range_iterator<Rng>::type),
-            tag::out(OutIter)
-        >
-    >::type
-    transform(ExPolicy && policy, Rng && rng, OutIter dest, F && f,
-        Proj && proj = Proj())
+            tag::out(OutIter)>>::type
+    transform(
+        ExPolicy&& policy, Rng&& rng, OutIter dest, F&& f, Proj&& proj = Proj())
     {
-        return transform(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), std::move(dest),
-            std::forward<F>(f), std::forward<Proj>(proj));
+        return transform(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), std::move(dest), std::forward<F>(f),
+            std::forward<Proj>(proj));
     }
 
     /// Applies the given function \a f to pairs of elements from two ranges:
@@ -207,37 +201,29 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <
-        typename ExPolicy, typename Rng, typename InIter2,
+    template <typename ExPolicy, typename Rng, typename InIter2,
         typename OutIter, typename F,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        hpx::traits::is_iterator<InIter2>::value &&
-        hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_projected_range<Proj1, Rng>::value &&
-        traits::is_projected<Proj2, InIter2>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F,
-                traits::projected_range<Proj1, Rng>,
-                traits::projected<Proj2, InIter2>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
+                    InIter2>::value&& hpx::traits::is_iterator<OutIter>::value&&
+                    traits::is_projected_range<Proj1, Rng>::value&&
+                        traits::is_projected<Proj2, InIter2>::value&&
+                            traits::is_indirect_callable<ExPolicy, F,
+                                traits::projected_range<Proj1, Rng>,
+                                traits::projected<Proj2, InIter2>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_tuple<
             tag::in1(typename hpx::traits::range_iterator<Rng>::type),
-            tag::in2(InIter2), tag::out(OutIter)
-        >
-    >::type
-    transform(ExPolicy && policy, Rng && rng, InIter2 first2, OutIter dest,
-        F && f, Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
+            tag::in2(InIter2), tag::out(OutIter)>>::type
+    transform(ExPolicy&& policy, Rng&& rng, InIter2 first2, OutIter dest, F&& f,
+        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
-        return transform(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), std::move(first2),
-            std::move(dest), std::forward<F>(f),
-            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        return transform(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), std::move(first2), std::move(dest),
+            std::forward<F>(f), std::forward<Proj1>(proj1),
+            std::forward<Proj2>(proj2));
     }
 
     /// Applies the given function \a f to pairs of elements from two ranges:
@@ -330,42 +316,30 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <
-        typename ExPolicy, typename Rng1, typename Rng2,
-        typename OutIter, typename F,
-        typename Proj1 = util::projection_identity,
+    template <typename ExPolicy, typename Rng1, typename Rng2, typename OutIter,
+        typename F, typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng1>::value &&
-        hpx::traits::is_range<Rng2>::value &&
-        hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_projected_range<Proj1, Rng1>::value &&
-        traits::is_projected_range<Proj2, Rng2>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F,
-                traits::projected_range<Proj1, Rng1>,
-                traits::projected_range<Proj2, Rng2>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng1>::value&& hpx::traits::is_range<
+                    Rng2>::value&& hpx::traits::is_iterator<OutIter>::value&&
+                    traits::is_projected_range<Proj1, Rng1>::value&&
+                        traits::is_projected_range<Proj2, Rng2>::value&&
+                            traits::is_indirect_callable<ExPolicy, F,
+                                traits::projected_range<Proj1, Rng1>,
+                                traits::projected_range<Proj2, Rng2>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_tuple<
             tag::in1(typename hpx::traits::range_iterator<Rng1>::type),
             tag::in2(typename hpx::traits::range_iterator<Rng2>::type),
-            tag::out(OutIter)
-        >
-    >::type
-    transform(ExPolicy && policy, Rng1 && rng1, Rng2 && rng2, OutIter dest,
-        F && f, Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
+            tag::out(OutIter)>>::type
+    transform(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, OutIter dest, F&& f,
+        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
-        return transform(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng1), hpx::util::end(rng1),
-            hpx::util::begin(rng2), hpx::util::end(rng2),
-            std::move(dest), std::forward<F>(f),
-            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        return transform(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+            hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
+            std::move(dest), std::forward<F>(f), std::forward<Proj1>(proj1),
+            std::forward<Proj2>(proj2));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif
-
-

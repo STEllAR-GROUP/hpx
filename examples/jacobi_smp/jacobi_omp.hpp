@@ -1,10 +1,11 @@
 
 //  Copyright (c) 2011-2013 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/timing.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -19,7 +20,7 @@ namespace jacobi_smp {
     void jacobi(
         std::size_t n
       , std::size_t iterations, std::size_t block_size
-      , std::string output_filename)
+      , std::string const& output_filename)
     {
         typedef std::vector<double> vector;
 

@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
@@ -17,7 +19,6 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/ini.hpp>
 

@@ -1,5 +1,6 @@
 //  Copyright (c) 2012 Maciej Brodowicz
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -25,6 +26,7 @@
 #define HPX_NATIVE_MIC
 #else
 
+// clang-format off
 #if defined(__GNUC__)
 
 // macros to facilitate handling of compiler-specific issues
@@ -96,6 +98,7 @@
 // Detecting CUDA compilation mode
 // Detecting NVCC
 #if defined(__NVCC__) || defined(__CUDACC__)
+#define HPX_COMPUTE_CODE
 # if defined(__CUDA_ARCH__)
 // nvcc compiling CUDA code, device mode.
 #  define HPX_COMPUTE_DEVICE_CODE
@@ -105,6 +108,7 @@
 # endif
 // Detecting NVCC
 #elif defined(__clang__) && defined(__CUDA__)
+#define HPX_COMPUTE_CODE
 # if defined(__CUDA_ARCH__)
 // clang compiling CUDA code, device mode.
 #   define HPX_COMPUTE_DEVICE_CODE
@@ -135,7 +139,7 @@
 #    define HPX_HAVE_ADDRESS_SANITIZER
 #  endif
 #endif
+// clang-format on
 #endif
 
 #endif
-

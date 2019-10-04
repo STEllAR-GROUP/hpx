@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2013 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -17,17 +18,15 @@
 
 #include <cstdint>
 
-namespace hpx { namespace util { namespace hardware
-{
+namespace hpx { namespace util { namespace hardware {
 
-inline std::uint64_t timestamp()
-{
-    return GetTimeBase();
-}
+    inline std::uint64_t timestamp()
+    {
+        return GetTimeBase();
+    }
 
-}}}
+}}}    // namespace hpx::util::hardware
 
 #endif
 
-#endif // HPX_UTIL_HARDWARE_TIMESTAMP_LINUX_GENERIC_HPP
-
+#endif    // HPX_UTIL_HARDWARE_TIMESTAMP_LINUX_GENERIC_HPP

@@ -1,13 +1,14 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "worker_timed.hpp"
 
+#include <hpx/concurrency/barrier.hpp>
 #include <hpx/format.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/util/barrier.hpp>
+#include <hpx/timing.hpp>
 
 #include <chrono>
 #include <cstdint>
@@ -19,16 +20,16 @@
 #include <thread>
 #include <vector>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 char const* benchmark_name = "Delay Baseline";
 
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
-using boost::program_options::value;
-using boost::program_options::store;
-using boost::program_options::command_line_parser;
-using boost::program_options::notify;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
+using hpx::program_options::value;
+using hpx::program_options::store;
+using hpx::program_options::command_line_parser;
+using hpx::program_options::notify;
 
 using hpx::util::high_resolution_timer;
 
@@ -41,7 +42,7 @@ std::uint64_t delay = 5;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
-std::string format_build_date(std::string timestamp)
+std::string format_build_date()
 {
     std::chrono::time_point<std::chrono::system_clock> now =
         std::chrono::system_clock::now();
@@ -64,7 +65,7 @@ void print_results(
     {
         cout << "# BENCHMARK: " << benchmark_name << "\n";
 
-        cout << "# VERSION: " << format_build_date(__DATE__) << "\n"
+        cout << "# VERSION: " << format_build_date() << "\n"
              << "#\n";
 
         // Note that if we change the number of fields above, we have to

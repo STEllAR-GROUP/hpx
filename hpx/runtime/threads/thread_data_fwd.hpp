@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,13 +10,13 @@
 #define HPX_THREADS_THREAD_DATA_FWD_AUG_11_2015_0228PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_id_type.hpp>
 #include <hpx/util_fwd.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/functional/function.hpp>
+#include <hpx/functional/unique_function.hpp>
 #if defined(HPX_HAVE_APEX)
 // forward declare the APEX object
 namespace apex { struct task_wrapper; }
@@ -41,9 +42,6 @@ namespace hpx { namespace threads
     struct HPX_EXPORT topology;
 
     class HPX_EXPORT executor;
-
-    struct hpx_hwloc_bitmap_wrapper;
-    typedef std::shared_ptr<hpx_hwloc_bitmap_wrapper> hwloc_bitmap_ptr;
 
     typedef coroutines::coroutine coroutine_type;
 

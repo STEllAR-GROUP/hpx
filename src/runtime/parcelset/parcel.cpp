@@ -1,11 +1,15 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
@@ -21,7 +25,6 @@
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/apex.hpp>
-#include <hpx/util/itt_notify.hpp>
 
 #include <hpx/thread_support/atomic_count.hpp>
 
@@ -536,3 +539,4 @@ namespace hpx { namespace parcelset
     }
 }}
 
+#endif

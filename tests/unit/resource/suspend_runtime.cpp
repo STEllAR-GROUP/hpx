@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Mikael Simberg
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,9 +9,11 @@
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/include/apply.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <cstddef>
@@ -39,7 +42,9 @@ void test_scheduler(int argc, char* argv[],
 
     hpx::suspend();
 
-    for (std::size_t i = 0; i < 100; ++i)
+    hpx::util::high_resolution_timer t;
+
+    while (t.elapsed() < 2)
     {
         hpx::resume();
 

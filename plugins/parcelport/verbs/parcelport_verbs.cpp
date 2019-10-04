@@ -1,5 +1,6 @@
 //  Copyright (c) 2015-2016 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,13 +11,13 @@
 // util
 #include <hpx/assertion.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
@@ -321,16 +322,15 @@ namespace verbs
         // Constructor : mostly just initializes the superclass with 'here'
         // --------------------------------------------------------------------
         parcelport(util::runtime_configuration const& ini,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void(std::size_t, char const*)> const& on_stop_thread)
-            : base_type(ini, here(ini), on_start_thread, on_stop_thread)
-            , active_send_count_(0)
-            , immediate_send_allowed_(true)
-            , stopped_(false)
-            , sends_posted(0)
-            , handled_receives(0)
-            , completions_handled(0)
-            , total_reads(0)
+            threads::policies::callback_notifier const& notifier)
+          : base_type(ini, here(ini), notifier)
+          , active_send_count_(0)
+          , immediate_send_allowed_(true)
+          , stopped_(false)
+          , sends_posted(0)
+          , handled_receives(0)
+          , completions_handled(0)
+          , total_reads(0)
         {
             FUNC_START_DEBUG_MSG;
             // we need this for background OS threads to get 'this' pointer

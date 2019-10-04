@@ -1,26 +1,25 @@
 //  Copyright (c) 2005-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/filesystem.hpp>
+#include <hpx/logging.hpp>
+#include <hpx/plugin.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/init_ini_data.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/util/plugin.hpp>
+#include <hpx/version.hpp>
 
 #include <boost/assign/std/vector.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/exception.hpp>
-#include <boost/filesystem/convenience.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
@@ -39,8 +38,8 @@ namespace hpx { namespace util
     bool handle_ini_file (section& ini, std::string const& loc)
     {
         try {
-            namespace fs = boost::filesystem;
-            boost::system::error_code ec;
+            namespace fs = filesystem;
+            fs::error_code ec;
             if (!fs::exists(loc, ec) || ec)
                 return false;       // avoid exception on missing file
             ini.read (loc);
@@ -57,7 +56,7 @@ namespace hpx { namespace util
     {
         char const* env = getenv(env_var);
         if (nullptr != env) {
-            namespace fs = boost::filesystem;
+            namespace fs = filesystem;
 
             fs::path inipath (env);
             if (nullptr != file_suffix)
@@ -79,7 +78,7 @@ namespace hpx { namespace util
     // successfully
     bool init_ini_data_base (section& ini, std::string& hpx_ini_file)
     {
-        namespace fs = boost::filesystem;
+        namespace fs = filesystem;
 
         // fall back: use compile time prefix
         std::string ini_paths(ini.get_entry("hpx.master_ini_path"));
@@ -141,8 +140,8 @@ namespace hpx { namespace util
         result = handle_ini_file_env(ini, "PWD", "/.hpx.ini") || result;
 
         if (!hpx_ini_file.empty()) {
-            namespace fs = boost::filesystem;
-            boost::system::error_code ec;
+            namespace fs = filesystem;
+            fs::error_code ec;
             if (!fs::exists(hpx_ini_file, ec) || ec) {
                 std::cerr << "hpx::init: command line warning: file specified using "
                              "--hpx::config does not exist ("
@@ -165,7 +164,7 @@ namespace hpx { namespace util
     // global function to read component ini information
     void merge_component_inis(section& ini)
     {
-        namespace fs = boost::filesystem;
+        namespace fs = filesystem;
 
         // now merge all information into one global structure
         std::string ini_path(ini.get_entry("hpx.ini_path", HPX_DEFAULT_INI_PATH));
@@ -189,24 +188,19 @@ namespace hpx { namespace util
                 fs::directory_iterator nodir;
                 fs::path this_path (*it);
 
-                boost::system::error_code ec;
+                fs::error_code ec;
                 if (!fs::exists(this_path, ec) || ec)
                     continue;
 
                 for (fs::directory_iterator dir(this_path); dir != nodir; ++dir)
                 {
-                    if (fs::extension(*dir) != ".ini")
+                    if ((*dir).path().extension() != ".ini")
                         continue;
 
                     // read and merge the ini file into the main ini hierarchy
                     try {
-#if BOOST_FILESYSTEM_VERSION == 3
                         ini.merge ((*dir).path().string());
                         LBT_(info) << "loaded configuration: " << (*dir).path().string();
-#else
-                        ini.merge ((*dir).string());
-                        LBT_(info) << "loaded configuration: " << (*dir).string();
-#endif
                     }
                     catch (hpx::exception const& /*e*/) {
                         ;
@@ -364,15 +358,15 @@ namespace hpx { namespace util
     namespace detail
     {
         inline bool cmppath_less(
-            std::pair<boost::filesystem::path, std::string> const& lhs,
-            std::pair<boost::filesystem::path, std::string> const& rhs)
+            std::pair<filesystem::path, std::string> const& lhs,
+            std::pair<filesystem::path, std::string> const& rhs)
         {
             return lhs.first < rhs.first;
         }
 
         inline bool cmppath_equal(
-            std::pair<boost::filesystem::path, std::string> const& lhs,
-            std::pair<boost::filesystem::path, std::string> const& rhs)
+            std::pair<filesystem::path, std::string> const& lhs,
+            std::pair<filesystem::path, std::string> const& rhs)
         {
             return lhs.first == rhs.first;
         }
@@ -381,10 +375,10 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     std::vector<std::shared_ptr<plugins::plugin_registry_base> >
     init_ini_data_default(std::string const& libs, util::section& ini,
-        std::map<std::string, boost::filesystem::path>& basenames,
+        std::map<std::string, filesystem::path>& basenames,
         std::map<std::string, hpx::util::plugin::dll>& modules)
     {
-        namespace fs = boost::filesystem;
+        namespace fs = filesystem;
 
         typedef std::vector<std::pair<fs::path, std::string> >::iterator
             iterator_type;
@@ -400,7 +394,7 @@ namespace hpx { namespace util
             fs::directory_iterator nodir;
             fs::path libs_path(libs);
 
-            boost::system::error_code ec;
+            fs::error_code ec;
             if (!fs::exists(libs_path, ec) || ec)
                 return plugin_registries;     // given directory doesn't exist
 
@@ -419,7 +413,7 @@ namespace hpx { namespace util
             for (fs::directory_iterator dir(libs_path); dir != nodir; ++dir)
             {
                 fs::path curr(*dir);
-                if (fs::extension(curr) != HPX_SHARED_LIB_EXTENSION)
+                if (curr.extension() != HPX_SHARED_LIB_EXTENSION)
                     continue;
 
                 // instance name and module name are the same
@@ -436,7 +430,7 @@ namespace hpx { namespace util
                     name.erase(i - 1, version.length() + 1); // - 1 for one more dot
 #endif
                 // ensure base directory, remove symlinks, etc.
-                boost::system::error_code fsec;
+                fs::error_code fsec;
                 fs::path canonical_curr =
                     fs::canonical(curr, fs::initial_path(), fsec);
                 if (fsec)

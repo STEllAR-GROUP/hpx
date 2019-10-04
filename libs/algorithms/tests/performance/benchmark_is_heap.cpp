@@ -1,19 +1,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2017 Taeguk Kwon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/format.hpp>
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_is_heap.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_generate.hpp>
+#include <hpx/include/parallel_is_heap.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/timing.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -25,16 +26,17 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-unsigned int seed = (unsigned int)std::random_device{}();
+unsigned int seed = (unsigned int) std::random_device{}();
 std::mt19937 _rand(seed);
 ///////////////////////////////////////////////////////////////////////////////
 
 struct random_fill
 {
     random_fill()
-        : gen(_rand()),
-        dist(0, RAND_MAX)
-    {}
+      : gen(_rand())
+      , dist(0, RAND_MAX)
+    {
+    }
 
     int operator()()
     {
@@ -46,12 +48,12 @@ struct random_fill
 
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
-    {}
+    {
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-double run_is_heap_benchmark_std(int test_count,
-    std::vector<int> const& v)
+double run_is_heap_benchmark_std(int test_count, std::vector<int> const& v)
 {
     std::cout << "--- run_is_heap_benchmark_std ---" << std::endl;
     bool result = true;
@@ -70,8 +72,7 @@ double run_is_heap_benchmark_std(int test_count,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-double run_is_heap_benchmark_seq(int test_count,
-    std::vector<int> const& v)
+double run_is_heap_benchmark_seq(int test_count, std::vector<int> const& v)
 {
     std::cout << "--- run_is_heap_benchmark_seq ---" << std::endl;
     bool result = true;
@@ -91,8 +92,7 @@ double run_is_heap_benchmark_seq(int test_count,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-double run_is_heap_benchmark_par(int test_count,
-    std::vector<int> const& v)
+double run_is_heap_benchmark_par(int test_count, std::vector<int> const& v)
 {
     std::cout << "--- run_is_heap_benchmark_par ---" << std::endl;
     bool result = true;
@@ -112,8 +112,8 @@ double run_is_heap_benchmark_par(int test_count,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-double run_is_heap_benchmark_par_unseq(int test_count,
-    std::vector<int> const& v)
+double run_is_heap_benchmark_par_unseq(
+    int test_count, std::vector<int> const& v)
 {
     std::cout << "--- run_is_heap_benchmark_par_unseq ---" << std::endl;
     bool result = true;
@@ -133,9 +133,10 @@ double run_is_heap_benchmark_par_unseq(int test_count,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
-    if (vm.count("seed")){
+    if (vm.count("seed"))
+    {
         seed = vm["seed"].as<unsigned int>();
         _rand.seed(seed);
     }
@@ -156,7 +157,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "break_pos   : " << break_pos << std::endl;
     std::cout << "test_count  : " << test_count << std::endl;
     std::cout << "os threads  : " << os_threads << std::endl;
-    std::cout << "----------------------------------------------\n" << std::endl;
+    std::cout << "----------------------------------------------\n"
+              << std::endl;
 
     std::cout << "* Preparing Benchmark..." << std::endl;
     std::vector<int> v(vector_size);
@@ -166,24 +168,23 @@ int hpx_main(boost::program_options::variables_map& vm)
     generate(execution::par, std::begin(v), std::end(v), random_fill());
     std::make_heap(std::begin(v), std::next(std::begin(v), break_pos));
     if (break_pos < vector_size)
-        v[break_pos] = static_cast<int>((std::numeric_limits<std::size_t>::max)());
+        v[break_pos] =
+            static_cast<int>((std::numeric_limits<std::size_t>::max)());
 
     std::cout << "* Running Benchmark..." << std::endl;
-    double time_std =
-        run_is_heap_benchmark_std(test_count, v);
-    double time_seq =
-        run_is_heap_benchmark_seq(test_count, v);
-    double time_par =
-        run_is_heap_benchmark_par(test_count, v);
-    double time_par_unseq =
-        run_is_heap_benchmark_par_unseq(test_count, v);
+    double time_std = run_is_heap_benchmark_std(test_count, v);
+    double time_seq = run_is_heap_benchmark_seq(test_count, v);
+    double time_par = run_is_heap_benchmark_par(test_count, v);
+    double time_par_unseq = run_is_heap_benchmark_par_unseq(test_count, v);
 
-    std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
+    std::cout << "\n-------------- Benchmark Result --------------"
+              << std::endl;
     auto fmt = "is_heap ({1}) : {2}(sec)";
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
-    hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq)
+        << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
 
     return hpx::finalize();
@@ -191,29 +192,23 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("vector_size",
-            boost::program_options::value<std::size_t>()->default_value(1000000),
-            "size of vector (default: 1000000)")
-        ("break_pos",
-            boost::program_options::value<std::size_t>()->
-                default_value((std::numeric_limits<std::size_t>::max)()),
-            "a position which breaks max heap (default: vector_size)")
-        ("test_count",
-            boost::program_options::value<int>()->default_value(10),
-            "number of tests to be averaged (default: 10)")
-        ("seed,s", boost::program_options::value<unsigned int>(),
-            "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("vector_size",
+        hpx::program_options::value<std::size_t>()->default_value(1000000),
+        "size of vector (default: 1000000)")("break_pos",
+        hpx::program_options::value<std::size_t>()->default_value(
+            (std::numeric_limits<std::size_t>::max)()),
+        "a position which breaks max heap (default: vector_size)")("test_count",
+        hpx::program_options::value<int>()->default_value(10),
+        "number of tests to be averaged (default: 10)")("seed,s",
+        hpx::program_options::value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // initialize program
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
@@ -221,4 +216,3 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
-

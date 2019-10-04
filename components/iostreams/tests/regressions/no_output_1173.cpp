@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Luis Ayuso
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -32,7 +33,7 @@ void on_shutdown(std::string const& expected)
     on_shutdown_executed = true;
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     typedef hpx::future<void> wait_for_worker;
     std::vector<wait_for_worker> futures;

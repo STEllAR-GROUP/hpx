@@ -2,6 +2,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,8 +10,11 @@
 #define HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -20,7 +24,6 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
@@ -88,10 +91,7 @@ namespace hpx { namespace parcelset
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(util::runtime_configuration& cfg,
             threads::threadmanager* tm,
-            util::function_nonser<void(std::size_t, char const*)> const&
-                on_start_thread,
-            util::function_nonser<void(std::size_t, char const*)> const&
-                on_stop_thread);
+            threads::policies::callback_notifier const& notifer);
 
         ~parcelhandler() {}
 
@@ -197,10 +197,13 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         HPX_FORCEINLINE void put_parcel(parcel p)
         {
-            put_parcel(std::move(p), [=](
-                boost::system::error_code const& ec, parcel const & p) -> void {
-                    return invoke_write_handler(ec, p);
-                });
+            auto f =
+                [=](boost::system::error_code const& ec, parcel const& p) -> void
+                {
+                    invoke_write_handler(ec, p);
+                };
+
+            put_parcel(std::move(p), std::move(f));
         }
 
         /// A parcel is submitted for transport at the source locality site to
@@ -509,5 +512,5 @@ namespace hpx { namespace parcelset
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-
+#endif
 

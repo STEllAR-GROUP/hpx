@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -15,7 +16,7 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     namespace commandline_options_provider
     {
-        boost::program_options::options_description add_commandline_options();
+        hpx::program_options::options_description add_commandline_options();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -36,7 +37,7 @@ namespace hpx { namespace components
         ///
         /// \note   This function will be executed by the runtime system
         ///         during system startup.
-        boost::program_options::options_description add_commandline_options()
+        hpx::program_options::options_description add_commandline_options()
         {
             return commandline_options_provider::add_commandline_options();
         }
@@ -47,7 +48,7 @@ namespace hpx { namespace components
 #define HPX_DEFINE_COMPONENT_COMMANDLINE_OPTIONS(add_options_function)        \
     namespace hpx { namespace components { namespace commandline_options_provider \
     {                                                                         \
-        boost::program_options::options_description add_commandline_options() \
+        hpx::program_options::options_description add_commandline_options() \
         {                                                                     \
             return add_options_function();                                    \
         }                                                                     \

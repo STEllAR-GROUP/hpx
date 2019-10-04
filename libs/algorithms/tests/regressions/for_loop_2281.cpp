@@ -1,10 +1,11 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/testing.hpp>
 
@@ -20,22 +21,17 @@ int hpx_main()
     hpx::lcos::local::spinlock mtx;
     std::set<hpx::thread::id> thread_ids;
 
-    hpx::parallel::for_loop(
-        hpx::parallel::execution::par, 0, 100,
-        [&](int i)
-        {
-            std::lock_guard<hpx::lcos::local::spinlock> l(mtx);
-            thread_ids.insert(hpx::this_thread::get_id());
-        });
+    hpx::parallel::for_loop(hpx::parallel::execution::par, 0, 100, [&](int i) {
+        std::lock_guard<hpx::lcos::local::spinlock> l(mtx);
+        thread_ids.insert(hpx::this_thread::get_id());
+    });
 
     HPX_TEST(thread_ids.size() > std::size_t(1));
 
     thread_ids.clear();
 
     hpx::parallel::for_loop_n(
-        hpx::parallel::execution::par, 0, 100,
-        [&](int i)
-        {
+        hpx::parallel::execution::par, 0, 100, [&](int i) {
             std::lock_guard<hpx::lcos::local::spinlock> l(mtx);
             thread_ids.insert(hpx::this_thread::get_id());
         });
@@ -47,12 +43,10 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=4"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=4"};
 
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv, cfg), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

@@ -3,6 +3,7 @@
 //  Copyright (c) 2011-2012 Hartmut Kaiser
 //  Copyright (c) 2010 Artyom Beilis (Tonkikh)
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -33,9 +34,7 @@ namespace hpx { namespace util
     class backtrace {
     public:
 
-        enum { default_stack_size = 128 };
-
-        backtrace(std::size_t frames_no = default_stack_size)
+        explicit backtrace(std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
         {
             if(frames_no == 0)
                 return;
@@ -125,13 +124,13 @@ namespace hpx { namespace util
     }
 
     inline std::string trace(
-        std::size_t frames_no = backtrace::default_stack_size) //-V659
+        std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH) //-V659
     {
         return backtrace(frames_no).trace();
     }
 
     inline std::string trace_on_new_stack(
-        std::size_t frames_no = backtrace::default_stack_size)
+        std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
     {
         return backtrace(frames_no).trace_on_new_stack();
     }

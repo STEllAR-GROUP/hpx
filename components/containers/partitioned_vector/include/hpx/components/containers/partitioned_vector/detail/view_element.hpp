@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Antoine Tran Tan
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,9 +10,9 @@
 #define HPX_PARTITIONED_VECTOR_DETAIL_VIEW_ELEMENT_HPP
 
 #include <hpx/assertion.hpp>
+#include <hpx/collectives/spmd_block.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
-#include <hpx/lcos/spmd_block.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/name.hpp>

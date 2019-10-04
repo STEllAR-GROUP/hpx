@@ -1,15 +1,14 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/type_support/static.hpp>
-#include <hpx/util/ini.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/concurrency/spinlock.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 // This is needed to get rid of an undefined reference to
@@ -17,6 +16,8 @@
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
+#include <hpx/type_support/static.hpp>
+#include <hpx/util/ini.hpp>
 
 #include <cstddef>
 #include <mutex>

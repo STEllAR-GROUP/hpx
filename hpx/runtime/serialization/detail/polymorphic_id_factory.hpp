@@ -1,6 +1,7 @@
 //  Copyright (c) 2015 Anton Bikineev
 //  Copyright (c) 2014 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -13,7 +14,7 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/type_support/static.hpp>
 

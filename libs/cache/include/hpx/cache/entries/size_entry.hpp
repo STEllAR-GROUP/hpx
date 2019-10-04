@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,15 +13,13 @@
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache { namespace entries
-{
+namespace hpx { namespace util { namespace cache { namespace entries {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Value, typename Derived = void>
     class size_entry;
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <typename Value, typename Derived>
         struct size_derived
         {
@@ -32,7 +31,7 @@ namespace hpx { namespace util { namespace cache { namespace entries
         {
             typedef size_entry<Value> type;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     /// \class size_entry size_entry.hpp hpx/cache/entries/size_entry.hpp
@@ -58,20 +57,24 @@ namespace hpx { namespace util { namespace cache { namespace entries
       : public entry<Value, typename detail::size_derived<Value, Derived>::type>
     {
     private:
-        typedef typename detail::size_derived<Value, Derived>::type derived_type;
+        typedef
+            typename detail::size_derived<Value, Derived>::type derived_type;
         typedef entry<Value, derived_type> base_type;
 
     public:
         /// \brief Any cache entry has to be default constructible
         size_entry()
           : size_(0)
-        {}
+        {
+        }
 
         /// \brief Construct a new instance of a cache entry holding the given
         ///        value.
         explicit size_entry(Value const& val, std::size_t size)
-          : base_type(val), size_(size)
-        {}
+          : base_type(val)
+          , size_(size)
+        {
+        }
 
         /// \brief    Return the 'size' of this entry.
         std::size_t get_size() const
@@ -81,14 +84,14 @@ namespace hpx { namespace util { namespace cache { namespace entries
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has a bigger size.
-        friend bool operator< (size_entry const& lhs, size_entry const& rhs)
+        friend bool operator<(size_entry const& lhs, size_entry const& rhs)
         {
             return lhs.get_size() > rhs.get_size();
         }
 
     private:
-        std::size_t size_;      // the 'size' of the entry
+        std::size_t size_;    // the 'size' of the entry
     };
-}}}}
+}}}}    // namespace hpx::util::cache::entries
 
 #endif

@@ -4,6 +4,7 @@
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,19 +12,20 @@
 #define HPX_PARCELSET_PARCELPORT_IMPL_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/connection_cache.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -106,13 +108,10 @@ namespace hpx { namespace parcelset
         /// Construct the parcelport on the given locality.
         parcelport_impl(util::runtime_configuration const& ini,
             locality const& here,
-            util::function_nonser<void(std::size_t, char const*)> const&
-                on_start_thread,
-            util::function_nonser<void(std::size_t, char const*)> const&
-                on_stop_thread)
+            threads::policies::callback_notifier const& notifier)
           : parcelport(ini, here, connection_handler_type())
-          , io_service_pool_(thread_pool_size(ini), on_start_thread,
-                on_stop_thread, pool_name(), pool_name_postfix())
+          , io_service_pool_(thread_pool_size(ini), notifier, pool_name(),
+                pool_name_postfix())
           , connection_cache_(
                 max_connections(ini), max_connections_per_loc(ini))
           , archive_flags_(0)
@@ -974,4 +973,5 @@ namespace hpx { namespace parcelset
     };
 }}
 
+#endif
 #endif

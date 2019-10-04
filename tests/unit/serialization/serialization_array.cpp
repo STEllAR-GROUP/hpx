@@ -1,6 +1,7 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Andreas Schaefer
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -26,7 +27,7 @@ struct A
 {
     A() {}
 
-    A(T t) : t_(t) {}
+    explicit A(T t) : t_(t) {}
     T t_;
 
     A & operator=(T t) { t_ = t; return *this; }
@@ -68,7 +69,7 @@ void test(T minval, T maxval)
         std::vector<A<T> > os;
         for(T c = minval; c < maxval; ++c)
         {
-            os.push_back(c);
+            os.emplace_back(c);
         }
         oarchive << hpx::serialization::make_array(&os[0], os.size());
 
@@ -113,7 +114,7 @@ void test_fp(T minval, T maxval)
         std::vector<A<T> > os;
         for(T c = minval; c < maxval; c += static_cast<T>(0.5))
         {
-            os.push_back(c);
+            os.emplace_back(c);
         }
         oarchive << hpx::serialization::make_array(&os[0], os.size());
 

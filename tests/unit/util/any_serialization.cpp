@@ -1,6 +1,7 @@
 /*=============================================================================
     Copyright (c) 2013 Shuangyang Yang
 
+//  SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
@@ -10,6 +11,7 @@
 #include <cstddef>
 #include <cstdio> // remove
 #include <fstream>
+#include <typeinfo>
 #include <vector>
 
 #include <boost/config.hpp>
@@ -21,14 +23,14 @@ namespace std
 #endif
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/any.hpp>
+#include <hpx/util/serializable_any.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include "small_big_object.hpp"
 
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
 
 using hpx::util::basic_any;
 
@@ -71,8 +73,10 @@ int hpx_main(variables_map& vm)
         out(buffer, any);
         any_type any_in;
         in(buffer, any_in);
-        HPX_TEST(!any_in.empty());
-        HPX_TEST_EQ(any, any_in);
+        HPX_TEST(any_in.has_value());
+        HPX_TEST(any.type() == any_in.type());
+        HPX_TEST_EQ(hpx::util::any_cast<small_object>(any),
+            hpx::util::any_cast<small_object>(any_in));
     }
 
     {
@@ -86,8 +90,9 @@ int hpx_main(variables_map& vm)
         out(buffer, any);
         any_type any_in;
         in(buffer, any_in);
-        HPX_TEST(!any_in.empty());
-        HPX_TEST_EQ(any, any_in);
+        HPX_TEST(any.type() == any_in.type());
+        HPX_TEST_EQ(hpx::util::any_cast<big_object>(any),
+            hpx::util::any_cast<big_object>(any_in));
     }
 
     return finalize();
