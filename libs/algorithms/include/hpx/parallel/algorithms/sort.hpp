@@ -28,6 +28,7 @@
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -114,8 +115,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             std::iter_swap(first, it_b);
 
-            typedef
-                typename std::iterator_traits<RandomIt>::reference reference;
+            using reference =
+                typename std::iterator_traits<RandomIt>::reference;
 
             reference val = *first;
             RandomIt c_first = first + 2, c_last = last - 2;
@@ -184,19 +185,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             std::size_t max_chunks = execution::maximal_number_of_chunks(
                 policy.parameters(), policy.executor(), cores, count);
-            HPX_ASSERT(0 != max_chunks);
 
             std::size_t chunk_size = execution::get_chunk_size(
                 policy.parameters(), policy.executor(), [] { return 0; }, cores,
                 count);
 
-            // we should not consider more chunks than we have elements
-            max_chunks = (std::min)(max_chunks, count);
-
-            // we should not make chunks smaller than what's determined by the
-            // max chunk size
-            chunk_size =
-                (std::max)(chunk_size, (count + max_chunks - 1) / max_chunks);
+            util::detail::adjust_chunk_size_and_max_chunks(
+                cores, count, max_chunks, chunk_size);
 
             // we should not get smaller than our sort_limit_per_task
             chunk_size = (std::max)(chunk_size, sort_limit_per_task);
