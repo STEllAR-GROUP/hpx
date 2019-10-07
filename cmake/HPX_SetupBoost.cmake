@@ -30,6 +30,11 @@ set(Boost_ADDITIONAL_VERSIONS
     "1.57.0" "1.57")
 set(Boost_MINIMUM_VERSION "1.61" CACHE  INTERNAL "1.61" FORCE)
 
+set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
+
+# Find the headers and get the version
+find_package(Boost ${Boost_MINIMUM_VERSION} REQUIRED)
+
 set(__boost_libraries)
 if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
    HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE)
@@ -61,11 +66,11 @@ if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   set(__boost_libraries ${__boost_libraries} thread chrono)
 endif()
 
-set(__boost_libraries
-  ${__boost_libraries}
-  system)
+# Boost.System is header-only from 1.69 onwards.
+if(Boost_VERSION_STRING VERSION_LESS 1.69)
+  set(__boost_libraries ${__boost_libraries} system)
+endif()
 
-set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
 find_package(Boost ${Boost_MINIMUM_VERSION}
   MODULE REQUIRED
   COMPONENTS ${__boost_libraries})
