@@ -194,29 +194,28 @@ int main(int argc, char* argv[])
     hpx::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()("concurrency",
-        hpx::program_options::value<std::size_t>(&concurrency)
-            ->default_value(1),
-        "number of concurrent serialization operations (default: 1)")
-
+    // clang-format off
+    cmdline.add_options()
+        ("concurrency",
+            hpx::program_options::value<std::size_t>(&concurrency)
+                ->default_value(1),
+            "number of concurrent serialization operations (default: 1)")
         ("data_size",
             hpx::program_options::value<std::size_t>(&data_size)
                 ->default_value(1),
             "size of data buffer to serialize in bytes (default: 1)")
-
-            ("iterations",
-                hpx::program_options::value<std::size_t>(&iterations)
-                    ->default_value(1000),
-                "number of iterations while measuring serialization overhead "
-                "(default: 1000)")
-
-                ("continuation", "add a continuation to each created parcel")
-
-                    ("zerocopy",
-                        "use zero copy serialization of bitwise copyable "
-                        "arguments")
-
-                        ("no-header", "do not print out the csv header row");
+        ("iterations",
+            hpx::program_options::value<std::size_t>(&iterations)
+                ->default_value(1000),
+            "number of iterations while measuring serialization overhead "
+            "(default: 1000)")
+        ("continuation", "add a continuation to each created parcel")
+        ("zerocopy",
+            "use zero copy serialization of bitwise copyable "
+            "arguments")
+        ("no-header", "do not print out the csv header row")
+        ;
+    // clang-format on
 
     return hpx::init(cmdline, argc, argv);
 }
