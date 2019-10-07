@@ -88,6 +88,13 @@ if(NOT Boost_FOUND)
   hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
 endif()
 
+# We are assuming that there is only one Boost Root
+if (NOT BOOST_ROOT AND "$ENV{BOOST_ROOT}")
+  set(BOOST_ROOT $ENV{BOOST_ROOT})
+elseif(NOT BOOST_ROOT)
+  string(REPLACE "/include" "" BOOST_ROOT "${Boost_INCLUDE_DIRS}")
+endif()
+
 add_library(hpx::boost INTERFACE IMPORTED)
 
 # If we compile natively for the MIC, we need some workarounds for certain

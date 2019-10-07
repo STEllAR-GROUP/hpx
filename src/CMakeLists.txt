@@ -244,7 +244,7 @@ endforeach()
 #endif()
 
 target_link_libraries(hpx PUBLIC hpx::boost)
-target_include_directories(hpx PUBLIC ${Boost_INCLUDE_DIRS})
+#target_include_directories(hpx PUBLIC ${Boost_INCLUDE_DIRS})
 
 # Set the basic search paths for the HPX headers
 target_include_directories(hpx PUBLIC
@@ -266,7 +266,8 @@ endif()
 
 target_link_libraries(hpx PUBLIC hpx::allocator)
 
-target_link_libraries(hpx PRIVATE hpx::hwloc)
+# Hwloc PUBLIC because used by exported target hpx_topology
+target_link_libraries(hpx PUBLIC hpx::hwloc)
 
 # Enable SIMD via VC if it is available
 if (TARGET hpx::vc)
