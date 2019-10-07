@@ -35,11 +35,14 @@
 
 namespace hpx { namespace threads { namespace coroutines {
     namespace detail {
+        template <typename ThreadData>
         class coroutine_self;
 
+        template <typename ThreadData>
         class coroutine_impl;
     }    // namespace detail
 
+    template <typename ThreadData>
     class coroutine;
 }}}    // namespace hpx::threads::coroutines
 

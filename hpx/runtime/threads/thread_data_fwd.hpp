@@ -37,22 +37,26 @@ namespace hpx
 
 namespace hpx { namespace threads
 {
+    class thread_data;
+
     /// \cond NOINTERNAL
     class HPX_EXPORT threadmanager;
     struct HPX_EXPORT topology;
 
     class HPX_EXPORT executor;
 
-    typedef coroutines::coroutine coroutine_type;
+    using thread_id_type = thread_id<thread_data>;
 
-    typedef coroutines::detail::coroutine_self thread_self;
-    typedef coroutines::detail::coroutine_impl thread_self_impl_type;
+    using coroutine_type = coroutines::coroutine<thread_data>;
 
-    typedef std::pair<thread_state_enum, thread_id_type> thread_result_type;
-    typedef thread_state_ex_enum thread_arg_type;
+    using thread_self = coroutines::detail::coroutine_self<thread_data>;
+    using thread_self_impl_type = coroutines::detail::coroutine_impl<thread_data>;
 
-    typedef thread_result_type thread_function_sig(thread_arg_type);
-    typedef util::unique_function_nonser<thread_function_sig> thread_function_type;
+    using thread_result_type = std::pair<thread_state_enum, thread_id_type>;
+    using thread_arg_type = thread_state_ex_enum;
+
+    using thread_function_sig = thread_result_type(thread_arg_type);
+    using thread_function_type = util::unique_function_nonser<thread_function_sig>;
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////
@@ -166,6 +170,19 @@ namespace hpx { namespace threads
     HPX_API_EXPORT void set_self_apex_data(apex_task_wrapper data);
 #endif
 }}
+
+namespace std {
+    template <>
+    struct hash<::hpx::threads::thread_id_type>
+    {
+        std::size_t operator()(::hpx::threads::thread_id_type const& v) const
+            noexcept
+        {
+            std::hash<const ::hpx::threads::thread_data*> hasher_;
+            return hasher_(v.get());
+        }
+    };
+}    // namespace std
 
 #endif
 

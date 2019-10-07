@@ -51,9 +51,6 @@ set(coroutines_compat_headers
   )
 
 set(coroutines_sources
-  detail/context_base.cpp
-  detail/coroutine_impl.cpp
-  detail/coroutine_self.cpp
   detail/tss.cpp
   swapcontext.cpp
   swapcontext32.ipp

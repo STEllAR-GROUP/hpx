@@ -46,30 +46,54 @@
 #include <hpx/functional/unique_function.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <utility>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
+    namespace {
+        template <typename ThreadData>
+        struct reset_self_on_exit
+        {
+            reset_self_on_exit(coroutine_self<ThreadData>* val,
+                coroutine_self<ThreadData>* old_val = nullptr)
+              : old_self(old_val)
+            {
+                coroutine_self<ThreadData>::set_self(val);
+            }
+
+            ~reset_self_on_exit()
+            {
+                coroutine_self<ThreadData>::set_self(old_self);
+            }
+
+            coroutine_self<ThreadData>* old_self;
+        };
+    }    // namespace
+
+    ///////////////////////////////////////////////////////////////////////////
     // This type augments the context_base type with the type of the stored
     // functor.
-    class coroutine_impl : public context_base<coroutine_impl>
+    template <typename ThreadData>
+    class coroutine_impl
+      : public context_base<coroutine_impl<ThreadData>, ThreadData>
     {
     public:
         HPX_NON_COPYABLE(coroutine_impl);
 
     public:
-        typedef context_base super_type;
-        typedef context_base::thread_id_type thread_id_type;
+        using super_type = context_base<coroutine_impl<ThreadData>, ThreadData>;
+        using thread_id_type = typename super_type::thread_id_type;
 
-        typedef std::pair<thread_state_enum, thread_id_type> result_type;
-        typedef thread_state_ex_enum arg_type;
+        using result_type = std::pair<thread_state_enum, thread_id_type>;
+        using arg_type = thread_state_ex_enum;
 
-        typedef util::unique_function_nonser<result_type(arg_type)>
-            functor_type;
+        using functor_type =
+            util::unique_function_nonser<result_type(arg_type)>;
 
         coroutine_impl(
             functor_type&& f, thread_id_type id, std::ptrdiff_t stack_size)
-          : context_base(stack_size, id)
+          : super_type(stack_size, id)
           , m_result(unknown, invalid_thread_id)
           , m_arg(nullptr)
           , m_fun(std::move(f))
@@ -77,10 +101,58 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
 #if defined(HPX_DEBUG)
-        HPX_EXPORT ~coroutine_impl();
+        HPX_EXPORT ~coroutine_impl()
+        {
+            HPX_ASSERT(!m_fun);    // functor should have been reset by now
+        }
 #endif
 
-        HPX_EXPORT void operator()() noexcept;
+        HPX_EXPORT void operator()() noexcept
+        {
+            using context_exit_status =
+                typename super_type::context_exit_status;
+            context_exit_status status = super_type::ctx_exited_return;
+
+            // yield value once the thread function has finished executing
+            result_type result_last(
+                thread_state_enum::terminated, invalid_thread_id);
+
+            // loop as long this coroutine has been rebound
+            do
+            {
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
+                finish_switch_fiber(nullptr, m_caller);
+#endif
+                std::exception_ptr tinfo;
+                try
+                {
+                    {
+                        coroutine_self<ThreadData>* old_self =
+                            coroutine_self<ThreadData>::get_self();
+                        coroutine_self<ThreadData> self(this, old_self);
+                        reset_self_on_exit<ThreadData> on_exit(&self, old_self);
+
+                        result_last = m_fun(*this->args());
+                        HPX_ASSERT(
+                            result_last.first == thread_state_enum::terminated);
+                    }
+
+                    // return value to other side of the fence
+                    this->bind_result(result_last);
+                }
+                catch (...)
+                {
+                    status = super_type::ctx_exited_abnormally;
+                    tinfo = std::current_exception();
+                }
+
+                this->reset();
+                this->do_return(status, std::move(tinfo));
+            } while (this->m_state == super_type::ctx_running);
+
+            // should not get here, never
+            HPX_ASSERT(this->m_state == super_type::ctx_running);
+        }
 
     public:
         void bind_result(result_type res)

@@ -48,9 +48,6 @@
 #include <hpx/coroutines/detail/swap_context.hpp>    //for swap hints
 #include <hpx/coroutines/detail/tss.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
-#endif
 
 #include <atomic>
 #include <cstddef>
@@ -89,12 +86,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     /////////////////////////////////////////////////////////////////////////////
     std::ptrdiff_t const default_stack_size = -1;
 
-    template <typename CoroutineImpl>
+    template <typename CoroutineImpl, typename ThreadData>
     class context_base : public default_context_impl<CoroutineImpl>
     {
     public:
-        typedef void deleter_type(context_base const*);
-        typedef hpx::threads::thread_id_type thread_id_type;
+        using deleter_type = void (*)(context_base const*);
+        using thread_id_type = hpx::threads::thread_id<ThreadData>;
 
         context_base(std::ptrdiff_t stack_size, thread_id_type id)
           : default_context_impl<CoroutineImpl>(stack_size)
@@ -109,9 +106,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
           , m_thread_data(nullptr)
 #else
           , m_thread_data(0)
-#endif
-#if defined(HPX_HAVE_APEX)
-          , m_apex_data(nullptr)
 #endif
           , m_type_info()
           , m_thread_id(id)
@@ -128,9 +122,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             delete_tss_storage(m_thread_data);
 #else
             m_thread_data = 0;
-#endif
-#if defined(HPX_HAVE_APEX)
-            m_apex_data = nullptr;
 #endif
             m_thread_id.reset();
         }
@@ -238,9 +229,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
             m_thread_data = 0;
 #endif
-#if defined(HPX_HAVE_APEX)
-            m_apex_data = nullptr;
-#endif
         }
 
         std::size_t get_thread_data() const
@@ -264,23 +252,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             return olddata;
 #endif
         }
-
-#if defined(HPX_HAVE_APEX)
-        apex_task_wrapper get_apex_data() const
-        {
-            // APEX wants the ADDRESS of a location to store
-            // data.  This storage could be updated asynchronously,
-            // so APEX stores this address, and uses it as a way
-            // to remember state for the HPX thread in-betweeen
-            // calls to apex::start/stop/yield/resume().
-            // APEX will change the value pointed to by the address.
-            return m_apex_data;
-        }
-        void set_apex_data(apex_task_wrapper data)
-        {
-            m_apex_data = data;
-        }
-#endif
 
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         tss_storage* get_thread_tss_data(bool create_if_needed) const
@@ -400,11 +371,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
         mutable std::size_t m_thread_data;
 #endif
-#if defined(HPX_HAVE_APEX)
-        // This is a pointer that APEX will use to maintain state
-        // when an HPX thread is pre-empted.
-        apex_task_wrapper m_apex_data;
-#endif
 
         // This is used to generate a meaningful exception trace.
         std::exception_ptr m_type_info;
@@ -412,6 +378,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         std::size_t continuation_recursion_count_;
     };
+
+    // initialize static allocation counter
+    template <typename CoroutineImpl, typename ThreadData>
+    allocation_counters
+        context_base<CoroutineImpl, ThreadData>::m_allocation_counters;
 }}}}    // namespace hpx::threads::coroutines::detail
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_BASE_HPP*/

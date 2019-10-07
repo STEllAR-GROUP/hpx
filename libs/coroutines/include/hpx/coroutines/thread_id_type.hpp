@@ -17,13 +17,20 @@
 #include <iosfwd>
 
 namespace hpx { namespace threads {
+    struct invalid_thread_id_tag
+    {
+    };
 
-    class HPX_EXPORT thread_data;
+    HPX_CONSTEXPR_OR_CONST invalid_thread_id_tag invalid_thread_id;
 
     template <typename T>
     struct thread_id
     {
         constexpr thread_id()
+          : thrd_(nullptr)
+        {
+        }
+        constexpr thread_id(invalid_thread_id_tag)
           : thrd_(nullptr)
         {
         }
@@ -81,6 +88,30 @@ namespace hpx { namespace threads {
         }
 
         friend constexpr bool operator==(
+            invalid_thread_id_tag, thread_id const& rhs)
+        {
+            return nullptr == rhs.thrd_;
+        }
+
+        friend constexpr bool operator!=(
+            invalid_thread_id_tag, thread_id const& rhs)
+        {
+            return nullptr != rhs.thrd_;
+        }
+
+        friend constexpr bool operator==(
+            thread_id const& lhs, invalid_thread_id_tag)
+        {
+            return nullptr == lhs.thrd_;
+        }
+
+        friend constexpr bool operator!=(
+            thread_id const& lhs, invalid_thread_id_tag)
+        {
+            return nullptr != lhs.thrd_;
+        }
+
+        friend constexpr bool operator==(
             thread_id const& lhs, thread_id const& rhs)
         {
             return lhs.thrd_ == rhs.thrd_;
@@ -127,24 +158,6 @@ namespace hpx { namespace threads {
     private:
         T* thrd_;
     };
-
-    typedef thread_id<thread_data> thread_id_type;
-
-    HPX_CONSTEXPR_OR_CONST thread_id_type invalid_thread_id;
-
 }}    // namespace hpx::threads
-
-namespace std {
-    template <>
-    struct hash<::hpx::threads::thread_id_type>
-    {
-        std::size_t operator()(::hpx::threads::thread_id_type const& v) const
-            noexcept
-        {
-            std::hash<const ::hpx::threads::thread_data*> hasher_;
-            return hasher_(v.get());
-        }
-    };
-}    // namespace std
 
 #endif

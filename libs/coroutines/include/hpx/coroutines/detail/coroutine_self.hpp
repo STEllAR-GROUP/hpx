@@ -37,9 +37,6 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/functional/function.hpp>
-#if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
-#endif
 
 #include <cstddef>
 #include <exception>
@@ -47,6 +44,7 @@
 #include <utility>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
+    template <typename ThreadData>
     class coroutine_self
     {
     public:
@@ -67,21 +65,21 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                 set_self(self_);
             }
 
-            coroutine_self* self_;
+            coroutine_self<ThreadData>* self_;
         };
 
     public:
         friend struct detail::coroutine_accessor;
 
-        typedef coroutine_impl impl_type;
-        typedef impl_type* impl_ptr;    // Note, no reference counting here.
-        typedef impl_type::thread_id_type thread_id_type;
+        using impl_type = coroutine_impl<ThreadData>;
+        using impl_ptr = impl_type*;    // Note, no reference counting here.
+        using thread_id_type = typename impl_type::thread_id_type;
 
-        typedef impl_type::result_type result_type;
-        typedef impl_type::arg_type arg_type;
+        using result_type = typename impl_type::result_type;
+        using arg_type = typename impl_type::arg_type;
 
-        typedef util::function_nonser<arg_type(result_type)>
-            yield_decorator_type;
+        using yield_decorator_type =
+            util::function_nonser<arg_type(result_type)>;
 
         arg_type yield(result_type arg = result_type())
         {
@@ -196,7 +194,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
     public:
-        static HPX_EXPORT coroutine_self*& local_self();
+        static HPX_EXPORT coroutine_self*& local_self()
+        {
+            HPX_NATIVE_TLS coroutine_self<ThreadData>* local_self_ = nullptr;
+            return local_self_;
+        }
 
         static void set_self(coroutine_self* self)
         {
@@ -206,19 +208,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         {
             return local_self();
         }
-
-#if defined(HPX_HAVE_APEX)
-        apex_task_wrapper get_apex_data(void) const
-        {
-            HPX_ASSERT(m_pimpl);
-            return m_pimpl->get_apex_data();
-        }
-        void set_apex_data(apex_task_wrapper data)
-        {
-            HPX_ASSERT(m_pimpl);
-            m_pimpl->set_apex_data(data);
-        }
-#endif
 
     private:
         yield_decorator_type yield_decorator_;
