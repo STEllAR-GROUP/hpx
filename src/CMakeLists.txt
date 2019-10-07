@@ -244,7 +244,6 @@ endforeach()
 #endif()
 
 target_link_libraries(hpx PUBLIC hpx::boost)
-#target_include_directories(hpx PUBLIC ${Boost_INCLUDE_DIRS})
 
 # Set the basic search paths for the HPX headers
 target_include_directories(hpx PUBLIC
