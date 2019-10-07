@@ -221,14 +221,14 @@ namespace hpx { namespace threads
     {
         thread_self* self = get_self_ptr();
         if (HPX_LIKELY(nullptr != self))
-            return self->get_apex_data();
+            return self->get_thread_id()->get_apex_data();
         return nullptr;
     }
     void set_self_apex_data(apex_task_wrapper data)
     {
         thread_self* self = get_self_ptr();
         if (HPX_LIKELY(nullptr != self))
-            self->set_apex_data(data);
+            self->get_thread_id()->set_apex_data(data);
         return;
     }
 #endif

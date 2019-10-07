@@ -6,6 +6,7 @@
 //
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/apex.hpp>
 
 #include <cstddef>
@@ -31,7 +32,7 @@ namespace hpx { namespace util {
                 && enable_parent_task_handler()) {
             parent_wrapper = parent_task.get()->get_apex_data();
         }
-        return apex::new_task(address, parent_wrapper);
+        return apex::new_task(address, UINTMAX_MAX, parent_wrapper);
     }
 
     apex_task_wrapper apex_new_task(
@@ -44,7 +45,7 @@ namespace hpx { namespace util {
                 && enable_parent_task_handler()) {
             parent_wrapper = parent_task.get()->get_apex_data();
         }
-        return apex::new_task(description, parent_wrapper);
+        return apex::new_task(description, UINTMAX_MAX, parent_wrapper);
     }
 
 #endif

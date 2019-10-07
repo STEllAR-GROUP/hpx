@@ -54,7 +54,7 @@ namespace hpx { namespace util {
         if (wrapper == nullptr) {
             threads::thread_id_type parent_task(nullptr);
             // doesn't matter which locality we use, the parent is null
-            return apex_new_task(description, 0, parent_task);
+            return apex_new_task(description, parent_task);
         }
         return apex::update_task(wrapper, description);
     }
