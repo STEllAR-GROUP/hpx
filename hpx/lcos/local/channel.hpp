@@ -266,7 +266,7 @@ namespace hpx { namespace lcos { namespace local
             }
             local::packaged_task<T()> pop_pt()
             {
-                return local::packaged_task<T()>([=, this]() -> T { return get(); });
+                return local::packaged_task<T()>([this]() -> T { return get(); });
             }
 
         public:

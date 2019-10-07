@@ -194,11 +194,10 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         HPX_FORCEINLINE void put_parcel(parcel p)
         {
-            auto f =
-                [=, this](boost::system::error_code const& ec, parcel const& p) -> void
-                {
-                    invoke_write_handler(ec, p);
-                };
+            auto f = [this](boost::system::error_code const& ec,
+                         parcel const& p) -> void {
+                invoke_write_handler(ec, p);
+            };
 
             put_parcel(std::move(p), std::move(f));
         }
@@ -235,10 +234,9 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         void put_parcels(std::vector<parcel> parcels)
         {
-            std::vector<write_handler_type> handlers(parcels.size(), [=, this](
-                boost::system::error_code const& ec, parcel const & p) -> void {
-                    return invoke_write_handler(ec, p);
-                });
+            std::vector<write_handler_type> handlers(parcels.size(),
+                [this](boost::system::error_code const& ec, parcel const& p)
+                    -> void { return invoke_write_handler(ec, p); });
 
             put_parcels(std::move(parcels), std::move(handlers));
         }
