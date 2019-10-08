@@ -631,10 +631,10 @@ namespace hpx { namespace util {
         // Perfect forwarding of T
         template <typename T>
         basic_any(T&& x,
-            typename std::enable_if<
-                !std::is_same<basic_any, typename std::decay<T>::type>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type* = nullptr)
+            typename std::enable_if<!std::is_same<basic_any,
+                typename std::decay<T>::type>::value>::type* = nullptr,
+            typename std::enable_if<std::is_copy_constructible<
+                typename std::decay<T>::type>::value>::type* = nullptr)
           : table(detail::any::get_table<typename std::decay<T>::type>::
                     template get<void, void, void, std::true_type>())
           , object(nullptr)
@@ -851,10 +851,10 @@ namespace hpx { namespace util {
         // Perfect forwarding of T
         template <typename T>
         basic_any(T&& x,
-            typename std::enable_if<
-                !std::is_same<basic_any, typename std::decay<T>::type>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type* = nullptr)
+            typename std::enable_if<!std::is_same<basic_any,
+                typename std::decay<T>::type>::value>::type* = nullptr,
+            typename std::enable_if<std::is_copy_constructible<
+                typename std::decay<T>::type>::value>::type* = nullptr)
           : table(detail::any::get_table<typename std::decay<T>::type>::
                     template get<void, void, Char, std::true_type>())
           , object(nullptr)
@@ -1065,10 +1065,10 @@ namespace hpx { namespace util {
         // Perfect forwarding of T
         template <typename T>
         basic_any(T&& x,
-            typename std::enable_if<
-                !std::is_same<basic_any, typename std::decay<T>::type>::value &&
-                std::is_move_constructible<
-                    typename std::decay<T>::type>::value>::type* = nullptr)
+            typename std::enable_if<!std::is_same<basic_any,
+                typename std::decay<T>::type>::value>::type* = nullptr,
+            typename std::enable_if<std::is_move_constructible<
+                typename std::decay<T>::type>::value>::type* = nullptr)
           : table(detail::any::get_table<typename std::decay<T>::type>::
                     template get<void, void, void, std::false_type>())
           , object(nullptr)
@@ -1252,10 +1252,10 @@ namespace hpx { namespace util {
         // Perfect forwarding of T
         template <typename T>
         basic_any(T&& x,
-            typename std::enable_if<
-                !std::is_same<basic_any, typename std::decay<T>::type>::value &&
-                std::is_move_constructible<
-                    typename std::decay<T>::type>::value>::type* = nullptr)
+            typename std::enable_if<!std::is_same<basic_any,
+                typename std::decay<T>::type>::value>::type* = nullptr,
+            typename std::enable_if<std::is_move_constructible<
+                typename std::decay<T>::type>::value>::type* = nullptr)
           : table(detail::any::get_table<typename std::decay<T>::type>::
                     template get<void, void, Char, std::false_type>())
           , object(nullptr)

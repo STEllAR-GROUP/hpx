@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <type_traits>
 #include <utility>

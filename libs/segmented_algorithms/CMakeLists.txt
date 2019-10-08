@@ -42,6 +42,7 @@ add_hpx_module(segmented_algorithms
     hpx_execution
     hpx_functional
     hpx_iterator_support
+    hpx_serialization
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

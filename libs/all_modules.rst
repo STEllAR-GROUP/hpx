@@ -38,6 +38,7 @@ All modules
    /libs/program_options/docs/index.rst
    /libs/resiliency/docs/index.rst
    /libs/segmented_algorithms/docs/index.rst
+   /libs/serialization/docs/index.rst
    /libs/statistics/docs/index.rst
    /libs/testing/docs/index.rst
    /libs/thread_support/docs/index.rst

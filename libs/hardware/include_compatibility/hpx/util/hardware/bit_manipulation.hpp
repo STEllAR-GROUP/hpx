@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/hardware/bit_manipulation.hpp>
 #include <hpx/hardware/config/defines.hpp>
+#include <hpx/hardware/bit_manipulation.hpp>
 
 #if defined(HPX_HARDWARE_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)

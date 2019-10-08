@@ -9,27 +9,27 @@
 #define HPX_LCOS_FUTURE_MAR_06_2012_1059AM
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/result_of.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
-#include <hpx/traits/acquire_shared_state.hpp>
+#include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
@@ -165,6 +165,10 @@ namespace hpx { namespace lcos { namespace detail
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT void preprocess_future(serialization::output_archive& ar,
+        hpx::lcos::detail::future_data_refcnt_base& state);
+
     template <typename Archive, typename T>
     void serialize_future_save(Archive& ar, T const& val, std::false_type)
     {
@@ -191,12 +195,13 @@ namespace hpx { namespace lcos { namespace detail
         {
             if (ar.is_preprocessing())
             {
-                typename hpx::traits::detail::shared_state_ptr_for<Future>::type state
-                    = hpx::traits::future_access<Future>::get_shared_state(f);
+                typename hpx::traits::detail::shared_state_ptr_for<Future>::type
+                    state =
+                        hpx::traits::future_access<Future>::get_shared_state(f);
 
                 state->execute_deferred();
 
-                ar.await_future(f);
+                preprocess_future(ar, *state);
             }
             else
             {
@@ -238,13 +243,13 @@ namespace hpx { namespace lcos { namespace detail
         {
             if (ar.is_preprocessing())
             {
-                typename
-                    hpx::traits::detail::shared_state_ptr_for<Future>::type state
-                    = hpx::traits::future_access<Future>::get_shared_state(f);
+                typename hpx::traits::detail::shared_state_ptr_for<Future>::type
+                    state =
+                        hpx::traits::future_access<Future>::get_shared_state(f);
 
                 state->execute_deferred();
 
-                ar.await_future(f);
+                preprocess_future(ar, *state);
             }
             else
             {

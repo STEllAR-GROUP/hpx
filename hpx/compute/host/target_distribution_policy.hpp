@@ -17,7 +17,7 @@
 #endif
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
+#include <hpx/serialization/base_object.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
 #include <hpx/compute/detail/target_distribution_policy.hpp>

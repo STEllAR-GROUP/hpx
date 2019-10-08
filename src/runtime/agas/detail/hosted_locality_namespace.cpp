@@ -17,7 +17,7 @@
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/vector.hpp>
 
 #include <cstdint>
 #include <map>

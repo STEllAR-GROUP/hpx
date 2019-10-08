@@ -12,8 +12,8 @@
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -27,10 +27,10 @@
             && HPX_HAVE_MAX_CPU_COUNT > 64)
 #  if defined(HPX_HAVE_MAX_CPU_COUNT)
 #    include <bitset>
-#    include <hpx/runtime/serialization/bitset.hpp>
+#    include <hpx/serialization/bitset.hpp>
 #  else
 #    include <boost/dynamic_bitset.hpp>
-#    include <hpx/runtime/serialization/dynamic_bitset.hpp>
+#    include <hpx/serialization/dynamic_bitset.hpp>
 #  endif
 #endif
 

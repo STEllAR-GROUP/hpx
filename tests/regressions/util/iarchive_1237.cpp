@@ -11,8 +11,8 @@
 #include <hpx/include/util.hpp>
 #include <hpx/testing.hpp>
 
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 
 #include <cstddef>
 #include <iostream>

@@ -17,9 +17,9 @@
 #include <hpx/runtime/actions/transfer_base_action.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
-#include <hpx/runtime/serialization/input_archive.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/input_archive.hpp>
+#include <hpx/serialization/output_archive.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/datastructures/detail/pack.hpp>

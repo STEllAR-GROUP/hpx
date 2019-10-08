@@ -17,7 +17,7 @@
 
 #include <hpx/config/asio.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/ip/tcp.hpp>

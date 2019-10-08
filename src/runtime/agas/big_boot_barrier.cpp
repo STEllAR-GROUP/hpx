@@ -31,8 +31,8 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
-#include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/detail/polymorphic_id_factory.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/functional/bind_front.hpp>

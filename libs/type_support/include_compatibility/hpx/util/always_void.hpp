@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/config/defines.hpp>
+#include <hpx/type_support/always_void.hpp>
 
 #if defined(HPX_TYPE_SUPPORT_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)

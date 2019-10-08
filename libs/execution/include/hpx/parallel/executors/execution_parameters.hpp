@@ -17,7 +17,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
+#include <hpx/serialization/base_object.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/traits/is_launch_policy.hpp>

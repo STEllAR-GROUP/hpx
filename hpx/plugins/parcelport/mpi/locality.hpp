@@ -14,7 +14,7 @@
 
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <boost/io/ios_state.hpp>
 
