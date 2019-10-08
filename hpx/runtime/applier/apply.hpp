@@ -442,15 +442,9 @@ namespace hpx
 
             threads::thread_init_data data;
 #ifdef HPX_HAVE_APEX
-            if (data.description.kind() == data.description.data_type_description) {
-                data.apex_data = hpx::util::apex_new_task(
-                        data.description.get_description(),
-                        data.parent_id);
-            } else {
-                data.apex_data = hpx::util::apex_new_task(
-                        data.description.get_address(),
-                        data.parent_id);
-            }
+            data.apex_data = hpx::util::apex_new_task(
+                data.description,
+                data.parent_id);
 #endif
             apply_helper<action_type>::call(std::move(data),
                 std::forward<Continuation>(cont), target,
