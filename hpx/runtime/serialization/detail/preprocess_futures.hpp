@@ -137,7 +137,7 @@ namespace hpx { namespace serialization { namespace detail {
             shared_state_->set_on_completed(std::move(f));
         }
 
-        // We add this solely for the purpose of making moveonly_any compile.
+        // We add this solely for the purpose of making unique_any compile.
         // Comparing instances of this type does not make any sense,
         // conceptually.
         friend bool operator==(
@@ -162,10 +162,10 @@ namespace hpx { namespace serialization {
     constexpr std::size_t extra_output_handle_futures = 2;
 
     template <>
-    inline util::moveonly_any_nonser
+    inline util::unique_any_nonser
     init_extra_output_data_item<extra_output_handle_futures>()
     {
-        return util::moveonly_any_nonser{detail::preprocess_futures{}};
+        return util::unique_any_nonser{detail::preprocess_futures{}};
     }
 
     template <>

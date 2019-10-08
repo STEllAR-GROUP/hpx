@@ -20,7 +20,7 @@ namespace hpx { namespace serialization {
 
     ////////////////////////////////////////////////////////////////////////////
     template <std::size_t N>
-    util::moveonly_any_nonser init_extra_input_data_item();
+    util::unique_any_nonser init_extra_input_data_item();
 
     namespace detail {
 

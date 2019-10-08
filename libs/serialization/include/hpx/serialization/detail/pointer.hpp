@@ -49,17 +49,17 @@ namespace hpx { namespace serialization {
 
     ////////////////////////////////////////////////////////////////////////////
     template <>
-    inline util::moveonly_any_nonser
+    inline util::unique_any_nonser
     init_extra_input_data_item<extra_input_pointer_tracker>()
     {
-        return util::moveonly_any_nonser{detail::input_pointer_tracker{}};
+        return util::unique_any_nonser{detail::input_pointer_tracker{}};
     }
 
     template <>
-    inline util::moveonly_any_nonser
+    inline util::unique_any_nonser
     init_extra_output_data_item<extra_output_pointer_tracker>()
     {
-        return util::moveonly_any_nonser{detail::output_pointer_tracker{}};
+        return util::unique_any_nonser{detail::output_pointer_tracker{}};
     }
 
     template <>

@@ -18,14 +18,14 @@
 #include "small_big_object.hpp"
 
 using hpx::util::any_cast;
-using hpx::util::moveonly_any_nonser;
-using hpx::util::streamable_moveonly_any_nonser;
+using hpx::util::streamable_unique_any_nonser;
+using hpx::util::unique_any_nonser;
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     {
-        streamable_moveonly_any_nonser any1(big_object(30, 40));
+        streamable_unique_any_nonser any1(big_object(30, 40));
         std::stringstream buffer;
 
         buffer << any1;
@@ -37,7 +37,7 @@ int main()
     {
         // test equality
         {
-            moveonly_any_nonser any1_nonser(7), any2_nonser(7), any3_nonser(10),
+            unique_any_nonser any1_nonser(7), any2_nonser(7), any3_nonser(10),
                 any4_nonser(std::string("seven"));
 
             HPX_TEST(any_cast<int>(any1_nonser) == 7);
@@ -73,12 +73,12 @@ int main()
 
             small_object const f(17);
 
-            moveonly_any_nonser any1_nonser(f);
-            moveonly_any_nonser any2_nonser(std::move(any1_nonser));
+            unique_any_nonser any1_nonser(f);
+            unique_any_nonser any2_nonser(std::move(any1_nonser));
             HPX_TEST(!any1_nonser.has_value());    // NOLINT
 
-            moveonly_any_nonser any3_nonser(f);
-            moveonly_any_nonser any4_nonser = std::move(any3_nonser);
+            unique_any_nonser any3_nonser(f);
+            unique_any_nonser any4_nonser = std::move(any3_nonser);
             HPX_TEST(!any3_nonser.has_value());    // NOLINT
 
             HPX_TEST_EQ(
@@ -95,12 +95,12 @@ int main()
 
             big_object const f(5, 12);
 
-            moveonly_any_nonser any1_nonser(f);
-            moveonly_any_nonser any2_nonser(std::move(any1_nonser));
+            unique_any_nonser any1_nonser(f);
+            unique_any_nonser any2_nonser(std::move(any1_nonser));
             HPX_TEST(!any1_nonser.has_value());    // NOLINT
 
-            moveonly_any_nonser any3_nonser(f);
-            moveonly_any_nonser any4_nonser = std::move(any3_nonser);
+            unique_any_nonser any3_nonser(f);
+            unique_any_nonser any4_nonser = std::move(any3_nonser);
             HPX_TEST(!any3_nonser.has_value());    // NOLINT
 
             HPX_TEST_EQ((any_cast<big_object>(any2_nonser))(5, 6),
@@ -111,17 +111,17 @@ int main()
 
         // move semantics
         {
-            moveonly_any_nonser any1(5);
+            unique_any_nonser any1(5);
             HPX_TEST(any1.has_value());
-            moveonly_any_nonser any2(std::move(any1));
+            unique_any_nonser any2(std::move(any1));
             HPX_TEST(any2.has_value());
             HPX_TEST(!any1.has_value());    // NOLINT
         }
 
         {
-            moveonly_any_nonser any1(5);
+            unique_any_nonser any1(5);
             HPX_TEST(any1.has_value());
-            moveonly_any_nonser any2;
+            unique_any_nonser any2;
             HPX_TEST(!any2.has_value());
 
             any2 = std::move(any1);

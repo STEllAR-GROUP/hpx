@@ -20,7 +20,7 @@ namespace hpx { namespace serialization {
 
     ////////////////////////////////////////////////////////////////////////////
     template <std::size_t N>
-    util::moveonly_any_nonser init_extra_output_data_item();
+    util::unique_any_nonser init_extra_output_data_item();
 
     template <std::size_t N>
     void reset_extra_output_data_item(extra_archive_data_type& data);
