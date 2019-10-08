@@ -51,25 +51,23 @@
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
-    namespace {
-        template <typename ThreadData>
-        struct reset_self_on_exit
+    template <typename ThreadData>
+    struct reset_self_on_exit
+    {
+        reset_self_on_exit(coroutine_self<ThreadData>* val,
+            coroutine_self<ThreadData>* old_val = nullptr)
+          : old_self(old_val)
         {
-            reset_self_on_exit(coroutine_self<ThreadData>* val,
-                coroutine_self<ThreadData>* old_val = nullptr)
-              : old_self(old_val)
-            {
-                coroutine_self<ThreadData>::set_self(val);
-            }
+            coroutine_self<ThreadData>::set_self(val);
+        }
 
-            ~reset_self_on_exit()
-            {
-                coroutine_self<ThreadData>::set_self(old_self);
-            }
+        ~reset_self_on_exit()
+        {
+            coroutine_self<ThreadData>::set_self(old_self);
+        }
 
-            coroutine_self<ThreadData>* old_self;
-        };
-    }    // namespace
+        coroutine_self<ThreadData>* old_self;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // This type augments the context_base type with the type of the stored
