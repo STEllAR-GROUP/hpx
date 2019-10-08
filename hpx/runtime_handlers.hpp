@@ -16,7 +16,9 @@ namespace hpx { namespace detail {
     HPX_NORETURN void assertion_handler(
         hpx::assertion::source_location const& loc, const char* expr,
         std::string const& msg);
+#if defined(HPX_HAVE_APEX)
     bool enable_parent_task_handler();
+#endif
     void test_failure_handler();
 #if defined(HPX_HAVE_VERIFY_LOCKS)
     void registered_locks_error_handler();

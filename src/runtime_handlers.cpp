@@ -46,10 +46,12 @@ namespace hpx { namespace detail {
         std::abort();
     }
 
+#if defined(HPX_HAVE_APEX)
     bool enable_parent_task_handler()
     {
-        return (hpx::get_initial_num_localities() == 1);
+        return hpx::get_initial_num_localities() == 1;
     }
+#endif
 
     void test_failure_handler()
     {
