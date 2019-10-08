@@ -254,22 +254,6 @@ namespace hpx { namespace compute { namespace util
         }
 
         // -------------------------------------------------------------------------
-        // utility function for setting memory on the GPU, async and apply versions
-        template <typename... Args>
-        hpx::future<void> memset_async(Args&&... args) {
-            return async(cudaMemsetAsync, std::forward<Args>(args)...);
-        }
-
-        template <typename... Args>
-        auto memset_apply(Args&&... args)
-#if !defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
-            -> decltype(apply(cudaMemsetAsync, std::forward<Args>(args)...))
-#endif
-        {
-            return apply(cudaMemsetAsync, std::forward<Args>(args)...);
-        }
-
-        // -------------------------------------------------------------------------
         // utility function for memory copies to/from the GPU, async and apply versions
         template <typename... Args>
         hpx::future<void> memcpy_async(Args&&... args) {
@@ -283,6 +267,22 @@ namespace hpx { namespace compute { namespace util
 #endif
         {
             return apply(cudaMemcpyAsync, std::forward<Args>(args)...);
+        }
+
+        // -------------------------------------------------------------------------
+        // utility function for setting memory on the GPU, async and apply versions
+        template <typename... Args>
+        hpx::future<void> memset_async(Args&&... args) {
+            return async(cudaMemsetAsync, std::forward<Args>(args)...);
+        }
+
+        template <typename... Args>
+        auto memset_apply(Args&&... args)
+#if !defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
+            -> decltype(apply(cudaMemsetAsync, std::forward<Args>(args)...))
+#endif
+        {
+            return apply(cudaMemsetAsync, std::forward<Args>(args)...);
         }
 
         // -------------------------------------------------------------------------
