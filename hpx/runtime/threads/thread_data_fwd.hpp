@@ -10,33 +10,33 @@
 #define HPX_THREADS_THREAD_DATA_FWD_AUG_11_2015_0228PM
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/coroutines/coroutine_fwd.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/util_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/util_fwd.hpp>
 #if defined(HPX_HAVE_APEX)
 // forward declare the APEX object
-namespace apex { struct task_wrapper; }
+namespace apex {
+    struct task_wrapper;
+}
 typedef std::shared_ptr<apex::task_wrapper> apex_task_wrapper;
 #endif
 
 #include <cstddef>
 #include <cstdint>
-#include <utility>
 #include <memory>
+#include <utility>
 
-namespace hpx
-{
+namespace hpx {
     /// \cond NOINTERNAL
     class HPX_EXPORT thread;
     /// \endcond
-}
+}    // namespace hpx
 
-namespace hpx { namespace threads
-{
+namespace hpx { namespace threads {
     class thread_data;
 
     /// \cond NOINTERNAL
@@ -50,13 +50,15 @@ namespace hpx { namespace threads
     using coroutine_type = coroutines::coroutine<thread_data>;
 
     using thread_self = coroutines::detail::coroutine_self<thread_data>;
-    using thread_self_impl_type = coroutines::detail::coroutine_impl<thread_data>;
+    using thread_self_impl_type =
+        coroutines::detail::coroutine_impl<thread_data>;
 
     using thread_result_type = std::pair<thread_state_enum, thread_id_type>;
     using thread_arg_type = thread_state_ex_enum;
 
     using thread_function_sig = thread_result_type(thread_arg_type);
-    using thread_function_type = util::unique_function_nonser<thread_function_sig>;
+    using thread_function_type =
+        util::unique_function_nonser<thread_function_sig>;
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////
@@ -169,7 +171,7 @@ namespace hpx { namespace threads
     HPX_API_EXPORT apex_task_wrapper get_self_apex_data(void);
     HPX_API_EXPORT void set_self_apex_data(apex_task_wrapper data);
 #endif
-}}
+}}    // namespace hpx::threads
 
 namespace std {
     template <>
@@ -178,11 +180,10 @@ namespace std {
         std::size_t operator()(::hpx::threads::thread_id_type const& v) const
             noexcept
         {
-            std::hash<const ::hpx::threads::thread_data*> hasher_;
+            std::hash<::hpx::threads::thread_data const*> hasher_;
             return hasher_(v.get());
         }
     };
 }    // namespace std
 
 #endif
-
