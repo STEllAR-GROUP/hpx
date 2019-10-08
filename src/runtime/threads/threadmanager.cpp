@@ -781,7 +781,9 @@ namespace hpx { namespace threads {
         if (get_self_ptr())
         {
             auto tid = get_self_id();
-            pool = tid->get_scheduler_base()->get_parent_pool();
+            pool = get_thread_id_data(tid)
+                       ->get_scheduler_base()
+                       ->get_parent_pool();
         }
         else
         {
@@ -798,7 +800,9 @@ namespace hpx { namespace threads {
         if (get_self_ptr())
         {
             auto tid = get_self_id();
-            pool = tid->get_scheduler_base()->get_parent_pool();
+            pool = get_thread_id_data(tid)
+                       ->get_scheduler_base()
+                       ->get_parent_pool();
         }
         else
         {

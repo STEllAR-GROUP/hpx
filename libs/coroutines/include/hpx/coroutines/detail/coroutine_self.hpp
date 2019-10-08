@@ -44,7 +44,6 @@
 #include <utility>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
-    template <typename ThreadData>
     class coroutine_self
     {
     public:
@@ -65,21 +64,21 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                 set_self(self_);
             }
 
-            coroutine_self<ThreadData>* self_;
+            coroutine_self* self_;
         };
 
     public:
         friend struct detail::coroutine_accessor;
 
-        using impl_type = coroutine_impl<ThreadData>;
-        using impl_ptr = impl_type*;    // Note, no reference counting here.
-        using thread_id_type = typename impl_type::thread_id_type;
+        typedef coroutine_impl impl_type;
+        typedef impl_type* impl_ptr;    // Note, no reference counting here.
+        typedef impl_type::thread_id_type thread_id_type;
 
-        using result_type = typename impl_type::result_type;
-        using arg_type = typename impl_type::arg_type;
+        typedef impl_type::result_type result_type;
+        typedef impl_type::arg_type arg_type;
 
-        using yield_decorator_type =
-            util::function_nonser<arg_type(result_type)>;
+        typedef util::function_nonser<arg_type(result_type)>
+            yield_decorator_type;
 
         arg_type yield(result_type arg = result_type())
         {
@@ -194,11 +193,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
     public:
-        static HPX_EXPORT coroutine_self*& local_self()
-        {
-            HPX_NATIVE_TLS coroutine_self<ThreadData>* local_self_ = nullptr;
-            return local_self_;
-        }
+        static HPX_EXPORT coroutine_self*& local_self();
 
         static void set_self(coroutine_self* self)
         {

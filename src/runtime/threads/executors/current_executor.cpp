@@ -166,7 +166,7 @@ namespace hpx { namespace threads { namespace executors
     // scheduler outlives the wrapper
     current_executor::current_executor() //-V730
       : scheduled_executor(new detail::current_executor(
-            get_self_id()->get_scheduler_base()))
+            get_thread_id_data(get_self_id())->get_scheduler_base()))
     {}
 
     current_executor::current_executor(policies::scheduler_base* scheduler) //-V730

@@ -84,7 +84,7 @@ namespace hpx { namespace threads { namespace detail
         {
             if (data.priority == thread_priority_default &&
                 thread_priority_high_recursive ==
-                    threads::get_self_id()->get_priority())
+                    get_thread_id_data(threads::get_self_id())->get_priority())
             {
                 data.priority = thread_priority_high_recursive;
             }

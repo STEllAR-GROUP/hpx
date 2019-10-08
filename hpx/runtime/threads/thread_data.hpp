@@ -717,6 +717,11 @@ namespace hpx { namespace threads
         apex_task_wrapper apex_data_;
 #endif
     };
+
+    HPX_CONSTEXPR thread_data* get_thread_id_data(thread_id_type const& tid)
+    {
+        return static_cast<thread_data*>(tid.get());
+    }
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -160,7 +160,7 @@ namespace hpx { namespace threads
     std::size_t get_self_stacksize()
     {
         thread_id_type id = get_self_id();
-        return id ? id->get_stack_size() : 0;
+        return id ? get_thread_id_data(id)->get_stack_size() : 0;
     }
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
@@ -183,7 +183,10 @@ namespace hpx { namespace threads
     {
         thread_self* self = get_self_ptr();
         if (HPX_LIKELY(nullptr != self))
-            return self->get_thread_id()->get_parent_thread_id();
+        {
+            return get_thread_id_data(self->get_thread_id())
+                ->get_parent_thread_id();
+        }
         return threads::invalid_thread_id;
     }
 
@@ -191,7 +194,10 @@ namespace hpx { namespace threads
     {
         thread_self* self = get_self_ptr();
         if (HPX_LIKELY(nullptr != self))
-            return self->get_thread_id()->get_parent_thread_phase();
+        {
+            return get_thread_id_data(self->get_thread_id())
+                ->get_parent_thread_phase();
+        }
         return 0;
     }
 
@@ -199,7 +205,10 @@ namespace hpx { namespace threads
     {
         thread_self* self = get_self_ptr();
         if (HPX_LIKELY(nullptr != self))
-            return self->get_thread_id()->get_parent_locality_id();
+        {
+            return get_thread_id_data(self->get_thread_id())
+                ->get_parent_locality_id();
+        }
         return naming::invalid_locality_id;
     }
 #endif
@@ -211,7 +220,10 @@ namespace hpx { namespace threads
 #else
         thread_self* self = get_self_ptr();
         if (HPX_LIKELY(nullptr != self))
-            return self->get_thread_id()->get_component_id();
+        {
+            return get_thread_id_data(self->get_thread_id())
+                ->get_component_id();
+        }
         return 0;
 #endif
     }
@@ -221,14 +233,18 @@ namespace hpx { namespace threads
     {
         thread_self* self = get_self_ptr();
         if (HPX_LIKELY(nullptr != self))
-            return self->get_thread_id()->get_apex_data();
+        {
+            return get_thread_id_data(self->get_thread_id())->get_apex_data();
+        }
         return nullptr;
     }
     void set_self_apex_data(apex_task_wrapper data)
     {
         thread_self* self = get_self_ptr();
         if (HPX_LIKELY(nullptr != self))
-            self->get_thread_id()->set_apex_data(data);
+        {
+            get_thread_id_data(self->get_thread_id())->set_apex_data(data);
+        }
         return;
     }
 #endif

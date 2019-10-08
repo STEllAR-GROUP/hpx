@@ -86,12 +86,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     /////////////////////////////////////////////////////////////////////////////
     std::ptrdiff_t const default_stack_size = -1;
 
-    template <typename CoroutineImpl, typename ThreadData>
+    template <typename CoroutineImpl>
     class context_base : public default_context_impl<CoroutineImpl>
     {
     public:
-        using deleter_type = void (*)(context_base const*);
-        using thread_id_type = hpx::threads::thread_id<ThreadData>;
+        typedef void deleter_type(context_base const*);
+        typedef hpx::threads::thread_id thread_id_type;
 
         context_base(std::ptrdiff_t stack_size, thread_id_type id)
           : default_context_impl<CoroutineImpl>(stack_size)
@@ -378,11 +378,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         std::size_t continuation_recursion_count_;
     };
-
-    // initialize static allocation counter
-    template <typename CoroutineImpl, typename ThreadData>
-    allocation_counters
-        context_base<CoroutineImpl, ThreadData>::m_allocation_counters;
 }}}}    // namespace hpx::threads::coroutines::detail
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_BASE_HPP*/

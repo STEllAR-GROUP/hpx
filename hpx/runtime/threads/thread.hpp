@@ -53,8 +53,9 @@ namespace hpx
         explicit thread(F&& f)
         {
             HPX_ASSERT(threads::get_self_ptr());
-            start_thread(
-                threads::get_self_id()->get_scheduler_base()->get_parent_pool(),
+            start_thread(get_thread_id_data(threads::get_self_id())
+                             ->get_scheduler_base()
+                             ->get_parent_pool(),
                 util::deferred_call(std::forward<F>(f)));
         }
 
@@ -62,8 +63,9 @@ namespace hpx
         explicit thread(F&& f, Ts&&... vs)
         {
             HPX_ASSERT(threads::get_self_ptr());
-            start_thread(
-                threads::get_self_id()->get_scheduler_base()->get_parent_pool(),
+            start_thread(get_thread_id_data(threads::get_self_id())
+                             ->get_scheduler_base()
+                             ->get_parent_pool(),
                 util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(vs)...));
         }

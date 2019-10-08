@@ -17,24 +17,13 @@
 #include <iosfwd>
 
 namespace hpx { namespace threads {
-    struct invalid_thread_id_tag
-    {
-    };
-
-    HPX_CONSTEXPR_OR_CONST invalid_thread_id_tag invalid_thread_id;
-
-    template <typename T>
     struct thread_id
     {
         constexpr thread_id()
           : thrd_(nullptr)
         {
         }
-        constexpr thread_id(invalid_thread_id_tag)
-          : thrd_(nullptr)
-        {
-        }
-        explicit constexpr thread_id(T* thrd)
+        explicit constexpr thread_id(void* thrd)
           : thrd_(thrd)
         {
         }
@@ -42,22 +31,12 @@ namespace hpx { namespace threads {
         thread_id(thread_id const&) = default;
         thread_id& operator=(thread_id const&) = default;
 
-        constexpr T* operator->() const
-        {
-            return thrd_;
-        }
-
-        constexpr T& operator*() const
-        {
-            return *thrd_;
-        }
-
         explicit constexpr operator bool() const
         {
             return nullptr != thrd_;
         }
 
-        constexpr T* get() const
+        constexpr void* get() const
         {
             return thrd_;
         }
@@ -83,30 +62,6 @@ namespace hpx { namespace threads {
         }
 
         friend constexpr bool operator!=(thread_id const& lhs, std::nullptr_t)
-        {
-            return nullptr != lhs.thrd_;
-        }
-
-        friend constexpr bool operator==(
-            invalid_thread_id_tag, thread_id const& rhs)
-        {
-            return nullptr == rhs.thrd_;
-        }
-
-        friend constexpr bool operator!=(
-            invalid_thread_id_tag, thread_id const& rhs)
-        {
-            return nullptr != rhs.thrd_;
-        }
-
-        friend constexpr bool operator==(
-            thread_id const& lhs, invalid_thread_id_tag)
-        {
-            return nullptr == lhs.thrd_;
-        }
-
-        friend constexpr bool operator!=(
-            thread_id const& lhs, invalid_thread_id_tag)
         {
             return nullptr != lhs.thrd_;
         }
@@ -156,8 +111,11 @@ namespace hpx { namespace threads {
         }
 
     private:
-        T* thrd_;
+        void* thrd_;
     };
+
+    HPX_CONSTEXPR_OR_CONST thread_id invalid_thread_id;
+
 }}    // namespace hpx::threads
 
 #endif
