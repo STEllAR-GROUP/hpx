@@ -7,6 +7,7 @@
 #pragma once    // prevent multiple inclusions of this header file.
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/thread_description.hpp>
