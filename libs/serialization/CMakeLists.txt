@@ -42,6 +42,7 @@ set(serialization_headers
   hpx/serialization/serialize_buffer.hpp
   hpx/serialization/string.hpp
   hpx/serialization/tuple.hpp
+  hpx/serialization/unordered_map.hpp
   hpx/serialization/vector.hpp
   hpx/serialization/variant.hpp
   hpx/serialization/valarray.hpp
