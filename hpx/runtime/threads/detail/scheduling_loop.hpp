@@ -850,7 +850,8 @@ namespace hpx { namespace threads { namespace detail
                                             static_cast<std::int16_t>(
                                                 num_thread)),
                                         true,
-                                        get_thread_id_data(background_thread)->get_priority());
+                                        get_thread_id_data(background_thread)
+                                            ->get_priority());
                                     scheduler.SchedulingPolicy::do_some_work(
                                         num_thread);
 

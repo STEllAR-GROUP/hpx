@@ -142,7 +142,8 @@ namespace hpx { namespace threads { namespace detail
                             << "set_thread_state: thread is currently active, "
                                "scheduling new thread, thread("
                             << thrd << "), description("
-                            << get_thread_id_data(thrd)->get_description() << "), new state("
+                            << get_thread_id_data(thrd)->get_description()
+                            << "), new state("
                             << get_thread_state_name(new_state) << ")";
 
                         thread_init_data data(
@@ -233,14 +234,20 @@ namespace hpx { namespace threads { namespace detail
             // at some point will ignore this thread by simply skipping it
             // (if it's not pending anymore).
 
-            LTM_(info) << "set_thread_state: thread(" << thrd << "), "
-                          "description(" << get_thread_id_data(thrd)->get_description() << "), "
-                          "new state(" << get_thread_state_name(new_state) << "), "
-                          "old state(" << get_thread_state_name(previous_state_val)
-                       << ")";
+            LTM_(info) << "set_thread_state: thread(" << thrd
+                       << "), "
+                          "description("
+                       << get_thread_id_data(thrd)->get_description()
+                       << "), "
+                          "new state("
+                       << get_thread_state_name(new_state)
+                       << "), "
+                          "old state("
+                       << get_thread_state_name(previous_state_val) << ")";
 
             // So all what we do here is to set the new state.
-            if (get_thread_id_data(thrd)->restore_state(new_state, new_state_ex, previous_state))
+            if (get_thread_id_data(thrd)->restore_state(
+                    new_state, new_state_ex, previous_state))
                 break;
 
             // state has changed since we fetched it from the thread, retry

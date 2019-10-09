@@ -283,7 +283,8 @@ namespace hpx { namespace threads
     util::thread_description get_thread_description(thread_id_type const& id,
         error_code& ec)
     {
-        return id ? get_thread_id_data(id)->get_description() : util::thread_description("<unknown>");
+        return id ? get_thread_id_data(id)->get_description() :
+                    util::thread_description("<unknown>");
     }
 
     util::thread_description set_thread_description(thread_id_type const& id,
