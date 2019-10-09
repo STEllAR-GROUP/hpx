@@ -29,8 +29,6 @@ if(HPX_WITH_APEX)
   set(subdirs ${subdirs} apex)
 endif()
 
-set(subdirs ${subdirs} computeapi)
-
 foreach(subdir ${subdirs})
   if(NOT TARGET tests.unit.${subdir})
     add_hpx_pseudo_target(tests.unit.${subdir})

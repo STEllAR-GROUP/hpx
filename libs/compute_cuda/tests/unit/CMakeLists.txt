@@ -39,7 +39,5 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Unit/Compute/CUDA")
 
-  add_hpx_unit_test("computeapi.cuda_" ${test} ${${test}_PARAMETERS})
-
+  add_hpx_unit_test("modules.compute_cuda" ${test} ${${test}_PARAMETERS})
 endforeach()
-

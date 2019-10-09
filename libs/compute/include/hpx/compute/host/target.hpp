@@ -25,10 +25,10 @@
 
 namespace hpx { namespace compute { namespace host
 {
-    struct target
+    struct HPX_EXPORT target
     {
     public:
-        struct HPX_EXPORT native_handle_type
+        struct native_handle_type
         {
             native_handle_type()
               : mask_(hpx::threads::get_topology().get_machine_affinity_mask())

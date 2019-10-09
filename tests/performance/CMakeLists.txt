@@ -6,7 +6,6 @@
 
 set(subdirs
     local
-    compute
    )
 
 if(HPX_WITH_NETWORKING)
