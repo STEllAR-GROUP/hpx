@@ -251,10 +251,10 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
 
     // adding async copy operations into the stream before cublas calls puts
     // the copies in the queue before the matrix operations.
-    cublas.copy_apply(
+    cublas.memcpy_apply(
         d_A, h_A.data(), size_A*sizeof(T), cudaMemcpyHostToDevice);
 
-    auto copy_future = cublas.copy_async(
+    auto copy_future = cublas.memcpy_async(
         d_B, h_B.data(), size_B*sizeof(T), cudaMemcpyHostToDevice);
 
     // we can call get_future multiple times on the cublas helper.
@@ -312,7 +312,7 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
 
 #ifndef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
     // when the matrix operations complete, copy the result to the host
-    auto copy_finished = cublas.copy_async(
+    auto copy_finished = cublas.memcpy_async(
         h_CUBLAS.data(), d_C, size_C*sizeof(T), cudaMemcpyDeviceToHost);
 
 #endif
