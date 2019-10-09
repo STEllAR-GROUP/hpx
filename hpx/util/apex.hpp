@@ -34,6 +34,7 @@ namespace hpx { namespace util {
 
     HPX_EXPORT apex_task_wrapper apex_new_task(
         thread_description const& description,
+        std::uint32_t parent_locality_id,
         threads::thread_id_type const& parent_task);
 
     inline apex_task_wrapper apex_update_task(
@@ -43,7 +44,7 @@ namespace hpx { namespace util {
         {
             threads::thread_id_type parent_task(nullptr);
             // doesn't matter which locality we use, the parent is null
-            return apex_new_task(description, parent_task);
+            return apex_new_task(description, 0, parent_task);
         }
         else if (description.kind() ==
             thread_description::data_type_description)
@@ -117,6 +118,7 @@ namespace hpx { namespace util {
 #else
     inline apex_task_wrapper apex_new_task(
         thread_description const& description,
+        std::uint32_t parent_locality_id,
         threads::thread_id_type const& parent_task)
     {
         return nullptr;

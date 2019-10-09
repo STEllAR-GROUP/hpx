@@ -157,10 +157,19 @@ namespace hpx { namespace threads
         return threads::invalid_thread_id;
     }
 
+    thread_data* get_self_id_data()
+    {
+        thread_self* self = get_self_ptr();
+        if (HPX_LIKELY(nullptr != self))
+            return get_thread_id_data(self->get_thread_id());
+
+        return nullptr;
+    }
+
     std::size_t get_self_stacksize()
     {
-        thread_id_type id = get_self_id();
-        return id ? get_thread_id_data(id)->get_stack_size() : 0;
+        thread_data* thrd_data = get_self_id_data();
+        return thrd_data ? thrd_data->get_stack_size() : 0;
     }
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
@@ -181,33 +190,30 @@ namespace hpx { namespace threads
 #else
     thread_id_type get_parent_id()
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
         {
-            return get_thread_id_data(self->get_thread_id())
-                ->get_parent_thread_id();
+            return thrd_data->get_parent_thread_id();
         }
         return threads::invalid_thread_id;
     }
 
     std::size_t get_parent_phase()
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
         {
-            return get_thread_id_data(self->get_thread_id())
-                ->get_parent_thread_phase();
+            return thrd_data->get_parent_thread_phase();
         }
         return 0;
     }
 
     std::uint32_t get_parent_locality_id()
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
         {
-            return get_thread_id_data(self->get_thread_id())
-                ->get_parent_locality_id();
+            return thrd_data->get_parent_locality_id();
         }
         return naming::invalid_locality_id;
     }
@@ -218,11 +224,10 @@ namespace hpx { namespace threads
 #ifndef HPX_HAVE_THREAD_TARGET_ADDRESS
         return 0;
 #else
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
         {
-            return get_thread_id_data(self->get_thread_id())
-                ->get_component_id();
+            return thrd_data->get_component_id();
         }
         return 0;
 #endif
@@ -231,19 +236,19 @@ namespace hpx { namespace threads
 #if defined(HPX_HAVE_APEX)
     apex_task_wrapper get_self_apex_data()
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
         {
-            return get_thread_id_data(self->get_thread_id())->get_apex_data();
+            return thrd_data->get_apex_data();
         }
         return nullptr;
     }
     void set_self_apex_data(apex_task_wrapper data)
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
         {
-            get_thread_id_data(self->get_thread_id())->set_apex_data(data);
+            thrd_data->set_apex_data(data);
         }
         return;
     }

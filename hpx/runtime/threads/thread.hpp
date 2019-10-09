@@ -52,20 +52,18 @@ namespace hpx
                 thread>::value>::type>
         explicit thread(F&& f)
         {
-            HPX_ASSERT(threads::get_self_ptr());
-            start_thread(get_thread_id_data(threads::get_self_id())
-                             ->get_scheduler_base()
-                             ->get_parent_pool(),
+            auto thrd_data = threads::get_self_id_data();
+            HPX_ASSERT(thrd_data);
+            start_thread(thrd_data->get_scheduler_base()->get_parent_pool(),
                 util::deferred_call(std::forward<F>(f)));
         }
 
         template <typename F, typename... Ts>
         explicit thread(F&& f, Ts&&... vs)
         {
-            HPX_ASSERT(threads::get_self_ptr());
-            start_thread(get_thread_id_data(threads::get_self_id())
-                             ->get_scheduler_base()
-                             ->get_parent_pool(),
+            auto thrd_data = threads::get_self_id_data();
+            HPX_ASSERT(thrd_data);
+            start_thread(thrd_data->get_scheduler_base()->get_parent_pool(),
                 util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(vs)...));
         }

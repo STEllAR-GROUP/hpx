@@ -778,12 +778,10 @@ namespace hpx { namespace threads {
         error_code& ec)
     {
         thread_pool_base* pool = nullptr;
-        if (get_self_ptr())
+        auto thrd_data = get_self_id_data();
+        if (thrd_data)
         {
-            auto tid = get_self_id();
-            pool = get_thread_id_data(tid)
-                       ->get_scheduler_base()
-                       ->get_parent_pool();
+            pool = thrd_data->get_scheduler_base()->get_parent_pool();
         }
         else
         {
@@ -797,12 +795,10 @@ namespace hpx { namespace threads {
         thread_init_data& data, thread_state_enum initial_state, error_code& ec)
     {
         thread_pool_base* pool = nullptr;
-        if (get_self_ptr())
+        auto thrd_data = get_self_id_data();
+        if (thrd_data)
         {
-            auto tid = get_self_id();
-            pool = get_thread_id_data(tid)
-                       ->get_scheduler_base()
-                       ->get_parent_pool();
+            pool = thrd_data->get_scheduler_base()->get_parent_pool();
         }
         else
         {

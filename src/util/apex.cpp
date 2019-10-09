@@ -25,6 +25,7 @@ namespace hpx { namespace util {
     }
 
     apex_task_wrapper apex_new_task(thread_description const& description,
+        std::uint32_t parent_locality_id,
         threads::thread_id_type const& parent_task)
     {
         apex_task_wrapper parent_wrapper = nullptr;

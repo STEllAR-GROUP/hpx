@@ -444,6 +444,7 @@ namespace hpx
 #ifdef HPX_HAVE_APEX
             data.apex_data = hpx::util::apex_new_task(
                 data.description,
+                data.parent_locality_id,
                 data.parent_id);
 #endif
             apply_helper<action_type>::call(std::move(data),

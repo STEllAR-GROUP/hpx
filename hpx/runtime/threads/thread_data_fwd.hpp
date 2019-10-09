@@ -82,6 +82,11 @@ namespace hpx { namespace threads {
     /// thread (or zero if the current thread is not a HPX thread).
     HPX_API_EXPORT thread_id_type get_self_id();
 
+    /// The function \a get_self_id_data returns the data of the HPX thread id
+    /// associated with the current thread (or nullptr if the current thread is
+    /// not a HPX thread).
+    HPX_API_EXPORT thread_data* get_self_id_data();
+
     /// The function \a get_parent_id returns the HPX thread id of the
     /// current thread's parent (or zero if the current thread is not a
     /// HPX thread).

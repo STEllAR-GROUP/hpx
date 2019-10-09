@@ -56,8 +56,6 @@ set(coroutines_sources
   detail/coroutine_self.cpp
   detail/tss.cpp
   swapcontext.cpp
-  swapcontext32.ipp
-  swapcontext64.ipp
   )
 
 include(HPX_AddModule)

@@ -19,11 +19,15 @@
 namespace hpx { namespace threads {
     struct thread_id
     {
+    private:
+        using thread_id_repr = void*;
+
+    public:
         constexpr thread_id()
           : thrd_(nullptr)
         {
         }
-        explicit constexpr thread_id(void* thrd)
+        explicit constexpr thread_id(thread_id_repr thrd)
           : thrd_(thrd)
         {
         }
@@ -36,7 +40,7 @@ namespace hpx { namespace threads {
             return nullptr != thrd_;
         }
 
-        constexpr void* get() const
+        constexpr thread_id_repr get() const
         {
             return thrd_;
         }
@@ -111,7 +115,7 @@ namespace hpx { namespace threads {
         }
 
     private:
-        void* thrd_;
+        thread_id_repr thrd_;
     };
 
     HPX_CONSTEXPR_OR_CONST thread_id invalid_thread_id;

@@ -78,9 +78,12 @@ namespace hpx { namespace threads
 
     std::size_t get_numa_node_number()
     {
-        auto tid = get_self_id();
-        auto pool =
-            get_thread_id_data(tid)->get_scheduler_base()->get_parent_pool();
+        auto thrd_data = get_self_id_data();
+        if (!thrd_data)
+        {
+            return 0;
+        }
+        auto pool = thrd_data->get_scheduler_base()->get_parent_pool();
         auto num_thread =
             hpx::get_worker_thread_num() + pool->get_thread_offset();
         auto pu_num = hpx::resource::get_partitioner().get_pu_num(num_thread);

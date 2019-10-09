@@ -111,7 +111,7 @@ namespace detail {
         }
         else {
             hpx::threads::thread_data *dummy =
-                get_thread_id_data(hpx::this_thread::get_id().native_handle());
+                hpx::threads::get_self_id_data();
             os << hexpointer(dummy);
         }
         os << nhex(12) << std::this_thread::get_id() << " cpu "
