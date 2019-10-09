@@ -1025,7 +1025,7 @@ How to build |hpx| under Windows 10 x64 with Visual Studio 2015
 
     .. note::
 
-       |hpx| is a very large software collection, so it is not recommend to use the
+       |hpx| is a very large software collection, so it is not recommended to use the
        default ``C:\Program Files\hpx``. Many users may prefer to use simpler paths *without*
        whitespace, like ``C:\bin\hpx`` or ``D:\bin\hpx`` etc.
 
