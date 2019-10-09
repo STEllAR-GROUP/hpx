@@ -27,7 +27,7 @@ CMake is a cross-platform build-generator tool. CMake does not build the
 project, it generates the files needed by your build tool (gnu make, visual
 studio, etc.) for building |hpx|.
 
-In general, the |HPX| CMake scripts try to adhere to the general CMake policies
+In general, the |hpx| CMake scripts try to adhere to the general CMake policies
 on how to write CMake-based projects.
 
 Basic CMake usage
@@ -299,7 +299,7 @@ listed below.
 .. note::
 
    In order to use a high speed parcelport, we currently recommend configuring
-   |HPX| to use MPI so that MPI can be used for communication between different
+   |hpx| to use MPI so that MPI can be used for communication between different
    localities. Please set the CMake variable ``MPI_CXX_COMPILER`` to your MPI
    C++ compiler wrapper if not detected automatically.
 
@@ -547,7 +547,7 @@ For a complete list of available |cmake| variables that influence the build of
 |hpx|, see :ref:`cmake_variables`.
 
 The variables can be used to refine the recipes that can be found at
-:ref:`build_recipes` which show some basic steps on how to build |HPX| for a
+:ref:`build_recipes` which show some basic steps on how to build |hpx| for a
 specific platform.
 
 In order to use |hpx|, only the core libraries are required (the ones marked as
@@ -607,7 +607,7 @@ Platform specific notes
 -----------------------
 
 Some platforms require users to have special link and/or compiler flags specified to
-build |HPX|. This is handled via CMake's support for different toolchains (see
+build |hpx|. This is handled via CMake's support for different toolchains (see
 `cmake-toolchains(7)
 <https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html>`_ for more
 information). This is also used for cross compilation.
@@ -784,7 +784,7 @@ We verified this using Boost V1.53. If you use a different version, just
 remember to replace ``/usr/local/include/boost-1_53`` with whatever prefix
 you used in your installation.
 
-Build HPX, finally
+Build |hpx|, finally
 ..................
 
 .. code-block:: bash
@@ -818,7 +818,7 @@ To build with Clang 3.3 (trunk), execute:
 For more detailed information about using |cmake|, please refer its documentation
 and to the section :ref:`building_hpx`.
 
-Alternative installation method of HPX on OS X (Mac)
+Alternative installation method of |hpx| on OS X (Mac)
 ....................................................
 
 Alternatively, you can install a recent version of gcc as well as all
@@ -848,7 +848,7 @@ required libraries via MacPorts:
       sudo port select gcc mp-gcc48
 
 #. Build Boost manually (the Boost package of MacPorts is built with Clang, and
-   unfortunately doesn't work with a GCC-build version of HPX):
+   unfortunately doesn't work with a GCC-build version of |hpx|):
 
    .. code-block:: bash
 
@@ -862,7 +862,7 @@ required libraries via MacPorts:
       export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$BOOST_ROOT/lib
       popd
 
-#. Build HPX:
+#. Build |hpx|:
 
    .. code-block:: bash
 
@@ -886,7 +886,7 @@ required libraries via MacPorts:
 
 #. Note that you need to set ``BOOST_ROOT``, ``HPX_ROOT`` and
    ``DYLD_LIBRARY_PATH`` (for both ``BOOST_ROOT`` and ``HPX_ROOT``) every time
-   you configure, build, or run an |HPX| application.
+   you configure, build, or run an |hpx| application.
 
 #. If you want to use |hpx| with MPI, you need to enable the MPI parcelport, and
    also specify the location of the MPI wrapper scripts. This can be done using
@@ -945,7 +945,7 @@ Installation of the |hpx| library
   There are two required variables you need to define: ``BOOST_ROOT`` and
   ``HWLOC_ROOT`` These (``PATH``) variables need to be set to point to the root
   folder of your Boost and hwloc installations. It is recommended to set
-  the variable ``CMAKE_INSTALL_PREFIX`` as well. This determines where the |HPX|
+  the variable ``CMAKE_INSTALL_PREFIX`` as well. This determines where the |hpx|
   libraries will be built and installed. If this (``PATH``) variable is set, it
   has to refer to the directory where the built |hpx| files should be installed
   to.
@@ -953,8 +953,8 @@ Installation of the |hpx| library
   to use. Select the Visual Studio 10 (64Bit) compiler (it usually is the
   default if available). The Visual Studio 2012 (64Bit) and Visual Studio 2013
   (64Bit) compilers are supported as well. Note that while it is possible to
-  build |HPX| for x86, we don't recommend doing so as 32 bit runs are severely
-  restricted by a 32 bit Windows system limitation affecting the number of |HPX|
+  build |hpx| for x86, we don't recommend doing so as 32 bit runs are severely
+  restricted by a 32 bit Windows system limitation affecting the number of |hpx|
   threads you can create.
 * Press "Configure" again. Repeat this step until the "Generate" button becomes
   clickable (and until no variable definitions are marked in red anymore).
@@ -967,7 +967,7 @@ documentation and also the section :ref:`building_hpx`.
 
 .. _howto_win32:
 
-How to build HPX under Windows 10 x64 with Visual Studio 2015
+How to build |hpx| under Windows 10 x64 with Visual Studio 2015
 .............................................................
 
 * Download the CMake V3.4.3 installer (or latest version) from `here
@@ -996,7 +996,7 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
 * Open CMake-GUI.exe and set up your source directory (input field 'Where is the
   source code') to the *base directory* of the source code you downloaded from
-  |HPX|'s GitHub pages. Here's an example of CMake path settings, which point to
+  |hpx|'s GitHub pages. Here's an example of CMake path settings, which point to
   the ``Documents/GitHub/hpx`` folder:
 
   .. _win32_cmake_settings1:
@@ -1005,27 +1005,27 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
      Example CMake path settings.
 
-  Inside 'Where is the source-code' enter the base directory of your |HPX|
+  Inside 'Where is the source-code' enter the base directory of your |hpx|
   source directory (do not enter the "src" sub-directory!). Inside 'Where to
   build the binaries' you should put in the path where all the building processes
   will happen. This is important because the building machinery will do an
   "out-of-tree" build. CMake will not touch or change the original source files
   in any way. Instead, it will generate Visual Studio Solution Files, which
-  will build |HPX| packages out of the |HPX| source tree.
+  will build |hpx| packages out of the |hpx| source tree.
 
 * Set three new environment variables (in CMake, not in Windows environment):
   ``BOOST_ROOT``, ``HWLOC_ROOT``, ``CMAKE_INSTALL_PREFIX``. The meaning of
   these variables is as follows:
 
-  * ``BOOST_ROOT`` the |HPX| root directory of the unpacked Boost headers/cpp files.
-  * ``HWLOC_ROOT`` the |HPX| root directory of the unpacked Portable Hardware Locality
+  * ``BOOST_ROOT`` the |hpx| root directory of the unpacked Boost headers/cpp files.
+  * ``HWLOC_ROOT`` the |hpx| root directory of the unpacked Portable Hardware Locality
     files.
-  * ``CMAKE_INSTALL_PREFIX`` the |HPX| root directory where the future builds of |HPX|
+  * ``CMAKE_INSTALL_PREFIX`` the |hpx| root directory where the future builds of |hpx|
     should be installed.
 
     .. note::
 
-       |HPX| is a very large software collection, so it is not recommend to use the
+       |hpx| is a very large software collection, so it is not recommend to use the
        default ``C:\Program Files\hpx``. Many users may prefer to use simpler paths *without*
        whitespace, like ``C:\bin\hpx`` or ``D:\bin\hpx`` etc.
 
@@ -1252,7 +1252,7 @@ How to install |hpx| on Fedora distributions
 .. note::
 
    This section of the manual is based off of our collaborator Patrick Diehl's
-   blog post `Installing HPX on Fedora 22
+   blog post `Installing |hpx| on Fedora 22
    <http://diehlpk.github.io/2015/08/04/hpx-fedora.html>`_.
 
 * Install all packages for minimal installation:
@@ -1264,7 +1264,7 @@ How to install |hpx| on Fedora distributions
        docbook-style-xsl libsodium-devel doxygen boost-doc hdf5-devel \
        fop boost-devel boost-openmpi-devel boost-mpich-devel
 
-* Get the development branch of |HPX|:
+* Get the development branch of |hpx|:
 
   .. code-block:: bash
 
@@ -1283,13 +1283,13 @@ How to install |hpx| on Fedora distributions
 
   .. note::
 
-     To build |HPX| without examples use:
+     To build |hpx| without examples use:
 
      .. code-block:: bash
 
         cmake -DCMAKE_INSTALL_PREFIX=/opt/hpx -DHPX_WITH_EXAMPLES=Off ..
 
-* Add the library path of |HPX| to ldconfig:
+* Add the library path of |hpx| to ldconfig:
 
   .. code-block:: bash
 
