@@ -62,7 +62,7 @@ namespace hpx { namespace util {
      * spent executing hpx threads */
     struct apex_wrapper
     {
-        apex_wrapper(apex_task_wrapper data_ptr)
+        explicit apex_wrapper(apex_task_wrapper data_ptr)
           : stopped(false)
           , data_(nullptr)
         {
