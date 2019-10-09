@@ -34,6 +34,9 @@ set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
 
 # Find the headers and get the version
 find_package(Boost ${Boost_MINIMUM_VERSION} REQUIRED)
+if(NOT Boost_VERSION_STRING)
+  set(Boost_VERSION_STRING "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
+endif()
 
 set(__boost_libraries)
 if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
