@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2013 Shuangyang Yang
-    Copyright (c) 2007-2013 Hartmut Kaiser
+    Copyright (c) 2007-2019 Hartmut Kaiser
     Copyright (c) Christopher Diggins 2005
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
@@ -312,7 +312,7 @@ namespace hpx { namespace util {
         };
 
         ////////////////////////////////////////////////////////////////////////
-        // static functions for small value-types (moveonly any)
+        // static functions for small value-types (unique_any)
         template <>
         struct fxns<std::true_type, std::false_type>
         {
@@ -360,7 +360,7 @@ namespace hpx { namespace util {
             };
         };
 
-        // static functions for big value-types (bigger than a void*, moveonly)
+        // static functions for big value-types (bigger than a void*, unique)
         template <>
         struct fxns<std::false_type, std::false_type>
         {
@@ -1037,7 +1037,7 @@ namespace hpx { namespace util {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    // specialization for moveonly any without streaming and without
+    // specialization for unique_any without streaming and without
     // serialization
     template <>
     class basic_any<void, void, void, std::false_type>
@@ -1225,7 +1225,7 @@ namespace hpx { namespace util {
         void* object;
     };
 
-    // specialization for moveonly any supporting streaming
+    // specialization for unique_any supporting streaming
     template <typename Char>    // default is char
     class basic_any<void, void, Char, std::false_type>
     {
@@ -1558,9 +1558,9 @@ namespace hpx { namespace util {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    // make moveonly any
+    // make unique_any
     template <typename T, typename... Ts>
-    basic_any<void, void, void, std::false_type> make_moveonly_any_nonser(
+    basic_any<void, void, void, std::false_type> make_unique_any_nonser(
         Ts&&... ts)
     {
         return basic_any<void, void, void, std::false_type>(
@@ -1568,7 +1568,7 @@ namespace hpx { namespace util {
     }
 
     template <typename T, typename U, typename... Ts>
-    basic_any<void, void, void, std::false_type> make_moveonly_any_nonser(
+    basic_any<void, void, void, std::false_type> make_unique_any_nonser(
         std::initializer_list<U> il, Ts&&... ts)
     {
         return basic_any<void, void, void, std::false_type>(
@@ -1577,7 +1577,7 @@ namespace hpx { namespace util {
 
     template <typename T, typename Char, typename... Ts>
     basic_any<void, void, Char, std::false_type>
-    make_streamable_moveonly_any_nonser(Ts&&... ts)
+    make_streamable_unique_any_nonser(Ts&&... ts)
     {
         return basic_any<void, void, Char, std::false_type>(
             std::in_place_type<T>, std::forward<Ts>(ts)...);
@@ -1585,7 +1585,7 @@ namespace hpx { namespace util {
 
     template <typename T, typename Char, typename U, typename... Ts>
     basic_any<void, void, Char, std::false_type>
-    make_streamable_moveonly_any_nonser(std::initializer_list<U> il, Ts&&... ts)
+    make_streamable_unique_any_nonser(std::initializer_list<U> il, Ts&&... ts)
     {
         return basic_any<void, void, Char, std::false_type>(
             std::in_place_type<T>, il, std::forward<Ts>(ts)...);
@@ -1606,16 +1606,16 @@ namespace hpx { namespace util {
         return basic_any<void, void, Char, std::true_type>(std::forward<T>(t));
     }
 
-    // make moveonly any
+    // make unique_any
     template <typename T>
-    basic_any<void, void, void, std::false_type> make_moveonly_any_nonser(T&& t)
+    basic_any<void, void, void, std::false_type> make_unique_any_nonser(T&& t)
     {
         return basic_any<void, void, void, std::false_type>(std::forward<T>(t));
     }
 
     template <typename T, typename Char>
     basic_any<void, void, Char, std::false_type>
-    make_streamable_moveonly_any_nonser(T&& t)
+    make_streamable_unique_any_nonser(T&& t)
     {
         return basic_any<void, void, Char, std::false_type>(std::forward<T>(t));
     }
@@ -1629,12 +1629,12 @@ namespace hpx { namespace util {
         basic_any<void, void, wchar_t, std::true_type>;
 
     ////////////////////////////////////////////////////////////////////////////
-    // better names for moveonly any
-    using moveonly_any_nonser = basic_any<void, void, void, std::false_type>;
+    // better names for unique_any
+    using unique_any_nonser = basic_any<void, void, void, std::false_type>;
 
-    using streamable_moveonly_any_nonser =
+    using streamable_unique_any_nonser =
         basic_any<void, void, char, std::false_type>;
-    using streamable_moveonly_wany_nonser =
+    using streamable_unique_wany_nonser =
         basic_any<void, void, wchar_t, std::false_type>;
 
 }}    // namespace hpx::util

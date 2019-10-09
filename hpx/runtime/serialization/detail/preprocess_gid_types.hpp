@@ -88,7 +88,7 @@ namespace hpx { namespace serialization {
                 split_gids_ = std::move(gids);
             }
 
-            // We add this solely for the purpose of making moveonly_any compile.
+            // We add this solely for the purpose of making unique_any compile.
             // Comparing instances of this type does not make any sense,
             // conceptually.
             friend bool operator==(
@@ -110,10 +110,10 @@ namespace hpx { namespace serialization {
     constexpr std::size_t encode_parcel_extra_output_data_size = 2;
 
     template <>
-    inline util::moveonly_any_nonser
+    inline util::unique_any_nonser
     init_extra_output_data_item<extra_output_split_credits>()
     {
-        return util::moveonly_any_nonser{detail::preprocess_gid_types{}};
+        return util::unique_any_nonser{detail::preprocess_gid_types{}};
     }
 
     template <>

@@ -8,7 +8,7 @@ set(tests
   any
   boost_any
   is_tuple_like
-  moveonly_any
+  unique_any
   tuple
 )
 

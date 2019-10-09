@@ -13,7 +13,7 @@
 
 namespace hpx { namespace serialization {
 
-    using extra_archive_data_type = std::vector<util::moveonly_any_nonser>;
+    using extra_archive_data_type = std::vector<util::unique_any_nonser>;
 }}    // namespace hpx::serialization
 
 #endif
