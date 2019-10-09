@@ -215,7 +215,7 @@ the processor cores, asynchronous input/output operations, and many more). What
 we propose is to go beyond anything we know today and to make latency hiding an
 intrinsic concept of the operation of the whole system stack.
 
-Embrace fine-grained parallelism instead of heavyweight Threads
+Embrace fine-grained parallelism instead of heavyweight threads
 ---------------------------------------------------------------
 
 If we plan to hide latencies even for very short operations, such as fetching
@@ -236,51 +236,51 @@ task), seamlessly switching to any other task which can continue, and to
 reschedule the initial task after the required result has been calculated, which
 makes the implementation of latency hiding almost trivial.
 
-Rediscover constraint-based synchronization to replace global Barriers
+Rediscover constraint-based synchronization to replace global barriers
 ----------------------------------------------------------------------
 
 The code we write today is riddled with implicit (and explicit) global barriers.
-By global barrier we mean the synchronization of the control flow between
+By "global barriers," we mean the synchronization of the control flow between
 several (very often all) threads (when using |openmp|_) or processes (|mpi|_).
 For instance, an implicit global barrier is inserted after each loop
 parallelized using |openmp|_ as the system synchronizes the threads used to
 execute the different iterations in parallel. In |mpi|_ each of the
 communication steps imposes an explicit barrier onto the execution flow as
-(often all) nodes have to be synchronized. Each of those barriers acts as an eye
-of the needle the overall execution is forced to be squeezed through. Even
+(often all) nodes have to be synchronized. Each of those barriers is like the eye
+of a needle the overall execution is forced to be squeezed through. Even
 minimal fluctuations in the execution times of the parallel threads (jobs)
-causes them to wait. Additionally it is often only one of the threads executing
+causes them to wait. Additionally, it is often only one of the threads executing
 doing the actual reduce operation, which further impedes parallelism. A closer
 analysis of a couple of key algorithms used in science applications reveals that
 these global barriers are not always necessary. In many cases it is sufficient
 to synchronize a small subset of the threads. Any operation should proceed
 whenever the preconditions for its execution are met, and only those. Usually
 there is no need to wait for iterations of a loop to finish before you could
-continue calculating other things, all you need is to have those iterations done
+continue calculating other things; all you need is to have those iterations done
 which were producing the required results for a particular next operation. Good
 bye global barriers, hello constraint based synchronization! People have been
-trying to build this type of computing (and even computers) already back in the
-1970's. The theory behind what they did is based on ideas around static and
+trying to build this type of computing (and even computers) since the 1970s.
+The theory behind what they did is based on ideas around static and
 dynamic dataflow. There are certain attempts today to get back to those ideas
 and to incorporate them with modern architectures. For instance, a lot of work
-is being done in the area of constructing dataflow oriented execution trees. Our
+is being done in the area of constructing dataflow-oriented execution trees. Our
 results show that employing dataflow techniques in combination with the other
 ideas, as outlined herein, considerably improves scalability for many problems.
 
-Adaptive Locality Control instead of Static Data Distribution
+Adaptive locality control instead of static data distribution
 -------------------------------------------------------------
 
 While this principle seems to be a given for single desktop or laptop computers
 (the operating system is your friend), it is everything but ubiquitous on modern
 supercomputers, which are usually built from a large number of separate nodes
-(i.e. Beowulf clusters), tightly interconnected by a high bandwidth, low latency
-network. Today's prevalent programming model for those is |mpi|_ which does not
+(i.e., Beowulf clusters), tightly interconnected by a high-bandwidth, low-latency
+network. Today's prevalent programming model for those is MPI, which does not
 directly help with proper data distribution, leaving it to the programmer to
 decompose the data to all of the nodes the application is running on. There are
 a couple of specialized languages and programming environments based on |pgas|_
 (Partitioned Global Address Space) designed to overcome this limitation, such as
-|chapel|_, |x10|_, |upc|_, or |fortress|_. However all systems based on |pgas|_
-rely on static data distribution. This works fine as long as such a static data
+|chapel|_, |x10|_, |upc|_, or |fortress|_. However, all systems based on PGAS
+rely on static data distribution. This works fine as long as this static data
 distribution does not result in heterogeneous workload distributions or other
 resource utilization imbalances. In a distributed system these imbalances can be
 mitigated by migrating part of the application data to different localities
@@ -298,31 +298,31 @@ space to the applications, even on distributed systems.
 Prefer moving work to the data over moving data to the work
 -----------------------------------------------------------
 
-For best performance it seems obvious to minimize the amount of bytes
+For the best performance it seems obvious to minimize the amount of bytes
 transferred from one part of the system to another. This is true on all levels.
-At the lowest level we try to take advantage of processor memory caches, thus
+At the lowest level we try to take advantage of processor memory caches, thus,
 minimizing memory latencies. Similarly, we try to amortize the data transfer
 time to and from `GPGPUs <http://en.wikipedia.org/wiki/GPGPU>`_ as much as
 possible. At high levels we try to minimize data transfer between different
 nodes of a cluster or between different virtual machines on the cloud. Our
 experience (well, it's almost common wisdom) show that the amount of bytes
 necessary to encode a certain operation is very often much smaller than the
-amount of bytes encoding the data the operation is performed upon. Nevertheless
+amount of bytes encoding the data the operation is performed upon. Nevertheless,
 we still often transfer the data to a particular place where we execute the
 operation just to bring the data back to where it came from afterwards. As an
-example let me look at the way we usually write our applications for clusters
-using |mpi|_. This programming model is all about data transfer between nodes.
-|mpi|_ is the prevalent programming model for clusters, it is fairly
+example let's look at the way we usually write our applications for clusters
+using MPI. This programming model is all about data transfer between nodes.
+MPI is the prevalent programming model for clusters, and it is fairly
 straightforward to understand and to use. Therefore, we often write the
-applications in a way accommodating this model, centered around data transfer.
+applications in a way that accommodates this model, centered around data transfer.
 These applications usually work well for smaller problem sizes and for regular
 data structures. The larger the amount of data we have to churn and the more
-irregular the problem domain becomes, the worse are the overall machine
-utilization and the (strong) scaling characteristics. While it is not impossible
+irregular the problem domain becomes, the worse the overall machine
+utilization and the (strong) scaling characteristics become. While it is not impossible
 to implement more dynamic, data driven, and asynchronous applications using
-|mpi|_, it is overly difficult to do so. At the same time, if we look at
+MPI, it is overly difficult to do so. At the same time, if we look at
 applications preferring to execute the code close the :term:`locality` where the
-data was placed, i.e. utilizing active messages (for instance based on
+data was placed, i.e., utilizing active messages (for instance based on
 |charm_pp|_), we see better asynchrony, simpler application codes, and improved
 scaling.
 
@@ -330,21 +330,21 @@ Favor message driven computation over message passing
 -----------------------------------------------------
 
 Today's prevalently used programming model on parallel (multi-node) systems is
-|mpi|_. It is based on message passing (as the name implies), which means that
+MPI. It is based on message passing (as the name implies), which means that
 the receiver has to be aware of a message about to come in. Both codes, the
 sender and the receiver, have to synchronize in order to perform the
 communication step. Even the newer, asynchronous interfaces require explicitly
 coding the algorithms around the required communication scheme. As a result, any
-more than trivial |mpi|_ application spends a considerable amount of time
-waiting for incoming messages, thus causing starvation and latencies to impede
+more than trivial MPI application spends a considerable amount of time
+waiting for incoming messages, thus, causing starvation and latencies to impede
 full resource utilization. The more complex and more dynamic the data structures
-and algorithms become, the larger are the adverse effects. The community has
+and algorithms become, the larger the adverse effects. The community has
 discovered message-driven and (data-driven) methods of implementing algorithms a
 long time ago, and systems such as |charm_pp|_ already have integrated active
 messages demonstrating the validity of the concept. Message driven computation
-allows sending messages without requiring the receiver to actively wait for
+allows for sending messages without requiring the receiver to actively wait for
 them. Any incoming message is handled asynchronously and triggers the encoded
 action by passing along arguments and---possibly---continuations. |hpx| combines
-this scheme with work queue-based scheduling as described above, which allows
-the system to overlap almost completely any communication with useful work,
+this scheme with work-queue based scheduling as described above, which allows
+the system to almost completely overlap any communication with useful work,
 thereby minimizing latencies.
