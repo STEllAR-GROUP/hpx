@@ -12,12 +12,6 @@
 #include <hpx/coroutines/detail/context_base.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 
-#if defined(HPX_HAVE_APEX)
-#include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/util/apex.hpp>
-#endif
-
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
     template class context_base<coroutine_impl>;

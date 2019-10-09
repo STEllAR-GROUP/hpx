@@ -32,7 +32,7 @@ namespace hpx { namespace util {
         if (parent_task != nullptr && enable_parent_task_handler &&
             enable_parent_task_handler())
         {
-            parent_wrapper = parent_task.get()->get_apex_data();
+            parent_wrapper = get_thread_id_data(parent_task)->get_apex_data();
         }
 
         if (description.kind() == thread_description::data_type_description)
