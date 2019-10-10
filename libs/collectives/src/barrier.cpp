@@ -32,8 +32,9 @@ namespace hpx { namespace lcos {
     barrier::barrier(std::string const& base_name)
       : node_(new (hpx::components::component_heap<wrapping_type>().alloc())
                 wrapping_type(new wrapped_type(base_name,
-                    hpx::get_num_localities(hpx::launch::sync),
-                    hpx::get_locality_id())))
+                    static_cast<std::size_t>(
+                        hpx::get_num_localities(hpx::launch::sync)),
+                    static_cast<std::size_t>(hpx::get_locality_id()))))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
             register_with_basename(
@@ -43,8 +44,8 @@ namespace hpx { namespace lcos {
 
     barrier::barrier(std::string const& base_name, std::size_t num)
       : node_(new (hpx::components::component_heap<wrapping_type>().alloc())
-                wrapping_type(
-                    new wrapped_type(base_name, num, hpx::get_locality_id())))
+                wrapping_type(new wrapped_type(base_name, num,
+                    static_cast<std::size_t>(hpx::get_locality_id()))))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
             register_with_basename(
@@ -173,7 +174,8 @@ namespace hpx { namespace lcos {
     {
         runtime& rt = get_runtime();
         util::runtime_configuration const& cfg = rt.get_config();
-        return barrier("/0/hpx/global_barrier", cfg.get_num_localities());
+        return barrier("/0/hpx/global_barrier",
+            static_cast<std::size_t>(cfg.get_num_localities()));
     }
 
     barrier& barrier::get_global_barrier()

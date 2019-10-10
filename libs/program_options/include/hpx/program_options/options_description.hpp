@@ -256,7 +256,7 @@ namespace hpx { namespace program_options {
 
         /** Find the maximum width of the option column, including options
             in groups. */
-        unsigned get_option_column_width() const;
+        std::size_t get_option_column_width() const;
 
     public:
         /** Returns an object of implementation-defined type suitable for adding
@@ -285,7 +285,7 @@ namespace hpx { namespace program_options {
 
         /** Outputs 'desc' to the specified stream, calling 'f' to output each
             option_description element. */
-        void print(std::ostream& os, unsigned width = 0) const;
+        void print(std::ostream& os, std::size_t width = 0) const;
 
     private:
 #if defined(HPX_MSVC) && HPX_MSVC >= 1800
@@ -300,8 +300,8 @@ namespace hpx { namespace program_options {
         //approximation_range find_approximation(const std::string& prefix) const;
 
         std::string m_caption;
-        const unsigned m_line_length;
-        const unsigned m_min_description_length;
+        std::size_t const m_line_length;
+        std::size_t const m_min_description_length;
 
         // Data organization is chosen because:
         // - there could be two names for one option

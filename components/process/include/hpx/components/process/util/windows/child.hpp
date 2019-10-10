@@ -54,14 +54,17 @@ public:
 
     child &operator=(child && c)
     {
-        if (proc_info.hProcess != INVALID_HANDLE_VALUE)
-            ::CloseHandle(proc_info.hProcess);
-        if (proc_info.hThread != INVALID_HANDLE_VALUE)
-            ::CloseHandle(proc_info.hThread);
+        if (this == &c)
+        {
+            if (proc_info.hProcess != INVALID_HANDLE_VALUE)
+                ::CloseHandle(proc_info.hProcess);
+            if (proc_info.hThread != INVALID_HANDLE_VALUE)
+                ::CloseHandle(proc_info.hThread);
 
-        proc_info = c.proc_info;
-        c.proc_info.hProcess = INVALID_HANDLE_VALUE;
-        c.proc_info.hThread = INVALID_HANDLE_VALUE;
+            proc_info = c.proc_info;
+            c.proc_info.hProcess = INVALID_HANDLE_VALUE;
+            c.proc_info.hThread = INVALID_HANDLE_VALUE;
+        }
         return *this;
     }
 

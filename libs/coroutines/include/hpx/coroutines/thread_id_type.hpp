@@ -23,11 +23,11 @@ namespace hpx { namespace threads {
         using thread_id_repr = void*;
 
     public:
-        constexpr thread_id()
+        constexpr thread_id() noexcept
           : thrd_(nullptr)
         {
         }
-        explicit constexpr thread_id(thread_id_repr thrd)
+        explicit constexpr thread_id(thread_id_repr thrd) noexcept
           : thrd_(thrd)
         {
         }
@@ -35,73 +35,77 @@ namespace hpx { namespace threads {
         thread_id(thread_id const&) = default;
         thread_id& operator=(thread_id const&) = default;
 
-        explicit constexpr operator bool() const
+        explicit constexpr operator bool() const noexcept
         {
             return nullptr != thrd_;
         }
 
-        constexpr thread_id_repr get() const
+        constexpr thread_id_repr get() const noexcept
         {
             return thrd_;
         }
 
-        HPX_CXX14_CONSTEXPR void reset()
+        HPX_CXX14_CONSTEXPR void reset() noexcept
         {
             thrd_ = nullptr;
         }
 
-        friend constexpr bool operator==(std::nullptr_t, thread_id const& rhs)
+        friend constexpr bool operator==(
+            std::nullptr_t, thread_id const& rhs) noexcept
         {
             return nullptr == rhs.thrd_;
         }
 
-        friend constexpr bool operator!=(std::nullptr_t, thread_id const& rhs)
+        friend constexpr bool operator!=(
+            std::nullptr_t, thread_id const& rhs) noexcept
         {
             return nullptr != rhs.thrd_;
         }
 
-        friend constexpr bool operator==(thread_id const& lhs, std::nullptr_t)
+        friend constexpr bool operator==(
+            thread_id const& lhs, std::nullptr_t) noexcept
         {
             return nullptr == lhs.thrd_;
         }
 
-        friend constexpr bool operator!=(thread_id const& lhs, std::nullptr_t)
+        friend constexpr bool operator!=(
+            thread_id const& lhs, std::nullptr_t) noexcept
         {
             return nullptr != lhs.thrd_;
         }
 
         friend constexpr bool operator==(
-            thread_id const& lhs, thread_id const& rhs)
+            thread_id const& lhs, thread_id const& rhs) noexcept
         {
             return lhs.thrd_ == rhs.thrd_;
         }
 
         friend constexpr bool operator!=(
-            thread_id const& lhs, thread_id const& rhs)
+            thread_id const& lhs, thread_id const& rhs) noexcept
         {
             return lhs.thrd_ != rhs.thrd_;
         }
 
         friend HPX_CXX14_CONSTEXPR bool operator<(
-            thread_id const& lhs, thread_id const& rhs)
+            thread_id const& lhs, thread_id const& rhs) noexcept
         {
             return std::less<void const*>{}(lhs.thrd_, rhs.thrd_);
         }
 
         friend HPX_CXX14_CONSTEXPR bool operator>(
-            thread_id const& lhs, thread_id const& rhs)
+            thread_id const& lhs, thread_id const& rhs) noexcept
         {
             return std::less<void const*>{}(rhs.thrd_, lhs.thrd_);
         }
 
         friend HPX_CXX14_CONSTEXPR bool operator<=(
-            thread_id const& lhs, thread_id const& rhs)
+            thread_id const& lhs, thread_id const& rhs) noexcept
         {
             return !(rhs > lhs);
         }
 
         friend HPX_CXX14_CONSTEXPR bool operator>=(
-            thread_id const& lhs, thread_id const& rhs)
+            thread_id const& lhs, thread_id const& rhs) noexcept
         {
             return !(rhs < lhs);
         }

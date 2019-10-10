@@ -148,7 +148,7 @@ namespace hpx { namespace naming
                     std::int64_t credits = detail::get_credit_from_gid(*p);
                     HPX_ASSERT(0 != credits);
 
-                    if (get_runtime_ptr())
+                    if (get_runtime_ptr())    // -V547
                     {
                         // Fire-and-forget semantics.
                         error_code ec(lightweight);

@@ -54,8 +54,9 @@ namespace hpx { namespace actions
             static ReturnType invoke(naming::address::address_type /*lva*/,
                 naming::address::component_type comptype, Ts&&... vs)
             {
-                 int * dummy = nullptr;
-                 return reinterpret_cast<const F&>(*dummy)( std::forward<Ts>(vs)... );
+                int* dummy = nullptr;
+                return reinterpret_cast<const F&>(*dummy)(    // -V522
+                    std::forward<Ts>(vs)...);
             }
         };
 

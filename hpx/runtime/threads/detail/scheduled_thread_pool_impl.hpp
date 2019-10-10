@@ -130,7 +130,7 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::print_pool(std::ostream& os)
     {
-        os << "[pool \"" << id_.name() << "\", #" << id_.index()
+        os << "[pool \"" << id_.name() << "\", #" << id_.index()    //-V128
            << "] with scheduler " << sched_->Scheduler::get_scheduler_name()
            << "\n"
            << "is running on PUs : \n";

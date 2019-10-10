@@ -2734,8 +2734,6 @@ hpx::future<void> addressing_service::mark_as_migrated(
 
     HPX_ASSERT(naming::detail::is_migratable(gid_));
 
-    naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
-
     // Always first grab the AGAS lock before invoking the user supplied
     // function. The user supplied code will grab another lock. Both locks have
     // to be acquired and always in the same sequence.
@@ -2743,7 +2741,7 @@ hpx::future<void> addressing_service::mark_as_migrated(
     // not exist on this locality, in which case it should not be accessed
     // anymore. The only way to determine whether the object still exists on
     // this locality is to query the migrated objects table in AGAS.
-    typedef std::unique_lock<mutex_type> lock_type;
+    using lock_type = std::unique_lock<mutex_type>;
 
     lock_type lock(migrated_objects_mtx_);
     util::ignore_while_checking<lock_type> ignore(&lock);
@@ -2758,6 +2756,8 @@ hpx::future<void> addressing_service::mark_as_migrated(
     // locality and the locality managing the address resolution for the object
     if (result.first)
     {
+        naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
+
         migrated_objects_table_type::iterator it =
             migrated_objects_table_.find(gid);
 
@@ -2934,7 +2934,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     std::vector<hpx::future<hpx::id_type>> find_all_from_basename(
         std::string basename, std::size_t num_ids)
-    {
+    {    // -V813
         if (basename.empty())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -2954,7 +2954,7 @@ namespace hpx
 
     std::vector<hpx::future<hpx::id_type>> find_from_basename(
         std::string basename, std::vector<std::size_t> const& ids)
-    {
+    {    // -V813
         if (basename.empty())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -2974,7 +2974,7 @@ namespace hpx
     }
 
     hpx::future<hpx::id_type> find_from_basename(std::string basename,
-        std::size_t sequence_nr)
+        std::size_t sequence_nr)    // -V813
     {
         if (basename.empty())
         {
@@ -2983,7 +2983,7 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == ~0U)
+        if (sequence_nr == ~static_cast<std::size_t>(0))
         {
             sequence_nr =
                 std::size_t(naming::get_locality_id_from_id(find_here()));
@@ -2994,7 +2994,7 @@ namespace hpx
     }
 
     hpx::future<bool> register_with_basename(std::string basename,
-        hpx::id_type id, std::size_t sequence_nr)
+        hpx::id_type id, std::size_t sequence_nr)    // -V813
     {
         if (basename.empty())
         {
@@ -3003,7 +3003,7 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == ~0U)
+        if (sequence_nr == ~static_cast<std::size_t>(0))
         {
             sequence_nr =
                 std::size_t(naming::get_locality_id_from_id(find_here()));
@@ -3029,7 +3029,7 @@ namespace hpx
 
     hpx::future<hpx::id_type> unregister_with_basename(
         std::string basename, std::size_t sequence_nr)
-    {
+    {    // -V813
         if (basename.empty())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -3037,7 +3037,7 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == ~0U)
+        if (sequence_nr == ~static_cast<std::size_t>(0))
         {
             sequence_nr =
                 std::size_t(naming::get_locality_id_from_id(find_here()));

@@ -270,7 +270,7 @@ primary_namespace::begin_migration(naming::gid_type id)
 }
 
 // migration of the given object is complete
-bool primary_namespace::end_migration(naming::gid_type id)
+bool primary_namespace::end_migration(naming::gid_type const& id)
 {
     util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.end_migration_.time_,
@@ -302,9 +302,7 @@ bool primary_namespace::end_migration(naming::gid_type id)
 
 // wait if given object is currently being migrated
 void primary_namespace::wait_for_migration_locked(
-    std::unique_lock<mutex_type>& l
-  , naming::gid_type id
-  , error_code& ec)
+    std::unique_lock<mutex_type>& l, naming::gid_type const& id, error_code& ec)
 {
     HPX_ASSERT_OWNS_LOCK(l);
 
@@ -333,9 +331,9 @@ void primary_namespace::wait_for_migration_locked(
 }
 
 bool primary_namespace::bind_gid(
-    gva g
+    gva const& g
   , naming::gid_type id
-  , naming::gid_type locality
+  , naming::gid_type const& locality
     )
 { // {{{ bind_gid implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
@@ -520,7 +518,8 @@ bool primary_namespace::bind_gid(
     return true;
 } // }}}
 
-primary_namespace::resolved_type primary_namespace::resolve_gid(naming::gid_type id)
+primary_namespace::resolved_type primary_namespace::resolve_gid(
+    naming::gid_type const& id)
 { // {{{ resolve_gid implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.resolve_gid_.time_,
@@ -561,16 +560,14 @@ primary_namespace::resolved_type primary_namespace::resolve_gid(naming::gid_type
     return r;
 } // }}}
 
-naming::id_type primary_namespace::colocate(naming::gid_type id)
+naming::id_type primary_namespace::colocate(naming::gid_type const& id)
 {
     return naming::id_type(
         hpx::util::get<2>(resolve_gid(id)), naming::id_type::unmanaged);
 }
 
 naming::address primary_namespace::unbind_gid(
-    std::uint64_t count
-  , naming::gid_type id
-    )
+    std::uint64_t count, naming::gid_type id)
 { // {{{ unbind_gid implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.unbind_gid_.time_,
@@ -673,10 +670,8 @@ std::int64_t primary_namespace::increment_credit(
 }
 
 std::vector<std::int64_t> primary_namespace::decrement_credit(
-    std::vector<
-        hpx::util::tuple<std::int64_t, naming::gid_type, naming::gid_type>
-    > requests
-    )
+    std::vector<hpx::util::tuple<std::int64_t, naming::gid_type,
+        naming::gid_type>> const& requests)
 { // decrement_credit implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.decrement_credit_.time_,

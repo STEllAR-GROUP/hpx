@@ -249,7 +249,7 @@ namespace hpx { namespace plugins { namespace parcel
         std::string parameters = p.parameters_;
         std::string additional_parameters;
 
-        std::string::size_type pos = parameters.find_first_of(",");
+        std::string::size_type pos = parameters.find_first_of(',');
         if (pos != std::string::npos)
         {
             additional_parameters = parameters.substr(pos);

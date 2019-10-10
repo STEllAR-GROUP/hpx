@@ -141,7 +141,7 @@ namespace hpx { namespace lcos {
             auto shared_state = this->shared_state_;
             auto&& f = [HPX_CAPTURE_MOVE(shared_state)]() {};
 #endif
-            naming::address addr_(this->resolve());
+            naming::address resolved_addr(this->resolve());
             naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
@@ -149,7 +149,7 @@ namespace hpx { namespace lcos {
             {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
-                        std::move(cont_id), std::move(addr_)),
+                        std::move(cont_id), std::move(resolved_addr)),
                     std::move(addr), id, priority, std::move(f),
                     std::forward<Ts>(vs)...);
             }
@@ -157,7 +157,7 @@ namespace hpx { namespace lcos {
             {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
-                        std::move(cont_id), std::move(addr_)),
+                        std::move(cont_id), std::move(resolved_addr)),
                     id, priority, std::move(f), std::forward<Ts>(vs)...);
             }
 
@@ -179,13 +179,13 @@ namespace hpx { namespace lcos {
             auto&& f = [HPX_CAPTURE_MOVE(shared_state)]() {};
 #endif
 
-            naming::address addr_(this->resolve());
+            naming::address resolved_addr(this->resolve());
             naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             hpx::apply_p_cb<action_type>(
                 actions::typed_continuation<Result, remote_result_type>(
-                    std::move(cont_id), std::move(addr_)),
+                    std::move(cont_id), std::move(resolved_addr)),
                 id, priority, std::move(f), std::forward<Ts>(vs)...);
 
             this->shared_state_->mark_as_started();
@@ -213,7 +213,7 @@ namespace hpx { namespace lcos {
                 };
 #endif
 
-            naming::address addr_(this->resolve());
+            naming::address resolved_addr(this->resolve());
             naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
@@ -221,7 +221,7 @@ namespace hpx { namespace lcos {
             {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
-                        std::move(cont_id), std::move(addr_)),
+                        std::move(cont_id), std::move(resolved_addr)),
                     std::move(addr), id, priority, std::move(f),
                     std::forward<Ts>(vs)...);
             }
@@ -229,7 +229,7 @@ namespace hpx { namespace lcos {
             {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
-                        std::move(cont_id), std::move(addr_)),
+                        std::move(cont_id), std::move(resolved_addr)),
                     id, priority, std::move(f), std::forward<Ts>(vs)...);
             }
 
@@ -258,13 +258,13 @@ namespace hpx { namespace lcos {
                 };
 #endif
 
-            naming::address addr_(this->resolve());
+            naming::address resolved_addr(this->resolve());
             naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             hpx::apply_p_cb<action_type>(
                 actions::typed_continuation<Result, remote_result_type>(
-                    std::move(cont_id), std::move(addr_)),
+                    std::move(cont_id), std::move(resolved_addr)),
                 id, priority, std::move(f), std::forward<Ts>(vs)...);
 
             this->shared_state_->mark_as_started();

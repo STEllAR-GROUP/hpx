@@ -506,9 +506,8 @@ namespace hpx { namespace threads { namespace policies {
         bool cleanup_terminated(
             std::size_t num_thread, bool delete_all) override
         {
-            bool empty = true;
-
-            empty = queues_[num_thread].data_->cleanup_terminated(delete_all);
+            bool empty =
+                queues_[num_thread].data_->cleanup_terminated(delete_all);
             if (!delete_all)
                 return empty;
 
@@ -1192,7 +1191,8 @@ namespace hpx { namespace threads { namespace policies {
 
             // iterate over the number of threads again to determine where to
             // steal from
-            std::ptrdiff_t radius = std::lround(num_threads / 2.0);
+            std::ptrdiff_t radius =
+                std::lround(static_cast<double>(num_threads) / 2.0);
             victim_threads_[num_thread].data_.reserve(num_threads);
 
             std::size_t num_pu = affinity_data_.get_pu_num(num_thread);
@@ -1214,7 +1214,7 @@ namespace hpx { namespace threads { namespace policies {
                 [&](hpx::util::function_nonser<bool(std::size_t)> f) {
                     // check our neighbors in a radial fashion (left and right
                     // alternating, increasing distance each iteration)
-                    int i = 1;
+                    std::ptrdiff_t i = 1;
                     for (/**/; i < radius; ++i)
                     {
                         std::ptrdiff_t left =

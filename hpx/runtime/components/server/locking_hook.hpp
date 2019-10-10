@@ -48,7 +48,18 @@ namespace hpx { namespace components
           , mtx_()
         {}
 
-        typedef void decorates_action;
+        using decorates_action = void;
+
+        locking_hook& operator=(locking_hook const& rhs)
+        {
+            this->base_type::operator=(rhs);
+            return *this;
+        }
+        locking_hook& operator=(locking_hook&& rhs)
+        {
+            this->base_type::operator=(std::move(rhs));
+            return *this;
+        }
 
         /// This is the hook implementation for decorate_action which locks
         /// the component ensuring that only one action is executed at a time

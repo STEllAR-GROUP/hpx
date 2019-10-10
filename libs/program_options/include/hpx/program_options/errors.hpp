@@ -400,7 +400,12 @@ namespace hpx { namespace program_options {
         /** Convenience functions for backwards compatibility */
         std::string tokens() const override
         {
-            return m_substitutions.find("invalid_line")->second;
+            auto it = m_substitutions.find("invalid_line");
+            if (it != m_substitutions.end())
+            {
+                return it->second;
+            }
+            return "<unknown>";
         }
     };
 

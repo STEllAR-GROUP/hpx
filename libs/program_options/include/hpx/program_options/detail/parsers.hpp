@@ -27,6 +27,7 @@ namespace hpx { namespace program_options {
 #include <hpx/program_options/parsers.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <string>
 #include <utility>
@@ -135,7 +136,7 @@ namespace hpx { namespace program_options {
         enum collect_unrecognized_mode mode)
     {
         std::vector<std::basic_string<Char>> result;
-        for (unsigned i = 0; i < options.size(); ++i)
+        for (std::size_t i = 0; i < options.size(); ++i)
         {
             if (options[i].unregistered ||
                 (mode == include_positional && options[i].position_key != -1))

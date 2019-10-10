@@ -274,9 +274,10 @@ namespace hpx { namespace serialization {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Archive>
-        void save(Archive& ar, const unsigned int version) const
+        void save(Archive& ar, unsigned int const version) const
         {
-            ar << size_ << alloc_;    //-V128
+            ar << size_ << alloc_;
+            // -V128
 
             if (size_ != 0)
             {
@@ -286,9 +287,10 @@ namespace hpx { namespace serialization {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Archive>
-        void load(Archive& ar, const unsigned int version)
+        void load(Archive& ar, unsigned int const version)
         {
-            ar >> size_ >> alloc_;    //-V128
+            ar >> size_ >> alloc_;
+            // -V128
 
             data_.reset(alloc_.allocate(size_), [this](T* p) {
                 serialize_buffer::deleter<allocator_type>(p, alloc_, size_);

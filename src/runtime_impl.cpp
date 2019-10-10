@@ -543,7 +543,7 @@ namespace hpx
         // wait for the thread to run
         {
             std::unique_lock<std::mutex> lk(mtx);
-            while (!running)
+            while (!running)    // -V776 // -V1044
                 cond.wait(lk);
         }
 
@@ -939,8 +939,6 @@ namespace hpx
             // --hpx:bind=none  should disable all affinity definitions
             if (threads::any(used_processing_units))
             {
-                error_code ec;
-
                 this->topology_.set_thread_affinity_mask(
                     this->topology_.get_service_affinity_mask(
                         used_processing_units), ec);

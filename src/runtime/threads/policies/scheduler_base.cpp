@@ -161,7 +161,7 @@ namespace hpx { namespace threads { namespace policies
 
                 hpx::util::yield_while([this, states_size, &l, &num_thread,
                                            &max_allowed_state]() {
-                    int num_allowed_threads = 0;
+                    std::size_t num_allowed_threads = 0;
 
                     for (std::size_t offset = 0; offset < states_size; ++offset)
                     {

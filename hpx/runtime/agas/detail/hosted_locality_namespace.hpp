@@ -34,42 +34,40 @@ namespace hpx { namespace agas { namespace detail
     {
         hosted_locality_namespace(naming::address addr);
 
-        naming::address::address_type ptr() const
+        naming::address::address_type ptr() const override
         {
             return addr_.address_;
         }
-        naming::address addr() const
+        naming::address addr() const override
         {
             return addr_;
         }
-        naming::id_type gid() const
+        naming::id_type gid() const override
         {
             return gid_;
         }
 
-        std::uint32_t allocate(
-            parcelset::endpoints_type const& endpoints
-          , std::uint64_t count
-          , std::uint32_t num_threads
-          , naming::gid_type suggested_prefix
-            );
+        std::uint32_t allocate(parcelset::endpoints_type const& endpoints,
+            std::uint64_t count, std::uint32_t num_threads,
+            naming::gid_type const& suggested_prefix) override;
 
-        void free(naming::gid_type locality);
+        void free(naming::gid_type const& locality) override;
 
-        std::vector<std::uint32_t> localities();
+        std::vector<std::uint32_t> localities() override;
 
-        parcelset::endpoints_type resolve_locality(naming::gid_type locality);
+        parcelset::endpoints_type resolve_locality(
+            naming::gid_type const& locality) override;
 
-        std::uint32_t get_num_localities();
-        hpx::future<std::uint32_t> get_num_localities_async();
+        std::uint32_t get_num_localities() override;
+        hpx::future<std::uint32_t> get_num_localities_async() override;
 
-        std::vector<std::uint32_t> get_num_threads();
-        hpx::future<std::vector<std::uint32_t> > get_num_threads_async();
+        std::vector<std::uint32_t> get_num_threads() override;
+        hpx::future<std::vector<std::uint32_t> > get_num_threads_async() override;
 
-        std::uint32_t get_num_overall_threads();
-        hpx::future<std::uint32_t> get_num_overall_threads_async();
+        std::uint32_t get_num_overall_threads() override;
+        hpx::future<std::uint32_t> get_num_overall_threads_async() override;
 
-        naming::gid_type statistics_counter(std::string name);
+        naming::gid_type statistics_counter(std::string name) override;
 
     private:
         naming::id_type gid_;

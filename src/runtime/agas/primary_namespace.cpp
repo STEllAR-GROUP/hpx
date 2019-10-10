@@ -173,7 +173,7 @@ namespace hpx { namespace agas {
     }
 
     hpx::future<std::pair<naming::id_type, naming::address>>
-    primary_namespace::begin_migration(naming::gid_type id)
+    primary_namespace::begin_migration(naming::gid_type const& id)
     {
         naming::id_type dest = naming::id_type(get_service_instance(id),
             naming::id_type::unmanaged);
@@ -186,7 +186,7 @@ namespace hpx { namespace agas {
         server::primary_namespace::begin_migration_action action;
         return hpx::async(action, std::move(dest), id);
     }
-    bool primary_namespace::end_migration(naming::gid_type id)
+    bool primary_namespace::end_migration(naming::gid_type const& id)
     {
         HPX_ASSERT(
             naming::get_locality_from_gid(get_service_instance(id)) ==
@@ -195,8 +195,8 @@ namespace hpx { namespace agas {
         return server_->end_migration(id);
     }
 
-    bool primary_namespace::bind_gid(
-        gva g, naming::gid_type id, naming::gid_type locality)
+    bool primary_namespace::bind_gid(gva const& g, naming::gid_type const& id,
+        naming::gid_type const& locality)
     {
         return server_->bind_gid(g, id, locality);
     }
@@ -240,7 +240,7 @@ namespace hpx { namespace agas {
 #endif
 
     primary_namespace::resolved_type
-    primary_namespace::resolve_gid(naming::gid_type id)
+    primary_namespace::resolve_gid(naming::gid_type const& id)
     {
         return server_->resolve_gid(id);
     }
@@ -270,8 +270,8 @@ namespace hpx { namespace agas {
         return hpx::async(action, std::move(dest), id);
     }
 
-    future<naming::address>
-    primary_namespace::unbind_gid_async(std::uint64_t count, naming::gid_type id)
+    future<naming::address> primary_namespace::unbind_gid_async(
+        std::uint64_t count, naming::gid_type const& id)
     {
         naming::id_type dest = naming::id_type(get_service_instance(id),
             naming::id_type::unmanaged);
@@ -284,8 +284,8 @@ namespace hpx { namespace agas {
         return hpx::async(action, std::move(dest), count, stripped_id);
     }
 
-    naming::address
-    primary_namespace::unbind_gid(std::uint64_t count, naming::gid_type id)
+    naming::address primary_namespace::unbind_gid(
+        std::uint64_t count, naming::gid_type const& id)
     {
         naming::id_type dest = naming::id_type(get_service_instance(id),
             naming::id_type::unmanaged);

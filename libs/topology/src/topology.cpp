@@ -128,7 +128,7 @@ namespace hpx { namespace threads { namespace detail {
 #elif defined(HPX_WINDOWS)
         SYSTEM_INFO systemInfo;
         GetSystemInfo(&systemInfo);
-        return systemInfo.dwPageSize;
+        return static_cast<std::size_t>(systemInfo.dwPageSize);
 #else
         return 4096;
 #endif

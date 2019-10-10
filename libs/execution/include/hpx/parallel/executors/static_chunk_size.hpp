@@ -67,7 +67,7 @@ namespace hpx { namespace parallel { namespace execution {
             // by default use static work distribution over number of
             // available compute resources, create four times the number of
             // chunks than we have cores
-            return (num_tasks + 4 * cores - 1) / (4 * cores);    // round up
+            return (num_tasks + 4 * cores - 1) / (4 * cores);    // -V112
         }
         /// \endcond
 

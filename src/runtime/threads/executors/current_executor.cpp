@@ -164,13 +164,13 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     // this is just a wrapper around a scheduler_base assuming the wrapped
     // scheduler outlives the wrapper
-    current_executor::current_executor() //-V730
-      : scheduled_executor(new detail::current_executor(
+    current_executor::current_executor()
+      : scheduled_executor(new detail::current_executor( //-V730
             get_self_id_data()->get_scheduler_base()))
     {}
 
-    current_executor::current_executor(policies::scheduler_base* scheduler) //-V730
-      : scheduled_executor(new detail::current_executor(scheduler))
+    current_executor::current_executor(policies::scheduler_base* scheduler)
+      : scheduled_executor(new detail::current_executor(scheduler)) //-V730
     {}
 
     hpx::state current_executor::get_state() const

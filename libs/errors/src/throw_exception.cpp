@@ -41,7 +41,7 @@ namespace hpx { namespace detail {
             p.string(), file, line, auxinfo);
     }
 
-    std::exception_ptr get_exception(boost::system::error_code ec,
+    std::exception_ptr get_exception(boost::system::error_code const& ec,
         std::string const& msg, throwmode mode, std::string const& func,
         std::string const& file, long line, std::string const& auxinfo)
     {

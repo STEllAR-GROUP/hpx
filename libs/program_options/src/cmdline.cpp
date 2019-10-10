@@ -16,6 +16,7 @@
 
 #include <cctype>
 #include <climits>
+#include <cstddef>
 #include <cstdio>
 #include <cstring>
 #include <functional>
@@ -83,7 +84,9 @@ namespace hpx { namespace program_options { namespace detail {
 
     cmdline::cmdline(int argc, const char* const* argv)
     {
-        init(vector<string>(argv + 1, argv + argc + !argc));
+        init(vector<string>(argv + 1,
+            argv + static_cast<std::size_t>(argc) +
+                static_cast<std::size_t>(!argc)));
     }
 
     void cmdline::init(const vector<string>& args)
@@ -235,17 +238,17 @@ namespace hpx { namespace program_options { namespace detail {
         while (!args.empty())
         {
             bool ok = false;
-            for (unsigned i = 0; i < style_parsers.size(); ++i)
+            for (std::size_t i = 0; i < style_parsers.size(); ++i)
             {
-                unsigned current_size = static_cast<unsigned>(args.size());
+                std::size_t current_size = args.size();
                 vector<option> next = style_parsers[i](args);
 
                 // Check that option names
                 // are valid, and that all values are in place.
                 if (!next.empty())
                 {
-                    vector<string> e;
-                    for (unsigned k = 0; k < next.size() - 1; ++k)
+                    vector<std::string> e;
+                    for (std::size_t k = 0; k < next.size() - 1; ++k)
                     {
                         finish_option(next[k], e, style_parsers);
                     }
@@ -278,7 +281,7 @@ namespace hpx { namespace program_options { namespace detail {
            can can consume more tokens (e.g. it's multitoken option),
            give those tokens to it.  */
         vector<option> result2;
-        for (unsigned i = 0; i < result.size(); ++i)
+        for (std::size_t i = 0; i < result.size(); ++i)
         {
             result2.push_back(result[i]);
             option& opt = result2.back();
@@ -305,17 +308,16 @@ namespace hpx { namespace program_options { namespace detail {
             if (!xd)
                 continue;
 
-            unsigned min_tokens = xd->semantic()->min_tokens();
-            unsigned max_tokens = xd->semantic()->max_tokens();
+            std::size_t min_tokens = xd->semantic()->min_tokens();
+            std::size_t max_tokens = xd->semantic()->max_tokens();
             if (min_tokens < max_tokens && opt.value.size() < max_tokens)
             {
                 // This option may grab some more tokens.
                 // We only allow to grab tokens that are not already
                 // recognized as key options.
 
-                int can_take_more =
-                    max_tokens - static_cast<int>(opt.value.size());
-                unsigned j = i + 1;
+                std::size_t can_take_more = max_tokens - opt.value.size();
+                std::size_t j = i + 1;
                 for (; can_take_more && j < result.size(); --can_take_more, ++j)
                 {
                     option& opt2 = result[j];
@@ -433,8 +435,7 @@ namespace hpx { namespace program_options { namespace detail {
             unsigned min_tokens = d.semantic()->min_tokens();
             unsigned max_tokens = d.semantic()->max_tokens();
 
-            unsigned present_tokens =
-                static_cast<unsigned>(opt.value.size() + other_tokens.size());
+            std::size_t present_tokens = opt.value.size() + other_tokens.size();
 
             if (present_tokens >= min_tokens)
             {
@@ -462,8 +463,8 @@ namespace hpx { namespace program_options { namespace detail {
                     // we use style parsers to check if it is syntactically an option,
                     // additionally we check if an option_description exists
                     vector<option> followed_option;
-                    vector<string> next_token(1, other_tokens[0]);
-                    for (unsigned i = 0;
+                    vector<std::string> next_token(1, other_tokens[0]);
+                    for (std::size_t i = 0;
                          followed_option.empty() && i < style_parsers.size();
                          ++i)
                     {
@@ -526,7 +527,7 @@ namespace hpx { namespace program_options { namespace detail {
                 name = tok.substr(2);
             }
             option opt;
-            opt.string_key = name;
+            opt.string_key = std::move(name);
             if (!adjacent.empty())
                 opt.value.push_back(adjacent);
             opt.original_tokens.push_back(tok);
@@ -612,7 +613,7 @@ namespace hpx { namespace program_options { namespace detail {
             string adjacent = tok.substr(2);
 
             option opt;
-            opt.string_key = name;
+            opt.string_key = std::move(name);
             if (!adjacent.empty())
                 opt.value.push_back(adjacent);
             opt.original_tokens.push_back(tok);
@@ -658,7 +659,7 @@ namespace hpx { namespace program_options { namespace detail {
         const string& tok = args[0];
         if (tok == "--")
         {
-            for (unsigned i = 1; i < args.size(); ++i)
+            for (std::size_t i = 1; i < args.size(); ++i)
             {
                 option opt;
                 opt.value.push_back(args[i]);

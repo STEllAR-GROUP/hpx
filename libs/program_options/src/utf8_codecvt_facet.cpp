@@ -99,7 +99,7 @@ namespace hpx { namespace program_options { namespace detail {
             if (from == from_end && i != cont_octet_count)
             {
                 // rewind "from" to before the current character translation
-                from_next = from - (i + 1);
+                from_next = from - (static_cast<std::size_t>(i) + 1);
                 to_next = to;
                 return std::codecvt_base::partial;
             }
@@ -160,7 +160,7 @@ namespace hpx { namespace program_options { namespace detail {
             if (to == to_end && i != cont_octet_count)
             {
                 from_next = from;
-                to_next = to - (i + 1);
+                to_next = to - (static_cast<std::size_t>(i) + 1);
                 return std::codecvt_base::partial;
             }
             ++from;
@@ -188,7 +188,7 @@ namespace hpx { namespace program_options { namespace detail {
         // within the bounds so far (no greater than max_limit)
         // 3) from_next points to the octet 'last_octet_count' before the
         // last measured character.
-        int last_octet_count = 0;
+        std::size_t last_octet_count = 0;
         std::size_t char_count = 0;
         const char* from_next = from;
         // Use "<" because the buffer may represent incomplete characters
@@ -216,7 +216,7 @@ namespace hpx { namespace program_options { namespace detail {
         else if (0xe0 <= lead_octet && lead_octet <= 0xef)
             return 3;
         else if (0xf0 <= lead_octet && lead_octet <= 0xf7)
-            return 4;
+            return 4;    // -V112
         else if (0xf8 <= lead_octet && lead_octet <= 0xfb)
             return 5;
         else

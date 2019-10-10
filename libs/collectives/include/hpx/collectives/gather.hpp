@@ -400,7 +400,10 @@ namespace hpx { namespace lcos {
         std::size_t this_site = std::size_t(-1))
     {
         if (num_sites == std::size_t(-1))
-            num_sites = hpx::get_num_localities(hpx::launch::sync);
+        {
+            num_sites = static_cast<std::size_t>(
+                hpx::get_num_localities(hpx::launch::sync));
+        }
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
@@ -439,7 +442,10 @@ namespace hpx { namespace lcos {
         std::size_t this_site = std::size_t(-1))
     {
         if (num_sites == std::size_t(-1))
-            num_sites = hpx::get_num_localities(hpx::launch::sync);
+        {
+            num_sites = static_cast<std::size_t>(
+                hpx::get_num_localities(hpx::launch::sync));
+        }
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
@@ -471,7 +477,10 @@ namespace hpx { namespace lcos {
         std::size_t this_site = std::size_t(-1))
     {
         if (num_sites == std::size_t(-1))
-            num_sites = hpx::get_num_localities(hpx::launch::sync);
+        {
+            num_sites = static_cast<std::size_t>(
+                hpx::get_num_localities(hpx::launch::sync));
+        }
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 

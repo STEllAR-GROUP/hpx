@@ -62,7 +62,8 @@ namespace hpx { namespace plugins
             fillini.emplace_back("enabled = 1");
 
             char const* more = traits::plugin_config_data<Plugin>::call();
-            if (more) {
+            if (more != nullptr)    // -V547
+            {
                 std::vector<std::string> data;
                 boost::split(data, more, boost::is_any_of("\n"));
                 std::copy(data.begin(), data.end(), std::back_inserter(fillini));

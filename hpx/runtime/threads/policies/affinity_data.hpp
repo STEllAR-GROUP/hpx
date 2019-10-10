@@ -31,7 +31,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
         std::size_t init(std::size_t num_threads = 1, std::size_t max_cores = 1,
             std::size_t pu_offset = 0, std::size_t pu_step = 1,
             std::size_t used_cores = 0, std::string affinity_domain = "pu",
-            std::string affinity_description = "balanced",
+            std::string const& affinity_description = "balanced",
             bool use_process_mask = false);
 
         void set_num_threads(size_t num_threads)
