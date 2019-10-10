@@ -37,7 +37,7 @@ line configuration options (see the description of the :option:`--hpx:ini`,
 
 .. _ini_format:
 
-The |hpx| INI File Format
+The |hpx| ini file format
 -------------------------
 
 All |hpx| applications can be configured using a special file format that is
@@ -115,7 +115,7 @@ expression will evaluate to an empty string.
 
 .. _config_defaults:
 
-Built-in Default Configuration Settings
+Built-in default configuration settings
 ---------------------------------------
 
 During startup any |hpx| application applies a predefined search pattern to
