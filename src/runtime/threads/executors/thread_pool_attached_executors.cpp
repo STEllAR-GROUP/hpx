@@ -18,7 +18,7 @@
 #  include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 #endif
 #include <hpx/assertion.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/functional/unique_function.hpp>

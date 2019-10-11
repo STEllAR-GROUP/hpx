@@ -177,9 +177,9 @@ namespace hpx { namespace parallel { namespace execution {
             std::size_t num_tasks = num_tasks_;
             if (num_tasks == std::size_t(-1))
             {
-                auto tid = threads::get_self_id();
-                auto pool = tid ?
-                    tid->get_scheduler_base()->get_parent_pool() :
+                auto thrd_data = threads::get_self_id_data();
+                auto pool = thrd_data ?
+                    thrd_data->get_scheduler_base()->get_parent_pool() :
                     &hpx::threads::get_thread_manager().default_pool();
                 num_tasks =
                     (std::min)(std::size_t(128), pool->get_os_thread_count());

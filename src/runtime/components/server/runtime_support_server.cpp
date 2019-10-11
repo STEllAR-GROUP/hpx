@@ -36,7 +36,7 @@
 #include <hpx/serialization/vector.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
+#include <hpx/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 
 #include <hpx/collectives.hpp>

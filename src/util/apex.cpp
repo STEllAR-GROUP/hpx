@@ -6,38 +6,50 @@
 //
 
 #include <hpx/config.hpp>
-#include <hpx/util/apex.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/find_localities.hpp>
+#include <hpx/util/apex.hpp>
+
+#include <cstddef>
 #include <cstdint>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
+
 #ifdef HPX_HAVE_APEX
-    apex_task_wrapper apex_new_task(
-           thread_description const& description,
-           std::uint32_t parent_locality_id,
-           threads::thread_id_type const& parent_task)
+
+    static enable_parent_task_handler_type enable_parent_task_handler;
+
+    void set_enable_parent_task_handler(enable_parent_task_handler_type f)
     {
-        static std::uint32_t num_localities = hpx::get_initial_num_localities();
+        enable_parent_task_handler = f;
+    }
+
+    apex_task_wrapper apex_new_task(thread_description const& description,
+        std::uint32_t parent_locality_id,
+        threads::thread_id_type const& parent_task)
+    {
         apex_task_wrapper parent_wrapper = nullptr;
         // Parent pointers aren't reliable in distributed runs.
-        if (parent_task != nullptr &&
-            num_localities == 1
-            /*hpx::get_locality_id() == parent_locality_id*/) {
-            parent_wrapper = parent_task.get()->get_apex_data();
+        if (parent_task != nullptr && enable_parent_task_handler &&
+            enable_parent_task_handler())
+        {
+            parent_wrapper = get_thread_id_data(parent_task)->get_apex_data();
         }
-        if (description.kind() ==
-                thread_description::data_type_description) {
-            return apex::new_task(description.get_description(),
-                UINTMAX_MAX, parent_wrapper);
-        } else {
-            return apex::new_task(description.get_address(),
-                UINTMAX_MAX, parent_wrapper);
+
+        if (description.kind() == thread_description::data_type_description)
+        {
+            return apex::new_task(
+                description.get_description(), UINTMAX_MAX, parent_wrapper);
+        }
+        else
+        {
+            HPX_ASSERT(
+                description.kind() == thread_description::data_type_address);
+            return apex::new_task(
+                description.get_address(), UINTMAX_MAX, parent_wrapper);
         }
     }
 
 #endif
-}}
 
+}}    // namespace hpx::util

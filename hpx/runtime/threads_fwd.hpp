@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 
 namespace hpx
 {
