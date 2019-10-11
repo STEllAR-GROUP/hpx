@@ -157,7 +157,7 @@ The ``system`` configuration section
      * This is initialized to the base directory the current executable has been
        loaded from.
 
-The `|HPX| configuration section
+The `|hpx| configuration section
 .................................
 
 .. code-block:: ini
@@ -594,7 +594,7 @@ equivalent CMake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
    * * Property
      * Description
    * * ``hpx.parcel.mpi.enable``
-     * Enables the use of the MPI parcelport. |HPX| tries to detect if the
+     * Enables the use of the MPI parcelport. |hpx| tries to detect if the
        application was started within a parallel MPI environment. If the
        detection was succesful, the MPI parcelport is enabled by default. To
        explicitly disable the MPI parcelport, set to 0. Note that the initial
@@ -625,7 +625,7 @@ equivalent CMake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
        parcel data. The default is the same value as set for
        ``hpx.parcel.zero_copy_optimization``.
    * * ``hpx.parcel.mpi.use_io_pool``
-     * This property can be set to run the progress thread inside of |HPX| threads
+     * This property can be set to run the progress thread inside of |hpx| threads
        instead of a separate thread pool. The default is ``1``.
    * * ``hpx.parcel.mpi.async_serialization``
      * This property defines whether this :term:`locality` is allowed to spawn a
@@ -1504,7 +1504,7 @@ The predefined command line options for any application using
 
 .. option:: --hpx:config arg
 
-   Load the specified |HPX| configuration (ini) file.
+   Load the specified |hpx| configuration (ini) file.
 
 .. option:: --hpx:ini arg
 
