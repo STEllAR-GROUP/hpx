@@ -145,18 +145,18 @@ In the structure ``stepper``, we have also had to make some changes to
 accommodate a distributed environment. In order to get the data from a
 neighboring partition, which could be remote, we must retrieve the data from the
 neighboring partitions. These retrievals are asynchronous and the function
-``heat_part_data``, which amongst other things calls ``heat``, should not be
-called unless the data from the neighboring partitions have arrived. Therefore
+``heat_part_data``, which, amongst other things, calls ``heat``, should not be
+called unless the data from the neighboring partitions have arrived. Therefore,
 it should come as no surprise that we synchronize this operation with another
 instance of dataflow (found in ``heat_part``). This dataflow is passed futures
 to the data in the current and surrounding partitions by calling ``get_data()``
-on each respective partition. When these futures are ready dataflow passes them
+on each respective partition. When these futures are ready, dataflow passes them
 to the ``unwrapped`` function, which extracts the shared_array of doubles and
 passes them to the lambda. The lambda calls ``heat_part_data`` on the
-:term:`locality` which the middle partition is on.
+:term:`locality`, which the middle partition is on.
 
 Although this example could run distributed, it only runs on one
-:term:`locality` as it always uses ``hpx::find_here()`` as the target for the
+:term:`locality`, as it always uses ``hpx::find_here()`` as the target for the
 functions to run on.
 
 In example 6, we begin to distribute the partition data on different nodes. This
@@ -172,11 +172,11 @@ which is described in the function ``locidx``. Because some of the data needed
 to update the partition in ``heat_part`` could now be on a new :term:`locality`,
 we must devise a way of moving data to the :term:`locality` of the middle
 partition. We accomplished this by adding a switch in the function
-``get_data()`` which returns the end element of the ``buffer data_`` if it is
+``get_data()`` that returns the end element of the ``buffer data_`` if it is
 from the left partition or the first element of the buffer if the data is from
 the right partition. In this way only the necessary elements, not the whole
 buffer, are exchanged between nodes. The reader should be reminded that this
-exchange of end elements occurs in the function ``get_data()`` and therefore is
+exchange of end elements occurs in the function ``get_data()`` and, therefore, is
 executed asynchronously.
 
 Now that we have the code running in distributed, it is time to make some
@@ -184,36 +184,36 @@ optimizations. The function ``heat_part`` spends most of its time on two tasks:
 retrieving remote data and working on the data in the middle partition. Because
 we know that the data for the middle partition is local, we can overlap the work
 on the middle partition with that of the possibly remote call of ``get_data()``.
-This algorithmic change which was implemented in example 7 can be seen below:
+This algorithmic change, which was implemented in example 7, can be seen below:
 
 .. literalinclude:: ../../examples/1d_stencil/1d_stencil_7.cpp
    :lines: 257-310
 
 Example 8 completes the futurization process and utilizes the full potential of
-HPX by distributing the program flow to multiple localities, usually defined as
-nodes in a cluster. It accomplishes this task by running an instance of HPX main
-on each :term:`locality`. In order to coordinate the execution of the program
+|hpx| by distributing the program flow to multiple localities, usually defined as
+nodes in a cluster. It accomplishes this task by running an instance of |hpx| main
+on each :term:`locality`. In order to coordinate the execution of the program,
 the ``struct stepper`` is wrapped into a component. In this way, each
-:term:`locality` contains an instance of stepper which executes its own instance
+:term:`locality` contains an instance of stepper that executes its own instance
 of the function ``do_work()``. This scheme does create an interesting
 synchronization problem that must be solved. When the program flow was being
-coordinated on the head node the, GID of each component was known. However, when
+coordinated on the head node, the GID of each component was known. However, when
 we distribute the program flow, each partition has no notion of the GID of its
 neighbor if the next partition is on another :term:`locality`. In order to make
 the GIDs of neighboring partitions visible to each other, we created two buffers
 to store the GIDs of the remote neighboring partitions on the left and right
-respectively. These buffers are filled by sending the GID of a newly created
+respectively. These buffers are filled by sending the GID of newly created
 edge partitions to the right and left buffers of the neighboring localities.
 
-In order to finish the simulation the solution vectors named ``result`` are then
+In order to finish the simulation, the solution vectors named ``result`` are then
 gathered together on :term:`locality` 0 and added into a vector of spaces
-``overall_result`` using the HPX functions ``gather_id`` and ``gather_here``.
+``overall_result`` using the |hpx| functions ``gather_id`` and ``gather_here``.
 
 .. todo::
 
    Insert performance of ``stencil_8``.
 
-Example 8 completes this example series which takes the serial code of example 1
+Example 8 completes this example series, which takes the serial code of example 1
 and incrementally morphs it into a fully distributed parallel code. This
 evolution was guided by the simple principles of futurization, the knowledge of
 grainsize, and utilization of components. Applying these techniques easily
