@@ -305,7 +305,7 @@ minimizing memory latencies. Similarly, we try to amortize the data transfer
 time to and from `GPGPUs <http://en.wikipedia.org/wiki/GPGPU>`_ as much as
 possible. At high levels we try to minimize data transfer between different
 nodes of a cluster or between different virtual machines on the cloud. Our
-experience (well, it's almost common wisdom) show that the amount of bytes
+experience (well, it's almost common wisdom) shows that the amount of bytes
 necessary to encode a certain operation is very often much smaller than the
 amount of bytes encoding the data the operation is performed upon. Nevertheless,
 we still often transfer the data to a particular place where we execute the
@@ -313,7 +313,7 @@ operation just to bring the data back to where it came from afterwards. As an
 example let's look at the way we usually write our applications for clusters
 using MPI. This programming model is all about data transfer between nodes.
 MPI is the prevalent programming model for clusters, and it is fairly
-straightforward to understand and to use. Therefore, we often write the
+straightforward to understand and to use. Therefore, we often write 
 applications in a way that accommodates this model, centered around data transfer.
 These applications usually work well for smaller problem sizes and for regular
 data structures. The larger the amount of data we have to churn and the more
@@ -338,10 +338,10 @@ coding the algorithms around the required communication scheme. As a result, any
 more than trivial MPI application spends a considerable amount of time
 waiting for incoming messages, thus, causing starvation and latencies to impede
 full resource utilization. The more complex and more dynamic the data structures
-and algorithms become, the larger the adverse effects. The community has
-discovered message-driven and (data-driven) methods of implementing algorithms a
-long time ago, and systems such as |charm_pp|_ already have integrated active
-messages demonstrating the validity of the concept. Message driven computation
+and algorithms become, the larger the adverse effects. The community discovered
+message-driven and (data-driven) methods of implementing algorithms a long
+time ago, and systems such as |charm_pp|_ have already integrated active
+messages demonstrating the validity of the concept. Message-driven computation
 allows for sending messages without requiring the receiver to actively wait for
 them. Any incoming message is handled asynchronously and triggers the encoded
 action by passing along arguments and---possibly---continuations. |hpx| combines
