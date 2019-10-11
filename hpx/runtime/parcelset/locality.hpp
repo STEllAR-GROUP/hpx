@@ -37,7 +37,7 @@ namespace hpx { namespace parcelset
         class impl_base
         {
         public:
-            virtual ~impl_base() {}
+            virtual ~impl_base() = default;
 
             virtual bool equal(impl_base const & rhs) const = 0;
             virtual bool less_than(impl_base const & rhs) const = 0;
@@ -68,14 +68,14 @@ namespace hpx { namespace parcelset
         locality()
         {}
 
-        template <typename Impl, typename Enable =
-            typename std::enable_if<
-               !std::is_same<locality, typename util::decay<Impl>::type>::value &&
-               !traits::is_iterator<Impl>::value
-            >::type
-        >
-        locality(Impl && i)
-          : impl_(new impl<typename util::decay<Impl>::type>(std::forward<Impl>(i)))
+        template <typename Impl,
+            typename Enable1 = typename std::enable_if<!std::is_same<locality,
+                typename util::decay<Impl>::type>::value>::type,
+            typename Enable2 = typename std::enable_if<
+                !traits::is_iterator<Impl>::value>::type>
+        locality(Impl&& i)
+          : impl_(new impl<typename util::decay<Impl>::type>(
+                std::forward<Impl>(i)))
         {}
 
         locality(locality const & other)
@@ -83,7 +83,7 @@ namespace hpx { namespace parcelset
         {
         }
 
-        locality(locality && other)
+        locality(locality&& other) noexcept
           : impl_(other.impl_ ? other.impl_->move() : nullptr)
         {
         }
@@ -104,7 +104,7 @@ namespace hpx { namespace parcelset
             return *this;
         }
 
-        locality & operator=(locality && other)
+        locality& operator=(locality&& other) noexcept
         {
             if(this != &other)
             {
@@ -196,50 +196,50 @@ namespace hpx { namespace parcelset
             explicit impl(Impl && i) : impl_(std::move(i)) {}
             explicit impl(Impl const & i) : impl_(i) {}
 
-            bool equal(impl_base const & rhs) const
+            bool equal(impl_base const & rhs) const override
             {
                 if(type() != rhs.type()) return false;
                 return impl_ == rhs.get<Impl>();
             }
 
-            bool less_than(impl_base const & rhs) const
+            bool less_than(impl_base const & rhs) const override
             {
                 return type() < rhs.type() ||
                     (type() == rhs.type() && impl_ < rhs.get<Impl>());
             }
 
-            bool valid() const
+            bool valid() const override
             {
                 return !!impl_;
             }
 
-            const char *type() const
+            const char *type() const override
             {
                 return Impl::type();
             }
 
-            std::ostream & print(std::ostream & os) const
+            std::ostream & print(std::ostream & os) const override
             {
                 os << impl_;
                 return os;
             }
 
-            void save(serialization::output_archive & ar) const
+            void save(serialization::output_archive & ar) const override
             {
                 impl_.save(ar);
             }
 
-            void load(serialization::input_archive & ar)
+            void load(serialization::input_archive & ar) override
             {
                 impl_.load(ar);
             }
 
-            impl_base * clone() const
+            impl_base * clone() const override
             {
                 return new impl<Impl>(impl_);
             }
 
-            impl_base * move()
+            impl_base * move() override
             {
                 return new impl<Impl>(std::move(impl_));
             }
@@ -248,7 +248,7 @@ namespace hpx { namespace parcelset
         };
     };
 
-    typedef std::map<std::string, locality> endpoints_type;
+    using endpoints_type = std::map<std::string, locality>;
 
     std::ostream& operator<< (std::ostream& os, endpoints_type const& endpoints);
 }}

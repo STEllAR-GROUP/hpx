@@ -52,7 +52,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         TaskPartitioner>
     {
         template <typename... Args>
-        using apply = TaskPartitioner<execution::datapar_task_policy>;
+        using apply = TaskPartitioner<execution::datapar_task_policy, Args...>;
     };
 #endif
 }}}}    // namespace hpx::parallel::util::detail
