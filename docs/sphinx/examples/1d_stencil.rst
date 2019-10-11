@@ -13,10 +13,10 @@ Local to remote: 1D stencil
 When developers write code they typically begin with a simple serial code and
 build upon it until all of the required functionality is present. The following
 set of examples were developed to demonstrate this iterative process of evolving
-a simple serial program to an efficient, fully distributed HPX application. For
+a simple serial program to an efficient, fully-distributed |hpx| application. For
 this demonstration, we implemented a 1D heat distribution problem. This
 calculation simulates the diffusion of heat across a ring from an initialized
-state to some user defined point in the future. It does this by breaking each
+state to some user-defined point in the future. It does this by breaking each
 portion of the ring into discrete segments and using the current segment's
 temperature and the temperature of the surrounding segments to calculate the
 temperature of the current segment in the next timestep as shown by
@@ -48,7 +48,7 @@ The first example is straight serial code. In this code we instantiate a vector
 
 Each element in the vector of doubles represents a single grid point. To
 calculate the change in heat distribution, the temperature of each grid point,
-along with its neighbors, are passed to the function ``heat``. In order to
+along with its neighbors, is passed to the function ``heat``. In order to
 improve readability, references named ``current`` and ``next`` are created
 which, depending on the time step, point to the first and second vector of
 doubles. The first vector of doubles is initialized with a simple heat ramp.
@@ -56,8 +56,8 @@ After calling the heat function with the data in the ``current`` vector, the
 results are placed into the ``next`` vector.
 
 In example 2 we employ a technique called futurization. Futurization is a method
-by which we can easily transform a code which is serially executed into a code
-which creates asynchronous threads. In the simplest case this involves replacing
+by which we can easily transform a code that is serially executed into a code
+that creates asynchronous threads. In the simplest case this involves replacing
 a variable with a future to a variable, a function with a future to a function,
 and adding a ``.get()`` at the point where a value is actually needed. The code
 below shows how this technique was applied to the ``struct stepper``.
@@ -65,13 +65,13 @@ below shows how this technique was applied to the ``struct stepper``.
 .. literalinclude:: ../../examples/1d_stencil/1d_stencil_2.cpp
    :lines: 51-107
 
-In example 2, we re-define our partition type as a ``shared_future`` and, in
-``main``, create the object ``result`` which is a future to a vector of
+In example 2, we redefine our partition type as a ``shared_future`` and, in
+``main``, create the object ``result``, which is a future to a vector of
 partitions. We use ``result`` to represent the last vector in a string of
 vectors created for each timestep. In order to move to the next timestep, the
 values of a partition and its neighbors must be passed to ``heat`` once the
-futures that contain them are ready. In HPX, we have an LCO (Local Control
-Object) named Dataflow which assists the programmer in expressing this
+futures that contain them are ready. In |hpx|, we have an LCO (Local Control
+Object) named Dataflow that assists the programmer in expressing this
 dependency. Dataflow allows us to pass the results of a set of futures to a
 specified function when the futures are ready. Dataflow takes three types of
 arguments, one which instructs the dataflow on how to perform the function call
@@ -82,7 +82,7 @@ string dataflows together and construct an execution tree.
 
 After the values of the futures in dataflow are ready, the values must be pulled
 out of the future container to be passed to the function ``heat``. In order to
-do this, we use the HPX facility ``unwrapped``, which underneath calls
+do this, we use the |hpx| facility ``unwrapped``, which underneath calls
 ``.get()`` on each of the futures so that the function ``heat`` will be passed
 doubles and not futures to doubles.
 
@@ -100,41 +100,41 @@ In example 3, we return to our serial code to figure out how to control the
 grain size of our program. The strategy that we employ is to create "partitions"
 of data points. The user can define how many partitions are created and how many
 data points are contained in each partition. This is accomplished by creating
-the ``struct partition`` which contains a member object ``data_``, a vector of
-doubles which holds the data points assigned to a particular instance of
+the ``struct partition``, which contains a member object ``data_``, a vector of
+doubles that holds the data points assigned to a particular instance of
 ``partition``.
 
 In example 4, we take advantage of the partition setup by redefining ``space``
 to be a vector of shared_futures with each future representing a partition. In
 this manner, each future represents several data points. Because the user can
-define how many data points are contained in each partition (and therefore how
-many data points that are represented by one future) a user can now control the
+define how many data points are contained in each partition (and, therefore, how
+many data points are represented by one future) a user can now control the
 grainsize of the simulation. The rest of the code was then futurized in the same
 manner as was done in example 2. It should be noted how strikingly similar
 example 4 is to example 2.
 
 Example 4 finally shows good results. This code scales equivalently to the
 OpenMP version. While these results are promising, there are more opportunities
-to improve the application's scalability. Currently this code only runs on one
-:term:`locality`, but to get the full benefit of HPX we need to be able to
+to improve the application's scalability. Currently, this code only runs on one
+:term:`locality`, but to get the full benefit of |hpx|, we need to be able to
 distribute the work to other machines in a cluster. We begin to add this
 functionality in example 5.
 
 In order to run on a distributed system, a large amount of boilerplate code must
-be added. Fortunately, HPX provides us with the concept of a :term:`component`
+be added. Fortunately, |hpx| provides us with the concept of a :term:`component`,
 which saves us from having to write quite as much code. A component is an object
-which can be remotely accessed using its global address. Components are made of
+that can be remotely accessed using its global address. Components are made of
 two parts: a server and a client class. While the client class is not required,
 abstracting the server behind a client allows us to ensure type safety instead
 of having to pass around pointers to global objects. Example 5 renames example
 4's ``struct partition`` to ``partition_data`` and adds serialization support.
-Next we add the server side representation of the data in the structure
+Next, we add the server side representation of the data in the structure
 ``partition_server``. ``Partition_server`` inherits from
-``hpx::components::component_base`` which contains a server side component
+``hpx::components::component_base``, which contains a server-side component
 boilerplate. The boilerplate code allows a component's public members to be
 accessible anywhere on the machine via its Global Identifier (GID). To
 encapsulate the component, we create a client side helper class. This object
-allows us to create new instances of our component, and access its members
+allows us to create new instances of our component and access its members
 without having to know its GID. In addition, we are using the client class to
 assist us with managing our asynchrony. For example, our client class
 ``partition``\ 's member function ``get_data()`` returns a future to
