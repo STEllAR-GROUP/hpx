@@ -10,7 +10,7 @@
 
 #include <hpx/runtime/threads/execution_agent.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -25,6 +25,7 @@
 #include <sstream>
 
 namespace hpx { namespace threads {
+
     execution_agent::execution_agent(
         coroutines::detail::coroutine_impl* coroutine) noexcept
       : self_(coroutine)
@@ -34,7 +35,8 @@ namespace hpx { namespace threads {
     std::string execution_agent::description() const
     {
         thread_id_type id = self_.get_thread_id();
-        return hpx::util::format("{}: {}", id, id->get_description());
+        return hpx::util::format(
+            "{}: {}", id, get_thread_id_data(id)->get_description());
     }
 
     void execution_agent::yield(const char* desc)
@@ -136,10 +138,10 @@ namespace hpx { namespace threads {
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             detail::reset_backtrace bt(id, ec);
 #endif
-            HPX_ASSERT(id->get_state().state() == active);
+            HPX_ASSERT(get_thread_id_data(id)->get_state().state() == active);
             HPX_ASSERT(state != active);
             statex = self_.yield(threads::thread_result_type(state, nullptr));
-            HPX_ASSERT(id->get_state().state() == active);
+            HPX_ASSERT(get_thread_id_data(id)->get_state().state() == active);
         }
 
         // handle interruption, if needed
@@ -167,7 +169,7 @@ namespace hpx { namespace threads {
         std::size_t k = 0;
         do
         {
-            previous_state = id->get_state();
+            previous_state = get_thread_id_data(id)->get_state();
             thread_state_enum previous_state_val = previous_state.state();
 
             // nothing to do here if the state doesn't change
@@ -176,7 +178,8 @@ namespace hpx { namespace threads {
                 LTM_(warning)
                     << "resume: old thread state is already pending "
                        "thread state, aborting state change, thread("
-                    << id << "), description(" << id->get_description() << ")";
+                    << id << "), description("
+                    << get_thread_id_data(id)->get_description() << ")";
                 return;
             }
             switch (previous_state_val)
@@ -190,14 +193,16 @@ namespace hpx { namespace threads {
                 LTM_(warning)
                     << "resume: thread is active, retrying state "
                        "change, thread("
-                    << id << "), description(" << id->get_description() << ")";
+                    << id << "), description("
+                    << get_thread_id_data(id)->get_description() << ")";
                 continue;
             }
             case terminated: {
                 LTM_(warning)
                     << "resume: thread is terminated, aborting state "
                        "change, thread("
-                    << id << "), description(" << id->get_description() << ")";
+                    << id << "), description("
+                    << get_thread_id_data(id)->get_description() << ")";
                 return;
             }
             case pending:
@@ -224,15 +229,14 @@ namespace hpx { namespace threads {
             // (if it's not pending anymore).
 
             LTM_(info) << "resume: thread(" << id
-                       << "), "
-                          "description("
-                       << id->get_description()
-                       << "), "
-                          "old state("
+                       << "), description("
+                       << get_thread_id_data(id)->get_description()
+                       << "), old state("
                        << get_thread_state_name(previous_state_val) << ")";
 
             // So all what we do here is to set the new state.
-            if (id->restore_state(pending, statex, previous_state))
+            if (get_thread_id_data(id)->restore_state(
+                    pending, statex, previous_state))
                 break;
 
             // state has changed since we fetched it from the thread, retry
@@ -240,11 +244,9 @@ namespace hpx { namespace threads {
                 << "resume: state has been changed since it was fetched, "
                    "retrying, thread("
                 << id
-                << "), "
-                   "description("
-                << id->get_description()
-                << "), "
-                   "old state("
+                << "), description("
+                << get_thread_id_data(id)->get_description()
+                << "), old state("
                 << get_thread_state_name(previous_state_val) << ")";
 
         } while (true);
@@ -253,10 +255,11 @@ namespace hpx { namespace threads {
         if (!(previous_state_val == pending ||
                 previous_state_val == pending_boost))
         {
-            auto scheduler = id->get_scheduler_base();
+            auto* data = get_thread_id_data(id);
+            auto scheduler = data->get_scheduler_base();
             auto hint = thread_schedule_hint();
             scheduler->schedule_thread(
-                id.get(), thread_schedule_hint(), true, id->get_priority());
+                data, thread_schedule_hint(), true, data->get_priority());
             // Wake up scheduler
             scheduler->do_some_work(hint.hint);
         }

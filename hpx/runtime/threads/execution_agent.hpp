@@ -12,10 +12,10 @@
 #include <hpx/basic_execution/agent_base.hpp>
 #include <hpx/basic_execution/context_base.hpp>
 #include <hpx/basic_execution/resource_base.hpp>
-#include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
-#include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_id_type.hpp>
+#include <hpx/coroutines/detail/coroutine_impl.hpp>
+#include <hpx/coroutines/detail/coroutine_self.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>

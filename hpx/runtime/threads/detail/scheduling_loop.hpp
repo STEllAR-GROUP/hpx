@@ -473,7 +473,8 @@ namespace hpx { namespace threads { namespace detail
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
                         // invoke background thread
-                        thrd_stat = (*get_thread_id_data(background_thread))(context_storage);
+                        thrd_stat = (*get_thread_id_data(background_thread))(
+                            context_storage);
 
                         thread_data* next = thrd_stat.get_next_thread();
                         if (next != nullptr &&

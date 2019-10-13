@@ -18,8 +18,7 @@
 #endif
 
 #include <hpx/basic_execution/this_thread.hpp>
-
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 
 namespace hpx { namespace util { namespace detail
 {

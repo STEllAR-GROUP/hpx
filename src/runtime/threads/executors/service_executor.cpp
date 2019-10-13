@@ -9,8 +9,9 @@
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/timing/steady_clock.hpp>
