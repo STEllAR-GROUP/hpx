@@ -19,6 +19,9 @@
 #include <hpx/errors/throw_exception.hpp>
 #endif
 
+#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
+
 namespace hpx { namespace util { namespace detail
 {
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
