@@ -9,7 +9,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/runtime/serialization/serialize_buffer.hpp>
+#include <hpx/serialization/serialize_buffer.hpp>
 
 #include <boost/assert.hpp>
 

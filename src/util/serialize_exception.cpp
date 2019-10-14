@@ -7,7 +7,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/custom_exception_info.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
 #include <boost/exception/diagnostic_information.hpp>

@@ -11,8 +11,8 @@
 //                               hpxinspect:noinclude:HPX_ASSERT
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/assertion/config/defines.hpp>
+#include <hpx/assertion.hpp>
 
 #if defined(HPX_ASSERTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)

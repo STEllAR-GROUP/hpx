@@ -9,7 +9,7 @@
 #ifndef HPX_SMALL_BIG_OBJECT_HPP
 #define HPX_SMALL_BIG_OBJECT_HPP
 
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <cstdint>
 #include <iostream>

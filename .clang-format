@@ -74,14 +74,16 @@ IncludeCategories:
     Priority:        1
   - Regex:           '^<hpx/.*/config\.hpp>'
     Priority:        2
-  - Regex:           '^<hpx/.*\.hpp>'
+  - Regex:           '^<hpx/.*/config/defines\.hpp>'
     Priority:        3
-  - Regex:           '^<hpx/parallel/.*\.hpp>'
+  - Regex:           '^<hpx/.*\.hpp>'
     Priority:        4
-  - Regex:           '^<.*'
+  - Regex:           '^<hpx/parallel/.*\.hpp>'
     Priority:        5
-  - Regex:           '.*'
+  - Regex:           '^<.*'
     Priority:        6
+  - Regex:           '.*'
+    Priority:        7
 # IncludeIsMainRegex: ''
 IndentCaseLabels: false
 IndentWidth: 4

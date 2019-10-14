@@ -10,5 +10,4 @@
 #define HPX_@name_upper@_HPP
 
 @module_headers@
-
 #endif

@@ -30,7 +30,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <simple_profiler.hpp>
 
 //

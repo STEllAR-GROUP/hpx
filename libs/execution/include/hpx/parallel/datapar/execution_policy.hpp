@@ -15,7 +15,7 @@
 #include <hpx/parallel/executors/parallel_executor.hpp>
 #include <hpx/parallel/executors/rebind_executor.hpp>
 #include <hpx/parallel/executors/sequenced_executor.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/traits/is_executor.hpp>

@@ -42,8 +42,8 @@
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
@@ -961,6 +961,7 @@ bool addressing_service::is_local_address_cached(
     // Assume non-local operation if the gid is known to have been migrated
     naming::gid_type id(naming::detail::get_stripped_gid_except_dont_cache(gid));
 
+#if defined(HPX_HAVE_NETWORKING)
     if (naming::detail::is_migratable(gid))
     {
         std::lock_guard<mutex_type> lock(migrated_objects_mtx_);
@@ -971,6 +972,7 @@ bool addressing_service::is_local_address_cached(
             return false;
         }
     }
+#endif
 
     // Try to resolve the address of the GID from the locally available
     // information.

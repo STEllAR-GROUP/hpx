@@ -21,9 +21,9 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/runtime/serialization/shared_ptr.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/shared_ptr.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>

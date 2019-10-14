@@ -9,7 +9,7 @@
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <vector>

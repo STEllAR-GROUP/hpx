@@ -8,7 +8,7 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>

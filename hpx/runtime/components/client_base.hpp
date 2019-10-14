@@ -16,7 +16,7 @@
 #include <hpx/runtime/components/make_client.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/action_remote_result.hpp>

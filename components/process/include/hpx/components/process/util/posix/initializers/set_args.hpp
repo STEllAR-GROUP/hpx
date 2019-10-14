@@ -15,7 +15,7 @@
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
-#include <hpx/runtime/serialization/string.hpp>
+#include <hpx/serialization/string.hpp>
 
 #include <cstddef>
 #include <string>

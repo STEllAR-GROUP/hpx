@@ -19,7 +19,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/functional/deferred_call.hpp>

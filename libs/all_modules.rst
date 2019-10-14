@@ -22,6 +22,7 @@ All modules
    /libs/concepts/docs/index.rst
    /libs/concurrency/docs/index.rst
    /libs/config/docs/index.rst
+   /libs/coroutines/docs/index.rst
    /libs/datastructures/docs/index.rst
    /libs/debugging/docs/index.rst
    /libs/errors/docs/index.rst
@@ -38,6 +39,7 @@ All modules
    /libs/program_options/docs/index.rst
    /libs/resiliency/docs/index.rst
    /libs/segmented_algorithms/docs/index.rst
+   /libs/serialization/docs/index.rst
    /libs/statistics/docs/index.rst
    /libs/testing/docs/index.rst
    /libs/thread_support/docs/index.rst

@@ -5,7 +5,7 @@
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
 
-//  SPDX-License-Identifier: BSL-1.0
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -20,9 +20,9 @@
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/runtime/serialization/detail/raw_ptr.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/base_object.hpp>
+#include <hpx/serialization/detail/raw_ptr.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -150,12 +150,12 @@ namespace hpx { namespace util {
         }
 
         // Perfect forwarding of T
-        template <typename T>
+        template <typename T,
+            typename Enable = typename std::enable_if<!std::is_same<basic_any,
+                typename std::decay<T>::type>::value>::type>
         basic_any(T&& x,
-            typename std::enable_if<
-                !std::is_same<basic_any, typename std::decay<T>::type>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type* = nullptr)
+            typename std::enable_if<std::is_copy_constructible<
+                typename std::decay<T>::type>::value>::type* = nullptr)
           : table(detail::any::get_table<typename util::decay<T>::type>::
                     template get<IArch, OArch, Char, std::true_type>())
           , object(nullptr)

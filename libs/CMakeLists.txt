@@ -19,6 +19,7 @@ set(HPX_LIBS
   concepts
   concurrency
   config
+  coroutines
   datastructures
   debugging
   errors
@@ -35,6 +36,7 @@ set(HPX_LIBS
   program_options
   resiliency
   segmented_algorithms
+  serialization
   statistics
   testing
   thread_support
@@ -84,7 +86,7 @@ hpx_info("Configuring modules:")
 
 # variables needed for modules.cpp
 set(MODULE_FORCE_LINKING_INCLUDES)
-set(MODULE_FORCE_LINKING_INCLUDES)
+set(MODULE_FORCE_LINKING_CALLS)
 
 # variables needed for config_strings_modules.hpp
 set(CONFIG_STRINGS_MODULES_INCLUDES)
@@ -117,4 +119,3 @@ configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
   "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/config_defines_strings_modules.hpp"
   @ONLY)
-

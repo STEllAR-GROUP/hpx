@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>
 #include <mutex>

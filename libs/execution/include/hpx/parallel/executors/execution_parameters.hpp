@@ -17,7 +17,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
+#include <hpx/serialization/base_object.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
@@ -37,6 +37,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace execution {
+
     namespace detail {
         /// \cond NOINTERNAL
 
@@ -54,7 +55,11 @@ namespace hpx { namespace parallel { namespace execution {
                 Executor&& exec, F&& f, std::size_t cores,
                 std::size_t num_tasks)
             {
-                return (num_tasks + 4 * cores - 1) / (4 * cores);
+                // return zero for the chunk-size which will tell the
+                // implementation to calculate the chunk size either based based
+                // on a specified maximum number of chunks or based on some
+                // internal rule (if no maximum number of chunks was given)
+                return 0;
             }
 
             template <typename AnyParameters, typename Executor, typename F>
@@ -111,7 +116,11 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::detail::wrap_int, AnyParameters&&, Executor&&,
                 std::size_t cores, std::size_t num_tasks)
             {
-                return 4 * cores;    // assume 4 times the number of cores
+                // return zero chunks which will tell the implementation to
+                // calculate the number of chunks either based based on a
+                // specified chunk size or based on some internal rule (if no
+                // chunk-size was given)
+                return 0;
             }
 
             template <typename AnyParameters, typename Executor>
@@ -623,7 +632,7 @@ namespace hpx { namespace parallel { namespace execution {
           , reset_thread_distribution_call_helper<T,
                 boost::reference_wrapper<T>>
         {
-            typedef boost::reference_wrapper<T> wrapper_type;
+            using wrapper_type = boost::reference_wrapper<T>;
 
             unwrapper(wrapper_type wrapped_param)
               : base_member_helper<wrapper_type>(wrapped_param)
@@ -642,7 +651,7 @@ namespace hpx { namespace parallel { namespace execution {
           , processing_units_count_call_helper<T, std::reference_wrapper<T>>
           , reset_thread_distribution_call_helper<T, std::reference_wrapper<T>>
         {
-            typedef std::reference_wrapper<T> wrapper_type;
+            using wrapper_type = std::reference_wrapper<T>;
 
             unwrapper(wrapper_type wrapped_param)
               : base_member_helper<wrapper_type>(wrapped_param)
@@ -722,17 +731,16 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename... Params>
     struct executor_parameters_join
     {
-        typedef detail::executor_parameters<
-            typename hpx::util::decay<Params>::type...>
-            type;
+        using type = detail::executor_parameters<
+            typename hpx::util::decay<Params>::type...>;
     };
 
     template <typename... Params>
     HPX_FORCEINLINE typename executor_parameters_join<Params...>::type
     join_executor_parameters(Params&&... params)
     {
-        typedef
-            typename executor_parameters_join<Params...>::type joined_params;
+        using joined_params =
+            typename executor_parameters_join<Params...>::type;
         return joined_params(std::forward<Params>(params)...);
     }
 
@@ -740,7 +748,7 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename Param>
     struct executor_parameters_join<Param>
     {
-        typedef Param type;
+        using type = Param;
     };
 
     template <typename Param>

@@ -7,8 +7,8 @@
 #if !defined(HPX_UTIL_STORAGE_TUPLE_HPP_APR_11_2013_1010AM)
 #define HPX_UTIL_STORAGE_TUPLE_HPP_APR_11_2013_1010AM
 
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/serializable_any.hpp>
 

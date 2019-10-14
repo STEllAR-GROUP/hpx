@@ -18,9 +18,9 @@
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/distributed_metadata_base.hpp>
 #include <hpx/runtime/get_ptr.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/unordered_map.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/unordered_map.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/functional/bind_front.hpp>
 

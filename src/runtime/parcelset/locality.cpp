@@ -11,8 +11,8 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/string.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/string.hpp>
 
 #include <boost/io/ios_state.hpp>
 

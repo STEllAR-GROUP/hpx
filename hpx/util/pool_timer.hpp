@@ -11,8 +11,6 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
-#include <boost/system/error_code.hpp>
-
 #include <memory>
 #include <string>
 

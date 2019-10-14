@@ -13,6 +13,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime_handlers.hpp>
 #include <hpx/util/backtrace.hpp>
@@ -24,6 +25,7 @@
 #include <string>
 
 namespace hpx { namespace detail {
+
     HPX_NORETURN void assertion_handler(
         hpx::assertion::source_location const& loc, const char* expr,
         std::string const& msg)
@@ -43,6 +45,13 @@ namespace hpx { namespace detail {
                   << std::endl;
         std::abort();
     }
+
+#if defined(HPX_HAVE_APEX)
+    bool enable_parent_task_handler()
+    {
+        return hpx::get_initial_num_localities() == 1;
+    }
+#endif
 
     void test_failure_handler()
     {

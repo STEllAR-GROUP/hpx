@@ -10,6 +10,12 @@ set(subdirs
     container_algorithms
    )
 
+if(HPX_WITH_DATAPAR_VC)
+set(subdirs ${subdirs}
+    datapar_algorithms
+   )
+endif()
+
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.unit.modules.algorithms.${subdir})
   add_subdirectory(${subdir})

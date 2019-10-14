@@ -28,8 +28,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/register_locks.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/serialization/map.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/map.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/util/ini.hpp>
 

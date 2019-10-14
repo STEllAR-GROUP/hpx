@@ -19,7 +19,7 @@
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cuda_runtime.h>
 

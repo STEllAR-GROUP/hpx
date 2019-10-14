@@ -11,13 +11,16 @@ function(create_configuration_summary message module_name)
 
   set(hpx_config_information)
   set(upper_cfg_name "HPX")
+  set(upper_option_suffix "")
 
   string(TOUPPER ${module_name} module_name_uc)
   if(NOT "${module_name_uc}x" STREQUAL "HPXx")
     set(upper_cfg_name "HPX_${module_name_uc}")
+    set(upper_option_suffix "_${module_name_uc}")
   endif()
 
-  get_property(DEFINITIONS_VARS GLOBAL PROPERTY HPX_CONFIG_DEFINITIONS)
+  get_property(DEFINITIONS_VARS GLOBAL
+    PROPERTY HPX_CONFIG_DEFINITIONS${upper_option_suffix})
   if(DEFINED DEFINITIONS_VARS)
     list(SORT DEFINITIONS_VARS)
     list(REMOVE_DUPLICATES DEFINITIONS_VARS)

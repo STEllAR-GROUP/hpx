@@ -10,8 +10,8 @@
 #define HPX_RUNTIME_LAUNCH_POLICY_AUG_13_2015_0647PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <type_traits>
 #include <utility>

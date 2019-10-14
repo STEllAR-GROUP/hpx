@@ -142,7 +142,7 @@ namespace hpx { namespace lcos {
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/calculate_fanout.hpp>

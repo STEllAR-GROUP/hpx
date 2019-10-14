@@ -13,7 +13,7 @@
 
 #if defined(HPX_HAVE_COMPRESSION_BZIP2)
 
-#include <hpx/runtime/serialization/binary_filter.hpp>
+#include <hpx/serialization/binary_filter.hpp>
 
 #include <boost/iostreams/filter/bzip2.hpp>
 

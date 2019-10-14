@@ -18,8 +18,8 @@
 
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 
 #include <cstddef>
 #include <fstream>

@@ -19,12 +19,12 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_MORE_THAN_64_THREADS)
 # if defined(HPX_HAVE_MAX_CPU_COUNT)
-#  include <hpx/runtime/serialization/bitset.hpp>
+#  include <hpx/serialization/bitset.hpp>
 # else
-#  include <hpx/runtime/serialization/dynamic_bitset.hpp>
+#  include <hpx/serialization/dynamic_bitset.hpp>
 # endif
 #endif
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #endif
 
 #include <cstddef>

@@ -5,9 +5,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    annotated_minmax_2593
     bulk_then_execute_3182
+    chunk_size_4118
+    future_then_async_executor
     handled_exception_2959
     is_executor_1691
+    parallel_executor_1781
    )
 
 if(HPX_WITH_DATAPAR)
