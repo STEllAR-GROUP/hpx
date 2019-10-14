@@ -76,7 +76,4 @@ given futures. It AND-composes all future objects given and returns after they
 finished executing. The function ``wait_all`` returns after all futures have
 become ready. All input futures are still valid after wait all returns.
 
-.. literalinclude:: ../../hpx/lcos/wait_all.hpp
-   :lines: 48-91
-
 .. literalinclude:: ../../examples/wait_all.cpp
