@@ -13,7 +13,7 @@
 #include <hpx/runtime/agas/component_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/vector.hpp>
 
 using hpx::components::component_agas_component_namespace;
 

@@ -15,7 +15,6 @@ set(subdirs
     parallel_block
     performance_counter
     resource
-    serialization
     threads
     topology
     traits

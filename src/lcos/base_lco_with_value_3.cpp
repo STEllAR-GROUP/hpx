@@ -7,7 +7,7 @@
 
 #include <hpx/apply.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/util/ini.hpp>
 
 #include <cstdint>

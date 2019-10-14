@@ -12,7 +12,7 @@
 
 #if defined(HPX_HAVE_COMPRESSION_SNAPPY)
 
-#include <hpx/runtime/serialization/binary_filter.hpp>
+#include <hpx/serialization/binary_filter.hpp>
 
 #include <boost/iostreams/filter/zlib.hpp>
 

@@ -20,6 +20,7 @@
 #include <hpx/util/pool_timer.hpp>
 
 #include <boost/asio/basic_waitable_timer.hpp>
+#include <boost/system/error_code.hpp>
 
 #include <chrono>
 #include <memory>

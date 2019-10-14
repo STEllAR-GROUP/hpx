@@ -19,7 +19,7 @@
 #include <hpx/parallel/execution.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/util/first_argument.hpp>
 
 #include <boost/range/irange.hpp>

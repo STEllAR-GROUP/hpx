@@ -45,7 +45,7 @@ namespace debug {
         hpx::threads::enumerate_threads(
             [&thread_data_vector](hpx::threads::thread_id_type id) -> bool
             {
-                hpx::threads::thread_data *data = id.get();
+                hpx::threads::thread_data *data = get_thread_id_data(id);
                 thread_data_vector.push_back(data);
                 return true; // always continue enumeration
             },

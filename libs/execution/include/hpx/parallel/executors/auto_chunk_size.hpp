@@ -10,7 +10,7 @@
 #define HPX_PARALLEL_AUTO_CHUNK_SIZE_JUL_31_2015_0742PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/timing.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 

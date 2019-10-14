@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/state.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
@@ -166,7 +166,7 @@ namespace hpx { namespace threads { namespace executors
     // scheduler outlives the wrapper
     current_executor::current_executor() //-V730
       : scheduled_executor(new detail::current_executor(
-            get_self_id()->get_scheduler_base()))
+            get_self_id_data()->get_scheduler_base()))
     {}
 
     current_executor::current_executor(policies::scheduler_base* scheduler) //-V730

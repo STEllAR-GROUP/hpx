@@ -10,7 +10,7 @@
 #define HPX_UTIL_DETAIL_VTABLE_SERIALIZABLE_FUNCTION_VTABLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
+#include <hpx/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/functional/detail/function_registration.hpp>
 #include <hpx/functional/detail/empty_function.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>

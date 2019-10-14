@@ -12,7 +12,7 @@ __global__ void trivial_kernel(T val) {
   printf("hello from gpu with value %f\n", val);
 }
 
-// here is a wrapper that can call the kernel from C++ outsied of the .cu file
+// here is a wrapper that can call the kernel from C++ outside of the .cu file
 template <typename T>
 void cuda_trivial_kernel(T t, cudaStream_t stream)
 {

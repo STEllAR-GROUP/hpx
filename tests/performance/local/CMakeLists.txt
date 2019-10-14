@@ -116,16 +116,8 @@ set(benchmarks ${benchmarks}
     coroutines_call_overhead
     function_object_wrapper_overhead
     future_overhead
-    serialization_performance
     sizeof
    )
-
-if(HPX_WITH_NETWORKING)
-  set(benchmarks ${benchmarks}
-    serialization_overhead
-  )
-  set(serialization_overhead_FLAGS DEPENDENCIES iostreams_component)
-endif()
 
 set(future_overhead_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 set(sizeof_FLAGS DEPENDENCIES iostreams_component)
@@ -171,7 +163,6 @@ set(timed_task_spawn_PARAMETERS NO_HPX_MAIN)
 set(hpx_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(native_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(coroutines_call_overhead_PARAMETERS NO_HPX_MAIN)
-set(serialization_performance_PARAMETERS NO_HPX_MAIN)
 
 if(HPX_WITH_CUDA)
   set_source_files_properties(stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)

@@ -21,9 +21,9 @@
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
-#include <hpx/runtime/serialization/input_archive.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
-#include <hpx/runtime/serialization/unique_ptr.hpp>
+#include <hpx/serialization/input_archive.hpp>
+#include <hpx/serialization/output_archive.hpp>
+#include <hpx/serialization/unique_ptr.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/action_priority.hpp>

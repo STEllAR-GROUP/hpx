@@ -609,32 +609,6 @@ jobs:
       - store_artifacts:
           path: tests.unit.resource
 
-  tests.unit.serialization:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.serialization
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.serialization
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.serialization
-      - store_artifacts:
-          path: tests.unit.serialization
-
   tests.unit.threads:
     <<: *defaults
     steps:
@@ -763,6 +737,7 @@ jobs:
               ninja -j2 -k 0 tests.unit.modules.iterator_support
               ninja -j2 -k 0 tests.unit.modules.logging
               ninja -j2 -k 0 tests.unit.modules.preprocessor
+              ninja -j2 -k 0 tests.unit.modules.serialization
               ninja -j2 -k 0 tests.unit.modules.statistics
               ninja -j2 -k 0 tests.unit.modules.testing
               ninja -j2 -k 0 tests.unit.modules.thread_support
@@ -787,6 +762,7 @@ jobs:
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.iterator_support
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.logging
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.serialization
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.statistics
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.testing
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
@@ -1088,8 +1064,6 @@ workflows:
           <<: *core_dependency
       - tests.unit.resource:
           <<: *core_dependency
-      - tests.unit.serialization:
-          <<: *core_dependency
       - tests.unit.threads:
           <<: *core_dependency
       - tests.unit.topology:
@@ -1136,7 +1110,6 @@ workflows:
             - tests.unit.parcelset
             - tests.unit.performance_counter
             - tests.unit.resource
-            - tests.unit.serialization
             - tests.unit.threads
             - tests.unit.topology
             - tests.unit.traits

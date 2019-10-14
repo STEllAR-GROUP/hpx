@@ -19,9 +19,9 @@
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/runtime/serialization/string.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/string.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/util/unwrap.hpp>

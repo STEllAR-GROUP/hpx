@@ -8,7 +8,7 @@
 
 #include <hpx/errors.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <boost/io/ios_state.hpp>
 

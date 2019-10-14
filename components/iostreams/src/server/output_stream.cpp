@@ -11,9 +11,9 @@
 
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/shared_ptr.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/shared_ptr.hpp>
+#include <hpx/serialization/vector.hpp>
 
 #include <hpx/components/iostreams/server/buffer.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>

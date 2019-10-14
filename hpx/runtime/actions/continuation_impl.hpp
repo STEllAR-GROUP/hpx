@@ -11,7 +11,7 @@
 #include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/serialization/access.hpp>
+#include <hpx/serialization/access.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <utility>

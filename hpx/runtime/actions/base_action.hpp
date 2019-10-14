@@ -23,9 +23,9 @@
 #include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_id_type.hpp>
-#include <hpx/traits/polymorphic_traits.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/coroutines/thread_id_type.hpp>
+#include <hpx/serialization/traits/polymorphic_traits.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/concurrency/itt_notify.hpp>

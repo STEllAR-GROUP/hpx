@@ -11,7 +11,7 @@
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/topology/topology.hpp>

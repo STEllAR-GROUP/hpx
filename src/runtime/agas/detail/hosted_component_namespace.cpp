@@ -12,7 +12,7 @@
 #include <hpx/async.hpp>
 #include <hpx/runtime/agas/detail/hosted_component_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/vector.hpp>
 
 #include <cstdint>
 #include <string>

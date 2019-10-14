@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(JENKINS_HASH_HAS_SERIALIZATION_SUPPORT)
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #endif
 
 #include <cstddef>

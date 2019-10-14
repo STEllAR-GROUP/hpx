@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/config/defines.hpp>
+#include <hpx/datastructures/any.hpp>
 
 #if defined(HPX_DATASTRUCTURES_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)

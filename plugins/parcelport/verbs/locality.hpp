@@ -8,7 +8,7 @@
 #define HPX_PARCELSET_POLICIES_VERBS_LOCALITY_HPP
 
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 //
 #include <cstdint>
 

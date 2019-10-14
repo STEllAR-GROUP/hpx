@@ -14,7 +14,7 @@
 ==============================================================================*/
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/util/serializable_any.hpp>
 
 #include <boost/functional/hash.hpp>

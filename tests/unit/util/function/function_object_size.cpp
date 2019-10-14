@@ -10,7 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/serializable_function.hpp>
 
-#include <hpx/runtime/serialization/access.hpp>
+#include <hpx/serialization/access.hpp>
 
 #include <cstdint>
 #include <iostream>

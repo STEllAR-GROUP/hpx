@@ -58,6 +58,7 @@ add_hpx_module(collectives
       hpx_cache
       hpx_concurrency
       hpx_config
+      hpx_coroutines
       hpx_datastructures
       hpx_errors
       hpx_execution
@@ -70,6 +71,7 @@ add_hpx_module(collectives
       hpx_plugin
       hpx_preprocessor
       hpx_program_options
+      hpx_serialization
       hpx_timing
       hpx_thread_support
       hpx_topology

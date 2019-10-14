@@ -17,9 +17,9 @@
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/runtime/serialization/input_archive.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
+#include <hpx/serialization/base_object.hpp>
+#include <hpx/serialization/input_archive.hpp>
+#include <hpx/serialization/output_archive.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/traits/action_remote_result.hpp>

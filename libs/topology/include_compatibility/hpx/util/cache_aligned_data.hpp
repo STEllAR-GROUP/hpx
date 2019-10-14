@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/topology/cache_aligned_data.hpp>
 #include <hpx/topology/config/defines.hpp>
+#include <hpx/topology/cache_aligned_data.hpp>
 
 #if defined(HPX_TOPOLOGY_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)

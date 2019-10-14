@@ -11,8 +11,8 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
 #include <cstdint>
 #include <iosfwd>
