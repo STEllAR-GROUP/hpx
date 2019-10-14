@@ -7,7 +7,8 @@
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 
 #include <cstddef>
-#include <utility>
+#include <cstdint>
+#include <tuple>
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -16,6 +17,15 @@ namespace hpx { namespace threads { namespace detail
         {
             HPX_NATIVE_TLS std::size_t thread_num_tss_ = std::size_t(-1);
             return thread_num_tss_;
+        }
+
+        thread_tuple& thread_numbers_tss()
+        {
+            HPX_NATIVE_TLS thread_tuple
+                thread_numbers_tss_ = {
+                    std::uint16_t(-1), std::uint16_t(-1)
+                };
+            return thread_numbers_tss_;
         }
     }
 
@@ -29,4 +39,15 @@ namespace hpx { namespace threads { namespace detail
     {
         return thread_num_tss();
     }
+
+    void set_thread_numbers_tss(const thread_tuple &tup)
+    {
+        thread_numbers_tss() = tup;
+    }
+
+    thread_tuple get_thread_numbers_tss()
+    {
+        return thread_numbers_tss();
+    }
+
 }}}
