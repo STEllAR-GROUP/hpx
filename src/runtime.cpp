@@ -1,12 +1,16 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/concurrency/thread_name.hpp>
+#include <hpx/custom_exception_info.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
@@ -21,16 +25,15 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/thread_hooks.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
+#include <hpx/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/state.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/thread_mapper.hpp>
@@ -294,15 +297,6 @@ namespace hpx
         }
     }
 
-    namespace detail
-    {
-        std::string& runtime_thread_name()
-        {
-            static HPX_NATIVE_TLS std::string thread_name_;
-            return thread_name_;
-        }
-    }
-
     void runtime::init_tss()
     {
         // initialize our TSS
@@ -390,6 +384,7 @@ namespace hpx
             active_counters_->stop_evaluating_counters();
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     void runtime::register_message_handler(char const* message_handler_type,
         char const* action, error_code& ec)
     {
@@ -413,6 +408,7 @@ namespace hpx
         return runtime_support_->create_binary_filter(binary_filter_type,
             compress, next_filter, ec);
     }
+#endif
 
     /// \brief Register all performance counter types related to this runtime
     ///        instance
@@ -550,7 +546,7 @@ namespace hpx
               &performance_counters::local_action_invocation_counter_discoverer,
               ""
             },
-
+#if defined(HPX_HAVE_NETWORKING)
             { "/runtime/count/remote-action-invocation",
               performance_counters::counter_raw,
               "returns the number of (remote) invocations of a specific action "
@@ -561,6 +557,7 @@ namespace hpx
               &performance_counters::remote_action_invocation_counter_discoverer,
               ""
             }
+#endif
         };
         performance_counters::install_counter_types(
             statistic_counter_types,
@@ -864,7 +861,7 @@ namespace hpx
 
     std::string get_thread_name()
     {
-        std::string& thread_name = detail::runtime_thread_name();
+        std::string& thread_name = detail::thread_name();
         if (thread_name.empty()) return "<unkown>";
         return thread_name;
     }
@@ -1365,6 +1362,7 @@ namespace hpx { namespace naming
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
 namespace hpx { namespace parcelset
 {
     bool do_background_work(
@@ -1374,6 +1372,7 @@ namespace hpx { namespace parcelset
             num_thread, mode);
     }
 }}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -1425,6 +1424,17 @@ namespace hpx { namespace threads
     HPX_API_EXPORT void remove_scheduler_mode(threads::policies::scheduler_mode m)
     {
         get_runtime().get_thread_manager().remove_scheduler_mode(m);
+    }
+
+    HPX_API_EXPORT topology const& get_topology()
+    {
+        hpx::runtime* rt = hpx::get_runtime_ptr();
+        if (rt == nullptr)
+        {
+            HPX_THROW_EXCEPTION(invalid_status, "hpx::threads::get_topology",
+                "the hpx runtime system has not been initialized yet");
+        }
+        return rt->get_topology();
     }
 }}
 
@@ -1515,6 +1525,7 @@ namespace hpx
         }
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     // Create an instance of a message handler plugin
     void register_message_handler(char const* message_handler_type,
@@ -1560,6 +1571,7 @@ namespace hpx
             "the runtime system is not available at this time");
         return nullptr;
     }
+#endif
 
     // helper function to stop evaluating counters during shutdown
     void stop_evaluating_counters()

@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,11 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <utility>
 
@@ -22,24 +22,12 @@ namespace hpx { namespace lcos { namespace local
     struct conditional_trigger
     {
     public:
-        conditional_trigger()
-        {
-        }
+        conditional_trigger() = default;
 
-        conditional_trigger(conditional_trigger && rhs)
-          : cond_(std::move(rhs.cond_))
-        {
-        }
+        conditional_trigger(conditional_trigger && rhs) noexcept = default;
 
-        conditional_trigger& operator=(conditional_trigger && rhs)
-        {
-            if (this != &rhs)
-            {
-                promise_ = std::move(rhs.promise_);
-                cond_ = std::move(rhs.cond_);
-            }
-            return *this;
-        }
+        conditional_trigger& operator=(
+            conditional_trigger&& rhs) noexcept = default;
 
         /// \brief get a future allowing to wait for the trigger to fire
         template <typename Condition>

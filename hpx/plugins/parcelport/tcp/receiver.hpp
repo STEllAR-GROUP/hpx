@@ -6,6 +6,7 @@
 //  Parts of this code were taken from the Boost.Asio library
 //  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -22,9 +23,9 @@
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/protect.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/functional/protect.hpp>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>

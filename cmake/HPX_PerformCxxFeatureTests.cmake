@@ -3,6 +3,7 @@
 # Copyright (c) 2013-2016 Agustin Berge
 # Copyright (c)      2017 Taeguk Kwon
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -92,6 +93,10 @@ function(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_atomic(
     REQUIRED "HPX needs support for C++11 std::atomic")
 
+  # Separately check for 128 bit atomics
+  hpx_check_for_cxx11_std_atomic_128bit(
+    DEFINITIONS HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+
   hpx_check_for_cxx11_std_chrono(
     REQUIRED "HPX needs support for C++11 std::chrono")
 
@@ -133,6 +138,9 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx11_std_shared_ptr(
     REQUIRED "HPX needs support for C++11 std::shared_ptr")
+
+  hpx_check_for_cxx11_std_shared_ptr_lwg3018(
+    DEFINITIONS HPX_HAVE_CXX11_SHARED_PTR_LWG3018)
 
   hpx_check_for_cxx11_std_shuffle(
     DEFINITIONS HPX_HAVE_CXX11_STD_SHUFFLE)
@@ -193,8 +201,11 @@ function(hpx_perform_cxx_feature_tests)
 
   if(HPX_WITH_CXX1Z OR HPX_WITH_CXX17 OR HPX_WITH_CXX2A)
     # Check the availability of certain C++17 language features
+    hpx_check_for_cxx17_filesystem(
+      DEFINITIONS HPX_HAVE_CXX17_FILESYSTEM)
+
     hpx_check_for_cxx17_fold_expressions(
-        DEFINITIONS HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
+      DEFINITIONS HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
 
     hpx_check_for_cxx17_fallthrough_attribute(
       DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
@@ -210,5 +221,8 @@ function(hpx_perform_cxx_feature_tests)
 
     hpx_check_for_cxx17_aligned_new(
       DEFINITIONS HPX_HAVE_CXX17_ALIGNED_NEW)
+
+    hpx_check_for_cxx17_std_in_place_type_t(
+      DEFINITIONS HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
   endif()
 endfunction()

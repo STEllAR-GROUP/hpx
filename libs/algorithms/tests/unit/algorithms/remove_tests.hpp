@@ -1,5 +1,6 @@
 //  Copyright (c) 2017-2018 Taeguk Kwon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,7 +9,7 @@
 
 #include <hpx/include/parallel_remove.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -47,9 +48,9 @@ struct user_defined_type
 {
     user_defined_type() = default;
     user_defined_type(int rand_no)
-        : val(rand_no)
+      : val(rand_no)
     {
-        std::uniform_int_distribution<> dis(0,name_list.size()-1);
+        std::uniform_int_distribution<> dis(0, name_list.size() - 1);
         name = name_list[dis(g)];
     }
 
@@ -90,16 +91,16 @@ struct user_defined_type
 };
 
 const std::vector<std::string> user_defined_type::name_list{
-    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"
-};
+    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill
 {
     random_fill() = default;
     random_fill(int rand_base, int range)
-        : gen(g()),
-        dist(rand_base - range / 2, rand_base + range / 2)
-    {}
+      : gen(g())
+      , dist(rand_base - range / 2, rand_base + range / 2)
+    {
+    }
 
     int operator()()
     {
@@ -113,8 +114,8 @@ struct random_fill
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag, typename DataType,
     typename ValueType>
-void test_remove(ExPolicy policy, IteratorTag, DataType, ValueType value,
-    int rand_base)
+void test_remove(
+    ExPolicy policy, IteratorTag, DataType, ValueType value, int rand_base)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -128,21 +129,20 @@ void test_remove(ExPolicy policy, IteratorTag, DataType, ValueType value,
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
     d = c;
 
-    auto result = hpx::parallel::remove(policy,
-        iterator(std::begin(c)), iterator(std::end(c)), value);
+    auto result = hpx::parallel::remove(
+        policy, iterator(std::begin(c)), iterator(std::end(c)), value);
     auto solution = std::remove(std::begin(d), std::end(d), value);
 
-    bool equality = test::equal(
-        std::begin(c), result.base(),
-        std::begin(d), solution);
+    bool equality =
+        test::equal(std::begin(c), result.base(), std::begin(d), solution);
 
     HPX_TEST(equality);
 }
 
 template <typename ExPolicy, typename IteratorTag, typename DataType,
     typename ValueType>
-void test_remove_async(ExPolicy policy, IteratorTag, DataType, ValueType value,
-    int rand_base)
+void test_remove_async(
+    ExPolicy policy, IteratorTag, DataType, ValueType value, int rand_base)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -156,22 +156,22 @@ void test_remove_async(ExPolicy policy, IteratorTag, DataType, ValueType value,
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
     d = c;
 
-    auto f = hpx::parallel::remove(policy,
-        iterator(std::begin(c)), iterator(std::end(c)), value);
+    auto f = hpx::parallel::remove(
+        policy, iterator(std::begin(c)), iterator(std::end(c)), value);
     auto result = f.get();
     auto solution = std::remove(std::begin(d), std::end(d), value);
 
-    bool equality = test::equal(
-        std::begin(c), result.base(),
-        std::begin(d), solution);
+    bool equality =
+        test::equal(std::begin(c), result.base(), std::begin(d), solution);
 
     HPX_TEST(equality);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag, typename DataType, typename Pred>
-void test_remove_if(ExPolicy policy, IteratorTag, DataType, Pred pred,
-    int rand_base)
+template <typename ExPolicy, typename IteratorTag, typename DataType,
+    typename Pred>
+void test_remove_if(
+    ExPolicy policy, IteratorTag, DataType, Pred pred, int rand_base)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -185,20 +185,20 @@ void test_remove_if(ExPolicy policy, IteratorTag, DataType, Pred pred,
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
     d = c;
 
-    auto result = hpx::parallel::remove_if(policy,
-        iterator(std::begin(c)), iterator(std::end(c)), pred);
+    auto result = hpx::parallel::remove_if(
+        policy, iterator(std::begin(c)), iterator(std::end(c)), pred);
     auto solution = std::remove_if(std::begin(d), std::end(d), pred);
 
-    bool equality = test::equal(
-        std::begin(c), result.base(),
-        std::begin(d), solution);
+    bool equality =
+        test::equal(std::begin(c), result.base(), std::begin(d), solution);
 
     HPX_TEST(equality);
 }
 
-template <typename ExPolicy, typename IteratorTag, typename DataType, typename Pred>
-void test_remove_if_async(ExPolicy policy, IteratorTag, DataType, Pred pred,
-    int rand_base)
+template <typename ExPolicy, typename IteratorTag, typename DataType,
+    typename Pred>
+void test_remove_if_async(
+    ExPolicy policy, IteratorTag, DataType, Pred pred, int rand_base)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -212,22 +212,21 @@ void test_remove_if_async(ExPolicy policy, IteratorTag, DataType, Pred pred,
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
     d = c;
 
-    auto f = hpx::parallel::remove_if(policy,
-        iterator(std::begin(c)), iterator(std::end(c)), pred);
+    auto f = hpx::parallel::remove_if(
+        policy, iterator(std::begin(c)), iterator(std::end(c)), pred);
     auto result = f.get();
     auto solution = std::remove_if(std::begin(d), std::end(d), pred);
 
-    bool equality = test::equal(
-        std::begin(c), result.base(),
-        std::begin(d), solution);
+    bool equality =
+        test::equal(std::begin(c), result.base(), std::begin(d), solution);
 
     HPX_TEST(equality);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_remove_exception(ExPolicy policy, IteratorTag,
-    bool test_for_remove_if = false)
+void test_remove_exception(
+    ExPolicy policy, IteratorTag, bool test_for_remove_if = false)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -242,31 +241,30 @@ void test_remove_exception(ExPolicy policy, IteratorTag,
     std::generate(std::begin(c), std::end(c), random_fill());
 
     bool caught_exception = false;
-    try {
+    try
+    {
         if (test_for_remove_if)
         {
-            hpx::parallel::remove_if(policy,
-                decorated_iterator(std::begin(c)),
-                decorated_iterator(std::end(c)),
-                throw_always());
+            hpx::parallel::remove_if(policy, decorated_iterator(std::begin(c)),
+                decorated_iterator(std::end(c)), throw_always());
         }
         else
         {
             hpx::parallel::remove(policy,
                 decorated_iterator(
-                    std::begin(c),
-                    []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c)),
-                int(10));
+                    std::begin(c), []() { throw std::runtime_error("test"); }),
+                decorated_iterator(std::end(c)), int(10));
         }
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const&) {
+    catch (hpx::exception_list const&)
+    {
         caught_exception = true;
         //test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -274,8 +272,8 @@ void test_remove_exception(ExPolicy policy, IteratorTag,
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_remove_exception_async(ExPolicy policy, IteratorTag,
-    bool test_for_remove_if = false)
+void test_remove_exception_async(
+    ExPolicy policy, IteratorTag, bool test_for_remove_if = false)
 {
     typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -287,24 +285,22 @@ void test_remove_exception_async(ExPolicy policy, IteratorTag,
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
+    try
+    {
         hpx::future<decorated_iterator> f;
 
         if (test_for_remove_if)
         {
             f = hpx::parallel::remove_if(policy,
                 decorated_iterator(std::begin(c)),
-                decorated_iterator(std::end(c)),
-                throw_always());
+                decorated_iterator(std::end(c)), throw_always());
         }
         else
         {
             f = hpx::parallel::remove(policy,
                 decorated_iterator(
-                    std::begin(c),
-                    []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c)),
-                int(10));
+                    std::begin(c), []() { throw std::runtime_error("test"); }),
+                decorated_iterator(std::end(c)), int(10));
         }
 
         returned_from_algorithm = true;
@@ -312,11 +308,13 @@ void test_remove_exception_async(ExPolicy policy, IteratorTag,
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const&) {
+    catch (hpx::exception_list const&)
+    {
         caught_exception = true;
         //test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -326,8 +324,8 @@ void test_remove_exception_async(ExPolicy policy, IteratorTag,
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_remove_bad_alloc(ExPolicy policy, IteratorTag,
-    bool test_for_remove_if = false)
+void test_remove_bad_alloc(
+    ExPolicy policy, IteratorTag, bool test_for_remove_if = false)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -342,30 +340,29 @@ void test_remove_bad_alloc(ExPolicy policy, IteratorTag,
     std::generate(std::begin(c), std::end(c), random_fill());
 
     bool caught_bad_alloc = false;
-    try {
+    try
+    {
         if (test_for_remove_if)
         {
-            hpx::parallel::remove_if(policy,
-                decorated_iterator(std::begin(c)),
-                decorated_iterator(std::end(c)),
-                throw_bad_alloc());
+            hpx::parallel::remove_if(policy, decorated_iterator(std::begin(c)),
+                decorated_iterator(std::end(c)), throw_bad_alloc());
         }
         else
         {
             hpx::parallel::remove(policy,
                 decorated_iterator(
-                    std::begin(c),
-                    []() { throw std::bad_alloc(); }),
-                decorated_iterator(std::end(c)),
-                int(10));
+                    std::begin(c), []() { throw std::bad_alloc(); }),
+                decorated_iterator(std::end(c)), int(10));
         }
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -373,8 +370,8 @@ void test_remove_bad_alloc(ExPolicy policy, IteratorTag,
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_remove_bad_alloc_async(ExPolicy policy, IteratorTag,
-    bool test_for_remove_if = false)
+void test_remove_bad_alloc_async(
+    ExPolicy policy, IteratorTag, bool test_for_remove_if = false)
 {
     typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -386,24 +383,22 @@ void test_remove_bad_alloc_async(ExPolicy policy, IteratorTag,
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
-    try {
+    try
+    {
         hpx::future<decorated_iterator> f;
 
         if (test_for_remove_if)
         {
             f = hpx::parallel::remove_if(policy,
                 decorated_iterator(std::begin(c)),
-                decorated_iterator(std::end(c)),
-                throw_bad_alloc());
+                decorated_iterator(std::end(c)), throw_bad_alloc());
         }
         else
         {
             f = hpx::parallel::remove(policy,
                 decorated_iterator(
-                    std::begin(c),
-                    []() { throw std::bad_alloc(); }),
-                decorated_iterator(std::end(c)),
-                int(10));
+                    std::begin(c), []() { throw std::bad_alloc(); }),
+                decorated_iterator(std::end(c)), int(10));
         }
 
         returned_from_algorithm = true;
@@ -411,10 +406,12 @@ void test_remove_bad_alloc_async(ExPolicy policy, IteratorTag,
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -424,8 +421,8 @@ void test_remove_bad_alloc_async(ExPolicy policy, IteratorTag,
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag, typename DataType>
-void test_remove_etc(ExPolicy policy, IteratorTag,
-    DataType, int rand_base, bool test_for_remove_if = false)
+void test_remove_etc(ExPolicy policy, IteratorTag, DataType, int rand_base,
+    bool test_for_remove_if = false)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -435,7 +432,8 @@ void test_remove_etc(ExPolicy policy, IteratorTag,
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size), org;
-    std::generate(std::begin(c), std::end(c), random_fill(rand_base, size / 10));
+    std::generate(
+        std::begin(c), std::end(c), random_fill(rand_base, size / 10));
     org = c;
 
     // Test projection.
@@ -449,11 +447,9 @@ void test_remove_etc(ExPolicy policy, IteratorTag,
 
         if (test_for_remove_if)
         {
-            result = hpx::parallel::remove_if(policy,
-                iterator(std::begin(c)), iterator(std::end(c)),
-                [&value](DataType const& a) -> bool {
-                    return a == value;
-                },
+            result = hpx::parallel::remove_if(
+                policy, iterator(std::begin(c)), iterator(std::end(c)),
+                [&value](DataType const& a) -> bool { return a == value; },
                 [&value](DataType const&) -> DataType& {
                     // This is projection.
                     return value;
@@ -461,9 +457,8 @@ void test_remove_etc(ExPolicy policy, IteratorTag,
         }
         else
         {
-            result = hpx::parallel::remove(policy,
-                iterator(std::begin(c)), iterator(std::end(c)),
-                value,
+            result = hpx::parallel::remove(policy, iterator(std::begin(c)),
+                iterator(std::end(c)), value,
                 [&value](DataType const&) -> DataType& {
                     // This is projection.
                     return value;
@@ -482,12 +477,12 @@ void test_remove(IteratorTag, int rand_base)
     using namespace hpx::parallel;
 
     ////////// Test cases for 'int' type.
-    test_remove(execution::seq, IteratorTag(), int(),
-        int(rand_base + 1), rand_base);
-    test_remove(execution::par, IteratorTag(), int(),
-        int(rand_base), rand_base);
-    test_remove(execution::par_unseq, IteratorTag(), int(),
-        int(rand_base - 1), rand_base);
+    test_remove(
+        execution::seq, IteratorTag(), int(), int(rand_base + 1), rand_base);
+    test_remove(
+        execution::par, IteratorTag(), int(), int(rand_base), rand_base);
+    test_remove(execution::par_unseq, IteratorTag(), int(), int(rand_base - 1),
+        rand_base);
 
     ////////// Test cases for user defined type.
     test_remove(execution::seq, IteratorTag(), user_defined_type(),
@@ -515,64 +510,62 @@ void test_remove_if(IteratorTag, int rand_base)
     using namespace hpx::parallel;
 
     ////////// Test cases for 'int' type.
-    test_remove_if(execution::seq, IteratorTag(), int(),
-        [rand_base](const int a) -> bool {
-            return a == rand_base;
-        }, rand_base);
-    test_remove_if(execution::par, IteratorTag(), int(),
-        [rand_base](const int a) -> bool {
-            return !(a == rand_base);
-        }, rand_base);
-    test_remove_if(execution::par_unseq, IteratorTag(), int(),
-        [rand_base](const int a) -> bool {
-            return a == rand_base;
-        }, rand_base);
+    test_remove_if(
+        execution::seq, IteratorTag(), int(),
+        [rand_base](const int a) -> bool { return a == rand_base; }, rand_base);
+    test_remove_if(
+        execution::par, IteratorTag(), int(),
+        [rand_base](const int a) -> bool { return !(a == rand_base); },
+        rand_base);
+    test_remove_if(
+        execution::par_unseq, IteratorTag(), int(),
+        [rand_base](const int a) -> bool { return a == rand_base; }, rand_base);
 
     ////////// Test cases for user defined type.
-    test_remove_if(execution::seq, IteratorTag(), user_defined_type(),
-        [rand_base](user_defined_type const& a) -> bool {
-            return !(a == rand_base);
-        }, rand_base);
-    test_remove_if(execution::par, IteratorTag(), user_defined_type(),
-        [rand_base](user_defined_type const& a) -> bool {
-            return a == rand_base;
-        }, rand_base);
-    test_remove_if(execution::par_unseq, IteratorTag(), user_defined_type(),
-        [rand_base](user_defined_type const& a) -> bool {
-            return !(a == rand_base);
-        }, rand_base);
+    test_remove_if(
+        execution::seq, IteratorTag(), user_defined_type(),
+        [rand_base](
+            user_defined_type const& a) -> bool { return !(a == rand_base); },
+        rand_base);
+    test_remove_if(
+        execution::par, IteratorTag(), user_defined_type(),
+        [rand_base](
+            user_defined_type const& a) -> bool { return a == rand_base; },
+        rand_base);
+    test_remove_if(
+        execution::par_unseq, IteratorTag(), user_defined_type(),
+        [rand_base](
+            user_defined_type const& a) -> bool { return !(a == rand_base); },
+        rand_base);
 
     ////////// Asynchronous test cases for 'int' type.
-    test_remove_if_async(execution::seq(execution::task), IteratorTag(), int(),
-        [rand_base](const int a) -> bool {
-            return !(a == rand_base);
-        }, rand_base);
-    test_remove_if_async(execution::par(execution::task), IteratorTag(), int(),
-        [rand_base](const int a) -> bool {
-            return a == rand_base;
-        }, rand_base);
+    test_remove_if_async(
+        execution::seq(execution::task), IteratorTag(), int(),
+        [rand_base](const int a) -> bool { return !(a == rand_base); },
+        rand_base);
+    test_remove_if_async(
+        execution::par(execution::task), IteratorTag(), int(),
+        [rand_base](const int a) -> bool { return a == rand_base; }, rand_base);
 
     ////////// Asynchronous test cases for user defined type.
-    test_remove_if_async(execution::seq(execution::task), IteratorTag(),
-        user_defined_type(),
-        [rand_base](user_defined_type const& a) -> bool {
-            return a == rand_base;
-        }, rand_base);
-    test_remove_if_async(execution::par(execution::task), IteratorTag(),
-        user_defined_type(),
-        [rand_base](user_defined_type const& a) -> bool {
-            return !(a == rand_base);
-        }, rand_base);
+    test_remove_if_async(
+        execution::seq(execution::task), IteratorTag(), user_defined_type(),
+        [rand_base](
+            user_defined_type const& a) -> bool { return a == rand_base; },
+        rand_base);
+    test_remove_if_async(
+        execution::par(execution::task), IteratorTag(), user_defined_type(),
+        [rand_base](
+            user_defined_type const& a) -> bool { return !(a == rand_base); },
+        rand_base);
 
     ////////// Corner test cases.
-    test_remove_if(execution::par, IteratorTag(), int(),
-        [](const int) -> bool {
-            return true;
-        }, rand_base);
-    test_remove_if(execution::par_unseq, IteratorTag(), user_defined_type(),
-        [](user_defined_type const&) -> bool {
-            return false;
-        }, rand_base);
+    test_remove_if(
+        execution::par, IteratorTag(), int(),
+        [](const int) -> bool { return true; }, rand_base);
+    test_remove_if(
+        execution::par_unseq, IteratorTag(), user_defined_type(),
+        [](user_defined_type const&) -> bool { return false; }, rand_base);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -607,10 +600,10 @@ void test_remove_exception(bool test_for_remove_if = false)
     test_remove_exception(execution::seq, IteratorTag(), test_for_remove_if);
     test_remove_exception(execution::par, IteratorTag(), test_for_remove_if);
 
-    test_remove_exception_async(execution::seq(execution::task),
-        IteratorTag(), test_for_remove_if);
-    test_remove_exception_async(execution::par(execution::task),
-        IteratorTag(), test_for_remove_if);
+    test_remove_exception_async(
+        execution::seq(execution::task), IteratorTag(), test_for_remove_if);
+    test_remove_exception_async(
+        execution::par(execution::task), IteratorTag(), test_for_remove_if);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -625,10 +618,10 @@ void test_remove_bad_alloc(bool test_for_remove_if = false)
     test_remove_bad_alloc(execution::seq, IteratorTag(), test_for_remove_if);
     test_remove_bad_alloc(execution::par, IteratorTag(), test_for_remove_if);
 
-    test_remove_bad_alloc_async(execution::seq(execution::task),
-        IteratorTag(), test_for_remove_if);
-    test_remove_bad_alloc_async(execution::par(execution::task),
-        IteratorTag(), test_for_remove_if);
+    test_remove_bad_alloc_async(
+        execution::seq(execution::task), IteratorTag(), test_for_remove_if);
+    test_remove_bad_alloc_async(
+        execution::par(execution::task), IteratorTag(), test_for_remove_if);
 }
 
 #endif

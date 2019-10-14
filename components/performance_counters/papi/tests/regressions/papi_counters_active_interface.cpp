@@ -1,5 +1,6 @@
 //  Copyright (c) 2013 Maciej Brodowicz
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -14,7 +15,7 @@
 #include <hpx/hpx_start.hpp>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 const char *counter_name = "/papi{locality#0/worker-thread#0}/PAPI_SR_INS";
@@ -27,7 +28,7 @@ inline bool close_enough(double m, double ex, double perc)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main(hpx::program_options::variables_map&)
 {
     hpx::start_active_counters();
 
@@ -65,7 +66,7 @@ int check_(int fd)
     while (true)
     {
         char buf[1024];
-        ssize_t n = read(fd, buf, 1024);
+        ssize_t n = read(fd, buf, sizeof(buf));
         if (n > 0)
         {
             out += std::string(buf, buf + n);
@@ -125,7 +126,7 @@ int main(int argc, char* argv[])
         throw std::runtime_error("could not create pipe to stdout");
 
     // Configure application-specific options.
-    boost::program_options::options_description cmdline(
+    hpx::program_options::options_description cmdline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Add the required counter command line option.

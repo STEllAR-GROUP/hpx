@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -19,7 +20,7 @@
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/thread_hooks.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -181,14 +182,14 @@ namespace hpx
         virtual int suspend() = 0;
         virtual int resume() = 0;
 
-        virtual parcelset::parcelhandler& get_parcel_handler() = 0;
-        virtual parcelset::parcelhandler const& get_parcel_handler() const = 0;
-
         virtual threads::threadmanager& get_thread_manager() = 0;
-
         virtual naming::resolver_client& get_agas_client() = 0;
 
+#if defined(HPX_HAVE_NETWORKING)
+        virtual parcelset::parcelhandler& get_parcel_handler() = 0;
+        virtual parcelset::parcelhandler const& get_parcel_handler() const = 0;
         virtual parcelset::endpoints_type const& endpoints() const = 0;
+#endif
         virtual std::string here() const = 0;
 
         virtual applier::applier& get_applier() = 0;
@@ -289,8 +290,10 @@ namespace hpx
         // stop periodic evaluation of counters during shutdown
         void stop_evaluating_counters();
 
+#if defined(HPX_HAVE_NETWORKING)
         void register_message_handler(char const* message_handler_type,
             char const* action, error_code& ec = throws);
+
         parcelset::policies::message_handler* create_message_handler(
             char const* message_handler_type, char const* action,
             parcelset::parcelport* pp, std::size_t num_messages,
@@ -298,6 +301,7 @@ namespace hpx
         serialization::binary_filter* create_binary_filter(
             char const* binary_filter_type, bool compress,
             serialization::binary_filter* next_filter, error_code& ec = throws);
+#endif
 
         notification_policy_type::on_startstop_type on_start_func() const;
         notification_policy_type::on_startstop_type on_stop_func() const;

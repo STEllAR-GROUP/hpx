@@ -1,6 +1,7 @@
 //  Copyright (c) 2015 Daniel Bourgeois
 //  Copyright (c) 2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,11 +11,11 @@
 #define HPX_PARALLEL_ALGORITHM_TRANFORM_REDUCE_BINARY_JUL_15_2015_0730AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
-#include <hpx/traits/is_callable.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/result_of.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -22,7 +23,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -32,12 +33,10 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // transform_reduce
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         template <typename F>
         struct transform_reduce_binary_indirect
@@ -45,9 +44,8 @@ namespace hpx { namespace parallel { inline namespace v1
             typename hpx::util::decay<F>::type& f_;
 
             template <typename Iter1, typename Iter2>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            auto operator()(Iter1 it1, Iter2 it2)
-            ->  decltype(hpx::util::invoke(f_, *it1, *it2))
+            HPX_HOST_DEVICE HPX_FORCEINLINE auto operator()(Iter1 it1,
+                Iter2 it2) -> decltype(hpx::util::invoke(f_, *it1, *it2))
             {
                 return hpx::util::invoke(f_, *it1, *it2);
             }
@@ -65,8 +63,8 @@ namespace hpx { namespace parallel { inline namespace v1
             value_type& part_sum_;
 
             template <typename Iter1, typename Iter2>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            void operator()(Iter1 it1, Iter2 it2)
+            HPX_HOST_DEVICE HPX_FORCEINLINE void operator()(
+                Iter1 it1, Iter2 it2)
             {
                 part_sum_ = hpx::util::invoke(
                     op1_, part_sum_, hpx::util::invoke(op2_, *it1, *it2));
@@ -79,13 +77,13 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             transform_reduce_binary()
               : transform_reduce_binary::algorithm("transform_reduce_binary")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename T_, typename Op1, typename Op2>
-            static T
-            sequential(ExPolicy && policy, InIter1 first1, InIter1 last1,
-                InIter2 first2, T_ init, Op1 && op1, Op2 && op2)
+            static T sequential(ExPolicy&& policy, InIter1 first1,
+                InIter1 last1, InIter2 first2, T_ init, Op1&& op1, Op2&& op2)
             {
                 if (first1 == last1)
                     return std::move(init);
@@ -93,11 +91,10 @@ namespace hpx { namespace parallel { inline namespace v1
                 // check whether we should apply vectorization
                 if (!util::loop_optimization<ExPolicy>(first1, last1))
                 {
-                    util::loop2<ExPolicy>(
-                        std::false_type(), first1, last1, first2,
+                    util::loop2<ExPolicy>(std::false_type(), first1, last1,
+                        first2,
                         transform_reduce_binary_partition<Op1, Op2, T>{
-                            op1, op2, init
-                        });
+                            op1, op2, init});
 
                     return init;
                 }
@@ -108,30 +105,25 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 std::pair<InIter1, InIter2> p = util::loop2<ExPolicy>(
                     std::true_type(), first1, last1, first2,
-                    transform_reduce_binary_partition<
-                            Op1, Op2, decltype(part_sum)
-                        >{op1, op2, part_sum});
+                    transform_reduce_binary_partition<Op1, Op2,
+                        decltype(part_sum)>{op1, op2, part_sum});
 
                 // this is to support vectorization, it will call op1 for each
                 // of the elements of a value-pack
-                auto result =
-                    util::detail::accumulate_values<ExPolicy>(
-                        [&op1](T const& sum, T const& val) -> T
-                        {
-                            return hpx::util::invoke(op1, sum, val);
-                        },
-                        std::move(part_sum),
-                        std::move(init));
+                auto result = util::detail::accumulate_values<ExPolicy>(
+                    [&op1](T const& sum, T const& val) -> T {
+                        return hpx::util::invoke(op1, sum, val);
+                    },
+                    std::move(part_sum), std::move(init));
 
                 // the vectorization might not cover all of the sequences,
                 // handle the remainder directly
                 if (p.first != last1)
                 {
-                    util::loop2<ExPolicy>(
-                        std::false_type(), p.first, last1, p.second,
-                        transform_reduce_binary_partition<
-                                Op1, Op2, decltype(result)
-                            >{op1, op2, result});
+                    util::loop2<ExPolicy>(std::false_type(), p.first, last1,
+                        p.second,
+                        transform_reduce_binary_partition<Op1, Op2,
+                            decltype(result)>{op1, op2, result});
                 }
 
                 return util::detail::extract_value<ExPolicy>(result);
@@ -139,11 +131,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename T_, typename Op1, typename Op2>
-            static typename util::detail::algorithm_result<
-                ExPolicy, T
-            >::type
-            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-                 FwdIter2 first2, T_ && init, Op1 && op1, Op2 && op2)
+            static typename util::detail::algorithm_result<ExPolicy, T>::type
+            parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+                FwdIter2 first2, T_&& init, Op1&& op1, Op2&& op2)
             {
                 typedef util::detail::algorithm_result<ExPolicy, T> result;
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
@@ -156,81 +146,70 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 difference_type count = std::distance(first1, last1);
 
-                auto f1 =
-                    [op1, HPX_CAPTURE_FORWARD(op2)](
-                        zip_iterator part_begin, std::size_t part_size
-                    ) mutable -> T
+                auto f1 = [op1, HPX_CAPTURE_FORWARD(op2)](
+                              zip_iterator part_begin,
+                              std::size_t part_size) mutable -> T {
+                    auto iters = part_begin.get_iterator_tuple();
+                    FwdIter1 it1 = hpx::util::get<0>(iters);
+                    FwdIter2 it2 = hpx::util::get<1>(iters);
+
+                    FwdIter1 last1 = it1;
+                    std::advance(last1, part_size);
+
+                    if (!util::loop_optimization<ExPolicy>(it1, last1))
                     {
-                        auto iters = part_begin.get_iterator_tuple();
-                        FwdIter1 it1 = hpx::util::get<0>(iters);
-                        FwdIter2 it2 = hpx::util::get<1>(iters);
-
-                        FwdIter1 last1 = it1;
-                        std::advance(last1, part_size);
-
-                        if (!util::loop_optimization<ExPolicy>(it1, last1))
-                        {
-                            // loop_step properly advances the iterators
-                            auto result = util::loop_step<ExPolicy>(
-                                std::false_type(),
-                                transform_reduce_binary_indirect<Op2>{op2},
-                                it1, it2);
-
-                            util::loop2<ExPolicy>(
-                                std::false_type(), it1, last1, it2,
-                                transform_reduce_binary_partition<
-                                        Op1, Op2, decltype(result)
-                                    >{op1, op2, result});
-
-                            return util::detail::extract_value<ExPolicy>(result);
-                        }
-
                         // loop_step properly advances the iterators
-                        auto part_sum = util::loop_step<ExPolicy>(
-                            std::true_type(),
-                            transform_reduce_binary_indirect<Op2>{op2}, it1, it2);
+                        auto result =
+                            util::loop_step<ExPolicy>(std::false_type(),
+                                transform_reduce_binary_indirect<Op2>{op2}, it1,
+                                it2);
 
-                        std::pair<FwdIter1, FwdIter2> p =
-                            util::loop2<ExPolicy>(
-                                std::true_type(), it1, last1, it2,
-                                transform_reduce_binary_partition<
-                                        Op1, Op2, decltype(part_sum)
-                                    >{op1, op2, part_sum});
-
-                        // this is to support vectorization, it will call op1
-                        // for each of the elements of a value-pack
-                        auto result = util::detail::accumulate_values<ExPolicy>(
-                            [&op1](T const& sum, T const& val) -> T
-                            {
-                                return hpx::util::invoke(op1, sum, val);
-                            },
-                            part_sum);
-
-                        // the vectorization might not cover all of the sequences,
-                        // handle the remainder directly
-                        if (p.first != last1)
-                        {
-                            util::loop2<ExPolicy>(
-                                std::false_type(), p.first, last1, p.second,
-                                transform_reduce_binary_partition<
-                                        Op1, Op2, decltype(result)
-                                    >{op1, op2, result});
-                        }
+                        util::loop2<ExPolicy>(std::false_type(), it1, last1,
+                            it2,
+                            transform_reduce_binary_partition<Op1, Op2,
+                                decltype(result)>{op1, op2, result});
 
                         return util::detail::extract_value<ExPolicy>(result);
-                    };
+                    }
+
+                    // loop_step properly advances the iterators
+                    auto part_sum = util::loop_step<ExPolicy>(std::true_type(),
+                        transform_reduce_binary_indirect<Op2>{op2}, it1, it2);
+
+                    std::pair<FwdIter1, FwdIter2> p =
+                        util::loop2<ExPolicy>(std::true_type(), it1, last1, it2,
+                            transform_reduce_binary_partition<Op1, Op2,
+                                decltype(part_sum)>{op1, op2, part_sum});
+
+                    // this is to support vectorization, it will call op1
+                    // for each of the elements of a value-pack
+                    auto result = util::detail::accumulate_values<ExPolicy>(
+                        [&op1](T const& sum, T const& val) -> T {
+                            return hpx::util::invoke(op1, sum, val);
+                        },
+                        part_sum);
+
+                    // the vectorization might not cover all of the sequences,
+                    // handle the remainder directly
+                    if (p.first != last1)
+                    {
+                        util::loop2<ExPolicy>(std::false_type(), p.first, last1,
+                            p.second,
+                            transform_reduce_binary_partition<Op1, Op2,
+                                decltype(result)>{op1, op2, result});
+                    }
+
+                    return util::detail::extract_value<ExPolicy>(result);
+                };
 
                 using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, T>::call(
                     std::forward<ExPolicy>(policy),
-                    make_zip_iterator(first1, first2), count,
-                    std::move(f1),
-                    [HPX_CAPTURE_FORWARD(init),
-                        HPX_CAPTURE_FORWARD(op1)
-                    ](std::vector<hpx::future<T> > && results) -> T
-                    {
+                    make_zip_iterator(first1, first2), count, std::move(f1),
+                    [HPX_CAPTURE_FORWARD(init), HPX_CAPTURE_FORWARD(op1)](
+                        std::vector<hpx::future<T>>&& results) -> T {
                         T ret = init;
-                        for(auto && fut : results)
+                        for (auto&& fut : results)
                         {
                             ret = hpx::util::invoke(op1, ret, fut.get());
                         }
@@ -239,36 +218,34 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T,
-            typename Reduce, typename Convert>
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename T, typename Reduce, typename Convert>
         typename util::detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce_(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, T init, Reduce && red_op,
-            Convert && conv_op, std::false_type)
+        transform_reduce_(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op,
+            std::false_type)
         {
-            static_assert(
-                (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Requires at least forward iterator.");
-            static_assert(
-                (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
             typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return detail::transform_reduce_binary<T>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
-                std::move(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
+                std::move(init), std::forward<Reduce>(red_op),
+                std::forward<Convert>(conv_op));
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T,
-            typename Reduce, typename Convert>
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename T, typename Reduce, typename Convert>
         typename util::detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce_(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, T init, Reduce && red_op,
-            Convert && conv_op, std::true_type);
+        transform_reduce_(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op,
+            std::true_type);
         /// \endcond
-    }
+    }    // namespace detail
     ///////////////////////////////////////////////////////////////////////////
     /// Returns the result of accumulating init with the inner products of the
     /// pairs formed by the elements of two ranges starting at first1 and
@@ -314,19 +291,19 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a parallel_task_policy and
     ///           returns \a T otherwise.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter1>::value &&
-        hpx::traits::is_iterator<FwdIter2>::value)>
-    typename util::detail::algorithm_result<ExPolicy, T>::type
-    transform_reduce(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, T init)
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename T,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter1>::value&&
+                    hpx::traits::is_iterator<FwdIter2>::value)>
+    typename util::detail::algorithm_result<ExPolicy, T>::type transform_reduce(
+        ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+        T init)
     {
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
-        return detail::transform_reduce_(
-            std::forward<ExPolicy>(policy), first1, last1, first2,
-            std::move(init), detail::plus(), detail::multiplies(), is_segmented());
+        return detail::transform_reduce_(std::forward<ExPolicy>(policy), first1,
+            last1, first2, std::move(init), detail::plus(),
+            detail::multiplies(), is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -408,36 +385,32 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a parallel_task_policy and
     ///           returns \a T otherwise.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T,
-        typename Reduce, typename Convert,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter1>::value &&
-        hpx::traits::is_iterator<FwdIter2>::value &&
-        hpx::traits::is_invocable<Convert,
-                typename std::iterator_traits<FwdIter1>::value_type,
-                typename std::iterator_traits<FwdIter2>::value_type
-            >::value &&
-        hpx::traits::is_invocable<Reduce,
-                typename hpx::util::invoke_result<Convert,
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename T, typename Reduce, typename Convert,
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value&& hpx::traits::
+                is_iterator<FwdIter1>::value&& hpx::traits::is_iterator<
+                    FwdIter2>::value&& hpx::traits::is_invocable<Convert,
                     typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type
-                >::type,
-                typename hpx::util::invoke_result<Convert,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type
-                >::type
-            >::value)>
-    typename util::detail::algorithm_result<ExPolicy, T>::type
-    transform_reduce(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, T init, Reduce && red_op, Convert && conv_op)
+                    typename std::iterator_traits<FwdIter2>::value_type>::
+                    value&& hpx::traits::is_invocable<Reduce,
+                        typename hpx::util::invoke_result<Convert,
+                            typename std::iterator_traits<FwdIter1>::value_type,
+                            typename std::iterator_traits<
+                                FwdIter2>::value_type>::type,
+                        typename hpx::util::invoke_result<Convert,
+                            typename std::iterator_traits<FwdIter1>::value_type,
+                            typename std::iterator_traits<
+                                FwdIter2>::value_type>::type>::value)>
+    typename util::detail::algorithm_result<ExPolicy, T>::type transform_reduce(
+        ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+        T init, Reduce&& red_op, Convert&& conv_op)
     {
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
-        return detail::transform_reduce_(
-            std::forward<ExPolicy>(policy), first1, last1, first2,
-            std::move(init), std::forward<Reduce>(red_op),
+        return detail::transform_reduce_(std::forward<ExPolicy>(policy), first1,
+            last1, first2, std::move(init), std::forward<Reduce>(red_op),
             std::forward<Convert>(conv_op), is_segmented());
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

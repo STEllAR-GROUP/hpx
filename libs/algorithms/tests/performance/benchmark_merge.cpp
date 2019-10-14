@@ -1,20 +1,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2017 Taeguk Kwon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/hpx_init.hpp>
+#include <hpx/format.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/include/parallel_merge.hpp>
 #include <hpx/include/parallel_sort.hpp>
-#include <hpx/format.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -33,9 +34,10 @@ unsigned int seed = std::random_device{}();
 struct random_fill
 {
     random_fill(std::size_t random_range)
-        : gen(seed),
-        dist(0, random_range - 1)
-    {}
+      : gen(seed)
+      , dist(0, random_range - 1)
+    {
+    }
 
     int operator()()
     {
@@ -48,8 +50,8 @@ struct random_fill
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename InIter1, typename InIter2, typename OutIter>
-double run_merge_benchmark_std(int test_count,
-    InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2, OutIter dest)
+double run_merge_benchmark_std(int test_count, InIter1 first1, InIter1 last1,
+    InIter2 first2, InIter2 last2, OutIter dest)
 {
     std::uint64_t time = hpx::util::high_resolution_clock::now();
 
@@ -64,9 +66,10 @@ double run_merge_benchmark_std(int test_count,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename FwdIter3>
-double run_merge_benchmark_hpx(int test_count, ExPolicy policy,
-    FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, FwdIter3 dest)
+template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+    typename FwdIter3>
+double run_merge_benchmark_hpx(int test_count, ExPolicy policy, FwdIter1 first1,
+    FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, FwdIter3 dest)
 {
     std::uint64_t time = hpx::util::high_resolution_clock::now();
 
@@ -92,7 +95,8 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
 
     container src1 = test_container::get_container(vector_size1);
     container src2 = test_container::get_container(vector_size2);
-    container result = test_container::get_container(vector_size1 + vector_size2);
+    container result =
+        test_container::get_container(vector_size1 + vector_size2);
 
     auto first1 = std::begin(src1);
     auto last1 = std::end(src1);
@@ -112,30 +116,28 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     std::cout << "* Running Benchmark..." << std::endl;
     std::cout << "--- run_merge_benchmark_std ---" << std::endl;
     double time_std =
-        run_merge_benchmark_std(test_count,
-            first1, last1, first2, last2, dest);
+        run_merge_benchmark_std(test_count, first1, last1, first2, last2, dest);
 
     std::cout << "--- run_merge_benchmark_seq ---" << std::endl;
-    double time_seq =
-        run_merge_benchmark_hpx(test_count, execution::seq,
-            first1, last1, first2, last2, dest);
+    double time_seq = run_merge_benchmark_hpx(
+        test_count, execution::seq, first1, last1, first2, last2, dest);
 
     std::cout << "--- run_merge_benchmark_par ---" << std::endl;
-    double time_par =
-        run_merge_benchmark_hpx(test_count, execution::par,
-            first1, last1, first2, last2, dest);
+    double time_par = run_merge_benchmark_hpx(
+        test_count, execution::par, first1, last1, first2, last2, dest);
 
     std::cout << "--- run_merge_benchmark_par_unseq ---" << std::endl;
-    double time_par_unseq =
-        run_merge_benchmark_hpx(test_count, execution::par_unseq,
-            first1, last1, first2, last2, dest);
+    double time_par_unseq = run_merge_benchmark_hpx(
+        test_count, execution::par_unseq, first1, last1, first2, last2, dest);
 
-    std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
+    std::cout << "\n-------------- Benchmark Result --------------"
+              << std::endl;
     auto fmt = "merge ({1}) : {2}(sec)";
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
-    hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq)
+        << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
 }
 
@@ -151,7 +153,7 @@ std::string correct_iterator_tag_str(std::string iterator_tag)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
@@ -161,8 +163,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     double vector_ratio = vm["vector_ratio"].as<double>();
     std::size_t random_range = vm["random_range"].as<std::size_t>();
     int test_count = vm["test_count"].as<int>();
-    std::string iterator_tag_str = correct_iterator_tag_str(
-        vm["iterator_tag"].as<std::string>());
+    std::string iterator_tag_str =
+        correct_iterator_tag_str(vm["iterator_tag"].as<std::string>());
 
     std::size_t const os_threads = hpx::get_os_thread_count();
 
@@ -180,7 +182,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "iterator_tag : " << iterator_tag_str << std::endl;
     std::cout << "test_count   : " << test_count << std::endl;
     std::cout << "os threads   : " << os_threads << std::endl;
-    std::cout << "----------------------------------------------\n" << std::endl;
+    std::cout << "----------------------------------------------\n"
+              << std::endl;
 
     if (iterator_tag_str == "random")
         run_benchmark(vector_size1, vector_size2, test_count, random_range,
@@ -197,34 +200,26 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("vector_size",
-            boost::program_options::value<std::size_t>()->default_value(1000000),
-            "sum of sizes of two vectors (default: 1000000)")
-        ("vector_ratio",
-            boost::program_options::value<double>()->default_value(0.7),
-            "ratio of two vector sizes (default: 0.7)")
-        ("random_range",
-            boost::program_options::value<std::size_t>()->default_value(6),
-            "range of random numbers [0, x) (default: 6)")
-        ("iterator_tag",
-            boost::program_options::value<std::string>()->default_value("random"),
-            "the kind of iterator tag (random/bidirectional/forward)")
-        ("test_count",
-            boost::program_options::value<int>()->default_value(10),
-            "number of tests to be averaged (default: 10)")
-        ("seed,s", boost::program_options::value<unsigned int>(),
-            "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("vector_size",
+        hpx::program_options::value<std::size_t>()->default_value(1000000),
+        "sum of sizes of two vectors (default: 1000000)")("vector_ratio",
+        hpx::program_options::value<double>()->default_value(0.7),
+        "ratio of two vector sizes (default: 0.7)")("random_range",
+        hpx::program_options::value<std::size_t>()->default_value(6),
+        "range of random numbers [0, x) (default: 6)")("iterator_tag",
+        hpx::program_options::value<std::string>()->default_value("random"),
+        "the kind of iterator tag (random/bidirectional/forward)")("test_count",
+        hpx::program_options::value<int>()->default_value(10),
+        "number of tests to be averaged (default: 10)")("seed,s",
+        hpx::program_options::value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // initialize program
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

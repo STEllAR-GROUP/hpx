@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,9 +11,9 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/gather.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/collectives.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/shared_array.hpp>
 
@@ -118,6 +119,7 @@ private:
 public:
     partition_data()
       : size_(0)
+      , min_index_(0)
     {}
 
     // Create a new (uninitialized) partition of the given size.
@@ -692,7 +694,7 @@ void do_all_work(std::uint64_t nt, std::uint64_t nx, std::uint64_t np,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
     std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
@@ -711,7 +713,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     options_description desc_commandline;
     desc_commandline.add_options()

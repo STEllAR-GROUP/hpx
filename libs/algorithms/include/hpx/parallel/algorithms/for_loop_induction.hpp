@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,7 +10,7 @@
 #define HPX_PARALLEL_ALGORITHM_FOR_LOOP_INDUCTION_MAR_05_2016_0305PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 
@@ -18,10 +19,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v2
-{
-    namespace detail
-    {
+namespace hpx { namespace parallel { inline namespace v2 {
+    namespace detail {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
@@ -29,8 +28,10 @@ namespace hpx { namespace parallel { inline namespace v2
         struct induction_helper
         {
             induction_helper(T var) noexcept
-              : var_(var), curr_(var)
-            {}
+              : var_(var)
+              , curr_(var)
+            {
+            }
 
             HPX_HOST_DEVICE
             void init_iteration(std::size_t index) noexcept
@@ -51,9 +52,7 @@ namespace hpx { namespace parallel { inline namespace v2
             }
 
             HPX_HOST_DEVICE
-            void exit_iteration(std::size_t /*index*/) noexcept
-            {
-            }
+            void exit_iteration(std::size_t /*index*/) noexcept {}
 
         private:
             typename std::decay<T>::type var_;
@@ -64,8 +63,11 @@ namespace hpx { namespace parallel { inline namespace v2
         struct induction_helper<T&>
         {
             induction_helper(T& var) noexcept
-              : live_out_var_(var), var_(var), curr_(var)
-            {}
+              : live_out_var_(var)
+              , var_(var)
+              , curr_(var)
+            {
+            }
 
             HPX_HOST_DEVICE
             void init_iteration(std::size_t index) noexcept
@@ -88,8 +90,8 @@ namespace hpx { namespace parallel { inline namespace v2
             HPX_HOST_DEVICE
             void exit_iteration(std::size_t index) noexcept
             {
-                live_out_var_ = parallel::v1::detail::next(
-                    live_out_var_, index);
+                live_out_var_ =
+                    parallel::v1::detail::next(live_out_var_, index);
             }
 
         private:
@@ -103,13 +105,16 @@ namespace hpx { namespace parallel { inline namespace v2
         struct induction_stride_helper
         {
             induction_stride_helper(T var, std::size_t stride) noexcept
-              : var_(var), curr_(var), stride_(stride)
-            {}
+              : var_(var)
+              , curr_(var)
+              , stride_(stride)
+            {
+            }
 
             HPX_HOST_DEVICE
             void init_iteration(std::size_t index) noexcept
             {
-                curr_ = parallel::v1::detail::next(var_, stride_*index);
+                curr_ = parallel::v1::detail::next(var_, stride_ * index);
             }
 
             HPX_HOST_DEVICE
@@ -125,9 +130,7 @@ namespace hpx { namespace parallel { inline namespace v2
             }
 
             HPX_HOST_DEVICE
-            void exit_iteration(std::size_t /*index*/) noexcept
-            {
-            }
+            void exit_iteration(std::size_t /*index*/) noexcept {}
 
         private:
             typename std::decay<T>::type var_;
@@ -139,13 +142,17 @@ namespace hpx { namespace parallel { inline namespace v2
         struct induction_stride_helper<T&>
         {
             induction_stride_helper(T& var, std::size_t stride) noexcept
-              : live_out_var_(var), var_(var), curr_(var), stride_(stride)
-            {}
+              : live_out_var_(var)
+              , var_(var)
+              , curr_(var)
+              , stride_(stride)
+            {
+            }
 
             HPX_HOST_DEVICE
             void init_iteration(std::size_t index) noexcept
             {
-                curr_ = parallel::v1::detail::next(var_, stride_*index);
+                curr_ = parallel::v1::detail::next(var_, stride_ * index);
             }
 
             HPX_HOST_DEVICE
@@ -163,8 +170,8 @@ namespace hpx { namespace parallel { inline namespace v2
             HPX_HOST_DEVICE
             void exit_iteration(std::size_t index) noexcept
             {
-                live_out_var_ = parallel::v1::detail::next(
-                    live_out_var_, stride_*index);
+                live_out_var_ =
+                    parallel::v1::detail::next(live_out_var_, stride_ * index);
             }
 
         private:
@@ -175,7 +182,7 @@ namespace hpx { namespace parallel { inline namespace v2
         };
 
         /// \endcond
-    }
+    }    // namespace detail
 
     /// The function template returns an induction object of unspecified type
     /// having a value type and encapsulating an initial value \a value of that
@@ -207,21 +214,20 @@ namespace hpx { namespace parallel { inline namespace v2
     ///          object.
     ///
     template <typename T>
-    HPX_FORCEINLINE detail::induction_stride_helper<T>
-    induction(T && value, std::size_t stride)
+    HPX_FORCEINLINE detail::induction_stride_helper<T> induction(
+        T&& value, std::size_t stride)
     {
-        return detail::induction_stride_helper<T>(std::forward<T>(value), stride);
+        return detail::induction_stride_helper<T>(
+            std::forward<T>(value), stride);
     }
 
     /// \cond NOINTERNAL
     template <typename T>
-    HPX_FORCEINLINE detail::induction_helper<T>
-    induction(T && value)
+    HPX_FORCEINLINE detail::induction_helper<T> induction(T&& value)
     {
         return detail::induction_helper<T>(std::forward<T>(value));
     }
     /// \endcond
-}}}
+}}}    // namespace hpx::parallel::v2
 
 #endif
-

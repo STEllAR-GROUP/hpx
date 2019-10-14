@@ -1,5 +1,6 @@
 //  Copyright (c) 2018 Christopher Ogle
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,17 +10,16 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_FILL_FEB_23_2018_0057AM
 
 #include <hpx/config.hpp>
+#include <hpx/iterator_support/is_range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
-#include <hpx/traits/is_range.hpp>
-#include <hpx/util/range.hpp>
 
 #include <hpx/parallel/algorithms/fill.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /// Assigns the given value to the elements in the range [first, last).
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
@@ -57,14 +57,13 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           is defined by \a void.
     ///
     template <typename ExPolicy, typename Rng, typename T,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value)>
-    typename util::detail::algorithm_result<ExPolicy>::type
-    fill(ExPolicy && policy, Rng && rng, T value)
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value)>
+    typename util::detail::algorithm_result<ExPolicy>::type fill(
+        ExPolicy&& policy, Rng&& rng, T value)
     {
-        return fill(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), value);
+        return fill(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), value);
     }
 
     /// Assigns the given value value to the first count elements in the range
@@ -109,21 +108,17 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
-    template <typename ExPolicy, typename Rng,
-        typename Size, typename T,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
-        typename hpx::traits::range_traits<Rng>::iterator_type
-    >::type
-    fill_n(ExPolicy && policy, Rng & rng, Size count, T value)
+    template <typename ExPolicy, typename Rng, typename Size, typename T,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_traits<Rng>::iterator_type>::type
+    fill_n(ExPolicy&& policy, Rng& rng, Size count, T value)
     {
-        return fill_n(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), count, value);
+        return fill_n(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            count, value);
     }
 
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

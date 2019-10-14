@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,7 +8,6 @@
 #define HPX_IO_SERVICE_THREAD_POOL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
@@ -29,10 +29,8 @@ namespace hpx { namespace threads { namespace detail
     class HPX_EXPORT io_service_thread_pool : public thread_pool_base
     {
     public:
-        io_service_thread_pool(threads::policies::callback_notifier& notifier,
-            std::size_t index, char const* pool_name,
-            policies::scheduler_mode m = policies::scheduler_mode::nothing_special,
-            std::size_t thread_offset = 0);
+        explicit io_service_thread_pool(
+            threads::thread_pool_init_parameters const& init);
 
         void print_pool(std::ostream& os) {}
 
@@ -66,25 +64,15 @@ namespace hpx { namespace threads { namespace detail
         void stop (std::unique_lock<std::mutex>& l, bool blocking = true);
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::future<void> resume();
-        void resume_cb(std::function<void(void)> callback,
-            error_code& ec = throws);
         void resume_direct(error_code& ec = throws);
 
-        hpx::future<void> suspend();
-        void suspend_cb(std::function<void(void)> callback,
-            error_code& ec = throws);
         void suspend_direct(error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::future<void> suspend_processing_unit(std::size_t virt_core);
-        void suspend_processing_unit_cb(
-            std::function<void(void)> callback, std::size_t virt_core,
+        void suspend_processing_unit_direct(std::size_t virt_core,
             error_code& ec = throws);
 
-        hpx::future<void> resume_processing_unit(std::size_t virt_core);
-        void resume_processing_unit_cb(
-            std::function<void(void)> callback, std::size_t virt_core,
+        void resume_processing_unit_direct(std::size_t virt_core,
             error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////

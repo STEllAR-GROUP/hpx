@@ -1,11 +1,15 @@
 //  Copyright (c)      2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 
 #include <cstdint>
 #include <string>
@@ -96,7 +100,7 @@ namespace hpx { namespace actions { namespace detail
 
     std::vector<std::string> action_registry::get_unassigned_typenames() const
     {
-        typedef typename_to_ctor_t::value_type value_type;
+        using value_type = typename_to_ctor_t::value_type;
 
         std::vector<std::string> result;
 
@@ -210,3 +214,5 @@ namespace hpx { namespace actions { namespace detail
         return action_registry::get_id(action_name);
     }
 }}}
+
+#endif

@@ -2,19 +2,18 @@
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2011      Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/runtime/threads/thread_data.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/util/register_locks.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif
@@ -158,10 +157,19 @@ namespace hpx { namespace threads
         return threads::invalid_thread_id;
     }
 
+    thread_data* get_self_id_data()
+    {
+        thread_self* self = get_self_ptr();
+        if (HPX_LIKELY(nullptr != self))
+            return get_thread_id_data(self->get_thread_id());
+
+        return nullptr;
+    }
+
     std::size_t get_self_stacksize()
     {
-        thread_id_type id = get_self_id();
-        return id ? id->get_stack_size() : 0;
+        thread_data* thrd_data = get_self_id_data();
+        return thrd_data ? thrd_data->get_stack_size() : 0;
     }
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
@@ -182,25 +190,31 @@ namespace hpx { namespace threads
 #else
     thread_id_type get_parent_id()
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
-            return self->get_thread_id()->get_parent_thread_id();
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
+        {
+            return thrd_data->get_parent_thread_id();
+        }
         return threads::invalid_thread_id;
     }
 
     std::size_t get_parent_phase()
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
-            return self->get_thread_id()->get_parent_thread_phase();
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
+        {
+            return thrd_data->get_parent_thread_phase();
+        }
         return 0;
     }
 
     std::uint32_t get_parent_locality_id()
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
-            return self->get_thread_id()->get_parent_locality_id();
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
+        {
+            return thrd_data->get_parent_locality_id();
+        }
         return naming::invalid_locality_id;
     }
 #endif
@@ -210,9 +224,11 @@ namespace hpx { namespace threads
 #ifndef HPX_HAVE_THREAD_TARGET_ADDRESS
         return 0;
 #else
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
-            return self->get_thread_id()->get_component_id();
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
+        {
+            return thrd_data->get_component_id();
+        }
         return 0;
 #endif
     }
@@ -220,16 +236,20 @@ namespace hpx { namespace threads
 #if defined(HPX_HAVE_APEX)
     apex_task_wrapper get_self_apex_data()
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
-            return self->get_apex_data();
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
+        {
+            return thrd_data->get_apex_data();
+        }
         return nullptr;
     }
     void set_self_apex_data(apex_task_wrapper data)
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
-            self->set_apex_data(data);
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
+        {
+            thrd_data->set_apex_data(data);
+        }
         return;
     }
 #endif

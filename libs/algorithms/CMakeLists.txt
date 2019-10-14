@@ -1,5 +1,6 @@
 # Copyright (c) 2019 The STE||AR-Group
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,8 +17,6 @@ set(algorithms_headers
   hpx/parallel/algorithms/detail/accumulate.hpp
   hpx/parallel/algorithms/detail/dispatch.hpp
   hpx/parallel/algorithms/detail/distance.hpp
-  hpx/parallel/algorithms/detail/is_negative.hpp
-  hpx/parallel/algorithms/detail/predicates.hpp
   hpx/parallel/algorithms/detail/set_operation.hpp
   hpx/parallel/algorithms/detail/transfer.hpp
   hpx/parallel/algorithms/equal.hpp
@@ -88,7 +87,11 @@ set(algorithms_headers
   hpx/parallel/container_algorithms/sort.hpp
   hpx/parallel/container_algorithms/transform.hpp
   hpx/parallel/container_algorithms/unique.hpp
-  hpx/parallel/exception_list.hpp
+  hpx/parallel/datapar.hpp
+  hpx/parallel/datapar/iterator_helpers.hpp
+  hpx/parallel/datapar/loop.hpp
+  hpx/parallel/datapar/transform_loop.hpp
+  hpx/parallel/datapar/zip_iterator.hpp
   hpx/parallel/memory.hpp
   hpx/parallel/numeric.hpp
   hpx/parallel/tagspec.hpp
@@ -115,15 +118,29 @@ set(algorithms_headers
   hpx/parallel/util/transfer.hpp
   hpx/parallel/util/transform_loop.hpp
   hpx/parallel/util/zip_iterator.hpp
+  hpx/traits/is_value_proxy.hpp
+  hpx/traits/segmented_iterator_traits.hpp
 )
 
 include(HPX_AddModule)
 add_hpx_module(algorithms
-    FORCE_LINKING_GEN
-    HEADERS ${algorithms_headers}
-    # TODO: Really depends on main HPX library, but cannot add that as a
-    # dependency yet. Need to have the parts that algorithms depends on in
-    # separate modules first.
-    DEPENDENCIES hpx_assertion hpx_config
-    CMAKE_SUBDIRS examples tests
+  FORCE_LINKING_GEN
+  HEADERS ${algorithms_headers}
+  # TODO: Really depends on main HPX library, but cannot add that as a
+  # dependency yet. Need to have the parts that algorithms depends on in
+  # separate modules first.
+  DEPENDENCIES
+    hpx_assertion
+    hpx_concepts
+    hpx_concurrency
+    hpx_config
+    hpx_datastructures
+    hpx_execution
+    hpx_iterator_support
+    hpx_functional
+    hpx_statistics
+    hpx_timing
+    hpx_type_support
+  CMAKE_SUBDIRS examples tests
 )
+

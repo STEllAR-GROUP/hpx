@@ -1,20 +1,18 @@
 # Copyright (c) 2015 Thomas Heller
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 function(add_hpx_compile_test category name)
-  set(options FAILURE_EXPECTED NOHPX_INIT NOLIBS)
+  set(options FAILURE_EXPECTED NOLIBS)
   set(one_value_args SOURCE_ROOT FOLDER)
-  set(multi_value_args SOURCES COMPONENT_DEPENDENCIES)
+  set(multi_value_args SOURCES COMPONENT_DEPENDENCIES DEPENDENCIES)
 
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   set(_additional_flags)
-  if(${category}_NOHPX_INIT)
-    set(_additional_flags ${_additional_flags} NOHPX_INIT)
-  endif()
-  if(${category}_NOLIBS)
+  if(${name}_NOLIBS)
     set(_additional_flags ${_additional_flags} NOLIBS)
   endif()
 
@@ -77,16 +75,13 @@ function(add_hpx_headers_compile_test subcategory name)
 endfunction(add_hpx_headers_compile_test)
 
 function(add_hpx_header_tests category)
-  set(options NOHPX_INIT NOLIBS)
+  set(options NOLIBS)
   set(one_value_args HEADER_ROOT)
   set(multi_value_args HEADERS EXCLUDE EXCLUDE_FROM_ALL COMPONENT_DEPENDENCIES DEPENDENCIES)
 
   cmake_parse_arguments(${category} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   set(_additional_flags)
-  if(${category}_NOHPX_INIT)
-    set(_additional_flags ${_additional_flags} NOHPX_INIT)
-  endif()
   if(${category}_NOLIBS)
     set(_additional_flags ${_additional_flags} NOLIBS)
   endif()
@@ -132,7 +127,8 @@ function(add_hpx_header_tests category)
         SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
         FOLDER "Tests/Headers/${header_dir}"
         COMPONENT_DEPENDENCIES ${${category}_COMPONENT_DEPENDENCIES}
-        DEPENDENCIES ${${category}_DEPENDENCIES})
+        DEPENDENCIES ${${category}_DEPENDENCIES}
+        ${_additional_flags})
     endif()
   endforeach()
 

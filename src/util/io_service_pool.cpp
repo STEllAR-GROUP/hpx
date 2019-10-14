@@ -4,15 +4,17 @@
 //  Parts of this code were taken from the Boost.Asio library
 //  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/util/barrier.hpp>
+#include <hpx/concurrency/barrier.hpp>
+#include <hpx/config/asio.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 
 #include <boost/asio/io_service.hpp>
 
@@ -26,16 +28,17 @@
 namespace hpx { namespace util
 {
     io_service_pool::io_service_pool(std::size_t pool_size,
-            on_startstop_func_type const& on_start_thread,
-            on_startstop_func_type const& on_stop_thread,
-            char const* pool_name, char const* name_postfix)
-      : next_io_service_(0), stopped_(false),
-        pool_size_(pool_size),
-        on_start_thread_(on_start_thread),
-        on_stop_thread_(on_stop_thread),
-        pool_name_(pool_name), pool_name_postfix_(name_postfix),
-        waiting_(false), wait_barrier_(pool_size + 1),
-        continue_barrier_(pool_size + 1)
+        threads::policies::callback_notifier const& notifier,
+        char const* pool_name, char const* name_postfix)
+      : next_io_service_(0)
+      , stopped_(false)
+      , pool_size_(pool_size)
+      , notifier_(notifier)
+      , pool_name_(pool_name)
+      , pool_name_postfix_(name_postfix)
+      , waiting_(false)
+      , wait_barrier_(pool_size + 1)
+      , continue_barrier_(pool_size + 1)
     {
         LPROGRESS_ << pool_name;
 
@@ -57,47 +60,19 @@ namespace hpx { namespace util
     }
 
     io_service_pool::io_service_pool(
-            on_startstop_func_type const& on_start_thread,
-            on_startstop_func_type const& on_stop_thread,
-            char const* pool_name, char const* name_postfix)
-      : next_io_service_(0), stopped_(false),
-        pool_size_(0),
-        on_start_thread_(on_start_thread),
-        on_stop_thread_(on_stop_thread),
-        pool_name_(pool_name), pool_name_postfix_(name_postfix),
-        waiting_(false), wait_barrier_(1),
-        continue_barrier_(1)
+        threads::policies::callback_notifier const& notifier,
+        char const* pool_name, char const* name_postfix)
+      : next_io_service_(0)
+      , stopped_(false)
+      , pool_size_(0)
+      , notifier_(notifier)
+      , pool_name_(pool_name)
+      , pool_name_postfix_(name_postfix)
+      , waiting_(false)
+      , wait_barrier_(1)
+      , continue_barrier_(1)
     {
         LPROGRESS_ << pool_name;
-    }
-
-    io_service_pool::io_service_pool(std::size_t pool_size,
-            char const* pool_name, char const* name_postfix)
-      : next_io_service_(0), stopped_(false),
-        pool_size_(pool_size),
-        on_start_thread_(),
-        on_stop_thread_(),
-        pool_name_(pool_name), pool_name_postfix_(name_postfix),
-        waiting_(false), wait_barrier_(pool_size + 1),
-        continue_barrier_(pool_size + 1)
-    {
-        LPROGRESS_ << pool_name;
-
-        if (pool_size == 0)
-        {
-            HPX_THROW_EXCEPTION(bad_parameter,
-                "io_service_pool::io_service_pool",
-                "io_service_pool size is 0");
-            return;
-        }
-
-        // Give all the io_services work to do so that their run() functions
-        // will not exit until they are explicitly stopped.
-        for (std::size_t i = 0; i < pool_size; ++i)
-        {
-            io_services_.emplace_back(new boost::asio::io_service);
-            work_.emplace_back(initialize_work(*io_services_[i]));
-        }
     }
 
     io_service_pool::~io_service_pool()
@@ -114,8 +89,7 @@ namespace hpx { namespace util
         if (startup != nullptr)
             startup->wait();
 
-        if (on_start_thread_)
-            on_start_thread_(index, pool_name_postfix_);
+        notifier_.on_start_thread(index, index, pool_name_, pool_name_postfix_);
 
         // use this thread for the given io service
         while (true)
@@ -133,8 +107,7 @@ namespace hpx { namespace util
             }
         }
 
-        if (on_stop_thread_)
-            on_stop_thread_(index, pool_name_postfix_);
+        notifier_.on_stop_thread(index, index, pool_name_, pool_name_postfix_);
     }
 
     bool io_service_pool::run(std::size_t num_threads, bool join_threads,

@@ -1,5 +1,6 @@
 //  Copyright (c) 2017-2018 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,23 +10,23 @@
 #define GUIDED_EXECUTOR_DEBUG 1
 #include <hpx/runtime/threads/executors/guided_pool_executor.hpp>
 #include <hpx/runtime/resource/partitioner.hpp>
-//#include <hpx/runtime/threads/cpu_mask.hpp>
+//#include <hpx/topology/cpu_mask.hpp>
 //#include <hpx/include/parallel_executors.hpp>
 #include <hpx/async.hpp>
 
 // we should not need these
 #include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
 
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/invoke_fused.hpp>
+#include <hpx/functional/result_of.hpp>
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/when_all.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/result_of.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/pack_traversal.hpp>
-#include <hpx/util/debug/demangle_helper.hpp>
+#include <hpx/debugging/demangle_helper.hpp>
 //
 #include "shared_priority_queue_scheduler.hpp"
 //
@@ -79,8 +80,8 @@ struct test_async_executor
     // --------------------------------------------------------------------
     struct future_extract_value
     {
-        template<typename T, template <typename> typename Future>
-        const T& operator()(const Future<T> &el) const
+        template <typename T, template <typename> class Future>
+        const T& operator()(const Future<T>& el) const
         {
             typedef typename traits::detail::shared_state_ptr_for<Future<T>>::type
                 shared_state_ptr;
@@ -173,21 +174,16 @@ struct test_async_executor
     // .then() execute specialized for a when_all dispatch for any future types
     // future< tuple< is_future<a>::type, is_future<b>::type, ...> >
     // --------------------------------------------------------------------
-    template <typename F,
-              template <typename> typename  OuterFuture,
-              typename ... InnerFutures,
-              typename ... Ts,
-              typename = enable_if_t<is_future_of_tuple_of_futures<
-                OuterFuture<util::tuple<InnerFutures...>>>::value>,
-              typename = enable_if_t<is_tuple_of_futures<
-                util::tuple<InnerFutures...>>::value>
-              >
-    auto
-    then_execute(F && f,
-                 OuterFuture<util::tuple<InnerFutures... > >&& predecessor,
-                 Ts &&... ts)
-    ->  future<typename util::detail::invoke_deferred_result<
-        F, OuterFuture<util::tuple<InnerFutures... >>, Ts...>::type>
+    template <typename F, template <typename> class OuterFuture,
+        typename... InnerFutures, typename... Ts,
+        typename = enable_if_t<is_future_of_tuple_of_futures<
+            OuterFuture<util::tuple<InnerFutures...>>>::value>,
+        typename = enable_if_t<
+            is_tuple_of_futures<util::tuple<InnerFutures...>>::value>>
+    auto then_execute(F&& f,
+        OuterFuture<util::tuple<InnerFutures...>>&& predecessor, Ts&&... ts)
+        -> future<typename util::detail::invoke_deferred_result<F,
+            OuterFuture<util::tuple<InnerFutures...>>, Ts...>::type>
     {
         typedef typename util::detail::invoke_deferred_result<
             F, OuterFuture<util::tuple<InnerFutures... >>, Ts...>::type
@@ -502,27 +498,25 @@ int main(int argc, char** argv)
         hpx::threads::policies::example::shared_priority_queue_scheduler<>;
     using hpx::threads::policies::scheduler_mode;
     // setup the default pool with our custom priority scheduler
-    rp.create_thread_pool(
-        "custom",
-        [](hpx::threads::policies::callback_notifier& notifier, std::size_t num_threads,
-          std::size_t thread_offset, std::size_t pool_index,
-          std::string const& pool_name) -> std::unique_ptr<hpx::threads::thread_pool_base>
-          {
-            std::cout << "User defined scheduler creation callback " << std::endl;
-            std::unique_ptr<high_priority_sched> scheduler(new high_priority_sched(
-                num_threads, {6, 6, 64}, "shared-priority-scheduler"));
+    rp.create_thread_pool("custom",
+        [](hpx::threads::thread_pool_init_parameters init,
+            hpx::threads::policies::thread_queue_init_parameters
+                thread_queue_init)
+            -> std::unique_ptr<hpx::threads::thread_pool_base> {
+            high_priority_sched::init_parameter_type scheduler_init(
+                init.num_threads_, {6, 6, 64}, init.affinity_data_,
+                thread_queue_init, "shared-priority-scheduler");
+            std::unique_ptr<high_priority_sched> scheduler(
+                new high_priority_sched(scheduler_init));
 
-            scheduler_mode mode = scheduler_mode(
-                scheduler_mode::do_background_work |
+            init.mode_ = scheduler_mode(scheduler_mode::do_background_work |
                 scheduler_mode::delay_exit);
 
             std::unique_ptr<hpx::threads::thread_pool_base> pool(
-              new hpx::threads::detail::scheduled_thread_pool<high_priority_sched>(
-                  std::move(scheduler), notifier, pool_index, pool_name,
-                  mode, thread_offset)
-            );
+                new hpx::threads::detail::scheduled_thread_pool<
+                    high_priority_sched>(std::move(scheduler), init));
             return pool;
-            });
+        });
 
     std::cout << "[main] "
               << "thread_pools created \n";

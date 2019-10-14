@@ -1,6 +1,7 @@
 //  Copyright (c)      2018 Mikael Simberg
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,22 +9,21 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_POOL_JUN_11_2015_1137AM
 
 #include <hpx/config.hpp>
-#include <hpx/error_code.hpp>
-#include <hpx/exception_fwd.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/concurrency/barrier.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
-#include <hpx/runtime/threads/cpu_mask.hpp>
+#include <hpx/runtime/threads/detail/network_background_callback.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/cpu_mask.hpp>
+#include <hpx/topology/topology.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/barrier.hpp>
-#include <hpx/util/steady_clock.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <thread>
@@ -58,6 +58,47 @@ namespace hpx { namespace threads
     };
     /// \endcond
 
+    struct thread_pool_init_parameters
+    {
+        std::string const& name_;
+        std::size_t index_;
+        policies::scheduler_mode mode_;
+        std::size_t num_threads_;
+        std::size_t thread_offset_;
+        hpx::threads::policies::callback_notifier& notifier_;
+        hpx::threads::policies::detail::affinity_data const& affinity_data_;
+        hpx::threads::detail::network_background_callback_type const&
+            network_background_callback_;
+        std::size_t max_background_threads_;
+        std::size_t max_idle_loop_count_;
+        std::size_t max_busy_loop_count_;
+
+        thread_pool_init_parameters(std::string const& name, std::size_t index,
+            policies::scheduler_mode mode, std::size_t num_threads,
+            std::size_t thread_offset,
+            hpx::threads::policies::callback_notifier& notifier,
+            hpx::threads::policies::detail::affinity_data const& affinity_data,
+            hpx::threads::detail::network_background_callback_type const&
+                network_background_callback =
+                    hpx::threads::detail::network_background_callback_type(),
+            std::size_t max_background_threads = std::size_t(-1),
+            std::size_t max_idle_loop_count = HPX_IDLE_LOOP_COUNT_MAX,
+            std::size_t max_busy_loop_count = HPX_BUSY_LOOP_COUNT_MAX)
+          : name_(name)
+          , index_(index)
+          , mode_(mode)
+          , num_threads_(num_threads)
+          , thread_offset_(thread_offset)
+          , notifier_(notifier)
+          , affinity_data_(affinity_data)
+          , network_background_callback_(network_background_callback)
+          , max_background_threads_(max_background_threads)
+          , max_idle_loop_count_(max_idle_loop_count)
+          , max_busy_loop_count_(max_busy_loop_count)
+        {
+        }
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     // note: this data structure has to be protected from races from the outside
 
@@ -66,9 +107,7 @@ namespace hpx { namespace threads
     {
     public:
         /// \cond NOINTERNAL
-        thread_pool_base(threads::policies::callback_notifier& notifier,
-            std::size_t index, std::string const& pool_name,
-            policies::scheduler_mode m, std::size_t thread_offset);
+        thread_pool_base(thread_pool_init_parameters const& init);
 
         virtual ~thread_pool_base() = default;
 
@@ -88,27 +127,22 @@ namespace hpx { namespace threads
         }
         /// \endcond
 
-        /// Resumes the thread pool. When the all OS threads on the thread pool
-        /// have been resumed the returned future will be ready.
+        /// Suspends the given processing unit. Blocks until the processing unit
+        /// has been suspended.
         ///
-        /// \note Can only be called from an HPX thread. Use resume_cb or
-        ///       resume_direct to suspend the pool from outside HPX.
-        ///
-        /// \returns A `future<void>` which is ready when the thread pool has
-        ///          been resumed.
-        ///
-        /// \throws hpx::exception if called from outside the HPX runtime.
-        virtual hpx::future<void> resume() = 0;
+        /// \param virt_core [in] The processing unit on the the pool to be
+        ///                  suspended. The processing units are indexed
+        ///                  starting from 0.
+        virtual void suspend_processing_unit_direct(
+            std::size_t virt_core, error_code& ec = throws) = 0;
 
-        /// Resumes the thread pool. Takes a callback as a parameter which will
-        /// be called when all OS threads on the thread pool have been resumed.
+        /// Resumes the given processing unit. Blocks until the processing unit
+        /// has been resumed.
         ///
-        /// \param callback [in] called when the thread pool has been resumed.
-        /// \param ec       [in,out] this represents the error status on exit, if this
-        ///                 is pre-initialized to \a hpx#throws the function will throw
-        ///                 on error instead.
-        virtual void resume_cb(
-            std::function<void(void)> callback, error_code& ec = throws) = 0;
+        /// \param virt_core [in] The processing unit on the the pool to be resumed.
+        ///                  The processing units are indexed starting from 0.
+        virtual void resume_processing_unit_direct(
+            std::size_t virt_core, error_code& ec = throws) = 0;
 
         /// Resumes the thread pool. Blocks until all OS threads on the thread pool
         /// have been resumed.
@@ -117,36 +151,6 @@ namespace hpx { namespace threads
         ///           is pre-initialized to \a hpx#throws the function will
         ///           throw on error instead.
         virtual void resume_direct(error_code& ec = throws) = 0;
-
-        /// Suspends the thread pool. When the all OS threads on the thread pool
-        /// have been suspended the returned future will be ready.
-        ///
-        /// \note Can only be called from an HPX thread. Use suspend_cb or
-        ///       suspend_direct to suspend the pool from outside HPX. A thread
-        ///       pool cannot be suspended from an HPX thread running on the
-        ///       pool itself.
-        ///
-        /// \returns A `future<void>` which is ready when the thread pool has
-        ///          been suspended.
-        ///
-        /// \throws hpx::exception if called from outside the HPX runtime.
-        virtual hpx::future<void> suspend() = 0;
-
-        /// Suspends the thread pool. Takes a callback as a parameter which will
-        /// be called when all OS threads on the thread pool have been suspended.
-        ///
-        /// \note A thread pool cannot be suspended from an HPX thread running
-        ///       on the pool itself.
-        ///
-        /// \param callback [in] called when the thread pool has been suspended.
-        /// \param ec       [in,out] this represents the error status on exit, if this
-        ///                 is pre-initialized to \a hpx#throws the function will throw
-        ///                 on error instead.
-        ///
-        /// \throws hpx::exception if called from an HPX thread which is running
-        ///         on the pool itself.
-        virtual void suspend_cb(
-            std::function<void(void)> callback, error_code& ec = throws) = 0;
 
         /// Suspends the thread pool. Blocks until all OS threads on the thread pool
         /// have been suspended.
@@ -360,9 +364,10 @@ namespace hpx { namespace threads
 
         virtual void do_some_work(std::size_t /*num_thread*/) {}
 
-        virtual void report_error(std::size_t num, std::exception_ptr const& e)
+        virtual void report_error(
+            std::size_t global_thread_num, std::exception_ptr const& e)
         {
-            notifier_.on_error(num, e);
+            notifier_.on_error(global_thread_num, e);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -389,72 +394,6 @@ namespace hpx { namespace threads
 
         /// \endcond
 
-        /// Suspends the given processing unit. When the processing unit has
-        /// been suspended the returned future will be ready.
-        ///
-        /// \note Can only be called from an HPX thread. Use
-        ///       suspend_processing_unit_cb or to suspend the processing unit
-        ///       from outside HPX. Requires that the pool has
-        ///       threads::policies::enable_elasticity set.
-        ///
-        /// \param virt_core [in] The processing unit on the the pool to be
-        ///                  suspended. The processing units are indexed
-        ///                  starting from 0.
-        ///
-        /// \returns A `future<void>` which is ready when the given processing
-        ///          unit has been suspended.
-        ///
-        /// \throws hpx::exception if called from outside the HPX runtime.
-        virtual hpx::future<void> suspend_processing_unit(std::size_t virt_core) = 0;
-
-        /// Suspends the given processing unit. Takes a callback as a parameter
-        /// which will be called when the processing unit has been suspended.
-        ///
-        /// \note Requires that the pool has
-        ///       threads::policies::enable_elasticity set.
-        ///
-        /// \param callback  [in] Callback which is called when the processing
-        ///                  unit has been suspended.
-        /// \param virt_core [in] The processing unit to suspend.
-        /// \param ec        [in,out] this represents the error status on exit, if this
-        ///                  is pre-initialized to \a hpx#throws the function will throw
-        ///                  on error instead.
-        virtual void suspend_processing_unit_cb(
-            std::function<void(void)> callback, std::size_t virt_core,
-            error_code& ec = throws) = 0;
-
-        /// Resumes the given processing unit. When the processing unit has been
-        /// resumed the returned future will be ready.
-        ///
-        /// \note Can only be called from an HPX thread. Use
-        ///       resume_processing_unit_cb or to resume the processing unit
-        ///       from outside HPX. Requires that the pool has
-        ///       threads::policies::enable_elasticity set.
-        ///
-        /// \param virt_core [in] The processing unit on the the pool to be
-        ///                  resumed. The processing units are indexed starting
-        ///                  from 0.
-        ///
-        /// \returns A `future<void>` which is ready when the given processing
-        ///          unit has been resumed.
-        virtual hpx::future<void> resume_processing_unit(std::size_t virt_core) = 0;
-
-        /// Resumes the given processing unit. Takes a callback as a parameter
-        /// which will be called when the processing unit has been resumed.
-        ///
-        /// \note Requires that the pool has
-        ///       threads::policies::enable_elasticity set.
-        ///
-        /// \param callback  [in] Callback which is called when the processing
-        ///                  unit has been suspended.
-        /// \param virt_core [in] The processing unit to resume.
-        /// \param ec        [in,out] this represents the error status on exit, if this
-        ///                  is pre-initialized to \a hpx#throws the function will throw
-        ///                  on error instead.
-        virtual void resume_processing_unit_cb(
-            std::function<void(void)> callback, std::size_t virt_core,
-                error_code& ec = throws) = 0;
-
         /// \cond NOINTERNAL
         policies::scheduler_mode get_scheduler_mode() const
         {
@@ -480,6 +419,8 @@ namespace hpx { namespace threads
         // the global index of a thread it owns, the pool has to compute:
         // global index = thread_offset_ + local index.
         std::size_t thread_offset_;
+
+        policies::detail::affinity_data const& affinity_data_;
 
         // scale timestamps to nanoseconds
         double timestamp_scale_;

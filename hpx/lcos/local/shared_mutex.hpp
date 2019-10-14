@@ -1,6 +1,7 @@
 //  (C) Copyright 2006-2008 Anthony Williams
 //  (C) Copyright      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -45,10 +46,11 @@ namespace hpx { namespace lcos { namespace local
 
         public:
             shared_mutex()
-              : shared_cond(), exclusive_cond(), upgrade_cond()
+              : state{0u, false, false, false}
+              , shared_cond()
+              , exclusive_cond()
+              , upgrade_cond()
             {
-                state_data state_ = {0, 0, 0, 0};
-                state = state_;
             }
 
             void lock_shared()

@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -17,7 +18,7 @@
 #include "sheneos/interpolator.hpp"
 
 #include <boost/dynamic_bitset.hpp>
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 char const* const shen_symbolic_name = "/sheneos/interpolator_test";
 
@@ -305,7 +306,7 @@ void wait_for_bulk_one_task(std::size_t i, hpx::util::high_resolution_timer& t)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::string const datafilename = vm["file"].as<std::string>();
 
@@ -403,8 +404,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    using boost::program_options::options_description;
-    using boost::program_options::value;
+    using hpx::program_options::options_description;
+    using hpx::program_options::value;
 
     // Configure application-specific options.
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");

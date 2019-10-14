@@ -1,5 +1,6 @@
 //  Copyright (c) 2015 Daniel Bourgeois
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,9 +10,9 @@
 #define HPX_PARALLEL_DETAIL_REMOVE_COPY_FEB_25_2015_0137PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/copy.hpp>
@@ -20,26 +21,23 @@
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /////////////////////////////////////////////////////////////////////////////
     // remove_copy
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // sequential remove_copy
         template <typename InIter, typename OutIter, typename T, typename Proj>
-        inline std::pair<InIter, OutIter>
-        sequential_remove_copy(InIter first, InIter last, OutIter dest,
-            T const& value, Proj && proj)
+        inline std::pair<InIter, OutIter> sequential_remove_copy(InIter first,
+            InIter last, OutIter dest, T const& value, Proj&& proj)
         {
             for (/* */; first != last; ++first)
             {
@@ -57,38 +55,34 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             remove_copy()
               : remove_copy::algorithm("remove_copy")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter, typename OutIter,
                 typename T, typename Proj>
-            static std::pair<InIter, OutIter>
-            sequential(ExPolicy, InIter first, InIter last, OutIter dest,
-                T const& val, Proj && proj)
+            static std::pair<InIter, OutIter> sequential(ExPolicy, InIter first,
+                InIter last, OutIter dest, T const& val, Proj&& proj)
             {
-                return sequential_remove_copy(first, last, dest, val,
-                    std::forward<Proj>(proj));
+                return sequential_remove_copy(
+                    first, last, dest, val, std::forward<Proj>(proj));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename T, typename Proj>
-            static typename util::detail::algorithm_result<
-                ExPolicy, std::pair<FwdIter1, FwdIter2>
-            >::type
-            parallel(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
-                FwdIter2 dest, T const& val, Proj && proj)
+            static typename util::detail::algorithm_result<ExPolicy,
+                std::pair<FwdIter1, FwdIter2>>::type
+            parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+                FwdIter2 dest, T const& val, Proj&& proj)
             {
                 return copy_if<IterPair>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(),
-                    first, last, dest,
-                    [val](T const& a) -> bool
-                    {
-                        return !(a == val);
-                    },
+                    std::forward<ExPolicy>(policy), std::false_type(), first,
+                    last, dest,
+                    [val](T const& a) -> bool { return !(a == val); },
                     std::forward<Proj>(proj));
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest. Copies only the elements for which the
@@ -155,50 +149,42 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T,
-        typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter1>::value &&
-        hpx::traits::is_iterator<FwdIter2>::value &&
-        traits::is_projected<Proj, FwdIter1>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, std::equal_to<T>,
-                traits::projected<Proj, FwdIter1>,
-                traits::projected<Proj, T const*>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
-    >::type
-    remove_copy(ExPolicy && policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
-        T const& val, Proj && proj = Proj())
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename T, typename Proj = util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<
+            ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value&&
+                hpx::traits::is_iterator<FwdIter2>::value&&
+                    traits::is_projected<Proj, FwdIter1>::value&&
+                        traits::is_indirect_callable<ExPolicy, std::equal_to<T>,
+                            traits::projected<Proj, FwdIter1>,
+                            traits::projected<Proj, T const*>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
+    remove_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
+        T const& val, Proj&& proj = Proj())
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
-            detail::remove_copy<std::pair<FwdIter1, FwdIter2> >().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, dest, val, std::forward<Proj>(proj)));
+            detail::remove_copy<std::pair<FwdIter1, FwdIter2>>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
+                val, std::forward<Proj>(proj)));
     }
 
     /////////////////////////////////////////////////////////////////////////////
     // remove_copy_if
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // sequential remove_copy_if
         template <typename InIter, typename OutIter, typename F, typename Proj>
-        inline std::pair<InIter, OutIter>
-        sequential_remove_copy_if(InIter first, InIter last, OutIter dest, F p,
-            Proj && proj)
+        inline std::pair<InIter, OutIter> sequential_remove_copy_if(
+            InIter first, InIter last, OutIter dest, F p, Proj&& proj)
         {
             for (/* */; first != last; ++first)
             {
@@ -217,13 +203,13 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             remove_copy_if()
               : remove_copy_if::algorithm("remove_copy_if")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter, typename OutIter,
                 typename F, typename Proj>
-            static std::pair<InIter, OutIter>
-            sequential(ExPolicy, InIter first, InIter last, OutIter dest,
-                F && f, Proj && proj)
+            static std::pair<InIter, OutIter> sequential(ExPolicy, InIter first,
+                InIter last, OutIter dest, F&& f, Proj&& proj)
             {
                 return sequential_remove_copy_if(first, last, dest,
                     std::forward<F>(f), std::forward<Proj>(proj));
@@ -231,27 +217,25 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F, typename Proj>
-            static typename util::detail::algorithm_result<
-                ExPolicy, std::pair<FwdIter1, FwdIter2>
-            >::type
-            parallel(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
-                FwdIter2 dest, F && f, Proj && proj)
+            static typename util::detail::algorithm_result<ExPolicy,
+                std::pair<FwdIter1, FwdIter2>>::type
+            parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+                FwdIter2 dest, F&& f, Proj&& proj)
             {
                 typedef typename std::iterator_traits<FwdIter1>::value_type
                     value_type;
 
                 return copy_if<IterPair>().call(
-                    std::forward<ExPolicy>(policy), std::false_type(),
-                    first, last, dest,
-                    [HPX_CAPTURE_FORWARD(f)](value_type const& a) -> bool
-                    {
+                    std::forward<ExPolicy>(policy), std::false_type(), first,
+                    last, dest,
+                    [HPX_CAPTURE_FORWARD(f)](value_type const& a) -> bool {
                         return !hpx::util::invoke(f, a);
                     },
                     std::forward<Proj>(proj));
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest. Copies only the elements for which the
@@ -334,37 +318,31 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename F,
-        typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter1>::value &&
-        traits::is_projected<Proj, FwdIter1>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F, traits::projected<Proj, FwdIter1>
-        >::value &&
-        hpx::traits::is_iterator<FwdIter2>::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
-    >::type
-    remove_copy_if(ExPolicy && policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
-        F && f, Proj && proj = Proj())
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename F, typename Proj = util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter1>::value&&
+                    traits::is_projected<Proj, FwdIter1>::value&&
+                        traits::is_indirect_callable<ExPolicy, F,
+                            traits::projected<Proj, FwdIter1>>::value&&
+                            hpx::traits::is_iterator<FwdIter2>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
+    remove_copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+        FwdIter2 dest, F&& f, Proj&& proj = Proj())
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
-            detail::remove_copy_if<std::pair<FwdIter1, FwdIter2> >().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, dest, std::forward<F>(f),
-                std::forward<Proj>(proj)));
+            detail::remove_copy_if<std::pair<FwdIter1, FwdIter2>>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
+                std::forward<F>(f), std::forward<Proj>(proj)));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

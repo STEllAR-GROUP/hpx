@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Grant Mercer
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,14 +10,14 @@
 #define HPX_PARALLEL_ALGORITHMS_SEARCH_NOV_9_2014_0317PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <hpx/parallel/util/loop.hpp>
@@ -29,40 +30,37 @@
 #include <utility>
 #include <vector>
 
-namespace hpx {namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // search
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
-        template<typename FwdIter>
-        struct search: public detail::algorithm<search<FwdIter>, FwdIter>
+        template <typename FwdIter>
+        struct search : public detail::algorithm<search<FwdIter>, FwdIter>
         {
             search()
-                : search::algorithm("search")
-            {}
-
-            template <typename ExPolicy, typename FwdIter2, typename Pred,
-                typename Proj1, typename Proj2>
-            static FwdIter
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                FwdIter2 s_first, FwdIter2 s_last, Pred && op,
-                Proj1 && proj1, Proj2 && proj2)
+              : search::algorithm("search")
             {
-                return std::search(first, last, s_first, s_last,
-                    util::compare_projected<Pred, Proj1, Proj2>(op,
-                        proj1, proj2));
             }
 
             template <typename ExPolicy, typename FwdIter2, typename Pred,
                 typename Proj1, typename Proj2>
-            static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter
-            >::type
-            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
-                FwdIter2 s_first, FwdIter2 s_last, Pred && op,
-                Proj1 && proj1, Proj2 && proj2)
+            static FwdIter sequential(ExPolicy, FwdIter first, FwdIter last,
+                FwdIter2 s_first, FwdIter2 s_last, Pred&& op, Proj1&& proj1,
+                Proj2&& proj2)
+            {
+                return std::search(first, last, s_first, s_last,
+                    util::compare_projected<Pred, Proj1, Proj2>(
+                        op, proj1, proj2));
+            }
+
+            template <typename ExPolicy, typename FwdIter2, typename Pred,
+                typename Proj1, typename Proj2>
+            static
+                typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+                parallel(ExPolicy&& policy, FwdIter first, FwdIter last,
+                    FwdIter2 s_first, FwdIter2 s_last, Pred&& op, Proj1&& proj1,
+                    Proj2&& proj2)
             {
                 using reference =
                     typename std::iterator_traits<FwdIter>::reference;
@@ -73,7 +71,8 @@ namespace hpx {namespace parallel { inline namespace v1
                 using s_difference_type =
                     typename std::iterator_traits<FwdIter2>::difference_type;
 
-                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter>
+                    result;
 
                 s_difference_type diff = std::distance(s_first, s_last);
                 if (diff <= 0)
@@ -141,7 +140,7 @@ namespace hpx {namespace parallel { inline namespace v1
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
     /// Uses a provided predicate to compare elements.
@@ -229,79 +228,71 @@ namespace hpx {namespace parallel { inline namespace v1
         typename Pred = detail::equal_to,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter>::value &&
-        traits::is_projected<Proj1, FwdIter>::value &&
-        hpx::traits::is_iterator<FwdIter2>::value &&
-        traits::is_projected<Proj2, FwdIter2>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Pred,
-            traits::projected<Proj1, FwdIter>,
-            traits::projected<Proj2, FwdIter2>
-        >::value
-    )>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    search(ExPolicy && policy, FwdIter first, FwdIter last,
-        FwdIter2 s_first, FwdIter2 s_last, Pred && op = Pred(),
-        Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter>::value&&
+                    traits::is_projected<Proj1, FwdIter>::value&&
+                        hpx::traits::is_iterator<FwdIter2>::value&&
+                            traits::is_projected<Proj2, FwdIter2>::value&&
+                                traits::is_indirect_callable<ExPolicy, Pred,
+                                    traits::projected<Proj1, FwdIter>,
+                                    traits::projected<Proj2, FwdIter2>>::value)>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type search(
+        ExPolicy&& policy, FwdIter first, FwdIter last, FwdIter2 s_first,
+        FwdIter2 s_last, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+        Proj2&& proj2 = Proj2())
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::search<FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, s_first, s_last, std::forward<Pred>(op),
+        return detail::search<FwdIter>().call(std::forward<ExPolicy>(policy),
+            is_seq(), first, last, s_first, s_last, std::forward<Pred>(op),
             std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // search_n
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
-        template<typename FwdIter>
-        struct search_n: public detail::algorithm<search_n<FwdIter>, FwdIter>
+        template <typename FwdIter>
+        struct search_n : public detail::algorithm<search_n<FwdIter>, FwdIter>
         {
             search_n()
-                : search_n::algorithm("search_n")
-            {}
-
-            template <typename ExPolicy, typename FwdIter2, typename Pred,
-                typename Proj1, typename Proj2>
-            static FwdIter
-            sequential(ExPolicy, FwdIter first, std::size_t count,
-                FwdIter2 s_first, FwdIter2 s_last, Pred && op,
-                Proj1 && proj1, Proj2 && proj2)
+              : search_n::algorithm("search_n")
             {
-                return std::search(first, std::next(first, count),
-                    s_first, s_last,
-                    util::compare_projected<Pred, Proj1, Proj2>(op,
-                        proj1, proj2));
             }
 
             template <typename ExPolicy, typename FwdIter2, typename Pred,
                 typename Proj1, typename Proj2>
-            static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter
-            >::type
-            parallel(ExPolicy && policy, FwdIter first, std::size_t count,
-                FwdIter2 s_first, FwdIter2 s_last, Pred && op,
-                Proj1 && proj1, Proj2 && proj2)
+            static FwdIter sequential(ExPolicy, FwdIter first,
+                std::size_t count, FwdIter2 s_first, FwdIter2 s_last, Pred&& op,
+                Proj1&& proj1, Proj2&& proj2)
             {
-                typedef typename std::iterator_traits<FwdIter>::reference
-                    reference;
+                return std::search(first, std::next(first, count), s_first,
+                    s_last,
+                    util::compare_projected<Pred, Proj1, Proj2>(
+                        op, proj1, proj2));
+            }
+
+            template <typename ExPolicy, typename FwdIter2, typename Pred,
+                typename Proj1, typename Proj2>
+            static
+                typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+                parallel(ExPolicy&& policy, FwdIter first, std::size_t count,
+                    FwdIter2 s_first, FwdIter2 s_last, Pred&& op, Proj1&& proj1,
+                    Proj2&& proj2)
+            {
+                typedef
+                    typename std::iterator_traits<FwdIter>::reference reference;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
                 typedef typename std::iterator_traits<FwdIter2>::difference_type
                     s_difference_type;
-                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter>
+                    result;
 
                 s_difference_type diff = std::distance(s_first, s_last);
                 if (diff <= 0)
@@ -367,7 +358,7 @@ namespace hpx {namespace parallel { inline namespace v1
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
     /// Uses a provided predicate to compare elements.
@@ -451,37 +442,30 @@ namespace hpx {namespace parallel { inline namespace v1
         typename Pred = detail::equal_to,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter>::value &&
-        traits::is_projected<Proj1, FwdIter>::value &&
-        hpx::traits::is_iterator<FwdIter2>::value &&
-        traits::is_projected<Proj2, FwdIter2>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Pred,
-            traits::projected<Proj1, FwdIter>,
-            traits::projected<Proj2, FwdIter2>
-        >::value
-    )>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    search_n(ExPolicy && policy, FwdIter first, std::size_t count,
-        FwdIter2 s_first, FwdIter2 s_last, Pred && op = Pred(),
-        Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter>::value&&
+                    traits::is_projected<Proj1, FwdIter>::value&&
+                        hpx::traits::is_iterator<FwdIter2>::value&&
+                            traits::is_projected<Proj2, FwdIter2>::value&&
+                                traits::is_indirect_callable<ExPolicy, Pred,
+                                    traits::projected<Proj1, FwdIter>,
+                                    traits::projected<Proj2, FwdIter2>>::value)>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type search_n(
+        ExPolicy&& policy, FwdIter first, std::size_t count, FwdIter2 s_first,
+        FwdIter2 s_last, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+        Proj2&& proj2 = Proj2())
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::search_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, count, s_first, s_last, std::forward<Pred>(op),
+        return detail::search_n<FwdIter>().call(std::forward<ExPolicy>(policy),
+            is_seq(), first, count, s_first, s_last, std::forward<Pred>(op),
             std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

@@ -1,6 +1,7 @@
 //  Copyright Eric Niebler 2013-2015
 //  Copyright 2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -11,10 +12,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/identity.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/identity.hpp>
 #include <hpx/util/tagged.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <cstddef>
 #include <utility>

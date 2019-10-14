@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -21,7 +22,7 @@
 struct test_server : hpx::components::simple_component_base<test_server>
 {
     test_server() = delete;
-    test_server(int i) : i_(i) {}
+    explicit test_server(int i) : i_(i) {}
 
     int call() const { return i_; }
 
@@ -45,7 +46,7 @@ struct test_client : hpx::components::client_base<test_client, test_server>
     test_client(hpx::id_type const& id)
       : base_type(id)
     {}
-    test_client(hpx::future<hpx::id_type> && id)
+    explicit test_client(hpx::future<hpx::id_type> && id)
       : base_type(std::move(id))
     {}
 

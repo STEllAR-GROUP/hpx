@@ -1,6 +1,7 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //  Copyright (c) 2016 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,8 +9,8 @@
 #define HPX_PARALLEL_ALGORITHM_SORT_BY_KEY_DEC_2015
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/util/tagged_pair.hpp>
-#include <hpx/util/tuple.hpp>
 
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/tagspec.hpp>
@@ -20,24 +21,22 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // sort
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         struct extract_key
         {
             template <typename Tuple>
-            auto operator() (Tuple && t) const
-            ->  decltype(hpx::util::get<0>(std::forward<Tuple>(t)))
+            auto operator()(Tuple&& t) const
+                -> decltype(hpx::util::get<0>(std::forward<Tuple>(t)))
             {
                 return hpx::util::get<0>(std::forward<Tuple>(t));
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     //-----------------------------------------------------------------------------
     /// Sorts one range of data using keys supplied in another range.
@@ -114,27 +113,19 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the last element in the input value sequence.
     //-----------------------------------------------------------------------------
 
-    template <
-        typename ExPolicy, typename KeyIter, typename ValueIter,
-        typename Compare = detail::less
-    >
-    typename util::detail::algorithm_result<
-        ExPolicy,
-        hpx::util::tagged_pair<tag::in1(KeyIter), tag::in2(ValueIter)>
-    >::type
-    sort_by_key(ExPolicy && policy,
-                KeyIter key_first,
-                KeyIter key_last,
-                ValueIter value_first,
-                Compare && comp = Compare())
+    template <typename ExPolicy, typename KeyIter, typename ValueIter,
+        typename Compare = detail::less>
+    typename util::detail::algorithm_result<ExPolicy,
+        hpx::util::tagged_pair<tag::in1(KeyIter), tag::in2(ValueIter)>>::type
+    sort_by_key(ExPolicy&& policy, KeyIter key_first, KeyIter key_last,
+        ValueIter value_first, Compare&& comp = Compare())
     {
 #if !defined(HPX_HAVE_TUPLE_RVALUE_SWAP)
-        static_assert(sizeof(KeyIter) == 0, // always false
+        static_assert(sizeof(KeyIter) == 0,    // always false
             "sort_by_key is not supported unless HPX_HAVE_TUPLE_RVALUE_SWAP "
             "is defined");
 #else
-        static_assert(
-            (hpx::traits::is_random_access_iterator<KeyIter>::value),
+        static_assert((hpx::traits::is_random_access_iterator<KeyIter>::value),
             "Requires a random access iterator.");
         static_assert(
             (hpx::traits::is_random_access_iterator<ValueIter>::value),
@@ -144,14 +135,12 @@ namespace hpx { namespace parallel { inline namespace v1
         std::advance(value_last, std::distance(key_first, key_last));
 
         return detail::get_iter_tagged_pair<tag::in1, tag::in2>(
-            hpx::parallel::sort(
-                std::forward<ExPolicy>(policy),
+            hpx::parallel::sort(std::forward<ExPolicy>(policy),
                 hpx::util::make_zip_iterator(key_first, value_first),
                 hpx::util::make_zip_iterator(key_last, value_last),
-                std::forward<Compare>(comp),
-                detail::extract_key()));
+                std::forward<Compare>(comp), detail::extract_key()));
 #endif
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

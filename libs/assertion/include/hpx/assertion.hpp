@@ -1,5 +1,6 @@
 //  Copyright (c) 2019 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -27,7 +28,7 @@ namespace hpx { namespace assertion {
     /// set already once, the call to this function will be ignored.
     /// \note This function is not thread safe
     HPX_EXPORT void set_assertion_handler(assertion_handler handler);
-}}
+}}    // namespace hpx::assertion
 
 #if defined(DOXYGEN)
 /// \def HPX_ASSERT(expr, msg)
@@ -54,9 +55,10 @@ namespace hpx { namespace assertion {
 #define HPX_ASSERT_(expr, msg)                                                 \
     ::hpx::assertion::detail::evaluate_assert(                                 \
         [&]() -> bool { return !!(expr); },                                    \
-        ::hpx::assertion::source_location{                                     \
-            __FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION},                  \
+        ::hpx::assertion::source_location{__FILE__,                            \
+            static_cast<unsigned>(__LINE__), HPX_ASSERT_CURRENT_FUNCTION},     \
         HPX_PP_STRINGIZE(expr), [&]() { return msg; });                        \
+
 /**/
 #define HPX_ASSERT_EQ(x, count)
 #define HPX_ASSERT_EQ_(x, count)

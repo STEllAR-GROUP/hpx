@@ -1,6 +1,7 @@
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 # Copyright (c) 2007-2017 Hartmut Kaiser
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,17 +13,11 @@ set(subdirs
     component
     computeapi
     lcos
-    parallel
     performance_counters
-    serialization
     threads
     traits
     util
    )
-
-if(HPX_HAVE_CXX11_LAMBDAS)
-    set(subdirs ${subdirs} parallel)
-endif()
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.regressions.${subdir})
@@ -31,7 +26,6 @@ foreach(subdir ${subdirs})
 endforeach()
 
 set(tests
-    commandline_options_1437
     dynamic_counters_loaded_1508
     id_type_ref_counting_1032
     multiple_init
@@ -40,7 +34,6 @@ set(tests
     unhandled_exception_582
    )
 
-set(commandline_options_1437_PARAMETERS THREADS_PER_LOCALITY 2)
 set(id_type_ref_counting_1032_PARAMETERS THREADS_PER_LOCALITY 1)
 set(unhandled_exception_582_PARAMETERS THREADS_PER_LOCALITY 1)
 set(dynamic_counters_loaded_1508_FLAGS DEPENDENCIES memory_component)

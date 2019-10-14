@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2011-2012 Maciej Brodowicz
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,7 +11,7 @@
 
 #include <hpx/components/performance_counters/papi/server/papi.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime.hpp>
@@ -19,10 +20,10 @@
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/util/bind_back.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/util/thread_mapper.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cctype>
 #include <cstdint>
@@ -43,8 +44,8 @@ typedef hpx::components::component<
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace papi
 {
-    using boost::program_options::options_description;
-    using boost::program_options::variables_map;
+    using hpx::program_options::options_description;
+    using hpx::program_options::variables_map;
     using hpx::performance_counters::counter_info;
     using hpx::performance_counters::counter_path_elements;
     using hpx::util::thread_mapper;

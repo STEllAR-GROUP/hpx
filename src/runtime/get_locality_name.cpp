@@ -1,12 +1,13 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
 #include <hpx/apply.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime.hpp>
@@ -17,6 +18,7 @@ namespace hpx { namespace detail
 {
     std::string get_locality_base_name()
     {
+#if defined(HPX_HAVE_NETWORKING)
         runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
         {
@@ -26,6 +28,9 @@ namespace hpx { namespace detail
             return "";
         }
         return rt->get_parcel_handler().get_locality_name();
+#else
+        return "console";
+#endif
     }
 
     std::string get_locality_name()

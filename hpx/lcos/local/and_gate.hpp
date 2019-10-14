@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,13 +9,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/conditional_trigger.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 
@@ -44,8 +44,9 @@ namespace hpx { namespace lcos { namespace local
         {
         }
 
-        base_and_gate(base_and_gate && rhs)
-          : received_segments_(std::move(rhs.received_segments_)),
+        base_and_gate(base_and_gate && rhs) noexcept
+          : mtx_(),
+            received_segments_(std::move(rhs.received_segments_)),
             promise_(std::move(rhs.promise_)),
             generation_(rhs.generation_),
             conditions_(std::move(rhs.conditions_))
@@ -53,11 +54,12 @@ namespace hpx { namespace lcos { namespace local
             rhs.generation_ = std::size_t(-1);
         }
 
-        base_and_gate& operator=(base_and_gate && rhs)
+        base_and_gate& operator=(base_and_gate && rhs) noexcept
         {
             if (this != &rhs)
             {
                 std::lock_guard<mutex_type> l(rhs.mtx_);
+                mtx_ = mutex_type();
                 received_segments_ = std::move(rhs.received_segments_);
                 promise_ = std::move(rhs.promise_);
                 generation_ = rhs.generation_;

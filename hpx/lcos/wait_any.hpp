@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -166,8 +167,8 @@ namespace hpx
 #include <hpx/lcos/wait_some.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/util/always_void.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/type_support/always_void.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <boost/utility/swap.hpp>
 

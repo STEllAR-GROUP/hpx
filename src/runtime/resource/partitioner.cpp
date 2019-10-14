@@ -1,5 +1,6 @@
 //  Copyright (c)      2017 Shoshana Jakobovits
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,9 +9,9 @@
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/resource/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
-#include <hpx/runtime/threads/cpu_mask.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -196,9 +197,9 @@ namespace hpx { namespace resource
     {
         detail::partitioner &create_partitioner(
             util::function_nonser<
-                int(boost::program_options::variables_map& vm)
+                int(hpx::program_options::variables_map& vm)
             > const& f,
-            boost::program_options::options_description const& desc_cmdline,
+            hpx::program_options::options_description const& desc_cmdline,
             int argc, char **argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode, runtime_mode mode,
             bool check, int* result)

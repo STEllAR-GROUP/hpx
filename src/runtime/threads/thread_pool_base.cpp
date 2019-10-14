@@ -1,22 +1,21 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/exception_info.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/state.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/hardware/timestamp.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -29,20 +28,20 @@ namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     thread_pool_base::thread_pool_base(
-            threads::policies::callback_notifier& notifier,
-            std::size_t index, std::string const& pool_name,
-            policies::scheduler_mode m, std::size_t thread_offset)
-      : id_(index, pool_name),
-        mode_(m),
-        thread_offset_(thread_offset),
-        timestamp_scale_(1.0),
-        notifier_(notifier)
-    {}
+        thread_pool_init_parameters const& init)
+      : id_(init.index_, init.name_)
+      , mode_(init.mode_)
+      , thread_offset_(init.thread_offset_)
+      , affinity_data_(init.affinity_data_)
+      , timestamp_scale_(1.0)
+      , notifier_(init.notifier_)
+    {
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     mask_type thread_pool_base::get_used_processing_units() const
     {
-        auto const& rp = resource::get_partitioner();
+        auto const& topo = create_topology();
         auto const sched = get_scheduler();
 
         mask_type used_processing_units = mask_type();
@@ -54,7 +53,7 @@ namespace hpx { namespace threads
             if (sched->get_state(thread_num).load() <= state_suspended)
             {
                 used_processing_units |=
-                    rp.get_pu_mask(thread_num + get_thread_offset());
+                    affinity_data_.get_pu_mask(topo, thread_num + get_thread_offset());
             }
         }
 
@@ -63,9 +62,9 @@ namespace hpx { namespace threads
 
     hwloc_bitmap_ptr thread_pool_base::get_numa_domain_bitmap() const
     {
-        auto const& rp = resource::get_partitioner();
+        auto const& topo = create_topology();
         mask_type used_processing_units = get_used_processing_units();
-        return rp.get_topology().cpuset_to_nodeset(used_processing_units);
+        return topo.cpuset_to_nodeset(used_processing_units);
     }
 
     std::size_t thread_pool_base::get_active_os_thread_count() const

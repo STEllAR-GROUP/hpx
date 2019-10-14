@@ -9,6 +9,7 @@
 //  http://timday.bitbucket.org/lru.html
 //  Copyright (c) 2010-2011 Tim Day
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -17,11 +18,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/tuple.hpp>
 
 #include <cstddef>
 #include <cstdint>

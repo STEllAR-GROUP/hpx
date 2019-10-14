@@ -1,6 +1,7 @@
 // (C) Copyright 2007-9 Anthony Williams
 // Copyright (c) 2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -9,7 +10,7 @@
 #define HPX_THREAD_GROUP_AUG_03_2015_0908PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors/exception.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/local/shared_mutex.hpp>
 #include <hpx/lcos/local/mutex.hpp>

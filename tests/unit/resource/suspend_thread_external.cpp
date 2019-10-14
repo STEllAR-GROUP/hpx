@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -13,6 +14,7 @@
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -32,18 +34,20 @@ int hpx_main(int argc, char* argv[])
 
     {
         // Check number of used resources
-        for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
+        for (std::size_t thread_num = 0; thread_num < num_threads - 1;
+             ++thread_num)
         {
-            tp.suspend_processing_unit(thread_num).get();
+            hpx::threads::suspend_processing_unit(tp, thread_num).get();
             HPX_TEST_EQ(std::size_t(num_threads - thread_num - 1),
                 tp.get_active_os_thread_count());
         }
 
-        for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
+        for (std::size_t thread_num = 0; thread_num < num_threads - 1;
+             ++thread_num)
         {
-            tp.resume_processing_unit(thread_num).get();
-            HPX_TEST_EQ(std::size_t(thread_num + 2),
-                tp.get_active_os_thread_count());
+            hpx::threads::resume_processing_unit(tp, thread_num).get();
+            HPX_TEST_EQ(
+                std::size_t(thread_num + 2), tp.get_active_os_thread_count());
         }
     }
 
@@ -56,22 +60,22 @@ int hpx_main(int argc, char* argv[])
         {
             std::vector<hpx::future<void>> fs;
 
-            fs.push_back(tp.suspend_processing_unit(thread_num));
-            fs.push_back(tp.resume_processing_unit(thread_num));
+            fs.push_back(hpx::threads::suspend_processing_unit(tp, thread_num));
+            fs.push_back(hpx::threads::resume_processing_unit(tp, thread_num));
 
             hpx::wait_all(fs);
 
             // Suspend is not guaranteed to run before resume, so make sure
             // processing unit is running
-            tp.resume_processing_unit(thread_num).get();
+            hpx::threads::resume_processing_unit(tp, thread_num).get();
 
             fs.clear();
 
             // Launching 4 (i.e. same as number of threads) tasks may deadlock
             // as no thread is available to steal from the current thread.
-            fs.push_back(tp.suspend_processing_unit(thread_num));
-            fs.push_back(tp.suspend_processing_unit(thread_num));
-            fs.push_back(tp.suspend_processing_unit(thread_num));
+            fs.push_back(hpx::threads::suspend_processing_unit(tp, thread_num));
+            fs.push_back(hpx::threads::suspend_processing_unit(tp, thread_num));
+            fs.push_back(hpx::threads::suspend_processing_unit(tp, thread_num));
 
             hpx::wait_all(fs);
 
@@ -79,9 +83,9 @@ int hpx_main(int argc, char* argv[])
 
             // Launching 4 (i.e. same as number of threads) tasks may deadlock
             // as no thread is available to steal from the current thread.
-            fs.push_back(tp.resume_processing_unit(thread_num));
-            fs.push_back(tp.resume_processing_unit(thread_num));
-            fs.push_back(tp.resume_processing_unit(thread_num));
+            fs.push_back(hpx::threads::resume_processing_unit(tp, thread_num));
+            fs.push_back(hpx::threads::resume_processing_unit(tp, thread_num));
+            fs.push_back(hpx::threads::resume_processing_unit(tp, thread_num));
 
             hpx::wait_all(fs);
         }
@@ -96,17 +100,17 @@ int hpx_main(int argc, char* argv[])
         while (t.elapsed() < 2)
         {
             for (std::size_t i = 0;
-                i < hpx::resource::get_num_threads("worker") * 10;
-                ++i)
+                 i < hpx::resource::get_num_threads("worker") * 10;
+                 ++i)
             {
-                fs.push_back(hpx::async([](){}));
+                fs.push_back(hpx::async([]() {}));
             }
 
             if (up)
             {
                 if (thread_num < hpx::resource::get_num_threads("worker"))
                 {
-                    tp.suspend_processing_unit(thread_num).get();
+                    hpx::threads::suspend_processing_unit(tp, thread_num).get();
                 }
 
                 ++thread_num;
@@ -119,7 +123,7 @@ int hpx_main(int argc, char* argv[])
             }
             else
             {
-                tp.resume_processing_unit(thread_num - 1).get();
+                hpx::threads::resume_processing_unit(tp, thread_num - 1).get();
 
                 --thread_num;
 
@@ -134,22 +138,19 @@ int hpx_main(int argc, char* argv[])
 
         // Don't exit with suspended pus
         for (std::size_t thread_num_resume = 0; thread_num_resume < thread_num;
-            ++thread_num_resume)
+             ++thread_num_resume)
         {
-            tp.resume_processing_unit(thread_num_resume).get();
+            hpx::threads::resume_processing_unit(tp, thread_num_resume).get();
         }
     }
 
     return hpx::finalize();
 }
 
-void test_scheduler(int argc, char* argv[],
-    hpx::resource::scheduling_policy scheduler)
+void test_scheduler(
+    int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
-    std::vector<std::string> cfg =
-    {
-        "hpx.os_threads=4"
-    };
+    std::vector<std::string> cfg = {"hpx.os_threads=4"};
 
     hpx::resource::partitioner rp(argc, argv, std::move(cfg));
 
@@ -181,27 +182,28 @@ void test_scheduler(int argc, char* argv[],
 
 int main(int argc, char* argv[])
 {
-    std::vector<hpx::resource::scheduling_policy> schedulers =
-        {
+    std::vector<hpx::resource::scheduling_policy> schedulers = {
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
-            hpx::resource::scheduling_policy::local,
-            hpx::resource::scheduling_policy::local_priority_fifo,
-            hpx::resource::scheduling_policy::local_priority_lifo,
+        hpx::resource::scheduling_policy::local,
+        hpx::resource::scheduling_policy::local_priority_fifo,
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+        hpx::resource::scheduling_policy::local_priority_lifo,
 #endif
-#if defined(HPX_HAVE_ABP_SCHEDULER)
-            hpx::resource::scheduling_policy::abp_priority_fifo,
-            hpx::resource::scheduling_policy::abp_priority_lifo,
+#endif
+#if defined(HPX_HAVE_ABP_SCHEDULER) && defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+        hpx::resource::scheduling_policy::abp_priority_fifo,
+        hpx::resource::scheduling_policy::abp_priority_lifo,
 #endif
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
-            hpx::resource::scheduling_policy::static_,
+        hpx::resource::scheduling_policy::static_,
 #endif
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-            hpx::resource::scheduling_policy::static_priority,
+        hpx::resource::scheduling_policy::static_priority,
 #endif
 #if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
-            hpx::resource::scheduling_policy::shared_priority,
+        hpx::resource::scheduling_policy::shared_priority,
 #endif
-        };
+    };
 
     for (auto const scheduler : schedulers)
     {

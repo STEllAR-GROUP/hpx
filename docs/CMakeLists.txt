@@ -1,5 +1,6 @@
 # Copyright (c) 2012 Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,13 +12,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/hpx_start.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_finalize.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_suspend.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/error.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/error_code.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/exception.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/exception_fwd.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/exception_list.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/throw_exception.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/parallel/execution_policy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/task_block.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"
@@ -54,15 +48,9 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/resource/partitioner.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/resource/partitioner_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/policies/scheduler_mode.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_enums.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_helpers.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_pool_base.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/barrier.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/broadcast.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/fold.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/gather.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/reduce.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/split_future.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_all.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_all.hpp"
@@ -72,11 +60,8 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_some.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_each.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/traits/is_execution_policy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/checkpoint.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/debugging.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/util/invoke.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/util/invoke_fused.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal_async.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/unwrap.hpp"

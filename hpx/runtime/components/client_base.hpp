@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,22 +9,22 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/make_client.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/action_remote_result.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/util/always_void.hpp>
-#include <hpx/util/bind_back.hpp>
+#include <hpx/type_support/always_void.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

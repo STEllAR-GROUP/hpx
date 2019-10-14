@@ -1,6 +1,7 @@
 //  Copyright (c) 2017 Antoine Tran Tan
 //  Copyright (c) 2017 Google
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,8 +12,8 @@
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
-#include <hpx/lcos/spmd_block.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/collectives/spmd_block.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 
 #include <algorithm>
 #include <array>
@@ -172,9 +173,8 @@ namespace hpx
 
     public:
         explicit coarray(hpx::lcos::spmd_block const& block,
-            std::string name,
-            hpx::detail::coarray_sizes<N>
-                cosizes,
+            std::string const& name,
+            hpx::detail::coarray_sizes<N> cosizes,
             std::size_t segment_size)
           : base_type(block)
           , vector_()
@@ -205,7 +205,9 @@ namespace hpx
                 vector_.register_as(hpx::launch::sync, name + "_hpx_coarray");
             }
             else
+            {
                 vector_.connect_to(hpx::launch::sync, name + "_hpx_coarray");
+            }
 
             view = update_view(cosizes, num_images, indices(), block,
                 vector_.begin(), vector_.end());

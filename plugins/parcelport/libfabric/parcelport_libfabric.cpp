@@ -1,5 +1,6 @@
 //  Copyright (c) 2015-2016 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -13,7 +14,7 @@
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
@@ -91,12 +92,11 @@ namespace libfabric
     // Constructor : mostly just initializes the superclass with 'here'
     // --------------------------------------------------------------------
     parcelport::parcelport(util::runtime_configuration const& ini,
-        util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-        util::function_nonser<void(std::size_t, char const*)> const& on_stop_thread)
-        : base_type(ini, locality(), on_start_thread, on_stop_thread)
-        , stopped_(false)
-        , completions_handled_(0)
-        , senders_in_use_(0)
+        threads::policies::callback_notifier const& notifier)
+      : base_type(ini, locality(), notifier)
+      , stopped_(false)
+      , completions_handled_(0)
+      , senders_in_use_(0)
     {
         FUNC_START_DEBUG_MSG;
 

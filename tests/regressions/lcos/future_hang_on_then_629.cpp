@@ -1,18 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/format.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
-
+#include <hpx/timing.hpp>
 
 #include <cstdint>
 #include <functional>
@@ -20,9 +20,9 @@
 #include <random>
 #include <vector>
 
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
-using boost::program_options::value;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
+using hpx::program_options::value;
 
 using hpx::init;
 using hpx::finalize;

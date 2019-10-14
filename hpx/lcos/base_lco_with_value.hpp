@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2012-2017 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -22,11 +23,11 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/unused.hpp>
-#include <hpx/util/void_guard.hpp>
+#include <hpx/type_support/unused.hpp>
+#include <hpx/type_support/void_guard.hpp>
 
 #include <cstddef>
 #include <cstdint>

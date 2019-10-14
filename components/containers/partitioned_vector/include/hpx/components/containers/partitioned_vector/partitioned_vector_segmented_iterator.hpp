@@ -1,6 +1,7 @@
 //  Copyright (c) 2014 Anuj R. Sharma
 //  Copyright (c) 2014-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http:// ww.boost.org/LICENSE_1_0.txt)
 
@@ -19,8 +20,8 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/iterator_adaptor.hpp>
-#include <hpx/util/iterator_facade.hpp>
+#include <hpx/iterator_support/iterator_adaptor.hpp>
+#include <hpx/iterator_support/iterator_facade.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>
@@ -390,7 +391,7 @@ namespace hpx
             data_(data)
         {}
 
-        const_local_vector_iterator(local_vector_iterator<T, Data> it)
+        const_local_vector_iterator(local_vector_iterator<T, Data> const& it)
           : partition_(it.get_partition()),
             local_index_(it.get_local_index()),
             data_(it.get_data())

@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Antoine Tran Tan
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,12 +10,12 @@
 #define HPX_PARTITIONED_VECTOR_VIEW_HPP
 
 #include <hpx/assertion.hpp>
+#include <hpx/collectives/spmd_block.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view_iterator.hpp>
-#include <hpx/lcos/spmd_block.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/util/detail/pack.hpp>
 
 #include <array>
 #include <cstddef>
@@ -120,7 +121,7 @@ namespace hpx
         {
             basis[0] = 1;
 
-            std::size_t  tmp = 1;
+            std::size_t tmp = 1;
             auto in  = sizes.begin();
 
             (void)std::initializer_list<int>{

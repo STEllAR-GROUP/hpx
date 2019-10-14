@@ -1,13 +1,14 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2013 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/config/asio.hpp>
 
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/batch_environment.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -81,12 +82,14 @@ namespace hpx { namespace util
         if (debug_)
             std::cerr << "got node list" << std::endl;
 
+        std::string nodes_list;
+        bool found_agas_host = false;
+
+#if defined(HPX_HAVE_NETWORKING)
         boost::asio::io_service io_service;
 
-        bool found_agas_host = false;
         std::size_t agas_node_num = 0;
-        std::string nodes_list;
-        for (std::string s : nodes)
+        for (std::string const& s : nodes)
         {
             if (!s.empty()) {
                 if (debug_)
@@ -117,16 +120,20 @@ namespace hpx { namespace util
                 nodes_list += s + ' ';
             }
         }
+#endif
 
         // if an AGAS host is specified, it needs to be in the list
         // of nodes participating in this run
-        if (!agas_host.empty() && !found_agas_host) {
-            throw hpx::detail::command_line_error("Requested AGAS host (" + agas_host +
-                ") not found in node list");
+        if (!agas_host.empty() && !found_agas_host)
+        {
+            throw hpx::detail::command_line_error("Requested AGAS host (" +
+                agas_host + ") not found in node list");
         }
 
-        if (debug_) {
-            if (!agas_node_.empty()) {
+        if (debug_)
+        {
+            if (!agas_node_.empty())
+            {
                 std::cerr << "using AGAS host: '" << agas_node_
                     << "' (node number " << agas_node_num_ << ")" << std::endl;
             }

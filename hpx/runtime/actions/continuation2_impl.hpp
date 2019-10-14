@@ -1,18 +1,19 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef HPX_ACTIONS_CONTINUATION2_IMPL_HPP
 #define HPX_ACTIONS_CONTINUATION2_IMPL_HPP
 
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/result_of.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/applier/apply_continue_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/serialization/access.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/serialization/access.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <utility>
 

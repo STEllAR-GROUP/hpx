@@ -1,6 +1,7 @@
 //  Copyright (c) 2014 Grant Mercer
 //  Copyright (c) 2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,13 +11,13 @@
 #define HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/traits/is_value_proxy.hpp>
-#include <hpx/util/void_guard.hpp>
+#include <hpx/type_support/void_guard.hpp>
 
-#include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
+#include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
@@ -27,12 +28,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // fill
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         template <typename T>
         struct fill_iteration
@@ -40,16 +39,16 @@ namespace hpx { namespace parallel { inline namespace v1
             typename hpx::util::decay<T>::type val_;
 
             template <typename U>
-            HPX_HOST_DEVICE
-            typename std::enable_if<!hpx::traits::is_value_proxy<U>::value>::type
-            operator()(U &u) const
+            HPX_HOST_DEVICE typename std::enable_if<
+                !hpx::traits::is_value_proxy<U>::value>::type
+            operator()(U& u) const
             {
                 u = val_;
             }
 
             template <typename U>
-            HPX_HOST_DEVICE
-            typename std::enable_if<hpx::traits::is_value_proxy<U>::value>::type
+            HPX_HOST_DEVICE typename std::enable_if<
+                hpx::traits::is_value_proxy<U>::value>::type
             operator()(U u) const
             {
                 u = val_;
@@ -60,12 +59,12 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             fill()
               : fill::algorithm("fill")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter, typename T>
-            HPX_HOST_DEVICE
-            static hpx::util::unused_type
-            sequential(ExPolicy, InIter first, InIter last, T const& val)
+            HPX_HOST_DEVICE static hpx::util::unused_type sequential(
+                ExPolicy, InIter first, InIter last, T const& val)
             {
                 std::fill(first, last, val);
                 return hpx::util::unused;
@@ -73,45 +72,42 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy, typename FwdIter, typename T>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
-                 T const& val)
+            parallel(
+                ExPolicy&& policy, FwdIter first, FwdIter last, T const& val)
             {
                 typedef typename util::detail::algorithm_result<ExPolicy>::type
                     result_type;
 
-                if(first == last)
+                if (first == last)
                     return util::detail::algorithm_result<ExPolicy>::get();
 
                 return hpx::util::void_guard<result_type>(),
-                    for_each_n<FwdIter>().call(
-                        std::forward<ExPolicy>(policy), std::false_type(),
-                        first, std::distance(first, last),
-                        fill_iteration<T>{val},
-                        util::projection_identity());
+                       for_each_n<FwdIter>().call(
+                           std::forward<ExPolicy>(policy), std::false_type(),
+                           first, std::distance(first, last),
+                           fill_iteration<T>{val}, util::projection_identity());
             }
         };
 
         template <typename ExPolicy, typename FwdIter, typename T>
-        static typename util::detail::algorithm_result<ExPolicy>::type
-        fill_(ExPolicy && policy, FwdIter first, FwdIter last, T const& value,
+        static typename util::detail::algorithm_result<ExPolicy>::type fill_(
+            ExPolicy&& policy, FwdIter first, FwdIter last, T const& value,
             std::false_type)
         {
-            typedef parallel::execution::is_sequenced_execution_policy<
-                    ExPolicy
-                > is_seq;
+            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
+                is_seq;
 
             return detail::fill().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, value);
+                std::forward<ExPolicy>(policy), is_seq(), first, last, value);
         }
 
         // forward declare the segmented version of this algorithm
         template <typename ExPolicy, typename FwdIter, typename T>
-        static typename util::detail::algorithm_result<ExPolicy>::type
-        fill_(ExPolicy && policy, FwdIter first, FwdIter last, T const& value,
+        static typename util::detail::algorithm_result<ExPolicy>::type fill_(
+            ExPolicy&& policy, FwdIter first, FwdIter last, T const& value,
             std::true_type);
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Assigns the given value to the elements in the range [first, last).
     ///
@@ -152,64 +148,55 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           is defined by \a void.
     ///
     template <typename ExPolicy, typename FwdIter, typename T,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_forward_iterator<FwdIter>::value)>
-    typename util::detail::algorithm_result<ExPolicy>::type
-    fill(ExPolicy && policy, FwdIter first, FwdIter last, T value)
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_forward_iterator<FwdIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy>::type fill(
+        ExPolicy&& policy, FwdIter first, FwdIter last, T value)
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         return detail::fill_(
-            std::forward<ExPolicy>(policy),
-            first, last, value, is_segmented());
+            std::forward<ExPolicy>(policy), first, last, value, is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // fill_n
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         template <typename FwdIter>
         struct fill_n : public detail::algorithm<fill_n<FwdIter>, FwdIter>
         {
             fill_n()
               : fill_n::algorithm("fill_n")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter, typename T>
-            static InIter
-            sequential(ExPolicy, InIter first, std::size_t count, T const& val)
+            static InIter sequential(
+                ExPolicy, InIter first, std::size_t count, T const& val)
             {
                 return std::fill_n(first, count, val);
             }
 
             template <typename ExPolicy, typename T>
-            static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter
-            >::type
-            parallel(ExPolicy && policy, FwdIter first, std::size_t count,
-                T const& val)
+            static
+                typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+                parallel(ExPolicy&& policy, FwdIter first, std::size_t count,
+                    T const& val)
             {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
-                return
-                    for_each_n<FwdIter>().call(
-                        std::forward<ExPolicy>(policy),
-                        std::false_type(), first, count,
-                        [val](type& v) -> void
-                        {
-                            v = val;
-                        },
-                        util::projection_identity());
+                return for_each_n<FwdIter>().call(
+                    std::forward<ExPolicy>(policy), std::false_type(), first,
+                    count, [val](type& v) -> void { v = val; },
+                    util::projection_identity());
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Assigns the given value value to the first count elements in the range
     /// beginning at first if count > 0. Does nothing otherwise.
@@ -253,16 +240,13 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
-    template <typename ExPolicy, typename FwdIter,
-        typename Size, typename T,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_forward_iterator<FwdIter>::value)>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    fill_n(ExPolicy && policy, FwdIter first, Size count, T value)
+    template <typename ExPolicy, typename FwdIter, typename Size, typename T,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_forward_iterator<FwdIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type fill_n(
+        ExPolicy&& policy, FwdIter first, Size count, T value)
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
@@ -274,10 +258,9 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::move(first));
         }
 
-        return detail::fill_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, std::size_t(count), value);
+        return detail::fill_n<FwdIter>().call(std::forward<ExPolicy>(policy),
+            is_seq(), first, std::size_t(count), value);
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

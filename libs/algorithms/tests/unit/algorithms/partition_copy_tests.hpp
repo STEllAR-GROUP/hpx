@@ -1,5 +1,6 @@
 //  Copyright (c) 2017-2018 Taeguk Kwon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,7 +9,7 @@
 
 #include <hpx/include/parallel_partition.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -46,9 +47,9 @@ struct user_defined_type
 {
     user_defined_type() = default;
     user_defined_type(int rand_no)
-        : val(rand_no)
+      : val(rand_no)
     {
-        std::uniform_int_distribution<> dis(0,name_list.size()-1);
+        std::uniform_int_distribution<> dis(0, name_list.size() - 1);
         name = name_list[dis(_gen)];
     }
 
@@ -76,15 +77,15 @@ struct user_defined_type
 };
 
 const std::vector<std::string> user_defined_type::name_list{
-    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"
-};
+    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill
 {
     random_fill(int rand_base, int range)
-        : gen(_gen()),
-        dist(rand_base - range / 2, rand_base + range / 2)
-    {}
+      : gen(_gen())
+      , dist(rand_base - range / 2, rand_base + range / 2)
+    {
+    }
 
     int operator()()
     {
@@ -96,9 +97,10 @@ struct random_fill
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag, typename DataType, typename Pred>
-void test_partition_copy(ExPolicy policy, IteratorTag, DataType, Pred pred,
-    int rand_base)
+template <typename ExPolicy, typename IteratorTag, typename DataType,
+    typename Pred>
+void test_partition_copy(
+    ExPolicy policy, IteratorTag, DataType, Pred pred, int rand_base)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -110,35 +112,32 @@ void test_partition_copy(ExPolicy policy, IteratorTag, DataType, Pred pred,
     using hpx::util::get;
 
     std::size_t const size = 10007;
-    std::vector<DataType> c(size),
-        d_true_res(size), d_false_res(size),
+    std::vector<DataType> c(size), d_true_res(size), d_false_res(size),
         d_true_sol(size), d_false_sol(size);
-    std::generate(std::begin(c), std::end(c), random_fill(rand_base, size / 10));
+    std::generate(
+        std::begin(c), std::end(c), random_fill(rand_base, size / 10));
 
-    auto result = hpx::parallel::partition_copy(policy,
-        iterator(std::begin(c)), iterator(std::end(c)),
-        iterator(std::begin(d_true_res)), iterator(std::begin(d_false_res)),
-        pred);
+    auto result = hpx::parallel::partition_copy(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), iterator(std::begin(d_true_res)),
+        iterator(std::begin(d_false_res)), pred);
     auto solution = std::partition_copy(std::begin(c), std::end(c),
-        std::begin(d_true_sol), std::begin(d_false_sol),
-        pred);
+        std::begin(d_true_sol), std::begin(d_false_sol), pred);
 
     HPX_TEST(get<0>(result).base() == std::end(c));
 
-    bool equality_true = test::equal(
-        std::begin(d_true_res), get<1>(result).base(),
-        std::begin(d_true_sol), get<0>(solution));
-    bool equality_false = test::equal(
-        std::begin(d_false_res), get<2>(result).base(),
-        std::begin(d_false_sol), get<1>(solution));
+    bool equality_true = test::equal(std::begin(d_true_res),
+        get<1>(result).base(), std::begin(d_true_sol), get<0>(solution));
+    bool equality_false = test::equal(std::begin(d_false_res),
+        get<2>(result).base(), std::begin(d_false_sol), get<1>(solution));
 
     HPX_TEST(equality_true);
     HPX_TEST(equality_false);
 }
 
-template <typename ExPolicy, typename IteratorTag, typename DataType, typename Pred>
-void test_partition_copy_async(ExPolicy policy, IteratorTag, DataType, Pred pred,
-    int rand_base)
+template <typename ExPolicy, typename IteratorTag, typename DataType,
+    typename Pred>
+void test_partition_copy_async(
+    ExPolicy policy, IteratorTag, DataType, Pred pred, int rand_base)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -150,28 +149,24 @@ void test_partition_copy_async(ExPolicy policy, IteratorTag, DataType, Pred pred
     using hpx::util::get;
 
     std::size_t const size = 10007;
-    std::vector<DataType> c(size),
-        d_true_res(size), d_false_res(size),
+    std::vector<DataType> c(size), d_true_res(size), d_false_res(size),
         d_true_sol(size), d_false_sol(size);
-    std::generate(std::begin(c), std::end(c), random_fill(rand_base, size / 10));
+    std::generate(
+        std::begin(c), std::end(c), random_fill(rand_base, size / 10));
 
-    auto f = hpx::parallel::partition_copy(policy,
-        iterator(std::begin(c)), iterator(std::end(c)),
-        iterator(std::begin(d_true_res)), iterator(std::begin(d_false_res)),
-        pred);
+    auto f = hpx::parallel::partition_copy(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), iterator(std::begin(d_true_res)),
+        iterator(std::begin(d_false_res)), pred);
     auto result = f.get();
     auto solution = std::partition_copy(std::begin(c), std::end(c),
-        std::begin(d_true_sol), std::begin(d_false_sol),
-        pred);
+        std::begin(d_true_sol), std::begin(d_false_sol), pred);
 
     HPX_TEST(get<0>(result).base() == std::end(c));
 
-    bool equality_true = test::equal(
-        std::begin(d_true_res), get<1>(result).base(),
-        std::begin(d_true_sol), get<0>(solution));
-    bool equality_false = test::equal(
-        std::begin(d_false_res), get<2>(result).base(),
-        std::begin(d_false_sol), get<1>(solution));
+    bool equality_true = test::equal(std::begin(d_true_res),
+        get<1>(result).base(), std::begin(d_true_sol), get<0>(solution));
+    bool equality_false = test::equal(std::begin(d_false_res),
+        get<2>(result).base(), std::begin(d_false_sol), get<1>(solution));
 
     HPX_TEST(equality_true);
     HPX_TEST(equality_false);
@@ -193,20 +188,23 @@ void test_partition_copy_exception(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), _gen());
 
     bool caught_exception = false;
-    try {
-        auto result = hpx::parallel::partition_copy(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            iterator(std::begin(d_true)), iterator(std::begin(d_false)),
-            throw_always());
+    try
+    {
+        auto result =
+            hpx::parallel::partition_copy(policy, iterator(std::begin(c)),
+                iterator(std::end(c)), iterator(std::begin(d_true)),
+                iterator(std::begin(d_false)), throw_always());
 
         HPX_UNUSED(result);
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -225,21 +223,23 @@ void test_partition_copy_exception_async(ExPolicy policy, IteratorTag)
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f = hpx::parallel::partition_copy(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            iterator(std::begin(d_true)), iterator(std::begin(d_false)),
-            throw_always());
+    try
+    {
+        auto f = hpx::parallel::partition_copy(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), iterator(std::begin(d_true)),
+            iterator(std::begin(d_false)), throw_always());
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -263,19 +263,22 @@ void test_partition_copy_bad_alloc(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), _gen());
 
     bool caught_bad_alloc = false;
-    try {
-        auto result = hpx::parallel::partition_copy(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            iterator(std::begin(d_true)), iterator(std::begin(d_false)),
-            throw_bad_alloc());
+    try
+    {
+        auto result =
+            hpx::parallel::partition_copy(policy, iterator(std::begin(c)),
+                iterator(std::end(c)), iterator(std::begin(d_true)),
+                iterator(std::begin(d_false)), throw_bad_alloc());
 
         HPX_UNUSED(result);
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -294,20 +297,22 @@ void test_partition_copy_bad_alloc_async(ExPolicy policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f = hpx::parallel::partition_copy(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            iterator(std::begin(d_true)), iterator(std::begin(d_false)),
-            throw_bad_alloc());
+    try
+    {
+        auto f = hpx::parallel::partition_copy(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), iterator(std::begin(d_true)),
+            iterator(std::begin(d_false)), throw_bad_alloc());
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -324,66 +329,68 @@ void test_partition_copy()
     int rand_base = _gen();
 
     ////////// Test cases for 'int' type.
-    test_partition_copy(execution::seq, IteratorTag(), int(),
-        [rand_base](const int n) -> bool {
-            return n < rand_base;
-        }, rand_base);
-    test_partition_copy(execution::par, IteratorTag(), int(),
-        [rand_base](const int n) -> bool {
-            return n <= rand_base;
-        }, rand_base);
-    test_partition_copy(execution::par_unseq, IteratorTag(), int(),
-        [rand_base](const int n) -> bool {
-            return n > rand_base;
-        }, rand_base);
+    test_partition_copy(
+        execution::seq, IteratorTag(), int(),
+        [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
+    test_partition_copy(
+        execution::par, IteratorTag(), int(),
+        [rand_base](const int n) -> bool { return n <= rand_base; }, rand_base);
+    test_partition_copy(
+        execution::par_unseq, IteratorTag(), int(),
+        [rand_base](const int n) -> bool { return n > rand_base; }, rand_base);
 
     ////////// Test cases for user defined type.
-    test_partition_copy(execution::seq, IteratorTag(), user_defined_type(),
-        [rand_base](user_defined_type const& t) -> bool {
-            return t < rand_base;
-        }, rand_base);
-    test_partition_copy(execution::par, IteratorTag(), user_defined_type(),
-        [rand_base](user_defined_type const& t) -> bool {
-            return !(t < rand_base);
-        }, rand_base);
-    test_partition_copy(execution::par_unseq, IteratorTag(), user_defined_type(),
-        [rand_base](user_defined_type const& t) -> bool {
-            return t < rand_base;
-        }, rand_base);
+    test_partition_copy(
+        execution::seq, IteratorTag(), user_defined_type(),
+        [rand_base](
+            user_defined_type const& t) -> bool { return t < rand_base; },
+        rand_base);
+    test_partition_copy(
+        execution::par, IteratorTag(), user_defined_type(),
+        [rand_base](
+            user_defined_type const& t) -> bool { return !(t < rand_base); },
+        rand_base);
+    test_partition_copy(
+        execution::par_unseq, IteratorTag(), user_defined_type(),
+        [rand_base](
+            user_defined_type const& t) -> bool { return t < rand_base; },
+        rand_base);
 
     ////////// Asynchronous test cases for 'int' type.
-    test_partition_copy_async(execution::seq(execution::task), IteratorTag(), int(),
-        [rand_base](const int n) -> bool {
-            return n >= rand_base;
-        }, rand_base);
-    test_partition_copy_async(execution::par(execution::task), IteratorTag(), int(),
-        [rand_base](const int n) -> bool {
-            return n < rand_base;
-        }, rand_base);
+    test_partition_copy_async(
+        execution::seq(execution::task), IteratorTag(), int(),
+        [rand_base](const int n) -> bool { return n >= rand_base; }, rand_base);
+    test_partition_copy_async(
+        execution::par(execution::task), IteratorTag(), int(),
+        [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
 
     ////////// Asynchronous test cases for user defined type.
-    test_partition_copy_async(execution::seq(execution::task), IteratorTag(),
-        user_defined_type(),
-        [rand_base](user_defined_type const& t) -> bool {
-            return !(t < rand_base);
-        }, rand_base);
-    test_partition_copy_async(execution::par(execution::task), IteratorTag(),
-        user_defined_type(),
-        [rand_base](user_defined_type const& t) -> bool {
-            return t < rand_base;
-        }, rand_base);
+    test_partition_copy_async(
+        execution::seq(execution::task), IteratorTag(), user_defined_type(),
+        [rand_base](
+            user_defined_type const& t) -> bool { return !(t < rand_base); },
+        rand_base);
+    test_partition_copy_async(
+        execution::par(execution::task), IteratorTag(), user_defined_type(),
+        [rand_base](
+            user_defined_type const& t) -> bool { return t < rand_base; },
+        rand_base);
 
     ////////// Corner test cases.
-    test_partition_copy(execution::par, IteratorTag(), int(),
+    test_partition_copy(
+        execution::par, IteratorTag(), int(),
         [rand_base](const int n) -> bool {
             HPX_UNUSED(rand_base);
             return true;
-        }, rand_base);
-    test_partition_copy(execution::par_unseq, IteratorTag(), user_defined_type(),
+        },
+        rand_base);
+    test_partition_copy(
+        execution::par_unseq, IteratorTag(), user_defined_type(),
         [rand_base](user_defined_type const& t) -> bool {
             HPX_UNUSED(rand_base);
             return false;
-        }, rand_base);
+        },
+        rand_base);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -398,10 +405,10 @@ void test_partition_copy_exception()
     test_partition_copy_exception(execution::seq, IteratorTag());
     test_partition_copy_exception(execution::par, IteratorTag());
 
-    test_partition_copy_exception_async(execution::seq(execution::task),
-        IteratorTag());
-    test_partition_copy_exception_async(execution::par(execution::task),
-        IteratorTag());
+    test_partition_copy_exception_async(
+        execution::seq(execution::task), IteratorTag());
+    test_partition_copy_exception_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -416,10 +423,10 @@ void test_partition_copy_bad_alloc()
     test_partition_copy_bad_alloc(execution::seq, IteratorTag());
     test_partition_copy_bad_alloc(execution::par, IteratorTag());
 
-    test_partition_copy_bad_alloc_async(execution::seq(execution::task),
-        IteratorTag());
-    test_partition_copy_bad_alloc_async(execution::par(execution::task),
-        IteratorTag());
+    test_partition_copy_bad_alloc_async(
+        execution::seq(execution::task), IteratorTag());
+    test_partition_copy_bad_alloc_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 #endif

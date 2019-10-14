@@ -1,5 +1,6 @@
 //  Copyright (c) 2016-2018 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,12 +9,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/datastructures/optional.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/result_of.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/util/optional.hpp>
-#include <hpx/util/result_of.hpp>
-#include <hpx/util/tuple.hpp>
 
 #include <chrono>
 #include <condition_variable>

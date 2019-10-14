@@ -1,13 +1,14 @@
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2009-2010 Dylan Stark
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // #define HPX_USE_WINDOWS_PERFORMANCE_COUNTERS 1
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors/exception.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -15,6 +16,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/state.hpp>
 #include <hpx/format.hpp>
+#include <hpx/timing.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -105,7 +107,7 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::cout << "starting monitor" << std::endl;
 
@@ -120,10 +122,10 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    boost::program_options::options_description
+    hpx::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    using boost::program_options::value;
+    using hpx::program_options::value;
     desc_commandline.add_options()
         ( "name", value<std::string>()->default_value(
               "/threadqueue{locality#0/total}/length")

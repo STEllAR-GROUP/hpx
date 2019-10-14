@@ -4,6 +4,7 @@
 //  Copyright (c) 2007 Alexandre (aka Alex) TABBAL
 //  Copyright (c) 2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,13 +12,15 @@
 #define HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -68,12 +71,9 @@ namespace hpx { namespace parcelset
 
     class HPX_EXPORT parcel
     {
-
     private:
-
-        typedef
-            std::map<const naming::gid_type*, naming::gid_type>
-            split_gids_type;
+        using split_gids_type =
+            std::map<naming::gid_type const*, naming::gid_type>;
 
 #if defined(HPX_DEBUG)
         bool is_valid() const;
@@ -143,7 +143,7 @@ namespace hpx { namespace parcelset
 
         bool does_termination_detection() const;
 
-        split_gids_type& split_gids() const;
+        split_gids_type move_split_gids() const;
 
         void set_split_gids(split_gids_type&& split_gids);
 
@@ -179,7 +179,7 @@ namespace hpx { namespace parcelset
         detail::parcel_data data_;
         std::unique_ptr<actions::base_action> action_;
 
-        split_gids_type split_gids_;
+        mutable split_gids_type split_gids_;
         std::size_t size_;
         std::size_t num_chunks_;
     };
@@ -191,4 +191,5 @@ HPX_IS_BITWISE_SERIALIZABLE(hpx::parcelset::detail::parcel_data)
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif

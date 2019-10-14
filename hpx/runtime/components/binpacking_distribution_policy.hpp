@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -18,11 +19,11 @@
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/runtime/serialization/string.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/string.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/util/bind_back.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>
@@ -50,7 +51,7 @@ namespace hpx { namespace components
             std::vector<performance_counters::performance_counter> && counters);
 
         HPX_EXPORT hpx::future<std::vector<std::uint64_t> > get_counter_values(
-            std::string component_name, std::string const& counter_name,
+            std::string const& component_name, std::string const& counter_name,
             std::vector<hpx::id_type> const& localities);
 
         HPX_EXPORT hpx::id_type const& get_best_locality(

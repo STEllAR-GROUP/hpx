@@ -1,10 +1,11 @@
 //  Copyright (c) 2015 Daniel Bourgeois
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_remove_copy.hpp>
 #include <hpx/testing.hpp>
 
@@ -32,15 +33,15 @@ void test_remove_copy_if(ExPolicy policy, IteratorTag)
 
     test_vector c(10007);
     std::vector<int> d(c.size());
-    std::size_t middle_idx = std::rand() % (c.size()/2);
+    std::size_t middle_idx = std::rand() % (c.size() / 2);
     auto middle =
         hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
-    std::iota(std::begin(c.base()), middle,
-        static_cast<int>(std::rand() % c.size()));
+    std::iota(
+        std::begin(c.base()), middle, static_cast<int>(std::rand() % c.size()));
     std::fill(middle, std::end(c.base()), -1);
 
-    hpx::parallel::remove_copy_if(policy, c, std::begin(d),
-        [](int i){ return i < 0; });
+    hpx::parallel::remove_copy_if(
+        policy, c, std::begin(d), [](int i) { return i < 0; });
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c.base()), middle, std::begin(d),
@@ -50,8 +51,7 @@ void test_remove_copy_if(ExPolicy policy, IteratorTag)
             return v1 == v2;
         }));
 
-    HPX_TEST(std::equal(middle, std::end(c.base()),
-        std::begin(d) + middle_idx,
+    HPX_TEST(std::equal(middle, std::end(c.base()), std::begin(d) + middle_idx,
         [&count](int v1, int v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
@@ -71,33 +71,30 @@ void test_remove_copy_if_async(ExPolicy p, IteratorTag)
 
     test_vector c(10007);
     std::vector<int> d(c.size());
-    std::size_t middle_idx = std::rand() % (c.size()/2);
+    std::size_t middle_idx = std::rand() % (c.size() / 2);
     auto middle =
         hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
-    std::iota(std::begin(c.base()), middle,
-        static_cast<int>(std::rand() % c.size()));
+    std::iota(
+        std::begin(c.base()), middle, static_cast<int>(std::rand() % c.size()));
     std::fill(middle, std::end(c.base()), -1);
 
-    auto f =
-        hpx::parallel::remove_copy_if(p, c,
-            std::begin(d), [](int i){ return i < 0; });
+    auto f = hpx::parallel::remove_copy_if(
+        p, c, std::begin(d), [](int i) { return i < 0; });
     f.wait();
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(
-        std::begin(c.base()), middle, std::begin(d),
+    HPX_TEST(std::equal(std::begin(c.base()), middle, std::begin(d),
         [&count](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
         }));
 
-    HPX_TEST(std::equal(middle, std::end(c.base()),
-        std::begin(d) + middle_idx,
+    HPX_TEST(std::equal(middle, std::end(c.base()), std::begin(d) + middle_idx,
         [&count](int v1, int v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
-            return v1!=v2;
+            return v1 != v2;
         }));
 
     HPX_TEST_EQ(count, d.size());
@@ -117,15 +114,15 @@ void test_remove_copy_if_outiter(ExPolicy policy, IteratorTag)
 
     test_vector c(10007);
     std::vector<int> d(0);
-    std::size_t middle_idx = std::rand() % (c.size()/2);
+    std::size_t middle_idx = std::rand() % (c.size() / 2);
     auto middle =
         hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
-    std::iota(std::begin(c.base()), middle,
-        static_cast<int>(std::rand() % c.size()));
+    std::iota(
+        std::begin(c.base()), middle, static_cast<int>(std::rand() % c.size()));
     std::fill(middle, std::end(c.base()), -1);
 
-    hpx::parallel::remove_copy_if(policy, c,
-        std::back_inserter(d), [](int i){ return i < 0; });
+    hpx::parallel::remove_copy_if(
+        policy, c, std::back_inserter(d), [](int i) { return i < 0; });
 
     HPX_TEST(std::equal(std::begin(c.base()), middle, std::begin(d),
         [](int v1, int v2) -> bool {
@@ -146,16 +143,15 @@ void test_remove_copy_if_outiter_async(ExPolicy p, IteratorTag)
 
     test_vector c(10007);
     std::vector<int> d(0);
-    std::size_t middle_idx = std::rand() % (c.size()/2);
+    std::size_t middle_idx = std::rand() % (c.size() / 2);
     auto middle =
         hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
-    std::iota(std::begin(c.base()), middle,
-        static_cast<int>(std::rand() % c.size()));
+    std::iota(
+        std::begin(c.base()), middle, static_cast<int>(std::rand() % c.size()));
     std::fill(middle, std::end(c.base()), -1);
 
-    auto f =
-        hpx::parallel::remove_copy_if(p, c,
-            std::back_inserter(d), [](int i){ return i < 0; });
+    auto f = hpx::parallel::remove_copy_if(
+        p, c, std::back_inserter(d), [](int i) { return i < 0; });
     f.wait();
 
     HPX_TEST(std::equal(std::begin(c.base()), middle, std::begin(d),
@@ -204,19 +200,21 @@ void test_remove_copy_if_exception(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
-    try {
-        hpx::parallel::remove_copy_if(policy,
-            c, std::begin(d),
-            [](std::size_t v) {
+    try
+    {
+        hpx::parallel::remove_copy_if(
+            policy, c, std::begin(d), [](std::size_t v) {
                 return throw std::runtime_error("test"), v == 0;
             });
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -237,24 +235,25 @@ void test_remove_copy_if_exception_async(ExPolicy p, IteratorTag)
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f =
-            hpx::parallel::remove_copy_if(p, c,
-                std::begin(d),
-                [](std::size_t v) {
-                    return throw std::runtime_error("test"), v == 0;
-                });
+    try
+    {
+        auto f = hpx::parallel::remove_copy_if(
+            p, c, std::begin(d), [](std::size_t v) {
+                return throw std::runtime_error("test"), v == 0;
+            });
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -273,10 +272,10 @@ void test_remove_copy_if_exception()
     test_remove_copy_if_exception(execution::seq, IteratorTag());
     test_remove_copy_if_exception(execution::par, IteratorTag());
 
-    test_remove_copy_if_exception_async(execution::seq(execution::task),
-        IteratorTag());
-    test_remove_copy_if_exception_async(execution::par(execution::task),
-        IteratorTag());
+    test_remove_copy_if_exception_async(
+        execution::seq(execution::task), IteratorTag());
+    test_remove_copy_if_exception_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void remove_copy_if_exception_test()
@@ -303,19 +302,19 @@ void test_remove_copy_if_bad_alloc(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
-    try {
-        hpx::parallel::remove_copy_if(policy,
-            c, std::begin(d),
-            [](std::size_t v) {
-                return throw std::bad_alloc(), v;
-            });
+    try
+    {
+        hpx::parallel::remove_copy_if(policy, c, std::begin(d),
+            [](std::size_t v) { return throw std::bad_alloc(), v; });
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -336,23 +335,22 @@ void test_remove_copy_if_bad_alloc_async(ExPolicy p, IteratorTag)
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f =
-            hpx::parallel::remove_copy_if(p, c,
-            std::begin(d),
-            [](std::size_t v) {
-                return throw std::bad_alloc(), v;
-            });
+    try
+    {
+        auto f = hpx::parallel::remove_copy_if(p, c, std::begin(d),
+            [](std::size_t v) { return throw std::bad_alloc(), v; });
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -371,10 +369,10 @@ void test_remove_copy_if_bad_alloc()
     test_remove_copy_if_bad_alloc(execution::seq, IteratorTag());
     test_remove_copy_if_bad_alloc(execution::par, IteratorTag());
 
-    test_remove_copy_if_bad_alloc_async(execution::seq(execution::task),
-        IteratorTag());
-    test_remove_copy_if_bad_alloc_async(execution::par(execution::task),
-        IteratorTag());
+    test_remove_copy_if_bad_alloc_async(
+        execution::seq(execution::task), IteratorTag());
+    test_remove_copy_if_bad_alloc_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void remove_copy_if_bad_alloc_test()
@@ -383,9 +381,9 @@ void remove_copy_if_bad_alloc_test()
     test_remove_copy_if_bad_alloc<std::forward_iterator_tag>();
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -401,19 +399,15 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // add command line option which controls the random number generator seed
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

@@ -1,6 +1,7 @@
 //  Copyright (c) 2016 Thomas Heller
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,9 +17,9 @@
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/target_ptr.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/util/min.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/statistics/min.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cuda_runtime.h>
 
@@ -172,7 +173,7 @@ namespace hpx { namespace compute { namespace cuda
         template <typename ... Args>
         HPX_HOST_DEVICE void bulk_construct(pointer p, std::size_t count, Args &&... args)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_COMPUTE_CODE)
             int threads_per_block = (hpx::util::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block - 1) / threads_per_block);
@@ -189,8 +190,6 @@ namespace hpx { namespace compute { namespace cuda
                 },
                 p.device_ptr(), count, std::forward<Args>(args)...);
             target_.synchronize();
-#else
-            HPX_ASSERT(false);
 #endif
         }
 
@@ -199,7 +198,7 @@ namespace hpx { namespace compute { namespace cuda
         template <typename ... Args>
         HPX_HOST_DEVICE void construct(pointer p, Args &&... args)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_COMPUTE_HOST_CODE) || defined(HPX_COMPUTE_DEVICE_CODE)
             detail::launch(
                 target_, 1, 1,
                 [] HPX_DEVICE (T* p, Args const&... args)
@@ -208,15 +207,13 @@ namespace hpx { namespace compute { namespace cuda
                 },
                 p.device_ptr(), std::forward<Args>(args)...);
             target_.synchronize();
-#else
-            HPX_ASSERT(false);
 #endif
         }
 
         // Calls the destructor of count objects pointed to by p
         HPX_HOST_DEVICE void bulk_destroy(pointer p, std::size_t count)
         {
-#if defined(HPX_COMPUTE_HOST_CODE)
+#if defined(HPX_COMPUTE_HOST_CODE) || defined(HPX_COMPUTE_DEVICE_CODE)
             int threads_per_block = (hpx::util::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block) / threads_per_block) - 1;
@@ -233,8 +230,6 @@ namespace hpx { namespace compute { namespace cuda
                 },
                 p.device_ptr(), count);
             target_.synchronize();
-#else
-            HPX_ASSERT(false);
 #endif
         }
 

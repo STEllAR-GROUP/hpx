@@ -3,6 +3,7 @@
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -14,13 +15,11 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_suspend.hpp>
+#include <hpx/program_options.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/util/function.hpp>
-
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstddef>
 #include <string>
@@ -36,7 +35,7 @@
 // console locality.
 int hpx_main();
 HPX_MAIN_EXPORT int hpx_main(int argc, char** argv);
-int hpx_main(boost::program_options::variables_map& vm);
+int hpx_main(hpx::program_options::variables_map& vm);
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -55,7 +54,7 @@ namespace hpx_startup
 namespace hpx
 {
 #ifndef DOXYGEN
-    typedef int (*hpx_main_type)(boost::program_options::variables_map&);
+    typedef int (*hpx_main_type)(hpx::program_options::variables_map&);
     typedef int (*hpx_user_main_type)(int argc, char** argv);
 #endif
 
@@ -117,9 +116,9 @@ namespace hpx
     ///                     parameter\p mode.
     inline int init(
         util::function_nonser<
-            int(boost::program_options::variables_map& vm)
+            int(hpx::program_options::variables_map& vm)
         > const& f,
-        boost::program_options::options_description const& desc_cmdline,
+        hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
         startup_function_type startup = startup_function_type(),
         shutdown_function_type shutdown = shutdown_function_type(),
@@ -175,8 +174,8 @@ namespace hpx
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
     inline int
-    init(int (*f)(boost::program_options::variables_map& vm),
-        boost::program_options::options_description const& desc_cmdline,
+    init(int (*f)(hpx::program_options::variables_map& vm),
+        hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv,
         startup_function_type startup = startup_function_type(),
         shutdown_function_type shutdown = shutdown_function_type(),
@@ -229,7 +228,7 @@ namespace hpx
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
     inline int
-    init(boost::program_options::options_description const& desc_cmdline,
+    init(hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv,
         startup_function_type startup = startup_function_type(),
         shutdown_function_type shutdown = shutdown_function_type(),
@@ -288,7 +287,7 @@ namespace hpx
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
     inline int
-    init(boost::program_options::options_description const& desc_cmdline,
+    init(hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
         startup_function_type startup = startup_function_type(),
         shutdown_function_type shutdown = shutdown_function_type(),
@@ -375,7 +374,7 @@ namespace hpx
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
     inline int
-    init(boost::program_options::options_description const& desc_cmdline,
+    init(hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv, hpx::runtime_mode mode);
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -424,7 +423,7 @@ namespace hpx
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
     inline int
-    init(boost::program_options::options_description const& desc_cmdline,
+    init(hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode);
 
@@ -575,7 +574,7 @@ namespace hpx
     /// \note               The created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    inline int init(int (*f)(boost::program_options::variables_map& vm),
+    inline int init(int (*f)(hpx::program_options::variables_map& vm),
         std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
@@ -613,7 +612,7 @@ namespace hpx
     /// \note               The created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    inline int init(int (*f)(boost::program_options::variables_map& vm),
+    inline int init(int (*f)(hpx::program_options::variables_map& vm),
         int argc, char** argv, hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -736,6 +735,44 @@ namespace hpx
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main entry point, which can be used to set up the
+    /// runtime for an HPX application (the runtime system will be set up in
+    /// console mode or worker mode depending on the command line settings). It
+    /// will schedule the function given by \p f as a HPX thread. This overload
+    /// will not call `hpx_main`.
+    ///
+    /// \param f            [in] The function to be scheduled as an HPX
+    ///                     thread. Usually this function represents the main
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
+    /// \param cfg          A list of configuration settings which will be added
+    ///                     to the system configuration before the runtime
+    ///                     instance is run. Each of the entries in this list
+    ///                     must have the format of a fully defined key/value
+    ///                     pair from an ini-file (for instance
+    ///                     'hpx.component.enabled=1')
+    /// \param mode         [in] The mode the created runtime environment
+    ///                     should be initialized in. There has to be exactly
+    ///                     one locality in each HPX application which is
+    ///                     executed in console mode (\a hpx::runtime_mode_console),
+    ///                     all other localities have to be run in worker mode
+    ///                     (\a hpx::runtime_mode_worker). Normally this is
+    ///                     set up automatically, but sometimes it is necessary
+    ///                     to explicitly specify the mode.
+    ///
+    /// \returns            The function returns the value, which has been
+    ///                     returned from the user supplied function \p f.
+    ///
+    /// \note               The created runtime system instance will be
+    ///                     executed in console or worker mode depending on the
+    ///                     configuration passed in `cfg`.
+    inline int init(util::function_nonser<int(int, char**)> const& f,
+        std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+
 /// \cond NOINTERNAL
     inline int init(std::nullptr_t f, std::string const& app_name, int argc,
         char** argv, hpx::runtime_mode mode = hpx::runtime_mode_default);
@@ -745,6 +782,9 @@ namespace hpx
 
     inline int init(std::nullptr_t f, int argc, char** argv,
         std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    inline int init(std::nullptr_t f, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 /// \endcond
 }

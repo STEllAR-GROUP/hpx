@@ -2,6 +2,7 @@
 //  Copyright (c) 2016 Thomas Heller
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
@@ -14,9 +15,9 @@
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/compute/cuda/detail/scoped_active_target.hpp>
 #include <hpx/compute/cuda/target.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/functional/invoke_fused.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cuda_runtime.h>
 

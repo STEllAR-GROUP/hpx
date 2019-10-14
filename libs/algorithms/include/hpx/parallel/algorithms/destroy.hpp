@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,15 +10,15 @@
 #define HPX_PARALLEL_DETAIL_destroy_JUN_01_2017_1049AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/void_guard.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
+#include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -28,12 +29,10 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // destroy
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // provide our own implementation of std::destroy
@@ -42,8 +41,8 @@ namespace hpx { namespace parallel { inline namespace v1
         template <typename InIter>
         void std_destroy(InIter first, InIter last)
         {
-            typedef typename std::iterator_traits<InIter>::value_type
-                value_type;
+            typedef
+                typename std::iterator_traits<InIter>::value_type value_type;
 
             for (/* */; first != last; ++first)
             {
@@ -55,7 +54,7 @@ namespace hpx { namespace parallel { inline namespace v1
         template <typename ExPolicy, typename FwdIter>
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         parallel_sequential_destroy_n(
-            ExPolicy && policy, FwdIter first, std::size_t count)
+            ExPolicy&& policy, FwdIter first, std::size_t count)
         {
             if (count == 0)
             {
@@ -65,32 +64,28 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return util::foreach_partitioner<ExPolicy>::call(
                 std::forward<ExPolicy>(policy), first, count,
-                [](FwdIter first, std::size_t count, std::size_t)
-                {
+                [](FwdIter first, std::size_t count, std::size_t) {
                     typedef typename std::iterator_traits<FwdIter>::value_type
                         value_type;
 
                     return util::loop_n<ExPolicy>(first, count,
-                        [](FwdIter it)
-                        {
-                            std::addressof(*it)->~value_type();
-                        });
+                        [](FwdIter it) { std::addressof(*it)->~value_type(); });
                 },
                 util::projection_identity());
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename FwdIter>
-        struct destroy
-          : public detail::algorithm<destroy<FwdIter> >
+        struct destroy : public detail::algorithm<destroy<FwdIter>>
         {
             destroy()
               : destroy::algorithm("destroy")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter>
-            static hpx::util::unused_type
-            sequential(ExPolicy, InIter first, InIter last)
+            static hpx::util::unused_type sequential(
+                ExPolicy, InIter first, InIter last)
             {
                 std_destroy(first, last);
                 return hpx::util::unused;
@@ -98,7 +93,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy && policy, FwdIter first, FwdIter last)
+            parallel(ExPolicy&& policy, FwdIter first, FwdIter last)
             {
                 return util::detail::algorithm_result<ExPolicy>::get(
                     parallel_sequential_destroy_n(
@@ -107,7 +102,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Destroys objects of type typename iterator_traits<ForwardIt>::value_type
     /// in the range [first, last).
@@ -145,14 +140,12 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a parallel_task_policy and returns \a void otherwise.
     ///
     template <typename ExPolicy, typename FwdIter,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter>::value)>
-    typename util::detail::algorithm_result<ExPolicy>::type
-    destroy(ExPolicy && policy, FwdIter first, FwdIter last)
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy>::type destroy(
+        ExPolicy&& policy, FwdIter first, FwdIter last)
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
@@ -163,8 +156,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
     ///////////////////////////////////////////////////////////////////////////
     // destroy_n
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // provide our own implementation of std::destroy
@@ -173,8 +165,8 @@ namespace hpx { namespace parallel { inline namespace v1
         template <typename InIter>
         InIter std_destroy_n(InIter first, std::size_t count)
         {
-            typedef typename std::iterator_traits<InIter>::value_type
-                value_type;
+            typedef
+                typename std::iterator_traits<InIter>::value_type value_type;
 
             for (/* */; count != 0; (void) ++first, --count)
             {
@@ -185,13 +177,12 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         template <typename FwdIter>
-        struct destroy_n
-          : public detail::algorithm<
-                destroy_n<FwdIter>, FwdIter>
+        struct destroy_n : public detail::algorithm<destroy_n<FwdIter>, FwdIter>
         {
             destroy_n()
               : destroy_n::algorithm("destroy_n")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter>
             static InIter sequential(ExPolicy, InIter first, std::size_t count)
@@ -200,17 +191,16 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             template <typename ExPolicy>
-            static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter
-            >::type
-            parallel(ExPolicy && policy, FwdIter first, std::size_t count)
+            static
+                typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+                parallel(ExPolicy&& policy, FwdIter first, std::size_t count)
             {
                 return parallel_sequential_destroy_n(
                     std::forward<ExPolicy>(policy), first, count);
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Destroys objects of type typename iterator_traits<ForwardIt>::value_type
     /// in the range [first, first + count).
@@ -257,14 +247,12 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the last element constructed.
     ///
     template <typename ExPolicy, typename FwdIter, typename Size,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter>::value)>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    destroy_n(ExPolicy && policy, FwdIter first, Size count)
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type destroy_n(
+        ExPolicy&& policy, FwdIter first, Size count)
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         // if count is representing a negative value, we do nothing
@@ -276,10 +264,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::destroy_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, std::size_t(count));
+        return detail::destroy_n<FwdIter>().call(std::forward<ExPolicy>(policy),
+            is_seq(), first, std::size_t(count));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

@@ -2,6 +2,7 @@
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2018 Nikunj Gupta
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -32,7 +33,6 @@ add_hpx_library_sources(hpx
   APPEND)
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/util/*.cpp"
-  EXCLUDE ".*lightweight_test.cpp"
   APPEND)
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/util/detail/*.cpp"
@@ -61,9 +61,6 @@ endif()
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/hpx_*.cpp"
   EXCLUDE "hpx_init[.]cpp|hpx_wrap.cpp")
-add_hpx_library_sources(hpx_init
-  GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/util/lightweight_test.cpp"
-  APPEND)
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/main.cpp" APPEND)
 
@@ -249,15 +246,9 @@ else()
   endif()
 endif()
 
-# this is a dummy target that we add compile flags to
-# all tests will depend on this target and inherit the flags
-# but user code linking against hpx will not
-add_library(hpx_internal_flags INTERFACE)
-
 # Default unnamed config (not Debug/Release/etc) are in this var
 get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_)
 target_compile_options(hpx PRIVATE ${_temp_flags})
-target_compile_options(hpx_internal_flags INTERFACE ${_temp_flags})
 
 # message("Adding ${_temp_flags}")
 
@@ -265,7 +256,6 @@ target_compile_options(hpx_internal_flags INTERFACE ${_temp_flags})
 foreach(_config "DEBUG" "RELEASE" "RELWITHDEBINFO" "MINSIZEREL")
   get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_${_config})
   target_compile_options(hpx PRIVATE $<$<CONFIG:${_config}>:${_temp_flags}>)
-  target_compile_options(hpx_internal_flags INTERFACE $<$<CONFIG:${_config}>:${_temp_flags}>)
 #  message("Adding $<$<CONFIG:${_config}>:${_temp_flags}>")
 endforeach()
 

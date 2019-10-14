@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -73,9 +74,11 @@ char const* const locality_pool_thread_no_total_counter_names[] =
 
 char const* const locality_counter_names[] =
 {
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
     "/threads/count/stack-recycles",
 #if !defined(HPX_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
     "/threads/count/stack-unbinds",
+#endif
 #endif
     "/scheduler/utilization/instantaneous",
     nullptr

@@ -1,24 +1,26 @@
 //  Copyright (c) 2016 Bibek Wagle
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
-#include <hpx/util/bind_front.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/timing/steady_clock.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/pool_timer.hpp>
-#include <hpx/util/steady_clock.hpp>
-#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/asio/basic_waitable_timer.hpp>
+#include <boost/system/error_code.hpp>
 
 #include <chrono>
 #include <memory>

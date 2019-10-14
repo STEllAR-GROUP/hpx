@@ -3,6 +3,7 @@
 //  Copyright (c) 2015 Francisco Jose Tapia
 //  Copyright (c) 2018 Taeguk Kwon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,11 +12,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/dataflow.hpp>
-#include <hpx/traits/concepts.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -27,6 +28,7 @@
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -38,27 +40,24 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // sort
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         static const std::size_t sort_limit_per_task = 65536ul;
 
         ///////////////////////////////////////////////////////////////////////
         // std::is_sorted is not available on all supported platforms yet
         template <typename Iter, typename Compare>
-        inline bool
-        is_sorted_sequential(Iter first, Iter last, Compare const& comp)
+        inline bool is_sorted_sequential(
+            Iter first, Iter last, Compare const& comp)
         {
             bool sorted = true;
             if (first != last)
             {
                 for (Iter it1 = first, it2 = first + 1;
-                     it2 != last && (sorted = !comp(*it2, *it1));
-                     it1 = it2++)
+                     it2 != last && (sorted = !comp(*it2, *it1)); it1 = it2++)
                 {
                     /**/
                 }
@@ -82,10 +81,8 @@ namespace hpx { namespace parallel { inline namespace v1
             std::ptrdiff_t N = last - first;
             if (std::size_t(N) <= chunk_size)
             {
-                return execution::async_execute(
-                    policy.executor(),
-                    [first, last, HPX_CAPTURE_MOVE(comp)]() -> RandomIt
-                    {
+                return execution::async_execute(policy.executor(),
+                    [first, last, HPX_CAPTURE_MOVE(comp)]() -> RandomIt {
                         std::sort(first, last, comp);
                         return last;
                     });
@@ -118,9 +115,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
             std::iter_swap(first, it_b);
 
-            typedef
-                typename std::iterator_traits<RandomIt>::reference
-                reference;
+            using reference =
+                typename std::iterator_traits<RandomIt>::reference;
 
             reference val = *first;
             RandomIt c_first = first + 2, c_last = last - 2;
@@ -136,7 +132,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     ++c_first;
                 while (comp(val, *c_last))
                     --c_last;
-            } // End while
+            }    // End while
 
             std::iter_swap(first, c_last);
 
@@ -150,9 +146,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 policy, c_first, last, comp, chunk_size);
 
             return hpx::dataflow(
-                [last](hpx::future<RandomIt> && left,
-                    hpx::future<RandomIt> && right) -> RandomIt
-                {
+                [last](hpx::future<RandomIt>&& left,
+                    hpx::future<RandomIt>&& right) -> RandomIt {
                     if (left.has_exception() || right.has_exception())
                     {
                         std::list<std::exception_ptr> errors;
@@ -178,9 +173,8 @@ namespace hpx { namespace parallel { inline namespace v1
         /// @return
         /// @remarks
         template <typename ExPolicy, typename RandomIt, typename Compare>
-        hpx::future<RandomIt>
-        parallel_sort_async(ExPolicy && policy, RandomIt first, RandomIt last,
-            Compare comp)
+        hpx::future<RandomIt> parallel_sort_async(
+            ExPolicy&& policy, RandomIt first, RandomIt last, Compare comp)
         {
             // number of elements to sort
             std::size_t count = last - first;
@@ -191,19 +185,13 @@ namespace hpx { namespace parallel { inline namespace v1
 
             std::size_t max_chunks = execution::maximal_number_of_chunks(
                 policy.parameters(), policy.executor(), cores, count);
-            HPX_ASSERT(0 != max_chunks);
 
-            std::size_t chunk_size =
-                execution::get_chunk_size(policy.parameters(),
-                    policy.executor(), []{ return 0; }, cores, count);
+            std::size_t chunk_size = execution::get_chunk_size(
+                policy.parameters(), policy.executor(), [] { return 0; }, cores,
+                count);
 
-            // we should not consider more chunks than we have elements
-            max_chunks = (std::min)(max_chunks, count);
-
-            // we should not make chunks smaller than what's determined by the
-            // max chunk size
-            chunk_size = (std::max)(chunk_size,
-                (count + max_chunks - 1) / max_chunks);
+            util::detail::adjust_chunk_size_and_max_chunks(
+                cores, count, max_chunks, chunk_size);
 
             // we should not get smaller than our sort_limit_per_task
             chunk_size = (std::max)(chunk_size, sort_limit_per_task);
@@ -234,44 +222,40 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             sort()
               : sort::algorithm("sort")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename Compare, typename Proj>
-            static RandomIt
-            sequential(ExPolicy, RandomIt first, RandomIt last,
-                Compare && comp, Proj && proj)
+            static RandomIt sequential(ExPolicy, RandomIt first, RandomIt last,
+                Compare&& comp, Proj&& proj)
             {
                 std::sort(first, last,
                     util::compare_projected<Compare, Proj>(
-                            std::forward<Compare>(comp),
-                            std::forward<Proj>(proj)
-                        ));
+                        std::forward<Compare>(comp), std::forward<Proj>(proj)));
                 return last;
             }
 
             template <typename ExPolicy, typename Compare, typename Proj>
-            static typename util::detail::algorithm_result<
-                ExPolicy, RandomIt
-            >::type
-            parallel(ExPolicy && policy, RandomIt first, RandomIt last,
-                Compare && comp, Proj && proj)
+            static typename util::detail::algorithm_result<ExPolicy,
+                RandomIt>::type
+            parallel(ExPolicy&& policy, RandomIt first, RandomIt last,
+                Compare&& comp, Proj&& proj)
             {
-                typedef util::detail::algorithm_result<
-                    ExPolicy, RandomIt
-                > algorithm_result;
+                typedef util::detail::algorithm_result<ExPolicy, RandomIt>
+                    algorithm_result;
 
-                try {
+                try
+                {
                     // call the sort routine and return the right type,
                     // depending on execution policy
-                    return algorithm_result::get(
-                        parallel_sort_async(std::forward<ExPolicy>(policy),
-                            first, last,
-                            util::compare_projected<Compare, Proj>(
-                                std::forward<Compare>(comp),
-                                std::forward<Proj>(proj)
-                            )));
+                    return algorithm_result::get(parallel_sort_async(
+                        std::forward<ExPolicy>(policy), first, last,
+                        util::compare_projected<Compare, Proj>(
+                            std::forward<Compare>(comp),
+                            std::forward<Proj>(proj))));
                 }
-                catch (...) {
+                catch (...)
+                {
                     return algorithm_result::get(
                         detail::handle_exception<ExPolicy, RandomIt>::call(
                             std::current_exception()));
@@ -279,7 +263,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     //-----------------------------------------------------------------------------
     /// Sorts the elements in the range [first, last) in ascending order. The
@@ -351,29 +335,25 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename RandomIt,
         typename Proj = util::projection_identity,
         typename Compare = detail::less,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<RandomIt>::value &&
-        traits::is_projected<Proj, RandomIt>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Compare,
-                traits::projected<Proj, RandomIt>,
-                traits::projected<Proj, RandomIt>
-        >::value)>
-    typename util::detail::algorithm_result<ExPolicy, RandomIt>::type
-    sort(ExPolicy && policy, RandomIt first, RandomIt last,
-        Compare && comp = Compare(), Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<RandomIt>::value&&
+                    traits::is_projected<Proj, RandomIt>::value&&
+                        traits::is_indirect_callable<ExPolicy, Compare,
+                            traits::projected<Proj, RandomIt>,
+                            traits::projected<Proj, RandomIt>>::value)>
+    typename util::detail::algorithm_result<ExPolicy, RandomIt>::type sort(
+        ExPolicy&& policy, RandomIt first, RandomIt last,
+        Compare&& comp = Compare(), Proj&& proj = Proj())
     {
-        static_assert(
-            (hpx::traits::is_random_access_iterator<RandomIt>::value),
+        static_assert((hpx::traits::is_random_access_iterator<RandomIt>::value),
             "Requires a random access iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::sort<RandomIt>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last,
-            std::forward<Compare>(comp), std::forward<Proj>(proj));
+        return detail::sort<RandomIt>().call(std::forward<ExPolicy>(policy),
+            is_seq(), first, last, std::forward<Compare>(comp),
+            std::forward<Proj>(proj));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

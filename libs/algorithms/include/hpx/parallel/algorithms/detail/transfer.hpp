@@ -1,20 +1,18 @@
 //  Copyright (c) 2016 Minh-Khanh Do
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARALLEL_ALGORITHMS_TRANSFER)
 #define HPX_PARALLEL_ALGORITHMS_TRANSFER
 
-#include <hpx/traits/is_iterator.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #endif
 #include <hpx/util/tagged_pair.hpp>
 
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/parallel/segmented_algorithms/detail/transfer.hpp>
-#endif
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -24,37 +22,54 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // transfer
-    namespace detail
-    {
+    namespace detail {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename FwdIter, typename OutIter>
+        struct iterators_are_segmented
+          : std::integral_constant<bool,
+                hpx::traits::segmented_iterator_traits<
+                    FwdIter>::is_segmented_iterator::value &&
+                    hpx::traits::segmented_iterator_traits<
+                        OutIter>::is_segmented_iterator::value>
+        {
+        };
+
+        template <typename FwdIter, typename OutIter>
+        struct iterators_are_not_segmented
+          : std::integral_constant<bool,
+                !hpx::traits::segmented_iterator_traits<
+                    FwdIter>::is_segmented_iterator::value &&
+                    !hpx::traits::segmented_iterator_traits<
+                        OutIter>::is_segmented_iterator::value>
+        {
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         // parallel version
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename FwdIter2>
-        typename util::detail::algorithm_result<
-            ExPolicy, std::pair<FwdIter1, FwdIter2>
-        >::type
-        transfer_(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
+        typename util::detail::algorithm_result<ExPolicy,
+            std::pair<FwdIter1, FwdIter2>>::type
+        transfer_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest, std::false_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
 
             return Algo().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, dest);
+                std::forward<ExPolicy>(policy), is_seq(), first, last, dest);
         }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // forward declare segmented version
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename FwdIter2>
-        typename util::detail::algorithm_result<
-            ExPolicy, std::pair<FwdIter1, FwdIter2>
-        >::type
-        transfer_(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
+        typename util::detail::algorithm_result<ExPolicy,
+            std::pair<FwdIter1, FwdIter2>>::type
+        transfer_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest, std::true_type);
 #endif
 
@@ -98,37 +113,32 @@ namespace hpx { namespace parallel { inline namespace v1
         //
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename FwdIter2,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value)>
-        typename util::detail::algorithm_result<
-            ExPolicy,
-            hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
-        >::type
-        transfer(ExPolicy && policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+            HPX_CONCEPT_REQUIRES_(hpx::parallel::execution::is_execution_policy<
+                ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value&&
+                    hpx::traits::is_iterator<FwdIter2>::value)>
+        typename util::detail::algorithm_result<ExPolicy,
+            hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
+        transfer(
+            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
-            static_assert(
-                (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
-            static_assert(
-                (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             return hpx::util::make_tagged_pair<tag::in, tag::out>(
-                    transfer_<Algo>(
-                        std::forward<ExPolicy>(policy), first, last, dest,
-                        std::false_type()));
+                transfer_<Algo>(std::forward<ExPolicy>(policy), first, last,
+                    dest, std::false_type()));
 #else
             typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
 
             return hpx::util::make_tagged_pair<tag::in, tag::out>(
-                    transfer_<Algo>(
-                        std::forward<ExPolicy>(policy), first, last, dest,
-                        is_segmented()));
+                transfer_<Algo>(std::forward<ExPolicy>(policy), first, last,
+                    dest, is_segmented()));
 #endif
         }
-    }
-}}}
+    }    // namespace detail
+}}}      // namespace hpx::parallel::v1
+
 #endif

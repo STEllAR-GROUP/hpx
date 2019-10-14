@@ -1,21 +1,18 @@
 # Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    command_line_arguments_706
-    command_line_required_arguments_2990
     configuration_1572
     function_argument
     function_serialization_728
     iarchive_1237
-    optional_swap_3200
     protect_with_nullary_pfo
     serialize_buffer_1069
     set_config_entry_deadlock
-    tuple_serialization_803
     unwrapped_1528
     use_all_cores_2262
    )
@@ -41,7 +38,6 @@ if(HPX_WITH_NETWORKING)
     set(tests ${tests}
         zero_copy_parcels_1001
        )
-
   set(zero_copy_parcels_1001_PARAMETERS LOCALITIES 2)
 endif()
 

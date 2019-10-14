@@ -1,5 +1,6 @@
 # Copyright (c) 2014 Thomas Heller
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,6 +13,7 @@ endif()
 # Add additional version to recognize
 set(Boost_ADDITIONAL_VERSIONS
     ${Boost_ADDITIONAL_VERSIONS}
+    "1.71.0" "1.71"
     "1.70.0" "1.70"
     "1.69.0" "1.69"
     "1.68.0" "1.68"
@@ -26,6 +28,15 @@ set(Boost_ADDITIONAL_VERSIONS
     "1.59.0" "1.59"
     "1.58.0" "1.58"
     "1.57.0" "1.57")
+set(Boost_MINIMUM_VERSION "1.61" CACHE  INTERNAL "1.61" FORCE)
+
+set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
+
+# Find the headers and get the version
+find_package(Boost ${Boost_MINIMUM_VERSION} REQUIRED)
+if(NOT Boost_VERSION_STRING)
+  set(Boost_VERSION_STRING "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
+endif()
 
 set(__boost_libraries)
 if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
@@ -58,14 +69,14 @@ if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   set(__boost_libraries ${__boost_libraries} thread chrono)
 endif()
 
-set(__boost_libraries
-  ${__boost_libraries}
-  filesystem
-  program_options
-  system)
+# Boost.System is header-only from 1.69 onwards.
+if(Boost_VERSION_STRING VERSION_LESS 1.69)
+  set(__boost_libraries ${__boost_libraries} system)
+endif()
 
-set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
-find_package(Boost 1.61 MODULE REQUIRED COMPONENTS ${__boost_libraries})
+find_package(Boost ${Boost_MINIMUM_VERSION}
+  MODULE REQUIRED
+  COMPONENTS ${__boost_libraries})
 
 if(NOT Boost_FOUND)
   hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
@@ -83,7 +94,7 @@ endif()
 set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 
 if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
-  find_package(Boost 1.61 QUIET MODULE COMPONENTS iostreams)
+  find_package(Boost ${Boost_MINIMUM_VERSION} QUIET MODULE COMPONENTS iostreams)
   if(Boost_IOSTREAMS_FOUND)
     hpx_info("  iostreams")
   else()
@@ -93,7 +104,7 @@ if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
 endif()
 
 if(HPX_WITH_TOOLS)
-  find_package(Boost 1.61 QUIET MODULE COMPONENTS regex)
+  find_package(Boost ${Boost_MINIMUM_VERSION} QUIET MODULE COMPONENTS regex)
   if(Boost_REGEX_FOUND)
     hpx_info("  regex")
   else()

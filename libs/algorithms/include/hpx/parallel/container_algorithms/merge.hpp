@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Taeguk Kwon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,10 +10,10 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_MERGE_AUG_15_2017_1045AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/traits/is_range.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/is_range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/util/tagged_tuple.hpp>
 
 #include <hpx/parallel/algorithms/merge.hpp>
@@ -23,8 +24,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     // TODO: Support forward and bidirectional iterator. (#2826)
     // For now, only support random access iterator.
     /// Merges two sorted ranges [first1, last1) and [first2, last2)
@@ -115,39 +115,29 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the source iterator \a last2,
     ///           the destination iterator to the end of the \a dest range.
     ///
-    template <typename ExPolicy,
-        typename Rng1, typename Rng2, typename RandIter3,
-        typename Comp = detail::less,
+    template <typename ExPolicy, typename Rng1, typename Rng2,
+        typename RandIter3, typename Comp = detail::less,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng1>::value &&
-        hpx::traits::is_range<Rng2>::value &&
-        hpx::traits::is_iterator<RandIter3>::value &&
-        traits::is_projected_range<Proj1, Rng1>::value &&
-        traits::is_projected_range<Proj2, Rng2>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Comp,
-            traits::projected_range<Proj1, Rng1>,
-            traits::projected_range<Proj2, Rng2>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng1>::value&& hpx::traits::is_range<
+                    Rng2>::value&& hpx::traits::is_iterator<RandIter3>::value&&
+                    traits::is_projected_range<Proj1, Rng1>::value&&
+                        traits::is_projected_range<Proj2, Rng2>::value&&
+                            traits::is_indirect_callable<ExPolicy, Comp,
+                                traits::projected_range<Proj1, Rng1>,
+                                traits::projected_range<Proj2, Rng2>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_tuple<
             tag::in1(typename hpx::traits::range_iterator<Rng1>::type),
             tag::in2(typename hpx::traits::range_iterator<Rng2>::type),
-            tag::out(RandIter3)>
-    >::type
-    merge(ExPolicy && policy, Rng1 && rng1, Rng2 && rng2,
-        RandIter3 dest, Comp && comp = Comp(),
-        Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
+            tag::out(RandIter3)>>::type
+    merge(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, RandIter3 dest,
+        Comp&& comp = Comp(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
-        return merge(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng1), hpx::util::end(rng1),
-            hpx::util::begin(rng2), hpx::util::end(rng2), dest,
-            std::forward<Comp>(comp),
-            std::forward<Proj1>(proj1),
+        return merge(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+            hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
+            dest, std::forward<Comp>(comp), std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
     }
 
@@ -222,33 +212,23 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           The \a inplace_merge algorithm returns
     ///           the source iterator \a last
     ///
-    template <typename ExPolicy,
-        typename Rng, typename RandIter,
-        typename Comp = detail::less,
-        typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        hpx::traits::is_iterator<RandIter>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_projected<Proj, RandIter>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Comp,
-            traits::projected_range<Proj, Rng>,
-            traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, RandIter
-    >::type
-    inplace_merge(ExPolicy && policy,
-        Rng && rng, RandIter middle,
-        Comp && comp = Comp(), Proj && proj = Proj())
+    template <typename ExPolicy, typename Rng, typename RandIter,
+        typename Comp = detail::less, typename Proj = util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
+                    RandIter>::value&& traits::is_projected_range<Proj,
+                    Rng>::value&& traits::is_projected<Proj, RandIter>::value&&
+                    traits::is_indirect_callable<ExPolicy, Comp,
+                        traits::projected_range<Proj, Rng>,
+                        traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy, RandIter>::type
+    inplace_merge(ExPolicy&& policy, Rng&& rng, RandIter middle,
+        Comp&& comp = Comp(), Proj&& proj = Proj())
     {
         return inplace_merge(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), middle, hpx::util::end(rng),
-            std::forward<Comp>(comp),
-            std::forward<Proj>(proj));
+            std::forward<Comp>(comp), std::forward<Proj>(proj));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,10 +10,10 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHMS_REVERSE_DEC_21_2015_0245PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/concepts.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/traits/is_range.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/is_range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/reverse.hpp>
@@ -23,8 +24,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /// Reverses the order of the elements in the range [first, last).
     /// Behaves as if applying std::iter_swap to every pair of iterators
     /// first+i, (last-i) - 1 for each non-negative i < (last-first)/2.
@@ -62,16 +62,14 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename Rng,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, typename hpx::traits::range_iterator<Rng>::type
-    >::type
-    reverse(ExPolicy && policy, Rng && rng)
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_iterator<Rng>::type>::type
+    reverse(ExPolicy&& policy, Rng&& rng)
     {
-        return reverse(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng));
+        return reverse(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -129,22 +127,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           copied.
     ///
     template <typename ExPolicy, typename Rng, typename OutIter,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        hpx::traits::is_iterator<OutIter>::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&&
+                    hpx::traits::is_iterator<OutIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<
             tag::in(typename hpx::traits::range_iterator<Rng>::type),
-            tag::out(OutIter)
-        >
-    >::type
-    reverse_copy(ExPolicy && policy, Rng && rng, OutIter dest_first)
+            tag::out(OutIter)>>::type
+    reverse_copy(ExPolicy&& policy, Rng&& rng, OutIter dest_first)
     {
         return reverse_copy(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), hpx::util::end(rng), dest_first);
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

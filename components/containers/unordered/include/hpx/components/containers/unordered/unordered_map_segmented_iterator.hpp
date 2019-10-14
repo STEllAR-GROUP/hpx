@@ -1,6 +1,7 @@
 //  Copyright (c) 2014 Anuj R. Sharma
 //  Copyright (c) 2014-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http:// ww.boost.org/LICENSE_1_0.txt)
 
@@ -16,7 +17,7 @@
 #include <hpx/config.hpp>
 //#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/util/iterator_adaptor.hpp>
+#include <hpx/iterator_support/iterator_adaptor.hpp>
 
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
 

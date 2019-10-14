@@ -1,5 +1,6 @@
 //  Copyright (c)      2017 Shoshana Jakobovits
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,9 +12,9 @@
 #include <hpx/runtime/resource/detail/create_partitioner.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstddef>
 #include <string>
@@ -131,9 +132,9 @@ namespace hpx { namespace resource
     public:
         partitioner(
             util::function_nonser<
-                int(boost::program_options::variables_map& vm)
+                int(hpx::program_options::variables_map& vm)
             > const& f,
-            boost::program_options::options_description const& desc_cmdline,
+            hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode = resource::mode_default,
             runtime_mode mode = runtime_mode_default)
@@ -174,7 +175,7 @@ namespace hpx { namespace resource
         {}
 
         partitioner(
-            boost::program_options::options_description const& desc_cmdline,
+            hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv,
             resource::partitioner_mode rpmode = resource::mode_default,
             runtime_mode mode = runtime_mode_default)
@@ -183,7 +184,7 @@ namespace hpx { namespace resource
         {}
 
         partitioner(
-            boost::program_options::options_description const& desc_cmdline,
+            hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode = resource::mode_default,
             runtime_mode mode = runtime_mode_default)
@@ -207,7 +208,7 @@ namespace hpx { namespace resource
         {}
 
         partitioner(std::nullptr_t f,
-            boost::program_options::options_description const& desc_cmdline,
+            hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode = resource::mode_default,
             runtime_mode mode = runtime_mode_default)

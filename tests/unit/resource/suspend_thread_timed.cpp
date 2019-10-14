@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -14,6 +15,7 @@
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -59,7 +61,7 @@ int hpx_main(int argc, char* argv[])
             {
                 if (thread_num != hpx::resource::get_num_threads("default") - 1)
                 {
-                    tp.suspend_processing_unit(thread_num).get();
+                    hpx::threads::suspend_processing_unit(tp, thread_num).get();
                 }
 
                 ++thread_num;
@@ -72,7 +74,7 @@ int hpx_main(int argc, char* argv[])
             }
             else
             {
-                tp.resume_processing_unit(thread_num - 1).get();
+                hpx::threads::resume_processing_unit(tp, thread_num - 1).get();
 
                 --thread_num;
 
@@ -89,7 +91,7 @@ int hpx_main(int argc, char* argv[])
         for (std::size_t thread_num_resume = 0; thread_num_resume < thread_num;
             ++thread_num_resume)
         {
-            tp.resume_processing_unit(thread_num_resume).get();
+            hpx::threads::resume_processing_unit(tp, thread_num_resume).get();
         }
     }
 
@@ -123,21 +125,22 @@ int main(int argc, char* argv[])
 
     {
         // These schedulers should succeed
-        std::vector<hpx::resource::scheduling_policy> schedulers =
-            {
+        std::vector<hpx::resource::scheduling_policy> schedulers = {
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
-                hpx::resource::scheduling_policy::local,
-                hpx::resource::scheduling_policy::local_priority_fifo,
-                hpx::resource::scheduling_policy::local_priority_lifo,
+            hpx::resource::scheduling_policy::local,
+            hpx::resource::scheduling_policy::local_priority_fifo,
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+            hpx::resource::scheduling_policy::local_priority_lifo,
 #endif
-#if defined(HPX_HAVE_ABP_SCHEDULER)
-                hpx::resource::scheduling_policy::abp_priority_fifo,
-                hpx::resource::scheduling_policy::abp_priority_lifo,
+#endif
+#if defined(HPX_HAVE_ABP_SCHEDULER) && defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+            hpx::resource::scheduling_policy::abp_priority_fifo,
+            hpx::resource::scheduling_policy::abp_priority_lifo,
 #endif
 #if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
-                hpx::resource::scheduling_policy::shared_priority,
+            hpx::resource::scheduling_policy::shared_priority,
 #endif
-            };
+        };
 
         for (auto const scheduler : schedulers)
         {
