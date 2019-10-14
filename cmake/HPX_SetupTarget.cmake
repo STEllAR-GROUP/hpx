@@ -2,6 +2,7 @@
 # Copyright (c) 2007-2018 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,8 +12,8 @@ hpx_set_cmake_policy(CMP0054 NEW)
 
 function(hpx_setup_target target)
   # retrieve arguments
-  set(options EXPORT NOHPX_INIT INSTALL NOLIBS PLUGIN NONAMEPREFIX)
-  set(one_value_args TYPE FOLDER NAME SOVERSION VERSION HPX_PREFIX)
+  set(options EXPORT NOHPX_INIT INSTALL INSTALL_HEADERS NOLIBS PLUGIN NONAMEPREFIX NOTLLKEYWORD)
+  set(one_value_args TYPE FOLDER NAME SOVERSION VERSION HPX_PREFIX HEADER_ROOT)
   set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INSTALL_FLAGS)
   cmake_parse_arguments(target "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
@@ -68,6 +69,14 @@ function(hpx_setup_target target)
     set(name "${target_NAME}")
   else()
     set(name "${target}")
+  endif()
+
+  if(target_NOTLLKEYWORD)
+    set(__tll_private)
+    set(__tll_public)
+  else()
+    set(__tll_private PRIVATE)
+    set(__tll_public PUBLIC)
   endif()
 
   set(nohpxinit FALSE)
@@ -212,13 +221,13 @@ function(hpx_setup_target target)
       set(hpx_libs ${hpx_libs} ${HPX_LIBRARIES})
     endif()
   else()
-    target_compile_options(${target} PUBLIC ${CXX_FLAG})
+    target_compile_options(${target} ${__tll_public} ${CXX_FLAG})
   endif()
 
-  target_link_libraries(${target} ${HPX_TLL_PUBLIC} ${hpx_libs} ${target_DEPENDENCIES})
+  target_link_libraries(${target} ${__tll_public} ${hpx_libs} ${target_DEPENDENCIES})
 
   if(TARGET hpx_internal_flags)
-    target_link_libraries(${target} PRIVATE hpx_internal_flags)
+    target_link_libraries(${target} ${__tll_private} hpx_internal_flags)
   endif()
 
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)
@@ -230,9 +239,15 @@ function(hpx_setup_target target)
 
   if(target_INSTALL AND NOT target_EXCLUDE_FROM_ALL)
     install(TARGETS ${target}
-      ${target_INSTALL_FLAGS}
       ${install_export}
+      ${target_INSTALL_FLAGS}
     )
+    if(target_INSTALL_HEADERS AND (NOT target_HEADER_ROOT STREQUAL ""))
+      install(
+        DIRECTORY "${target_HEADER_ROOT}/"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+        COMPONENT ${name})
+    endif()
   endif()
 endfunction()
 

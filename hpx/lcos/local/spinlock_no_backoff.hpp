@@ -3,6 +3,7 @@
 //  Copyright (c) 2011-2012 Hartmut Kaiser
 //  Copyright (c) 2008 Peter Dimov
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -12,8 +13,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/itt_notify.hpp>
-#include <hpx/util/register_locks.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/concurrency/register_locks.hpp>
 
 #if defined(HPX_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock.hpp>

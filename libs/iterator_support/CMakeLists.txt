@@ -1,0 +1,45 @@
+# Copyright (c) 2019 The STE||AR-Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+
+set(iterator_support_headers
+  hpx/iterator_support/is_iterator.hpp
+  hpx/iterator_support/is_range.hpp
+  hpx/iterator_support/iterator_adaptor.hpp
+  hpx/iterator_support/iterator_facade.hpp
+  hpx/iterator_support/iterator_range.hpp
+  hpx/iterator_support/range.hpp
+)
+
+set(iterator_support_compat_headers
+  hpx/traits/is_iterator.hpp
+  hpx/traits/is_range.hpp
+  hpx/util/iterator_adaptor.hpp
+  hpx/util/iterator_facade.hpp
+  hpx/util/iterator_range.hpp
+  hpx/util/range.hpp
+)
+
+set(iterator_support_sources)
+
+include(HPX_AddModule)
+add_hpx_module(iterator_support
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
+  FORCE_LINKING_GEN
+  GLOBAL_HEADER_GEN ON
+  EXCLUDE_FROM_GLOBAL_HEADER
+    "hpx/iterator_support/is_iterator.hpp"
+    "hpx/iterator_support/is_range.hpp"
+  SOURCES ${iterator_support_sources}
+  HEADERS ${iterator_support_headers}
+  COMPAT_HEADERS ${iterator_support_compat_headers}
+  DEPENDENCIES
+    hpx_config
+    hpx_type_support
+  CMAKE_SUBDIRS examples tests
+)

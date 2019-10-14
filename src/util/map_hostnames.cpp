@@ -1,9 +1,10 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/asio_util.hpp>
@@ -12,8 +13,10 @@
 #include <iostream>
 #include <string>
 
+#if defined(HPX_HAVE_NETWORKING)
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#endif
 
 namespace hpx { namespace util
 {
@@ -31,6 +34,7 @@ namespace hpx { namespace util
             return "127.0.0.1";
         }
 
+#if defined(HPX_HAVE_NETWORKING)
         if (!!transform_) {   // If the transform is not empty
             host_name = transform_(host_name);
             if (debug_) {
@@ -51,6 +55,9 @@ namespace hpx { namespace util
                       << "' to: " << resolved_addr << std::endl;
         }
         return resolved_addr;
+#else
+        return "127.0.0.1";
+#endif
     }
 }}
 

@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Denis Blank
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,7 +8,7 @@
 #define HPX_UTIL_PACK_TRAVERSAL_HPP
 
 #include <hpx/util/detail/pack_traversal_impl.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -2,6 +2,7 @@
 //  Copyright (c) 2014 Patricia Grubel
 //  Copyright (c) 2017 Adrian Serio
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -145,7 +146,7 @@ struct backup
     std::vector<hpx::util::checkpoint> bin;
     std::string file_name_;
 
-    backup(std::string file_name, size_t np)
+    backup(std::string const& file_name, std::size_t np)
       : bin(np)
       , file_name_(file_name)
     {
@@ -397,7 +398,7 @@ struct stepper
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::uint64_t np = vm["np"].as<std::uint64_t>();    // Number of partitions.
     std::uint64_t nx =
@@ -443,7 +444,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     // Configure application-specific options.
     options_description desc_commandline;

@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2018 Mikael Simberg
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
@@ -186,7 +187,7 @@ rst_prolog += '''
 .. |hpx_stackoverflow| replace:: StackOverflow |hpx| questions
 .. _hpx_stackoverflow: https://stackoverflow.com/questions/tagged/hpx
 .. |hpx_buildbot| replace:: |hpx| Buildbot Website
-.. _hpx_buildbot: https://rostam.cct.lsu.edu/
+.. _hpx_buildbot: http://rostam.cct.lsu.edu/
 .. |pycicle| replace:: pycicle
 .. _pycicle: https://github.com/biddisco/pycicle/
 .. |circleci| replace:: CircleCI
@@ -327,7 +328,9 @@ rst_prolog += '''
 .. |visual_cxx| replace:: Visual C++
 .. _visual_cxx: https://msdn.microsoft.com/en-us/visualc/default.aspx
 .. |jemalloc| replace:: jemalloc
-.. _jemalloc: https://www.canonware.com/jemalloc
+.. _jemalloc: http://jemalloc.net
+.. |mimalloc| replace:: mi-malloc
+.. _mimalloc: http://microsoft.github.io/mimalloc/
 .. |libunwind| replace:: libunwind
 .. _libunwind: https://www.nongnu.org/libunwind
 .. |hdf5| replace:: Hierarchical Data Format V5 (HDF5)

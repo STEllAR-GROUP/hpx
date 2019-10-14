@@ -3,12 +3,16 @@
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
+#include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -27,17 +31,16 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/apex.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_front.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/itt_notify.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
@@ -100,10 +103,7 @@ namespace hpx { namespace parcelset
 
     parcelhandler::parcelhandler(util::runtime_configuration& cfg,
         threads::threadmanager* tm,
-        util::function_nonser<void(std::size_t, char const*)> const&
-            on_start_thread,
-        util::function_nonser<void(std::size_t, char const*)> const&
-            on_stop_thread)
+        threads::policies::callback_notifier const& notifier)
       : tm_(tm)
       , use_alternative_parcelports_(false)
       , enable_parcel_handling_(true)
@@ -122,13 +122,7 @@ namespace hpx { namespace parcelset
             for (plugins::parcelport_factory_base* factory :
                     get_parcelport_factories())
             {
-                std::shared_ptr<parcelport> pp(
-                    factory->create(
-                        cfg
-                      , on_start_thread
-                      , on_stop_thread
-                    )
-                );
+                std::shared_ptr<parcelport> pp(factory->create(cfg, notifier));
                 attach_parcelport(pp);
             }
         }
@@ -249,20 +243,21 @@ namespace hpx { namespace parcelset
 
     ///////////////////////////////////////////////////////////////////////////
     bool parcelhandler::do_background_work(std::size_t num_thread,
-        bool stop_buffering)
+        bool stop_buffering, parcelport_background_mode mode)
     {
         bool did_some_work = false;
 
 #if defined(HPX_HAVE_NETWORKING)
         // flush all parcel buffers
-        if (is_networking_enabled_ && 0 == num_thread)
+        if (is_networking_enabled_ && 0 == num_thread &&
+            (mode & parcelport_background_mode_flush_buffers))
         {
             std::unique_lock<mutex_type> l(handlers_mtx_, std::try_to_lock);
 
             if(l.owns_lock())
             {
                 using parcelset::policies::message_handler;
-                message_handler::flush_mode mode =
+                message_handler::flush_mode flush_mode =
                     message_handler::flush_mode_background_work;
 
                 message_handler_map::iterator end = handlers_.end();
@@ -274,7 +269,7 @@ namespace hpx { namespace parcelset
                         std::shared_ptr<policies::message_handler> p((*it).second);
                         util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
                         did_some_work =
-                            p->flush(mode, stop_buffering) || did_some_work;
+                            p->flush(flush_mode, stop_buffering) || did_some_work;
                     }
                 }
             }
@@ -285,7 +280,8 @@ namespace hpx { namespace parcelset
         {
             if(pp.first > 0)
             {
-                did_some_work = pp.second->do_background_work(num_thread) ||
+                did_some_work =
+                    pp.second->do_background_work(num_thread, mode) ||
                     did_some_work;
             }
         }
@@ -1634,3 +1630,4 @@ namespace hpx { namespace parcelset
     }
 }}
 
+#endif

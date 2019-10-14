@@ -2,6 +2,7 @@
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011-2017 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,15 +10,15 @@
 #define HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/compat/thread.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/plugin.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
+#include <hpx/program_options.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -27,21 +28,20 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/is_component.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/plugin.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/program_options/options_description.hpp>
-
 #include <atomic>
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <list>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <set>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -247,9 +247,11 @@ namespace hpx { namespace components { namespace server
         void remove_here_from_connection_cache();
         void remove_here_from_console_connection_cache();
 
+#if defined(HPX_HAVE_NETWORKING)
         ///////////////////////////////////////////////////////////////////////
         void register_message_handler(char const* message_handler_type,
             char const* action, error_code& ec);
+
         parcelset::policies::message_handler* create_message_handler(
             char const* message_handler_type, char const* action,
             parcelset::parcelport* pp, std::size_t num_messages,
@@ -257,6 +259,7 @@ namespace hpx { namespace components { namespace server
         serialization::binary_filter* create_binary_filter(
             char const* binary_filter_type, bool compress,
             serialization::binary_filter* next_filter, error_code& ec);
+#endif
 
         // notify of message being sent
         void dijkstra_make_black();
@@ -265,63 +268,63 @@ namespace hpx { namespace components { namespace server
         // Load all components from the ini files found in the configuration
         int load_components(util::section& ini, naming::gid_type const& prefix,
             naming::resolver_client& agas_client,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 
 #if !defined(HPX_HAVE_STATIC_LINKING)
         bool load_component(hpx::util::plugin::dll& d,
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path const& lib,
+            std::string const& component, filesystem::path const& lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
         bool load_component_dynamic(
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path lib,
+            std::string const& component, filesystem::path lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 
         bool load_startup_shutdown_functions(hpx::util::plugin::dll& d,
             error_code& ec);
         bool load_commandline_options(hpx::util::plugin::dll& d,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             error_code& ec);
 #endif
 
         bool load_component_static(
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path const& lib,
+            std::string const& component, filesystem::path const& lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
         bool load_startup_shutdown_functions_static(std::string const& module,
             error_code& ec);
         bool load_commandline_options_static(
             std::string const& module,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             error_code& ec);
 
         // Load all plugins from the ini files found in the configuration
         bool load_plugins(util::section& ini,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 
 #if !defined(HPX_HAVE_STATIC_LINKING)
         bool load_plugin(hpx::util::plugin::dll& d,
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path const& lib,
+            std::string const& component, filesystem::path const& lib,
             bool isenabled,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
         bool load_plugin_dynamic(
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path lib,
+            std::string const& component, filesystem::path lib,
             bool isenabled,
-            boost::program_options::options_description& options,
+            hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 #endif
 
@@ -337,13 +340,13 @@ namespace hpx { namespace components { namespace server
 #endif
 
     private:
-        compat::mutex mtx_;
-        compat::condition_variable wait_condition_;
-        compat::condition_variable stop_condition_;
+        std::mutex mtx_;
+        std::condition_variable wait_condition_;
+        std::condition_variable stop_condition_;
         bool stop_called_;
         bool stop_done_;
         bool terminated_;
-        compat::thread::id main_thread_id_;
+        std::thread::id main_thread_id_;
         bool dijkstra_color_;   // false: white, true: black
         std::atomic<bool> shutdown_all_invoked_;
 

@@ -1,17 +1,16 @@
 //  Copyright (c) 2012 Maciej Brodowicz
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/errors.hpp>
 #include <hpx/util/thread_mapper.hpp>
-
-#include <hpx/compat/thread.hpp>
-#include <hpx/error_code.hpp>
-#include <hpx/throw_exception.hpp>
 
 #include <cstdint>
 #include <mutex>
 #include <string>
+#include <thread>
 
 #if defined(__linux__)
 #include <sys/syscall.h>
@@ -60,7 +59,7 @@ namespace hpx { namespace util
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        compat::thread::id id = compat::this_thread::get_id();
+        std::thread::id id = std::this_thread::get_id();
         thread_map_type::iterator it = thread_map_.find(id);
         if (it != thread_map_.end())
         {
@@ -94,7 +93,7 @@ namespace hpx { namespace util
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        compat::thread::id id = compat::this_thread::get_id();
+        std::thread::id id = std::this_thread::get_id();
         thread_map_type::iterator it = thread_map_.find(id);
         return (it == thread_map_.end()) ? false : unmap_thread(it);
     }

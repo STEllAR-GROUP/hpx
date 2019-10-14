@@ -1,21 +1,18 @@
 # Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    command_line_arguments_706
-    command_line_required_arguments_2990
     configuration_1572
     function_argument
     function_serialization_728
     iarchive_1237
-    optional_swap_3200
     protect_with_nullary_pfo
     serialize_buffer_1069
     set_config_entry_deadlock
-    tuple_serialization_803
     unwrapped_1528
     use_all_cores_2262
    )
@@ -41,7 +38,6 @@ if(HPX_WITH_NETWORKING)
     set(tests ${tests}
         zero_copy_parcels_1001
        )
-
   set(zero_copy_parcels_1001_PARAMETERS LOCALITIES 2)
 endif()
 
@@ -61,16 +57,6 @@ foreach(test ${tests})
 
   add_hpx_regression_test("util" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.util_dir.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.util_dir
-                              tests.regressions.util_dir.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.util_dir.${test}
-                              ${test}_test)
 endforeach()
 
 if(HPX_WITH_NETWORKING)
@@ -78,12 +64,14 @@ if(HPX_WITH_NETWORKING)
   add_hpx_regression_test(
       "util" zero_copy_parcels_1001_no_array_optimization
       EXECUTABLE zero_copy_parcels_1001
+      PSEUDO_DEPS_NAME zero_copy_parcels_1001
       ${zero_copy_parcels_1001_PARAMETERS}
       ARGS --hpx:ini=hpx.parcel.array_optimization=0)
 
   add_hpx_regression_test(
       "util" zero_copy_parcels_1001_no_zero_copy_optimization
       EXECUTABLE zero_copy_parcels_1001
+      PSEUDO_DEPS_NAME zero_copy_parcels_1001
       ${zero_copy_parcels_1001_PARAMETERS}
       ARGS --hpx:ini=hpx.parcel.zero_copy_optimization=0)
 endif()

@@ -1,11 +1,13 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_LCOS_ASYNC_COLOCATED_CALLBACK_MAR_30_2015_1146AM)
 #define HPX_LCOS_ASYNC_COLOCATED_CALLBACK_MAR_30_2015_1146AM
 
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/async_continue_callback.hpp>
 #include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/lcos/detail/async_colocated_callback_fwd.hpp>
@@ -13,7 +15,6 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <utility>
 

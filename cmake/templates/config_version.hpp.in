@@ -2,6 +2,7 @@
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2013 Adrian Serio
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,30 +17,30 @@
 
 #include <boost/version.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
-//  The version of HPX
-//
-//  HPX_VERSION_FULL & 0x0000FF is the sub-minor version
-//  HPX_VERSION_FULL & 0x00FF00 is the minor version
-//  HPX_VERSION_FULL & 0xFF0000 is the major version
-//
-//  HPX_VERSION_DATE   YYYYMMDD is the date of the release
-//                               (estimated release date for master branch)
-//
+/// Evaluates to the major version of HPX
 #define HPX_VERSION_MAJOR        @HPX_VERSION_MAJOR@u
+/// Evaluates to the minor version of HPX
 #define HPX_VERSION_MINOR        @HPX_VERSION_MINOR@u
+/// Evaluates to the subminor version of HPX
 #define HPX_VERSION_SUBMINOR     @HPX_VERSION_SUBMINOR@u
 
+/// Evaluates to the HPX version:
+/// ``HPX_VERSION_FULL & 0xFF0000 == HPX_VERSION_MAJOR``
+/// ``HPX_VERSION_FULL & 0x00FF00 == HPX_VERSION_MINOR``
+/// ``HPX_VERSION_FULL & 0x0000FF == HPX_VERSION_SUBMINOR``
 #define HPX_VERSION_FULL                                                       \
     ((HPX_VERSION_MAJOR << 16) | (HPX_VERSION_MINOR << 8) | HPX_VERSION_SUBMINOR)
 
+/// Evaluates to the release date of this HPX version in the format YYYYMMDD.
 #define HPX_VERSION_DATE         @HPX_VERSION_DATE@
+
+/// Evaluates to the version tag (empty for releases, ``-trunk`` on the
+/// development branch, ``-rcX`` on a release candidate.
+#define HPX_VERSION_TAG          "@HPX_VERSION_TAG@"
 
 #if !defined(HPX_AGAS_VERSION)
     #define HPX_AGAS_VERSION 0x30
 #endif
-
-#define HPX_VERSION_TAG          "@HPX_VERSION_TAG@"
 
 #if !defined(HPX_HAVE_GIT_COMMIT)
     #define HPX_HAVE_GIT_COMMIT  "unknown"
@@ -70,9 +71,11 @@ namespace hpx
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_EXPORTS) && !defined(HPX_NO_VERSION_CHECK)
-    // This is instantiated for each translation unit outside of the HPX core
-    // library, forcing to resolve the variable HPX_CHECK_VERSION.
+#if !defined(HPX_EXPORTS) && !defined(HPX_MODULE_EXPORTS) &&                   \
+    !defined(HPX_NO_VERSION_CHECK)
+
+// This is instantiated for each translation unit outside of the HPX core
+// library, forcing to resolve the variable HPX_CHECK_VERSION.
     namespace
     {
         // Note: this function is never executed.

@@ -1,18 +1,19 @@
 //  Copyright (c) 2011-2013 Bryce Adelstein-Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // This test demonstrates the issue described in #1036: Scheduler hangs when
 // user code attempts to "block" OS-threads
 
+#include <hpx/functional/bind.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/testing.hpp>
+#include <hpx/timing.hpp>
+#include <hpx/topology/topology.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -117,7 +118,7 @@ int main(
   , char* argv[]
     )
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     // Configure application-specific options.
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");

@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,9 +11,9 @@
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -24,12 +25,14 @@
 namespace hpx { namespace performance_counters
 {
     ///////////////////////////////////////////////////////////////////////////
-    char const counter_prefix[] = "/counters";
+    constexpr char const counter_prefix[] = "/counters";
+    constexpr std::size_t counter_prefix_len =
+        (sizeof(counter_prefix) / sizeof(counter_prefix[0])) - 1;
 
     ///////////////////////////////////////////////////////////////////////////
     inline std::string& ensure_counter_prefix(std::string& name)
     {
-        if (name.find(counter_prefix) != 0)
+        if (name.compare(0, counter_prefix_len, counter_prefix) != 0)
             name = counter_prefix + name;
         return name;
     }
@@ -42,8 +45,8 @@ namespace hpx { namespace performance_counters
 
     inline std::string& remove_counter_prefix(std::string& name)
     {
-        if (name.find(counter_prefix) == 0)
-            name = name.substr(sizeof(counter_prefix)-1);
+        if (name.compare(0, counter_prefix_len, counter_prefix) == 0)
+            name = name.substr(counter_prefix_len);
         return name;
     }
 

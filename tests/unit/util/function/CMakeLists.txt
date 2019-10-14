@@ -1,19 +1,11 @@
 # Copyright (c) 2013 Hartmut Kaiser
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    function_bind_test
-    contains_test
-    function_arith
-    function_args
-    function_ref_wrapper
-    function_target
-    function_test
-    nothrow_swap
-    stateless_test
-    sum_avg
+    function_object_size
    )
 
 foreach(test ${tests})
@@ -32,16 +24,6 @@ foreach(test ${tests})
 
   add_hpx_unit_test("util.function" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.util.functiondir.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.util.functiondir
-                              tests.unit.util.functiondir.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.util.functiondir.${test}
-                              ${test}_test)
 endforeach()
 
 

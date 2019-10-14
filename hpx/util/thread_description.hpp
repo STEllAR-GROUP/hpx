@@ -1,5 +1,6 @@
 //  Copyright (c) 2016-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,14 +8,14 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_DESCRIPTION_FEB_19_2016_0200PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/traits/is_action.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/functional/traits/get_function_address.hpp>
+#include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <hpx/util/itt_notify.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #endif
 
 #include <cstddef>
@@ -148,6 +149,25 @@ namespace hpx { namespace util
             return desc_itt_ ? desc_itt_ :
                 util::itt::string_handle(get_description());
         }
+
+        util::itt::task get_task_itt(util::itt::domain const& domain) const
+            noexcept
+        {
+            switch (kind())
+            {
+            case util::thread_description::data_type_description:
+                return util::itt::task(domain, get_description_itt());
+                break;
+            case util::thread_description::data_type_address:
+                return util::itt::task(domain, "address", get_address());
+                break;
+            default:
+                HPX_ASSERT(false);
+                break;
+            }
+
+            return util::itt::task(domain, "<error>");
+        }
 #endif
 
         std::size_t get_address() const noexcept
@@ -228,6 +248,25 @@ namespace hpx { namespace util
         {
             HPX_ASSERT(type_ == data_type_description);
             return util::itt::string_handle(get_description());
+        }
+
+        util::itt::task get_task_itt(util::itt::domain const& domain) const
+            noexcept
+        {
+            switch (kind())
+            {
+            case util::thread_description::data_type_description:
+                return util::itt::task(domain, get_description_itt());
+                break;
+            case util::thread_description::data_type_address:
+                return util::itt::task(domain, "address", get_address());
+                break;
+            default:
+                HPX_ASSERT(false);
+                break;
+            }
+
+            return util::itt::task(domain, "<error>");
         }
 #endif
 

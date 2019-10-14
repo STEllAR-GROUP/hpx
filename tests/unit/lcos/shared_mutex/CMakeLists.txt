@@ -1,5 +1,6 @@
 # Copyright (c) 2015 Hartmut Kaiser
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -26,16 +27,5 @@ foreach(test ${tests})
                      FOLDER "Tests/Unit/LCOs/SharedMutex")
 
   add_hpx_unit_test("lcos.shared_mutex" ${test} ${${test}_PARAMETERS})
-
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.lcos.shared_mutexdir.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.lcos.shared_mutexdir
-                              tests.unit.lcos.shared_mutexdir.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.lcos.shared_mutexdir.${test}
-                              ${test}_test)
 
 endforeach()

@@ -4,6 +4,7 @@
 // Copyright (C) 2007-2008 Anthony Williams
 // Copyright (C) 2013 Agustin Berge
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,9 +13,9 @@
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -68,8 +69,6 @@ struct wait_for_flag
         {
             return flag;
         }
-    private:
-        void operator=(check_flag&);
     };
 
 
@@ -457,9 +456,6 @@ struct cond_predicate
 
     int& _var;
     int _val;
-private:
-    void operator=(cond_predicate&);
-
 };
 
 void condition_test_waits(condition_test_data* data)
@@ -671,8 +667,8 @@ void test_wait_until_relative_times_out()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
 
 int hpx_main(variables_map&)
 {

@@ -1,13 +1,14 @@
 //  Copyright (c) 2005-2012 Hartmut Kaiser
 //  Copyright (c) 2014      Bryce Adelstein-Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_TICK_COUNTER_MAR_24_2008_1222PM)
 #define HPX_UTIL_TICK_COUNTER_MAR_24_2008_1222PM
 
-#include <hpx/util/hardware/timestamp.hpp>
+#include <hpx/hardware/timestamp.hpp>
 
 #include <cstdint>
 

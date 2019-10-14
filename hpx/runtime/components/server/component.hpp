@@ -2,6 +2,7 @@
 //  Copyright (c) 2015-2017 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,8 +10,8 @@
 #define HPX_RUNTIME_COMPONENTS_SERVER_COMPONENT_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/internal_allocator.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/traits/component_heap_type.hpp>
 
 #include <cstddef>

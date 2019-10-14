@@ -1,13 +1,14 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/util/function.hpp>
+#include <hpx/concurrency/spinlock.hpp>
+#include <hpx/functional/function.hpp>
+#include <hpx/type_support/static.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/static_reinit.hpp>
-#include <hpx/util/static.hpp>
-#include <hpx/util/spinlock.hpp>
 
 #include <mutex>
 #include <utility>
@@ -20,7 +21,7 @@ namespace hpx { namespace util
     {
         // Use util::spinlock instead of lcos::local::spinlock to avoid possible
         // suspensions of HPX threads as this will cause a deadlock when the
-        // register_functions function is called from within compat::call_once
+        // register_functions function is called from within std::call_once
         typedef util::spinlock mutex_type;
 
         typedef util::function_nonser<void()> construct_type;

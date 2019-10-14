@@ -2,6 +2,7 @@
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,18 +12,18 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
-#include <hpx/runtime/threads/detail/combined_tagged_state.hpp>
+#include <hpx/coroutines/coroutine.hpp>
+#include <hpx/coroutines/detail/combined_tagged_state.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 
-#include <hpx/util/assert.hpp>
-#include <hpx/util/atomic_count.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/backtrace.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/functional/function.hpp>
+#include <hpx/logging.hpp>
+#include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/util/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
@@ -43,8 +44,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
-    class thread_data;
-
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
@@ -82,7 +81,7 @@ namespace hpx { namespace threads
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a threads is
     /// implemented by the thread-manager.
-    class thread_data
+    class HPX_EXPORT thread_data
     {
     public:
         HPX_NON_COPYABLE(thread_data);
@@ -266,11 +265,7 @@ namespace hpx { namespace threads
         /// Return the id of the component this thread is running in
         naming::address_type get_component_id() const
         {
-#ifndef HPX_HAVE_THREAD_TARGET_ADDRESS
             return 0;
-#else
-            return component_id_;
-#endif
         }
 
 #ifndef HPX_HAVE_THREAD_DESCRIPTION
@@ -542,11 +537,11 @@ namespace hpx { namespace threads
 #if defined(HPX_HAVE_APEX)
         apex_task_wrapper get_apex_data() const
         {
-            return coroutine_.get_apex_data();
+            return apex_data_;
         }
         void set_apex_data(apex_task_wrapper data)
         {
-            return coroutine_.set_apex_data(data);
+            apex_data_ = data;
         }
 #endif
 
@@ -572,9 +567,6 @@ namespace hpx { namespace threads
         thread_data(thread_init_data& init_data,
             void* queue, thread_state_enum newstate)
           : current_state_(thread_state(newstate, wait_signaled)),
-#ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
-            component_id_(init_data.lva),
-#endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             description_(init_data.description),
             lco_description_(),
@@ -631,9 +623,6 @@ namespace hpx { namespace threads
 
             current_state_.store(thread_state(newstate, wait_signaled));
 
-#ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
-            component_id_ = init_data.lva;
-#endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             description_ = (init_data.description);
             lco_description_ = util::thread_description();
@@ -684,10 +673,6 @@ namespace hpx { namespace threads
 
         ///////////////////////////////////////////////////////////////////////
         // Debugging/logging information
-#ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
-        naming::address_type component_id_;
-#endif
-
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
         util::thread_description description_;
         util::thread_description lco_description_;
@@ -728,7 +713,15 @@ namespace hpx { namespace threads
 
         coroutine_type coroutine_;
         void* queue_;
+#if defined(HPX_HAVE_APEX)
+        apex_task_wrapper apex_data_;
+#endif
     };
+
+    HPX_CONSTEXPR thread_data* get_thread_id_data(thread_id_type const& tid)
+    {
+        return static_cast<thread_data*>(tid.get());
+    }
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -1,5 +1,6 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,11 +8,11 @@
 #define HPX_COMPONENTS_PINNED_PTR_JAN_22_2016_1027AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/component_pin_support.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <memory>
 #include <type_traits>

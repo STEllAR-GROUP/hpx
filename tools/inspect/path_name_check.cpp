@@ -3,15 +3,16 @@
 //  Copyright Beman Dawes 2002.
 //  Copyright Gennaro Prota 2006.
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+#include <hpx/filesystem.hpp>
 
 #include "path_name_check.hpp"
 
-#include "boost/filesystem/operations.hpp"
 #include "boost/lexical_cast.hpp"
 #include "function_hyper.hpp"
 
@@ -25,7 +26,7 @@ using std::string;
 namespace
 {
   const char allowable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-.";
-  const char initial_char[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
+  const char initial_char[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.";
 }
 
 namespace boost
@@ -43,7 +44,7 @@ namespace boost
       string::size_type pos;
 
       //  called for each file and directory, so only the leaf need be tested
-      string const leaf( full_path.leaf().string() );
+      string const leaf( full_path.filename().string() );
 
       //  includes only allowable characters
       if ( (pos = leaf.find_first_not_of( allowable )) != string::npos )
@@ -62,16 +63,18 @@ namespace boost
             + " file or directory name begins with an unacceptable character" );
       }
 
-      //  rules for dot characters differ slightly for directories and files
-      if ( filesystem::is_directory( full_path ) )
-      {
-        if ( std::strchr( leaf.c_str(), '.' ) )
-        {
-          ++m_name_errors;
-          error( library_name, full_path, loclink(full_path, string(name()))
-              + " directory name contains a dot character ('.')" );
-        }
-      }
+      // We want to inspect some of the hidden dirs
+
+      ////  rules for dot characters differ slightly for directories and files
+      //if ( hpx::filesystem::is_directory( full_path ) )
+      //{
+      //  if ( std::strchr( leaf.c_str(), '.' ) )
+      //  {
+      //    ++m_name_errors;
+      //    error( library_name, full_path, loclink(full_path, string(name()))
+      //        + " directory name contains a dot character ('.')" );
+      //  }
+      //}
       //else // not a directory
       //{
       //  //  includes at most one dot character

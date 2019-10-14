@@ -1,5 +1,6 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,23 +8,23 @@
 
 #if defined(HPX_HAVE_CUDA)
 
+#include <hpx/assertion.hpp>
 #include <hpx/compute/cuda/target.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type_impl.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/util/assert.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_MORE_THAN_64_THREADS)
 # if defined(HPX_HAVE_MAX_CPU_COUNT)
-#  include <hpx/runtime/serialization/bitset.hpp>
+#  include <hpx/serialization/bitset.hpp>
 # else
-#  include <hpx/runtime/serialization/dynamic_bitset.hpp>
+#  include <hpx/serialization/dynamic_bitset.hpp>
 # endif
 #endif
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #endif
 
 #include <cstddef>

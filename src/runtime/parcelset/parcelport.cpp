@@ -1,11 +1,14 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // This is needed to make everything work with the Intel MPI library header
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/state.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -14,11 +17,11 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -291,3 +294,4 @@ namespace hpx { namespace parcelset
 
 }}
 
+#endif

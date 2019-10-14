@@ -1,6 +1,7 @@
 ..
     Copyright (C) 2007-2013 Hartmut Kaiser
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -281,7 +282,7 @@ a couple of specialized languages and programming environments based on |pgas|_
 (Partitioned Global Address Space) designed to overcome this limitation, such as
 |chapel|_, |x10|_, |upc|_, or |fortress|_. However all systems based on |pgas|_
 rely on static data distribution. This works fine as long as such a static data
-distribution does not result in homogeneous workload distributions or other
+distribution does not result in heterogeneous workload distributions or other
 resource utilization imbalances. In a distributed system these imbalances can be
 mitigated by migrating part of the application data to different localities
 (nodes). The only framework supporting (limited) migration today is |charm_pp|_.
@@ -320,7 +321,7 @@ data structures. The larger the amount of data we have to churn and the more
 irregular the problem domain becomes, the worse are the overall machine
 utilization and the (strong) scaling characteristics. While it is not impossible
 to implement more dynamic, data driven, and asynchronous applications using
-|mpi|_, it is overly difficult to so. At the same time, if we look at
+|mpi|_, it is overly difficult to do so. At the same time, if we look at
 applications preferring to execute the code close the :term:`locality` where the
 data was placed, i.e. utilizing active messages (for instance based on
 |charm_pp|_), we see better asynchrony, simpler application codes, and improved

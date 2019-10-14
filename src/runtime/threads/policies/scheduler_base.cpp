@@ -1,32 +1,28 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/config_entry.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/yield_while.hpp>
 #include <hpx/util_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
-#include <hpx/runtime/threads/coroutines/detail/tss.hpp>
+#include <hpx/coroutines/detail/tss.hpp>
 #endif
 
 #include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cmath>
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -34,6 +30,7 @@
 #include <memory>
 #include <mutex>
 #include <set>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -41,22 +38,22 @@
 namespace hpx { namespace threads { namespace policies
 {
     scheduler_base::scheduler_base(std::size_t num_threads,
-            char const* description, scheduler_mode mode)
+        char const* description, thread_queue_init_parameters thread_queue_init,
+        scheduler_mode mode)
       : modes_(num_threads)
       , suspend_mtxs_(num_threads)
       , suspend_conds_(num_threads)
       , pu_mtxs_(num_threads)
       , states_(num_threads)
       , description_(description)
+      , thread_queue_init_(thread_queue_init)
       , parent_pool_(nullptr)
       , background_thread_count_(0)
     {
         set_scheduler_mode(mode);
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-        double max_time =
-            hpx::util::safe_lexical_cast<double>(hpx::get_config_entry(
-                "hpx.max_idle_backoff_time", HPX_IDLE_BACKOFF_TIME_MAX));
+        double max_time = thread_queue_init.max_idle_backoff_time_;
 
         wait_counts_.resize(num_threads);
         for (auto && data : wait_counts_)
@@ -102,17 +99,6 @@ namespace hpx { namespace threads { namespace policies
 #endif
     }
 
-    bool scheduler_base::background_callback(std::size_t num_thread)
-    {
-        bool result = false;
-        if (hpx::parcelset::do_background_work(num_thread))
-            result = true;
-
-        if (0 == num_thread)
-            hpx::agas::garbage_collect_non_blocking();
-        return result;
-    }
-
     /// This function gets called by the thread-manager whenever new work
     /// has been added, allowing the scheduler to reactivate one or more of
     /// possibly idling OS threads
@@ -145,7 +131,7 @@ namespace hpx { namespace threads { namespace policies
     {
         if (num_thread == std::size_t(-1))
         {
-            for (compat::condition_variable& c : suspend_conds_)
+            for (std::condition_variable& c : suspend_conds_)
             {
                 c.notify_one();
             }

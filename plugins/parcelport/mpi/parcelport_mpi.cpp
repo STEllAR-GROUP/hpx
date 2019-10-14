@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -116,9 +117,8 @@ namespace hpx { namespace parcelset
             }
         public:
             parcelport(util::runtime_configuration const& ini,
-                util::function_nonser<void(std::size_t, char const*)> const& on_start,
-                util::function_nonser<void(std::size_t, char const*)> const& on_stop)
-              : base_type(ini, here(), on_start, on_stop)
+                threads::policies::callback_notifier const& notifier)
+              : base_type(ini, here(), notifier)
               , stopped_(false)
               , receiver_(*this)
             {}
@@ -144,10 +144,10 @@ namespace hpx { namespace parcelset
                 return true;
             }
 
-            /// Stop the handling of connectons.
+            /// Stop the handling of connections.
             void do_stop()
             {
-                while(do_background_work(0))
+                while(do_background_work(0, parcelport_background_mode_all))
                 {
                     if(threads::get_self_ptr())
                         hpx::this_thread::suspend(hpx::threads::pending,
@@ -158,7 +158,7 @@ namespace hpx { namespace parcelset
             }
 
             /// Return the name of this locality
-            std::string get_locality_name() const
+            std::string get_locality_name() const override
             {
                 return util::mpi_environment::get_processor_name();
             }
@@ -171,7 +171,7 @@ namespace hpx { namespace parcelset
             }
 
             parcelset::locality agas_locality(
-                util::runtime_configuration const & ini) const
+                util::runtime_configuration const & ini) const override
             {
                 return
                     parcelset::locality(
@@ -181,19 +181,26 @@ namespace hpx { namespace parcelset
                     );
             }
 
-            parcelset::locality create_locality() const
+            parcelset::locality create_locality() const override
             {
                 return parcelset::locality(locality());
             }
 
-            bool background_work(std::size_t num_thread)
+            bool background_work(
+                std::size_t num_thread, parcelport_background_mode mode)
             {
                 if (stopped_)
                     return false;
 
                 bool has_work = false;
-                has_work = sender_.background_work();
-                has_work = receiver_.background_work() || has_work;
+                if (mode & parcelport_background_mode_send)
+                {
+                    has_work = sender_.background_work();
+                }
+                if (mode & parcelport_background_mode_receive)
+                {
+                    has_work = receiver_.background_work() || has_work;
+                }
                 return has_work;
             }
 
@@ -279,7 +286,8 @@ namespace hpx { namespace traits
                 "env = ${HPX_HAVE_PARCELPORT_MPI_ENV:" HPX_HAVE_PARCELPORT_MPI_ENV "}\n"
 #else
                 "env = ${HPX_HAVE_PARCELPORT_MPI_ENV:"
-                        "MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE"
+                        "MV2_COMM_WORLD_RANK,PMIX_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,"
+                        "ALPS_APP_PE"
                     "}\n"
 #endif
                 "multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:0}\n"

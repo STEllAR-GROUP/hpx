@@ -2,6 +2,7 @@
 //  Copyright (c) 2017      Thomas Heller
 //  Copyright (c) 2011      Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,12 +13,11 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/find_prefix.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/assign/std/vector.hpp>
 
 #include <algorithm>
 #include <string>
@@ -31,35 +31,34 @@ namespace hpx { namespace components { namespace detail
         char const* component_string, factory_state_enum state,
         char const* more)
     {
-        using namespace boost::assign;
-        fillini += std::string("[hpx.components.") + name + "]";
-        fillini += std::string("name = ") + component_string;
+        fillini.emplace_back(std::string("[hpx.components.") + name + "]");
+        fillini.emplace_back(std::string("name = ") + component_string);
 
         if (!is_static)
         {
             if (filepath.empty()) {
-                fillini += std::string("path = ") +
-                    util::find_prefixes("/hpx", component_string);
+                fillini.emplace_back(std::string("path = ") +
+                    util::find_prefixes("/hpx", component_string));
             }
             else {
-                fillini += std::string("path = ") + filepath;
+                fillini.emplace_back(std::string("path = ") + filepath);
             }
         }
 
         switch (state) {
         case factory_enabled:
-            fillini += "enabled = 1";
+            fillini.emplace_back("enabled = 1");
             break;
         case factory_disabled:
-            fillini += "enabled = 0";
+            fillini.emplace_back("enabled = 0");
             break;
         case factory_check:
-            fillini += "enabled = $[hpx.components.load_external]";
+            fillini.emplace_back("enabled = $[hpx.components.load_external]");
             break;
         }
 
         if (is_static) {
-            fillini += "static = 1";
+            fillini.emplace_back("static = 1");
         }
 
         if (more) {
@@ -75,7 +74,9 @@ namespace hpx { namespace components { namespace detail
         std::string enabled_entry = config.get_entry(
             std::string("hpx.components.") + name + ".enabled", "0");
 
-        boost::algorithm::to_lower(enabled_entry);
+        std::transform(enabled_entry.begin(), enabled_entry.end(),
+            enabled_entry.begin(), [](char c) { return std::tolower(c); });
+
         if (enabled_entry == "no" || enabled_entry == "false" ||
             enabled_entry == "0")
         {

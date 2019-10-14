@@ -1,6 +1,7 @@
 ..
     Copyright (C) 2018 Mikael Simberg
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -13,6 +14,7 @@ Releases
 .. toctree::
    :maxdepth: 1
 
+   releases/whats_new_1_4_0
    releases/whats_new_1_3_0
    releases/whats_new_1_2_1
    releases/whats_new_1_2_0

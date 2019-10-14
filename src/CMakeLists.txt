@@ -2,10 +2,9 @@
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2018 Nikunj Gupta
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-add_subdirectory(components)
 
 foreach(lib "hpx" "hpx_init")
   set(${lib}_SOURCES "" CACHE INTERNAL "Sources for lib${lib}." FORCE)
@@ -34,7 +33,6 @@ add_hpx_library_sources(hpx
   APPEND)
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/util/*.cpp"
-  EXCLUDE ".*lightweight_test.cpp"
   APPEND)
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/util/detail/*.cpp"
@@ -49,6 +47,10 @@ add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/compat/*.cpp"
   APPEND)
 
+add_hpx_library_sources(hpx_generated
+  GLOB GLOBS "${CMAKE_BINARY_DIR}/libs/modules.cpp"
+  APPEND)
+
 # libhpx_wrap sources
 if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
   add_hpx_library_sources (hpx_wrap
@@ -59,9 +61,6 @@ endif()
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/hpx_*.cpp"
   EXCLUDE "hpx_init[.]cpp|hpx_wrap.cpp")
-add_hpx_library_sources(hpx_init
-  GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/util/lightweight_test.cpp"
-  APPEND)
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/main.cpp" APPEND)
 
@@ -140,12 +139,6 @@ add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/compat/*.hpp"
   APPEND)
 
-if(HPX_WITH_STATIC_LINKING)
-  add_hpx_library_headers(hpx
-    GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/components/*.hpp"
-    APPEND)
-endif()
-
 # libhpx_init headers
 add_hpx_library_headers(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/hpx_main*.hpp")
@@ -158,6 +151,11 @@ add_hpx_source_group(
   NAME hpx CLASS "Source Files"
   ROOT "${PROJECT_SOURCE_DIR}/src"
   TARGETS ${hpx_SOURCES})
+
+add_hpx_source_group(
+  NAME hpx_generated CLASS "Source Files"
+  ROOT "${CMAKE_BINARY_DIR}/libs"
+  TARGETS ${hpx_generated_SOURCES})
 
 add_hpx_source_group(
   NAME hpx CLASS "External Source Files"
@@ -224,35 +222,33 @@ endforeach()
 ################################################################################
 # libhpx
 if(HPX_WITH_STATIC_LINKING)
-  set(hpx_SOURCES ${hpx_SOURCES} ${hpx_init_SOURCES})
+  set(hpx_SOURCES ${hpx_SOURCES} ${hpx_init_SOURCES} ${hpx_generated_SOURCES})
 endif()
 if(HPX_WITH_DEFAULT_TARGETS)
   if(HPX_WITH_CUDA)
     cuda_add_library(hpx ${hpx_library_link_mode_core}
-      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_generated_SOURCES}
+      ${hpx_external_OBJECTS} ${hpx_HEADERS})
   else()
     add_library(hpx ${hpx_library_link_mode_core}
-      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_generated_SOURCES}
+      ${hpx_external_OBJECTS} ${hpx_HEADERS})
   endif()
 else()
   if(HPX_WITH_CUDA)
     cuda_add_library(hpx ${hpx_library_link_mode_core} EXCLUDE_FROM_ALL
-      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_generated_SOURCES}
+      ${hpx_external_OBJECTS} ${hpx_HEADERS})
   else()
     add_library(hpx ${hpx_library_link_mode_core} EXCLUDE_FROM_ALL
-      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+      ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_generated_SOURCES}
+      ${hpx_external_OBJECTS} ${hpx_HEADERS})
   endif()
 endif()
-
-# this is a dummy target that we add compile flags to
-# all tests will depend on this target and inherit the flags
-# but user code linking against hpx will not
-add_library(hpx_internal_flags INTERFACE)
 
 # Default unnamed config (not Debug/Release/etc) are in this var
 get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_)
 target_compile_options(hpx PRIVATE ${_temp_flags})
-target_compile_options(hpx_internal_flags INTERFACE ${_temp_flags})
 
 # message("Adding ${_temp_flags}")
 
@@ -260,7 +256,6 @@ target_compile_options(hpx_internal_flags INTERFACE ${_temp_flags})
 foreach(_config "DEBUG" "RELEASE" "RELWITHDEBINFO" "MINSIZEREL")
   get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_${_config})
   target_compile_options(hpx PRIVATE $<$<CONFIG:${_config}>:${_temp_flags}>)
-  target_compile_options(hpx_internal_flags INTERFACE $<$<CONFIG:${_config}>:${_temp_flags}>)
 #  message("Adding $<$<CONFIG:${_config}>:${_temp_flags}>")
 endforeach()
 
@@ -284,22 +279,32 @@ endif()
 
 target_include_directories(hpx PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/hpx>)
-target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${HPX_LIBRARIES})
+target_link_libraries(hpx PUBLIC ${HPX_LIBRARIES})
 if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
-  target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
+  target_link_libraries(hpx PUBLIC ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
 endif()
 if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
-  target_link_libraries(hpx ${HPX_TLL_PRIVATE} ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
+  target_link_libraries(hpx PRIVATE ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
 endif()
 
 foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
   if (_parcelport_${_plugin}_LIBRARIES)
-    target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${_parcelport_${_plugin}_LIBRARIES})
+    target_link_libraries(hpx PUBLIC ${_parcelport_${_plugin}_LIBRARIES})
     hpx_export_targets(${_parcelport_${_plugin}_LIBRARIES})
   endif()
 endforeach()
 
-target_link_libraries(hpx ${HPX_TLL_PUBLIC} hpx_preprocessor)
+# integrate the hpx modules with the main library
+foreach(_module ${HPX_LIBS})
+  # add module binaries as PRIVATE dependencies to the core hpx library to
+  # avoid dependent applicatons have to link against those
+  target_link_libraries(hpx PRIVATE hpx_${_module})
+
+  # add module include directories as PUBLIC to core hpx library to enable
+  # compilation against indirectly included headers
+  get_target_property(_module_includes hpx_${_module} INTERFACE_INCLUDE_DIRECTORIES)
+  target_include_directories(hpx PUBLIC ${_module_includes})
+endforeach()
 
 set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
@@ -324,7 +329,6 @@ set(hpx_targets ${hpx_targets} hpx)
 # libhpx_init
 
 if(NOT HPX_WITH_STATIC_LINKING)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
   if(HPX_WITH_DEFAULT_TARGETS)
     if(HPX_WITH_CUDA)
       cuda_add_library(hpx_init STATIC
@@ -343,7 +347,14 @@ if(NOT HPX_WITH_STATIC_LINKING)
     endif()
   endif()
   target_include_directories(hpx_init PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
-  target_link_libraries(hpx_init ${HPX_TLL_PUBLIC} hpx_preprocessor)
+  set_target_properties(hpx_init PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+  foreach(_module ${HPX_LIBS})
+    # add module include directories as PRIVATE to the hpx_init library to
+    # enable its compilation against indirectly included headers
+    get_target_property(_module_includes hpx_${_module} INTERFACE_INCLUDE_DIRECTORIES)
+    target_include_directories(hpx_init PRIVATE ${_module_includes})
+  endforeach()
 
   set_property(TARGET hpx_init APPEND
     PROPERTY COMPILE_DEFINITIONS
@@ -384,7 +395,13 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
       "HPX_ENABLE_ASSERT_HANDLER")
 
     target_include_directories(hpx_wrap PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
-    target_link_libraries(hpx_wrap ${HPX_TLL_PUBLIC} hpx_preprocessor)
+
+    foreach(_module ${HPX_LIBS})
+      # add module include directories as PRIVATE to the hpx_wrap library to
+      # enable its compilation against indirectly included headers
+      get_target_property(_module_includes hpx_${_module} INTERFACE_INCLUDE_DIRECTORIES)
+      target_include_directories(hpx_wrap PRIVATE ${_module_includes})
+    endforeach()
 
     set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
     set(hpx_targets ${hpx_targets} hpx_wrap)
@@ -403,6 +420,9 @@ foreach(_keyword PUBLIC;PRIVATE)
     if(NOT HPX_WITH_STATIC_LINKING)
       target_compile_definitions(hpx_init ${_keyword} ${_flag})
     endif()
+    foreach(_module ${HPX_LIBS})
+      target_compile_definitions(hpx_${_module} ${_keyword} ${_flag})
+    endforeach()
   endforeach()
 
   get_property(HPX_TARGET_COMPILE_OPTIONS_VAR
@@ -416,6 +436,9 @@ foreach(_keyword PUBLIC;PRIVATE)
     if(NOT HPX_WITH_STATIC_LINKING)
       target_compile_options(hpx_init ${_keyword} ${_flag})
     endif()
+    foreach(_module ${HPX_LIBS})
+      target_compile_options(hpx_${_module} ${_keyword} ${_flag})
+    endforeach()
   endforeach()
 endforeach()
 

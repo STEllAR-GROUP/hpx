@@ -1,11 +1,12 @@
 //  (C) Copyright 2013-2015 Steven R. Brandt
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/local/composable_guard.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/hpx_init.hpp>
 
 #include <atomic>
@@ -50,7 +51,7 @@ void check_()
     HPX_TEST(2*increments == i1 && 2*increments == i2);
 }
 
-int hpx_main(boost::program_options::variables_map& vm) {
+int hpx_main(hpx::program_options::variables_map& vm) {
     if (vm.count("increments"))
         increments = vm["increments"].as<int>();
 
@@ -70,11 +71,11 @@ int hpx_main(boost::program_options::variables_map& vm) {
 }
 
 int main(int argc, char* argv[]) {
-    boost::program_options::options_description
+    hpx::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("increments,n", boost::program_options::value<int>()->default_value(3000),
+        ("increments,n", hpx::program_options::value<int>()->default_value(3000),
             "the number of times to increment the counters")
         ;
 

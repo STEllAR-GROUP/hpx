@@ -1,5 +1,6 @@
 # Copyright (c) 2014 Thomas Heller
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -95,6 +96,9 @@ endif()
 # Get the include directories we need ...
 get_directory_property(_INCLUDE_DIRS INCLUDE_DIRECTORIES)
 
+# Add core HPX library include directory
+set(_INCLUDE_DIRS ${_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR})
+
 # replace all characters with special regex meaning
 set(special_chars "^;+;*;?;$;.;-;|;(;);]")
 set(binarydir_escaped ${CMAKE_BINARY_DIR})
@@ -175,7 +179,12 @@ set(HPX_CONF_INCLUDE_DIRS
 )
 foreach(lib ${HPX_LIBS})
   set(HPX_CONF_INCLUDE_DIRS
-    "${HPX_CONF_INCLUDE_DIRS} -I${PROJECT_SOURCE_DIR}/libs/${lib}/include")
+    "${HPX_CONF_INCLUDE_DIRS} -I${PROJECT_SOURCE_DIR}/libs/${lib}/include \
+    -I${CMAKE_BINARY_DIR}/libs/${lib}/include")
+endforeach()
+foreach(component ${HPX_COMPONENTS})
+  set(HPX_CONF_INCLUDE_DIRS
+    "${HPX_CONF_INCLUDE_DIRS} -I${PROJECT_SOURCE_DIR}/components/${component}/include")
 endforeach()
 set(HPX_CMAKE_CONF_INCLUDE_DIRS
   ${_NEEDED_CMAKE_BUILD_DIR_INCLUDE_DIRS}

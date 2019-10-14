@@ -2,6 +2,7 @@
 //  Copyright (c)      2012 Zach Byerly
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +27,8 @@
 #include <hpx/include/async.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
+#include <hpx/timing.hpp>
 
 #include <boost/math/constants/constants.hpp>
 
@@ -37,9 +39,9 @@
 #include <mutex>
 #include <vector>
 
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
-using boost::program_options::value;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
+using hpx::program_options::value;
 
 using hpx::naming::id_type;
 using hpx::naming::invalid_id;

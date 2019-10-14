@@ -1,5 +1,6 @@
 //  Copyright (c) 2015-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -41,8 +42,16 @@ namespace hpx { namespace threads { namespace policies
                 reduce_thread_priority |
                 delay_exit |
                 enable_stealing |
-                enable_idle_backoff
+                enable_idle_backoff,
             ///< This option represents the default mode.
+        all_flags =
+                do_background_work |
+                reduce_thread_priority |
+                delay_exit |
+                fast_idle_mode |
+                enable_elasticity |
+                enable_stealing |
+                enable_idle_backoff
     };
 }}}
 

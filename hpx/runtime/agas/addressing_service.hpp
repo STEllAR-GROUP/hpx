@@ -4,6 +4,7 @@
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -12,7 +13,7 @@
 #define HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
@@ -26,10 +27,10 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/cache/lru_cache.hpp>
-#include <hpx/util/cache/statistics/local_full_statistics.hpp>
+#include <hpx/cache/lru_cache.hpp>
+#include <hpx/cache/statistics/local_full_statistics.hpp>
 #include <hpx/util_fwd.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 
@@ -48,7 +49,9 @@
 
 namespace hpx { namespace agas
 {
+#if defined(HPX_HAVE_NETWORKING)
 HPX_EXPORT void destroy_big_boot_barrier();
+#endif
 
 struct HPX_EXPORT addressing_service
 {
@@ -128,17 +131,26 @@ public:
       , runtime_mode runtime_type_
         );
 
+#if defined(HPX_HAVE_NETWORKING)
     ~addressing_service()
     {
         // TODO: Free the future pools?
         destroy_big_boot_barrier();
     }
+#else
+    ~addressing_service() = default;
+#endif
 
+#if defined(HPX_HAVE_NETWORKING)
     void bootstrap(
         parcelset::parcelhandler& ph, util::runtime_configuration const& ini);
 
     void initialize(parcelset::parcelhandler& ph, std::uint64_t rts_lva,
         std::uint64_t mem_lva);
+#else
+    void bootstrap(util::runtime_configuration const& ini);
+    void initialize(std::uint64_t rts_lva, std::uint64_t mem_lva);
+#endif
 
     /// \brief Adjust the size of the local AGAS Address resolution cache
     void adjust_local_cache_size(std::size_t);
@@ -216,11 +228,18 @@ public:
     }
 
 protected:
+#if defined(HPX_HAVE_NETWORKING)
     void launch_bootstrap(
         std::shared_ptr<parcelset::parcelport> const& pp
       , parcelset::endpoints_type const & endpoints
       , util::runtime_configuration const& ini_
         );
+#else
+    void launch_bootstrap(
+        parcelset::endpoints_type const & endpoints
+      , util::runtime_configuration const& ini_
+        );
+#endif
 
     void launch_hosted();
 
@@ -1099,6 +1118,7 @@ public:
       , error_code& ec = throws
         );
 
+#if defined(HPX_HAVE_NETWORKING)
     /// \brief Route the given parcel to the appropriate AGAS service instance
     ///
     /// This function sends the given parcel to the AGAS service instance which
@@ -1118,6 +1138,7 @@ public:
             parcelset::parcel const&)> &&
       , threads::thread_priority local_priority =
             threads::thread_priority_default);
+#endif
 
     /// \brief Increment the global reference count for the given id
     ///

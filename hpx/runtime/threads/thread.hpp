@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,16 +8,19 @@
 #define HPX_RUNTIME_THREADS_THREAD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos_fwd.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime_fwd.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/steady_clock.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <iosfwd>
 #include <mutex>
 #include <utility>
@@ -28,6 +32,10 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
+    using thread_termination_handler_type =
+        std::function<void(std::exception_ptr const& e)>;
+    void set_thread_termination_handler(thread_termination_handler_type f);
+
     class thread
     {
         typedef lcos::local::spinlock mutex_type;
@@ -44,14 +52,34 @@ namespace hpx
                 thread>::value>::type>
         explicit thread(F&& f)
         {
-            start_thread(util::deferred_call(std::forward<F>(f)));
+            auto thrd_data = threads::get_self_id_data();
+            HPX_ASSERT(thrd_data);
+            start_thread(thrd_data->get_scheduler_base()->get_parent_pool(),
+                util::deferred_call(std::forward<F>(f)));
         }
 
-        template <typename F, typename ...Ts>
+        template <typename F, typename... Ts>
         explicit thread(F&& f, Ts&&... vs)
         {
-            start_thread(util::deferred_call(
-                std::forward<F>(f), std::forward<Ts>(vs)...));
+            auto thrd_data = threads::get_self_id_data();
+            HPX_ASSERT(thrd_data);
+            start_thread(thrd_data->get_scheduler_base()->get_parent_pool(),
+                util::deferred_call(
+                    std::forward<F>(f), std::forward<Ts>(vs)...));
+        }
+
+        template <typename F>
+        thread(threads::thread_pool_base* pool, F&& f)
+        {
+            start_thread(pool, util::deferred_call(std::forward<F>(f)));
+        }
+
+        template <typename F, typename... Ts>
+        thread(threads::thread_pool_base* pool, F&& f, Ts&&... vs)
+        {
+            start_thread(pool,
+                util::deferred_call(
+                    std::forward<F>(f), std::forward<Ts>(vs)...));
         }
 
         ~thread();
@@ -104,7 +132,8 @@ namespace hpx
         {
             id_ = threads::invalid_thread_id;
         }
-        void start_thread(util::unique_function_nonser<void()>&& func);
+        void start_thread(threads::thread_pool_base* pool,
+            util::unique_function_nonser<void()>&& func);
         static threads::thread_result_type thread_function_nullary(
             util::unique_function_nonser<void()> const& func);
 
