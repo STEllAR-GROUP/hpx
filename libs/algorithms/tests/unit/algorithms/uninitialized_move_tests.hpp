@@ -1,13 +1,14 @@
 //  Copyright (c) 2014-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARALLEL_TEST_UNINIT_MOVE_MAY_30_2017_0853AM)
 #define HPX_PARALLEL_TEST_UNINIT_MOVE_MAY_30_2017_0853AM
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_uninitialized_move.hpp>
 #include <hpx/testing.hpp>
@@ -24,7 +25,7 @@
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_uninitialized_move(ExPolicy && policy, IteratorTag)
+void test_uninitialized_move(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -50,7 +51,7 @@ void test_uninitialized_move(ExPolicy && policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_uninitialized_move_async(ExPolicy && p, IteratorTag)
+void test_uninitialized_move_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -61,8 +62,7 @@ void test_uninitialized_move_async(ExPolicy && p, IteratorTag)
 
     hpx::future<base_iterator> f =
         hpx::parallel::uninitialized_move(std::forward<ExPolicy>(p),
-            iterator(std::begin(c)), iterator(std::end(c)),
-            std::begin(d));
+            iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
     f.wait();
 
     std::size_t count = 0;
@@ -91,28 +91,28 @@ void test_uninitialized_move_exception(ExPolicy policy, IteratorTag)
     std::vector<test::count_instances> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    std::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % c.size());    //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::parallel::uninitialized_move(policy,
-            decorated_iterator(
-                std::begin(c),
-                [&throw_after]()
-                {
+            decorated_iterator(std::begin(c),
+                [&throw_after]() {
                     if (throw_after-- == 0)
                         throw std::runtime_error("test");
                 }),
-            decorated_iterator(std::end(c)),
-            std::begin(d));
+            decorated_iterator(std::end(c)), std::begin(d));
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -131,34 +131,33 @@ void test_uninitialized_move_exception_async(ExPolicy p, IteratorTag)
     std::vector<test::count_instances> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    std::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % c.size());    //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        hpx::future<base_iterator> f =
-            hpx::parallel::uninitialized_move(p,
-                decorated_iterator(
-                    std::begin(c),
-                    [&throw_after]()
-                    {
-                        if (throw_after-- == 0)
-                            throw std::runtime_error("test");
-                    }),
-                decorated_iterator(std::end(c)),
-                std::begin(d));
+    try
+    {
+        hpx::future<base_iterator> f = hpx::parallel::uninitialized_move(p,
+            decorated_iterator(std::begin(c),
+                [&throw_after]() {
+                    if (throw_after-- == 0)
+                        throw std::runtime_error("test");
+                }),
+            decorated_iterator(std::end(c)), std::begin(d));
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -183,28 +182,28 @@ void test_uninitialized_move_bad_alloc(ExPolicy policy, IteratorTag)
     std::vector<test::count_instances> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    std::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % c.size());    //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_bad_alloc = false;
-    try {
+    try
+    {
         hpx::parallel::uninitialized_move(policy,
-            decorated_iterator(
-                std::begin(c),
-                [&throw_after]()
-                {
+            decorated_iterator(std::begin(c),
+                [&throw_after]() {
                     if (throw_after-- == 0)
                         throw std::bad_alloc();
                 }),
-            decorated_iterator(std::end(c)),
-            std::begin(d));
+            decorated_iterator(std::end(c)), std::begin(d));
 
         HPX_TEST(false);
     }
-    catch (std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -223,33 +222,32 @@ void test_uninitialized_move_bad_alloc_async(ExPolicy p, IteratorTag)
     std::vector<test::count_instances> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    std::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % c.size());    //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
-    try {
-        hpx::future<base_iterator> f =
-            hpx::parallel::uninitialized_move(p,
-                decorated_iterator(
-                    std::begin(c),
-                    [&throw_after]()
-                    {
-                        if (throw_after-- == 0)
-                            throw std::bad_alloc();
-                    }),
-                decorated_iterator(std::end(c)),
-                std::begin(d));
+    try
+    {
+        hpx::future<base_iterator> f = hpx::parallel::uninitialized_move(p,
+            decorated_iterator(std::begin(c),
+                [&throw_after]() {
+                    if (throw_after-- == 0)
+                        throw std::bad_alloc();
+                }),
+            decorated_iterator(std::end(c)), std::begin(d));
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 

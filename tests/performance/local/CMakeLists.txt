@@ -1,6 +1,7 @@
 # Copyright (c) 2014-2017 Hartmut Kaiser
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -115,13 +116,10 @@ set(benchmarks ${benchmarks}
     coroutines_call_overhead
     function_object_wrapper_overhead
     future_overhead
-    serialization_overhead
-    serialization_performance
     sizeof
    )
 
 set(future_overhead_FLAGS DEPENDENCIES iostreams_component hpx_timing)
-set(serialization_overhead_FLAGS DEPENDENCIES iostreams_component)
 set(sizeof_FLAGS DEPENDENCIES iostreams_component)
 
 set(benchmarks ${benchmarks}
@@ -165,7 +163,6 @@ set(timed_task_spawn_PARAMETERS NO_HPX_MAIN)
 set(hpx_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(native_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(coroutines_call_overhead_PARAMETERS NO_HPX_MAIN)
-set(serialization_performance_PARAMETERS NO_HPX_MAIN)
 
 if(HPX_WITH_CUDA)
   set_source_files_properties(stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)

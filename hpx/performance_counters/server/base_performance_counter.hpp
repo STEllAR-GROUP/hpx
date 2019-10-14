@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,13 +8,13 @@
 #define HPX_PERFORMANCE_COUNTERS_SERVER_BASE_MAR_03_2009_0741M
 
 #include <hpx/config.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/component.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

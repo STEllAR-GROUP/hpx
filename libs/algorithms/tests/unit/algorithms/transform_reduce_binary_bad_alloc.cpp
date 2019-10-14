@@ -1,10 +1,11 @@
 //  Copyright (c) 2015 Daniel Bourgeois
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_transform_reduce.hpp>
 #include <hpx/testing.hpp>
 
@@ -30,23 +31,23 @@ void test_transform_reduce_binary_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c = test::random_iota(10007);
     std::vector<std::size_t> d = test::random_iota(10007);
-    std::size_t init = std::rand() % 1007; //-V101
+    std::size_t init = std::rand() % 1007;    //-V101
 
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::parallel::transform_reduce(policy,
-        decorated_iterator(
-                std::begin(c),
-                [](){ throw std::bad_alloc(); }),
-            decorated_iterator(std::end(c)),
-            std::begin(d), init);
+            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
+            decorated_iterator(std::end(c)), std::begin(d), init);
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_exception = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
     HPX_TEST(caught_exception);
@@ -61,19 +62,16 @@ void test_transform_reduce_binary_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c = test::random_iota(10007);
     std::vector<std::size_t> d = test::random_iota(10007);
-    std::size_t init = std::rand() % 1007; //-V101
+    std::size_t init = std::rand() % 1007;    //-V101
 
     bool returned_from_algorithm = false;
     bool caught_exception = false;
 
-    try {
-        hpx::future<std::size_t> f =
-            hpx::parallel::transform_reduce(p,
-                decorated_iterator(
-                    std::begin(c),
-                    [](){ throw std::bad_alloc(); }),
-                decorated_iterator(std::end(c)),
-                std::begin(d), init);
+    try
+    {
+        hpx::future<std::size_t> f = hpx::parallel::transform_reduce(p,
+            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
+            decorated_iterator(std::end(c)), std::begin(d), init);
 
         returned_from_algorithm = true;
 
@@ -81,10 +79,12 @@ void test_transform_reduce_binary_bad_alloc_async(ExPolicy p, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_exception = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -106,7 +106,7 @@ void test_transform_reduce_binary_bad_alloc()
     test_transform_reduce_binary_bad_alloc_async(
         execution::seq(execution::task), IteratorTag());
     test_transform_reduce_binary_bad_alloc_async(
-            execution::par(execution::task), IteratorTag());
+        execution::par(execution::task), IteratorTag());
 }
 
 void transform_reduce_binary_bad_alloc_test()
@@ -116,9 +116,9 @@ void transform_reduce_binary_bad_alloc_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -133,19 +133,15 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // add command line option which controls the random number generator seed
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-         "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

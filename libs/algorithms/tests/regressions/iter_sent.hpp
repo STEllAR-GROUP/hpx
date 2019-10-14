@@ -2,21 +2,22 @@
 //  Copyright (c) 2019 Hartmut Kaiser
 //  Copyright (c) 2019 Piotr Mikolajczyk
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_TEST_ITER_SENT_APR_14_2019_1040PM)
 #define HPX_TEST_ITER_SENT_APR_14_2019_1040PM
 
-#include <iterator>
 #include <cstddef>
+#include <iterator>
 
-template<typename Value>
+template <typename Value>
 struct Sentinel
 {
 };
 
-template<typename Value, Value stopValue>
+template <typename Value, Value stopValue>
 struct Iterator
 {
     using difference_type = std::ptrdiff_t;
@@ -25,7 +26,10 @@ struct Iterator
     using pointer = Value const*;
     using reference = Value const&;
 
-    explicit Iterator(Value initialState): state(initialState) {}
+    explicit Iterator(Value initialState)
+      : state(initialState)
+    {
+    }
 
     virtual Value operator*() const
     {
@@ -140,6 +144,5 @@ struct Iterator
 protected:
     Value state;
 };
-
 
 #endif

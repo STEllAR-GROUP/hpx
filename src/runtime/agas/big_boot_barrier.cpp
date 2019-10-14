@@ -3,11 +3,14 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2015 Anton Bikineev
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
@@ -28,11 +31,11 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
-#include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/serialization/detail/polymorphic_id_factory.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/topology/topology.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/reinitializable_static.hpp>
@@ -224,7 +227,6 @@ namespace hpx { namespace agas { namespace detail
 
 namespace hpx { namespace agas
 {
-
     template <typename Action, typename... Args>
     void big_boot_barrier::apply(
         std::uint32_t source_locality_id
@@ -901,3 +903,4 @@ big_boot_barrier& get_big_boot_barrier()
 
 }}
 
+#endif

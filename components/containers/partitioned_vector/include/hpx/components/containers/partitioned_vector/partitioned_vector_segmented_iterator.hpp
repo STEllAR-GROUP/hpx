@@ -1,6 +1,7 @@
 //  Copyright (c) 2014 Anuj R. Sharma
 //  Copyright (c) 2014-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http:// ww.boost.org/LICENSE_1_0.txt)
 
@@ -390,7 +391,7 @@ namespace hpx
             data_(data)
         {}
 
-        const_local_vector_iterator(local_vector_iterator<T, Data> it)
+        const_local_vector_iterator(local_vector_iterator<T, Data> const& it)
           : partition_(it.get_partition()),
             local_index_(it.get_local_index()),
             data_(it.get_data())

@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,11 +9,11 @@
 #define HPX_TRAITS_FUTURE_THEN_RESULT_DEC_25_2016_1141AM
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/always_void.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/functional/result_of.hpp>
+#include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
-#include <hpx/util/result_of.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_traits.hpp>

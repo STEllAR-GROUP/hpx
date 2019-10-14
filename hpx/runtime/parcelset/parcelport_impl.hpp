@@ -4,6 +4,7 @@
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,19 +12,20 @@
 #define HPX_PARCELSET_PARCELPORT_IMPL_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/connection_cache.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -106,13 +108,10 @@ namespace hpx { namespace parcelset
         /// Construct the parcelport on the given locality.
         parcelport_impl(util::runtime_configuration const& ini,
             locality const& here,
-            util::function_nonser<void(std::size_t, char const*)> const&
-                on_start_thread,
-            util::function_nonser<void(std::size_t, char const*)> const&
-                on_stop_thread)
+            threads::policies::callback_notifier const& notifier)
           : parcelport(ini, here, connection_handler_type())
-          , io_service_pool_(thread_pool_size(ini), on_start_thread,
-                on_stop_thread, pool_name(), pool_name_postfix())
+          , io_service_pool_(thread_pool_size(ini), notifier, pool_name(),
+                pool_name_postfix())
           , connection_cache_(
                 max_connections(ini), max_connections_per_loc(ini))
           , archive_flags_(0)
@@ -538,7 +537,7 @@ namespace hpx { namespace parcelset
                     this_.archive_flags_,
                     this_.get_max_outbound_message_size());
 
-                typedef detail::call_for_each handler_type;
+                using handler_type = detail::call_for_each;
 
                 if (sender->parcelport_->async_write(
                     handler_type(
@@ -622,7 +621,7 @@ namespace hpx { namespace parcelset
         void enqueue_parcel(locality const& locality_id,
             parcel&& p, write_handler_type&& f)
         {
-            typedef pending_parcels_map::mapped_type mapped_type;
+            using mapped_type = pending_parcels_map::mapped_type;
 
             std::unique_lock<lcos::local::spinlock> l(mtx_);
             // We ignore the lock here. It might happen that while enqueuing,
@@ -644,7 +643,7 @@ namespace hpx { namespace parcelset
             std::vector<parcel>&& parcels,
             std::vector<write_handler_type>&& handlers)
         {
-            typedef pending_parcels_map::mapped_type mapped_type;
+            using mapped_type = pending_parcels_map::mapped_type;
 
             std::unique_lock<lcos::local::spinlock> l(mtx_);
             // We ignore the lock here. It might happen that while enqueuing,
@@ -684,7 +683,7 @@ namespace hpx { namespace parcelset
             std::vector<parcel>& parcels,
             std::vector<write_handler_type>& handlers)
         {
-            typedef pending_parcels_map::iterator iterator;
+            using iterator = pending_parcels_map::iterator;
 
             {
                 std::unique_lock<lcos::local::spinlock> l(mtx_, std::try_to_lock);
@@ -964,7 +963,7 @@ namespace hpx { namespace parcelset
         /// The connection cache for sending connections
         util::connection_cache<connection, locality> connection_cache_;
 
-        typedef hpx::lcos::local::spinlock mutex_type;
+        using mutex_type = hpx::lcos::local::spinlock;
 
         int archive_flags_;
         hpx::util::atomic_count operations_in_flight_;
@@ -974,4 +973,5 @@ namespace hpx { namespace parcelset
     };
 }}
 
+#endif
 #endif

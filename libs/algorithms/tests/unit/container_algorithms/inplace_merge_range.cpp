@@ -1,10 +1,11 @@
 //  Copyright (c) 2017-2018 Taeguk Kwon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_merge.hpp>
 #include <hpx/testing.hpp>
 
@@ -24,9 +25,10 @@ struct user_defined_type
 {
     user_defined_type() = default;
     user_defined_type(int rand_no)
-      : val(rand_no),
-        name(name_list[std::rand() % name_list.size()])
-    {}
+      : val(rand_no)
+      , name(name_list[std::rand() % name_list.size()])
+    {
+    }
 
     bool operator<(user_defined_type const& t) const
     {
@@ -67,15 +69,15 @@ struct user_defined_type
 };
 
 const std::vector<std::string> user_defined_type::name_list{
-    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"
-};
+    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill
 {
     random_fill(int rand_base, int range)
-      : gen(std::rand()),
-        dist(rand_base - range / 2, rand_base + range / 2)
-    {}
+      : gen(std::rand())
+      , dist(rand_base - range / 2, rand_base + range / 2)
+    {
+    }
 
     int operator()()
     {
@@ -116,9 +118,7 @@ void test_inplace_merge(ExPolicy policy, DataType)
 
     HPX_TEST(result == res_last);
 
-    bool equality = test::equal(
-        res_first, res_last,
-        sol_first, sol_last);
+    bool equality = test::equal(res_first, res_last, sol_first, sol_last);
 
     HPX_TEST(equality);
 }
@@ -153,9 +153,8 @@ void test_inplace_merge_async(ExPolicy policy, DataType)
 
     HPX_TEST(result == res_last);
 
-    bool equality = test::equal(
-        res_first, res_last,
-        std::begin(sol), std::end(sol));
+    bool equality =
+        test::equal(res_first, res_last, std::begin(sol), std::end(sol));
 
     HPX_TEST(equality);
 }
@@ -180,9 +179,9 @@ void test_inplace_merge()
     test_inplace_merge<user_defined_type>();
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -196,19 +195,15 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // add command line option which controls the random number generator seed
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

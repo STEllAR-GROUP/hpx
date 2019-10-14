@@ -1,10 +1,11 @@
 //  Copyright (c) 2014-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_scan.hpp>
 #include <hpx/testing.hpp>
 
@@ -21,37 +22,36 @@
 ///////////////////////////////////////////////////////////////////////////////
 void exclusive_scan_benchmark()
 {
-    try {
-      std::vector<double> c(100000000);
-      std::vector<double> d(c.size());
-      std::fill(std::begin(c), std::end(c), 1.0);
+    try
+    {
+        std::vector<double> c(100000000);
+        std::vector<double> d(c.size());
+        std::fill(std::begin(c), std::end(c), 1.0);
 
-      double const val(0);
-      auto op =
-        [](double v1, double v2) {
-          return v1 + v2;
-      };
+        double const val(0);
+        auto op = [](double v1, double v2) { return v1 + v2; };
 
-      hpx::util::high_resolution_timer t;
-      hpx::parallel::exclusive_scan(hpx::parallel::execution::par,
-        std::begin(c), std::end(c), std::begin(d),
-        val, op);
-      double elapsed = t.elapsed();
+        hpx::util::high_resolution_timer t;
+        hpx::parallel::exclusive_scan(hpx::parallel::execution::par,
+            std::begin(c), std::end(c), std::begin(d), val, op);
+        double elapsed = t.elapsed();
 
-      // verify values
-      std::vector<double> e(c.size());
-      hpx::parallel::v1::detail::sequential_exclusive_scan(
-          std::begin(c), std::end(c), std::begin(e), val, op);
+        // verify values
+        std::vector<double> e(c.size());
+        hpx::parallel::v1::detail::sequential_exclusive_scan(
+            std::begin(c), std::end(c), std::begin(e), val, op);
 
-      bool ok = std::equal(std::begin(d), std::end(d), std::begin(e));
-      HPX_TEST(ok);
-      if (ok) {
-          // CDash graph plotting
-          hpx::util::print_cdash_timing("ExclusiveScanTime", elapsed);
-      }
+        bool ok = std::equal(std::begin(d), std::end(d), std::begin(e));
+        HPX_TEST(ok);
+        if (ok)
+        {
+            // CDash graph plotting
+            hpx::util::print_cdash_timing("ExclusiveScanTime", elapsed);
+        }
     }
-    catch (...) {
-      HPX_TEST(false);
+    catch (...)
+    {
+        HPX_TEST(false);
     }
 }
 
@@ -71,14 +71,10 @@ void test_exclusive_scan1(ExPolicy policy, IteratorTag)
     std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     std::size_t const val(0);
-    auto op =
-        [](std::size_t v1, std::size_t v2) {
-            return v1 + v2;
-        };
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::parallel::exclusive_scan(policy,
-        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
-        val, op);
+    hpx::parallel::exclusive_scan(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(d), val, op);
 
     // verify values
     std::vector<std::size_t> e(c.size());
@@ -99,15 +95,10 @@ void test_exclusive_scan1_async(ExPolicy p, IteratorTag)
     std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     std::size_t const val(0);
-    auto op =
-        [](std::size_t v1, std::size_t v2) {
-            return v1 + v2;
-        };
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::future<void> f =
-        hpx::parallel::exclusive_scan(p,
-            iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
-            val, op);
+    hpx::future<void> f = hpx::parallel::exclusive_scan(p,
+        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d), val, op);
     f.wait();
 
     // verify values
@@ -138,9 +129,9 @@ void exclusive_scan_test1()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -150,24 +141,21 @@ int hpx_main(boost::program_options::variables_map& vm)
     exclusive_scan_test1();
     exclusive_scan_benchmark();
 
-  return hpx::finalize();
+    return hpx::finalize();
 }
 
 int main(int argc, char* argv[])
 {
     // add command line option which controls the random number generator seed
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

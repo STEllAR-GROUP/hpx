@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 
 namespace hpx
 {
@@ -18,7 +19,9 @@ namespace hpx
         namespace policies
         {
             struct scheduler_base;
-            class HPX_EXPORT callback_notifier;
+            namespace detail {
+                struct HPX_EXPORT affinity_data;
+            }
         }
 
         namespace executors
@@ -27,6 +30,7 @@ namespace hpx
         }
 
         class HPX_EXPORT thread_pool_base;
+        struct HPX_EXPORT thread_pool_init_parameters;
     }
 }
 

@@ -1,5 +1,6 @@
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -36,8 +37,11 @@ set(lockfree_fifo_LIBRARIES
     ${Boost_LIBRARIES}
     hpx_assertion
     hpx_config
-    hpx_testing
+    hpx_concurrency
     hpx_datastructures
+    hpx_functional
+    hpx_program_options
+    hpx_testing
     hpx_type_support)
 
 set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -78,10 +82,10 @@ foreach(test ${tests})
 
 endforeach()
 
-set_property(TARGET lockfree_fifo_test APPEND
-    PROPERTY COMPILE_DEFINITIONS "HPX_NO_VERSION_CHECK")
-
-target_include_directories(lockfree_fifo_test PRIVATE ${HPX_SOURCE_DIR})
+target_compile_definitions(lockfree_fifo_test
+  PRIVATE HPX_MODULE_STATIC_LINKING HPX_NO_VERSION_CHECK)
+target_include_directories(lockfree_fifo_test
+  PRIVATE ${HPX_SOURCE_DIR})
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set_tests_properties(tests.unit.threads.thread_stacksize_overflow PROPERTIES

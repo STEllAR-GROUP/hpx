@@ -1,5 +1,6 @@
 //  Copyright (c) 2018 Mikael Simberg
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,26 +10,26 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_start.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/yield_while.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstddef>
 #include <iostream>
 
 int main(int argc, char ** argv)
 {
-    boost::program_options::options_description desc_commandline;
+    hpx::program_options::options_description desc_commandline;
     desc_commandline.add_options()
         ("repetitions",
-         boost::program_options::value<std::uint64_t>()->default_value(100),
+         hpx::program_options::value<std::uint64_t>()->default_value(100),
          "Number of repetitions");
 
-    boost::program_options::variables_map vm;
-    boost::program_options::store(
-        boost::program_options::command_line_parser(argc, argv)
+    hpx::program_options::variables_map vm;
+    hpx::program_options::store(
+        hpx::program_options::command_line_parser(argc, argv)
         .allow_unregistered()
         .options(desc_commandline)
         .run(),

@@ -1,5 +1,6 @@
 # Copyright (c) 2007-2017 Hartmut Kaiser
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,15 +13,13 @@ set(tests
     returned_client_2150
    )
 
-set(bulk_new_3054_PARAMETERS LOCALITIES 2)
-set(new_2848_PARAMETERS LOCALITIES 2)
-
 if(HPX_WITH_NETWORKING)
-    set(tests ${tests}
-        create_remote_component_2334
-       )
-
+  set(tests ${tests}
+      create_remote_component_2334
+  )
+  set(bulk_new_3054_PARAMETERS LOCALITIES 2)
   set(create_remote_component_2334_PARAMETERS LOCALITIES 2)
+  set(new_2848_PARAMETERS LOCALITIES 2)
 endif()
 
 foreach(test ${tests})

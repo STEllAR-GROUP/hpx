@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2018 Mikael Simberg
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
@@ -327,7 +328,9 @@ rst_prolog += '''
 .. |visual_cxx| replace:: Visual C++
 .. _visual_cxx: https://msdn.microsoft.com/en-us/visualc/default.aspx
 .. |jemalloc| replace:: jemalloc
-.. _jemalloc: https://www.canonware.com/jemalloc
+.. _jemalloc: http://jemalloc.net
+.. |mimalloc| replace:: mi-malloc
+.. _mimalloc: http://microsoft.github.io/mimalloc/
 .. |libunwind| replace:: libunwind
 .. _libunwind: https://www.nongnu.org/libunwind
 .. |hdf5| replace:: Hierarchical Data Format V5 (HDF5)

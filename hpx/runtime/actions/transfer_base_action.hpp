@@ -2,6 +2,7 @@
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2011-2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,6 +11,9 @@
 #ifndef HPX_RUNTIME_ACTIONS_TRANSFER_BASE_ACTION_HPP
 #define HPX_RUNTIME_ACTIONS_TRANSFER_BASE_ACTION_HPP
 
+#include <hpx/config/defines.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/actions_fwd.hpp>
 
 #include <hpx/assertion.hpp>
@@ -17,9 +21,9 @@
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
-#include <hpx/runtime/serialization/input_archive.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
-#include <hpx/runtime/serialization/unique_ptr.hpp>
+#include <hpx/serialization/input_archive.hpp>
+#include <hpx/serialization/output_archive.hpp>
+#include <hpx/serialization/unique_ptr.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/action_priority.hpp>
@@ -31,7 +35,7 @@
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <hpx/util/itt_notify.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #endif
 
 #include <atomic>
@@ -240,7 +244,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        action_type get_action_type() const override
+        action_flavor get_action_type() const override
         {
             return derived_type::get_action_type();
         }
@@ -365,4 +369,5 @@ namespace hpx { namespace parcelset { namespace detail
 }}}
 #endif
 
+#endif
 #endif

@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -18,7 +19,6 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/threads/topology.hpp> //! FIXME remove
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util_fwd.hpp>
@@ -214,6 +214,7 @@ namespace hpx
             return agas_client_;
         }
 
+#if defined(HPX_HAVE_NETWORKING)
         /// \brief Allow access to the parcel handler instance used by the HPX
         ///        runtime.
         parcelset::parcelhandler const& get_parcel_handler() const override
@@ -225,6 +226,7 @@ namespace hpx
         {
             return parcel_handler_;
         }
+#endif
 
         /// \brief Allow access to the thread manager instance used by the HPX
         ///        runtime.
@@ -240,6 +242,7 @@ namespace hpx
             return applier_;
         }
 
+#if defined(HPX_HAVE_NETWORKING)
         /// \brief Allow access to the locality endpoints this runtime instance is
         /// associated with.
         ///
@@ -249,13 +252,18 @@ namespace hpx
         {
             return parcel_handler_.endpoints();
         }
+#endif
 
         /// \brief Returns a string of the locality endpoints (usable in debug output)
         std::string here() const override
         {
+#if defined(HPX_HAVE_NETWORKING)
             std::ostringstream strm;
             strm << get_runtime().endpoints();
             return strm.str();
+#else
+            return "console";
+#endif
         }
 
         std::uint64_t get_runtime_support_lva() const override
@@ -342,26 +350,34 @@ namespace hpx
         void deinit_tss(char const* context, std::size_t num);
 
         void init_tss_ex(std::string const& locality, char const* context,
-            std::size_t num, char const* postfix, bool service_thread,
+            std::size_t local_thread_num, std::size_t global_thread_num,
+            char const* pool_name, char const* postfix, bool service_thread,
             error_code& ec);
 
-        void init_tss(char const* context, std::size_t num, char const* postfix,
-            bool service_thread);
+        void init_tss(char const* context, std::size_t local_thread_num,
+            std::size_t global_thread_num, char const* pool_name,
+            char const* postfix, bool service_thread);
 
     private:
         util::unique_id_ranges id_pool_;
         runtime_mode mode_;
         int result_;
+        notification_policy_type main_pool_notifier_;
         util::io_service_pool main_pool_;
 #ifdef HPX_HAVE_IO_POOL
+        notification_policy_type io_pool_notifier_;
         util::io_service_pool io_pool_;
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
+        notification_policy_type timer_pool_notifier_;
         util::io_service_pool timer_pool_;
 #endif
         notification_policy_type notifier_;
         std::unique_ptr<hpx::threads::threadmanager> thread_manager_;
+#if defined(HPX_HAVE_NETWORKING)
+        notification_policy_type parcel_handler_notifier_;
         parcelset::parcelhandler parcel_handler_;
+#endif
         naming::resolver_client agas_client_;
         applier::applier applier_;
 

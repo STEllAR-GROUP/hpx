@@ -1,5 +1,6 @@
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -19,7 +20,7 @@ hpx::naming::id_type test_return() { return hpx::find_here(); }
 HPX_PLAIN_ACTION(test_return, test_return_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main(hpx::program_options::variables_map&)
 {
     std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
 
@@ -66,7 +67,7 @@ int hpx_main(boost::program_options::variables_map&)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    boost::program_options::options_description cmdline(
+    hpx::program_options::options_description cmdline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX.

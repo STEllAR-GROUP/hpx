@@ -1,10 +1,11 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
@@ -14,7 +15,7 @@
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstdint>
 #include <string>

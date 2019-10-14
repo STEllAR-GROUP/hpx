@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Taeguk Kwon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -23,8 +24,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /// Reorders the elements in the range \a rng in such a way that
     /// all elements for which the predicate \a pred returns true precede
     /// the elements for which the predicate \a pred returns false.
@@ -86,25 +86,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           The \a partition algorithm returns the iterator to
     ///           the first element of the second group.
     ///
-    template <typename ExPolicy, typename Rng,
-        typename Pred, typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Pred, traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
-        typename hpx::traits::range_iterator<Rng>::type
-    >::type
-    partition(ExPolicy && policy, Rng && rng, Pred && pred,
-        Proj && proj = Proj())
+    template <typename ExPolicy, typename Rng, typename Pred,
+        typename Proj = util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    Pred, traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_iterator<Rng>::type>::type
+    partition(ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
     {
-        return partition(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng),
-            std::forward<Pred>(pred),
+        return partition(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            hpx::util::end(rng), std::forward<Pred>(pred),
             std::forward<Proj>(proj));
     }
 
@@ -190,32 +183,26 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the destination iterator to the end of the \a dest_true range, and
     ///           the destination iterator to the end of the \a dest_false range.
     ///
-    template <typename ExPolicy, typename Rng, typename FwdIter2, typename FwdIter3,
-        typename Pred, typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        hpx::traits::is_iterator<FwdIter2>::value &&
-        hpx::traits::is_iterator<FwdIter3>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Pred, traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
+    template <typename ExPolicy, typename Rng, typename FwdIter2,
+        typename FwdIter3, typename Pred,
+        typename Proj = util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
+                    FwdIter2>::value&& hpx::traits::is_iterator<FwdIter3>::
+                    value&& traits::is_projected_range<Proj, Rng>::value&&
+                        traits::is_indirect_callable<ExPolicy, Pred,
+                            traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_tuple<
             tag::in(typename hpx::traits::range_iterator<Rng>::type),
-            tag::out1(FwdIter2), tag::out2(FwdIter3)>
-    >::type
-    partition_copy(ExPolicy && policy, Rng && rng,
-        FwdIter2 dest_true, FwdIter3 dest_false, Pred && pred,
-        Proj && proj = Proj())
+            tag::out1(FwdIter2), tag::out2(FwdIter3)>>::type
+    partition_copy(ExPolicy&& policy, Rng&& rng, FwdIter2 dest_true,
+        FwdIter3 dest_false, Pred&& pred, Proj&& proj = Proj())
     {
         return partition_copy(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), hpx::util::end(rng), dest_true, dest_false,
-            std::forward<Pred>(pred),
-            std::forward<Proj>(proj));
+            std::forward<Pred>(pred), std::forward<Proj>(proj));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

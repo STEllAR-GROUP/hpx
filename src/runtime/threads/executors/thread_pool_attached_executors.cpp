@@ -1,11 +1,12 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/runtime/threads/executors/thread_pool_attached_executors.hpp>
 
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #  include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #endif
@@ -17,10 +18,10 @@
 #  include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 #endif
 #include <hpx/assertion.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 #include <chrono>
 #include <cstddef>

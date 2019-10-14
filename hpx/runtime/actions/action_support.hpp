@@ -2,6 +2,7 @@
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,15 +17,15 @@
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/runtime/serialization/input_archive.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
+#include <hpx/serialization/base_object.hpp>
+#include <hpx/serialization/input_archive.hpp>
+#include <hpx/serialization/output_archive.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/traits/action_remote_result.hpp>
-#include <hpx/util/debug/demangle_helper.hpp>
+#include <hpx/debugging/demangle_helper.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <hpx/util/itt_notify.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #endif
 
 #include <cstddef>
@@ -59,6 +60,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+#if defined(HPX_HAVE_NETWORKING)
         template <typename Action>
         char const* get_action_name()
 #ifndef HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION
@@ -72,6 +74,13 @@ namespace hpx { namespace actions
             static_assert(
                 traits::needs_automatic_registration<Action>::value,
                 "HPX_REGISTER_ACTION_DECLARATION missing");
+            return util::debug::type_id<Action>::typeid_.type_id();
+        }
+#endif
+#else // HPX_HAVE_NETWORKING
+        template <typename Action>
+        char const* get_action_name()
+        {
             return util::debug::type_id<Action>::typeid_.type_id();
         }
 #endif

@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,24 +9,23 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
+#include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/unique_function.hpp>
 
 #include <boost/container/small_vector.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -835,11 +835,9 @@ namespace detail
         }
 
     protected:
-        static threads::thread_result_type run_impl(future_base_type this_)
+        static void run_impl(future_base_type this_)
         {
             this_->do_run();
-            return threads::thread_result_type(
-                threads::terminated, threads::invalid_thread_id);
         }
 
     public:
@@ -910,12 +908,10 @@ namespace detail
         };
 
     protected:
-        static threads::thread_result_type run_impl(future_base_type this_)
+        static void run_impl(future_base_type this_)
         {
             reset_id r(*this_);
             this_->do_run();
-            return threads::thread_result_type(
-                threads::terminated, threads::invalid_thread_id);
         }
 
     public:

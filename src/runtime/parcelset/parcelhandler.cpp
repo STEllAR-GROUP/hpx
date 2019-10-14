@@ -3,13 +3,16 @@
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -28,12 +31,12 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/apex.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_front.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/itt_notify.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
@@ -100,10 +103,7 @@ namespace hpx { namespace parcelset
 
     parcelhandler::parcelhandler(util::runtime_configuration& cfg,
         threads::threadmanager* tm,
-        util::function_nonser<void(std::size_t, char const*)> const&
-            on_start_thread,
-        util::function_nonser<void(std::size_t, char const*)> const&
-            on_stop_thread)
+        threads::policies::callback_notifier const& notifier)
       : tm_(tm)
       , use_alternative_parcelports_(false)
       , enable_parcel_handling_(true)
@@ -122,13 +122,7 @@ namespace hpx { namespace parcelset
             for (plugins::parcelport_factory_base* factory :
                     get_parcelport_factories())
             {
-                std::shared_ptr<parcelport> pp(
-                    factory->create(
-                        cfg
-                      , on_start_thread
-                      , on_stop_thread
-                    )
-                );
+                std::shared_ptr<parcelport> pp(factory->create(cfg, notifier));
                 attach_parcelport(pp);
             }
         }
@@ -1636,3 +1630,4 @@ namespace hpx { namespace parcelset
     }
 }}
 
+#endif

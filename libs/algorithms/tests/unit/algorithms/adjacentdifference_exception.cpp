@@ -1,10 +1,11 @@
 //  Copyright (c) 2015 Daniel Bourgeois
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_adjacent_difference.hpp>
 #include <hpx/testing.hpp>
 
@@ -25,28 +26,29 @@ void test_adjacent_difference_exception(ExPolicy policy, IteratorTag)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator <base_iterator, IteratorTag>
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(10007);
 
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::parallel::adjacent_difference(policy,
-            decorated_iterator(std::begin(c)),
-            decorated_iterator(std::end(c)), std::begin(d),
-            [](std::size_t lhs, std::size_t rhs) -> std::size_t
-            {
+            decorated_iterator(std::begin(c)), decorated_iterator(std::end(c)),
+            std::begin(d), [](std::size_t lhs, std::size_t rhs) -> std::size_t {
                 throw std::runtime_error("test");
                 return lhs - rhs;
             });
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -57,7 +59,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_adjacent_difference_exception_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator <base_iterator, IteratorTag>
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
@@ -66,13 +68,11 @@ void test_adjacent_difference_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
 
-    try {
-        hpx::future<base_iterator> f =
-        hpx::parallel::adjacent_difference(p,
-            decorated_iterator(std::begin(c)),
-            decorated_iterator(std::end(c)), std::begin(d),
-            [](std::size_t lhs, std::size_t rhs) -> std::size_t
-            {
+    try
+    {
+        hpx::future<base_iterator> f = hpx::parallel::adjacent_difference(p,
+            decorated_iterator(std::begin(c)), decorated_iterator(std::end(c)),
+            std::begin(d), [](std::size_t lhs, std::size_t rhs) -> std::size_t {
                 throw std::runtime_error("test");
                 return lhs - rhs;
             });
@@ -83,11 +83,13 @@ void test_adjacent_difference_exception_async(ExPolicy p, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -106,10 +108,10 @@ void test_adjacent_difference_exception()
     test_adjacent_difference_exception(execution::seq, IteratorTag());
     test_adjacent_difference_exception(execution::par, IteratorTag());
 
-    test_adjacent_difference_exception_async(execution::seq(execution::task),
-        IteratorTag());
-    test_adjacent_difference_exception_async(execution::par(execution::task),
-        IteratorTag());
+    test_adjacent_difference_exception_async(
+        execution::seq(execution::task), IteratorTag());
+    test_adjacent_difference_exception_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void adjacent_difference_exception_test()
@@ -118,9 +120,9 @@ void adjacent_difference_exception_test()
     test_adjacent_difference_exception<std::forward_iterator_tag>();
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -134,19 +136,15 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // add command line option which controls the random number generator seed
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

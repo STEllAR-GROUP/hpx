@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -23,7 +24,8 @@ struct less_than
 {
     less_than(int partition_at)
       : partition_at_(partition_at)
-    {}
+    {
+    }
 
     template <typename T>
     bool operator()(T const& val)
@@ -38,7 +40,8 @@ struct great_equal_than
 {
     great_equal_than(int partition_at)
       : partition_at_(partition_at)
-    {}
+    {
+    }
 
     template <typename T>
     bool operator()(T const& val)
@@ -86,12 +89,11 @@ void test_stable_partition(ExPolicy policy, IteratorTag)
     int partition_at = std::rand();
 
     auto result =
-        hpx::parallel::stable_partition(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            less_than(partition_at));
+        hpx::parallel::stable_partition(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), less_than(partition_at));
 
-    auto partition_pt = std::find_if(std::begin(c), std::end(c),
-        great_equal_than(partition_at));
+    auto partition_pt = std::find_if(
+        std::begin(c), std::end(c), great_equal_than(partition_at));
     HPX_TEST(result.base() == partition_pt);
 
     // verify values
@@ -124,14 +126,12 @@ void test_stable_partition_async(ExPolicy p, IteratorTag)
 
     int partition_at = std::rand();
 
-    auto f =
-        hpx::parallel::stable_partition(p,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            less_than(partition_at));
+    auto f = hpx::parallel::stable_partition(p, iterator(std::begin(c)),
+        iterator(std::end(c)), less_than(partition_at));
 
     auto result = f.get();
-    auto partition_pt = std::find_if(std::begin(c), std::end(c),
-        great_equal_than(partition_at));
+    auto partition_pt = std::find_if(
+        std::begin(c), std::end(c), great_equal_than(partition_at));
     HPX_TEST(result.base() == partition_pt);
 
     // verify values
@@ -163,18 +163,20 @@ void test_stable_partition_exception(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
-    try {
-        hpx::parallel::stable_partition(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            throw_always());
+    try
+    {
+        hpx::parallel::stable_partition(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), throw_always());
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -193,21 +195,22 @@ void test_stable_partition_exception_async(ExPolicy p, IteratorTag)
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f =
-            hpx::parallel::stable_partition(p,
-                iterator(std::begin(c)), iterator(std::end(c)),
-                throw_always());
+    try
+    {
+        auto f = hpx::parallel::stable_partition(
+            p, iterator(std::begin(c)), iterator(std::end(c)), throw_always());
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -231,17 +234,19 @@ void test_stable_partition_bad_alloc(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
-    try {
-        hpx::parallel::stable_partition(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            throw_bad_alloc());
+    try
+    {
+        hpx::parallel::stable_partition(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), throw_bad_alloc());
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -260,20 +265,21 @@ void test_stable_partition_bad_alloc_async(ExPolicy p, IteratorTag)
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f =
-            hpx::parallel::stable_partition(p,
-                iterator(std::begin(c)), iterator(std::end(c)),
-                throw_bad_alloc());
+    try
+    {
+        auto f = hpx::parallel::stable_partition(p, iterator(std::begin(c)),
+            iterator(std::end(c)), throw_bad_alloc());
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 

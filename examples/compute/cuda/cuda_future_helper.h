@@ -1,5 +1,6 @@
 //  Copyright (c) 2018 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -177,9 +178,48 @@ namespace hpx { namespace compute { namespace util
         cuda_future_helper operator=(const cuda_future_helper& other) = delete;
 
         // -------------------------------------------------------------------------
+        // launch a kernel on our stream - this does not require a c++ wrapped
+        // invoke call of the cuda kernel but must be called with the args that would
+        // otherwise be passed to cudaLaunchKernel - minus the stream arg which
+        // the helper class will provide. This function does not return a future.
+        // Typically, one must pass ...
+        // const void* func, dim3 gridDim, dim3 blockDim, void** args, size_t sharedMem)
+        template <typename R, typename... Params, typename... Args>
+        R device_launch_apply(R(*cuda_kernel)(Params...), Args &&... args)
+        {
+            // make sure we run on the correct device
+            cuda_error(cudaSetDevice(target_.native_handle().get_device()));
+            // launch the kernel directly on the GPU
+            cuda_error(
+                cudaLaunchKernel(reinterpret_cast<void const*>(cuda_kernel),
+                    std::forward<Args>(args)..., stream_));
+        }
+
+        // -------------------------------------------------------------------------
+        // launch a kernel on our stream - this does not require a c++ wrapped
+        // invoke call of the cuda kernel but must be called with the args that would
+        // otherwise be passed to cudaLaunchKernel - minus the stream arg which
+        // the helper class will provide.
+        // This function returns a future that will become ready when the task
+        // completes, this allows integregration of GPU kernels with
+        // hpx::futures and the tasking DAG.
+        //
+        // Typically, for cudaLaunchKernel one must pass ...
+        // const void* func, dim3 gridDim, dim3 blockDim, void** args, size_t sharedMem)
+        template <typename... Args>
+        hpx::future<void> device_launch_async(Args&&... args)
+        {
+            // make sure we run on the correct device
+            cuda_error(cudaSetDevice(target_.native_handle().get_device()));
+            // launch the kernel directly on the GPU
+            cuda_error(cudaLaunchKernel(std::forward<Args>(args)..., stream_));
+            return get_future();
+        }
+
+        // -------------------------------------------------------------------------
         // launch a kernel on our stream and return a future that will become ready
         // when the task completes, this allows integregration of GPU kernels with
-        // hpx::futuresa and the tasking DAG.
+        // hpx::futures and the tasking DAG.
         template <typename R, typename... Params, typename... Args>
         hpx::future<void> async(R(*cuda_kernel)(Params...), Args &&... args) {
             // make sure we run on the correct device
@@ -214,14 +254,14 @@ namespace hpx { namespace compute { namespace util
         }
 
         // -------------------------------------------------------------------------
-        // utility function for copying to/from the GPU, async and apply versions
+        // utility function for memory copies to/from the GPU, async and apply versions
         template <typename... Args>
-        hpx::future<void> copy_async(Args&&... args) {
+        hpx::future<void> memcpy_async(Args&&... args) {
             return async(cudaMemcpyAsync, std::forward<Args>(args)...);
         }
 
         template <typename... Args>
-        auto copy_apply(Args&&... args)
+        auto memcpy_apply(Args&&... args)
 #if !defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
             -> decltype(apply(cudaMemcpyAsync, std::forward<Args>(args)...))
 #endif

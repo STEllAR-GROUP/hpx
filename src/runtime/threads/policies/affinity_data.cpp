@@ -1,17 +1,16 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/format.hpp>
-#include <hpx/runtime/config_entry.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
-#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/command_line_handling.hpp>
+#include <hpx/runtime/threads/policies/parse_affinity_options.hpp>
+#include <hpx/topology/cpu_mask.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <algorithm>
@@ -20,59 +19,13 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace detail
-{
-    std::string get_affinity_domain(util::command_line_handling const& cfg);
-    std::size_t get_affinity_description(util::command_line_handling const& cfg,
-        std::string& affinity_desc);
-}}
-
-namespace hpx { namespace threads { namespace policies { namespace detail
-{
-    std::size_t get_pu_offset(util::command_line_handling const& cfg)
-    {
-        std::size_t pu_offset = std::size_t(-1);
-
-        if (cfg.pu_offset_ != std::size_t(-1))
-        {
-            pu_offset = cfg.pu_offset_;
-            if (pu_offset >= hpx::threads::hardware_concurrency())
-            {
-                throw hpx::detail::command_line_error(
-                    "Invalid command line option "
-                    "--hpx:pu-offset, value must be smaller than number of "
-                    "available processing units.");
-            }
-        }
-
-        return pu_offset;
-    }
-
-    std::size_t get_pu_step(util::command_line_handling const& cfg)
-    {
-        std::size_t pu_step = 1;
-
-        if (cfg.pu_step_ != 1)
-        {
-            pu_step = cfg.pu_step_;
-            if (pu_step == 0 || pu_step >= hpx::threads::hardware_concurrency())
-            {
-                throw hpx::detail::command_line_error(
-                    "Invalid command line option "
-                    "--hpx:pu-step, value must be non-zero and smaller than "
-                    "number of available processing units.");
-            }
-        }
-
-        return pu_step;
-    }
-
+namespace hpx { namespace threads { namespace policies { namespace detail {
     inline std::size_t count_initialized(std::vector<mask_type> const& masks)
     {
         std::size_t count = 0;
         for (mask_cref_type m : masks)
         {
-            if(threads::any(m))
+            if (threads::any(m))
                 ++count;
         }
         return count;
@@ -87,14 +40,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
       , affinity_masks_()
       , pu_nums_()
       , no_affinity_()
+      , use_process_mask_(false)
     {
-        // allow only one affinity-data instance
-        if (instance_number_counter_++ >= 0)
-        {
-            throw std::runtime_error(
-                "Cannot instantiate more than one affinity data instance");
-        }
-
         threads::resize(no_affinity_, hardware_concurrency());
     }
 
@@ -103,13 +50,15 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         --instance_number_counter_;
     }
 
-    std::size_t affinity_data::init(util::command_line_handling const& cfg_)
+    std::size_t affinity_data::init(std::size_t num_threads,
+        std::size_t max_cores, std::size_t pu_offset, std::size_t pu_step,
+        std::size_t used_cores, std::string affinity_domain,
+        std::string affinity_description, bool use_process_mask)
     {
-        num_threads_ = cfg_.num_threads_;
+        num_threads_ = num_threads;
+        use_process_mask_ = use_process_mask;
         std::size_t num_system_pus = hardware_concurrency();
 
-        // initialize from command line
-        std::size_t pu_offset = get_pu_offset(cfg_);
         if (pu_offset == std::size_t(-1))
         {
             pu_offset_ = 0;
@@ -119,31 +68,26 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             pu_offset_ = pu_offset;
         }
 
-        if(num_system_pus > 1)
-            pu_step_ = get_pu_step(cfg_) % num_system_pus;
+        if (num_system_pus > 1)
+        {
+            pu_step_ = pu_step % num_system_pus;
+        }
 
-        affinity_domain_ = hpx::detail::get_affinity_domain(cfg_);
+        affinity_domain_ = affinity_domain;
         pu_nums_.clear();
-
-        std::size_t const used_cores = cfg_.rtcfg_.get_first_used_core();
-        std::size_t max_cores =
-            hpx::util::safe_lexical_cast<std::size_t>(
-                get_config_entry("hpx.cores", 0), 0);
 
         init_cached_pu_nums(num_system_pus);
 
         auto const& topo = threads::create_topology();
 
-        std::string affinity_desc;
-        hpx::detail::get_affinity_description(cfg_, affinity_desc);
-        if (affinity_desc == "none")
+        if (affinity_description == "none")
         {
             // don't use any affinity for any of the os-threads
             threads::resize(no_affinity_, num_system_pus);
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::set(no_affinity_, get_pu_num(i));
         }
-        else if (!affinity_desc.empty())
+        else if (!affinity_description.empty())
         {
             affinity_masks_.clear();
             affinity_masks_.resize(num_threads_, mask_type{});
@@ -151,24 +95,26 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::resize(affinity_masks_[i], num_system_pus);
 
-            parse_affinity_options(affinity_desc, affinity_masks_,
-                used_cores, max_cores, num_threads_, pu_nums_);
+            parse_affinity_options(affinity_description, affinity_masks_,
+                used_cores, max_cores, num_threads_, pu_nums_, use_process_mask);
 
             std::size_t num_initialized = count_initialized(affinity_masks_);
-            if (num_initialized != num_threads_) {
+            if (num_initialized != num_threads_)
+            {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "affinity_data::affinity_data",
                     hpx::util::format(
                         "The number of OS threads requested "
                         "({1}) does not match the number of threads to "
-                        "bind ({2})", num_threads_, num_initialized));
+                        "bind ({2})",
+                        num_threads_, num_initialized));
             }
         }
         else if (pu_offset == std::size_t(-1))
         {
             // calculate the pu offset based on the used cores, but only if its
             // not explicitly specified
-            for(std::size_t num_core = 0; num_core != used_cores; ++num_core)
+            for (std::size_t num_core = 0; num_core != used_cores; ++num_core)
             {
                 pu_offset_ += topo.get_number_of_core_pus(num_core);
             }
@@ -256,7 +202,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             return ret;
         }
 
-        for (std::size_t thread_num = 0; thread_num < num_threads_; ++thread_num)
+        for (std::size_t thread_num = 0; thread_num < num_threads_;
+             ++thread_num)
         {
             ret |= get_pu_mask(topo, thread_num);
         }
@@ -279,7 +226,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             threads::resize(pu_mask, hardware_concurrency());
             threads::set(pu_mask, pu_num);
 
-            for (std::size_t num_thread = 0; num_thread < num_threads_; ++num_thread)
+            for (std::size_t num_thread = 0; num_thread < num_threads_;
+                 ++num_thread)
             {
                 mask_cref_type affinity_mask = get_pu_mask(topo, num_thread);
                 if (threads::any(pu_mask & affinity_mask))

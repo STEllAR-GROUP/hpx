@@ -1,6 +1,7 @@
 
 //  Copyright (c) 2011-2013 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,7 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #endif
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
 #include <boost/spirit/include/qi_char.hpp>
 #include <boost/spirit/include/qi_string.hpp>
@@ -26,11 +27,11 @@
 #include <string>
 #include <vector>
 
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
-using boost::program_options::value;
-using boost::program_options::store;
-using boost::program_options::parse_command_line;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
+using hpx::program_options::value;
+using hpx::program_options::store;
+using hpx::program_options::parse_command_line;
 
 #include "jacobi_nonuniform.hpp"
 

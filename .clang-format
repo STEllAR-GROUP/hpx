@@ -1,6 +1,7 @@
 # Copyright (c) 2016 Thomas Heller
 # Copyright (c) 2016-2018 Hartmut Kaiser
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -18,9 +19,7 @@
 #   file while saving edits to disk
 # - Please do _not_ reformat a full source file without dire need.
 
-# PLEASE NOTE: This file requires to use a recent version of clang-format. It
-#              is known to work with clang-format V7.0, other (earlier) version
-#              may work as well.
+# PLEASE NOTE: This file requires to use a recent version clang-format V8.0
 
 ---
 AccessModifierOffset: -4
@@ -73,14 +72,18 @@ FixNamespaceComments: true
 IncludeCategories:
   - Regex:           '^<hpx/config\.hpp>'
     Priority:        1
-  - Regex:           '^<hpx/.*\.hpp>'
+  - Regex:           '^<hpx/.*/config\.hpp>'
     Priority:        2
-  - Regex:           '^<hpx/parallel/.*\.hpp>'
+  - Regex:           '^<hpx/.*/config/defines\.hpp>'
     Priority:        3
-  - Regex:           '^<.*'
+  - Regex:           '^<hpx/.*\.hpp>'
     Priority:        4
-  - Regex:           '.*'
+  - Regex:           '^<hpx/parallel/.*\.hpp>'
     Priority:        5
+  - Regex:           '^<.*'
+    Priority:        6
+  - Regex:           '.*'
+    Priority:        7
 # IncludeIsMainRegex: ''
 IndentCaseLabels: false
 IndentWidth: 4

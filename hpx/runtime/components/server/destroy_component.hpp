@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011-2017 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,12 +9,11 @@
 #define HPX_COMPONENTS_SERVER_DESTROY_COMPONENT_JUN_02_2008_0146PM
 
 #include <hpx/config.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/throw_exception.hpp>
 
 #include <sstream>
 

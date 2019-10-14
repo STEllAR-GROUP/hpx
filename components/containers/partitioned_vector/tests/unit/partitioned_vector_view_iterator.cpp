@@ -1,12 +1,13 @@
 //  Copyright (c) 2017 Antoine Tran Tan
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/partitioned_vector_view.hpp>
-#include <hpx/lcos/spmd_block.hpp>
+#include <hpx/collectives/spmd_block.hpp>
 
 #include <hpx/testing.hpp>
 
@@ -44,29 +45,28 @@ void bulk_test( hpx::lcos::spmd_block block,
     view_type my_view(block,
         my_vector.begin(), my_vector.end(), {size_x,size_y,size_z});
 
-    int idx = 0;
-
     // Ensure that only one image is putting data into the different
     // partitions
     if(block.this_image() == 0)
     {
         // Traverse all the co-indexed elements
+        int idx = 0;
         for(auto i = my_view.begin(); i != my_view.end(); i++)
         {
             // It's a Put operation
-            *i = std::vector<double>(elt_size,idx++);
+            *i = std::vector<double>(elt_size, idx++);
         }
 
         auto left_it  = my_view.begin();
         auto right_it = my_view.cbegin();
 
         // Note: Useless computation, since we assign segments to themselves
-        for(; left_it != my_view.end(); left_it++, right_it++)
+        for (; left_it != my_view.end(); ++left_it, ++right_it)
         {
             // Check that dereferencing iterator and const_iterator does not
             // retrieve the same type
             HPX_TEST((
-                !std::is_same<decltype(*left_it),decltype(*right_it)>::value));
+                !std::is_same<decltype(*left_it), decltype(*right_it)>::value));
 
             // It's a Put operation
             *left_it = *right_it;
@@ -79,15 +79,15 @@ void bulk_test( hpx::lcos::spmd_block block,
     {
         int idx = 0;
 
-        for (std::size_t k = 0; k<size_z; k++)
-            for (std::size_t j = 0; j<size_y; j++)
-                for (std::size_t i = 0; i<size_x; i++)
+        for (std::size_t k = 0; k < size_z; k++)
+            for (std::size_t j = 0; j < size_y; j++)
+                for (std::size_t i = 0; i < size_x; i++)
                 {
-                    std::vector<double> result(elt_size,idx);
+                    std::vector<double> result(elt_size, idx);
 
                     // It's a Get operation
                     std::vector<double> value =
-                        (std::vector<double>)my_view(i,j,k);
+                        (std::vector<double>) my_view(i, j, k);
 
                     const_iterator it1 = result.begin(), it2 = value.begin();
                     const_iterator end1 = result.end();
@@ -105,7 +105,7 @@ void bulk_test( hpx::lcos::spmd_block block,
         // Re-check by traversing all the co-indexed elements
         for(auto i = my_view.cbegin(); i != my_view.cend(); i++)
         {
-            std::vector<double> result(elt_size,idx);
+            std::vector<double> result(elt_size, idx);
 
             // It's a Get operation
             std::vector<double> value = (std::vector<double>)(*i);

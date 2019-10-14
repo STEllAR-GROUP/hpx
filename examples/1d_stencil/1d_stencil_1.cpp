@@ -1,6 +1,7 @@
 //  Copyright (c) 2014 Hartmut Kaiser
 //  Copyright (c) 2014 Patricia Grubel
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -75,7 +76,7 @@ struct stepper
 };
 //]
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
     std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
@@ -109,7 +110,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    namespace po = boost::program_options;
+    namespace po = hpx::program_options;
 
     po::options_description desc_commandline;
     desc_commandline.add_options()

@@ -1,5 +1,6 @@
 # Copyright (c) 2019 The STE||AR-Group
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -33,12 +34,11 @@ set(preprocessor_sources
 
 include(HPX_AddModule)
 add_hpx_module(preprocessor
-    COMPATIBILITY_HEADERS ON
-    DEPRECATION_WARNINGS
-    FORCE_LINKING_GEN
-    SOURCES ${preprocessor_sources}
-    HEADERS ${preprocessor_headers}
-    COMPAT_HEADERS ${preprocessor_compat_headers}
-    DEPENDENCIES hpx_config
-    CMAKE_SUBDIRS tests
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
+  FORCE_LINKING_GEN
+  SOURCES ${preprocessor_sources}
+  HEADERS ${preprocessor_headers}
+  COMPAT_HEADERS ${preprocessor_compat_headers}
+  CMAKE_SUBDIRS tests
 )

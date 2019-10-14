@@ -1,5 +1,6 @@
 //  Copyright (c) 2018 Mikael Simberg
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -14,6 +15,7 @@
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -23,13 +25,10 @@
 #include <utility>
 #include <vector>
 
-void test_scheduler(int argc, char* argv[],
-    hpx::resource::scheduling_policy scheduler)
+void test_scheduler(
+    int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
-    std::vector<std::string> cfg =
-    {
-        "hpx.os_threads=4"
-    };
+    std::vector<std::string> cfg = {"hpx.os_threads=4"};
 
     hpx::resource::partitioner rp(nullptr, argc, argv, std::move(cfg));
 
@@ -46,17 +45,14 @@ void test_scheduler(int argc, char* argv[],
 
     while (t.elapsed() < 2)
     {
-        for (std::size_t i = 0;
-             i < default_pool_threads * 10000; ++i)
+        for (std::size_t i = 0; i < default_pool_threads * 10000; ++i)
         {
-            hpx::apply([](){});
+            hpx::apply([]() {});
         }
 
         bool suspended = false;
-        default_pool.suspend_cb([&suspended]()
-                                {
-                                    suspended = true;
-                                });
+        hpx::threads::suspend_pool_cb(
+            default_pool, [&suspended]() { suspended = true; });
 
         while (!suspended)
         {
@@ -64,10 +60,8 @@ void test_scheduler(int argc, char* argv[],
         }
 
         bool resumed = false;
-        default_pool.resume_cb([&resumed]()
-                               {
-                                   resumed = true;
-                               });
+        hpx::threads::resume_pool_cb(
+            default_pool, [&resumed]() { resumed = true; });
 
         while (!resumed)
         {

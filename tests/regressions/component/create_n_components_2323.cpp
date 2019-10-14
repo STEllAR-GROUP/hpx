@@ -1,5 +1,6 @@
 //  Copyright (c) 2016 David Pfander
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -30,7 +31,7 @@ struct component_server : hpx::components::component_base<component_server>
         HPX_TEST(false);    // shouldn't be called
     }
 
-    component_server(std::vector<double> const& a)
+    explicit component_server(std::vector<double> const& a)
     {
         HPX_TEST_EQ(a.size(), test_array_size);
         ++count;

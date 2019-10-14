@@ -4,6 +4,7 @@
 //  Copyright (c) 2011 Katelyn Kufahl
 //  Copyright (c) 2011-2014 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,14 +12,14 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
-#include <hpx/exception_list.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/plugins/parcelport/tcp/connection_handler.hpp>
 #include <hpx/plugins/parcelport/tcp/receiver.hpp>
 #include <hpx/plugins/parcelport/tcp/sender.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/util/asio_util.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/io/ios_state.hpp>
@@ -62,11 +63,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
     connection_handler::connection_handler(
         util::runtime_configuration const& ini,
-        util::function_nonser<void(std::size_t, char const*)> const&
-            on_start_thread,
-        util::function_nonser<void(std::size_t, char const*)> const&
-            on_stop_thread)
-      : base_type(ini, parcelport_address(ini), on_start_thread, on_stop_thread)
+        threads::policies::callback_notifier const& notifier)
+      : base_type(ini, parcelport_address(ini), notifier)
       , acceptor_(nullptr)
     {
         if (here_.type() != std::string("tcp")) {

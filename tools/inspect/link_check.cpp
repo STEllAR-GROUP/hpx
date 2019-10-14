@@ -2,23 +2,24 @@
 
 //  Copyright Beman Dawes 2002.
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+#include <hpx/filesystem.hpp>
 
 #include "link_check.hpp"
 #include "function_hyper.hpp"
 #include "boost/regex.hpp"
-#include "boost/filesystem/operations.hpp"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <cstdlib>
 #include <set>
 
 // #include <iostream>
 
-namespace fs = boost::filesystem;
+namespace fs = hpx::filesystem;
 
 namespace
 {

@@ -1,6 +1,7 @@
 #  Copyright (c) 2017-2018 Thomas Heller
 #  Copyright (c) 2015 Martin Stumpf
 #
+#  SPDX-License-Identifier: BSL-1.0
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -38,7 +39,7 @@ gh_pages_filter: &gh_pages_filter
       branches:
         ignore: gh-pages
       tags:
-        only: /.*/
+        ignore: stable
 
 docs_push_filter: &docs_push_filter
     filters:
@@ -47,7 +48,7 @@ docs_push_filter: &docs_push_filter
           - master
           - release
       tags:
-        only: /.*/
+        ignore: stable
 
 core_dependency: &core_dependency
     requires:
@@ -88,13 +89,49 @@ jobs:
           name: Downloading CTest XML to Junit XML
           command: |
               curl \
-                https://raw.githubusercontent.com/Kitware/CDash/master/tests/circle/conv.xsl \
+                https://raw.githubusercontent.com/Kitware/CDash/master/app/cdash/tests/circle/conv.xsl \
+                --fail \
                 -o /hpx/conv.xsl
       - persist_to_workspace:
           root: /hpx
           paths:
             - ./source
             - ./conv.xsl
+
+  # Check circular dependencies with cpp-dependencies tool
+  check_circular_deps:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Check circular dependencies with cpp-dependencies
+          command: |
+              cpp-dependencies --dir /hpx/source/libs --graph-cycles /tmp/circular_deps.dot
+              dot /tmp/circular_deps.dot -Tsvg -o /tmp/circular_deps.svg
+              if [[ $(wc -l /tmp/circular_deps.dot | awk '{print $1}') -gt 2 ]]; then exit 1; fi
+      - store_artifacts:
+          path: /tmp/circular_deps.dot
+          destination: /hpx/artifacts/circular_deps.dot
+      - store_artifacts:
+          path: /tmp/circular_deps.svg
+          destination: /hpx/artifacts/circular_deps.svg
+
+  # Insure that the modules stay clang-formatted
+  clang_format:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Check that the modules are well clang-formatted
+          command: |
+              cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
+              clang-format-8 -i **/*.{cpp,hpp}
+              git diff --exit-code > /tmp/modified_format_files.txt
+      - store_artifacts:
+          path: /tmp/modified_format_files.txt
+          destination: /hpx/artifacts/modified_format_files.txt
 
   configure:
     <<: *defaults
@@ -266,7 +303,7 @@ jobs:
               # NOTE: transpose_block_numa is disabled because
               # hwloc_get_area_membind_nodeset (which is used by the
               # numa_allocator) fails with EPERM.
-              ctest -T test --no-compress-output --output-on-failure \
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure \
                   -R tests.examples \
                   -E tests.examples.transpose.transpose_block_numa
       - run:
@@ -294,7 +331,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.actions
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.actions
       - run:
           <<: *convert_xml
       - run:
@@ -320,7 +357,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.agas
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.agas
       - run:
           <<: *convert_xml
       - run:
@@ -352,7 +389,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.build
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.build
       - run:
           <<: *convert_xml
       - run:
@@ -378,7 +415,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.component
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.component
       - run:
           <<: *convert_xml
       - run:
@@ -404,7 +441,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.computeapi
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.computeapi
       - run:
           <<: *convert_xml
       - run:
@@ -430,7 +467,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.diagnostics
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.diagnostics
       - run:
           <<: *convert_xml
       - run:
@@ -456,7 +493,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.lcos
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.lcos
       - run:
           <<: *convert_xml
       - run:
@@ -468,7 +505,7 @@ jobs:
       - store_artifacts:
           path: tests.unit.lcos
 
-  tests.unit.parallel.block:
+  tests.unit.parallel_block:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -476,13 +513,13 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.parallel.block
+              ninja -j2 -k 0 tests.unit.parallel_block
       - run:
           name: Running Unit Tests
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.block
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.parallel_block
       - run:
           <<: *convert_xml
       - run:
@@ -490,89 +527,9 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.unit.parallel.block
+          path: tests.unit.parallel_block
       - store_artifacts:
-          path: tests.unit.parallel.block
-
-  tests.unit.parallel.datapar_algorithms:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.parallel.datapar_algorithms
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.datapar_algorithms
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.parallel.datapar_algorithms
-      - store_artifacts:
-          path: tests.unit.parallel.datapar_algorithms
-
-  tests.unit.parallel.executors:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.parallel.executors
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.executors
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.parallel.executors
-      - store_artifacts:
-          path: tests.unit.parallel.executors
-
-  tests.unit.parallel.segmented_algorithms:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          # We need to compile some tests serially because they eat too much
-          # memory
-          command: |
-              ninja -j1 -k 0 tests.unit.parallel.segmented_algorithms
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.segmented_algorithms
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.parallel.segmented_algorithms
-      - store_artifacts:
-          path: tests.unit.parallel.segmented_algorithms
+          path: tests.unit.parallel_block
 
   tests.unit.parcelset:
     <<: *defaults
@@ -588,7 +545,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parcelset
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.parcelset
       - run:
           <<: *convert_xml
       - run:
@@ -614,7 +571,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.performance_counter
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.performance_counter
       - run:
           <<: *convert_xml
       - run:
@@ -640,7 +597,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.resource
+              ctest --timeout 120 -T test --no-compress-output --output-on-failure -R tests.unit.resource
       - run:
           <<: *convert_xml
       - run:
@@ -651,32 +608,6 @@ jobs:
           path: tests.unit.resource
       - store_artifacts:
           path: tests.unit.resource
-
-  tests.unit.serialization:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.serialization
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.serialization
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.serialization
-      - store_artifacts:
-          path: tests.unit.serialization
 
   tests.unit.threads:
     <<: *defaults
@@ -692,7 +623,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.threads
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.threads
       - run:
           <<: *convert_xml
       - run:
@@ -718,7 +649,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure \
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure \
                   -R tests.unit.topology \
                   -E tests.unit.topology.numa_allocator
       - run:
@@ -746,7 +677,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.traits
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.traits
       - run:
           <<: *convert_xml
       - run:
@@ -772,7 +703,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.util
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.util
       - run:
           <<: *convert_xml
       - run:
@@ -799,12 +730,14 @@ jobs:
               ninja -j2 -k 0 tests.unit.modules.concepts
               ninja -j2 -k 0 tests.unit.modules.config
               ninja -j2 -k 0 tests.unit.modules.datastructures
+              ninja -j2 -k 0 tests.unit.modules.errors
               ninja -j2 -k 0 tests.unit.modules.format
               ninja -j2 -k 0 tests.unit.modules.hardware
               ninja -j2 -k 0 tests.unit.modules.hashing
               ninja -j2 -k 0 tests.unit.modules.iterator_support
               ninja -j2 -k 0 tests.unit.modules.logging
               ninja -j2 -k 0 tests.unit.modules.preprocessor
+              ninja -j2 -k 0 tests.unit.modules.serialization
               ninja -j2 -k 0 tests.unit.modules.statistics
               ninja -j2 -k 0 tests.unit.modules.testing
               ninja -j2 -k 0 tests.unit.modules.thread_support
@@ -815,24 +748,26 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.allocator_support
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.assertion
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.concepts
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.datastructures
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.format
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.hardware
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.hashing
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.iterator_support
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.logging
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.statistics
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.testing
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.type_support
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.util
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.allocator_support
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.assertion
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.concepts
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.datastructures
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.errors
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.format
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.hardware
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.hashing
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.iterator_support
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.logging
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.serialization
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.statistics
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.testing
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.type_support
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.util
       - run:
           <<: *convert_xml
       - run:
@@ -858,7 +793,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.modules.algorithms
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.algorithms
       - run:
           <<: *convert_xml
       - run:
@@ -869,6 +804,60 @@ jobs:
           path: tests.unit.modules.algorithms
       - store_artifacts:
           path: tests.unit.modules.algorithms
+
+  tests.unit.modules.execution:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 tests.unit.modules.execution
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.execution
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.modules.execution
+      - store_artifacts:
+          path: tests.unit.modules.execution
+
+  tests.unit.modules.segmented_algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests
+          # We need to compile some tests serially because they eat too much
+          # memory
+          command: |
+              ninja -j1 -k 0 tests.unit.modules.segmented_algorithms
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.segmented_algorithms
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.modules.segmented_algorithms
+      - store_artifacts:
+          path: tests.unit.modules.segmented_algorithms
 
   tests.regressions:
     <<: *defaults
@@ -883,7 +872,7 @@ jobs:
           name: Running Regressions Tests
           when: always
           command: |
-              ctest -T test --no-compress-output --output-on-failure -R tests.regressions
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.regressions
       - run:
           <<: *convert_xml
       - run:
@@ -903,7 +892,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers
+              ctest --timeout 60 -j2 -T test --no-compress-output --output-on-failure -R tests.headers
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -1016,6 +1005,14 @@ workflows:
     jobs:
       - checkout_code:
           <<: *gh_pages_filter
+      - check_circular_deps:
+          requires:
+            - checkout_code
+          <<: *gh_pages_filter
+      - clang_format:
+          requires:
+            - checkout_code
+          <<: *gh_pages_filter
       - configure:
           requires:
             - checkout_code
@@ -1059,21 +1056,13 @@ workflows:
           <<: *core_dependency
       - tests.unit.lcos:
           <<: *core_dependency
-      - tests.unit.parallel.block:
-          <<: *core_dependency
-      - tests.unit.parallel.datapar_algorithms:
-          <<: *core_dependency
-      - tests.unit.parallel.executors:
-          <<: *core_dependency
-      - tests.unit.parallel.segmented_algorithms:
+      - tests.unit.parallel_block:
           <<: *core_dependency
       - tests.unit.parcelset:
           <<: *core_dependency
       - tests.unit.performance_counter:
           <<: *core_dependency
       - tests.unit.resource:
-          <<: *core_dependency
-      - tests.unit.serialization:
           <<: *core_dependency
       - tests.unit.threads:
           <<: *core_dependency
@@ -1086,6 +1075,10 @@ workflows:
       - tests.unit.modules:
           <<: *core_dependency
       - tests.unit.modules.algorithms:
+          <<: *core_dependency
+      - tests.unit.modules.execution:
+          <<: *core_dependency
+      - tests.unit.modules.segmented_algorithms:
           <<: *core_dependency
       - tests.regressions:
           <<: *core_dependency
@@ -1113,19 +1106,18 @@ workflows:
             - tests.unit.computeapi
             - tests.unit.diagnostics
             - tests.unit.lcos
-            - tests.unit.parallel.block
-            - tests.unit.parallel.datapar_algorithms
-            - tests.unit.parallel.executors
-            - tests.unit.parallel.segmented_algorithms
+            - tests.unit.parallel_block
             - tests.unit.parcelset
             - tests.unit.performance_counter
             - tests.unit.resource
-            - tests.unit.serialization
             - tests.unit.threads
             - tests.unit.topology
             - tests.unit.traits
             - tests.unit.util
             - tests.unit.modules
+            - tests.unit.modules.algorithms
+            - tests.unit.modules.execution
+            - tests.unit.modules.segmented_algorithms
             - tests.headers
             - tests.performance
             - tests.regressions

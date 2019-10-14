@@ -3,6 +3,7 @@
 //  Copyright (c) 2012-2019 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -10,7 +11,11 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
+#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -23,14 +28,10 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/timing/scoped_timer.hpp>
-#include <hpx/util/bind_back.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
-#include <hpx/util/register_locks.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -186,6 +187,7 @@ void primary_namespace::finalize()
     }
 }
 
+#if defined(HPX_HAVE_NETWORKING)
 // Parcel routing forwards the message handler request to the routed action
 parcelset::policies::message_handler* primary_namespace::get_message_handler(
     parcelset::parcelhandler* ph
@@ -216,6 +218,7 @@ serialization::binary_filter* primary_namespace::get_serialization_filter(
     parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
     return routed_p.get_serialization_filter();
 }
+#endif
 
 // start migration of the given object
 std::pair<naming::id_type, naming::address>

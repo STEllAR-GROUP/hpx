@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -1030,7 +1031,7 @@ namespace test
     {
         std::string::size_type p = str.find(what);
         if (p != std::string::npos) {
-            std::size_t len = std::strlen(what);
+            std::size_t len = strnlen(what, 64);
             do {
                 str.replace(p, len, with);
                 p = str.find(what, p+len);

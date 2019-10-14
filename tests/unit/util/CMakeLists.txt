@@ -1,20 +1,20 @@
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    any
     any_serialization
     bind_action
-    boost_any
     checkpoint
     config_entry
     pack_traversal
     pack_traversal_async
     parse_slurm_nodelist
+    serializable_any
+    serializable_boost_any
     tagged
-    tuple
     unwrap
    )
 
@@ -31,9 +31,7 @@ if(HWLOC_FOUND)
   set(parse_affinity_options_PARAMETERS THREADS_PER_LOCALITY 2)
 endif()
 
-set(serialize_buffer_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
+set(serialize_buffer_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 
 foreach(test ${tests})
   set(sources

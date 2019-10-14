@@ -1,6 +1,7 @@
 
 //  Copyright (c) 2012 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -14,7 +15,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/lcos/future_wait.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/timing.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -32,6 +33,8 @@ namespace jacobi
             typedef hpx::components::component<solver> component_type;
 
             solver()
+              : ny(0)
+              , nx(0)
             {
                 HPX_ASSERT(false);
             }

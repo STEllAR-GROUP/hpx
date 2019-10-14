@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,13 +9,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/program_options.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 #include <cstddef>
 #include <string>
@@ -24,6 +23,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // Helper functions for retrieving command line options (with error
+    // checking)
+    std::size_t get_num_high_priority_queues(
+        util::command_line_handling const& cfg, std::size_t num_threads);
+
+    std::string get_affinity_domain(util::command_line_handling const& cfg);
+
+    std::size_t get_affinity_description(
+        util::command_line_handling const& cfg, std::string& affinity_desc);
+
+    std::size_t get_pu_offset(util::command_line_handling const& cfg);
+
+    std::size_t get_pu_step(util::command_line_handling const& cfg);
+
     ///////////////////////////////////////////////////////////////////////////
     struct command_line_handling
     {
@@ -36,21 +50,22 @@ namespace hpx { namespace util
             pu_step_(1),
             pu_offset_(std::size_t(-1)),
             numa_sensitive_(0),
+            use_process_mask_(false),
             cmd_line_parsed_(false),
             info_printed_(false),
             version_printed_(false),
             parse_result_(0)
         {}
 
-        int call(boost::program_options::options_description const& desc_cmdline,
+        int call(hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv);
 
-        boost::program_options::variables_map vm_;
+        hpx::program_options::variables_map vm_;
         util::runtime_configuration rtcfg_;
 
         std::vector<std::string> ini_config_;
         util::function_nonser<
-            int(boost::program_options::variables_map& vm)
+            int(hpx::program_options::variables_map& vm)
         > hpx_main_f_;
 
         std::size_t node_;
@@ -63,6 +78,7 @@ namespace hpx { namespace util
         std::string affinity_domain_;
         std::string affinity_bind_;
         std::size_t numa_sensitive_;
+        bool use_process_mask_;
         bool cmd_line_parsed_;
         bool info_printed_;
         bool version_printed_;
@@ -70,18 +86,18 @@ namespace hpx { namespace util
 
     protected:
         bool handle_arguments(util::manage_config& cfgmap,
-            boost::program_options::variables_map& vm,
+            hpx::program_options::variables_map& vm,
             std::vector<std::string>& ini_config, std::size_t& node,
             bool initial = false);
 
-        void enable_logging_settings(boost::program_options::variables_map& vm,
+        void enable_logging_settings(hpx::program_options::variables_map& vm,
             std::vector<std::string>& ini_config);
 
         void store_command_line(int argc, char** argv);
         void store_unregistered_options(std::string const& cmd_name,
             std::vector<std::string> const& unregistered_options);
         bool handle_help_options(
-            boost::program_options::options_description const& help);
+            hpx::program_options::options_description const& help);
 
         void handle_attach_debugger();
 

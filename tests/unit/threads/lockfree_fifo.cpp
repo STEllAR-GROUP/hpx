@@ -1,17 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (C) 2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/bind.hpp>
 
 #include <boost/lockfree/queue.hpp>
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <thread>
 #include <cstdint>
@@ -58,12 +59,12 @@ void worker_thread(std::uint64_t num_thread)
 
 int main(int argc, char** argv)
 {
-    using boost::program_options::variables_map;
-    using boost::program_options::options_description;
-    using boost::program_options::value;
-    using boost::program_options::store;
-    using boost::program_options::command_line_parser;
-    using boost::program_options::notify;
+    using hpx::program_options::variables_map;
+    using hpx::program_options::options_description;
+    using hpx::program_options::value;
+    using hpx::program_options::store;
+    using hpx::program_options::command_line_parser;
+    using hpx::program_options::notify;
 
     variables_map vm;
 

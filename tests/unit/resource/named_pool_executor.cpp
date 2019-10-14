@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -25,7 +26,7 @@
 const int max_threads = 4;
 
 // dummy function we will call using async
-void dummy_task(std::size_t n, std::string text)
+void dummy_task(std::size_t n, std::string const& text)
 {
     for (std::size_t i(0); i < n; ++i)
     {

@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -18,8 +19,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace threads { namespace policies { namespace detail
-{
+namespace hpx { namespace threads { namespace policies { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     // Structure holding the information related to thread affinity selection
     // for the shepherd threads of this instance
@@ -28,7 +28,11 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         affinity_data();
         ~affinity_data();
 
-        std::size_t init(util::command_line_handling const& cfg_);
+        std::size_t init(std::size_t num_threads = 1, std::size_t max_cores = 1,
+            std::size_t pu_offset = 0, std::size_t pu_step = 1,
+            std::size_t used_cores = 0, std::string affinity_domain = "pu",
+            std::string affinity_description = "balanced",
+            bool use_process_mask = false);
 
         void set_num_threads(size_t num_threads)
         {
@@ -41,7 +45,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             affinity_masks_ = affinity_masks;
         }
         void set_affinity_masks(
-            std::vector<threads::mask_type> && affinity_masks)
+            std::vector<threads::mask_type>&& affinity_masks)
         {
             affinity_masks_ = std::move(affinity_masks);
         }
@@ -68,7 +72,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         {
             pu_nums_ = pu_nums;
         }
-        void set_pu_nums(std::vector<std::size_t> && pu_nums)
+        void set_pu_nums(std::vector<std::size_t>&& pu_nums)
         {
             pu_nums_ = std::move(pu_nums);
         }
@@ -89,6 +93,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         std::vector<mask_type> affinity_masks_;
         std::vector<std::size_t> pu_nums_;
         mask_type no_affinity_;                             ///< mask of processing units which have no affinity
+        bool use_process_mask_; ///< use the process CPU mask to limit available PUs
         static std::atomic<int> instance_number_counter_;   ///< counter for instance numbers
     };
 }}}}

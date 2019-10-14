@@ -1,13 +1,15 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_UTIL_DETAIL_HANDLE_REMOTE_EXCEPTIONS_DEC_28_2014_0316PM)
+#if !defined(                                                                  \
+    HPX_PARALLEL_UTIL_DETAIL_HANDLE_REMOTE_EXCEPTIONS_DEC_28_2014_0316PM)
 #define HPX_PARALLEL_UTIL_DETAIL_HANDLE_REMOTE_EXCEPTIONS_DEC_28_2014_0316PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception_list.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -18,36 +20,39 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace util { namespace detail
-{
+namespace hpx { namespace parallel { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////
     template <typename ExPolicy>
     struct handle_remote_exceptions
     {
         // std::bad_alloc has to be handled separately
-        static void call(std::exception_ptr const& e,
-            std::list<std::exception_ptr>& errors)
+        static void call(
+            std::exception_ptr const& e, std::list<std::exception_ptr>& errors)
         {
-            try {
+            try
+            {
                 std::rethrow_exception(e);
             }
-            catch (std::bad_alloc const& ba) {
+            catch (std::bad_alloc const& ba)
+            {
                 throw ba;
             }
-            catch (exception_list const& el) {
-                for (std::exception_ptr const& ex: el)
+            catch (exception_list const& el)
+            {
+                for (std::exception_ptr const& ex : el)
                     errors.push_back(ex);
             }
-            catch (...) {
+            catch (...)
+            {
                 errors.push_back(e);
             }
         }
 
         template <typename T>
-        static void call(std::vector<hpx::future<T> > const& workitems,
+        static void call(std::vector<hpx::future<T>> const& workitems,
             std::list<std::exception_ptr>& errors)
         {
-            for (hpx::future<T> const& f: workitems)
+            for (hpx::future<T> const& f : workitems)
             {
                 if (f.has_exception())
                     call(f.get_exception_ptr(), errors);
@@ -58,10 +63,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
 
         template <typename T>
-        static void call(std::vector<hpx::shared_future<T> > const& workitems,
+        static void call(std::vector<hpx::shared_future<T>> const& workitems,
             std::list<std::exception_ptr>& errors)
         {
-            for (hpx::shared_future<T> const& f: workitems)
+            for (hpx::shared_future<T> const& f : workitems)
             {
                 if (f.has_exception())
                     call(f.get_exception_ptr(), errors);
@@ -82,10 +87,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
 
         template <typename T>
-        static void call(std::vector<hpx::future<T> > const& workitems,
+        static void call(std::vector<hpx::future<T>> const& workitems,
             std::list<std::exception_ptr>&)
         {
-            for (hpx::future<T> const& f: workitems)
+            for (hpx::future<T> const& f : workitems)
             {
                 if (f.has_exception())
                     hpx::terminate();
@@ -93,16 +98,16 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
 
         template <typename T>
-        static void call(std::vector<hpx::shared_future<T> > const& workitems,
+        static void call(std::vector<hpx::shared_future<T>> const& workitems,
             std::list<std::exception_ptr>&)
         {
-            for (hpx::shared_future<T> const& f: workitems)
+            for (hpx::shared_future<T> const& f : workitems)
             {
                 if (f.has_exception())
                     hpx::terminate();
             }
         }
     };
-}}}}
+}}}}    // namespace hpx::parallel::util::detail
 
 #endif

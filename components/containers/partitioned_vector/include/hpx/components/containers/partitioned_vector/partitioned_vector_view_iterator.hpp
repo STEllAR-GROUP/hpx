@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Antoine Tran Tan
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -171,15 +172,18 @@ namespace hpx {
         using const_element_type = hpx::detail::const_view_element<T,Data>;
 
         explicit const_partitioned_vector_view_iterator(
-              hpx::lcos::spmd_block const & block
-            , const_segment_iterator const & begin
-            , const_segment_iterator const & end
-            , std::array<std::size_t, N+1> const & sw_basis
-            , std::array<std::size_t, N+1> const & hw_basis
-            , std::size_t count
-            )
-        : block_(block), t_(begin), begin_(begin), end_(end), count_(count)
-        , sw_basis_(sw_basis), hw_basis_(hw_basis)
+            hpx::lcos::spmd_block const& block,
+            const_segment_iterator const& begin,
+            const_segment_iterator const& end,
+            std::array<std::size_t, N + 1> const& sw_basis,
+            std::array<std::size_t, N + 1> const& hw_basis, std::size_t count)
+          : block_(block)
+          , t_(begin)
+          , begin_(begin)
+          , end_(end)
+          , count_(count)
+          , sw_basis_(sw_basis)
+          , hw_basis_(hw_basis)
         {}
 
         const_partitioned_vector_view_iterator(
@@ -188,10 +192,15 @@ namespace hpx {
         const_partitioned_vector_view_iterator(
            const_partitioned_vector_view_iterator &&) = default;
 
-        const_partitioned_vector_view_iterator(
-           partitioned_vector_view_iterator<T,N,Data> const & o)
-            : block_(o.block_), t_(o.t_), begin_(o.begin_), end_(o.end_),
-                 count_(o.count_), sw_basis_(o.sw_basis_), hw_basis_(o.hw_basis_)
+        explicit const_partitioned_vector_view_iterator(
+            partitioned_vector_view_iterator<T, N, Data> const& o)
+          : block_(o.block_)
+          , t_(o.t_)
+          , begin_(o.begin_)
+          , end_(o.end_)
+          , count_(o.count_)
+          , sw_basis_(o.sw_basis_)
+          , hw_basis_(o.hw_basis_)
         {}
 
         // Note : partitioned_vector_view_iterator is not assignable

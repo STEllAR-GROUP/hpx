@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Mikael Simberg
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,6 +17,7 @@
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/timing.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -31,7 +33,7 @@ int hpx_main(int argc, char* argv[])
     try
     {
         // Use .get() to throw exception
-        hpx::this_thread::get_pool()->suspend().get();
+        hpx::threads::suspend_pool(*hpx::this_thread::get_pool()).get();
         HPX_TEST_MSG(false, "Suspending should not be allowed on own pool");
     }
     catch (hpx::exception const&)
@@ -55,18 +57,17 @@ int hpx_main(int argc, char* argv[])
         {
             std::vector<hpx::future<void>> fs;
 
-            for (std::size_t i = 0;
-                 i < worker_pool_threads * 10000; ++i)
+            for (std::size_t i = 0; i < worker_pool_threads * 10000; ++i)
             {
-                fs.push_back(hpx::async(worker_exec, [](){}));
+                fs.push_back(hpx::async(worker_exec, []() {}));
             }
 
-            worker_pool.suspend().get();
+            hpx::threads::suspend_pool(worker_pool).get();
 
             // All work should be done when pool has been suspended
             HPX_TEST(hpx::when_all(std::move(fs)).is_ready());
 
-            worker_pool.resume().get();
+            hpx::threads::resume_pool(worker_pool).get();
         }
     }
 
@@ -79,26 +80,21 @@ int hpx_main(int argc, char* argv[])
         {
             std::vector<hpx::future<void>> fs;
 
-            for (std::size_t i = 0;
-                 i < worker_pool_threads * 10000; ++i)
+            for (std::size_t i = 0; i < worker_pool_threads * 10000; ++i)
             {
-                fs.push_back(hpx::async(worker_exec, [](){}));
+                fs.push_back(hpx::async(worker_exec, []() {}));
             }
 
-            worker_pool.suspend_cb([&sem]()
-                {
-                    sem.signal();
-                });
+            hpx::threads::suspend_pool_cb(
+                worker_pool, [&sem]() { sem.signal(); });
 
             sem.wait(1);
 
             // All work should be done when pool has been suspended
             HPX_TEST(hpx::when_all(std::move(fs)).is_ready());
 
-            worker_pool.resume_cb([&sem]()
-                {
-                    sem.signal();
-                });
+            hpx::threads::resume_pool_cb(
+                worker_pool, [&sem]() { sem.signal(); });
 
             sem.wait(1);
         }
@@ -111,38 +107,38 @@ int hpx_main(int argc, char* argv[])
         while (t.elapsed() < 2)
         {
             for (std::size_t thread_num = 0;
-                thread_num < worker_pool_threads - 1; ++thread_num)
+                 thread_num < worker_pool_threads - 1;
+                 ++thread_num)
             {
-                worker_pool.suspend_processing_unit(thread_num);
+                hpx::threads::suspend_processing_unit(worker_pool, thread_num);
             }
 
             std::vector<hpx::future<void>> fs;
 
             for (std::size_t i = 0;
-                 i < hpx::resource::get_num_threads("default") * 10000; ++i)
+                 i < hpx::resource::get_num_threads("default") * 10000;
+                 ++i)
             {
-                fs.push_back(hpx::async(worker_exec, [](){}));
+                fs.push_back(hpx::async(worker_exec, []() {}));
             }
 
-            worker_pool.suspend().get();
+            hpx::threads::suspend_pool(worker_pool).get();
 
             // All work should be done when pool has been suspended
             HPX_TEST(hpx::when_all(std::move(fs)).is_ready());
 
-            worker_pool.resume().get();
+            hpx::threads::resume_pool(worker_pool).get();
         }
     }
 
     return hpx::finalize();
 }
 
-void test_scheduler(int argc, char* argv[],
+void test_scheduler(int argc,
+    char* argv[],
     hpx::resource::scheduling_policy scheduler)
 {
-    std::vector<std::string> cfg =
-    {
-        "hpx.os_threads=4"
-    };
+    std::vector<std::string> cfg = {"hpx.os_threads=4"};
 
     hpx::resource::partitioner rp(argc, argv, std::move(cfg));
 
