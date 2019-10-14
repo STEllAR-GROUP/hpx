@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,14 +10,14 @@
 #define HPX_RUNTIME_TRIGGER_LCO_JUN_22_2015_0618PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos_fwd.hpp>
-#include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
+#include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -480,6 +481,7 @@ namespace hpx
         }
         else
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             HPX_ASSERT(!addr || components::get_base_type(addr.type_) ==
                     components::component_base_lco_with_value);
 

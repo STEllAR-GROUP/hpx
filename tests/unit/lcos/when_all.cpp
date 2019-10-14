@@ -1,6 +1,7 @@
 //  Copyright (C) 2012 Hartmut Kaiser
 //  (C) Copyright 2008-10 Anthony Williams
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -8,7 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <chrono>
 #include <deque>
@@ -271,8 +272,8 @@ void test_wait_for_all_deferred_futures()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
 
 using hpx::lcos::future;
 

@@ -1,5 +1,6 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,7 +17,7 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_generate.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstddef>
 #include <cstdlib>
@@ -114,7 +115,7 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     unsigned int seed = std::random_device{}();
     if (vm.count("seed"))
@@ -191,7 +192,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // add command line option which controls the random number generator seed
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 

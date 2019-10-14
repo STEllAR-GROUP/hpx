@@ -2,6 +2,7 @@
 //  Copyright (c) 2016      Thomas Heller
 //  Copyright (c) 2011      Bryce Adelstein-Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -115,13 +116,25 @@ namespace lcos {
 
         // Returns: A future<Result> object with the same shared state as *this.
         // Throws: future_error if *this has no shared state or if get_future
-        //         has already been called on a promise with the same shared
-        //         state as *this.
+        //         or get_shared_future has already been called on a promise
+        //         with the same shared state as *this.
         // Error conditions:
-        //   - future_already_retrieved if get_future has already been called
-        //     on a promise with the same shared state as *this.
+        //   - future_already_retrieved if get_future or get_shared_future has
+        //     already been called on a promise with the same shared state as
+        //     *this.
         //   - no_state if *this has no shared state.
         using base_type::get_future;
+
+        // Returns: A shared_future<Result> object with the same shared state
+        //          as *this.
+        // Throws: future_error if *this has no shared state or if
+        //         get_shared_future has already been called on a promise
+        //         with the same shared state as *this.
+        // Error conditions:
+        //   - future_already_retrieved if get_shared_future has already been
+        //     called on a promise with the same shared state as *this.
+        //   - no_state if *this has no shared state.
+        using base_type::get_shared_future;
 
         // Effects: atomically stores the value r in the shared state and makes
         //          that state ready (30.6.4).
@@ -202,13 +215,25 @@ namespace lcos {
 
         // Returns: A future<Result> object with the same shared state as *this.
         // Throws: future_error if *this has no shared state or if get_future
-        //         has already been called on a promise with the same shared
-        //         state as *this.
+        //         or get_shared_future has already been called on a promise
+        //         with the same shared state as *this.
         // Error conditions:
-        //   - future_already_retrieved if get_future has already been called
-        //     on a promise with the same shared state as *this.
+        //   - future_already_retrieved if get_future or get_shared_future has
+        //     already been called on a promise with the same shared state as
+        //     *this.
         //   - no_state if *this has no shared state.
         using base_type::get_future;
+
+        // Returns: A shared_future<Result> object with the same shared state
+        //          as *this.
+        // Throws: future_error if *this has no shared state or if
+        //         get_shared_future has already been called on a promise
+        //         with the same shared state as *this.
+        // Error conditions:
+        //   - future_already_retrieved if get_shared_future has already been
+        //     called on a promise with the same shared state as *this.
+        //   - no_state if *this has no shared state.
+        using base_type::get_shared_future;
 
         // Effects: atomically stores the value r in the shared state and makes
         //          that state ready (30.6.4).

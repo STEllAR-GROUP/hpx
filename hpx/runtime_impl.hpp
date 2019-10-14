@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,8 +9,6 @@
 #define HPX_RUNTIME_RUNTIME_IMPL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/mutex.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -20,15 +19,16 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/threads/topology.hpp> //! FIXME remove
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util_fwd.hpp>
 
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -54,7 +54,7 @@ namespace hpx
             util::function_nonser<runtime::hpx_main_function_type> const& func,
             int& result);
 
-        void wait_helper(compat::mutex& mtx, compat::condition_variable& cond,
+        void wait_helper(std::mutex& mtx, std::condition_variable& cond,
             bool& running);
 
     public:
@@ -132,8 +132,8 @@ namespace hpx
         ///                   return immediately. Use a second call to stop
         ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
-        void stopped(bool blocking, compat::condition_variable& cond,
-            compat::mutex& mtx);
+        void stopped(bool blocking, std::condition_variable& cond,
+            std::mutex& mtx);
 
         /// \brief Suspend the runtime system
         ///
@@ -214,6 +214,7 @@ namespace hpx
             return agas_client_;
         }
 
+#if defined(HPX_HAVE_NETWORKING)
         /// \brief Allow access to the parcel handler instance used by the HPX
         ///        runtime.
         parcelset::parcelhandler const& get_parcel_handler() const override
@@ -225,6 +226,7 @@ namespace hpx
         {
             return parcel_handler_;
         }
+#endif
 
         /// \brief Allow access to the thread manager instance used by the HPX
         ///        runtime.
@@ -240,6 +242,7 @@ namespace hpx
             return applier_;
         }
 
+#if defined(HPX_HAVE_NETWORKING)
         /// \brief Allow access to the locality endpoints this runtime instance is
         /// associated with.
         ///
@@ -249,13 +252,18 @@ namespace hpx
         {
             return parcel_handler_.endpoints();
         }
+#endif
 
         /// \brief Returns a string of the locality endpoints (usable in debug output)
         std::string here() const override
         {
+#if defined(HPX_HAVE_NETWORKING)
             std::ostringstream strm;
             strm << get_runtime().endpoints();
             return strm.str();
+#else
+            return "console";
+#endif
         }
 
         std::uint64_t get_runtime_support_lva() const override
@@ -342,30 +350,38 @@ namespace hpx
         void deinit_tss(char const* context, std::size_t num);
 
         void init_tss_ex(std::string const& locality, char const* context,
-            std::size_t num, char const* postfix, bool service_thread,
+            std::size_t local_thread_num, std::size_t global_thread_num,
+            char const* pool_name, char const* postfix, bool service_thread,
             error_code& ec);
 
-        void init_tss(char const* context, std::size_t num, char const* postfix,
-            bool service_thread);
+        void init_tss(char const* context, std::size_t local_thread_num,
+            std::size_t global_thread_num, char const* pool_name,
+            char const* postfix, bool service_thread);
 
     private:
         util::unique_id_ranges id_pool_;
         runtime_mode mode_;
         int result_;
+        notification_policy_type main_pool_notifier_;
         util::io_service_pool main_pool_;
 #ifdef HPX_HAVE_IO_POOL
+        notification_policy_type io_pool_notifier_;
         util::io_service_pool io_pool_;
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
+        notification_policy_type timer_pool_notifier_;
         util::io_service_pool timer_pool_;
 #endif
         notification_policy_type notifier_;
         std::unique_ptr<hpx::threads::threadmanager> thread_manager_;
+#if defined(HPX_HAVE_NETWORKING)
+        notification_policy_type parcel_handler_notifier_;
         parcelset::parcelhandler parcel_handler_;
+#endif
         naming::resolver_client agas_client_;
         applier::applier applier_;
 
-        compat::mutex mtx_;
+        std::mutex mtx_;
         std::exception_ptr exception_;
     };
 }

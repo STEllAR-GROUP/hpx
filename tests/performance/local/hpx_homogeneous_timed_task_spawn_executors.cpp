@@ -1,13 +1,15 @@
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/format.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/format.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -17,9 +19,9 @@
 
 #include "worker_timed.hpp"
 
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
-using boost::program_options::value;
+using hpx::program_options::variables_map;
+using hpx::program_options::options_description;
+using hpx::program_options::value;
 
 using hpx::init;
 using hpx::finalize;
@@ -103,7 +105,7 @@ int hpx_main(
             // be bound to the remaining number of cores
             if ((i + 1) * num_cores_per_executor > num_os_threads)
             {
-                HPX_ASSERT(i == std::size_t(num_executors) - 1);
+                HPX_TEST(i == std::size_t(num_executors) - 1);
                 num_cores_per_executor = num_os_threads - i * num_cores_per_executor;
             }
             executors.push_back(local_priority_queue_executor(num_cores_per_executor));

@@ -2,6 +2,7 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2012-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -10,7 +11,7 @@
 #define HPX_60B7914E_21A5_4977_AA9C_8E66C44EE0FB
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/errors.hpp>
 
 #include <boost/utility/binary.hpp>
 

@@ -1,6 +1,7 @@
 # Copyright (c) 2007-2015 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,10 +12,9 @@ set(tests
    )
 
 if(HPX_WITH_NETWORKING)
-    set(tests ${tests}
-        register_with_basename_1804
-       )
-
+  set(tests ${tests}
+    register_with_basename_1804
+   )
   set(register_with_basename_1804_PARAMETERS LOCALITIES 2)
 endif()
 
@@ -34,15 +34,5 @@ foreach(test ${tests})
 
   add_hpx_regression_test("agas" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.agas_dir.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.agas_dir
-                              tests.regressions.agas_dir.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.agas_dir.${test}
-                              ${test}_test)
 endforeach()
 

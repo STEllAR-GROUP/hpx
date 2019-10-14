@@ -1,5 +1,6 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,14 +13,14 @@
 
 #if defined(HPX_HAVE_CUDA)
 
+#include <hpx/assertion.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/lcos/dataflow.hpp>
 #endif
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
+#include <hpx/serialization/base_object.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/detail/target_distribution_policy.hpp>

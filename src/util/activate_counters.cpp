@@ -1,24 +1,25 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2013      Bryce Adelstein-Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/format.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/lcos/wait_all.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/stubs/performance_counter.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/activate_counters.hpp>
-#include <hpx/util/bind_front.hpp>
-#include <hpx/util/format.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/unwrap.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/stubs/performance_counter.hpp>
-#include <hpx/lcos/wait_all.hpp>
 
 #include <cstddef>
 #include <fstream>

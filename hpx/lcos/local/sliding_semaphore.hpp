@@ -1,5 +1,6 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -61,6 +62,21 @@ namespace hpx { namespace lcos { namespace local
                 std::int64_t lower_limit = 0)
           : sem_(max_difference, lower_limit)
         {}
+
+        /// \brief Set/Change the difference that will cause the semaphore to trigger
+        ///
+        /// \param max_difference
+        ///                 [in] The max difference between the upper limit
+        ///                 (as set by wait()) and the lower limit (as set by
+        ///                 signal()) which is allowed without suspending any
+        ///                 thread calling wait().
+        /// \param lower_limit  [in] The initial lower limit.
+        void set_max_difference(std::int64_t max_difference,
+                std::int64_t lower_limit = 0)
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            sem_.set_max_difference(l, max_difference, lower_limit);
+        }
 
         /// \brief Wait for the semaphore to be signaled
         ///

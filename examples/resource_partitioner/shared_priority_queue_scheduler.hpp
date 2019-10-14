@@ -1,5 +1,6 @@
 //  Copyright (c) 2017-2018 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,17 +8,17 @@
 #define EXAMPLES_RESOURCE_PARTITIONER_SHARED_PRIORITY_QUEUE_SCHEDULER
 
 #include <hpx/config.hpp>
-#include <hpx/compat/mutex.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/errors/throw_exception.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
 #if !defined(HPX_MSVC)
@@ -30,6 +31,7 @@
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <numeric>
 #include <sstream>
@@ -152,17 +154,24 @@ namespace hpx { namespace debug {
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx {
-namespace threads {
-namespace policies {
-namespace example {
+namespace hpx { namespace threads { namespace policies { namespace example {
 
-    inline void spin_for_time(std::size_t microseconds, const char *task) {
+    inline void spin_for_time(std::size_t microseconds, const char* task)
+    {
 #ifdef SHARED_PRIORITY_SCHEDULER_DEBUG
         hpx::util::annotate_function apex_profiler(task);
         std::this_thread::sleep_for(std::chrono::microseconds(microseconds));
 #endif
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+    using default_shared_priority_queue_scheduler_terminated_queue =
+        lockfree_lifo;
+#else
+    using default_shared_priority_queue_scheduler_terminated_queue =
+        lockfree_fifo;
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     /// The shared_priority_queue_scheduler maintains a set of high, normal, and
@@ -172,24 +181,13 @@ namespace example {
     /// high priority queue, the next 4 will share another one and so on. In
     /// addition, the shared_priority_queue_scheduler is NUMA-aware and takes
     /// NUMA scheduling hints into account when creating and scheduling work.
-    template <typename Mutex = compat::mutex,
+    template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
-        typename TerminatedQueuing = lockfree_lifo>
+        typename TerminatedQueuing =
+            default_shared_priority_queue_scheduler_terminated_queue>
     class shared_priority_queue_scheduler : public scheduler_base
     {
-    protected:
-        // The maximum number of active threads this thread manager should
-        // create. This number will be a constraint only as long as the work
-        // items queue is not empty. Otherwise the number of active threads
-        // will be incremented in steps equal to the \a min_add_new_count
-        // specified above.
-        // FIXME: this is specified both here, and in thread_queue.
-        enum
-        {
-            max_thread_count = 1000
-        };
-
     public:
         typedef std::false_type has_periodic_maintenance;
 
@@ -197,23 +195,55 @@ namespace example {
             TerminatedQueuing>
             thread_queue_type;
 
-        shared_priority_queue_scheduler(
-            std::size_t num_worker_threads,
-            core_ratios cores_per_queue,
-            char const* description,
-            int max_tasks = max_thread_count)
-          : scheduler_base(num_worker_threads, description)
-          , cores_per_queue_(cores_per_queue)
-          , max_queue_thread_count_(max_tasks)
-          , num_workers_(num_worker_threads)
+        struct init_parameter
+        {
+            init_parameter(std::size_t num_worker_threads,
+                core_ratios cores_per_queue,
+                detail::affinity_data const& affinity_data,
+                thread_queue_init_parameters thread_queue_init = {},
+                char const* description = "shared_priority_queue_scheduler")
+              : num_worker_threads_(num_worker_threads)
+              , cores_per_queue_(cores_per_queue)
+              , thread_queue_init_(thread_queue_init)
+              , affinity_data_(affinity_data)
+              , description_(description)
+            {
+            }
+
+            init_parameter(std::size_t num_worker_threads,
+                core_ratios cores_per_queue,
+                detail::affinity_data const& affinity_data,
+                char const* description)
+              : num_worker_threads_(num_worker_threads)
+              , cores_per_queue_(cores_per_queue)
+              , thread_queue_init_()
+              , affinity_data_(affinity_data)
+              , description_(description)
+            {
+            }
+
+            std::size_t num_worker_threads_;
+            core_ratios cores_per_queue_;
+            thread_queue_init_parameters thread_queue_init_;
+            detail::affinity_data const& affinity_data_;
+            char const* description_;
+        };
+        typedef init_parameter init_parameter_type;
+
+        explicit shared_priority_queue_scheduler(init_parameter const& init)
+          : scheduler_base(init.num_worker_threads_, init.description_,
+                init.thread_queue_init_)
+          , cores_per_queue_(init.cores_per_queue_)
+          , num_workers_(init.num_worker_threads_)
           , num_domains_(1)
+          , affinity_data_(init.affinity_data_)
           , initialized_(false)
         {
             LOG_CUSTOM_MSG(
                 "Constructing shared_priority_queue_scheduler with num threads "
                 << decnumber(num_worker_threads));
             //
-            HPX_ASSERT(num_worker_threads != 0);
+            HPX_ASSERT(num_workers_ != 0);
         }
 
         virtual ~shared_priority_queue_scheduler()
@@ -738,8 +768,10 @@ namespace example {
             {
                 // Create thread on this worker thread if possible
                 LOG_CUSTOM_VAR(msg = msgs[0]);
-                std::size_t global_thread_num = hpx::get_worker_thread_num();
-                thread_num = this->global_to_local_thread_index(global_thread_num);
+                std::size_t global_thread_num =
+                    threads::detail::get_thread_num_tss();
+                thread_num =
+                    this->global_to_local_thread_index(global_thread_num);
                 if (thread_num>=num_workers_) {
                     // This is a task being injected from a thread on another pool.
                     // Reset thread_num to first queue.
@@ -768,8 +800,10 @@ namespace example {
                 domain_num = data.schedulehint.hint % num_domains_;
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
-                std::size_t global_thread_num = hpx::get_worker_thread_num();
-                thread_num = this->global_to_local_thread_index(global_thread_num);
+                std::size_t global_thread_num =
+                    threads::detail::get_thread_num_tss();
+                thread_num =
+                    this->global_to_local_thread_index(global_thread_num);
                 if (d_lookup_[thread_num] == domain_num) {
                     q_index = q_lookup_[thread_num];
                 }
@@ -937,8 +971,10 @@ namespace example {
             {
                 // Create thread on this worker thread if possible
                 LOG_CUSTOM_VAR(msg = msgs[0]);
-                std::size_t global_thread_num = hpx::get_worker_thread_num();
-                thread_num = this->global_to_local_thread_index(global_thread_num);
+                std::size_t global_thread_num =
+                    threads::detail::get_thread_num_tss();
+                thread_num =
+                    this->global_to_local_thread_index(global_thread_num);
                 if (thread_num>=num_workers_) {
                     // This is a task being injected from a thread on another pool.
                     // Reset thread_num to first queue.
@@ -968,8 +1004,10 @@ namespace example {
                 domain_num = schedulehint.hint % num_domains_;
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
-                std::size_t global_thread_num = hpx::get_worker_thread_num();
-                thread_num = this->global_to_local_thread_index(global_thread_num);
+                std::size_t global_thread_num =
+                    threads::detail::get_thread_num_tss();
+                thread_num =
+                    this->global_to_local_thread_index(global_thread_num);
                 if (d_lookup_[thread_num] == domain_num) {
                     q_index = q_lookup_[thread_num];
                 }
@@ -1037,8 +1075,10 @@ namespace example {
             {
                 // Create thread on this worker thread if possible
                 LOG_CUSTOM_VAR(msg = msgs[0]);
-                std::size_t global_thread_num = hpx::get_worker_thread_num();
-                thread_num = this->global_to_local_thread_index(global_thread_num);
+                std::size_t global_thread_num =
+                    threads::detail::get_thread_num_tss();
+                thread_num =
+                    this->global_to_local_thread_index(global_thread_num);
                 if (thread_num>=num_workers_) {
                     // This is a task being injected from a thread on another pool.
                     // Reset thread_num to first queue.
@@ -1068,8 +1108,10 @@ namespace example {
                 domain_num = schedulehint.hint % num_domains_;
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
-                std::size_t global_thread_num = hpx::get_worker_thread_num();
-                thread_num = this->global_to_local_thread_index(global_thread_num);
+                std::size_t global_thread_num =
+                    threads::detail::get_thread_num_tss();
+                thread_num =
+                    this->global_to_local_thread_index(global_thread_num);
                 if (d_lookup_[thread_num] == domain_num) {
                     q_index = q_lookup_[thread_num];
                 }
@@ -1405,7 +1447,7 @@ namespace example {
                         q_counts_[i] / cores_per_queue_.high_priority,
                         std::size_t(1));
                     hp_queues_[i].init(
-                        q_counts_[i], queues, max_queue_thread_count_);
+                        q_counts_[i], queues, thread_queue_init_);
                     LOG_CUSTOM_MSG2("Created HP queue for numa " << i
                                     << " cores " << q_counts_[i]
                                     << " queues " << queues);
@@ -1413,7 +1455,7 @@ namespace example {
                     queues = (std::max)(q_counts_[i] / cores_per_queue_.normal_priority,
                         std::size_t(1));
                     np_queues_[i].init(
-                        q_counts_[i], queues, max_queue_thread_count_);
+                        q_counts_[i], queues, thread_queue_init_);
                     LOG_CUSTOM_MSG2("Created NP queue for numa " << i
                                     << " cores " << q_counts_[i]
                                     << " queues " << queues);
@@ -1421,7 +1463,7 @@ namespace example {
                     queues = (std::max)(q_counts_[i] / cores_per_queue_.low_priority,
                         std::size_t(1));
                     lp_queues_[i].init(
-                        q_counts_[i], queues, max_queue_thread_count_);
+                        q_counts_[i], queues, thread_queue_init_);
                     LOG_CUSTOM_MSG2("Created LP queue for numa " << i
                                     << " cores " << q_counts_[i]
                                     << " queues " << queues);
@@ -1541,14 +1583,13 @@ namespace example {
         // number of cores per queue for HP, NP, LP queues
         core_ratios cores_per_queue_;
 
-        // max storage size of any queue
-        std::size_t max_queue_thread_count_;
-
         // number of worker threads assigned to this pool
         std::size_t num_workers_;
 
         // number of numa domains that the threads are occupying
         std::size_t num_domains_;
+
+        detail::affinity_data const& affinity_data_;
 
         // used to make sure the scheduler is only initialized once on a thread
         bool initialized_;

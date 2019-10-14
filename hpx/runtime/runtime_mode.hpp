@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -33,8 +34,14 @@ namespace hpx
     /// constant.
     HPX_API_EXPORT char const* get_runtime_mode_name(runtime_mode state);
 
-    /// Get the internal representation (runtime_mode constant) from the
-    /// readable string representing the name.
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Returns the internal representation (runtime_mode constant) from
+    /// the readable string representing the name.
+    ///
+    /// This represents the internal representation from the readable string
+    /// representing the name.
+    ///
+    /// \param mode this represents the runtime mode
     HPX_API_EXPORT runtime_mode get_runtime_mode_from_name(std::string const& mode);
 }
 

@@ -1,17 +1,18 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/assertion.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/compat/thread.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
+#include <thread>
 #include <chrono>
 #include <cstddef>
 #include <iostream>
@@ -96,7 +97,7 @@ namespace throttle { namespace server
             // put this shepherd thread to sleep for 100ms
             hpx::util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
 
-            hpx::compat::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
         // if this thread still needs to be suspended, re-schedule this routine

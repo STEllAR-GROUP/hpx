@@ -3,12 +3,15 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2015 Anton Bikineev
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/compat/mutex.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
+#include <hpx/assertion.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -28,14 +31,13 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
-#include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/serialization/detail/polymorphic_id_factory.hpp>
+#include <hpx/serialization/vector.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/topology/topology.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/util/detail/yield_k.hpp>
-#include <hpx/util/format.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
@@ -225,7 +227,6 @@ namespace hpx { namespace agas { namespace detail
 
 namespace hpx { namespace agas
 {
-
     template <typename Action, typename... Args>
     void big_boot_barrier::apply(
         std::uint32_t source_locality_id
@@ -669,7 +670,7 @@ void big_boot_barrier::add_locality_endpoints(std::uint32_t locality_id,
 ///////////////////////////////////////////////////////////////////////////////
 void big_boot_barrier::spin()
 {
-    std::unique_lock<compat::mutex> lock(mtx);
+    std::unique_lock<std::mutex> lock(mtx);
     while (connected)
         cond.wait(lock);
 
@@ -809,7 +810,7 @@ void big_boot_barrier::notify()
 
     bool notify = false;
     {
-        std::lock_guard<compat::mutex> lk(mtx, std::adopt_lock);
+        std::lock_guard<std::mutex> lk(mtx, std::adopt_lock);
         if (agas_client.get_status() == state_starting)
         {
             --connected;
@@ -902,3 +903,4 @@ big_boot_barrier& get_big_boot_barrier()
 
 }}
 
+#endif

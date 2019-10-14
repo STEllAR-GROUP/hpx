@@ -1,11 +1,12 @@
 //  Copyright (c) 2018 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -23,20 +24,24 @@ std::size_t count_registrations = 0;
 std::size_t count_deregistrations = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
-void on_thread_start(std::size_t num, char const* name)
+void on_thread_start(std::size_t global_thread_num,
+    std::size_t /* local_thread_num */, char const* /* pool_name */,
+    char const* name)
 {
     std::lock_guard<std::mutex> l(mtx);
 
     // threads shouldn't be registered twice
     auto it = threads.find(name);
-    HPX_TEST(it == threads.end() || it->second != num);
+    HPX_TEST(it == threads.end() || it->second != global_thread_num);
 
-    threads.emplace(name, num);
+    threads.emplace(name, global_thread_num);
 
     ++count_registrations;
 }
 
-void on_thread_stop(std::size_t num, char const* name)
+void on_thread_stop(std::size_t global_thread_num,
+    std::size_t /* local_thread_num */, char const* /* pool_name */,
+    char const* name)
 {
     std::lock_guard<std::mutex> l(mtx);
 
@@ -47,7 +52,7 @@ void on_thread_stop(std::size_t num, char const* name)
     bool found_thread = false;
     for (auto it = p.first; it != p.second; ++it)
     {
-        if (it->second == num)
+        if (it->second == global_thread_num)
         {
             found_thread = true;
         }

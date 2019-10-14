@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2006 Joao Abecasis
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,13 +9,13 @@
 #define HPX_UTIL_REINITIALIZABLE_STATIC_OCT_25_2012_1129AM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/util/static_reinit.hpp>
 
 #include <cstddef>
 #include <memory>   // for placement new
+#include <mutex>
 #include <type_traits>
 
 #if !defined(HPX_WINDOWS)
@@ -33,8 +34,6 @@ namespace hpx { namespace util
     //
     //  Requirements:
     //      T is default constructible or has one argument
-    //      T::T() MUST not throw!
-    //          this is a requirement of boost::call_once.
     //
     //  In addition this type registers global construction and destruction
     //  functions used by the HPX runtime system to reinitialize the held data
@@ -98,7 +97,7 @@ namespace hpx { namespace util
         {
 #if !defined(__CUDACC__)
             // do not rely on ADL to find the proper call_once
-            compat::call_once(constructed_,
+            std::call_once(constructed_,
                 &reinitializable_static::default_constructor);
 #endif
         }
@@ -108,7 +107,7 @@ namespace hpx { namespace util
         {
 #if !defined(__CUDACC__)
             // do not rely on ADL to find the proper call_once
-            compat::call_once(constructed_,
+            std::call_once(constructed_,
                 util::bind_front(
                     &reinitializable_static::template value_constructor<U>,
                     const_cast<U const *>(std::addressof(val))));
@@ -148,7 +147,7 @@ namespace hpx { namespace util
             std::alignment_of<value_type>::value>::type storage_type;
 
         static storage_type data_[N];
-        static compat::once_flag constructed_;
+        static std::once_flag constructed_;
     };
 
     template <typename T, typename Tag, std::size_t N>
@@ -156,7 +155,7 @@ namespace hpx { namespace util
         reinitializable_static<T, Tag, N>::data_[N];
 
     template <typename T, typename Tag, std::size_t N>
-    compat::once_flag reinitializable_static<
+    std::once_flag reinitializable_static<
         T, Tag, N>::constructed_;
 }}
 

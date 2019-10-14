@@ -3,6 +3,7 @@
 //  Copyright (c) 2013-2014 Thomas Heller
 //  Copyright (c) 2013-2014 Patricia Grubel
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,8 +11,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/format.hpp>
 
 #include "htts2.hpp"
 
@@ -39,8 +40,8 @@ struct hpx_driver : htts2::driver
             "hpx.commandline.allow_unknown!=1"
         };
 
-        hpx::util::function_nonser<int(boost::program_options::variables_map& vm)> f;
-        boost::program_options::options_description desc;
+        hpx::util::function_nonser<int(hpx::program_options::variables_map& vm)> f;
+        hpx::program_options::options_description desc;
 
         using hpx::util::placeholders::_1;
         hpx::init(hpx::util::bind(&hpx_driver::run_impl, std::ref(*this), _1),
@@ -48,7 +49,7 @@ struct hpx_driver : htts2::driver
     }
 
   private:
-    int run_impl(boost::program_options::variables_map&)
+    int run_impl(hpx::program_options::variables_map&)
     {
         // Cold run
         //kernel();

@@ -1,5 +1,6 @@
 //  Copyright 2016 (c) Jan-Tobias Sohns
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,7 +11,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <cstddef>
@@ -22,7 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void out(std::vector<unsigned int> vec)
+void out(std::vector<unsigned int> const& vec)
 {
      hpx::cout << "out called " << hpx::find_here() << std::endl;
 }
@@ -34,7 +35,7 @@ int main(int argc, char* argv[])
      return hpx::init(argc, argv);
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
      // find locality info
      std::vector<hpx::naming::id_type> locs = hpx::find_all_localities();

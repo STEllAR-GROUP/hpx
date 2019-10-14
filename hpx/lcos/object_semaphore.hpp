@@ -1,6 +1,7 @@
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,10 +9,10 @@
 #define HPX_1FB4A979_B6B6_4845_BD95_3CEC605011A2
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <cstdint>
 

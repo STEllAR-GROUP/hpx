@@ -2,12 +2,13 @@
 //  Copyright (c) 2012 Hartmut Kaiser
 //  Copyright (c) 2011-2014 Bryce Adelstein-Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -24,7 +25,7 @@
 
 char const* benchmark_name = "Context Switching Overhead - HPX";
 
-using namespace boost::program_options;
+using namespace hpx::program_options;
 using namespace hpx::threads;
 
 using hpx::threads::coroutine_type;
@@ -38,7 +39,7 @@ std::uint64_t seed       = 0;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
-std::string format_build_date(std::string timestamp)
+std::string format_build_date()
 {
     std::chrono::time_point<std::chrono::system_clock> now =
         std::chrono::system_clock::now();
@@ -67,7 +68,7 @@ void print_results(
         cout << "# BENCHMARK: " << benchmark_name << "\n";
 
         cout << "# VERSION: " << HPX_HAVE_GIT_COMMIT << " "
-                 << format_build_date(__DATE__) << "\n"
+                 << format_build_date() << "\n"
              << "#\n";
 
         // Note that if we change the number of fields above, we have to
@@ -246,7 +247,7 @@ int hpx_main(
                     boost::algorithm::is_any_of(","),
                     boost::algorithm::token_compress_on);
 
-                HPX_ASSERT(entry.size() == 2);
+                HPX_TEST(entry.size() == 2);
 
                 counter_shortnames.push_back(entry[0]);
                 counters.push_back(entry[1]);

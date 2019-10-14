@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Bibek Wagle
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -29,7 +30,7 @@ HPX_PLAIN_ACTION(pingpong::server::get_element, pingpong_get_element_action);
 //HPX_ACTION_USES_MESSAGE_COALESCING(pingpong_get_element_action);
 
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
    //Commandline specific code
     std::size_t const n = vm["nparcels"].as<std::size_t>();
@@ -74,12 +75,12 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    boost::program_options::options_description cmdline(
+    hpx::program_options::options_description cmdline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
         ("nparcels,n",
-         boost::program_options::value<std::size_t>()->default_value(100),
+         hpx::program_options::value<std::size_t>()->default_value(100),
          "the number of parcels to create")
         ;
     // Initialize and run HPX

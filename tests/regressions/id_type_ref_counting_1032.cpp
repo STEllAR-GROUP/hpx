@@ -1,5 +1,6 @@
 //  Copyright (c) 2013 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -8,7 +9,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <chrono>
 
@@ -33,19 +34,19 @@ struct test_server1
 {
     test_server1()
     {
-        HPX_ASSERT(!alive);
+        HPX_TEST(!alive);
         alive = true;
     }
     test_server1(hpx::id_type o)
       : other(o)
     {
-        HPX_ASSERT(!alive);
+        HPX_TEST(!alive);
         alive = true;
     }
 
     ~test_server1()
     {
-        HPX_ASSERT(alive);
+        HPX_TEST(alive);
         void (*f)(hpx::id_type) = func<ComponentBase>;
         hpx::apply(f, other);
         alive = false;
@@ -66,12 +67,12 @@ struct test_server2
 {
     test_server2()
     {
-        HPX_ASSERT(!alive);
+        HPX_TEST(!alive);
         alive = true;
     }
     ~test_server2()
     {
-        HPX_ASSERT(alive);
+        HPX_TEST(alive);
         alive = false;
     }
 

@@ -1,19 +1,20 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/config/defaults.hpp>
-#include <hpx/compat/mutex.hpp>
-#include <hpx/runtime.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/filesystem.hpp>
+#include <hpx/logging.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/timing.hpp>
+#include <hpx/util/find_prefix.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/unlock_guard.hpp>
 
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -31,33 +32,28 @@
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
+#include <hpx/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 
-#include <hpx/lcos/barrier.hpp>
-#include <hpx/lcos/broadcast.hpp>
-#include <hpx/lcos/detail/barrier_node.hpp>
-#if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
-#include <hpx/lcos/reduce.hpp>
-#endif
+#include <hpx/collectives.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 
-#include <hpx/util/assert.hpp>
-#include <hpx/util/parse_command_line.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
 
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
+#endif
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
@@ -73,6 +69,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -138,13 +135,6 @@ namespace hpx
 {
     // helper function to stop evaluating counters during shutdown
     void stop_evaluating_counters();
-
-    namespace parcelset
-    {
-        // default parcel-sent handler function
-        void default_write_handler(boost::system::error_code const& ec,
-            parcelset::parcel const& p);
-    }
 }
 
 namespace hpx { namespace components
@@ -269,7 +259,7 @@ namespace hpx { namespace components { namespace server
       : stop_called_(false)
       , stop_done_(false)
       , terminated_(false)
-      , main_thread_id_(compat::this_thread::get_id())
+      , main_thread_id_(std::this_thread::get_id())
       , dijkstra_color_(false)
       , shutdown_all_invoked_(false)
       , modules_(cfg.modules())
@@ -290,23 +280,28 @@ namespace hpx { namespace components { namespace server
         // push pending logs
         components::cleanup_logging();
 
-        if (respond_to) {
+        if (respond_to)
+        {
             // respond synchronously
-            typedef lcos::base_lco_with_value<void> void_lco_type;
-            typedef void_lco_type::set_event_action action_type;
+            using void_lco_type = lcos::base_lco_with_value<void>;
+            using action_type = void_lco_type::set_event_action;
 
             naming::address addr;
-            if (agas::is_local_address_cached(respond_to, addr)) {
+            if (agas::is_local_address_cached(respond_to, addr))
+            {
                 // execute locally, action is executed immediately as it is
                 // a direct_action
                 hpx::applier::detail::apply_l<action_type>(respond_to,
                     std::move(addr));
             }
-            else {
+#if defined(HPX_HAVE_NETWORKING)
+            else
+            {
                 // apply remotely, parcel is sent synchronously
                 hpx::applier::detail::apply_r_sync<action_type>(std::move(addr),
                     respond_to);
             }
+#endif
         }
 
         std::abort();
@@ -518,10 +513,13 @@ namespace hpx { namespace components { namespace server
     {
         applier::applier& appl = hpx::applier::get_applier();
         naming::resolver_client& agas_client = appl.get_agas_client();
-        parcelset::parcelhandler& ph = appl.get_parcel_handler();
 
         agas_client.start_shutdown();
+
+#if defined(HPX_HAVE_NETWORKING)
+        parcelset::parcelhandler& ph = appl.get_parcel_handler();
         ph.flush_parcels();
+#endif
 
         std::uint32_t locality_id = get_locality_id();
 
@@ -775,14 +773,16 @@ namespace hpx { namespace components { namespace server
         runtime* rt = get_runtime_ptr();
         if (rt == nullptr) return;
 
+#if defined(HPX_HAVE_NETWORKING)
         // instruct our connection cache to drop all connections it is holding
         rt->get_parcel_handler().remove_from_connection_cache(gid, eps);
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void runtime_support::run()
     {
-        std::unique_lock<compat::mutex> l(mtx_);
+        std::unique_lock<std::mutex> l(mtx_);
         stop_called_ = false;
         stop_done_ = false;
         terminated_ = false;
@@ -791,7 +791,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::wait()
     {
-        std::unique_lock<compat::mutex> l(mtx_);
+        std::unique_lock<std::mutex> l(mtx_);
         while (!stop_done_) {
             LRT_(info) << "runtime_support: about to enter wait state";
             wait_condition_.wait(l);
@@ -802,7 +802,7 @@ namespace hpx { namespace components { namespace server
     void runtime_support::stop(double timeout,
         naming::id_type const& respond_to, bool remove_from_remote_caches)
     {
-        std::unique_lock<compat::mutex> l(mtx_);
+        std::unique_lock<std::mutex> l(mtx_);
         if (!stop_called_) {
             // push pending logs
             components::cleanup_logging();
@@ -821,7 +821,7 @@ namespace hpx { namespace components { namespace server
             stop_called_ = true;
 
             {
-                util::unlock_guard<compat::mutex> ul(mtx_);
+                util::unlock_guard<std::mutex> ul(mtx_);
 
                 util::yield_while(
                     [&tm, timeout, &t, start_time, &timed_out]()
@@ -881,21 +881,26 @@ namespace hpx { namespace components { namespace server
                 if (remove_from_remote_caches)
                     remove_here_from_console_connection_cache();
 
-                if (respond_to) {
+                if (respond_to)
+                {
                     // respond synchronously
-                    typedef lcos::base_lco_with_value<void> void_lco_type;
-                    typedef void_lco_type::set_event_action action_type;
+                    using void_lco_type = lcos::base_lco_with_value<void>;
+                    using action_type = void_lco_type::set_event_action;
 
                     naming::address addr;
-                    if (agas::is_local_address_cached(respond_to, addr)) {
+                    if (agas::is_local_address_cached(respond_to, addr))
+                    {
                         // this should never happen
                         HPX_ASSERT(false);
                     }
-                    else {
+#if defined(HPX_HAVE_NETWORKING)
+                    else
+                    {
                         // apply remotely, parcel is sent synchronously
                         hpx::applier::detail::apply_r_sync<action_type>(
                             std::move(addr), respond_to);
                     }
+#endif
                 }
             }
 
@@ -904,7 +909,7 @@ namespace hpx { namespace components { namespace server
 
             // The main thread notifies stop_condition_, so don't wait if we're
             // on the main thread.
-            if (compat::this_thread::get_id() != main_thread_id_)
+            if (std::this_thread::get_id() != main_thread_id_)
             {
                 stop_condition_.wait(l);        // wait for termination
             }
@@ -913,7 +918,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::notify_waiting_main()
     {
-        std::unique_lock<compat::mutex> l(mtx_);
+        std::unique_lock<std::mutex> l(mtx_);
         if (!stop_called_) {
             stop_called_ = true;
             stop_done_ = true;
@@ -921,7 +926,7 @@ namespace hpx { namespace components { namespace server
 
             // The main thread notifies stop_condition_, so don't wait if we're
             // on the main thread.
-            if (compat::this_thread::get_id() != main_thread_id_)
+            if (std::this_thread::get_id() != main_thread_id_)
             {
                 stop_condition_.wait(l);        // wait for termination
             }
@@ -931,7 +936,7 @@ namespace hpx { namespace components { namespace server
     // this will be called after the thread manager has exited
     void runtime_support::stopped()
     {
-        std::lock_guard<compat::mutex> l(mtx_);
+        std::lock_guard<std::mutex> l(mtx_);
         if (!terminated_) {
             terminated_ = true;
             stop_condition_.notify_all();   // finished cleanup/termination
@@ -954,6 +959,87 @@ namespace hpx { namespace components { namespace server
         return str;
     }
 
+    namespace detail {
+        void handle_print_bind(hpx::program_options::variables_map const& vm_,
+            std::size_t num_threads)
+        {
+            threads::topology& top = threads::create_topology();
+            auto const& rp = hpx::resource::get_partitioner();
+            auto const& tm = get_runtime().get_thread_manager();
+            {
+                std::ostringstream
+                    strm;    // make sure all output is kept together
+
+                strm << std::string(79, '*') << '\n';
+                strm << "locality: " << hpx::get_locality_id() << '\n';
+                for (std::size_t i = 0; i != num_threads; ++i)
+                {
+                    // print the mask for the current PU
+                    threads::mask_cref_type pu_mask = rp.get_pu_mask(i);
+                    std::string pool_name = tm.get_pool(i).get_pool_name();
+
+                    if (!threads::any(pu_mask))
+                    {
+                        strm << std::setw(4) << i
+                             << ": thread binding disabled"    //-V112
+                             << std::endl;
+                    }
+                    else
+                    {
+                        top.print_affinity_mask(strm, i, pu_mask, pool_name);
+                    }
+
+                    // Make sure the mask does not contradict the CPU bindings
+                    // returned by the system (see #973: Would like option to
+                    // report HWLOC bindings).
+                    error_code ec(lightweight);
+                    std::thread& blob = tm.get_os_thread_handle(i);
+                    threads::mask_type boundcpu =
+                        top.get_cpubind_mask(blob, ec);
+
+                    /* threads::mask_type boundcpu = top.get_cpubind_mask(
+                    rt.get_thread_manager().get_os_thread_handle(i), ec);*/
+
+                    // The masks reported by HPX must be the same as the ones
+                    // reported from HWLOC.
+                    if (!ec && threads::any(boundcpu) &&
+                        !threads::equal(boundcpu, pu_mask, num_threads))
+                    {
+                        std::string boundcpu_str = threads::to_string(boundcpu);
+                        std::string pu_mask_str = threads::to_string(pu_mask);
+                        HPX_THROW_EXCEPTION(invalid_status,
+                            "handle_print_bind",
+                            hpx::util::format(
+                                "unexpected mismatch between locality {1}: "
+                                "binding "
+                                "reported from HWLOC({2}) and HPX({3}) on "
+                                "thread {4}",
+                                hpx::get_locality_id(), boundcpu_str,
+                                pu_mask_str, i));
+                    }
+                }
+
+                std::cout << strm.str();
+            }
+        }
+
+#if defined(HPX_HAVE_NETWORKING)
+        void handle_list_parcelports()
+        {
+            {
+                std::ostringstream
+                    strm;    // make sure all output is kept together
+                strm << std::string(79, '*') << '\n';
+                strm << "locality: " << hpx::get_locality_id() << '\n';
+
+                get_runtime().get_parcel_handler().list_parcelports(strm);
+
+                std::cout << strm.str();
+            }
+        }
+#endif
+    }
+
     int runtime_support::load_components()
     {
         // load components now that AGAS is up
@@ -970,7 +1056,7 @@ namespace hpx { namespace components { namespace server
         std::set<std::string> startup_handled;
 
         // collect additional command-line options
-        boost::program_options::options_description options;
+        hpx::program_options::options_description options;
 
         // then dynamic ones
         naming::resolver_client& client = get_runtime().get_agas_client();
@@ -985,7 +1071,7 @@ namespace hpx { namespace components { namespace server
             std::string unknown_cmd_line(ini.get_entry("hpx.unknown_cmd_line", ""));
             if (!unknown_cmd_line.empty()) {
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
-                boost::program_options::variables_map vm;
+                hpx::program_options::variables_map vm;
 
                 util::commandline_error_mode mode = util::rethrow_on_error;
                 std::string allow_unknown(
@@ -1039,7 +1125,7 @@ namespace hpx { namespace components { namespace server
             std::string cmd_line(ini.get_entry("hpx.cmd_line", ""));
             if (!cmd_line.empty()) {
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
-                boost::program_options::variables_map vm;
+                hpx::program_options::variables_map vm;
 
                 util::parse_commandline(ini, options, cmd_line, vm, std::size_t(-1),
                     util::allow_unregistered | util::report_missing_config_file,
@@ -1048,12 +1134,13 @@ namespace hpx { namespace components { namespace server
                 if (vm.count("hpx:print-bind")) {
                     std::size_t num_threads = boost::lexical_cast<std::size_t>(
                         ini.get_entry("hpx.os_threads", 1));
-                    util::handle_print_bind(vm, num_threads);
+                    detail::handle_print_bind(vm, num_threads);
                 }
 
+#if defined(HPX_HAVE_NETWORKING)
                 if (vm.count("hpx:list-parcel-ports"))
-                    util::handle_list_parcelports();
-
+                    detail::handle_list_parcelports();
+#endif
                 if (vm.count("hpx:exit"))
                     return 1;
             }
@@ -1142,6 +1229,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::remove_here_from_connection_cache()
     {
+#if defined(HPX_HAVE_NETWORKING)
         runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
             return;
@@ -1163,14 +1251,17 @@ namespace hpx { namespace components { namespace server
 
             indirect_packaged_task ipt;
             callbacks.push_back(ipt.get_future());
+
             apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
         }
 
         wait_all(callbacks);
+#endif
     }
 
     void runtime_support::remove_here_from_console_connection_cache()
     {
+#if defined(HPX_HAVE_NETWORKING)
         runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
             return;
@@ -1187,9 +1278,11 @@ namespace hpx { namespace components { namespace server
         apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
 
         callback.wait();
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
     void runtime_support::register_message_handler(
         char const* message_handler_type, char const* action, error_code& ec)
     {
@@ -1359,14 +1452,15 @@ namespace hpx { namespace components { namespace server
                     << binary_filter_type;
         return bf;
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_component_static(
         util::section& ini, std::string const& instance,
-        std::string const& component, boost::filesystem::path const& lib,
+        std::string const& component, filesystem::path const& lib,
         naming::gid_type const& prefix, naming::resolver_client& agas_client,
         bool isdefault, bool isenabled,
-        boost::program_options::options_description& options,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         try {
@@ -1426,7 +1520,7 @@ namespace hpx { namespace components { namespace server
     // Load all components from the ini files found in the configuration
     int runtime_support::load_components(util::section& ini,
         naming::gid_type const& prefix, naming::resolver_client& agas_client,
-        boost::program_options::options_description& options,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         // load all components as described in the configuration information
@@ -1461,7 +1555,7 @@ namespace hpx { namespace components { namespace server
         iterator end = s.end();
         for (iterator i = s.begin (); i != end; ++i)
         {
-            namespace fs = boost::filesystem;
+            namespace fs = filesystem;
 
             // the section name is the instance name of the component
             util::section const& sect = i->second;
@@ -1503,7 +1597,7 @@ namespace hpx { namespace components { namespace server
                 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
                 boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
                 tokenizer tokens(component_path, sep);
-                boost::system::error_code fsec;
+                fs::error_code fsec;
                 for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
                 {
                     lib = fs::path(*it);
@@ -1631,7 +1725,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_commandline_options_static(
         std::string const& module,
-        boost::program_options::options_description& options, error_code& ec)
+        hpx::program_options::options_description& options, error_code& ec)
     {
         try {
             util::plugin::get_plugins_list_type f;
@@ -1677,10 +1771,10 @@ namespace hpx { namespace components { namespace server
 #if !defined(HPX_HAVE_STATIC_LINKING)
     bool runtime_support::load_component_dynamic(
         util::section& ini, std::string const& instance,
-        std::string const& component, boost::filesystem::path lib,
+        std::string const& component, filesystem::path lib,
         naming::gid_type const& prefix, naming::resolver_client& agas_client,
         bool isdefault, bool isenabled,
-        boost::program_options::options_description& options,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         modules_map_type::iterator it = modules_.find(HPX_MANGLE_STRING(component));
@@ -1699,7 +1793,7 @@ namespace hpx { namespace components { namespace server
         if (ec) {
             // build path to component to load
             std::string libname(HPX_MAKE_DLL_STRING(component));
-            lib /= boost::filesystem::path(libname);
+            lib /= filesystem::path(libname);
             d.load_library(ec);
             if (ec) {
                 LRT_(warning) << "dynamic loading failed: " << lib.string()
@@ -1774,7 +1868,7 @@ namespace hpx { namespace components { namespace server
     }
 
     bool runtime_support::load_commandline_options(hpx::util::plugin::dll& d,
-        boost::program_options::options_description& options, error_code& ec)
+        hpx::program_options::options_description& options, error_code& ec)
     {
         try {
             // get the factory, may fail
@@ -1812,9 +1906,9 @@ namespace hpx { namespace components { namespace server
     bool runtime_support::load_component(
         hpx::util::plugin::dll& d, util::section& ini,
         std::string const& instance, std::string const& component,
-        boost::filesystem::path const& lib, naming::gid_type const& prefix,
+        filesystem::path const& lib, naming::gid_type const& prefix,
         naming::resolver_client& agas_client, bool isdefault, bool isenabled,
-        boost::program_options::options_description& options,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         try {
@@ -1870,7 +1964,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
     bool runtime_support::load_plugins(util::section& ini,
-        boost::program_options::options_description& options,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         // load all components as described in the configuration information
@@ -1904,7 +1998,7 @@ namespace hpx { namespace components { namespace server
         iterator end = s.end();
         for (iterator i = s.begin (); i != end; ++i)
         {
-            namespace fs = boost::filesystem;
+            namespace fs = filesystem;
 
             // the section name is the instance name of the component
             util::section const& sect = i->second;
@@ -1937,7 +2031,7 @@ namespace hpx { namespace components { namespace server
                 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
                 boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
                 tokenizer tokens(component_path, sep);
-                boost::system::error_code fsec;
+                fs::error_code fsec;
                 for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
                 {
                     lib = fs::path(*it);
@@ -1990,8 +2084,8 @@ namespace hpx { namespace components { namespace server
     bool runtime_support::load_plugin(hpx::util::plugin::dll& d,
         util::section& ini,
         std::string const& instance, std::string const& plugin,
-        boost::filesystem::path const& lib, bool isenabled,
-        boost::program_options::options_description& options,
+        filesystem::path const& lib, bool isenabled,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         try {
@@ -2067,8 +2161,8 @@ namespace hpx { namespace components { namespace server
 
     bool runtime_support::load_plugin_dynamic(util::section& ini,
         std::string const& instance, std::string const& plugin,
-        boost::filesystem::path lib, bool isenabled,
-        boost::program_options::options_description& options,
+        filesystem::path lib, bool isenabled,
+        hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
         modules_map_type::iterator it = modules_.find(HPX_MANGLE_STRING(plugin));
@@ -2086,7 +2180,7 @@ namespace hpx { namespace components { namespace server
         if (ec) {
             // build path to component to load
             std::string libname(HPX_MAKE_DLL_STRING(plugin));
-            lib /= boost::filesystem::path(libname);
+            lib /= filesystem::path(libname);
             d.load_library(ec);
             if (ec) {
                 LRT_(warning) << "dynamic loading failed: " << lib.string()

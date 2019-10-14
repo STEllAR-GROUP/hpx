@@ -1,31 +1,32 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
-#include <hpx/error_code.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
-#include <hpx/runtime/serialization/intrusive_ptr.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/detail/preprocess_futures.hpp>
+#include <hpx/runtime/serialization/detail/preprocess_gid_types.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/serialization/intrusive_ptr.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/state.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <boost/io/ios_state.hpp>
 
@@ -240,6 +241,28 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         // prepare the given id, note: this function modifies the passed id
+        void handle_credit_splitting(
+            serialization::output_archive& ar, id_type_impl& gid,
+            serialization::detail::preprocess_gid_types* split_gids)
+        {
+            auto* handle_futures = ar.try_get_extra_data<
+                serialization::detail::preprocess_futures>(
+                serialization::extra_output_handle_futures);
+
+            if (handle_futures == nullptr)
+                return;
+
+            HPX_ASSERT(split_gids != nullptr);
+
+            auto f = split_gid_if_needed(gid).then(hpx::launch::sync,
+                [split_gids, &gid](hpx::future<gid_type>&& gid_future) {
+                    split_gids->add_gid(gid, gid_future.get());
+                });
+
+            handle_futures->await_future(
+                *traits::future_access<decltype(f)>::get_shared_state(f));
+        }
+
         void id_type_impl::preprocess_gid(serialization::output_archive& ar) const
         {
             // unmanaged gids do not require any special handling
@@ -248,7 +271,11 @@ namespace hpx { namespace naming
                 return;
             }
 
-            if (ar.has_gid(*this))
+            auto* split_gids = ar.try_get_extra_data<
+                serialization::detail::preprocess_gid_types>(
+                serialization::extra_output_split_credits);
+
+            if (split_gids != nullptr && split_gids->has_gid(*this))
             {
                 return;
             }
@@ -259,31 +286,21 @@ namespace hpx { namespace naming
             // of the credit splitting is equal to one).
             if (managed == type_)
             {
-                ar.await_future(
-                    split_gid_if_needed(const_cast<id_type_impl&>(*this)).then(
-                        hpx::launch::sync,
-                        [&ar, this](hpx::future<gid_type> && gid_future)
-                        {
-                            ar.add_gid(*this, gid_future.get());
-                        }
-                    )
-                );
-                return;
+                handle_credit_splitting(
+                    ar, const_cast<id_type_impl&>(*this), split_gids);
             }
         }
 
         ///////////////////////////////////////////////////////////////////////
         hpx::future<gid_type> split_gid_if_needed(gid_type& gid)
         {
-            typedef std::unique_lock<gid_type::mutex_type> scoped_lock;
-            scoped_lock l(gid.get_mutex());
+            std::unique_lock<gid_type::mutex_type> l(gid.get_mutex());
             return split_gid_if_needed_locked(l, gid);
         }
 
         gid_type postprocess_incref(gid_type &gid)
         {
-            typedef std::unique_lock<gid_type::mutex_type> scoped_lock;
-            scoped_lock l(gid.get_mutex());
+            std::unique_lock<gid_type::mutex_type> l(gid.get_mutex());
 
             gid_type new_gid = gid;             // strips lock-bit
             HPX_ASSERT(new_gid != invalid_gid);
@@ -418,8 +435,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         gid_type split_credits_for_gid(gid_type& id)
         {
-            typedef std::unique_lock<gid_type::mutex_type> scoped_lock;
-            scoped_lock l(id.get_mutex());
+            std::unique_lock<gid_type::mutex_type> l(id.get_mutex());
             return split_credits_for_gid_locked(l, id);
         }
 
@@ -445,8 +461,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         std::int64_t replenish_credits(gid_type& gid)
         {
-            typedef std::unique_lock<gid_type::mutex_type> scoped_lock;
-            scoped_lock l(gid);
+            std::unique_lock<gid_type::mutex_type> l(gid);
             return replenish_credits_locked(l, gid);
         }
 
@@ -523,7 +538,7 @@ namespace hpx { namespace naming
         {
             // Avoid performing side effects if the archive is not saving the
             // data.
-            if(ar.is_preprocessing())
+            if (ar.is_preprocessing())
             {
                 preprocess_gid(ar);
                 gid_serialization_data data { *this, type_ };
@@ -546,7 +561,11 @@ namespace hpx { namespace naming
             }
             else
             {
-                new_gid = ar.get_new_gid(*this);
+                auto& split_gids = ar.get_extra_data<
+                    serialization::detail::preprocess_gid_types&>(
+                    serialization::extra_output_split_credits);
+
+                new_gid = split_gids.get_new_gid(*this);
                 HPX_ASSERT(new_gid != invalid_gid);
             }
 

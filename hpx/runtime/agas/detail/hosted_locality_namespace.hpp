@@ -3,6 +3,7 @@
 //  Copyright (c) 2012-2017 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -12,6 +13,7 @@
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
@@ -78,4 +80,5 @@ namespace hpx { namespace agas { namespace detail
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::parcelset::endpoints_type, parcelset_endpoints_type)
 
+#endif
 #endif

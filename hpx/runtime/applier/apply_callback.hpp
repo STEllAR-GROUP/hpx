@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,15 +8,15 @@
 #define HPX_APPLIER_APPLY_CALLBACK_DEC_16_2012_1228PM
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/format.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/util/detail/pack.hpp>
-#include <hpx/util/format.hpp>
-#include <hpx/util/tuple.hpp>
 
 #include <hpx/runtime/applier/apply.hpp>
 
@@ -25,6 +26,7 @@
 
 namespace hpx
 {
+#if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
     {
@@ -49,6 +51,7 @@ namespace hpx
                 std::forward<Ts>(vs)...);
         }
     }}
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename ...Ts>
@@ -116,6 +119,7 @@ namespace hpx
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
     {
@@ -145,6 +149,7 @@ namespace hpx
                 std::forward<Ts>(vs)...);
         }
     }}
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Continuation, typename Callback, typename ...Ts>
@@ -169,14 +174,24 @@ namespace hpx
                 std::move(addr), priority, std::forward<Ts>(vs)...);
 
             // invoke callback
+#if defined(HPX_HAVE_NETWORKING)
             cb(boost::system::error_code(), parcelset::parcel());
+#else
+            cb();
+#endif
             return result;
         }
 
+#if defined(HPX_HAVE_NETWORKING)
         // apply remotely
         return applier::detail::apply_r_p_cb<Action>(std::move(addr),
             std::forward<Continuation>(c), gid,
             priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+#else
+        HPX_THROW_EXCEPTION(invalid_status,
+            "hpx::apply_cb",
+            "unexpected attempt to send a parcel with networking disabled");
+#endif
     }
 
     template <typename Action, typename Continuation, typename Callback, typename ...Ts>
@@ -256,6 +271,7 @@ namespace hpx
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
     {
@@ -299,6 +315,7 @@ namespace hpx
                 std::forward<Ts>(vs)...);
         }
     }}
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename ...Ts>

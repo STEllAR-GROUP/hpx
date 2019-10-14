@@ -1,5 +1,6 @@
 # Copyright (c) 2011-2013 Thomas Heller
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -102,8 +103,8 @@ if(HPX_WITH_GIT_TAG)
     file(REMOVE_RECURSE "${DOCS_LATEST_DEST}")
     if("html" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
       file(
-        COPY "${DOCS_SOURCE}"
-        DESTINATION "${DOCS_LATEST_DEST}/html"
+        COPY "${DOCS_SOURCE}/html"
+        DESTINATION "${DOCS_LATEST_DEST}"
         PATTERN "*.buildinfo" EXCLUDE)
     endif()
     if("singlehtml" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
