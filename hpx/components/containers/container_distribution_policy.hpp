@@ -1,6 +1,7 @@
 //  Copyright (c) 2014 Bibek Ghimire
 //  Copyright (c) 2014-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,10 +12,10 @@
 #include <hpx/runtime/components/default_distribution_policy.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/shared_ptr.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/shared_ptr.hpp>
+#include <hpx/serialization/vector.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -3,6 +3,7 @@
 //  Copyright (c) 2012-2013 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -14,7 +15,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <atomic>
 #include <cstdint>

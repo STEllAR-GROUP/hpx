@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -15,9 +16,16 @@ namespace interpolate1d
 {
     struct dimension
     {
-        std::size_t offset_;    // lower index
+        dimension()
+          : offset_(0)
+          , count_(0)
+          , size_(0)
+        {
+        }
+
+        std::size_t offset_;   // lower index
         std::size_t count_;    // upper index
-        std::size_t size_;         // overall size of this dimension
+        std::size_t size_;     // overall size of this dimension
     };
 }
 

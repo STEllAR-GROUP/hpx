@@ -1,14 +1,15 @@
 //  Copyright (c) 2014 Grant Mercer
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/timing.hpp>
 
 #include <hpx/parallel/executors/parallel_executor_aggregated.hpp>
 
@@ -432,7 +433,7 @@ std::uint64_t averageout_sequential_forloop(std::size_t vector_size)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     // pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
@@ -589,32 +590,32 @@ int main(int argc, char* argv[])
         "hpx.os_threads=all"
     };
 
-    boost::program_options::options_description cmdline(
+    hpx::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
         ( "vector_size"
-        , boost::program_options::value<std::size_t>()->default_value(1000)
+        , hpx::program_options::value<std::size_t>()->default_value(1000)
         , "size of vector")
 
         ("work_delay"
-        , boost::program_options::value<int>()->default_value(1)
+        , hpx::program_options::value<int>()->default_value(1)
         , "loop delay per element in nanoseconds")
 
         ("test_count"
-        , boost::program_options::value<int>()->default_value(100)
+        , hpx::program_options::value<int>()->default_value(100)
         , "number of tests to be averaged")
 
         ("chunk_size"
-        , boost::program_options::value<int>()->default_value(0)
+        , hpx::program_options::value<int>()->default_value(0)
         , "number of iterations to combine while parallelization")
 
         ("overlapping_loops"
-        , boost::program_options::value<int>()->default_value(0)
+        , hpx::program_options::value<int>()->default_value(0)
         , "number of overlapping task loops")
 
         ("csv_output"
-        , boost::program_options::value<int>()->default_value(0)
+        , hpx::program_options::value<int>()->default_value(0)
         ,"print results in csv format")
 
         ("aggregated"

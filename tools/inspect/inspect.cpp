@@ -5,6 +5,7 @@
 //  Copyright Gennaro Prota 2006.
 //  Copyright Hartmut Kaiser 2014-2016.
 
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -21,7 +22,9 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 //  Directories with a file name of the hpx_no_inspect value are not inspected.
 //  Files that contain the hpx_no_inspect value are not inspected.
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
+#include <hpx/filesystem.hpp>
+#include <hpx/program_options.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -34,8 +37,6 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include <string>
 #include <vector>
 
-#include "boost/filesystem/operations.hpp"
-#include "boost/filesystem/fstream.hpp"
 #include "boost/program_options.hpp"
 #include "function_hyper.hpp"
 
@@ -57,6 +58,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include "crlf_check.hpp"
 #include "end_check.hpp"
 #include "license_check.hpp"
+#include "spdx_license_check.hpp"
 #include "link_check.hpp"
 #include "path_name_check.hpp"
 #include "tab_check.hpp"
@@ -82,7 +84,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include "boost/test/included/prg_exec_monitor.hpp"
 #endif
 
-namespace fs = boost::filesystem;
+namespace fs = hpx::filesystem;
 
 using namespace boost::inspect;
 
@@ -105,7 +107,7 @@ namespace
   long file_count = 0;
   long directory_count = 0;
   long error_count = 0;
-  const int max_offenders = 5;  // maximum "worst offenders" to display
+  //const int max_offenders = 5;  // maximum "worst offenders" to display
 
   boost::inspect::string_set content_signatures;
 
@@ -237,9 +239,9 @@ namespace
   bool visit_predicate( const path & pth )
   {
     string local( boost::inspect::relative_to( pth, search_root_path() ) );
-    string leaf( pth.leaf().string() );
-    if (leaf[0] == '.')  // ignore hidden by convention directories such as
-      return false;      //  .htaccess, .git, .svn, .bzr, .DS_Store, etc.
+    string leaf( pth.filename().string() );
+    if (leaf == ".git")  // ignore .git, but not the other directories
+      return false;
 
     return
       // so we can inspect a GIT checkout
@@ -252,7 +254,7 @@ namespace
       && local.find("doc/xml") != 0
       && local.find("doc\\xml") != 0
       // ignore if tag file present
-      && !boost::filesystem::exists(pth / hpx_no_inspect)
+      && !hpx::filesystem::exists(pth / hpx_no_inspect)
       ;
   }
 
@@ -287,7 +289,7 @@ namespace
   bool find_signature( const path & file_path,
     const boost::inspect::string_set & signatures )
   {
-    string name( file_path.leaf().string() );
+    string name( file_path.filename().string() );
     if ( signatures.find( name ) == signatures.end() )
     {
       string::size_type pos( name.rfind( '.' ) );
@@ -306,7 +308,8 @@ namespace
 
     if ( !find_signature( file_path, content_signatures ) ) return;
 
-    fs::ifstream fin( file_path, std::ios_base::in|std::ios_base::binary );
+    std::ifstream fin( file_path.string(),
+        std::ios_base::in|std::ios_base::binary );
     if ( !fin )
       throw string( "could not open input file: " ) + file_path.string();
     std::getline( fin, target, '\0' ); // read the whole file
@@ -349,7 +352,7 @@ namespace
           visit_all<DirectoryIterator>( cur_lib, *itr, insps );
         }
       }
-      else if (itr->path().leaf().string()[0] != '.') // ignore if hidden
+      else if (itr->path().filename().string()[0] != '.') // ignore if hidden
       {
         ++file_count;
         string content;
@@ -432,33 +435,6 @@ namespace
       out << "</blockquote>\n";
   }
 
-//  html_encode  -------------------------------------------------------------//
-
-  std::string html_encode(std::string const& text)
-  {
-    std::string result;
-
-    for(std::string::const_iterator it = text.begin(),
-        end = text.end(); it != end; ++it)
-    {
-      switch(*it) {
-      case '<':
-        result += "&lt;";
-        break;
-      case '>':
-        result += "&gt;";
-        break;
-      case '&':
-        result += "&amp;";
-        break;
-      default:
-        result += *it;
-      }
-    }
-
-    return result;
-  }
-
 //  display_details  ---------------------------------------------------------//
 
   void display_details(std::ostream& out)
@@ -494,7 +470,7 @@ namespace
             {
               out << "\n  " << this_rel_path.parent_path().string() << '/';
             }
-            out << "\n    " << this_rel_path.leaf() << ':';
+            out << "\n    " << this_rel_path.filename() << ':';
           }
         }
         if ( current.library != itr->library
@@ -747,7 +723,7 @@ namespace boost
       register_signature( ".pl" );
       register_signature( ".py" );
       register_signature( ".sh" );
-      register_signature( "CMakeText.txt" );
+      register_signature( "CMakeLists.txt" );
       register_signature( ".cmake" );
       register_signature( ".yml" );
 
@@ -816,11 +792,12 @@ int main( int argc_param, char * argv_param[] )
 int cpp_main( int argc_param, char * argv_param[] )
 #endif
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: inspect [dir [dir ...]] [options]");
 
     bool license_ck = false;
+    bool spdx_license_ck = false;
     bool copyright_ck = false;
     bool crlf_ck = false;
     bool end_ck = false;
@@ -850,6 +827,8 @@ int cpp_main( int argc_param, char * argv_param[] )
 
         ("license", value<bool>(&license_ck)->implicit_value(false),
             "check for Boost license violations (default: off)")
+        ("spdx_license", value<bool>(&spdx_license_ck)->implicit_value(false),
+            "check for SPDX license violations (default: off)")
         ("copyright", value<bool>(&copyright_ck)->implicit_value(false),
             "check for copyright violations (default: off)")
         ("crlf", value<bool>(&crlf_ck)->implicit_value(false),
@@ -932,13 +911,11 @@ int cpp_main( int argc_param, char * argv_param[] )
     if (vm.count("hpx:positional"))
     {
         for (auto const& s: vm["hpx:positional"].as<std::vector<std::string> >())
-            search_roots.push_back(fs::canonical(fs::absolute(s,
-                fs::initial_path())));
+            search_roots.push_back(fs::canonical(s, fs::initial_path()));
     }
     else
     {
-        search_roots.push_back(fs::canonical(fs::absolute(".",
-            fs::initial_path())));
+        search_roots.push_back(fs::canonical(fs::initial_path()));
     }
 
     if (vm.count("text"))
@@ -950,6 +927,7 @@ int cpp_main( int argc_param, char * argv_param[] )
     if (vm.count("all"))
     {
         license_ck = true;
+        spdx_license_ck = true;
         copyright_ck = true;
         crlf_ck = true;
         end_ck = true;
@@ -981,6 +959,9 @@ int cpp_main( int argc_param, char * argv_param[] )
   if ( license_ck )
     inspectors.push_back( inspector_element(
         new boost::inspect::license_check ) );
+  if ( spdx_license_ck )
+    inspectors.push_back( inspector_element(
+        new boost::inspect::spdx_license_check ) );
   if ( copyright_ck )
     inspectors.push_back( inspector_element(
         new boost::inspect::copyright_check ) );
@@ -1037,7 +1018,7 @@ int cpp_main( int argc_param, char * argv_param[] )
     for(auto const& search_root: search_roots)
     {
         ::search_root = search_root;
-        visit_all<fs::directory_iterator>( search_root.leaf().string(),
+        visit_all<fs::directory_iterator>( search_root.filename().string(),
             search_root, inspectors );
     }
 

@@ -3,6 +3,7 @@
     Copyright (C) 2012 Vinay C Amatya
     Copyright (C) 2015 Hartmut Kaiser
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -30,7 +31,7 @@ when the future is created.
 
 .. _future_schematics:
 
-.. figure:: /_static/images/future_schematics.png
+.. figure:: ../_static/images/future_schematics.png
 
    Schematic of a future execution.
 
@@ -98,7 +99,7 @@ runtime system. It is important to note that application-specific command line
 options are defined here. |hpx| uses |boost_program_options|_ for command line
 processing. You can see that our programs ``--n-value`` option is set by calling
 the ``add_options()`` method on an instance of
-``boost::program_options::options_description``. The default value of the
+``hpx::program_options::options_description``. The default value of the
 variable is set to 10. This is why when we ran the program for the first time
 without using the ``--n-value`` option the program returned the 10th value of
 the Fibonacci sequence. The constructor argument of the description is the text

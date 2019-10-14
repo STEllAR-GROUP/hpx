@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,14 +8,13 @@
 #define HPX_LCOS_LOCAL_AND_GATE_JUL_13_2012_0919AM
 
 #include <hpx/config.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/local/conditional_trigger.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 
@@ -44,8 +44,9 @@ namespace hpx { namespace lcos { namespace local
         {
         }
 
-        base_and_gate(base_and_gate && rhs)
-          : received_segments_(std::move(rhs.received_segments_)),
+        base_and_gate(base_and_gate && rhs) noexcept
+          : mtx_(),
+            received_segments_(std::move(rhs.received_segments_)),
             promise_(std::move(rhs.promise_)),
             generation_(rhs.generation_),
             conditions_(std::move(rhs.conditions_))
@@ -53,11 +54,12 @@ namespace hpx { namespace lcos { namespace local
             rhs.generation_ = std::size_t(-1);
         }
 
-        base_and_gate& operator=(base_and_gate && rhs)
+        base_and_gate& operator=(base_and_gate && rhs) noexcept
         {
             if (this != &rhs)
             {
                 std::lock_guard<mutex_type> l(rhs.mtx_);
+                mtx_ = mutex_type();
                 received_segments_ = std::move(rhs.received_segments_);
                 promise_ = std::move(rhs.promise_);
                 generation_ = rhs.generation_;
@@ -89,9 +91,11 @@ namespace hpx { namespace lcos { namespace local
             return triggered;
         }
 
-    public:
+    protected:
         /// \brief get a future allowing to wait for the gate to fire
-        future<void> get_future(std::size_t count = std::size_t(-1),
+        template <typename OuterLock>
+        future<void> get_future(OuterLock& outer_lock,
+            std::size_t count = std::size_t(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
@@ -102,7 +106,7 @@ namespace hpx { namespace lcos { namespace local
                 count = received_segments_.size();
             HPX_ASSERT(count != 0);
 
-            init_locked(l, count, ec);
+            init_locked(outer_lock, l, count, ec);
             if (!ec) {
                 HPX_ASSERT(generation_ != std::size_t(-1));
                 ++generation_;
@@ -117,6 +121,60 @@ namespace hpx { namespace lcos { namespace local
             return hpx::future<void>();
         }
 
+    public:
+        future<void> get_future(std::size_t count = std::size_t(-1),
+            std::size_t* generation_value = nullptr,
+            error_code& ec = hpx::throws)
+        {
+            no_mutex mtx;
+            std::unique_lock<no_mutex> lk(mtx);
+            return get_future(lk, count, generation_value, ec);
+        }
+
+    protected:
+        /// \brief get a shared future allowing to wait for the gate to fire
+        template <typename OuterLock>
+        shared_future<void> get_shared_future(OuterLock& outer_lock,
+            std::size_t count = std::size_t(-1),
+            std::size_t* generation_value = nullptr,
+            error_code& ec = hpx::throws)
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+
+            // by default we use as many segments as specified during construction
+            if (count == std::size_t(-1))
+                count = received_segments_.size();
+            HPX_ASSERT(count != 0);
+            HPX_ASSERT(generation_ != std::size_t(-1));
+
+            if (generation_ == 0)
+            {
+                init_locked(outer_lock, l, count, ec);
+                generation_ = 1;
+            }
+
+            if (!ec) {
+                trigger_conditions(ec);   // re-check/trigger condition, if needed
+                if (!ec) {
+                    if (generation_value)
+                        *generation_value = generation_;
+                    return promise_.get_shared_future(ec);
+                }
+            }
+            return hpx::future<void>().share();
+        }
+
+    public:
+        shared_future<void> get_shared_future(std::size_t count = std::size_t(-1),
+            std::size_t* generation_value = nullptr,
+            error_code& ec = hpx::throws)
+        {
+            no_mutex mtx;
+            std::unique_lock<no_mutex> lk(mtx);
+            return get_shared_future(lk, count, generation_value, ec);
+        }
+
+    protected:
         /// \brief Set the data which has to go into the segment \a which.
         template <typename OuterLock>
         bool set(std::size_t which, OuterLock & outer_lock, error_code& ec = throws)
@@ -126,6 +184,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 // out of bounds index
                 l.unlock();
+                outer_lock.unlock();
                 HPX_THROWS_IF(ec, bad_parameter, "base_and_gate<>::set",
                     "index is out of range for this base_and_gate");
                 return false;
@@ -134,6 +193,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 // segment already filled, logic error
                 l.unlock();
+                outer_lock.unlock();
                 HPX_THROWS_IF(ec, bad_parameter, "base_and_gate<>::set",
                     "input with the given index has already been triggered");
                 return false;
@@ -151,19 +211,20 @@ namespace hpx { namespace lcos { namespace local
                 promise<void> p;
                 std::swap(p, promise_);
                 received_segments_.reset();     // reset data store
-                {
-                    // Unlock the lock to avoid locking problems
-                    // when triggering the promise
-                    l.unlock();
-                    outer_lock.unlock();
-                    p.set_value();              // fire event
-                    return true;
-                }
+
+                // Unlock the lock to avoid locking problems when triggering
+                // the promise
+                l.unlock();
+                outer_lock.unlock();
+                p.set_value();              // fire event
+
+                return true;
             }
 
             return false;
         }
 
+    public:
         bool set(std::size_t which, error_code& ec = throws)
         {
             no_mutex mtx;
@@ -193,7 +254,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
             template <typename Condition>
-             future<void> get_future(Condition&& func,
+            future<void> get_future(Condition&& func,
                 error_code& ec = hpx::throws)
             {
                 return (*it_)->get_future(std::forward<Condition>(func), ec);
@@ -268,13 +329,15 @@ namespace hpx { namespace lcos { namespace local
         }
 
     protected:
-        template <typename Lock>
-        void init_locked(Lock& l, std::size_t count, error_code& ec = throws)
+        template <typename OuterLock, typename Lock>
+        void init_locked(OuterLock& outer_lock, Lock& l, std::size_t count,
+            error_code& ec = throws)
         {
             if (0 != received_segments_.count())
             {
                 // reset happens while part of the slots are filled
                 l.unlock();
+                outer_lock.unlock();
                 HPX_THROWS_IF(ec, bad_parameter, "base_and_gate<>::init",
                     "initializing this base_and_gate while slots are filled");
                 return;
@@ -325,9 +388,34 @@ namespace hpx { namespace lcos { namespace local
         }
 
         template <typename Lock>
+        future<void> get_future(Lock& l,
+            std::size_t count = std::size_t(-1),
+            std::size_t* generation_value = nullptr,
+            error_code& ec = hpx::throws)
+        {
+            return this->base_type::get_future(l, count, generation_value, ec);
+        }
+
+        template <typename Lock>
+        shared_future<void> get_shared_future(Lock& l,
+            std::size_t count = std::size_t(-1),
+            std::size_t* generation_value = nullptr,
+            error_code& ec = hpx::throws)
+        {
+            return this->base_type::get_shared_future(
+                l, count, generation_value, ec);
+        }
+
+        template <typename Lock>
+        bool set(std::size_t which, Lock& l, error_code& ec = throws)
+        {
+            return this->base_type::set(which, l, ec);
+        }
+
+        template <typename Lock>
         void synchronize(std::size_t generation_value, Lock& l,
             char const* function_name = "and_gate::synchronize",
-            error_code& ec= throws)
+            error_code& ec = throws)
         {
             this->base_type::synchronize(generation_value, l, function_name, ec);
         }

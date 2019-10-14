@@ -1,6 +1,7 @@
 ..
     Copyright (C) 2018 Mikael Simberg
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -32,7 +33,7 @@ It is also recommended that you check out the latest stable tag:
 
 .. code-block:: sh
 
-    git checkout 1.2.1
+    git checkout 1.3.0
 
 |hpx| dependencies
 ==================
@@ -85,7 +86,7 @@ to find them by passing one or more of the following options to |cmake|_:
 
 .. code-block:: sh
 
-    -DBOOST_DIR=/path/to/boost
+    -DBOOST_ROOT=/path/to/boost
     -DHWLOC_ROOT=/path/to/hwloc
     -DTCMALLOC_ROOT=/path/to/tcmalloc
     -DJEMALLOC_ROOT=/path/to/jemalloc

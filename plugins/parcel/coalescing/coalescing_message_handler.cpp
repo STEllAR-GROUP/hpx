@@ -1,21 +1,22 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_PARCEL_COALESCING)
-#include <hpx/traits/plugin_config_data.hpp>
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/util/unlock_guard.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/traits/plugin_config_data.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_back.hpp>
-#include <hpx/util/bind_front.hpp>
 
 #include <hpx/plugins/message_handler_factory.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>

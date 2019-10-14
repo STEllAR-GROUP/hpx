@@ -1,14 +1,16 @@
 //  Copyright (c) 2014 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
 #include <hpx/lcos/local/detail/sliding_semaphore.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/testing.hpp>
 
 #include <boost/assert.hpp>
 
@@ -28,7 +30,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <simple_profiler.hpp>
 
 //
@@ -246,13 +248,13 @@ public:
 
   pointer allocate(size_type n, void const* hint = nullptr)
   {
-    HPX_ASSERT(n == size_);
+    HPX_TEST(n == size_);
     return static_cast<T*>(pointer_);
   }
 
   void deallocate(pointer p, size_type n)
   {
-    HPX_ASSERT(p == pointer_ && n == size_);
+    HPX_TEST(p == pointer_ && n == size_);
   }
 
 private:
@@ -425,7 +427,8 @@ int background_work()
 {
     while(FuturesActive)
     {
-        hpx::parcelset::do_background_work(0);
+        hpx::parcelset::do_background_work(
+            0, hpx::parcelset::parcelport_background_mode_all);
         hpx::this_thread::suspend(std::chrono::microseconds(10));
     }
     return 1;
@@ -903,7 +906,7 @@ void test_read(
 // Main test loop which randomly sends packets of data from one locality to
 // another looping over the entire buffer address space and timing the total
 // transmit/receive time to see how well we're doing.
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     DEBUG_OUTPUT(3,"HPX main");
     //
@@ -992,19 +995,19 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    boost::program_options::options_description
+    hpx::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
         ( "localMB",
-          boost::program_options::value<std::uint64_t>()->default_value(256),
+          hpx::program_options::value<std::uint64_t>()->default_value(256),
           "Sets the storage capacity (in MB) on each node.\n"
           "The total storage will be num_ranks * localMB")
         ;
 
     desc_commandline.add_options()
         ( "globalMB",
-          boost::program_options::value<std::uint64_t>()->default_value(0),
+          hpx::program_options::value<std::uint64_t>()->default_value(0),
           "Sets the storage capacity (in MB) for the entire job.\n"
           "The storage per node will be globalMB / num_ranks\n"
           "By default, localMB is used, setting this overrides localMB value."
@@ -1013,33 +1016,33 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "transferKB",
-          boost::program_options::value<std::uint64_t>()->default_value(64),
+          hpx::program_options::value<std::uint64_t>()->default_value(64),
           "Sets the default block transfer size (in KB).\n"
           "Each put/get IOP will be this size")
         ;
 
     desc_commandline.add_options()
         ( "semaphore",
-          boost::program_options::value<std::uint64_t>()->default_value(16),
+          hpx::program_options::value<std::uint64_t>()->default_value(16),
           "The max amount of simultaneous put/get operations to allow.\n")
         ;
 
     desc_commandline.add_options()
         ( "iterations",
-          boost::program_options::value<std::uint64_t>()->default_value(5),
+          hpx::program_options::value<std::uint64_t>()->default_value(5),
           "The number of iterations over the global memory.\n")
         ;
 
     desc_commandline.add_options()
         ( "all-to-all",
-          boost::program_options::value<bool>()->default_value(true),
+          hpx::program_options::value<bool>()->default_value(true),
           "When set, all ranks send to all others, when off, "
           "only rank 0 sends to the others.\n")
         ;
 
     desc_commandline.add_options()
         ( "no-local",
-          boost::program_options::value<bool>()->default_value(false),
+          hpx::program_options::value<bool>()->default_value(false),
           "When set, non local transfers are made, "
           "ranks send to the others but not to themselves.\n")
         ;
@@ -1048,7 +1051,7 @@ int main(int argc, char* argv[])
     // we use a default of unknowm so we don't mistake plots
     desc_commandline.add_options()
         ( "parceltype",
-          boost::program_options::value<std::string>()->default_value("unknown"),
+          hpx::program_options::value<std::string>()->default_value("unknown"),
           "Pass in the parcelport network type being tested,"
           "this value has no effect on the code and is used only in output "
           "so that plotting scripts know what network type was active during \
@@ -1057,7 +1060,7 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "distribution",
-          boost::program_options::value<std::uint64_t>()->default_value(1),
+          hpx::program_options::value<std::uint64_t>()->default_value(1),
           "Specify the distribution of data blocks to send/receive,\n"
           "in random mode, blocks of data are sent from one rank to \
             any other rank (including itself),"

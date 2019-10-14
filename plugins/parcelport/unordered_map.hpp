@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,48 +84,46 @@ namespace concurrent {
         {}
 
         template <typename InputIterator>
-        unordered_map(InputIterator first, InputIterator last,
-            size_type n = 64,
-            const hasher& hf = hasher(),
-            const key_equal& eql = key_equal(),
+        unordered_map(InputIterator first, InputIterator last, size_type n = 64,
+            const hasher& hf = hasher(), const key_equal& eql = key_equal(),
             const allocator_type& a = allocator_type())
-            : map_(first, last, n, hf, eql, a)
-            , iterator_lock_(mutex_, defer_lock())
-            {}
+          : map_(first, last, n, hf, eql, a)
+          , iterator_lock_(mutex_, defer_lock())
+        {}
 
         unordered_map(const unordered_map& other)
-        : map_(other)
-        , iterator_lock_(mutex_, defer_lock())
+          : map_(other)
+          , mutex_()
+          , iterator_lock_(mutex_, defer_lock())
         {}
 
         unordered_map(const allocator_type& a)
-        : map_(a)
-        , iterator_lock_(mutex_, defer_lock())
+          : map_(a)
+          , iterator_lock_(mutex_, defer_lock())
         {}
 
         unordered_map(const unordered_map& other, const allocator_type& a)
-        : map_(other, a)
-        , iterator_lock_(mutex_, defer_lock())
+          : map_(other, a)
+          , iterator_lock_(mutex_, defer_lock())
         {}
 
         // C++11 specific
         unordered_map(unordered_map&& other)
-        : map_(std::forward<unordered_map>(other))
-        , iterator_lock_(mutex_, defer_lock())
+          : map_(std::forward<unordered_map>(other))
+          , mutex_()
+          , iterator_lock_(mutex_, defer_lock())
         {}
 
         unordered_map(unordered_map&& other, const allocator_type& a)
-        : map_(std::forward<unordered_map>(other), a)
-        , iterator_lock_(mutex_, defer_lock())
+          : map_(std::forward<unordered_map>(other), a)
+          , iterator_lock_(mutex_, defer_lock())
         {}
 
-        unordered_map(std::initializer_list<value_type> il,
-            size_type n = 64,
-            const hasher& hf = hasher(),
-            const key_equal& eql = key_equal(),
+        unordered_map(std::initializer_list<value_type> il, size_type n = 64,
+            const hasher& hf = hasher(), const key_equal& eql = key_equal(),
             const allocator_type& a = allocator_type())
-        : map_(il, n, hf, eql, a)
-        , iterator_lock_(mutex_, defer_lock())
+          : map_(il, n, hf, eql, a)
+          , iterator_lock_(mutex_, defer_lock())
         {}
 
         ~unordered_map()
@@ -135,14 +134,15 @@ namespace concurrent {
 
         unordered_map& operator=(const unordered_map& other)
         {
-            write_lock lock(mutex_);
+            write_lock lock(other.mutex_);
             return map_ = other;
         }
 
         // C++11 specific
         unordered_map& operator=(unordered_map&& other)
         {
-            write_lock lock(mutex_);
+            write_lock lock(other.mutex_);
+            mutex_ = rw_mutex_type();
             return map_ = std::forward<unordered_map>(other);
         }
 

@@ -1,5 +1,6 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,10 +8,10 @@
 #define HPX_LCOS_DETAIL_SLIDING_SEMAPHORE_AUG_25_2016_1026AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
 
 #include <algorithm>
 #include <cstdint>
@@ -34,6 +35,16 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         sliding_semaphore(std::int64_t max_difference, std::int64_t lower_limit)
           : max_difference_(max_difference), lower_limit_(lower_limit), cond_()
         {}
+
+        void set_max_difference(std::unique_lock<mutex_type> &l,
+                                std::int64_t max_difference,
+                                std::int64_t lower_limit)
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+
+            max_difference_ = max_difference;
+            lower_limit_    = lower_limit;
+        }
 
         void wait(std::unique_lock<mutex_type>& l, std::int64_t upper_limit)
         {

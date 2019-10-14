@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -15,9 +16,7 @@ namespace startup_shutdown { namespace server
     {
     public:
         // constructor: initialize accumulator value
-        startup_shutdown_component()
-          : arg_(nullptr)
-        {}
+        startup_shutdown_component() = default;
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -33,8 +32,9 @@ namespace startup_shutdown { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         HPX_DEFINE_COMPONENT_ACTION(startup_shutdown_component, init);
+
     private:
-      std::string arg_;
+        std::string arg_;
     };
 }}
 

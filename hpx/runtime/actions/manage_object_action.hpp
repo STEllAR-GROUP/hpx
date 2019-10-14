@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,11 +9,11 @@
 #define HPX_RUNTIME_ACTIONS_MANAGE_OBJECT_ACTION_JAN_26_2010_0141PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/serialization/array.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/runtime/serialization/serialize_buffer.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/serialization/array.hpp>
+#include <hpx/serialization/base_object.hpp>
+#include <hpx/serialization/serialize_buffer.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <cstddef>

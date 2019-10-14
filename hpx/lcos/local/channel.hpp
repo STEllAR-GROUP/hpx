@@ -1,5 +1,6 @@
 //  Copyright (c) 2016-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,20 +8,20 @@
 #define HPX_LCOS_LOCAL_CHANNEL_JUL_23_2016_0707PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/receive_buffer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
-#include <hpx/util/atomic_count.hpp>
-#include <hpx/util/iterator_facade.hpp>
-#include <hpx/util/register_locks.hpp>
-#include <hpx/util/unlock_guard.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -266,7 +267,7 @@ namespace hpx { namespace lcos { namespace local
             }
             local::packaged_task<T()> pop_pt()
             {
-                return local::packaged_task<T()>([=]() -> T { return get(); });
+                return local::packaged_task<T()>([this]() -> T { return get(); });
             }
 
         public:

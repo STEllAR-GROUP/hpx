@@ -1,5 +1,6 @@
 # Copyright (c) 2019 Thomas Heller
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,7 +12,15 @@ Checks: >
     -bugprone-forward-declaration-namespace,
     -bugprone-macro-parentheses,
     modernize-use-nullptr,
+    misc-assert-side-effect
+    misc-dangling-handle
+    misc-forwarding-reference-overload
+    misc-move-constructor-init
+    misc-move-forwarding-reference
+    misc-multiple-statement-macro
     misc-non-copyable-objects
+    misc-use-after-move
+    misc-virtual-near-miss
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*hpx.*'
 CheckOptions:

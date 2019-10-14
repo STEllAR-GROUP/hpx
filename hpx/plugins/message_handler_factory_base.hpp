@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,11 +8,11 @@
 #define HPX_MESSAGE_HANDLER_FACTORY_BASE_MAR_24_2013_0339PM
 
 #include <hpx/config.hpp>
-#include <hpx/plugins/plugin_factory_base.hpp>
 
+#if defined(HPX_HAVE_NETWORKING)
+#include <hpx/plugin.hpp>
+#include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
-#include <hpx/util/plugin.hpp>
-#include <hpx/util/plugin/export_plugin.hpp>
 
 #include <cstddef>
 
@@ -48,5 +49,6 @@ namespace hpx { namespace plugins
         pluginname, factory)                                                  \
 /**/
 
+#endif
 #endif
 

@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -13,7 +14,7 @@
 __global__ void dummy()
 {}
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t iterations = vm["iterations"].as<std::size_t>();
 
@@ -84,12 +85,12 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
     cmdline.add_options()
         (   "iterations",
-            boost::program_options::value<std::size_t>()->default_value(1024),
+            hpx::program_options::value<std::size_t>()->default_value(1024),
             "number of iterations (default: 1024)")
         ;
     return hpx::init(cmdline, argc, argv);

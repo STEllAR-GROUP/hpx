@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,13 +8,13 @@
 #define HPX_COMPONENTS_SERVER_LOCKING_HOOK_OCT_17_2012_0732PM
 
 #include <hpx/config.hpp>
+#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/get_lva.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
+#include <hpx/coroutines/coroutine.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/util/bind_front.hpp>
-#include <hpx/util/register_locks.hpp>
-#include <hpx/util/unlock_guard.hpp>
 
 #include <mutex>
 #include <utility>
@@ -40,9 +41,11 @@ namespace hpx { namespace components
 
         locking_hook(locking_hook const& rhs)
           : base_type(rhs)
+          , mtx_()
         {}
         locking_hook(locking_hook && rhs)
           : base_type(std::move(rhs))
+          , mtx_()
         {}
 
         typedef void decorates_action;

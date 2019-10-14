@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,6 +9,7 @@
 #define HPX_APPLIER_APPLY_NOV_27_2008_0957AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
@@ -21,11 +23,10 @@
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
-#include <hpx/traits/is_action.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_valid_action.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -38,6 +39,7 @@ namespace hpx
     // Invoked by a running HPX-thread to apply an action to any resource
     namespace applier { namespace detail
     {
+#if defined(HPX_HAVE_NETWORKING)
         ///////////////////////////////////////////////////////////////////////
         template <typename Action>
         inline naming::address&& complement_addr(naming::address& addr)
@@ -180,6 +182,7 @@ namespace hpx
             return apply_r_p<Action>(std::move(addr), gid,
                 actions::action_priority<Action>(), std::forward<Ts>(vs)...);
         }
+#endif
 
         // We know it is local and has to be directly executed.
         template <typename Action, typename ...Ts>
@@ -361,6 +364,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
     {
+#if defined(HPX_HAVE_NETWORKING)
         template <typename Action, typename Continuation, typename ...Ts>
         inline bool
         apply_r_p(naming::address&& addr, Continuation && c,
@@ -380,9 +384,9 @@ namespace hpx
         apply_r (naming::address&& addr, Continuation && c,
             naming::id_type const& gid, Ts&&... vs)
         {
-            return apply_r_p<Action>(std::move(addr), std::forward<Continuation>(c), gid,
-                actions::action_priority<Action>(),
-                std::forward<Ts>(vs)...);
+            return apply_r_p<Action>(std::move(addr),
+                std::forward<Continuation>(c), gid,
+                actions::action_priority<Action>(), std::forward<Ts>(vs)...);
         }
 
         template <typename Action>
@@ -409,6 +413,7 @@ namespace hpx
                 {
                     hpx::parcelset::sync_put_parcel(std::move(p));
                 });
+
             return false;     // destination is remote
         }
 
@@ -419,6 +424,7 @@ namespace hpx
             return apply_r_sync_p<Action>(std::move(addr), gid,
                 actions::action_priority<Action>());
         }
+#endif
 
         // We know it is local and has to be directly executed.
         template <typename Action, typename Continuation, typename ...Ts>
@@ -614,6 +620,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
     namespace applier { namespace detail
     {
         template <typename Action, typename ...Ts>
@@ -654,6 +661,7 @@ namespace hpx
                 std::forward<Ts>(vs)...);
         }
     }}
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename ...Ts>

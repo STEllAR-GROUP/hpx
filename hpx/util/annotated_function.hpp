@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,17 +10,17 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#include <hpx/functional/invoke.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/functional/traits/get_function_address.hpp>
+#include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0
 #include <hpx/runtime/get_thread_name.hpp>
-#include <hpx/util/itt_notify.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #elif defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif
@@ -113,7 +114,6 @@ namespace hpx { namespace util
     };
 #endif
 
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         template <typename F>
@@ -147,6 +147,12 @@ namespace hpx { namespace util
                 ar & f_;
             }
 
+            ///////////////////////////////////////////////////////////////////
+            /// \brief Returns the function address
+            ///
+            /// This function returns the passed function address.
+            /// \param none
+
             std::size_t get_function_address() const
             {
                 return traits::get_function_address<
@@ -154,6 +160,14 @@ namespace hpx { namespace util
                     >::call(f_);
             }
 
+            ///////////////////////////////////////////////////////////////////
+            /// \brief Returns the function annotation
+            ///
+            /// This function returns the function annotation, if it has a name
+            /// name is returned, name is returned; if name is empty the typeid
+            /// is returned
+            ///
+            /// \param none
             char const* get_function_annotation() const noexcept
             {
                 return name_ ? name_ : typeid(f_).name();
@@ -191,6 +205,11 @@ namespace hpx { namespace util
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Given a function as an argument, the user can annotate_function
+    /// as well.
+    /// Annotating includes setting the thread description per thread id.
+    ///
+    /// \param function
     template <typename F>
     F && annotated_function(F && f, char const* = nullptr)
     {

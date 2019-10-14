@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -19,7 +20,7 @@
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/util/lazy_enable_if.hpp>
+#include <hpx/type_support/lazy_enable_if.hpp>
 
 #include <algorithm>
 #include <cstddef>

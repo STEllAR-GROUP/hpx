@@ -1,5 +1,6 @@
 # Copyright (c) 2013 Erik Schnetter
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -20,13 +21,5 @@ if(HPX_WITH_CXX11_DEFAULTED_FUNCTIONS)
                      FOLDER "Tests/Regressions/Block-Matrix")
 
   add_hpx_regression_test("block_matrix" block_matrix ${block_matrix_PARAMETERS})
-
-  add_hpx_pseudo_target(tests.regressions.block_matrix_dir.block_matrix)
-
-  add_hpx_pseudo_dependencies(tests.regressions.block_matrix_dir
-                              tests.regressions.block_matrix_dir.block_matrix)
-
-  add_hpx_pseudo_dependencies(tests.regressions.block_matrix_dir.block_matrix
-                              block_matrix_test)
 
 endif()

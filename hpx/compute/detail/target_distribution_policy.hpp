@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -33,19 +34,22 @@ namespace hpx { namespace compute { namespace detail
 
         /// Default-construct a new instance of a \a target_distribution_policy.
         target_distribution_policy()
-          : targets_(),
+          : mtx_(),
+            targets_(),
             num_partitions_(1),
             next_target_(0)
         {}
 
         target_distribution_policy(target_distribution_policy const& rhs)
-          : targets_(rhs.targets_),
+          : mtx_(),
+            targets_(rhs.targets_),
             num_partitions_(rhs.num_partitions_),
             next_target_(0)
         {}
 
         target_distribution_policy(target_distribution_policy && rhs)
-          : targets_(std::move(rhs.targets_)),
+          : mtx_(),
+            targets_(std::move(rhs.targets_)),
             num_partitions_(rhs.num_partitions_),
             next_target_(0)
         {}

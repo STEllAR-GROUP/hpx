@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -175,18 +176,18 @@ namespace hpx
 #else
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/util/always_void.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/detail/pack.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/type_support/always_void.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <algorithm>
 #include <array>

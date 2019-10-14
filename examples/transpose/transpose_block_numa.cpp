@@ -1,16 +1,18 @@
 //  Copyright (c) 2014-2015 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <hpx/format.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/serialization.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <hpx/parallel/util/numa_allocator.hpp>
@@ -217,7 +219,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
 
 ///////////////////////////////////////////////////////////////////////////////
 std::size_t get_num_numa_nodes(hpx::threads::topology const& topo,
-    boost::program_options::variables_map& vm)
+    hpx::program_options::variables_map& vm)
 {
     std::size_t numa_nodes = topo.get_number_of_numa_nodes();
     if (numa_nodes == 0)
@@ -236,7 +238,7 @@ std::size_t get_num_numa_nodes(hpx::threads::topology const& topo,
 
 std::pair<std::size_t, std::size_t> get_num_numa_pus(
     hpx::threads::topology const& topo, std::size_t numa_nodes,
-    boost::program_options::variables_map& vm)
+    hpx::program_options::variables_map& vm)
 {
     std::size_t numa_pus = hpx::threads::hardware_concurrency() / numa_nodes;
 
@@ -252,7 +254,7 @@ std::pair<std::size_t, std::size_t> get_num_numa_pus(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     {
         // extract hardware topology
@@ -537,7 +539,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 //
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
 
     options_description desc_commandline;
     desc_commandline.add_options()
@@ -553,10 +555,10 @@ int main(int argc, char* argv[])
          "improved cache and TLB performance")
         ( "verbose", "Verbose output")
         ("transpose-threads",
-         boost::program_options::value<std::string>()->default_value("all"),
+         hpx::program_options::value<std::string>()->default_value("all"),
          "number of threads per NUMA domain to use. (default: all)")
         ("transpose-numa-domains",
-         boost::program_options::value<std::string>()->default_value("all"),
+         hpx::program_options::value<std::string>()->default_value("all"),
          "number of NUMA domains to use. (default: all)")
     ;
 
@@ -575,7 +577,7 @@ int main(int argc, char* argv[])
     std::size_t numa_nodes = get_num_numa_nodes(topo, vm);
     std::pair<std::size_t, std::size_t> pus =
         get_num_numa_pus(topo, numa_nodes, vm);
-    std::size_t num_cores = topo.get_number_of_numa_node_cores(0);
+    //std::size_t num_cores = topo.get_number_of_numa_node_cores(0);
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
@@ -583,8 +585,8 @@ int main(int argc, char* argv[])
         "hpx.run_hpx_main!=1",
         "hpx.numa_sensitive=2",  // no-cross NUMA stealing
         // block all cores of requested number of NUMA-domains
-        hpx::util::format("hpx.cores={}", numa_nodes * num_cores),
-        hpx::util::format("hpx.os_threads={}", numa_nodes * pus.second)
+//        hpx::util::format("hpx.cores={}", numa_nodes * num_cores),
+//        hpx::util::format("hpx.os_threads={}", numa_nodes * pus.second)
     };
 
     std::string node_name("numanode");
@@ -605,8 +607,9 @@ int main(int argc, char* argv[])
             pus.second-1                             // core:0-%d
         );
     }
-    cfg.push_back(bind_desc);
+//    cfg.push_back(bind_desc);
 
+//    return hpx::init();
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
 

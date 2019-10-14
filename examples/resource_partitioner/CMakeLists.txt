@@ -1,5 +1,6 @@
 # Copyright (c) 2017 Shoshana Jakobovits
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -55,23 +56,10 @@ foreach(example_program ${example_programs})
     add_definitions(-D_USE_MATH_DEFINES)
   endif()
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(examples.resource_partitioner.${example_program})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(examples.resource_partitioner
-                              examples.resource_partitioner.${example_program})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.resource_partitioner.${example_program}
-                              ${example_program})
+  add_hpx_example_target_dependencies("resource_partitioner" ${example_program})
 
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-    add_hpx_example_test("resource_partitioner" ${example_program} ${${example_program}_PARAMETERS})
-    add_hpx_pseudo_target(tests.examples.resource_partitioner.${example_program})
-    add_hpx_pseudo_dependencies(tests.examples.resource_partitioner
-                                tests.examples.resource_partitioner.${example_program})
-    add_hpx_pseudo_dependencies(tests.examples.resource_partitioner.${example_program}
-                                ${example_program})
+    add_hpx_example_test("resource_partitioner" ${example_program}
+      ${${example_program}_PARAMETERS})
   endif()
 endforeach()

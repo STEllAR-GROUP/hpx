@@ -2,11 +2,13 @@
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/config/version.hpp>
 #include <hpx/config/config_strings.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
@@ -15,12 +17,12 @@
 #include <hpx/plugins/parcelport/mpi/mpi.hpp>
 #endif
 
-#include <hpx/exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/find_prefix.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/format.hpp>
 #include <hpx/version.hpp>
 
 #include <boost/config.hpp>
@@ -108,6 +110,7 @@ namespace hpx
             "of any scale).\n\n"
             "Copyright (c) 2007-2019, The STE||AR Group,\n"
             "http://stellar-group.org, email:hpx-users@stellar.cct.lsu.edu\n\n"
+//  SPDX-License-Identifier: BSL-1.0
             "Distributed under the Boost Software License, "
             "Version 1.0. (See accompanying\n"
             "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n";
@@ -144,6 +147,8 @@ namespace hpx
     {
         std::ostringstream strm;
 
+        strm << "Core library:\n";
+
         char const* const* p = hpx::config_strings;
         while (*p)
             strm << "  " << *p++ << "\n";
@@ -179,6 +184,20 @@ namespace hpx
             strm << "  HPX_PREFIX=" << util::find_prefix() << "\n";
 #endif
         }
+        strm << "\n";
+
+        // print module configurations
+        module_config_strings const* ms = hpx::config_strings_modules;
+        while (ms->name)
+        {
+            strm << "Module " << ms->name << ":\n";
+            char const* const* p = ms->config_strings;
+            while (*p)
+                strm << "  " << *p++ << "\n";
+            strm << "\n";
+            ++ms;
+        }
+
         return strm.str();
     }
 
@@ -297,9 +316,5 @@ namespace hpx
 
         return strm.str();
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    char const HPX_CHECK_VERSION[] = HPX_PP_STRINGIZE(HPX_CHECK_VERSION);
-    char const HPX_CHECK_BOOST_VERSION[] = HPX_PP_STRINGIZE(HPX_CHECK_BOOST_VERSION);
 }
 

@@ -2,13 +2,14 @@
 
 //  Copyright Beman Dawes 2002.
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  Contributed by Joerg Walter
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
 
 #include "crlf_check.hpp"
 #include "function_hyper.hpp"
@@ -52,13 +53,13 @@ namespace boost
         }
       }
 
-      if (failed && full_path.leaf() != test_file_name)
+      if (failed && full_path.filename() != test_file_name)
       {
         ++m_files_with_errors;
         error( library_name, full_path, name() );
       }
 
-      if (!failed && full_path.leaf() == test_file_name)
+      if (!failed && full_path.filename() == test_file_name)
       {
         ++m_files_with_errors;
         error( library_name, full_path, loclink(full_path,
