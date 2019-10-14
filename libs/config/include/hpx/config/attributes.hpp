@@ -14,17 +14,27 @@
 
 /// Function attribute to tell compiler not to inline the function.
 #define HPX_NOINLINE
+
 /// Function attribute to tell compiler that the function does not return.
 #define HPX_NORETURN
+
 /// Marks an entity as deprecated. The argument \c x specifies a custom message
 /// that is included in the compiler warning. For more details see
 /// `<https://en.cppreference.com/w/cpp/language/attributes/deprecated>`__.
 #define HPX_DEPRECATED(x)
+
 /// Indicates that the fall through from the previous case label is intentional
 /// and should not be diagnosed by a compiler that warns on fallthrough. For
 /// more details see
 /// `<https://en.cppreference.com/w/cpp/language/attributes/fallthrough>`__.
 #define HPX_FALLTHROUGH
+
+/// If a function declared nodiscard or a function returning an enumeration or
+/// class declared nodiscard by value is called from a discarded-value expression
+/// other than a cast to void, the compiler is encouraged to issue a warning.
+/// For more details see
+/// `https://en.cppreference.com/w/cpp/language/attributes/nodiscard`__.
+#define HPX_NODISCARD
 #else
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,9 +75,9 @@
 #elif defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000) && \
      !defined(HPX_INTEL_VERSION)
 #   define HPX_FALLTHROUGH __attribute__((fallthrough))
+#elif defined(HPX_CLANG_VERSION)
 // All versions of clang supported by HPX have the [[clang::fallthrough]]
 // attribute.
-#elif defined(HPX_CLANG_VERSION)
 #   define HPX_FALLTHROUGH [[clang::fallthrough]]
 #else
 #   define HPX_FALLTHROUGH
@@ -80,6 +90,25 @@
 #else
 #  define HPX_EMPTY_BASES
 #endif
+
+///////////////////////////////////////////////////////////////////////////////
+// handle [[nodiscard]]
+#if defined(HPX_HAVE_CXX17_NODISCARD_ATTRIBUTE)
+#   define HPX_NODISCARD [[nodiscard]]
+#   define HPX_NODISCARD_MSG(x) [[nodiscard(x)]]
+#elif defined(HPX_GCC_VERSION)
+#   define HPX_NODISCARD __attribute__((warn_unused_result))
+#   define HPX_NODISCARD_MSG(x) __attribute__((warn_unused_result))
+#elif defined(HPX_CLANG_VERSION)
+// All versions of clang supported by HPX have the [[clang::warn_unused_result]]
+// attribute.
+#   define HPX_NODISCARD [[clang::warn_unused_result]]
+#   define HPX_NODISCARD_MSG(x) [[clang::warn_unused_result(x)]]
+#else
+#   define HPX_NODISCARD
+#   define HPX_NODISCARD_MSG(x)
+#endif
+
 // clang-format on
 
 #endif

@@ -295,6 +295,13 @@ function(hpx_check_for_cxx17_fallthrough_attribute)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx17_nodiscard_attribute)
+  add_hpx_config_test(HPX_WITH_CXX17_NODISCARD_ATTRIBUTE
+    SOURCE cmake/tests/cxx17_nodiscard_attribute.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_cxx17_hardware_destructive_interference_size)
   add_hpx_config_test(HPX_WITH_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE
     SOURCE cmake/tests/cxx17_hardware_destructive_interference_size.cpp
