@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2014 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,8 +9,10 @@
 #define HPX_PARCELSET_PARCEL_BUFFER_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/performance_counters/parcels/data_point.hpp>
-#include <hpx/runtime/serialization/serialization_chunk.hpp>
+#include <hpx/serialization/serialization_chunk.hpp>
 #include <hpx/util/integer/endian.hpp>
 
 #include <utility>
@@ -112,4 +115,5 @@ namespace hpx { namespace parcelset
     };
 }}
 
+#endif
 #endif

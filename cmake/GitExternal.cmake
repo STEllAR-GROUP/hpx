@@ -2,6 +2,7 @@
 # Copyright (c) 2014-2015 Daniel Nachbaur
 # Copyright (c) 2013-2015 Stefan Eileman
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -19,12 +20,12 @@
 #
 # [optional] Flags which control behaviour
 #  NO_UPDATE
-#    When set, GitExternal will not change a repo that has already been checked out. 
-#    The purpose of this is to allow one to set a default branch to be checked out, 
-#    but stop GitExternal from changing back to that branch if the user has checked 
+#    When set, GitExternal will not change a repo that has already been checked out.
+#    The purpose of this is to allow one to set a default branch to be checked out,
+#    but stop GitExternal from changing back to that branch if the user has checked
 #    out and is working on another.
-#  VERBOSE 
-#    When set, displays information about git commands that are executed  
+#  VERBOSE
+#    When set, displays information about git commands that are executed
 #
 
 find_package(Git)
@@ -55,17 +56,21 @@ function(GIT_EXTERNAL DIR REPO TAG)
     if(nok)
       message(FATAL_ERROR "${DIR} git clone failed: ${error}\n")
     endif()
-  endif()
 
-  if(IS_DIRECTORY "${DIR}/.git")
+    # checkout requested tag
+    GIT_EXTERNAL_MESSAGE("git checkout -q ${TAG}")
+    execute_process(
+      COMMAND "${GIT_EXECUTABLE}" checkout -q "${TAG}"
+      RESULT_VARIABLE nok ERROR_VARIABLE error
+      WORKING_DIRECTORY "${DIR}"
+      )
+    if(nok)
+      message(STATUS "${DIR} git checkout ${TAG} failed: ${error}\n")
+    endif()
+  elseif(IS_DIRECTORY "${DIR}/.git")
     if (${GIT_EXTERNAL_NO_UPDATE})
       GIT_EXTERNAL_MESSAGE("Update branch disabled by user")
     else()
-      GIT_EXTERNAL_MESSAGE("current ref is \"${currentref}\" and tag is \"${TAG}\"")
-      if(currentref STREQUAL TAG) # nothing to do
-        return()
-      endif()
-
       # reset generated files
       foreach(GIT_EXTERNAL_RESET_FILE ${GIT_EXTERNAL_RESET})
         GIT_EXTERNAL_MESSAGE("git reset -q ${GIT_EXTERNAL_RESET_FILE}")
@@ -100,15 +105,24 @@ function(GIT_EXTERNAL DIR REPO TAG)
         message(STATUS "${DIR} git checkout ${TAG} failed: ${error}\n")
       endif()
 
-      # update tag
-      GIT_EXTERNAL_MESSAGE("git rebase FETCH_HEAD")
-      execute_process(COMMAND ${GIT_EXECUTABLE} rebase FETCH_HEAD
-        RESULT_VARIABLE RESULT OUTPUT_VARIABLE OUTPUT ERROR_VARIABLE OUTPUT
+      # check if this is a branch
+      GIT_EXTERNAL_MESSAGE("git symbolic-ref -q HEAD")
+      execute_process(COMMAND "${GIT_EXECUTABLE}" symbolic-ref -q HEAD
+        RESULT_VARIABLE nok ERROR_VARIABLE error
         WORKING_DIRECTORY "${DIR}")
-      if(RESULT)
-        message(STATUS "git rebase failed, aborting ${DIR} merge")
-        execute_process(COMMAND ${GIT_EXECUTABLE} rebase --abort
+      if(nok)
+        message(STATUS "${TAG} is not a branch")
+      else()
+        # update tag
+        GIT_EXTERNAL_MESSAGE("git rebase FETCH_HEAD")
+        execute_process(COMMAND ${GIT_EXECUTABLE} rebase FETCH_HEAD
+          RESULT_VARIABLE RESULT OUTPUT_VARIABLE OUTPUT ERROR_VARIABLE OUTPUT
           WORKING_DIRECTORY "${DIR}")
+        if(RESULT)
+          message(STATUS "git rebase failed, aborting ${DIR} merge")
+          execute_process(COMMAND ${GIT_EXECUTABLE} rebase --abort
+            WORKING_DIRECTORY "${DIR}")
+        endif()
       endif()
     endif()
   else()

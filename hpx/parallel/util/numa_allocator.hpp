@@ -1,6 +1,7 @@
 //  Copyright (c) 2015 Thomas Heller
 //  Copyright (c) 2015-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,6 +9,7 @@
 #define HPX_UTIL_NUMA_ALLOCATOR_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
@@ -15,8 +17,7 @@
 #include <hpx/parallel/executors/execution_information.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
-#include <hpx/runtime/threads/topology.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -106,8 +107,7 @@ namespace hpx { namespace parallel { namespace util
 #if defined(HPX_DEBUG)
                             // make sure memory was placed appropriately
                             hpx::threads::mask_type mem_mask =
-                                topo_.get_thread_affinity_mask_from_lva(
-                                    reinterpret_cast<hpx::naming::address_type>(&val));
+                                topo_.get_thread_affinity_mask_from_lva(&val);
 
                             std::size_t thread_num = hpx::get_worker_thread_num();
                             hpx::threads::mask_cref_type thread_mask =
@@ -123,6 +123,11 @@ namespace hpx { namespace parallel { namespace util
                 );
             }
             hpx::wait_all(first_touch);
+
+            for (auto && f : first_touch)
+            {
+                f.get();        // rethrow exceptions
+            }
 
             // return the overall memory block
             return p;

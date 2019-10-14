@@ -4,11 +4,12 @@
 //  Copyright Gennaro Prota 2006.
 //  Copyright Hartmut Kaiser 2016.
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
 
 #include <algorithm>
 
@@ -64,18 +65,6 @@ namespace boost
       { "(\\bboost\\s*::\\s*reference_wrapper\\b)", "std::reference_wrapper" },
       { "(\\bboost\\s*::\\s*(c?ref)\\b)", "std::\\2" },
       { "(\\bboost\\s*::\\s*(u?int[0-9]+_t)\\b)", "std::\\2" },
-      { "(\\bboost\\s*::\\s*thread\\b)", "hpx::compat::thread" },
-      { "(\\bboost\\s*::\\s*this_thread::\\s*get_id\\b)", "hpx::compat::this_thread::get_id" },
-      { "(\\bboost\\s*::\\s*this_thread::\\s*yield\\b)", "hpx::compat::this_thread::yield" },
-      { "(\\bboost\\s*::\\s*this_thread::\\s*sleep_until\\b)", "hpx::compat::this_thread::sleep_until" },
-      { "(\\bboost\\s*::\\s*this_thread::\\s*sleep_for\\b)", "hpx::compat::this_thread::sleep_for" },
-      { "(\\bboost\\s*::\\s*mutex\\b)", "hpx::compat::mutex" },
-      { "(\\bboost\\s*::\\s*recursive_mutex\\b)", "hpx::compat::recursive_mutex" },
-      { "(\\bboost\\s*::\\s*once_flag\\b)", "hpx::compat::once_flag" },
-      { "(\\bboost\\s*::\\s*call_once\\b)", "hpx::compat::call_once" },
-      { "(\\bboost\\s*::\\s*cv_status\\b)", "hpx::compat::cv_status" },
-      { "(\\bboost\\s*::\\s*condition_variable\\b)", "hpx::compat::condition_variable" },
-      { "(\\bboost\\s*::\\s*barrier\\b)", "hpx::compat::barrier" },
       { "(\\bboost\\s*::\\s*exception_ptr\\b)", "std::exception_ptr" },
       { "(\\bboost\\s*::\\s*copy_exception\\b)", "std::make_exception_ptr" },
       { "(\\bboost\\s*::\\s*current_exception\\b)", "std::current_exception" },

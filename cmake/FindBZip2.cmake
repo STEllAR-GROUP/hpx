@@ -12,6 +12,7 @@
 # Copyright 2006 Alexander Neundorf <neundorf@kde.org>
 # Copyright 2012 Rolf Eike Beer <eike@sf-mail.de>
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the OSI-approved BSD License (the "License");
 # see accompanying file Copyright.txt for details.
 #

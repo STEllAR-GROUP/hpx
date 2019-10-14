@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,6 +9,7 @@
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM
 
 #include <hpx/config.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
@@ -16,16 +18,15 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/base_object.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/action_remote_result.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_continuation.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/util/serializable_unique_function.hpp>
 
 #include <exception>
 #include <type_traits>

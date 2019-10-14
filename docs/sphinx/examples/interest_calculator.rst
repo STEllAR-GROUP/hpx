@@ -3,6 +3,7 @@
     Copyright (C) 2012 Vinay C Amatya
     Copyright (C) 2015 Hartmut Kaiser
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -17,9 +18,9 @@ concepts. One of these tools is a :term:`local control object` (:term:`LCO`)
 called dataflow. An :term:`LCO` is a type of component that can spawn a new
 thread when triggered. They are also distinguished from other components by a
 standard interface which allow users to understand and use them easily.
-Dataflows, being a :term:`LCO`, is triggered when the values it depends on
+A Dataflow, being an :term:`LCO`, is triggered when the values it depends on
 become available. For instance, if you have a calculation X that depends on the
-result of three other calculations, you could set up a dataflow that would begin
+results of three other calculations, you could set up a dataflow that would begin
 the calculation X as soon as the other three calculations have returned their
 values. Dataflows are set up to depend on other dataflows. It is this property
 that makes dataflow a powerful parallelization tool. If you understand the
@@ -48,7 +49,7 @@ and
 
 .. math::
 
-   P = P + i
+   P = P + I
 
 Setup
 =====
@@ -101,8 +102,8 @@ then our shared_futures are set up. Notice that we first place our principal and
 rate into shares futures by passing the variables ``init_principal`` and
 ``init_rate`` using :cpp:class:`hpx::make_ready_future`.
 
-In this way :cpp:class:`hpx::shared_future`\ ``<double>`` principal and ``rate``
-will be initialized to ``init_principal`` and ``init_rate`` when
+In this way :cpp:class:`hpx::shared_future`\ ``<double>`` ``principal``
+and ``rate`` will be initialized to ``init_principal`` and ``init_rate`` when
 :cpp:class:`hpx::make_ready_future`\ ``<double>`` returns a future containing
 those initial values. These shared futures then enter the for loop and are
 passed to ``interest``. Next ``principal`` and ``interest`` are passed to the

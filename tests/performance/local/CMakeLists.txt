@@ -1,6 +1,7 @@
 # Copyright (c) 2014-2017 Hartmut Kaiser
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -26,6 +27,7 @@ if(NOT HPX_WITH_SANITIZERS)
       ${benchmarks}
       start_stop
      )
+   set(start_stop_FLAGS DEPENDENCIES hpx_timing)
 endif()
 
 if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD)
@@ -33,7 +35,8 @@ if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD)
       ${benchmarks}
       transform_reduce_binary_scaling
      )
-  set(transform_reduce_binary_scaling_FLAGS DEPENDENCIES iostreams_component)
+  set(transform_reduce_binary_scaling_FLAGS DEPENDENCIES iostreams_component
+    hpx_timing)
 endif()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
@@ -44,9 +47,14 @@ if(HPX_WITH_EXAMPLES_OPENMP)
      )
 
   set(openmp_homogeneous_timed_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies} hpx_preprocessor)
+      DEPENDENCIES
+        ${boost_library_dependencies}
+        hpx_assertion
+        hpx_config
+        hpx_format
+        hpx_timing)
   set(openmp_parallel_region_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies} hpx_preprocessor)
+      DEPENDENCIES ${boost_library_dependencies} hpx_format hpx_timing)
 endif()
 
 if(HPX_WITH_EXAMPLES_QTHREADS)
@@ -60,11 +68,12 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
 
   set(qthreads_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                  ${QTHREADS_LIBRARIES} hpx_preprocessor)
+                  ${QTHREADS_LIBRARIES} hpx_config hpx_format hpx_preprocessor
+                  hpx_timing)
 
   set(qthreads_heterogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                  ${QTHREADS_LIBRARIES} hpx_preprocessor)
+                  ${QTHREADS_LIBRARIES} hpx_assertion hpx_format hpx_timing)
 endif()
 
 if(HPX_WITH_EXAMPLES_TBB)
@@ -77,23 +86,26 @@ if(HPX_WITH_EXAMPLES_TBB)
 
   set(tbb_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   ${TBB_LIBRARIES} hpx_preprocessor)
+                   ${TBB_LIBRARIES} hpx_config hpx_format hpx_preprocessor
+                   hpx_timing)
 endif()
 
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
-set(hpx_heterogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component)
-set(parent_vs_child_stealing_FLAGS DEPENDENCIES iostreams_component)
+set(hpx_heterogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component
+  hpx_timing)
+set(parent_vs_child_stealing_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 set(skynet_FLAGS DEPENDENCIES iostreams_component)
-set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component)
+set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 
 set(delay_baseline_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies} hpx_preprocessor)
+    DEPENDENCIES ${boost_library_dependencies} hpx_config hpx_format hpx_timing)
 
 set(delay_baseline_threaded_FLAGS
-    DEPENDENCIES ${boost_library_dependencies} hpx_preprocessor)
+    DEPENDENCIES ${boost_library_dependencies} hpx_format hpx_timing)
 
 set(print_heterogeneous_payloads_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies} hpx_preprocessor)
+    DEPENDENCIES ${boost_library_dependencies} hpx_config hpx_format)
+set(resume_suspend_FLAGS DEPENDENCIES hpx_timing)
 
 set(benchmarks ${benchmarks}
     hpx_tls_overhead
@@ -104,13 +116,10 @@ set(benchmarks ${benchmarks}
     coroutines_call_overhead
     function_object_wrapper_overhead
     future_overhead
-    serialization_overhead
-    serialization_performance
     sizeof
    )
 
-set(future_overhead_FLAGS DEPENDENCIES iostreams_component)
-set(serialization_overhead_FLAGS DEPENDENCIES iostreams_component)
+set(future_overhead_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 set(sizeof_FLAGS DEPENDENCIES iostreams_component)
 
 set(benchmarks ${benchmarks}
@@ -119,18 +128,22 @@ set(benchmarks ${benchmarks}
     spinlock_overhead2
     stencil3_iterators
     stream
-    transform_reduce_scaling
     partitioned_vector_foreach
    )
 
-set(foreach_scaling_FLAGS DEPENDENCIES iostreams_component)
-set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component)
-set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component)
-set(stencil3_iterators_FLAGS DEPENDENCIES iostreams_component)
+set(foreach_scaling_FLAGS DEPENDENCIES iostreams_component hpx_timing)
+set(function_object_wrapper_overhead_FLAGS DEPENDENCIES hpx_timing)
+set(hpx_tls_overhead_FLAGS DEPENDENCIES hpx_timing)
+set(native_tls_overhead_FLAGS DEPENDENCIES hpx_timing)
+set(nonconcurrent_fifo_overhead_FLAGS DEPENDENCIES hpx_timing)
+set(nonconcurrent_lifo_overhead_FLAGS DEPENDENCIES hpx_timing)
+set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component hpx_timing)
+set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component hpx_timing)
+set(stencil3_iterators_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 set(stream_FLAGS DEPENDENCIES iostreams_component)
-set(transform_reduce_scaling_FLAGS DEPENDENCIES iostreams_component)
+set(transform_reduce_scaling_FLAGS DEPENDENCIES hpx_timing)
 set(partitioned_vector_foreach_FLAGS
-  DEPENDENCIES iostreams_component partitioned_vector_component)
+  DEPENDENCIES iostreams_component partitioned_vector_component hpx_timing)
 
 set(future_overhead_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -150,7 +163,6 @@ set(timed_task_spawn_PARAMETERS NO_HPX_MAIN)
 set(hpx_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(native_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(coroutines_call_overhead_PARAMETERS NO_HPX_MAIN)
-set(serialization_performance_PARAMETERS NO_HPX_MAIN)
 
 if(HPX_WITH_CUDA)
   set_source_files_properties(stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)
@@ -173,29 +185,9 @@ foreach(benchmark ${benchmarks})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/Local")
 
-  list(FIND ${benchmark}_FLAGS NOLIBS has_NOLIBS)
-  if (NOT has_NOLIBS EQUAL -1)
-    target_compile_definitions(${benchmark}_test PRIVATE
-                               HPX_FORMAT_EXPORT= #empty
-                               HPX_NO_VERSION_CHECK)
-    target_sources(${benchmark}_test
-                   PRIVATE ${PROJECT_SOURCE_DIR}/src/util/format.cpp)
-  endif()
-
   if(NOT "${${benchmark}_PARAMETERS}" MATCHES NO_HPX_MAIN)
-    add_hpx_test("tests.performance.local" ${benchmark} ${${benchmark}_PARAMETERS})
+    add_hpx_performance_test("local" ${benchmark} ${${benchmark}_PARAMETERS})
   endif()
-
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.performance.local.${benchmark})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.local
-                              tests.performance.local.${benchmark})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.local.${benchmark}
-                              ${benchmark}_test)
 
 endforeach()
 
@@ -212,5 +204,5 @@ endif()
 
 add_hpx_pseudo_target(tests.performance.local.htts_v2)
 add_subdirectory(htts_v2)
-add_hpx_pseudo_dependencies(tests.performance tests.performance.local.htts_v2)
+add_hpx_pseudo_dependencies(tests.performance.local tests.performance.local.htts_v2)
 

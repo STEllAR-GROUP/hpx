@@ -1,13 +1,16 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2017      Denis Blank
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/util/debugging.hpp>
 
 #include <iostream>
+#include <string>
 
 #if defined(HPX_HAVE_UNISTD_H)
 #include <unistd.h>
@@ -39,6 +42,14 @@ namespace util {
 #elif defined(HPX_WINDOWS)
         DebugBreak();
 #endif
+    }
+
+    void may_attach_debugger(std::string const& category)
+    {
+        if (get_config_entry("hpx.attach_debugger", "") == category)
+        {
+            attach_debugger();
+        }
     }
 }    // end namespace util
 }    // end namespace hpx

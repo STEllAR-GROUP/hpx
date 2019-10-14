@@ -10,7 +10,7 @@
 #include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/include/parallel_copy.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <hpx/hpx_init.hpp>
 
@@ -58,7 +58,7 @@ void test_for_loop(executor_type& exec,
     }
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     unsigned int seed = (unsigned int)std::random_device{}();
     if (vm.count("seed"))
@@ -116,7 +116,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // add command line option which controls the random number generator seed
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 

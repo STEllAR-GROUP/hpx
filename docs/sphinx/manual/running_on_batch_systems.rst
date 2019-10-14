@@ -4,6 +4,7 @@
     Copyright (C) 2013 Pyry Jahkola
     Copyright (C) 2013 Thomas Heller
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -263,7 +264,7 @@ cope with that limitation you can use the |sbatch| command.
 The ``sbatch`` command expects a script that it can run once the requested
 resources are available. In order to request resources you need to add
 ``#SBATCH`` comments in your script or provide the necessary parameters to
-``sbatc`` directly. The parameters are the same as with ``run``. The commands
+``sbatch`` directly. The parameters are the same as with ``run``. The commands
 you need to execute are the same you would need to start your application as if
 you were in an interactive shell.
 

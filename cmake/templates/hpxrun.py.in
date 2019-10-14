@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2014 Thomas Heller
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -103,6 +104,10 @@ def build_cmd(options, args):
     cmd = [args[0]]
     args.pop(0)
 
+    # Append the remaining args
+    for arg in args:
+        cmd += [arg]
+
     if options.localities > 1:
         # Selecting the parcelport for hpx via hpx ini confifuration
         select_parcelport = (lambda pp:
@@ -124,10 +129,6 @@ def build_cmd(options, args):
     # set number of localities
     if options.localities > 1:
         cmd += ['--hpx:localities=' + str(options.localities)]
-
-    # Append the remaining args
-    for arg in args:
-        cmd += [arg]
 
     return cmd
 

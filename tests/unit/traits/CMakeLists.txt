@@ -1,13 +1,11 @@
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
     is_callable
-    is_iterator
-    is_range
-    is_tuple_like
    )
 
 foreach(test ${tests})
@@ -26,15 +24,5 @@ foreach(test ${tests})
 
   add_hpx_unit_test("traits" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.traits.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.traits
-                              tests.unit.traits.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.traits.${test}
-                              ${test}_test)
 endforeach()
 

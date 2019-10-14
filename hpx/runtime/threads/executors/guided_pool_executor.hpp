@@ -1,5 +1,6 @@
 //  Copyright (c) 2017-2019 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,12 +12,11 @@
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/lcos/dataflow.hpp>
-#include <hpx/util/bind_back.hpp>
-#include <hpx/util/debug/demangle_helper.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/debugging/demangle_helper.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/util/pack_traversal.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
 
 #include <cstddef>
@@ -25,14 +25,14 @@
 #include <type_traits>
 #include <utility>
 
+//#define GUIDED_EXECUTOR_DEBUG 1
+//#define GUIDED_POOL_EXECUTOR_FAKE_NOOP
+
 #ifdef GUIDED_EXECUTOR_DEBUG
 #include <iostream>
 #endif
 
 #include <hpx/config/warnings_prefix.hpp>
-
-//#define GUIDED_EXECUTOR_DEBUG 1
-//#define GUIDED_POOL_EXECUTOR_FAKE_NOOP
 
 // --------------------------------------------------------------------
 // pool_numa_hint
@@ -57,8 +57,8 @@ namespace hpx { namespace threads { namespace executors
     // --------------------------------------------------------------------
     struct future_extract_value
     {
-        template<typename T, template <typename> typename Future>
-        const T& operator()(const Future<T> &el) const
+        template <typename T, template <typename> class Future>
+        const T& operator()(const Future<T>& el) const
         {
             const auto & state = traits::detail::get_shared_state(el);
             return *state->get_result();
@@ -306,8 +306,8 @@ namespace hpx { namespace threads { namespace executors
             // the numa_hint_function will be evaluated on that thread and then
             // the real task will be spawned on a new task with hints - as intended
             return dataflow(launch::sync,
-                [f{std::move(f)}, this](Future && predecessor, Ts &&... ts)
-                {
+                [HPX_CAPTURE_FORWARD(f), this](
+                    Future&& predecessor, Ts&&... ts) {
                     pre_execution_then_domain_schedule<
                         pool_executor, pool_numa_hint<Tag>>
                             pre_exec { pool_executor_, hint_, hp_sync_};
@@ -317,29 +317,23 @@ namespace hpx { namespace threads { namespace executors
                         std::forward<Future>(predecessor));
                 },
                 std::forward<Future>(predecessor),
-                std::forward<Ts>(ts)...
-            );
+                std::forward<Ts>(ts)...);
         }
 
         // --------------------------------------------------------------------
         // .then() execute specialized for a when_all dispatch for any future types
         // future< tuple< is_future<a>::type, is_future<b>::type, ...> >
         // --------------------------------------------------------------------
-        template <typename F,
-                  template <typename> typename  OuterFuture,
-                  typename ... InnerFutures,
-                  typename ... Ts,
-                  typename = enable_if_t<is_future_of_tuple_of_futures<
-                    OuterFuture<util::tuple<InnerFutures...>>>::value>,
-                  typename = enable_if_t<traits::is_future_tuple<
-                    util::tuple<InnerFutures...>>::value>
-                  >
-        auto
-        then_execute(F && f,
-                     OuterFuture<util::tuple<InnerFutures... > > && predecessor,
-                     Ts &&... ts)
-        ->  future<typename util::detail::invoke_deferred_result<
-            F, OuterFuture<util::tuple<InnerFutures... >>, Ts...>::type>
+        template <typename F, template <typename> class OuterFuture,
+            typename... InnerFutures, typename... Ts,
+            typename = enable_if_t<is_future_of_tuple_of_futures<
+                OuterFuture<util::tuple<InnerFutures...>>>::value>,
+            typename = enable_if_t<
+                traits::is_future_tuple<util::tuple<InnerFutures...>>::value>>
+        auto then_execute(F&& f,
+            OuterFuture<util::tuple<InnerFutures...>>&& predecessor, Ts&&... ts)
+            -> future<typename util::detail::invoke_deferred_result<F,
+                OuterFuture<util::tuple<InnerFutures...>>, Ts...>::type>
         {
 #ifdef GUIDED_EXECUTOR_DEBUG
             // get the tuple of futures from the predecessor future <tuple of futures>
@@ -371,9 +365,9 @@ namespace hpx { namespace threads { namespace executors
 
             // Please see notes for previous then_execute function above
             return dataflow(launch::sync,
-                [f{std::move(f)}, this]
-                (OuterFuture<util::tuple<InnerFutures...>> && predecessor, Ts &&... ts)
-                {
+                [HPX_CAPTURE_FORWARD(f), this](
+                    OuterFuture<util::tuple<InnerFutures...>>&& predecessor,
+                    Ts&&... ts) {
                     pre_execution_then_domain_schedule<pool_executor,
                         pool_numa_hint<Tag>>
                         pre_exec { pool_executor_, hint_, hp_sync_ };
@@ -383,9 +377,9 @@ namespace hpx { namespace threads { namespace executors
                         std::forward<OuterFuture<util::tuple<InnerFutures...>>>
                         (predecessor));
                 },
-                std::forward<OuterFuture<util::tuple<InnerFutures...>>>(predecessor),
-                std::forward<Ts>(ts)...
-            );
+                std::forward<OuterFuture<util::tuple<InnerFutures...>>>(
+                    predecessor),
+                std::forward<Ts>(ts)...);
         }
 
         // --------------------------------------------------------------------
@@ -431,7 +425,7 @@ namespace hpx { namespace threads { namespace executors
 #else
                          decltype(unwrapped_futures_tuple)>(" | ")
 #endif
-                      << "\n"
+                      << "\n";
 
             std::cout << "dataflow hint returning " << domain << "\n";
 #endif

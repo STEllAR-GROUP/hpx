@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,13 +8,13 @@
 #define HPX_LCOS_FUTURE_WAIT_OCT_23_2008_1140AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 
@@ -108,7 +109,8 @@ namespace hpx { namespace lcos
               : lazy_values_(lazy_values),
                 ready_count_(0),
                 f_(std::forward<F>(f)),
-                success_counter_(success_counter)
+                success_counter_(success_counter),
+                goal_reached_on_calling_thread_(false)
             {}
 
             template <typename F_>
@@ -117,16 +119,20 @@ namespace hpx { namespace lcos
               : lazy_values_(std::move(lazy_values)),
                 ready_count_(0),
                 f_(std::forward<F>(f)),
-                success_counter_(success_counter)
+                success_counter_(success_counter),
+                goal_reached_on_calling_thread_(false)
             {}
 
             wait_each(wait_each && rhs)
               : lazy_values_(std::move(rhs.lazy_values_)),
                 ready_count_(rhs.ready_count_.load()),
                 f_(std::move(rhs.f_)),
-                success_counter_(rhs.success_counter_)
+                success_counter_(rhs.success_counter_),
+                goal_reached_on_calling_thread_(
+                    rhs.goal_reached_on_calling_thread_)
             {
                 rhs.success_counter_ = nullptr;
+                rhs.goal_reached_on_calling_thread_ = false;
             }
 
             wait_each& operator= (wait_each && rhs)
@@ -138,6 +144,9 @@ namespace hpx { namespace lcos
                     f_ = std::move(rhs.f_);
                     success_counter_ = rhs.success_counter_;
                     rhs.success_counter_ = nullptr;
+                    goal_reached_on_calling_thread_ =
+                        rhs.goal_reached_on_calling_thread_;
+                    rhs.goal_reached_on_calling_thread_ = false;
                 }
                 return *this;
             }

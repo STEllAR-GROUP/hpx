@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Antoine Tran Tan
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,8 +12,8 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/detail/pack.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/util/first_argument.hpp>
 
 #include <boost/range/irange.hpp>

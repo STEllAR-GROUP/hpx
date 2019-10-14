@@ -1,5 +1,6 @@
 # Copyright (c) 2007-2018 Hartmut Kaiser
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -23,17 +24,7 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Unit/PerformanceCounters/")
 
-  add_hpx_unit_test("performance_counters" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test("performance_counter" ${test} ${${test}_PARAMETERS})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.performance_counter.${test})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.performance_counter
-                              tests.unit.performance_counter.${test})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.performance_counter.${test}
-                              ${test}_test)
 endforeach()
 

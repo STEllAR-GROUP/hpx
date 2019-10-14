@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,18 +9,18 @@
 #define HPX_LCOS_PACKAGED_ACTION_JUN_27_2008_0420PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/internal_allocator.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 
 #include <boost/asio/error.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -29,11 +30,11 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx {
-namespace lcos {
+namespace hpx { namespace lcos {
 
-    namespace detail
-    {
+#if defined(HPX_HAVE_NETWORKING)
+    namespace detail {
+
         template <typename Result>
         struct parcel_write_handler
         {
@@ -45,7 +46,8 @@ namespace lcos {
                 // any error in the parcel layer will be stored in the future object
                 if (ec)
                 {
-                    if (hpx::tolerate_node_faults()) {
+                    if (hpx::tolerate_node_faults())
+                    {
                         if (ec == boost::asio::error::connection_reset)
                             return;
                     }
@@ -70,7 +72,7 @@ namespace lcos {
                 if (ec)
                 {
                     std::exception_ptr exception = HPX_GET_EXCEPTION(ec,
-                        "packaged_action::parcel_write_handler",
+                        "packaged_action::parcel_write_handler_cb",
                         parcelset::dump_parcel(p));
                     shared_state->set_exception(exception);
                 }
@@ -80,6 +82,7 @@ namespace lcos {
             }
         };
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     /// A packaged_action can be used by a single \a thread to invoke a
@@ -119,9 +122,9 @@ namespace lcos {
               typename hpx::traits::extract_action<Action>::remote_result_type>
     {
     protected:
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::remote_result_type remote_result_type;
-        typedef promise<Result, remote_result_type> base_type;
+        using action_type = typename hpx::traits::extract_action<Action>::type;
+        using remote_result_type = typename action_type::remote_result_type;
+        using base_type = promise<Result, remote_result_type>;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts>
@@ -132,8 +135,12 @@ namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
+#if defined(HPX_HAVE_NETWORKING)
             auto&& f = detail::parcel_write_handler<Result>{this->shared_state_};
-
+#else
+            auto shared_state = this->shared_state_;
+            auto&& f = [HPX_CAPTURE_MOVE(shared_state)]() {};
+#endif
             naming::address addr_(this->resolve());
             naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
@@ -165,7 +172,12 @@ namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
+#if defined(HPX_HAVE_NETWORKING)
             auto&& f = detail::parcel_write_handler<Result>{this->shared_state_};
+#else
+            auto shared_state = this->shared_state_;
+            auto&& f = [HPX_CAPTURE_MOVE(shared_state)]() {};
+#endif
 
             naming::address addr_(this->resolve());
             naming::id_type cont_id(this->get_id(false));
@@ -187,9 +199,19 @@ namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
-            typedef typename util::decay<Callback>::type callback_type;
+            using callback_type = typename util::decay<Callback>::type;
+
+#if defined(HPX_HAVE_NETWORKING)
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
                 this->shared_state_, std::forward<Callback>(cb)};
+#else
+            auto shared_state = this->shared_state_;
+            auto&& f =
+                [HPX_CAPTURE_MOVE(shared_state), HPX_CAPTURE_FORWARD(cb)]()
+                {
+                    cb();
+                };
+#endif
 
             naming::address addr_(this->resolve());
             naming::id_type cont_id(this->get_id(false));
@@ -222,9 +244,19 @@ namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
-            typedef typename util::decay<Callback>::type callback_type;
+            using callback_type = typename util::decay<Callback>::type;
+
+#if defined(HPX_HAVE_NETWORKING)
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
                 this->shared_state_, std::forward<Callback>(cb)};
+#else
+            auto shared_state = this->shared_state_;
+            auto&& f =
+                [HPX_CAPTURE_MOVE(shared_state), HPX_CAPTURE_FORWARD(cb)]()
+                {
+                    cb();
+                };
+#endif
 
             naming::address addr_(this->resolve());
             naming::id_type cont_id(this->get_id(false));
@@ -324,7 +356,12 @@ namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
+#if defined(HPX_HAVE_NETWORKING)
             auto&& f = detail::parcel_write_handler<Result>{this->shared_state_};
+#else
+            auto shared_state = this->shared_state_;
+            auto&& f = [HPX_CAPTURE_MOVE(shared_state)]() {};
+#endif
 
             naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
@@ -344,9 +381,19 @@ namespace lcos {
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", " << id << ") args(" << sizeof...(Ts) << ")";
 
-            typedef typename util::decay<Callback>::type callback_type;
+            using callback_type = typename util::decay<Callback>::type;
+
+#if defined(HPX_HAVE_NETWORKING)
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
                 this->shared_state_, std::forward<Callback>(cb)};
+#else
+            auto shared_state = this->shared_state_;
+            auto&& f =
+                [HPX_CAPTURE_MOVE(shared_state),HPX_CAPTURE_FORWARD(cb)]()
+                {
+                    cb();
+                };
+#endif
 
             naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
@@ -364,8 +411,8 @@ namespace lcos {
     class packaged_action<Action, Result, /*DirectExecute=*/true>
         : public packaged_action<Action, Result, /*DirectExecute=*/false>
     {
-        typedef typename packaged_action<Action, Result,
-            /*DirectExecute=*/false>::action_type action_type;
+        using action_type = typename packaged_action<Action, Result,
+            /*DirectExecute=*/false>::action_type;
 
     public:
         /// Construct a (non-functional) instance of an \a packaged_action. To
@@ -392,7 +439,7 @@ namespace lcos {
             naming::address addr;
             if (agas::is_local_address_cached(id, addr))
             {
-                typedef typename Action::component_type component_type;
+                using component_type = typename Action::component_type;
                 HPX_ASSERT(
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
@@ -435,7 +482,7 @@ namespace lcos {
 
             if (addr.locality_ == hpx::get_locality())
             {
-                typedef typename Action::component_type component_type;
+                using component_type = typename Action::component_type;
                 HPX_ASSERT(
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
@@ -479,7 +526,7 @@ namespace lcos {
             naming::address addr;
             if (agas::is_local_address_cached(id, addr))
             {
-                typedef typename Action::component_type component_type;
+                using component_type = typename Action::component_type;
                 HPX_ASSERT(
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
@@ -497,7 +544,12 @@ namespace lcos {
                         this->shared_state_->set_remote_data(std::move(result));
 
                         // invoke callback
+#if defined(HPX_HAVE_NETWORKING)
                         cb(boost::system::error_code(), parcelset::parcel());
+#else
+                        cb();
+#endif
+
                         return;
                     }
                 }
@@ -510,7 +562,11 @@ namespace lcos {
                     this->shared_state_->set_remote_data(std::move(result));
 
                     // invoke callback
+#if defined(HPX_HAVE_NETWORKING)
                     cb(boost::system::error_code(), parcelset::parcel());
+#else
+                    cb();
+#endif
                     return;
                 }
             }
@@ -528,7 +584,7 @@ namespace lcos {
 
             if (addr.locality_ == hpx::get_locality())
             {
-                typedef typename Action::component_type component_type;
+                using component_type = typename Action::component_type;
                 HPX_ASSERT(
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
@@ -546,7 +602,11 @@ namespace lcos {
                         this->shared_state_->set_remote_data(std::move(result));
 
                         // invoke callback
+#if defined(HPX_HAVE_NETWORKING)
                         cb(boost::system::error_code(), parcelset::parcel());
+#else
+                        cb();
+#endif
                         return;
                     }
                 }
@@ -559,7 +619,11 @@ namespace lcos {
                     this->shared_state_->set_remote_data(std::move(result));
 
                     // invoke callback
+#if defined(HPX_HAVE_NETWORKING)
                     cb(boost::system::error_code(), parcelset::parcel());
+#else
+                    cb();
+#endif
                     return;
                 }
             }
@@ -570,7 +634,6 @@ namespace lcos {
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
     };
-}
-}
+}}
 
 #endif

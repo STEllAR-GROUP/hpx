@@ -1,6 +1,7 @@
 // Copyright (C) 2016 John Biddiscombe
 // Copyright (C) 2000, 2001 Stephen Cleary
 //
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 
@@ -16,7 +17,7 @@
 #undef BOOST_POOL_INSTRUMENT
 
 #include <hpx/config.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/assertion.hpp>
 //
 #include <plugins/parcelport/verbs/rdma/verbs_memory_region.hpp>
 

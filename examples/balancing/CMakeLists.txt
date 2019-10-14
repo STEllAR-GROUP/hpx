@@ -1,5 +1,6 @@
 # Copyright (c) 2011 Bryce Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -23,23 +24,9 @@ foreach(example_program ${example_programs})
                      ${${example_program}_FLAGS}
                      FOLDER "Examples/Balancing/${example_program}")
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(examples.balancing.${example_program})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(examples.balancing
-                              examples.balancing.${example_program})
-
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.balancing.${example_program}
-                              ${example_program})
+  add_hpx_example_target_dependencies("balancing" ${example_program})
 
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_example_test("balancing" ${example_program} ${${example_program}_PARAMETERS})
-    add_hpx_pseudo_target(tests.examples.balancing.${example_program})
-    add_hpx_pseudo_dependencies(tests.examples.balancing
-                                tests.examples.balancing.${example_program})
-    add_hpx_pseudo_dependencies(tests.examples.balancing.${example_program}
-                                ${example_program})
   endif()
 endforeach()

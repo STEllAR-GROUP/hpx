@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,7 +9,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -71,11 +72,18 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<int> callback_called(0);
 
+#if defined(HPX_HAVE_NETWORKING)
 void cb(boost::system::error_code const& ec,
     hpx::parcelset::parcel const& p)
 {
     ++callback_called;
 }
+#else
+void cb()
+{
+    ++callback_called;
+}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_remote_async_cb_colocated(test_client const& target)

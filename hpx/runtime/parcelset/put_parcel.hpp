@@ -1,11 +1,18 @@
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef HPX_PARCELSET_PUT_PARCEL_HPP
 #define HPX_PARCELSET_PUT_PARCEL_HPP
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
+
+#include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
@@ -13,15 +20,17 @@
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/actions/transfer_continuation_action.hpp>
+#include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/traits/is_action.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/unused.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -121,6 +130,7 @@ namespace hpx { namespace parcelset
             {
                 naming::gid_type gid = dest.get_gid();
                 naming::detail::strip_credits_from_gid(gid);
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 HPX_ASSERT(gid);
 
                 pp(detail::create_parcel::call_with_action(
@@ -131,6 +141,7 @@ namespace hpx { namespace parcelset
             else if (dest.get_management_type() == naming::id_type::managed_move_credit)
             {
                 naming::gid_type gid = naming::detail::move_gid(dest.get_gid());
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 HPX_ASSERT(gid);
 
                 pp(detail::create_parcel::call_with_action(
@@ -200,4 +211,5 @@ namespace hpx { namespace parcelset
     }
 }}
 
+#endif
 #endif

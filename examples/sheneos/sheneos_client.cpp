@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,7 +13,7 @@
 
 #include "sheneos/interpolator.hpp"
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 inline bool
@@ -21,7 +22,7 @@ eval(char const* expr, sheneos::interpolator& shen, double ye,
 {
     std::vector<double> results = shen.interpolate(ye, temp, rho);
     std::cout << expr << std::endl;
-    std::cout << std::string(std::strlen(expr), '-') << std::endl;
+    std::cout << std::string(strnlen(expr, 256), '-') << std::endl;
 
     if (results.size() != expected.size()) {
         std::cout << "Result size mismatch, got: " << results.size()
@@ -38,7 +39,7 @@ eval(char const* expr, sheneos::interpolator& shen, double ye,
     return true;
 }
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::string const datafilename = vm["file"].as<std::string>();
     int num_partitions = 27;
@@ -84,11 +85,11 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    boost::program_options::options_description desc_commandline(
+    hpx::program_options::options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("file", boost::program_options::value<std::string>()->default_value(
+        ("file", hpx::program_options::value<std::string>()->default_value(
                 "sheneos_220r_180t_50y_extT_analmu_20100322_SVNr28.h5"),
             "name of HDF5 data file containing the Shen EOS tables")
         ;

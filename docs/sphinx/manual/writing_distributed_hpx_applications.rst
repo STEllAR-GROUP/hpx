@@ -3,6 +3,7 @@
     Copyright (C) 2007-2015 Hartmut Kaiser
     Copyright (C) 2012 Bryce Adelstein-Lelbach
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -239,7 +240,7 @@ extensions added by |hpx| (light gray) where:
 
 .. _figure_hpx_the_api:
 
-.. figure:: /_static/images/hpx_the_api.png
+.. figure:: ../_static/images/hpx_the_api.png
 
    Overview of the main API exposed by |hpx|.
 
@@ -390,7 +391,7 @@ invocation.
 It is very important to understand that this 'synchronous' invocation syntax in
 fact conceals an asynchronous function call. This is beneficial as the calling
 thread is suspended while waiting for the outcome of a potentially remote
-operation. The |hpx| thread scheduler will schedule other work in the mean time,
+operation. The |hpx| thread scheduler will schedule other work in the meantime,
 allowing the application to make further progress while the remote result is
 computed. This helps overlapping computation with communication and hiding
 communication latencies.
@@ -1038,7 +1039,7 @@ variables is prohibited, this parallel section is created via the RAII idiom.
 To define a parallel section, simply write an action taking a ``spmd_block``
 variable as a first parameter::
 
-    #include <hpx/lcos/spmd_block.hpp>
+    #include <hpx/collectives/spmd_block.hpp>
 
     void bulk_function(hpx::lcos::spmd_block block /* , arg0, arg1, ... */)
     {
@@ -1062,7 +1063,7 @@ The ``spmd_block`` class contains the following methods:
 Here is a sample code summarizing the features offered by the ``spmd_block``
 class::
 
-    #include <hpx/lcos/spmd_block.hpp>
+    #include <hpx/collectives/spmd_block.hpp>
 
     void bulk_function(hpx::lcos::spmd_block block /* , arg0, arg1, ... */)
     {
@@ -1401,7 +1402,7 @@ view. We illustrate below how a single constructor call can perform those two
 operations::
 
     #include <hpx/components/containers/coarray/coarray.hpp>
-    #include <hpx/lcos/spmd_block.hpp>
+    #include <hpx/collectives/spmd_block.hpp>
 
     // The following code generates all necessary boiler plate to enable the
     // co-creation of 'coarray'
@@ -1469,7 +1470,7 @@ is possible.
 Here is an example of using local subscripts::
 
     #include <hpx/components/containers/coarray/coarray.hpp>
-    #include <hpx/lcos/spmd_block.hpp>
+    #include <hpx/collectives/spmd_block.hpp>
 
     // The following code generates all necessary boiler plate to enable the
     // co-creation of 'coarray'

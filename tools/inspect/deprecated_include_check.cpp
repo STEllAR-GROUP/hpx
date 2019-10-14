@@ -4,11 +4,12 @@
 //  Copyright Gennaro Prota 2006.
 //  Copyright Hartmut Kaiser 2016.
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
 
 #include <algorithm>
 
@@ -31,7 +32,7 @@ namespace boost
       { "boost/unordered_map\\.hpp", "unordered_map" },
       { "boost/unordered_set\\.hpp", "unordered_set" },
       { "boost/utility/enable_if\\.hpp", "type_traits" },
-      { "boost/detail/atomic_count\\.hpp", "hpx/util/atomic_count.hpp" },
+      { "boost/detail/atomic_count\\.hpp", "hpx/thread_support/atomic_count.hpp" },
       { "boost/function\\.hpp", "hpx/util/function.hpp" },
       { "boost/shared_ptr\\.hpp", "memory" },
       { "boost/make_shared\\.hpp", "memory" },
@@ -40,9 +41,9 @@ namespace boost
       { "boost/(chrono/)?chrono\\.hpp", "chrono" },
       { "boost/(core/)?ref\\.hpp", "functional" },
       { "boost/cstdint\\.hpp", "cstdint" },
-      { "boost/thread/barrier\\.hpp", "hpx/compat/barrier.hpp" },
+      { "boost/thread/barrier\\.hpp", "hpx/util/barrier.hpp" },
       { "boost/exception_ptr\\.hpp", "exception" },
-      { "boost/range/iterator_range\\.hpp", "hpx/util/iterator_range.hpp" },
+      { "boost/range/iterator_range\\.hpp", "hpx/iterator_support/iterator_range.hpp" },
       { "hpx/hpx_fwd\\.hpp", "nothing (remove unconditionally)" },
       { "boost/preprocessor/cat\\.hpp", "hpx/util/detail/pp/cat.hpp" },
       { "boost/preprocessor/stringize\\.hpp", "hpx/util/detail/pp/stringize.hpp" },
@@ -51,6 +52,8 @@ namespace boost
       { "boost/random/([^\\s]*)\\.hpp", "random" },
       { "boost/format\\.hpp", "hpx/util/format.hpp" },
       { "boost/regex.hpp", "regex" },
+      { "boost/program_options([^\\s]*)\\.hpp", "hpx/program_options\\2.hpp" },
+      { "boost/filesystem([^\\s]*)\\.hpp", "hpx/filesystem.hpp" },
       { nullptr, nullptr }
     };
 
@@ -74,11 +77,11 @@ namespace boost
            ++includes_it)
       {
         std::string rx =
-            std::string("^\\s*#\\s*include\\s*<(")
+            std::string(R"(^\s*#\s*include\s*<()")
           +   includes_it->include_regex
           + ")>\\s*$"
           + "|"
-          + "^\\s*#\\s*include\\s*\"("
+          + R"(^\s*#\s*include\s*"()"
           +   includes_it->include_regex
           + ")\"\\s*$";
 

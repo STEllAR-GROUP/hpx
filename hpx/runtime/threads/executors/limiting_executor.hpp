@@ -1,5 +1,6 @@
 //  Copyright (c) 2017-2018 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -13,7 +14,7 @@
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <atomic>
@@ -90,7 +91,7 @@ namespace hpx { namespace threads { namespace executors
             auto&& args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
             parallel::execution::post(
                 executor_,
-                [this, HPX_CAPTURE_MOVE(f), HPX_CAPTURE_MOVE(args)]() mutable
+                [this, HPX_CAPTURE_FORWARD(f), HPX_CAPTURE_FORWARD(args)]() mutable
                 {
                     hpx::util::invoke_fused(std::move(f), std::move(args));
                     count_down();
@@ -113,7 +114,7 @@ namespace hpx { namespace threads { namespace executors
             auto&& args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
             lcos::local::futures_factory<result_type()> p(
                 executor_,
-                [this, HPX_CAPTURE_MOVE(f), HPX_CAPTURE_MOVE(args)]() mutable
+                [this, HPX_CAPTURE_FORWARD(f), HPX_CAPTURE_FORWARD(args)]() mutable
                 {
                     hpx::util::invoke_fused(std::move(f), std::move(args));
                     count_down();
@@ -150,7 +151,7 @@ namespace hpx { namespace threads { namespace executors
             auto&& args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
             lcos::local::futures_factory<result_type()> p(
                 executor_,
-                [this, HPX_CAPTURE_MOVE(f), HPX_CAPTURE_MOVE(args)]() mutable
+                [this, HPX_CAPTURE_FORWARD(f), HPX_CAPTURE_FORWARD(args)]() mutable
                 {
                     hpx::util::invoke_fused(std::move(f), std::move(args));
                     count_down();

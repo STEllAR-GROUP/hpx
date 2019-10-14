@@ -1,12 +1,13 @@
 //  Copyright (c) 2013 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/testing.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -57,7 +58,7 @@ HPX_REGISTER_COMPONENT(test_component);
 HPX_REGISTER_ACTION(test::pong_action, test_pong_action);
 HPX_REGISTER_ACTION(test::ping_action, test_ping_action);
 
-int hpx_main(boost::program_options::variables_map & vm)
+int hpx_main(hpx::program_options::variables_map & vm)
 {
     {
         std::vector<hpx::id_type> localities = hpx::find_all_localities();
@@ -79,12 +80,12 @@ int hpx_main(boost::program_options::variables_map & vm)
 
 int main(int argc, char **argv)
 {
-    boost::program_options::options_description desc(
+    hpx::program_options::options_description desc(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
     desc.add_options()
         ( "iterations",
-          boost::program_options::value<std::size_t>()->default_value(100),
+          hpx::program_options::value<std::size_t>()->default_value(100),
           "number of times to repeat the test")
         ;
 

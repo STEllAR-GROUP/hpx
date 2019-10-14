@@ -1,5 +1,6 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,14 +12,14 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
+#include <hpx/cache/entries/lfu_entry.hpp>
+#include <hpx/cache/local_cache.hpp>
+#include <hpx/cache/statistics/local_full_statistics.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/util/cache/entries/lfu_entry.hpp>
-#include <hpx/util/cache/local_cache.hpp>
-#include <hpx/util/cache/statistics/local_full_statistics.hpp>
-#include <hpx/util/histogram.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/statistics/histogram.hpp>
+#include <hpx/testing.hpp>
 
-#include <boost/program_options.hpp>
+#include <hpx/program_options.hpp>
 #include <boost/accumulators/accumulators.hpp>
 
 #include <algorithm>
@@ -52,7 +53,7 @@ public:
       : key_(hpx::naming::detail::get_stripped_gid(id),
             hpx::naming::detail::get_stripped_gid(id) + (count - 1))
     {
-        HPX_ASSERT(count);
+        HPX_TEST(count);
     }
 
     hpx::naming::gid_type get_gid() const
@@ -63,7 +64,7 @@ public:
     std::uint64_t get_count() const
     {
         hpx::naming::gid_type const size = key_.second - key_.first;
-        HPX_ASSERT(size.get_msb() == 0);
+        HPX_TEST(size.get_msb() == 0);
         return size.get_lsb();
     }
 
@@ -228,7 +229,7 @@ void test_update(gva_cache_type& cache, hpx::naming::gid_type first_key)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t cache_size = HPX_AGAS_LOCAL_CACHE_SIZE;
     if (vm.count("cache_size"))
@@ -257,7 +258,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    using namespace hpx::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 

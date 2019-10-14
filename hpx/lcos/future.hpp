@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,37 +9,36 @@
 #define HPX_LCOS_FUTURE_MAR_06_2012_1059AM
 
 #include <hpx/config.hpp>
-#include <hpx/error_code.hpp>
+#include <hpx/allocator_support/allocator_deleter.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/function.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/result_of.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
-#include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
-#include <hpx/traits/concepts.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/util/allocator_deleter.hpp>
-#include <hpx/util/always_void.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/util/identity.hpp>
-#include <hpx/util/internal_allocator.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/util/lazy_enable_if.hpp>
-#include <hpx/util/result_of.hpp>
+#include <hpx/type_support/always_void.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/identity.hpp>
+#include <hpx/type_support/lazy_enable_if.hpp>
+#include <hpx/type_support/void_guard.hpp>
 #include <hpx/util/serialize_exception.hpp>
-#include <hpx/util/steady_clock.hpp>
-#include <hpx/util/void_guard.hpp>
 
 #if defined(HPX_HAVE_AWAIT)
     #include <hpx/lcos/detail/future_await_traits.hpp>
@@ -165,6 +165,10 @@ namespace hpx { namespace lcos { namespace detail
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT void preprocess_future(serialization::output_archive& ar,
+        hpx::lcos::detail::future_data_refcnt_base& state);
+
     template <typename Archive, typename T>
     void serialize_future_save(Archive& ar, T const& val, std::false_type)
     {
@@ -191,12 +195,13 @@ namespace hpx { namespace lcos { namespace detail
         {
             if (ar.is_preprocessing())
             {
-                typename hpx::traits::detail::shared_state_ptr_for<Future>::type state
-                    = hpx::traits::future_access<Future>::get_shared_state(f);
+                typename hpx::traits::detail::shared_state_ptr_for<Future>::type
+                    state =
+                        hpx::traits::future_access<Future>::get_shared_state(f);
 
                 state->execute_deferred();
 
-                ar.await_future(f);
+                preprocess_future(ar, *state);
             }
             else
             {
@@ -238,13 +243,13 @@ namespace hpx { namespace lcos { namespace detail
         {
             if (ar.is_preprocessing())
             {
-                typename
-                    hpx::traits::detail::shared_state_ptr_for<Future>::type state
-                    = hpx::traits::future_access<Future>::get_shared_state(f);
+                typename hpx::traits::detail::shared_state_ptr_for<Future>::type
+                    state =
+                        hpx::traits::future_access<Future>::get_shared_state(f);
 
                 state->execute_deferred();
 
-                ar.await_future(f);
+                preprocess_future(ar, *state);
             }
             else
             {

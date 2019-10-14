@@ -2,6 +2,7 @@
     Copyright (C) 2007-2015 Hartmut Kaiser
     Copyright (C) 2011-2012 Bryce Adelstein-Lelbach
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -1163,7 +1164,7 @@ categories at the console instance of an application.
 Levels
 ------
 
-All |hpx| logging output have seven different logging levels. These levels can
+All |hpx| logging output has seven different logging levels. These levels can
 be set explicitly or through environmental variables in the main |hpx| ini file
 as shown below. The logging levels and their associated integral values are
 shown in the table below, ordered from most verbose to least verbose. By
@@ -1466,6 +1467,11 @@ The predefined command line options for any application using
    :option:`--hpx:pu-step`, :option:`--hpx:pu-offset` or
    :option:`--hpx:affinity` options. Implies :option:`--hpx:numa-sensitive`
    (:option:`--hpx:bind`\ ``=none``) disables defining thread affinities).
+
+.. option:: --hpx:use-process-mask
+
+   use the process mask to restrict available hardware resources (implies
+   :option:`--hpx:ignore-batch-env`)
 
 .. option:: --hpx:print-bind
 
@@ -1880,9 +1886,20 @@ using the ``scatter`` or ``balanced``/``numa-balanced`` options in most cases.
 
 .. _commandline_affinities:
 
-.. figure:: /_static/images/affinities.png
+.. figure:: ../_static/images/affinities.png
 
    Schematic of thread affinity type distributions.
+
+In addition to the predefined distributions it is possible to restrict the
+resources used by |hpx| to the process CPU mask. The CPU mask is typically set
+by e.g. |mpi|_ and batch environments. Using the command line option
+:option:`--hpx:use-process-mask` makes |hpx| act as if only the processing units
+in the CPU mask are available for use by |hpx|. The number of threads is
+automatically determined from the CPU mask. The number of threads can still be
+changed manually using this option, but only to a number less than or equal to
+the number of processing units in the CPU mask. The option
+:option:`--hpx:print-bind` is useful in conjunction with
+:option:`--hpx:use-process-mask` to make sure threads are placed as expected.
 
 .. [#] The phase of a |hpx|-thread counts how often this thread has been
        activated.

@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -14,20 +15,20 @@
 #  include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 #endif
 
-#include <hpx/runtime/get_worker_thread_num.hpp>
-#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
+#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/steady_clock.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -47,16 +48,20 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    this_thread_executor<Scheduler>::this_thread_executor(char const* description)
-      : scheduler_(
-            typename Scheduler::init_parameter_type(1, description),
-            false
-        ),
-        shutdown_sem_(0),
-        thread_num_(std::size_t(-1)),
-        parent_thread_num_(std::size_t(-1)), orig_thread_num_(std::size_t(-1)),
-        tasks_scheduled_(0), tasks_completed_(0), cookie_(0),
-        self_(nullptr)
+    this_thread_executor<Scheduler>::this_thread_executor(
+        char const* description,
+        policies::detail::affinity_data const& affinity_data)
+      : scheduler_(typename Scheduler::init_parameter_type(
+                       1, affinity_data, description),
+            false)
+      , shutdown_sem_(0)
+      , thread_num_(std::size_t(-1))
+      , parent_thread_num_(std::size_t(-1))
+      , orig_thread_num_(std::size_t(-1))
+      , tasks_scheduled_(0)
+      , tasks_completed_(0)
+      , cookie_(0)
+      , self_(nullptr)
     {
         scheduler_.set_parent_pool(this_thread::get_pool());
         // Inform the resource manager about this new executor. This causes the
@@ -329,13 +334,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         hpx::state expected = state_starting;
         if (state.compare_exchange_strong(expected, state_stopping))
         {
-//             {
-//                 std::unique_lock<mutex_type> l(mtx_);
-//                 resource::get_partitioner().get_affinity_data().add_punit(
-//                     0, thread_num_);
-//                 scheduler_.on_start_thread(0);
-//             }
-
             self_ = threads::get_self_ptr();
 
             this_thread_on_run_exit on_exit(shutdown_sem_, self_);
@@ -354,10 +352,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
             std::int64_t bg_work = 0;
+            std::int64_t bg_send = 0;
+            std::int64_t bg_receive = 0;
             threads::detail::scheduling_counters counters(
                 executed_threads, executed_thread_phases,
                 overall_times, thread_times, idle_loop_count, busy_loop_count,
-                task_active, bg_work);
+                task_active, bg_work, bg_send, bg_receive);
 #else
             threads::detail::scheduling_counters counters(
                 executed_threads, executed_thread_phases,
@@ -434,12 +434,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         HPX_ASSERT(std::size_t(-1) == orig_thread_num_);
 
         thread_num_ = thread_num;
-        orig_thread_num_ = hpx::get_worker_thread_num();
+        orig_thread_num_ = threads::detail::get_thread_num_tss();
 
         std::atomic<hpx::state>& state = scheduler_.get_state(0);
         hpx::state expected = state_initialized;
         bool result = state.compare_exchange_strong(expected, state_starting);
         HPX_ASSERT(result);
+        HPX_UNUSED(result);
     }
 
     // Remove the given processing unit from the scheduler.
@@ -454,6 +455,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         std::atomic<hpx::state>& state = scheduler_.get_state(0);
         hpx::state oldstate = state.exchange(state_stopped);
         HPX_ASSERT(oldstate == state_suspended || oldstate == state_stopped);
+        HPX_UNUSED(oldstate);
 
         thread_num_ = std::size_t(-1);
         parent_thread_num_ = std::size_t(-1);

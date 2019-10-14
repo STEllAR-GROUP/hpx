@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,11 +9,10 @@
 #define HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/thread.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
@@ -22,8 +22,9 @@
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_select_direct_execution.hpp>
 #include <hpx/traits/action_stacksize.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/type_support/decay.hpp>
 
+#include <thread>
 #include <chrono>
 #include <exception>
 #include <memory>
@@ -68,9 +69,6 @@ namespace hpx { namespace applier { namespace detail
                 comptype, std::forward<Ts>(vs)...);
         }
 
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-        data.lva = lva;
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         data.description = util::thread_description(
@@ -87,7 +85,7 @@ namespace hpx { namespace applier { namespace detail
 
         while (!threads::threadmanager_is_at_least(state_running))
         {
-            compat::this_thread::sleep_for(
+            std::this_thread::sleep_for(
                 std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
         }
 
@@ -110,9 +108,6 @@ namespace hpx { namespace applier { namespace detail
             std::forward<Continuation>(cont), lva, comptype,
             std::forward<Ts>(vs)...);
 
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-        data.lva = lva;
-#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         data.description = util::thread_description(
@@ -129,7 +124,7 @@ namespace hpx { namespace applier { namespace detail
 
         while (!threads::threadmanager_is_at_least(state_running))
         {
-            compat::this_thread::sleep_for(
+            std::this_thread::sleep_for(
                 std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
         }
 

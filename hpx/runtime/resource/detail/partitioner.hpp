@@ -1,5 +1,6 @@
 //  Copyright (c)      2017 Shoshana Jakobovits
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,13 +11,14 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/resource/partitioner.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/runtime/threads/cpu_mask.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/tuple.hpp>
-
-#include <boost/program_options.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/program_options.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -52,12 +54,11 @@ namespace hpx { namespace resource { namespace detail
         static std::size_t num_threads_overall;
 
     private:
-        init_pool_data(const std::string &name,
-            scheduling_policy = scheduling_policy::unspecified,
-            hpx::threads::policies::scheduler_mode =
-                hpx::threads::policies::scheduler_mode::default_mode);
+        init_pool_data(const std::string& name, scheduling_policy policy,
+            hpx::threads::policies::scheduler_mode mode);
 
-        init_pool_data(std::string const& name, scheduler_function create_func);
+        init_pool_data(std::string const& name, scheduler_function create_func,
+            hpx::threads::policies::scheduler_mode mode);
 
         std::string pool_name_;
         scheduling_policy scheduling_policy_;
@@ -127,6 +128,15 @@ namespace hpx { namespace resource { namespace detail
         // resource partitioner called in hpx_init
         void configure_pools();
 
+        // returns the number of threads(pus) requested
+        // by the user at startup.
+        // This should not be called before the RP has parsed the config and
+        // assigned affinity data
+        std::size_t threads_needed() {
+            HPX_ASSERT(pus_needed_ != std::size_t(-1));
+            return pus_needed_;
+        }
+
         ////////////////////////////////////////////////////////////////////////
         scheduling_policy which_scheduler(std::string const& pool_name);
         threads::topology &get_topology() const;
@@ -152,9 +162,9 @@ namespace hpx { namespace resource { namespace detail
         bool cmd_line_parsed() const;
         int parse(
             util::function_nonser<
-                int(boost::program_options::variables_map& vm)
+                int(hpx::program_options::variables_map& vm)
             > const& f,
-            boost::program_options::options_description desc_cmdline,
+            hpx::program_options::options_description desc_cmdline,
             int argc, char **argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode,
             runtime_mode mode, bool fill_internal_topology = true);
@@ -224,7 +234,7 @@ namespace hpx { namespace resource { namespace detail
         // holds all of the command line switches
         util::command_line_handling cfg_;
         std::size_t first_core_;
-        std::size_t cores_needed_;
+        std::size_t pus_needed_;
 
         // contains the basic characteristics of the thread pool partitioning ...
         // that will be passed to the runtime
@@ -244,6 +254,8 @@ namespace hpx { namespace resource { namespace detail
 
         // topology information
         threads::topology& topo_;
+
+        threads::policies::scheduler_mode default_scheduler_mode_;
     };
 }}}
 
