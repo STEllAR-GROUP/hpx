@@ -113,15 +113,19 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         {
         }
 
-        void reset()
+        void reset_tss()
         {
-#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-            m_phase = 0;
-#endif
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             delete_tss_storage(m_thread_data);
 #else
             m_thread_data = 0;
+#endif
+        }
+
+        void reset()
+        {
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
+            m_phase = 0;
 #endif
             m_thread_id.reset();
         }
