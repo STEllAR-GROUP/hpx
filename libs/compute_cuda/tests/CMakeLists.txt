@@ -39,10 +39,13 @@ if (HPX_WITH_TESTS_BENCHMARKS)
 endif()
 
 if (HPX_WITH_TESTS_HEADERS)
+  # TODO: Why is this needed?
+  add_library(hpx_includes INTERFACE)
+  target_include_directories(hpx_includes INTERFACE ${CMAKE_SOURCE_DIR})
   add_hpx_header_tests(
     modules.compute_cuda
     HEADERS ${compute_cuda_headers}
     HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
     NOLIBS
-    DEPENDENCIES hpx_compute_cuda)
+    DEPENDENCIES hpx_compute_cuda hpx_includes)
 endif()
