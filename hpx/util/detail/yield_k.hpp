@@ -20,6 +20,8 @@
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 
+#include <cstddef>
+
 namespace hpx { namespace util { namespace detail
 {
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION

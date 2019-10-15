@@ -8,8 +8,11 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstddef>
 #include <mutex>
+#include <string>
 #include <thread>
+#include <vector>
 
 std::size_t dummy_called = 0;
 

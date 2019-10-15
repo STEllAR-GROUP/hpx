@@ -13,6 +13,7 @@
 #include <hpx/timing/steady_clock.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 
 namespace hpx { namespace basic_execution { namespace this_thread {

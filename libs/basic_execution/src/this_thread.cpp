@@ -16,9 +16,12 @@
 #include <hpx/timing/steady_clock.hpp>
 
 #include <condition_variable>
+#include <cstddef>
 #include <cstdint>
 #include <mutex>
+#include <string>
 #include <thread>
+#include <utility>
 
 #if defined(HPX_WINDOWS)
 #include <windows.h>

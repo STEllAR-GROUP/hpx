@@ -11,6 +11,7 @@
 #include <hpx/timing/steady_clock.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <iosfwd>
 
 namespace hpx { namespace basic_execution {
