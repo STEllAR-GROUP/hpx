@@ -134,8 +134,10 @@ namespace hpx { namespace threads { namespace detail
            << "\n"
            << "is running on PUs : \n";
         os << std::hex << HPX_CPU_MASK_PREFIX << get_used_processing_units()
+           << " " << std::bitset<HPX_HAVE_MAX_CPU_COUNT>(get_used_processing_units())
            << '\n';
         os << "on numa domains : \n" << get_numa_domain_bitmap() << '\n';
+        os << "pool offset : \n" << std::dec << this->thread_offset_ << "\n";
     }
 
     template <typename Scheduler>
