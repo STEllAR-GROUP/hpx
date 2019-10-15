@@ -15,11 +15,12 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util_fwd.hpp>
@@ -28,6 +29,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <type_traits>
 #include <utility>
 
@@ -721,8 +723,25 @@ namespace hpx { namespace this_thread {
 /// \cond NOINTERNAL
 
 ///////////////////////////////////////////////////////////////////////////////
-// FIXME: the API function below belong into the namespace hpx::threads
-namespace hpx { namespace applier {
+namespace hpx { namespace threads
+{
+    namespace detail {
+        using get_default_pool_type = std::function<thread_pool_base*()>;
+        HPX_EXPORT void set_get_default_pool(get_default_pool_type f);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create a new \a thread using the given data.
+    ///
+    /// \note This function is completely equivalent to the first overload
+    ///       of threads#register_thread_plain above, except that part of the
+    ///       parameters are passed as members of the threads#thread_init_data
+    ///       object.
+    ///
+    HPX_API_EXPORT threads::thread_id_type register_thread_plain(
+        threads::thread_init_data& data,
+        threads::thread_state_enum initial_state = threads::pending,
+        bool run_now = true, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given function as the work to
@@ -784,16 +803,24 @@ namespace hpx { namespace applier {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT threads::thread_id_type register_thread_plain(
-        threads::thread_function_type&& func,
-        util::thread_description const& description =
-            util::thread_description(),
+    HPX_FORCEINLINE threads::thread_id_type register_thread_plain(
+        threads::thread_function_type && func,
+        util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
-        threads::thread_schedule_hint = threads::thread_schedule_hint(),
+        threads::thread_schedule_hint schedulehint = threads::thread_schedule_hint(),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
-        error_code& ec = throws);
+        error_code& ec = throws)
+    {
+        util::thread_description d =
+            description ? description : util::thread_description(func, "register_thread_plain");
+
+        threads::thread_init_data data(std::move(func), d, priority,
+            schedulehint, threads::get_stack_size(stacksize));
+
+        return register_thread_plain(data, initial_state, run_now, ec);
+    }
 
     /// \brief Create a new \a thread using the given function as the work to
     ///        be executed. The work item can't be suspended when
@@ -817,19 +844,6 @@ namespace hpx { namespace applier {
         threads::thread_priority priority = threads::thread_priority_normal,
         threads::thread_schedule_hint = threads::thread_schedule_hint(),
         error_code& ec = throws);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Create a new \a thread using the given data.
-    ///
-    /// \note This function is completely equivalent to the first overload
-    ///       of threads#register_thread_plain above, except that part of the
-    ///       parameters are passed as members of the threads#thread_init_data
-    ///       object.
-    ///
-    HPX_API_EXPORT threads::thread_id_type register_thread_plain(
-        threads::thread_init_data& data,
-        threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Create a new \a thread using the given data. The new thread
@@ -1003,6 +1017,20 @@ namespace hpx { namespace applier {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new work item using the given function as the
+    ///        work to be executed.
+    ///
+    /// \note This function is completely equivalent to the first overload
+    ///       of threads#register_work_plain above, except that part of the
+    ///       parameters are passed as members of the threads#thread_init_data
+    ///       object.
+    ///
+    HPX_API_EXPORT void register_work_plain(
+        threads::thread_init_data& data,
+        threads::thread_state_enum initial_state = threads::pending,
+        error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create a new work item using the given function as the
     ///        work to be executed. This work item will be used to create a
     ///        \a threads#thread instance whenever the shepherd thread runs out
     ///        of work only. The created work descriptions will be queued
@@ -1049,16 +1077,26 @@ namespace hpx { namespace applier {
     ///
     /// \throws invalid_status if the runtime system has not been started yet.
     ///
-    HPX_API_EXPORT void register_work_plain(
+    HPX_FORCEINLINE void register_work_plain(
         threads::thread_function_type&& func,
         util::thread_description const& description =
             util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
-        threads::thread_schedule_hint = threads::thread_schedule_hint(),
+        threads::thread_schedule_hint schedulehint = threads::thread_schedule_hint(),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
-        error_code& ec = throws);
+        error_code& ec = throws)
+    {
+        util::thread_description d =
+            description ? description : util::thread_description(func, "register_work_plain");
 
+        threads::thread_init_data data(std::move(func), d, priority,
+            schedulehint, threads::get_stack_size(stacksize));
+
+        return register_work_plain(data, initial_state, ec);
+    }
+
+    // TODO
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new work item using the given function as the
     ///        work to be executed. This work item will be used to create a
@@ -1115,33 +1153,6 @@ namespace hpx { namespace applier {
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
         threads::thread_schedule_hint = threads::thread_schedule_hint(),
-        error_code& ec = throws);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Create a new work item using the given function as the
-    ///        work to be executed.
-    ///
-    /// \note This function is completely equivalent to the first overload
-    ///       of threads#register_work_plain above, except that part of the
-    ///       parameters are passed as members of the threads#thread_init_data
-    ///       object.
-    ///
-    HPX_API_EXPORT void register_work_plain(threads::thread_init_data& data,
-        threads::thread_state_enum initial_state = threads::pending,
-        error_code& ec = throws);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Create a new work item using the given function as the
-    ///        work to be executed. The new thread can't be suspended.
-    ///
-    /// \note This function is completely equivalent to the first overload
-    ///       of threads#register_work_plain above, except that part of the
-    ///       parameters are passed as members of the threads#thread_init_data
-    ///       object.
-    ///
-    HPX_API_EXPORT void register_non_suspendable_work_plain(
-        threads::thread_init_data& data,
-        threads::thread_state_enum initial_state = threads::pending,
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1266,26 +1277,26 @@ namespace hpx { namespace applier {
 }}    // namespace hpx::applier
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads {
+#if defined(HPX_HAVE_REGISTER_THREAD_COMPATIBILITY)
+namespace hpx { namespace applier
+{
+    using threads::register_thread_plain;
+    using threads::register_thread;
+    using threads::register_thread_nullary;
 
-    // Import all thread creation functions into this name space (we will
-    // deprecate the functions in namespace applier above at some point).
-    using applier::register_thread;
-    using applier::register_thread_nullary;
-    using applier::register_thread_plain;
+    using threads::register_work_plain;
+    using threads::register_work;
+    using threads::register_work_nullary;
 
-    using applier::register_non_suspendable_thread;
-    using applier::register_non_suspendable_thread_nullary;
-    using applier::register_non_suspendable_thread_plain;
+    using threads::register_non_suspendable_thread_plain;
+    using threads::register_non_suspendable_thread;
+    using threads::register_non_suspendable_thread_nullary;
 
-    using applier::register_work;
-    using applier::register_work_nullary;
-    using applier::register_work_plain;
-
-    using applier::register_non_suspendable_work;
-    using applier::register_non_suspendable_work_nullary;
-    using applier::register_non_suspendable_work_plain;
-}}    // namespace hpx::threads
+    using threads::register_non_suspendable_work_plain;
+    using threads::register_non_suspendable_work;
+    using threads::register_non_suspendable_work_nullary;
+}}
+#endif
 
 /// \endcond
 
