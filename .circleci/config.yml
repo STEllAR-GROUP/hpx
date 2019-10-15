@@ -702,7 +702,7 @@ jobs:
               ninja -j2 -k 0 tests.unit.modules.cache
               ninja -j2 -k 0 tests.unit.modules.collectives
               ninja -j2 -k 0 tests.unit.modules.compute
-              ninja -j2 -k 0 tests.unit.modules.compute_cuda
+              # ninja -j2 -k 0 tests.unit.modules.compute_cuda # CUDA not enabled on CircleCI
               ninja -j2 -k 0 tests.unit.modules.concepts
               ninja -j2 -k 0 tests.unit.modules.config
               ninja -j2 -k 0 tests.unit.modules.concurrency
@@ -737,7 +737,7 @@ jobs:
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.compute
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.compute_cuda
+              # ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.compute_cuda
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.concepts
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.concurrency
