@@ -820,17 +820,17 @@ namespace detail
         void run()
         {
             check_started();
-            this->do_run();       // always on this thread
+            this->do_run();    // always on this thread
         }
 
         // run in a separate thread
-        virtual threads::thread_id_type apply(launch /*policy*/,
+        virtual threads::thread_id_type apply(
+            threads::thread_pool_base* /*pool*/, launch /*policy*/,
             threads::thread_priority /*priority*/,
             threads::thread_stacksize /*stacksize*/,
-            threads::thread_schedule_hint /*schedulehint*/,
-            error_code& /*ec*/)
+            threads::thread_schedule_hint /*schedulehint*/, error_code& /*ec*/)
         {
-            HPX_ASSERT(false);      // shouldn't ever be called
+            HPX_ASSERT(false);    // shouldn't ever be called
             return threads::invalid_thread_id;
         }
 

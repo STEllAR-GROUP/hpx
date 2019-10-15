@@ -77,29 +77,33 @@ namespace hpx { namespace lcos { namespace local
         private:
             void do_run_impl(/*is_void=*/std::false_type)
             {
-                try {
+                try
+                {
                     this->set_value(f_());
                 }
-                catch(...) {
+                catch (...)
+                {
                     this->set_exception(std::current_exception());
                 }
             }
 
             void do_run_impl(/*is_void=*/std::true_type)
             {
-                try {
+                try
+                {
                     f_();
                     this->set_value(result_type());
                 }
-                catch(...) {
+                catch (...)
+                {
                     this->set_exception(std::current_exception());
                 }
             }
 
         protected:
             // run in a separate thread
-            threads::thread_id_type apply(launch policy,
-                threads::thread_priority priority,
+            threads::thread_id_type apply(threads::thread_pool_base* pool,
+                launch policy, threads::thread_priority priority,
                 threads::thread_stacksize stacksize,
                 threads::thread_schedule_hint schedulehint,
                 error_code& ec) override
@@ -111,7 +115,7 @@ namespace hpx { namespace lcos { namespace local
 
                 if (policy == launch::fork)
                 {
-                    return threads::register_thread_nullary(
+                    return threads::register_thread_nullary(pool,
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
                         util::thread_description(f_, "task_object::apply"),
@@ -232,8 +236,8 @@ namespace hpx { namespace lcos { namespace local
 
         protected:
             // run in a separate thread
-            threads::thread_id_type apply(launch policy,
-                threads::thread_priority priority,
+            threads::thread_id_type apply(threads::thread_pool_base* pool,
+                launch policy, threads::thread_priority priority,
                 threads::thread_stacksize stacksize,
                 threads::thread_schedule_hint schedulehint,
                 error_code& ec) override
@@ -243,15 +247,17 @@ namespace hpx { namespace lcos { namespace local
                 typedef typename Base::future_base_type future_base_type;
                 future_base_type this_(this);
 
-                if (exec_) {
+                if (exec_)
+                {
                     parallel::execution::post(*exec_,
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
-                            schedulehint);
+                        schedulehint);
                     return threads::invalid_thread_id;
                 }
-                else if (policy == launch::fork) {
-                    return threads::register_thread_nullary(
+                else if (policy == launch::fork)
+                {
+                    return threads::register_thread_nullary(pool,
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
                         util::thread_description(
@@ -262,13 +268,14 @@ namespace hpx { namespace lcos { namespace local
                             static_cast<std::int16_t>(get_worker_thread_num())),
                         stacksize, ec);
                 }
-                else {
-                    threads::register_thread_nullary(
+                else
+                {
+                    threads::register_thread_nullary(pool,
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
-                        util::thread_description(this->f_, "task_object::apply"),
-                        threads::pending, false, priority,
-                        schedulehint,
+                        util::thread_description(
+                            this->f_, "task_object::apply"),
+                        threads::pending, false, priority, schedulehint,
                         stacksize, ec);
                     return threads::invalid_thread_id;
                 }

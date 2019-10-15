@@ -998,6 +998,26 @@ namespace hpx { namespace threads {
             initial_state, run_now, priority, os_thread, stacksize, ec);
     }
 
+    template <typename F>
+    threads::thread_id_type register_thread_nullary(
+        threads::thread_pool_base* pool, F&& func,
+        util::thread_description const& description =
+            util::thread_description(),
+        threads::thread_state_enum initial_state = threads::pending,
+        bool run_now = true,
+        threads::thread_priority priority = threads::thread_priority_normal,
+        threads::thread_schedule_hint os_thread =
+            threads::thread_schedule_hint(),
+        threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+        error_code& ec = throws)
+    {
+        threads::thread_function_type thread_func(
+            detail::thread_function_nullary<typename std::decay<F>::type>{
+                std::forward<F>(func)});
+        return register_thread_plain(pool, std::move(thread_func), description,
+            initial_state, run_now, priority, os_thread, stacksize, ec);
+    }
+
     HPX_FORCEINLINE void register_work_plain(threads::thread_pool_base* pool,
         threads::thread_init_data& data,
         threads::thread_state_enum initial_state = threads::pending,
@@ -1256,6 +1276,24 @@ namespace hpx { namespace threads {
                 std::forward<F>(func)});
         register_work_plain(std::move(thread_func), description, initial_state,
             priority, os_thread, stacksize, ec);
+    }
+
+    template <typename F>
+    void register_work_nullary(threads::thread_pool_base* pool, F&& func,
+        util::thread_description const& description =
+            util::thread_description(),
+        threads::thread_state_enum initial_state = threads::pending,
+        threads::thread_priority priority = threads::thread_priority_normal,
+        threads::thread_schedule_hint os_thread =
+            threads::thread_schedule_hint(),
+        threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+        error_code& ec = throws)
+    {
+        threads::thread_function_type thread_func(
+            detail::thread_function_nullary<typename std::decay<F>::type>{
+                std::forward<F>(func)});
+        register_work_plain(pool, std::move(thread_func), description,
+            initial_state, priority, os_thread, stacksize, ec);
     }
 }}    // namespace hpx::threads
 
