@@ -427,32 +427,6 @@ jobs:
       - store_artifacts:
           path: tests.unit.component
 
-  tests.unit.computeapi:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.computeapi
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.computeapi
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.computeabi
-      - store_artifacts:
-          path: tests.unit.computeabi
-
   tests.unit.diagnostics:
     <<: *defaults
     steps:
@@ -1071,8 +1045,6 @@ workflows:
           <<: *core_dependency
       - tests.unit.component:
           <<: *core_dependency
-      - tests.unit.computeapi:
-          <<: *core_dependency
       - tests.unit.diagnostics:
           <<: *core_dependency
       - tests.unit.lcos:
@@ -1124,7 +1096,6 @@ workflows:
             - tests.unit.agas
             - tests.unit.build
             - tests.unit.component
-            - tests.unit.computeapi
             - tests.unit.diagnostics
             - tests.unit.lcos
             - tests.unit.parallel_block
