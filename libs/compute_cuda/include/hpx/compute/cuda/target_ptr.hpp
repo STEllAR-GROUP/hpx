@@ -22,98 +22,95 @@
 
 #include <cstddef>
 
-namespace hpx { namespace compute { namespace cuda
-{
+namespace hpx { namespace compute { namespace cuda {
     template <typename T>
     class target_ptr
-      : public hpx::util::iterator_adaptor<
-            target_ptr<T>, T*,
+      : public hpx::util::iterator_adaptor<target_ptr<T>, T*,
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             T, std::random_access_iterator_tag, T&, std::ptrdiff_t, T*
 #else
             value_proxy<T>, std::random_access_iterator_tag, value_proxy<T>,
             std::ptrdiff_t, T*
 #endif
-        >
+            >
     {
-        typedef hpx::util::iterator_adaptor<
-                target_ptr<T>, T*,
+        typedef hpx::util::iterator_adaptor<target_ptr<T>, T*,
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-                T, std::random_access_iterator_tag, T&, std::ptrdiff_t, T*
+            T, std::random_access_iterator_tag, T&, std::ptrdiff_t, T*
 #else
-                value_proxy<T>, std::random_access_iterator_tag, value_proxy<T>,
-                std::ptrdiff_t, T*
+            value_proxy<T>, std::random_access_iterator_tag, value_proxy<T>,
+            std::ptrdiff_t, T*
 #endif
-            > base_type;
+            >
+            base_type;
 
     public:
-        typedef
-            typename compute::detail::get_proxy_type<T>::type *
-            proxy_type;
+        typedef typename compute::detail::get_proxy_type<T>::type* proxy_type;
 
         HPX_HOST_DEVICE HPX_FORCEINLINE target_ptr()
           : base_type(nullptr)
           , tgt_(nullptr)
-        {}
+        {
+        }
 
         explicit HPX_HOST_DEVICE HPX_FORCEINLINE target_ptr(std::nullptr_t)
           : base_type(nullptr)
           , tgt_(nullptr)
-        {}
+        {
+        }
 
-        target_ptr(T* p, target & tgt)
+        target_ptr(T* p, target& tgt)
           : base_type(p)
           , tgt_(&tgt)
-        {}
+        {
+        }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        target_ptr(target_ptr const& rhs)
+        HPX_HOST_DEVICE HPX_FORCEINLINE target_ptr(target_ptr const& rhs)
           : base_type(rhs)
           , tgt_(rhs.tgt_)
-        {}
+        {
+        }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        target_ptr& operator=(target_ptr const& rhs)
+        HPX_HOST_DEVICE HPX_FORCEINLINE target_ptr& operator=(
+            target_ptr const& rhs)
         {
             this->base_type::operator=(rhs);
             tgt_ = rhs.tgt_;
             return *this;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        explicit operator bool() const
+        HPX_HOST_DEVICE HPX_FORCEINLINE explicit operator bool() const
         {
             return this->base() != nullptr;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        friend bool operator==(target_ptr const& lhs, std::nullptr_t)
+        HPX_HOST_DEVICE HPX_FORCEINLINE friend bool operator==(
+            target_ptr const& lhs, std::nullptr_t)
         {
             return lhs.base() == nullptr;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        friend bool operator!=(target_ptr const& lhs, std::nullptr_t)
+        HPX_HOST_DEVICE HPX_FORCEINLINE friend bool operator!=(
+            target_ptr const& lhs, std::nullptr_t)
         {
             return lhs.base() != nullptr;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        friend bool operator==(std::nullptr_t, target_ptr const& rhs)
+        HPX_HOST_DEVICE HPX_FORCEINLINE friend bool operator==(
+            std::nullptr_t, target_ptr const& rhs)
         {
             return nullptr == rhs.base();
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        friend bool operator!=(std::nullptr_t, target_ptr const& rhs)
+        HPX_HOST_DEVICE HPX_FORCEINLINE friend bool operator!=(
+            std::nullptr_t, target_ptr const& rhs)
         {
             return nullptr != rhs.base();
         }
 
     public:
-
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-        HPX_DEVICE HPX_FORCEINLINE  operator T*() const
+        HPX_DEVICE HPX_FORCEINLINE operator T*() const
         {
             return this->base();
         }
@@ -145,7 +142,7 @@ namespace hpx { namespace compute { namespace cuda
     private:
         target* tgt_;
     };
-}}}
+}}}    // namespace hpx::compute::cuda
 
 #endif
 #endif

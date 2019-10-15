@@ -17,14 +17,13 @@
 
 #include <vector>
 
-namespace hpx { namespace compute { namespace cuda
-{
+namespace hpx { namespace compute { namespace cuda {
     struct HPX_EXPORT target;
 
     HPX_EXPORT std::vector<target> get_local_targets();
-    HPX_EXPORT hpx::future<std::vector<target> >
-        get_targets(hpx::id_type const& locality);
-}}}
+    HPX_EXPORT hpx::future<std::vector<target>> get_targets(
+        hpx::id_type const& locality);
+}}}    // namespace hpx::compute::cuda
 
 #endif
 #endif

@@ -11,10 +11,9 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace compute { namespace traits
-{
+namespace hpx { namespace compute { namespace traits {
     template <typename Target, typename Enable = void>
     struct access_target;
-}}}
+}}}    // namespace hpx::compute::traits
 
 #endif

@@ -18,11 +18,11 @@
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_MORE_THAN_64_THREADS)
-# if defined(HPX_HAVE_MAX_CPU_COUNT)
-#  include <hpx/serialization/bitset.hpp>
-# else
-#  include <hpx/serialization/dynamic_bitset.hpp>
-# endif
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
+#include <hpx/serialization/bitset.hpp>
+#else
+#include <hpx/serialization/dynamic_bitset.hpp>
+#endif
 #endif
 #include <hpx/serialization/serialize.hpp>
 #endif
@@ -35,10 +35,8 @@
 
 #include <boost/intrusive_ptr.hpp>
 
-namespace hpx { namespace compute { namespace cuda
-{
-    namespace detail
-    {
+namespace hpx { namespace compute { namespace cuda {
+    namespace detail {
         struct runtime_registration_wrapper
         {
             runtime_registration_wrapper(hpx::runtime* rt)
@@ -50,7 +48,7 @@ namespace hpx { namespace compute { namespace cuda
                 // each external OS-thread intended to invoke HPX functionality.
                 // Calling this function more than once on the same thread will
                 // report an error.
-                hpx::error_code ec(hpx::lightweight);       // ignore errors
+                hpx::error_code ec(hpx::lightweight);    // ignore errors
                 hpx::register_thread(rt_, "cuda", ec);
             }
             ~runtime_registration_wrapper()
@@ -67,8 +65,8 @@ namespace hpx { namespace compute { namespace cuda
         struct future_data : lcos::detail::future_data<void>
         {
         private:
-            static void CUDART_CB stream_callback(cudaStream_t stream,
-                cudaError_t error, void* user_data);
+            static void CUDART_CB stream_callback(
+                cudaStream_t stream, cudaError_t error, void* user_data);
 
         public:
             future_data();
@@ -83,7 +81,8 @@ namespace hpx { namespace compute { namespace cuda
         {
             release_on_exit(future_data* data)
               : data_(data)
-            {}
+            {
+            }
 
             ~release_on_exit()
             {
@@ -95,8 +94,8 @@ namespace hpx { namespace compute { namespace cuda
         };
 
         ///////////////////////////////////////////////////////////////////////
-        void CUDART_CB future_data::stream_callback(cudaStream_t stream,
-            cudaError_t error, void* user_data)
+        void CUDART_CB future_data::stream_callback(
+            cudaStream_t stream, cudaError_t error, void* user_data)
         {
             future_data* this_ = static_cast<future_data*>(user_data);
 
@@ -105,12 +104,10 @@ namespace hpx { namespace compute { namespace cuda
 
             if (error != cudaSuccess)
             {
-                this_->set_exception(
-                    HPX_GET_EXCEPTION(kernel_error,
-                        "cuda::detail::future_data::stream_callback()",
-                        std::string("cudaStreamAddCallback failed: ") +
-                            cudaGetErrorString(error))
-                );
+                this_->set_exception(HPX_GET_EXCEPTION(kernel_error,
+                    "cuda::detail::future_data::stream_callback()",
+                    std::string("cudaStreamAddCallback failed: ") +
+                        cudaGetErrorString(error)));
                 return;
             }
 
@@ -119,7 +116,8 @@ namespace hpx { namespace compute { namespace cuda
 
         future_data::future_data()
           : rt_(hpx::get_runtime_ptr())
-        {}
+        {
+        }
 
         void future_data::init(cudaStream_t stream)
         {
@@ -127,8 +125,8 @@ namespace hpx { namespace compute { namespace cuda
             // right away as the callback could be called immediately.
             lcos::detail::intrusive_ptr_add_ref(this);
 
-            cudaError_t error = cudaStreamAddCallback(
-                stream, stream_callback, this, 0);
+            cudaError_t error =
+                cudaStreamAddCallback(stream, stream_callback, this, 0);
             if (error != cudaSuccess)
             {
                 // callback was not called, release object
@@ -141,7 +139,7 @@ namespace hpx { namespace compute { namespace cuda
                         cudaGetErrorString(error));
             }
         }
-    }
+    }    // namespace detail
 
     void target::native_handle_type::init_processing_units()
     {
@@ -157,27 +155,29 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         std::size_t mp = props.multiProcessorCount;
-        switch(props.major)
+        switch (props.major)
         {
-            case 2: // Fermi
-                if (props.minor == 1) {
-                    mp = mp * 48;
-                }
-                else {
-                    mp = mp * 32;
-                }
-                break;
-            case 3: // Kepler
-                mp = mp * 192;
-                break;
-            case 5: // Maxwell
-                mp = mp * 128;
-                break;
-            case 6: // Pascal
-                mp = mp * 64;
-                break;
-             default:
-                break;
+        case 2:    // Fermi
+            if (props.minor == 1)
+            {
+                mp = mp * 48;
+            }
+            else
+            {
+                mp = mp * 32;
+            }
+            break;
+        case 3:    // Kepler
+            mp = mp * 192;
+            break;
+        case 5:    // Maxwell
+            mp = mp * 128;
+            break;
+        case 6:    // Pascal
+            mp = mp * 64;
+            break;
+        default:
+            break;
         }
         processing_units_ = mp;
         processor_family_ = props.major;
@@ -185,7 +185,8 @@ namespace hpx { namespace compute { namespace cuda
     }
 
     target::native_handle_type::native_handle_type(int device)
-      : device_(device), stream_(0)
+      : device_(device)
+      , stream_(0)
     {
         init_processing_units();
     }
@@ -198,26 +199,26 @@ namespace hpx { namespace compute { namespace cuda
     void target::native_handle_type::reset() noexcept
     {
         if (stream_)
-            cudaStreamDestroy(stream_);     // ignore error
+            cudaStreamDestroy(stream_);    // ignore error
     }
 
     target::native_handle_type::native_handle_type(
-            target::native_handle_type const& rhs) noexcept
-      : device_(rhs.device_),
-        processing_units_(rhs.processing_units_),
-        processor_family_(rhs.processor_family_),
-        processor_name_(rhs.processor_name_),
-        stream_(0)
+        target::native_handle_type const& rhs) noexcept
+      : device_(rhs.device_)
+      , processing_units_(rhs.processing_units_)
+      , processor_family_(rhs.processor_family_)
+      , processor_name_(rhs.processor_name_)
+      , stream_(0)
     {
     }
 
     target::native_handle_type::native_handle_type(
-            target::native_handle_type && rhs) noexcept
-      : device_(rhs.device_),
-        processing_units_(rhs.processing_units_),
-        processor_family_(rhs.processor_family_),
-        processor_name_(rhs.processor_name_),
-        stream_(rhs.stream_)
+        target::native_handle_type&& rhs) noexcept
+      : device_(rhs.device_)
+      , processing_units_(rhs.processing_units_)
+      , processor_family_(rhs.processor_family_)
+      , processor_name_(rhs.processor_name_)
+      , stream_(rhs.stream_)
     {
         rhs.stream_ = 0;
     }
@@ -238,7 +239,7 @@ namespace hpx { namespace compute { namespace cuda
     }
 
     target::native_handle_type& target::native_handle_type::operator=(
-        target::native_handle_type && rhs) noexcept
+        target::native_handle_type&& rhs) noexcept
     {
         if (this == &rhs)
             return *this;
@@ -267,8 +268,7 @@ namespace hpx { namespace compute { namespace cuda
                     std::string("cudaSetDevice failed: ") +
                         cudaGetErrorString(error));
             }
-            error = cudaStreamCreateWithFlags(&stream_,
-                cudaStreamNonBlocking);
+            error = cudaStreamCreateWithFlags(&stream_, cudaStreamNonBlocking);
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(kernel_error,
@@ -290,16 +290,14 @@ namespace hpx { namespace compute { namespace cuda
 
         if (stream == 0)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "cuda::target::synchronize",
+            HPX_THROW_EXCEPTION(invalid_status, "cuda::target::synchronize",
                 "no stream available");
         }
 
         cudaError_t error = cudaStreamSynchronize(stream);
-        if(error != cudaSuccess)
+        if (error != cudaSuccess)
         {
-            HPX_THROW_EXCEPTION(kernel_error,
-                "cuda::target::synchronize",
+            HPX_THROW_EXCEPTION(kernel_error, "cuda::target::synchronize",
                 std::string("cudaStreamSynchronize failed: ") +
                     cudaGetErrorString(error));
         }
@@ -313,25 +311,24 @@ namespace hpx { namespace compute { namespace cuda
         // during initialization
         boost::intrusive_ptr<shared_state_type> p(new shared_state_type());
         p->init(handle_.get_stream());
-        return hpx::traits::future_access<hpx::future<void> >::
-            create(std::move(p));
+        return hpx::traits::future_access<hpx::future<void>>::create(
+            std::move(p));
     }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     ///////////////////////////////////////////////////////////////////////////
-    void target::serialize(serialization::input_archive& ar,
-        const unsigned int version)
+    void target::serialize(
+        serialization::input_archive& ar, const unsigned int version)
     {
         ar >> handle_.device_ >> locality_;
     }
 
-    void target::serialize(serialization::output_archive& ar,
-        const unsigned int version)
+    void target::serialize(
+        serialization::output_archive& ar, const unsigned int version)
     {
         ar << handle_.device_ << locality_;
     }
 #endif
-}}}
+}}}    // namespace hpx::compute::cuda
 
 #endif
-

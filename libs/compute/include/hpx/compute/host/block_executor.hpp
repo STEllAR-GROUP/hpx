@@ -9,6 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compute/host/target.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/parallel/executors/execution.hpp>
@@ -16,9 +19,6 @@
 #include <hpx/parallel/executors/thread_pool_attached_executors.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
-#include <hpx/iterator_support/range.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>
@@ -30,14 +30,14 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace host
-{
+namespace hpx { namespace compute { namespace host {
     /// The block executor can be used to build NUMA aware programs.
     /// It will distribute work evenly across the passed targets
     ///
     /// \tparam Executor The underlying executor to use
-    template <typename Executor =
-        hpx::threads::executors::local_priority_queue_attached_executor>
+    template <
+        typename Executor =
+            hpx::threads::executors::local_priority_queue_attached_executor>
     struct block_executor
     {
     public:
@@ -62,13 +62,15 @@ namespace hpx { namespace compute { namespace host
           : targets_(other.targets_)
           , current_(0)
           , executors_(other.executors_)
-        {}
+        {
+        }
 
         block_executor(block_executor&& other)
           : targets_(std::move(other.targets_))
           , current_(other.current_.load())
           , executors_(std::move(other.executors_))
-        {}
+        {
+        }
 
         block_executor& operator=(block_executor const& other)
         {
@@ -81,7 +83,7 @@ namespace hpx { namespace compute { namespace host
             return *this;
         }
 
-        block_executor& operator=(block_executor && other)
+        block_executor& operator=(block_executor&& other)
         {
             if (&other != this)
             {
@@ -95,8 +97,8 @@ namespace hpx { namespace compute { namespace host
         /// \cond NOINTERNAL
         bool operator==(block_executor const& rhs) const noexcept
         {
-            return std::equal(targets_.begin(), targets_.end(),
-                rhs.targets_.begin());
+            return std::equal(
+                targets_.begin(), targets_.end(), rhs.targets_.begin());
         }
 
         bool operator!=(block_executor const& rhs) const noexcept
@@ -110,45 +112,40 @@ namespace hpx { namespace compute { namespace host
         }
         /// \endcond
 
-        template <typename F, typename ... Ts>
-        void post(F && f, Ts &&... ts)
+        template <typename F, typename... Ts>
+        void post(F&& f, Ts&&... ts)
         {
-            parallel::execution::post(executors_[current_],
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            parallel::execution::post(executors_[current_], std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
-        template <typename F, typename ... Ts>
+        template <typename F, typename... Ts>
         hpx::future<
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
-        async_execute(F && f, Ts &&... ts)
+        async_execute(F&& f, Ts&&... ts)
         {
             std::size_t current = ++current_ % executors_.size();
             return parallel::execution::async_execute(executors_[current],
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-        template <typename F, typename ... Ts>
+        template <typename F, typename... Ts>
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
-        sync_execute(F && f, Ts &&... ts)
+        sync_execute(F&& f, Ts&&... ts)
         {
             std::size_t current = ++current_ % executors_.size();
             return parallel::execution::sync_execute(executors_[current],
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-        template <typename F, typename Shape, typename ... Ts>
-        std::vector<hpx::future<
-            typename parallel::execution::detail::bulk_function_result<
-                F, Shape, Ts...
-            >::type
-        > >
-        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
+        template <typename F, typename Shape, typename... Ts>
+        std::vector<hpx::future<typename parallel::execution::detail::
+                bulk_function_result<F, Shape, Ts...>::type>>
+        bulk_async_execute(F&& f, Shape const& shape, Ts&&... ts)
         {
-            std::vector<hpx::future<
-                typename parallel::execution::detail::bulk_function_result<
-                    F, Shape, Ts...
-                >::type
-            > > results;
+            std::vector<hpx::future<typename parallel::execution::detail::
+                    bulk_function_result<F, Shape, Ts...>::type>>
+                results;
             std::size_t cnt = util::size(shape);
             std::size_t num_executors = executors_.size();
 
@@ -176,29 +173,30 @@ namespace hpx { namespace compute { namespace host
                 }
                 return results;
             }
-            catch (std::bad_alloc const& ba) {
+            catch (std::bad_alloc const& ba)
+            {
                 throw ba;
             }
-            catch (...) {
+            catch (...)
+            {
                 throw exception_list(std::current_exception());
             }
         }
 
         template <typename F, typename Shape, typename... Ts>
-        typename parallel::execution::detail::bulk_execute_result<
-            F, Shape, Ts...
-        >::type
+        typename parallel::execution::detail::bulk_execute_result<F, Shape,
+            Ts...>::type
         bulk_sync_execute(F&& f, Shape const& shape, Ts&&... ts)
         {
-            typename parallel::execution::detail::bulk_execute_result<
-                    F, Shape, Ts...
-                >::type results;
+            typename parallel::execution::detail::bulk_execute_result<F, Shape,
+                Ts...>::type results;
             std::size_t cnt = util::size(shape);
             std::size_t num_executors = executors_.size();
 
             results.reserve(cnt);
 
-            try {
+            try
+            {
                 auto begin = util::begin(shape);
                 for (std::size_t i = 0; i != num_executors; ++i)
                 {
@@ -209,23 +207,22 @@ namespace hpx { namespace compute { namespace host
                     auto part_end = begin;
                     std::advance(part_begin, part_begin_offset);
                     std::advance(part_end, part_end_offset);
-                    auto part_results =
-                        parallel::execution::bulk_sync_execute(
-                            executors_[i],
-                            std::forward<F>(f),
-                            util::make_iterator_range(begin, part_end),
-                            std::forward<Ts>(ts)...);
-                    results.insert(
-                        results.end(),
+                    auto part_results = parallel::execution::bulk_sync_execute(
+                        executors_[i], std::forward<F>(f),
+                        util::make_iterator_range(begin, part_end),
+                        std::forward<Ts>(ts)...);
+                    results.insert(results.end(),
                         std::make_move_iterator(part_results.begin()),
                         std::make_move_iterator(part_results.end()));
                 }
                 return results;
             }
-            catch (std::bad_alloc const& ba) {
+            catch (std::bad_alloc const& ba)
+            {
                 throw ba;
             }
-            catch (...) {
+            catch (...)
+            {
                 throw exception_list(std::current_exception());
             }
         }
@@ -239,7 +236,7 @@ namespace hpx { namespace compute { namespace host
         void init_executors()
         {
             executors_.reserve(targets_.size());
-            for(auto const & tgt : targets_)
+            for (auto const& tgt : targets_)
             {
                 auto num_pus = tgt.num_pus();
                 executors_.emplace_back(num_pus.first, num_pus.second);
@@ -249,40 +246,38 @@ namespace hpx { namespace compute { namespace host
         std::atomic<std::size_t> current_;
         std::vector<Executor> executors_;
     };
-}}}
+}}}    // namespace hpx::compute::host
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     template <typename Executor>
-    struct executor_execution_category<
-        compute::host::block_executor<Executor> >
+    struct executor_execution_category<compute::host::block_executor<Executor>>
     {
         typedef parallel::execution::parallel_execution_tag type;
     };
 
     template <typename Executor>
-    struct is_one_way_executor<
-            compute::host::block_executor<Executor> >
+    struct is_one_way_executor<compute::host::block_executor<Executor>>
       : std::true_type
-    {};
+    {
+    };
 
     template <typename Executor>
-    struct is_two_way_executor<
-            compute::host::block_executor<Executor> >
+    struct is_two_way_executor<compute::host::block_executor<Executor>>
       : std::true_type
-    {};
+    {
+    };
 
     template <typename Executor>
-    struct is_bulk_one_way_executor<
-            compute::host::block_executor<Executor> >
+    struct is_bulk_one_way_executor<compute::host::block_executor<Executor>>
       : std::true_type
-    {};
+    {
+    };
 
     template <typename Executor>
-    struct is_bulk_two_way_executor<
-            compute::host::block_executor<Executor> >
+    struct is_bulk_two_way_executor<compute::host::block_executor<Executor>>
       : std::true_type
-    {};
-}}}
+    {
+    };
+}}}    // namespace hpx::parallel::execution
 
 #endif

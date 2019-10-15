@@ -31,8 +31,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace compute { namespace cuda
-{
+namespace hpx { namespace compute { namespace cuda {
     ///////////////////////////////////////////////////////////////////////////
     struct target
     {
@@ -48,12 +47,12 @@ namespace hpx { namespace compute { namespace cuda
             HPX_HOST_DEVICE native_handle_type(
                 native_handle_type const& rhs) noexcept;
             HPX_HOST_DEVICE native_handle_type(
-                native_handle_type && rhs) noexcept;
+                native_handle_type&& rhs) noexcept;
 
-            HPX_HOST_DEVICE native_handle_type&
-            operator=(native_handle_type const& rhs) noexcept;
-            HPX_HOST_DEVICE native_handle_type&
-            operator=(native_handle_type && rhs) noexcept;
+            HPX_HOST_DEVICE native_handle_type& operator=(
+                native_handle_type const& rhs) noexcept;
+            HPX_HOST_DEVICE native_handle_type& operator=(
+                native_handle_type&& rhs) noexcept;
 
             HPX_HOST_DEVICE cudaStream_t get_stream() const;
 
@@ -97,7 +96,8 @@ namespace hpx { namespace compute { namespace cuda
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
           , locality_(hpx::find_here())
 #endif
-        {}
+        {
+        }
 
         // Constructs target from a given device ID
         explicit HPX_HOST_DEVICE target(int device)
@@ -105,28 +105,32 @@ namespace hpx { namespace compute { namespace cuda
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
           , locality_(hpx::find_here())
 #endif
-        {}
+        {
+        }
 
         HPX_HOST_DEVICE target(hpx::id_type const& locality, int device)
           : handle_(device)
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
           , locality_(locality)
 #endif
-        {}
+        {
+        }
 
         HPX_HOST_DEVICE target(target const& rhs) noexcept
           : handle_(rhs.handle_)
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
           , locality_(rhs.locality_)
 #endif
-        {}
+        {
+        }
 
-        HPX_HOST_DEVICE target(target && rhs) noexcept
+        HPX_HOST_DEVICE target(target&& rhs) noexcept
           : handle_(std::move(rhs.handle_))
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
           , locality_(std::move(rhs.locality_))
 #endif
-        {}
+        {
+        }
 
         HPX_HOST_DEVICE target& operator=(target const& rhs) noexcept
         {
@@ -140,7 +144,7 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
         }
 
-        HPX_HOST_DEVICE target& operator=(target && rhs) noexcept
+        HPX_HOST_DEVICE target& operator=(target&& rhs) noexcept
         {
             if (&rhs != this)
             {
@@ -176,8 +180,8 @@ namespace hpx { namespace compute { namespace cuda
         {
             return cuda::get_local_targets();
         }
-        static hpx::future<std::vector<target> >
-            get_targets(hpx::id_type const& locality)
+        static hpx::future<std::vector<target>> get_targets(
+            hpx::id_type const& locality)
         {
             return cuda::get_targets(locality);
         }
@@ -201,7 +205,7 @@ namespace hpx { namespace compute { namespace cuda
     };
 
     HPX_API_EXPORT target& get_default_target();
-}}}
+}}}    // namespace hpx::compute::cuda
 
 #include <hpx/config/warnings_suffix.hpp>
 

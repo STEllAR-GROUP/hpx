@@ -16,26 +16,25 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace compute { namespace cuda
-{
+namespace hpx { namespace compute { namespace cuda {
     struct default_executor_parameters
     {
         template <typename Executor, typename F>
-        std::size_t get_chunk_size(Executor& exec, F &&, std::size_t cores,
-            std::size_t num_tasks)
+        std::size_t get_chunk_size(
+            Executor& exec, F&&, std::size_t cores, std::size_t num_tasks)
         {
             return std::size_t(-1);
         }
     };
-}}}
+}}}    // namespace hpx::compute::cuda
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     template <>
     struct is_executor_parameters<compute::cuda::default_executor_parameters>
       : std::true_type
-    {};
-}}}
+    {
+    };
+}}}    // namespace hpx::parallel::execution
 
 #endif
 #endif

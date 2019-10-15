@@ -18,8 +18,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace detail
-{
+namespace hpx { namespace compute { namespace detail {
     /// This class specifies the parameters for a simple distribution policy
     /// to use for creating (and evenly distributing) a given number of items
     /// on a given set of localities.
@@ -34,25 +33,28 @@ namespace hpx { namespace compute { namespace detail
 
         /// Default-construct a new instance of a \a target_distribution_policy.
         target_distribution_policy()
-          : mtx_(),
-            targets_(),
-            num_partitions_(1),
-            next_target_(0)
-        {}
+          : mtx_()
+          , targets_()
+          , num_partitions_(1)
+          , next_target_(0)
+        {
+        }
 
         target_distribution_policy(target_distribution_policy const& rhs)
-          : mtx_(),
-            targets_(rhs.targets_),
-            num_partitions_(rhs.num_partitions_),
-            next_target_(0)
-        {}
+          : mtx_()
+          , targets_(rhs.targets_)
+          , num_partitions_(rhs.num_partitions_)
+          , next_target_(0)
+        {
+        }
 
-        target_distribution_policy(target_distribution_policy && rhs)
-          : mtx_(),
-            targets_(std::move(rhs.targets_)),
-            num_partitions_(rhs.num_partitions_),
-            next_target_(0)
-        {}
+        target_distribution_policy(target_distribution_policy&& rhs)
+          : mtx_()
+          , targets_(std::move(rhs.targets_))
+          , num_partitions_(rhs.num_partitions_)
+          , next_target_(0)
+        {
+        }
 
         target_distribution_policy& operator=(
             target_distribution_policy const& rhs)
@@ -66,8 +68,7 @@ namespace hpx { namespace compute { namespace detail
             return *this;
         }
 
-        target_distribution_policy& operator=(
-            target_distribution_policy && rhs)
+        target_distribution_policy& operator=(target_distribution_policy&& rhs)
         {
             if (this != &rhs)
             {
@@ -95,14 +96,15 @@ namespace hpx { namespace compute { namespace detail
                 targets_ = Target::get_local_targets();
 
             std::size_t num_parts = (num_partitions_ == std::size_t(-1)) ?
-                targets_.size() : num_partitions_;
+                targets_.size() :
+                num_partitions_;
             return (std::max)(num_parts, std::size_t(1));
         }
 
     protected:
         /// \cond NOINTERNAL
-        HPX_FORCEINLINE static std::size_t
-        round_to_multiple(std::size_t n1, std::size_t n2, std::size_t n3)
+        HPX_FORCEINLINE static std::size_t round_to_multiple(
+            std::size_t n1, std::size_t n2, std::size_t n3)
         {
             return (n1 / n2) * n3;
         }
@@ -129,7 +131,7 @@ namespace hpx { namespace compute { namespace detail
             // the last locality might get less items
             if (!targets_.empty() && t == targets_.back())
             {
-                return items - round_to_multiple(items, sites, sites-1);
+                return items - round_to_multiple(items, sites, sites - 1);
             }
 
             // otherwise just distribute evenly
@@ -139,34 +141,36 @@ namespace hpx { namespace compute { namespace detail
 
     protected:
         /// \cond NOINTERNAL
-        target_distribution_policy(std::vector<target_type> const& targets,
-                std::size_t num_partitions)
-          : targets_(targets),
-            num_partitions_(num_partitions),
-            next_target_(0)
-        {}
+        target_distribution_policy(
+            std::vector<target_type> const& targets, std::size_t num_partitions)
+          : targets_(targets)
+          , num_partitions_(num_partitions)
+          , next_target_(0)
+        {
+        }
 
-        target_distribution_policy(std::vector<target_type> && targets,
-                std::size_t num_partitions)
-          : targets_(std::move(targets)),
-            num_partitions_(num_partitions),
-            next_target_(0)
-        {}
+        target_distribution_policy(
+            std::vector<target_type>&& targets, std::size_t num_partitions)
+          : targets_(std::move(targets))
+          , num_partitions_(num_partitions)
+          , next_target_(0)
+        {
+        }
 
         friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive& ar, unsigned int const)
         {
-            ar & targets_ & num_partitions_;
+            ar& targets_& num_partitions_;
         }
 
         mutable mutex_type mtx_;
-        mutable std::vector<target_type> targets_;   // targets
+        mutable std::vector<target_type> targets_;    // targets
         std::size_t num_partitions_;
         mutable std::size_t next_target_;
         /// \endcond
     };
-}}}
+}}}    // namespace hpx::compute::detail
 
 #endif

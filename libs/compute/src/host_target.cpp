@@ -10,23 +10,22 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/topology/topology.hpp>
 
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS)
-# if defined(HPX_HAVE_MAX_CPU_COUNT)
-#  include <hpx/serialization/bitset.hpp>
-# else
-#  include <hpx/serialization/dynamic_bitset.hpp>
-# endif
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
+#include <hpx/serialization/bitset.hpp>
+#else
+#include <hpx/serialization/dynamic_bitset.hpp>
+#endif
 #endif
 
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace compute { namespace host
-{
+namespace hpx { namespace compute { namespace host {
     std::pair<std::size_t, std::size_t> target::num_pus() const
     {
         auto& rp = hpx::resource::get_partitioner();
@@ -52,8 +51,9 @@ namespace hpx { namespace compute { namespace host
         ar >> handle_.mask_ >> locality_;
     }
 
-    void target::serialize(serialization::output_archive& ar, const unsigned int)
+    void target::serialize(
+        serialization::output_archive& ar, const unsigned int)
     {
         ar << handle_.mask_ << locality_;
     }
-}}}
+}}}    // namespace hpx::compute::host

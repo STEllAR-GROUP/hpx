@@ -7,8 +7,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/compute.hpp>
 #include <hpx/include/parallel_for_each.hpp>
-#include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/traits/is_value_proxy.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -23,14 +23,15 @@ template <typename T>
 class test_value_proxy
 {
 public:
-
     test_value_proxy(T& p)
       : p_(&p)
-    {}
+    {
+    }
 
     test_value_proxy(test_value_proxy const& other)
       : p_(other.p_)
-    {}
+    {
+    }
 
     test_value_proxy& operator=(T const& t)
     {
@@ -53,13 +54,12 @@ private:
     T* p_;
 };
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <typename T>
-    struct is_value_proxy<test_value_proxy<T> >
-      : std::true_type
-    {};
-}}
+    struct is_value_proxy<test_value_proxy<T>> : std::true_type
+    {
+    };
+}}    // namespace hpx::traits
 
 template <typename T>
 struct test_allocator
@@ -81,16 +81,17 @@ struct test_allocator
     typedef std::false_type is_always_equal;
     typedef std::true_type propagate_on_container_move_assignment;
 
-    test_allocator()
-    {}
+    test_allocator() {}
 
     template <typename U>
     test_allocator(test_allocator<U> const& alloc)
-    {}
+    {
+    }
 
     template <typename U>
-    test_allocator(test_allocator<U> && alloc)
-    {}
+    test_allocator(test_allocator<U>&& alloc)
+    {
+    }
 
     // Returns the actual address of x even in presence of overloaded
     // operator&
@@ -108,8 +109,8 @@ struct test_allocator
     // topo.allocate(). The pointer hint may be used to provide locality of
     // reference: the allocator, if supported by the implementation, will
     // attempt to allocate the new memory block as close as possible to hint.
-    pointer allocate(size_type n,
-        std::allocator<void>::const_pointer hint = nullptr)
+    pointer allocate(
+        size_type n, std::allocator<void>::const_pointer hint = nullptr)
     {
         return new T[n];
     }
@@ -136,15 +137,15 @@ public:
     // storage pointed to by p, using placement-new. This will use the
     // underlying executors to distribute the memory according to
     // first touch memory placement.
-    template <typename U, typename ... Args>
-    void bulk_construct(U* p, std::size_t count, Args &&... args)
+    template <typename U, typename... Args>
+    void bulk_construct(U* p, std::size_t count, Args&&... args)
     {
     }
 
     // Constructs an object of type T in allocated uninitialized storage
     // pointed to by p, using placement-new
-    template <typename U, typename ... Args>
-    void construct(U* p, Args &&... args)
+    template <typename U, typename... Args>
+    void construct(U* p, Args&&... args)
     {
         new (p) T(std::forward<Args>(args)...);
     }
@@ -175,11 +176,10 @@ struct set_42
 
 int hpx_main()
 {
-    hpx::compute::vector<int, test_allocator<int> > v(100);
+    hpx::compute::vector<int, test_allocator<int>> v(100);
 
     hpx::parallel::for_each(
-        hpx::parallel::execution::par, v.begin(), v.end(),
-        set_42());
+        hpx::parallel::execution::par, v.begin(), v.end(), set_42());
 
     HPX_TEST_EQ(std::count(v.begin(), v.end(), 42), std::ptrdiff_t(v.size()));
     return hpx::finalize();
@@ -188,8 +188,8 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

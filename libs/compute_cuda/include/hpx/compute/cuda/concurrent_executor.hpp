@@ -25,10 +25,10 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace cuda
-{
-    template <typename Executor =
-        hpx::parallel::execution::local_priority_queue_attached_executor>
+namespace hpx { namespace compute { namespace cuda {
+    template <
+        typename Executor =
+            hpx::parallel::execution::local_priority_queue_attached_executor>
     struct concurrent_executor
     {
     private:
@@ -41,15 +41,14 @@ namespace hpx { namespace compute { namespace cuda
         // bulk-shape ranges for the accelerator.
         typedef concurrent_executor_parameters executor_parameters_type;
 
-        concurrent_executor(
-                cuda::target const& cuda_target,
-                std::vector<host::target> const& host_targets)
-          : host_executor_(host_targets),
-            current_(0)
+        concurrent_executor(cuda::target const& cuda_target,
+            std::vector<host::target> const& host_targets)
+          : host_executor_(host_targets)
+          , current_(0)
         {
             std::size_t num_targets = host_targets.size();
             cuda_executors_.reserve(num_targets);
-            for(std::size_t i = 0; i != num_targets; ++i)
+            for (std::size_t i = 0; i != num_targets; ++i)
             {
                 cuda::target t(cuda_target.native_handle().get_device());
                 t.native_handle().get_stream();
@@ -61,17 +60,19 @@ namespace hpx { namespace compute { namespace cuda
           : host_executor_(other.host_executor_)
           , cuda_executors_(other.cuda_executors_)
           , current_(0)
-        {}
+        {
+        }
 
         concurrent_executor(concurrent_executor&& other)
           : host_executor_(std::move(other.host_executor_))
           , cuda_executors_(std::move(other.cuda_executors_))
           , current_(other.current_.load())
-        {}
+        {
+        }
 
         concurrent_executor& operator=(concurrent_executor const& other)
         {
-            if(&other != this)
+            if (&other != this)
             {
                 host_executor_ = other.host_executor_;
                 cuda_executors_ = other.cuda_executors_;
@@ -117,69 +118,60 @@ namespace hpx { namespace compute { namespace cuda
             return cuda_executors_.size();
         }
 
-        template <typename F, typename ... Ts>
-        void post(F && f, Ts &&... ts)
+        template <typename F, typename... Ts>
+        void post(F&& f, Ts&&... ts)
         {
             std::size_t current = ++current_ % cuda_executors_.size();
             parallel::execution::post(
                 host_executor_,
-                [this, current](F&& f, Ts&&... ts) mutable
-                {
-                    parallel::execution::post(
-                        cuda_executors_[current], std::forward<F>(f),
-                        std::forward<Ts>(ts)...);
+                [this, current](F&& f, Ts&&... ts) mutable {
+                    parallel::execution::post(cuda_executors_[current],
+                        std::forward<F>(f), std::forward<Ts>(ts)...);
                 },
-                std::forward<F>(f), std::forward<Ts>(ts)...
-            );
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-        template <typename F, typename ... Ts>
-        hpx::future<void> async_execute(F && f, Ts &&... ts)
+        template <typename F, typename... Ts>
+        hpx::future<void> async_execute(F&& f, Ts&&... ts)
         {
             std::size_t current = ++current_ % cuda_executors_.size();
             return parallel::execution::async_execute(
                 host_executor_,
-                [this, current](F&& f, Ts&&... ts) mutable
-                {
+                [this, current](F&& f, Ts&&... ts) mutable {
                     return parallel::execution::async_execute(
                         cuda_executors_[current], std::forward<F>(f),
                         std::forward<Ts>(ts)...);
                 },
-                std::forward<F>(f), std::forward<Ts>(ts)...
-            );
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-        template <typename F, typename ... Ts>
-        void sync_execute(F && f, Ts &&... ts)
+        template <typename F, typename... Ts>
+        void sync_execute(F&& f, Ts&&... ts)
         {
             std::size_t current = ++current_ % cuda_executors_.size();
             parallel::execution::sync_execute(
                 host_executor_,
-                [this, current](F&& f, Ts&&... ts) mutable
-                {
-                    parallel::execution::sync_execute(
-                        cuda_executors_[current], std::forward<F>(f),
-                        std::forward<Ts>(ts)...);
+                [this, current](F&& f, Ts&&... ts) mutable {
+                    parallel::execution::sync_execute(cuda_executors_[current],
+                        std::forward<F>(f), std::forward<Ts>(ts)...);
                 },
-                std::forward<F>(f), std::forward<Ts>(ts)...
-            );
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-        template <typename F, typename Shape, typename ... Ts>
-        std::vector<hpx::future<void> >
-        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
+        template <typename F, typename Shape, typename... Ts>
+        std::vector<hpx::future<void>> bulk_async_execute(
+            F&& f, Shape const& shape, Ts&&... ts)
         {
             std::size_t cnt = util::size(shape);
-            std::vector<hpx::future<void> > result;
+            std::vector<hpx::future<void>> result;
             result.reserve(cnt);
 
-            for (auto const& s: shape)
+            for (auto const& s : shape)
             {
                 std::size_t current = ++current_ % cuda_executors_.size();
                 result.push_back(parallel::execution::async_execute(
                     host_executor_,
-                    [this, current, s](F&& f, Ts&&... ts) mutable
-                    {
+                    [this, current, s](F&& f, Ts&&... ts) mutable {
                         typedef typename hpx::util::decay<decltype(s)>::type
                             shape_type;
 
@@ -197,41 +189,40 @@ namespace hpx { namespace compute { namespace cuda
         std::vector<cuda_executor_type> cuda_executors_;
         std::atomic<std::size_t> current_;
     };
-}}}
+}}}    // namespace hpx::compute::cuda
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     template <typename Executor>
     struct executor_execution_category<
-        compute::cuda::concurrent_executor<Executor> >
+        compute::cuda::concurrent_executor<Executor>>
     {
         typedef parallel::execution::parallel_execution_tag type;
     };
 
     template <typename Executor>
-    struct is_one_way_executor<
-        compute::cuda::concurrent_executor<Executor> >
+    struct is_one_way_executor<compute::cuda::concurrent_executor<Executor>>
       : std::true_type
-    {};
+    {
+    };
 
     template <typename Executor>
-    struct is_two_way_executor<
-        compute::cuda::concurrent_executor<Executor> >
+    struct is_two_way_executor<compute::cuda::concurrent_executor<Executor>>
       : std::true_type
-    {};
+    {
+    };
 
     template <typename Executor>
     struct is_bulk_one_way_executor<
-        compute::cuda::concurrent_executor<Executor> >
-      : std::true_type
-    {};
+        compute::cuda::concurrent_executor<Executor>> : std::true_type
+    {
+    };
 
     template <typename Executor>
     struct is_bulk_two_way_executor<
-        compute::cuda::concurrent_executor<Executor> >
-      : std::true_type
-    {};
-}}}
+        compute::cuda::concurrent_executor<Executor>> : std::true_type
+    {
+    };
+}}}    // namespace hpx::parallel::execution
 
 #endif
 #endif

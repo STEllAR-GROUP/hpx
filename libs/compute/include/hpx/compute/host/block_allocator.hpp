@@ -34,8 +34,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace host
-{
+namespace hpx { namespace compute { namespace host {
     /// The block_allocator allocates blocks of memory evenly divided onto the
     /// passed vector of targets. This is done by using first touch memory
     /// placement. (maybe better methods will be used in the future...);
@@ -49,8 +48,9 @@ namespace hpx { namespace compute { namespace host
     /// std::size_t N = 2048;
     /// vector_type v(N, allocator_type(numa_nodes));
     ///
-    template <typename T, typename Executor =
-        hpx::parallel::execution::local_priority_queue_attached_executor>
+    template <typename T,
+        typename Executor =
+            hpx::parallel::execution::local_priority_queue_attached_executor>
     struct block_allocator
     {
         typedef T value_type;
@@ -76,40 +76,47 @@ namespace hpx { namespace compute { namespace host
 
         block_allocator()
           : executor_(target_type(1))
-        {}
+        {
+        }
 
         block_allocator(target_type const& targets)
           : executor_(targets)
-        {}
+        {
+        }
 
-        block_allocator(target_type && targets)
+        block_allocator(target_type&& targets)
           : executor_(targets)
-        {}
+        {
+        }
 
         block_allocator(block_allocator const& alloc)
           : executor_(alloc.executor_)
-        {}
+        {
+        }
 
-        block_allocator(block_allocator && alloc)
+        block_allocator(block_allocator&& alloc)
           : executor_(std::move(alloc.executor_))
-        {}
+        {
+        }
 
         template <typename U>
         block_allocator(block_allocator<U> const& alloc)
           : executor_(alloc.executor_)
-        {}
+        {
+        }
 
         template <typename U>
-        block_allocator(block_allocator<U> && alloc)
+        block_allocator(block_allocator<U>&& alloc)
           : executor_(std::move(alloc.executor_))
-        {}
+        {
+        }
 
         block_allocator& operator=(block_allocator const& rhs)
         {
             executor_ = rhs.executor_;
             return *this;
         }
-        block_allocator& operator=(block_allocator && rhs)
+        block_allocator& operator=(block_allocator&& rhs)
         {
             executor_ = std::move(rhs.executor_);
             return *this;
@@ -131,8 +138,8 @@ namespace hpx { namespace compute { namespace host
         // topo.allocate(). The pointer hint may be used to provide locality of
         // reference: the allocator, if supported by the implementation, will
         // attempt to allocate the new memory block as close as possible to hint.
-        pointer allocate(size_type n,
-            std::allocator<void>::const_pointer hint = nullptr)
+        pointer allocate(
+            size_type n, std::allocator<void>::const_pointer hint = nullptr)
         {
             return reinterpret_cast<pointer>(
                 hpx::threads::get_topology().allocate(n * sizeof(T)));
@@ -160,8 +167,8 @@ namespace hpx { namespace compute { namespace host
         // storage pointed to by p, using placement-new. This will use the
         // underlying executors to distribute the memory according to
         // first touch memory placement.
-        template <typename U, typename ... Args>
-        void bulk_construct(U* p, std::size_t count, Args &&... args)
+        template <typename U, typename... Args>
+        void bulk_construct(U* p, std::size_t count, Args&&... args)
         {
             if (count == std::size_t(0))
             {
@@ -170,56 +177,49 @@ namespace hpx { namespace compute { namespace host
 
             auto irange = boost::irange(std::size_t(0), count);
             auto policy =
-                hpx::parallel::execution::parallel_policy()
-                    .on(executor_)
-                    .with(hpx::parallel::execution::static_chunk_size());
+                hpx::parallel::execution::parallel_policy().on(executor_).with(
+                    hpx::parallel::execution::static_chunk_size());
 
             typedef boost::range_detail::integer_iterator<std::size_t>
                 iterator_type;
-            typedef std::pair<iterator_type, iterator_type> partition_result_type;
+            typedef std::pair<iterator_type, iterator_type>
+                partition_result_type;
 
-            typedef parallel::util::partitioner_with_cleanup<
-                    decltype(policy), void, partition_result_type
-                > partitioner;
+            typedef parallel::util::partitioner_with_cleanup<decltype(policy),
+                void, partition_result_type>
+                partitioner;
             typedef parallel::util::cancellation_token<
-                    parallel::util::detail::no_data
-                > cancellation_token;
+                parallel::util::detail::no_data>
+                cancellation_token;
 
-            auto && arguments =
+            auto&& arguments =
                 hpx::util::forward_as_tuple(std::forward<Args>(args)...);
 
             cancellation_token tok;
-            partitioner::call(std::move(policy),
-                util::begin(irange), count,
-                [&arguments, p, &tok](iterator_type it, std::size_t part_size)
-                    mutable -> partition_result_type
-                {
+            partitioner::call(
+                std::move(policy), util::begin(irange), count,
+                [&arguments, p, &tok](iterator_type it,
+                    std::size_t part_size) mutable -> partition_result_type {
                     iterator_type last =
                         parallel::util::loop_with_cleanup_n_with_token(
                             it, part_size, tok,
-                            [&arguments, p](iterator_type it)
-                            {
+                            [&arguments, p](iterator_type it) {
                                 using hpx::util::functional::placement_new_one;
                                 hpx::util::invoke_fused(
                                     placement_new_one<U>(p + *it), arguments);
                             },
                             // cleanup function, called for all elements of
                             // current partition which succeeded before exception
-                            [p](iterator_type it)
-                            {
-                                (p + *it)->~U();
-                            });
+                            [p](iterator_type it) { (p + *it)->~U(); });
                     return std::make_pair(it, last);
                 },
                 // finalize, called once if no error occurred
-                [](std::vector<hpx::future<partition_result_type> > &&)
-                {
+                [](std::vector<hpx::future<partition_result_type>>&&) {
                     // do nothing
                 },
                 // cleanup function, called for each partition which
                 // didn't fail, but only if at least one failed
-                [p](partition_result_type && r) -> void
-                {
+                [p](partition_result_type&& r) -> void {
                     while (r.first != r.second)
                     {
                         (p + *r.first)->~U();
@@ -230,12 +230,11 @@ namespace hpx { namespace compute { namespace host
 
         // Constructs an object of type T in allocated uninitialized storage
         // pointed to by p, using placement-new
-        template <typename U, typename ... Args>
-        void construct(U* p, Args &&... args)
+        template <typename U, typename... Args>
+        void construct(U* p, Args&&... args)
         {
-            executor_.execute(
-                hpx::util::functional::placement_new<U>(),
-                p, std::forward<Args>(args)...);
+            executor_.execute(hpx::util::functional::placement_new<U>(), p,
+                std::forward<Args>(args)...);
         }
 
         // Calls the destructor of count objects pointed to by p
@@ -250,15 +249,10 @@ namespace hpx { namespace compute { namespace host
             // keep memory locality, use executor...
             auto irange = boost::irange(std::size_t(0), count);
             hpx::parallel::for_each(
-                hpx::parallel::execution::par
-                    .on(executor_)
-                    .with(hpx::parallel::execution::static_chunk_size()),
+                hpx::parallel::execution::par.on(executor_).with(
+                    hpx::parallel::execution::static_chunk_size()),
                 util::begin(irange), util::end(irange),
-                [p](std::size_t i)
-                {
-                    (p + i)->~U();
-                }
-            );
+                [p](std::size_t i) { (p + i)->~U(); });
         }
 
         // Calls the destructor of the object pointed to by p
@@ -277,6 +271,6 @@ namespace hpx { namespace compute { namespace host
     private:
         block_executor<executor_type> executor_;
     };
-}}}
+}}}    // namespace hpx::compute::host
 
 #endif

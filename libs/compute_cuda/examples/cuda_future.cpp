@@ -9,13 +9,13 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_copy.hpp>
+#include <hpx/include/parallel_executor_parameters.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/parallel_executor_parameters.hpp>
 //
-#include <hpx/include/compute.hpp>
 #include <hpx/compute/cuda/target.hpp>
+#include <hpx/include/compute.hpp>
 // CUDA runtime
 #include <cuda_runtime.h>
 //
@@ -38,11 +38,10 @@
 template <typename T>
 extern void cuda_trivial_kernel(T, cudaStream_t stream);
 
-extern __global__
-void saxpy(int n, float a, float *x, float *y);
+extern __global__ void saxpy(int n, float a, float* x, float* y);
 
 // -------------------------------------------------------------------------
-int test_saxpy(hpx::compute::util::cuda_future_helper &helper)
+int test_saxpy(hpx::compute::util::cuda_future_helper& helper)
 {
     int N = 1 << 20;
 
@@ -52,10 +51,10 @@ int test_saxpy(hpx::compute::util::cuda_future_helper &helper)
 
     float *d_A, *d_B;
     hpx::compute::util::cuda_error(
-        cudaMalloc((void **) &d_A, N*sizeof(float)));
+        cudaMalloc((void**) &d_A, N * sizeof(float)));
 
     hpx::compute::util::cuda_error(
-        cudaMalloc((void **) &d_B, N*sizeof(float)));
+        cudaMalloc((void**) &d_B, N * sizeof(float)));
 
     // init host data
     for (int idx = 0; idx < N; idx++)
@@ -67,34 +66,37 @@ int test_saxpy(hpx::compute::util::cuda_future_helper &helper)
     // copy both arrays from cpu to gpu, putting both copies onto the stream
     // no need to get a future back yet
     helper.memcpy_apply(
-        d_A, h_A.data(), N*sizeof(float), cudaMemcpyHostToDevice);
+        d_A, h_A.data(), N * sizeof(float), cudaMemcpyHostToDevice);
     helper.memcpy_apply(
-        d_B, h_B.data(), N*sizeof(float), cudaMemcpyHostToDevice);
+        d_B, h_B.data(), N * sizeof(float), cudaMemcpyHostToDevice);
 
     unsigned int threads = 256;
     unsigned int blocks = (N + 255) / threads;
     float ratio = 2.0f;
 
     // now launch a kernel on the stream
-    void *args[] = { &N, &ratio, &d_A, &d_B };
+    void* args[] = {&N, &ratio, &d_A, &d_B};
     helper.device_launch_apply(&saxpy, dim3(blocks), dim3(threads), args, 0);
 
     // finally, perform a copy from the gpu back to the cpu all on the same stream
     // grab a future to when this completes
-    auto cuda_future = helper.memcpy_async(h_B.data(), d_B,
-        N * sizeof(float), cudaMemcpyDeviceToHost);
+    auto cuda_future = helper.memcpy_async(
+        h_B.data(), d_B, N * sizeof(float), cudaMemcpyDeviceToHost);
 
     // we can add a continuation to the memcpy future, so that when the
     // memory copy completes, we can do new things ...
-    cuda_future.then([&](hpx::future<void> &&f){
-        std::cout << "saxpy completed on GPU, checking results" << std::endl;
-        float max_error = 0.0f;
-        for (int jdx = 0; jdx < N; jdx++)
-        {
-            max_error = (std::max)(max_error, abs(h_B[jdx] - 4.0f));
-        }
-        std::cout << "Max Error: " << max_error << std::endl;
-    }).get();
+    cuda_future
+        .then([&](hpx::future<void>&& f) {
+            std::cout << "saxpy completed on GPU, checking results"
+                      << std::endl;
+            float max_error = 0.0f;
+            for (int jdx = 0; jdx < N; jdx++)
+            {
+                max_error = (std::max)(max_error, abs(h_B[jdx] - 4.0f));
+            }
+            std::cout << "Max Error: " << max_error << std::endl;
+        })
+        .get();
 
     // the .get() is important in the line above because without it, this function
     // returns amd the task above goes out of scope and the refs it holds
@@ -108,8 +110,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
 {
     std::size_t device = vm["device"].as<std::size_t>();
     //
-    unsigned int seed = (unsigned int)std::time(nullptr);
-     if (vm.count("seed"))
+    unsigned int seed = (unsigned int) std::time(nullptr);
+    if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
@@ -129,9 +131,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     auto fn = &cuda_trivial_kernel<double>;
     double d = 3.1415;
     auto f = helper.async(fn, d);
-    f.then([](hpx::future<void> &&f) {
-        std::cout << "trivial kernel completed \n";
-    }).get();
+    f.then([](hpx::future<void>&& f) {
+         std::cout << "trivial kernel completed \n";
+     }).get();
 
     test_saxpy(helper);
 
@@ -139,23 +141,18 @@ int hpx_main(hpx::program_options::variables_map& vm)
 }
 
 // -------------------------------------------------------------------------
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     printf("[HPX Cuda future] - Starting...\n");
 
     using namespace hpx::program_options;
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
-    cmdline.add_options()
-        (   "device",
-            hpx::program_options::value<std::size_t>()->default_value(0),
-            "Device to use")
-        (   "iterations",
-            hpx::program_options::value<std::size_t>()->default_value(30),
-            "iterations")
-        ("seed,s",
-            hpx::program_options::value<unsigned int>(),
-            "the random number generator seed to use for this run")
-        ;
+    cmdline.add_options()("device",
+        hpx::program_options::value<std::size_t>()->default_value(0),
+        "Device to use")("iterations",
+        hpx::program_options::value<std::size_t>()->default_value(30),
+        "iterations")("seed,s", hpx::program_options::value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     return hpx::init(cmdline, argc, argv);
 }

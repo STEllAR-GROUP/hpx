@@ -14,9 +14,9 @@
 #include <hpx/compute/detail/iterator.hpp>
 #include <hpx/compute/traits/access_target.hpp>
 #include <hpx/compute/traits/allocator_traits.hpp>
+#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/runtime/report_error.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
 
 #include <cstddef>
 #include <initializer_list>
@@ -24,9 +24,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace compute
-{
-    template <typename T, typename Allocator = std::allocator<T> >
+namespace hpx { namespace compute {
+    template <typename T, typename Allocator = std::allocator<T>>
     class vector
     {
     private:
@@ -46,21 +45,24 @@ namespace hpx { namespace compute
         typedef detail::iterator<T, Allocator> iterator;
         typedef detail::iterator<T const, Allocator> const_iterator;
         typedef detail::reverse_iterator<T, Allocator> reverse_iterator;
-        typedef detail::const_reverse_iterator<T, Allocator> const_reverse_iterator;
+        typedef detail::const_reverse_iterator<T, Allocator>
+            const_reverse_iterator;
 
         // Default constructor. Constructs an empty container
         explicit vector(Allocator const& alloc = Allocator())
-        // C++-14, delegating ctor version:
-        // vector() : vector(Allocator()) {}
-        // explicit vector(Allocator const& alloc)
+          // C++-14, delegating ctor version:
+          // vector() : vector(Allocator()) {}
+          // explicit vector(Allocator const& alloc)
           : size_(0)
           , capacity_(0)
           , alloc_(alloc)
           , data_()
-        {}
+        {
+        }
 
         // Constructs the container with count copies of elements with value value
-        vector(size_type count, T const& value, Allocator const& alloc = Allocator())
+        vector(size_type count, T const& value,
+            Allocator const& alloc = Allocator())
           : size_(count)
           , capacity_(count)
           , alloc_(alloc)
@@ -110,7 +112,7 @@ namespace hpx { namespace compute
             hpx::parallel::util::copy(other.begin(), other.end(), begin());
         }
 
-        vector(vector && other)
+        vector(vector&& other)
           : size_(other.size_)
           , capacity_(other.capacity_)
           , alloc_(std::move(other.alloc_))
@@ -121,7 +123,7 @@ namespace hpx { namespace compute
             other.capacity_ = 0;
         }
 
-        vector(vector && other, Allocator const& alloc)
+        vector(vector&& other, Allocator const& alloc)
           : size_(other.size_)
           , capacity_(other.capacity_)
           , alloc_(alloc)
@@ -143,17 +145,19 @@ namespace hpx { namespace compute
 
         ~vector()
         {
-            if(data_ == nullptr)
+            if (data_ == nullptr)
                 return;
 
 #if !defined(__CUDA_ARCH__)
-            try {
+            try
+            {
 #endif
                 alloc_traits::bulk_destroy(alloc_, data_, size_);
                 alloc_traits::deallocate(alloc_, data_, capacity_);
 #if !defined(__CUDA_ARCH__)
             }
-            catch(...) {
+            catch (...)
+            {
                 // make sure no exception escapes this destructor
                 hpx::report_error(std::current_exception());
             }
@@ -165,11 +169,12 @@ namespace hpx { namespace compute
             if (this == &other)
                 return *this;
 
-            pointer data = alloc_traits::allocate(other.alloc_, other.capacity_);
+            pointer data =
+                alloc_traits::allocate(other.alloc_, other.capacity_);
             hpx::parallel::util::copy(other.begin(), other.end(),
                 iterator(data, 0, alloc_traits::target(other.alloc_)));
 
-            if(data_ != nullptr)
+            if (data_ != nullptr)
             {
                 alloc_traits::bulk_destroy(alloc_, data_, size_);
                 alloc_traits::deallocate(alloc_, data_, capacity_);
@@ -183,11 +188,10 @@ namespace hpx { namespace compute
             return *this;
         }
 
-        vector& operator=(vector && other)
+        vector& operator=(vector&& other)
         {
             if (this == &other)
                 return *this;
-
 
             size_ = other.size_;
             capacity_ = other.capacity_;
@@ -374,11 +378,10 @@ namespace hpx { namespace compute
 
     /// Effects: x.swap(y);
     template <typename T, typename Allocator>
-    HPX_FORCEINLINE
-    void swap(vector<T, Allocator>& x, vector<T, Allocator>& y)
+    HPX_FORCEINLINE void swap(vector<T, Allocator>& x, vector<T, Allocator>& y)
     {
         x.swap(y);
     }
-}}
+}}    // namespace hpx::compute
 
 #endif

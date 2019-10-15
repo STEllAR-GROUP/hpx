@@ -32,8 +32,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace cuda
-{
+namespace hpx { namespace compute { namespace cuda {
     /// A target_distribution_policy used for CPU bound localities.
     struct target_distribution_policy
       : compute::detail::target_distribution_policy<cuda::target>
@@ -66,12 +65,13 @@ namespace hpx { namespace compute { namespace cuda
         /// \param targets [in] The targets the new instances should represent
         ///
         target_distribution_policy operator()(
-            std::vector<target_type> && targets,
+            std::vector<target_type>&& targets,
             std::size_t num_partitions = std::size_t(-1)) const
         {
             if (num_partitions == std::size_t(-1))
                 num_partitions = targets.size();
-            return target_distribution_policy(std::move(targets), num_partitions);
+            return target_distribution_policy(
+                std::move(targets), num_partitions);
         }
 
         /// Create a new \a target_distribution_policy representing the given
@@ -84,7 +84,8 @@ namespace hpx { namespace compute { namespace cuda
         {
             std::vector<target_type> targets;
             targets.push_back(target);
-            return target_distribution_policy(std::move(targets), num_partitions);
+            return target_distribution_policy(
+                std::move(targets), num_partitions);
         }
 
         /// Create a new \a target_distribution_policy representing the given
@@ -93,11 +94,12 @@ namespace hpx { namespace compute { namespace cuda
         /// \param target [in] The target the new instances should represent
         ///
         target_distribution_policy operator()(
-            target_type && target, std::size_t num_partitions = 1) const
+            target_type&& target, std::size_t num_partitions = 1) const
         {
             std::vector<target_type> targets;
             targets.push_back(std::move(target));
-            return target_distribution_policy(std::move(targets), num_partitions);
+            return target_distribution_policy(
+                std::move(targets), num_partitions);
         }
 
         /// Create one object on one of the localities associated by
@@ -112,8 +114,8 @@ namespace hpx { namespace compute { namespace cuda
         /// \returns A future holding the global address which represents
         ///          the newly created object
         ///
-        template <typename Component, typename ... Ts>
-        hpx::future<hpx::id_type> create(Ts &&... ts) const
+        template <typename Component, typename... Ts>
+        hpx::future<hpx::id_type> create(Ts&&... ts) const
         {
             target_type t = this->get_next_target();
             hpx::id_type target_locality = t.get_locality();
@@ -122,7 +124,7 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         /// \cond NOINTERNAL
-        typedef std::pair<hpx::id_type, std::vector<hpx::id_type> >
+        typedef std::pair<hpx::id_type, std::vector<hpx::id_type>>
             bulk_locality_result;
         /// \endcond
 
@@ -139,21 +141,21 @@ namespace hpx { namespace compute { namespace cuda
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
         ///
-        template <typename Component, typename ...Ts>
-        hpx::future<std::vector<bulk_locality_result> >
-        bulk_create(std::size_t count, Ts &&... ts) const
+        template <typename Component, typename... Ts>
+        hpx::future<std::vector<bulk_locality_result>> bulk_create(
+            std::size_t count, Ts&&... ts) const
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false)
-            return hpx::future<std::vector<bulk_locality_result> >();
+            return hpx::future<std::vector<bulk_locality_result>>();
 #else
             std::vector<hpx::id_type> localities;
             localities.reserve(this->targets_.size());
 
-            std::vector<hpx::future<hpx::id_type> > objs;
+            std::vector<hpx::future<hpx::id_type>> objs;
             objs.reserve(this->targets_.size());
 
-            for(target_type& t : this->targets_)
+            for (target_type& t : this->targets_)
             {
                 hpx::id_type target_locality = t.get_locality();
 
@@ -165,12 +167,11 @@ namespace hpx { namespace compute { namespace cuda
             }
 
             return hpx::dataflow(
-                [=](std::vector<hpx::future<hpx::id_type> > && v)
-                    mutable -> std::vector<bulk_locality_result>
-                {
+                [=](std::vector<hpx::future<hpx::id_type>>&& v) mutable
+                -> std::vector<bulk_locality_result> {
                     HPX_ASSERT(localities.size() == v.size());
 
-                    std::map<hpx::id_type, std::vector<hpx::id_type> > m;
+                    std::map<hpx::id_type, std::vector<hpx::id_type>> m;
                     for (std::size_t i = 0; i != v.size(); ++i)
                     {
                         m[localities[i]].push_back(v[i].get());
@@ -193,22 +194,24 @@ namespace hpx { namespace compute { namespace cuda
 
     protected:
         /// \cond NOINTERNAL
-        target_distribution_policy(std::vector<target_type> const& targets,
-                std::size_t num_partitions)
+        target_distribution_policy(
+            std::vector<target_type> const& targets, std::size_t num_partitions)
           : base_type(targets, num_partitions)
-        {}
+        {
+        }
 
-        target_distribution_policy(std::vector<target_type> && targets,
-                std::size_t num_partitions)
+        target_distribution_policy(
+            std::vector<target_type>&& targets, std::size_t num_partitions)
           : base_type(std::move(targets), num_partitions)
-        {}
+        {
+        }
 
         friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive& ar, unsigned int const)
         {
-            ar & serialization::base_object<base_type>(*this);
+            ar& serialization::base_object<base_type>(*this);
         }
         /// \endcond
     };
@@ -217,26 +220,26 @@ namespace hpx { namespace compute { namespace cuda
     /// It will represent all local CUDA devices and will place all items to
     /// create here.
     static target_distribution_policy const target_layout;
-}}}
+}}}    // namespace hpx::compute::cuda
 
 /// \cond NOINTERNAL
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <>
     struct is_distribution_policy<compute::cuda::target_distribution_policy>
       : std::true_type
-    {};
+    {
+    };
 
     template <>
     struct num_container_partitions<compute::cuda::target_distribution_policy>
     {
-        static std::size_t
-        call(compute::cuda::target_distribution_policy const& policy)
+        static std::size_t call(
+            compute::cuda::target_distribution_policy const& policy)
         {
             return policy.get_num_partitions();
         }
     };
-}}
+}}    // namespace hpx::traits
 /// \endcond
 
 #endif

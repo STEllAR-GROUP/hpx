@@ -32,8 +32,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace compute { namespace cuda
-{
+namespace hpx { namespace compute { namespace cuda {
     template <typename T>
     class allocator
     {
@@ -64,20 +63,24 @@ namespace hpx { namespace compute { namespace cuda
 
         allocator()
           : target_(cuda::get_default_target())
-        {}
+        {
+        }
 
         allocator(target_type const& tgt)
           : target_(tgt)
-        {}
+        {
+        }
 
-        allocator(target_type && tgt)
+        allocator(target_type&& tgt)
           : target_(std::move(tgt))
-        {}
+        {
+        }
 
         template <typename U>
         allocator(allocator<U> const& alloc)
           : target_(alloc.target_)
-        {}
+        {
+        }
 
         // Returns the actual address of x even in presence of overloaded
         // operator&
@@ -104,16 +107,16 @@ namespace hpx { namespace compute { namespace cuda
         // called. The pointer hint may be used to provide locality of
         // reference: the allocator, if supported by the implementation, will
         // attempt to allocate the new memory block as close as possible to hint.
-        pointer allocate(size_type n,
-            std::allocator<void>::const_pointer hint = nullptr)
+        pointer allocate(
+            size_type n, std::allocator<void>::const_pointer hint = nullptr)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             pointer result;
 #else
-            value_type *p = nullptr;
+            value_type* p = nullptr;
             detail::scoped_active_target active(target_);
 
-            cudaError_t error = cudaMalloc(&p, n*sizeof(T));
+            cudaError_t error = cudaMalloc(&p, n * sizeof(T));
 
             pointer result(p, target_);
             if (error != cudaSuccess)
@@ -170,8 +173,9 @@ namespace hpx { namespace compute { namespace cuda
     public:
         // Constructs count objects of type T in allocated uninitialized
         // storage pointed to by p, using placement-new
-        template <typename ... Args>
-        HPX_HOST_DEVICE void bulk_construct(pointer p, std::size_t count, Args &&... args)
+        template <typename... Args>
+        HPX_HOST_DEVICE void bulk_construct(
+            pointer p, std::size_t count, Args&&... args)
         {
 #if defined(HPX_COMPUTE_CODE)
             int threads_per_block = (hpx::util::min)(1024, int(count));
@@ -180,12 +184,11 @@ namespace hpx { namespace compute { namespace cuda
 
             detail::launch(
                 target_, num_blocks, threads_per_block,
-                [] HPX_DEVICE (T* p, std::size_t count, Args const&... args)
-                {
+                [] HPX_DEVICE(T * p, std::size_t count, Args const&... args) {
                     std::size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
                     if (idx < count)
                     {
-                        ::new (p + idx) T (std::forward<Args>(args)...);
+                        ::new (p + idx) T(std::forward<Args>(args)...);
                     }
                 },
                 p.device_ptr(), count, std::forward<Args>(args)...);
@@ -195,15 +198,14 @@ namespace hpx { namespace compute { namespace cuda
 
         // Constructs an object of type T in allocated uninitialized storage
         // pointed to by p, using placement-new
-        template <typename ... Args>
-        HPX_HOST_DEVICE void construct(pointer p, Args &&... args)
+        template <typename... Args>
+        HPX_HOST_DEVICE void construct(pointer p, Args&&... args)
         {
 #if defined(HPX_COMPUTE_HOST_CODE) || defined(HPX_COMPUTE_DEVICE_CODE)
             detail::launch(
                 target_, 1, 1,
-                [] HPX_DEVICE (T* p, Args const&... args)
-                {
-                    ::new (p) T (std::forward<Args>(args)...);
+                [] HPX_DEVICE(T * p, Args const&... args) {
+                    ::new (p) T(std::forward<Args>(args)...);
                 },
                 p.device_ptr(), std::forward<Args>(args)...);
             target_.synchronize();
@@ -220,8 +222,7 @@ namespace hpx { namespace compute { namespace cuda
 
             detail::launch(
                 target_, num_blocks, threads_per_block,
-                [] HPX_DEVICE (T* p, std::size_t count)
-                {
+                [] HPX_DEVICE(T * p, std::size_t count) {
                     std::size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
                     if (idx < count)
                     {
@@ -252,8 +253,7 @@ namespace hpx { namespace compute { namespace cuda
     private:
         target_type target_;
     };
-}}}
+}}}    // namespace hpx::compute::cuda
 
 #endif
 #endif
-

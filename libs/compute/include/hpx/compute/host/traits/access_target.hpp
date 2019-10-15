@@ -16,8 +16,7 @@
 
 #include <vector>
 
-namespace hpx { namespace compute { namespace traits
-{
+namespace hpx { namespace compute { namespace traits {
     template <>
     struct access_target<host::target>
     {
@@ -53,6 +52,6 @@ namespace hpx { namespace compute { namespace traits
             *dst = *src;
         }
     };
-}}}
+}}}    // namespace hpx::compute::traits
 
 #endif

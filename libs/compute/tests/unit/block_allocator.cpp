@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/compute/host.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
@@ -16,29 +16,29 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-T* test_block_allocation(hpx::compute::host::block_allocator<T>& alloc,
-    std::size_t count)
+T* test_block_allocation(
+    hpx::compute::host::block_allocator<T>& alloc, std::size_t count)
 {
     return alloc.allocate(count);
 }
 
 template <typename T>
-void test_block_construction(hpx::compute::host::block_allocator<T>& alloc,
-    T* p, std::size_t count)
+void test_block_construction(
+    hpx::compute::host::block_allocator<T>& alloc, T* p, std::size_t count)
 {
     alloc.bulk_construct(p, count);
 }
 
 template <typename T>
-void test_block_destruction(hpx::compute::host::block_allocator<T>& alloc,
-    T* p, std::size_t count)
+void test_block_destruction(
+    hpx::compute::host::block_allocator<T>& alloc, T* p, std::size_t count)
 {
     return alloc.bulk_destroy(p, count);
 }
 
 template <typename T>
-void test_block_deallocation(hpx::compute::host::block_allocator<T>& alloc,
-    T* p, std::size_t count)
+void test_block_deallocation(
+    hpx::compute::host::block_allocator<T>& alloc, T* p, std::size_t count)
 {
     return alloc.deallocate(p, count);
 }
@@ -73,7 +73,7 @@ struct test
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::random_device{}();
+    unsigned int seed = (unsigned int) std::random_device{}();
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -105,15 +105,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

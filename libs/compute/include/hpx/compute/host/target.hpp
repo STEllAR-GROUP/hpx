@@ -23,8 +23,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace compute { namespace host
-{
+namespace hpx { namespace compute { namespace host {
     struct HPX_EXPORT target
     {
     public:
@@ -32,11 +31,13 @@ namespace hpx { namespace compute { namespace host
         {
             native_handle_type()
               : mask_(hpx::threads::get_topology().get_machine_affinity_mask())
-            {}
+            {
+            }
 
             explicit native_handle_type(hpx::threads::mask_type mask)
               : mask_(mask)
-            {}
+            {
+            }
 
             hpx::threads::mask_type& get_device() noexcept
             {
@@ -56,27 +57,31 @@ namespace hpx { namespace compute { namespace host
     public:
         // Constructs default target
         target()
-          : handle_(), locality_(hpx::find_here())
+          : handle_()
+          , locality_(hpx::find_here())
         {
         }
 
         // Constructs target from a given mask of processing units
         explicit target(hpx::threads::mask_type mask)
-          : handle_(mask), locality_(hpx::find_here())
+          : handle_(mask)
+          , locality_(hpx::find_here())
         {
         }
 
         explicit target(hpx::id_type const& locality)
-          : handle_(), locality_(locality)
+          : handle_()
+          , locality_(locality)
         {
         }
 
         target(hpx::id_type const& locality, hpx::threads::mask_type mask)
-          : handle_(mask), locality_(locality)
+          : handle_(mask)
+          , locality_(locality)
         {
         }
 
-        native_handle_type & native_handle() noexcept
+        native_handle_type& native_handle() noexcept
         {
             return handle_;
         }
@@ -106,8 +111,8 @@ namespace hpx { namespace compute { namespace host
         {
             return host::get_local_targets();
         }
-        static hpx::future<std::vector<target> >
-            get_targets(hpx::id_type const& locality)
+        static hpx::future<std::vector<target>> get_targets(
+            hpx::id_type const& locality)
         {
             return host::get_targets(locality);
         }
@@ -127,7 +132,7 @@ namespace hpx { namespace compute { namespace host
         native_handle_type handle_;
         hpx::id_type locality_;
     };
-}}}
+}}}    // namespace hpx::compute::host
 
 #include <hpx/config/warnings_suffix.hpp>
 

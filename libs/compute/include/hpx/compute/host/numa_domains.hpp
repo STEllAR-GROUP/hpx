@@ -13,9 +13,8 @@
 
 #include <vector>
 
-namespace hpx { namespace compute { namespace host
-{
+namespace hpx { namespace compute { namespace host {
     HPX_EXPORT std::vector<target> numa_domains();
-}}}
+}}}    // namespace hpx::compute::host
 
 #endif

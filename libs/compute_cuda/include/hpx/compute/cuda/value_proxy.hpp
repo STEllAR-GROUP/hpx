@@ -19,25 +19,24 @@
 
 #include <type_traits>
 
-namespace hpx { namespace compute { namespace cuda
-{
+namespace hpx { namespace compute { namespace cuda {
     template <typename T>
     class value_proxy
     {
-        typedef
-            traits::access_target<cuda::target> access_target;
+        typedef traits::access_target<cuda::target> access_target;
 
     public:
-
-        value_proxy(T *p, cuda::target & tgt) noexcept
+        value_proxy(T* p, cuda::target& tgt) noexcept
           : p_(p)
           , target_(&tgt)
-        {}
+        {
+        }
 
         value_proxy(value_proxy const& other)
           : p_(other.p_)
           , target_(other.target_)
-        {}
+        {
+        }
 
         value_proxy& operator=(T const& t)
         {
@@ -65,7 +64,7 @@ namespace hpx { namespace compute { namespace cuda
             return access_target::read(*target_, p_);
         }
 
-        T* operator &() const
+        T* operator&() const
         {
             return p_;
         }
@@ -88,21 +87,22 @@ namespace hpx { namespace compute { namespace cuda
     template <typename T>
     class value_proxy<T const>
     {
-        typedef
-            traits::access_target<cuda::target> access_target;
+        typedef traits::access_target<cuda::target> access_target;
 
     public:
         typedef T const proxy_type;
 
-        value_proxy(T *p, cuda::target & tgt) noexcept
+        value_proxy(T* p, cuda::target& tgt) noexcept
           : p_(p)
           , target_(tgt)
-        {}
+        {
+        }
 
         value_proxy(value_proxy<T> const& other)
           : p_(other.device_ptr())
           , target_(other.target())
-        {}
+        {
+        }
 
         HPX_HOST_DEVICE operator T() const
         {
@@ -123,14 +123,14 @@ namespace hpx { namespace compute { namespace cuda
         T* p_;
         cuda::target& target_;
     };
-}}}
+}}}    // namespace hpx::compute::cuda
 
 namespace hpx { namespace traits {
     template <typename T>
-    struct is_value_proxy<hpx::compute::cuda::value_proxy<T>>
-      : std::true_type
-    {};
-}}
+    struct is_value_proxy<hpx::compute::cuda::value_proxy<T>> : std::true_type
+    {
+    };
+}}    // namespace hpx::traits
 
 #endif
 #endif

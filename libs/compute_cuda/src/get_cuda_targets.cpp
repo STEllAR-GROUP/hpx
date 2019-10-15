@@ -8,16 +8,16 @@
 
 #if defined(HPX_HAVE_CUDA)
 
-#include <hpx/errors.hpp>
 #include <hpx/async.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <hpx/compute/cuda/target.hpp>
 
@@ -26,16 +26,14 @@
 
 #include <cuda_runtime.h>
 
-namespace hpx { namespace compute { namespace cuda
-{
+namespace hpx { namespace compute { namespace cuda {
     std::vector<target> get_local_targets()
     {
         int device_count = 0;
         cudaError_t error = cudaGetDeviceCount(&device_count);
         if (error != cudaSuccess)
         {
-            HPX_THROW_EXCEPTION(kernel_error,
-                "cuda::get_local_targets()",
+            HPX_THROW_EXCEPTION(kernel_error, "cuda::get_local_targets()",
                 std::string("cudaGetDeviceCount failed: ") +
                     cudaGetErrorString(error));
         }
@@ -43,28 +41,26 @@ namespace hpx { namespace compute { namespace cuda
         std::vector<target> targets;
         targets.reserve(device_count);
 
-        for(int i = 0; i < device_count; ++i)
+        for (int i = 0; i < device_count; ++i)
         {
             targets.emplace_back(target(i));
         }
 
         return targets;
     }
-}}}
+}}}    // namespace hpx::compute::cuda
 
-HPX_PLAIN_ACTION(hpx::compute::cuda::get_local_targets,
-    compute_cuda_get_targets_action);
+HPX_PLAIN_ACTION(
+    hpx::compute::cuda::get_local_targets, compute_cuda_get_targets_action);
 
-namespace hpx { namespace compute { namespace cuda
-{
-    hpx::future<std::vector<target> > get_targets(hpx::id_type const& locality)
+namespace hpx { namespace compute { namespace cuda {
+    hpx::future<std::vector<target>> get_targets(hpx::id_type const& locality)
     {
         if (locality == hpx::find_here())
             return hpx::make_ready_future(get_local_targets());
 
         return hpx::async(compute_cuda_get_targets_action(), locality);
     }
-}}}
+}}}    // namespace hpx::compute::cuda
 
 #endif
-

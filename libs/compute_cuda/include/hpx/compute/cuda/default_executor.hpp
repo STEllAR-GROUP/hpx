@@ -35,17 +35,15 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace cuda
-{
-    namespace detail
-    {
+namespace hpx { namespace compute { namespace cuda {
+    namespace detail {
         // generic implementation which simply passes through the shape elements
         template <typename Shape, typename Enable = void>
         struct bulk_launch_helper
         {
-            template <typename F, typename ... Ts>
-            static void call(cuda::target const& target, F && f,
-                Shape const& shape, Ts &&... ts)
+            template <typename F, typename... Ts>
+            static void call(cuda::target const& target, F&& f,
+                Shape const& shape, Ts&&... ts)
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
                 std::size_t count = util::size(shape);
@@ -65,9 +63,8 @@ namespace hpx { namespace compute { namespace cuda
 
                 detail::launch(
                     target, num_blocks, threads_per_block,
-                    [] HPX_DEVICE
-                        (F f, value_type* p, std::size_t count, Ts&... ts)
-                    {
+                    [] HPX_DEVICE(
+                        F f, value_type * p, std::size_t count, Ts & ... ts) {
                         std::size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
                         if (idx < count)
                         {
@@ -79,7 +76,8 @@ namespace hpx { namespace compute { namespace cuda
 #else
                 HPX_THROW_EXCEPTION(hpx::not_implemented,
                     "hpx::compute::cuda::detail::bulk_launch_helper",
-                    "Trying to launch a CUDA kernel, but did not compile in CUDA mode");
+                    "Trying to launch a CUDA kernel, but did not compile in "
+                    "CUDA mode");
 #endif
             }
         };
@@ -89,19 +87,17 @@ namespace hpx { namespace compute { namespace cuda
         struct bulk_launch_helper<
             hpx::util::tuple<Iterator, std::size_t, std::size_t>,
             typename std::enable_if<
-                hpx::traits::is_iterator<Iterator>::value
-            >::type
-        >
+                hpx::traits::is_iterator<Iterator>::value>::type>
         {
-            template <typename F, typename Shape, typename ... Ts>
-            static void call(cuda::target const& target, F && f,
-                Shape const& shape, Ts &&... ts)
+            template <typename F, typename Shape, typename... Ts>
+            static void call(cuda::target const& target, F&& f,
+                Shape const& shape, Ts&&... ts)
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
                 typedef typename hpx::traits::range_traits<Shape>::value_type
                     value_type;
 
-                for (auto const& s: shape)
+                for (auto const& s : shape)
                 {
                     auto begin = hpx::util::get<0>(s);
                     std::size_t chunk_size = hpx::util::get<1>(s);
@@ -109,33 +105,32 @@ namespace hpx { namespace compute { namespace cuda
                     // FIXME: make the 1024 to be configurable...
                     int threads_per_block =
                         (std::min)(1024, static_cast<int>(chunk_size));
-                    int num_blocks = static_cast<int>(
-                        (chunk_size + threads_per_block - 1) / threads_per_block);
+                    int num_blocks =
+                        static_cast<int>((chunk_size + threads_per_block - 1) /
+                            threads_per_block);
 
                     detail::launch(
                         target, num_blocks, threads_per_block,
-                        [begin, chunk_size]
-                        HPX_DEVICE (F f, Ts&... ts)
-                        {
-                            std::size_t idx
-                                = blockIdx.x * blockDim.x + threadIdx.x;
-                            if(idx < chunk_size)
+                        [begin, chunk_size] HPX_DEVICE(F f, Ts & ... ts) {
+                            std::size_t idx =
+                                blockIdx.x * blockDim.x + threadIdx.x;
+                            if (idx < chunk_size)
                             {
-                                hpx::util::invoke_r<void>(f,
-                                    value_type(begin + idx, 1, idx), ts...);
+                                hpx::util::invoke_r<void>(
+                                    f, value_type(begin + idx, 1, idx), ts...);
                             }
                         },
-                        std::forward<F>(f), std::forward<Ts>(ts)...
-                    );
+                        std::forward<F>(f), std::forward<Ts>(ts)...);
                 }
 #else
                 HPX_THROW_EXCEPTION(hpx::not_implemented,
                     "hpx::compute::cuda::detail::bulk_launch_helper",
-                    "Trying to launch a CUDA kernel, but did not compile in CUDA mode");
+                    "Trying to launch a CUDA kernel, but did not compile in "
+                    "CUDA mode");
 #endif
             }
         };
-    }
+    }    // namespace detail
 
     struct default_executor
     {
@@ -146,7 +141,8 @@ namespace hpx { namespace compute { namespace cuda
 
         default_executor(cuda::target const& target)
           : target_(target)
-        {}
+        {
+        }
 
         /// \cond NOINTERNAL
         bool operator==(default_executor const& rhs) const noexcept
@@ -170,47 +166,47 @@ namespace hpx { namespace compute { namespace cuda
             return target_.native_handle().processing_units();
         }
 
-        template <typename F, typename ... Ts>
-        void post(F && f, Ts &&... ts) const
+        template <typename F, typename... Ts>
+        void post(F&& f, Ts&&... ts) const
         {
-            detail::launch(target_, 1, 1,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            detail::launch(
+                target_, 1, 1, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-        template <typename F, typename ... Ts>
-        hpx::future<void> async_execute(F && f, Ts &&... ts) const
+        template <typename F, typename... Ts>
+        hpx::future<void> async_execute(F&& f, Ts&&... ts) const
         {
             post(std::forward<F>(f), std::forward<Ts>(ts)...);
             return target_.get_future();
         }
 
-        template <typename F, typename ... Ts>
-        void sync_execute(F && f, Ts &&... ts) const
+        template <typename F, typename... Ts>
+        void sync_execute(F&& f, Ts&&... ts) const
         {
             post(std::forward<F>(f), std::forward<Ts>(ts)...);
             target_.synchronize();
         }
 
-        template <typename F, typename Shape, typename ... Ts>
-        void bulk_launch(F && f, Shape const& shape, Ts &&... ts) const
+        template <typename F, typename Shape, typename... Ts>
+        void bulk_launch(F&& f, Shape const& shape, Ts&&... ts) const
         {
-            detail::bulk_launch_helper<Shape>::call(target_,
-                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+            detail::bulk_launch_helper<Shape>::call(
+                target_, std::forward<F>(f), shape, std::forward<Ts>(ts)...);
         }
 
-        template <typename F, typename Shape, typename ... Ts>
-        std::vector<hpx::future<void> >
-        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts) const
+        template <typename F, typename Shape, typename... Ts>
+        std::vector<hpx::future<void>> bulk_async_execute(
+            F&& f, Shape const& shape, Ts&&... ts) const
         {
             bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
 
-            std::vector<hpx::future<void> > result;
+            std::vector<hpx::future<void>> result;
             result.push_back(target_.get_future());
             return result;
         }
 
-        template <typename F, typename Shape, typename ... Ts>
-        void bulk_sync_execute(F && f, Shape const& shape, Ts &&... ts) const
+        template <typename F, typename Shape, typename... Ts>
+        void bulk_sync_execute(F&& f, Shape const& shape, Ts&&... ts) const
         {
             bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
             target_.synchronize();
@@ -229,10 +225,9 @@ namespace hpx { namespace compute { namespace cuda
     private:
         cuda::target target_;
     };
-}}}
+}}}    // namespace hpx::compute::cuda
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     template <>
     struct executor_execution_category<compute::cuda::default_executor>
     {
@@ -240,25 +235,27 @@ namespace hpx { namespace parallel { namespace execution
     };
 
     template <>
-    struct is_one_way_executor<compute::cuda::default_executor>
-      : std::true_type
-    {};
+    struct is_one_way_executor<compute::cuda::default_executor> : std::true_type
+    {
+    };
 
     template <>
-    struct is_two_way_executor<compute::cuda::default_executor>
-      : std::true_type
-    {};
+    struct is_two_way_executor<compute::cuda::default_executor> : std::true_type
+    {
+    };
 
     template <>
     struct is_bulk_one_way_executor<compute::cuda::default_executor>
       : std::true_type
-    {};
+    {
+    };
 
     template <>
     struct is_bulk_two_way_executor<compute::cuda::default_executor>
       : std::true_type
-    {};
-}}}
+    {
+    };
+}}}    // namespace hpx::parallel::execution
 
 #endif
 #endif

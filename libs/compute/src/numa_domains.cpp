@@ -11,15 +11,14 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
-#include <hpx/topology/cpu_mask.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <vector>
 
-namespace hpx { namespace compute { namespace host
-{
+namespace hpx { namespace compute { namespace host {
     std::vector<target> numa_domains()
     {
         auto const& topo = hpx::threads::get_topology();
@@ -32,7 +31,6 @@ namespace hpx { namespace compute { namespace host
         {
             hpx::threads::resize(mask, topo.get_number_of_pus());
         }
-
 
         auto& rp = hpx::resource::get_partitioner();
 
@@ -69,4 +67,4 @@ namespace hpx { namespace compute { namespace host
 
         return res;
     }
-}}}
+}}}    // namespace hpx::compute::host

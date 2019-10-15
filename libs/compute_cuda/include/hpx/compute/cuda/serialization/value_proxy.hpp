@@ -14,11 +14,10 @@
 #include <hpx/compute/cuda/value_proxy.hpp>
 #include <hpx/serialization/serialize.hpp>
 
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     template <typename T>
-    void serialize(input_archive & ar, compute::cuda::value_proxy<T> & v,
-        unsigned)
+    void serialize(
+        input_archive& ar, compute::cuda::value_proxy<T>& v, unsigned)
     {
         T t;
         ar >> t;
@@ -26,12 +25,12 @@ namespace hpx { namespace serialization
     }
 
     template <typename T>
-    void serialize(output_archive & ar, compute::cuda::value_proxy<T> const& v,
-        unsigned)
+    void serialize(
+        output_archive& ar, compute::cuda::value_proxy<T> const& v, unsigned)
     {
         ar << T(v);
     }
-}}
+}}    // namespace hpx::serialization
 
 #endif
 #endif
