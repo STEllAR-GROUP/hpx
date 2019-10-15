@@ -684,17 +684,18 @@ namespace hpx { namespace this_thread
         return true;
 #endif
     }
-}}
+}}    // namespace hpx::this_thread
 
-namespace hpx { namespace threads {
-    namespace detail {
-        static get_default_pool_type get_default_pool;
+namespace hpx { namespace threads { namespace detail {
+    static get_default_pool_type get_default_pool;
 
-        void set_get_default_pool(get_default_pool_type f) {
-            get_default_pool = f;
-        }
+    void set_get_default_pool(get_default_pool_type f)
+    {
+        get_default_pool = f;
+    }
 
-        thread_pool_base* get_self_or_default_pool() {
+    HPX_EXPORT thread_pool_base* get_self_or_default_pool()
+    {
         thread_pool_base* pool = nullptr;
         auto thrd_data = get_self_id_data();
         if (thrd_data)
@@ -708,29 +709,13 @@ namespace hpx { namespace threads {
         }
         else
         {
-            HPX_THROW_EXCEPTION(invalid_status, "hpx::threads::register_thread_plain", "Attempting to register a thread outside the HPX runtime and no default pool handler is installed. Did you mean to run this on an HPX thread?");
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::threads::register_thread_plain",
+                "Attempting to register a thread outside the HPX runtime and "
+                "no default pool handler is installed. Did you mean to run "
+                "this on an HPX thread?");
         }
+
         return pool;
-        }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    threads::thread_id_type register_thread_plain(
-        threads::thread_init_data& data, threads::thread_state_enum state,
-        bool run_now, error_code& ec)
-    {
-        thread_pool_base* pool = detail::get_self_or_default_pool();
-        threads::thread_id_type id = threads::invalid_thread_id;
-        pool->create_thread(data, id, state, run_now, ec);
-        return id;
-    }
-
-    void register_work_plain(
-        threads::thread_init_data& data, threads::thread_state_enum state,
-        error_code& ec)
-    {
-        thread_pool_base* pool = detail::get_self_or_default_pool();
-        pool->create_work(data, state, ec);
-    }
-}}
-
+}}}    // namespace hpx::threads::detail
