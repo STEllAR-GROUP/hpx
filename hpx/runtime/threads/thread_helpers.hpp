@@ -15,12 +15,11 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util_fwd.hpp>
@@ -35,7 +34,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads {
-
     /// \cond NOINTERNAL
     class thread_init_data;
     /// \endcond
@@ -501,7 +499,6 @@ namespace hpx { namespace threads {
 }}    // namespace hpx::threads
 
 namespace hpx { namespace this_thread {
-
     ///////////////////////////////////////////////////////////////////////////
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread
@@ -908,7 +905,6 @@ namespace hpx { namespace threads {
     ///       \a threads#register_thread_plain
     ///
     namespace detail {
-
         template <typename F>
         struct thread_function
         {
@@ -969,24 +965,6 @@ namespace hpx { namespace threads {
                 std::forward<F>(func)});
         return register_thread_plain(std::move(thread_func), description,
             initial_state, run_now, priority, os_thread, stacksize, ec);
-    }
-
-    template <typename F>
-    threads::thread_id_type register_non_suspendable_thread(F&& func,
-        util::thread_description const& description =
-            util::thread_description(),
-        threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        threads::thread_schedule_hint os_thread =
-            threads::thread_schedule_hint(),
-        error_code& ec = throws)
-    {
-        threads::thread_function_type thread_func(
-            detail::thread_function<typename std::decay<F>::type>{
-                std::forward<F>(func)});
-        return register_non_suspendable_thread_plain(std::move(thread_func),
-            description, initial_state, run_now, priority, os_thread, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
