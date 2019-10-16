@@ -17,13 +17,12 @@
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/receive_buffer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/type_support/unused.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
 #include <cstdlib>
@@ -71,7 +70,7 @@ namespace hpx { namespace lcos { namespace local
             hpx::util::atomic_count count_;
         };
 
-        // support functions for boost::intrusive_ptr
+        // support functions for hpx::intrusive_ptr
         template <typename T>
         void intrusive_ptr_add_ref(channel_impl_base<T>* p)
         {
@@ -564,7 +563,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
     private:
-        boost::intrusive_ptr<detail::channel_impl_base<T> > channel_;
+        hpx::intrusive_ptr<detail::channel_impl_base<T> > channel_;
         std::pair<T, bool> data_;
     };
 
@@ -620,7 +619,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
     private:
-        boost::intrusive_ptr<detail::channel_impl_base<T> > channel_;
+        hpx::intrusive_ptr<detail::channel_impl_base<T> > channel_;
         mutable std::pair<hpx::future<T>, bool> data_;
     };
 
@@ -731,7 +730,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
         protected:
-            boost::intrusive_ptr<channel_impl_base<T> > channel_;
+            hpx::intrusive_ptr<channel_impl_base<T> > channel_;
         };
     }
 
@@ -909,7 +908,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
     private:
-        boost::intrusive_ptr<detail::channel_impl_base<util::unused_type> > channel_;
+        hpx::intrusive_ptr<detail::channel_impl_base<util::unused_type> > channel_;
         bool data_;
     };
 
@@ -996,7 +995,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
         protected:
-            boost::intrusive_ptr<channel_impl_base<util::unused_type> > channel_;
+            hpx::intrusive_ptr<channel_impl_base<util::unused_type> > channel_;
         };
     }
 

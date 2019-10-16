@@ -11,6 +11,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type_impl.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -32,8 +33,6 @@
 #include <utility>
 
 #include <cuda_runtime.h>
-
-#include <boost/intrusive_ptr.hpp>
 
 namespace hpx { namespace compute { namespace cuda {
     namespace detail {
@@ -309,7 +308,7 @@ namespace hpx { namespace compute { namespace cuda {
 
         // make sure shared state stays alive even if the callback is invoked
         // during initialization
-        boost::intrusive_ptr<shared_state_type> p(new shared_state_type());
+        hpx::intrusive_ptr<shared_state_type> p(new shared_state_type());
         p->init(handle_.get_stream());
         return hpx::traits::future_access<hpx::future<void>>::create(
             std::move(p));

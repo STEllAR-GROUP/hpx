@@ -63,12 +63,10 @@ namespace hpx { namespace assertion {
 #if defined(HPX_DEBUG)
 #define HPX_ASSERT(expr) HPX_ASSERT_(expr, std::string())
 #define HPX_ASSERT_MSG(expr, msg) HPX_ASSERT_(expr, msg)
+#define HPX_NOEXCEPT_WITH_ASSERT
 #else
-#define HPX_ASSERT(expr)                                                       \
-    {                                                                          \
-    }
-#define HPX_ASSERT_MSG(expr, msg)                                              \
-    {                                                                          \
-    }
+#define HPX_ASSERT(expr)
+#define HPX_ASSERT_MSG(expr, msg)
+#define HPX_NOEXCEPT_WITH_ASSERT noexcept
 #endif
 #endif

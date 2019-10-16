@@ -9,9 +9,9 @@
 #define JACOBI_ROW_RANGE_HPP
 
 #include <hpx/assertion.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 
-#include <boost/intrusive_ptr.hpp>
 #include <boost/range/iterator.hpp>
 #include <boost/range/mutable_iterator.hpp>
 
@@ -68,12 +68,12 @@ namespace jacobi
         std::ptrdiff_t begin_;
         std::ptrdiff_t end_;
 
-        boost::intrusive_ptr<value_holder> values_;
+        hpx::intrusive_ptr<value_holder> values_;
 
         row_range()
         {}
 
-        row_range(boost::intrusive_ptr<value_holder> values,
+        row_range(hpx::intrusive_ptr<value_holder> values,
               std::ptrdiff_t b, std::ptrdiff_t e)
             : begin_(b)
             , end_(e)

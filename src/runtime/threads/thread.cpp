@@ -9,10 +9,10 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -20,8 +20,6 @@
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -252,7 +250,7 @@ namespace hpx {
         {
         private:
             typedef lcos::detail::future_data<void>::mutex_type mutex_type;
-            typedef boost::intrusive_ptr<thread_task_base> future_base_type;
+            typedef hpx::intrusive_ptr<thread_task_base> future_base_type;
 
         protected:
             typedef lcos::detail::future_data<void>::result_type result_type;
@@ -317,7 +315,7 @@ namespace hpx {
         }
 
         detail::thread_task_base* p = new detail::thread_task_base(id_);
-        boost::intrusive_ptr<lcos::detail::future_data<void>> base(p);
+        hpx::intrusive_ptr<lcos::detail::future_data<void>> base(p);
         if (!p->valid())
         {
             HPX_THROWS_IF(ec, thread_resource_error, "thread::get_future",

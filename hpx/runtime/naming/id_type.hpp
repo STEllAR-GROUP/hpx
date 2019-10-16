@@ -8,10 +8,9 @@
 #define HPX_RUNTIME_NAMING_ID_TYPE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <cstdint>
 #include <iosfwd>
@@ -116,7 +115,7 @@ namespace hpx { namespace naming
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
-        boost::intrusive_ptr<detail::id_type_impl> gid_;
+        hpx::intrusive_ptr<detail::id_type_impl> gid_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

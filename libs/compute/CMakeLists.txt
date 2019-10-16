@@ -51,6 +51,7 @@ add_hpx_module(compute
     hpx_coroutines
     hpx_execution
     hpx_hardware
+    hpx_memory
     hpx_plugin
     hpx_program_options
     hpx_serialization

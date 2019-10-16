@@ -6,6 +6,8 @@
 
 // hpxinspect:nodeprecatedinclude:boost/shared_ptr.hpp
 // hpxinspect:nodeprecatedname:boost::shared_ptr
+// hpxinspect:nodeprecatedinclude:boost/intrusive_ptr.hpp
+// hpxinspect:nodeprecatedname:boost::intrusive_ptr
 
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/intrusive_ptr.hpp>
@@ -16,12 +18,15 @@
 
 #include <hpx/testing.hpp>
 
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 #include <boost/intrusive_ptr.hpp>
 #include <boost/shared_ptr.hpp>
+#endif
 
 #include <memory>
 #include <vector>
 
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 void test_boost_shared()
 {
     boost::shared_ptr<int> ip(new int(7));
@@ -43,6 +48,7 @@ void test_boost_shared()
     op1.reset();
     HPX_TEST_EQ(*op2, *ip);
 }
+#endif
 
 void test_shared()
 {
@@ -87,6 +93,7 @@ void test_unique()
     HPX_TEST_EQ(*op2, *ip);
 }
 
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 struct A
 {
     A()
@@ -143,13 +150,16 @@ void test_intrusive()
     HPX_TEST_EQ(op2->count, 1);
     HPX_TEST_EQ(op2->i, ip->i);
 }
+#endif
 
 int main()
 {
-    test_boost_shared();
     test_shared();
     test_unique();
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
+    test_boost_shared();
     test_intrusive();
+#endif
 
     return hpx::util::report_errors();
 }

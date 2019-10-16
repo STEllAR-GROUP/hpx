@@ -8,17 +8,16 @@
 #define HPX_RUNTIME_THREADS_THREAD_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/get_os_thread_count.hpp>
-#include <hpx/topology/cpu_mask.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/functional/unique_function.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/runtime/get_os_thread_count.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/functional/unique_function.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -218,7 +217,7 @@ namespace hpx { namespace threads
             util::atomic_count count_;
         };
 
-        /// support functions for boost::intrusive_ptr
+        /// support functions for hpx::intrusive_ptr
         inline void intrusive_ptr_add_ref(executor_base* p)
         {
             ++p->count_;
@@ -377,7 +376,7 @@ namespace hpx { namespace threads
         }
 
     protected:
-        boost::intrusive_ptr<detail::executor_base> executor_data_;
+        hpx::intrusive_ptr<detail::executor_base> executor_data_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -422,8 +421,9 @@ namespace hpx { namespace threads
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
         {
-            boost::static_pointer_cast<detail::scheduled_executor_base>(
-                executor_data_)->add_at(abs_time, std::move(f), desc, stacksize, ec);
+            hpx::static_pointer_cast<detail::scheduled_executor_base>(
+                executor_data_)
+                ->add_at(abs_time, std::move(f), desc, stacksize, ec);
         }
 
         void add_at(util::steady_time_point const& abs_time,
@@ -449,8 +449,9 @@ namespace hpx { namespace threads
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
         {
-            boost::static_pointer_cast<detail::scheduled_executor_base>(
-                executor_data_)->add_after(rel_time, std::move(f), desc, stacksize, ec);
+            hpx::static_pointer_cast<detail::scheduled_executor_base>(
+                executor_data_)
+                ->add_after(rel_time, std::move(f), desc, stacksize, ec);
         }
 
         void add_after(util::steady_duration const& rel_time,

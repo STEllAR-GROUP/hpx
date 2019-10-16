@@ -199,13 +199,15 @@ namespace hpx
         template <typename Pred>
         struct select_policy : policy_holder<select_policy<Pred> >
         {
-            template <typename F, typename U =
-                typename std::enable_if<!std::is_same<
-                    select_policy<Pred>, typename std::decay<F>::type
-                >::value>::type>
-            explicit select_policy(F && f, threads::thread_priority priority =
-                        threads::thread_priority_default)
-              : policy_holder<select_policy<Pred> >(launch_policy::async, priority)
+            template <typename F,
+                typename U =
+                    typename std::enable_if<!std::is_same<select_policy<Pred>,
+                        typename std::decay<F>::type>::value>::type>
+            explicit select_policy(F&& f,
+                threads::thread_priority priority =
+                    threads::thread_priority_default)    // NOLINT
+              : policy_holder<select_policy<Pred>>(
+                    launch_policy::async, priority)
               , pred_(std::forward<F>(f))
             {}
 

@@ -13,6 +13,8 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/logging.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/memory/serialization/intrusive_ptr.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -21,7 +23,6 @@
 #include <hpx/runtime/serialization/detail/preprocess_futures.hpp>
 #include <hpx/runtime/serialization/detail/preprocess_gid_types.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/serialization/intrusive_ptr.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/state.hpp>
@@ -580,7 +581,7 @@ namespace hpx { namespace naming
             }
         }
 
-        /// support functions for std::intrusive_ptr
+        /// support functions for hpx::intrusive_ptr
         void intrusive_ptr_add_ref(id_type_impl* p)
         {
             ++p->count_;

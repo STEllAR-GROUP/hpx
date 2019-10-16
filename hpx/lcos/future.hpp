@@ -22,6 +22,7 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/lcos_fwd.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
@@ -44,7 +45,6 @@
     #include <hpx/lcos/detail/future_await_traits.hpp>
 #endif
 
-#include <boost/intrusive_ptr.hpp>
 
 #include <exception>
 #include <iterator>
@@ -72,7 +72,7 @@ namespace hpx { namespace lcos { namespace detail
         value_type value;
         ar >> value;
 
-        boost::intrusive_ptr<shared_state> p(
+        hpx::intrusive_ptr<shared_state> p(
             new shared_state(init_no_addref{}, in_place{}, std::move(value)),
             false);
 
@@ -89,7 +89,7 @@ namespace hpx { namespace lcos { namespace detail
         std::unique_ptr<value_type> value(
             serialization::detail::constructor_selector<value_type>::create(ar));
 
-        boost::intrusive_ptr<shared_state> p(
+        hpx::intrusive_ptr<shared_state> p(
             new shared_state(init_no_addref{}, in_place{}, std::move(*value)),
             false);
 
@@ -116,7 +116,7 @@ namespace hpx { namespace lcos { namespace detail
             std::exception_ptr exception;
             ar >> exception;
 
-            boost::intrusive_ptr<shared_state> p(
+            hpx::intrusive_ptr<shared_state> p(
                 new shared_state(init_no_addref{}, std::move(exception)),
                 false);
 
@@ -142,7 +142,7 @@ namespace hpx { namespace lcos { namespace detail
         ar >> state;
         if (state == future_state::has_value)
         {
-            boost::intrusive_ptr<shared_state> p(
+            hpx::intrusive_ptr<shared_state> p(
                 new shared_state(init_no_addref{}, in_place{}, hpx::util::unused),
                 false);
 
@@ -151,7 +151,7 @@ namespace hpx { namespace lcos { namespace detail
             std::exception_ptr exception;
             ar >> exception;
 
-            boost::intrusive_ptr<shared_state> p(
+            hpx::intrusive_ptr<shared_state> p(
                 new shared_state(init_no_addref{}, std::move(exception)),
                 false);
 
@@ -579,12 +579,12 @@ namespace hpx { namespace lcos { namespace detail
         {}
 
         explicit future_base(
-            boost::intrusive_ptr<shared_state_type> const& p
+            hpx::intrusive_ptr<shared_state_type> const& p
         ) : shared_state_(p)
         {}
 
         explicit future_base(
-            boost::intrusive_ptr<shared_state_type> && p
+            hpx::intrusive_ptr<shared_state_type> && p
         ) : shared_state_(std::move(p))
         {}
 
@@ -846,7 +846,7 @@ namespace hpx { namespace lcos { namespace detail
 #endif
 
     protected:
-        boost::intrusive_ptr<shared_state_type> shared_state_;
+        hpx::intrusive_ptr<shared_state_type> shared_state_;
     };
 }}}
 
@@ -886,18 +886,18 @@ namespace hpx { namespace lcos
 
         // Effects: constructs a future object from an shared state
         explicit future(
-            boost::intrusive_ptr<shared_state_type> const& state
+            hpx::intrusive_ptr<shared_state_type> const& state
         ) : base_type(state)
         {}
 
         explicit future(
-            boost::intrusive_ptr<shared_state_type> && state
+            hpx::intrusive_ptr<shared_state_type> && state
         ) : base_type(std::move(state))
         {}
 
         template <typename SharedState>
-        explicit future(boost::intrusive_ptr<SharedState> const& state)
-          : base_type(boost::static_pointer_cast<shared_state_type>(state))
+        explicit future(hpx::intrusive_ptr<SharedState> const& state)
+          : base_type(hpx::static_pointer_cast<shared_state_type>(state))
         {}
 
     public:
@@ -1209,18 +1209,18 @@ namespace hpx { namespace lcos
 
         // Effects: constructs a future object from an shared state
         explicit shared_future(
-            boost::intrusive_ptr<shared_state_type> const& state
+            hpx::intrusive_ptr<shared_state_type> const& state
         ) : base_type(state)
         {}
 
         explicit shared_future(
-            boost::intrusive_ptr<shared_state_type> && state
+            hpx::intrusive_ptr<shared_state_type> && state
         ) : base_type(std::move(state))
         {}
 
         template <typename SharedState>
-        explicit shared_future(boost::intrusive_ptr<SharedState> const& state)
-          : base_type(boost::static_pointer_cast<shared_state_type>(state))
+        explicit shared_future(hpx::intrusive_ptr<SharedState> const& state)
+          : base_type(hpx::static_pointer_cast<shared_state_type>(state))
         {}
 
     public:
@@ -1576,7 +1576,7 @@ namespace hpx { namespace lcos
         typedef lcos::detail::future_data<T> shared_state;
         typedef typename shared_state::init_no_addref init_no_addref;
 
-        boost::intrusive_ptr<shared_state> p(
+        hpx::intrusive_ptr<shared_state> p(
             new shared_state(init_no_addref{}, e), false);
 
         return hpx::traits::future_access<future<T> >::create(std::move(p));
@@ -1606,7 +1606,7 @@ namespace hpx { namespace lcos
         typedef typename hpx::util::decay_unwrap<T>::type result_type;
         typedef lcos::detail::timed_future_data<result_type> shared_state;
 
-        boost::intrusive_ptr<shared_state> p(
+        hpx::intrusive_ptr<shared_state> p(
             new shared_state(abs_time.value(), std::forward<T>(init)));
 
         return hpx::traits::future_access<future<result_type> >::create(

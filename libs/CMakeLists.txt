@@ -33,6 +33,7 @@ set(HPX_LIBS
   hashing
   iterator_support
   logging
+  memory
   plugin
   preprocessor
   program_options

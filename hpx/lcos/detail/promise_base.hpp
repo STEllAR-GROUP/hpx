@@ -10,20 +10,19 @@
 #define HPX_LCOS_DETAIL_PROMISE_BASE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/detail/promise_lco.hpp>
 #include <hpx/lcos/local/promise.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/unique_function.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <exception>
 #include <memory>
@@ -176,7 +175,7 @@ namespace lcos {
         protected:
             typedef Result result_type;
             typedef SharedState shared_state_type;
-            typedef boost::intrusive_ptr<shared_state_type> shared_state_ptr;
+            typedef hpx::intrusive_ptr<shared_state_type> shared_state_ptr;
 
             typedef promise_lco<Result, RemoteResult> wrapped_type;
             typedef components::managed_component<wrapped_type> wrapping_type;
