@@ -34,7 +34,6 @@
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <cstddef>
 #include <exception>

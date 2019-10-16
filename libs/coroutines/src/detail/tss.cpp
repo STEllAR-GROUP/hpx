@@ -16,8 +16,6 @@
 #include <hpx/coroutines/detail/tss.hpp>
 #include <hpx/errors.hpp>
 
-#include <hpx/runtime/threads_fwd.hpp>
-
 #include <cstddef>
 #include <map>
 #include <memory>
