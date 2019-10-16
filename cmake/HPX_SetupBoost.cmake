@@ -37,8 +37,9 @@ set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
 find_package(Boost ${Boost_MINIMUM_VERSION} REQUIRED)
 if(NOT Boost_VERSION_STRING)
   set(Boost_VERSION_STRING "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
+endif()
 
-set(__boost_libraries )
+set(__boost_libraries "")
 if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
    HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE)
   set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono thread)
@@ -123,17 +124,6 @@ if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
   endif()
   # Can't directly link to "iostreams" target in set_property, can change is when using target_link_libraries
   set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${Boost_IOSTREAMS_LIBRARIES})
-endif()
-
-if(HPX_WITH_TOOLS)
-  find_package(Boost ${Boost_MINIMUM_VERSION} QUIET MODULE COMPONENTS regex)
-  if(Boost_REGEX_FOUND)
-    hpx_info("  regex")
-  else()
-    hpx_error("Could not find Boost.Regex but HPX_WITH_TOOLS=On (the inspect tool requires Boost.Regex). Either set it to off or provide a boost installation including the regex library")
-  endif()
-  # Can't directly link to "iostreams" target in set_property, can change is when using target_link_libraries
-  set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${Boost_REGEX_LIBRARIES})
 endif()
 
 # If we compile natively for the MIC, we need some workarounds for certain
