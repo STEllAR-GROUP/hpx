@@ -6,16 +6,14 @@
 
 set(tests
     for_each_value_proxy
+    parallel_fill_4132
    )
 
-include_directories(${CUDA_INCLUDE_DIRS})
+set(for_each_value_proxy_PARAMETERS THREADS_PER_LOCALITY 4)
+set(parallel_fill_4132_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
-
-  set(${test}_FLAGS
-    DEPENDENCIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES})
+  set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
@@ -28,6 +26,5 @@ foreach(test ${tests})
                      FOLDER "Tests/Regressions/Compute")
 
   add_hpx_regression_test("computeapi" ${test} ${${test}_PARAMETERS})
-
 endforeach()
 
