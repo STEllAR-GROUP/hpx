@@ -33,7 +33,7 @@ if(HPX_WITH_COMPRESSION_BZIP2)
     target_include_directories(compress_bzip2 SYSTEM PRIVATE ${BZIP2_INCLUDE_DIR})
   endif()
 
-  target_link_libraries(compress_bzip2 PRIVATE hpx::boost)
+  target_link_libraries(compress_bzip2 PRIVATE hpx::boost::iostreams)
 
   add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2)
   add_hpx_pseudo_dependencies(core plugins.binary_filter.bzip2)

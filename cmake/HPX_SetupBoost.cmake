@@ -113,19 +113,6 @@ set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${Boost_
 find_package(Threads QUIET REQUIRED)
 set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES Threads::Threads)
 
-if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
-  find_package(Boost ${Boost_MINIMUM_VERSION} QUIET MODULE COMPONENTS iostreams)
-  if(Boost_IOSTREAMS_FOUND)
-    hpx_info("  iostreams")
-  else()
-    hpx_error("Could not find Boost.Iostreams but HPX_WITH_COMPRESSION_BZIP2=On or \
-    HPX_WITH_COMPRESSION_LIB=On. Either set it to off or provide a boost installation including \
-    the iostreams library")
-  endif()
-  # Can't directly link to "iostreams" target in set_property, can change is when using target_link_libraries
-  set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${Boost_IOSTREAMS_LIBRARIES})
-endif()
-
 # If we compile natively for the MIC, we need some workarounds for certain
 # Boost headers
 # FIXME: push changes upstream
