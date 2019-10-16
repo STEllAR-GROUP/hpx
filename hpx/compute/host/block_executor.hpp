@@ -150,27 +150,29 @@ namespace hpx { namespace compute { namespace host
                 >::type
             > > results;
             std::size_t cnt = util::size(shape);
-            std::size_t part_size = cnt / executors_.size();
+            std::size_t num_executors = executors_.size();
 
             results.reserve(cnt);
 
-            try {
+            try
+            {
                 auto begin = util::begin(shape);
                 for (std::size_t i = 0; i != executors_.size(); ++i)
                 {
+                    std::size_t part_begin_offset = (i * cnt) / num_executors;
+                    std::size_t part_end_offset =
+                        ((i + 1) * cnt) / num_executors;
+                    auto part_begin = begin;
                     auto part_end = begin;
-                    std::advance(part_end, part_size);
-                    auto futures =
-                        parallel::execution::bulk_async_execute(
-                            executors_[i],
-                            std::forward<F>(f),
-                            util::make_iterator_range(begin, part_end),
-                            std::forward<Ts>(ts)...);
-                    results.insert(
-                        results.end(),
+                    std::advance(part_begin, part_begin_offset);
+                    std::advance(part_end, part_end_offset);
+                    auto futures = parallel::execution::bulk_async_execute(
+                        executors_[i], std::forward<F>(f),
+                        util::make_iterator_range(part_begin, part_end),
+                        std::forward<Ts>(ts)...);
+                    results.insert(results.end(),
                         std::make_move_iterator(futures.begin()),
                         std::make_move_iterator(futures.end()));
-                    begin = part_end;
                 }
                 return results;
             }
@@ -192,16 +194,21 @@ namespace hpx { namespace compute { namespace host
                     F, Shape, Ts...
                 >::type results;
             std::size_t cnt = util::size(shape);
-            std::size_t part_size = cnt / executors_.size();
+            std::size_t num_executors = executors_.size();
 
             results.reserve(cnt);
 
             try {
                 auto begin = util::begin(shape);
-                for (std::size_t i = 0; i != executors_.size(); ++i)
+                for (std::size_t i = 0; i != num_executors; ++i)
                 {
+                    std::size_t part_begin_offset = (i * cnt) / num_executors;
+                    std::size_t part_end_offset =
+                        ((i + 1) * cnt) / num_executors;
+                    auto part_begin = begin;
                     auto part_end = begin;
-                    std::advance(part_end, part_size);
+                    std::advance(part_begin, part_begin_offset);
+                    std::advance(part_end, part_end_offset);
                     auto part_results =
                         parallel::execution::bulk_sync_execute(
                             executors_[i],
@@ -212,7 +219,6 @@ namespace hpx { namespace compute { namespace host
                         results.end(),
                         std::make_move_iterator(part_results.begin()),
                         std::make_move_iterator(part_results.end()));
-                    begin = part_end;
                 }
                 return results;
             }
