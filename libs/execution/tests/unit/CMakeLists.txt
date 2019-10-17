@@ -28,6 +28,7 @@ set(tests
     timed_this_thread_executors
     timed_thread_pool_executors
     standalone_thread_pool_os_executors
+    standalone_thread_pool_executor
    )
 
 foreach(test ${tests})
