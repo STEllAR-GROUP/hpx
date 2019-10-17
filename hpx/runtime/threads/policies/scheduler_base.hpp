@@ -11,7 +11,6 @@
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/format.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
