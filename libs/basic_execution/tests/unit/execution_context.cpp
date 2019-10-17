@@ -42,6 +42,7 @@ struct dummy_agent : hpx::basic_execution::agent_base
         ++dummy_called;
     }
     void yield_k(std::size_t k, char const* desc) override {}
+    void yield_to(hpx::basic_execution::agent_base& agent, char const* desc) override {}
     void suspend(char const* desc) override {}
     void resume(char const* desc) override {}
     void abort(char const* desc) override {}

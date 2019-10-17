@@ -51,6 +51,8 @@ namespace hpx { namespace basic_execution {
         void yield(char const* desc = "hpx::basic_execution::agent_ref::yield");
         void yield_k(std::size_t k,
             char const* desc = "hpx::basic_execution::agent_ref::yield_k");
+        void yield_to(agent_ref agent,
+            char const* desc = "hpx::basic_execution::agent_ref::yield_to");
         void suspend(
             char const* desc = "hpx::basic_execution::agent_ref::suspend");
         void resume(
@@ -72,6 +74,11 @@ namespace hpx { namespace basic_execution {
             sleep_until(hpx::util::steady_time_point{sleep_time}, desc);
         }
 
+        void sleep_for(
+            hpx::util::steady_duration const& sleep_duration, char const* desc);
+        void sleep_until(
+            hpx::util::steady_time_point const& sleep_time, char const* desc);
+
         // TODO:
         // affinity
         // thread_num
@@ -79,11 +86,6 @@ namespace hpx { namespace basic_execution {
 
     private:
         agent_base* impl_;
-
-        void sleep_for(
-            hpx::util::steady_duration const& sleep_duration, char const* desc);
-        void sleep_until(
-            hpx::util::steady_time_point const& sleep_time, char const* desc);
 
         friend constexpr bool operator==(
             agent_ref const& lhs, agent_ref const& rhs)

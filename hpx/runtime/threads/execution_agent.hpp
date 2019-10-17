@@ -48,6 +48,7 @@ namespace hpx { namespace threads {
 
         void yield(char const* desc) override;
         void yield_k(std::size_t k, char const* desc) override;
+        void yield_to(hpx::basic_execution::agent_base& agent, char const* desc) override;
         void suspend(char const* desc) override;
         void resume(char const* desc) override;
         void abort(char const* desc) override;
@@ -60,12 +61,12 @@ namespace hpx { namespace threads {
         coroutines::detail::coroutine_self self_;
 
         hpx::threads::thread_state_ex_enum do_yield(
-            char const* desc, threads::thread_state_enum state);
+            char const* desc, threads::thread_state_enum state, thread_id to = invalid_thread_id);
 
         void do_resume(
             char const* desc, hpx::threads::thread_state_ex_enum statex);
 
-        execution_context context_;
+        static execution_context context_;
     };
 }}    // namespace hpx::threads
 

@@ -64,6 +64,7 @@ namespace hpx { namespace basic_execution {
 
             void yield(char const* desc) override;
             void yield_k(std::size_t k, char const* desc) override;
+            void yield_to(agent_base& agent, char const* desc) override;
             void suspend(char const* desc) override;
             void resume(char const* desc) override;
             void abort(char const* desc) override;
@@ -80,8 +81,10 @@ namespace hpx { namespace basic_execution {
             std::condition_variable suspend_cv_;
             std::condition_variable resume_cv_;
 
-            default_context context_;
+            static default_context context_;
         };
+
+        default_context default_agent::context_;
 
         default_agent::default_agent()
           : running_(true)
@@ -139,6 +142,20 @@ namespace hpx { namespace basic_execution {
                 nanosleep(&rqtp, nullptr);
 #endif
             }
+        }
+
+        void default_agent::yield_to(agent_base& agent, char const* desc)
+        {
+            if (agent.context() != context())
+            {
+                agent.resume("default_agent::yield_to");
+                yield(desc);
+                return;
+            }
+            HPX_ASSERT(dynamic_cast<default_agent*>(&agent));
+            auto& agent_impl = static_cast<default_agent &>(agent);
+            agent_impl.resume("default_agent::yield_to");
+            yield(desc);
         }
 
         void default_agent::suspend(char const* desc)
@@ -267,6 +284,11 @@ namespace hpx { namespace basic_execution {
         void yield_k(std::size_t k, char const* desc)
         {
             agent().yield_k(k, desc);
+        }
+
+        void yield_to(agent_ref agnt, char const* desc)
+        {
+            agent().yield_to(agnt, desc);
         }
 
         void suspend(char const* desc)

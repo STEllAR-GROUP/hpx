@@ -40,6 +40,8 @@ namespace hpx { namespace basic_execution { namespace this_thread {
         char const* desc = "hpx::basic_execution::this_thread::yield");
     HPX_EXPORT void yield_k(std::size_t k,
         char const* desc = "hpx::basic_execution::this_thread::yield_k");
+    HPX_EXPORT void yield_to(agent_ref agent,
+        char const* desc = "hpx::basic_execution::this_thread::yield_to");
     HPX_EXPORT void suspend(
         char const* desc = "hpx::basic_execution::this_thread::suspend");
 
@@ -52,6 +54,18 @@ namespace hpx { namespace basic_execution { namespace this_thread {
 
     template <class Clock, class Duration>
     void sleep_until(std::chrono::time_point<Clock, Duration> const& sleep_time,
+        char const* desc = "hpx::basic_execution::this_thread::sleep_for")
+    {
+        agent().sleep_until(sleep_time, desc);
+    }
+
+    inline void sleep_for(hpx::util::steady_duration const& sleep_duration,
+        char const* desc = "hpx::basic_execution::this_thread::sleep_for")
+    {
+        agent().sleep_for(sleep_duration, desc);
+    }
+
+    inline void sleep_until(hpx::util::steady_time_point const& sleep_time,
         char const* desc = "hpx::basic_execution::this_thread::sleep_for")
     {
         agent().sleep_until(sleep_time, desc);

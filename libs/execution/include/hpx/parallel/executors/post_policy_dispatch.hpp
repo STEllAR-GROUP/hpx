@@ -9,12 +9,12 @@
 #define HPX_PARALLEL_EXECUTION_DETAIL_POST_POLICY_DISPATCH_DEC_05_2017_0234PM
 
 #include <hpx/config.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 
 #include <cstdint>
 #include <utility>
@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             if (tid)
             {
                 // yield_to(tid)
-                hpx::this_thread::suspend(threads::pending, tid,
+                hpx::basic_execution::this_thread::yield_to(&threads::get_thread_id_data(tid)->agent_,
                     "hpx::parallel::execution::parallel_executor::post");
             }
         }

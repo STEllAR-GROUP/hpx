@@ -20,6 +20,17 @@ namespace hpx { namespace basic_execution {
 
         virtual resource_base const& resource() const = 0;
     };
+
+    inline bool operator==(context_base const& lhs, context_base const& rhs)
+    {
+        // just do a pointer comparison for now...
+        return &lhs == &rhs;
+    }
+
+    inline bool operator!=(context_base const& lhs, context_base const& rhs)
+    {
+        return !(lhs == rhs);
+    }
 }}    // namespace hpx::basic_execution
 
 #endif

@@ -37,6 +37,16 @@ namespace hpx { namespace basic_execution {
         impl_->yield(desc);
     }
 
+    void agent_ref::yield_to(agent_ref agent, const char* desc)
+    {
+        HPX_ASSERT(*this == hpx::basic_execution::this_thread::agent());
+        // verify that there are no more registered locks for this OS-thread
+#ifdef HPX_HAVE_VERIFY_LOCKS
+        util::verify_no_locks();
+#endif
+        impl_->yield_to(*agent.impl_, desc);
+    }
+
     void agent_ref::suspend(const char* desc)
     {
         HPX_ASSERT(*this == hpx::basic_execution::this_thread::agent());
