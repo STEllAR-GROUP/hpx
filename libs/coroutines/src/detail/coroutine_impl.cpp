@@ -84,25 +84,26 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             finish_switch_fiber(nullptr, m_caller);
 #endif
             std::exception_ptr tinfo;
-            try
             {
+                coroutine_self* old_self = coroutine_self::get_self();
+                coroutine_self self(this, old_self);
+                reset_self_on_exit on_exit(&self, old_self);
+                try
                 {
-                    coroutine_self* old_self = coroutine_self::get_self();
-                    coroutine_self self(this, old_self);
-                    reset_self_on_exit on_exit(&self, old_self);
-
                     result_last = m_fun(*this->args());
                     HPX_ASSERT(
                         result_last.first == thread_state_enum::terminated);
+
+                    // return value to other side of the fence
+                    this->bind_result(result_last);
+                }
+                catch (...)
+                {
+                    status = super_type::ctx_exited_abnormally;
+                    tinfo = std::current_exception();
                 }
 
-                // return value to other side of the fence
-                this->bind_result(result_last);
-            }
-            catch (...)
-            {
-                status = super_type::ctx_exited_abnormally;
-                tinfo = std::current_exception();
+                this->reset_tss();
             }
 
             this->reset();
