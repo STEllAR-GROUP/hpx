@@ -60,9 +60,9 @@ namespace hpx { namespace assertion {
         HPX_PP_STRINGIZE(expr), [&]() { return msg; });                        \
 
 /**/
-#define HPX_ASSERT_EQ(x, count)
+#define HPX_ASSERT_EQ(expr1, expr2)
 #define HPX_ASSERT_EQ_(x, count)
-    ::hpx:assertion::detail::evaluate_count_assert(
+    ::hpx:assertion::detail::evaluate_assert(
         [&](x) -> bool {return !!(count); },
         ::hpx::assertion::source_location{
            _FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION},
