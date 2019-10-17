@@ -700,37 +700,3 @@ namespace hpx { namespace this_thread {
 #endif
     }
 }}    // namespace hpx::this_thread
-
-namespace hpx { namespace threads { namespace detail {
-    static get_default_pool_type get_default_pool;
-
-    void set_get_default_pool(get_default_pool_type f)
-    {
-        get_default_pool = f;
-    }
-
-    HPX_EXPORT thread_pool_base* get_self_or_default_pool()
-    {
-        thread_pool_base* pool = nullptr;
-        auto thrd_data = get_self_id_data();
-        if (thrd_data)
-        {
-            pool = thrd_data->get_scheduler_base()->get_parent_pool();
-        }
-        else if (detail::get_default_pool)
-        {
-            pool = detail::get_default_pool();
-            HPX_ASSERT(pool);
-        }
-        else
-        {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "hpx::threads::register_thread_plain",
-                "Attempting to register a thread outside the HPX runtime and "
-                "no default pool handler is installed. Did you mean to run "
-                "this on an HPX thread?");
-        }
-
-        return pool;
-    }
-}}}    // namespace hpx::threads::detail

@@ -22,6 +22,7 @@
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <chrono>
 #include <cstddef>

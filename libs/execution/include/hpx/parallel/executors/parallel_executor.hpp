@@ -165,7 +165,7 @@ namespace hpx { namespace parallel { namespace execution {
                 f, "hpx::parallel::execution::parallel_executor::post");
 
             detail::post_policy_dispatch<Policy>::call(
-                desc, policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
+                policy_, desc, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         // BulkTwoWayExecutor interface

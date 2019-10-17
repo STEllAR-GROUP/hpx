@@ -15,6 +15,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
 
 #include <cstdint>
 #include <utility>
@@ -25,8 +26,20 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     struct post_policy_dispatch
     {
         template <typename F, typename... Ts>
-        static void call(hpx::util::thread_description const& desc,
-            Policy const& policy, F&& f, Ts&&... ts)
+        static void call(Policy const& policy,
+            hpx::util::thread_description const& desc,
+            threads::thread_pool_base* pool, threads::thread_schedule_hint hint,
+            F&& f, Ts&&... ts)
+        {
+            threads::register_thread_nullary(pool,
+                hpx::util::deferred_call(
+                    std::forward<F>(f), std::forward<Ts>(ts)...),
+                desc, threads::pending, false, policy.priority(), hint);
+        }
+
+        template <typename F, typename... Ts>
+        static void call(Policy const& policy,
+            hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
         {
             threads::register_thread_nullary(
                 hpx::util::deferred_call(
@@ -39,24 +52,38 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     struct post_policy_dispatch<launch::fork_policy>
     {
         template <typename F, typename... Ts>
-        static void call(hpx::util::thread_description const& desc,
-            launch::fork_policy const& policy, F&& f, Ts&&... ts)
+        static void call(launch::fork_policy const& policy,
+            hpx::util::thread_description const& desc,
+            threads::thread_pool_base* pool, threads::thread_schedule_hint hint,
+            F&& f, Ts&&... ts)
         {
-            threads::thread_id_type tid = threads::register_thread_nullary(
+            threads::thread_id_type tid = threads::register_thread_nullary(pool,
                 hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...),
                 desc, threads::pending_do_not_schedule, true, policy.priority(),
                 threads::thread_schedule_hint(
                     static_cast<std::int16_t>(get_worker_thread_num())),
                 threads::thread_stacksize_current);
+            threads::thread_id_type tid_self = threads::get_self_id();
 
             // make sure this thread is executed last
-            if (tid)
+            if (tid && tid_self &&
+                get_thread_id_data(tid)->get_scheduler_base() ==
+                    get_thread_id_data(tid_self)->get_scheduler_base())
             {
                 // yield_to(tid)
                 hpx::this_thread::suspend(threads::pending, tid,
                     "hpx::parallel::execution::parallel_executor::post");
             }
+        }
+
+        template <typename F, typename... Ts>
+        static void call(launch::fork_policy const& policy,
+            hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
+        {
+            call(policy, desc, threads::detail::get_self_or_default_pool(),
+                threads::thread_schedule_hint{}, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
     };
 }}}}    // namespace hpx::parallel::execution::detail
