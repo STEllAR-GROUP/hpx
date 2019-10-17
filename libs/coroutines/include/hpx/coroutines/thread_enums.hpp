@@ -16,7 +16,10 @@
 #include <cstdint>
 
 namespace hpx { namespace threads {
+
     ///////////////////////////////////////////////////////////////////////////
+    // clang-format off
+
     /// \enum thread_state_enum
     ///
     /// The \a thread_state_enum enumerator encodes the current state of a
@@ -24,30 +27,33 @@ namespace hpx { namespace threads {
     enum thread_state_enum
     {
         unknown = 0,
-        active = 1,                  /*!< thread is currently active (running,
-                                 has resources) */
-        pending = 2,                 /*!< thread is pending (ready to run, but
-                                 no hardware resource available) */
-        suspended = 3,               /*!< thread has been suspended (waiting for
-                                 synchronization event, but still
-                                 known and under control of the
-                                 thread-manager) */
-        depleted = 4,                /*!< thread has been depleted (deeply
-                                 suspended, it is not known to the
-                                 thread-manager) */
-        terminated = 5,              /*!< thread has been stopped an may be
-                                 garbage collected */
-        staged = 6,                  /*!< this is not a real thread state, but
-                                 allows to reference staged task descriptions,
-                                 which eventually will be converted into
-                                 thread objects */
-        pending_do_not_schedule = 7, /*< this is not a real thread state,
-                                 but allows to create a thread in pending state
-                                 without scheduling it (internal, do not use) */
-        pending_boost = 8            /*< this is not a real thread state,
-                                 but allows to suspend a thread in pending state
-                                 without high priority rescheduling */
+        active = 1,                   /*!< thread is currently active (running,
+                                           has resources) */
+        pending = 2,                  /*!< thread is pending (ready to run, but
+                                           no hardware resource available) */
+        suspended = 3,                /*!< thread has been suspended (waiting
+                                           for synchronization event, but still
+                                           known and under control of the
+                                           thread-manager) */
+        depleted = 4,                 /*!< thread has been depleted (deeply
+                                           suspended, it is not known to the
+                                           thread-manager) */
+        terminated = 5,               /*!< thread has been stopped an may be
+                                           garbage collected */
+        staged = 6,                   /*!< this is not a real thread state, but
+                                           allows to reference staged task
+                                           descriptions, which eventually will
+                                           be converted into thread objects */
+        pending_do_not_schedule = 7,  /*< this is not a real thread state,
+                                          but allows to create a thread in
+                                          pending state without scheduling it
+                                          (internal, do not use) */
+        pending_boost = 8             /*< this is not a real thread state,
+                                          but allows to suspend a thread in
+                                          pending state without high priority
+                                          rescheduling */
     };
+    // clang-format on
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Returns the name of the given state
@@ -59,6 +65,8 @@ namespace hpx { namespace threads {
     HPX_API_EXPORT char const* get_thread_state_name(thread_state_enum state);
 
     ///////////////////////////////////////////////////////////////////////////
+    // clang-format off
+
     /// This enumeration lists all possible thread-priorities for HPX threads.
     ///
     enum thread_priority
@@ -78,10 +86,10 @@ namespace hpx { namespace threads {
             task and any child tasks spawned by this task will be made high
             priority as well - unless they are specifically flagged as non
             default priority. */
-        thread_priority_boost = 4,          /*!< Same as \a thread_priority_high
+        thread_priority_boost = 4, /*!< Same as \a thread_priority_high
             except that the thread will fall back to \a thread_priority_normal
             if resumed after being suspended. */
-        thread_priority_high = 5,           /*!< Task goes onto a special high
+        thread_priority_high = 5,  /*!< Task goes onto a special high
             priority queue and will be executed before normal/low priority
             tasks are taken (some schedulers modify the behavior slightly and
             the documentation for those should be consulted). */
@@ -91,6 +99,7 @@ namespace hpx { namespace threads {
         thread_priority_critical = thread_priority_high_recursive,
         /// \endcond
     };
+    // clang-format on
 
     ////////////////////////////////////////////////////////////////////////////
     /// \brief Return the thread priority name.
@@ -110,9 +119,9 @@ namespace hpx { namespace threads {
     enum thread_state_ex_enum
     {
         wait_unknown = 0,
-        wait_signaled = 1,    ///< The thread has been signaled
-        wait_timeout =
-            2,    ///< The thread has been reactivated after a timeout
+        wait_signaled = 1,     ///< The thread has been signaled
+        wait_timeout = 2,      ///< The thread has been reactivated after a
+                               ///< timeout
         wait_terminate = 3,    ///< The thread needs to be terminated
         wait_abort = 4         ///< The thread needs to be aborted
     };
@@ -124,9 +133,9 @@ namespace hpx { namespace threads {
 
     /// \cond NOINTERNAL
     // special type storing both state in one tagged structure
-    typedef threads::detail::combined_tagged_state<thread_state_enum,
-        thread_state_ex_enum>
-        thread_state;
+    using thread_state =
+        threads::detail::combined_tagged_state<thread_state_enum,
+            thread_state_ex_enum>;
     /// \endcond
 
     /// Get the readable string representing the name of the given
@@ -141,12 +150,13 @@ namespace hpx { namespace threads {
     enum thread_stacksize
     {
         thread_stacksize_unknown = -1,
-        thread_stacksize_small = 1,     ///< use small stack size
-        thread_stacksize_medium = 2,    ///< use medium sized stack size
-        thread_stacksize_large = 3,     ///< use large stack size
-        thread_stacksize_huge = 4,      ///< use very large stack size
-
-        thread_stacksize_current = 5,    ///< use size of current thread's stack
+        thread_stacksize_small = 1,      ///< use small stack size
+        thread_stacksize_medium = 2,     ///< use medium sized stack size
+        thread_stacksize_large = 3,      ///< use large stack size
+        thread_stacksize_huge = 4,       ///< use very large stack size
+        thread_stacksize_nostack = 5,    ///< this thread does not suspend
+                                         ///< (does not need a stack)
+        thread_stacksize_current = 6,    ///< use size of current thread's stack
 
         thread_stacksize_default =
             thread_stacksize_small,    ///< use default stack size

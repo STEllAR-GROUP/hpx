@@ -34,6 +34,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <limits>
 #include <map>
 #include <memory>
 #include <set>
@@ -1170,6 +1171,9 @@ namespace hpx { namespace util
 
         case threads::thread_stacksize_huge:
             return huge_stacksize;
+
+        case threads::thread_stacksize_nostack:
+            return (std::numeric_limits<std::ptrdiff_t>::max)();
 
         default:
         case threads::thread_stacksize_small:

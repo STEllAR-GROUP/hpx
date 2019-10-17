@@ -17,8 +17,8 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/testing.hpp>
 
-#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/integer/common_factor.hpp>
 
 #include <chrono>
@@ -37,13 +37,13 @@
 
 char const* benchmark_name = "Homogeneous Timed Task Spawn - HPX";
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
-using hpx::init;
 using hpx::finalize;
 using hpx::get_os_thread_count;
+using hpx::init;
 
 using hpx::applier::register_work;
 
@@ -80,18 +80,14 @@ std::string format_build_date()
     std::time_t current_time = std::chrono::system_clock::to_time_t(now);
 
     std::string ts = std::ctime(&current_time);
-    ts.resize(ts.size()-1);     // remove trailing '\n'
+    ts.resize(ts.size() - 1);    // remove trailing '\n'
     return ts;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_results(
-    std::uint64_t cores
-  , double walltime
-  , double warmup_estimate
-  , std::vector<std::string> const& counter_shortnames
-  , std::shared_ptr<hpx::util::activate_counters> ac
-    )
+void print_results(std::uint64_t cores, double walltime, double warmup_estimate,
+    std::vector<std::string> const& counter_shortnames,
+    std::shared_ptr<hpx::util::activate_counters> ac)
 {
     std::vector<hpx::performance_counters::counter_value> counter_values;
 
@@ -103,45 +99,38 @@ void print_results(
         header = false;
         cout << "Delay,Tasks,STasks,OS_Threads,Execution_Time_sec,Warmup_sec";
 
-        for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
+        for (const auto & counter_shortname : counter_shortnames)
         {
-            cout << "," << counter_shortnames[i];
+            cout << "," << counter_shortname;
         }
         cout << "\n";
-
-
     }
 
     if (header)
     {
-        cout << "# BENCHMARK: " << benchmark_name
-                 << " (" << scaling << " scaling, "
-                 << distribution << " distribution)\n";
+        cout << "# BENCHMARK: " << benchmark_name << " (" << scaling
+             << " scaling, " << distribution << " distribution)\n";
 
         cout << "# VERSION: " << HPX_HAVE_GIT_COMMIT << " "
-                 << format_build_date() << "\n"
+             << format_build_date() << "\n"
              << "#\n";
 
         // Note that if we change the number of fields above, we have to
         // change the constant that we add when printing out the field # for
         // performance counters below (e.g. the last_index part).
-        cout <<
-                "## 0:DELAY:Delay [micro-seconds] - Independent Variable\n"
+        cout << "## 0:DELAY:Delay [micro-seconds] - Independent Variable\n"
                 "## 1:TASKS:# of Tasks - Independent Variable\n"
                 "## 2:STASKS:# of Tasks to Suspend - Independent Variable\n"
                 "## 3:OSTHRDS:OS-threads - Independent Variable\n"
                 "## 4:WTIME:Total Walltime [seconds]\n"
-                "## 5:WARMUP:Total Walltime [seconds]\n"
-                ;
+                "## 5:WARMUP:Total Walltime [seconds]\n";
 
         std::uint64_t const last_index = 5;
 
         for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
         {
-            cout << "## "
-                 << (i + 1 + last_index) << ":"
-    << counter_shortnames[i] << ":"
-                 << ac->name(i);
+            cout << "## " << (i + 1 + last_index) << ":"
+                 << counter_shortnames[i] << ":" << ac->name(i);
 
             if (!ac->unit_of_measure(i).empty())
                 cout << " [" << ac->unit_of_measure(i) << "]";
@@ -150,21 +139,14 @@ void print_results(
         }
     }
 
-    hpx::util::format_to(cout,
-        "{}, {}, {}, {}, {:.14g}, {:.14g}",
-        delay,
-        tasks,
-        suspended_tasks,
-        cores,
-        walltime,
-        warmup_estimate
-    );
+    hpx::util::format_to(cout, "{}, {}, {}, {}, {:.14g}, {:.14g}", delay, tasks,
+        suspended_tasks, cores, walltime, warmup_estimate);
 
     if (ac)
     {
         for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
-            hpx::util::format_to(cout, ", {:.14g}",
-                counter_values[i].get_value<double>());
+            hpx::util::format_to(
+                cout, ", {:.14g}", counter_values[i].get_value<double>());
     }
 
     cout << "\n";
@@ -172,13 +154,10 @@ void print_results(
 
 ///////////////////////////////////////////////////////////////////////////////
 void wait_for_tasks(
-    hpx::lcos::local::barrier& finished
-  , std::uint64_t suspended_tasks
-    )
+    hpx::lcos::local::barrier& finished, std::uint64_t suspended_tasks)
 {
-    std::uint64_t const pending_count =
-        get_thread_count(hpx::threads::thread_priority_normal
-                       , hpx::threads::pending);
+    std::uint64_t const pending_count = get_thread_count(
+        hpx::threads::thread_priority_normal, hpx::threads::pending);
 
     if (pending_count == 0)
     {
@@ -187,11 +166,10 @@ void wait_for_tasks(
 
         if (all_count != suspended_tasks + 1)
         {
-            register_work(hpx::util::bind(&wait_for_tasks
-                                    , std::ref(finished)
-                                    , suspended_tasks)
-                , "wait_for_tasks", hpx::threads::pending
-                , hpx::threads::thread_priority_low);
+            register_work(hpx::util::bind(&wait_for_tasks, std::ref(finished),
+                              suspended_tasks),
+                "wait_for_tasks", hpx::threads::pending,
+                hpx::threads::thread_priority_low);
             return;
         }
     }
@@ -201,120 +179,116 @@ void wait_for_tasks(
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::threads::thread_result_type invoke_worker_timed_no_suspension(
-    hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
-    )
+    hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled)
 {
     worker_timed(delay * 1000);
-    return hpx::threads::thread_result_type(hpx::threads::terminated,
-        hpx::threads::invalid_thread_id);
+    return hpx::threads::thread_result_type(
+        hpx::threads::terminated, hpx::threads::invalid_thread_id);
 }
 
 hpx::threads::thread_result_type invoke_worker_timed_suspension(
-    hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
-    )
+    hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled)
 {
     worker_timed(delay * 1000);
 
     hpx::error_code ec(hpx::lightweight);
     hpx::this_thread::suspend(hpx::threads::suspended, "suspend", ec);
 
-    return hpx::threads::thread_result_type(hpx::threads::terminated,
-        hpx::threads::invalid_thread_id);
+    return hpx::threads::thread_result_type(
+        hpx::threads::terminated, hpx::threads::invalid_thread_id);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef void (*stage_worker_function)(std::uint64_t, bool);
+using stage_worker_function = void (*)(std::uint64_t, bool);
 
 void stage_worker_static_balanced_stackbased(
-    std::uint64_t target_thread
-  , bool suspend
-    )
+    std::uint64_t target_thread, bool suspend)
 {
     if (suspend)
-        hpx::threads::register_thread_plain(
-            &invoke_worker_timed_suspension
-          , "invoke_worker_timed_suspension"
-          , hpx::threads::pending
-          , false
-          , hpx::threads::thread_priority_normal
-          , hpx::threads::thread_schedule_hint(target_thread)
-            );
+    {
+        hpx::threads::register_thread_plain(&invoke_worker_timed_suspension,
+            "invoke_worker_timed_suspension", hpx::threads::pending, false,
+            hpx::threads::thread_priority_normal,
+            hpx::threads::thread_schedule_hint(
+                static_cast<std::int16_t>(target_thread)));
+    }
     else
-        hpx::threads::register_thread_plain(
-            &invoke_worker_timed_no_suspension
-          , "invoke_worker_timed_no_suspension"
-          , hpx::threads::pending
-          , false
-          , hpx::threads::thread_priority_normal
-          , hpx::threads::thread_schedule_hint(target_thread)
-            );
+    {
+        hpx::threads::register_thread_plain(&invoke_worker_timed_no_suspension,
+            "invoke_worker_timed_no_suspension", hpx::threads::pending, false,
+            hpx::threads::thread_priority_normal,
+            hpx::threads::thread_schedule_hint(
+                static_cast<std::int16_t>(target_thread)));
+    }
 }
 
-void stage_worker_static_imbalanced(
-    std::uint64_t target_thread
-  , bool suspend
-    )
+void stage_worker_static_balanced_stackless(
+    std::uint64_t target_thread, bool suspend)
 {
     if (suspend)
-        hpx::threads::register_thread_plain(
-            &invoke_worker_timed_suspension
-          , "invoke_worker_timed_suspension"
-          , hpx::threads::pending
-          , false
-          , hpx::threads::thread_priority_normal
-          , hpx::threads::thread_schedule_hint(0)
-            );
+    {
+        hpx::threads::register_non_suspendable_thread_plain(
+            &invoke_worker_timed_suspension, "invoke_worker_timed_suspension",
+            hpx::threads::pending, false, hpx::threads::thread_priority_normal,
+            hpx::threads::thread_schedule_hint(
+                static_cast<std::int16_t>(target_thread)));
+    }
     else
-        hpx::threads::register_thread_plain(
-            &invoke_worker_timed_no_suspension
-          , "invoke_worker_timed_no_suspension"
-          , hpx::threads::pending
-          , false
-          , hpx::threads::thread_priority_normal
-          , hpx::threads::thread_schedule_hint(0)
-            );
+    {
+        hpx::threads::register_non_suspendable_thread_plain(
+            &invoke_worker_timed_no_suspension,
+            "invoke_worker_timed_no_suspension", hpx::threads::pending, false,
+            hpx::threads::thread_priority_normal,
+            hpx::threads::thread_schedule_hint(
+                static_cast<std::int16_t>(target_thread)));
+    }
 }
 
-void stage_worker_round_robin(
-    std::uint64_t target_thread
-  , bool suspend
-    )
+void stage_worker_static_imbalanced(std::uint64_t target_thread, bool suspend)
 {
     if (suspend)
-        hpx::threads::register_thread_plain(
-            &invoke_worker_timed_suspension
-          , "invoke_worker_timed_suspension"
-          , hpx::threads::pending
-          , false
-            );
+    {
+        hpx::threads::register_thread_plain(&invoke_worker_timed_suspension,
+            "invoke_worker_timed_suspension", hpx::threads::pending, false,
+            hpx::threads::thread_priority_normal,
+            hpx::threads::thread_schedule_hint(0));
+    }
     else
-        hpx::threads::register_thread_plain(
-            &invoke_worker_timed_no_suspension
-          , "invoke_worker_timed_no_suspension"
-          , hpx::threads::pending
-          , false
-            );
+    {
+        hpx::threads::register_thread_plain(&invoke_worker_timed_no_suspension,
+            "invoke_worker_timed_no_suspension", hpx::threads::pending, false,
+            hpx::threads::thread_priority_normal,
+            hpx::threads::thread_schedule_hint(0));
+    }
 }
 
-void stage_workers(
-    std::uint64_t target_thread
-  , std::uint64_t local_tasks
-  , stage_worker_function stage_worker
-    )
+void stage_worker_round_robin(std::uint64_t target_thread, bool suspend)
+{
+    if (suspend)
+    {
+        hpx::threads::register_thread_plain(&invoke_worker_timed_suspension,
+            "invoke_worker_timed_suspension", hpx::threads::pending, false);
+    }
+    else
+    {
+        hpx::threads::register_thread_plain(&invoke_worker_timed_no_suspension,
+            "invoke_worker_timed_no_suspension", hpx::threads::pending, false);
+    }
+}
+
+void stage_workers(std::uint64_t target_thread, std::uint64_t local_tasks,
+    stage_worker_function stage_worker)
 {
     std::uint64_t num_thread = hpx::get_worker_thread_num();
 
     if (num_thread != target_thread)
     {
-        register_work(hpx::util::bind(&stage_workers
-                                , target_thread
-                                , local_tasks
-                                , stage_worker)
-            , "stage_workers"
-            , hpx::threads::pending
-            , hpx::threads::thread_priority_normal
-            , hpx::threads::thread_schedule_hint(target_thread)
-              );
+        register_work(hpx::util::bind(&stage_workers, target_thread,
+                          local_tasks, stage_worker),
+            "stage_workers", hpx::threads::pending,
+            hpx::threads::thread_priority_normal,
+            hpx::threads::thread_schedule_hint(
+                static_cast<std::int16_t>(target_thread)));
         return;
     }
 
@@ -334,9 +308,7 @@ void stage_workers(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(
-    variables_map& vm
-    )
+int hpx_main(variables_map& vm)
 {
     {
         if (vm.count("no-header"))
@@ -358,16 +330,28 @@ int hpx_main(
         stage_worker_function stage_worker;
 
         if ("static-balanced-stackbased" == distribution)
+        {
             stage_worker = &stage_worker_static_balanced_stackbased;
+        }
+        else if ("static-balanced-stackless" == distribution)
+        {
+            stage_worker = &stage_worker_static_balanced_stackless;
+        }
         else if ("static-imbalanced" == distribution)
+        {
             stage_worker = &stage_worker_static_imbalanced;
+        }
         else if ("round-robin" == distribution)
+        {
             stage_worker = &stage_worker_round_robin;
+        }
         else
+        {
             throw std::invalid_argument(
                 "invalid distribution type specified (valid options are "
-                "\"static-balanced\", \"static-imbalanced\" or \"round-robin\")"
-                );
+                "\"static-balanced\", \"static-imbalanced\" or "
+                "\"round-robin\")");
+        }
 
         ///////////////////////////////////////////////////////////////////////
         std::uint64_t tasks_per_feeder = 0;
@@ -378,30 +362,34 @@ int hpx_main(
         if ("strong" == scaling)
         {
             if (tasks % os_thread_count)
+            {
                 throw std::invalid_argument(
-                    "tasks must be cleanly divisable by OS-thread count\n");
-
+                    "tasks must be cleanly divisible by OS-thread count\n");
+            }
             if (suspended_tasks % os_thread_count)
+            {
                 throw std::invalid_argument(
-                    "suspended tasks must be cleanly divisable by OS-thread "
+                    "suspended tasks must be cleanly divisible by OS-thread "
                     "count\n");
-
+            }
             tasks_per_feeder = tasks / os_thread_count;
             //total_tasks      = tasks;
             suspended_tasks_per_feeder = suspended_tasks / os_thread_count;
-            total_suspended_tasks      = suspended_tasks;
+            total_suspended_tasks = suspended_tasks;
         }
         else if ("weak" == scaling)
         {
             tasks_per_feeder = tasks;
             //total_tasks      = tasks * os_thread_count;
             suspended_tasks_per_feeder = suspended_tasks;
-            total_suspended_tasks      = suspended_tasks * os_thread_count;
+            total_suspended_tasks = suspended_tasks * os_thread_count;
         }
         else
+        {
             throw std::invalid_argument(
                 "invalid scaling type specified (valid options are \"strong\" "
                 "or \"weak\")");
+        }
 
         ///////////////////////////////////////////////////////////////////////
         if (suspended_tasks != 0)
@@ -421,12 +409,12 @@ int hpx_main(
         if (vm.count("counter"))
         {
             std::vector<std::string> raw_counters =
-                vm["counter"].as<std::vector<std::string> >();
+                vm["counter"].as<std::vector<std::string>>();
 
-            for (std::uint64_t i = 0; i < raw_counters.size(); ++i)
+            for (auto& raw_counter : raw_counters)
             {
                 std::vector<std::string> entry;
-                boost::algorithm::split(entry, raw_counters[i],
+                boost::algorithm::split(entry, raw_counter,
                     boost::algorithm::is_any_of(","),
                     boost::algorithm::token_compress_on);
 
@@ -439,14 +427,17 @@ int hpx_main(
 
         std::shared_ptr<hpx::util::activate_counters> ac;
         if (!counters.empty())
-            ac.reset(new hpx::util::activate_counters(counters));
+        {
+            ac = std::make_shared<hpx::util::activate_counters>(counters);
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // Start the clock.
         high_resolution_timer t;
-
         if (ac)
+        {
             ac->reset_counters();
+        }
 
         // This needs to stay here; we may have suspended as recently as the
         // performance counter reset (which is called just before the staging
@@ -455,18 +446,15 @@ int hpx_main(
 
         for (std::uint64_t i = 0; i < os_thread_count; ++i)
         {
-            if (num_thread == i) continue;
+            if (num_thread == i)
+                continue;
 
-            register_work(hpx::util::bind(&stage_workers
-                                    , i
-                                    , tasks_per_feeder
-                                    , stage_worker
-                                      )
-                , "stage_workers"
-                , hpx::threads::pending
-                , hpx::threads::thread_priority_normal
-                , hpx::threads::thread_schedule_hint(i)
-                  );
+            register_work(hpx::util::bind(&stage_workers, i, tasks_per_feeder,
+                              stage_worker),
+                "stage_workers", hpx::threads::pending,
+                hpx::threads::thread_priority_normal,
+                hpx::threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(i)));
         }
 
         stage_workers(num_thread, tasks_per_feeder, stage_worker);
@@ -478,20 +466,18 @@ int hpx_main(
         // executed, and then it
         hpx::lcos::local::barrier finished(2);
 
-        register_work(hpx::util::bind(&wait_for_tasks
-                                , std::ref(finished)
-                                , total_suspended_tasks
-                                 )
-            , "wait_for_tasks", hpx::threads::pending
-            , hpx::threads::thread_priority_low);
+        register_work(hpx::util::bind(&wait_for_tasks, std::ref(finished),
+                          total_suspended_tasks),
+            "wait_for_tasks", hpx::threads::pending,
+            hpx::threads::thread_priority_low);
 
         finished.wait();
 
         // Stop the clock
         double time_elapsed = t.elapsed();
 
-        print_results(os_thread_count, time_elapsed, warmup_estimate
-                    , counter_shortnames, ac);
+        print_results(os_thread_count, time_elapsed, warmup_estimate,
+            counter_shortnames, ac);
     }
 
     if (suspended_tasks != 0)
@@ -502,14 +488,12 @@ int hpx_main(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(
-    int argc
-  , char* argv[]
-    )
+int main(int argc, char* argv[])
 {
     // Configure application-specific options.
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     cmdline.add_options()
         ( "scaling"
         , value<std::string>(&scaling)->default_value("weak")
@@ -517,9 +501,11 @@ int main(
           "\"weak\")")
 
         ( "distribution"
-        , value<std::string>(&distribution)->default_value("static-balanced")
+        , value<std::string>(&distribution)->default_value(
+            "static-balanced-stackbased")
         , "type of distribution to perform (valid options are "
-          "\"static-balanced\", \"static-imbalanced\" or \"round-robin\")")
+          "\"static-balanced-stackbased\", \"static-balanced-stackless\", "
+          "\"static-imbalanced\", or \"round-robin\")")
 
         ( "tasks"
         , value<std::uint64_t>(&tasks)->default_value(500000)
@@ -547,6 +533,7 @@ int main(
         ( "csv-header"
         , "print out csv header")
         ;
+    // clang-format on
 
     // Initialize and run HPX.
     return init(cmdline, argc, argv);
