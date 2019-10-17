@@ -5,11 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
-#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
@@ -215,7 +214,7 @@ namespace hpx {
         {
             // wait for thread to be terminated
             util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
-            this_thread::suspend(threads::suspended, "thread::join");
+            hpx::basic_execution::this_thread::suspend("thread::join");
         }
 
         detach_locked();    // invalidate this object
@@ -333,13 +332,9 @@ namespace hpx {
     namespace this_thread {
         void yield_to(thread::id id) noexcept
         {
-            this_thread::suspend(
-                threads::pending, id.native_handle(), "this_thread::yield_to");
-        }
-
-        void yield() noexcept
-        {
-            this_thread::suspend(threads::pending, "this_thread::yield");
+            auto tid = id.native_handle();
+            hpx::basic_execution::this_thread::yield_to(&threads::get_thread_id_data(tid)->agent_,
+                "this_thread::yield_to");
         }
 
         thread::id get_id() noexcept
@@ -379,11 +374,6 @@ namespace hpx {
         {
             threads::interrupt_thread(threads::get_self_id());
             threads::interruption_point(threads::get_self_id());
-        }
-
-        void sleep_until(util::steady_time_point const& abs_time)
-        {
-            this_thread::suspend(abs_time, "this_thread::sleep_until");
         }
 
         std::size_t get_thread_data()

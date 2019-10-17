@@ -8,6 +8,7 @@
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -70,13 +71,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
         if (!queue_.empty())
         {
-            threads::thread_id_type id = queue_.front().id_;
+            auto ctx = queue_.front().ctx_;
 
             // remove item from queue before error handling
-            queue_.front().id_ = threads::invalid_thread_id;
+            queue_.front().ctx_.reset();
             queue_.pop_front();
 
-            if (HPX_UNLIKELY(id == threads::invalid_thread_id))
+            if (HPX_UNLIKELY(!ctx))
             {
                 lock.unlock();
 
@@ -89,8 +90,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             bool not_empty = !queue_.empty();
             lock.unlock();
 
-            threads::set_thread_state(id, threads::pending,
-                threads::wait_signaled, priority, true, ec);
+            ctx.resume();
 
             return not_empty;
         }
@@ -118,13 +118,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 qe.q_ = &queue;
 
             do {
-                threads::thread_id_type id = queue.front().id_;
+                auto ctx = queue.front().ctx_;
 
                 // remove item from queue before error handling
-                queue.front().id_ = threads::invalid_thread_id;
+                queue.front().ctx_.reset();
                 queue.pop_front();
 
-                if (HPX_UNLIKELY(id == threads::invalid_thread_id))
+                if (HPX_UNLIKELY(!ctx))
                 {
                     prepend_entries(lock, queue);
                     lock.unlock();
@@ -138,8 +138,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 error_code local_ec;
                 {
                     util::ignore_while_checking<std::unique_lock<mutex_type> > il(&lock);
-                    threads::set_thread_state(id, threads::pending,
-                        threads::wait_signaled, priority, true, local_ec);
+                    ctx.resume();
                 }
 
                 if (local_ec)
@@ -177,24 +176,21 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         std::unique_lock<mutex_type>& lock,
         char const* description, error_code& ec)
     {
-        HPX_ASSERT(threads::get_self_ptr() != nullptr);
         HPX_ASSERT(lock.owns_lock());
 
         // enqueue the request and block this thread
-        queue_entry f(threads::get_self_id(), &queue_);
+        auto this_ctx = hpx::basic_execution::this_thread::agent();
+        queue_entry f(this_ctx, &queue_);
         queue_.push_back(f);
 
         reset_queue_entry r(f, queue_);
-        threads::thread_state_ex_enum reason = threads::wait_unknown;
         {
-            // yield this thread
+            // suspend this thread
             util::unlock_guard<std::unique_lock<mutex_type> > ul(lock);
-            reason = this_thread::suspend(threads::suspended, description, ec);
-            if (ec) return threads::wait_unknown;
+            this_ctx.suspend();
         }
 
-        return (f.id_ != threads::invalid_thread_id) ?
-            threads::wait_timeout : reason;
+        return f.ctx_ ? threads::wait_timeout : threads::wait_signaled;
     }
 
     threads::thread_state_ex_enum condition_variable::wait_until(
@@ -202,24 +198,21 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         util::steady_time_point const& abs_time,
         char const* description, error_code& ec)
     {
-        HPX_ASSERT(threads::get_self_ptr() != nullptr);
         HPX_ASSERT(lock.owns_lock());
 
         // enqueue the request and block this thread
-        queue_entry f(threads::get_self_id(), &queue_);
+        auto this_ctx = hpx::basic_execution::this_thread::agent();
+        queue_entry f(this_ctx, &queue_);
         queue_.push_back(f);
 
         reset_queue_entry r(f, queue_);
-        threads::thread_state_ex_enum reason = threads::wait_unknown;
         {
-            // yield this thread
+            // suspend this thread
             util::unlock_guard<std::unique_lock<mutex_type> > ul(lock);
-            reason = this_thread::suspend(abs_time, description, ec);
-            if (ec) return threads::wait_unknown;
+            this_ctx.sleep_until(abs_time.value());
         }
 
-        return (f.id_ != threads::invalid_thread_id) ?
-            threads::wait_timeout : reason;
+        return f.ctx_ ? threads::wait_timeout : threads::wait_signaled;
     }
 
     template <typename Mutex>
@@ -238,12 +231,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             while (!queue.empty())
             {
-                threads::thread_id_type id = queue.front().id_;
+                auto ctx = queue.front().ctx_;
 
-                queue.front().id_ = threads::invalid_thread_id;
+                // remove item from queue before error handling
+                queue.front().ctx_.reset();
                 queue.pop_front();
 
-                if (HPX_UNLIKELY(id == threads::invalid_thread_id))
+                if (HPX_UNLIKELY(!ctx))
                 {
                     LERR_(fatal)
                         << "condition_variable::abort_all:"
@@ -251,32 +245,14 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                     continue;
                 }
 
-                LERR_(fatal)
-                        << "condition_variable::abort_all:"
-                        << " pending thread: "
-                        << get_thread_state_name(
-                                threads::get_thread_state(id))
-                        << "(" << id << "): "
-                        << threads::get_thread_description(id);
+                LERR_(fatal) << "condition_variable::abort_all:"
+                             << " pending thread: " << ctx;
 
                 // unlock while notifying thread as this can suspend
                 util::unlock_guard<std::unique_lock<Mutex> > unlock(lock);
 
                 // forcefully abort thread, do not throw
-                error_code ec(lightweight);
-                threads::set_thread_state(id, threads::pending,
-                    threads::wait_abort, threads::thread_priority_default, true,
-                    ec);
-                if (ec)
-                {
-                    LERR_(fatal)
-                        << "condition_variable::abort_all:"
-                        << " could not abort thread: "
-                        << get_thread_state_name(
-                                threads::get_thread_state(id))
-                        << "(" << id << "): "
-                        << threads::get_thread_description(id);
-                }
+                ctx.abort();
             }
         }
     }

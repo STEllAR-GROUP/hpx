@@ -14,8 +14,10 @@
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
+#include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/type_support/decay.hpp>
 

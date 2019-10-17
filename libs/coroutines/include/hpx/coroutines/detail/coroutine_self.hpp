@@ -95,6 +95,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
             {
                 reset_self_on_exit on_exit(this);
+                HPX_ASSERT(arg.first != hpx::threads::active);
                 this->m_pimpl->yield();
             }
 

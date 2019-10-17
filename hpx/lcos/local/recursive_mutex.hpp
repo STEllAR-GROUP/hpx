@@ -13,6 +13,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/agent_ref.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <atomic>
@@ -24,38 +26,6 @@ namespace hpx { namespace lcos { namespace local
 {
     namespace detail
     {
-        template <typename Mutex>
-        struct thread_id_from_mutex
-        {
-            typedef std::size_t thread_id_type;
-
-            static thread_id_type invalid_id() { return ~0u; }
-
-            static thread_id_type call()
-            {
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
-                return (thread_id_type)GetCurrentThreadId();
-#else
-                return (thread_id_type)pthread_self();
-#endif
-            };
-        };
-
-        template <>
-        struct thread_id_from_mutex<lcos::local::spinlock>
-        {
-            typedef std::size_t thread_id_type;
-
-            static thread_id_type invalid_id() { return ~0u; }
-
-            static thread_id_type call()
-            {
-                return hpx::threads::get_self_ptr() ?
-                    reinterpret_cast<thread_id_type>(hpx::threads::get_self_id().get()) :
-                    thread_id_from_mutex<void>::call();
-            };
-        };
-
         /// An exclusive-ownership recursive mutex which implements Boost.Thread's
         /// TimedLockable concept.
         template <typename Mutex = local::spinlock>
@@ -65,17 +35,13 @@ namespace hpx { namespace lcos { namespace local
             HPX_NON_COPYABLE(recursive_mutex_impl);
 
         private:
-            typedef typename thread_id_from_mutex<Mutex>::thread_id_type
-                thread_id_type;
-
             std::atomic<std::uint64_t> recursion_count;
-            std::atomic<thread_id_type> locking_thread_id;
+            std::atomic<hpx::basic_execution::agent_ref> locking_context;
             Mutex mtx;
 
         public:
             recursive_mutex_impl(char const* const desc = "recursive_mutex_impl")
               : recursion_count(0)
-              , locking_thread_id(thread_id_from_mutex<Mutex>::invalid_id())
               , mtx(desc)
             {}
 
@@ -87,10 +53,10 @@ namespace hpx { namespace lcos { namespace local
             /// \throws Never throws.
             bool try_lock()
             {
-                thread_id_type const id = thread_id_from_mutex<Mutex>::call();
-                HPX_ASSERT(id != thread_id_from_mutex<Mutex>::invalid_id());
+                auto ctx = hpx::basic_execution::this_thread::agent();
+                HPX_ASSERT(ctx);
 
-                return try_recursive_lock(id) || try_basic_lock(id);
+                return try_recursive_lock(ctx) || try_basic_lock(ctx);
             }
 
             /// Acquires ownership of the \a recursive_mutex. Suspends the
@@ -102,13 +68,13 @@ namespace hpx { namespace lcos { namespace local
             ///         called outside of a HPX-thread.
             void lock()
             {
-                thread_id_type const id = thread_id_from_mutex<Mutex>::call();
-                HPX_ASSERT(id != thread_id_from_mutex<Mutex>::invalid_id());
+                auto ctx = hpx::basic_execution::this_thread::agent();
+                HPX_ASSERT(ctx);
 
-                if (!try_recursive_lock(id))
+                if (!try_recursive_lock(ctx))
                 {
                     mtx.lock();
-                    locking_thread_id.exchange(id);
+                    locking_context.exchange(ctx);
                     util::ignore_lock(&mtx);
                     util::register_lock(this);
                     recursion_count.store(1);
@@ -164,8 +130,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 if (0 == --recursion_count)
                 {
-                    locking_thread_id.exchange(
-                        thread_id_from_mutex<Mutex>::invalid_id());
+                    locking_context.exchange(hpx::basic_execution::agent_ref());
                     util::unregister_lock(this);
                     util::reset_ignored(&mtx);
                     mtx.unlock();
@@ -173,10 +138,11 @@ namespace hpx { namespace lcos { namespace local
             }
 
         private:
-            bool try_recursive_lock(thread_id_type current_thread_id)
+            bool try_recursive_lock(
+                hpx::basic_execution::agent_ref current_context)
             {
-                if (locking_thread_id.load(std::memory_order_acquire) ==
-                    current_thread_id)
+                if (locking_context.load(std::memory_order_acquire) ==
+                    current_context)
                 {
                     if (++recursion_count == 1)
                         util::register_lock(this);
@@ -185,11 +151,11 @@ namespace hpx { namespace lcos { namespace local
                 return false;
             }
 
-            bool try_basic_lock(thread_id_type current_thread_id)
+            bool try_basic_lock(hpx::basic_execution::agent_ref current_context)
             {
                 if (mtx.try_lock())
                 {
-                    locking_thread_id.exchange(current_thread_id);
+                    locking_context.exchange(current_context);
                     util::ignore_lock(&mtx);
                     util::register_lock(this);
                     recursion_count.store(1);

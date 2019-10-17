@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos_fwd.hpp>
@@ -223,8 +224,8 @@ namespace hpx
     {
         HPX_API_EXPORT thread::id get_id() noexcept;
 
-        HPX_API_EXPORT void yield() noexcept;
         HPX_API_EXPORT void yield_to(thread::id) noexcept;
+        using namespace hpx::basic_execution::this_thread;
 
         // extensions
         HPX_API_EXPORT threads::thread_priority get_priority();
@@ -235,13 +236,6 @@ namespace hpx
         HPX_API_EXPORT bool interruption_requested();
 
         HPX_API_EXPORT void interrupt();
-
-        HPX_API_EXPORT void sleep_until(util::steady_time_point const& abs_time);
-
-        inline void sleep_for(util::steady_duration const& rel_time)
-        {
-            sleep_until(rel_time.from_now());
-        }
 
         HPX_API_EXPORT std::size_t get_thread_data();
         HPX_API_EXPORT std::size_t set_thread_data(std::size_t);

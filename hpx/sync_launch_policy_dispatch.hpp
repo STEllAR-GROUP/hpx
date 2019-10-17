@@ -8,10 +8,12 @@
 #define HPX_SYNC_LAUNCH_POLICY_DISPATCH_FEB_14_2019_1252PM
 
 #include <hpx/config.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/lcos/sync_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/functional/invoke.hpp>
 
@@ -53,7 +55,7 @@ namespace hpx { namespace detail
                 {
                     // make sure this thread is executed last
                     // yield_to
-                    hpx::this_thread::suspend(threads::pending, tid,
+                    hpx::basic_execution::this_thread::yield_to(&threads::get_thread_id_data(tid)->agent_,
                         "sync_launch_policy_dispatch<fork>");
                 }
             }

@@ -209,7 +209,7 @@
 #  endif
 #endif
 #if !defined(HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT)
-#  define HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT 1000000
+#  define HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT 4294967294
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

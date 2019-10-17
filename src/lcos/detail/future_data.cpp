@@ -9,12 +9,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/detail/yield_k.hpp>
@@ -58,22 +59,20 @@ namespace hpx { namespace lcos { namespace detail
         hpx::launch policy = launch::fork;
         if (!is_hpx_thread)
             policy = launch::async;
-
         // launch a new thread executing the given function
         threads::thread_id_type tid = p.apply(
             policy, threads::thread_priority_boost,
             threads::thread_stacksize_current,
             threads::thread_schedule_hint());
 
-        // wait for the task to run
         if (is_hpx_thread)
         {
             // make sure this thread is executed last
-            hpx::this_thread::yield_to(thread::id(std::move(tid)));
-            return p.get_future().get();
+            hpx::basic_execution::this_thread::yield_to(&threads::get_thread_id_data(tid)->agent_,
+                "hpx::lcos::detail::run_on_completed_new_thread");
+            // wait for the task to run
+            p.get_future().get();
         }
-        // If we are not on a HPX thread, we need to return immediately, to
-        // allow the newly spawned thread to execute.
     }
 
     ///////////////////////////////////////////////////////////////////////////
