@@ -17,6 +17,11 @@
 
 namespace hpx { namespace basic_execution {
 
+    context_base const& agent_ref::context() const
+    {
+        return impl_->context();
+    }
+
     void agent_ref::yield(const char* desc)
     {
         HPX_ASSERT(*this == hpx::basic_execution::this_thread::agent());

@@ -8,6 +8,9 @@
 #define HPX_LCOS_LOCAL_FUTURES_FACTORY_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/basic_execution/agent_ref.hpp>
+#include <hpx/basic_execution/context_base.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
@@ -122,12 +125,17 @@ namespace hpx { namespace lcos { namespace local
                         stacksize, ec);
                 }
 
-                threads::register_thread_nullary(
+                hpx::basic_execution::this_thread::agent().context().post(
                     util::deferred_call(
-                        &base_type::run_impl, std::move(this_)),
-                    util::thread_description(f_, "task_object::apply"),
-                    threads::pending, false, priority, schedulehint,
-                    stacksize, ec);
+                        &base_type::run_impl, std::move(this_))
+                );
+
+//                 threads::register_thread_nullary(
+//                     util::deferred_call(
+//                         &base_type::run_impl, std::move(this_)),
+//                     util::thread_description(f_, "task_object::apply"),
+//                     threads::pending, false, priority, schedulehint,
+//                     stacksize, ec);
                 return threads::invalid_thread_id;
             }
         };

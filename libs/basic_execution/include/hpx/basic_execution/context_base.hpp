@@ -9,6 +9,7 @@
 
 #include <hpx/basic_execution/resource_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 #include <cstdint>
 
@@ -19,6 +20,8 @@ namespace hpx { namespace basic_execution {
         virtual ~context_base() = default;
 
         virtual resource_base const& resource() const = 0;
+
+        virtual void post(hpx::util::unique_function_nonser<void()> f) const = 0;
     };
 
     inline bool operator==(context_base const& lhs, context_base const& rhs)

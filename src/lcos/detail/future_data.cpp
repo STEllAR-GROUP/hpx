@@ -170,39 +170,39 @@ namespace hpx { namespace lcos { namespace detail
     {
         // We need to run the completion on a new thread if we are on a
         // non HPX thread.
-#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-        bool recurse_asynchronously =
-            !this_thread::has_sufficient_stack_space();
-#else
-        handle_continuation_recursion_count cnt;
-        bool recurse_asynchronously =
-            cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH ||
-            (hpx::threads::get_self_ptr() == nullptr);
-#endif
-        if (!recurse_asynchronously)
+// #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+//         bool recurse_asynchronously =
+//             !this_thread::has_sufficient_stack_space();
+// #else
+//         handle_continuation_recursion_count cnt;
+//         bool recurse_asynchronously =
+//             cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH ||
+//             (hpx::threads::get_self_ptr() == nullptr);
+// #endif
+//         if (!recurse_asynchronously)
         {
             // directly execute continuation on this thread
             run_on_completed(std::forward<Callback>(on_completed));
         }
-        else
-        {
-            // re-spawn continuation on a new thread
-            void (*p)(Callback &&) = &future_data_base::run_on_completed;
-
-            try
-            {
-                run_on_completed_on_new_thread(
-                    util::deferred_call(
-                        p, std::forward<Callback>(on_completed)));
-            }
-            catch(...)
-            {
-                // If an exception while creating the new task or inside the
-                // completion handler is thrown, there is nothing we can do...
-                // ... but terminate and report the error
-                hpx::detail::report_exception_and_terminate(std::current_exception());
-            }
-        }
+//         else
+//         {
+//             // re-spawn continuation on a new thread
+//             void (*p)(Callback &&) = &future_data_base::run_on_completed;
+//
+//             try
+//             {
+//                 run_on_completed_on_new_thread(
+//                     util::deferred_call(
+//                         p, std::forward<Callback>(on_completed)));
+//             }
+//             catch(...)
+//             {
+//                 // If an exception while creating the new task or inside the
+//                 // completion handler is thrown, there is nothing we can do...
+//                 // ... but terminate and report the error
+//                 hpx::detail::report_exception_and_terminate(std::current_exception());
+//             }
+//         }
     }
 
     // We need only one explicit instantiation here as the second version

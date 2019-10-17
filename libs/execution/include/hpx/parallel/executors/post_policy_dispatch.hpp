@@ -28,10 +28,14 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         static void call(hpx::util::thread_description const& desc,
             Policy const& policy, F&& f, Ts&&... ts)
         {
-            threads::register_thread_nullary(
+            hpx::basic_execution::this_thread::agent().context().post(
                 hpx::util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...),
-                desc, threads::pending, false, policy.priority());
+                    std::forward<F>(f), std::forward<Ts>(ts)...)
+            );
+//             threads::register_thread_nullary(
+//                 hpx::util::deferred_call(
+//                     std::forward<F>(f), std::forward<Ts>(ts)...),
+//                 desc, threads::pending, false, policy.priority());
         }
     };
 

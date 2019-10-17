@@ -30,6 +30,14 @@
 
 namespace hpx { namespace threads {
 
+    void execution_context::post(hpx::util::unique_function_nonser<void()> f) const
+    {
+        hpx::util::thread_description desc("thread_func");
+        threads::register_thread_nullary(std::move(f),
+            desc, threads::pending, false);
+//             desc, threads::pending, false, policy.priority());
+    };
+
     execution_context execution_agent::context_;
 
     execution_agent::execution_agent(

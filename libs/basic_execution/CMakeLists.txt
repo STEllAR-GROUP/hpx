@@ -11,6 +11,8 @@ set(basic_execution_headers
   hpx/basic_execution/agent_base.hpp
   hpx/basic_execution/agent_ref.hpp
   hpx/basic_execution/context_base.hpp
+  hpx/basic_execution/default_agent.hpp
+  hpx/basic_execution/default_context.hpp
   hpx/basic_execution/register_locks.hpp
   hpx/basic_execution/resource_base.hpp
   hpx/basic_execution/this_thread.hpp
@@ -22,6 +24,8 @@ set(basic_execution_compat_headers
 
 set(basic_execution_sources
   agent_ref.cpp
+  default_agent.cpp
+  default_context.cpp
   register_locks.cpp
   this_thread.cpp
 )
@@ -37,6 +41,7 @@ add_hpx_module(basic_execution
     hpx_config
     hpx_errors
     hpx_format
+    hpx_functional
     hpx_timing
   CMAKE_SUBDIRS examples tests
 )

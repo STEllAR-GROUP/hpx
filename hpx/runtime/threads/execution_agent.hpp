@@ -31,6 +31,7 @@ namespace hpx { namespace threads {
         {
             return resource_;
         }
+        void post(hpx::util::unique_function_nonser<void()> f) const override;
         hpx::basic_execution::resource_base resource_;
     };
 

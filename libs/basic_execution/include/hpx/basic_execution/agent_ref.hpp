@@ -8,6 +8,7 @@
 #define HPX_BASIC_EXECUTION_AGENT_REF_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/basic_execution/context_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <chrono>
@@ -47,6 +48,8 @@ namespace hpx { namespace basic_execution {
         {
             impl_ = impl;
         }
+
+        context_base const& context() const;
 
         void yield(char const* desc = "hpx::basic_execution::agent_ref::yield");
         void yield_k(std::size_t k,
