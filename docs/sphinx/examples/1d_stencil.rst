@@ -40,7 +40,7 @@ We parallelize this code over the following eight examples:
 * :download:`Example 8 <../../examples/1d_stencil/1d_stencil_8.cpp>`
 
 The first example is straight serial code. In this code we instantiate a vector
-``U`` which contains two vectors of doubles as seen in the structure
+``U`` that contains two vectors of doubles as seen in the structure
 ``stepper``.
 
 .. literalinclude:: ../../examples/1d_stencil/1d_stencil_1.cpp
@@ -107,10 +107,10 @@ doubles that holds the data points assigned to a particular instance of
 In example 4, we take advantage of the partition setup by redefining ``space``
 to be a vector of shared_futures with each future representing a partition. In
 this manner, each future represents several data points. Because the user can
-define how many data points are contained in each partition (and, therefore, how
-many data points are represented by one future) a user can now control the
-grainsize of the simulation. The rest of the code was then futurized in the same
-manner as was done in example 2. It should be noted how strikingly similar
+define how many data points are in each partition, and, therefore, how
+many data points are represented by one future, a user can control the
+grainsize of the simulation. The rest of the code is then futurized in the same
+manner as example 2. It should be noted how strikingly similar
 example 4 is to example 2.
 
 Example 4 finally shows good results. This code scales equivalently to the
@@ -143,12 +143,12 @@ assist us with managing our asynchrony. For example, our client class
 
 In the structure ``stepper``, we have also had to make some changes to
 accommodate a distributed environment. In order to get the data from a
-neighboring partition, which could be remote, we must retrieve the data from the
-neighboring partitions. These retrievals are asynchronous and the function
+particular neighboring partition, which could be remote, we must retrieve the data from all
+of the neighboring partitions. These retrievals are asynchronous and the function
 ``heat_part_data``, which, amongst other things, calls ``heat``, should not be
 called unless the data from the neighboring partitions have arrived. Therefore,
 it should come as no surprise that we synchronize this operation with another
-instance of dataflow (found in ``heat_part``). This dataflow is passed futures
+instance of dataflow (found in ``heat_part``). This dataflow passes futures
 to the data in the current and surrounding partitions by calling ``get_data()``
 on each respective partition. When these futures are ready, dataflow passes them
 to the ``unwrapped`` function, which extracts the shared_array of doubles and
