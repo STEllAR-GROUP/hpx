@@ -249,15 +249,15 @@ communication steps imposes an explicit barrier onto the execution flow as
 (often all) nodes have to be synchronized. Each of those barriers is like the eye
 of a needle the overall execution is forced to be squeezed through. Even
 minimal fluctuations in the execution times of the parallel threads (jobs)
-causes them to wait. Additionally, it is often only one of the threads executing
-doing the actual reduce operation, which further impedes parallelism. A closer
+causes them to wait. Additionally, it is often only one of the executing threads 
+that performs the actual reduce operation, which further impedes parallelism. A closer
 analysis of a couple of key algorithms used in science applications reveals that
 these global barriers are not always necessary. In many cases it is sufficient
 to synchronize a small subset of the threads. Any operation should proceed
 whenever the preconditions for its execution are met, and only those. Usually
-there is no need to wait for iterations of a loop to finish before you could
-continue calculating other things; all you need is to have those iterations done
-which were producing the required results for a particular next operation. Good
+there is no need to wait for iterations of a loop to finish before you can
+continue calculating other things; all you need is to complete the iterations
+that produce the required results for the next operation. Good
 bye global barriers, hello constraint based synchronization! People have been
 trying to build this type of computing (and even computers) since the 1970s.
 The theory behind what they did is based on ideas around static and
@@ -320,8 +320,8 @@ data structures. The larger the amount of data we have to churn and the more
 irregular the problem domain becomes, the worse the overall machine
 utilization and the (strong) scaling characteristics become. While it is not impossible
 to implement more dynamic, data driven, and asynchronous applications using
-MPI, it is overly difficult to do so. At the same time, if we look at
-applications preferring to execute the code close the :term:`locality` where the
+MPI, it is somewhat difficult to do so. At the same time, if we look at
+applications that prefer to execute the code close to the :term:`locality` where the
 data was placed, i.e., utilizing active messages (for instance based on
 |charm_pp|_), we see better asynchrony, simpler application codes, and improved
 scaling.
@@ -330,16 +330,16 @@ Favor message driven computation over message passing
 -----------------------------------------------------
 
 Today's prevalently used programming model on parallel (multi-node) systems is
-MPI. It is based on message passing (as the name implies), which means that
+MPI. It is based on message passing, as the name implies, which means that
 the receiver has to be aware of a message about to come in. Both codes, the
 sender and the receiver, have to synchronize in order to perform the
 communication step. Even the newer, asynchronous interfaces require explicitly
-coding the algorithms around the required communication scheme. As a result, any
-more than trivial MPI application spends a considerable amount of time
+coding the algorithms around the required communication scheme. As a result, everything
+but the most trivial MPI applications spends a considerable amount of time
 waiting for incoming messages, thus, causing starvation and latencies to impede
 full resource utilization. The more complex and more dynamic the data structures
 and algorithms become, the larger the adverse effects. The community discovered
-message-driven and (data-driven) methods of implementing algorithms a long
+message-driven and data-driven methods of implementing algorithms a long
 time ago, and systems such as |charm_pp|_ have already integrated active
 messages demonstrating the validity of the concept. Message-driven computation
 allows for sending messages without requiring the receiver to actively wait for
