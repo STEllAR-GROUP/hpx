@@ -470,7 +470,7 @@ namespace hpx { namespace util {
 
             // this is constexpr starting C++14 only as older gcc's complain
             // about the constructor not having an empty body
-            HPX_CXX14_CONSTEXPR fxn_ptr()
+            constexpr fxn_ptr()
             {
                 base_type::get_type = Vtable::get_type;
                 base_type::static_delete = Vtable::static_delete;
@@ -492,7 +492,7 @@ namespace hpx { namespace util {
 
             // this is constexpr starting C++14 only as older gcc's complain
             // about the constructor not having an empty body
-            HPX_CXX14_CONSTEXPR fxn_ptr()
+            constexpr fxn_ptr()
             {
                 base_type::get_type = Vtable::get_type;
                 base_type::static_delete = Vtable::static_delete;

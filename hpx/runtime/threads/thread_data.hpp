@@ -243,7 +243,7 @@ namespace hpx { namespace threads {
     public:
         /// Return the id of the component this thread is running in
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        HPX_CXX14_CONSTEXPR
+        constexpr
 #endif
         naming::address_type get_component_id() const noexcept
         {
@@ -434,7 +434,7 @@ namespace hpx { namespace threads {
 #endif
 
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        HPX_CXX14_CONSTEXPR
+        constexpr
 #endif
         thread_priority get_priority() const noexcept
         {
@@ -605,7 +605,7 @@ namespace hpx { namespace threads {
         bool is_stackless_;
     };
 
-    HPX_CXX14_CONSTEXPR inline thread_data* get_thread_id_data(
+    constexpr inline thread_data* get_thread_id_data(
         thread_id_type const& tid)
     {
         return static_cast<thread_data*>(tid.get());

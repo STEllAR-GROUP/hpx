@@ -30,7 +30,7 @@ namespace hpx { namespace traits {
         }
 
         // functions related to output operations
-        HPX_CXX14_CONSTEXPR static void write(Container& cont,
+        constexpr static void write(Container& cont,
             std::size_t count, std::size_t current, void const* address)
         {
         }
@@ -43,7 +43,7 @@ namespace hpx { namespace traits {
         }
 
         // functions related to input operations
-        HPX_CXX14_CONSTEXPR static void read(Container const& cont,
+        constexpr static void read(Container const& cont,
             std::size_t count, std::size_t current, void* address)
         {
         }
@@ -55,7 +55,7 @@ namespace hpx { namespace traits {
             return decompressed_size;
         }
 
-        HPX_CXX14_CONSTEXPR static void reset(Container& cont) {}
+        constexpr static void reset(Container& cont) {}
     };
 
     ///////////////////////////////////////////////////////////////////////
