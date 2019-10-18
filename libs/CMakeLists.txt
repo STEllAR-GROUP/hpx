@@ -16,6 +16,8 @@ set(HPX_LIBS
   assertion
   cache
   collectives
+  compute
+  compute_cuda
   concepts
   concurrency
   config
@@ -46,6 +48,7 @@ set(HPX_LIBS
   util
   CACHE INTERNAL "list of HPX modules" FORCE
 )
+
 
 # add example pseudo targets needed for modules
 if(HPX_WITH_EXAMPLES)

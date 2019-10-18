@@ -427,32 +427,6 @@ jobs:
       - store_artifacts:
           path: tests.unit.component
 
-  tests.unit.computeapi:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.computeapi
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.computeapi
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.computeabi
-      - store_artifacts:
-          path: tests.unit.computeabi
-
   tests.unit.diagnostics:
     <<: *defaults
     steps:
@@ -727,20 +701,30 @@ jobs:
               ninja -j2 -k 0 tests.unit.modules.assertion
               ninja -j2 -k 0 tests.unit.modules.cache
               ninja -j2 -k 0 tests.unit.modules.collectives
+              ninja -j2 -k 0 tests.unit.modules.compute
+              # ninja -j2 -k 0 tests.unit.modules.compute_cuda # CUDA not enabled on CircleCI
               ninja -j2 -k 0 tests.unit.modules.concepts
               ninja -j2 -k 0 tests.unit.modules.config
+              ninja -j2 -k 0 tests.unit.modules.concurrency
               ninja -j2 -k 0 tests.unit.modules.datastructures
+              ninja -j2 -k 0 tests.unit.modules.debugging
               ninja -j2 -k 0 tests.unit.modules.errors
+              ninja -j2 -k 0 tests.unit.modules.filesystem
               ninja -j2 -k 0 tests.unit.modules.format
+              ninja -j2 -k 0 tests.unit.modules.functional
               ninja -j2 -k 0 tests.unit.modules.hardware
               ninja -j2 -k 0 tests.unit.modules.hashing
               ninja -j2 -k 0 tests.unit.modules.iterator_support
               ninja -j2 -k 0 tests.unit.modules.logging
               ninja -j2 -k 0 tests.unit.modules.preprocessor
+              ninja -j2 -k 0 tests.unit.modules.program_options
+              ninja -j2 -k 0 tests.unit.modules.resiliency
               ninja -j2 -k 0 tests.unit.modules.serialization
               ninja -j2 -k 0 tests.unit.modules.statistics
               ninja -j2 -k 0 tests.unit.modules.testing
               ninja -j2 -k 0 tests.unit.modules.thread_support
+              ninja -j2 -k 0 tests.unit.modules.timing
+              ninja -j2 -k 0 tests.unit.modules.topology
               ninja -j2 -k 0 tests.unit.modules.type_support
               ninja -j2 -k 0 tests.unit.modules.util
       - run:
@@ -752,22 +736,33 @@ jobs:
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.assertion
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.compute
+              # ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.compute_cuda
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.concepts
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.concurrency
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.datastructures
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.debugging
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.errors
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.filesystem
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.format
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.functional
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.hardware
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.hashing
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.iterator_support
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.logging
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.program_options
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.resiliency
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.serialization
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.statistics
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.testing
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.timing
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.topology
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.type_support
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.util
+
       - run:
           <<: *convert_xml
       - run:
@@ -1050,8 +1045,6 @@ workflows:
           <<: *core_dependency
       - tests.unit.component:
           <<: *core_dependency
-      - tests.unit.computeapi:
-          <<: *core_dependency
       - tests.unit.diagnostics:
           <<: *core_dependency
       - tests.unit.lcos:
@@ -1103,7 +1096,6 @@ workflows:
             - tests.unit.agas
             - tests.unit.build
             - tests.unit.component
-            - tests.unit.computeapi
             - tests.unit.diagnostics
             - tests.unit.lcos
             - tests.unit.parallel_block
