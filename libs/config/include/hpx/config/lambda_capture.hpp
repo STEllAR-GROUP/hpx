@@ -20,8 +20,8 @@
 
 #include <utility>
 
-#define HPX_CAPTURE_FORWARD(var)  var = std::forward<decltype(var)>(var)
-#define HPX_CAPTURE_MOVE(var)     var = std::move(var)
+#define HPX_CAPTURE_FORWARD(var) var = std::forward<decltype(var)>(var)
+#define HPX_CAPTURE_MOVE(var) var = std::move(var)
 #endif
 
 #endif

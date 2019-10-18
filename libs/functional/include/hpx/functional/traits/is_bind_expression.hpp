@@ -13,8 +13,7 @@
 
 namespace hpx { namespace traits {
     template <typename T>
-    struct is_bind_expression
-      : std::is_bind_expression<T>
+    struct is_bind_expression : std::is_bind_expression<T>
     {
     };
 

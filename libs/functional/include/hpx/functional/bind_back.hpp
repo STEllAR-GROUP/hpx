@@ -72,10 +72,9 @@ namespace hpx { namespace util {
             bound_back& operator=(bound_back const&) = delete;
 
             template <typename... Us>
-            constexpr HPX_HOST_DEVICE
-                typename invoke_bound_back_result<F&, util::pack<Ts&...>,
-                    Us&&...>::type
-                operator()(Us&&... vs) &
+            constexpr HPX_HOST_DEVICE typename invoke_bound_back_result<F&,
+                util::pack<Ts&...>, Us&&...>::type
+            operator()(Us&&... vs) &
             {
                 return HPX_INVOKE(
                     _f, std::forward<Us>(vs)..., util::get<Is>(_args)...);
@@ -92,10 +91,9 @@ namespace hpx { namespace util {
             }
 
             template <typename... Us>
-            constexpr HPX_HOST_DEVICE
-                typename invoke_bound_back_result<F&&, util::pack<Ts&&...>,
-                    Us&&...>::type
-                operator()(Us&&... vs) &&
+            constexpr HPX_HOST_DEVICE typename invoke_bound_back_result<F&&,
+                util::pack<Ts&&...>, Us&&...>::type
+            operator()(Us&&... vs) &&
             {
                 return HPX_INVOKE(std::move(_f), std::forward<Us>(vs)...,
                     util::get<Is>(std::move(_args))...);
