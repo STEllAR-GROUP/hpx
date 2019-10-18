@@ -16,8 +16,6 @@
 #include <hpx/coroutines/detail/tss.hpp>
 #include <hpx/errors.hpp>
 
-#include <hpx/runtime/threads_fwd.hpp>
-
 #include <cstddef>
 #include <map>
 #include <memory>
@@ -60,7 +58,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     std::size_t get_tss_thread_data(tss_storage* storage)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
-        hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
+        coroutine_self* self = coroutine_self::get_self();
         if (nullptr == self)
         {
             HPX_THROW_EXCEPTION(null_thread_id,
@@ -89,7 +87,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     std::size_t set_tss_thread_data(tss_storage* storage, std::size_t data)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
-        hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
+        coroutine_self* self = coroutine_self::get_self();
         if (nullptr == self)
         {
             HPX_THROW_EXCEPTION(null_thread_id,
@@ -128,7 +126,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     tss_data_node* find_tss_data(void const* key)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
-        hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
+        coroutine_self* self = coroutine_self::get_self();
         if (nullptr == self)
         {
             HPX_THROW_EXCEPTION(null_thread_id,
@@ -163,7 +161,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         std::shared_ptr<tss_cleanup_function> const& func, void* tss_data)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
-        hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
+        coroutine_self* self = coroutine_self::get_self();
         if (nullptr == self)
         {
             HPX_THROW_EXCEPTION(null_thread_id,
@@ -186,7 +184,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     void erase_tss_node(void const* key, bool cleanup_existing)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
-        hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
+        coroutine_self* self = coroutine_self::get_self();
         if (nullptr == self)
         {
             HPX_THROW_EXCEPTION(null_thread_id,
