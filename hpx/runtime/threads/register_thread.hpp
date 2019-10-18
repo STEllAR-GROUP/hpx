@@ -11,6 +11,7 @@
 #define HPX_RUNTIME_THREADS_REGISTER_THREAD_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
@@ -19,6 +20,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <utility>
+#include <type_traits>
 
 namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////

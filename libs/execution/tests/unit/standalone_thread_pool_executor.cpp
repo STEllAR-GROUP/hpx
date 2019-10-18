@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
+#include <cstdint>
 #include <iterator>
 #include <numeric>
 #include <string>
@@ -178,8 +179,8 @@ int main(int argc, char* argv[])
             hpx::threads::policies::scheduler_mode::default_mode, num_threads,
             0, notifier, ad,
             hpx::threads::detail::network_background_callback_type{}, 0,
-            std::numeric_limits<std::int64_t>::max(),
-            std::numeric_limits<std::int64_t>::max());
+            (std::numeric_limits<std::int64_t>::max)(),
+            (std::numeric_limits<std::int64_t>::max)());
 
         // Create the thread pool and an associated executor.
         hpx::threads::detail::scheduled_thread_pool pool{
