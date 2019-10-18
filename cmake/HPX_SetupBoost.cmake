@@ -75,6 +75,10 @@ if(NOT HPX_WITH_NATIVE_TLS)
 endif()
 
 if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
+  if(CMAKE_VERSION VERSION_LESS 3.12)
+    hpx_error("The Boost.context component needs at least CMake 3.12.3 to be \
+    found.")
+  endif()
   # if context is needed, we should still link with boost thread and chrono
   set(__boost_libraries ${__boost_libraries} context thread chrono)
 endif()
