@@ -14,6 +14,7 @@
 #include <utility>
 
 namespace hpx { namespace serialization { namespace detail {
+
     struct extra_archive_data_member_base;
     template <typename T>
     struct extra_archive_data_member;
@@ -21,7 +22,7 @@ namespace hpx { namespace serialization { namespace detail {
     struct extra_archive_data_node
     {
         extra_archive_data_node() noexcept
-          : ptr_(nullptr)
+          : ptr_()
           , id_(nullptr)
         {
         }
@@ -47,7 +48,7 @@ namespace hpx { namespace serialization { namespace detail {
         {
         }
 
-        virtual ~extra_archive_data_member_base() {}
+        virtual ~extra_archive_data_member_base() = default;
 
         extra_archive_data_node next_;
     };
@@ -70,7 +71,7 @@ namespace hpx { namespace serialization { namespace detail {
             return std::addressof(t_);
         }
 
-        static void id() {}
+        static void id() noexcept {}
 
         T t_;
     };
@@ -106,15 +107,16 @@ namespace hpx { namespace serialization { namespace detail {
 
     struct extra_archive_data
     {
-        extra_archive_data() noexcept {}
+        extra_archive_data() noexcept = default;
 
         template <typename T>
-        T& get()
+        T& get() noexcept
         {
             if (T* t = try_get<T>())
             {
                 return *t;
             }
+
             head_ = extra_archive_data_node(
                 static_cast<T*>(nullptr), std::move(head_));
             return *try_get<T>();
@@ -130,4 +132,5 @@ namespace hpx { namespace serialization { namespace detail {
     };
 
 }}}    // namespace hpx::serialization::detail
+
 #endif

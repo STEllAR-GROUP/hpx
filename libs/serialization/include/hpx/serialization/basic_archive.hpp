@@ -139,14 +139,14 @@ namespace hpx { namespace serialization {
             size_ = 0;
         }
 
-        // access extra data stored at position idx
+        // access extra data stored
         template <typename T>
         T& get_extra_data()
         {
             return extra_data_.get<T>();
         }
 
-        // try accessing extra data stored at position idx, might return nullptr
+        // try accessing extra data stored, might return nullptr
         template <typename T>
         T* try_get_extra_data()
         {
