@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
