@@ -36,8 +36,8 @@ namespace hpx { namespace lcos { namespace local
             static threads::thread_id call() noexcept
             {
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
-                return threads::thread_id{
-                    reinterpret_cast<void*>(GetCurrentThreadId())};
+                return threads::thread_id{reinterpret_cast<void*>(
+                    static_cast<std::size_t>(GetCurrentThreadId()))};
 #else
                 return threads::thread_id{
                     reinterpret_cast<void*>(pthread_self())};
