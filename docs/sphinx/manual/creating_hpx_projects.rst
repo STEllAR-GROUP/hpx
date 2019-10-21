@@ -51,15 +51,15 @@ commands (where ``$HPX_LOCATION`` is the build directory or
    |hpx| libraries have different names in debug and release mode. If you want
    to link against a debug |hpx| library, you need to use the ``_debug`` suffix
    for the pkg-config name. That means instead of ``hpx_application`` or
-   ``hpx_component`` you will have to use ``hpx_application_debug`` or
+   ``hpx_component``, you will have to use ``hpx_application_debug`` or
    ``hpx_component_debug`` Moreover, all referenced |hpx| components need to
-   have a appended ``d`` suffix, e.g. instead of ``-lhpx_iostreams`` you will
+   have an appended ``d`` suffix. For example, instead of ``-lhpx_iostreams`` you will
    need to specify ``-lhpx_iostreamsd``.
 
 .. important::
 
     If the |hpx| libraries are in a path that is not found by the dynamic
-    linker. You need to add the path ``$HPX_LOCATION/lib`` to your linker search
+    linker, you will need to add the path ``$HPX_LOCATION/lib`` to your linker search
     path (for example ``LD_LIBRARY_PATH`` on Linux).
 
 To test the program, type:
@@ -76,7 +76,7 @@ How to build |hpx| components with pkg-config
 ---------------------------------------------
 
 Let's try a more complex example involving an |hpx| component. An |hpx|
-component is a class which exposes |hpx| actions. |hpx| components are compiled
+component is a class that exposes |hpx| actions. |hpx| components are compiled
 into dynamically loaded modules called component libraries. Here's the source
 code:
 
@@ -99,7 +99,7 @@ code:
 
 Copy the three source files above into three files (called
 ``hello_world_component.cpp``, ``hello_world_component.hpp`` and
-``hello_world_client.cpp`` respectively).
+``hello_world_client.cpp``, respectively).
 
 Now, in the directory where you put the files, run the following command to
 build the component library. (where ``$HPX_LOCATION`` is the build directory or
@@ -166,13 +166,13 @@ which should print ``Hello HPX World!`` and exit.
 Using |hpx| with CMake-based projects
 =====================================
 
-In Addition to the pkg-config support discussed on the previous pages, |hpx|
-comes with full CMake support. In order to integrate |hpx| into your existing,
-or new CMakeLists.txt you can leverage the `find_package
+In addition to the pkg-config support discussed on the previous pages, |hpx|
+comes with full CMake support. In order to integrate |hpx| into existing or
+new CMakeLists.txt, you can leverage the `find_package
 <https://www.cmake.org/cmake/help/latest/command/find_package.html>`_ command
-integrated into CMake. Following is a Hello World component example using CMake.
+integrated into CMake. Following, is a Hello World component example using CMake.
 
-Let's revisit what we have. We have three files which compose our example
+Let's revisit what we have. We have three files that compose our example
 application:
 
 * ``hello_world_component.hpp``
@@ -193,12 +193,12 @@ The basic structure to include |hpx| into your CMakeLists.txt is shown here:
    find_package(HPX)
 
 In order to have CMake find |hpx|, it needs to be told where to look for the
-``HPXConfig.cmake`` file that is generated when HPX is built or installed, it is
+``HPXConfig.cmake`` file that is generated when |hpx| is built or installed. It is
 used by ``find_package(HPX)`` to set up all the necessary macros needed to use
 |hpx| in your project. The ways to achieve this are:
 
-* set the ``HPX_DIR`` cmake variable to point to the directory containing the
-  ``HPXConfig.cmake`` script on the command line when you invoke cmake:
+* Set the ``HPX_DIR`` CMake variable to point to the directory containing the
+  ``HPXConfig.cmake`` script on the command line when you invoke CMake:
 
   .. code-block:: bash
 
@@ -207,7 +207,7 @@ used by ``find_package(HPX)`` to set up all the necessary macros needed to use
   where ``$HPX_LOCATION`` is the build directory or ``CMAKE_INSTALL_PREFIX`` you
   used when building/configuring |hpx|.
 
-* set the ``CMAKE_PREFIX_PATH`` variable to the root directory of your |hpx|
+* Set the ``CMAKE_PREFIX_PATH`` variable to the root directory of your |hpx|
   build or install location on the command line when you invoke cmake:
 
   .. code-block:: bash
