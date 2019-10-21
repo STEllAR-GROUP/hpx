@@ -36,6 +36,7 @@
 #include <exception>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx
@@ -181,18 +182,11 @@ namespace hpx
                             filter->set_max_length(buffer.data_.capacity());
 
                         serialization::output_archive archive(
-                            serialization::detail::init_extra_output_data<
-                                serialization::
-                                    encode_parcel_extra_output_data_size>(),
                             buffer.data_, archive_flags, &buffer.chunks_,
                             filter.get());
 
                         if (num_parcels != std::size_t(-1))
                             archive << parcels_sent; //-V128
-
-                        auto& archive_split_gids = archive.get_extra_data<
-                            serialization::detail::preprocess_gid_types>(
-                            serialization::extra_output_split_credits);
 
                         for(std::size_t i = 0; i != parcels_sent; ++i)
                         {
@@ -203,8 +197,16 @@ namespace hpx
 #endif
                             LPT_(debug) << ps[i];
 
-                            archive_split_gids.set_split_gids(
-                                ps[i].move_split_gids());
+                            auto split_gids_map = ps[i].move_split_gids();
+                            if (!split_gids_map.empty())
+                            {
+                                auto& split_gids =
+                                    archive.get_extra_data<serialization::
+                                            detail::preprocess_gid_types>();
+                                split_gids.set_split_gids(
+                                    std::move(split_gids_map));
+                            }
+
                             archive << ps[i];
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)

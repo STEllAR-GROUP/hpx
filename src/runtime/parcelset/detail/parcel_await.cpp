@@ -15,7 +15,6 @@
 #include <hpx/runtime/serialization/detail/preprocess_container.hpp>
 #include <hpx/runtime/serialization/detail/preprocess_futures.hpp>
 #include <hpx/runtime/serialization/detail/preprocess_gid_types.hpp>
-#include <hpx/serialization/extra_output_data.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
 
@@ -26,8 +25,6 @@
 #include <vector>
 
 namespace hpx { namespace parcelset { namespace detail {
-
-    constexpr std::size_t preprocessing_extra_output_data_size = 3;
 
     template <typename Parcel, typename Handler, typename Derived>
     struct parcel_await_base : std::enable_shared_from_this<Derived>
@@ -40,9 +37,7 @@ namespace hpx { namespace parcelset { namespace detail {
           : put_parcel_(std::move(pp))
           , parcel_(std::move(parcel))
           , handler_(std::move(handler))
-          , archive_(serialization::detail::init_extra_output_data<
-                         preprocessing_extra_output_data_size>(),
-                data_, archive_flags)
+          , archive_(data_, archive_flags)
           , overhead_(archive_.bytes_written())
         {
         }
@@ -55,13 +50,11 @@ namespace hpx { namespace parcelset { namespace detail {
         bool apply_single(parcel& p)
         {
             archive_.reset();
-            archive_.reset_extra_data<preprocessing_extra_output_data_size>();
 
             archive_ << p;
 
-            auto& handle_futures = archive_.get_extra_data<
-                serialization::detail::preprocess_futures>(
-                serialization::extra_output_handle_futures);
+            auto handle_futures = archive_.try_get_extra_data<
+                serialization::detail::preprocess_futures>();
 
             // We are doing a fixed point iteration until we are sure that the
             // serialization process requires nothing more to wait on ...
@@ -70,10 +63,10 @@ namespace hpx { namespace parcelset { namespace detail {
             //      need to do another await round for the id splitting
             //  - id_type: we need to await, if and only if, the credit of the
             //      needs to split.
-            if (handle_futures.has_futures())
+            if (handle_futures && handle_futures->has_futures())
             {
                 auto this_ = this->shared_from_this();
-                handle_futures([this_]() { this_->apply(); });
+                (*handle_futures)([this_]() { this_->apply(); });
                 return false;
             }
 
@@ -82,10 +75,12 @@ namespace hpx { namespace parcelset { namespace detail {
             p.size() = data_.size() + overhead_;
             p.num_chunks() = archive_.get_num_chunks();
 
-            auto& split_gids = archive_.get_extra_data<
-                serialization::detail::preprocess_gid_types>(
-                serialization::extra_output_split_credits);
-            p.set_split_gids(split_gids.move_split_gids());
+            auto* split_gids = archive_.try_get_extra_data<
+                serialization::detail::preprocess_gid_types>();
+            if (split_gids)
+            {
+                p.set_split_gids(std::move(split_gids->move_split_gids()));
+            }
 
             return true;
         }

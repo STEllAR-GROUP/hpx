@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures.hpp>
-#include <hpx/serialization/extra_archive_data.hpp>
+#include <hpx/serialization/detail/extra_archive_data.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -55,10 +55,9 @@ namespace hpx { namespace serialization {
         static const std::uint64_t npos = std::uint64_t(-1);
 
     protected:
-        basic_archive(std::uint32_t flags, extra_archive_data_type&& extra_data)
+        basic_archive(std::uint32_t flags)
           : flags_(flags)
           , size_(0)
-          , extra_data_(std::move(extra_data))
         {
         }
 
@@ -140,27 +139,24 @@ namespace hpx { namespace serialization {
             size_ = 0;
         }
 
-        // access extra data stored at position idx
+        // access extra data stored
         template <typename T>
-        T& get_extra_data(std::size_t idx)
+        T& get_extra_data()
         {
-            HPX_ASSERT(idx < extra_data_.size());
-            return hpx::util::any_cast<T&>(extra_data_[idx]);
+            return extra_data_.get<T>();
         }
 
-        // try accessing extra data stored at position idx, might return nullptr
+        // try accessing extra data stored, might return nullptr
         template <typename T>
-        T* try_get_extra_data(std::size_t idx)
+        T* try_get_extra_data()
         {
-            if (idx < extra_data_.size())
-                return hpx::util::any_cast<T>(&extra_data_[idx]);
-            return nullptr;
+            return extra_data_.try_get<T>();
         }
 
     protected:
         std::uint32_t flags_;
         std::size_t size_;
-        extra_archive_data_type extra_data_;
+        detail::extra_archive_data extra_data_;
     };
 
     template <typename Archive>
