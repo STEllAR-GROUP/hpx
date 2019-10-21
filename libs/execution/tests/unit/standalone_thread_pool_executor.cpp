@@ -21,9 +21,10 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <cstdlib>
 #include <cstdint>
+#include <cstdlib>
 #include <iterator>
+#include <memory>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -182,9 +183,10 @@ int main(int argc, char* argv[])
             (std::numeric_limits<std::int64_t>::max)(),
             (std::numeric_limits<std::int64_t>::max)());
 
-        // Create the thread pool and an associated executor.
-        hpx::threads::detail::scheduled_thread_pool pool{
-            std::make_unique<sched_type>(scheduler_init), thread_pool_init};
+        // Create the scheduler, thread pool, and associated executor.
+        std::unique_ptr<sched_type> scheduler{new sched_type(scheduler_init)};
+        hpx::threads::detail::scheduled_thread_pool<sched_type> pool{
+            std::move(scheduler), thread_pool_init};
         hpx::parallel::execution::thread_pool_executor exec{&pool};
 
         // Run the pool.
