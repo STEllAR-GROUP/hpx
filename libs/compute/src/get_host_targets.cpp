@@ -12,7 +12,6 @@
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/topology/topology.hpp>

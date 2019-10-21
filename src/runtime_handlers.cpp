@@ -18,6 +18,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/runtime_handlers.hpp>
+#include <hpx/threadmanager.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/debugging.hpp>
 

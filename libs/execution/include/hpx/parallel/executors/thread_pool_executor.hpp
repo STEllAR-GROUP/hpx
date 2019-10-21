@@ -31,7 +31,6 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
