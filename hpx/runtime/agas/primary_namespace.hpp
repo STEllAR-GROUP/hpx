@@ -57,11 +57,13 @@ struct HPX_EXPORT primary_namespace
     naming::id_type gid() const;
 
     hpx::future<std::pair<naming::id_type, naming::address>>
-        begin_migration(naming::gid_type id);
-    bool end_migration(naming::gid_type id);
+        begin_migration(naming::gid_type const& id);
+    bool end_migration(naming::gid_type const& id);
 
-    bool bind_gid(gva g, naming::gid_type id, naming::gid_type locality);
-    future<bool> bind_gid_async(gva g, naming::gid_type id, naming::gid_type locality);
+    bool bind_gid(gva const& g, naming::gid_type const& id,
+        naming::gid_type const& locality);
+    future<bool> bind_gid_async(
+        gva g, naming::gid_type id, naming::gid_type locality);
 
 #if defined(HPX_HAVE_NETWORKING)
     void route(parcelset::parcel && p,
@@ -69,14 +71,14 @@ struct HPX_EXPORT primary_namespace
         parcelset::parcel const&)> && f);
 #endif
 
-    resolved_type resolve_gid(naming::gid_type id);
+    resolved_type resolve_gid(naming::gid_type const& id);
     future<resolved_type> resolve_full(naming::gid_type id);
 
     future<id_type> colocate(naming::gid_type id);
 
-    naming::address unbind_gid(std::uint64_t count, naming::gid_type id);
+    naming::address unbind_gid(std::uint64_t count, naming::gid_type const& id);
     future<naming::address>
-    unbind_gid_async(std::uint64_t count, naming::gid_type id);
+    unbind_gid_async(std::uint64_t count, naming::gid_type const& id);
 
     future<std::int64_t> increment_credit(
         std::int64_t credits

@@ -14,10 +14,10 @@
 
 #include <regex>
 #include <string>
+#include <utility>
 
+namespace hpx { namespace actions { namespace detail {
 
-namespace hpx { namespace actions { namespace detail
-{
     invocation_count_registry& invocation_count_registry::local_instance()
     {
         hpx::util::static_<invocation_count_registry, local_tag> registry;
@@ -95,7 +95,7 @@ namespace hpx { namespace actions { namespace detail
                 if (ec) return false;
 
                 performance_counters::counter_info cinfo = info;
-                cinfo.fullname_ = fullname;
+                cinfo.fullname_ = std::move(fullname);
                 return f(cinfo, ec) && !ec;
             }
 
@@ -126,7 +126,7 @@ namespace hpx { namespace actions { namespace detail
                 if (ec) return false;
 
                 performance_counters::counter_info cinfo = info;
-                cinfo.fullname_ = fullname;
+                cinfo.fullname_ = std::move(fullname);
 
                 if (!f(cinfo, ec) || ec)
                     return false;
@@ -182,7 +182,7 @@ namespace hpx { namespace actions { namespace detail
         if (ec) return false;
 
         performance_counters::counter_info cinfo = info;
-        cinfo.fullname_ = fullname;
+        cinfo.fullname_ = std::move(fullname);
 
         if (!f(cinfo, ec) || ec)
             return false;
@@ -192,5 +192,4 @@ namespace hpx { namespace actions { namespace detail
 
         return true;
     }
-}}}
-
+}}}    // namespace hpx::actions::detail

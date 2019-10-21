@@ -213,8 +213,8 @@ namespace hpx { namespace  threads
             std::size_t num_cores_stolen_;
         };
 
-        typedef std::map<std::size_t, static_allocation_data>
-            allocation_data_map_type;
+        using allocation_data_map_type =
+            std::map<std::size_t, static_allocation_data>;
         allocation_data_map_type proxies_static_allocation_data_;
 
         // stores static allocation data for all schedulers

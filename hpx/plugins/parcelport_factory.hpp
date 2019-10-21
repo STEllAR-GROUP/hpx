@@ -118,7 +118,8 @@ namespace hpx { namespace plugins
 
             // get the parcelport specific information ...
             char const* more = traits::plugin_config_data<Parcelport>::call();
-            if (more) {
+            if (more != nullptr)    // -V547
+            {
                 std::vector<std::string> data;
                 boost::split(data, more, boost::is_any_of("\n"));
                 std::copy(data.begin(), data.end(), std::back_inserter(fillini));

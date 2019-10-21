@@ -26,7 +26,13 @@ namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     interval_timer::interval_timer()
-      : microsecs_(0), id_(nullptr)
+      : microsecs_(0)
+      , id_(nullptr)
+      , pre_shutdown_(false)
+      , is_started_(false)
+      , first_start_(true)
+      , is_terminated_(false)
+      , is_stopped_(false)
     {}
 
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
@@ -282,37 +288,38 @@ namespace hpx { namespace util { namespace detail
 
 namespace hpx { namespace util
 {
-    interval_timer::interval_timer() {}
+    interval_timer::interval_timer() {}    // -V730
 
-    interval_timer::interval_timer(util::function_nonser<bool()> const& f,
-            std::int64_t microsecs, std::string const& description,
-            bool pre_shutdown)
+    interval_timer::interval_timer(    // -V730
+        util::function_nonser<bool()> const& f, std::int64_t microsecs,
+        std::string const& description, bool pre_shutdown)
       : timer_(std::make_shared<detail::interval_timer>(
             f, microsecs, description, pre_shutdown))
     {}
 
-    interval_timer::interval_timer(util::function_nonser<bool()> const& f,
-            util::function_nonser<void()> const& on_term,
-            std::int64_t microsecs, std::string const& description,
-            bool pre_shutdown)
+    interval_timer::interval_timer(    // -V730
+        util::function_nonser<bool()> const& f,
+        util::function_nonser<void()> const& on_term, std::int64_t microsecs,
+        std::string const& description, bool pre_shutdown)
       : timer_(std::make_shared<detail::interval_timer>(
             f, on_term, microsecs, description, pre_shutdown))
     {}
 
-    interval_timer::interval_timer(util::function_nonser<bool()> const& f,
-            util::steady_duration const& rel_time,
-            char const*  description, bool pre_shutdown)
+    interval_timer::interval_timer(    // -V730
+        util::function_nonser<bool()> const& f,
+        util::steady_duration const& rel_time, char const* description,
+        bool pre_shutdown)
       : timer_(std::make_shared<detail::interval_timer>(
             f, rel_time.value().count() / 1000, description, pre_shutdown))
     {}
 
-    interval_timer::interval_timer(util::function_nonser<bool()> const& f,
-            util::function_nonser<void()> const& on_term,
-            util::steady_duration const& rel_time,
-            char const*  description, bool pre_shutdown)
-      : timer_(std::make_shared<detail::interval_timer>(
-            f, on_term, rel_time.value().count() / 1000, description,
-            pre_shutdown))
+    interval_timer::interval_timer(    // -V730
+        util::function_nonser<bool()> const& f,
+        util::function_nonser<void()> const& on_term,
+        util::steady_duration const& rel_time, char const* description,
+        bool pre_shutdown)
+      : timer_(std::make_shared<detail::interval_timer>(f, on_term,
+            rel_time.value().count() / 1000, description, pre_shutdown))
     {}
 
     interval_timer::~interval_timer()

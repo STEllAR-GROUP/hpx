@@ -70,7 +70,3 @@ HPX_REGISTER_ACTION_ID(
     locality_namespace_statistics_counter_action,
     hpx::actions::locality_namespace_statistics_counter_action_id)
 
-namespace hpx { namespace agas {
-    locality_namespace::~locality_namespace()
-    {}
-}}

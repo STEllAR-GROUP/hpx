@@ -42,6 +42,7 @@ namespace hpx { namespace program_options {
 
 #include <boost/lexical_cast.hpp>
 
+#include <cstddef>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -168,7 +169,7 @@ namespace hpx { namespace program_options {
         }
         std::vector<T>* tv = hpx::util::any_cast<std::vector<T>>(&v);
         HPX_ASSERT(nullptr != tv);
-        for (unsigned i = 0; i < s.size(); ++i)
+        for (std::size_t i = 0; i < s.size(); ++i)
         {
             try
             {

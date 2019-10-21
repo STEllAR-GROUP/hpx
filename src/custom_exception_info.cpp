@@ -239,7 +239,7 @@ namespace hpx { namespace detail
         }
 
         // need this return to silence a warning with icc
-        HPX_ASSERT(false);
+        HPX_ASSERT(false);  // -V779
         return std::exception_ptr();
     }
 

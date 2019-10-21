@@ -98,14 +98,26 @@ namespace hpx { namespace detail {
 namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////
     namespace strings {
-        char const* const thread_state_names[] = {"unknown", "active",
-            "pending", "suspended", "depleted", "terminated", "staged",
-            "pending_do_not_schedule", "pending_boost"};
-    }
+
+        // clang-format off
+        char const* const thread_state_names[] = {
+            "unknown",
+            "active",
+            "pending",
+            "suspended",
+            "depleted",
+            "terminated",
+            "staged",
+            "pending_do_not_schedule",
+            "pending_boost"
+        };
+        // clang-format on
+
+    }    // namespace strings
 
     char const* get_thread_state_name(thread_state_enum state)
     {
-        if (state < unknown || state > pending_boost)
+        if (state > pending_boost)
             return "unknown";
         return strings::thread_state_names[state];
     }
@@ -117,19 +129,30 @@ namespace hpx { namespace threads {
 
     ///////////////////////////////////////////////////////////////////////
     namespace strings {
-        char const* const thread_state_ex_names[] = {"wait_unknown",
-            "wait_signaled", "wait_timeout", "wait_terminate", "wait_abort"};
+
+        // clang-format off
+        char const* const thread_state_ex_names[] = {
+            "wait_unknown",
+            "wait_signaled",
+            "wait_timeout",
+            "wait_terminate",
+            "wait_abort"
+        };
+        // clang-format on
+
     }    // namespace strings
 
     char const* get_thread_state_ex_name(thread_state_ex_enum state_ex)
     {
-        if (state_ex < wait_unknown || state_ex > wait_abort)
+        if (state_ex > wait_abort)
             return "wait_unknown";
         return strings::thread_state_ex_names[state_ex];
     }
 
     ///////////////////////////////////////////////////////////////////////
     namespace strings {
+
+        // clang-format off
         char const* const thread_priority_names[] = {
             "default",
             "low",
@@ -138,6 +161,7 @@ namespace hpx { namespace threads {
             "boost",
             "high (non-recursive)",
         };
+        // clang-format on
     }
 
     char const* get_thread_priority_name(thread_priority priority)
@@ -151,13 +175,17 @@ namespace hpx { namespace threads {
     }
 
     namespace strings {
+
+        // clang-format off
         char const* const stack_size_names[] = {
             "small",
             "medium",
             "large",
             "huge",
         };
-    }
+        // clang-format on
+
+    }    // namespace strings
 
     char const* get_stack_size_name(std::ptrdiff_t size)
     {
@@ -338,8 +366,9 @@ namespace hpx { namespace threads {
                     hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
-                typedef hpx::threads::policies::local_queue_scheduler<>
-                    local_sched_type;
+                using local_sched_type =
+                    hpx::threads::policies::local_queue_scheduler<>;
+
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, numa_sensitive,
@@ -373,9 +402,10 @@ namespace hpx { namespace threads {
                     hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
-                typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    std::mutex, hpx::threads::policies::lockfree_fifo>
-                    local_sched_type;
+                using local_sched_type =
+                    hpx::threads::policies::local_priority_queue_scheduler<
+                        std::mutex, hpx::threads::policies::lockfree_fifo>;
+
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
@@ -406,9 +436,10 @@ namespace hpx { namespace threads {
                     hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
-                typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    std::mutex, hpx::threads::policies::lockfree_lifo>
-                    local_sched_type;
+                using local_sched_type =
+                    hpx::threads::policies::local_priority_queue_scheduler<
+                        std::mutex, hpx::threads::policies::lockfree_lifo>;
+
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
@@ -439,15 +470,14 @@ namespace hpx { namespace threads {
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
-                std::string affinity_domain =
-                    hpx::util::get_affinity_domain(cfg_);
                 std::string affinity_desc;
                 std::size_t numa_sensitive =
                     hpx::util::get_affinity_description(cfg_, affinity_desc);
 
                 // instantiate the scheduler
-                typedef hpx::threads::policies::static_queue_scheduler<>
-                    local_sched_type;
+                using local_sched_type =
+                    hpx::threads::policies::static_queue_scheduler<>;
+
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, numa_sensitive,
@@ -477,8 +507,6 @@ namespace hpx { namespace threads {
                 std::size_t num_high_priority_queues =
                     hpx::util::get_num_high_priority_queues(
                         cfg_, rp.get_num_threads(name));
-                std::string affinity_domain =
-                    hpx::util::get_affinity_domain(cfg_);
                 std::string affinity_desc;
                 std::size_t numa_sensitive =
                     hpx::util::get_affinity_description(cfg_, affinity_desc);
@@ -486,6 +514,7 @@ namespace hpx { namespace threads {
                 // instantiate the scheduler
                 using local_sched_type =
                     hpx::threads::policies::static_priority_queue_scheduler<>;
+
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
@@ -518,9 +547,10 @@ namespace hpx { namespace threads {
                         cfg_, rp.get_num_threads(name));
 
                 // instantiate the scheduler
-                typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    std::mutex, hpx::threads::policies::lockfree_fifo>
-                    local_sched_type;
+                using local_sched_type =
+                    hpx::threads::policies::local_priority_queue_scheduler<
+                        std::mutex, hpx::threads::policies::lockfree_fifo>;
+
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
@@ -555,9 +585,10 @@ namespace hpx { namespace threads {
                         cfg_, rp.get_num_threads(name));
 
                 // instantiate the scheduler
-                typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    std::mutex, hpx::threads::policies::lockfree_lifo>
-                    local_sched_type;
+                using local_sched_type =
+                    hpx::threads::policies::local_priority_queue_scheduler<
+                        std::mutex, hpx::threads::policies::lockfree_lifo>;
+
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
@@ -588,7 +619,7 @@ namespace hpx { namespace threads {
                     shared_priority_queue_scheduler<>
                         local_sched_type;
                 local_sched_type::init_parameter_type init(
-                    thread_pool_init.num_threads_, {4, 4, 64},
+                    thread_pool_init.num_threads_, {4, 4, 64},    // -V112
                     thread_pool_init.affinity_data_, thread_queue_init,
                     "core-shared_priority_queue_scheduler");
                 std::unique_ptr<local_sched_type> sched(
@@ -643,7 +674,8 @@ namespace hpx { namespace threads {
 
     void threadmanager::print_pools(std::ostream& os)
     {
-        os << "The thread-manager owns " << pools_.size() << " pool(s) : \n";
+        os << "The thread-manager owns " << pools_.size()    //  -V128
+           << " pool(s) : \n";
 
         for (auto&& pool_iter : pools_)
         {
@@ -685,7 +717,7 @@ namespace hpx { namespace threads {
                 pool_name + "'. \n");
     }
 
-    thread_pool_base& threadmanager::get_pool(pool_id_type pool_id) const
+    thread_pool_base& threadmanager::get_pool(pool_id_type const& pool_id) const
     {
         return get_pool(pool_id.name());
     }

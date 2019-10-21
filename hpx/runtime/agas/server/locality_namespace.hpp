@@ -168,9 +168,9 @@ struct HPX_EXPORT locality_namespace
         );
 
     parcelset::endpoints_type resolve_locality(
-        naming::gid_type locality);
+        naming::gid_type const& locality);
 
-    void free(naming::gid_type locality);
+    void free(naming::gid_type const& locality);
 
     std::vector<std::uint32_t> localities();
 
@@ -180,7 +180,7 @@ struct HPX_EXPORT locality_namespace
 
     std::uint32_t get_num_overall_threads();
 
-    naming::gid_type statistics_counter(std::string name);
+    naming::gid_type statistics_counter(std::string const& name);
 
   public:
     HPX_DEFINE_COMPONENT_ACTION(locality_namespace, allocate);

@@ -32,7 +32,11 @@ namespace hpx { namespace components
         enum { max_pending = 128 };
 
         pending_logs()
-          : prefix_(naming::invalid_id), queue_mtx_(), activated_(false)
+          : prefix_mtx_()
+          , prefix_(naming::invalid_id)
+          , queue_mtx_()
+          , activated_(false)
+          , is_sending_(false)
         {}
 
         void add(message_type const& msg);

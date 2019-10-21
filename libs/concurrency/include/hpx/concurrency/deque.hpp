@@ -218,7 +218,7 @@ namespace boost { namespace lockfree {
         anchor anchor_;
         pool pool_;
 
-        HPX_STATIC_CONSTEXPR int padding_size =
+        HPX_STATIC_CONSTEXPR std::size_t padding_size =
             BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(anchor);    //-V103
         char padding[padding_size];
 

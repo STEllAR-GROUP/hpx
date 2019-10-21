@@ -330,13 +330,12 @@ namespace hpx { namespace lcos {
             id_type id_first = ids.front();
             if (ids.size() > 1)
             {
-                std::vector<id_type> ids_next(ids.begin() + 1, ids.end());
-
-                typedef typename detail::make_fold_action<Action>::
-                    template fold_invoker<FoldOp>::type fold_impl_action;
+                using fold_impl_action = typename detail::make_fold_action<
+                    Action>::template fold_invoker<FoldOp>::type;
 
                 if (!ids.empty())
                 {
+                    std::vector<id_type> ids_next(ids.begin() + 1, ids.end());
                     fold_futures.push_back(
                         hpx::detail::async_colocated<fold_impl_action>(
                             ids_next.front(), act, std::move(ids_next), fold_op,

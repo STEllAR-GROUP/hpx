@@ -34,16 +34,13 @@ namespace hpx { namespace agas { namespace detail
     {}
 
     std::uint32_t hosted_locality_namespace::allocate(
-        parcelset::endpoints_type const& endpoints
-      , std::uint64_t count
-      , std::uint32_t num_threads
-      , naming::gid_type suggested_prefix
-        )
+        parcelset::endpoints_type const& endpoints, std::uint64_t count,
+        std::uint32_t num_threads, naming::gid_type const& suggested_prefix)
     {
         return 0;
     }
 
-    void hosted_locality_namespace::free(naming::gid_type locality)
+    void hosted_locality_namespace::free(naming::gid_type const& locality)
     {
         server::locality_namespace::free_action action;
         action(gid_, locality);
@@ -55,12 +52,12 @@ namespace hpx { namespace agas { namespace detail
         return action(gid_);
     }
 
-    parcelset::endpoints_type
-    hosted_locality_namespace::resolve_locality(naming::gid_type locality)
+    parcelset::endpoints_type hosted_locality_namespace::resolve_locality(
+        naming::gid_type const& locality)
     {
         server::locality_namespace::resolve_locality_action action;
-        future<parcelset::endpoints_type> endpoints_future
-            = hpx::async(action, gid_, locality);
+        future<parcelset::endpoints_type> endpoints_future =
+            hpx::async(action, gid_, locality);
 
         if (nullptr == threads::get_self_ptr())
         {

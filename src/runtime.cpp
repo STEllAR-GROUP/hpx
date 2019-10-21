@@ -694,7 +694,8 @@ namespace hpx
     {
         // adjust thread assignments to allow for more than one locality per
         // node
-        std::size_t first_core = this->get_config().get_first_used_core();
+        std::size_t first_core =
+            static_cast<std::size_t>(this->get_config().get_first_used_core());
         std::size_t cores_needed =
             hpx::resource::get_partitioner().assign_cores(first_core);
 

@@ -659,12 +659,12 @@ void big_boot_barrier::apply_notification(
 }
 
 void big_boot_barrier::add_locality_endpoints(std::uint32_t locality_id,
-    parcelset::endpoints_type const& endpoints)
+    parcelset::endpoints_type const& endpoints_data)
 {
-    if (localities.size() < locality_id + 1)
-        localities.resize(locality_id + 1);
+    if (localities.size() < static_cast<std::size_t>(locality_id) + 1)
+        localities.resize(static_cast<std::size_t>(locality_id) + 1);
 
-    localities[locality_id] = endpoints;
+    localities[static_cast<std::size_t>(locality_id)] = endpoints_data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

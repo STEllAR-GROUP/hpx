@@ -244,8 +244,10 @@ namespace hpx { namespace performance_counters
         typedef counter_type_path_elements base_type;
 
         counter_path_elements()
-          : parentinstanceindex_(-1), instanceindex_(-1),
-            parentinstance_is_basename_(false)
+          : parentinstanceindex_(-1)
+          , instanceindex_(-1)
+          , subinstanceindex_(-1)
+          , parentinstance_is_basename_(false)
         {}
 
         counter_path_elements(std::string const& objectname,

@@ -349,7 +349,9 @@ namespace hpx { namespace threads
                     static_allocation_data st = data.second;
                     if (st.num_owned_cores_ > st.min_proxy_cores_)
                     {
-                        HPX_ASSERT(st.adjusted_desired_ == double(st.max_proxy_cores_));
+                        HPX_ASSERT(std::size_t(st.adjusted_desired_) ==
+                            st.max_proxy_cores_);
+
                         scaled_static_allocation_data.insert(
                             allocation_data_map_type::value_type(data.first, st));
 
@@ -388,8 +390,9 @@ namespace hpx { namespace threads
                         static_allocation_data& st = data.second;
                         if (st.allocation_ > st.num_owned_cores_)
                         {
-                            double modifier = static_cast<double>(
-                                st.num_owned_cores_) / st.allocation_;
+                            double modifier =
+                                static_cast<double>(st.num_owned_cores_) /
+                                static_cast<double>(st.allocation_);
 
                             // Reduce adjusted_desired by multiplying it with
                             // 'modifier', to try to bias allocation to the
@@ -423,7 +426,8 @@ namespace hpx { namespace threads
                         static_allocation_data& st = data.second;
                         if (st.allocation_ > st.max_proxy_cores_)
                         {
-                            double modifier = st.max_proxy_cores_ /
+                            double modifier =
+                                static_cast<double>(st.max_proxy_cores_) /
                                 static_cast<double>(st.allocation_);
 
                             // Reduce adjusted_desired by multiplying with it
@@ -458,7 +462,9 @@ namespace hpx { namespace threads
                         static_allocation_data& st = data.second;
                         if (st.min_proxy_cores_ > st.allocation_)
                         {
-                            double new_desired = st.min_proxy_cores_ / scaling;
+                            double new_desired =
+                                static_cast<double>(st.min_proxy_cores_) /
+                                scaling;
 
                             // Bias desired to get allocation closer to min.
                             total_desired += new_desired - st.adjusted_desired_;
@@ -569,12 +575,12 @@ namespace hpx { namespace threads
         {
             static_allocation_data& st = data.second;
             st.allocation_ = static_cast<std::size_t>(st.scaled_allocation_);
-            st.scaled_allocation_ -= st.allocation_;
+            st.scaled_allocation_ -= static_cast<double>(st.allocation_);
         }
 
         // Sort by scaled_allocation
-        typedef std::pair<double, allocation_data_map_type::iterator> item;
-        typedef std::vector<item> helper_type;
+        using item = std::pair<double, allocation_data_map_type::iterator>;
+        using helper_type = std::vector<item>;
 
         helper_type d;
         d.reserve(scaled_static_allocation_data.size());
@@ -583,7 +589,7 @@ namespace hpx { namespace threads
                 scaled_static_allocation_data.begin();
              it != scaled_static_allocation_data.end(); ++it)
         {
-            d.push_back(std::make_pair(it->second.scaled_allocation_, it));
+            d.emplace_back(it->second.scaled_allocation_, it);
         }
 
         std::sort(
@@ -620,11 +626,12 @@ namespace hpx { namespace threads
 
             if (it <= rit.base())
             {
-                if (it->second->second.scaled_allocation_ > epsilon)
+                auto& alloc_data = it->second->second;
+                if (alloc_data.scaled_allocation_ > epsilon)
                 {
-                    fraction += (1.0 - it->second->second.scaled_allocation_);
-                    it->second->second.scaled_allocation_ = 0.0;
-                    it->second->second.allocation_ += 1;
+                    fraction += (1.0 - alloc_data.scaled_allocation_);
+                    alloc_data.scaled_allocation_ = 0.0;
+                    alloc_data.allocation_ += 1;
                 }
             }
             else

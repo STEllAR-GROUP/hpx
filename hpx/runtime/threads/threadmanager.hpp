@@ -79,7 +79,7 @@ namespace hpx { namespace threads
         scheduler_type& default_scheduler() const;
 
         thread_pool_base& get_pool(std::string const& pool_name) const;
-        thread_pool_base& get_pool(pool_id_type pool_id) const;
+        thread_pool_base& get_pool(pool_id_type const& pool_id) const;
         thread_pool_base& get_pool(std::size_t thread_index) const;
 
         /// The function \a register_work adds a new work item to the thread

@@ -23,7 +23,7 @@ namespace hpx {
         {
             std::string result;
             std::string msg(msg_);
-            std::string::size_type pos = msg.find_first_of("\n");
+            std::string::size_type pos = msg.find_first_of('\n');
             std::string::size_type first_non_ws = msg.find_first_not_of(" \n");
             std::string::size_type pos1 = 0;
 
@@ -32,13 +32,13 @@ namespace hpx {
                 if (pos > first_non_ws)
                 {    // skip leading newline
                     result += msg.substr(pos1, pos - pos1 + 1);
-                    pos = msg.find_first_of("\n", pos1 = pos + 1);
+                    pos = msg.find_first_of('\n', pos1 = pos + 1);
                     if (std::string::npos != pos)
                         result += "  ";
                 }
                 else
                 {
-                    pos = msg.find_first_of("\n", pos1 = pos + 1);
+                    pos = msg.find_first_of('\n', pos1 = pos + 1);
                 }
             }
 
@@ -135,7 +135,7 @@ namespace hpx {
         {
             result += "  ";
             result += detail::indent_message(hpx::get_error_what(*it));
-            if (result.find_last_of("\n") < result.size() - 1)
+            if (result.find_last_of('\n') < result.size() - 1)
                 result += "\n";
         }
         return result;

@@ -44,7 +44,8 @@ namespace hpx { namespace util {
     {
         using helper = detail::hash_helper<N>;
         static_assert(N != 0, "This algorithm only works with N != 0");
-        static_assert((1 << helper::log2) == N, "N must be a power of two");
+        static_assert(
+            (1 << helper::log2) == N, "N must be a power of two");    // -V104
         return (detail::golden_ratio * (i ^ (i >> helper::shift_amount))) >>
             helper::shift_amount;
     }

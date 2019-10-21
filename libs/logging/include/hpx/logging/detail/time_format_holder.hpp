@@ -115,33 +115,31 @@ namespace hpx { namespace util { namespace logging { namespace detail {
             typedef std::vector<index_info> array;
             array indexes;
             if (day_idx != std::string::npos)
-                indexes.push_back(index_info(day_idx, &m_day));
+                indexes.emplace_back(day_idx, &m_day);
             if (month_idx != std::string::npos)
-                indexes.push_back(index_info(month_idx, &m_month));
+                indexes.emplace_back(month_idx, &m_month);
 
             if (yy_idx != std::string::npos || yyyy_idx != std::string::npos)
             {
                 if (yyyy_idx != std::string::npos)
-                    indexes.push_back(
-                        index_info(yyyy_idx, &m_yyyy, 4));    //-V112
+                    indexes.emplace_back(yyyy_idx, &m_yyyy, 4);    //-V112
                 else
-                    indexes.push_back(index_info(yy_idx, &m_yy));
+                    indexes.emplace_back(yy_idx, &m_yy);
             }
 
             if (hour_idx != std::string::npos)
-                indexes.push_back(index_info(hour_idx, &m_hour));
+                indexes.emplace_back(hour_idx, &m_hour);
             if (min_idx != std::string::npos)
-                indexes.push_back(index_info(min_idx, &m_min));
+                indexes.emplace_back(min_idx, &m_min);
             if (sec_idx != std::string::npos)
-                indexes.push_back(index_info(sec_idx, &m_sec));
+                indexes.emplace_back(sec_idx, &m_sec);
             if (millisec_idx != std::string::npos)
-                indexes.push_back(index_info(millisec_idx, &m_millisec, 4, 3));
-            //-V112 //-V525
+                indexes.emplace_back(
+                    millisec_idx, &m_millisec, 4, 3);    // -V112
             if (microsec_idx != std::string::npos)
-                indexes.push_back(index_info(microsec_idx, &m_microsec, 5, 6));
+                indexes.emplace_back(microsec_idx, &m_microsec, 5, 6);
             if (nanosec_idx != std::string::npos)
-                indexes.push_back(
-                    index_info(nanosec_idx, &m_nanosec, 4, 9));    //-V112
+                indexes.emplace_back(nanosec_idx, &m_nanosec, 4, 9);    //-V112
 
             std::sort(indexes.begin(), indexes.end(), index_info::by_index);
 

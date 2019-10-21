@@ -36,6 +36,10 @@ HPX_REGISTER_ACTION(
 namespace hpx { namespace lcos { namespace detail {
     barrier_node::barrier_node()
       : count_(0)
+      , rank_(0)
+      , num_(0)
+      , arity_(0)
+      , cut_off_(0)
       , local_barrier_(0)
     {
         HPX_ASSERT(false);

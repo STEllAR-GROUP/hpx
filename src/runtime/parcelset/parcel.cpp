@@ -162,15 +162,21 @@ namespace hpx { namespace parcelset
     }
 #endif
 
-    parcel::parcel() {}
+    parcel::parcel()
+      : data_()
+      , action_()
+      , size_(0)
+      , num_chunks_(0)
+    {}
 
     parcel::~parcel() {}
 
     parcel::parcel(naming::gid_type&& dest, naming::address&& addr,
-            std::unique_ptr<actions::base_action> act)
+        std::unique_ptr<actions::base_action> act)
       : data_(std::move(dest), std::move(addr), act->has_continuation())
       , action_(std::move(act))
       , size_(0)
+      , num_chunks_(0)
     {
 //         HPX_ASSERT(is_valid());
     }

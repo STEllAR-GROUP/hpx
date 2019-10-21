@@ -53,13 +53,13 @@ namespace hpx { namespace util
 
             if (s.size() < hpx_prefix_len ||
                 s.compare(0, hpx_prefix_len, hpx_prefix) != 0 ||
-                !std::isdigit(s[hpx_prefix_len]))
+                !std::isdigit(s[hpx_prefix_len]))  // -V557
             {
                 return false;
             }
 
             // any --hpx: option without a second ':' is handled elsewhere as well
-            std::string::size_type p = s.find_first_of(":", hpx_prefix_len);
+            std::string::size_type p = s.find_first_of(':', hpx_prefix_len);
             if (p == std::string::npos)
                 return false;
 
@@ -116,7 +116,7 @@ namespace hpx { namespace util
             else {
                 // short option (no value) or long option
                 if (opt[1] == '-') {
-                    start_at = opt.find_last_of("=");
+                    start_at = opt.find_last_of('=');
                     long_option = true;
                 }
 
@@ -790,7 +790,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     std::string embed_in_quotes(std::string const& s)
     {
-        char quote = (s.find_first_of("\"") != std::string::npos) ? '\'' : '\"';
+        char quote = (s.find_first_of('"') != std::string::npos) ? '\'' : '"';
 
         if (s.find_first_of("\t ") != std::string::npos)
             return quote + s + quote;

@@ -213,7 +213,8 @@ namespace hpx { namespace util
         }
 
         std::string handle_queuing(util::manage_config& cfgmap,
-            hpx::program_options::variables_map& vm, std::string default_)
+            hpx::program_options::variables_map& vm,
+            std::string const& default_)
         {
             // command line options is used preferred
             if (vm.count("hpx:queuing"))
@@ -224,7 +225,8 @@ namespace hpx { namespace util
         }
 
         std::string handle_affinity(util::manage_config& cfgmap,
-            hpx::program_options::variables_map& vm, std::string default_)
+            hpx::program_options::variables_map& vm,
+            std::string const& default_)
         {
             // command line options is used preferred
             if (vm.count("hpx:affinity"))
@@ -235,7 +237,8 @@ namespace hpx { namespace util
         }
 
         std::string handle_affinity_bind(util::manage_config& cfgmap,
-            hpx::program_options::variables_map& vm, std::string default_)
+            hpx::program_options::variables_map& vm,
+            std::string const& default_)
         {
             // command line options is used preferred
             if (vm.count("hpx:bind"))
@@ -759,7 +762,7 @@ namespace hpx { namespace util
             (vm.count("hpx:use-process-mask") > 0);
 
         bool enable_batch_env =
-            ((cfgmap.get_value<int>("hpx.ignore_batch_env", 0) +
+            ((cfgmap.get_value<std::size_t>("hpx.ignore_batch_env", 0) +
                  vm.count("hpx:ignore-batch-env")) == 0) &&
             !use_process_mask_;
 
@@ -1310,7 +1313,7 @@ namespace hpx { namespace util
         int argc, char** argv)
     {
         std::vector<std::string> options;
-        options.reserve(argc + ini_config_.size());
+        options.reserve(static_cast<std::size_t>(argc) + ini_config_.size());
 
         // extract all command line arguments from configuration settings and
         // remove them from this list
@@ -1454,7 +1457,7 @@ namespace hpx { namespace util
         if (util::mpi_environment::check_mpi_environment(rtcfg_))
         {
             mpi_environment::init(&argc, &argv, *this);
-            num_localities_ = mpi_environment::size();
+            num_localities_ = static_cast<std::size_t>(mpi_environment::size());
         }
 #endif
 

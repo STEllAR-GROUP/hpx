@@ -176,7 +176,7 @@ namespace hpx { namespace resource { namespace detail {
         HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
         HPX_ASSERT(!util::get<2>(assigned_pu_nums_[virt_core]));
 
-        util::get<2>(assigned_pu_nums_[virt_core]) = true;
+        util::get<2>(assigned_pu_nums_[virt_core]) = true;    // -V601
     }
 
     void init_pool_data::unassign_pu(std::size_t virt_core)
@@ -184,7 +184,7 @@ namespace hpx { namespace resource { namespace detail {
         HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
         HPX_ASSERT(util::get<2>(assigned_pu_nums_[virt_core]));
 
-        util::get<2>(assigned_pu_nums_[virt_core]) = false;
+        util::get<2>(assigned_pu_nums_[virt_core]) = false;    // -V601
     }
 
     bool init_pool_data::pu_is_exclusive(std::size_t virt_core) const
@@ -914,7 +914,7 @@ namespace hpx { namespace resource { namespace detail {
         util::function_nonser<int(
             hpx::program_options::variables_map& vm)> const& f,
         hpx::program_options::options_description desc_cmdline, int argc,
-        char** argv, std::vector<std::string> ini_config,
+        char** argv, std::vector<std::string> ini_config,    // -V813
         resource::partitioner_mode rpmode, runtime_mode mode,
         bool fill_internal_topology)
     {
@@ -937,8 +937,9 @@ namespace hpx { namespace resource { namespace detail {
             hpx::util::safe_lexical_cast<std::size_t>(
                 get_config_entry("hpx.cores", 0), 0),
             get_pu_offset(cfg_), get_pu_step(cfg_),
-            cfg_.rtcfg_.get_first_used_core(), get_affinity_domain(cfg_),
-            affinity_description, cfg_.use_process_mask_);
+            static_cast<std::size_t>(cfg_.rtcfg_.get_first_used_core()),
+            get_affinity_domain(cfg_), affinity_description,
+            cfg_.use_process_mask_);
 
         if (fill_internal_topology)
         {
@@ -1164,7 +1165,7 @@ namespace hpx { namespace resource { namespace detail {
 
         //! make this prettier
         os << "the resource partitioner owns " << initial_thread_pools_.size()
-           << " pool(s) : \n";
+           << " pool(s) : \n";    // -V128
         for (auto itp : initial_thread_pools_)
         {
             itp.print_pool(os);
