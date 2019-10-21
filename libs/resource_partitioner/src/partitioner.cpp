@@ -5,10 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/include/runtime.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
-#include <hpx/runtime/resource/partitioner.hpp>
-#include <hpx/runtime/thread_pool_helpers.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 
 #include <hpx/program_options.hpp>
@@ -23,48 +21,6 @@
 
 namespace hpx { namespace resource
 {
-    ///////////////////////////////////////////////////////////////////////////
-    std::size_t get_num_thread_pools()
-    {
-        return get_partitioner().get_num_pools();
-    }
-
-    std::size_t get_num_threads()
-    {
-        return get_partitioner().get_num_threads();
-    }
-
-    std::size_t get_num_threads(std::string const& pool_name)
-    {
-        return get_partitioner().get_num_threads(pool_name);
-    }
-
-    std::size_t get_num_threads(std::size_t pool_index)
-    {
-        return get_partitioner().get_num_threads(pool_index);
-    }
-
-    std::size_t get_pool_index(std::string const& pool_name)
-    {
-        return get_partitioner().get_pool_index(pool_name);
-    }
-
-    std::string const& get_pool_name(std::size_t pool_index)
-    {
-        return get_partitioner().get_pool_name(pool_index);
-    }
-
-    threads::thread_pool_base& get_thread_pool(
-        std::string const& pool_name)
-    {
-        return get_runtime().get_thread_manager().get_pool(pool_name);
-    }
-
-    threads::thread_pool_base& get_thread_pool(std::size_t pool_index)
-    {
-        return get_thread_pool(get_pool_name(pool_index));
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     std::vector<pu> pu::pus_sharing_core()
     {
@@ -159,30 +115,18 @@ namespace hpx { namespace resource
         {
             // if the resource partitioner is not accessed for the first time
             // if the command-line parsing has not yet been done
-            throw std::invalid_argument(
-                "hpx::resource::get_partitioner() can be called only after "
-                "the resource partitioner has been initialized and before it "
-                "has been deleted");
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::resource::get_partitioner",
+                "can be called only after the resource partitioner has "
+                "been initialized and before it has been deleted.");
         }
 
         if (!rp->cmd_line_parsed())
         {
-            if (get_runtime_ptr() != nullptr)
-            {
-                HPX_THROW_EXCEPTION(invalid_status,
-                    "hpx::resource::get_partitioner",
-                    "can be called only after the resource partitioner has "
-                    "been allowed to parse the command line options.");
-            }
-            else
-            {
-                // if the resource partitioner is not accessed for the first time
-                // if the command-line parsing has not yet been done
-                throw std::invalid_argument(
-                    "hpx::resource::get_partitioner() can be called only after "
-                    "the resource partitioner has been allowed to parse the "
-                    "command line options.");
-            }
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::resource::get_partitioner",
+                "can be called only after the resource partitioner has "
+                "been allowed to parse the command line options.");
         }
 
         return *rp;
@@ -213,21 +157,11 @@ namespace hpx { namespace resource
                     // if the resource partitioner is not accessed for the
                     // first time if the command-line parsing has not yet
                     // been done
-                    if (get_runtime_ptr() != nullptr)
-                    {
-                        HPX_THROW_EXCEPTION(invalid_status,
-                            "hpx::resource::get_partitioner",
-                            "can be called only after the resource partitioner "
-                            "has been allowed to parse the command line "
-                            "options.");
-                    }
-                    else
-                    {
-                        throw std::invalid_argument(
-                            "hpx::resource::get_partitioner() can be called "
-                            "only after the resource partitioner has been "
-                            "allowed to parse the command line options.");
-                    }
+                    HPX_THROW_EXCEPTION(invalid_status,
+                        "hpx::resource::get_partitioner",
+                        "can be called only after the resource partitioner "
+                        "has been allowed to parse the command line "
+                        "options.");
                 }
 
                 // no need to parse a second time

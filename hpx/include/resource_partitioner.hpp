@@ -8,7 +8,7 @@
 #define HPX_RESOURCE_PARTITIONER_AUG_08_2017_1103AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/resource/partitioner.hpp>
+#include <hpx/resource_partitioner/partitioner.hpp>
 
 #endif
 

@@ -10,7 +10,7 @@
 
 //[body
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime/resource/partitioner.hpp>
+#include <hpx/resource_partitioner/partitioner.hpp>
 
 #include <iostream>
 

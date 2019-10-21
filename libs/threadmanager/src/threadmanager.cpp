@@ -16,7 +16,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>

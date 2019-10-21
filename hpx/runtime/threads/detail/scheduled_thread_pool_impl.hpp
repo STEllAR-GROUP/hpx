@@ -14,7 +14,7 @@
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>

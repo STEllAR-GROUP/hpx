@@ -8,30 +8,38 @@ cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(threadmanager_headers
-  hpx/threadmanager.hpp
+set(resource_partitioner_headers
+  hpx/resource_partitioner/detail/create_partitioner.hpp
+  hpx/resource_partitioner/detail/partitioner.hpp
+  hpx/resource_partitioner/partitioner.hpp
+  hpx/resource_partitioner/partitioner_fwd.hpp
   )
 
-set(threadmanager_compat_headers
-  hpx/runtime/threads/threadmanager.hpp
+set(resource_partitioner_compat_headers
+  hpx/runtime/resource/detail/create_partitioner.hpp
+  hpx/runtime/resource/detail/partitioner.hpp
+  hpx/runtime/resource/partitioner.hpp
+  hpx/runtime/resource/partitioner_fwd.hpp
   )
 
-set(threadmanager_sources
-  threadmanager.cpp
+set(resource_partitioner_sources
+  detail_partitioner.cpp
+  partitioner.cpp
   )
 
 include(HPX_AddModule)
-add_hpx_module(threadmanager
+add_hpx_module(resource_partitioner
   COMPATIBILITY_HEADERS ON # Added in 1.4.0
   DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
-  GLOBAL_HEADER_GEN OFF
-  SOURCES ${threadmanager_sources}
-  HEADERS ${threadmanager_headers}
-  COMPAT_HEADERS ${threadmanager_compat_headers}
+  GLOBAL_HEADER_GEN ON
+  SOURCES ${resource_partitioner_sources}
+  HEADERS ${resource_partitioner_headers}
+  COMPAT_HEADERS ${resource_partitioner_compat_headers}
   DEPENDENCIES
     hpx_allocator_support
     hpx_assertion
+    hpx_cache
     hpx_concurrency
     hpx_coroutines
     hpx_errors
@@ -40,7 +48,6 @@ add_hpx_module(threadmanager
     hpx_hardware
     hpx_plugin
     hpx_program_options
-    hpx_resource_partitioner
     hpx_serialization
     hpx_topology
   CMAKE_SUBDIRS examples tests

@@ -8,7 +8,7 @@
 #define HPX_DETAIL_CREATE_PARTITIONER_AUG_10_2017_1116AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/resource/partitioner_fwd.hpp>
+#include <hpx/resource_partitioner/partitioner_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/util/find_prefix.hpp>

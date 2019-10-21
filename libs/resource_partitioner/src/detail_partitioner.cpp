@@ -10,9 +10,8 @@
 #include <hpx/format.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/runtime/config_entry.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
-#include <hpx/runtime/resource/partitioner.hpp>
-#include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
@@ -33,27 +32,13 @@ namespace hpx { namespace resource { namespace detail {
     HPX_NORETURN void throw_runtime_error(
         std::string const& func, std::string const& message)
     {
-        if (get_runtime_ptr() != nullptr)
-        {
-            HPX_THROW_EXCEPTION(invalid_status, func, message);
-        }
-        else
-        {
-            throw std::runtime_error(func + ": " + message);
-        }
+        HPX_THROW_EXCEPTION(invalid_status, func, message);
     }
 
     HPX_NORETURN void throw_invalid_argument(
         std::string const& func, std::string const& message)
     {
-        if (get_runtime_ptr() != nullptr)
-        {
-            HPX_THROW_EXCEPTION(bad_parameter, func, message);
-        }
-        else
-        {
-            throw std::invalid_argument(func + ": " + message);
-        }
+        HPX_THROW_EXCEPTION(bad_parameter, func, message);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -570,14 +555,6 @@ namespace hpx { namespace resource { namespace detail {
     void partitioner::create_thread_pool(std::string const& pool_name,
         scheduling_policy sched, hpx::threads::policies::scheduler_mode mode)
     {
-        if (get_runtime_ptr() != nullptr)
-        {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "partitioner::create_thread_pool",
-                "this function must be called before the runtime system has "
-                "been started");
-        }
-
         if (pool_name.empty())
         {
             throw std::invalid_argument(
@@ -617,14 +594,6 @@ namespace hpx { namespace resource { namespace detail {
     void partitioner::create_thread_pool(
         std::string const& pool_name, scheduler_function scheduler_creation)
     {
-        if (get_runtime_ptr() != nullptr)
-        {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "partitioner::create_thread_pool",
-                "this function must be called before the runtime system has "
-                "been started");
-        }
-
         if (pool_name.empty())
         {
             throw std::invalid_argument(
@@ -667,13 +636,6 @@ namespace hpx { namespace resource { namespace detail {
     void partitioner::add_resource(pu const& p, std::string const& pool_name,
         bool exclusive, std::size_t num_threads)
     {
-        if (get_runtime_ptr() != nullptr)
-        {
-            HPX_THROW_EXCEPTION(invalid_status, "partitioner::add_resource",
-                "this function must be called before the runtime system has "
-                "been started");
-        }
-
         std::unique_lock<mutex_type> l(mtx_);
 
         if (!exclusive && !(mode_ & mode_allow_dynamic_pools))
@@ -982,14 +944,6 @@ namespace hpx { namespace resource { namespace detail {
     std::size_t partitioner::shrink_pool(std::string const& pool_name,
         util::function_nonser<void(std::size_t)> const& remove_pu)
     {
-        if (get_runtime_ptr() == nullptr)
-        {
-            throw std::runtime_error(
-                "partitioner::create_thread_pool: "
-                "this function must be called after the runtime system has "
-                "been started");
-        }
-
         if (!(mode_ & mode_allow_dynamic_pools))
         {
             HPX_THROW_EXCEPTION(bad_parameter, "partitioner::shrink_pool",
@@ -1038,14 +992,6 @@ namespace hpx { namespace resource { namespace detail {
     std::size_t partitioner::expand_pool(std::string const& pool_name,
         util::function_nonser<void(std::size_t)> const& add_pu)
     {
-        if (get_runtime_ptr() == nullptr)
-        {
-            throw std::runtime_error(
-                "partitioner::create_thread_pool: "
-                "this function must be called after the runtime system has "
-                "been started");
-        }
-
         if (!(mode_ & mode_allow_dynamic_pools))
         {
             HPX_THROW_EXCEPTION(bad_parameter, "partitioner::expand_pool",

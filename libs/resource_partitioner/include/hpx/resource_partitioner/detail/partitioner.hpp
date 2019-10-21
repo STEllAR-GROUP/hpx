@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/runtime/resource/partitioner.hpp>
+#include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>

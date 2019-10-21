@@ -8,8 +8,8 @@
 #define HPX_RESOURCE_PARTITIONER_AUG_10_2017_1005AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/resource/partitioner_fwd.hpp>
-#include <hpx/runtime/resource/detail/create_partitioner.hpp>
+#include <hpx/resource_partitioner/partitioner_fwd.hpp>
+#include <hpx/resource_partitioner/detail/create_partitioner.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/functional/function.hpp>
