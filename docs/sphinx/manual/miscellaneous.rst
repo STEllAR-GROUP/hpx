@@ -251,6 +251,32 @@ illustrated below.
    :language: c++
    :lines: 129-150
 
+Checkpointing Components
+------------------------
+
+``save_checkpoint`` and ``restore_checkpoint`` are also able to store components
+inside ``checkpoint``s. This can be done in one of two ways. First a client of
+the component can be passed to ``save_checkpoint``. When the user wishes to
+resurrect the component she can pass a client instance to ``restore_checkpoint``.
+
+This technique is demonstrated below:
+
+.. literalinclude:: ../../tests/unit/util/checkpoint.cpp
+   :language: c++
+   :lines: 143-144
+
+The second way a user can save a component is by passing a ``shared_ptr`` to the
+component to ``save_checkpoint``. This component can be resurrected by creating
+a new instance of the component type and passing a ``shared_ptr`` to the new
+instance to ``restore_checkpoint``. An example can be found below:
+
+This technique is demonstrated below:
+
+.. literalinclude:: ../../tests/unit/util/checkpoint.cpp
+   :language: c++
+   :lines: 113-126
+
+
 .. _iostreams:
 
 The |hpx| I/O-streams component

@@ -261,9 +261,20 @@ namespace hpx { namespace naming
         void id_type_impl::preprocess_gid(serialization::output_archive& ar) const
         {
             // unmanaged gids do not require any special handling
+            // check-pointing does not require any special handling here neither
             if (unmanaged == type_)
             {
                 return;
+            }
+
+            // we should not call this function during check-pointing operations
+            if (ar.try_get_extra_data<checkpointing_tag>() != nullptr)
+            {
+                // this is a check-pointing operation, we do not support this
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "id_type_impl::preprocess_gid",
+                    "can't check-point managed id_type's, use a component "
+                    "client instead");
             }
 
             auto& split_gids = ar.get_extra_data<
@@ -271,6 +282,8 @@ namespace hpx { namespace naming
 
             if (split_gids.has_gid(*this))
             {
+                // archive doesn't support credit splitting or no splitting
+                // required
                 return;
             }
 
@@ -542,12 +555,22 @@ namespace hpx { namespace naming
 
             id_type_management type = type_;
 
+            if (unmanaged != type_ &&
+                ar.try_get_extra_data<checkpointing_tag>() != nullptr)
+            {
+                // this is a check-pointing operation, we do not support this
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "id_type_impl::save",
+                    "can't check-point managed id_type's, use a component "
+                    "client instead");
+            }
+
             gid_type new_gid;
             if (unmanaged == type_)
             {
                 new_gid = *this;
             }
-            else if(managed_move_credit == type_)
+            else if (managed_move_credit == type_)
             {
                 // all credits will be moved to the returned gid
                 new_gid = move_gid(const_cast<id_type_impl&>(*this));
@@ -562,7 +585,7 @@ namespace hpx { namespace naming
                 HPX_ASSERT(new_gid != invalid_gid);
             }
 
-            gid_serialization_data data { new_gid, type };
+            gid_serialization_data data{new_gid, type};
             ar << data;
         }
 

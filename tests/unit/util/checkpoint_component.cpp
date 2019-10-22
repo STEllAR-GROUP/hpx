@@ -1,18 +1,18 @@
 // Copyright (c) 2018 Adrian Serio
 //
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
-// This example tests the interoperablility of save_checkpoint and
+
+// This example tests the interoperability of save_checkpoint and
 // restore_checkpoint with components.
-//
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/runtime/serialization/shared_ptr.hpp>
+#include <hpx/serialization/shared_ptr.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/util/checkpoint.hpp>
-#include <hpx/util/lightweight_test.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -63,9 +63,10 @@ struct data_server : hpx::components::component_base<data_server>
     void serialize(Archive& arch, const unsigned int version)
     {
         arch& data_;
-    };
+    }
 };
-typedef hpx::components::component<data_server> data_server_type;
+
+using data_server_type = hpx::components::component<data_server>;
 HPX_REGISTER_COMPONENT(data_server_type, data_server);
 
 HPX_REGISTER_ACTION(data_server::get_data_action);
@@ -73,7 +74,7 @@ HPX_REGISTER_ACTION(data_server::print_action);
 
 struct data_client : hpx::components::client_base<data_client, data_server>
 {
-    typedef hpx::components::client_base<data_client, data_server> base_type;
+    using base_type = hpx::components::client_base<data_client, data_server>;
     data_client() = default;
     ~data_client() = default;
 
@@ -109,14 +110,12 @@ int main()
 {
     // Test 1
     //  test checkpoint a component using a shared_ptr
-    //[comp_test_2
     std::vector<int> vec{1, 2, 3, 4, 5};
     data_client A(hpx::find_here(), std::move(vec));
 
     // Checkpoint Server
-    //]
     hpx::id_type old_id = A.get_id();
-    //[comp_test_3
+
     hpx::future<std::shared_ptr<data_server>> f_a_ptr =
         hpx::get_ptr<data_server>(A.get_id());
     std::shared_ptr<data_server> a_ptr = f_a_ptr.get();
@@ -126,7 +125,6 @@ int main()
     // Create a new server instance
     std::shared_ptr<data_server> b_server;
     restore_checkpoint(f.get(), b_server);
-    //]
 
     HPX_TEST(A.get_data().get() == b_server->get_data());
 
@@ -137,17 +135,17 @@ int main()
 
     // Test 2
     // Try to checkpoint and restore a component with a client
-    //[comp_test_1
     std::vector<int> vec3{10, 10, 10, 10, 10};
+
     // Create a component instance through client constructor
     data_client D(hpx::find_here(), std::move(vec3));
     hpx::future<checkpoint> f3 = save_checkpoint(D);
 
     // Create a new client
     data_client E;
+
     // Restore server inside client instance
     restore_checkpoint(f3.get(), E);
-    //]
 
     HPX_TEST(D.get_data().get() == E.get_data().get());
 

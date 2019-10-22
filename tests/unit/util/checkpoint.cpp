@@ -8,14 +8,14 @@
 // restore_checkpoint.
 //
 
+#include <hpx/hpx_main.hpp>
+#include <hpx/testing.hpp>
+#include <hpx/util/checkpoint.hpp>
+
 #include <fstream>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <hpx/hpx_main.hpp>
-#include <hpx/util/checkpoint.hpp>
-#include <hpx/testing.hpp>
 
 using hpx::util::checkpoint;
 using hpx::util::restore_checkpoint;
@@ -142,7 +142,7 @@ int main()
     if (test_file_7_1)
     {
         test_file_7_1.seekg(0, test_file_7_1.end);
-        int length = test_file_7_1.tellg();
+        auto length = test_file_7_1.tellg();
         test_file_7_1.seekg(0, test_file_7_1.beg);
         char_vec.resize(length);
         test_file_7_1.read(char_vec.data(), length);
@@ -211,7 +211,7 @@ int main()
     if (test_file_10_1)
     {
         test_file_10_1.seekg(0, test_file_10_1.end);
-        int length = test_file_10_1.tellg();
+        auto length = test_file_10_1.tellg();
         test_file_10_1.seekg(0, test_file_10_1.beg);
         char_vec_10.resize(length);
         test_file_10_1.read(char_vec_10.data(), length);
