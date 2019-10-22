@@ -208,16 +208,16 @@ used by ``find_package(HPX)`` to set up all the necessary macros needed to use
   used when building/configuring |hpx|.
 
 * Set the ``CMAKE_PREFIX_PATH`` variable to the root directory of your |hpx|
-  build or install location on the command line when you invoke cmake:
+  build or install location on the command line when you invoke CMake:
 
   .. code-block:: bash
 
      cmake -DCMAKE_PREFIX_PATH=$HPX_LOCATION ...
 
-  the difference between ``CMAKE_PREFIX_PATH`` and ``HPX_DIR`` is that cmake
-  will add common postfixes such as ``lib/cmake/<project`` to the
+  The difference between ``CMAKE_PREFIX_PATH`` and ``HPX_DIR`` is that CMake
+  will add common postfixes, such as ``lib/cmake/<project``, to the
   ``MAKE_PREFIX_PATH`` and search in these locations too. Note that if your
-  project uses |hpx| as well as other cmake managed projects, the paths to the
+  project uses |hpx| as well as other CMake-managed projects, the paths to the
   locations of these multiple projects may be concatenated in the
   ``CMAKE_PREFIX_PATH``.
 
@@ -243,7 +243,7 @@ macro and add it to the ``CMakeLists.txt`` file:
 .. note::
 
    ``add_hpx_component`` adds a ``_component`` suffix to the target name. In the
-   example above a ``hello_world_component`` target will be created.
+   example above, a ``hello_world_component`` target will be created.
 
 The available options to ``add_hpx_component`` are:
 
@@ -251,10 +251,10 @@ The available options to ``add_hpx_component`` are:
 * ``HEADERS``: The header files for that component
 * ``DEPENDENCIES``: Other libraries or targets this component depends on
 * ``COMPONENT_DEPENDENCIES``: The components this component depends on
-* ``PLUGIN``: Treat this component as a plugin-able library
+* ``PLUGIN``: Treats this component as a plugin-able library
 * ``COMPILE_FLAGS``: Additional compiler flags
 * ``LINK_FLAGS``: Additional linker flags
-* ``FOLDER``: Add the headers and source files to this Source Group folder
+* ``FOLDER``: Adds the headers and source files to this Source Group folder
 
 ..
    * ``SOURCE_ROOT``
@@ -286,7 +286,7 @@ After adding the component, the way you add the executable is as follows:
    when adding a component using ``add_hpx_component``.
 
 When you configure your application, all you need to do is set the ``HPX_DIR``
-variable to point to the installation of |hpx|!
+variable to point to the installation of |hpx|.
 
 .. note::
 
@@ -301,7 +301,7 @@ variable to point to the installation of |hpx|!
 CMake macros to integrate |hpx| into existing applications
 ----------------------------------------------------------
 
-In addition to the ``add_hpx_component`` and ``add_hpx_executable`` you can use
+In addition to the ``add_hpx_component`` and ``add_hpx_executable``, you can use
 the ``hpx_setup_target`` macro to have an already existing target to be used
 with the |hpx| libraries:
 
@@ -312,8 +312,8 @@ with the |hpx| libraries:
 Optional parameters are:
 
 * ``EXPORT``: Adds it to the CMake export list HPXTargets
-* ``INSTALL``: Generates a install rule for the target
-* ``PLUGIN``: Treat this component as a plugin-able library
+* ``INSTALL``: Generates an install rule for the target
+* ``PLUGIN``: Treats this component as a plugin-able library
 * ``TYPE``: The type can be: EXECUTABLE, LIBRARY or COMPONENT
 * ``DEPENDENCIES``: Other libraries or targets this component depends on
 * ``COMPONENT_DEPENDENCIES``: The components this component depends on
@@ -328,15 +328,15 @@ Optional parameters are:
    * ``SOVERSION``
    * ``VERSION``
 
-If you do not use CMake, you can still build against |hpx| but you should refer
+If you do not use CMake, you can still build against |hpx|, but you should refer
 to the section on :ref:`comps`.
 
 .. note::
 
    Since |hpx| relies on dynamic libraries, the dynamic linker needs to know
-   where to look for them. If |hpx| isn't installed into a path which is
+   where to look for them. If |hpx| isn't installed into a path that is
    configured as a linker search path, external projects need to either set
-   ``RPATH`` or adapt ``LD_LIBRARY_PATH`` to point to where the hpx libraries
+   ``RPATH`` or adapt ``LD_LIBRARY_PATH`` to point to where the |hpx| libraries
    reside. In order to set ``RPATH``\ s, you can include ``HPX_SetFullRPATH`` in
    your project after all libraries you want to link against have been added.
    Please also consult the CMake documentation `here
@@ -344,7 +344,7 @@ to the section on :ref:`comps`.
 
 .. _makefile:
 
-Using HPX with Makefile
+Using |hpx| with Makefile
 =======================
 
 A basic project building with |hpx| is through creating makefiles. The process
@@ -355,7 +355,7 @@ How to build |hpx| applications with makefile
 ---------------------------------------------
 
 If |hpx| is installed correctly, you should be able to build and run a simple
-hello world program. It prints ``Hello World!`` on the :term:`locality` you
+Hello World program. It prints ``Hello World!`` on the :term:`locality` you
 run it on.
 
 .. literalinclude:: ../../examples/quickstart/hello_world_1.cpp
@@ -363,7 +363,7 @@ run it on.
 
 Copy the content of this program into a file called hello_world.cpp.
 
-Now in the directory where you put hello_world.cpp, create a Makefile.
+Now, in the directory where you put hello_world.cpp, create a Makefile.
 Add the following code:
 
 .. code-block:: makefile
@@ -392,8 +392,8 @@ Add the following code:
 .. important::
 
    ``LINK_FLAGS`` should be left empty if HPX_WITH_HPX_MAIN is set to OFF.
-   Boost in the above example is build with ``--layout=tagged``. Actual boost
-   flags may vary on your build of boost.
+   Boost in the above example is build with ``--layout=tagged``. Actual Boost
+   flags may vary on your build of Boost.
 
 To build the program, type:
 
@@ -411,8 +411,8 @@ How to build |hpx| components with makefile
 -------------------------------------------
 
 Let's try a more complex example involving an |hpx| component. An |hpx|
-component is a class which exposes |hpx| actions. |hpx| components are compiled
-into dynamically loaded modules called component libraries. Here's the source
+component is a class that exposes |hpx| actions. |hpx| components are compiled
+into dynamically-loaded modules called component libraries. Here's the source
 code:
 
 **hello_world_component.cpp**
@@ -432,7 +432,7 @@ code:
 .. literalinclude:: ../../examples/hello_world_component/hello_world_client.cpp
    :language: c++
 
-Now in the directory, create a Makefile. Add the following code:
+Now, in the directory, create a Makefile. Add the following code:
 
 .. code-block:: makefile
 
@@ -482,4 +482,4 @@ A successfull build should result in hello_world binary. To test, type:
    or CMakeLists.txt. Writing Makefile may result in broken builds if
    due care is not taken.
    pkg-config files and CMake systems are configured with CMake build of
-   |hpx|. Hence, they are stable and provides with better support overall.
+   |hpx|. Hence, they are stable when used together and provide better support overall.
