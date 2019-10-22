@@ -241,6 +241,9 @@ namespace hpx { namespace threads { namespace policies {
             case thread_stacksize_huge:
                 return thread_queue_init_.huge_stacksize_;
 
+            case thread_stacksize_nostack:
+                return (std::numeric_limits<std::ptrdiff_t>::max)();
+
             case thread_stacksize_current:
                 return get_self_stacksize();
                 break;
