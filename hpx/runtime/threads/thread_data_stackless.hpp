@@ -57,8 +57,7 @@ namespace hpx { namespace threads {
         static util::internal_allocator<thread_data_stackless> thread_alloc_;
 
     public:
-        stackless_coroutine_type::result_type call(
-            hpx::basic_execution::this_thread::detail::agent_storage*)
+        stackless_coroutine_type::result_type call()
         {
             HPX_ASSERT(get_state().state() == active);
             HPX_ASSERT(this == coroutine_.get_thread_id().get());
@@ -74,7 +73,7 @@ namespace hpx { namespace threads {
         }
 #endif
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-        std::size_t get_thread_phase() const override
+        std::size_t get_thread_phase() const noexcept override
         {
             return coroutine_.get_thread_phase();
         }

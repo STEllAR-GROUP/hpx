@@ -77,7 +77,7 @@ namespace hpx { namespace threads {
         }
 #endif
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-        std::size_t get_thread_phase() const override
+        std::size_t get_thread_phase() const noexcept override
         {
             return coroutine_.get_thread_phase();
         }
