@@ -11,6 +11,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(coroutines_headers
   hpx/coroutines/coroutine.hpp
   hpx/coroutines/coroutine_fwd.hpp
+  hpx/coroutines/stackless_coroutine.hpp
   hpx/coroutines/detail/combined_tagged_state.hpp
   hpx/coroutines/detail/context_base.hpp
   hpx/coroutines/detail/context_generic_context.hpp
