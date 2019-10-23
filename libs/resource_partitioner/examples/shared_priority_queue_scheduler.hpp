@@ -1385,8 +1385,8 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                     count += np_queues_[d].get_thread_count(state);
                     count += lp_queues_[d].get_thread_count(state);
                 }
-                //                    LOG_CUSTOM_MSG("default get_thread_count thread_num "
-                //                        << decnumber(thread_num) << decnumber(count));
+                // LOG_CUSTOM_MSG("default get_thread_count thread_num "
+                // << decnumber(thread_num) << decnumber(count));
                 return count;
             }
             case thread_priority_low:
