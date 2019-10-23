@@ -45,8 +45,9 @@ if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
   set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono thread)
 endif()
 
-# Boost.System is header-only from 1.69 onwards.
-if(Boost_VERSION_STRING VERSION_LESS 1.69)
+# Boost.System is header-only from 1.69 onwards. But filesystem is needed the
+# libboost_system.so library in Boost 1.69 so can't link only to filesystem
+if(Boost_VERSION_STRING VERSION_LESS 1.70)
   set(__boost_libraries ${__boost_libraries} system)
 endif()
 
