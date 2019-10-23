@@ -8,36 +8,36 @@ include(HPX_Message)
 include(HPX_Option)
 
 if (NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
-  hpx_set_option(HPX_THREAD_MANAGER_WITH_TESTS VALUE OFF FORCE)
+  hpx_set_option(HPX_THREADMANAGER_WITH_TESTS VALUE OFF FORCE)
   return()
 endif()
-if (NOT HPX_THREAD_MANAGER_WITH_TESTS)
-  hpx_info("    Tests for thread_manager disabled")
+if (NOT HPX_THREADMANAGER_WITH_TESTS)
+  hpx_info("    Tests for threadmanager disabled")
   return()
 endif()
 
 if (HPX_WITH_TESTS_UNIT)
-  add_hpx_pseudo_target(tests.unit.modules.thread_manager)
-  add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.thread_manager)
+  add_hpx_pseudo_target(tests.unit.modules.threadmanager)
+  add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.threadmanager)
   add_subdirectory(unit)
 endif()
 
 if (HPX_WITH_TESTS_REGRESSIONS)
-  add_hpx_pseudo_target(tests.regressions.modules.thread_manager)
-  add_hpx_pseudo_dependencies(tests.regressions.modules tests.regressions.modules.thread_manager)
+  add_hpx_pseudo_target(tests.regressions.modules.threadmanager)
+  add_hpx_pseudo_dependencies(tests.regressions.modules tests.regressions.modules.threadmanager)
   add_subdirectory(regressions)
 endif()
 
 if (HPX_WITH_TESTS_BENCHMARKS)
-  add_hpx_pseudo_target(tests.performance.modules.thread_manager)
-  add_hpx_pseudo_dependencies(tests.performance.modules tests.performance.modules.thread_manager)
+  add_hpx_pseudo_target(tests.performance.modules.threadmanager)
+  add_hpx_pseudo_dependencies(tests.performance.modules tests.performance.modules.threadmanager)
   add_subdirectory(performance)
 endif()
 
 if (HPX_WITH_TESTS_HEADERS)
   add_hpx_header_tests(
-    modules.thread_manager
-    HEADERS ${thread_manager_headers}
+    modules.threadmanager
+    HEADERS ${threadmanager_headers}
     HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-    DEPENDENCIES hpx_thread_manager)
+    DEPENDENCIES hpx_threadmanager)
 endif()
