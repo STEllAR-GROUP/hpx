@@ -39,6 +39,5 @@ if (HPX_WITH_TESTS_HEADERS)
     modules.thread_manager
     HEADERS ${thread_manager_headers}
     HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-    NOLIBS
     DEPENDENCIES hpx_thread_manager)
 endif()
