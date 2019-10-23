@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies {
@@ -51,6 +52,7 @@ namespace hpx { namespace threads { namespace policies {
           , medium_stacksize_(medium_stacksize)
           , large_stacksize_(large_stacksize)
           , huge_stacksize_(huge_stacksize)
+          , nostack_stacksize_((std::numeric_limits<std::ptrdiff_t>::max)())
         {
         }
 
@@ -63,10 +65,11 @@ namespace hpx { namespace threads { namespace policies {
         std::int64_t max_delete_count_;
         std::int64_t max_terminated_threads_;
         double max_idle_backoff_time_;
-        std::ptrdiff_t small_stacksize_;
-        std::ptrdiff_t medium_stacksize_;
-        std::ptrdiff_t large_stacksize_;
-        std::ptrdiff_t huge_stacksize_;
+        std::ptrdiff_t const small_stacksize_;
+        std::ptrdiff_t const medium_stacksize_;
+        std::ptrdiff_t const large_stacksize_;
+        std::ptrdiff_t const huge_stacksize_;
+        std::ptrdiff_t const nostack_stacksize_;
     };
 }}}    // namespace hpx::threads::policies
 

@@ -16,6 +16,7 @@
 # include <hpx/runtime/threads/scoped_background_timer.hpp>
 #endif
 #include <hpx/state.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>

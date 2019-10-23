@@ -84,14 +84,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     };
 
     /////////////////////////////////////////////////////////////////////////////
-    std::ptrdiff_t const default_stack_size = -1;
+    HPX_CONSTEXPR std::ptrdiff_t const default_stack_size = -1;
 
     template <typename CoroutineImpl>
     class context_base : public default_context_impl<CoroutineImpl>
     {
     public:
-        typedef void deleter_type(context_base const*);
-        typedef hpx::threads::thread_id thread_id_type;
+        using deleter_type = void(context_base const*);
+        using thread_id_type = hpx::threads::thread_id;
 
         context_base(std::ptrdiff_t stack_size, thread_id_type id)
           : default_context_impl<CoroutineImpl>(stack_size)

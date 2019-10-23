@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2018 Hartmut Kaiser
+# Copyright (c) 2015-2019 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,6 +16,8 @@ set(exclude_from_headers
   "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/timed_execution_fwd.hpp"
   "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/parallel_executor.hpp"
   "${PROJECT_SOURCE_DIR}/hpx/lcos/local/futures_factory.hpp"
+  "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_stackful.hpp"
+  "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_stackless.hpp"
 )
 
 # If we compile with the MPI parcelport enabled, we need to additionally

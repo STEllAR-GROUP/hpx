@@ -53,14 +53,14 @@ namespace hpx { namespace threads { namespace coroutines {
     public:
         friend struct detail::coroutine_accessor;
 
-        typedef detail::coroutine_impl impl_type;
-        typedef impl_type::thread_id_type thread_id_type;
+        using impl_type = detail::coroutine_impl;
+        using thread_id_type = impl_type::thread_id_type;
 
-        typedef impl_type::result_type result_type;
-        typedef impl_type::arg_type arg_type;
+        using result_type = impl_type::result_type;
+        using arg_type = impl_type::arg_type;
 
-        typedef util::unique_function_nonser<result_type(arg_type)>
-            functor_type;
+        using functor_type =
+            util::unique_function_nonser<result_type(arg_type)>;
 
         coroutine(functor_type&& f, thread_id_type id,
             std::ptrdiff_t stack_size = detail::default_stack_size)

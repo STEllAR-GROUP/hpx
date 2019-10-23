@@ -10,13 +10,13 @@
 #define HPX_RUNTIME_THREADS_THREAD_DATA_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/get_locality_id.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/errors.hpp>
 
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/spinlock_pool.hpp>
@@ -40,30 +40,10 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads
-{
-    namespace detail
-    {
-        ///////////////////////////////////////////////////////////////////////
-        struct thread_exit_callback_node
-        {
-            util::function_nonser<void()> f_;
-            thread_exit_callback_node* next_;
+////////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace threads {
 
-            thread_exit_callback_node(util::function_nonser<void()> const& f,
-                    thread_exit_callback_node* next)
-              : f_(f), next_(next)
-            {}
-
-            void operator()()
-            {
-                f_();
-            }
-        };
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     /// A \a thread is the representation of a ParalleX thread. It's a first
     /// class object in ParalleX. In our implementation this is a user level
     /// thread running on top of one of the OS threads spawned by the \a
@@ -83,25 +63,16 @@ namespace hpx { namespace threads
     class HPX_EXPORT thread_data
     {
     public:
-        HPX_NON_COPYABLE(thread_data);
-
-    private:
-        // Avoid warning about using 'this' in initializer list
-        thread_data* this_() { return this; }
+        thread_data(thread_data const&) = delete;
+        thread_data(thread_data&&) = delete;
+        thread_data& operator=(thread_data const&) = delete;
+        thread_data& operator=(thread_data&&) = delete;
 
     public:
-        typedef thread_function_type function_type;
-
-        struct tag {};
-        typedef util::spinlock_pool<tag> mutex_type;
-
-        ~thread_data()
+        struct tag
         {
-            free_thread_exit_callbacks();
-            LTM_(debug) << "~thread(" << this << "), description(" //-V128
-                        << get_description() << "), phase("
-                        << get_thread_phase() << ")";
-        }
+        };
+        using mutex_type = util::spinlock_pool<tag>;
 
         /// The get_state function queries the state of this thread instance.
         ///
@@ -137,7 +108,8 @@ namespace hpx { namespace threads
         {
             thread_state prev_state = current_state_.load(load_order);
 
-            for (;;) {
+            for (;;)
+            {
                 thread_state tmp = prev_state;
 
                 // ABA prevention for state only (not for state_ex)
@@ -165,8 +137,8 @@ namespace hpx { namespace threads
             thread_state tmp = prev_state;
             thread_state_ex_enum state_ex = tmp.state_ex();
 
-            new_tagged_state = thread_state(newstate, state_ex,
-                prev_state.tag() + 1);
+            new_tagged_state =
+                thread_state(newstate, state_ex, prev_state.tag() + 1);
 
             if (!current_state_.compare_exchange_strong(
                     tmp, new_tagged_state, exchange_order))
@@ -232,7 +204,7 @@ namespace hpx { namespace threads
                 thread_state(new_state, state_ex, tag), load_exchange);
         }
 
-    private:
+    protected:
         /// The set_state function changes the extended state of this
         /// thread instance.
         ///
@@ -247,11 +219,12 @@ namespace hpx { namespace threads
             thread_state prev_state =
                 current_state_.load(std::memory_order_acquire);
 
-            for (;;) {
+            for (;;)
+            {
                 thread_state tmp = prev_state;
 
-                if (HPX_LIKELY(current_state_.compare_exchange_strong(tmp,
-                        thread_state(tmp.state(), new_state, tmp.tag()))))
+                if (HPX_LIKELY(current_state_.compare_exchange_strong(
+                        tmp, thread_state(tmp.state(), new_state, tmp.tag()))))
                 {
                     return prev_state.state_ex();
                 }
@@ -272,7 +245,8 @@ namespace hpx { namespace threads
         {
             return util::thread_description("<unknown>");
         }
-        util::thread_description set_description(util::thread_description /*value*/)
+        util::thread_description set_description(
+            util::thread_description /*value*/)
         {
             return util::thread_description("<unknown>");
         }
@@ -281,7 +255,8 @@ namespace hpx { namespace threads
         {
             return util::thread_description("<unknown>");
         }
-        util::thread_description set_lco_description(util::thread_description /*value*/)
+        util::thread_description set_lco_description(
+            util::thread_description /*value*/)
         {
             return util::thread_description("<unknown>");
         }
@@ -363,7 +338,7 @@ namespace hpx { namespace threads
 
 #ifndef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 
-# ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
         char const* get_backtrace() const
         {
             return nullptr;
@@ -372,7 +347,7 @@ namespace hpx { namespace threads
         {
             return nullptr;
         }
-# else
+#else
         util::backtrace const* get_backtrace() const
         {
             return nullptr;
@@ -381,11 +356,11 @@ namespace hpx { namespace threads
         {
             return nullptr;
         }
-# endif
+#endif
 
-#else  // defined(HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
+#else    // defined(HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 
-# ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
         char const* get_backtrace() const
         {
             mutex_type::scoped_lock l(this);
@@ -399,7 +374,7 @@ namespace hpx { namespace threads
             backtrace_ = value;
             return bt;
         }
-# else
+#else
         util::backtrace const* get_backtrace() const
         {
             mutex_type::scoped_lock l(this);
@@ -413,7 +388,7 @@ namespace hpx { namespace threads
             backtrace_ = value;
             return bt;
         }
-# endif
+#endif
 
         // Generate full backtrace for captured stack
         std::string backtrace()
@@ -422,7 +397,7 @@ namespace hpx { namespace threads
             std::string bt;
             if (0 != backtrace_)
             {
-# ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
                 bt = *backtrace_;
 #else
                 bt = backtrace_->trace();
@@ -464,7 +439,8 @@ namespace hpx { namespace threads
         void interrupt(bool flag = true)
         {
             mutex_type::scoped_lock l(this);
-            if (flag && !enabled_interrupt_) {
+            if (flag && !enabled_interrupt_)
+            {
                 l.unlock();
                 HPX_THROW_EXCEPTION(thread_not_interruptable,
                     "thread_data::interrupt",
@@ -493,7 +469,7 @@ namespace hpx { namespace threads
         template <typename ThreadQueue>
         ThreadQueue& get_queue()
         {
-            return *static_cast<ThreadQueue *>(queue_);
+            return *static_cast<ThreadQueue*>(queue_);
         }
 
         /// \brief Execute the thread function
@@ -502,36 +478,26 @@ namespace hpx { namespace threads
         ///                 should be scheduled from this point on. The thread
         ///                 manager will use the returned value to set the
         ///                 thread's scheduling status.
-        coroutine_type::result_type operator()()
+        inline coroutine_type::result_type operator()();
+
+        virtual thread_id_type get_thread_id() const
         {
-            HPX_ASSERT(this == coroutine_.get_thread_id().get());
-            return coroutine_(set_state_ex(wait_signaled));
+            return thread_id_type{const_cast<thread_data*>(this)};
         }
 
-        thread_id_type get_thread_id() const
+#if !defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
+        virtual std::size_t get_thread_phase() const
         {
-            HPX_ASSERT(this == coroutine_.get_thread_id().get());
-            return coroutine_.get_thread_id();
-        }
-
-        std::size_t get_thread_phase() const
-        {
-#ifndef HPX_HAVE_THREAD_PHASE_INFORMATION
             return 0;
+        }
 #else
-            return coroutine_.get_thread_phase();
+        virtual std::size_t get_thread_phase() const = 0;
 #endif
-        }
+        virtual std::size_t get_thread_data() const = 0;
+        virtual std::size_t set_thread_data(std::size_t data) = 0;
 
-        std::size_t get_thread_data() const
-        {
-            return coroutine_.get_thread_data();
-        }
-
-        std::size_t set_thread_data(std::size_t data)
-        {
-            return coroutine_.set_thread_data(data);
-        }
+        virtual void rebind(
+            thread_init_data& init_data, thread_state_enum newstate) = 0;
 
 #if defined(HPX_HAVE_APEX)
         apex_task_wrapper get_apex_data() const
@@ -544,130 +510,18 @@ namespace hpx { namespace threads
         }
 #endif
 
-        void rebind(thread_init_data& init_data,
-            thread_state_enum newstate)
-        {
-            LTM_(debug) << "~thread(" << this << "), description(" //-V128
-                        << get_description() << "), phase("
-                        << get_thread_phase() << "), rebind";
+        // Construct a new \a thread
+        thread_data(thread_init_data& init_data, void* queue,
+            thread_state_enum newstate, bool  is_stackless = false);
 
-            rebind_base(init_data, newstate);
+        virtual ~thread_data();
+        virtual void destroy() = 0;
 
-            coroutine_.rebind(std::move(init_data.func), thread_id_type(this));
-
-            HPX_ASSERT(init_data.stacksize != 0);
-            HPX_ASSERT(coroutine_.is_ready());
-        }
-
-        /// This function will be called when the thread is about to be deleted
-        //virtual void reset() {}
-
-        /// Construct a new \a thread
-        thread_data(thread_init_data& init_data,
-            void* queue, thread_state_enum newstate)
-          : current_state_(thread_state(newstate, wait_signaled)),
-#ifdef HPX_HAVE_THREAD_DESCRIPTION
-            description_(init_data.description),
-            lco_description_(),
-#endif
-#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
-            parent_locality_id_(init_data.parent_locality_id),
-            parent_thread_id_(init_data.parent_id),
-            parent_thread_phase_(init_data.parent_phase),
-#endif
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-            marked_state_(unknown),
-#endif
-#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-            backtrace_(nullptr),
-#endif
-            priority_(init_data.priority),
-            requested_interrupt_(false),
-            enabled_interrupt_(true),
-            ran_exit_funcs_(false),
-            scheduler_base_(init_data.scheduler_base),
-            stacksize_(init_data.stacksize),
-            coroutine_(std::move(init_data.func),
-                thread_id_type(this_()), init_data.stacksize),
-            queue_(queue)
-        {
-            LTM_(debug) << "thread::thread(" << this << "), description("
-                        << get_description() << ")";
-
-#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
-            // store the thread id of the parent thread, mainly for debugging
-            // purposes
-            if (parent_thread_id_) {
-                thread_self* self = get_self_ptr();
-                if (self)
-                {
-                    parent_thread_id_ = threads::get_self_id();
-                    parent_thread_phase_ = self->get_thread_phase();
-                }
-            }
-            if (0 == parent_locality_id_)
-                parent_locality_id_ = get_locality_id();
-#endif
-#if defined(HPX_HAVE_APEX)
-            set_apex_data(init_data.apex_data);
-#endif
-            HPX_ASSERT(init_data.stacksize != 0);
-            HPX_ASSERT(coroutine_.is_ready());
-        }
+    protected:
+        void rebind_base(
+            thread_init_data& init_data, thread_state_enum newstate);
 
     private:
-        void rebind_base(thread_init_data& init_data, thread_state_enum newstate)
-        {
-            free_thread_exit_callbacks();
-
-            current_state_.store(thread_state(newstate, wait_signaled));
-
-#ifdef HPX_HAVE_THREAD_DESCRIPTION
-            description_ = (init_data.description);
-            lco_description_ = util::thread_description();
-#endif
-#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
-            parent_locality_id_ = init_data.parent_locality_id;
-            parent_thread_id_ = init_data.parent_id;
-            parent_thread_phase_ = init_data.parent_phase;
-#endif
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-            set_marked_state(unknown);
-#endif
-#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-            backtrace_ = nullptr;
-#endif
-            priority_ = init_data.priority;
-            requested_interrupt_ = false;
-            enabled_interrupt_ = true;
-            ran_exit_funcs_ = false;
-            exit_funcs_.clear();
-            scheduler_base_ = init_data.scheduler_base;
-
-            HPX_ASSERT(init_data.stacksize == get_stack_size());
-
-            LTM_(debug) << "thread::thread(" << this << "), description("
-                        << get_description() << "), rebind";
-
-#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
-            // store the thread id of the parent thread, mainly for debugging
-            // purposes
-            if (nullptr == parent_thread_id_) {
-                thread_self* self = get_self_ptr();
-                if (self)
-                {
-                    parent_thread_id_ = threads::get_self_id();
-                    parent_thread_phase_ = self->get_thread_phase();
-                }
-            }
-            if (0 == parent_locality_id_)
-                parent_locality_id_ = get_locality_id();
-#endif
-#if defined(HPX_HAVE_APEX)
-            set_apex_data(init_data.apex_data);
-#endif
-        }
-
         mutable std::atomic<thread_state> current_state_;
 
         ///////////////////////////////////////////////////////////////////////
@@ -688,13 +542,12 @@ namespace hpx { namespace threads
 #endif
 
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-# ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
         char const* backtrace_;
-# else
+#else
         util::backtrace const* backtrace_;
-# endif
 #endif
-
+#endif
         ///////////////////////////////////////////////////////////////////////
         thread_priority priority_;
 
@@ -703,26 +556,40 @@ namespace hpx { namespace threads
         bool ran_exit_funcs_;
 
         // Singly linked list (heap-allocated)
-        std::forward_list<util::function_nonser<void()> > exit_funcs_;
+        std::forward_list<util::function_nonser<void()>> exit_funcs_;
 
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
 
         std::ptrdiff_t stacksize_;
 
-        coroutine_type coroutine_;
         void* queue_;
 #if defined(HPX_HAVE_APEX)
         apex_task_wrapper apex_data_;
 #endif
+        bool is_stackless_;
     };
 
     HPX_CONSTEXPR thread_data* get_thread_id_data(thread_id_type const& tid)
     {
         return static_cast<thread_data*>(tid.get());
     }
-}}
+}}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#include <hpx/runtime/threads/thread_data_stackful.hpp>
+#include <hpx/runtime/threads/thread_data_stackless.hpp>
+
+namespace hpx { namespace threads {
+
+    inline coroutine_type::result_type thread_data::operator()()
+    {
+        if (is_stackless_)
+        {
+            return static_cast<thread_data_stackless*>(this)->call();
+        }
+        return static_cast<thread_data_stackful*>(this)->call();
+    }
+}}
 #endif /*HPX_RUNTIME_THREADS_THREAD_DATA_HPP*/
