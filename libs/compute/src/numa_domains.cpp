@@ -8,9 +8,9 @@
 
 #include <hpx/compute/host/numa_domains.hpp>
 #include <hpx/compute/host/target.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 
