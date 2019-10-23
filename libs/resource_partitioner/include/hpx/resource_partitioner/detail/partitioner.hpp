@@ -8,17 +8,17 @@
 #define HPX_DETAIL_RESOURCE_PARTITIONER_AUG_10_2017_0926AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/program_options.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/topology/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/program_options.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -26,8 +26,7 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace resource { namespace detail
-{
+namespace hpx { namespace resource { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     // structure used to encapsulate all characteristics of thread_pools
     // as specified by the user in int main()
@@ -35,8 +34,8 @@ namespace hpx { namespace resource { namespace detail
     {
     public:
         // mechanism for adding resources (zero-based index)
-        void add_resource(std::size_t pu_index, bool exclusive,
-            std::size_t num_threads);
+        void add_resource(
+            std::size_t pu_index, bool exclusive, std::size_t num_threads);
 
         void print_pool(std::ostream&) const;
 
@@ -64,7 +63,7 @@ namespace hpx { namespace resource { namespace detail
         scheduling_policy scheduling_policy_;
 
         // PUs this pool is allowed to run on
-        std::vector<threads::mask_type> assigned_pus_;  // mask
+        std::vector<threads::mask_type> assigned_pus_;    // mask
 
         // pu index/exclusive/assigned
         std::vector<util::tuple<std::size_t, bool, bool>> assigned_pu_nums_;
@@ -94,8 +93,8 @@ namespace hpx { namespace resource { namespace detail
 
         // create a thread_pool with a callback function for creating a custom
         // scheduler
-        void create_thread_pool(std::string const& name,
-            scheduler_function scheduler_creation);
+        void create_thread_pool(
+            std::string const& name, scheduler_function scheduler_creation);
 
         // Functions to add processing units to thread pools via
         // the pu/core/numa_domain API
@@ -119,7 +118,8 @@ namespace hpx { namespace resource { namespace detail
             std::string const& pool_name, bool exclusive = true);
 
         // called by constructor of scheduler_base
-        threads::policies::detail::affinity_data const& get_affinity_data() const
+        threads::policies::detail::affinity_data const& get_affinity_data()
+            const
         {
             return affinity_data_;
         }
@@ -132,15 +132,16 @@ namespace hpx { namespace resource { namespace detail
         // by the user at startup.
         // This should not be called before the RP has parsed the config and
         // assigned affinity data
-        std::size_t threads_needed() {
+        std::size_t threads_needed()
+        {
             HPX_ASSERT(pus_needed_ != std::size_t(-1));
             return pus_needed_;
         }
 
         ////////////////////////////////////////////////////////////////////////
         scheduling_policy which_scheduler(std::string const& pool_name);
-        threads::topology &get_topology() const;
-        util::command_line_handling &get_command_line_switches();
+        threads::topology& get_topology() const;
+        util::command_line_handling& get_command_line_switches();
 
         std::size_t get_num_distinct_pus() const;
 
@@ -150,24 +151,23 @@ namespace hpx { namespace resource { namespace detail
         std::size_t get_num_threads(std::string const& pool_name) const;
         std::size_t get_num_threads(std::size_t pool_index) const;
 
-        hpx::threads::policies::scheduler_mode
-        get_scheduler_mode(std::size_t pool_index) const;
+        hpx::threads::policies::scheduler_mode get_scheduler_mode(
+            std::size_t pool_index) const;
 
         std::string const& get_pool_name(std::size_t index) const;
         std::size_t get_pool_index(std::string const& pool_name) const;
 
         std::size_t get_pu_num(std::size_t global_thread_num);
-        threads::mask_cref_type get_pu_mask(std::size_t global_thread_num) const;
+        threads::mask_cref_type get_pu_mask(
+            std::size_t global_thread_num) const;
 
         bool cmd_line_parsed() const;
-        int parse(
-            util::function_nonser<
-                int(hpx::program_options::variables_map& vm)
-            > const& f,
-            hpx::program_options::options_description desc_cmdline,
-            int argc, char **argv, std::vector<std::string> ini_config,
-            resource::partitioner_mode rpmode,
-            runtime_mode mode, bool fill_internal_topology = true);
+        int parse(util::function_nonser<int(
+                      hpx::program_options::variables_map& vm)> const& f,
+            hpx::program_options::options_description desc_cmdline, int argc,
+            char** argv, std::vector<std::string> ini_config,
+            resource::partitioner_mode rpmode, runtime_mode mode,
+            bool fill_internal_topology = true);
 
         scheduler_function get_pool_creator(size_t index) const;
 
@@ -192,11 +192,13 @@ namespace hpx { namespace resource { namespace detail
         std::size_t expand_pool(std::string const& pool_name,
             util::function_nonser<void(std::size_t)> const& add_pu);
 
-        void set_default_pool_name(const std::string &name) {
+        void set_default_pool_name(const std::string& name)
+        {
             initial_thread_pools_[0].pool_name_ = name;
         }
 
-        const std::string &get_default_pool_name() const {
+        const std::string& get_default_pool_name() const
+        {
             return initial_thread_pools_[0].pool_name_;
         }
 
@@ -225,7 +227,8 @@ namespace hpx { namespace resource { namespace detail
         detail::init_pool_data& get_pool_data(
             std::unique_lock<mutex_type>& l, std::string const& pool_name);
 
-        void set_scheduler(scheduling_policy sched, std::string const& pool_name);
+        void set_scheduler(
+            scheduling_policy sched, std::string const& pool_name);
 
         ////////////////////////////////////////////////////////////////////////
         // counter for instance numbers
@@ -257,6 +260,6 @@ namespace hpx { namespace resource { namespace detail
 
         threads::policies::scheduler_mode default_scheduler_mode_;
     };
-}}}
+}}}    // namespace hpx::resource::detail
 
 #endif

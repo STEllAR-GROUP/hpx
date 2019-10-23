@@ -19,8 +19,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resource
-{
+namespace hpx { namespace resource {
     ///////////////////////////////////////////////////////////////////////////
     std::vector<pu> pu::pus_sharing_core()
     {
@@ -71,8 +70,7 @@ namespace hpx { namespace resource
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         std::recursive_mutex& partitioner_mtx()
         {
             static std::recursive_mutex mtx;
@@ -102,12 +100,14 @@ namespace hpx { namespace resource
             if (part)
                 part.reset();
         }
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    struct partitioner_tag {};
+    struct partitioner_tag
+    {
+    };
 
-    detail::partitioner &get_partitioner()
+    detail::partitioner& get_partitioner()
     {
         std::unique_ptr<detail::partitioner>& rp = detail::get_partitioner();
 
@@ -137,18 +137,17 @@ namespace hpx { namespace resource
         return detail::partitioner_ref() != nullptr;
     }
 
-    namespace detail
-    {
-        detail::partitioner &create_partitioner(
-            util::function_nonser<
-                int(hpx::program_options::variables_map& vm)
-            > const& f,
+    namespace detail {
+        detail::partitioner& create_partitioner(
+            util::function_nonser<int(
+                hpx::program_options::variables_map& vm)> const& f,
             hpx::program_options::options_description const& desc_cmdline,
-            int argc, char **argv, std::vector<std::string> ini_config,
-            resource::partitioner_mode rpmode, runtime_mode mode,
-            bool check, int* result)
+            int argc, char** argv, std::vector<std::string> ini_config,
+            resource::partitioner_mode rpmode, runtime_mode mode, bool check,
+            int* result)
         {
-            std::unique_ptr<detail::partitioner>& rp = detail::get_partitioner();
+            std::unique_ptr<detail::partitioner>& rp =
+                detail::get_partitioner();
 
             if (rp->cmd_line_parsed())
             {
@@ -181,7 +180,7 @@ namespace hpx { namespace resource
             }
             return *rp;
         }
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     void partitioner::create_thread_pool(std::string const& name,
@@ -202,7 +201,8 @@ namespace hpx { namespace resource
         partitioner_.set_default_pool_name(name);
     }
 
-    const std::string & partitioner::get_default_pool_name() const {
+    const std::string& partitioner::get_default_pool_name() const
+    {
         return partitioner_.get_default_pool_name();
     }
 
@@ -247,7 +247,7 @@ namespace hpx { namespace resource
         return partitioner_.numa_domains();
     }
 
-    hpx::threads::topology const &partitioner::get_topology() const
+    hpx::threads::topology const& partitioner::get_topology() const
     {
         return partitioner_.get_topology();
     }
@@ -257,4 +257,4 @@ namespace hpx { namespace resource
         return partitioner_.threads_needed();
     }
 
-}}    // namespace hpx
+}}    // namespace hpx::resource

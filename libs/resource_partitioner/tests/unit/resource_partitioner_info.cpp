@@ -45,9 +45,7 @@ int hpx_main(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg = {
-        "hpx.os_threads=4"
-    };
+    std::vector<std::string> cfg = {"hpx.os_threads=4"};
 
     // set up the resource partitioner
     hpx::resource::partitioner rp(argc, argv, std::move(cfg));

@@ -12,9 +12,9 @@
 #include <hpx/parallel/execution.hpp>
 //
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/topology/cpu_mask.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 //
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/runtime.hpp>
@@ -194,18 +194,16 @@ int hpx_main(hpx::program_options::variables_map& vm)
               << std::endl;
     thread_set.clear();
 
-//     auto high_priority_async_policy =
-//         hpx::launch::async_policy(hpx::threads::thread_priority_critical);
-//     auto normal_priority_async_policy = hpx::launch::async_policy();
+    //     auto high_priority_async_policy =
+    //         hpx::launch::async_policy(hpx::threads::thread_priority_critical);
+    //     auto normal_priority_async_policy = hpx::launch::async_policy();
 
     // test a parallel algorithm on custom pool with high priority
     hpx::parallel::for_loop_strided(
         hpx::parallel::execution::par
             .with(fixed /*, high_priority_async_policy*/)
             .on(mpi_executor),
-        0, loop_count, 1,
-        [&](std::size_t i)
-        {
+        0, loop_count, 1, [&](std::size_t i) {
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
@@ -229,13 +227,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     hpx::program_options::options_description desc_cmdline("Test options");
-    desc_cmdline.add_options()
-        ( "use-pools,u", "Enable advanced HPX thread pools and executors")
-        ( "use-scheduler,s", "Enable custom priority scheduler")
-        ( "pool-threads,m",
-          hpx::program_options::value<int>()->default_value(1),
-          "Number of threads to assign to custom pool")
-    ;
+    desc_cmdline.add_options()(
+        "use-pools,u", "Enable advanced HPX thread pools and executors")(
+        "use-scheduler,s", "Enable custom priority scheduler")("pool-threads,m",
+        hpx::program_options::value<int>()->default_value(1),
+        "Number of threads to assign to custom pool");
 
     // HPX uses a boost program options variable map, but we need it before
     // hpx-main, so we will create another one here and throw it away after use

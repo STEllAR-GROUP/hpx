@@ -9,16 +9,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/errors/throw_exception.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/topology/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
-#include <hpx/errors/throw_exception.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/util_fwd.hpp>
 
 #if !defined(HPX_MSVC)
@@ -33,9 +33,9 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <numeric>
 #include <sstream>
+#include <string>
 #include <type_traits>
 #include <vector>
 
@@ -93,8 +93,7 @@ static std::chrono::high_resolution_clock::time_point log_t_start =
     "\"" << data.description.get_description() << "\" "                        \
          << hexpointer(thrd ? thrd->get() : 0)
 #else
-#define THREAD_DESC2(data, thrd)                                               \
-    hexpointer(thrd ? thrd : 0)
+#define THREAD_DESC2(data, thrd) hexpointer(thrd ? thrd : 0)
 #endif
 
 #else
@@ -114,43 +113,52 @@ static std::chrono::high_resolution_clock::time_point log_t_start =
 //
 namespace hpx { namespace debug {
 #ifdef SHARED_PRIORITY_SCHEDULER_MINIMAL_DEBUG
-    template<typename T>
-    void output(const std::string &name, const std::vector<T> &v) {
+    template <typename T>
+    void output(const std::string& name, const std::vector<T>& v)
+    {
         std::cout << name.c_str() << "\t : {" << decnumber(v.size()) << "} : ";
-        std::copy(std::begin(v), std::end(v), std::ostream_iterator<T>(std::cout, ", "));
+        std::copy(std::begin(v), std::end(v),
+            std::ostream_iterator<T>(std::cout, ", "));
         std::cout << "\n";
     }
 
-    template<typename T, std::size_t N>
-    void output(const std::string &name, const std::array<T, N> &v) {
+    template <typename T, std::size_t N>
+    void output(const std::string& name, const std::array<T, N>& v)
+    {
         std::cout << name.c_str() << "\t : {" << decnumber(v.size()) << "} : ";
-        std::copy(std::begin(v), std::end(v), std::ostream_iterator<T>(std::cout, ", "));
+        std::copy(std::begin(v), std::end(v),
+            std::ostream_iterator<T>(std::cout, ", "));
         std::cout << "\n";
     }
 
-    template<typename Iter>
-    void output(const std::string &name, Iter begin, Iter end) {
+    template <typename Iter>
+    void output(const std::string& name, Iter begin, Iter end)
+    {
         std::cout << name.c_str() << "\t : {"
-                  << decnumber(std::distance(begin,end)) << "} : ";
+                  << decnumber(std::distance(begin, end)) << "} : ";
         std::copy(begin, end,
-            std::ostream_iterator<typename std::iterator_traits<Iter>::
-            value_type>(std::cout, ", "));
+            std::ostream_iterator<
+                typename std::iterator_traits<Iter>::value_type>(
+                std::cout, ", "));
         std::cout << std::endl;
     }
 #else
-    template<typename T>
-    void output(const std::string &name, const std::vector<T> &v) {
+    template <typename T>
+    void output(const std::string& name, const std::vector<T>& v)
+    {
     }
 
-    template<typename T, std::size_t N>
-    void output(const std::string &name, const std::array<T, N> &v) {
+    template <typename T, std::size_t N>
+    void output(const std::string& name, const std::array<T, N>& v)
+    {
     }
 
-    template<typename Iter>
-    void output(const std::string &name, Iter begin, Iter end) {
+    template <typename Iter>
+    void output(const std::string& name, Iter begin, Iter end)
+    {
     }
 #endif
-}}
+}}    // namespace hpx::debug
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -253,7 +261,10 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                 << " - Deleting shared_priority_queue_scheduler ");
         }
 
-        bool numa_sensitive() const override { return true; }
+        bool numa_sensitive() const override
+        {
+            return true;
+        }
         virtual bool has_thread_stealing(std::size_t) const override
         {
             return true;
@@ -269,16 +280,20 @@ namespace hpx { namespace threads { namespace policies { namespace example {
         {
             std::uint64_t time = 0;
 
-            for (std::size_t d = 0; d < num_domains_; ++d) {
-                for (auto &queue : lp_queues_[d].queues_) {
+            for (std::size_t d = 0; d < num_domains_; ++d)
+            {
+                for (auto& queue : lp_queues_[d].queues_)
+                {
                     time += queue->get_creation_time(reset);
                 }
 
-                for (auto &queue : np_queues_[d].queues_) {
+                for (auto& queue : np_queues_[d].queues_)
+                {
                     time += queue->get_creation_time(reset);
                 }
 
-                for (auto &queue : hp_queues_[d].queues_) {
+                for (auto& queue : hp_queues_[d].queues_)
+                {
                     time += queue->get_creation_time(reset);
                 }
             }
@@ -290,16 +305,20 @@ namespace hpx { namespace threads { namespace policies { namespace example {
         {
             std::uint64_t time = 0;
 
-            for (std::size_t d = 0; d < num_domains_; ++d) {
-                for (auto &queue : lp_queues_[d].queues_) {
+            for (std::size_t d = 0; d < num_domains_; ++d)
+            {
+                for (auto& queue : lp_queues_[d].queues_)
+                {
                     time += queue->get_cleanup_time(reset);
                 }
 
-                for (auto &queue : np_queues_[d].queues_) {
+                for (auto& queue : np_queues_[d].queues_)
+                {
                     time += queue->get_cleanup_time(reset);
                 }
 
-                for (auto &queue : hp_queues_[d].queues_) {
+                for (auto& queue : hp_queues_[d].queues_)
+                {
                     time += queue->get_cleanup_time(reset);
                 }
             }
@@ -316,20 +335,24 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             if (num_thread == std::size_t(-1))
             {
-                for (std::size_t d = 0; d < num_domains_; ++d) {
-                    for (auto &queue : lp_queues_[d].queues_) {
-                        num_pending_misses += queue->get_num_pending_misses(
-                            reset);
+                for (std::size_t d = 0; d < num_domains_; ++d)
+                {
+                    for (auto& queue : lp_queues_[d].queues_)
+                    {
+                        num_pending_misses +=
+                            queue->get_num_pending_misses(reset);
                     }
 
-                    for (auto &queue : np_queues_[d].queues_) {
-                        num_pending_misses += queue->get_num_pending_misses(
-                            reset);
+                    for (auto& queue : np_queues_[d].queues_)
+                    {
+                        num_pending_misses +=
+                            queue->get_num_pending_misses(reset);
                     }
 
-                    for (auto &queue : hp_queues_[d].queues_) {
-                        num_pending_misses += queue->get_num_pending_misses(
-                            reset);
+                    for (auto& queue : hp_queues_[d].queues_)
+                    {
+                        num_pending_misses +=
+                            queue->get_num_pending_misses(reset);
                     }
                 }
 
@@ -338,17 +361,17 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             std::size_t domain_num = d_lookup_[num_thread];
 
-            num_pending_misses +=
-                lp_queues_[domain_num].queues_[lp_lookup_[num_thread]]->
-                    get_num_pending_misses(reset);
+            num_pending_misses += lp_queues_[domain_num]
+                                      .queues_[lp_lookup_[num_thread]]
+                                      ->get_num_pending_misses(reset);
 
-            num_pending_misses +=
-                np_queues_[domain_num].queues_[np_lookup_[num_thread]]->
-                    get_num_pending_misses(reset);
+            num_pending_misses += np_queues_[domain_num]
+                                      .queues_[np_lookup_[num_thread]]
+                                      ->get_num_pending_misses(reset);
 
-            num_pending_misses +=
-                hp_queues_[domain_num].queues_[hp_lookup_[num_thread]]->
-                    get_num_pending_misses(reset);
+            num_pending_misses += hp_queues_[domain_num]
+                                      .queues_[hp_lookup_[num_thread]]
+                                      ->get_num_pending_misses(reset);
 
             return num_pending_misses;
         }
@@ -360,20 +383,24 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             if (num_thread == std::size_t(-1))
             {
-                for (std::size_t d = 0; d < num_domains_; ++d) {
-                    for (auto &queue : lp_queues_[d].queues_) {
-                        num_pending_accesses += queue->get_num_pending_accesses(
-                            reset);
+                for (std::size_t d = 0; d < num_domains_; ++d)
+                {
+                    for (auto& queue : lp_queues_[d].queues_)
+                    {
+                        num_pending_accesses +=
+                            queue->get_num_pending_accesses(reset);
                     }
 
-                    for (auto &queue : np_queues_[d].queues_) {
-                        num_pending_accesses += queue->get_num_pending_accesses(
-                            reset);
+                    for (auto& queue : np_queues_[d].queues_)
+                    {
+                        num_pending_accesses +=
+                            queue->get_num_pending_accesses(reset);
                     }
 
-                    for (auto &queue : hp_queues_[d].queues_) {
-                        num_pending_accesses += queue->get_num_pending_accesses(
-                            reset);
+                    for (auto& queue : hp_queues_[d].queues_)
+                    {
+                        num_pending_accesses +=
+                            queue->get_num_pending_accesses(reset);
                     }
                 }
 
@@ -382,17 +409,17 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             std::size_t domain_num = d_lookup_[num_thread];
 
-            num_pending_accesses +=
-                lp_queues_[domain_num].queues_[lp_lookup_[num_thread]]->
-                    get_num_pending_accesses(reset);
+            num_pending_accesses += lp_queues_[domain_num]
+                                        .queues_[lp_lookup_[num_thread]]
+                                        ->get_num_pending_accesses(reset);
 
-            num_pending_accesses +=
-                np_queues_[domain_num].queues_[np_lookup_[num_thread]]->
-                    get_num_pending_accesses(reset);
+            num_pending_accesses += np_queues_[domain_num]
+                                        .queues_[np_lookup_[num_thread]]
+                                        ->get_num_pending_accesses(reset);
 
-            num_pending_accesses +=
-                hp_queues_[domain_num].queues_[hp_lookup_[num_thread]]->
-                    get_num_pending_accesses(reset);
+            num_pending_accesses += hp_queues_[domain_num]
+                                        .queues_[hp_lookup_[num_thread]]
+                                        ->get_num_pending_accesses(reset);
 
             return num_pending_accesses;
         }
@@ -404,20 +431,24 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             if (num_thread == std::size_t(-1))
             {
-                for (std::size_t d = 0; d < num_domains_; ++d) {
-                    for (auto &queue : lp_queues_[d].queues_) {
-                        num_stolen_threads += queue->get_num_stolen_from_pending(
-                            reset);
+                for (std::size_t d = 0; d < num_domains_; ++d)
+                {
+                    for (auto& queue : lp_queues_[d].queues_)
+                    {
+                        num_stolen_threads +=
+                            queue->get_num_stolen_from_pending(reset);
                     }
 
-                    for (auto &queue : np_queues_[d].queues_) {
-                        num_stolen_threads += queue->get_num_stolen_from_pending(
-                            reset);
+                    for (auto& queue : np_queues_[d].queues_)
+                    {
+                        num_stolen_threads +=
+                            queue->get_num_stolen_from_pending(reset);
                     }
 
-                    for (auto &queue : hp_queues_[d].queues_) {
-                        num_stolen_threads += queue->get_num_stolen_from_pending(
-                            reset);
+                    for (auto& queue : hp_queues_[d].queues_)
+                    {
+                        num_stolen_threads +=
+                            queue->get_num_stolen_from_pending(reset);
                     }
                 }
 
@@ -426,17 +457,17 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             std::size_t domain_num = d_lookup_[num_thread];
 
-            num_stolen_threads +=
-                lp_queues_[domain_num].queues_[lp_lookup_[num_thread]]->
-                    get_num_stolen_from_pending(reset);
+            num_stolen_threads += lp_queues_[domain_num]
+                                      .queues_[lp_lookup_[num_thread]]
+                                      ->get_num_stolen_from_pending(reset);
 
-            num_stolen_threads +=
-                np_queues_[domain_num].queues_[np_lookup_[num_thread]]->
-                    get_num_stolen_from_pending(reset);
+            num_stolen_threads += np_queues_[domain_num]
+                                      .queues_[np_lookup_[num_thread]]
+                                      ->get_num_stolen_from_pending(reset);
 
-            num_stolen_threads +=
-                hp_queues_[domain_num].queues_[hp_lookup_[num_thread]]->
-                    get_num_stolen_from_pending(reset);
+            num_stolen_threads += hp_queues_[domain_num]
+                                      .queues_[hp_lookup_[num_thread]]
+                                      ->get_num_stolen_from_pending(reset);
 
             return num_stolen_threads;
         }
@@ -448,20 +479,24 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             if (num_thread == std::size_t(-1))
             {
-                for (std::size_t d = 0; d < num_domains_; ++d) {
-                    for (auto &queue : lp_queues_[d].queues_) {
-                        num_stolen_threads += queue->get_num_stolen_to_pending(
-                            reset);
+                for (std::size_t d = 0; d < num_domains_; ++d)
+                {
+                    for (auto& queue : lp_queues_[d].queues_)
+                    {
+                        num_stolen_threads +=
+                            queue->get_num_stolen_to_pending(reset);
                     }
 
-                    for (auto &queue : np_queues_[d].queues_) {
-                        num_stolen_threads += queue->get_num_stolen_to_pending(
-                            reset);
+                    for (auto& queue : np_queues_[d].queues_)
+                    {
+                        num_stolen_threads +=
+                            queue->get_num_stolen_to_pending(reset);
                     }
 
-                    for (auto &queue : hp_queues_[d].queues_) {
-                        num_stolen_threads += queue->get_num_stolen_to_pending(
-                            reset);
+                    for (auto& queue : hp_queues_[d].queues_)
+                    {
+                        num_stolen_threads +=
+                            queue->get_num_stolen_to_pending(reset);
                     }
                 }
 
@@ -470,17 +505,17 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             std::size_t domain_num = d_lookup_[num_thread];
 
-            num_stolen_threads +=
-                lp_queues_[domain_num].queues_[lp_lookup_[num_thread]]->
-                    get_num_stolen_to_pending(reset);
+            num_stolen_threads += lp_queues_[domain_num]
+                                      .queues_[lp_lookup_[num_thread]]
+                                      ->get_num_stolen_to_pending(reset);
 
-            num_stolen_threads +=
-                np_queues_[domain_num].queues_[np_lookup_[num_thread]]->
-                    get_num_stolen_to_pending(reset);
+            num_stolen_threads += np_queues_[domain_num]
+                                      .queues_[np_lookup_[num_thread]]
+                                      ->get_num_stolen_to_pending(reset);
 
-            num_stolen_threads +=
-                hp_queues_[domain_num].queues_[hp_lookup_[num_thread]]->
-                    get_num_stolen_to_pending(reset);
+            num_stolen_threads += hp_queues_[domain_num]
+                                      .queues_[hp_lookup_[num_thread]]
+                                      ->get_num_stolen_to_pending(reset);
 
             return num_stolen_threads;
         }
@@ -492,20 +527,24 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             if (num_thread == std::size_t(-1))
             {
-                for (std::size_t d = 0; d < num_domains_; ++d) {
-                    for (auto &queue : lp_queues_[d].queues_) {
-                        num_stolen_threads += queue->get_num_stolen_from_staged(
-                            reset);
+                for (std::size_t d = 0; d < num_domains_; ++d)
+                {
+                    for (auto& queue : lp_queues_[d].queues_)
+                    {
+                        num_stolen_threads +=
+                            queue->get_num_stolen_from_staged(reset);
                     }
 
-                    for (auto &queue : np_queues_[d].queues_) {
-                        num_stolen_threads += queue->get_num_stolen_from_staged(
-                            reset);
+                    for (auto& queue : np_queues_[d].queues_)
+                    {
+                        num_stolen_threads +=
+                            queue->get_num_stolen_from_staged(reset);
                     }
 
-                    for (auto &queue : hp_queues_[d].queues_) {
-                        num_stolen_threads += queue->get_num_stolen_from_staged(
-                            reset);
+                    for (auto& queue : hp_queues_[d].queues_)
+                    {
+                        num_stolen_threads +=
+                            queue->get_num_stolen_from_staged(reset);
                     }
                 }
 
@@ -514,17 +553,17 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             std::size_t domain_num = d_lookup_[num_thread];
 
-            num_stolen_threads +=
-                lp_queues_[domain_num].queues_[lp_lookup_[num_thread]]->
-                    get_num_stolen_from_staged(reset);
+            num_stolen_threads += lp_queues_[domain_num]
+                                      .queues_[lp_lookup_[num_thread]]
+                                      ->get_num_stolen_from_staged(reset);
 
-            num_stolen_threads +=
-                np_queues_[domain_num].queues_[np_lookup_[num_thread]]->
-                    get_num_stolen_from_staged(reset);
+            num_stolen_threads += np_queues_[domain_num]
+                                      .queues_[np_lookup_[num_thread]]
+                                      ->get_num_stolen_from_staged(reset);
 
-            num_stolen_threads +=
-                hp_queues_[domain_num].queues_[hp_lookup_[num_thread]]->
-                    get_num_stolen_from_staged(reset);
+            num_stolen_threads += hp_queues_[domain_num]
+                                      .queues_[hp_lookup_[num_thread]]
+                                      ->get_num_stolen_from_staged(reset);
 
             return num_stolen_threads;
         }
@@ -536,20 +575,24 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             if (num_thread == std::size_t(-1))
             {
-                for (std::size_t d = 0; d < num_domains_; ++d) {
-                    for (auto &queue : lp_queues_[d].queues_) {
-                        num_stolen_threads += queue->get_num_stolen_to_staged(
-                            reset);
+                for (std::size_t d = 0; d < num_domains_; ++d)
+                {
+                    for (auto& queue : lp_queues_[d].queues_)
+                    {
+                        num_stolen_threads +=
+                            queue->get_num_stolen_to_staged(reset);
                     }
 
-                    for (auto &queue : np_queues_[d].queues_) {
-                        num_stolen_threads += queue->get_num_stolen_to_staged(
-                            reset);
+                    for (auto& queue : np_queues_[d].queues_)
+                    {
+                        num_stolen_threads +=
+                            queue->get_num_stolen_to_staged(reset);
                     }
 
-                    for (auto &queue : hp_queues_[d].queues_) {
-                        num_stolen_threads += queue->get_num_stolen_to_staged(
-                            reset);
+                    for (auto& queue : hp_queues_[d].queues_)
+                    {
+                        num_stolen_threads +=
+                            queue->get_num_stolen_to_staged(reset);
                     }
                 }
 
@@ -558,17 +601,17 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             std::size_t domain_num = d_lookup_[num_thread];
 
-            num_stolen_threads +=
-                lp_queues_[domain_num].queues_[lp_lookup_[num_thread]]->
-                    get_num_stolen_to_staged(reset);
+            num_stolen_threads += lp_queues_[domain_num]
+                                      .queues_[lp_lookup_[num_thread]]
+                                      ->get_num_stolen_to_staged(reset);
 
-            num_stolen_threads +=
-                np_queues_[domain_num].queues_[np_lookup_[num_thread]]->
-                    get_num_stolen_to_staged(reset);
+            num_stolen_threads += np_queues_[domain_num]
+                                      .queues_[np_lookup_[num_thread]]
+                                      ->get_num_stolen_to_staged(reset);
 
-            num_stolen_threads +=
-                hp_queues_[domain_num].queues_[hp_lookup_[num_thread]]->
-                    get_num_stolen_to_staged(reset);
+            num_stolen_threads += hp_queues_[domain_num]
+                                      .queues_[hp_lookup_[num_thread]]
+                                      ->get_num_stolen_to_staged(reset);
 
             return num_stolen_threads;
         }
@@ -586,18 +629,22 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             if (num_thread == std::size_t(-1))
             {
-                for (std::size_t d = 0; d < num_domains_; ++d) {
-                    for (auto &queue : lp_queues_[d].queues_) {
+                for (std::size_t d = 0; d < num_domains_; ++d)
+                {
+                    for (auto& queue : lp_queues_[d].queues_)
+                    {
                         wait_time += queue->get_average_thread_wait_time();
                         ++count;
                     }
 
-                    for (auto &queue : np_queues_[d].queues_) {
+                    for (auto& queue : np_queues_[d].queues_)
+                    {
                         wait_time += queue->get_average_thread_wait_time();
                         ++count;
                     }
 
-                    for (auto &queue : hp_queues_[d].queues_) {
+                    for (auto& queue : hp_queues_[d].queues_)
+                    {
                         wait_time += queue->get_average_thread_wait_time();
                         ++count;
                     }
@@ -608,19 +655,19 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             std::size_t domain_num = d_lookup_[num_thread];
 
-            wait_time +=
-                lp_queues_[domain_num].queues_[lp_lookup_[num_thread]]->
-                    get_average_thread_wait_time();
+            wait_time += lp_queues_[domain_num]
+                             .queues_[lp_lookup_[num_thread]]
+                             ->get_average_thread_wait_time();
             ++count;
 
-            wait_time +=
-                np_queues_[domain_num].queues_[np_lookup_[num_thread]]->
-                    get_average_thread_wait_time();
+            wait_time += np_queues_[domain_num]
+                             .queues_[np_lookup_[num_thread]]
+                             ->get_average_thread_wait_time();
             ++count;
 
-            wait_time +=
-                hp_queues_[domain_num].queues_[hp_lookup_[num_thread]]->
-                    get_average_thread_wait_time();
+            wait_time += hp_queues_[domain_num]
+                             .queues_[hp_lookup_[num_thread]]
+                             ->get_average_thread_wait_time();
             ++count;
 
             return wait_time / (count + 1);
@@ -637,18 +684,22 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             if (num_thread == std::size_t(-1))
             {
-                for (std::size_t d = 0; d < num_domains_; ++d) {
-                    for (auto &queue : lp_queues_[d].queues_) {
+                for (std::size_t d = 0; d < num_domains_; ++d)
+                {
+                    for (auto& queue : lp_queues_[d].queues_)
+                    {
                         wait_time += queue->get_average_task_wait_time();
                         ++count;
                     }
 
-                    for (auto &queue : np_queues_[d].queues_) {
+                    for (auto& queue : np_queues_[d].queues_)
+                    {
                         wait_time += queue->get_average_task_wait_time();
                         ++count;
                     }
 
-                    for (auto &queue : hp_queues_[d].queues_) {
+                    for (auto& queue : hp_queues_[d].queues_)
+                    {
                         wait_time += queue->get_average_task_wait_time();
                         ++count;
                     }
@@ -659,19 +710,19 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             std::size_t domain_num = d_lookup_[num_thread];
 
-            wait_time +=
-                lp_queues_[domain_num].queues_[lp_lookup_[num_thread]]->
-                    get_average_task_wait_time();
+            wait_time += lp_queues_[domain_num]
+                             .queues_[lp_lookup_[num_thread]]
+                             ->get_average_task_wait_time();
             ++count;
 
-            wait_time +=
-                np_queues_[domain_num].queues_[np_lookup_[num_thread]]->
-                    get_average_task_wait_time();
+            wait_time += np_queues_[domain_num]
+                             .queues_[np_lookup_[num_thread]]
+                             ->get_average_task_wait_time();
             ++count;
 
-            wait_time +=
-                hp_queues_[domain_num].queues_[hp_lookup_[num_thread]]->
-                    get_average_task_wait_time();
+            wait_time += hp_queues_[domain_num]
+                             .queues_[hp_lookup_[num_thread]]
+                             ->get_average_task_wait_time();
             ++count;
 
             return wait_time / (count + 1);
@@ -682,17 +733,21 @@ namespace hpx { namespace threads { namespace policies { namespace example {
         void abort_all_suspended_threads() override
         {
             LOG_CUSTOM_MSG("abort_all_suspended_threads");
-            for (std::size_t d = 0; d < num_domains_; ++d) {
-                for (auto &queue : lp_queues_[d].queues_) {
-                     queue->abort_all_suspended_threads();
+            for (std::size_t d = 0; d < num_domains_; ++d)
+            {
+                for (auto& queue : lp_queues_[d].queues_)
+                {
+                    queue->abort_all_suspended_threads();
                 }
 
-                for (auto &queue : np_queues_[d].queues_) {
-                     queue->abort_all_suspended_threads();
+                for (auto& queue : np_queues_[d].queues_)
+                {
+                    queue->abort_all_suspended_threads();
                 }
 
-                for (auto &queue : hp_queues_[d].queues_) {
-                     queue->abort_all_suspended_threads();
+                for (auto& queue : hp_queues_[d].queues_)
+                {
+                    queue->abort_all_suspended_threads();
                 }
             }
         }
@@ -700,32 +755,39 @@ namespace hpx { namespace threads { namespace policies { namespace example {
         // ------------------------------------------------------------
         bool cleanup_terminated(bool delete_all) override
         {
-//            LOG_CUSTOM_MSG("cleanup_terminated with delete_all "
-//                << delete_all);
+            //            LOG_CUSTOM_MSG("cleanup_terminated with delete_all "
+            //                << delete_all);
             bool empty = true;
             //
-            for (std::size_t d=0; d<num_domains_; ++d) {
-                for (auto &queue : lp_queues_[d].queues_) {
-                     empty = queue->cleanup_terminated(delete_all) && empty;
+            for (std::size_t d = 0; d < num_domains_; ++d)
+            {
+                for (auto& queue : lp_queues_[d].queues_)
+                {
+                    empty = queue->cleanup_terminated(delete_all) && empty;
                 }
 
-                for (auto &queue : np_queues_[d].queues_) {
-                     empty = queue->cleanup_terminated(delete_all) && empty;
+                for (auto& queue : np_queues_[d].queues_)
+                {
+                    empty = queue->cleanup_terminated(delete_all) && empty;
                 }
 
-                for (auto &queue : hp_queues_[d].queues_) {
-                     empty = queue->cleanup_terminated(delete_all) && empty;
+                for (auto& queue : hp_queues_[d].queues_)
+                {
+                    empty = queue->cleanup_terminated(delete_all) && empty;
                 }
             }
 
             return empty;
         }
 
-        bool cleanup_terminated(std::size_t thread_num, bool delete_all) override
+        bool cleanup_terminated(
+            std::size_t thread_num, bool delete_all) override
         {
-            if (thread_num == std::size_t(-1)) {
+            if (thread_num == std::size_t(-1))
+            {
                 HPX_THROW_EXCEPTION(bad_parameter,
-                    "shared_priority_queue_scheduler_example::cleanup_terminated",
+                    "shared_priority_queue_scheduler_example::cleanup_"
+                    "terminated",
                     "Invalid thread number: " + std::to_string(thread_num));
             }
             bool empty = true;
@@ -734,12 +796,18 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             std::size_t domain_num = d_lookup_[thread_num];
 
             // cleanup the queues assigned to this thread
-            empty = hp_queues_[domain_num].queues_[hp_lookup_[thread_num]]->
-                    cleanup_terminated(delete_all) && empty;
-            empty = np_queues_[domain_num].queues_[np_lookup_[thread_num]]->
-                    cleanup_terminated(delete_all) && empty;
-            empty = lp_queues_[domain_num].queues_[lp_lookup_[thread_num]]->
-                    cleanup_terminated(delete_all) && empty;
+            empty = hp_queues_[domain_num]
+                        .queues_[hp_lookup_[thread_num]]
+                        ->cleanup_terminated(delete_all) &&
+                empty;
+            empty = np_queues_[domain_num]
+                        .queues_[np_lookup_[thread_num]]
+                        ->cleanup_terminated(delete_all) &&
+                empty;
+            empty = lp_queues_[domain_num]
+                        .queues_[lp_lookup_[thread_num]]
+                        ->cleanup_terminated(delete_all) &&
+                empty;
             return empty;
         }
 
@@ -747,7 +815,8 @@ namespace hpx { namespace threads { namespace policies { namespace example {
         // create a new thread and schedule it if the initial state
         // is equal to pending
         void create_thread(thread_init_data& data, thread_id_type* thrd,
-            thread_state_enum initial_state, bool run_now, error_code& ec) override
+            thread_state_enum initial_state, bool run_now,
+            error_code& ec) override
         {
             // safety check that task was created by this thread/scheduler
             HPX_ASSERT(data.scheduler_base == this);
@@ -756,15 +825,17 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             std::size_t domain_num = 0;
             std::size_t q_index = std::size_t(-1);
 
-            LOG_CUSTOM_VAR(const char* const msgs[] =
-                {"HINT_NONE" COMMA "HINT....." COMMA "ERROR...." COMMA  "NORMAL..."});
-            LOG_CUSTOM_VAR(const char *msg = nullptr);
+            LOG_CUSTOM_VAR(
+                const char* const msgs[] = {"HINT_NONE" COMMA "HINT....." COMMA
+                                            "ERROR...." COMMA "NORMAL..."});
+            LOG_CUSTOM_VAR(const char* msg = nullptr);
 
             std::unique_lock<pu_mutex_type> l;
 
             using threads::thread_schedule_hint_mode;
 
-            switch (data.schedulehint.mode) {
+            switch (data.schedulehint.mode)
+            {
             case thread_schedule_hint_mode::thread_schedule_hint_mode_none:
             {
                 // Create thread on this worker thread if possible
@@ -773,14 +844,15 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                     threads::detail::get_thread_num_tss();
                 thread_num =
                     this->global_to_local_thread_index(global_thread_num);
-                if (thread_num>=num_workers_) {
+                if (thread_num >= num_workers_)
+                {
                     // This is a task being injected from a thread on another pool.
                     // Reset thread_num to first queue.
                     thread_num = 0;
                 }
                 thread_num = select_active_pu(l, thread_num);
-                domain_num     = d_lookup_[thread_num];
-                q_index        = q_lookup_[thread_num];
+                domain_num = d_lookup_[thread_num];
+                q_index = q_lookup_[thread_num];
                 break;
             }
             case thread_schedule_hint_mode::thread_schedule_hint_mode_thread:
@@ -789,7 +861,7 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                 LOG_CUSTOM_VAR(msg = msgs[3]);
                 thread_num = select_active_pu(l, data.schedulehint.hint);
                 domain_num = d_lookup_[thread_num];
-                q_index    = q_lookup_[thread_num];
+                q_index = q_lookup_[thread_num];
                 break;
             }
             case thread_schedule_hint_mode::thread_schedule_hint_mode_numa:
@@ -805,10 +877,12 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                     threads::detail::get_thread_num_tss();
                 thread_num =
                     this->global_to_local_thread_index(global_thread_num);
-                if (d_lookup_[thread_num] == domain_num) {
+                if (d_lookup_[thread_num] == domain_num)
+                {
                     q_index = q_lookup_[thread_num];
                 }
-                else {
+                else
+                {
                     q_index = counters_[domain_num]++;
                 }
                 break;
@@ -817,13 +891,13 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "shared_priority_queue_scheduler_example::create_thread",
                     "Invalid schedule hint mode: " +
-                    std::to_string(data.schedulehint.mode));
+                        std::to_string(data.schedulehint.mode));
             }
 
-            LOG_CUSTOM_MSG("create_thread " << msg << " "
-                           << "queue " << decnumber(thread_num)
-                           << "domain " << decnumber(domain_num)
-                           << "qindex " << decnumber(q_index));
+            LOG_CUSTOM_MSG("create_thread "
+                << msg << " "
+                << "queue " << decnumber(thread_num) << "domain "
+                << decnumber(domain_num) << "qindex " << decnumber(q_index));
 
             // create the thread using priority to select queue
             if (data.priority == thread_priority_high ||
@@ -836,53 +910,55 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                     data.priority = thread_priority_normal;
                 }
 
-                hp_queues_[domain_num].queues_[hp_lookup_[
-                    q_index % hp_queues_[domain_num].num_cores]]->
-                    create_thread(data, thrd, initial_state, run_now, ec);
+                hp_queues_[domain_num]
+                    .queues_[hp_lookup_[q_index %
+                        hp_queues_[domain_num].num_cores]]
+                    ->create_thread(data, thrd, initial_state, run_now, ec);
 
                 LOG_CUSTOM_MSG("create_thread thread_priority_high "
-                               << "queue " << decnumber(q_index)
-                               << "domain " << decnumber(domain_num)
-                               << "desc " << THREAD_DESC2(data, thrd)
-                               << "scheduler " << hexpointer(data.scheduler_base));
+                    << "queue " << decnumber(q_index) << "domain "
+                    << decnumber(domain_num) << "desc "
+                    << THREAD_DESC2(data, thrd) << "scheduler "
+                    << hexpointer(data.scheduler_base));
                 return;
             }
 
             if (data.priority == thread_priority_low)
             {
-                lp_queues_[domain_num].queues_[lp_lookup_[
-                    q_index % lp_queues_[domain_num].num_cores]]->
-                    create_thread(data, thrd, initial_state, run_now, ec);
+                lp_queues_[domain_num]
+                    .queues_[lp_lookup_[q_index %
+                        lp_queues_[domain_num].num_cores]]
+                    ->create_thread(data, thrd, initial_state, run_now, ec);
 
                 LOG_CUSTOM_MSG("create_thread thread_priority_low "
-                               << "queue " << decnumber(q_index)
-                               << "domain " << decnumber(domain_num)
-                               << "desc " << THREAD_DESC2(data, thrd)
-                               << "scheduler " << hexpointer(data.scheduler_base));
+                    << "queue " << decnumber(q_index) << "domain "
+                    << decnumber(domain_num) << "desc "
+                    << THREAD_DESC2(data, thrd) << "scheduler "
+                    << hexpointer(data.scheduler_base));
                 return;
             }
 
             // normal priority
-            np_queues_[domain_num].queues_[np_lookup_[
-                q_index % np_queues_[domain_num].num_cores]]->
-                create_thread(data, thrd, initial_state, run_now, ec);
+            np_queues_[domain_num]
+                .queues_[np_lookup_[q_index % np_queues_[domain_num].num_cores]]
+                ->create_thread(data, thrd, initial_state, run_now, ec);
 
             LOG_CUSTOM_MSG2("create_thread thread_priority_normal "
-                            << "queue " << decnumber(q_index)
-                            << "domain " << decnumber(domain_num)
-                            << "desc " << THREAD_DESC2(data, thrd)
-                            << "scheduler " << hexpointer(data.scheduler_base));
+                << "queue " << decnumber(q_index) << "domain "
+                << decnumber(domain_num) << "desc " << THREAD_DESC2(data, thrd)
+                << "scheduler " << hexpointer(data.scheduler_base));
         }
 
         /// Return the next thread to be executed, return false if none available
         virtual bool get_next_thread(std::size_t thread_num, bool running,
             threads::thread_data*& thrd, bool /*enable_stealing*/) override
         {
-//                LOG_CUSTOM_MSG("get_next_thread " << " queue "
-//                                                  << decnumber(thread_num));
+            //                LOG_CUSTOM_MSG("get_next_thread " << " queue "
+            //                                                  << decnumber(thread_num));
             bool result = false;
 
-            if (thread_num == std::size_t(-1)) {
+            if (thread_num == std::size_t(-1))
+            {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "shared_priority_queue_scheduler_example::get_next_thread",
                     "Invalid thread number: " + std::to_string(thread_num));
@@ -893,45 +969,55 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             // is there a high priority task, take first from our numa domain
             // and then try to steal from others
-            for (std::size_t d=0; d<num_domains_; ++d) {
-                std::size_t dom = (domain_num+d) % num_domains_;
+            for (std::size_t d = 0; d < num_domains_; ++d)
+            {
+                std::size_t dom = (domain_num + d) % num_domains_;
                 // set the preferred queue for this domain, if applicable
                 std::size_t q_index = q_lookup_[thread_num];
                 // get next task, steal if from another domain
                 result = hp_queues_[dom].get_next_thread(q_index, thrd);
-                if (result) break;
+                if (result)
+                    break;
             }
 
             // try a normal priority task
-            if (!result) {
-                for (std::size_t d=0; d<num_domains_; ++d) {
-                    std::size_t dom = (domain_num+d) % num_domains_;
+            if (!result)
+            {
+                for (std::size_t d = 0; d < num_domains_; ++d)
+                {
+                    std::size_t dom = (domain_num + d) % num_domains_;
                     // set the preferred queue for this domain, if applicable
                     std::size_t q_index = q_lookup_[thread_num];
                     // get next task, steal if from another domain
                     result = np_queues_[dom].get_next_thread(q_index, thrd);
-                    if (result) break;
+                    if (result)
+                        break;
                 }
             }
 
             // low priority task
-            if (!result) {
+            if (!result)
+            {
 #ifdef JB_LP_STEALING
-                for (std::size_t d=domain_num; d<domain_num+num_domains_; ++d) {
+                for (std::size_t d = domain_num; d < domain_num + num_domains_;
+                     ++d)
+                {
                     std::size_t dom = d % num_domains_;
                     // set the preferred queue for this domain, if applicable
-                    std::size_t q_index = (dom==domain_num) ?
+                    std::size_t q_index = (dom == domain_num) ?
                         q_lookup_[thread_num] :
-                        lp_lookup_[(counters_[dom]++ %
-                                    lp_queues_[dom].num_cores)];
+                        lp_lookup_[(
+                            counters_[dom]++ % lp_queues_[dom].num_cores)];
 
                     result = lp_queues_[dom].get_next_thread(q_index, thrd);
-                    if (result) break;
+                    if (result)
+                        break;
                 }
 #else
                 // no cross domain stealing for LP queues
                 result = lp_queues_[domain_num].get_next_thread(0, thrd);
-                if (result) {
+                if (result)
+                {
                     spin_for_time(1000, "LP task");
                 }
 #endif
@@ -940,17 +1026,15 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             {
                 HPX_ASSERT(thrd->get_scheduler_base() == this);
                 LOG_CUSTOM_MSG("got next thread "
-                               << "queue " << decnumber(thread_num)
-                               << "domain " << decnumber(domain_num)
-                               << "desc " << THREAD_DESC(thrd));
+                    << "queue " << decnumber(thread_num) << "domain "
+                    << decnumber(domain_num) << "desc " << THREAD_DESC(thrd));
             }
             return result;
         }
 
         /// Schedule the passed thread
         void schedule_thread(threads::thread_data* thrd,
-            threads::thread_schedule_hint schedulehint,
-            bool allow_fallback,
+            threads::thread_schedule_hint schedulehint, bool allow_fallback,
             thread_priority priority = thread_priority_normal) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
@@ -959,15 +1043,17 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             std::size_t domain_num = 0;
             std::size_t q_index = std::size_t(-1);
 
-            LOG_CUSTOM_VAR(const char* const msgs[] =
-                {"HINT_NONE" COMMA "HINT....." COMMA "ERROR...." COMMA  "NORMAL..."});
-            LOG_CUSTOM_VAR(const char *msg = nullptr);
+            LOG_CUSTOM_VAR(
+                const char* const msgs[] = {"HINT_NONE" COMMA "HINT....." COMMA
+                                            "ERROR...." COMMA "NORMAL..."});
+            LOG_CUSTOM_VAR(const char* msg = nullptr);
 
             std::unique_lock<pu_mutex_type> l;
 
             using threads::thread_schedule_hint_mode;
 
-            switch (schedulehint.mode) {
+            switch (schedulehint.mode)
+            {
             case thread_schedule_hint_mode::thread_schedule_hint_mode_none:
             {
                 // Create thread on this worker thread if possible
@@ -976,24 +1062,25 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                     threads::detail::get_thread_num_tss();
                 thread_num =
                     this->global_to_local_thread_index(global_thread_num);
-                if (thread_num>=num_workers_) {
+                if (thread_num >= num_workers_)
+                {
                     // This is a task being injected from a thread on another pool.
                     // Reset thread_num to first queue.
                     thread_num = 0;
                 }
                 thread_num = select_active_pu(l, thread_num, allow_fallback);
-                domain_num     = d_lookup_[thread_num];
-                q_index        = q_lookup_[thread_num];
+                domain_num = d_lookup_[thread_num];
+                q_index = q_lookup_[thread_num];
                 break;
             }
             case thread_schedule_hint_mode::thread_schedule_hint_mode_thread:
             {
                 // Create thread on requested worker thread
                 LOG_CUSTOM_VAR(msg = msgs[3]);
-                thread_num = select_active_pu(l, schedulehint.hint,
-                    allow_fallback);
+                thread_num =
+                    select_active_pu(l, schedulehint.hint, allow_fallback);
                 domain_num = d_lookup_[thread_num];
-                q_index    = q_lookup_[thread_num];
+                q_index = q_lookup_[thread_num];
                 break;
             }
             case thread_schedule_hint_mode::thread_schedule_hint_mode_numa:
@@ -1009,10 +1096,12 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                     threads::detail::get_thread_num_tss();
                 thread_num =
                     this->global_to_local_thread_index(global_thread_num);
-                if (d_lookup_[thread_num] == domain_num) {
+                if (d_lookup_[thread_num] == domain_num)
+                {
                     q_index = q_lookup_[thread_num];
                 }
-                else {
+                else
+                {
                     q_index = counters_[domain_num]++;
                 }
                 break;
@@ -1021,40 +1110,41 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "shared_priority_queue_scheduler_example::schedule_thread",
                     "Invalid schedule hint mode: " +
-                    std::to_string(schedulehint.mode));
+                        std::to_string(schedulehint.mode));
             }
 
             LOG_CUSTOM_MSG("thread scheduled "
-                          << "queue " << decnumber(thread_num)
-                          << "domain " << decnumber(domain_num)
-                          << "qindex " << decnumber(q_index));
+                << "queue " << decnumber(thread_num) << "domain "
+                << decnumber(domain_num) << "qindex " << decnumber(q_index));
 
             if (priority == thread_priority_high ||
                 priority == thread_priority_high_recursive ||
                 priority == thread_priority_boost)
             {
-                hp_queues_[domain_num].queues_[hp_lookup_[
-                    q_index % hp_queues_[domain_num].num_cores]]->
-                    schedule_thread(thrd, false);
+                hp_queues_[domain_num]
+                    .queues_[hp_lookup_[q_index %
+                        hp_queues_[domain_num].num_cores]]
+                    ->schedule_thread(thrd, false);
             }
             else if (priority == thread_priority_low)
             {
-                lp_queues_[domain_num].queues_[lp_lookup_[
-                    q_index % lp_queues_[domain_num].num_cores]]->
-                    schedule_thread(thrd, false);
+                lp_queues_[domain_num]
+                    .queues_[lp_lookup_[q_index %
+                        lp_queues_[domain_num].num_cores]]
+                    ->schedule_thread(thrd, false);
             }
             else
             {
-                np_queues_[domain_num].queues_[np_lookup_[
-                    q_index % np_queues_[domain_num].num_cores]]->
-                    schedule_thread(thrd, false);
+                np_queues_[domain_num]
+                    .queues_[np_lookup_[q_index %
+                        np_queues_[domain_num].num_cores]]
+                    ->schedule_thread(thrd, false);
             }
         }
 
         /// Put task on the back of the queue
         void schedule_thread_last(threads::thread_data* thrd,
-            threads::thread_schedule_hint schedulehint,
-            bool allow_fallback,
+            threads::thread_schedule_hint schedulehint, bool allow_fallback,
             thread_priority priority = thread_priority_normal) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
@@ -1063,15 +1153,17 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             std::size_t domain_num = 0;
             std::size_t q_index = std::size_t(-1);
 
-            LOG_CUSTOM_VAR(const char* const msgs[] =
-                {"HINT_NONE" COMMA "HINT....." COMMA "ERROR...." COMMA  "NORMAL..."});
-            LOG_CUSTOM_VAR(const char *msg = nullptr);
+            LOG_CUSTOM_VAR(
+                const char* const msgs[] = {"HINT_NONE" COMMA "HINT....." COMMA
+                                            "ERROR...." COMMA "NORMAL..."});
+            LOG_CUSTOM_VAR(const char* msg = nullptr);
 
             std::unique_lock<pu_mutex_type> l;
 
             using threads::thread_schedule_hint_mode;
 
-            switch (schedulehint.mode) {
+            switch (schedulehint.mode)
+            {
             case thread_schedule_hint_mode::thread_schedule_hint_mode_none:
             {
                 // Create thread on this worker thread if possible
@@ -1080,24 +1172,25 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                     threads::detail::get_thread_num_tss();
                 thread_num =
                     this->global_to_local_thread_index(global_thread_num);
-                if (thread_num>=num_workers_) {
+                if (thread_num >= num_workers_)
+                {
                     // This is a task being injected from a thread on another pool.
                     // Reset thread_num to first queue.
                     thread_num = 0;
                 }
                 thread_num = select_active_pu(l, thread_num, allow_fallback);
-                domain_num     = d_lookup_[thread_num];
-                q_index        = q_lookup_[thread_num];
+                domain_num = d_lookup_[thread_num];
+                q_index = q_lookup_[thread_num];
                 break;
             }
             case thread_schedule_hint_mode::thread_schedule_hint_mode_thread:
             {
                 // Create thread on requested worker thread
                 LOG_CUSTOM_VAR(msg = msgs[3]);
-                thread_num = select_active_pu(l, schedulehint.hint,
-                    allow_fallback);
+                thread_num =
+                    select_active_pu(l, schedulehint.hint, allow_fallback);
                 domain_num = d_lookup_[thread_num];
-                q_index    = q_lookup_[thread_num];
+                q_index = q_lookup_[thread_num];
                 break;
             }
             case thread_schedule_hint_mode::thread_schedule_hint_mode_numa:
@@ -1113,45 +1206,50 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                     threads::detail::get_thread_num_tss();
                 thread_num =
                     this->global_to_local_thread_index(global_thread_num);
-                if (d_lookup_[thread_num] == domain_num) {
+                if (d_lookup_[thread_num] == domain_num)
+                {
                     q_index = q_lookup_[thread_num];
                 }
-                else {
+                else
+                {
                     q_index = counters_[domain_num]++;
                 }
                 break;
             }
             default:
                 HPX_THROW_EXCEPTION(bad_parameter,
-                    "shared_priority_queue_scheduler_example::schedule_thread_last",
+                    "shared_priority_queue_scheduler_example::schedule_thread_"
+                    "last",
                     "Invalid schedule hint mode: " +
-                    std::to_string(schedulehint.mode));
+                        std::to_string(schedulehint.mode));
             }
 
             LOG_CUSTOM_MSG("thread scheduled "
-                          << "queue " << decnumber(thread_num)
-                          << "domain " << decnumber(domain_num)
-                          << "qindex " << decnumber(q_index));
+                << "queue " << decnumber(thread_num) << "domain "
+                << decnumber(domain_num) << "qindex " << decnumber(q_index));
 
             if (priority == thread_priority_high ||
                 priority == thread_priority_high_recursive ||
                 priority == thread_priority_boost)
             {
-                hp_queues_[domain_num].queues_[hp_lookup_[
-                    q_index % hp_queues_[domain_num].num_cores]]->
-                    schedule_thread(thrd, true);
+                hp_queues_[domain_num]
+                    .queues_[hp_lookup_[q_index %
+                        hp_queues_[domain_num].num_cores]]
+                    ->schedule_thread(thrd, true);
             }
             else if (priority == thread_priority_low)
             {
-                lp_queues_[domain_num].queues_[lp_lookup_[
-                    q_index % lp_queues_[domain_num].num_cores]]->
-                    schedule_thread(thrd, true);
+                lp_queues_[domain_num]
+                    .queues_[lp_lookup_[q_index %
+                        lp_queues_[domain_num].num_cores]]
+                    ->schedule_thread(thrd, true);
             }
             else
             {
-                np_queues_[domain_num].queues_[np_lookup_[
-                    q_index % np_queues_[domain_num].num_cores]]->
-                    schedule_thread(thrd, true);
+                np_queues_[domain_num]
+                    .queues_[np_lookup_[q_index %
+                        np_queues_[domain_num].num_cores]]
+                    ->schedule_thread(thrd, true);
             }
         }
 
@@ -1162,7 +1260,8 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             threads::thread_data* thrd, std::int64_t& busy_count) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
-            thrd->get_queue<thread_queue_type>().destroy_thread(thrd, busy_count);
+            thrd->get_queue<thread_queue_type>().destroy_thread(
+                thrd, busy_count);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -1176,27 +1275,31 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                 << "thread_num " << decnumber(thread_num));
 
             std::int64_t count = 0;
-            for (std::size_t d=0; d<num_domains_; ++d) {
+            for (std::size_t d = 0; d < num_domains_; ++d)
+            {
                 count += hp_queues_[d].get_queue_length();
                 count += np_queues_[d].get_queue_length();
                 count += lp_queues_[d].get_queue_length();
             }
 
-            if (thread_num != std::size_t(-1)) {
+            if (thread_num != std::size_t(-1))
+            {
                 // find the numa domain from the local thread index
                 std::size_t domain = d_lookup_[thread_num];
                 // get next task, steal if from another domain
-                std::int64_t result =
-                    hp_queues_[domain].queues_[hp_lookup_[thread_num]]->
-                      get_queue_length();
-                if (result>0) return result;
-                result =
-                    np_queues_[domain].queues_[np_lookup_[thread_num]]->
-                      get_queue_length();
-                if (result>0) return result;
-                return
-                    lp_queues_[domain].queues_[lp_lookup_[thread_num]]->
-                      get_queue_length();
+                std::int64_t result = hp_queues_[domain]
+                                          .queues_[hp_lookup_[thread_num]]
+                                          ->get_queue_length();
+                if (result > 0)
+                    return result;
+                result = np_queues_[domain]
+                             .queues_[np_lookup_[thread_num]]
+                             ->get_queue_length();
+                if (result > 0)
+                    return result;
+                return lp_queues_[domain]
+                    .queues_[lp_lookup_[thread_num]]
+                    ->get_queue_length();
             }
             return count;
         }
@@ -1209,46 +1312,58 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             std::size_t thread_num = std::size_t(-1),
             bool reset = false) const override
         {
-            LOG_CUSTOM_MSG("get_thread_count thread_num "
-                << hexnumber(thread_num));
+            LOG_CUSTOM_MSG(
+                "get_thread_count thread_num " << hexnumber(thread_num));
 
             std::int64_t count = 0;
 
             // if a specific worker id was requested
-            if (thread_num != std::size_t(-1)) {
+            if (thread_num != std::size_t(-1))
+            {
                 std::size_t domain_num = d_lookup_[thread_num];
                 //
-                switch (priority) {
-                case thread_priority_default: {
-                    count += hp_queues_[domain_num].queues_[hp_lookup_[thread_num]]->
-                        get_thread_count(state);
-                    count += np_queues_[domain_num].queues_[np_lookup_[thread_num]]->
-                        get_thread_count(state);
-                    count += lp_queues_[domain_num].queues_[lp_lookup_[thread_num]]->
-                        get_thread_count(state);
+                switch (priority)
+                {
+                case thread_priority_default:
+                {
+                    count += hp_queues_[domain_num]
+                                 .queues_[hp_lookup_[thread_num]]
+                                 ->get_thread_count(state);
+                    count += np_queues_[domain_num]
+                                 .queues_[np_lookup_[thread_num]]
+                                 ->get_thread_count(state);
+                    count += lp_queues_[domain_num]
+                                 .queues_[lp_lookup_[thread_num]]
+                                 ->get_thread_count(state);
                     LOG_CUSTOM_MSG("default get_thread_count thread_num "
                         << hexnumber(thread_num) << decnumber(count));
                     return count;
                 }
-                case thread_priority_low: {
-                    count += lp_queues_[domain_num].queues_[lp_lookup_[thread_num]]->
-                        get_thread_count(state);
+                case thread_priority_low:
+                {
+                    count += lp_queues_[domain_num]
+                                 .queues_[lp_lookup_[thread_num]]
+                                 ->get_thread_count(state);
                     LOG_CUSTOM_MSG("low get_thread_count thread_num "
                         << hexnumber(thread_num) << decnumber(count));
                     return count;
                 }
-                case thread_priority_normal: {
-                    count += np_queues_[domain_num].queues_[np_lookup_[thread_num]]->
-                        get_thread_count(state);
+                case thread_priority_normal:
+                {
+                    count += np_queues_[domain_num]
+                                 .queues_[np_lookup_[thread_num]]
+                                 ->get_thread_count(state);
                     LOG_CUSTOM_MSG("normal get_thread_count thread_num "
                         << hexnumber(thread_num) << decnumber(count));
                     return count;
                 }
                 case thread_priority_boost:
                 case thread_priority_high:
-                case thread_priority_high_recursive: {
-                    count += hp_queues_[domain_num].queues_[hp_lookup_[thread_num]]->
-                        get_thread_count(state);
+                case thread_priority_high_recursive:
+                {
+                    count += hp_queues_[domain_num]
+                                 .queues_[hp_lookup_[thread_num]]
+                                 ->get_thread_count(state);
                     return count;
                 }
                 default:
@@ -1260,27 +1375,34 @@ namespace hpx { namespace threads { namespace policies { namespace example {
                 }
             }
 
-            switch (priority) {
-            case thread_priority_default: {
-                for (std::size_t d=0; d<num_domains_; ++d) {
+            switch (priority)
+            {
+            case thread_priority_default:
+            {
+                for (std::size_t d = 0; d < num_domains_; ++d)
+                {
                     count += hp_queues_[d].get_thread_count(state);
                     count += np_queues_[d].get_thread_count(state);
                     count += lp_queues_[d].get_thread_count(state);
                 }
-//                    LOG_CUSTOM_MSG("default get_thread_count thread_num "
-//                        << decnumber(thread_num) << decnumber(count));
+                //                    LOG_CUSTOM_MSG("default get_thread_count thread_num "
+                //                        << decnumber(thread_num) << decnumber(count));
                 return count;
             }
-            case thread_priority_low: {
-                for (std::size_t d=0; d<num_domains_; ++d) {
+            case thread_priority_low:
+            {
+                for (std::size_t d = 0; d < num_domains_; ++d)
+                {
                     count += lp_queues_[d].get_thread_count(state);
                 }
                 LOG_CUSTOM_MSG("low get_thread_count thread_num "
                     << decnumber(thread_num) << decnumber(count));
                 return count;
             }
-            case thread_priority_normal: {
-                for (std::size_t d=0; d<num_domains_; ++d) {
+            case thread_priority_normal:
+            {
+                for (std::size_t d = 0; d < num_domains_; ++d)
+                {
                     count += np_queues_[d].get_thread_count(state);
                 }
                 LOG_CUSTOM_MSG("normal get_thread_count thread_num "
@@ -1289,8 +1411,10 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             }
             case thread_priority_boost:
             case thread_priority_high:
-            case thread_priority_high_recursive: {
-                for (std::size_t d=0; d<num_domains_; ++d) {
+            case thread_priority_high_recursive:
+            {
+                for (std::size_t d = 0; d < num_domains_; ++d)
+                {
                     count += hp_queues_[d].get_thread_count(state);
                 }
                 LOG_CUSTOM_MSG("high get_thread_count thread_num "
@@ -1318,13 +1442,11 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             LOG_CUSTOM_MSG("enumerate_threads");
 
-            for (std::size_t d=0; d<num_domains_; ++d) {
-                result = result &&
-                    hp_queues_[d].enumerate_threads(f, state);
-                result = result &&
-                    np_queues_[d].enumerate_threads(f, state);
-                result = result &&
-                    lp_queues_[d].enumerate_threads(f, state);
+            for (std::size_t d = 0; d < num_domains_; ++d)
+            {
+                result = result && hp_queues_[d].enumerate_threads(f, state);
+                result = result && np_queues_[d].enumerate_threads(f, state);
+                result = result && lp_queues_[d].enumerate_threads(f, state);
             }
             return result;
         }
@@ -1341,7 +1463,8 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             added = 0;
 
-            if (thread_num == std::size_t(-1)) {
+            if (thread_num == std::size_t(-1))
+            {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "shared_priority_queue_scheduler_example::wait_or_add_new",
                     "Invalid thread number: " + std::to_string(thread_num));
@@ -1352,49 +1475,55 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             // is there a high priority task, take first from our numa domain
             // and then try to steal from others
-            for (std::size_t d=0; d<num_domains_; ++d) {
-                std::size_t dom = (domain_num+d) % num_domains_;
+            for (std::size_t d = 0; d < num_domains_; ++d)
+            {
+                std::size_t dom = (domain_num + d) % num_domains_;
                 // set the preferred queue for this domain, if applicable
                 std::size_t q_index = q_lookup_[thread_num];
                 // get next task, steal if from another domain
                 result =
                     hp_queues_[dom].wait_or_add_new(q_index, running, added) &&
                     result;
-                if (0 != added) return result;
+                if (0 != added)
+                    return result;
             }
 
             // try a normal priority task
-            for (std::size_t d=0; d<num_domains_; ++d) {
-                std::size_t dom = (domain_num+d) % num_domains_;
+            for (std::size_t d = 0; d < num_domains_; ++d)
+            {
+                std::size_t dom = (domain_num + d) % num_domains_;
                 // set the preferred queue for this domain, if applicable
                 std::size_t q_index = q_lookup_[thread_num];
                 // get next task, steal if from another domain
                 result =
                     np_queues_[dom].wait_or_add_new(q_index, running, added) &&
                     result;
-                if (0 != added) return result;
+                if (0 != added)
+                    return result;
             }
 
             // low priority task
 #ifdef JB_LP_STEALING
-            for (std::size_t d=domain_num; d<domain_num+num_domains_; ++d) {
+            for (std::size_t d = domain_num; d < domain_num + num_domains_; ++d)
+            {
                 std::size_t dom = d % num_domains_;
                 // set the preferred queue for this domain, if applicable
-                std::size_t q_index = (dom==domain_num) ?
+                std::size_t q_index = (dom == domain_num) ?
                     q_lookup_[thread_num] :
-                    lp_lookup_[(counters_[dom]++ %
-                                lp_queues_[dom].num_cores)];
+                    lp_lookup_[(counters_[dom]++ % lp_queues_[dom].num_cores)];
 
-                result = lp_queues_[dom].wait_or_add_new(
-                    q_index, running, added);
-                if (0 != added) return result;
+                result =
+                    lp_queues_[dom].wait_or_add_new(q_index, running, added);
+                if (0 != added)
+                    return result;
             }
 #else
             // no cross domain stealing for LP queues
             result =
                 lp_queues_[domain_num].wait_or_add_new(0, running, added) &&
                 result;
-            if (0 != added) return result;
+            if (0 != added)
+                return result;
 #endif
 
             return result;
@@ -1403,91 +1532,109 @@ namespace hpx { namespace threads { namespace policies { namespace example {
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t thread_num) override
         {
-            LOG_CUSTOM_MSG("start thread with local thread num "
-                << decnumber(thread_num));
+            LOG_CUSTOM_MSG(
+                "start thread with local thread num " << decnumber(thread_num));
 
             std::unique_lock<std::mutex> lock(init_mutex);
             if (!initialized_)
             {
                 initialized_ = true;
 
-                auto &rp = resource::get_partitioner();
+                auto& rp = resource::get_partitioner();
                 auto const& topo = rp.get_topology();
 
                 // For each worker thread, count which each numa domain they
                 // belong to and build lists of useful indexes/refs
                 num_domains_ = 1;
-                std::array<std::size_t, HPX_HAVE_MAX_NUMA_DOMAIN_COUNT> q_counts_;
+                std::array<std::size_t, HPX_HAVE_MAX_NUMA_DOMAIN_COUNT>
+                    q_counts_;
                 std::fill(d_lookup_.begin(), d_lookup_.end(), 0);
                 std::fill(q_lookup_.begin(), q_lookup_.end(), 0);
                 std::fill(q_counts_.begin(), q_counts_.end(), 0);
                 std::fill(counters_.begin(), counters_.end(), 0);
 
-                for (std::size_t local_id=0; local_id!=num_workers_; ++local_id)
+                for (std::size_t local_id = 0; local_id != num_workers_;
+                     ++local_id)
                 {
-                    std::size_t global_id = local_to_global_thread_index(local_id);
+                    std::size_t global_id =
+                        local_to_global_thread_index(local_id);
                     std::size_t pu_num = rp.get_pu_num(global_id);
                     std::size_t domain = topo.get_numa_node_number(pu_num);
 #ifdef DEBUG_FORCE_2_NUMA_DOMAINS
                     domain = std::rand() % 2;
 #endif
                     d_lookup_[local_id] = domain;
-                    num_domains_ = (std::max)(num_domains_, domain+1);
+                    num_domains_ = (std::max)(num_domains_, domain + 1);
                 }
 
                 HPX_ASSERT(num_domains_ <= HPX_HAVE_MAX_NUMA_DOMAIN_COUNT);
 
-                for (std::size_t local_id=0; local_id!=num_workers_; ++local_id)
+                for (std::size_t local_id = 0; local_id != num_workers_;
+                     ++local_id)
                 {
                     q_lookup_[local_id] = q_counts_[d_lookup_[local_id]]++;
                 }
 
                 // create queue sets for each numa domain
-                for (std::size_t i=0; i<num_domains_; ++i) {
+                for (std::size_t i = 0; i < num_domains_; ++i)
+                {
                     std::size_t queues = (std::max)(
                         q_counts_[i] / cores_per_queue_.high_priority,
                         std::size_t(1));
                     hp_queues_[i].init(
                         q_counts_[i], queues, thread_queue_init_);
-                    LOG_CUSTOM_MSG2("Created HP queue for numa " << i
-                                    << " cores " << q_counts_[i]
-                                    << " queues " << queues);
+                    LOG_CUSTOM_MSG2("Created HP queue for numa "
+                        << i << " cores " << q_counts_[i] << " queues "
+                        << queues);
 
-                    queues = (std::max)(q_counts_[i] / cores_per_queue_.normal_priority,
+                    queues = (std::max)(
+                        q_counts_[i] / cores_per_queue_.normal_priority,
                         std::size_t(1));
                     np_queues_[i].init(
                         q_counts_[i], queues, thread_queue_init_);
-                    LOG_CUSTOM_MSG2("Created NP queue for numa " << i
-                                    << " cores " << q_counts_[i]
-                                    << " queues " << queues);
+                    LOG_CUSTOM_MSG2("Created NP queue for numa "
+                        << i << " cores " << q_counts_[i] << " queues "
+                        << queues);
 
-                    queues = (std::max)(q_counts_[i] / cores_per_queue_.low_priority,
-                        std::size_t(1));
+                    queues =
+                        (std::max)(q_counts_[i] / cores_per_queue_.low_priority,
+                            std::size_t(1));
                     lp_queues_[i].init(
                         q_counts_[i], queues, thread_queue_init_);
-                    LOG_CUSTOM_MSG2("Created LP queue for numa " << i
-                                    << " cores " << q_counts_[i]
-                                    << " queues " << queues);
+                    LOG_CUSTOM_MSG2("Created LP queue for numa "
+                        << i << " cores " << q_counts_[i] << " queues "
+                        << queues);
                 }
 
                 // create worker_id to queue lookups for each queue type
-                for (std::size_t local_id=0; local_id!=num_workers_; ++local_id)
+                for (std::size_t local_id = 0; local_id != num_workers_;
+                     ++local_id)
                 {
-                    hp_lookup_[local_id] = hp_queues_[d_lookup_[local_id]].
-                        get_queue_index(q_lookup_[local_id]);
-                    np_lookup_[local_id] = np_queues_[d_lookup_[local_id]].
-                        get_queue_index(q_lookup_[local_id]);
-                    lp_lookup_[local_id] = lp_queues_[d_lookup_[local_id]].
-                        get_queue_index(q_lookup_[local_id]);
+                    hp_lookup_[local_id] =
+                        hp_queues_[d_lookup_[local_id]].get_queue_index(
+                            q_lookup_[local_id]);
+                    np_lookup_[local_id] =
+                        np_queues_[d_lookup_[local_id]].get_queue_index(
+                            q_lookup_[local_id]);
+                    lp_lookup_[local_id] =
+                        lp_queues_[d_lookup_[local_id]].get_queue_index(
+                            q_lookup_[local_id]);
                 }
 
-                debug::output("d_lookup_  ", &d_lookup_[0],  &d_lookup_[num_workers_]);
-                debug::output("q_lookup_  ", &q_lookup_[0],  &q_lookup_[num_workers_]);
-                debug::output("hp_lookup_ ", &hp_lookup_[0], &hp_lookup_[num_workers_]);
-                debug::output("np_lookup_ ", &np_lookup_[0], &np_lookup_[num_workers_]);
-                debug::output("lp_lookup_ ", &lp_lookup_[0], &lp_lookup_[num_workers_]);
-                debug::output("counters_  ", &counters_[0],  &counters_[num_domains_]);
-                debug::output("q_counts_  ", &q_counts_[0],  &q_counts_[num_domains_]);
+                debug::output(
+                    "d_lookup_  ", &d_lookup_[0], &d_lookup_[num_workers_]);
+                debug::output(
+                    "q_lookup_  ", &q_lookup_[0], &q_lookup_[num_workers_]);
+                debug::output(
+                    "hp_lookup_ ", &hp_lookup_[0], &hp_lookup_[num_workers_]);
+                debug::output(
+                    "np_lookup_ ", &np_lookup_[0], &np_lookup_[num_workers_]);
+                debug::output(
+                    "lp_lookup_ ", &lp_lookup_[0], &lp_lookup_[num_workers_]);
+                debug::output(
+                    "counters_  ", &counters_[0], &counters_[num_domains_]);
+                debug::output(
+                    "q_counts_  ", &q_counts_[0], &q_counts_[num_domains_]);
             }
 
             lock.unlock();
@@ -1496,14 +1643,17 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             // NOTE: This may call on_start_thread multiple times for a single
             // thread_queue.
-            lp_queues_[domain_num].queues_[lp_lookup_[thread_num]]->
-                on_start_thread(thread_num);
+            lp_queues_[domain_num]
+                .queues_[lp_lookup_[thread_num]]
+                ->on_start_thread(thread_num);
 
-            np_queues_[domain_num].queues_[np_lookup_[thread_num]]->
-                on_start_thread(thread_num);
+            np_queues_[domain_num]
+                .queues_[np_lookup_[thread_num]]
+                ->on_start_thread(thread_num);
 
-            hp_queues_[domain_num].queues_[hp_lookup_[thread_num]]->
-                on_start_thread(thread_num);
+            hp_queues_[domain_num]
+                .queues_[hp_lookup_[thread_num]]
+                ->on_start_thread(thread_num);
         }
 
         void on_stop_thread(std::size_t thread_num) override
@@ -1511,7 +1661,8 @@ namespace hpx { namespace threads { namespace policies { namespace example {
             LOG_CUSTOM_MSG("on_stop_thread with local thread num "
                 << decnumber(thread_num));
 
-            if (thread_num>num_workers_) {
+            if (thread_num > num_workers_)
+            {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "shared_priority_queue_scheduler_example::on_stop_thread",
                     "Invalid thread number: " + std::to_string(thread_num));
@@ -1521,23 +1672,27 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             // NOTE: This may call on_stop_thread multiple times for a single
             // thread_queue.
-            lp_queues_[domain_num].queues_[lp_lookup_[thread_num]]->
-                on_stop_thread(thread_num);
+            lp_queues_[domain_num]
+                .queues_[lp_lookup_[thread_num]]
+                ->on_stop_thread(thread_num);
 
-            np_queues_[domain_num].queues_[np_lookup_[thread_num]]->
-                on_stop_thread(thread_num);
+            np_queues_[domain_num]
+                .queues_[np_lookup_[thread_num]]
+                ->on_stop_thread(thread_num);
 
-            hp_queues_[domain_num].queues_[hp_lookup_[thread_num]]->
-                on_stop_thread(thread_num);
+            hp_queues_[domain_num]
+                .queues_[hp_lookup_[thread_num]]
+                ->on_stop_thread(thread_num);
         }
 
         void on_error(
             std::size_t thread_num, std::exception_ptr const& e) override
         {
-            LOG_CUSTOM_MSG("on_error with local thread num "
-                << decnumber(thread_num));
+            LOG_CUSTOM_MSG(
+                "on_error with local thread num " << decnumber(thread_num));
 
-            if (thread_num>num_workers_) {
+            if (thread_num > num_workers_)
+            {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "shared_priority_queue_scheduler_example::on_error",
                     "Invalid thread number: " + std::to_string(thread_num));
@@ -1547,14 +1702,14 @@ namespace hpx { namespace threads { namespace policies { namespace example {
 
             // NOTE: This may call on_error multiple times for a single
             // thread_queue.
-            lp_queues_[domain_num].queues_[lp_lookup_[thread_num]]->
-                on_error(thread_num, e);
+            lp_queues_[domain_num].queues_[lp_lookup_[thread_num]]->on_error(
+                thread_num, e);
 
-            np_queues_[domain_num].queues_[np_lookup_[thread_num]]->
-                on_error(thread_num, e);
+            np_queues_[domain_num].queues_[np_lookup_[thread_num]]->on_error(
+                thread_num, e);
 
-            hp_queues_[domain_num].queues_[hp_lookup_[thread_num]]->
-                on_error(thread_num, e);
+            hp_queues_[domain_num].queues_[hp_lookup_[thread_num]]->on_error(
+                thread_num, e);
         }
 
         void reset_thread_distribution() override
@@ -1596,7 +1751,7 @@ namespace hpx { namespace threads { namespace policies { namespace example {
         bool initialized_;
         std::mutex init_mutex;
     };
-}}}}
+}}}}    // namespace hpx::threads::policies::example
 #endif
 
 #include <hpx/config/warnings_suffix.hpp>

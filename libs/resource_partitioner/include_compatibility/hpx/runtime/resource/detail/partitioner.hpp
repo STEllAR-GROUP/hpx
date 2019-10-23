@@ -10,10 +10,12 @@
 
 #if defined(HPX_RESOURCE_PARTITIONER_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message("The header hpx/runtime/resource/detail/partitioner.hpp is deprecated, \
+#pragma message(                                                               \
+    "The header hpx/runtime/resource/detail/partitioner.hpp is deprecated, \
     please include hpx/resource_partitioner/detail/partitioner.hpp instead")
 #else
-#warning "The header hpx/runtime/resource/detail/partitioner.hpp is deprecated, \
+#warning                                                                       \
+    "The header hpx/runtime/resource/detail/partitioner.hpp is deprecated, \
     please include hpx/resource_partitioner/detail/partitioner.hpp instead"
 #endif
 #endif

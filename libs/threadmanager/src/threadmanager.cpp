@@ -161,7 +161,7 @@ namespace hpx { namespace threads {
             "high (non-recursive)",
         };
         // clang-format on
-    }
+    }    // namespace strings
 
     char const* get_thread_priority_name(thread_priority priority)
     {

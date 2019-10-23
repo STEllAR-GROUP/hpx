@@ -20,7 +20,7 @@ int hpx_main(int argc, char* argv[])
 {
     std::size_t num_threads = hpx::resource::get_num_threads("default");
     hpx::threads::thread_pool_base& tp =
-                hpx::resource::get_thread_pool("default");
+        hpx::resource::get_thread_pool("default");
 
     auto used_pu_mask = tp.get_used_processing_units();
     HPX_TEST_EQ(hpx::threads::count(used_pu_mask), num_threads);
@@ -36,9 +36,7 @@ int hpx_main(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg = {
-        "hpx.os_threads=4"
-    };
+    std::vector<std::string> cfg = {"hpx.os_threads=4"};
 
     // set up the resource partitioner
     hpx::resource::partitioner rp(argc, argv, std::move(cfg));

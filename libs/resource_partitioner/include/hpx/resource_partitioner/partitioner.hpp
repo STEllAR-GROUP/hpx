@@ -8,11 +8,11 @@
 #define HPX_RESOURCE_PARTITIONER_AUG_10_2017_1005AM
 
 #include <hpx/config.hpp>
-#include <hpx/resource_partitioner/partitioner_fwd.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/resource_partitioner/detail/create_partitioner.hpp>
+#include <hpx/resource_partitioner/partitioner_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/functional/function.hpp>
 
 #include <hpx/program_options.hpp>
 
@@ -21,16 +21,15 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resource
-{
+namespace hpx { namespace resource {
     ///////////////////////////////////////////////////////////////////////////
     class pu
     {
         HPX_CONSTEXPR static const std::size_t invalid_pu_id = std::size_t(-1);
 
     public:
-        explicit pu(std::size_t id = invalid_pu_id, core *core = nullptr,
-                std::size_t thread_occupancy = 0)
+        explicit pu(std::size_t id = invalid_pu_id, core* core = nullptr,
+            std::size_t thread_occupancy = 0)
           : id_(id)
           , core_(core)
           , thread_occupancy_(thread_occupancy)
@@ -52,7 +51,7 @@ namespace hpx { namespace resource
         std::vector<pu> pus_sharing_numa_domain();
 
         std::size_t id_;
-        core *core_;
+        core* core_;
 
         // indicates the number of threads that should run on this PU
         //  0: this PU is not exposed by the affinity bindings
@@ -66,11 +65,12 @@ namespace hpx { namespace resource
 
     class core
     {
-        HPX_CONSTEXPR static const std::size_t invalid_core_id = std::size_t(-1);
+        HPX_CONSTEXPR static const std::size_t invalid_core_id =
+            std::size_t(-1);
 
     public:
-        explicit core(std::size_t id = invalid_core_id,
-                numa_domain *domain = nullptr)
+        explicit core(
+            std::size_t id = invalid_core_id, numa_domain* domain = nullptr)
           : id_(id)
           , domain_(domain)
         {
@@ -93,7 +93,7 @@ namespace hpx { namespace resource
         friend class resource::detail::partitioner;
 
         std::size_t id_;
-        numa_domain *domain_;
+        numa_domain* domain_;
         std::vector<pu> pus_;
     };
 
@@ -130,49 +130,50 @@ namespace hpx { namespace resource
     class partitioner
     {
     public:
-        partitioner(
-            util::function_nonser<
-                int(hpx::program_options::variables_map& vm)
-            > const& f,
+        partitioner(util::function_nonser<int(
+                        hpx::program_options::variables_map& vm)> const& f,
             hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode = resource::mode_default,
             runtime_mode mode = runtime_mode_default)
-          : partitioner_(detail::create_partitioner(f, desc_cmdline, argc,
-                argv, std::move(ini_config), rpmode, mode))
-        {}
+          : partitioner_(detail::create_partitioner(f, desc_cmdline, argc, argv,
+                std::move(ini_config), rpmode, mode))
+        {
+        }
 
 #if !defined(HPX_EXPORTS)
-        partitioner(util::function_nonser<int(int, char**)> const& f,
-            int argc, char** argv,
+        partitioner(util::function_nonser<int(int, char**)> const& f, int argc,
+            char** argv,
             resource::partitioner_mode rpmode = resource::mode_default,
             hpx::runtime_mode mode = hpx::runtime_mode_default)
           : partitioner_(
                 detail::create_partitioner(f, argc, argv, rpmode, mode))
-        {}
+        {
+        }
 
-        partitioner(util::function_nonser<int(int, char**)> const& f,
-            int argc, char** argv, std::vector<std::string> const& cfg,
+        partitioner(util::function_nonser<int(int, char**)> const& f, int argc,
+            char** argv, std::vector<std::string> const& cfg,
             resource::partitioner_mode rpmode = resource::mode_default,
             hpx::runtime_mode mode = hpx::runtime_mode_default)
           : partitioner_(
                 detail::create_partitioner(f, argc, argv, cfg, rpmode, mode))
-        {}
+        {
+        }
 
         partitioner(int argc, char** argv,
             resource::partitioner_mode rpmode = resource::mode_default,
             runtime_mode mode = runtime_mode_default)
-          : partitioner_(
-                detail::create_partitioner(argc, argv, rpmode, mode))
-        {}
+          : partitioner_(detail::create_partitioner(argc, argv, rpmode, mode))
+        {
+        }
 
-        partitioner(int argc, char** argv,
-            std::vector<std::string> ini_config,
+        partitioner(int argc, char** argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode = resource::mode_default,
             runtime_mode mode = runtime_mode_default)
           : partitioner_(detail::create_partitioner(
                 argc, argv, std::move(ini_config), rpmode, mode))
-        {}
+        {
+        }
 
         partitioner(
             hpx::program_options::options_description const& desc_cmdline,
@@ -181,7 +182,8 @@ namespace hpx { namespace resource
             runtime_mode mode = runtime_mode_default)
           : partitioner_(detail::create_partitioner(
                 desc_cmdline, argc, argv, rpmode, mode))
-        {}
+        {
+        }
 
         partitioner(
             hpx::program_options::options_description const& desc_cmdline,
@@ -190,14 +192,16 @@ namespace hpx { namespace resource
             runtime_mode mode = runtime_mode_default)
           : partitioner_(detail::create_partitioner(
                 desc_cmdline, argc, argv, std::move(ini_config), rpmode, mode))
-        {}
+        {
+        }
 
         partitioner(std::nullptr_t f, int argc, char** argv,
             resource::partitioner_mode rpmode = resource::mode_default,
             hpx::runtime_mode mode = hpx::runtime_mode_default)
           : partitioner_(
                 detail::create_partitioner(f, argc, argv, rpmode, mode))
-        {}
+        {
+        }
 
         partitioner(std::nullptr_t f, int argc, char** argv,
             std::vector<std::string> const& cfg,
@@ -205,17 +209,18 @@ namespace hpx { namespace resource
             hpx::runtime_mode mode = hpx::runtime_mode_default)
           : partitioner_(
                 detail::create_partitioner(f, argc, argv, cfg, rpmode, mode))
-        {}
+        {
+        }
 
         partitioner(std::nullptr_t f,
             hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode = resource::mode_default,
             runtime_mode mode = runtime_mode_default)
-            : partitioner_(detail::create_partitioner(
-                  f, desc_cmdline, argc, argv, std::move(ini_config), rpmode,
-                  mode))
-        {}
+          : partitioner_(detail::create_partitioner(f, desc_cmdline, argc, argv,
+                std::move(ini_config), rpmode, mode))
+        {
+        }
 #endif
 
         ///////////////////////////////////////////////////////////////////////
@@ -226,13 +231,13 @@ namespace hpx { namespace resource
                 hpx::threads::policies::scheduler_mode::default_mode);
 
         // Create a custom thread pool with a callback function
-        HPX_EXPORT void create_thread_pool(std::string const& name,
-            scheduler_function scheduler_creation);
+        HPX_EXPORT void create_thread_pool(
+            std::string const& name, scheduler_function scheduler_creation);
 
         // allow the default pool to be renamed to something else
         HPX_EXPORT void set_default_pool_name(std::string const& name);
 
-        HPX_EXPORT const std::string & get_default_pool_name() const;
+        HPX_EXPORT const std::string& get_default_pool_name() const;
 
         ///////////////////////////////////////////////////////////////////////
         // Functions to add processing units to thread pools via
@@ -265,11 +270,11 @@ namespace hpx { namespace resource
         HPX_EXPORT std::size_t get_number_requested_threads();
 
         // return the topology object managed by the internal partitioner
-        HPX_EXPORT hpx::threads::topology const &get_topology() const;
+        HPX_EXPORT hpx::threads::topology const& get_topology() const;
 
     private:
         detail::partitioner& partitioner_;
     };
-}}
+}}    // namespace hpx::resource
 
 #endif

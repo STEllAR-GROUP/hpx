@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/barrier.hpp>
+#include <hpx/concurrency/spinlock.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/concurrency/spinlock.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -38,8 +38,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace threads
-{
+namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a thread-manager class is the central instance of management for
     /// all (non-depleted) threads
@@ -104,8 +103,7 @@ namespace hpx { namespace threads
         ///               thread_state#suspended, any other value will throw a
         ///               hpx#bad_parameter exception).
         void register_work(thread_init_data& data,
-            thread_state_enum initial_state = pending,
-            error_code& ec = throws);
+            thread_state_enum initial_state = pending, error_code& ec = throws);
 
         /// The function \a register_thread adds a new work item to the thread
         /// manager. It creates a new \a thread, adds it to the internal
@@ -139,8 +137,8 @@ namespace hpx { namespace threads
         ///               threadmanager#do_some_work is called). This parameter
         ///               is optional and defaults to \a true.
         void register_thread(thread_init_data& data, thread_id_type& id,
-            thread_state_enum initial_state = pending,
-            bool run_now = true, error_code& ec = throws);
+            thread_state_enum initial_state = pending, bool run_now = true,
+            error_code& ec = throws);
 
         /// \brief  Run the thread manager's work queue. This function
         ///         instantiates the specified number of OS threads in each
@@ -156,7 +154,7 @@ namespace hpx { namespace threads
         ///
         /// \param blocking
         ///
-        void stop (bool blocking = true);
+        void stop(bool blocking = true);
 
         // \brief Suspend all thread pools.
         void suspend();
@@ -264,7 +262,7 @@ namespace hpx { namespace threads
         }
 
         hwloc_bitmap_ptr get_pool_numa_bitmap(
-            const std::string &pool_name) const
+            const std::string& pool_name) const
         {
             return get_pool(pool_name).get_numa_domain_bitmap();
         }
@@ -291,7 +289,8 @@ namespace hpx { namespace threads
         {
             for (auto& pool_iter : pools_)
             {
-                pool_iter->add_remove_scheduler_mode(to_add_mode, to_remove_mode);
+                pool_iter->add_remove_scheduler_mode(
+                    to_add_mode, to_remove_mode);
             }
         }
 
@@ -331,7 +330,8 @@ namespace hpx { namespace threads
         std::int64_t get_average_thread_wait_time(bool reset);
         std::int64_t get_average_task_wait_time(bool reset);
 #endif
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
         std::int64_t get_background_work_duration(bool reset);
         std::int64_t get_background_overhead(bool reset);
 
@@ -405,8 +405,8 @@ namespace hpx { namespace threads
         std::int64_t get_num_stolen_to_staged(bool reset);
 #endif
 
-private:
-        mutable mutex_type mtx_; // mutex protecting the members
+    private:
+        mutable mutex_type mtx_;    // mutex protecting the members
 
         // specified by the user in command line, or all cores by default
         // represents the total number of OS threads, irrespective of how many
@@ -416,14 +416,14 @@ private:
         std::vector<pool_id_type> threads_lookup_;
 
 #ifdef HPX_HAVE_TIMER_POOL
-        util::io_service_pool& timer_pool_;     // used for timed set_state
+        util::io_service_pool& timer_pool_;    // used for timed set_state
 #endif
         pool_vector pools_;
 
         notification_policy_type& notifier_;
         detail::network_background_callback_type network_background_callback_;
     };
-}}
+}}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>
 

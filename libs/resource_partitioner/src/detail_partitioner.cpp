@@ -9,9 +9,9 @@
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/runtime/config_entry.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
