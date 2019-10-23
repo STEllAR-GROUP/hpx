@@ -720,10 +720,12 @@ jobs:
               ninja -j2 -k 0 tests.unit.modules.preprocessor
               ninja -j2 -k 0 tests.unit.modules.program_options
               ninja -j2 -k 0 tests.unit.modules.resiliency
+              ninja -j2 -k 0 tests.unit.modules.resource_partitioner
               ninja -j2 -k 0 tests.unit.modules.serialization
               ninja -j2 -k 0 tests.unit.modules.statistics
               ninja -j2 -k 0 tests.unit.modules.testing
               ninja -j2 -k 0 tests.unit.modules.thread_support
+              ninja -j2 -k 0 tests.unit.modules.threadmanager
               ninja -j2 -k 0 tests.unit.modules.timing
               ninja -j2 -k 0 tests.unit.modules.topology
               ninja -j2 -k 0 tests.unit.modules.type_support
@@ -756,10 +758,12 @@ jobs:
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.program_options
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.resiliency
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.resource_partitioner
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.serialization
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.statistics
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.testing
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.threadmanager
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.timing
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.topology
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.type_support
