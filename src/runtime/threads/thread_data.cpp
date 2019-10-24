@@ -10,6 +10,7 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/register_locks.hpp>
+#include <hpx/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/logging.hpp>

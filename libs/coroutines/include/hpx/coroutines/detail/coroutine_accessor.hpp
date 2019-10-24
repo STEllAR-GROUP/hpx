@@ -31,20 +31,9 @@
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
+
     struct coroutine_accessor
     {
-        template <typename Coroutine>
-        static void acquire(Coroutine& x)
-        {
-            x.acquire();
-        }
-
-        template <typename Coroutine>
-        static void release(Coroutine& x)
-        {
-            x.release();
-        }
-
         template <typename Coroutine>
         static typename Coroutine::impl_ptr get_impl(Coroutine& x)
         {
