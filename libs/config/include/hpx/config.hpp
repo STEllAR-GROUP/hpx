@@ -308,14 +308,14 @@
 #    define HPX_MAKE_DLL_STRING(n)  "lib" + n + HPX_SHARED_LIB_EXTENSION
 #  endif
 #elif defined(HPX_DEBUG)
-#  define HPX_MAKE_DLL_STRING(n)   n + "d" + HPX_SHARED_LIB_EXTENSION
+#  define HPX_MAKE_DLL_STRING(n)   (n) + "d" + HPX_SHARED_LIB_EXTENSION
 #else
-#  define HPX_MAKE_DLL_STRING(n)   n + HPX_SHARED_LIB_EXTENSION
+#  define HPX_MAKE_DLL_STRING(n)   (n) + HPX_SHARED_LIB_EXTENSION
 #endif
 
 #if defined(HPX_DEBUG)
 #  define HPX_MANGLE_NAME(n)     HPX_PP_CAT(n, d)
-#  define HPX_MANGLE_STRING(n)   n + "d"
+#  define HPX_MANGLE_STRING(n)   (n) + "d"
 #else
 #  define HPX_MANGLE_NAME(n)     n
 #  define HPX_MANGLE_STRING(n)   n

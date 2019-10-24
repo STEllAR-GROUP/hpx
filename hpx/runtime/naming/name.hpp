@@ -431,7 +431,7 @@ namespace hpx { namespace naming
     inline gid_type get_gid_from_locality_id(std::uint32_t locality_id) noexcept
     {
         return gid_type(
-            std::uint64_t(locality_id+1) << gid_type::locality_id_shift,
+            (std::uint64_t(locality_id)+1) << gid_type::locality_id_shift,
             0);
     }
 
@@ -505,7 +505,7 @@ namespace hpx { namespace naming
         std::uint64_t msb = gid.get_msb() & ~gid_type::component_type_mask;
 
         HPX_ASSERT(!(msb & gid_type::dynamically_assigned));
-        msb |= ((type << gid_type::component_type_shift) &
+        msb |= ((std::uint64_t(type) << gid_type::component_type_shift) &
                     gid_type::component_type_mask);
         return gid_type(msb, gid.get_lsb());
     }
@@ -659,7 +659,7 @@ namespace hpx { namespace naming
         {
             HPX_ASSERT(!(msb & gid_type::dynamically_assigned));
             return (msb & ~gid_type::component_type_mask) |
-                ((type << gid_type::component_type_shift) &
+                ((std::uint64_t(type) << gid_type::component_type_shift) &
                     gid_type::component_type_mask);
         }
 
@@ -922,7 +922,7 @@ namespace hpx { namespace naming
     inline id_type get_id_from_locality_id(std::uint32_t locality_id) noexcept
     {
         return id_type(
-            std::uint64_t(locality_id+1) << gid_type::locality_id_shift,
+            (std::uint64_t(locality_id)+1) << gid_type::locality_id_shift,
             0, id_type::unmanaged);
     }
 

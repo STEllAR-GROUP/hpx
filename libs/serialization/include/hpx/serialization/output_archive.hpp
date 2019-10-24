@@ -15,7 +15,6 @@
 #include <hpx/serialization/basic_archive.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/detail/raw_ptr.hpp>
-#include <hpx/serialization/extra_output_data.hpp>
 #include <hpx/serialization/output_container.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
@@ -114,18 +113,7 @@ namespace hpx { namespace serialization {
         output_archive(Container& buffer, std::uint32_t flags = 0U,
             std::vector<serialization_chunk>* chunks = nullptr,
             binary_filter* filter = nullptr)
-          : output_archive(detail::init_extra_output_data<
-                               default_extra_output_data_size>(),
-                buffer, flags, chunks, filter)
-        {
-        }
-
-        template <typename Container>
-        output_archive(extra_archive_data_type&& extra_data, Container& buffer,
-            std::uint32_t flags = 0U,
-            std::vector<serialization_chunk>* chunks = nullptr,
-            binary_filter* filter = nullptr)
-          : base_type(make_flags(flags, chunks), std::move(extra_data))
+          : base_type(make_flags(flags, chunks))
           , buffer_(detail::create_output_container(buffer, chunks, filter,
                 typename traits::serialization_access_data<
                     Container>::preprocessing_only()))
@@ -172,12 +160,6 @@ namespace hpx { namespace serialization {
         {
             buffer_->reset();
             basic_archive<output_archive>::reset();
-        }
-
-        template <std::size_t N>
-        void reset_extra_data()
-        {
-            detail::reset_extra_output_data<N>(this->extra_data_);
         }
 
         void flush()

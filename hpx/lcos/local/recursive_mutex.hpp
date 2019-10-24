@@ -13,6 +13,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <atomic>
@@ -27,33 +28,37 @@ namespace hpx { namespace lcos { namespace local
         template <typename Mutex>
         struct thread_id_from_mutex
         {
-            typedef std::size_t thread_id_type;
+            static threads::thread_id invalid_id() noexcept
+            {
+                return threads::invalid_thread_id;
+            }
 
-            static thread_id_type invalid_id() { return ~0u; }
-
-            static thread_id_type call()
+            static threads::thread_id call() noexcept
             {
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
-                return (thread_id_type)GetCurrentThreadId();
+                return threads::thread_id{reinterpret_cast<void*>(
+                    static_cast<std::size_t>(GetCurrentThreadId()))};
 #else
-                return (thread_id_type)pthread_self();
+                return threads::thread_id{
+                    reinterpret_cast<void*>(pthread_self())};
 #endif
-            };
+            }
         };
 
         template <>
         struct thread_id_from_mutex<lcos::local::spinlock>
         {
-            typedef std::size_t thread_id_type;
+            static threads::thread_id invalid_id() noexcept
+            {
+                return threads::invalid_thread_id;
+            }
 
-            static thread_id_type invalid_id() { return ~0u; }
-
-            static thread_id_type call()
+            static threads::thread_id call()
             {
                 return hpx::threads::get_self_ptr() ?
-                    reinterpret_cast<thread_id_type>(hpx::threads::get_self_id().get()) :
+                    hpx::threads::get_self_id() :
                     thread_id_from_mutex<void>::call();
-            };
+            }
         };
 
         /// An exclusive-ownership recursive mutex which implements Boost.Thread's
@@ -65,8 +70,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_NON_COPYABLE(recursive_mutex_impl);
 
         private:
-            typedef typename thread_id_from_mutex<Mutex>::thread_id_type
-                thread_id_type;
+            using thread_id_type = threads::thread_id;
 
             std::atomic<std::uint64_t> recursion_count;
             std::atomic<thread_id_type> locking_thread_id;
@@ -212,7 +216,7 @@ namespace hpx { namespace lcos { namespace local
         };
     }
 
-    typedef detail::recursive_mutex_impl<> recursive_mutex;
+    using recursive_mutex = detail::recursive_mutex_impl<>;
 }}}
 
 #endif

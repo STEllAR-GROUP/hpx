@@ -13,7 +13,6 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/serialization/extra_output_data.hpp>
 
 #include <map>
 #include <mutex>

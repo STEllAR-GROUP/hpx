@@ -565,7 +565,10 @@ namespace hpx
             start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_, std::move(startup),
                 std::move(shutdown));
 
-            (void)rt.release();          // pointer to runtime is stored in TLS
+            // pointer to runtime is stored in TLS
+            hpx::runtime* p = rt.release();
+            (void)p;
+
             return 0;
         }
 
@@ -917,7 +920,7 @@ namespace hpx
                     argv[argcount++] = const_cast<char*>(args[i].data());
                 }
                 else if (6 == args[i].find("positional", 6)) {
-                    std::string::size_type p = args[i].find_first_of("=");
+                    std::string::size_type p = args[i].find_first_of('=');
                     if (p != std::string::npos) {
                         args[i] = args[i].substr(p+1);
                         argv[argcount++] = const_cast<char*>(args[i].data());

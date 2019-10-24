@@ -62,6 +62,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -262,7 +263,12 @@ namespace hpx { namespace components { namespace server
       , main_thread_id_(std::this_thread::get_id())
       , dijkstra_color_(false)
       , shutdown_all_invoked_(false)
+      , dijkstra_mtx_()
+      , dijkstra_cond_()
+      , p_mtx_()
+      , plugins_()
       , modules_(cfg.modules())
+      , static_modules_()
     {}
 
     // function to be called during shutdown
@@ -976,16 +982,15 @@ namespace hpx { namespace components { namespace server
                 {
                     // print the mask for the current PU
                     threads::mask_cref_type pu_mask = rp.get_pu_mask(i);
-                    std::string pool_name = tm.get_pool(i).get_pool_name();
 
                     if (!threads::any(pu_mask))
                     {
-                        strm << std::setw(4) << i
-                             << ": thread binding disabled"    //-V112
-                             << std::endl;
+                        strm << std::setw(4) << i    //-V112
+                             << ": thread binding disabled" << std::endl;
                     }
                     else
                     {
+                        std::string pool_name = tm.get_pool(i).get_pool_name();
                         top.print_affinity_mask(strm, i, pu_mask, pool_name);
                     }
 
@@ -1475,7 +1480,6 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
 
-            error_code ec(lightweight);
             if (nullptr == component_ini ||
                 "0" == component_ini->get_entry("no_factory", "0"))
             {
@@ -1494,6 +1498,7 @@ namespace hpx { namespace components { namespace server
             // make sure startup/shutdown registration is called once for each
             // module, same for plugins
             if (startup_handled.find(component) == startup_handled.end()) {
+                error_code ec(lightweight);
                 startup_handled.insert(component);
                 load_commandline_options_static(component, options, ec);
                 if (ec) ec = error_code(lightweight);
@@ -1923,7 +1928,6 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
 
-            error_code ec(lightweight);
             if (nullptr == component_ini ||
                 "0" == component_ini->get_entry("no_factory", "0"))
             {
@@ -1938,6 +1942,7 @@ namespace hpx { namespace components { namespace server
             // make sure startup/shutdown registration is called once for each
             // module, same for plugins
             if (startup_handled.find(d.get_name()) == startup_handled.end()) {
+                error_code ec(lightweight);
                 startup_handled.insert(d.get_name());
                 load_commandline_options(d, options, ec);
                 if (ec) ec = error_code(lightweight);

@@ -13,8 +13,7 @@ namespace hpx { namespace lcos { namespace detail {
         hpx::lcos::detail::future_data_refcnt_base& state)
     {
         auto& handle_futures =
-            ar.get_extra_data<serialization::detail::preprocess_futures>(
-                serialization::extra_output_handle_futures);
+            ar.get_extra_data<serialization::detail::preprocess_futures>();
 
         handle_futures.await_future(state);
     }

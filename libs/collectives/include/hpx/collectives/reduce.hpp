@@ -132,10 +132,8 @@ namespace hpx { namespace lcos {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Action, typename Futures, typename... Ts>
-        void reduce_invoke(Action /*act*/
-            ,
-            Futures& futures, hpx::id_type const& id, std::size_t,
-            Ts const&... vs)
+        void reduce_invoke(Action, Futures& futures, hpx::id_type const& id,
+            std::size_t, Ts const&... vs)
         {
             futures.push_back(hpx::async<Action>(id, vs...));
         }

@@ -40,7 +40,7 @@ namespace hpx { namespace program_options {
             std::string current;
             bool inside_quoted = false;
             bool empty_quote = false;
-            int backslash_count = 0;
+            std::size_t backslash_count = 0;
 
             for (; i != e; ++i)
             {

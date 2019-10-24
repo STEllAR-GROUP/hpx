@@ -150,7 +150,7 @@ if lib_name != '--recreate-index':
 
     ################################################################################
     # Generate basic directory structure
-    for subdir in ['cmake', 'docs', 'examples', 'include', 'src', 'tests']:
+    for subdir in ['docs', 'examples', 'include', 'src', 'tests']:
         path = os.path.join(lib_name, subdir)
         mkdir(path)
     # Generate include directory structure

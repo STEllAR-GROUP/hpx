@@ -108,8 +108,8 @@ namespace hpx { namespace serialization { namespace detail {
                     serialization_error, "polymorphic_id_factory::create", msg);
             }
 
-            ctor_t ctor = vec[id];    //-V108
-            HPX_ASSERT(ctor != nullptr);
+            ctor_t ctor = vec[id];
+            HPX_ASSERT(ctor != nullptr);    //-V108
             return static_cast<T*>(ctor());
         }
 

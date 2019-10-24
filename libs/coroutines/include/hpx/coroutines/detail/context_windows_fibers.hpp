@@ -204,7 +204,9 @@ namespace hpx { namespace threads { namespace coroutines {
              *  a new stack. The stack size can be optionally specified.
              */
             explicit fibers_context_impl(std::ptrdiff_t stack_size)
-              : stacksize_(stack_size == -1 ? default_stack_size : stack_size)
+              : stacksize_(stack_size == -1 ?
+                        std::ptrdiff_t(default_stack_size) :
+                        stack_size)
             {
             }
 
@@ -213,9 +215,7 @@ namespace hpx { namespace threads { namespace coroutines {
                 if (m_ctx != nullptr)
                     return;
 
-                m_ctx = CreateFiberEx(
-                    stack_size == -1 ? default_stack_size : stack_size,
-                    stack_size == -1 ? default_stack_size : stack_size, 0,
+                m_ctx = CreateFiberEx(stack_size, stack_size, 0,
                     static_cast<LPFIBER_START_ROUTINE>(
                         &trampoline<CoroutineImpl>),
                     static_cast<LPVOID>(this));

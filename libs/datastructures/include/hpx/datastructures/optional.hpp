@@ -136,6 +136,11 @@ namespace hpx { namespace util {
             std::is_nothrow_move_assignable<T>::value&&
                 std::is_nothrow_move_constructible<T>::value)
         {
+            if (this == &other)
+            {
+                return *this;
+            }
+
             if (empty_)
             {
                 if (!other.empty_)

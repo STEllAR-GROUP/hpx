@@ -104,7 +104,8 @@ namespace hpx { namespace parcelset
     parcelhandler::parcelhandler(util::runtime_configuration& cfg,
         threads::threadmanager* tm,
         threads::policies::callback_notifier const& notifier)
-      : tm_(tm)
+      : resolver_(nullptr)
+      , tm_(tm)
       , use_alternative_parcelports_(false)
       , enable_parcel_handling_(true)
       , load_message_handlers_(util::get_entry_as<int>(cfg,

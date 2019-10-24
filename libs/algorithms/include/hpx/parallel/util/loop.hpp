@@ -143,8 +143,9 @@ namespace hpx { namespace parallel { namespace util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
                 Iter it, std::size_t num, F&& f)
             {
-                std::size_t count(num & std::size_t(-4));
-                for (std::size_t i = 0; i < count; (void) ++it, i += 4)
+                std::size_t count(num & std::size_t(-4));    // -V112
+                for (std::size_t i = 0; i < count;
+                     (void) ++it, i += 4)    // -V112
                 {
                     f(it);
                     f(++it);
@@ -162,8 +163,9 @@ namespace hpx { namespace parallel { namespace util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
                 Iter it, std::size_t num, CancelToken& tok, F&& f)
             {
-                std::size_t count(num & std::size_t(-4));
-                for (std::size_t i = 0; i < count; (void) ++it, i += 4)
+                std::size_t count(num & std::size_t(-4));    // -V112
+                for (std::size_t i = 0; i < count;
+                     (void) ++it, i += 4)    // -V112
                 {
                     if (tok.was_cancelled())
                         break;

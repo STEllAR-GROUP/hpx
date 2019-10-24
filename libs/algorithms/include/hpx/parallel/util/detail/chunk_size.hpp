@@ -63,10 +63,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             if (chunk_size == 0)
             {
                 // try to calculate chunk-size and maximum number of chunks
-                chunk_size = (count + 4 * cores - 1) / (4 * cores);
+                chunk_size = (count + 4 * cores - 1) / (4 * cores);    // -V112
 
                 // we should not consider more chunks than we have elements
-                max_chunks = (std::min)(4 * cores, count);
+                max_chunks = (std::min)(4 * cores, count);    // -V112
 
                 // we should not make chunks smaller than what's determined by
                 // the max chunk size

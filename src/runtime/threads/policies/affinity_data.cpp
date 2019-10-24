@@ -17,6 +17,7 @@
 #include <atomic>
 #include <cstddef>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace threads { namespace policies { namespace detail {
@@ -52,8 +53,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
 
     std::size_t affinity_data::init(std::size_t num_threads,
         std::size_t max_cores, std::size_t pu_offset, std::size_t pu_step,
-        std::size_t used_cores, std::string affinity_domain,
-        std::string affinity_description, bool use_process_mask)
+        std::size_t used_cores, std::string affinity_domain,    // -V813
+        std::string const& affinity_description, bool use_process_mask)
     {
         num_threads_ = num_threads;
         use_process_mask_ = use_process_mask;
@@ -73,7 +74,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
             pu_step_ = pu_step % num_system_pus;
         }
 
-        affinity_domain_ = affinity_domain;
+        affinity_domain_ = std::move(affinity_domain);
         pu_nums_.clear();
 
         init_cached_pu_nums(num_system_pus);

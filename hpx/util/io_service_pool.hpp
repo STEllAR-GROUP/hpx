@@ -103,12 +103,13 @@ namespace hpx { namespace util
         void wait_locked();
 
     private:
-        typedef std::unique_ptr<boost::asio::io_service> io_service_ptr;
+        using io_service_ptr = std::unique_ptr<boost::asio::io_service>;
+
 // FIXME: Intel compilers don't like this
 #if defined(HPX_NATIVE_MIC)
         typedef std::unique_ptr<boost::asio::io_service::work> work_type;
 #else
-        typedef boost::asio::io_service::work work_type;
+        using work_type = boost::asio::io_service::work;
 #endif
 
         HPX_FORCEINLINE work_type initialize_work(boost::asio::io_service& io_service)

@@ -7,6 +7,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/util/thread_mapper.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <string>
@@ -103,8 +104,9 @@ namespace hpx { namespace util
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        if (tix >= thread_info_.size()) return false; //-V104
-        thread_info_[tix].cleanup_ = cb; //-V108
+        if (static_cast<std::size_t>(tix) >= thread_info_.size())
+            return false;
+        thread_info_[static_cast<std::size_t>(tix)].cleanup_ = cb;
         return true;
     }
 
@@ -112,8 +114,10 @@ namespace hpx { namespace util
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        if (tix >= thread_info_.size()) return false; //-V104
-        thread_info_[tix].cleanup_ = &thread_mapper::null_cb; //-V108
+        if (static_cast<std::size_t>(tix) >= thread_info_.size())
+            return false;
+        thread_info_[static_cast<std::size_t>(tix)].cleanup_ =
+            &thread_mapper::null_cb;
         return true;
     }
 
@@ -121,8 +125,9 @@ namespace hpx { namespace util
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        return (tix < thread_info_.size()) ? //-V104
-            thread_info_[tix].tid_: invalid_tid; //-V108
+        return (static_cast<std::size_t>(tix) < thread_info_.size()) ?
+            thread_info_[static_cast<std::size_t>(tix)].tid_ :
+            invalid_tid;
     }
 
     std::string const& thread_mapper::get_thread_label(std::uint32_t tix) const

@@ -1039,8 +1039,9 @@ namespace hpx { namespace threads { namespace detail
         std::size_t pus_t2 = 0;
         for (std::size_t n = 0; n < num_numas; ++n)
         {
-            std::size_t temp = static_cast<std::size_t>(std::round(
-                static_cast<double>(num_threads * num_pus_numa[n]) / pus_t));
+            std::size_t temp = static_cast<std::size_t>(
+                std::round(static_cast<double>(num_threads * num_pus_numa[n]) /
+                    static_cast<double>(pus_t)));
 
             // due to rounding up, we might have too many threads
             if ((pus_t2 + temp) > num_threads)

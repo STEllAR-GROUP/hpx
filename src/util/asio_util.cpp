@@ -329,7 +329,7 @@ namespace hpx { namespace util
     bool split_ip_address(std::string const& v, std::string& host,
         std::uint16_t& port)
     {
-        std::string::size_type p = v.find_first_of(":");
+        std::string::size_type p = v.find_first_of(':');
 
         std::string tmp_host;
         std::uint16_t tmp_port = 0;

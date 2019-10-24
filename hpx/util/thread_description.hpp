@@ -87,7 +87,7 @@ namespace hpx { namespace util
         {
             char const* name = traits::get_function_annotation<F>::call(f);
             // If a name exists, use it, not the altname.
-            if (name != nullptr)
+            if (name != nullptr)    // -V547
             {
                 altname = name;
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)

@@ -40,8 +40,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         typedef std::shared_ptr<connection_type> connection_ptr;
         typedef std::deque<connection_ptr> connection_list;
 
-        receiver(Parcelport & pp)
+        receiver(Parcelport& pp)
           : pp_(pp)
+          , hdr_request_(0)
         {}
 
         void run()

@@ -275,7 +275,8 @@ namespace hpx { namespace lcos {
                     hpx::parallel::execution::parallel_executor;
 
                 executor_type exec;
-                std::size_t offset = hpx::get_locality_id();
+                std::size_t offset =
+                    static_cast<std::size_t>(hpx::get_locality_id());
                 offset *= images_per_locality;
 
                 hpx::parallel::execution::bulk_sync_execute(exec,
@@ -304,7 +305,9 @@ namespace hpx { namespace lcos {
         helper_action_type act;
 
         std::size_t num_images =
-            hpx::get_num_localities(hpx::launch::sync) * images_per_locality;
+            static_cast<std::size_t>(
+                hpx::get_num_localities(hpx::launch::sync)) *
+            images_per_locality;
 
         return hpx::lcos::broadcast(act, hpx::find_all_localities(),
             std::forward<std::string>(name), images_per_locality, num_images,

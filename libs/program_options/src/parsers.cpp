@@ -21,6 +21,7 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <utility>
 
 #ifdef _WIN32
 #include <stdlib.h>
@@ -169,7 +170,7 @@ namespace hpx { namespace program_options {
             if (!option_name.empty())
             {
                 option n;
-                n.string_key = option_name;
+                n.string_key = std::move(option_name);
                 n.value.push_back(i->second);
                 result.options.push_back(n);
             }

@@ -11,6 +11,7 @@
 #include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/errors.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <unordered_map>
@@ -147,7 +148,7 @@ namespace hpx { namespace actions { namespace detail
         }
 
         ctor_t ctor = this_.cache_[id];
-        if (ctor == nullptr)
+        if (ctor == nullptr)   // -V108
         {
             std::string msg("Unknown type descriptor " + std::to_string(id));
 #if defined(HPX_DEBUG)
@@ -172,16 +173,17 @@ namespace hpx { namespace actions { namespace detail
 
     void action_registry::cache_id(std::uint32_t id, action_registry::ctor_t ctor)
     {
-        if (id >= cache_.size())
+        std::size_t id_ = std::size_t(id);
+        if (id_ >= cache_.size())
         {
-            cache_.resize(id + 1, nullptr);
-            cache_[id] = nullptr;
+            cache_.resize(id_ + 1, nullptr);
+            cache_[id_] = nullptr;
             return;
         }
 
-        if (cache_[id] == nullptr)
+        if (cache_[id_] == nullptr)
         {
-            cache_[id] = ctor;
+            cache_[id_] = ctor;
         }
     }
 

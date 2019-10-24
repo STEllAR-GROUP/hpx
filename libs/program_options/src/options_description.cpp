@@ -416,7 +416,7 @@ namespace hpx { namespace program_options {
 
         */
         void format_paragraph(std::ostream& os, std::string par,
-            unsigned indent, unsigned line_length)
+            std::size_t indent, std::size_t line_length)
         {
             // Through reminder of this function, 'line_length' will
             // be the length available for characters, not including
@@ -533,7 +533,7 @@ namespace hpx { namespace program_options {
                     {
                         os << '\n';
 
-                        for (unsigned pad = indent; pad > 0; --pad)
+                        for (std::size_t pad = indent; pad > 0; --pad)
                         {
                             os.put(' ');
                         }
@@ -546,7 +546,7 @@ namespace hpx { namespace program_options {
         }
 
         void format_description(std::ostream& os, const std::string& desc,
-            unsigned first_column_width, unsigned line_length)
+            std::size_t first_column_width, std::size_t line_length)
         {
             // we need to use one char less per line to work correctly if actual
             // console has longer lines
@@ -585,7 +585,7 @@ namespace hpx { namespace program_options {
                 {
                     os << '\n';
 
-                    for (unsigned pad = first_column_width; pad > 0; --pad)
+                    for (std::size_t pad = first_column_width; pad > 0; --pad)
                     {
                         os.put(' ');
                     }
@@ -594,7 +594,7 @@ namespace hpx { namespace program_options {
         }
 
         void format_one(std::ostream& os, const option_description& opt,
-            unsigned first_column_width, unsigned line_length)
+            std::size_t first_column_width, std::size_t line_length)
         {
             stringstream ss;
             ss << "  " << opt.format_name() << ' ' << opt.format_parameter();
@@ -608,15 +608,14 @@ namespace hpx { namespace program_options {
                 {
                     // first column is too long, lets put description in new line
                     os.put('\n');
-                    for (unsigned pad = first_column_width; pad > 0; --pad)
+                    for (std::size_t pad = first_column_width; pad > 0; --pad)
                     {
                         os.put(' ');
                     }
                 }
                 else
                 {
-                    for (unsigned pad = first_column_width -
-                             static_cast<unsigned>(ss.str().size());
+                    for (std::size_t pad = first_column_width - ss.str().size();
                          pad > 0; --pad)
                     {
                         os.put(' ');
@@ -629,17 +628,17 @@ namespace hpx { namespace program_options {
         }
     }    // namespace
 
-    unsigned options_description::get_option_column_width() const
+    std::size_t options_description::get_option_column_width() const
     {
         /* Find the maximum width of the option column */
-        unsigned width(23);
-        unsigned i;    // vc6 has broken for loop scoping
+        std::size_t width(23);
+        std::size_t i;    // vc6 has broken for loop scoping
         for (i = 0; i < m_options.size(); ++i)
         {
             const option_description& opt = *m_options[i];
             stringstream ss;
             ss << "  " << opt.format_name() << ' ' << opt.format_parameter();
-            width = (std::max)(width, static_cast<unsigned>(ss.str().size()));
+            width = (std::max)(width, ss.str().size());
         }
 
         /* Get width of groups as well*/
@@ -648,7 +647,7 @@ namespace hpx { namespace program_options {
 
         /* this is the column were description should start, if first
            column is longer, we go to a new line */
-        const unsigned start_of_description_column =
+        std::size_t const start_of_description_column =
             m_line_length - m_min_description_length;
 
         width = (std::min)(width, start_of_description_column - 1);
@@ -658,7 +657,7 @@ namespace hpx { namespace program_options {
         return width;
     }
 
-    void options_description::print(std::ostream& os, unsigned width) const
+    void options_description::print(std::ostream& os, std::size_t width) const
     {
         if (!m_caption.empty())
             os << m_caption << ":\n";
@@ -667,7 +666,7 @@ namespace hpx { namespace program_options {
             width = get_option_column_width();
 
         /* The options formatting style is stolen from Subversion. */
-        for (unsigned i = 0; i < m_options.size(); ++i)
+        for (std::size_t i = 0; i < m_options.size(); ++i)
         {
             if (belong_to_group[i])
                 continue;

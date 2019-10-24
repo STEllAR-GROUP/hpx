@@ -88,7 +88,7 @@ namespace hpx { namespace traits {
                 break;
 
             case 4:
-                std::memcpy(dest, address, 4);
+                std::memcpy(dest, address, 4);    // -V112
                 break;
 
             case 2:
@@ -128,7 +128,7 @@ namespace hpx { namespace traits {
                 break;
 
             case 4:
-                std::memcpy(address, src, 4);
+                std::memcpy(address, src, 4);    // -V112
                 break;
 
             case 2:

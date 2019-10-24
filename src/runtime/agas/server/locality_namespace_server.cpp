@@ -269,7 +269,7 @@ std::uint32_t locality_namespace::allocate(
 } // }}}
 
 parcelset::endpoints_type locality_namespace::resolve_locality(
-    naming::gid_type locality)
+    naming::gid_type const& locality)
 { // {{{ resolve_locality implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.resolve_locality_.time_,
@@ -291,7 +291,7 @@ parcelset::endpoints_type locality_namespace::resolve_locality(
     return parcelset::endpoints_type();
 } // }}}
 
-void locality_namespace::free(naming::gid_type locality)
+void locality_namespace::free(naming::gid_type const& locality)
 { // {{{ free implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.free_.time_,
@@ -450,7 +450,7 @@ std::uint32_t locality_namespace::get_num_overall_threads()
     return num_threads;
 }
 
-naming::gid_type locality_namespace::statistics_counter(std::string name)
+naming::gid_type locality_namespace::statistics_counter(std::string const& name)
 { // {{{ statistics_counter implementation
     LAGAS_(info) << "locality_namespace::statistics_counter";
 

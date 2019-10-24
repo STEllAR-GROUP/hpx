@@ -28,6 +28,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -293,7 +294,7 @@ namespace hpx { namespace util
         {
             std::string result;
             std::string::size_type pos = 0;
-            std::string::size_type pos1 = value.find_first_of ("\\", 0);
+            std::string::size_type pos1 = value.find_first_of ('\\', 0);
             if (std::string::npos != pos1) {
                 do {
                     switch (value[pos1+1]) {
@@ -301,18 +302,18 @@ namespace hpx { namespace util
                     case '\"':
                     case '?':
                         result = result + value.substr(pos, pos1-pos);
-                        pos1 = value.find_first_of ("\\", (pos = pos1+1)+1);
+                        pos1 = value.find_first_of ('\\', (pos = pos1+1)+1);
                         break;
 
                     case 'n':
                         result = result + value.substr(pos, pos1-pos) + "\n";
-                        pos1 = value.find_first_of ("\\", pos = pos1+1);
+                        pos1 = value.find_first_of ('\\', pos = pos1+1);
                         ++pos;
                         break;
 
                     default:
                         result = result + value.substr(pos, pos1-pos+1);
-                        pos1 = value.find_first_of ("\\", pos = pos1+1);
+                        pos1 = value.find_first_of ('\\', pos = pos1+1);
                     }
 
                 } while (pos1 != std::string::npos);

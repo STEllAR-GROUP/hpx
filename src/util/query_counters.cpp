@@ -116,7 +116,7 @@ namespace hpx { namespace util
     void query_counters::print_name_csv(Stream& out, std::string const& name)
     {
         std::string s = performance_counters::remove_counter_prefix(name);
-        if (s.find_first_of(",") != std::string::npos)
+        if (s.find_first_of(',') != std::string::npos)
             out << "\"" << s << "\"";
         else
             out << s;
@@ -425,7 +425,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     bool query_counters::print_raw_counters(bool destination_is_cout,
-        bool no_output, bool reset, char const* description,
+        bool reset, bool no_output, char const* description,
         std::vector<performance_counters::counter_info> const& infos,
         error_code& ec)
     {
@@ -479,7 +479,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     bool query_counters::print_array_counters(bool destination_is_cout,
-        bool no_output, bool reset, char const* description,
+        bool reset, bool no_output, char const* description,
         std::vector<performance_counters::counter_info> const& infos,
         error_code& ec)
     {
@@ -569,11 +569,11 @@ namespace hpx { namespace util
         std::vector<performance_counters::counter_info> infos =
             counters_.get_counter_infos();
 
-        result = print_raw_counters(destination_is_cout, no_output, reset,
+        result = print_raw_counters(destination_is_cout, reset, no_output,
             description, infos, ec);
         if (ec) return false;
 
-        result = print_array_counters(destination_is_cout, no_output, reset,
+        result = print_array_counters(destination_is_cout, reset, no_output,
             description, infos, ec) || result;
         if (ec) return false;
 

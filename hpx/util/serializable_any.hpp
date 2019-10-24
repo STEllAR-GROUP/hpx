@@ -346,7 +346,7 @@ namespace hpx { namespace util {
                 typename detail::any::fxn_ptr_table<IArch, OArch, Char,
                     std::true_type>* p = nullptr;
                 ar >> hpx::serialization::detail::raw_ptr(p);
-                table = p->get_ptr();
+                table = p->get_ptr();  // -V522
                 delete p;
                 table->load_object(&object, ar, version);
             }

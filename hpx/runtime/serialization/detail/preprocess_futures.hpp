@@ -14,8 +14,6 @@
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos_fwd.hpp>
-#include <hpx/serialization/extra_archive_data.hpp>
-#include <hpx/serialization/extra_output_data.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -50,6 +48,13 @@ namespace hpx { namespace serialization { namespace detail {
             rhs.done_ = true;
             rhs.num_futures_ = 0;
             rhs.triggered_futures_ = 0;
+        }
+
+        ~preprocess_futures()
+        {
+            HPX_ASSERT(done_);
+            HPX_ASSERT(num_futures_ == 0);
+            HPX_ASSERT(num_futures_ == triggered_futures_);
         }
 
         preprocess_futures& operator=(preprocess_futures&& rhs) noexcept
@@ -90,6 +95,8 @@ namespace hpx { namespace serialization { namespace detail {
         {
             {
                 std::lock_guard<mutex_type> l(mtx_);
+                if (num_futures_ == 0)
+                    done_ = false;
                 ++num_futures_;
             }
 
@@ -98,7 +105,7 @@ namespace hpx { namespace serialization { namespace detail {
 
         void reset()
         {
-            done_ = false;
+            done_ = true;
             num_futures_ = 0;
             triggered_futures_ = 0;
             promise_ = hpx::lcos::local::promise<void>();
@@ -106,10 +113,6 @@ namespace hpx { namespace serialization { namespace detail {
 
         bool has_futures()
         {
-            if (num_futures_ == 0)
-            {
-                promise_.set_value();
-            }
             return num_futures_ > 0;
         }
 
@@ -117,6 +120,7 @@ namespace hpx { namespace serialization { namespace detail {
         void operator()(F f)
         {
             bool set_promise = false;
+            hpx::future<void> fut = promise_.get_future();
 
             {
                 std::lock_guard<mutex_type> l(mtx_);
@@ -125,26 +129,17 @@ namespace hpx { namespace serialization { namespace detail {
                     set_promise = true;
             }
 
-            hpx::future<void> fut = promise_.get_future();
-
             if (set_promise)
                 promise_.set_value();
 
             // we don't call f directly to avoid possible stack overflow.
-            auto shared_state_ =
+            auto& shared_state_ =
                 hpx::traits::future_access<hpx::future<void>>::get_shared_state(
                     fut);
-            shared_state_->set_on_completed(std::move(f));
-        }
-
-        // We add this solely for the purpose of making unique_any compile.
-        // Comparing instances of this type does not make any sense,
-        // conceptually.
-        friend bool operator==(
-            preprocess_futures const&, preprocess_futures const&)
-        {
-            HPX_ASSERT(false);    // shouldn't ever be called
-            return false;
+            shared_state_->set_on_completed([this, HPX_CAPTURE_MOVE(f)]() {
+                reset();
+                f();
+            });
         }
 
     private:
@@ -155,26 +150,5 @@ namespace hpx { namespace serialization { namespace detail {
         hpx::lcos::local::promise<void> promise_;
     };
 }}}    // namespace hpx::serialization::detail
-
-namespace hpx { namespace serialization {
-
-    // serialization support for gid_type (handles credit-splitting)
-    constexpr std::size_t extra_output_handle_futures = 2;
-
-    template <>
-    inline util::unique_any_nonser
-    init_extra_output_data_item<extra_output_handle_futures>()
-    {
-        return util::unique_any_nonser{detail::preprocess_futures{}};
-    }
-
-    template <>
-    inline void reset_extra_output_data_item<extra_output_handle_futures>(
-        extra_archive_data_type& data)
-    {
-        util::any_cast<detail::preprocess_futures&>(
-            data[extra_output_handle_futures]).reset();
-    }
-}}    // namespace hpx::serialization
 
 #endif

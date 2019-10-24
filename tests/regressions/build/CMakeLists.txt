@@ -17,7 +17,7 @@ if(NOT HPX_WITH_STATIC_LINKING)
     set_target_properties(test_server_1950
         PROPERTIES FOLDER "Tests/Regressions/Build/")
 
-    add_executable(test_client_1950_test client_1950.cpp)
+    add_executable(test_client_1950_test EXCLUDE_FROM_ALL client_1950.cpp)
     target_link_libraries(test_client_1950_test PRIVATE ${_libraries} test_server_1950)
 
     # Keep the same semantics *_test as the other tests

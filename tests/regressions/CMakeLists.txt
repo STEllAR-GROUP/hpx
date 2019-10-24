@@ -11,7 +11,6 @@ set(subdirs
     build
     block_matrix
     component
-    computeapi
     lcos
     performance_counters
     threads

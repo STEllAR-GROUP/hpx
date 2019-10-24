@@ -63,26 +63,17 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             base_type;
 
     public:
-        sender_connection(
-            sender_type * s
-          , int dst
-          , parcelset::parcelport* pp
-        )
+        sender_connection(sender_type* s, int dst, parcelset::parcelport* pp)
           : state_(initialized)
           , sender_(s)
+          , tag_(-1)
           , dst_(dst)
           , request_(MPI_REQUEST_NULL)
           , request_ptr_(nullptr)
           , chunks_idx_(0)
           , ack_(0)
           , pp_(pp)
-          , there_(
-                parcelset::locality(
-                    locality(
-                        dst_
-                    )
-                )
-            )
+          , there_(parcelset::locality(locality(dst_)))
         {
         }
 

@@ -19,6 +19,7 @@
 #include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/serialization/detail/preprocess_gid_types.hpp>
 #include <hpx/serialization/access.hpp>
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/serialization/input_archive.hpp>
@@ -162,15 +163,21 @@ namespace hpx { namespace parcelset
     }
 #endif
 
-    parcel::parcel() {}
+    parcel::parcel()
+      : data_()
+      , action_()
+      , size_(0)
+      , num_chunks_(0)
+    {}
 
     parcel::~parcel() {}
 
     parcel::parcel(naming::gid_type&& dest, naming::address&& addr,
-            std::unique_ptr<actions::base_action> act)
+        std::unique_ptr<actions::base_action> act)
       : data_(std::move(dest), std::move(addr), act->has_continuation())
       , action_(std::move(act))
       , size_(0)
+      , num_chunks_(0)
     {
 //         HPX_ASSERT(is_valid());
     }

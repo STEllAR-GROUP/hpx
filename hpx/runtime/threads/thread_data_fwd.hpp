@@ -17,18 +17,19 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/util_fwd.hpp>
-#if defined(HPX_HAVE_APEX)
-// forward declare the APEX object
-namespace apex {
-    struct task_wrapper;
-}
-typedef std::shared_ptr<apex::task_wrapper> apex_task_wrapper;
-#endif
 
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <utility>
+
+#if defined(HPX_HAVE_APEX)
+// forward declare the APEX object
+namespace apex {
+    struct task_wrapper;
+}
+using apex_task_wrapper = std::shared_ptr<apex::task_wrapper>;
+#endif
 
 namespace hpx {
     /// \cond NOINTERNAL
@@ -37,7 +38,10 @@ namespace hpx {
 }    // namespace hpx
 
 namespace hpx { namespace threads {
+
     class thread_data;
+    class thread_data_stackful;
+    class thread_data_stackless;
 
     /// \cond NOINTERNAL
     class HPX_EXPORT threadmanager;
@@ -48,6 +52,7 @@ namespace hpx { namespace threads {
     using thread_id_type = thread_id;
 
     using coroutine_type = coroutines::coroutine;
+    using stackless_coroutine_type = coroutines::stackless_coroutine;
 
     using thread_self = coroutines::detail::coroutine_self;
     using thread_self_impl_type =

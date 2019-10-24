@@ -235,12 +235,10 @@ struct HPX_EXPORT primary_namespace
 #endif
 
     // helper function
-    void wait_for_migration_locked(
-        std::unique_lock<mutex_type>& l
-      , naming::gid_type id
-      , error_code& ec);
+    void wait_for_migration_locked(std::unique_lock<mutex_type>& l,
+        naming::gid_type const& id, error_code& ec);
 
-  public:
+public:
     primary_namespace()
       : base_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB)
       , mutex_()
@@ -280,23 +278,17 @@ struct HPX_EXPORT primary_namespace
 #endif
 
     bool bind_gid(
-        gva g
-      , naming::gid_type id
-      , naming::gid_type locality
-        );
+        gva const& g, naming::gid_type id, naming::gid_type const& locality);
 
     // API
     std::pair<naming::id_type, naming::address> begin_migration(naming::gid_type id);
-    bool end_migration(naming::gid_type id);
+    bool end_migration(naming::gid_type const& id);
 
-    resolved_type resolve_gid(naming::gid_type id);
+    resolved_type resolve_gid(naming::gid_type const& id);
 
-    naming::id_type colocate(naming::gid_type id);
+    naming::id_type colocate(naming::gid_type const& id);
 
-    naming::address unbind_gid(
-        std::uint64_t count
-      , naming::gid_type id
-        );
+    naming::address unbind_gid(std::uint64_t count, naming::gid_type id);
 
     std::int64_t increment_credit(
         std::int64_t credits
@@ -305,10 +297,8 @@ struct HPX_EXPORT primary_namespace
         );
 
     std::vector<std::int64_t> decrement_credit(
-        std::vector<
-            hpx::util::tuple<std::int64_t, naming::gid_type, naming::gid_type>
-        > requests
-        );
+        std::vector<hpx::util::tuple<std::int64_t, naming::gid_type,
+            naming::gid_type>> const& requests);
 
     std::pair<naming::gid_type, naming::gid_type> allocate(std::uint64_t count);
 

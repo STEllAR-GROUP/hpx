@@ -15,7 +15,6 @@
 #include <hpx/serialization/basic_archive.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/detail/raw_ptr.hpp>
-#include <hpx/serialization/extra_input_data.hpp>
 #include <hpx/serialization/input_container.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
@@ -39,18 +38,8 @@ namespace hpx { namespace serialization {
 
         template <typename Container>
         input_archive(Container& buffer, std::size_t inbound_data_size = 0,
-            std::vector<serialization_chunk> const* chunks = nullptr)
-          : input_archive(
-                detail::init_extra_input_data<default_extra_input_data_size>(),
-                buffer, inbound_data_size, chunks)
-        {
-        }
-
-        template <typename Container>
-        input_archive(extra_archive_data_type&& extra_data, Container& buffer,
-            std::size_t inbound_data_size = 0,
             const std::vector<serialization_chunk>* chunks = nullptr)
-          : base_type(0U, std::move(extra_data))
+          : base_type(0U)
           , buffer_(new input_container<Container>(
                 buffer, chunks, inbound_data_size))
         {

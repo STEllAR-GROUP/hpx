@@ -93,7 +93,7 @@ namespace hpx { namespace parcelset
             threads::threadmanager* tm,
             threads::policies::callback_notifier const& notifer);
 
-        ~parcelhandler() {}
+        ~parcelhandler() = default;
 
         std::shared_ptr<parcelport> get_bootstrap_parcelport() const;
 
@@ -441,7 +441,7 @@ namespace hpx { namespace parcelset
         {
             std::map<std::string, int>::const_iterator it = priority_.find(name);
             if(it == priority_.end()) return 0;
-            return priority_.find(name)->second;
+            return it->second;
         }
 
         parcelport *find_parcelport(std::string const& type, error_code& = throws) const
@@ -449,7 +449,7 @@ namespace hpx { namespace parcelset
             int priority = get_priority(type);
             if(priority <= 0) return nullptr;
             HPX_ASSERT(pports_.find(priority) != pports_.end());
-            return pports_.find(priority)->second.get();
+            return pports_.find(priority)->second.get();    // -V783
         }
 
         /// \brief Attach the given parcel port to this handler
@@ -459,8 +459,8 @@ namespace hpx { namespace parcelset
         naming::resolver_client *resolver_;
 
         /// the parcelport this handler is associated with
-        typedef std::map<int, std::shared_ptr<parcelport>,
-            std::greater<int> > pports_type;
+        using pports_type = std::map<int, std::shared_ptr<parcelport>,
+            std::greater<int> >;
         pports_type pports_;
 
         std::map<std::string, int> priority_;

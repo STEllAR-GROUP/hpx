@@ -296,9 +296,16 @@ endforeach()
 
 # integrate the hpx modules with the main library
 foreach(_module ${HPX_LIBS})
+  set(_module_target hpx_${_module})
+  if(UNIX OR APPLE)
+    # add the full archive (some are not used directly in libhpx and need to be
+    # forced into libhpx with this option)
+    set(_module_target "-Wl,--whole-archive" "${_module_target}" "-Wl,--no-whole-archive")
+  endif()
+
   # add module binaries as PRIVATE dependencies to the core hpx library to
   # avoid dependent applicatons have to link against those
-  target_link_libraries(hpx PRIVATE hpx_${_module})
+  target_link_libraries(hpx PRIVATE ${_module_target})
 
   # add module include directories as PUBLIC to core hpx library to enable
   # compilation against indirectly included headers

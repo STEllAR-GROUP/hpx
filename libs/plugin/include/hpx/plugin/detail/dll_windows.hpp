@@ -68,7 +68,7 @@ namespace hpx { namespace util { namespace plugin {
 
         dll(std::string const& libname)
           : dll_name(libname)
-          , map_name("")
+          , map_name()
           , dll_handle(nullptr)
         {
             // map_name defaults to dll base name

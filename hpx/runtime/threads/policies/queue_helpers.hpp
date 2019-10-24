@@ -52,9 +52,9 @@ namespace hpx { namespace threads { namespace policies {
         {
             num_cores = cores;
             num_queues = queues;
-            scale = num_cores == 1 ?
-                0 :
-                static_cast<double>(num_queues - 1) / (num_cores - 1);
+            scale = num_cores == 1 ? 0 :
+                                     static_cast<double>(num_queues - 1) /
+                    static_cast<double>(num_cores - 1);
             //
             queues_.resize(num_queues);
             for (std::size_t i = 0; i < num_queues; ++i)
@@ -74,7 +74,7 @@ namespace hpx { namespace threads { namespace policies {
         // ----------------------------------------------------------------
         inline std::size_t get_queue_index(std::size_t id) const
         {
-            return std::lround(id * scale);
+            return std::lround(static_cast<double>(id) * scale);
         }
 
         // ----------------------------------------------------------------

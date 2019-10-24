@@ -98,7 +98,8 @@ namespace hpx { namespace components { namespace process { namespace windows
                 filesystem::error_code ec;
                 bool file = filesystem::is_regular_file(p2, ec);
                 if (!ec && file &&
-                    SHGetFileInfoA(p2.string().c_str(), 0, 0, 0, SHGFI_EXETYPE)) //-V575
+                    SHGetFileInfoA(p2.string().c_str(), 0, nullptr, 0,
+                        SHGFI_EXETYPE))    //-V575
                 {
                     return p2.string();
                 }

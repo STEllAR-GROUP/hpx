@@ -34,7 +34,6 @@
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -93,9 +92,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                     result_last = m_fun(*this->args());
                     HPX_ASSERT(
                         result_last.first == thread_state_enum::terminated);
-
-                    // return value to other side of the fence
-                    this->bind_result(result_last);
                 }
                 catch (...)
                 {
@@ -104,6 +100,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                 }
 
                 this->reset_tss();
+
+                // return value to other side of the fence
+                this->bind_result(result_last);
             }
 
             this->reset();

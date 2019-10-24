@@ -252,7 +252,7 @@ namespace hpx { namespace program_options {
     {
         for (;;)
         {
-            std::size_t pos = m_message.find(from.c_str(), 0, from.length());
+            std::size_t pos = m_message.find(from);
             // not found: all replaced
             if (pos == std::string::npos)
                 return;
@@ -359,7 +359,7 @@ namespace hpx { namespace program_options {
         // Being very cautious: should be > 1 alternative!
         if (alternatives_vec.size() > 1)
         {
-            for (unsigned i = 0; i < alternatives_vec.size() - 1; ++i)
+            for (std::size_t i = 0; i < alternatives_vec.size() - 1; ++i)
                 error_template += "'%prefix%" + alternatives_vec[i] + "', ";
             error_template += "and ";
         }
