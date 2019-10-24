@@ -274,6 +274,14 @@ namespace hpx { namespace threads { namespace policies {
             return thread_queue_init_.small_stacksize_;
         }
 
+        void set_user_polling_function(const std::function<void(void)> &f) {
+            user_polling_function_ = f;
+        }
+
+        void user_polling_function() {
+            user_polling_function_();
+        }
+
     protected:
         // the scheduler mode, ptoected from false sharing
         util::cache_line_data<std::atomic<scheduler_mode>> mode_;
@@ -305,6 +313,8 @@ namespace hpx { namespace threads { namespace policies {
         threads::thread_pool_base* parent_pool_;
 
         std::atomic<std::int64_t> background_thread_count_;
+
+        std::function<void(void)> user_polling_function_;
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:

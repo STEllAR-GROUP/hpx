@@ -939,6 +939,12 @@ namespace hpx { namespace threads { namespace detail
                 }
             }
 
+            if (scheduler.SchedulingPolicy::get_scheduler_mode() &
+                    policies::enable_user_polling)
+            {
+                scheduler.user_polling_function();
+            }
+
             // something went badly wrong, give up
             if (HPX_UNLIKELY(this_state.load() == state_terminating))
                 break;
