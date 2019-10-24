@@ -37,7 +37,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         using mutex_type = hpx::lcos::local::spinlock;
 
         sender()
-          : next_free_tag_request_(-1)
+          : next_free_tag_request_((MPI_Request)(-1))
           , next_free_tag_(-1)
         {
         }
