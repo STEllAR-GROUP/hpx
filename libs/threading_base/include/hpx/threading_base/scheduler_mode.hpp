@@ -86,7 +86,8 @@ namespace hpx { namespace threads { namespace policies {
             assign_work_thread_parent |
             steal_high_priority_first |
             steal_after_local |
-            enable_idle_backoff
+            enable_idle_backoff |
+            enable_user_polling
         // clang-format on
     };
 }}}    // namespace hpx::threads::policies
