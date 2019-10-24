@@ -28,6 +28,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
