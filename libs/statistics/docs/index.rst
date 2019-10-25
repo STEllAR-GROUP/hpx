@@ -11,4 +11,5 @@
 statistics
 ==========
 
-This module provide some statistics utilities like rolling min/max or histogram.
+This module provide some statistics utilities like rolling min/max and
+histogram.

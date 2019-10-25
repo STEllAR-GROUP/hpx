@@ -11,4 +11,5 @@
 memory
 ======
 
-Part of this module is a forked version of hpx::intrusive_ptr.
+Part of this module is a forked version of boost::intrusive_ptr from
+Boost.SmartPtr.

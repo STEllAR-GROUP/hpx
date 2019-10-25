@@ -11,3 +11,9 @@
 datastructures
 ==============
 
+The datastructures module provides basic data structures (typically provided for
+compatibility with older C++ standards):
+
+* :cpp:class:`hpx::util::basic_any`
+* :cpp:class:`hpx::util::optional`
+* :cpp:class:`hpx::util::tuple`

@@ -11,3 +11,4 @@
 thread_support
 ==============
 
+This module provides miscellaneous utilities for threading and concurrency.

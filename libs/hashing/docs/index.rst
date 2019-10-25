@@ -11,3 +11,7 @@
 hashing
 =======
 
+The hashing module provides two hashing implementations:
+
+* :cpp:func:`hpx::util::fibhash`
+* :cpp:class:`hpx::util::jenkins_hash`

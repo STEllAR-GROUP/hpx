@@ -11,3 +11,7 @@
 cache
 =====
 
+This module provides two cache data structures:
+
+* :cpp:class:`hpx::util::cache::local_cache`
+* :cpp:class:`hpx::util::cache::lru_cache`

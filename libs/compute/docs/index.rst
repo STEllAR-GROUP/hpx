@@ -11,3 +11,6 @@
 compute
 =======
 
+The compute module provides utilities for handling task and memory affinity on
+host systems. The :ref:`libs_compute_cuda` for extensions to CUDA programmable
+GPU devices.

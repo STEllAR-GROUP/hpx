@@ -11,3 +11,5 @@
 coroutines
 ==========
 
+The coroutines module provides coroutine (user-space thread) implementations
+for different platforms.

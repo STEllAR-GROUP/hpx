@@ -11,3 +11,4 @@
 type_support
 ============
 
+This module provides helper facilities related to types.

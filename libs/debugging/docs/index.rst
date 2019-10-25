@@ -11,3 +11,4 @@
 debugging
 =========
 
+This module provides helpers for demangling symbol names.

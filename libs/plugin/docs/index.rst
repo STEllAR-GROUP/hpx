@@ -11,3 +11,4 @@
 plugin
 ======
 
+This module provides base utilities for creating plugins.

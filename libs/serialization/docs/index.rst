@@ -11,3 +11,5 @@
 serialization
 =============
 
+This module provides serialization primitives and support for many C++ standard
+library and Boost types.

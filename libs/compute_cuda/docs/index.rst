@@ -11,3 +11,5 @@
 compute_cuda
 ============
 
+This module extends the :ref:`libs_compute` module to handle CUDA programmable
+GPU devices.
