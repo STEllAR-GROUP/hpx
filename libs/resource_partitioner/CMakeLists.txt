@@ -46,6 +46,7 @@ add_hpx_module(resource_partitioner
     hpx_execution
     hpx_functional
     hpx_hardware
+    hpx_memory
     hpx_plugin
     hpx_program_options
     hpx_serialization
