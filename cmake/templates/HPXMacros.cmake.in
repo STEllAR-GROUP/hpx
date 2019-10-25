@@ -73,8 +73,8 @@ function(hpx_check_boost_compatibility)
   endif()
 
   # make sure paths are tested even if not string identical
-  get_filename_component(PATH1 ${HPX_BOOST_ROOT} ABSOLUTE)
-  get_filename_component(PATH2 ${BOOST_ROOT} ABSOLUTE)
+  get_filename_component(PATH1 "${HPX_BOOST_ROOT}" ABSOLUTE)
+  get_filename_component(PATH2 "${BOOST_ROOT}" ABSOLUTE)
 
   if(NOT PATH1 STREQUAL PATH2)
     hpx_error("The specified BOOST_ROOT differs from what has been used when"

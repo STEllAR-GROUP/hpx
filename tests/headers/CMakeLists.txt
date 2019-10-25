@@ -20,22 +20,8 @@ set(exclude_from_headers
   "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_stackless.hpp"
 )
 
-# If we compile with the MPI parcelport enabled, we need to additionally
-# add the MPI include path here, because for the main library, it's only
-# added for the plugin.
 if(HPX_WITH_PARCELPORT_MPI)
-  find_package(MPI)
-
-  if(MPI_CXX_INCLUDE_PATH)
-    include_directories(${MPI_CXX_INCLUDE_PATH})
-  endif()
-endif()
-
-# If we compile with PAPI performance counters, we need to additionally
-# add the PAPI include path here
-if(HPX_WITH_PAPI)
-  find_package(PAPI)
-  include_directories(${PAPI_INCLUDE_DIR})
+  set(test_deps hpx::mpi)
 endif()
 
 add_hpx_header_tests(
@@ -43,4 +29,6 @@ add_hpx_header_tests(
   HEADER_ROOT ${PROJECT_SOURCE_DIR}
   HEADERS ${headers}
   EXCLUDE ${exclude_from_headers}
-  EXCLUDE_FROM_ALL ${exclude_from_all_headers})
+  EXCLUDE_FROM_ALL ${exclude_from_all_headers}
+  DEPENDENCIES ${test_deps}
+  )

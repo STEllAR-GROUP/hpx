@@ -54,12 +54,11 @@ if(Vc_VERSION_STRING AND (NOT ${Vc_VERSION_STRING} VERSION_LESS "1.70.0"))
   set(HPX_WITH_DATAPAR_VC_NO_LIBRARY On)
 endif()
 
-include_directories(SYSTEM ${Vc_INCLUDE_DIR})
-if(NOT HPX_WITH_DATAPAR_VC_NO_LIBRARY)
-  link_directories(${Vc_LIB_DIR})
+add_library(hpx::vc INTERFACE IMPORTED)
+set_property(TARGET hpx::vc PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Vc_INCLUDE_DIR})
 
-  hpx_library_dir(${Vc_LIB_DIR})
-  hpx_libraries(${Vc_LIBRARIES})
+if(NOT HPX_WITH_DATAPAR_VC_NO_LIBRARY)
+  set_property(TARGET hpx::vc PROPERTY INTERFACE_LINK_LIBRARIES ${Vc_LIBRARIES})
 endif()
 
 foreach(_flag ${Vc_DEFINITIONS})
@@ -69,20 +68,15 @@ foreach(_flag ${Vc_DEFINITIONS})
   if(${_flagpos} EQUAL 0)
     string(SUBSTRING ${_flag} 2 -1 _flag)
   endif()
-  hpx_add_target_compile_definition(${_flag})
+
+  set_property(TARGET hpx::vc APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS ${_flag})
 endforeach()
 
 # do not include Vc build flags for MSVC builds as this breaks building the
 # core HPX libraries itself
 if(NOT MSVC)
-  foreach(_flag ${Vc_COMPILE_FLAGS})
-    hpx_add_compile_flag(${_flag})
-  endforeach()
-
-  foreach(_flag ${Vc_ARCHITECTURE_FLAGS})
-    hpx_add_compile_flag(${_flag})
-  endforeach()
-else()
+  set_property(TARGET hpx::vc PROPERTY INTERFACE_COMPILE_OPTIONS ${Vc_COMPILE_FLAGS} ${Vc_ARCHITECTURE_FLAGS})
+ else()
   hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
 endif()
 

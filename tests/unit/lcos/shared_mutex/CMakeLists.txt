@@ -9,8 +9,10 @@ set(tests
     shared_mutex2
    )
 
-set(shared_future1_PARAMETERS THREADS_PER_LOCALITY 4)
-set(shared_future2_PARAMETERS THREADS_PER_LOCALITY 4)
+set(shared_mutex1_PARAMETERS THREADS_PER_LOCALITY 4)
+set(shared_mutex2_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(shared_mutex1_FLAGS DEPENDENCIES PRIVATE hpx::boost)
 
 foreach(test ${tests})
   set(sources

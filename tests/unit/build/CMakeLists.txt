@@ -38,6 +38,7 @@ function(create_cmake_test name hpx_dir)
       "${CMAKE_COMMAND}" -E chdir "${build_dir}" "${CMAKE_COMMAND}"
       "${PROJECT_SOURCE_DIR}/examples/hello_world_component"
       -DHPX_DIR=${hpx_dir}
+      -DBOOST_ROOT=${BOOST_ROOT}
       ${ADDITIONAL_CMAKE_OPTIONS}
       -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       -DCMAKE_BUILD_TYPE=$<CONFIGURATION> VERBATIM)
@@ -84,7 +85,8 @@ function(create_pkgconfig_test name hpx_dir)
       CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       PKG_CONFIG=${PKG_CONFIG_EXECUTABLE}
       BUILD_TYPE=$<CONFIGURATION> VERBATIM)
-  add_dependencies(${name}.make_compile ${name}.make_build_dir hpx iostreams_component)
+  add_dependencies(${name}.make_compile ${name}.make_build_dir hpx_wrap
+    iostreams_component)
   if(NOT HPX_WITH_STATIC_LINKING)
     add_dependencies(${name}.make_compile hpx_init)
   endif()

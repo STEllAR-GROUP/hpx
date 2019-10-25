@@ -11,7 +11,6 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 
-#include <hpx/runtime/serialization/detail/boost_simd.hpp>
 #include <hpx/runtime/serialization/detail/vc.hpp>
 
 #endif

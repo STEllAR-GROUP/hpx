@@ -12,6 +12,10 @@
 #include <cstddef>
 #include <vector>
 
+#ifndef H5_HAVE_THREADSAFE
+#error    "This example requires that the HDF5 API is thread-safe. Please provide a suitable version of HDF5."
+#endif
+
 using namespace H5;
 
 int main()

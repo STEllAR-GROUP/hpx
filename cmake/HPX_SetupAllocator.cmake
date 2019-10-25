@@ -9,7 +9,9 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(NOT HPX_WITH_MALLOC)
-  set(HPX_WITH_MALLOC ${DEFAULT_MALLOC})
+  set(HPX_WITH_MALLOC CACHE STRING
+          "Use the specified allocator. Supported allocators are tcmalloc, jemalloc, tbbmalloc and system."
+          ${DEFAULT_MALLOC})
   set(allocator_error
     "The default allocator for your system is ${DEFAULT_MALLOC}, but ${DEFAULT_MALLOC} could not be found. "
       "The system allocator has poor performance. As such ${DEFAULT_MALLOC} is a strong optional requirement. "
@@ -23,16 +25,18 @@ endif()
 
 string(TOUPPER "${HPX_WITH_MALLOC}" HPX_WITH_MALLOC_UPPER)
 
+add_library(hpx::allocator INTERFACE IMPORTED)
+
 if(NOT HPX_WITH_MALLOC_DEFAULT)
   if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "TCMALLOC")
     find_package(TCMalloc)
     if(NOT TCMALLOC_LIBRARIES)
       hpx_error(${allocator_error})
     endif()
-    if(COMMAND hpx_libraries)
-      hpx_libraries(${TCMALLOC_LIBRARIES})
-    endif()
-    set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARIES})
+
+    set_property(TARGET hpx::allocator PROPERTY
+      INTERFACE_LINK_LIBRARIES ${TCMALLOC_LIBRARIES})
+
     if(MSVC)
       hpx_add_link_flag_if_available(/INCLUDE:__tcmalloc)
     endif()
@@ -44,15 +48,11 @@ if(NOT HPX_WITH_MALLOC_DEFAULT)
     if(NOT JEMALLOC_LIBRARIES)
       hpx_error(${allocator_error})
     endif()
-    if(COMMAND hpx_libraries)
-      hpx_libraries(${JEMALLOC_LIBRARIES})
-    endif()
-    set(hpx_MALLOC_LIBRARY ${JEMALLOC_LIBRARIES})
-    include_directories(${JEMALLOC_INCLUDE_DIR})
-    if(JEMALLOC_ADDITIONAL_INCLUDE_DIR)
-      include_directories(${JEMALLOC_ADDITIONAL_INCLUDE_DIR})
-    endif()
-    set(_use_custom_allocator TRUE)
+    set_property(TARGET hpx::allocator PROPERTY
+      INTERFACE_INCLUDE_DIRECTORIES ${JEMALLOC_INCLUDE_DIR}
+      ${JEMALLOC_ADDITIONAL_INCLUDE_DIR})
+    set_property(TARGET hpx::allocator PROPERTY
+      INTERFACE_LINK_LIBRARIES ${JEMALLOC_LIBRARIES})
   endif()
 
   if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "MIMALLOC")
@@ -78,18 +78,13 @@ if(NOT HPX_WITH_MALLOC_DEFAULT)
     if(MSVC)
       hpx_add_link_flag_if_available(/INCLUDE:__TBB_malloc_proxy)
     endif()
-    if(COMMAND hpx_libraries)
-      hpx_libraries(${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
-    endif()
-    set(hpx_MALLOC_LIBRARY ${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
-    set(_use_custom_allocator TRUE)
+    set_property(TARGET hpx::allocator PROPERTY
+      INTERFACE_LINK_LIBRARIES ${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
   endif()
 
   if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "CUSTOM")
     set(_use_custom_allocator TRUE)
   endif()
-else()
-  set(_use_custom_allocator TRUE)
 endif()
 
 if("${HPX_WITH_MALLOC_UPPER}" MATCHES "SYSTEM")
@@ -100,3 +95,30 @@ if("${HPX_WITH_MALLOC_UPPER}" MATCHES "SYSTEM")
 endif()
 
 hpx_info("Using ${HPX_WITH_MALLOC} allocator.")
+
+# Setup Intel amplifier
+if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
+  find_package(Amplifier)
+  if(NOT AMPLIFIER_FOUND)
+    hpx_error("Intel Amplifier could not be found and HPX_WITH_ITTNOTIFY=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
+  endif()
+
+  add_library(hpx::amplifier INTERFACE IMPORTED)
+  set_property(TARGET hpx::amplifier PROPERTY
+    INTERFACE_INCLUDE_DIRECTORIES ${AMPLIFIER_INCLUDE_DIR})
+  set_property(TARGET hpx::amplifier PROPERTY
+    INTERFACE_LINK_LIBRARIES ${AMPLIFIER_LIBRARIES})
+
+  hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
+  hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
+endif()
+
+# convey selected allocator type to the build configuration
+hpx_add_config_define(HPX_HAVE_MALLOC "\"${HPX_WITH_MALLOC}\"")
+if(${HPX_WITH_MALLOC} STREQUAL "jemalloc")
+  if(NOT ("${HPX_WITH_JEMALLOC_PREFIX}" STREQUAL "<none>") AND
+     NOT ("${HPX_WITH_JEMALLOC_PREFIX}x" STREQUAL "x"))
+    hpx_add_config_define(HPX_HAVE_JEMALLOC_PREFIX ${HPX_WITH_JEMALLOC_PREFIX})
+    hpx_add_config_define(HPX_HAVE_INTERNAL_ALLOCATOR)
+  endif()
+endif()
