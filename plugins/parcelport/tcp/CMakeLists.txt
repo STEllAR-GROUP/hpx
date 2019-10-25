@@ -29,6 +29,7 @@ if(HPX_WITH_PARCELPORT_TCP)
       hpx_execution
       hpx_functional
       hpx_hardware
+      hpx_memory
       hpx_plugin
       hpx_program_options
       hpx_serialization
