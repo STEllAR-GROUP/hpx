@@ -9,11 +9,10 @@
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/unwrap.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
 #include <string>
@@ -96,7 +95,7 @@ namespace hpx { namespace lcos { namespace detail {
             {
                 if (async)
                 {
-                    boost::intrusive_ptr<barrier_node> this_(this);
+                    hpx::intrusive_ptr<barrier_node> this_(this);
                     return hpx::async(&barrier_node::set_event, this_);
                 }
                 set_event();
@@ -130,7 +129,7 @@ namespace hpx { namespace lcos { namespace detail {
             result = broadcast_promise_.get_future();
         }
 
-        boost::intrusive_ptr<barrier_node> this_(this);
+        hpx::intrusive_ptr<barrier_node> this_(this);
         return do_wait(this_, std::move(result));
     }
 
@@ -175,7 +174,7 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     template hpx::future<void> barrier_node::do_wait(
-        boost::intrusive_ptr<barrier_node>, hpx::future<void>);
+        hpx::intrusive_ptr<barrier_node>, hpx::future<void>);
     template hpx::future<void> barrier_node::do_wait(
         barrier_node*, hpx::future<void>);
 
@@ -192,7 +191,7 @@ namespace hpx { namespace lcos { namespace detail {
             futures.push_back(hpx::async(action, id));
         }
 
-        boost::intrusive_ptr<barrier_node> this_(this);
+        hpx::intrusive_ptr<barrier_node> this_(this);
         // Once we know that all our children entered the barrier, we flag ourself
         return hpx::when_all(futures).then(
             hpx::launch::sync, [HPX_CAPTURE_MOVE(this_)](hpx::future<void> f) {
@@ -222,7 +221,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         // Once we notified our children, we mark ourself ready.
-        boost::intrusive_ptr<barrier_node> this_(this);
+        hpx::intrusive_ptr<barrier_node> this_(this);
         hpx::when_all(futures).then(
             hpx::launch::sync, [HPX_CAPTURE_MOVE(this_)](future<void> f) {
                 // Trigger possible errors...

@@ -71,14 +71,14 @@ namespace util {
     /// \param   visitor A visitor object which provides the three `operator()`
     ///                  overloads that were described above.
     ///                  Additionally the visitor must be compatible
-    ///                  for referencing it from a `boost::intrusive_ptr`.
+    ///                  for referencing it from a `hpx::intrusive_ptr`.
     ///                  The visitor should must have a virtual destructor!
     ///
     /// \param   pack    The arbitrary parameter pack which is traversed
     ///                  asynchronously. Nested objects inside containers and
     ///                  tuple like types are traversed recursively.
     ///
-    /// \returns         A boost::intrusive_ptr that references an instance of
+    /// \returns         A hpx::intrusive_ptr that references an instance of
     ///                  the given visitor object.
     ///
     /// See `traverse_pack` for a detailed description about the
@@ -137,7 +137,7 @@ namespace util {
     /// \param   visitor A visitor object which provides the three `operator()`
     ///                  overloads that were described above.
     ///                  Additionally the visitor must be compatible
-    ///                  for referencing it from a `boost::intrusive_ptr`.
+    ///                  for referencing it from a `hpx::intrusive_ptr`.
     ///                  The visitor should must have a virtual destructor!
     ///
     /// \param   pack    The arbitrary parameter pack which is traversed
@@ -146,7 +146,7 @@ namespace util {
     /// \param  alloc    Allocator instance to use to create the traversal
     ///                  frame.
     ///
-    /// \returns         A boost::intrusive_ptr that references an instance of
+    /// \returns         A hpx::intrusive_ptr that references an instance of
     ///                  the given visitor object.
     ///
     /// See `traverse_pack` for a detailed description about the

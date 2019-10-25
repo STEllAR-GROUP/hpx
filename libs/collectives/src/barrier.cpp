@@ -7,6 +7,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
@@ -15,8 +16,6 @@
 #include <hpx/state.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
 #include <string>
@@ -138,7 +137,7 @@ namespace hpx { namespace lcos {
 
                 // we need to wait on everyone to have its name unregistered,
                 // and hold on to our node long enough...
-                boost::intrusive_ptr<wrapping_type> node = node_;
+                hpx::intrusive_ptr<wrapping_type> node = node_;
                 hpx::when_all(f, wait(hpx::launch::async))
                     .then(hpx::launch::sync,
                         [HPX_CAPTURE_MOVE(node)](hpx::future<void> f) {

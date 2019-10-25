@@ -36,6 +36,7 @@ All modules
    /libs/hashing/docs/index.rst
    /libs/iterator_support/docs/index.rst
    /libs/logging/docs/index.rst
+   /libs/memory/docs/index.rst
    /libs/plugin/docs/index.rst
    /libs/preprocessor/docs/index.rst
    /libs/program_options/docs/index.rst

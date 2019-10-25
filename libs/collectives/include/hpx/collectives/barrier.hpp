@@ -12,10 +12,9 @@
 #include <hpx/config.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
 #include <string>
@@ -132,7 +131,7 @@ namespace hpx { namespace lcos {
         /// \cond NOINTERNAL
         barrier();
 
-        boost::intrusive_ptr<wrapping_type> node_;
+        hpx::intrusive_ptr<wrapping_type> node_;
         /// \endcond
     };
 }}    // namespace hpx::lcos

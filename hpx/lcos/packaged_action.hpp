@@ -9,21 +9,21 @@
 #define HPX_LCOS_PACKAGED_ACTION_JUN_27_2008_0420PM
 
 #include <hpx/config.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/promise.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 
 #include <boost/asio/error.hpp>
-#include <boost/intrusive_ptr.hpp>
 
 #include <exception>
 #include <memory>
@@ -38,7 +38,7 @@ namespace hpx { namespace lcos {
         template <typename Result>
         struct parcel_write_handler
         {
-            boost::intrusive_ptr<detail::promise_data<Result>> shared_state;
+            hpx::intrusive_ptr<detail::promise_data<Result>> shared_state;
 
             void operator()(
                 boost::system::error_code const& ec, parcelset::parcel const& p)
@@ -62,7 +62,7 @@ namespace hpx { namespace lcos {
         template <typename Result, typename Callback>
         struct parcel_write_handler_cb
         {
-            boost::intrusive_ptr<detail::promise_data<Result>> shared_state;
+            hpx::intrusive_ptr<detail::promise_data<Result>> shared_state;
             Callback cb;
 
             void operator()(

@@ -106,8 +106,11 @@ namespace hpx
 #include <hpx/config.hpp>
 #include <hpx/lcos_fwd.hpp>     // forward declare wait_all()
 
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
@@ -115,10 +118,7 @@ namespace hpx
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unwrap_ref.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/datastructures/tuple.hpp>
 
-#include <boost/intrusive_ptr.hpp>
 #include <boost/ref.hpp>
 
 #include <algorithm>
@@ -143,7 +143,7 @@ namespace hpx { namespace lcos
 
         template <typename R>
         struct is_future_or_shared_state<
-                boost::intrusive_ptr<future_data_base<R> > >
+                hpx::intrusive_ptr<future_data_base<R> > >
           : std::true_type
         {};
 
@@ -185,7 +185,7 @@ namespace hpx { namespace lcos
 
         template <typename R>
         struct future_or_shared_state_result<
-            boost::intrusive_ptr<future_data_base<R> > >
+            hpx::intrusive_ptr<future_data_base<R> > >
         {
             typedef R type;
         };

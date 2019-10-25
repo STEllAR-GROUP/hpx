@@ -329,12 +329,18 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
                         m_manipulator = '%';
                 }
                 else if (m_manipulator.empty())
+                {
                     ;    // ignore this char - not from a manipulator
+                }
                 else if (m_manipulator[0] == '%')
+                {
                     m_manipulator += c;
+                }
                 else
+                {
                     // manipulator should always start with %
                     HPX_ASSERT(false);
+                }
             }
 
         private:

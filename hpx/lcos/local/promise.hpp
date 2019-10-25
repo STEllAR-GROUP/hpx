@@ -8,15 +8,15 @@
 #define HPX_LCOS_LOCAL_PROMISE_MAR_01_2012_0121PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos_fwd.hpp>
+#include <hpx/allocator_support/allocator_deleter.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/lcos_fwd.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/traits/future_access.hpp>
-#include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <boost/intrusive_ptr.hpp>
 #include <boost/utility/swap.hpp>
 
 #include <exception>
@@ -224,7 +224,7 @@ namespace hpx { namespace lcos { namespace local
                 }
             }
 
-            boost::intrusive_ptr<shared_state_type> shared_state_;
+            hpx::intrusive_ptr<shared_state_type> shared_state_;
             bool future_retrieved_;
             bool shared_future_retrieved_;
         };

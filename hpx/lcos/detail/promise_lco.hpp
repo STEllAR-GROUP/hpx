@@ -14,15 +14,14 @@
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/local/promise.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/traits/component_type_database.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/traits/component_type_database.hpp>
 #include <hpx/type_support/unused.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <exception>
 #include <utility>
@@ -59,7 +58,7 @@ namespace lcos {
         {
         protected:
             typedef lcos::detail::future_data<Result>       shared_state_type;
-            typedef boost::intrusive_ptr<shared_state_type> shared_state_ptr;
+            typedef hpx::intrusive_ptr<shared_state_type> shared_state_ptr;
 
             typedef lcos::base_lco_with_value<Result, RemoteResult> base_type;
 
@@ -113,7 +112,7 @@ namespace lcos {
         {
         protected:
             typedef lcos::detail::future_data<Result>       shared_state_type;
-            typedef boost::intrusive_ptr<shared_state_type> shared_state_ptr;
+            typedef hpx::intrusive_ptr<shared_state_type> shared_state_ptr;
 
             typedef promise_lco_base<Result, RemoteResult> base_type;
 
@@ -151,9 +150,9 @@ namespace lcos {
             : public promise_lco_base<void, hpx::util::unused_type>
         {
         protected:
-            typedef lcos::detail::future_data<void>         shared_state_type;
-            typedef boost::intrusive_ptr<shared_state_type> shared_state_ptr;
-            typedef promise_lco_base<void, hpx::util::unused_type> base_type;
+            using shared_state_type = lcos::detail::future_data<void>;
+            using shared_state_ptr = hpx::intrusive_ptr<shared_state_type>;
+            using base_type = promise_lco_base<void, hpx::util::unused_type>;
 
         public:
             promise_lco(shared_state_ptr const& shared_state)

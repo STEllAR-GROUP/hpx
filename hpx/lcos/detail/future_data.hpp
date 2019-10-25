@@ -9,13 +9,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
@@ -28,7 +29,6 @@
 #include <hpx/util/annotated_function.hpp>
 
 #include <boost/container/small_vector.hpp>
-#include <boost/intrusive_ptr.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -104,7 +104,7 @@ namespace detail
         util::atomic_count count_;
     };
 
-    /// support functions for boost::intrusive_ptr
+    /// support functions for hpx::intrusive_ptr
     inline void intrusive_ptr_add_ref(future_data_refcnt_base* p)
     {
         ++p->count_;
@@ -699,7 +699,7 @@ namespace detail
             util::steady_clock::time_point const& abs_time,
             Result_&& init)
         {
-            boost::intrusive_ptr<timed_future_data> this_(this);
+            hpx::intrusive_ptr<timed_future_data> this_(this);
 
             error_code ec;
             threads::thread_id_type id = threads::register_thread_nullary(
@@ -733,7 +733,7 @@ namespace detail
     protected:
         typedef future_data<Result> base_type;
         typedef typename future_data<Result>::mutex_type mutex_type;
-        typedef boost::intrusive_ptr<task_base> future_base_type;
+        typedef hpx::intrusive_ptr<task_base> future_base_type;
         typedef typename future_data<Result>::result_type result_type;
         typedef typename base_type::init_no_addref init_no_addref;
 
@@ -867,7 +867,7 @@ namespace detail
     {
     protected:
         typedef typename task_base<Result>::mutex_type mutex_type;
-        typedef boost::intrusive_ptr<cancelable_task_base> future_base_type;
+        typedef hpx::intrusive_ptr<cancelable_task_base> future_base_type;
         typedef typename future_data<Result>::result_type result_type;
         typedef typename task_base<Result>::init_no_addref init_no_addref;
 
