@@ -8,18 +8,17 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/register_locks.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/state.hpp>
 #include <hpx/timing/steady_clock.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -175,8 +174,8 @@ namespace hpx { namespace threads { namespace executors
 
     hpx::state current_executor::get_state() const
     {
-        return boost::static_pointer_cast<
-                detail::current_executor
-            >(executor::executor_data_)->get_state();
+        return hpx::static_pointer_cast<detail::current_executor>(
+            executor::executor_data_)
+            ->get_state();
     }
 }}}

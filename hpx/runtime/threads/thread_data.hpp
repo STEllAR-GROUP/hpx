@@ -21,14 +21,14 @@
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/logging.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <atomic>
 #include <cstddef>

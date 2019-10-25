@@ -5,6 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/intrusive_ptr.hpp
+// hpxinspect:nodeprecatedname:boost::intrusive_ptr
+
 #ifndef HPX_SERIALIZATION_INTRUSIVE_PTR_HPP
 #define HPX_SERIALIZATION_INTRUSIVE_PTR_HPP
 

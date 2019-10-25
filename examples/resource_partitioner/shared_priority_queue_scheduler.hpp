@@ -29,6 +29,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <mutex>

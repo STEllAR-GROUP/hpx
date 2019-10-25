@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/intrusive_ptr.hpp
+// hpxinspect:nodeprecatedname:boost::intrusive_ptr
+
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/intrusive_ptr.hpp>
@@ -13,7 +16,9 @@
 
 #include <hpx/testing.hpp>
 
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 #include <boost/intrusive_ptr.hpp>
+#endif
 
 #include <iostream>
 #include <memory>
@@ -129,6 +134,7 @@ void test_shared()
     HPX_TEST_EQ(op1.use_count(), 2);
 }
 
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 // =========================intrusive_ptr test==============================
 struct D
 {
@@ -261,11 +267,14 @@ void test_intrusive()
     op1.reset();
     HPX_TEST_EQ(op2->count, 1);
 }
+#endif
 
 int main()
 {
     test_shared();
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
     test_intrusive();
+#endif
 
     return hpx::util::report_errors();
 }

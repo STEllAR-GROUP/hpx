@@ -9,18 +9,17 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/custom_exception_info.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/detail/yield_k.hpp>
-#include <hpx/functional/unique_function.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
 #include <exception>
