@@ -17,7 +17,7 @@ int main()
     std::vector<std::string> nodelist;
     hpx::util::batch_environment env(nodelist, hpx::get_config(), true);
 
-    for (std::string const& s: nodelist)
+    for (std::string const& s : nodelist)
         std::cout << s << "\n";
 
     return 0;

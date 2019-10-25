@@ -16,6 +16,7 @@ set(HPX_LIBS
   allocator_support
   assertion
   basic_execution
+  batch_environments
   cache
   checkpoint
   collectives

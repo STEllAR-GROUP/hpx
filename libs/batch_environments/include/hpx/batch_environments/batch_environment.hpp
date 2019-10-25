@@ -9,8 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/concurrency/spinlock.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <boost/asio/ip/tcp.hpp>
 
@@ -23,20 +21,18 @@
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
-#pragma warning(disable: 4251)
+#pragma warning(disable : 4251)
 #endif
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////
     // Try to retrieve default values from a batch environment
     struct HPX_EXPORT batch_environment
     {
         // the constructor tries to read initial values from a batch environment,
         // filling our map of nodes and thread counts
-        batch_environment(std::vector<std::string> & nodelist,
-            util::runtime_configuration const& cfg,
-            bool debug = false, bool enable = true);
+        batch_environment(std::vector<std::string>& nodelist,
+            bool have_mpi = false, bool debug = false, bool enable = true);
 
         // this function initializes the map of nodes from the given (space
         // separated) list of nodes
@@ -66,7 +62,10 @@ namespace hpx { namespace util
 
         // The AGAS node number represents the number of the node which has
         // been selected as the AGAS host.
-        std::size_t agas_node() const { return agas_node_num_; }
+        std::size_t agas_node() const
+        {
+            return agas_node_num_;
+        }
 
         // The function will analyze the current environment and return true
         // if it finds sufficient information to deduce its running as a batch
@@ -76,9 +75,9 @@ namespace hpx { namespace util
         // Return a string containing the name of the batch system
         std::string get_batch_name() const;
 
-        typedef std::map<
-            boost::asio::ip::tcp::endpoint, std::pair<std::string, std::size_t>
-        > node_map_type;
+        typedef std::map<boost::asio::ip::tcp::endpoint,
+            std::pair<std::string, std::size_t>>
+            node_map_type;
 
         std::string agas_node_;
         std::size_t agas_node_num_;
@@ -89,7 +88,7 @@ namespace hpx { namespace util
         std::string batch_name_;
         bool debug_;
     };
-}}
+}}    // namespace hpx::util
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)

@@ -5,17 +5,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/errors.hpp>
+#include <hpx/batch_environments/alps_environment.hpp>
+#include <hpx/batch_environments/batch_environment.hpp>
+#include <hpx/batch_environments/pbs_environment.hpp>
+#include <hpx/batch_environments/slurm_environment.hpp>
 #include <hpx/config/asio.hpp>
-
-#include <hpx/topology/topology.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/util/asio_util.hpp>
-#include <hpx/util/batch_environment.hpp>
-#include <hpx/util/runtime_configuration.hpp>
 
-#include <hpx/util/batch_environments/alps_environment.hpp>
-#include <hpx/util/batch_environments/slurm_environment.hpp>
-#include <hpx/util/batch_environments/pbs_environment.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/ip/host_name.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -23,13 +22,9 @@
 #include <utility>
 #include <vector>
 
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/ip/host_name.hpp>
-
-namespace hpx { namespace util
-{
-    batch_environment::batch_environment(std::vector<std::string> & nodelist,
-            util::runtime_configuration const& cfg, bool debug, bool enable)
+namespace hpx { namespace util {
+    batch_environment::batch_environment(std::vector<std::string>& nodelist,
+        bool have_mpi, bool debug, bool enable)
       : agas_node_num_(0)
       , node_num_(-1)
       , num_threads_(-1)
@@ -40,7 +35,7 @@ namespace hpx { namespace util
             return;
 
         batch_environments::alps_environment alps_env(nodelist, debug);
-        if(alps_env.valid())
+        if (alps_env.valid())
         {
             batch_name_ = "ALPS";
             num_threads_ = alps_env.num_threads();
@@ -49,7 +44,7 @@ namespace hpx { namespace util
             return;
         }
         batch_environments::slurm_environment slurm_env(nodelist, debug);
-        if(slurm_env.valid())
+        if (slurm_env.valid())
         {
             batch_name_ = "SLURM";
             num_threads_ = slurm_env.num_threads();
@@ -57,8 +52,8 @@ namespace hpx { namespace util
             node_num_ = slurm_env.node_num();
             return;
         }
-        batch_environments::pbs_environment pbs_env(nodelist, debug, cfg);
-        if(pbs_env.valid())
+        batch_environments::pbs_environment pbs_env(nodelist, have_mpi, debug);
+        if (pbs_env.valid())
         {
             batch_name_ = "PBS";
             num_threads_ = pbs_env.num_threads();
@@ -76,8 +71,7 @@ namespace hpx { namespace util
 
     // this function initializes the map of nodes from the given a list of nodes
     std::string batch_environment::init_from_nodelist(
-        std::vector<std::string> const& nodes,
-        std::string const& agas_host)
+        std::vector<std::string> const& nodes, std::string const& agas_host)
     {
         if (debug_)
             std::cerr << "got node list" << std::endl;
@@ -91,7 +85,8 @@ namespace hpx { namespace util
         std::size_t agas_node_num = 0;
         for (std::string const& s : nodes)
         {
-            if (!s.empty()) {
+            if (!s.empty())
+            {
                 if (debug_)
                     std::cerr << "extracted: '" << s << "'" << std::endl;
 
@@ -106,7 +101,8 @@ namespace hpx { namespace util
                     agas_node_num_ = agas_node_num;
                 }
 
-                if (0 == nodes_.count(ep)) {
+                if (0 == nodes_.count(ep))
+                {
                     if (debug_)
                         std::cerr << "incrementing agas_node_num" << std::endl;
                     ++agas_node_num;
@@ -135,17 +131,17 @@ namespace hpx { namespace util
             if (!agas_node_.empty())
             {
                 std::cerr << "using AGAS host: '" << agas_node_
-                    << "' (node number " << agas_node_num_ << ")" << std::endl;
+                          << "' (node number " << agas_node_num_ << ")"
+                          << std::endl;
             }
 
             std::cerr << "Nodes from nodelist:" << std::endl;
             node_map_type::const_iterator end = nodes_.end();
-            for (node_map_type::const_iterator it = nodes_.begin();
-                 it != end; ++it)
+            for (node_map_type::const_iterator it = nodes_.begin(); it != end;
+                 ++it)
             {
-                std::cerr << (*it).second.first << ": "
-                    << (*it).second.second << " (" << (*it).first << ")"
-                    << std::endl;
+                std::cerr << (*it).second.first << ": " << (*it).second.second
+                          << " (" << (*it).first << ")" << std::endl;
             }
         }
         return nodes_list;
@@ -183,7 +179,8 @@ namespace hpx { namespace util
         return hostname;
     }
 
-    std::string batch_environment::host_name(std::string const& def_hpx_name) const
+    std::string batch_environment::host_name(
+        std::string const& def_hpx_name) const
     {
         std::string host = nodes_.empty() ? def_hpx_name : host_name();
         if (debug_)
@@ -193,7 +190,8 @@ namespace hpx { namespace util
 
     // We either select the first host listed in the node file or a given
     // host name to host the AGAS server.
-    std::string batch_environment::agas_host_name(std::string const& def_agas) const
+    std::string batch_environment::agas_host_name(
+        std::string const& def_agas) const
     {
         std::string host = agas_node_.empty() ? def_agas : agas_node_;
         if (debug_)
@@ -206,5 +204,4 @@ namespace hpx { namespace util
     {
         return batch_name_;
     }
-}}
-
+}}    // namespace hpx::util

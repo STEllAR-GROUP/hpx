@@ -10,7 +10,6 @@ set(tests
     config_entry
     pack_traversal
     pack_traversal_async
-    parse_slurm_nodelist
     serializable_any
     serializable_boost_any
     tagged

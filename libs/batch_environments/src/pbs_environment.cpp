@@ -5,14 +5,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/util/batch_environments/pbs_environment.hpp>
-#include <hpx/format.hpp>
-#include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/batch_environments/pbs_environment.hpp>
 #include <hpx/errors.hpp>
-#if defined(HPX_HAVE_PARCELPORT_MPI) && defined(HPX_HAVE_NETWORKING)
-#include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
-#endif
+#include <hpx/format.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <cstddef>
 #include <fstream>
@@ -21,28 +17,27 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace util { namespace batch_environments
-{
+namespace hpx { namespace util { namespace batch_environments {
     pbs_environment::pbs_environment(
-            std::vector<std::string> & nodelist, bool debug,
-            util::runtime_configuration const& cfg)
-        : node_num_(std::size_t(-1))
-        , num_localities_(std::size_t(-1))
-        , num_threads_(std::size_t(-1))
-        , valid_(false)
+        std::vector<std::string>& nodelist, bool have_mpi, bool debug)
+      : node_num_(std::size_t(-1))
+      , num_localities_(std::size_t(-1))
+      , num_threads_(std::size_t(-1))
+      , valid_(false)
     {
-        char *node_num = std::getenv("PBS_NODENUM");
+        char* node_num = std::getenv("PBS_NODENUM");
         valid_ = node_num != nullptr;
-        if(valid_)
+        if (valid_)
         {
             // Initialize our node number
-            node_num_ = safe_lexical_cast<std::size_t>(node_num, std::size_t(1));
+            node_num_ =
+                safe_lexical_cast<std::size_t>(node_num, std::size_t(1));
 
             if (nodelist.empty())
             {
                 // read the PBS node file. This initializes the number of
                 // localities
-                read_nodefile(nodelist, debug, cfg);
+                read_nodefile(nodelist, have_mpi, debug);
             }
             else
             {
@@ -51,21 +46,21 @@ namespace hpx { namespace util { namespace batch_environments
                 read_nodelist(nodelist, debug);
             }
 
-            char * thread_num = std::getenv("PBS_NUM_PPN");
+            char* thread_num = std::getenv("PBS_NUM_PPN");
             if (thread_num != nullptr)
             {
                 // Initialize number of cores to run on
-                num_threads_ = safe_lexical_cast<std::size_t>(
-                    thread_num, std::size_t(-1));
+                num_threads_ =
+                    safe_lexical_cast<std::size_t>(thread_num, std::size_t(-1));
             }
         }
     }
 
-    void pbs_environment::read_nodefile(std::vector<std::string> & nodelist,
-        bool debug, util::runtime_configuration const& cfg)
+    void pbs_environment::read_nodefile(
+        std::vector<std::string>& nodelist, bool have_mpi, bool debug)
     {
-        char *node_file = std::getenv("PBS_NODEFILE");
-        if(!node_file)
+        char* node_file = std::getenv("PBS_NODEFILE");
+        if (!node_file)
         {
             valid_ = false;
             return;
@@ -105,20 +100,20 @@ namespace hpx { namespace util { namespace batch_environments
             if (debug)
                 std::cerr << "failed opening: " << node_file << std::endl;
 
-#if defined(HPX_HAVE_PARCELPORT_MPI) && defined(HPX_HAVE_NETWORKING)
             // if MPI is active we can ignore the missing node-file
-            if (util::mpi_environment::check_mpi_environment(cfg))
+            if (have_mpi)
+            {
                 return;
-#endif
+            }
 
             // raise hard error if nodefile could not be opened
-            throw hpx::detail::command_line_error(hpx::util::format(
-                "Could not open nodefile: '{}'", node_file));
+            throw hpx::detail::command_line_error(
+                hpx::util::format("Could not open nodefile: '{}'", node_file));
         }
     }
 
-    void pbs_environment::read_nodelist(std::vector<std::string> & nodelist,
-        bool debug)
+    void pbs_environment::read_nodelist(
+        std::vector<std::string>& nodelist, bool debug)
     {
         if (nodelist.empty())
         {
@@ -132,7 +127,7 @@ namespace hpx { namespace util { namespace batch_environments
         if (debug)
             std::cerr << "parsing nodelist" << std::endl;
 
-        for (std::string const& s: nodelist)
+        for (std::string const& s : nodelist)
         {
             if (!s.empty())
             {
@@ -145,6 +140,4 @@ namespace hpx { namespace util { namespace batch_environments
         }
         num_localities_ = nodes.size();
     }
-}}}
-
-
+}}}    // namespace hpx::util::batch_environments

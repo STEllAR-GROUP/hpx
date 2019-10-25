@@ -5,8 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_ALPS_ENVIRONMENT_HPP)
-#define HPX_UTIL_ALPS_ENVIRONMENT_HPP
+#if !defined(HPX_UTIL_SLURM_ENVIRONMENT_HPP)
+#define HPX_UTIL_SLURM_ENVIRONMENT_HPP
 
 #include <hpx/config.hpp>
 
@@ -16,10 +16,10 @@
 
 namespace hpx { namespace util { namespace batch_environments {
 
-    struct alps_environment
+    struct slurm_environment
     {
-        HPX_EXPORT alps_environment(std::vector<std::string> & nodelist,
-            bool debug);
+        HPX_EXPORT slurm_environment(
+            std::vector<std::string>& nodelist, bool debug);
 
         bool valid() const
         {
@@ -44,9 +44,16 @@ namespace hpx { namespace util { namespace batch_environments {
     private:
         std::size_t node_num_;
         std::size_t num_threads_;
+        std::size_t num_tasks_;
         std::size_t num_localities_;
         bool valid_;
+
+        HPX_EXPORT void retrieve_number_of_localities(bool debug);
+        HPX_EXPORT void retrieve_number_of_tasks(bool debug);
+        HPX_EXPORT void retrieve_nodelist(
+            std::vector<std::string>& nodes, bool debug);
+        HPX_EXPORT void retrieve_number_of_threads();
     };
-}}}
+}}}    // namespace hpx::util::batch_environments
 
 #endif

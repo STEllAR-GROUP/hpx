@@ -19,8 +19,8 @@ namespace hpx { namespace util { namespace batch_environments {
 
     struct pbs_environment
     {
-        HPX_EXPORT pbs_environment(std::vector<std::string> & nodelist,
-            bool debug, util::runtime_configuration const& cfg);
+        HPX_EXPORT pbs_environment(
+            std::vector<std::string>& nodelist, bool have_mpi, bool debug);
 
         bool valid() const
         {
@@ -48,11 +48,11 @@ namespace hpx { namespace util { namespace batch_environments {
         std::size_t num_threads_;
         bool valid_;
 
-        HPX_EXPORT void read_nodefile(std::vector<std::string> & nodelist,
-            bool debug, util::runtime_configuration const& cfg);
-        HPX_EXPORT void read_nodelist(std::vector<std::string> & nodelist,
-            bool debug);
+        HPX_EXPORT void read_nodefile(
+            std::vector<std::string>& nodelist, bool have_mpi, bool debug);
+        HPX_EXPORT void read_nodelist(
+            std::vector<std::string>& nodelist, bool debug);
     };
-}}}
+}}}    // namespace hpx::util::batch_environments
 
 #endif
