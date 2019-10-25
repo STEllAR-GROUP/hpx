@@ -182,7 +182,7 @@ waiting for the runtime system to exit, but will return immediately.
 
 .. important::
 
-   You cannot use any of the |hpx| API functions other that
+   You cannot use any of the |hpx| API functions other than
    :cpp:func:`hpx::stop` from inside your ``main()`` function.
 
 The function :cpp:func:`hpx::finalize` has to be called on one of the |hpx|
@@ -191,7 +191,7 @@ system should be stopped after the scheduled work has been executed.
 
 This method of invoking |hpx| is useful for applications where the main thread
 is used for special operations, such a GUIs. The function :cpp:func:`hpx::stop`
-can be used to wait for the |hpx| runtime system to exit and should be at least
+can be used to wait for the |hpx| runtime system to exit and should at least be 
 used as the last function called in ``main()``. The value returned from
 ``hpx_main`` will be returned from :cpp:func:`hpx::stop` after the runtime
 system has stopped.
@@ -233,7 +233,7 @@ The header file to include for this method of using |hpx| is
 ``hpx/hpx_start.hpp``.
 
 There are many additional overloads of :cpp:func:`hpx::start` available, such as
-for instance to provide your own entry point function instead of ``hpx_main``.
+the option for users to provide thier own entry point function instead of ``hpx_main``.
 Please refer to the function documentation for more details (see:
 ``hpx/hpx_start.hpp``).
 
@@ -243,7 +243,7 @@ Suspending and resuming the |hpx| runtime
 =========================================
 
 In some applications it is required to combine |hpx| with other runtimes. To
-support this use case |hpx| provides two functions: :cpp:func:`hpx::suspend` and
+support this use case, |hpx| provides two functions: :cpp:func:`hpx::suspend` and
 :cpp:func:`hpx::resume`. :cpp:func:`hpx::suspend` is a blocking call which will
 wait for all scheduled tasks to finish executing and then put the thread pool OS
 threads to sleep. :cpp:func:`hpx::resume` simply wakes up the sleeping threads
@@ -286,7 +286,7 @@ so that they are ready to accept new work. :cpp:func:`hpx::suspend` and
    |hpx| runtime.
 
 |hpx| also supports suspending individual thread pools and threads. For details
-on how to do that see the documentation for :cpp:class:`hpx::threads::thread_pool_base`.
+on how to do that, see the documentation for :cpp:class:`hpx::threads::thread_pool_base`.
 
 Automatically suspending worker threads
 ---------------------------------------
@@ -340,7 +340,7 @@ Working of ``hpx_main.hpp``
 
 In order to initialize |hpx| from ``main()``, we make use of linker tricks.
 
-It is implemented differently for different Operating Systems. Method of
+It is implemented differently for different operating systems. The method of
 implementation is as follows:
 
 * :ref:`Linux <hpx_main_implementation_linux>`: Using linker ``--wrap`` option.
@@ -354,7 +354,7 @@ Linux implementation
 --------------------
 
 We make use of the Linux linker ``ld``\ 's ``--wrap`` option to wrap the
-``main()`` function. This way any call to ``main()`` are redirected to our own
+``main()`` function. This way any calls to ``main()`` are redirected to our own
 implementation of main. It is here that we check for the existence of
 ``hpx_main.hpp`` by making use of a shadow variable ``include_libhpx_wrap``. The
 value of this variable determines the function stack at runtime.
