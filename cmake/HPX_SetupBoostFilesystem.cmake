@@ -35,8 +35,16 @@ if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
   endif()
 
   add_library(hpx::boost::filesystem INTERFACE IMPORTED)
-  set_property(TARGET hpx::boost::filesystem PROPERTY INTERFACE_LINK_LIBRARIES
-    ${Boost_FILESYSTEM_LIBRARIES})
+
+  set_property(TARGET hpx::boost::filesystem APPEND PROPERTY
+    INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
+  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+    set_property(TARGET hpx::boost::filesystem PROPERTY INTERFACE_LINK_LIBRARIES
+      ${Boost_FILESYSTEM_LIBRARIES})
+  else()
+    target_link_libraries(hpx::boost::filesystem INTERFACE
+      ${Boost_FILESYSTEM_LIBRARIES})
+  endif()
 
 else()
   if(NOT HPX_WITH_CXX17_FILESYSTEM)

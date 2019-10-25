@@ -22,4 +22,8 @@ add_library(hpx::hwloc INTERFACE IMPORTED)
 # System has been removed when passing at set_property for cmake < 3.11
 # instead of target_include_directories
 set_property(TARGET hpx::hwloc PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${HWLOC_INCLUDE_DIR})
-set_property(TARGET hpx::hwloc PROPERTY INTERFACE_LINK_LIBRARIES ${HWLOC_LIBRARIES})
+if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+  set_property(TARGET hpx::hwloc PROPERTY INTERFACE_LINK_LIBRARIES ${HWLOC_LIBRARIES})
+else()
+  target_link_libraries(hpx::hwloc INTERFACE ${HWLOC_LIBRARIES})
+endif()

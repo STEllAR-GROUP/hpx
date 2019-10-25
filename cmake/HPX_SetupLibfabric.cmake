@@ -25,8 +25,12 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC)
   add_library(hpx::libfabric INTERFACE IMPORTED)
   set_property(TARGET hpx::libfabric PROPERTY
     INTERFACE_INCLUDE_DIRECTORIES ${LIBFABRIC_INCLUDE_DIR})
-  set_property(TARGET hpx::libfabric PROPERTY
-    INTERFACE_LINK_LIBRARIES ${LIBFABRIC_LIBRARY})
+
+  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+    set_property(TARGET hpx::libfabric PROPERTY INTERFACE_LINK_LIBRARIES ${LIBFABRIC_LIBRARY})
+  else()
+    target_link_libraries(hpx::libfabric INTERFACE ${LIBFABRIC_LIBRARY})
+  endif()
 
 
   # Setup PMI imported target

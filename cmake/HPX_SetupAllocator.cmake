@@ -8,6 +8,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+include(HPX_AddDefinitions)
+
 if(NOT HPX_WITH_MALLOC)
   set(HPX_WITH_MALLOC CACHE STRING
           "Use the specified allocator. Supported allocators are tcmalloc, jemalloc, tbbmalloc and system."
@@ -34,8 +36,12 @@ if(NOT HPX_WITH_MALLOC_DEFAULT)
       hpx_error(${allocator_error})
     endif()
 
-    set_property(TARGET hpx::allocator PROPERTY
-      INTERFACE_LINK_LIBRARIES ${TCMALLOC_LIBRARIES})
+    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+      set_property(TARGET hpx::allocator PROPERTY
+        INTERFACE_LINK_LIBRARIES ${TCMALLOC_LIBRARIES})
+    else()
+        target_link_libraries(hpx::allocator INTERFACE ${TCMALLOC_LIBRARIES})
+    endif()
 
     if(MSVC)
       hpx_add_link_flag_if_available(/INCLUDE:__tcmalloc)
@@ -48,11 +54,16 @@ if(NOT HPX_WITH_MALLOC_DEFAULT)
     if(NOT JEMALLOC_LIBRARIES)
       hpx_error(${allocator_error})
     endif()
+
     set_property(TARGET hpx::allocator PROPERTY
       INTERFACE_INCLUDE_DIRECTORIES ${JEMALLOC_INCLUDE_DIR}
       ${JEMALLOC_ADDITIONAL_INCLUDE_DIR})
-    set_property(TARGET hpx::allocator PROPERTY
-      INTERFACE_LINK_LIBRARIES ${JEMALLOC_LIBRARIES})
+    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+      set_property(TARGET hpx::allocator PROPERTY
+        INTERFACE_LINK_LIBRARIES ${JEMALLOC_LIBRARIES})
+    else()
+      target_link_libraries(hpx::allocator INTERFACE ${JEMALLOC_LIBRARIES})
+    endif()
   endif()
 
   if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "MIMALLOC")
@@ -78,13 +89,20 @@ if(NOT HPX_WITH_MALLOC_DEFAULT)
     if(MSVC)
       hpx_add_link_flag_if_available(/INCLUDE:__TBB_malloc_proxy)
     endif()
-    set_property(TARGET hpx::allocator PROPERTY
-      INTERFACE_LINK_LIBRARIES ${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
+    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+      set_property(TARGET hpx::allocator PROPERTY
+        INTERFACE_LINK_LIBRARIES ${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
+    else()
+      target_link_libraries(hpx::allocator INTERFACE
+        ${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
+    endif()
   endif()
 
   if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "CUSTOM")
     set(_use_custom_allocator TRUE)
   endif()
+else()
+  set(HPX_WITH_MALLOC ${HPX_WITH_MALLOC_DEFAULT})
 endif()
 
 if("${HPX_WITH_MALLOC_UPPER}" MATCHES "SYSTEM")
@@ -106,8 +124,12 @@ if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
   add_library(hpx::amplifier INTERFACE IMPORTED)
   set_property(TARGET hpx::amplifier PROPERTY
     INTERFACE_INCLUDE_DIRECTORIES ${AMPLIFIER_INCLUDE_DIR})
-  set_property(TARGET hpx::amplifier PROPERTY
-    INTERFACE_LINK_LIBRARIES ${AMPLIFIER_LIBRARIES})
+  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+    set_property(TARGET hpx::amplifier PROPERTY
+      INTERFACE_LINK_LIBRARIES ${AMPLIFIER_LIBRARIES})
+  else()
+    target_link_libraries(hpx::allocator INTERFACE ${AMPLIFIER_LIBRARIES})
+  endif()
 
   hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
   hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)

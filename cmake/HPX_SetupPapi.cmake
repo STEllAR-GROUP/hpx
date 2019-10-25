@@ -22,6 +22,9 @@ if(HPX_WITH_PAPI)
   add_library(hpx::papi INTERFACE IMPORTED)
   set_property(TARGET hpx::papi PROPERTY
     INTERFACE_INCLUDE_DIRECTORIES ${PAPI_INCLUDE_DIR})
-  set_property(TARGET hpx::papi PROPERTY
-    INTERFACE_LINK_LIBRARIES ${PAPI_LIBRARY})
+  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+    set_property(TARGET hpx::papi PROPERTY INTERFACE_LINK_LIBRARIES ${PAPI_LIBRARY})
+  else()
+    target_link_libraries(hpx::papi INTERFACE ${PAPI_LIBRARY})
+  endif()
 endif()
