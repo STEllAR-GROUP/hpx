@@ -12,7 +12,6 @@
 #define HPX_RUNTIME_THREADS_POLICIES_PARSE_AFFINITY_OPTIONS_HPP
 
 #include <hpx/config.hpp>
-
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/topology/cpu_mask.hpp>

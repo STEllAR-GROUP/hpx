@@ -7,8 +7,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
-#include <hpx/runtime/threads/policies/parse_affinity_options.hpp>
+#include <hpx/affinity/affinity_data.hpp>
+#include <hpx/affinity/parse_affinity_options.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>

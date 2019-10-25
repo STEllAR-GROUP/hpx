@@ -11,6 +11,7 @@ include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
 
 set(HPX_LIBS
+  affinity
   algorithms
   allocator_support
   assertion
