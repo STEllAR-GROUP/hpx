@@ -1607,6 +1607,32 @@ endif()
 set(HPX_WITH_TARGET_ARCHITECTURE ${__target_arch} CACHE INTERNAL "" FORCE)
 
 ################################################################################
+# Set configuration option to use Boost.Context or not. This depends on the
+# platform.
+set(__use_generic_coroutine_context OFF)
+if(APPLE)
+  set(__use_generic_coroutine_context ON)
+endif()
+if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ")
+  set(__use_generic_coroutine_context ON)
+endif()
+hpx_option(HPX_WITH_GENERIC_CONTEXT_COROUTINES BOOL
+  "Use Boost.Context as the underlying coroutines context switch implementation."
+  ${__use_generic_coroutine_context} ADVANCED)
+
+# Compatibility with using Boost.ProgramOptions, introduced in V1.4.0
+hpx_option(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY
+  BOOL "Enable Boost.ProgramOptions compatibility. (default: ON)"
+  ON ADVANCED CATEGORY "Modules")
+
+# Compatibility with using Boost.FileSystem, introduced in V1.4.0
+set(__filesystem_compatibility_default ON)
+if(HPX_WITH_CXX17_FILESYSTEM)
+  set(__filesystem_compatibility_default OFF)
+endif()
+hpx_option(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY
+  BOOL "Enable Boost.FileSystem compatibility. (default: ${__filesystem_compatibility_default})"
+  ${__filesystem_compatibility_default} ADVANCED CATEGORY "Modules")
 
 ################################################################################
 # Find Our dependencies:
