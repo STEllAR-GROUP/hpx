@@ -46,6 +46,12 @@ namespace hpx_startup
 /// \namespace hpx
 namespace hpx
 {
+    namespace detail
+    {
+        HPX_EXPORT void on_exit() noexcept;
+        HPX_EXPORT void on_abort(int signal) noexcept;
+    }
+
 #ifndef DOXYGEN
     typedef int (*hpx_main_type)(hpx::program_options::variables_map&);
 #endif
