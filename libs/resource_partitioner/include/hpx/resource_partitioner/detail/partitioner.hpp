@@ -14,7 +14,7 @@
 #include <hpx/program_options.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>

@@ -46,6 +46,7 @@ add_hpx_module(compute
   HEADERS ${compute_headers}
   COMPAT_HEADERS ${compute_compat_headers}
   DEPENDENCIES
+    hpx_affinity
     hpx_algorithms
     hpx_config
     hpx_coroutines

@@ -21,7 +21,7 @@
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/timing/steady_clock.hpp>

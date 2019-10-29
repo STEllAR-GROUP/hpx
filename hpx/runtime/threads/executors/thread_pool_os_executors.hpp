@@ -11,7 +11,7 @@
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
