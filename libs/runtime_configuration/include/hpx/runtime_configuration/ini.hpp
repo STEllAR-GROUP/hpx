@@ -10,12 +10,10 @@
 #define HPX_UTIL_SECTION_SEP_17_2008_022PM
 
 #include <hpx/config.hpp>
-#include <hpx/util_fwd.hpp> // this needs to go first
-#include <hpx/util/to_string.hpp>
-
-#include <hpx/functional/function.hpp>
+#include <hpx/concurrency/spinlock.hpp>
+#include <hpx/functional.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/util/to_string.hpp>
 
 #include <iostream>
 #include <map>
@@ -51,7 +49,7 @@ namespace hpx { namespace util
     private:
         section *this_() { return this; }
 
-        typedef lcos::local::spinlock mutex_type;
+        using mutex_type = util::spinlock;
 
         section* root_;
         entry_map entries_;
@@ -273,4 +271,3 @@ namespace hpx { namespace util
 }} // namespace hpx::util
 
 #endif
-

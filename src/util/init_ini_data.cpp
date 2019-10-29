@@ -15,7 +15,7 @@
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/find_prefix.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/version.hpp>
 

@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
 
 #include <hpx/program_options.hpp>
 

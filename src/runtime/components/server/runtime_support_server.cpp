@@ -15,7 +15,7 @@
 #include <hpx/timing.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
 
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>

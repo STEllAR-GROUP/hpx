@@ -8,7 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/custom_exception_info.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>

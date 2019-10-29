@@ -16,7 +16,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>

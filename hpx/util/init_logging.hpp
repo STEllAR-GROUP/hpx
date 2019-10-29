@@ -8,7 +8,7 @@
 #define HPX_UTIL_AGAS_INIT_LOGGING_SEP_07_2013_0754PM
 
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <string>

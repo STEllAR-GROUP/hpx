@@ -51,6 +51,7 @@ add_hpx_module(resource_partitioner
     hpx_memory
     hpx_plugin
     hpx_program_options
+    hpx_runtime_configuration
     hpx_serialization
     hpx_synchronization
     hpx_threading_base

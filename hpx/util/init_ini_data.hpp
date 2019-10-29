@@ -12,7 +12,7 @@
 #include <hpx/plugin.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
 
 #include <map>
 #include <memory>

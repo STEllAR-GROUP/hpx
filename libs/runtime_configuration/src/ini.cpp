@@ -26,12 +26,11 @@
 #include <utility>
 
 #include <hpx/assertion.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/serialization/map.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
