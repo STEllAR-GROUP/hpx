@@ -49,24 +49,34 @@ set(HPX_Fortran_COMPILER_VERSION "@CMAKE_Fortran_COMPILER_VERSION@" CACHE STRING
 # Setup the imported libraries (publicly linked) #
 
 # Boost
-set(HPX_BOOST_ROOT "@BOOST_ROOT@")
-# By default BOOST_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
-# HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
-if (NOT BOOST_ROOT AND NOT "$ENV{BOOST_ROOT}")
-  set(BOOST_ROOT ${HPX_BOOST_ROOT})
-endif()
 # Separate targets to be unarily linked to some modules
-include(HPX_SetupBoost)
-include(HPX_SetupBoostFilesystem)
-include(HPX_SetupBoostProgramOptions)
+if (NOT TARGET hpx::boost)
+  set(HPX_BOOST_ROOT "@BOOST_ROOT@")
+  # By default BOOST_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
+  # HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
+  if (NOT BOOST_ROOT AND NOT "$ENV{BOOST_ROOT}")
+    set(BOOST_ROOT ${HPX_BOOST_ROOT})
+  endif()
+  include(HPX_SetupBoost)
+endif()
+if (NOT TARGET hpx::boost::filesystem)
+  include(HPX_SetupBoostFilesystem)
+endif()
+if (NOT TARGET hpx::boost::program_options)
+  include(HPX_SetupBoostProgramOptions)
+endif()
 
 # Hwloc
-set(HPX_HWLOC_ROOT "@HWLOC_ROOT@")
-include(HPX_SetupHwloc)
+if (NOT TARGET hpx::hwloc)
+  set(HPX_HWLOC_ROOT "@HWLOC_ROOT@")
+  include(HPX_SetupHwloc)
+endif()
 
 # Papi
-set(HPX_PAPI_ROOT "@PAPI_ROOT@")
-include(HPX_SetupPapi)
+if (NOT TARGET hpx::papi)
+  set(HPX_PAPI_ROOT "@PAPI_ROOT@")
+  include(HPX_SetupPapi)
+endif()
 ##################################################
 
 set(HPX_WITH_MALLOC_DEFAULT @HPX_WITH_MALLOC@)
