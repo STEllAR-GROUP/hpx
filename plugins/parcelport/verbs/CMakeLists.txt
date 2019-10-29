@@ -27,6 +27,7 @@ if (HPX_WITH_PARCELPORT_VERBS)
       hpx_preprocessor
       hpx_plugin
       hpx_timing
+      hpx_threadmanager
       hpx::verbs
       hpx::boost
     INCLUDE_DIRS
