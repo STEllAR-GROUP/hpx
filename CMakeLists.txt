@@ -395,7 +395,8 @@ endif()
 if(NOT HPX_WITH_DATAPAR_VC)
   hpx_info("No vectorization library configured")
 else()
-  set(HPX_WITH_DATAPAR ON)
+  hpx_option(HPX_WITH_DATAPAR BOOL
+    "Enable data parallel algorithm support (default: ON)" ON ADVANCED)
 endif()
 
 ################################################################################
@@ -2006,9 +2007,12 @@ foreach(_module ${HPX_LIBS})
 endforeach()
 
 ################################################################################
-# External build system support (FindHPX.cmake and pkg-config).
-################################################################################
+# store cache vars and their values in order for them to be forwarded to the
+# projects (needs to be before the HPX_GeneratePackage call)
+include(HPX_ForwardCacheVariables)
 
+################################################################################
+# External build system support (FindHPX.cmake and pkg-config).
 include(HPX_GeneratePackage)
 
 message("")

@@ -5,6 +5,9 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# Forward HPX_* cache variables
+include("${CMAKE_CURRENT_LIST_DIR}/HPXCacheVariables.cmake")
+
 # include exported targets if not already defined
 if (NOT TARGET hpx_config)
   include("${CMAKE_CURRENT_LIST_DIR}/HPXModulesTargets.cmake")
@@ -46,14 +49,7 @@ set(HPX_Fortran_COMPILER_VERSION "@CMAKE_Fortran_COMPILER_VERSION@" CACHE STRING
 # Setup the imported libraries (publicly linked) #
 
 # Boost
-set(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY
-  @HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY@
-  CACHE STRING "" FORCE)
-set(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY
-  @HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY@
-  CACHE STRING "" FORCE)
-set(HPX_WITH_CXX17_FILESYSTEM @HPX_WITH_CXX17_FILESYSTEM@)
-set(HPX_WITH_NATIVE_TLS @HPX_WITH_NATIVE_TLS@)
+# We could define it inside the HPXCacheVariables file
 set(HPX_BOOST_ROOT "@BOOST_ROOT@")
 # By default BOOST_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
 # HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
@@ -74,18 +70,7 @@ set(HPX_PAPI_ROOT "@PAPI_ROOT@")
 include(HPX_SetupPapi)
 ##################################################
 
-set(HPX_WITH_PSEUDO_DEPENDENCIES @HPX_WITH_PSEUDO_DEPENDENCIES@)
-set(HPX_WITH_STATIC_LINKING @HPX_WITH_STATIC_LINKING@)
 set(HPX_WITH_MALLOC_DEFAULT @HPX_WITH_MALLOC@)
-set(HPX_WITH_PARCELPORT_TCP @HPX_WITH_PARCELPORT_TCP@)
-set(HPX_WITH_PARCELPORT_MPI @HPX_WITH_PARCELPORT_MPI@)
-set(HPX_WITH_APEX @HPX_WITH_APEX@)
-if(MSVC)
-  set(HPX_WITH_VCPKG @HPX_WITH_VCPKG@)
-endif()
-set(HPX_WITH_DYNAMIC_HPX_MAIN @HPX_WITH_DYNAMIC_HPX_MAIN@)
-set(HPX_WITH_DATAPAR @HPX_WITH_DATAPAR@)
-set(HPX_WITH_DATAPAR_VC @HPX_WITH_DATAPAR_VC@)
 
 if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
@@ -101,30 +86,23 @@ if(NOT DEFINED ${CMAKE_FIND_PACKAGE_NAME}_FOUND)
   set(${CMAKE_FIND_PACKAGE_NAME}_FOUND true)
 endif()
 
-# Set variables to enable cuda/nvcc or cuda/clang when using add_hpx_executable()
-set(HPX_WITH_CUDA @HPX_WITH_CUDA@)
-set(HPX_WITH_CUDA_CLANG @HPX_WITH_CUDA_CLANG@)
-set(HPX_CUDA_CLANG_FLAGS @HPX_CUDA_CLANG_FLAGS@)
-
 # Set variables used by nvcc
 if(HPX_WITH_CUDA)
-    find_package(CUDA REQUIRED)
-    set(HPX_WITH_CUDA_CLANG @HPX_WITH_CUDA_CLANG@)
-    set(CUDA_SEPARABLE_COMPILATION ON)
-    set(CUDA_NVCC_FLAGS @CUDA_NVCC_FLAGS@)
-    set(HPX_CUDA_CLANG_FLAGS @HPX_CUDA_CLANG_FLAGS@)
-    # The following is a workaround to make sure that target_link_libraries in
-    # cuda_add_executable/library is called with a link keyword, not with a
-    # plain signature. From CMake 3.9 onwards this can be done officially with
-    # the CUDA_LINK_LIBRARIES_KEYWORD. For older versions we can emulate this by
-    # prepending a link keyword to CUDA_LIBRARIES.
-    #
-    # See
-    # https://gitlab.kitware.com/cmake/cmake/commit/9f41bfd7b9e6e8a7545f741f872949d2ae801978
-    # and https://gitlab.kitware.com/cmake/cmake/issues/16602 for more details.
-    if(CMAKE_VERSION VERSION_LESS "3.9")
-      set(CUDA_LIBRARIES PUBLIC ${CUDA_LIBRARIES})
-    else()
-      set(CUDA_LINK_LIBRARIES_KEYWORD PUBLIC)
-    endif()
+  find_package(CUDA REQUIRED)
+  set(CUDA_SEPARABLE_COMPILATION ON)
+  set(CUDA_NVCC_FLAGS @CUDA_NVCC_FLAGS@)
+  # The following is a workaround to make sure that target_link_libraries in
+  # cuda_add_executable/library is called with a link keyword, not with a
+  # plain signature. From CMake 3.9 onwards this can be done officially with
+  # the CUDA_LINK_LIBRARIES_KEYWORD. For older versions we can emulate this by
+  # prepending a link keyword to CUDA_LIBRARIES.
+  #
+  # See
+  # https://gitlab.kitware.com/cmake/cmake/commit/9f41bfd7b9e6e8a7545f741f872949d2ae801978
+  # and https://gitlab.kitware.com/cmake/cmake/issues/16602 for more details.
+  if(CMAKE_VERSION VERSION_LESS "3.9")
+    set(CUDA_LIBRARIES PUBLIC ${CUDA_LIBRARIES})
+  else()
+    set(CUDA_LINK_LIBRARIES_KEYWORD PUBLIC)
+  endif()
 endif()
