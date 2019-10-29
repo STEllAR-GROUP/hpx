@@ -22,6 +22,7 @@ if(HPX_WITH_PAPI)
   )
 
   add_hpx_component(papi_counters
+    INTERNAL_FLAGS
     FOLDER "Core/Components/Counters"
     INSTALL_HEADERS
     PLUGIN

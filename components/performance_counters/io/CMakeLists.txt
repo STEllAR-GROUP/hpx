@@ -18,6 +18,7 @@ if(HPX_WITH_IO_COUNTERS)
   )
 
   add_hpx_component(io_counters
+    INTERNAL_FLAGS
     FOLDER "Core/Components/Counters"
     INSTALL_HEADERS
     PLUGIN

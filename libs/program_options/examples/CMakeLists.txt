@@ -39,10 +39,11 @@ if (HPX_WITH_EXAMPLES)
 
     # add example executable
     add_hpx_executable(${example}
-                        SOURCES ${sources}
-                        ${${example}_FLAGS}
-                        DEPENDENCIES ${${example}_LIBS}
-                        FOLDER ${folder_name})
+      INTERNAL_FLAGS
+      SOURCES ${sources}
+      ${${example}_FLAGS}
+      DEPENDENCIES ${${example}_LIBS}
+      FOLDER ${folder_name})
 
     add_hpx_example_target_dependencies(
       "modules.program_options" ${example} ${${example}_PARAMETERS})

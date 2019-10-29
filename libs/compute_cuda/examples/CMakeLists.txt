@@ -75,9 +75,10 @@ foreach(example_program ${example_programs})
 
   # add example executable
   add_hpx_executable(${example_program}
-                     SOURCES ${sources}
-                     ${${example_program}_FLAGS}
-                     FOLDER "Examples/Compute/CUDA")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${example_program}_FLAGS}
+    FOLDER "Examples/Compute/CUDA")
 
   add_hpx_example_target_dependencies("modules.compute_cuda" ${example_program})
 

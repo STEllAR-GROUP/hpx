@@ -7,7 +7,7 @@
 
 function(add_hpx_library name)
   # retrieve arguments
-  set(options EXCLUDE_FROM_ALL NOLIBS NOEXPORT AUTOGLOB STATIC PLUGIN NONAMEPREFIX)
+  set(options EXCLUDE_FROM_ALL INTERNAL_FLAGS NOLIBS NOEXPORT AUTOGLOB STATIC PLUGIN NONAMEPREFIX)
   set(one_value_args FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX)
   set(multi_value_args SOURCES HEADERS AUXILIARY DEPENDENCIES COMPONENT_DEPENDENCIES COMPILER_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
@@ -191,6 +191,10 @@ function(add_hpx_library name)
 
   if(NOT ${${name}_NOEXPORT})
     set(_target_flags ${_target_flags} EXPORT)
+  endif()
+
+  if(${name}_INTERNAL_FLAGS)
+    set(_target_flags ${_target_flags} INTERNAL_FLAGS)
   endif()
 
   hpx_setup_target(

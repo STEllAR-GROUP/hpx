@@ -24,11 +24,12 @@ foreach(benchmark ${benchmarks})
 
   # add example executable
   add_hpx_executable(${benchmark}_test
-                     SOURCES ${sources}
-                     ${${benchmark}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Benchmarks/Modules/ComputeCuda")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${benchmark}_FLAGS}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER "Benchmarks/Modules/ComputeCuda")
 
   add_hpx_performance_test("modules.compute_cuda" ${benchmark} ${${benchmark}_PARAMETERS})
 endforeach()

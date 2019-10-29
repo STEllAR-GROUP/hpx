@@ -35,6 +35,7 @@ if(HPX_WITH_NETWORKING)
 
     # add executable needed for launch_process_test
     add_hpx_executable(launched_process_test
+      INTERNAL_FLAGS
       SOURCES launched_process.cpp
       EXCLUDE_FROM_ALL
       HPX_PREFIX ${HPX_BUILD_PREFIX}
@@ -110,11 +111,12 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     ${${test}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER ${folder_name})
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${test}_FLAGS}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER ${folder_name})
 
   add_hpx_unit_test("component" ${test} ${${test}_PARAMETERS})
 

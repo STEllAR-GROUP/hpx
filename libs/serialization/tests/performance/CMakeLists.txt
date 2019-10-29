@@ -25,10 +25,11 @@ foreach(benchmark ${benchmarks})
 
   # add example executable
   add_hpx_executable(${benchmark}_test
-                     SOURCES ${sources}
-                     ${${benchmark}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     FOLDER ${folder_name})
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${benchmark}_FLAGS}
+    EXCLUDE_FROM_ALL
+    FOLDER ${folder_name})
 
   add_hpx_performance_test("modules.serialization"
     ${benchmark} ${${benchmark}_PARAMETERS})

@@ -105,6 +105,7 @@ set(process_sources
 )
 
 add_hpx_component(process
+  INTERNAL_FLAGS
   FOLDER "Core/Components/Process"
   INSTALL_HEADERS
   PREPEND_HEADER_ROOT

@@ -193,11 +193,12 @@ foreach(benchmark ${benchmarks})
 
   # add example executable
   add_hpx_executable(${benchmark}_test
-                     SOURCES ${sources}
-                     ${${benchmark}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Benchmarks/Local")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${benchmark}_FLAGS}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER "Benchmarks/Local")
 
   target_include_directories(${benchmark}_test SYSTEM PRIVATE ${${benchmark}_INCLUDE_DIRECTORIES})
   target_link_libraries(${benchmark}_test PRIVATE ${${benchmark}_LIBRARIES})

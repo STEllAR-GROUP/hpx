@@ -24,6 +24,7 @@ if(HPX_WITH_COMPRESSION_ZLIB)
 
   include(HPX_AddLibrary)
   add_hpx_library(compress_zlib
+    INTERNAL_FLAGS
     PLUGIN
     SOURCES
       "${PROJECT_SOURCE_DIR}/plugins/binary_filter/zlib/zlib_serialization_filter.cpp"

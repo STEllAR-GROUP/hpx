@@ -16,6 +16,7 @@ set(unordered_sources
 )
 
 add_hpx_component(unordered
+  INTERNAL_FLAGS
   FOLDER "Core/Components/Containers"
   INSTALL_HEADERS
   PREPEND_HEADER_ROOT

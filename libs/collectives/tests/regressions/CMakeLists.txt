@@ -26,11 +26,12 @@ if(HPX_WITH_NETWORKING)
 
     # add example executable
     add_hpx_executable(${test}_test
-                       SOURCES ${sources}
-                       ${${test}_FLAGS}
-                       EXCLUDE_FROM_ALL
-                       HPX_PREFIX ${HPX_BUILD_PREFIX}
-                       FOLDER "Tests/Regressions/Modules/Collectives")
+      INTERNAL_FLAGS
+      SOURCES ${sources}
+      ${${test}_FLAGS}
+      EXCLUDE_FROM_ALL
+      HPX_PREFIX ${HPX_BUILD_PREFIX}
+      FOLDER "Tests/Regressions/Modules/Collectives")
 
     add_hpx_regression_test("modules.collectives" ${test} ${${test}_PARAMETERS})
   endforeach()

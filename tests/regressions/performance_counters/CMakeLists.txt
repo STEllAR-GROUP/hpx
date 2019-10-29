@@ -19,19 +19,21 @@ foreach(test ${tests})
   # add example executable
   if(${test} MATCHES "^papi_.*")
     add_hpx_executable(${test}_test
-                       SOURCES ${sources}
-                       COMPONENT_DEPENDENCIES "papi_counters"
-                       ${${test}_FLAGS}
-                       EXCLUDE_FROM_ALL
-                       HPX_PREFIX ${HPX_BUILD_PREFIX}
-                       FOLDER "Tests/Regressions/PerformanceCounters")
+      INTERNAL_FLAGS
+      SOURCES ${sources}
+      COMPONENT_DEPENDENCIES "papi_counters"
+      ${${test}_FLAGS}
+      EXCLUDE_FROM_ALL
+      HPX_PREFIX ${HPX_BUILD_PREFIX}
+      FOLDER "Tests/Regressions/PerformanceCounters")
   else()
     add_hpx_executable(${test}_test
-                       SOURCES ${sources}
-                       ${${test}_FLAGS}
-                       EXCLUDE_FROM_ALL
-                       HPX_PREFIX ${HPX_BUILD_PREFIX}
-                       FOLDER "Tests/Regressions/PerformanceCounters")
+      INTERNAL_FLAGS
+      SOURCES ${sources}
+      ${${test}_FLAGS}
+      EXCLUDE_FROM_ALL
+      HPX_PREFIX ${HPX_BUILD_PREFIX}
+      FOLDER "Tests/Regressions/PerformanceCounters")
   endif()
 
   add_hpx_regression_test("performance_counters" ${test} ${${test}_PARAMETERS})

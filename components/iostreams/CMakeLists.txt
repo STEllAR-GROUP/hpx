@@ -29,6 +29,7 @@ set(iostreams_sources
 )
 
 add_hpx_component(iostreams
+  INTERNAL_FLAGS
   FOLDER "Core/Components/IO"
   INSTALL_HEADERS
   PREPEND_HEADER_ROOT

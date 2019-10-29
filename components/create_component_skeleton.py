@@ -40,6 +40,7 @@ set({component_name}_headers)
 set({component_name}_sources)
 
 add_hpx_component({component_name}
+  INTERNAL_FLAGS
   FOLDER "Core/Components"
   INSTALL_HEADERS
   HEADER_ROOT "${{CMAKE_CURRENT_SOURCE_DIR}}/include"

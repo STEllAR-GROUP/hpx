@@ -17,12 +17,13 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     COMPONENT_DEPENDENCIES papi_counters
-                     ${${test}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Regressions/Components")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    COMPONENT_DEPENDENCIES papi_counters
+    ${${test}_FLAGS}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER "Tests/Regressions/Components")
 
   add_hpx_regression_test("components.papi_counters" ${test} ${${test}_PARAMETERS})
 endforeach()
