@@ -524,7 +524,7 @@ if(HPX_WITH_STACKTRACES OR HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
   hpx_info("Stack traces are enabled.")
   hpx_add_config_define(HPX_HAVE_STACKTRACES)
   if(WIN32)
-    hpx_libraries(dbghelp)
+    hpx_base_libraries(dbghelp)
   endif()
 
   hpx_option(HPX_WITH_THREAD_BACKTRACE_DEPTH STRING
@@ -1174,7 +1174,7 @@ if(HPX_WITH_CUDA)
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--default-stream per-thread)
   else()
     hpx_add_target_compile_option(-DBOOST_THREAD_USES_MOVE PUBLIC)
-    hpx_libraries(cudart)
+    hpx_base_libraries(cudart)
     hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
     link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
   endif()
@@ -1249,24 +1249,24 @@ if(NOT WIN32)
   if(NOT MSVC)
     hpx_add_compile_flag_if_available(-pthread)
     if(HPX_HAVE_LIBATOMIC)
-      hpx_libraries(atomic)
+      hpx_base_libraries(atomic)
     endif()
   endif()
 
   if(HPX_HAVE_LIBSUPCPP)
-    hpx_libraries(supc++)
+    hpx_base_libraries(supc++)
   endif()
 
   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
-    hpx_libraries(dl)
+    hpx_base_libraries(dl)
   endif()
 
   if(NOT APPLE AND NOT ("${HPX_PLATFORM_UC}" STREQUAL "ANDROID"))
-    hpx_libraries(rt)
+    hpx_base_libraries(rt)
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
-    hpx_libraries(log)
+    hpx_base_libraries(log)
   endif()
 
   if(APPLE)
@@ -1342,7 +1342,7 @@ if(WIN32)
     hpx_add_target_compile_option(-bigobj PUBLIC)
   endif()
 
-  hpx_libraries(psapi shlwapi)
+  hpx_base_libraries(psapi shlwapi)
 
   ##############################################################################
   # Macro definitions for system headers
@@ -1518,8 +1518,8 @@ else()
     hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
   endif()
   if(WIN32)
-    hpx_libraries(WS2_32)
-    hpx_libraries(mswsock)
+    hpx_base_libraries(WS2_32)
+    hpx_base_libraries(mswsock)
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
@@ -1639,8 +1639,6 @@ hpx_option(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY
 #   These are all dependencies needed to build the core library. Dependencies
 #   that are only needed by plugins, examples or tests should be found
 #   seperately in the appropriate subdirectory.
-# When a package is found, the necessary include paths are set, and the libraries
-# are added to the HPX_LIBRARIES variables
 
 # Setup our required Boost libraries.
 include(HPX_SetupBoost)
