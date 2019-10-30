@@ -308,7 +308,7 @@ else()
     FOLDER "Core")
 endif()
 
-target_link_libraries(hpx PUBLIC ${HPX_LIBRARIES})
+target_link_libraries(hpx PUBLIC ${HPX_BASE_LIBRARIES})
 if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
   target_link_libraries(hpx PUBLIC ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
 endif()
