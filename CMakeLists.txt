@@ -838,52 +838,30 @@ endif(HPX_WITH_NETWORKING)
 hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL
   "Enable examples requiring OpenMP support (default: OFF)." OFF
   CATEGORY "Build Targets" ADVANCED)
-if(HPX_WITH_EXAMPLES_OPENMP)
-  find_package(OpenMP)
-  if(NOT OPENMP_FOUND)
-    set(HPX_WITH_EXAMPLES_OPENMP OFF)
-  endif()
-endif()
+include(HPX_SetupOpenMP)
+# Setup TBB
 hpx_option(HPX_WITH_EXAMPLES_TBB BOOL
   "Enable examples requiring TBB support (default: OFF)." OFF
   CATEGORY "Build Targets" ADVANCED)
-if(HPX_WITH_EXAMPLES_TBB)
-  find_package(TBB)
-  if(NOT TBB_FOUND)
-    set(HPX_WITH_EXAMPLES_TBB OFF)
-  endif()
-endif()
+include(HPX_SetupTBB)
+# Setup QThreads
 hpx_option(HPX_WITH_EXAMPLES_QTHREADS BOOL
   "Enable examples requiring QThreads support (default: OFF)." OFF
   CATEGORY "Build Targets" ADVANCED)
-if(HPX_WITH_EXAMPLES_QTHREADS)
-  find_package(QThreads)
-  if(NOT QTHREADS_FOUND)
-    set(HPX_WITH_EXAMPLES_QTHREADS OFF)
-  endif()
-endif()
+include(HPX_SetupQThreads)
+# Setup HDF5
 hpx_option(HPX_WITH_EXAMPLES_HDF5 BOOL
   "Enable examples requiring HDF5 support (default: OFF)." OFF
   CATEGORY "Build Targets" ADVANCED)
-if(HPX_WITH_EXAMPLES_HDF5)
-  enable_language(Fortran)
-  find_package(HDF5 COMPONENTS CXX Fortran)
-  if(NOT HDF5_FOUND)
-    set(HPX_WITH_EXAMPLES_HDF5 OFF)
-  endif()
-endif()
+include(HPX_SetupHDF5)
 
 # Disabling the Qt example on BG/Q as GUIs don't make sense there anyways
 if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_option(HPX_WITH_EXAMPLES_QT4 BOOL
     "Enable examples requiring Qt4 support (default: OFF)." OFF
     CATEGORY "Build Targets" ADVANCED)
-  if(HPX_WITH_EXAMPLES_QT4)
-    find_package(Qt4)
-    if(NOT QT4_FOUND)
-      set(HPX_WITH_EXAMPLES_QT4 OFF)
-    endif()
-  endif()
+  # Setup Qt4
+  include(HPX_SetupQt4)
 endif()
 
 ## Debugging related build options
@@ -1619,7 +1597,6 @@ include(HPX_SetupBoostIostreams)
 include(HPX_SetupBoostProgramOptions)
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
-include(HPX_SetupHwloc)
 
 # reset external source lists
 add_hpx_library_sources_noglob(hpx_external)
@@ -1629,6 +1606,7 @@ add_hpx_library_headers_noglob(hpx_external)
 include(HPX_SetupApex)
 include(HPX_SetupPapi)
 include(HPX_SetupHpxmp)
+include(HPX_SetupHwloc)
 include(HPX_SetupGooglePerfTools)
 include(HPX_SetupValgrind)
 # Setup plugins
