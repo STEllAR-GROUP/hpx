@@ -100,13 +100,6 @@ function(hpx_setup_target target)
     endif()
   endif()
 
-  if(HPX_INCLUDE_DIRS)
-    set_property(TARGET ${target} APPEND
-      PROPERTY INCLUDE_DIRECTORIES
-      "${HPX_INCLUDE_DIRS}"
-    )
-  endif()
-
   if("${_type}" STREQUAL "EXECUTABLE")
     if(target_HPX_PREFIX)
       set(_prefix ${target_HPX_PREFIX})
