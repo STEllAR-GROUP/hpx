@@ -8,13 +8,13 @@
 #define HPX_DETAIL_RESOURCE_PARTITIONER_AUG_10_2017_0926AM
 
 #include <hpx/config.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
