@@ -49,7 +49,6 @@ set(HPX_Fortran_COMPILER_VERSION "@CMAKE_Fortran_COMPILER_VERSION@" CACHE STRING
 # Setup the imported libraries (publicly linked) #
 
 # Boost
-# We could define it inside the HPXCacheVariables file
 set(HPX_BOOST_ROOT "@BOOST_ROOT@")
 # By default BOOST_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
 # HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
