@@ -91,7 +91,11 @@ if (NOT TARGET hpx::boost)
   if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
     # Before flag remove when passing at set_property for cmake < 3.11 instead of target_include_directories
     # so should be added first
-    set_property(TARGET hpx::boost PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/external/asio)
+    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+      set_property(TARGET hpx::boost PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/external/asio)
+    else()
+      target_include_directories(hpx::boost BEFORE INTERFACE ${PROJECT_SOURCE_DIR}/external/asio)
+    endif()
   endif()
 
   set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
@@ -108,13 +112,6 @@ if (NOT TARGET hpx::boost)
     target_link_libraries(hpx::boost INTERFACE Threads::Threads)
   endif()
 
-  # If we compile natively for the MIC, we need some workarounds for certain
-  # Boost headers
-  # FIXME: push changes upstream
-  if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-    target_include_directories(hpx::boost BEFORE INTERFACE ${PROJECT_SOURCE_DIR}/external/asio)
-  endif()
-
   include(HPX_AddDefinitions)
   # Boost preprocessor definitions
   if(NOT Boost_USE_STATIC_LIBS)
@@ -125,4 +122,5 @@ if (NOT TARGET hpx::boost)
   endif()
   hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
   set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS BOOST_ALL_NO_LIB) # disable auto-linking
+
 endif()
