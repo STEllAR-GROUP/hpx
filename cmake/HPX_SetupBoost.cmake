@@ -121,13 +121,6 @@ else()
   target_link_libraries(hpx::boost INTERFACE Threads::Threads)
 endif()
 
-# If we compile natively for the MIC, we need some workarounds for certain
-# Boost headers
-# FIXME: push changes upstream
-if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-  target_include_directories(hpx::boost BEFORE INTERFACE ${PROJECT_SOURCE_DIR}/external/asio)
-endif()
-
 include(HPX_AddDefinitions)
 # Boost preprocessor definitions
 if(NOT Boost_USE_STATIC_LIBS)
