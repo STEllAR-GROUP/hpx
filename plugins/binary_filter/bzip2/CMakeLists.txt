@@ -20,6 +20,7 @@ if(HPX_WITH_COMPRESSION_BZIP2)
   hpx_debug("add_bzip2_module" "BZIP2_FOUND: ${BZIP2_FOUND}")
 
   add_hpx_library(compress_bzip2
+    INTERNAL_FLAGS
     PLUGIN
     SOURCES
       "${PROJECT_SOURCE_DIR}/plugins/binary_filter/bzip2/bzip2_serialization_filter.cpp"

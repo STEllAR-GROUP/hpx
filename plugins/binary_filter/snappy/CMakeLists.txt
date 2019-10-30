@@ -14,6 +14,7 @@ if(HPX_WITH_COMPRESSION_SNAPPY)
 
   hpx_debug("add_snappy_module" "SNAPPY_FOUND: ${SNAPPY_FOUND}")
   add_hpx_library(compress_snappy
+    INTERNAL_FLAGS
     PLUGIN
     SOURCES
       "${PROJECT_SOURCE_DIR}/plugins/binary_filter/snappy/snappy_serialization_filter.cpp"

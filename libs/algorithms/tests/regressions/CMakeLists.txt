@@ -29,10 +29,11 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     EXCLUDE_FROM_ALL
-                     ${${test}_FLAGS}
-                     FOLDER "Tests/Regressions/Modules/Algorithms/")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    EXCLUDE_FROM_ALL
+    ${${test}_FLAGS}
+    FOLDER "Tests/Regressions/Modules/Algorithms/")
 
   add_hpx_regression_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
 

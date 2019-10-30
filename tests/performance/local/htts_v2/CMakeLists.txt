@@ -68,11 +68,12 @@ foreach(benchmark ${benchmarks})
 
   # add example executable
   add_hpx_executable(${benchmark}
-                     SOURCES ${sources}
-                     ${${benchmark}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Benchmarks/HTTS v2/${benchmark}")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${benchmark}_FLAGS}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER "Benchmarks/HTTS v2/${benchmark}")
 
   target_compile_definitions(${benchmark} PRIVATE HPX_MODULE_STATIC_LINKING)
   target_include_directories(${benchmark} SYSTEM PRIVATE ${${benchmark}_INCLUDE_DIRECTORIES})

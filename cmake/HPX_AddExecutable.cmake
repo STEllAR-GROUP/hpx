@@ -7,7 +7,8 @@
 
 function(add_hpx_executable name)
   # retrieve arguments
-  set(options EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD AUTOGLOB NOLIBS NOHPX_INIT)
+  set(options EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD AUTOGLOB
+    INTERNAL_FLAGS NOLIBS NOHPX_INIT)
   set(one_value_args INI FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX LANGUAGE HPX_PREFIX)
   set(multi_value_args SOURCES HEADERS AUXILIARY DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
@@ -162,6 +163,10 @@ function(add_hpx_executable name)
 
   if(${${name}_NOHPX_INIT})
     set(_target_flags ${_target_flags} NOHPX_INIT)
+  endif()
+
+  if(${name}_INTERNAL_FLAGS)
+    set(_target_flags ${_target_flags} INTERNAL_FLAGS)
   endif()
 
   hpx_setup_target(

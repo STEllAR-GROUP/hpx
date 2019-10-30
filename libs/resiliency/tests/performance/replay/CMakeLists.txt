@@ -25,8 +25,8 @@ foreach(benchmark ${benchmarks})
   source_group("Source Files" FILES ${sources})
 
   # add benchmark executable
-  add_hpx_executable(
-    ${benchmark}_test
+  add_hpx_executable(${benchmark}_test
+    INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL
     ${${benchmark}_FLAGS}

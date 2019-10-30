@@ -31,9 +31,10 @@ if (HPX_WITH_EXAMPLES)
 
     # add example executable
     add_hpx_executable(${example_program}
-                       SOURCES ${sources}
-                       ${${example_program}_FLAGS}
-                       FOLDER "Examples/Modules/Resiliency")
+      INTERNAL_FLAGS
+      SOURCES ${sources}
+      ${${example_program}_FLAGS}
+      FOLDER "Examples/Modules/Resiliency")
 
     add_hpx_example_target_dependencies("modules.resiliency" ${example_program})
 

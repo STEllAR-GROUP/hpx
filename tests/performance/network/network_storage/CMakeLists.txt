@@ -7,6 +7,7 @@
 ###############################################################################
 
 add_hpx_executable(network_storage
+  INTERNAL_FLAGS
   AUTOGLOB
   EXCLUDE_FROM_ALL
   HPX_PREFIX ${HPX_BUILD_PREFIX}
