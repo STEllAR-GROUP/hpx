@@ -74,8 +74,12 @@ naming::id_type unregister_name(
   , error_code& ec
     )
 {
-    naming::resolver_client& agas_ = naming::get_agas_client();
-    return agas_.unregister_name(name);
+    if (!hpx::is_stopped())
+    {
+        naming::resolver_client& agas_ = naming::get_agas_client();
+        return agas_.unregister_name(name);
+    }
+    return naming::invalid_id;
 }
 
 lcos::future<naming::id_type> unregister_name(
