@@ -9,14 +9,17 @@ cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(runtime_configuration_headers
+  hpx/runtime_configuration/find_prefix.hpp
   hpx/runtime_configuration/ini.hpp
 )
 
 set(runtime_configuration_compat_headers
+  hpx/util/find_prefix.hpp
   hpx/util/ini.hpp
 )
 
 set(runtime_configuration_sources
+  find_prefix.cpp
   ini.cpp
 )
 
