@@ -31,5 +31,8 @@ if(HPX_WITH_GOOGLE_PERFTOOLS)
   else()
     target_link_libraries(hpx::gperftools INTERFACE ${GOOGLE_PERFTOOLS_LIBRARIES})
   endif()
-
+  # Construct back HPX_LIBRARIES and HPX_INCLUDE_DIRS to deprecate them progressively
+  hpx_include_dirs(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+  hpx_libraries(${GOOGLE_PERFTOOLS_LIBRARIES})
+  ##############################################
 endif()

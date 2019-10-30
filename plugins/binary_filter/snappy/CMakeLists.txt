@@ -35,5 +35,9 @@ if(HPX_WITH_COMPRESSION_SNAPPY)
 
   add_hpx_pseudo_dependencies(plugins.binary_filter.snappy compress_snappy)
   add_hpx_pseudo_dependencies(core plugins.binary_filter.snappy)
+  # Construct back HPX_LIBRARIES and HPX_INCLUDE_DIRS to deprecate them progressively
+  hpx_include_dirs(${SNAPPY_INCLUDE_DIR})
+  hpx_libraries(${SNAPPY_LIBRARY})
+  ##############################################
 endif()
 

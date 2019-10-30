@@ -52,12 +52,8 @@ if(HPX_WITH_EXAMPLES_HDF5)
             eos_driver/linterp.f
             eos_driver/linterp_many.F90
             eos_driver/bisection.F90
-        DEPENDENCIES sheneos_component
+            DEPENDENCIES sheneos_component PRIVATE hpx::hdf5
         FOLDER "Examples/ShenEOS")
-
-      target_include_directories(sheneos_compare PRIVATE ${HDF5_INCLUDE_DIRS})
-      target_link_libraries(sheneos_compare PRIVATE ${HDF5_FORTRAN_LIBRARY}
-        ${HDF5_LIBRARY})
 
       target_compile_options(sheneos_compare ${OpenMP_CXX_FLAGS})
       set_target_properties(sheneos_compare

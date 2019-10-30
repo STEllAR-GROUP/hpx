@@ -30,7 +30,6 @@ if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
   endif()
 
   add_library(hpx::boost::program_options INTERFACE IMPORTED)
-
   set_property(TARGET hpx::boost::program_options APPEND PROPERTY
     INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
   if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
@@ -40,5 +39,9 @@ if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
     target_link_libraries(hpx::boost::program_options INTERFACE
       ${Boost_PROGRAM_OPTIONS_LIBRARIES})
   endif()
+  # Construct back HPX_LIBRARIES to deprecate them progressively
+  hpx_include_dirs(${Boost_INCLUDE_DIRS})
+  hpx_libraries(${Boost_PROGRAM_OPTIONS_LIBRARIES})
+  ##############################################
 
 endif()

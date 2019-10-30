@@ -21,7 +21,7 @@ if(HPX_WITH_EXAMPLES_QT4)
         ${qt_FLAGS}
         FOLDER "Examples/Qt")
 
-    target_include_directories(qt PRIVATE ./ PRIVATE ${QT4_INCLUDE_DIRS})
+    target_include_directories(qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${QT4_INCLUDE_DIRS})
     target_link_libraries(qt PRIVATE ${HPX_TLL_PUBLIC} ${QT_LIBRARIES})
 
     add_hpx_example_target_dependencies("qt" qt)

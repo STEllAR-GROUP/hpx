@@ -45,6 +45,10 @@ if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
     target_link_libraries(hpx::boost::filesystem INTERFACE
       ${Boost_FILESYSTEM_LIBRARIES})
   endif()
+  # Construct back HPX_LIBRARIES to deprecate them progressively
+  hpx_include_dirs(${Boost_INCLUDE_DIRS})
+  hpx_libraries(${Boost_FILESYSTEM_LIBRARIES})
+  ##############################################
 
 else()
   if(NOT HPX_WITH_CXX17_FILESYSTEM)

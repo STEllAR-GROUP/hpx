@@ -71,6 +71,10 @@ foreach(test ${tests})
   if(HPX_WITH_CUDA)
     target_include_directories(${test}_test SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
     target_link_libraries(${test}_test PRIVATE ${${${test}}_LIBRARIES})
+    # Construct back HPX_LIBRARIES and HPX_INCLUDE_DIRS to deprecate them progressively
+    hpx_include_dirs(${CUDA_INCLUDE_DIRS})
+    hpx_libraries(${${${test}}_LIBRARIES})
+    ##############################################
   endif()
 
   add_hpx_unit_test("modules.segmented_algorithms" ${test} ${${test}_PARAMETERS})

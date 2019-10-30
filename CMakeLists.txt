@@ -96,6 +96,7 @@ include(CMakeDependentOption)
 
 # include additional macro definitions
 include(HPX_Libraries)
+include(HPX_IncludeDirs)
 include(HPX_AddConfigTest)
 include(HPX_AddDefinitions)
 include(HPX_CreateSymbolicLink)
@@ -1979,6 +1980,9 @@ foreach(_module ${HPX_LIBS})
   create_configuration_summary(
     "Module configuration summary (${_module}):" "${_module}")
 endforeach()
+
+# Construct back HPX_LIBRARIES and HPX_INCLUDE_DIRS to deprecate them progressively
+hpx_libraries(${HPX_BASE_LIBRARIES})
 
 ################################################################################
 # External build system support (FindHPX.cmake and pkg-config).

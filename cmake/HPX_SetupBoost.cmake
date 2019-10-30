@@ -105,6 +105,9 @@ if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
   # Before flag remove when passing at set_property for cmake < 3.11 instead of target_include_directories
   # so should be added first
   set_property(TARGET hpx::boost PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/external/asio)
+  # Construct back HPX_INCLUDE_DIRS to deprecate them progressively
+  hpx_include_dirs(${PROJECT_SOURCE_DIR}/external/asio)
+  ##############################################
 endif()
 
 set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
@@ -113,6 +116,10 @@ if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
 else()
   target_link_libraries(hpx::boost INTERFACE ${Boost_LIBRARIES})
 endif()
+# Construct back HPX_LIBRARIES and HPX_INCLUDE_DIRS to deprecate them progressively
+hpx_include_dirs(${Boost_INCLUDE_DIRS})
+hpx_libraries(${Boost_LIBRARIES})
+##############################################
 
 find_package(Threads QUIET REQUIRED)
 if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
@@ -120,6 +127,9 @@ if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
 else()
   target_link_libraries(hpx::boost INTERFACE Threads::Threads)
 endif()
+# Construct back HPX_LIBRARIES to deprecate them progressively
+hpx_libraries(${Threads_LIBRARIES})
+##############################################
 
 include(HPX_AddDefinitions)
 # Boost preprocessor definitions

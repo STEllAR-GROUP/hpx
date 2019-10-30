@@ -43,6 +43,10 @@ if(NOT HPX_WITH_MALLOC_DEFAULT)
         target_link_libraries(hpx::allocator INTERFACE ${TCMALLOC_LIBRARIES})
     endif()
 
+    # Construct back HPX_LIBRARIES to deprecate them progressively
+    hpx_libraries(${TCMALLOC_LIBRARIES})
+    #########################################
+
     if(MSVC)
       hpx_add_link_flag_if_available(/INCLUDE:__tcmalloc)
     endif()
@@ -64,6 +68,10 @@ if(NOT HPX_WITH_MALLOC_DEFAULT)
     else()
       target_link_libraries(hpx::allocator INTERFACE ${JEMALLOC_LIBRARIES})
     endif()
+    # Construct back HPX_LIBRARIES and HPX_INCLUDE_DIRS to deprecate them progressively
+    hpx_include_dirs(${JEMALLOC_INCLUDE_DIR} ${JEMALLOC_ADDITIONAL_INCLUDE_DIR})
+    hpx_libraries(${JEMALLOC_LIBRARIES})
+    ##########################################
   endif()
 
   if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "MIMALLOC")
@@ -73,6 +81,9 @@ if(NOT HPX_WITH_MALLOC_DEFAULT)
     endif()
     set_property(TARGET hpx::allocator PROPERTY
       INTERFACE_LINK_LIBRARIES ${MIMALLOC_LIBRARIES})
+    # Construct back HPX_LIBRARIES to deprecate them progressively
+    hpx_libraries(${MIMALLOC_LIBRARIES})
+    ##############################################
     if(MSVC)
       hpx_add_link_flag_if_available(/INCLUDE:mi_version)
     endif()
@@ -94,6 +105,9 @@ if(NOT HPX_WITH_MALLOC_DEFAULT)
       target_link_libraries(hpx::allocator INTERFACE
         ${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
     endif()
+    # Construct back HPX_LIBRARIES to deprecate them progressively
+    hpx_libraries(${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
+    ##############################################
   endif()
 
   if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "CUSTOM")
@@ -128,6 +142,10 @@ if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
   else()
     target_link_libraries(hpx::allocator INTERFACE ${AMPLIFIER_LIBRARIES})
   endif()
+  # Construct back HPX_LIBRARIES and HPX_INCLUDE_DIRS to deprecate them progressively
+  hpx_include_dirs(${AMPLIFIER_INCLUDE_DIR})
+  hpx_libraries(${AMPLIFIER_LIBRARIES})
+  ##############################################
 
   hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
   hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)

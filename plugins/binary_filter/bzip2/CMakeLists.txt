@@ -38,4 +38,9 @@ if(HPX_WITH_COMPRESSION_BZIP2)
 
   add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2)
   add_hpx_pseudo_dependencies(core plugins.binary_filter.bzip2)
+
+  # Construct back HPX_LIBRARIES and HPX_INCLUDE_DIRS to deprecate them progressively
+  hpx_include_dirs(${BZIP2_INCLUDE_DIR})
+  hpx_libraries(${BZIP2_LIBRARIES})
+  ##############################################
 endif()

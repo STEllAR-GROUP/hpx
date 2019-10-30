@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
+if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB OR HPX_WITH_COMPRESSION_SNAPPY)
 
   find_package(Boost ${Boost_MINIMUM_VERSION} QUIET MODULE COMPONENTS iostreams)
 
@@ -30,4 +30,7 @@ if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
       ${Boost_IOSTREAMS_LIBRARIES})
   endif()
 
+  # Construct back HPX_LIBRARIES to deprecate them progressively
+  hpx_libraries(${Boost_IOSTREAMS_LIBRARIES})
+  ##############################################
 endif()

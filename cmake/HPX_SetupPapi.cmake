@@ -23,8 +23,13 @@ if(HPX_WITH_PAPI)
   set_property(TARGET hpx::papi PROPERTY
     INTERFACE_INCLUDE_DIRECTORIES ${PAPI_INCLUDE_DIR})
   if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-    set_property(TARGET hpx::papi PROPERTY INTERFACE_LINK_LIBRARIES ${PAPI_LIBRARY})
+    set_property(TARGET hpx::papi PROPERTY
+      INTERFACE_LINK_LIBRARIES ${PAPI_LIBRARY})
   else()
     target_link_libraries(hpx::papi INTERFACE ${PAPI_LIBRARY})
   endif()
+  # Construct back HPX_LIBRARIES and HPX_INCLUDE_DIRS to deprecate them progressively
+  hpx_include_dirs(${PAPI_INCLUDE_DIR})
+  hpx_libraries(${PAPI_LIBRARY})
+  ##############################################
 endif()

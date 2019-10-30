@@ -43,4 +43,9 @@ if(HPX_WITH_COMPRESSION_ZLIB)
   add_hpx_pseudo_dependencies(plugins.binary_filter.zlib compress_zlib)
   add_hpx_pseudo_dependencies(core plugins.binary_filter.zlib)
 
+  # Construct back HPX_LIBRARIES and HPX_INCLUDE_DIRS to deprecate them progressively
+  hpx_include_dirs(${ZLIB_INCLUDE_DIRS})
+  hpx_libraries(${ZLIB_LIBRARIES})
+  ##############################################
+
 endif()

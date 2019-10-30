@@ -21,9 +21,15 @@ endif()
 add_library(hpx::hwloc INTERFACE IMPORTED)
 # System has been removed when passing at set_property for cmake < 3.11
 # instead of target_include_directories
-set_property(TARGET hpx::hwloc PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${HWLOC_INCLUDE_DIR})
+set_property(TARGET hpx::hwloc PROPERTY
+  INTERFACE_INCLUDE_DIRECTORIES ${HWLOC_INCLUDE_DIR})
 if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-  set_property(TARGET hpx::hwloc PROPERTY INTERFACE_LINK_LIBRARIES ${HWLOC_LIBRARIES})
+  set_property(TARGET hpx::hwloc PROPERTY
+    INTERFACE_LINK_LIBRARIES ${HWLOC_LIBRARIES})
 else()
   target_link_libraries(hpx::hwloc INTERFACE ${HWLOC_LIBRARIES})
 endif()
+# Construct back HPX_LIBRARIES and HPX_INCLUDE_DIRS to deprecate them progressively
+hpx_include_dirs(${HWLOC_INCLUDE_DIR})
+hpx_libraries(${HWLOC_LIBRARIES})
+##############################################

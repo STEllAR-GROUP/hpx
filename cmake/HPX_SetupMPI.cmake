@@ -18,38 +18,30 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
     hpx_error("MPI could not be found and HPX_WITH_PARCELPORT_MPI=ON, please specify \
     MPI_ROOT to point to the root of your MPI installation")
   endif()
+
   add_library(hpx::mpi INTERFACE IMPORTED)
   set_property(TARGET hpx::mpi PROPERTY
     INTERFACE_INCLUDE_DIRECTORIES ${MPI_INCLUDE_PATH} ${MPI_CXX_INCLUDE_DIRS})
   # MPI_LIBRARY and EXTRA is deprecated but still linked for older MPI versions
-  if (MPI_CXX_LIBRARIES)
-    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-      set_property(TARGET hpx::mpi APPEND PROPERTY
-        INTERFACE_LINK_LIBRARIES ${MPI_CXX_LIBRARIES})
-    else()
-      target_link_libraries(hpx::mpi INTERFACE ${MPI_CXX_LIBRARIES})
-    endif()
+  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+    set_property(TARGET hpx::mpi APPEND PROPERTY
+      INTERFACE_LINK_LIBRARIES ${MPI_CXX_LIBRARIES} ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARY})
+  else()
+    target_link_libraries(hpx::mpi INTERFACE ${MPI_CXX_LIBRARIES} ${MPI_LIBRARY}
+      ${MPI_EXTRA_LIBRARY})
   endif()
-  # Ensure compatibility with older versions
-  if (MPI_LIBRARY)
-    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-      set_property(TARGET hpx::mpi APPEND PROPERTY
-        INTERFACE_LINK_LIBRARIES ${MPI_LIBRARY})
-    else()
-      target_link_libraries(hpx::mpi INTERFACE ${MPI_LIBRARY})
-    endif()
-  endif()
-  if (MPI_EXTRA_LIBRARY)
-    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-      set_property(TARGET hpx::mpi APPEND PROPERTY
-        INTERFACE_LINK_LIBRARIES ${MPI_EXTRA_LIBRARY})
-    else()
-      target_link_libraries(hpx::mpi INTERFACE ${MPI_EXTRA_LIBRARY})
-    endif()
-  endif()
-  set_property(TARGET hpx::mpi PROPERTY INTERFACE_COMPILE_OPTIONS ${MPI_CXX_COMPILE_FLAGS})
-  set_property(TARGET hpx::mpi PROPERTY INTERFACE_COMPILE_DEFINITIONS ${MPI_CXX_COMPILE_DEFINITIONS})
+
+  set_property(TARGET hpx::mpi PROPERTY
+    INTERFACE_COMPILE_OPTIONS ${MPI_CXX_COMPILE_FLAGS})
+  set_property(TARGET hpx::mpi PROPERTY
+    INTERFACE_COMPILE_DEFINITIONS ${MPI_CXX_COMPILE_DEFINITIONS})
+
   if(MPI_CXX_LINK_FLAGS)
     #hpx_add_link_flag_if_available(${MPI_CXX_LINK_FLAGS})
   endif()
+
+  # Construct back HPX_LIBRARIES and HPX_INCLUDE_DIRS to deprecate them progressively
+  hpx_include_dirs(${MPI_INCLUDE_PATH} ${MPI_CXX_INCLUDE_DIRS})
+  hpx_libraries(${MPI_CXX_LIBRARIES} ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARY})
+  ##############################################
 endif()

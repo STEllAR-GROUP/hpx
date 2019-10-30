@@ -56,6 +56,9 @@ endif()
 
 add_library(hpx::vc INTERFACE IMPORTED)
 set_property(TARGET hpx::vc PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Vc_INCLUDE_DIR})
+# Construct back HPX_INCLUDE_DIRS to deprecate them progressively
+hpx_include_dirs(${Vc_INCLUDE_DIR})
+##############################################
 
 if(NOT HPX_WITH_DATAPAR_VC_NO_LIBRARY)
   if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
@@ -63,6 +66,9 @@ if(NOT HPX_WITH_DATAPAR_VC_NO_LIBRARY)
   else()
     target_link_libraries(hpx::vc INTERFACE ${Vc_LIBRARIES})
   endif()
+  # Construct back HPX_LIBRARIES to deprecate them progressively
+  hpx_libraries(${Vc_LIBRARIES})
+  ##############################################
 endif()
 
 foreach(_flag ${Vc_DEFINITIONS})

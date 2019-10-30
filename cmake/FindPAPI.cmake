@@ -33,7 +33,6 @@ elseif(NOT PAPI_ROOT)
   string(REPLACE "/include" "" PAPI_ROOT "${PAPI_INCLUDE_DIR}")
 endif()
 
-
 set(PAPI_LIBRARIES ${PAPI_LIBRARY})
 set(PAPI_INCLUDE_DIRS ${PAPI_INCLUDE_DIR})
 
