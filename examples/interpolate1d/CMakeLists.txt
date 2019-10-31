@@ -26,19 +26,19 @@ if(HPX_WITH_EXAMPLES_HDF5)
     source_group("Source Files" FILES ${sources})
 
     # add example executable
-    add_hpx_executable(${subdir}_client_example
+    add_hpx_executable(${subdir}_client
       SOURCES ${sources}
       DEPENDENCIES ${subdir}_component
       FOLDER "Examples/Interpolate1D")
 
-    add_hpx_example_target_dependencies("interpolate1d" ${subdir})
+    add_hpx_example_target_dependencies("interpolate1d" ${subdir}_client)
 
     if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
       add_hpx_example_test("interpolate1d" ${subdir}_client ${${subdir}_PARAMETERS})
     endif()
   endforeach()
 
-  add_hpx_executable(create_1d_testdata_example
+  add_hpx_executable(create_1d_testdata
     SOURCES create_testdata.cpp
     NOLIBS
     DEPENDENCIES PRIVATE hpx::hdf5
