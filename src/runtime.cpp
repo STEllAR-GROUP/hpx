@@ -1319,9 +1319,12 @@ namespace hpx
 
     bool is_stopped()
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr != rt)
-            return rt->get_state() == state_stopped;
+        if (!detail::exit_called)
+        {
+            runtime* rt = get_runtime_ptr();
+            if (nullptr != rt)
+                return rt->get_state() == state_stopped;
+        }
         return true;        // assume stopped
     }
 
