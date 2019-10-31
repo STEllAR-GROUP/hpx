@@ -17,5 +17,12 @@ else()
 endif()
 
 add_library(hpx::boost::regex INTERFACE IMPORTED)
-set_property(TARGET hpx::boost::regex PROPERTY INTERFACE_LINK_LIBRARIES
-  ${Boost_REGEX_LIBRARIES})
+
+set_property(TARGET hpx::boost::regex APPEND PROPERTY
+  INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
+if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+  set_property(TARGET hpx::boost::regex PROPERTY INTERFACE_LINK_LIBRARIES
+    ${Boost_REGEX_LIBRARIES})
+else()
+  target_link_libraries(hpx::boost::regex INTERFACE ${Boost_REGEX_LIBRARIES})
+endif()

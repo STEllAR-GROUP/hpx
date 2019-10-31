@@ -23,17 +23,29 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
     INTERFACE_INCLUDE_DIRECTORIES ${MPI_INCLUDE_PATH} ${MPI_CXX_INCLUDE_DIRS})
   # MPI_LIBRARY and EXTRA is deprecated but still linked for older MPI versions
   if (MPI_CXX_LIBRARIES)
-    set_property(TARGET hpx::mpi APPEND PROPERTY
-      INTERFACE_LINK_LIBRARIES ${MPI_CXX_LIBRARIES})
+    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+      set_property(TARGET hpx::mpi APPEND PROPERTY
+        INTERFACE_LINK_LIBRARIES ${MPI_CXX_LIBRARIES})
+    else()
+      target_link_libraries(hpx::mpi INTERFACE ${MPI_CXX_LIBRARIES})
+    endif()
   endif()
-  # Insure compatibility with older versions
+  # Ensure compatibility with older versions
   if (MPI_LIBRARY)
-    set_property(TARGET hpx::mpi APPEND PROPERTY
-      INTERFACE_LINK_LIBRARIES ${MPI_LIBRARY})
+    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+      set_property(TARGET hpx::mpi APPEND PROPERTY
+        INTERFACE_LINK_LIBRARIES ${MPI_LIBRARY})
+    else()
+      target_link_libraries(hpx::mpi INTERFACE ${MPI_LIBRARY})
+    endif()
   endif()
   if (MPI_EXTRA_LIBRARY)
-    set_property(TARGET hpx::mpi APPEND PROPERTY
-      INTERFACE_LINK_LIBRARIES ${MPI_EXTRA_LIBRARY})
+    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+      set_property(TARGET hpx::mpi APPEND PROPERTY
+        INTERFACE_LINK_LIBRARIES ${MPI_EXTRA_LIBRARY})
+    else()
+      target_link_libraries(hpx::mpi INTERFACE ${MPI_EXTRA_LIBRARY})
+    endif()
   endif()
   set_property(TARGET hpx::mpi PROPERTY INTERFACE_COMPILE_OPTIONS ${MPI_CXX_COMPILE_FLAGS})
   set_property(TARGET hpx::mpi PROPERTY INTERFACE_COMPILE_DEFINITIONS ${MPI_CXX_COMPILE_DEFINITIONS})

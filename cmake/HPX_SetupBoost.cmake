@@ -51,11 +51,6 @@ if(Boost_VERSION_STRING VERSION_LESS 1.70)
   set(__boost_libraries ${__boost_libraries} system)
 endif()
 
-if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
-   HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE)
-  set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono thread)
-endif()
-
 # Set configuration option to use Boost.Context or not. This depends on the
 # platform.
 set(__use_generic_coroutine_context OFF)
@@ -113,10 +108,18 @@ if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
 endif()
 
 set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
-set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${Boost_LIBRARIES})
+if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+  set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${Boost_LIBRARIES})
+else()
+  target_link_libraries(hpx::boost INTERFACE ${Boost_LIBRARIES})
+endif()
 
 find_package(Threads QUIET REQUIRED)
-set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES Threads::Threads)
+if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+  set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES Threads::Threads)
+else()
+  target_link_libraries(hpx::boost INTERFACE Threads::Threads)
+endif()
 
 # If we compile natively for the MIC, we need some workarounds for certain
 # Boost headers
