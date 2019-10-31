@@ -460,7 +460,18 @@ namespace hpx
 
         // block if required
         if (blocking)
+        {
             return wait();     // wait for the shutdown_action to be executed
+        }
+        else
+        {
+            // wait for at least state_running
+            util::yield_while(
+                [this]()
+                {
+                    return get_state() < state_running;
+                }, "runtime_impl::start");
+        }
 
         // Register this thread with the runtime system to allow calling certain
         // HPX functionality from the main thread.
