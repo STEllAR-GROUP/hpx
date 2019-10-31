@@ -7,32 +7,29 @@
 # Creates imported hpx::boost::filesystem target
 if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
 
-  hpx_add_config_define_namespace(
-    DEFINE HPX_FILESYSTEM_HAVE_BOOST_FILESYSTEM_COMPATIBILITY
-    NAMESPACE FILESYSTEM)
+  # In case find_package(HPX) is called multiple times
+  if (NOT TARGET hpx::boost::filesystem)
 
-  find_package(Boost ${Boost_MINIMUM_VERSION}
-    QUIET MODULE
-    COMPONENTS filesystem)
+    hpx_add_config_define_namespace(
+      DEFINE HPX_FILESYSTEM_HAVE_BOOST_FILESYSTEM_COMPATIBILITY
+      NAMESPACE FILESYSTEM)
 
-  if(NOT Boost_FILESYSTEM_FOUND)
-    hpx_error("Could not find Boost.Filesystem. Provide a boost installation \
-    including the filesystem library or use a compiler with support for the \
-    C++17 filesystem library")
-  else()
-    hpx_info("    Boost library found: filesystem")
-  endif()
+    find_package(Boost ${Boost_MINIMUM_VERSION}
+      QUIET MODULE
+      COMPONENTS filesystem)
 
-  add_library(hpx::boost::filesystem INTERFACE IMPORTED)
+    add_library(hpx::boost::filesystem INTERFACE IMPORTED)
 
-  set_property(TARGET hpx::boost::filesystem APPEND PROPERTY
-    INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
-  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-    set_property(TARGET hpx::boost::filesystem PROPERTY INTERFACE_LINK_LIBRARIES
-      ${Boost_FILESYSTEM_LIBRARIES})
-  else()
-    target_link_libraries(hpx::boost::filesystem INTERFACE
-      ${Boost_FILESYSTEM_LIBRARIES})
+    set_property(TARGET hpx::boost::filesystem APPEND PROPERTY
+      INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
+    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+      set_property(TARGET hpx::boost::filesystem PROPERTY INTERFACE_LINK_LIBRARIES
+        ${Boost_FILESYSTEM_LIBRARIES})
+    else()
+      target_link_libraries(hpx::boost::filesystem INTERFACE
+        ${Boost_FILESYSTEM_LIBRARIES})
+    endif()
+
   endif()
 
 else()

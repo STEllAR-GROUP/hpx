@@ -13,7 +13,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_WITH_PAPI)
+if(HPX_WITH_PAPI AND NOT TARGET hpx::papi)
+
   find_package(PAPI)
   if(NOT PAPI_FOUND)
     hpx_error("PAPI could not be found and HPX_WITH_PAPI=On, please specify \
