@@ -13,7 +13,7 @@
 #include <hpx/basic_execution/context_base.hpp>
 #include <hpx/basic_execution/resource_base.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
-#include <hpx/coroutines/detail/coroutine_self.hpp>
+#include <hpx/coroutines/detail/coroutine_stackful_self.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -57,7 +57,7 @@ namespace hpx { namespace threads {
             char const* desc) override;
 
     private:
-        coroutines::detail::coroutine_self self_;
+        coroutines::detail::coroutine_stackful_self self_;
 
         hpx::threads::thread_state_ex_enum do_yield(
             char const* desc, threads::thread_state_enum state);

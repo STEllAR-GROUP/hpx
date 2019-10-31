@@ -242,7 +242,8 @@ namespace hpx { namespace threads {
 
     public:
         /// Return the id of the component this thread is running in
-        HPX_CONSTEXPR naming::address_type get_component_id() const noexcept
+        HPX_CXX14_CONSTEXPR naming::address_type get_component_id()
+            const noexcept
         {
             return 0;
         }
@@ -350,7 +351,7 @@ namespace hpx { namespace threads {
         {
             return nullptr;
         }
-        HPX_CONSTEXPR char const* set_backtrace(char const*) noexcept
+        char const* set_backtrace(char const*) noexcept
         {
             return nullptr;
         }
@@ -359,8 +360,7 @@ namespace hpx { namespace threads {
         {
             return nullptr;
         }
-        HPX_CONSTEXPR util::backtrace const* set_backtrace(
-            util::backtrace const*) noexcept
+        util::backtrace const* set_backtrace(util::backtrace const*) noexcept
         {
             return nullptr;
         }
@@ -416,11 +416,11 @@ namespace hpx { namespace threads {
         }
 #endif
 
-        HPX_CONSTEXPR thread_priority get_priority() const noexcept
+        HPX_CXX14_CONSTEXPR thread_priority get_priority() const noexcept
         {
             return priority_;
         }
-        HPX_CONSTEXPR void set_priority(thread_priority priority) noexcept
+        void set_priority(thread_priority priority) noexcept
         {
             priority_ = priority;
         }
@@ -445,7 +445,7 @@ namespace hpx { namespace threads {
             return enable;
         }
 
-        void interrupt(bool flag = true) noexcept
+        void interrupt(bool flag = true)
         {
             mutex_type::scoped_lock l(this);
             if (flag && !enabled_interrupt_)
