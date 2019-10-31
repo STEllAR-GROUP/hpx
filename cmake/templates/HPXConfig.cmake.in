@@ -48,6 +48,9 @@ set(HPX_Fortran_COMPILER_VERSION "@CMAKE_Fortran_COMPILER_VERSION@" CACHE STRING
 ##################################################
 # Setup the imported libraries (publicly linked) #
 
+# Allocator
+include(HPX_SetupAllocator)
+
 # Boost
 # Separate boost targets to be unarily linked to some modules
 set(HPX_BOOST_ROOT "@BOOST_ROOT@")
