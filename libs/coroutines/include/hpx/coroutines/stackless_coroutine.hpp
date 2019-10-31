@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/coroutines/coroutine.hpp>
+#include <hpx/coroutines/detail/coroutine_self.hpp>
 #include <hpx/coroutines/detail/tss.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
@@ -70,6 +71,7 @@ namespace hpx { namespace threads { namespace coroutines {
 #else
           , thread_data_(0)
 #endif
+          , continuation_recursion_count_(0)
         {
         }
 
@@ -186,29 +188,7 @@ namespace hpx { namespace threads { namespace coroutines {
         friend struct reset_on_exit;
 
     public:
-        HPX_FORCEINLINE result_type operator()(arg_type arg = arg_type())
-        {
-            HPX_ASSERT(is_ready());
-
-            result_type result(
-                thread_state_enum::terminated, invalid_thread_id);
-
-            {
-                reset_on_exit on_exit{*this};
-
-                HPX_UNUSED(on_exit);
-
-                result = f_(arg);    // invoke wrapped function
-
-                // we always have to run to completion
-                HPX_ASSERT(result.first == threads::terminated);
-
-                reset_tss();
-            }
-
-            reset();
-            return result;
-        }
+        HPX_FORCEINLINE result_type operator()(arg_type arg = arg_type());
 
         explicit operator bool() const
         {
@@ -225,6 +205,11 @@ namespace hpx { namespace threads { namespace coroutines {
             return (std::numeric_limits<std::ptrdiff_t>::max)();
         }
 
+        std::size_t& get_continuation_recursion_count()
+        {
+            return continuation_recursion_count_;
+        }
+
     protected:
         functor_type f_;
         context_state state_;
@@ -238,7 +223,42 @@ namespace hpx { namespace threads { namespace coroutines {
 #else
         mutable std::size_t thread_data_;
 #endif
+        std::size_t continuation_recursion_count_;
     };
+
+}}}    // namespace hpx::threads::coroutines
+
+////////////////////////////////////////////////////////////////////////////////
+#include <hpx/coroutines/detail/coroutine_stackless_self.hpp>
+
+namespace hpx { namespace threads { namespace coroutines {
+
+    HPX_FORCEINLINE stackless_coroutine::result_type stackless_coroutine::
+    operator()(arg_type arg)
+    {
+        HPX_ASSERT(is_ready());
+
+        result_type result(thread_state_enum::terminated, invalid_thread_id);
+
+        {
+            detail::coroutine_stackless_self self(this);
+            detail::reset_self_on_exit on_self_exit(&self, nullptr);
+
+            reset_on_exit on_exit{*this};
+
+            HPX_UNUSED(on_exit);
+
+            result = f_(arg);    // invoke wrapped function
+
+            // we always have to run to completion
+            HPX_ASSERT(result.first == threads::terminated);
+
+            reset_tss();
+        }
+
+        reset();
+        return result;
+    }
 
 }}}    // namespace hpx::threads::coroutines
 
