@@ -6,21 +6,21 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/util/runtime_configuration.hpp>
-
-// TODO: move parcel ports into plugins
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/get_entry_as.hpp>
+#include <hpx/version.hpp>
+
+// TODO
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/init_logging.hpp>
-#include <hpx/util/register_locks_globally.hpp>
-#include <hpx/version.hpp>
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 
 #include <boost/predef/other/endian.h>
 #include <boost/spirit/include/qi_alternative.hpp>
@@ -68,45 +68,6 @@
 #endif
 
 #include <limits>
-
-///////////////////////////////////////////////////////////////////////////////
-#if defined(__linux) || defined(linux) || defined(__linux__)\
-         || defined(__FreeBSD__) || defined(__APPLE__)
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
-    namespace posix
-    {
-        ///////////////////////////////////////////////////////////////////////
-        // this global (urghhh) variable is used to control whether guard pages
-        // will be used or not
-        HPX_EXPORT bool use_guard_pages = true;
-    }
-}}}}
-#endif
-
-namespace hpx { namespace threads { namespace policies
-{
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-    ///////////////////////////////////////////////////////////////////////////
-    // We globally control whether to do minimal deadlock detection using this
-    // global bool variable. It will be set once by the runtime configuration
-    // startup code
-    HPX_EXPORT bool minimal_deadlock_detection = true;
-#endif
-}}}
-
-#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-namespace hpx { namespace util { namespace detail
-{
-    ///////////////////////////////////////////////////////////////////////////
-    // We globally control whether to do minimal deadlock detection in
-    // spin-locks using this global bool variable. It will be set once by the
-    // runtime configuration startup code
-    bool spinlock_break_on_deadlock = false;
-    std::size_t spinlock_deadlock_detection_limit =
-        HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT;
-}}}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -593,33 +554,6 @@ namespace hpx { namespace util
         large_stacksize = init_large_stack_size();
         HPX_ASSERT(init_huge_stack_size() <= HPX_HUGE_STACK_SIZE);
         huge_stacksize = init_huge_stack_size();
-
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-        threads::coroutines::detail::posix::use_guard_pages =
-            init_use_stack_guard_pages();
-#endif
-#ifdef HPX_HAVE_VERIFY_LOCKS
-        if (enable_lock_detection())
-            util::enable_lock_detection();
-        else
-            util::disable_lock_detection();
-#endif
-#ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
-        if (enable_global_lock_detection())
-            util::enable_global_lock_detection();
-        else
-            util::disable_global_lock_detection();
-#endif
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-        threads::policies::minimal_deadlock_detection =
-            enable_minimal_deadlock_detection();
-#endif
-#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-        util::detail::spinlock_break_on_deadlock =
-            enable_spinlock_deadlock_detection();
-        util::detail::spinlock_deadlock_detection_limit =
-            get_spinlock_deadlock_detection_limit();
-#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -658,33 +592,6 @@ namespace hpx { namespace util
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
         huge_stacksize = init_huge_stack_size();
-
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-        threads::coroutines::detail::posix::use_guard_pages =
-            init_use_stack_guard_pages();
-#endif
-#ifdef HPX_HAVE_VERIFY_LOCKS
-        if (enable_lock_detection())
-            util::enable_lock_detection();
-        else
-            util::disable_lock_detection();
-#endif
-#ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
-        if (enable_global_lock_detection())
-            util::enable_global_lock_detection();
-        else
-            util::disable_global_lock_detection();
-#endif
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-        threads::policies::minimal_deadlock_detection =
-            enable_minimal_deadlock_detection();
-#endif
-#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-        util::detail::spinlock_break_on_deadlock =
-            enable_spinlock_deadlock_detection();
-        util::detail::spinlock_deadlock_detection_limit =
-            get_spinlock_deadlock_detection_limit();
-#endif
     }
 
     std::size_t runtime_configuration::get_ipc_data_buffer_cache_size() const
@@ -1075,7 +982,7 @@ namespace hpx { namespace util
     }
 
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-    bool runtime_configuration::init_use_stack_guard_pages() const
+    bool runtime_configuration::use_stack_guard_pages() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx.stacks");

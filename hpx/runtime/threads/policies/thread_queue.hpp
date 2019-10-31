@@ -16,7 +16,9 @@
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/runtime/threads/policies/deadlock_detection.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
+#include <hpx/runtime/threads/policies/maintain_queue_wait_times.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
@@ -47,21 +49,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies {
-#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-    ///////////////////////////////////////////////////////////////////////////
-    // We control whether to collect queue wait times using this global bool.
-    // It will be set by any of the related performance counters. Once set it
-    // stays set, thus no race conditions will occur.
-    extern HPX_EXPORT bool maintain_queue_wait_times;
-#endif
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-    ///////////////////////////////////////////////////////////////////////////
-    // We globally control whether to do minimal deadlock detection using this
-    // global bool variable. It will be set once by the runtime configuration
-    // startup code
-    extern bool minimal_deadlock_detection;
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     // // Queue back-end interface:
     //

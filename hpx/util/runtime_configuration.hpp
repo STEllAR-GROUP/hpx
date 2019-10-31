@@ -11,12 +11,14 @@
 #include <hpx/config.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/plugin.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
+
+// TODO
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/runtime_configuration/ini.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -104,6 +106,10 @@ namespace hpx { namespace util
         bool enable_spinlock_deadlock_detection() const;
         std::size_t get_spinlock_deadlock_detection_limit() const;
 
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
+        bool use_stack_guard_pages() const;
+#endif
+
         // Returns the number of OS threads this locality is running.
         std::size_t get_os_thread_count() const;
 
@@ -142,10 +148,6 @@ namespace hpx { namespace util
         std::ptrdiff_t init_medium_stack_size() const;
         std::ptrdiff_t init_large_stack_size() const;
         std::ptrdiff_t init_huge_stack_size() const;
-
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-        bool init_use_stack_guard_pages() const;
-#endif
 
         void pre_initialize_ini();
         void post_initialize_ini(std::string& hpx_ini_file,

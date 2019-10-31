@@ -19,21 +19,11 @@
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/threadmanager_counters.hpp>
+#include <hpx/threading_base/maintain_queue_wait_times.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <utility>
-
-#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies {
-    ///////////////////////////////////////////////////////////////////////////
-    // We control whether to collect queue wait times using this global bool.
-    // It will be set by any of the related performance counters. Once set it
-    // stays set, thus no race conditions will occur.
-    HPX_EXPORT bool maintain_queue_wait_times = false;
-}}}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads {

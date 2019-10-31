@@ -21,6 +21,7 @@
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
+#include <hpx/runtime/threads/policies/maintain_queue_wait_times.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -46,17 +47,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies {
-    ///////////////////////////////////////////////////////////////////////////
-    // We control whether to collect queue wait times using this global bool.
-    // It will be set by any of the related performance counters. Once set it
-    // stays set, thus no race conditions will occur.
-    HPX_EXPORT bool maintain_queue_wait_times = false;
-}}}    // namespace hpx::threads::policies
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail {

@@ -15,6 +15,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/affinity/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/deadlock_detection.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -40,14 +41,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies {
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-    ///////////////////////////////////////////////////////////////////////////
-    // We globally control whether to do minimal deadlock detection using this
-    // global bool variable. It will be set once by the runtime configuration
-    // startup code
-    extern bool minimal_deadlock_detection;
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
     using default_local_priority_queue_scheduler_terminated_queue =

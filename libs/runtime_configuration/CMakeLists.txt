@@ -39,6 +39,7 @@ add_hpx_module(runtime_configuration
     hpx_coroutines
     hpx_errors
     hpx_functional
+    hpx_plugin
     hpx_serialization
     hpx_thread_support
   CMAKE_SUBDIRS examples tests
