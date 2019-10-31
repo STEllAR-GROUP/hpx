@@ -6,7 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/util/batch_environment.hpp>
+#include <hpx/batch_environments.hpp>
 
 #include <iostream>
 #include <string>
@@ -15,7 +15,7 @@
 int main()
 {
     std::vector<std::string> nodelist;
-    hpx::util::batch_environment env(nodelist, hpx::get_config(), true);
+    hpx::util::batch_environment env(nodelist, false, true);
 
     for (std::string const& s : nodelist)
         std::cout << s << "\n";

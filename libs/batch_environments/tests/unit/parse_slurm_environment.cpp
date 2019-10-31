@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/testing.hpp>
-#include <hpx/util/batch_environments/slurm_environment.hpp>
+#include <hpx/batch_environments/slurm_environment.hpp>
 
 #include <array>
 #include <cstddef>
@@ -29,9 +29,9 @@ static auto run_in_slurm_env(
     static const std::vector<std::string> hpx_nodelist{
         "anode1", "anode2", "inode7", "inode11", "inode14", "inode20"};
     static constexpr std::array<const char*, 13u> procids{
-        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
+        {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}};
     static constexpr std::array<const char*, 13u> nodeids{
-        "0", "0", "0", "1", "1", "2", "2", "3", "3", "4", "4", "5", "5"};
+        {"0", "0", "0", "1", "1", "2", "2", "3", "3", "4", "4", "5", "5"}};
 
     for (auto& procid : procids)
     {
