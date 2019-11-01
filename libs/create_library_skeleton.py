@@ -69,8 +69,10 @@ cmake_minimum_required(VERSION {cmake_version} FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${{CMAKE_CURRENT_SOURCE_DIR}}/cmake")
 
+# Default location is $HPX_ROOT/libs/{lib_name}/include
 set({lib_name}_headers)
 
+# Default location is $HPX_ROOT/libs/{lib_name}/include_compatibility
 set({lib_name}_compat_headers)
 
 set({lib_name}_sources)

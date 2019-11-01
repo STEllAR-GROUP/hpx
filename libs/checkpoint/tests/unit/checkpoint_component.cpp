@@ -8,13 +8,12 @@
 // restore_checkpoint with components.
 
 #include <hpx/hpx_main.hpp>
+
+#include <hpx/checkpoint.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/include/iostreams.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/checkpoint.hpp>
 
-#include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -149,5 +148,5 @@ int main()
 
     HPX_TEST(D.get_data().get() == E.get_data().get());
 
-    return 0;
+    return hpx::util::report_errors();
 }

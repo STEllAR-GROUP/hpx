@@ -9,8 +9,9 @@
 //
 
 #include <hpx/hpx_main.hpp>
+
+#include <hpx/checkpoint.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/checkpoint.hpp>
 
 #include <fstream>
 #include <string>
@@ -224,5 +225,5 @@ int main()
     // Cleanup
     std::remove("test_file_10.txt");
 
-    return 0;
+    return hpx::util::report_errors();
 }

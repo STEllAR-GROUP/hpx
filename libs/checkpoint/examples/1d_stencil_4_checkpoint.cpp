@@ -17,16 +17,15 @@
 // scalability on SMP machines.
 //
 // In this variation of stencil we use the save_checkpoint and
-// revive_checkpint functions to back up the state of the applicaton
-// every n timesteps.
+// revive_checkpint functions to back up the state of the application
+// every n time steps.
 //
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/include/iostreams.hpp>
+#include <hpx/checkpoint.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/util/checkpoint.hpp>
 
 #include <boost/range/irange.hpp>
 
@@ -176,7 +175,7 @@ struct backup
         }
         else
         {
-            hpx::cout << "Error opening file!" << std::endl;
+            std::cout << "Error opening file!" << std::endl;
         }
         file_archive.close();
     }
@@ -274,11 +273,12 @@ struct stepper
         using hpx::dataflow;
         using hpx::util::unwrapping;
 
-        // Set up Checkpointing
-        std::size_t num_c = nt / cp;    //Number of checkpoints to be made
-        hpx::cout << "Number of checkpoints to be made: " << num_c << std::endl;
+        // Set up Check-pointing
+        std::size_t num_c = nt / cp;    // Number of checkpoints to be made
+        std::cout << "Number of checkpoints to be made: " << num_c << std::endl;
         std::vector<std::string> v_file_names(num_c, fn);
         std::vector<backup> container;
+
         // Initialize checkpoint file names
         for (std::size_t i = 0; i < num_c; i++)
         {
@@ -286,6 +286,7 @@ struct stepper
                 v_file_names[i] + "_" + std::to_string((i + 1) * cp);
             container.push_back(backup(v_file_names[i], np));
         }
+
         // Container to wait on all held futures
         std::vector<hpx::future<void>> backup_complete;
 
