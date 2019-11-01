@@ -14,7 +14,7 @@
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-#include <hpx/iterator_support/is_range.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
 
 #include <algorithm>
 #include <array>

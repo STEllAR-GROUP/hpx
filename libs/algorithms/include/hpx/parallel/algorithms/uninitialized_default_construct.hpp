@@ -11,7 +11,7 @@
 #define HPX_PARALLEL_DETAIL_UNINITIALIZED_DEFAULT_CONSTRUCT_MAY_31_2017_0928AM
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

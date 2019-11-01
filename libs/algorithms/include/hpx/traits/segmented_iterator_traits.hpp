@@ -8,7 +8,7 @@
 #define HPX_SEGMENTED_ITERATOR_TRAITS_OCT_14_2014_0229PM
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <type_traits>

@@ -17,7 +17,7 @@
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #endif
 #include <hpx/functional/traits/is_callable.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/type_support/identity.hpp>

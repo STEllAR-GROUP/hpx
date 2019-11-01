@@ -11,7 +11,7 @@
 // This is really an incomplete test; should be fleshed out.
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/type_support/always_void.hpp>

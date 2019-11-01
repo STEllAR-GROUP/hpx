@@ -9,7 +9,7 @@
 #define HPX_TRAITS_ACQUIRE_SHARED_STATE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/is_range.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/traits/future_access.hpp>

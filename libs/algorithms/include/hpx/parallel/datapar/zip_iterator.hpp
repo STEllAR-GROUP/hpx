@@ -12,7 +12,7 @@
 #if defined(HPX_HAVE_DATAPAR)
 
 #include <hpx/datastructures/detail/pack.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
 
 #include <hpx/parallel/datapar/iterator_helpers.hpp>

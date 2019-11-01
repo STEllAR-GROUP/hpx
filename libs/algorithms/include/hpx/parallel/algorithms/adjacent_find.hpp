@@ -10,7 +10,7 @@
 #define HPX_PARALLEL_DETAIL_ADJACENT_FIND_SEP_20_2014_0731PM
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>

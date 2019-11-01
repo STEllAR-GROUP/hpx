@@ -12,7 +12,7 @@
 #define HPX_TESTS_UTIL_ITERATOR_TESTS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/type_support/always_void.hpp>
 

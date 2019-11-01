@@ -10,7 +10,7 @@
 #define HPX_PARALLEL_DETAIL_EQUAL_JUL_06_2014_0848PM
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/range.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

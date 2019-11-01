@@ -7,8 +7,8 @@
 cmake_minimum_required(VERSION 3.6.3 FATAL_ERROR)
 
 set(iterator_support_headers
-  hpx/iterator_support/is_iterator.hpp
-  hpx/iterator_support/is_range.hpp
+  hpx/iterator_support/traits/is_iterator.hpp
+  hpx/iterator_support/traits/is_range.hpp
   hpx/iterator_support/iterator_adaptor.hpp
   hpx/iterator_support/iterator_facade.hpp
   hpx/iterator_support/iterator_range.hpp
@@ -36,8 +36,8 @@ add_hpx_module(iterator_support
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/iterator_support/is_iterator.hpp"
-    "hpx/iterator_support/is_range.hpp"
+    "hpx/iterator_support/traits/is_iterator.hpp"
+    "hpx/iterator_support/traits/is_range.hpp"
   SOURCES ${iterator_support_sources}
   HEADERS ${iterator_support_headers}
   COMPAT_HEADERS ${iterator_support_compat_headers}

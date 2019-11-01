@@ -16,7 +16,7 @@
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/serialization/map.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <map>
 #include <memory>
