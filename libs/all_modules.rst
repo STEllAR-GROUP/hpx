@@ -17,6 +17,7 @@ All modules
    /libs/algorithms/docs/index.rst
    /libs/allocator_support/docs/index.rst
    /libs/assertion/docs/index.rst
+   /libs/basic_execution/docs/index.rst
    /libs/cache/docs/index.rst
    /libs/collectives/docs/index.rst
    /libs/compute/docs/index.rst

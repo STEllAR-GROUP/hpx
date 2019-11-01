@@ -5,15 +5,15 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/config/defines.hpp>
-#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/basic_execution/config/defines.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 
-#if defined(HPX_CONCURRENCY_HAVE_DEPRECATION_WARNINGS)
+#if defined(HPX_BASIC_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/register_locks.hpp is deprecated, \
-    please include hpx/concurrency/register_locks.hpp instead")
+    please include hpx/basic_execution/register_locks.hpp instead")
 #else
 #warning "The header hpx/util/register_locks.hpp is deprecated, \
-    please include hpx/concurrency/register_locks.hpp instead"
+    please include hpx/basic_execution/register_locks.hpp instead"
 #endif
 #endif

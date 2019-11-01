@@ -15,6 +15,7 @@
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/runtime/threads/execution_agent.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 
@@ -56,10 +57,16 @@ namespace hpx { namespace threads {
         static util::internal_allocator<thread_data_stackful> thread_alloc_;
 
     public:
-        coroutine_type::result_type call()
+        coroutine_type::result_type call(
+            hpx::basic_execution::this_thread::detail::agent_storage*
+                agent_storage)
         {
+            HPX_ASSERT(get_state().state() == active);
             HPX_ASSERT(this == coroutine_.get_thread_id().get());
-            return coroutine_(this->thread_data::set_state_ex(wait_signaled));
+
+            hpx::basic_execution::this_thread::reset_agent ctx(
+                agent_storage, agent_);
+            return coroutine_(set_state_ex(wait_signaled));
         }
 
 #if defined(HPX_DEBUG)
@@ -70,7 +77,7 @@ namespace hpx { namespace threads {
         }
 #endif
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-        std::size_t get_thread_phase() const override
+        std::size_t get_thread_phase() const noexcept override
         {
             return coroutine_.get_thread_phase();
         }
@@ -101,6 +108,7 @@ namespace hpx { namespace threads {
           : thread_data(init_data, queue, newstate)
           , coroutine_(std::move(init_data.func), thread_id_type(this_()),
                 init_data.stacksize)
+          , agent_(coroutine_.impl())
         {
             HPX_ASSERT(coroutine_.is_ready());
         }
@@ -118,6 +126,7 @@ namespace hpx { namespace threads {
 
     private:
         coroutine_type coroutine_;
+        execution_agent agent_;
     };
 
     ////////////////////////////////////////////////////////////////////////////

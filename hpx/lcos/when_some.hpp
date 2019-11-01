@@ -341,11 +341,10 @@ namespace hpx { namespace lcos
                         // execute_deferred might have made the future ready
                         if (!shared_state->is_ready())
                         {
-                            shared_state->set_on_completed(
-                                util::deferred_call(
-                                    &when_some<Sequence>::on_future_ready,
-                                    when_.shared_from_this(),
-                                    idx_, threads::get_self_id()));
+                            shared_state->set_on_completed(util::deferred_call(
+                                &when_some<Sequence>::on_future_ready,
+                                when_.shared_from_this(), idx_,
+                                hpx::basic_execution::this_thread::agent()));
                             ++idx_;
                             return;
                         }
@@ -413,7 +412,8 @@ namespace hpx { namespace lcos
             typedef lcos::local::spinlock mutex_type;
 
         public:
-            void on_future_ready(std::size_t idx, threads::thread_id_type const& id)
+            void on_future_ready(
+                std::size_t idx, hpx::basic_execution::agent_ref ctx)
             {
                 std::size_t const new_count = count_.fetch_add(1) + 1;
                 if (new_count <= needed_count_)
@@ -423,9 +423,12 @@ namespace hpx { namespace lcos
                         lazy_values_.indices.push_back(idx);
                     }
                     if (new_count == needed_count_) {
-                        if (id != threads::get_self_id()) {
-                            threads::set_thread_state(id, threads::pending);
-                        } else {
+                        if (ctx != hpx::basic_execution::this_thread::agent())
+                        {
+                            ctx.resume();
+                        }
+                        else
+                        {
                             goal_reached_on_calling_thread_ = true;
                         }
                     }
@@ -458,7 +461,7 @@ namespace hpx { namespace lcos
                 if (!goal_reached_on_calling_thread_)
                 {
                     // wait for any of the futures to return to become ready
-                    this_thread::suspend(threads::suspended,
+                    hpx::basic_execution::this_thread::suspend(
                         "hpx::lcos::detail::when_some::operator()");
                 }
 

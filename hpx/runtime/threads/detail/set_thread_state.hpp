@@ -223,7 +223,8 @@ namespace hpx { namespace threads { namespace detail
                     strm << "set_thread_state: previous state was "
                          << get_thread_state_name(previous_state_val) << " ("
                          << previous_state_val << ")";
-                    HPX_ASSERT_MSG(false, strm.str().c_str());    // should not happen
+                    HPX_ASSERT_MSG(
+                        false, strm.str().c_str());    // should not happen
                     break;
                 }
             }

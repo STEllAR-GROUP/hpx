@@ -16,6 +16,7 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/runtime/threads/execution_agent.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 
@@ -58,7 +59,9 @@ namespace hpx { namespace threads {
     public:
         stackless_coroutine_type::result_type call()
         {
+            HPX_ASSERT(get_state().state() == active);
             HPX_ASSERT(this == coroutine_.get_thread_id().get());
+
             return coroutine_(this->thread_data::set_state_ex(wait_signaled));
         }
 
@@ -70,7 +73,7 @@ namespace hpx { namespace threads {
         }
 #endif
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-        std::size_t get_thread_phase() const override
+        std::size_t get_thread_phase() const noexcept override
         {
             return coroutine_.get_thread_phase();
         }

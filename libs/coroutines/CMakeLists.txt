@@ -22,6 +22,8 @@ set(coroutines_headers
   hpx/coroutines/detail/coroutine_accessor.hpp
   hpx/coroutines/detail/coroutine_impl.hpp
   hpx/coroutines/detail/coroutine_self.hpp
+  hpx/coroutines/detail/coroutine_stackful_self.hpp
+  hpx/coroutines/detail/coroutine_stackless_self.hpp
   hpx/coroutines/detail/get_stack_pointer.hpp
   hpx/coroutines/detail/posix_utility.hpp
   hpx/coroutines/detail/swap_context.hpp

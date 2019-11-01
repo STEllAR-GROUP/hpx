@@ -14,6 +14,7 @@ set(HPX_LIBS
   algorithms
   allocator_support
   assertion
+  basic_execution
   cache
   collectives
   compute
