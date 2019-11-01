@@ -140,7 +140,6 @@ set(benchmarks ${benchmarks}
     foreach_scaling
     spinlock_overhead1
     spinlock_overhead2
-    stencil3_iterators
     stream
     partitioned_vector_foreach
    )
@@ -153,7 +152,6 @@ set(nonconcurrent_fifo_overhead_FLAGS DEPENDENCIES hpx_timing)
 set(nonconcurrent_lifo_overhead_FLAGS DEPENDENCIES hpx_timing)
 set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component hpx_timing)
-set(stencil3_iterators_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 set(stream_FLAGS DEPENDENCIES iostreams_component)
 set(transform_reduce_scaling_FLAGS DEPENDENCIES hpx_timing)
 set(partitioned_vector_foreach_FLAGS

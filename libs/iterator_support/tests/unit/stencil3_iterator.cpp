@@ -6,9 +6,9 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/testing.hpp>
 
-#include <hpx/util/transform_iterator.hpp>
+#include <hpx/iterator_support.hpp>
+#include <hpx/testing.hpp>
 
 #include <iterator>
 #include <numeric>

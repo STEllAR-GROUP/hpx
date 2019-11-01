@@ -13,6 +13,8 @@ set(iterator_support_headers
   hpx/iterator_support/iterator_facade.hpp
   hpx/iterator_support/iterator_range.hpp
   hpx/iterator_support/range.hpp
+  hpx/iterator_support/transform_iterator.hpp
+  hpx/iterator_support/zip_iterator.hpp
 )
 
 set(iterator_support_compat_headers
@@ -22,6 +24,7 @@ set(iterator_support_compat_headers
   hpx/util/iterator_facade.hpp
   hpx/util/iterator_range.hpp
   hpx/util/range.hpp
+  hpx/util/transform_iterator.hpp
 )
 
 set(iterator_support_sources)
@@ -40,6 +43,9 @@ add_hpx_module(iterator_support
   COMPAT_HEADERS ${iterator_support_compat_headers}
   DEPENDENCIES
     hpx_config
+    hpx_datastructures
+    hpx_functional
+    hpx_serialization
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

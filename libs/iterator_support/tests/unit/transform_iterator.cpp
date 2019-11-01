@@ -4,11 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/hpx_init.hpp>
 
-#include <hpx/util/transform_iterator.hpp>
+#include <hpx/iterator_support.hpp>
+#include <hpx/testing.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -18,18 +18,16 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace test
-{
+namespace test {
+
     template <typename Iterator>
-    HPX_FORCEINLINE
-    Iterator previous(Iterator it)
+    HPX_FORCEINLINE Iterator previous(Iterator it)
     {
         return --it;
     }
 
     template <typename Iterator>
-    HPX_FORCEINLINE
-    Iterator next(Iterator it)
+    HPX_FORCEINLINE Iterator next(Iterator it)
     {
         return ++it;
     }
@@ -40,13 +38,16 @@ namespace test
         previous_transformer() {}
 
         // at position 'begin' it will dereference 'value', otherwise 'it-1'
-        previous_transformer(IteratorBase const& begin, IteratorValue const& value)
-            : begin_(begin), value_(value)
-        {}
+        previous_transformer(
+            IteratorBase const& begin, IteratorValue const& value)
+          : begin_(begin)
+          , value_(value)
+        {
+        }
 
         template <typename Iterator>
-        typename std::iterator_traits<Iterator>::reference
-        operator()(Iterator const& it) const
+        typename std::iterator_traits<Iterator>::reference operator()(
+            Iterator const& it) const
         {
             if (it == begin_)
                 return *value_;
@@ -60,7 +61,8 @@ namespace test
 
     template <typename IteratorBase, typename IteratorValue>
     inline previous_transformer<IteratorBase, IteratorValue>
-    make_previous_transformer(IteratorBase const& base, IteratorValue const& value)
+    make_previous_transformer(
+        IteratorBase const& base, IteratorValue const& value)
     {
         return previous_transformer<IteratorBase, IteratorValue>(base, value);
     }
@@ -73,12 +75,14 @@ namespace test
 
         // at position 'end' it will dereference 'value', otherwise 'it+1'
         next_transformer(IteratorBase const& end, IteratorValue const& value)
-            : end_(end), value_(value)
-        {}
+          : end_(end)
+          , value_(value)
+        {
+        }
 
         template <typename Iterator>
-        typename std::iterator_traits<Iterator>::reference
-        operator()(Iterator const& it) const
+        typename std::iterator_traits<Iterator>::reference operator()(
+            Iterator const& it) const
         {
             if (it == end_)
                 return *value_;
@@ -91,12 +95,12 @@ namespace test
     };
 
     template <typename IteratorBase, typename IteratorValue>
-    inline next_transformer<IteratorBase, IteratorValue>
-    make_next_transformer(IteratorBase const& base, IteratorValue const& value)
+    inline next_transformer<IteratorBase, IteratorValue> make_next_transformer(
+        IteratorBase const& base, IteratorValue const& value)
     {
         return next_transformer<IteratorBase, IteratorValue>(base, value);
     }
-}
+}    // namespace test
 
 ///////////////////////////////////////////////////////////////////////////////
 // dereference element to the left of current
@@ -106,18 +110,15 @@ void test_left_element_full()
     std::vector<int> values(10);
     std::iota(std::begin(values), std::end(values), 0);
 
-    auto transformer = test::make_previous_transformer(
-        std::begin(values), &values.back());
+    auto transformer =
+        test::make_previous_transformer(std::begin(values), &values.back());
 
     std::ostringstream str;
 
     std::for_each(
         hpx::util::make_transform_iterator(std::begin(values), transformer),
         hpx::util::make_transform_iterator(std::end(values), transformer),
-        [&str](int d)
-        {
-            str << d << " ";
-        });
+        [&str](int d) { str << d << " "; });
 
     HPX_TEST_EQ(str.str(), std::string("9 0 1 2 3 4 5 6 7 8 "));
 }
@@ -129,18 +130,15 @@ void test_right_element_full()
     std::vector<int> values(10);
     std::iota(std::begin(values), std::end(values), 0);
 
-    auto transformer = test::make_next_transformer(
-        std::end(values)-1, &values.front());
+    auto transformer =
+        test::make_next_transformer(std::end(values) - 1, &values.front());
 
     std::ostringstream str;
 
     std::for_each(
         hpx::util::make_transform_iterator(std::begin(values), transformer),
         hpx::util::make_transform_iterator(std::end(values), transformer),
-        [&str](int d)
-        {
-            str << d << " ";
-        });
+        [&str](int d) { str << d << " "; });
 
     HPX_TEST_EQ(str.str(), std::string("1 2 3 4 5 6 7 8 9 0 "));
 }

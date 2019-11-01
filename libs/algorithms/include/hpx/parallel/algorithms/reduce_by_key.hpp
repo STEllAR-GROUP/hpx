@@ -14,12 +14,12 @@
 //
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/transform_iterator.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/util/transform_iterator.hpp>
 //
 #include <cstdint>
 #include <functional>

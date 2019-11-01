@@ -10,9 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/tagged_pair.hpp>
-#include <hpx/util/zip_iterator.hpp>
 
 #include <utility>
 
