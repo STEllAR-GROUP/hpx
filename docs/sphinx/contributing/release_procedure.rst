@@ -161,10 +161,10 @@ are completed to avoid confusion.
 
 #. This step does not apply to patch releases. Bump version numbers on master.
 
-   #. Create a new branch from master, and check that branch out (name it for
-      example by the next version number).
+   #. Create a new branch from master, and check that branch out (name it, for
+      example, by the next version number).
 
-   #. Bump the HPX version to the next release target. The following files
+   #. Bump the |hpx| version to the next release target. The following files
       contain version info:
 
       * ``CMakeLists.txt``
@@ -176,7 +176,7 @@ are completed to avoid confusion.
 
    #. Modify the the release procedure if necessary.
 
-   #. Merge new branch containing next version numbers to master, resolve conflicts
+   #. Merge new branch containing next version numbers to master; resolve conflicts
       if necessary.
 
 #. Switch Buildbot back to test the main branch
