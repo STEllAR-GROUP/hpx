@@ -811,7 +811,7 @@ namespace hpx { namespace naming
             HPX_NON_COPYABLE(id_type_impl);
 
         private:
-            typedef void (*deleter_type)(detail::id_type_impl*);
+            using deleter_type = void (*)(detail::id_type_impl*);
             static deleter_type get_deleter(id_type_management t) noexcept;
 
         public:

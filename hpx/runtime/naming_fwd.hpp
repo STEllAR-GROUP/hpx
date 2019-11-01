@@ -34,6 +34,9 @@ namespace hpx
 
         HPX_CONSTEXPR_OR_CONST std::uint32_t invalid_locality_id =
             ~static_cast<std::uint32_t>(0);
+
+        // tag used to mark serialization archive during check-pointing
+        struct checkpointing_tag {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
