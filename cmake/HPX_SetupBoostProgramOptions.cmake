@@ -4,12 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-include(HPX_Option)
-# Compatibility with using Boost.ProgramOptions, introduced in V1.4.0
-hpx_option(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY
-  BOOL "Enable Boost.ProgramOptions compatibility. (default: ON)"
-  ON ADVANCED CATEGORY "Modules")
-
 if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
   set(__boost_program_options hpx::boost::program_options)
 endif()

@@ -4,17 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(__filesystem_compatibility_default ON)
-if(HPX_WITH_CXX17_FILESYSTEM)
-  set(__filesystem_compatibility_default OFF)
-endif()
-
-include(HPX_Option)
-# Compatibility with using Boost.FileSystem, introduced in V1.4.0
-hpx_option(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY
-  BOOL "Enable Boost.FileSystem compatibility. (default: ${__filesystem_compatibility_default})"
-  ${__filesystem_compatibility_default} ADVANCED CATEGORY "Modules")
-
 # Creates imported hpx::boost::filesystem target
 if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
 

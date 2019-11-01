@@ -51,21 +51,6 @@ if(Boost_VERSION_STRING VERSION_LESS 1.70)
   set(__boost_libraries ${__boost_libraries} system)
 endif()
 
-# Set configuration option to use Boost.Context or not. This depends on the
-# platform.
-set(__use_generic_coroutine_context OFF)
-if(APPLE)
-  set(__use_generic_coroutine_context ON)
-endif()
-if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ")
-  set(__use_generic_coroutine_context ON)
-endif()
-hpx_option(
-  HPX_WITH_GENERIC_CONTEXT_COROUTINES
-  BOOL
-  "Use Boost.Context as the underlying coroutines context switch implementation."
-  ${__use_generic_coroutine_context} ADVANCED)
-
 if(NOT HPX_WITH_NATIVE_TLS)
   set(__boost_libraries ${__boost_libraries} thread)
 endif()
