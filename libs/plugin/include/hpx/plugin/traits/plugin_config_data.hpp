@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
+
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for plugin config data injection
     template <typename Plugin, typename Enable = void>
@@ -22,7 +22,6 @@ namespace hpx { namespace traits
             return nullptr;
         }
     };
-}}
+}}    // namespace hpx::traits
 
 #endif
-

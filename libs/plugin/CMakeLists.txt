@@ -20,7 +20,8 @@ set(plugin_headers
   hpx/plugin/plugin_wrapper.hpp
   hpx/plugin/virtual_constructor.hpp
   hpx/plugin/detail/dll_dlopen.hpp
-  hpx/plugin/detail/dll_windows.hpp
+  hpx/plugin/detail/dll_dlopen.hpp
+  hpx/plugin/traits/plugin_config_data.hpp
 )
 
 # Default location is $HPX_ROOT/libs/plugin/include_compatibility
@@ -36,6 +37,7 @@ set(plugin_compat_headers
   hpx/util/plugin/virtual_constructor.hpp
   hpx/util/plugin/detail/dll_dlopen.hpp
   hpx/util/plugin/detail/dll_windows.hpp
+  hpx/traits/plugin_config_data.hpp
 )
 
 include(HPX_AddModule)

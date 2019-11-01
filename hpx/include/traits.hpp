@@ -10,6 +10,8 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/concepts/has_xxx.hpp>
+#include <hpx/datastructures/traits/is_tuple_like.hpp>
+#include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/functional/traits/is_action.hpp>
@@ -18,6 +20,7 @@
 #include <hpx/functional/traits/is_placeholder.hpp>
 #include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/iterator_support/is_range.hpp>
+#include <hpx/plugin/traits/plugin_config_data.hpp>
 #include <hpx/serialization/traits/brace_initializable_traits.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/serialization/traits/needs_automatic_registration.hpp>
@@ -58,15 +61,12 @@
 #include <hpx/traits/is_future_tuple.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/is_timed_executor.hpp>
-#include <hpx/datastructures/traits/is_tuple_like.hpp>
 #include <hpx/traits/is_valid_action.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
-#include <hpx/traits/plugin_config_data.hpp>
 #include <hpx/traits/pointer_category.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #endif
