@@ -282,8 +282,8 @@ namespace hpx { namespace naming
 
             if (split_gids.has_gid(*this))
             {
-                // archive doesn't support credit splitting or no splitting
-                // required
+                // the gid has been split already and we don't need to do
+                // anything further
                 return;
             }
 
