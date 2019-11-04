@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/errors.hpp>
+#include <hpx/asio/map_hostnames.hpp>
+#include <hpx/asio/asio_util.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/util/map_hostnames.hpp>
-#include <hpx/util/asio_util.hpp>
 
 #include <cstdint>
 #include <iostream>

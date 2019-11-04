@@ -39,6 +39,7 @@ add_hpx_module(batch_environments
   HEADERS ${batch_environments_headers}
   COMPAT_HEADERS ${batch_environments_compat_headers}
   DEPENDENCIES
+    hpx_asio
     hpx_assertion
     hpx_config
     hpx_errors

@@ -28,9 +28,10 @@ if(HPX_WITH_PARCELPORT_MPI)
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender_connection.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/tag_provider.hpp"
     DEPENDENCIES
-      hpx_config
+      hpx_asio
       hpx_allocator_support
       hpx_cache
+      hpx_config
       hpx_concurrency
       hpx_coroutines
       hpx_execution

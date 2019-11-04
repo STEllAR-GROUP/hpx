@@ -14,6 +14,7 @@ set(HPX_LIBS
   affinity
   algorithms
   allocator_support
+  asio
   assertion
   basic_execution
   batch_environments
