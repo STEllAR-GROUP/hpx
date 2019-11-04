@@ -14,6 +14,7 @@ set(util_headers
   hpx/util/insert_checked.hpp
   hpx/util/ios_flags_saver.hpp
   hpx/util/manage_config.hpp
+  hpx/util/sed_transform.hpp
 )
 
 set(util_compat_headers
@@ -22,6 +23,7 @@ set(util_compat_headers
 
 set(util_sources
   manage_config.cpp
+  sed_transform.cpp
 )
 
 include(HPX_AddModule)
