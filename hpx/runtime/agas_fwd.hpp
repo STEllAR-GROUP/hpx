@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/runtime_configuration/agas_service_mode.hpp>
 
 #include <cstdint>
 #include <string>
@@ -37,13 +38,6 @@ namespace hpx { namespace agas
         struct HPX_EXPORT symbol_namespace;
     }
     struct HPX_API_EXPORT addressing_service;
-
-    enum service_mode
-    {
-        service_mode_invalid = -1,
-        service_mode_bootstrap = 0,
-        service_mode_hosted = 1
-    };
 }}
 
 #endif /*HPX_RUNTIME_AGAS_FWD_HPP*/

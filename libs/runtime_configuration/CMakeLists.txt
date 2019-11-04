@@ -9,11 +9,13 @@ cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(runtime_configuration_headers
+  hpx/runtime_configuration/agas_service_mode.hpp
   hpx/runtime_configuration/component_registry_base.hpp
   hpx/runtime_configuration/find_prefix.hpp
   hpx/runtime_configuration/ini.hpp
   hpx/runtime_configuration/plugin_registry_base.hpp
   hpx/runtime_configuration/runtime_configuration.hpp
+  hpx/runtime_configuration/runtime_mode.hpp
   hpx/runtime_configuration/static_factory_data.hpp
 )
 
@@ -24,6 +26,7 @@ set(runtime_configuration_compat_headers
   hpx/plugins/plugin_registry_base.hpp
   hpx/runtime/components/component_registry_base.hpp
   hpx/runtime/components/static_factory_data.hpp
+  hpx/runtime/runtime_mode.hpp
 )
 
 set(runtime_configuration_sources
@@ -31,6 +34,7 @@ set(runtime_configuration_sources
   ini.cpp
   init_ini_data.cpp
   runtime_configuration.cpp
+  runtime_mode.cpp
 )
 
 include(HPX_AddModule)

@@ -10,6 +10,7 @@
 #include <hpx/filesystem.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>
+#include <hpx/runtime_configuration/agas_service_mode.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/find_prefix.hpp>
 #include <hpx/runtime_configuration/init_ini_data.hpp>

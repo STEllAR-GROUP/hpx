@@ -15,7 +15,7 @@
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>

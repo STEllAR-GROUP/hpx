@@ -12,13 +12,11 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/plugin.hpp>
+#include <hpx/runtime_configuration/agas_service_mode.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
+#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>
-
-// TODO
-#include <hpx/runtime/agas_fwd.hpp>
-#include <hpx/runtime/runtime_mode.hpp>
 
 #include <cstddef>
 #include <cstdint>

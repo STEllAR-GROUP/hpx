@@ -8,7 +8,7 @@
 #define HPX_UTIL_PARSE_COMMAND_LINE_NOV_30_2011_0652PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 
 #include <hpx/program_options.hpp>

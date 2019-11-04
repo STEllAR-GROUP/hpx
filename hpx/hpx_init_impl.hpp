@@ -13,7 +13,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/functional/bind_back.hpp>
