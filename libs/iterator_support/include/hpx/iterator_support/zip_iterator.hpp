@@ -12,7 +12,7 @@
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/result_of.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 

@@ -10,8 +10,8 @@
 #define HPX_PARALLEL_ALGORITH_INCLUDES_MAR_10_2015_0737PM
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>

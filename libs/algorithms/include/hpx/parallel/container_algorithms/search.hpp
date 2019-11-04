@@ -10,8 +10,8 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_SEARCH_FEB_28_2018_0007AM
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
 
 #include <hpx/parallel/algorithms/search.hpp>

@@ -12,9 +12,9 @@
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
