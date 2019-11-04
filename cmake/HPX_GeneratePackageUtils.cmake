@@ -71,7 +71,7 @@ function(hpx_collect_usage_requirements target compile_definitions compile_optio
         endif()
 
       elseif(TARGET ${dep})
-        # This is a public dependency. Follow the dependency graph and add the target's usage 
+        # This is a public dependency. Follow the dependency graph and add the target's usage
         # requirements.
         if (NOT dep IN_LIST _already_processed_targets)
           # This is not put inside a function in order not to hide the recursivity
@@ -180,10 +180,8 @@ endfunction(hpx_construct_library_list)
 function(hpx_generate_pkgconfig_from_target target template is_build)
 
   if(${is_build})
-    set(HPX_CONF_PREFIX ${CMAKE_BINARY_DIR})
     set(OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib/pkgconfig/)
   else()
-    set(HPX_CONF_PREFIX ${CMAKE_INSTALL_PREFIX})
     # Parent_scope to use the same variable to install
     set(OUTPUT_DIR ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/)
     set(OUTPUT_DIR_PC ${OUTPUT_DIR} PARENT_SCOPE)
