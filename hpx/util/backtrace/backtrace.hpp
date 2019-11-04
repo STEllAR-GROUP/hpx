@@ -80,8 +80,6 @@ namespace hpx { namespace util
             return stack_trace::get_symbols(&frames_.front(),frames_.size());
         }
 
-        HPX_API_EXPORT std::string trace_on_new_stack() const;
-
         void trace(std::ostream &out) const
         {
             if(frames_.empty())
@@ -128,13 +126,6 @@ namespace hpx { namespace util
     {
         return backtrace(frames_no).trace();
     }
-
-    inline std::string trace_on_new_stack(
-        std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
-    {
-        return backtrace(frames_no).trace_on_new_stack();
-    }
-
 }} // hpx::util
 
 #endif

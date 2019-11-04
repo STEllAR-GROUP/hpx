@@ -26,12 +26,6 @@ namespace hpx { namespace util {
     {
         return "";
     }
-
-    inline std::string trace_on_new_stack(
-        std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
-    {
-        return "";
-    }
 }}    // namespace hpx::util
 
 #endif

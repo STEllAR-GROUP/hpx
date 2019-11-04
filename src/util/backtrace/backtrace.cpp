@@ -13,14 +13,10 @@
 
 #if defined(HPX_HAVE_STACKTRACES)
 
-#define HPX_BACKTRACE_SOURCE
-#include <hpx/async.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/util/backtrace/backtrace.hpp>
 
 #include <boost/config.hpp>
 
-#include <hpx/util/backtrace/backtrace.hpp>
-#include <hpx/functional/bind_front.hpp>
 
 #if (defined(__linux) || defined(__APPLE__) || defined(__sun)) \
      && (!defined(__ANDROID__) || !defined(ANDROID))
@@ -402,36 +398,6 @@ namespace hpx { namespace util {
 
 #endif
     } // stack_trace
-
-    std::string backtrace::trace_on_new_stack() const
-    {
-        if(frames_.empty())
-            return std::string();
-
-        // avoid infinite recursion on handling errors
-        auto* self = threads::get_self_ptr();
-        if (nullptr == self ||
-            self->get_thread_id() == threads::invalid_thread_id)
-        {
-            return trace();
-        }
-
-        lcos::local::futures_factory<std::string()> p(util::bind_front(
-            stack_trace::get_symbols, &frames_.front(), frames_.size()));
-
-        error_code ec(lightweight);
-        threads::thread_id_type tid = p.apply("backtrace",
-            launch::fork, threads::thread_priority_default,
-            threads::thread_stacksize_medium,
-            threads::thread_schedule_hint(),
-            ec);
-        if (ec) return "<couldn't retrieve stack backtrace>";
-
-        // make sure this thread is executed last
-        hpx::this_thread::yield_to(thread::id(std::move(tid)));
-
-        return p.get_future().get(ec);
-    }
 }} // hpx::util
 
 #endif
