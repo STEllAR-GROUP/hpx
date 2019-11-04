@@ -95,7 +95,6 @@ include(CheckCXXCompilerFlag)
 include(CMakeDependentOption)
 
 # include additional macro definitions
-include(HPX_Libraries)
 include(HPX_LibraryDir)
 include(HPX_AddConfigTest)
 include(HPX_AddDefinitions)
@@ -520,11 +519,15 @@ hpx_option(HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION BOOL
   OFF
   CATEGORY "Thread Manager" ADVANCED)
 
+# We create a target to contain libraries like rt, dl etc. in order to remove
+# global variables
+add_library(hpx_base_libraries INTERFACE)
+
 if(HPX_WITH_STACKTRACES OR HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
   hpx_info("Stack traces are enabled.")
   hpx_add_config_define(HPX_HAVE_STACKTRACES)
   if(WIN32)
-    hpx_base_libraries(dbghelp)
+    target_link_libraries(hpx_base_libraries INTERFACE dbghelp)
   endif()
 
   hpx_option(HPX_WITH_THREAD_BACKTRACE_DEPTH STRING
@@ -1174,7 +1177,7 @@ if(HPX_WITH_CUDA)
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--default-stream per-thread)
   else()
     hpx_add_target_compile_option(-DBOOST_THREAD_USES_MOVE PUBLIC)
-    hpx_base_libraries(cudart)
+    target_link_libraries(hpx_base_libraries INTERFACE cudart)
     hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
     link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
   endif()
@@ -1249,24 +1252,24 @@ if(NOT WIN32)
   if(NOT MSVC)
     hpx_add_compile_flag_if_available(-pthread)
     if(HPX_HAVE_LIBATOMIC)
-      hpx_base_libraries(atomic)
+      target_link_libraries(hpx_base_libraries INTERFACE atomic)
     endif()
   endif()
 
   if(HPX_HAVE_LIBSUPCPP)
-    hpx_base_libraries(supc++)
+    target_link_libraries(hpx_base_libraries INTERFACE supc++)
   endif()
 
   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
-    hpx_base_libraries(dl)
+    target_link_libraries(hpx_base_libraries INTERFACE dl)
   endif()
 
   if(NOT APPLE AND NOT ("${HPX_PLATFORM_UC}" STREQUAL "ANDROID"))
-    hpx_base_libraries(rt)
+    target_link_libraries(hpx_base_libraries INTERFACE rt)
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
-    hpx_base_libraries(log)
+    target_link_libraries(hpx_base_libraries INTERFACE log)
   endif()
 
   if(APPLE)
@@ -1342,7 +1345,7 @@ if(WIN32)
     hpx_add_target_compile_option(-bigobj PUBLIC)
   endif()
 
-  hpx_base_libraries(psapi shlwapi)
+  target_link_libraries(hpx_base_libraries INTERFACE psapi shlwapi)
 
   ##############################################################################
   # Macro definitions for system headers
@@ -1518,8 +1521,7 @@ else()
     hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
   endif()
   if(WIN32)
-    hpx_base_libraries(WS2_32)
-    hpx_base_libraries(mswsock)
+    target_link_libraries(hpx_base_libraries INTERFACE psapi WS2_32 mswsock)
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
@@ -2029,6 +2031,16 @@ foreach(_module ${HPX_LIBS})
   create_configuration_summary(
     "Module configuration summary (${_module}):" "${_module}")
 endforeach()
+
+include(HPX_ExportTargets)
+# Modules can't link to this if not exported
+install(TARGETS hpx_base_libraries EXPORT HPXTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  COMPONENT hpx_base_libraries
+)
+hpx_export_targets(hpx_base_libraries)
 
 ################################################################################
 # store cache vars and their values in order for them to be forwarded to the

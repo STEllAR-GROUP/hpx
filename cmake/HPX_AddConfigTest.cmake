@@ -72,7 +72,8 @@ function(add_hpx_config_test variable)
     set(CONFIG_TEST_INCLUDE_DIRS ${CONFIG_TEST_INCLUDE_DIRS} ${${variable}_INCLUDE_DIRECTORIES})
     set(CONFIG_TEST_LINK_DIRS ${CONFIG_TEST_LINK_DIRS} ${${variable}_LINK_DIRECTORIES})
 
-    set(CONFIG_TEST_LINK_LIBRARIES ${HPX_BASE_LIBRARIES} ${${variable}_LIBRARIES})
+    get_property(_base_libraries TARGET hpx_base_libraries PROPERTY INTERFACE_LINK_LIBRARIES)
+    set(CONFIG_TEST_LINK_LIBRARIES ${_base_libraries} ${${variable}_LIBRARIES})
 
     if(${variable}_EXECUTE)
       if(NOT CMAKE_CROSSCOMPILING)
