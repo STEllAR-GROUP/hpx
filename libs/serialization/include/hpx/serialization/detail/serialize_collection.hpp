@@ -8,16 +8,43 @@
 #define HPX_SERIALIZATION_DETAIL_SERIALIZE_COLLECTION_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/util/detail/reserve.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <type_traits>
 #include <utility>
 
 namespace hpx { namespace serialization { namespace detail {
 
+    ////////////////////////////////////////////////////////////////////////////
+    // not every random access sequence is reservable, so we need an explicit
+    // trait to determine this
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(reserve)
+
+    template <typename Collection>
+    using is_reservable = std::integral_constant<bool,
+        has_reserve<typename std::decay<Collection>::type>::value>;
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename Container>
+    HPX_FORCEINLINE
+        typename std::enable_if<!is_reservable<Container>::value>::type
+        reserve_if_container(Container&, std::size_t) noexcept
+    {
+    }
+
+    template <typename Container>
+    HPX_FORCEINLINE
+        typename std::enable_if<is_reservable<Container>::value>::type
+        reserve_if_container(Container& v, std::size_t n)
+    {
+        v.reserve(n);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
     template <typename Value>
     class save_collection_impl
     {
@@ -77,7 +104,7 @@ namespace hpx { namespace serialization { namespace detail {
                 using value_type = typename Collection::value_type;
 
                 collection.clear();
-                hpx::traits::detail::reserve_if_reservable(collection, size);
+                reserve_if_container(collection, size);
 
                 while (size-- > 0)
                 {
