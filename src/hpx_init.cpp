@@ -12,7 +12,7 @@
 #include <hpx/apply.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
-#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/coroutines/detail/context_impl.hpp>
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
