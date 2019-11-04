@@ -7,7 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/errors.hpp>
 
 #include <cstddef>
@@ -17,8 +17,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
+
 #ifdef HPX_HAVE_VERIFY_LOCKS
     namespace detail {
+
         struct lock_data
         {
             lock_data()
@@ -53,7 +55,7 @@ namespace hpx { namespace util {
 
         struct register_locks
         {
-            typedef std::map<void const*, lock_data> held_locks_map;
+            using held_locks_map = std::map<void const*, lock_data>;
 
             struct held_locks_data
             {
@@ -192,10 +194,11 @@ namespace hpx { namespace util {
 
     // verify that no locks are held by this HPX-thread
     namespace detail {
+
         inline bool some_locks_are_not_ignored(
             register_locks::held_locks_map const& held_locks)
         {
-            typedef register_locks::held_locks_map::const_iterator iterator;
+            using iterator = register_locks::held_locks_map::const_iterator;
 
             iterator end = held_locks.end();
             for (iterator it = held_locks.begin(); it != end; ++it)
@@ -269,6 +272,7 @@ namespace hpx { namespace util {
     }
 
     namespace detail {
+
         void set_ignore_status(void const* lock, bool status)
         {
             if (register_locks::lock_detection_enabled_ &&

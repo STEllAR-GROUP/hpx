@@ -88,13 +88,20 @@ namespace hpx { namespace util
                 break;
 
             // escape regex special characters
-            case '+': HPX_FALLTHROUGH;
-            case '.': HPX_FALLTHROUGH;
-            case '(': HPX_FALLTHROUGH;
-            case ')': HPX_FALLTHROUGH;
-            case '{': HPX_FALLTHROUGH;
-            case '}': HPX_FALLTHROUGH;
-            case '^': HPX_FALLTHROUGH;
+            case '+':
+                HPX_FALLTHROUGH;
+            case '.':
+                HPX_FALLTHROUGH;
+            case '(':
+                HPX_FALLTHROUGH;
+            case ')':
+                HPX_FALLTHROUGH;
+            case '{':
+                HPX_FALLTHROUGH;
+            case '}':
+                HPX_FALLTHROUGH;
+            case '^':
+                HPX_FALLTHROUGH;
             case '$':
                 result.append("\\");
                 HPX_FALLTHROUGH;

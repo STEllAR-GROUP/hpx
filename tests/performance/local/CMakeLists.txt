@@ -58,8 +58,6 @@ if(HPX_WITH_EXAMPLES_OPENMP)
 endif()
 
 if(HPX_WITH_EXAMPLES_QTHREADS)
-  include_directories(${QTHREADS_INCLUDE_DIR})
-
   set(benchmarks
       ${benchmarks}
       qthreads_homogeneous_timed_task_spawn
@@ -67,27 +65,41 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
      )
 
   set(qthreads_homogeneous_timed_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies}
-                  ${QTHREADS_LIBRARIES} hpx_config hpx_format hpx_preprocessor
-                  hpx_timing)
+      DEPENDENCIES
+        ${boost_library_dependencies}
+        ${QTHREADS_LIBRARIES}
+        hpx_config
+        hpx_format
+        hpx_preprocessor
+        hpx_timing)
 
   set(qthreads_heterogeneous_timed_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies}
-                  ${QTHREADS_LIBRARIES} hpx_assertion hpx_format hpx_timing)
+      DEPENDENCIES
+        ${boost_library_dependencies}
+        ${QTHREADS_LIBRARIES}
+        hpx_assertion
+        hpx_format
+        hpx_timing)
+
+  set(qthreads_heterogeneous_timed_task_spawn_INCLUDE_DIRECTORIES ${QTHREADS_INCLUDE_DIR})
 endif()
 
 if(HPX_WITH_EXAMPLES_TBB)
-  include_directories(${TBB_INCLUDE_DIR})
-
   set(benchmarks
       ${benchmarks}
       tbb_homogeneous_timed_task_spawn
      )
 
-  set(tbb_homogeneous_timed_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies}
-                   ${TBB_LIBRARIES} hpx_config hpx_format hpx_preprocessor
-                   hpx_timing)
+   set(tbb_homogeneous_timed_task_spawn_FLAGS NOLIBS
+      DEPENDENCIES
+        ${boost_library_dependencies}
+        ${TBB_LIBRARIES}
+        hpx_config
+        hpx_format
+        hpx_preprocessor
+        hpx_timing)
+
+  set(tbb_homogeneous_timed_task_spawn_INCLUDE_DIRECTORIES ${TBB_INCLUDE_DIR})
 endif()
 
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
@@ -103,7 +115,7 @@ set(delay_baseline_FLAGS NOLIBS
 set(delay_baseline_threaded_FLAGS
     DEPENDENCIES ${boost_library_dependencies} hpx_format hpx_timing)
 
-set(print_heterogeneous_payloads_FLAGS NOLIBS
+  set(print_heterogeneous_payloads_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies} hpx_config hpx_format)
 set(resume_suspend_FLAGS DEPENDENCIES hpx_timing)
 
@@ -111,6 +123,8 @@ set(benchmarks ${benchmarks}
     hpx_tls_overhead
     native_tls_overhead
    )
+
+set(native_tls_overhead_LIBRARIES hpx::boost)
 
 set(benchmarks ${benchmarks}
     coroutines_call_overhead
@@ -179,11 +193,15 @@ foreach(benchmark ${benchmarks})
 
   # add example executable
   add_hpx_executable(${benchmark}_test
-                     SOURCES ${sources}
-                     ${${benchmark}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Benchmarks/Local")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${benchmark}_FLAGS}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER "Benchmarks/Local")
+
+  target_include_directories(${benchmark}_test SYSTEM PRIVATE ${${benchmark}_INCLUDE_DIRECTORIES})
+  target_link_libraries(${benchmark}_test PRIVATE ${${benchmark}_LIBRARIES})
 
   if(NOT "${${benchmark}_PARAMETERS}" MATCHES NO_HPX_MAIN)
     add_hpx_performance_test("local" ${benchmark} ${${benchmark}_PARAMETERS})

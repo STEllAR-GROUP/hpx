@@ -13,14 +13,13 @@
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
 
+#include <hpx/plugin/traits/plugin_config_data.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/ini.hpp>
-
-#include <hpx/traits/plugin_config_data.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>

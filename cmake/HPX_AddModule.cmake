@@ -4,9 +4,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+include(HPX_ExportTargets)
+
 function(add_hpx_module name)
   # Retrieve arguments
-  set(options DEPRECATION_WARNINGS EXPORT FORCE_LINKING_GEN INSTALL_BINARIES CUDA)
+  set(options DEPRECATION_WARNINGS FORCE_LINKING_GEN
+    CUDA CONFIG_FILES)
   # Compatibility needs to be on/off to allow 3 states : ON/OFF and disabled
   set(one_value_args COMPATIBILITY_HEADERS GLOBAL_HEADER_GEN)
   set(multi_value_args SOURCES HEADERS COMPAT_HEADERS DEPENDENCIES CMAKE_SUBDIRS
@@ -98,6 +101,7 @@ function(add_hpx_module name)
     endforeach(header_file)
     configure_file("${CMAKE_SOURCE_DIR}/cmake/templates/global_module_header.hpp.in"
       "${global_header}")
+    set(generated_headers ${global_header})
   endif()
 
   if(${name}_FORCE_LINKING_GEN)
@@ -115,8 +119,25 @@ function(add_hpx_module name)
   # generate configuration header for this module
   set(config_header
     "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}/config/defines.hpp")
-
   write_config_defines_file(NAMESPACE ${name_upper} FILENAME ${config_header})
+  set(generated_headers ${generated_headers} ${config_header})
+
+  if (${name}_CONFIG_FILES)
+    # Version file
+    set(global_config_file ${CMAKE_CURRENT_BINARY_DIR}/include/hpx/config/version.hpp)
+    configure_file(
+        "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
+        "${global_config_file}"
+        @ONLY)
+    set(generated_headers ${generated_headers} ${global_config_file})
+    # Global config defines file (different from the one for each module)
+    set(global_config_file ${CMAKE_CURRENT_BINARY_DIR}/include/hpx/config/defines.hpp)
+    write_config_defines_file(
+      TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
+      NAMESPACE default
+      FILENAME "${global_config_file}")
+    set(generated_headers ${generated_headers} ${global_config_file})
+  endif()
 
   # list all specified headers
   foreach(header_file ${headers})
@@ -127,19 +148,20 @@ function(add_hpx_module name)
   if(${name}_CUDA AND HPX_WITH_CUDA)
     cuda_add_library(hpx_${name} STATIC
       ${sources} ${force_linking_source}
-      ${headers} ${global_header} ${compat_headers}
-      ${force_linking_header} ${config_header})
+      ${headers} ${force_linking_header}
+      ${generated_headers} ${compat_headers})
   else()
     add_library(hpx_${name} STATIC
       ${sources} ${force_linking_source}
-      ${headers} ${global_header} ${compat_headers}
-      ${force_linking_header} ${config_header})
+      ${headers} ${force_linking_header}
+      ${generated_headers} ${compat_headers})
   endif()
 
   target_link_libraries(hpx_${name} PUBLIC ${${name}_DEPENDENCIES})
   target_include_directories(hpx_${name} PUBLIC
     $<BUILD_INTERFACE:${HEADER_ROOT}>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
 
   target_link_libraries(hpx_${name} PRIVATE hpx_internal_flags)
 
@@ -178,12 +200,12 @@ function(add_hpx_module name)
       TARGETS ${compat_headers})
   endif()
 
-  if (${name}_GLOBAL_HEADER_GEN)
+  if (${name}_GLOBAL_HEADER_GEN OR ${name}_CONFIG_FILES)
     add_hpx_source_group(
       NAME hpx_{name}
       ROOT ${CMAKE_CURRENT_BINARY_DIR}/include/hpx
       CLASS "Generated Files"
-      TARGETS ${global_header})
+      TARGETS ${generated_headers})
   endif()
   if (${name}_FORCE_LINKING_GEN)
     add_hpx_source_group(
@@ -208,17 +230,13 @@ function(add_hpx_module name)
     POSITION_INDEPENDENT_CODE ON)
 
   # Install the static library for the module
-  if(${name}_INSTALL_BINARIES)
-    install(TARGETS hpx_${name} EXPORT HPXTargets
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-      COMPONENT ${name}
-    )
-    if(${name}_EXPORT)
-      hpx_export_targets(hpx_${name})
-    endif()
-  endif()
+  install(TARGETS hpx_${name} EXPORT HPXModulesTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT ${name}
+  )
+  hpx_export_modules_targets(hpx_${name})
 
   # Install the headers from the source
   install(

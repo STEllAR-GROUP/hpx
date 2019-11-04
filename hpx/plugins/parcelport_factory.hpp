@@ -11,12 +11,12 @@
 #define HPX_PLUGINS_PARCELPORT_FACTORY_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/plugin/traits/plugin_config_data.hpp>
 #include <hpx/plugins/parcelport_factory_base.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/traits/plugin_config_data.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 

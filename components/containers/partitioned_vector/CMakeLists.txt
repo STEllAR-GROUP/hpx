@@ -39,6 +39,7 @@ set(partitioned_vector_sources
 )
 
 add_hpx_component(partitioned_vector
+  INTERNAL_FLAGS
   FOLDER "Core/Components/Containers"
   INSTALL_HEADERS
   PREPEND_HEADER_ROOT

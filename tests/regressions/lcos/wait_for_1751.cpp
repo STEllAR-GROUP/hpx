@@ -36,7 +36,7 @@ int hpx_main()
             auto now = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> dif = now - start_time;
 
-            HPX_TEST_LTE(dif.count(), 1.01);
+            HPX_TEST_LTE(dif.count(), 1.1);
             break;
         }
         else
@@ -46,7 +46,7 @@ int hpx_main()
 
         auto now = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> dif = now - start_time;
-        HPX_TEST_LT(dif.count(), 1.0);
+        HPX_TEST_LT(dif.count(), 1.1);
     }
 
     return hpx::finalize();

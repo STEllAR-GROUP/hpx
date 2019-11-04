@@ -34,7 +34,7 @@ namespace hpx { namespace util { namespace integer
 
         while (!!ii && i) {
             ii = ii.div (radix, r);
-            sz [--i] = r.toInt () + ((r.toInt () > 9) ? 'A' - 10 : '0');
+            sz[--i] = r.toInt() + ((r.toInt() > 9) ? 'A' - 10 : '0');
         };
 
         if (*this < 0)

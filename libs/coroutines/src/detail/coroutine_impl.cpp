@@ -33,7 +33,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
-#include <hpx/coroutines/detail/coroutine_self.hpp>
+#include <hpx/coroutines/detail/coroutine_stackful_self.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -41,24 +41,6 @@
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
-    namespace {
-        struct reset_self_on_exit
-        {
-            reset_self_on_exit(
-                coroutine_self* val, coroutine_self* old_val = nullptr)
-              : old_self(old_val)
-            {
-                coroutine_self::set_self(val);
-            }
-
-            ~reset_self_on_exit()
-            {
-                coroutine_self::set_self(old_self);
-            }
-
-            coroutine_self* old_self;
-        };
-    }    // namespace
 
 #if defined(HPX_DEBUG)
     coroutine_impl::~coroutine_impl()
@@ -85,7 +67,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             std::exception_ptr tinfo;
             {
                 coroutine_self* old_self = coroutine_self::get_self();
-                coroutine_self self(this, old_self);
+                coroutine_stackful_self self(this, old_self);
                 reset_self_on_exit on_exit(&self, old_self);
                 try
                 {

@@ -18,6 +18,7 @@
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
 #endif
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
@@ -95,17 +96,17 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
     {
         // if we're still starting up, give this executor a chance of executing
         // its tasks
-        while (!scheduler_.has_reached_state(state_running))
-        {
-            this_thread::suspend();
-        }
+        hpx::util::yield_while(
+            [this]() { return scheduler_.get_state(0) < state_running; },
+            "this_thread_executor<Scheduler>::~this_thread_executor()");
 
         // Wait for work to finish.
-        while (scheduler_.get_thread_count() >
-            scheduler_.get_background_thread_count())
-        {
-            hpx::this_thread::suspend();
-        }
+        hpx::util::yield_while(
+            [this]() {
+                return scheduler_.get_thread_count() >
+                    scheduler_.get_background_thread_count();
+            },
+            "this_thread_executor<Scheduler>::~this_thread_executor()");
 
         // Inform the resource manager that this executor is about to be
         // destroyed. This will cause it to invoke remove_processing_unit below
@@ -288,7 +289,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
         {
             {
                 on_self_reset on_exit(self_[virt_core]);
-                this_thread::suspend();
+                hpx::basic_execution::this_thread::yield();
             }
 
             // reset state to running if current state is still suspended

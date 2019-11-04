@@ -159,6 +159,26 @@ namespace hpx
             "new allocator failed to allocate memory");
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // Sometimes the HPX library gets simply unloaded as a result of some
+        // extreme error handling. Avoid hangs in the end by setting a flag.
+        static bool exit_called = false;
+
+        void on_exit() noexcept
+        {
+            exit_called = true;
+        }
+
+        void on_abort(int) noexcept
+        {
+            exit_called = true;
+            std::exit(-1);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void set_error_handlers()
     {
 #if defined(HPX_WINDOWS)
@@ -1299,16 +1319,19 @@ namespace hpx
 
     bool is_stopped()
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr != rt)
-            return rt->get_state() == state_stopped;
+        if (!detail::exit_called)
+        {
+            runtime* rt = get_runtime_ptr();
+            if (nullptr != rt)
+                return rt->get_state() == state_stopped;
+        }
         return true;        // assume stopped
     }
 
     bool is_stopped_or_shutting_down()
     {
         runtime* rt = get_runtime_ptr();
-        if (nullptr != rt)
+        if (!detail::exit_called && nullptr != rt)
         {
             state st = rt->get_state();
             return st >= state_shutdown;

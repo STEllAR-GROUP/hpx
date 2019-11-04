@@ -25,12 +25,12 @@ set(serialize_buffer_1069_FLAGS DEPENDENCIES iostreams_component)
 if(HPX_WITH_COMPRESSION_ZLIB)
   set(function_serialization_728_dependencies
     ${function_serialization_728_dependencies}
-    compress_zlib_lib)
+    compress_zlib)
 endif()
 if(WITH_PARCEL_COALESCING)
   set(function_serialization_728_dependencies
     ${function_serialization_728_dependencies}
-    parcel_coalescing_lib)
+    parcel_coalescing)
 endif()
 set(function_serialization_728_FLAGS DEPENDENCIES ${function_serialization_728_dependencies})
 
@@ -49,11 +49,12 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     ${${test}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Regressions/Util")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${test}_FLAGS}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER "Tests/Regressions/Util")
 
   add_hpx_regression_test("util" ${test} ${${test}_PARAMETERS})
 

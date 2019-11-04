@@ -29,10 +29,11 @@ foreach(benchmark ${benchmarks})
 
   # add example executable
   add_hpx_executable(${benchmark}_test
-                     SOURCES ${sources}
-                     EXCLUDE_FROM_ALL
-                     ${${benchmark}_FLAGS}
-                     FOLDER "Benchmarks/Modules/Algorithms")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    EXCLUDE_FROM_ALL
+    ${${benchmark}_FLAGS}
+    FOLDER "Benchmarks/Modules/Algorithms")
 
   add_hpx_performance_test("modules.algorithms" ${benchmark} ${${benchmark}_PARAMETERS})
 endforeach()

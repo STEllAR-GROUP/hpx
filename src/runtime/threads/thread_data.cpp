@@ -6,14 +6,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/threads/thread_data.hpp>
-
 #include <hpx/assertion.hpp>
-#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>

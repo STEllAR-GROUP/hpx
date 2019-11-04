@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Adrian Serio
+// Copyright (c) 2018 Adrian Serio
 //
 //  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,14 +8,14 @@
 // restore_checkpoint.
 //
 
+#include <hpx/hpx_main.hpp>
+#include <hpx/testing.hpp>
+#include <hpx/util/checkpoint.hpp>
+
 #include <fstream>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <hpx/hpx_main.hpp>
-#include <hpx/util/checkpoint.hpp>
-#include <hpx/testing.hpp>
 
 using hpx::util::checkpoint;
 using hpx::util::restore_checkpoint;
@@ -131,9 +131,9 @@ int main()
     std::vector<float> vec7{1.02f, 1.03f, 1.04f, 1.05f};
     hpx::future<checkpoint> fut_7 = save_checkpoint(vec7);
     checkpoint archive7 = fut_7.get();
-    std::copy(archive7.begin()    // Write data to ofstream
-        , archive7.end()    // ie. the file
-        , std::ostream_iterator<char>(test_file_7));
+    std::copy(archive7.begin(),    // Write data to ofstream
+        archive7.end(),            // ie. the file
+        std::ostream_iterator<char>(test_file_7));
     test_file_7.close();
 
     std::vector<float> vec7_1;
@@ -142,12 +142,12 @@ int main()
     if (test_file_7_1)
     {
         test_file_7_1.seekg(0, test_file_7_1.end);
-        int length = test_file_7_1.tellg();
+        auto length = test_file_7_1.tellg();
         test_file_7_1.seekg(0, test_file_7_1.beg);
         char_vec.resize(length);
         test_file_7_1.read(char_vec.data(), length);
     }
-    checkpoint archive7_1(std::move(char_vec));  // Write data to checkpoint
+    checkpoint archive7_1(std::move(char_vec));    // Write data to checkpoint
     restore_checkpoint(archive7_1, vec7_1);
     //]
 
@@ -200,9 +200,9 @@ int main()
     std::vector<float> vec10{1.02f, 1.03f, 1.04f, 1.05f};
     hpx::future<checkpoint> fut_10 = save_checkpoint(vec10);
     checkpoint archive10 = fut_10.get();
-    std::copy(archive10.begin()    // Write data to ofstream
-        , archive10.end()    // ie. the file
-        , std::ostream_iterator<char>(test_file_10));
+    std::copy(archive10.begin(),    // Write data to ofstream
+        archive10.end(),            // ie. the file
+        std::ostream_iterator<char>(test_file_10));
     test_file_10.close();
 
     std::vector<float> vec10_1;
@@ -211,12 +211,12 @@ int main()
     if (test_file_10_1)
     {
         test_file_10_1.seekg(0, test_file_10_1.end);
-        int length = test_file_10_1.tellg();
+        auto length = test_file_10_1.tellg();
         test_file_10_1.seekg(0, test_file_10_1.beg);
         char_vec_10.resize(length);
         test_file_10_1.read(char_vec_10.data(), length);
     }
-    checkpoint archive10_1(char_vec_10);  // Write data to checkpoint
+    checkpoint archive10_1(char_vec_10);    // Write data to checkpoint
     restore_checkpoint(archive10_1, vec10_1);
 
     HPX_TEST(vec10 == vec10_1);

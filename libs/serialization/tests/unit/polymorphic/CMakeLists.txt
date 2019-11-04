@@ -23,12 +23,13 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     ${${test}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     NOLIBS
-                     DEPENDENCIES hpx_serialization hpx_testing
-                     FOLDER "Tests/Unit/Modules/Serialization/Polymorphic")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${test}_FLAGS}
+    EXCLUDE_FROM_ALL
+    NOLIBS
+    DEPENDENCIES hpx_serialization hpx_testing
+    FOLDER "Tests/Unit/Modules/Serialization/Polymorphic")
 
   add_hpx_unit_test("modules.serialization" ${test} ${${test}_PARAMETERS})
   target_compile_definitions(${test}_test PRIVATE -DHPX_MODULE_STATIC_LINKING)

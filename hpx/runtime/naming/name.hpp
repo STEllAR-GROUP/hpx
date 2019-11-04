@@ -12,8 +12,8 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
@@ -811,7 +811,7 @@ namespace hpx { namespace naming
             HPX_NON_COPYABLE(id_type_impl);
 
         private:
-            typedef void (*deleter_type)(detail::id_type_impl*);
+            using deleter_type = void (*)(detail::id_type_impl*);
             static deleter_type get_deleter(id_type_management t) noexcept;
 
         public:

@@ -10,6 +10,7 @@ set(tests
     resume_priority
     run_as_hpx_thread_exceptions_3304
     run_as_os_thread_lockup_2991
+    stackless_self_4155
     thread_data_1111
     thread_pool_executor_1112
     thread_rescheduling
@@ -39,11 +40,12 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     ${${test}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Regressions/Threads")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${test}_FLAGS}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER "Tests/Regressions/Threads")
 
   add_hpx_regression_test("threads" ${test} ${${test}_PARAMETERS})
 

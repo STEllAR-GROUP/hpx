@@ -14,11 +14,12 @@ if(HPX_WITH_CXX11_DEFAULTED_FUNCTIONS)
   source_group("Source Files" FILES ${sources})
 
   add_hpx_executable(block_matrix_test
-                     SOURCES ${sources}
-                     ${block_matrix_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Regressions/Block-Matrix")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${block_matrix_FLAGS}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER "Tests/Regressions/Block-Matrix")
 
   add_hpx_regression_test("block_matrix" block_matrix ${block_matrix_PARAMETERS})
 

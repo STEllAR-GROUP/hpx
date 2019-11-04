@@ -44,12 +44,13 @@
 #include <utility>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
+
     class coroutine_self
     {
     public:
         HPX_NON_COPYABLE(coroutine_self);
 
-    private:
+    protected:
         // store the current this and write it to the TSS on exit
         struct reset_self_on_exit
         {
@@ -68,37 +69,24 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         };
 
     public:
-        friend struct detail::coroutine_accessor;
+        using thread_id_type = hpx::threads::thread_id;
 
-        typedef coroutine_impl impl_type;
-        typedef impl_type* impl_ptr;    // Note, no reference counting here.
-        typedef impl_type::thread_id_type thread_id_type;
+        using result_type = std::pair<thread_state_enum, thread_id_type>;
+        using arg_type = thread_state_ex_enum;
 
-        typedef impl_type::result_type result_type;
-        typedef impl_type::arg_type arg_type;
+        using yield_decorator_type =
+            util::function_nonser<arg_type(result_type)>;
 
-        typedef util::function_nonser<arg_type(result_type)>
-            yield_decorator_type;
+        explicit coroutine_self(coroutine_self* next_self = nullptr)
+          : next_self_(next_self)
+        {
+        }
 
         arg_type yield(result_type arg = result_type())
         {
             return !yield_decorator_.empty() ?
                 yield_decorator_(std::move(arg)) :
                 yield_impl(std::move(arg));
-        }
-
-        arg_type yield_impl(result_type arg)
-        {
-            HPX_ASSERT(m_pimpl);
-
-            this->m_pimpl->bind_result(arg);
-
-            {
-                reset_self_on_exit on_exit(this);
-                this->m_pimpl->yield();
-            }
-
-            return *m_pimpl->args();
         }
 
         template <typename F>
@@ -129,67 +117,33 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             return tmp;
         }
 
-        thread_id_type get_thread_id() const
-        {
-            HPX_ASSERT(m_pimpl);
-            return m_pimpl->get_thread_id();
-        }
+        virtual ~coroutine_self() = default;
 
-        std::size_t get_thread_phase() const
-        {
-#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-            HPX_ASSERT(m_pimpl);
-            return m_pimpl->get_thread_phase();
-#else
-            return 0;
-#endif
-        }
+        virtual arg_type yield_impl(result_type arg) = 0;
 
-        std::ptrdiff_t get_available_stack_space()
-        {
-#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-            return m_pimpl->get_available_stack_space();
-#else
-            return (std::numeric_limits<std::ptrdiff_t>::max)();
-#endif
-        }
+        virtual thread_id_type get_thread_id() const = 0;
 
-        explicit coroutine_self(
-            impl_type* pimpl, coroutine_self* next_self = nullptr)
-          : m_pimpl(pimpl)
-          , next_self_(next_self)
-        {
-        }
+        virtual std::size_t get_thread_phase() const = 0;
 
-        std::size_t get_thread_data() const
-        {
-            HPX_ASSERT(m_pimpl);
-            return m_pimpl->get_thread_data();
-        }
-        std::size_t set_thread_data(std::size_t data)
-        {
-            HPX_ASSERT(m_pimpl);
-            return m_pimpl->set_thread_data(data);
-        }
+        virtual std::ptrdiff_t get_available_stack_space() = 0;
 
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
-        tss_storage* get_thread_tss_data()
-        {
-            HPX_ASSERT(m_pimpl);
-            return m_pimpl->get_thread_tss_data(false);
-        }
+        virtual std::size_t get_thread_data() const = 0;
+        virtual std::size_t set_thread_data(std::size_t data) = 0;
 
-        tss_storage* get_or_create_thread_tss_data()
-        {
-            HPX_ASSERT(m_pimpl);
-            return m_pimpl->get_thread_tss_data(true);
-        }
-#endif
+        virtual tss_storage* get_thread_tss_data() = 0;
+        virtual tss_storage* get_or_create_thread_tss_data() = 0;
 
-        std::size_t& get_continuation_recursion_count()
+        virtual std::size_t& get_continuation_recursion_count() = 0;
+
+        // access coroutines context object
+        using impl_type = coroutine_impl;
+        using impl_ptr = impl_type*;
+
+    private:
+        friend struct coroutine_accessor;
+        virtual impl_ptr get_impl()
         {
-            HPX_ASSERT(m_pimpl);
-            return m_pimpl->get_continuation_recursion_count();
+            return nullptr;
         }
 
     public:
@@ -206,14 +160,27 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
     private:
         yield_decorator_type yield_decorator_;
-
-        impl_ptr get_impl()
-        {
-            return m_pimpl;
-        }
-        impl_ptr m_pimpl;
         coroutine_self* next_self_;
     };
+
+    ////////////////////////////////////////////////////////////////////////////
+    struct reset_self_on_exit
+    {
+        reset_self_on_exit(
+            coroutine_self* val, coroutine_self* old_val = nullptr)
+          : old_self(old_val)
+        {
+            coroutine_self::set_self(val);
+        }
+
+        ~reset_self_on_exit()
+        {
+            coroutine_self::set_self(old_self);
+        }
+
+        coroutine_self* old_self;
+    };
+
 }}}}    // namespace hpx::threads::coroutines::detail
 
-#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SELF_HPP*/
+#endif

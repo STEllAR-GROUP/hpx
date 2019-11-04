@@ -5,7 +5,13 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# Forward HPX_* cache variables
+include("${CMAKE_CURRENT_LIST_DIR}/HPXCacheVariables.cmake")
+
 # include exported targets if not already defined
+if (NOT TARGET hpx_config)
+  include("${CMAKE_CURRENT_LIST_DIR}/HPXModulesTargets.cmake")
+endif()
 if (NOT TARGET hpx)
   include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
 endif()
@@ -14,11 +20,6 @@ endif()
 include("${CMAKE_CURRENT_LIST_DIR}/HPXMacros.cmake")
 
 get_filename_component(_hpx_root_dir "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
-
-set(HPX_INCLUDE_DIRS "@HPX_CMAKE_CONF_INCLUDE_DIRS@")
-
-set(HPX_LIBRARIES "@HPX_CONF_LIBRARIES@")
-set(HPX_LIBRARY_DIR "@HPX_CONF_LIBRARY_DIR@")
 
 set(HPX_VERSION_STRING "@HPX_VERSION@")
 set(HPX_VERSION_MAJOR @HPX_VERSION_MAJOR@)
@@ -44,27 +45,35 @@ set(HPX_Fortran_COMPILER "@CMAKE_Fortran_COMPILER@" CACHE STRING "Fortran compil
 set(HPX_Fortran_COMPILER_ID "@CMAKE_Fortran_COMPILER_ID@" CACHE STRING "Fortran compiler id for HPX" FORCE)
 set(HPX_Fortran_COMPILER_VERSION "@CMAKE_Fortran_COMPILER_VERSION@" CACHE STRING "Fortran compiler version for HPX" FORCE)
 
-set(HPX_BOOST_ROOT "@BOOST_ROOT@")
-set(HPX_BOOST_LIBRARIES "@Boost_LIBRARIES@")
+##################################################
+# Setup the imported libraries (publicly linked) #
 
-set(HPX_WITH_PSEUDO_DEPENDENCIES @HPX_WITH_PSEUDO_DEPENDENCIES@)
-set(HPX_WITH_STATIC_LINKING @HPX_WITH_STATIC_LINKING@)
-set(HPX_WITH_MALLOC_DEFAULT @HPX_WITH_MALLOC@)
-set(HPX_WITH_PARCELPORT_TCP @HPX_WITH_PARCELPORT_TCP@)
-set(HPX_WITH_PARCELPORT_MPI @HPX_WITH_PARCELPORT_MPI@)
-set(HPX_WITH_APEX @HPX_WITH_APEX@)
-if(MSVC)
-  set(HPX_WITH_VCPKG @HPX_WITH_VCPKG@)
+# Boost
+set(HPX_BOOST_ROOT "@BOOST_ROOT@")
+# By default BOOST_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
+# HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
+if (NOT BOOST_ROOT AND NOT "$ENV{BOOST_ROOT}")
+  set(BOOST_ROOT ${HPX_BOOST_ROOT})
 endif()
-set(HPX_WITH_DYNAMIC_HPX_MAIN @HPX_WITH_DYNAMIC_HPX_MAIN@)
-set(HPX_WITH_DATAPAR @HPX_WITH_DATAPAR@)
-set(HPX_WITH_DATAPAR_VC @HPX_WITH_DATAPAR_VC@)
+# Separate targets to be unarily linked to some modules
+include(HPX_SetupBoost)
+include(HPX_SetupBoostFilesystem)
+include(HPX_SetupBoostProgramOptions)
+
+# Hwloc
+set(HPX_HWLOC_ROOT "@HWLOC_ROOT@")
+include(HPX_SetupHwloc)
+
+# Papi
+set(HPX_PAPI_ROOT "@PAPI_ROOT@")
+include(HPX_SetupPapi)
+##################################################
+
+set(HPX_WITH_MALLOC_DEFAULT @HPX_WITH_MALLOC@)
 
 if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
-
-set(HPX_LINK_LIBRARIES "@HPX_LINK_LIBRARIES@")
 
 enable_language(C)
 
@@ -76,36 +85,23 @@ if(NOT DEFINED ${CMAKE_FIND_PACKAGE_NAME}_FOUND)
   set(${CMAKE_FIND_PACKAGE_NAME}_FOUND true)
 endif()
 
-# Set variables to enable cuda/nvcc or cuda/clang when using add_hpx_executable()
-set(HPX_WITH_CUDA @HPX_WITH_CUDA@)
-set(HPX_WITH_CUDA_CLANG @HPX_WITH_CUDA_CLANG@)
-set(HPX_CUDA_CLANG_FLAGS @HPX_CUDA_CLANG_FLAGS@)
-
 # Set variables used by nvcc
 if(HPX_WITH_CUDA)
-    find_package(CUDA REQUIRED)
-    set(HPX_WITH_CUDA_CLANG @HPX_WITH_CUDA_CLANG@)
-    set(CUDA_SEPARABLE_COMPILATION ON)
-    set(CUDA_NVCC_FLAGS @CUDA_NVCC_FLAGS@)
-    set(HPX_CUDA_CLANG_FLAGS @HPX_CUDA_CLANG_FLAGS@)
-    # The following is a workaround to make sure that target_link_libraries in
-    # cuda_add_executable/library is called with a link keyword, not with a
-    # plain signature. From CMake 3.9 onwards this can be done officially with
-    # the CUDA_LINK_LIBRARIES_KEYWORD. For older versions we can emulate this by
-    # prepending a link keyword to CUDA_LIBRARIES.
-    #
-    # See
-    # https://gitlab.kitware.com/cmake/cmake/commit/9f41bfd7b9e6e8a7545f741f872949d2ae801978
-    # and https://gitlab.kitware.com/cmake/cmake/issues/16602 for more details.
-    if(CMAKE_VERSION VERSION_LESS "3.9")
-      set(CUDA_LIBRARIES PUBLIC ${CUDA_LIBRARIES})
-    else()
-      set(CUDA_LINK_LIBRARIES_KEYWORD PUBLIC)
-    endif()
-    cuda_include_directories("@HPX_CMAKE_CONF_INCLUDE_DIRS@")
-endif()
-
-# Add HPX linker flag to CMAKE_EXE_LINKER_FLAGS
-if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
-    set(HPX_LINKER_FLAGS "@HPX_LINKER_FLAGS@")
+  find_package(CUDA REQUIRED)
+  set(CUDA_SEPARABLE_COMPILATION ON)
+  set(CUDA_NVCC_FLAGS @CUDA_NVCC_FLAGS@)
+  # The following is a workaround to make sure that target_link_libraries in
+  # cuda_add_executable/library is called with a link keyword, not with a
+  # plain signature. From CMake 3.9 onwards this can be done officially with
+  # the CUDA_LINK_LIBRARIES_KEYWORD. For older versions we can emulate this by
+  # prepending a link keyword to CUDA_LIBRARIES.
+  #
+  # See
+  # https://gitlab.kitware.com/cmake/cmake/commit/9f41bfd7b9e6e8a7545f741f872949d2ae801978
+  # and https://gitlab.kitware.com/cmake/cmake/issues/16602 for more details.
+  if(CMAKE_VERSION VERSION_LESS "3.9")
+    set(CUDA_LIBRARIES PUBLIC ${CUDA_LIBRARIES})
+  else()
+    set(CUDA_LINK_LIBRARIES_KEYWORD PUBLIC)
+  endif()
 endif()

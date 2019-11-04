@@ -30,27 +30,30 @@ if (HPX_WITH_EXAMPLES)
   endif()
 
   foreach(example ${examples})
-      set(sources
-          ${example}.cpp)
 
-      source_group("Source Files" FILES ${sources})
+    set(sources ${example}.cpp)
 
-      set(folder_name "Examples/Modules/ProgramOptions")
+    source_group("Source Files" FILES ${sources})
 
-      # add example executable
-      add_hpx_executable(${example}
-                          SOURCES ${sources}
-                          ${${example}_FLAGS}
-                          FOLDER ${folder_name})
+    set(folder_name "Examples/Modules/ProgramOptions")
 
-      add_hpx_example_target_dependencies(
-        "modules.program_options" ${example} ${${example}_PARAMETERS})
+    # add example executable
+    add_hpx_executable(${example}
+      INTERNAL_FLAGS
+      SOURCES ${sources}
+      ${${example}_FLAGS}
+      DEPENDENCIES ${${example}_LIBS}
+      FOLDER ${folder_name})
+
+    add_hpx_example_target_dependencies(
+      "modules.program_options" ${example} ${${example}_PARAMETERS})
 
     if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND
         NOT ("${example_program}" IN_LIST disabled_tests))
       add_hpx_example_test("modules.program_options"
         ${example} ${${example}_PARAMETERS})
     endif()
+
   endforeach()
 
 endif()

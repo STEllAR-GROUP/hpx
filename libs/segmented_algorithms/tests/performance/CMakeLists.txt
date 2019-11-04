@@ -15,12 +15,13 @@ foreach(benchmark ${benchmarks})
 
   # add example executable
   add_hpx_executable(${benchmark}_test
-                     SOURCES ${sources}
-                     ${${benchmark}_FLAGS}
-                     DEPENDENCIES iostreams_component partitioned_vector_component
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Benchmarks/Modules/SegmentedAlgorithms")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${benchmark}_FLAGS}
+    DEPENDENCIES iostreams_component partitioned_vector_component
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER "Benchmarks/Modules/SegmentedAlgorithms")
 
   add_hpx_performance_test("modules.segmented_algorithms" ${benchmark} ${${benchmark}_PARAMETERS})
 endforeach()

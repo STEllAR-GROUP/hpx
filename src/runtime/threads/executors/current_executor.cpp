@@ -7,7 +7,7 @@
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>

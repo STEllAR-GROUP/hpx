@@ -10,8 +10,6 @@ if(HPX_WITH_EXAMPLES_HDF5)
     hpx_error("The Interpolate1D example requires HDF C++ library enabled for thread-safety")
   endif()
 
-  include_directories(${HDF5_INCLUDE_DIRS})
-
   # just recurse into all components subdirectories and execute the scripts there
   set(subdirs
       interpolate1d)
@@ -42,10 +40,11 @@ if(HPX_WITH_EXAMPLES_HDF5)
 
   add_hpx_executable(create_1d_testdata_example
     SOURCES create_testdata.cpp
-    DEPENDENCIES ${HDF5_LIBRARIES}
     NOLIBS
     FOLDER "Examples/Interpolate1D")
 
+  target_include_directories(create_1d_testdata PRIVATE ${HDF5_INCLUDE_DIRS})
+  target_link_libraries(create_1d_testdata PRIVATE ${HDF5_CXX_LIBRARIES})
   add_hpx_example_target_dependencies("interpolate1d" create_1d_testdata)
 
 endif()

@@ -34,7 +34,7 @@ void bulk_test( hpx::lcos::spmd_block block,
 
     hpx::coarray<double,3> a(block, name, {height,width,_}, elt_size);
 
-    int idx = block.this_image()*height*width;
+    int idx = block.this_image() * height * width;
 
     for (std::size_t j = 0; j<width; j++)
     for (std::size_t i = 0; i<height; i++)

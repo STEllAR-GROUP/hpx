@@ -13,6 +13,10 @@
 #include <cstdint>
 #include <string>
 
+#ifndef H5_HAVE_THREADSAFE
+#error    "This example requires that the HDF5 API is thread-safe. Please provide a suitable version of HDF5."
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // Interpolation helper functions related to hdf5
 namespace interpolate1d

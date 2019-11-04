@@ -24,4 +24,4 @@ before_script:
   - cmake -H. -Bbuild -G'Visual Studio 15 2017 Win64' -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE='C:/projects/vcpkg/scripts/buildsystems/vcpkg.cmake' -DHPX_WITH_PSEUDO_DEPENDENCIES=On -DHPX_WITH_EXAMPLES=Off -DHPX_WITH_TESTS=Off -DHPX_WITH_DEPRECATION_WARNINGS=Off
 
 script:
-  - cmake --build build --config Debug --target core -- -verbosity:minimal -maxcpucount:2 -nologo
+  - cmake --build build --config Debug --target core -- -verbosity:minimal -maxcpucount:4 -nologo

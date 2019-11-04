@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/traits/plugin_config_data.hpp>
+#include <hpx/plugin/traits/plugin_config_data.hpp>
 
 #include <hpx/plugins/parcelport/tcp/connection_handler.hpp>
 #include <hpx/plugins/parcelport/tcp/sender.hpp>

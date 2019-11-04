@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.6.3 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -80,3 +80,12 @@ add_hpx_module(collectives
       hpx_util
     CMAKE_SUBDIRS examples tests
 )
+
+# Temporary : this module is currently depending on main headers which
+# themselves include apex. In the future, those main headers would be in a
+# module that link to apex, and we'd be able to remove this.
+if (TARGET hpx::apex)
+  target_link_libraries(hpx_collectives PRIVATE hpx::apex)
+  get_target_property(_apex_inc_dir hpx::apex INTERFACE_INCLUDE_DIRECTORIES)
+  target_include_directories(hpx_collectives INTERFACE "${_apex_inc_dir}")
+endif()

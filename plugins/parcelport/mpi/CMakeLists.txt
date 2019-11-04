@@ -7,90 +7,51 @@
 
 include(HPX_AddLibrary)
 
+if (TARGET hpx::apex)
+  set(EXTRA_DEPENDENCIES hpx::apex)
+endif()
+
 ################################################################################
 # Decide whether to use the MPI based parcelport
 ################################################################################
 if(HPX_WITH_PARCELPORT_MPI)
-  find_package(MPI)
-
-  if(NOT MPI_CXX_FOUND)
-    hpx_error("MPI could not be found and HPX_WITH_PARCELPORT_MPI=On, please specify MPI_CXX_COMPILER to point to a working MPI C++ compiler for your platform")
-  endif()
-  hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI)
-  if(MSVC)
-    # FIXME: add OpenMPI specific flag here for now as the hpx_add_compile_flag()
-    # below does not add the extra options to the top level directory
-    hpx_add_config_define(OMPI_IMPORTS)
-  endif()
-  if(MPI_CXX_COMPILE_FLAGS)
-    hpx_add_compile_flag(${MPI_CXX_COMPILE_FLAGS})
-  endif()
-  if(MPI_CXX_LINK_FLAGS)
-    #    hpx_add_link_flag_if_available(${MPI_CXX_LINK_FLAGS})
-  endif()
-
-  if(MPI_CXX_COMPILE_DEFINITIONS)
-    # Emulate add_compile_definitions.
-    # This command was only introduced as part of CMake 3.11, but we already require it for versions >= 3.10.
-    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ${MPI_CXX_COMPILE_DEFINITIONS})
-  endif()
-
-  # This list is to detect whether we run inside an mpi environment.
-  # If one of those environment variables is set, the MPI parcelport
-  # is enabled by default.
-  # PMI_RANK: Intel MPI and MVAPICH2
-  # OMPI_COMM_WORLD_SIZE: OpenMPI starting at version 1.3
-  if(HPX_WITH_PARCELPORT_MPI_ENV)
-    string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${HPX_WITH_PARCELPORT_MPI_ENV}")
-    hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI_ENV "\"${hpx_parcelport_mpi_env_}\"")
-  endif()
-  if(HPX_WITH_PARCELPORT_MPI_MULTITHREADED)
-    hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
-  endif()
-
-  macro(add_parcelport_mpi_module)
-    hpx_debug("add_parcelport_mpi_module")
-    if(MPI_CXX_INCLUDE_PATH)
-      include_directories(${MPI_CXX_INCLUDE_PATH})
-    elseif(MPI_CXX_HEADER_DIR)
-      # cmake V3.10.2 has changed the name for the MPI include directory
-      include_directories(${MPI_CXX_HEADER_DIR})
-    endif()
-
-    set(_mpi_libraries)
-    if(MPI_CXX_LIBRARIES)
-      set(_mpi_libraries ${_mpi_libraries} ${MPI_CXX_LIBRARIES})
-    elseif(MPI_CXX_LIB_NAMES)
-      # cmake V3.10.2 has changed the way MPI libraries are being discovered
-      foreach(lib ${MPI_CXX_LIB_NAMES})
-        set(_mpi_libraries ${_mpi_libraries} ${MPI_${lib}_LIBRARY})
-      endforeach()
-    endif()
-    if(MPI_LIBRARY)
-      set(_mpi_libraries ${_mpi_libraries} ${MPI_LIBRARY})
-    endif()
-    if(MPI_EXTRA_LIBRARY)
-      set(_mpi_libraries ${_mpi_libraries} ${MPI_EXTRA_LIBRARY})
-    endif()
-    add_parcelport(mpi
-      STATIC
-      SOURCES
-        "${PROJECT_SOURCE_DIR}/plugins/parcelport/mpi/mpi_environment.cpp"
-        "${PROJECT_SOURCE_DIR}/plugins/parcelport/mpi/parcelport_mpi.cpp"
-      HEADERS
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/header.hpp"
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/locality.hpp"
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/mpi_environment.hpp"
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/receiver.hpp"
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/receiver_connection.hpp"
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender.hpp"
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender_connection.hpp"
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/tag_provider.hpp"
-      DEPENDENCIES
-        ${_mpi_libraries}
-      FOLDER "Core/Plugins/Parcelport/MPI")
-  endmacro()
-else()
-  macro(add_parcelport_mpi_module)
-  endmacro()
+  hpx_debug("add_parcelport_mpi_module")
+  include(HPX_AddParcelport)
+  add_parcelport(mpi
+    STATIC
+    SOURCES
+      "${PROJECT_SOURCE_DIR}/plugins/parcelport/mpi/mpi_environment.cpp"
+      "${PROJECT_SOURCE_DIR}/plugins/parcelport/mpi/parcelport_mpi.cpp"
+    HEADERS
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/header.hpp"
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/locality.hpp"
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/mpi_environment.hpp"
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/receiver.hpp"
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/receiver_connection.hpp"
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender.hpp"
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender_connection.hpp"
+      "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/tag_provider.hpp"
+    DEPENDENCIES
+      hpx_config
+      hpx_allocator_support
+      hpx_cache
+      hpx_concurrency
+      hpx_coroutines
+      hpx_execution
+      hpx_filesystem
+      hpx_hardware
+      hpx_memory
+      hpx_plugin
+      hpx_program_options
+      hpx_serialization
+      hpx_timing
+      hpx_topology
+      hpx_util
+      hpx::boost
+      hpx::mpi
+      ${EXTRA_DEPENDENCIES}
+    INCLUDE_DIRS
+      ${PROJECT_SOURCE_DIR}
+    FOLDER
+      "Core/Plugins/Parcelport/MPI")
 endif()

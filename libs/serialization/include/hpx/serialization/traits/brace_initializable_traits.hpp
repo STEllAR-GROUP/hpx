@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace traits {
 

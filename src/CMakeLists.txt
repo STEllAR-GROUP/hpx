@@ -198,27 +198,6 @@ if(NOT HPX_WITH_STATIC_LINKING)
   endif()
 endif()
 
-# Add static parcelport sources ...
-add_static_parcelports()
-set(hpx_HEADERS ${hpx_HEADERS} ${HPX_STATIC_PARCELPORT_PLUGINS_HEADERS})
-set(hpx_SOURCES ${hpx_SOURCES} ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES})
-#
-# set_source_files_properties and set_property appear to be broken when setting
-# INCLUDE_DIRECTORIES, so work around by adding compile flags for the include
-# locations needed by parcelport plugin sources
-#
-foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
-  if (_parcelport_${_plugin}_INCLUDE_DIRECTORIES)
-    string (REPLACE ";" " -I" _INCLUDE_STRING "${_parcelport_${_plugin}_INCLUDE_DIRECTORIES}")
-    set_property(
-      SOURCE
-        ${_parcelport_${_plugin}_SOURCES}
-      APPEND_STRING PROPERTY COMPILE_FLAGS
-        " -I${_INCLUDE_STRING}"
-    )
-  endif()
-endforeach()
-
 ################################################################################
 # libhpx
 if(HPX_WITH_STATIC_LINKING)
@@ -249,6 +228,7 @@ endif()
 # Default unnamed config (not Debug/Release/etc) are in this var
 get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_)
 target_compile_options(hpx PRIVATE ${_temp_flags})
+target_compile_definitions(hpx PUBLIC $<$<CONFIG:Debug>:HPX_DEBUG>)
 
 # message("Adding ${_temp_flags}")
 
@@ -262,6 +242,57 @@ endforeach()
 #if(HPX_WITH_STATIC_LINKING)
 #  add_dependencies(hpx static_component_data_hpp)
 #endif()
+
+target_link_libraries(hpx PUBLIC hpx::boost)
+
+# Set the basic search paths for the HPX headers
+target_include_directories(hpx PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+  $<INSTALL_INTERFACE:include>
+  )
+
+# FIXME : temporary add public dependencies to the boost libraries which are
+# only linked in the modules (which are themselves privately linked to hpx), it
+# should be removed when we make the modules object libraries that we publicly
+# link to hpx
+if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
+  target_link_libraries(hpx PUBLIC hpx::boost::program_options)
+endif()
+if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
+  target_link_libraries(hpx PUBLIC hpx::boost::filesystem)
+endif()
+
+target_link_libraries(hpx PUBLIC hpx::allocator)
+
+# Hwloc PUBLIC because used by exported target hpx_topology
+target_link_libraries(hpx PUBLIC hpx::hwloc)
+
+# Enable SIMD via VC if it is available
+if (TARGET hpx::vc)
+  target_link_libraries(hpx PRIVATE hpx::vc)
+endif()
+
+if (TARGET hpx::amplifier)
+  target_link_libraries(hpx PRIVATE hpx::amplifier)
+endif()
+
+if (TARGET hpx::apex)
+  target_link_libraries(hpx PRIVATE hpx::apex)
+  # System has been removed when passing at set_property for cmake < 3.11 in
+  # HPX_SetupApex.cmake so the property get is not SYSTEM_INTERFACE_INC_DIR
+  # anymore, we can put it back once we require cmake >= 3.11
+  get_target_property(_apex_inc_dir hpx::apex INTERFACE_INCLUDE_DIRECTORIES)
+  target_include_directories(hpx INTERFACE "${_apex_inc_dir}")
+endif()
+
+if (TARGET hpx::gperftools)
+  target_link_libraries(hpx PRIVATE hpx::gperftools)
+endif()
+
+if (TARGET hpx::valgrind)
+  target_link_libraries(hpx PRIVATE hpx::valgrind)
+endif()
 
 if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   set_target_properties(hpx PROPERTIES
@@ -277,8 +308,6 @@ else()
     FOLDER "Core")
 endif()
 
-target_include_directories(hpx PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/hpx>)
 target_link_libraries(hpx PUBLIC ${HPX_LIBRARIES})
 if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
   target_link_libraries(hpx PUBLIC ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
@@ -287,15 +316,14 @@ if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
   target_link_libraries(hpx PRIVATE ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
 endif()
 
-foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
-  if (_parcelport_${_plugin}_LIBRARIES)
-    target_link_libraries(hpx PUBLIC ${_parcelport_${_plugin}_LIBRARIES})
-    hpx_export_targets(${_parcelport_${_plugin}_LIBRARIES})
-  endif()
+# Link to each parcelport plugin
+foreach(_parcelport_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
+  target_link_libraries(hpx PRIVATE ${_parcelport_plugin})
 endforeach()
 
 # integrate the hpx modules with the main library
 foreach(_module ${HPX_LIBS})
+
   set(_module_target hpx_${_module})
   if(UNIX OR APPLE)
     # add the full archive (some are not used directly in libhpx and need to be
@@ -311,13 +339,11 @@ foreach(_module ${HPX_LIBS})
   # compilation against indirectly included headers
   get_target_property(_module_includes hpx_${_module} INTERFACE_INCLUDE_DIRECTORIES)
   target_include_directories(hpx PUBLIC ${_module_includes})
+
 endforeach()
 
-set_property(TARGET hpx APPEND
-  PROPERTY COMPILE_DEFINITIONS
-  "HPX_COMPONENT_NAME=hpx"
-  "HPX_EXPORTS"
-  "HPX_ENABLE_ASSERT_HANDLER")
+target_compile_definitions(hpx PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
+  HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
 
 ################################################################################
 # Emulation of SwapContext on Windows
@@ -363,10 +389,16 @@ if(NOT HPX_WITH_STATIC_LINKING)
     target_include_directories(hpx_init PRIVATE ${_module_includes})
   endforeach()
 
-  set_property(TARGET hpx_init APPEND
-    PROPERTY COMPILE_DEFINITIONS
-    "HPX_APPLICATION_EXPORTS"
-    "HPX_ENABLE_ASSERT_HANDLER")
+  # Set the basic search paths for the generated HPX headers
+  target_include_directories(hpx_init
+    PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+      $<INSTALL_INTERFACE:include>)
+  target_link_libraries(hpx_init PRIVATE hpx::boost)
+
+  target_compile_definitions(hpx_init PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
+    HPX_APPLICATION_EXPORTS)
 
   set_property(TARGET hpx_init PROPERTY FOLDER "Core")
   set(hpx_targets ${hpx_targets} hpx_init)
@@ -396,12 +428,23 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
       endif()
     endif()
 
-    set_property(TARGET hpx_wrap APPEND
-      PROPERTY COMPILE_DEFINITIONS
-      "HPX_APPLICATION_EXPORTS"
-      "HPX_ENABLE_ASSERT_HANDLER")
+    target_compile_definitions(hpx_wrap PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
+      HPX_APPLICATION_EXPORTS)
 
-    target_include_directories(hpx_wrap PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
+    # Set the basic search paths for the generated HPX headers
+    target_include_directories(hpx_wrap
+      PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:include>)
+    target_link_libraries(hpx_wrap PUBLIC hpx)
+    if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+      set_property(TARGET hpx_wrap APPEND PROPERTY INTERFACE_LINK_OPTIONS -Wl,-wrap=main)
+    elseif(APPLE)
+      set_property(TARGET hpx_wrap APPEND PROPERTY INTERFACE_LINK_OPTIONS -Wl,-e,_initialize_main)
+    else()
+      hpx_error("hpx_main is not supported on ${CMAKE_SYSTEM_NAME}.")
+    endif()
 
     foreach(_module ${HPX_LIBS})
       # add module include directories as PRIVATE to the hpx_wrap library to
@@ -470,3 +513,14 @@ hpx_export_targets(${hpx_targets})
 foreach(target ${hpx_targets})
   add_hpx_pseudo_dependencies(core ${target})
 endforeach()
+
+# Add particular targets for the pkgconfig setup
+add_library(hpx_application INTERFACE)
+target_link_libraries(hpx_application INTERFACE hpx_wrap)
+target_compile_definitions(hpx_application INTERFACE HPX_APPLICATION_EXPORTS)
+add_library(hpx::application ALIAS hpx_application)
+
+add_library(hpx_component INTERFACE)
+target_compile_definitions(hpx_component INTERFACE HPX_COMPONENT_EXPORTS)
+target_link_libraries(hpx_component INTERFACE hpx)
+add_library(hpx::component ALIAS hpx_component)

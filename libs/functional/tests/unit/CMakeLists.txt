@@ -28,11 +28,12 @@ foreach(test ${function_tests})
   source_group("Source Files" FILES ${sources})
 
   add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     NOLIBS
-                     DEPENDENCIES hpx_functional hpx_testing
-                     EXCLUDE_FROM_ALL
-                     FOLDER "Tests/Unit/Modules/Functional/Function")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    NOLIBS
+    DEPENDENCIES hpx_functional hpx_testing
+    EXCLUDE_FROM_ALL
+    FOLDER "Tests/Unit/Modules/Functional/Function")
 
   add_hpx_unit_test("modules.functional.function" ${test})
 

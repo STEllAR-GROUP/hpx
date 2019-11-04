@@ -21,10 +21,11 @@ foreach(benchmark ${benchmarks})
 
   # add example executable
   add_hpx_executable(${benchmark}_test
-                     SOURCES ${sources}
-                     ${${benchmark}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     FOLDER "Benchmarks/Modules/Collectives/OSU")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${benchmark}_FLAGS}
+    EXCLUDE_FROM_ALL
+    FOLDER "Benchmarks/Modules/Collectives/OSU")
 
   add_hpx_performance_test("modules.collectives"
     ${benchmark} ${${benchmark}_PARAMETERS})
@@ -44,10 +45,11 @@ foreach(benchmark ${coll_benchmarks})
 
   # add example executable
   add_hpx_executable(${benchmark}_test
-                     SOURCES ${sources}
-                     ${${benchmark}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     FOLDER "Benchmarks/Modules/Collectives/OSU")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${benchmark}_FLAGS}
+    EXCLUDE_FROM_ALL
+    FOLDER "Benchmarks/Modules/Collectives/OSU")
 
   add_hpx_performance_test("modules.collectives"
     ${benchmark} ${${benchmark}_PARAMETERS})

@@ -9,8 +9,10 @@ set(tests
     shared_mutex2
    )
 
-set(shared_future1_PARAMETERS THREADS_PER_LOCALITY 4)
-set(shared_future2_PARAMETERS THREADS_PER_LOCALITY 4)
+set(shared_mutex1_PARAMETERS THREADS_PER_LOCALITY 4)
+set(shared_mutex2_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(shared_mutex1_FLAGS DEPENDENCIES PRIVATE hpx::boost)
 
 foreach(test ${tests})
   set(sources
@@ -20,11 +22,12 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     ${${test}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/LCOs/SharedMutex")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${test}_FLAGS}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER "Tests/Unit/LCOs/SharedMutex")
 
   add_hpx_unit_test("lcos.shared_mutex" ${test} ${${test}_PARAMETERS})
 

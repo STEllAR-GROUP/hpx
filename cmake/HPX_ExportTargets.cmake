@@ -4,8 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(HPX_EXPORT_TARGETS "" CACHE INTERNAL "" FORCE)
-
 function(hpx_export_targets)
   foreach(target ${ARGN})
     list(FIND HPX_EXPORT_TARGETS ${target} _found)
@@ -13,4 +11,13 @@ function(hpx_export_targets)
       set(HPX_EXPORT_TARGETS ${HPX_EXPORT_TARGETS} ${target} CACHE INTERNAL "" FORCE)
     endif()
   endforeach()
-endfunction()
+endfunction(hpx_export_targets)
+
+function(hpx_export_modules_targets)
+  foreach(target ${ARGN})
+    list(FIND HPX_EXPORT_MODULES_TARGETS ${target} _found)
+    if(_found EQUAL -1)
+      set(HPX_EXPORT_MODULES_TARGETS ${HPX_EXPORT_MODULES_TARGETS} ${target} CACHE INTERNAL "" FORCE)
+    endif()
+  endforeach()
+endfunction(hpx_export_modules_targets)

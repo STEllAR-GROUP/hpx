@@ -73,8 +73,8 @@ function(hpx_check_boost_compatibility)
   endif()
 
   # make sure paths are tested even if not string identical
-  get_filename_component(PATH1 ${HPX_BOOST_ROOT} ABSOLUTE)
-  get_filename_component(PATH2 ${BOOST_ROOT} ABSOLUTE)
+  get_filename_component(PATH1 "${HPX_BOOST_ROOT}" ABSOLUTE)
+  get_filename_component(PATH2 "${BOOST_ROOT}" ABSOLUTE)
 
   if(NOT PATH1 STREQUAL PATH2)
     hpx_error("The specified BOOST_ROOT differs from what has been used when"
@@ -89,13 +89,15 @@ function(hpx_setup_allocator)
   if(HPX_DISABLE_CUSTOM_ALLOCATOR)
     return()
   endif()
-  if(DEFINED HPX_WITH_MALLOC)
+  if(HPX_WITH_MALLOC)
     string(TOUPPER "${HPX_WITH_MALLOC}" HPX_MALLOC_UPPER)
     string(TOUPPER "${HPX_WITH_MALLOC_DEFAULT}" HPX_MALLOC_DEFAULT_UPPER)
-    if(NOT HPX_MALLOC_UPPER STREQUAL HPX_MALLOC_DEFAULT_UPPER)
-      hpx_error("The specified allocators do not match. This Project is configured with ${HPX_WITH_MALLOC} and HPX was configured with ${HPX_WITH_MALLOC_DEFAULT}.")
+    if(NOT (HPX_MALLOC_UPPER STREQUAL HPX_MALLOC_DEFAULT_UPPER))
+      hpx_error("The specified allocators do not match. This Project is configured with '${HPX_WITH_MALLOC}' and HPX was configured with '${HPX_WITH_MALLOC_DEFAULT}'.")
     endif()
   endif()
-  set(HPX_WITH_MALLOC ${HPX_WITH_MALLOC_DEFAULT} CACHE STRING "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)")
+  set(HPX_WITH_MALLOC ${HPX_WITH_MALLOC_DEFAULT} CACHE STRING
+    "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"
+    STRINGS "system;tcmalloc;jemalloc;mimalloc;tbbmalloc;custom")
   include(HPX_SetupAllocator)
 endfunction()

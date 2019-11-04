@@ -20,6 +20,7 @@ set(memory_sources
 )
 
 add_hpx_component(memory
+  INTERNAL_FLAGS
   FOLDER "Core/Components/Counters"
   INSTALL_HEADERS
   PLUGIN

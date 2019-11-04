@@ -26,6 +26,7 @@ set(component_storage_sources
 )
 
 add_hpx_component(component_storage
+  INTERNAL_FLAGS
   FOLDER "Core/Components/IO"
   INSTALL_HEADERS
   PREPEND_HEADER_ROOT

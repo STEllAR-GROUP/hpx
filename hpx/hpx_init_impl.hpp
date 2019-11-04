@@ -20,7 +20,9 @@
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/functional/function.hpp>
 
+#include <csignal>
 #include <cstddef>
+#include <cstdlib>
 #include <string>
 #include <utility>
 #include <vector>
@@ -72,6 +74,11 @@ namespace hpx
 #if defined(__FreeBSD__)
         freebsd_environ = environ;
 #endif
+        // set a handler for std::abort
+        std::signal(SIGABRT, detail::on_abort);
+        std::at_quick_exit(detail::on_exit);
+        std::atexit(detail::on_exit);
+
         return detail::run_or_start(f, desc_cmdline, argc, argv,
             hpx_startup::user_main_config(cfg),
             std::move(startup), std::move(shutdown), mode, true);

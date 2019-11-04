@@ -13,8 +13,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V3.3.2
-cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+# We require at least CMake V3.6.3
+cmake_minimum_required(VERSION 3.6.3 FATAL_ERROR)
 
 if (HPX_WITH_CUDA AND CMAKE_VERSION VERSION_LESS 3.9)
   message(FATAL_ERROR "CUDA support requires at least CMake 3.9.")
@@ -64,11 +64,14 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 ################################################################################
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
+# To fix the windows link bug (need to be included only once!)
+include(HPX_FilterLibrariesMSVC)
+
 include(GNUInstallDirs)
 include(HPX_Utils)
 
 # explicitly set certain policies
-cmake_policy(VERSION 3.3.2)
+cmake_policy(VERSION 3.6.3)
 hpx_set_cmake_policy(CMP0042 NEW)
 if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
   # the old behavior not supported for newer cmake versions anymore
@@ -92,7 +95,6 @@ include(CheckCXXCompilerFlag)
 include(CMakeDependentOption)
 
 # include additional macro definitions
-include(HPX_ExportTargets)
 include(HPX_Libraries)
 include(HPX_LibraryDir)
 include(HPX_AddConfigTest)
@@ -386,23 +388,15 @@ if(HPX_WITH_DATAPAR_VC)
   hpx_option(HPX_WITH_DATAPAR_VC_NO_LIBRARY BOOL
     "Don't link with the Vc static library (default: OFF)" OFF ADVANCED)
 endif()
-hpx_option(HPX_WITH_DATAPAR_BOOST_SIMD BOOL
-  "Enable data parallel algorithm support using the external Boost.SIMD library (default: OFF)" OFF ADVANCED)
-
-if(HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_SIMD)
-  hpx_error("Please select only one of the supported external vectorization libraries (HPX_WITH_DATAPAR_VC or HPX_WITH_DATAPAR_BOOST_SIMD)")
-endif()
 
 if(HPX_WITH_DATAPAR_VC)
   include(HPX_SetupVc)
 endif()
-if(HPX_WITH_DATAPAR_BOOST_SIMD)
-  include(HPX_SetupBoostSIMD)
-endif()
-if((NOT HPX_WITH_DATAPAR_VC) AND (NOT HPX_WITH_DATAPAR_BOOST_SIMD))
+if(NOT HPX_WITH_DATAPAR_VC)
   hpx_info("No vectorization library configured")
 else()
-  set(HPX_WITH_DATAPAR ON)
+  hpx_option(HPX_WITH_DATAPAR BOOL
+    "Enable data parallel algorithm support (default: ON)" ON ADVANCED)
 endif()
 
 ################################################################################
@@ -757,6 +751,7 @@ endif()
 hpx_option(HPX_WITH_NETWORKING BOOL
   "Enable support for networking and multi-node runs (default: ON)"
   ON CATEGORY "Parcelport")
+
 if(HPX_WITH_NETWORKING)
   hpx_add_config_define(HPX_HAVE_NETWORKING)
 
@@ -774,19 +769,39 @@ if(HPX_WITH_NETWORKING)
     hpx_add_config_define(HPX_HAVE_PARCEL_PROFILING)
   endif()
 
-  ## Parcelport related build options
+  ## Parcelport related build options and #define in global defines.hpp
   hpx_option(HPX_WITH_PARCELPORT_LIBFABRIC BOOL
     "Enable the libfabric based parcelport. This is currently an experimental feature"
     OFF CATEGORY "Parcelport" ADVANCED)
+  if (HPX_WITH_PARCELPORT_LIBFABRIC)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_LIBFABRIC)
+  endif()
+
   hpx_option(HPX_WITH_PARCELPORT_VERBS BOOL
     "Enable the ibverbs based parcelport. This is currently an experimental feature"
     OFF CATEGORY "Parcelport" ADVANCED)
+  if (NOT HPX_WITH_PARCELPORT_VERBS)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS)
+  endif()
+
   hpx_option(HPX_WITH_PARCELPORT_MPI BOOL
     "Enable the MPI based parcelport."
     OFF CATEGORY "Parcelport")
+  if(HPX_WITH_PARCELPORT_MPI)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI)
+    if(MSVC)
+      # FIXME: add OpenMPI specific flag here for now as the hpx_add_compile_flag()
+      # below does not add the extra options to the top level directory
+      hpx_add_config_define(OMPI_IMPORTS)
+    endif()
+  endif()
+
   hpx_option(HPX_WITH_PARCELPORT_TCP BOOL
     "Enable the TCP based parcelport."
     ON CATEGORY "Parcelport")
+  if(HPX_WITH_PARCELPORT_TCP)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_TCP)
+  endif()
   hpx_option(HPX_WITH_PARCELPORT_ACTION_COUNTERS BOOL
     "Enable performance counters reporting parcelport statistics on a per-action basis."
     OFF CATEGORY "Parcelport")
@@ -798,10 +813,28 @@ if(HPX_WITH_NETWORKING)
   hpx_option(HPX_WITH_PARCELPORT_MPI_ENV STRING
     "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK)."
     "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK" CATEGORY "Parcelport" ADVANCED)
+  if(HPX_WITH_PARCELPORT_MPI)
+    # This list is to detect whether we run inside an mpi environment.
+    # If one of those environment variables is set, the MPI parcelport
+    # is enabled by default.
+    # PMI_RANK: Intel MPI and MVAPICH2
+    # OMPI_COMM_WORLD_SIZE: OpenMPI starting at version 1.3
+    if(HPX_WITH_PARCELPORT_MPI_ENV)
+      string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${HPX_WITH_PARCELPORT_MPI_ENV}")
+      hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI_ENV "\"${hpx_parcelport_mpi_env_}\"")
+    endif()
+  endif()
+
   hpx_option(HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
     "Turn on MPI multithreading support (default: ON)."
     ON CATEGORY "Parcelport" ADVANCED)
-endif()
+  if(HPX_WITH_PARCELPORT_MPI)
+    if(HPX_WITH_PARCELPORT_MPI_MULTITHREADED)
+      hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
+    endif()
+  endif()
+
+endif(HPX_WITH_NETWORKING)
 
 ## External libraries/frameworks used by sme of the examples and benchmarks
 hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL
@@ -835,7 +868,8 @@ hpx_option(HPX_WITH_EXAMPLES_HDF5 BOOL
   "Enable examples requiring HDF5 support (default: OFF)." OFF
   CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_HDF5)
-  find_package(HDF5 COMPONENTS CXX)
+  enable_language(Fortran)
+  find_package(HDF5 COMPONENTS CXX Fortran)
   if(NOT HDF5_FOUND)
     set(HPX_WITH_EXAMPLES_HDF5 OFF)
   endif()
@@ -1581,6 +1615,32 @@ endif()
 set(HPX_WITH_TARGET_ARCHITECTURE ${__target_arch} CACHE INTERNAL "" FORCE)
 
 ################################################################################
+# Set configuration option to use Boost.Context or not. This depends on the
+# platform.
+set(__use_generic_coroutine_context OFF)
+if(APPLE)
+  set(__use_generic_coroutine_context ON)
+endif()
+if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ")
+  set(__use_generic_coroutine_context ON)
+endif()
+hpx_option(HPX_WITH_GENERIC_CONTEXT_COROUTINES BOOL
+  "Use Boost.Context as the underlying coroutines context switch implementation."
+  ${__use_generic_coroutine_context} ADVANCED)
+
+# Compatibility with using Boost.ProgramOptions, introduced in V1.4.0
+hpx_option(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY
+  BOOL "Enable Boost.ProgramOptions compatibility. (default: ON)"
+  ON ADVANCED CATEGORY "Modules")
+
+# Compatibility with using Boost.FileSystem, introduced in V1.4.0
+set(__filesystem_compatibility_default ON)
+if(HPX_WITH_CXX17_FILESYSTEM)
+  set(__filesystem_compatibility_default OFF)
+endif()
+hpx_option(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY
+  BOOL "Enable Boost.FileSystem compatibility. (default: ${__filesystem_compatibility_default})"
+  ${__filesystem_compatibility_default} ADVANCED CATEGORY "Modules")
 
 ################################################################################
 # Find Our dependencies:
@@ -1590,166 +1650,29 @@ set(HPX_WITH_TARGET_ARCHITECTURE ${__target_arch} CACHE INTERNAL "" FORCE)
 # When a package is found, the necessary include paths are set, and the libraries
 # are added to the HPX_LIBRARIES variables
 
-# Setting up our required Boost libraries. This will find all required boost
-# libraries and add possibly needed boost headers shipped with the hpx source
+# Setup our required Boost libraries.
 include(HPX_SetupBoost)
-
+include(HPX_SetupBoostFilesystem)
+include(HPX_SetupBoostIostreams)
+include(HPX_SetupBoostProgramOptions)
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
-
-# convey selected allocator type to the build configuration
-hpx_add_config_define(HPX_HAVE_MALLOC "\"${HPX_WITH_MALLOC}\"")
-if(${HPX_WITH_MALLOC} STREQUAL "jemalloc")
-  if(NOT ("${HPX_WITH_JEMALLOC_PREFIX}" STREQUAL "<none>") AND
-     NOT ("${HPX_WITH_JEMALLOC_PREFIX}x" STREQUAL "x"))
-    hpx_add_config_define(HPX_HAVE_JEMALLOC_PREFIX ${HPX_WITH_JEMALLOC_PREFIX})
-    hpx_add_config_define(HPX_HAVE_INTERNAL_ALLOCATOR)
-  endif()
-endif()
-
-find_package(Hwloc)
-if(NOT HWLOC_FOUND)
-  hpx_error("Hwloc could not be found, please specify HWLOC_ROOT to point to the correct location")
-endif()
-hpx_libraries(${HWLOC_LIBRARIES})
-include_directories(${HWLOC_INCLUDE_DIR})
-
-################################################################################
-# Set search paths for generated headers.
-################################################################################
-include_directories("${CMAKE_BINARY_DIR}")
-
-################################################################################
-# Enable integration with Intel Amplifier
-################################################################################
-if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
-  find_package(Amplifier)
-  if(NOT AMPLIFIER_FOUND)
-    hpx_error("Intel Amplifier could not be found and HPX_WITH_ITTNOTIFY=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
-  endif()
-  hpx_libraries(${AMPLIFIER_LIBRARIES})
-  include_directories(${AMPLIFIER_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
-  hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
-endif()
-
-################################################################################
-# Enable integration with Apex event counters
-################################################################################
+include(HPX_SetupHwloc)
 
 # reset external source lists
 add_hpx_library_sources_noglob(hpx_external)
 add_hpx_library_headers_noglob(hpx_external)
 
-if(HPX_WITH_APEX)
-  set(_hpx_apex_no_update)
-  if(HPX_WITH_APEX_NO_UPDATE)
-    set(_hpx_apex_no_update NO_UPDATE)
-  endif()
-
-  # We want to track parent dependencies
-  hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
-
-  # If APEX_ROOT not specified, local clone into hpx source dir
-  if (NOT APEX_ROOT)
-    # handle APEX library
-    include(GitExternal)
-    git_external(apex
-      https://github.com/khuck/xpress-apex.git
-      ${HPX_WITH_APEX_TAG}
-      ${_hpx_apex_no_update}
-      VERBOSE)
-    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/apex)
-      set(APEX_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/apex)
-    else()
-      hpx_error("Apex could not be found and HPX_WITH_APEX=On")
-    endif()
-  endif(NOT APEX_ROOT)
-
-  LIST(APPEND CMAKE_MODULE_PATH "${APEX_ROOT}/cmake/Modules")
-  add_subdirectory(${APEX_ROOT}/src/apex ${CMAKE_BINARY_DIR}/apex/src/apex)
-  if(AMPLIFIER_FOUND)
-    hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
-  endif()
-
-  include_directories(${APEX_SOURCE_DIR})
-  set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-      ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} apex)
-  if(APEX_WITH_MSR)
-    set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} -L${MSR_ROOT}/lib -lmsr)
-  endif()
-  if(APEX_WITH_ACTIVEHARMONY)
-    set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
-  endif()
-  if(APEX_WITH_OTF2)
-    set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} -L${OTF2_ROOT}/lib -lotf2)
-  endif()
-
-  # handle optional ITTNotify library
-  if(HPX_WITH_ITTNOTIFY)
-    add_subdirectory(${APEX_ROOT}/src/ITTNotify)
-    if(NOT ITTNOTIFY_FOUND)
-      hpx_error("ITTNotify could not be found and HPX_WITH_ITTNOTIFY=On")
-    endif()
-    include_directories(${ITTNOTIFY_SOURCE_DIR})
-    hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
-    set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} ittnotify)
-  endif()
-endif()
-
-if(HPX_WITH_HPXMP)
-
-  # hpxMP requires ASM support
-  enable_language(ASM)
-  set(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
-
-  set(_hpxmp_no_update)
-  if(HPX_WITH_HPXMP_NO_UPDATE)
-    set(_hpxmp_no_update NO_UPDATE)
-  endif()
-
-  if (NOT HPXMP_ROOT)
-    # handle hpxMP library
-    include(GitExternal)
-    git_external(hpxmp
-      https://github.com/STEllAR-GROUP/hpxMP.git
-      ${HPX_WITH_HPXMP_TAG}
-      ${_hpxmp_no_update}
-      VERBOSE)
-    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/hpxmp)
-      set(HPXMP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/hpxmp)
-    else()
-      hpx_error("hpxMP could not be found and HPX_WITH_HPXMP=On")
-    endif()
-  endif(NOT HPXMP_ROOT)
-
-  add_subdirectory(${HPXMP_ROOT})
-
-  # make sure thread-local storage is supported
-  hpx_add_config_define(HPX_HAVE_THREAD_LOCAL_STORAGE)
-endif()
-
-if(HPX_WITH_GOOGLE_PERFTOOLS)
-  find_package(GooglePerftools)
-  if(NOT GOOGLE_PERFTOOLS_FOUND)
-    hpx_error("Google Perftools could not be found and HPX_WITH_GOOGLE_PERFTOOLS=On, please specify GOOGLE_PERFTOOLS to point to the root of your Google Perftools installation")
-  endif()
-  hpx_libraries(${GOOGLE_PERFTOOLS_LIBRARIES})
-  include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
-endif()
-
-if(HPX_WITH_VALGRIND)
-  find_package(Valgrind)
-  if(NOT VALGRIND_FOUND)
-    hpx_error("Valgrind could not be found and HPX_WITH_VALGRIND=On, please specify VALGRIND_ROOT to point to the root of your Valgrind installation")
-  endif()
-  include_directories(${VALGRIND_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_VALGRIND)
-endif()
+# Setup packages and subprojects
+include(HPX_SetupApex)
+include(HPX_SetupPapi)
+include(HPX_SetupHpxmp)
+include(HPX_SetupGooglePerfTools)
+include(HPX_SetupValgrind)
+# Setup plugins
+# (set here cause if we include it inside plugins, it will not be defined in
+# src/CMakeLists.txt where we call add_static_parcelports)
+include(HPX_SetupMPI)
 
 if(HPX_WITH_SANITIZERS)
   hpx_add_config_define(HPX_HAVE_SANITIZERS)
@@ -1778,7 +1701,10 @@ endif()
 if(WIN32)
   if(HPX_WITH_SWAP_CONTEXT_EMULATION)
     if(NOT CMAKE_ASM_MASM_COMPILER)
-      hpx_error("SwitchToFiber emulation can not be enabled. The masm compiler could not be found. Try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe) or disable the emulation by setting HPX_WITH_SWAP_CONTEXT_EMULATION to Off")
+      hpx_error("SwitchToFiber emulation can not be enabled. The masm compiler \
+      could not be found. Try setting the ASM_MASM environment variable to the \
+      assembler executable (ml.exe/ml64.exe) or disable the emulation by setting \
+      HPX_WITH_SWAP_CONTEXT_EMULATION to Off")
     else()
       hpx_info("SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'")
       hpx_add_config_define(HPX_HAVE_SWAP_CONTEXT_EMULATION)
@@ -1805,7 +1731,7 @@ endif()
 # search path configuration
 ################################################################################
 if(HPX_WITH_FULL_RPATH)
-  hpx_include(SetFullRPATH)
+  include(HPX_SetFullRPATH)
 endif()
 
 ################################################################################
@@ -1815,19 +1741,6 @@ include(HPX_GitCommit)
 hpx_add_config_define(HPX_HAVE_GIT_COMMIT "\"${HPX_WITH_GIT_COMMIT}\"")
 
 hpx_include(SetOutputPaths)
-##############################################################################
-
-################################################################################
-# Provide a function for generating config headers
-################################################################################
-function(generate_config_defines_header TARGET_DIRECTORY)
-  # Generate a defines.hpp to be used in the build directory ...
-  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-  write_config_defines_file(
-    TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
-    NAMESPACE default
-    FILENAME "${TARGET_DIRECTORY}/hpx/config/defines.hpp")
-endfunction()
 
 ################################################################################
 # Add custom targets for tests
@@ -1874,18 +1787,6 @@ set(HPX_DEBUG_POSTFIX "d")
 ################################################################################
 include(HPX_CompilerFlagsTarget)
 
-################################################################################
-# Add libraries
-################################################################################
-add_subdirectory(libs)
-
-################################################################################
-# Configure compression and other plugins
-################################################################################
-set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
-add_hpx_pseudo_target(plugins)
-add_subdirectory(plugins)
-
 if(HPX_WITH_COMPRESSION_BZIP2)
   hpx_add_config_define(HPX_HAVE_COMPRESSION_BZIP2)
 endif()
@@ -1895,6 +1796,23 @@ endif()
 if(HPX_WITH_COMPRESSION_ZLIB)
   hpx_add_config_define(HPX_HAVE_COMPRESSION_ZLIB)
 endif()
+
+################################################################################
+# Add libraries
+################################################################################
+add_subdirectory(libs)
+
+################################################################################
+# Add core dependency
+################################################################################
+add_hpx_pseudo_target(core)
+
+################################################################################
+# Configure compression and other plugins
+################################################################################
+set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
+add_hpx_pseudo_target(plugins)
+add_subdirectory(plugins)
 
 ################################################################################
 # Documentation toolchain (Sphinx, Doxygen, Breathe)
@@ -1912,7 +1830,9 @@ if(HPX_WITH_TOOLS)
   add_subdirectory(tools)
 endif()
 
-add_hpx_pseudo_target(core)
+################################################################################
+# Add core configuration
+################################################################################
 add_subdirectory(src)
 
 ################################################################################
@@ -1930,46 +1850,17 @@ if(HPX_WITH_TESTS)
     hpx_warn("A python interpreter could not be found. The test suite can not be run automatically.")
   endif()
 
-  include_directories(tests)
+  # pseudo_target added above
   add_subdirectory(tests)
 endif()
 
 if(HPX_WITH_EXAMPLES)
-  include_directories(examples)
   add_subdirectory(examples)
 endif()
 
 if(HPX_WITH_DOCUMENTATION)
   add_subdirectory(docs)
 endif()
-
-###############################################################################
-# Activate plugins
-###############################################################################
-add_plugin_modules()
-
-################################################################################
-# Generate config headers and helpers
-################################################################################
-generate_config_defines_header(${CMAKE_BINARY_DIR})
-
-# Generate a defines.hpp to be used in the install directory ...
-set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
-write_config_defines_file(
-  TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
-  NAMESPACE default
-  FILENAME "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
-
-# Configure version.hpp for build tree and install directory
-configure_file(
-    "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
-    "${CMAKE_BINARY_DIR}/hpx/config/version.hpp"
-    @ONLY)
-
-configure_file(
-    "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
-    "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/version.hpp"
-    @ONLY)
 
 # Configure hpxrun.py
 configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
@@ -2150,9 +2041,12 @@ foreach(_module ${HPX_LIBS})
 endforeach()
 
 ################################################################################
-# External build system support (FindHPX.cmake and pkg-config).
-################################################################################
+# store cache vars and their values in order for them to be forwarded to the
+# projects (needs to be before the HPX_GeneratePackage call)
+include(HPX_ForwardCacheVariables)
 
+################################################################################
+# External build system support (FindHPX.cmake and pkg-config).
 include(HPX_GeneratePackage)
 
 message("")

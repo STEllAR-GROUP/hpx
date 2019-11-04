@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Hartmut Kaiser
 //  Copyright (c) 2014 Patricia Grubel
-//  Copyright (c) 2017 Adrian Serio
+//  Copyright (c) 2018 Adrian Serio
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -167,7 +167,9 @@ struct backup
     {
         hpx::util::checkpoint archive_data =
             hpx::util::save_checkpoint(hpx::launch::sync, bin);
-        std::ofstream file_archive(file_name_);
+        // Make sure file stream is bianary for Windows/Mac machines
+        std::ofstream file_archive(
+            file_name_, std::ios::binary | std::ios::out);
         if (file_archive.is_open())
         {
             file_archive << archive_data;
@@ -183,7 +185,8 @@ struct backup
         std::size_t nx)
     {
         hpx::util::checkpoint temp_archive;
-        std::ifstream ist(file_name_);
+        // Make sure file stream is bianary for Windows/Mac machines
+        std::ifstream ist(file_name_, std::ios::binary | std::ios::in);
         ist >> temp_archive;
         hpx::util::restore_checkpoint(temp_archive, bin);
         for (std::size_t i = 0; i < U[0].size(); i++)
@@ -337,7 +340,6 @@ struct stepper
                             container[(t / cp) - 1].save(value, i);
                             partition f_value = hpx::make_ready_future(value);
                             return f_value;
-
                         });
                 }
             }

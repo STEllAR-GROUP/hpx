@@ -45,10 +45,7 @@ set(tests
 
 # add dependencies to partitioned_vector_target when Cuda is enabled
 if(HPX_WITH_CUDA)
-  include_directories(${CUDA_INCLUDE_DIRS})
-
-  set(partitioned_vector_target_FLAGS
-      DEPENDENCIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES})
+  set(partitioned_vector_target_LIBRARIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES})
 endif()
 
 foreach(test ${tests})
@@ -64,11 +61,17 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     ${${test}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER ${folder_name})
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${test}_FLAGS}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER ${folder_name})
+
+  if(HPX_WITH_CUDA)
+    target_include_directories(${test}_test SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
+    target_link_libraries(${test}_test PRIVATE ${${${test}}_LIBRARIES})
+  endif()
 
   add_hpx_unit_test("modules.segmented_algorithms" ${test} ${${test}_PARAMETERS})
 

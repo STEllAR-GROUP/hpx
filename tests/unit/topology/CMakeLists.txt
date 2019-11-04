@@ -16,7 +16,8 @@ if (HPX_WITH_SHARED_PRIORITY_SCHEDULER AND HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
     ARGS --size=128 --nb=512 --tiles-per-domain=2 --col-proc=1 --row-proc=1)
 endif()
 set(numa_allocator_FLAGS
-  COMPONENT_DEPENDENCIES iostreams)
+  COMPONENT_DEPENDENCIES iostreams
+  DEPENDENCIES PRIVATE hpx::hwloc)
 
 ###############################################################################
 foreach(test ${tests})
@@ -27,11 +28,12 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     ${${test}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/Topology/")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${test}_FLAGS}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER "Tests/Unit/Topology/")
 
   add_hpx_unit_test("topology" ${test} ${${test}_PARAMETERS})
 
