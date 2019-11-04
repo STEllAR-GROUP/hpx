@@ -59,10 +59,12 @@ if(HPX_WITH_DATAPAR_VC AND NOT TARGET hpx::vc)
   set_property(TARGET hpx::vc PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Vc_INCLUDE_DIR})
 
   if(NOT HPX_WITH_DATAPAR_VC_NO_LIBRARY)
-    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+    if(${CMAKE_VERSION} VERSION_LESS "3.13.0")
       set_property(TARGET hpx::vc PROPERTY INTERFACE_LINK_LIBRARIES ${Vc_LIBRARIES})
+      set_property(TARGET hpx::vc PROPERTY INTERFACE_LINK_DIRECTORIES ${Vc_LIB_DIR})
     else()
       target_link_libraries(hpx::vc INTERFACE ${Vc_LIBRARIES})
+      target_link_directories(hpx::vc INTERFACE ${Vc_LIB_DIR})
     endif()
   endif()
 
