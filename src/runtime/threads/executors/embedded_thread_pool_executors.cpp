@@ -28,6 +28,7 @@
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/util/yield_while.hpp>
 
 #include <atomic>
 #include <chrono>
