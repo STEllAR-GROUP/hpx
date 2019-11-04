@@ -38,7 +38,7 @@ namespace hpx { namespace basic_execution {
         HPX_CXX14_CONSTEXPR agent_ref& operator=(
             agent_ref&&) noexcept = default;
 
-        constexpr explicit operator bool() noexcept
+        constexpr explicit operator bool() const noexcept
         {
             return impl_ != nullptr;
         }
