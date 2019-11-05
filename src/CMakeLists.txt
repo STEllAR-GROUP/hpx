@@ -270,7 +270,7 @@ target_link_libraries(hpx PUBLIC hpx::hwloc)
 
 # Enable SIMD via VC if it is available
 if (TARGET hpx::vc)
-  target_link_libraries(hpx PRIVATE hpx::vc)
+  target_link_libraries(hpx PUBLIC hpx::vc)
 endif()
 
 if (TARGET hpx::amplifier)
