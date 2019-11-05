@@ -1556,10 +1556,6 @@ namespace hpx { namespace util
             rtcfg_.reconfigure(cfg);
         }
 
-        // initialize logging
-        util::detail::init_logging(
-            rtcfg_, rtcfg_.mode_ == runtime_mode_console);
-
         // load plugin modules (after first pass of command line handling,
         // so that settings given on command line could propagate to modules)
         std::vector<std::shared_ptr<plugins::plugin_registry_base> >
@@ -1571,22 +1567,6 @@ namespace hpx { namespace util
         // minimally assume one locality and this is the console
         if (node_ == std::size_t(-1))
             node_ = 0;
-
-#if defined(HPX_HAVE_NETWORKING)
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-        // getting localities from MPI environment (support mpirun)
-        if (detail::check_mpi_environment(rtcfg_))
-        {
-            mpi_environment::init(&argc, &argv, *this);
-            num_localities_ = static_cast<std::size_t>(mpi_environment::size());
-        }
-#endif
-
-        if (num_localities_ != 1 || node_ != 0 || rtcfg_.enable_networking())
-        {
-            parcelset::parcelhandler::init(&argc, &argv, *this);
-        }
-#endif
 
         for (std::shared_ptr<plugins::plugin_registry_base>& reg :
             plugin_registries)

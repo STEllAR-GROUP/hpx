@@ -42,6 +42,7 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/from_string.hpp>
+#include <hpx/util/init_logging.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 
@@ -371,6 +372,28 @@ namespace hpx
                 cms.rtcfg_.enable_spinlock_deadlock_detection();
             util::detail::spinlock_deadlock_detection_limit =
                 cms.rtcfg_.get_spinlock_deadlock_detection_limit();
+#endif
+
+            // initialize logging
+            util::detail::init_logging(
+                cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode_console);
+
+#if defined(HPX_HAVE_NETWORKING)
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            // getting localities from MPI environment (support mpirun)
+            if (detail::check_mpi_environment(cms.rtcfg_))
+            {
+                mpi_environment::init(&argc, &argv, *this);
+                num_localities_ =
+                    static_cast<std::size_t>(mpi_environment::size());
+            }
+#endif
+
+            if (cms.num_localities_ != 1 || cms.node_ != 0 ||
+                cms.rtcfg_.enable_networking())
+            {
+                parcelset::parcelhandler::init(&argc, &argv, cms);
+            }
 #endif
         }
 
