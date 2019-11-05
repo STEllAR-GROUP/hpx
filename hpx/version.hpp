@@ -71,10 +71,6 @@ namespace hpx
 
     // Return the HPX configuration information
     HPX_EXPORT std::string configuration_string();
-
-    // Return the HPX runtime configuration information
-    HPX_EXPORT std::string runtime_configuration_string(
-        util::command_line_handling const& cfg);
 }
 
 #endif

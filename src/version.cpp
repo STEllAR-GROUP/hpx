@@ -17,11 +17,8 @@
 #include <hpx/plugins/parcelport/mpi/mpi.hpp>
 #endif
 
-#include <hpx/errors.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime_fwd.hpp>
-#include <hpx/util/command_line_handling.hpp>
-#include <hpx/runtime_configuration/find_prefix.hpp>
+#include <hpx/runtime_configuration/find_prefix.hpp> // TODO: Move to another module?
 #include <hpx/format.hpp>
 #include <hpx/version.hpp>
 
@@ -293,27 +290,4 @@ namespace hpx
     {
         return std::string(__DATE__)  + " " + __TIME__;
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    std::string runtime_configuration_string(
-        util::command_line_handling const& cfg)
-    {
-        std::ostringstream strm;
-
-        // runtime mode
-        strm << "  {mode}: " << get_runtime_mode_name(cfg.rtcfg_.mode_) << "\n";
-
-        if (cfg.num_localities_ != 1)
-            strm << "  {localities}: " << cfg.num_localities_ << "\n";
-
-        // default scheduler used for this run
-        strm << "  {scheduler}: " << cfg.queuing_ << "\n";
-
-        // amount of threads and cores configured for this run
-        strm << "  {os-threads}: " << cfg.num_threads_ << "\n";
-        strm << "  {cores}: " << cfg.num_cores_ << "\n";
-
-        return strm.str();
-    }
 }
-

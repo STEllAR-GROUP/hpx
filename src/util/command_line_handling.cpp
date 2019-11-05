@@ -53,6 +53,27 @@ namespace hpx { namespace util
 {
     namespace detail
     {
+        std::string runtime_configuration_string(
+            util::command_line_handling const& cfg)
+        {
+            std::ostringstream strm;
+
+            // runtime mode
+            strm << "  {mode}: " << get_runtime_mode_name(cfg.rtcfg_.mode_) << "\n";
+
+            if (cfg.num_localities_ != 1)
+                strm << "  {localities}: " << cfg.num_localities_ << "\n";
+
+            // default scheduler used for this run
+            strm << "  {scheduler}: " << cfg.queuing_ << "\n";
+
+            // amount of threads and cores configured for this run
+            strm << "  {os-threads}: " << cfg.num_threads_ << "\n";
+            strm << "  {cores}: " << cfg.num_cores_ << "\n";
+
+            return strm.str();
+        }
+
         ///////////////////////////////////////////////////////////////////////
         int print_version(std::ostream& out)
         {
@@ -67,7 +88,7 @@ namespace hpx { namespace util
             out << hpx::configuration_string() << std::endl;
 
             out << "Runtime configuration:\n----------------------\n";
-            out << hpx::runtime_configuration_string(cfg) << std::endl;
+            out << runtime_configuration_string(cfg) << std::endl;
 
             return 1;
         }
