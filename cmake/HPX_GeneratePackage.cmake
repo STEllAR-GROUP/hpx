@@ -52,6 +52,7 @@ endif()
 configure_file(cmake/templates/${HPX_PACKAGE_NAME}Config.cmake.in
   "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${HPX_PACKAGE_NAME}Config.cmake"
   ESCAPE_QUOTES @ONLY)
+set(HPX_CONF_PREFIX ${CMAKE_INSTALL_PREFIX})
 configure_file(cmake/templates/hpxcxx.in
   "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpxcxx"
   @ONLY)
@@ -59,6 +60,7 @@ configure_file(cmake/templates/hpxcxx.in
 configure_file(cmake/templates/${HPX_PACKAGE_NAME}Config.cmake.in
   "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/${HPX_PACKAGE_NAME}Config.cmake"
   ESCAPE_QUOTES @ONLY)
+set(HPX_CONF_PREFIX ${CMAKE_BINARY_DIR})
 configure_file(cmake/templates/hpxcxx.in
   "${CMAKE_CURRENT_BINARY_DIR}/bin/hpxcxx"
   @ONLY)
