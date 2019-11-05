@@ -71,7 +71,7 @@ if (NOT TARGET hpx::allocator)
       else()
         target_link_libraries(hpx::allocator INTERFACE ${JEMALLOC_LIBRARIES})
       endif()
-    endif(JEMALLOC)
+    endif()
 
     ##################################################
     # MIMALLOC
