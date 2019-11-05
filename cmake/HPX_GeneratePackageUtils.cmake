@@ -102,6 +102,9 @@ function(hpx_collect_usage_requirements target compile_definitions compile_optio
         # This is a plain path.
         if (IS_ABSOLUTE ${dep})
           set(_libraries ${_libraries} ${dep})
+          # This is a link flag put as a link_libraries (to solve some cmake problems)
+        elseif(${dep} MATCHES "^-")
+          set(_libraries ${_libraries} ${dep})
         else()
           set(_libraries ${_libraries} -l${dep})
         endif()
