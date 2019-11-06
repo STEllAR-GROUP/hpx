@@ -188,7 +188,7 @@ endfunction(add_hpx_example_test)
 # To create target examples.<name> when calling make examples
 # need 2 distinct rules for examples and tests.examples
 function(add_hpx_example_target_dependencies subcategory name)
-  set(option DEPS_ONLY)
+  set(options DEPS_ONLY)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
   if (NOT ${name}_DEPS_ONLY)
     # Add a custom target for this example

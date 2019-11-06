@@ -95,8 +95,6 @@ include(CheckCXXCompilerFlag)
 include(CMakeDependentOption)
 
 # include additional macro definitions
-include(HPX_Libraries)
-include(HPX_LibraryDir)
 include(HPX_AddConfigTest)
 include(HPX_AddDefinitions)
 include(HPX_CreateSymbolicLink)
@@ -371,17 +369,6 @@ hpx_option(HPX_WITH_CUDA BOOL
   "Enable CUDA support (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_CUDA_CLANG BOOL
   "Use clang to compile CUDA code (default: OFF)" OFF ADVANCED)
-if(HPX_WITH_CUDA)
-  find_package(CUDA REQUIRED)
-  set(HPX_WITH_COMPUTE On)
-  hpx_add_config_define(HPX_HAVE_CUDA)
-  hpx_add_config_define(HPX_HAVE_COMPUTE)
-  # keywords for target_link_libraries (cuda)
-  set(CUDA_LINK_LIBRARIES_KEYWORD "PRIVATE")
-endif()
-if(HPX_WITH_CUDA_CLANG AND NOT (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
-  hpx_error("To use Cuda Clang, please select Clang as your default C++ compiler")
-endif()
 hpx_option(HPX_WITH_HCC BOOL
   "Enable hcc support (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_SYCL BOOL
@@ -528,11 +515,15 @@ hpx_option(HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION BOOL
   OFF
   CATEGORY "Thread Manager" ADVANCED)
 
+# We create a target to contain libraries like rt, dl etc. in order to remove
+# global variables
+add_library(hpx_base_libraries INTERFACE)
+
 if(HPX_WITH_STACKTRACES OR HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
   hpx_info("Stack traces are enabled.")
   hpx_add_config_define(HPX_HAVE_STACKTRACES)
   if(WIN32)
-    hpx_libraries(dbghelp)
+    target_link_libraries(hpx_base_libraries INTERFACE dbghelp)
   endif()
 
   hpx_option(HPX_WITH_THREAD_BACKTRACE_DEPTH STRING
@@ -1153,41 +1144,6 @@ hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS PUBLIC
 include(HPX_DetectCppDialect)
 hpx_detect_cpp_dialect()
 
-################################################################################
-# CUDA features
-################################################################################
-if(HPX_WITH_CUDA)
-  if(NOT HPX_WITH_CUDA_CLANG)
-    if(NOT MSVC)
-      hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
-      link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
-      #set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-G)
-      #set(CUDA_NVCC_FLAGS_RELWITHDEBINFO ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O3;-g)
-      #set(CUDA_NVCC_FLAGS_MINSIZEREL ${CUDA_NVCC_FLAGS_MINSIZEREL};-DNDEBUG;-O1)
-      #set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O3)
-      set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-w)
-    else()
-      set(CUDA_PROPAGATE_HOST_FLAGS OFF)
-      hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64)
-      link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64)
-      set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-G;-Xcompiler=-MDd;-Xcompiler=-Od;-Xcompiler=-Zi;-Xcompiler=-bigobj)
-      set(CUDA_NVCC_FLAGS_RELWITHDEBINFO ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O2;-g;-Xcompiler=-MD,-O2,-Zi;-Xcompiler=-bigobj)
-      set(CUDA_NVCC_FLAGS_MINSIZEREL ${CUDA_NVCC_FLAGS_MINSIZEREL};-DNDEBUG;-O1;-Xcompiler=-MD,-O1;-Xcompiler=-bigobj)
-      set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O2;-Xcompiler=-MD,-Ox;-Xcompiler=-bigobj)
-    endif()
-    set(CUDA_SEPARABLE_COMPILATION ON)
-    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};${CXX_FLAG})
-    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-relaxed-constexpr)
-    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-extended-lambda)
-    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--default-stream per-thread)
-  else()
-    hpx_add_target_compile_option(-DBOOST_THREAD_USES_MOVE PUBLIC)
-    hpx_libraries(cudart)
-    hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
-    link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
-  endif()
-endif()
-
 # Store option value passed by an user for HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION.
 if(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
   set(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION_ADVANCED )
@@ -1257,24 +1213,24 @@ if(NOT WIN32)
   if(NOT MSVC)
     hpx_add_compile_flag_if_available(-pthread)
     if(HPX_HAVE_LIBATOMIC)
-      hpx_libraries(atomic)
+      target_link_libraries(hpx_base_libraries INTERFACE atomic)
     endif()
   endif()
 
   if(HPX_HAVE_LIBSUPCPP)
-    hpx_libraries(supc++)
+    target_link_libraries(hpx_base_libraries INTERFACE supc++)
   endif()
 
   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
-    hpx_libraries(dl)
+    target_link_libraries(hpx_base_libraries INTERFACE dl)
   endif()
 
   if(NOT APPLE AND NOT ("${HPX_PLATFORM_UC}" STREQUAL "ANDROID"))
-    hpx_libraries(rt)
+    target_link_libraries(hpx_base_libraries INTERFACE rt)
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
-    hpx_libraries(log)
+    target_link_libraries(hpx_base_libraries INTERFACE log)
   endif()
 
   if(APPLE)
@@ -1350,7 +1306,7 @@ if(WIN32)
     hpx_add_target_compile_option(-bigobj PUBLIC)
   endif()
 
-  hpx_libraries(psapi shlwapi)
+  target_link_libraries(hpx_base_libraries INTERFACE psapi shlwapi)
 
   ##############################################################################
   # Macro definitions for system headers
@@ -1526,8 +1482,7 @@ else()
     hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
   endif()
   if(WIN32)
-    hpx_libraries(WS2_32)
-    hpx_libraries(mswsock)
+    target_link_libraries(hpx_base_libraries INTERFACE psapi WS2_32 mswsock)
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
@@ -1647,8 +1602,6 @@ hpx_option(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY
 #   These are all dependencies needed to build the core library. Dependencies
 #   that are only needed by plugins, examples or tests should be found
 #   seperately in the appropriate subdirectory.
-# When a package is found, the necessary include paths are set, and the libraries
-# are added to the HPX_LIBRARIES variables
 
 # Setup our required Boost libraries.
 include(HPX_SetupBoost)
@@ -1665,6 +1618,7 @@ add_hpx_library_headers_noglob(hpx_external)
 
 # Setup packages and subprojects
 include(HPX_SetupApex)
+include(HPX_SetupCUDA)
 include(HPX_SetupPapi)
 include(HPX_SetupHpxmp)
 include(HPX_SetupGooglePerfTools)
@@ -2039,6 +1993,16 @@ foreach(_module ${HPX_LIBS})
   create_configuration_summary(
     "Module configuration summary (${_module}):" "${_module}")
 endforeach()
+
+include(HPX_ExportTargets)
+# Modules can't link to this if not exported
+install(TARGETS hpx_base_libraries EXPORT HPXTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  COMPONENT hpx_base_libraries
+)
+hpx_export_targets(hpx_base_libraries)
 
 ################################################################################
 # store cache vars and their values in order for them to be forwarded to the

@@ -18,7 +18,7 @@ add_hpx_executable(cancelable_action_client
     DEPENDENCIES cancelable_action_component
     FOLDER "Examples/CancelableAction")
 
-  add_hpx_example_target_dependencies("cancelable_action" cancelable_action_client DEPS_ONLY)
+add_hpx_example_target_dependencies("cancelable_action" cancelable_action_client)
 
 if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
   add_hpx_example_test("cancelable_action" cancelable_action_client THREADS_PER_LOCALITY 4)
