@@ -112,6 +112,14 @@ hpx_info("CMake version: ${CMAKE_VERSION}")
 hpx_info("HPX version: ${HPX_VERSION}")
 
 ################################################################################
+# reset cached variables that need to be re-filled
+unset(HPX_COMPONENTS CACHE)
+unset(HPX_EXPORT_TARGETS CACHE)
+unset(HPX_EXPORT_MODULES_TARGETS CACHE)
+unset(HPX_LIBS CACHE)
+unset(HPX_STATIC_PARCELPORT_PLUGINS CACHE)
+
+################################################################################
 # Fortran compiler detection
 #
 hpx_option(HPX_WITH_FORTRAN
