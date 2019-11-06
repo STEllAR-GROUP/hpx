@@ -12,7 +12,7 @@
 #define HPX_TRAITS_IS_FUTURE_RANGE_HPP
 
 #include <hpx/traits/is_future.hpp>
-#include <hpx/iterator_support/is_range.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
 
 #include <boost/ref.hpp>
 

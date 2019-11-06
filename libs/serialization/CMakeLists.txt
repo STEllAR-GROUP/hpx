@@ -156,7 +156,6 @@ add_hpx_module(serialization
     hpx_hashing
     hpx_preprocessor
     hpx_type_support
-    hpx_util
   CMAKE_SUBDIRS examples tests
 )
 

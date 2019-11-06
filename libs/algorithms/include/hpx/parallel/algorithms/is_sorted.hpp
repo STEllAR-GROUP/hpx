@@ -11,8 +11,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>

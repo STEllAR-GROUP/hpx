@@ -22,7 +22,6 @@ set(tests
 set(subdirs
     bind
     function
-    iterator
     mem_fn
    )
 

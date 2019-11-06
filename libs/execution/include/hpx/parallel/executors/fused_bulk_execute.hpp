@@ -11,8 +11,8 @@
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/iterator_support/is_range.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/executors/execution_fwd.hpp>
 
 #include <cstddef>

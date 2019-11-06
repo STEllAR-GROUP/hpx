@@ -14,7 +14,7 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>

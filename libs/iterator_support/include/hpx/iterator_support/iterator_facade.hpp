@@ -15,7 +15,7 @@
 #define HPX_UTIL_ITERATOR_FACADE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <cstddef>
 #include <iterator>

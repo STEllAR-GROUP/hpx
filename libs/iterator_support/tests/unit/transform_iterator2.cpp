@@ -17,9 +17,8 @@
 //       to be in iterator_adaptor_test.cpp.
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/transform_iterator.hpp>
 
 #include "iterator_tests.hpp"
 
@@ -34,9 +33,7 @@ struct mult_functor
     // DefaultConstructible, as the transform_iterator must be
     // DefaultConstructible to satisfy the requirements for
     // TrivialIterator.
-    mult_functor()
-    {
-    }
+    mult_functor() {}
 
     mult_functor(int aa)
       : a(aa)
@@ -58,9 +55,7 @@ struct adaptable_mult_functor : mult_functor
     // DefaultConstructible, as the transform_iterator must be
     // DefaultConstructible to satisfy the requirements for
     // TrivialIterator.
-    adaptable_mult_functor()
-    {
-    }
+    adaptable_mult_functor() {}
 
     adaptable_mult_functor(int aa)
       : mult_functor(aa)
@@ -136,7 +131,8 @@ int main()
         for (int k2 = 0; k2 < N; ++k2)
             x[k2] = x[k2] * 2;
 
-        typedef hpx::util::transform_iterator<int*, adaptable_mult_functor> iter_t;
+        typedef hpx::util::transform_iterator<int*, adaptable_mult_functor>
+            iter_t;
         iter_t i(y, adaptable_mult_functor(2));
 
         tests::input_iterator_test(i, x[0], x[1]);
@@ -165,111 +161,112 @@ int main()
     }
 
     // Test transform_iterator default argument handling
+    {{typedef hpx::util::transform_iterator<int*, adaptable_mult_functor, float>
+            iter_t;
+
+    HPX_TEST((std::is_same<iter_t::reference, float>::value));
+    HPX_TEST((std::is_same<iter_t::value_type, float>::value));
+}
+
+{
+    typedef hpx::util::transform_iterator<int*, adaptable_mult_functor, int&,
+        float>
+        iter_t;
+
+    HPX_TEST((std::is_same<iter_t::reference, int&>::value));
+    HPX_TEST((std::is_same<iter_t::value_type, float>::value));
+}
+
+{
+    typedef hpx::util::transform_iterator<int*, adaptable_mult_functor, float,
+        double>
+        iter_t;
+
+    HPX_TEST((std::is_same<iter_t::reference, float>::value));
+    HPX_TEST((std::is_same<iter_t::value_type, double>::value));
+}
+}
+
+// Test transform_iterator with function pointers
+{
+    int x[N], y[N];
+    for (int k = 0; k < N; ++k)
+        x[k] = k;
+    std::copy(x, x + N, y);
+
+    for (int k2 = 0; k2 < N; ++k2)
+        x[k2] = x[k2] * 2;
+
+    tests::input_iterator_test(
+        hpx::util::make_transform_iterator(&y[0], &mult_2), x[0], x[1]);
+
+    tests::random_access_readable_iterator_test(
+        hpx::util::make_transform_iterator(&y[0], &mult_2), N, x);
+}
+
+// Test transform_iterator as projection iterator
+{
+    typedef std::pair<int, int> pair_t;
+
+    int x[N];
+    int y[N];
+    pair_t values[N];
+
+    for (int i = 0; i < N; ++i)
     {
-        {
-            typedef hpx::util::transform_iterator<
-                    int*, adaptable_mult_functor, float
-                > iter_t;
-
-            HPX_TEST((std::is_same<iter_t::reference, float>::value));
-            HPX_TEST((std::is_same<iter_t::value_type, float>::value));
-        }
-
-        {
-            typedef hpx::util::transform_iterator<
-                    int*, adaptable_mult_functor, int&, float
-                > iter_t;
-
-            HPX_TEST((std::is_same<iter_t::reference, int&>::value));
-            HPX_TEST((std::is_same<iter_t::value_type, float>::value));
-        }
-
-        {
-            typedef hpx::util::transform_iterator<
-                    int*, adaptable_mult_functor, float, double
-                > iter_t;
-
-            HPX_TEST((std::is_same<iter_t::reference, float>::value));
-            HPX_TEST((std::is_same<iter_t::value_type, double>::value));
-        }
+        x[i] = i;
+        y[i] = N - (i + 1);
     }
 
-    // Test transform_iterator with function pointers
-    {
-        int x[N], y[N];
-        for (int k = 0; k < N; ++k)
-            x[k] = k;
-        std::copy(x, x + N, y);
+    std::copy(x, x + N,
+        hpx::util::make_transform_iterator((pair_t*) values, select_first()));
 
-        for (int k2 = 0; k2 < N; ++k2)
-            x[k2] = x[k2] * 2;
+    std::copy(y, y + N,
+        hpx::util::make_transform_iterator((pair_t*) values, select_second()));
 
-        tests::input_iterator_test(
-            hpx::util::make_transform_iterator(&y[0], &mult_2), x[0], x[1]);
+    tests::random_access_readable_iterator_test(
+        hpx::util::make_transform_iterator(
+            (pair_t*) values, value_select_first()),
+        N, x);
 
-        tests::random_access_readable_iterator_test(
-            hpx::util::make_transform_iterator(&y[0], &mult_2), N, x);
-    }
+    tests::random_access_readable_iterator_test(
+        hpx::util::make_transform_iterator(
+            (pair_t*) values, const_select_first()),
+        N, x);
 
-    // Test transform_iterator as projection iterator
-    {
-        typedef std::pair<int, int> pair_t;
+    tests::constant_lvalue_iterator_test(
+        hpx::util::make_transform_iterator(
+            (pair_t*) values, const_select_first()),
+        x[0]);
 
-        int x[N];
-        int y[N];
-        pair_t values[N];
+    tests::non_const_lvalue_iterator_test(
+        hpx::util::make_transform_iterator((pair_t*) values, select_first()),
+        x[0], 17);
 
-        for (int i = 0; i < N; ++i)
-        {
-            x[i] = i;
-            y[i] = N - (i + 1);
-        }
+    tests::const_nonconst_iterator_test(
+        ++hpx::util::make_transform_iterator((pair_t*) values, select_first()),
+        hpx::util::make_transform_iterator(
+            (pair_t*) values, const_select_first()));
+}
 
-        std::copy(x, x + N,
-            hpx::util::make_transform_iterator((pair_t*) values, select_first()));
+// Test transform_iterator with polymorphic object function
+{
+    int x[N], y[N];
+    for (int k = 0; k < N; ++k)
+        x[k] = k;
+    std::copy(x, x + N, y);
 
-        std::copy(y, y + N,
-            hpx::util::make_transform_iterator((pair_t*) values, select_second()));
+    for (int k2 = 0; k2 < N; ++k2)
+        x[k2] = x[k2] * 2;
 
-        tests::random_access_readable_iterator_test(
-            hpx::util::make_transform_iterator((pair_t*) values, value_select_first()),
-            N, x);
+    tests::input_iterator_test(
+        hpx::util::make_transform_iterator(&y[0], polymorphic_mult_functor()),
+        x[0], x[1]);
 
-        tests::random_access_readable_iterator_test(
-            hpx::util::make_transform_iterator((pair_t*) values, const_select_first()),
-            N, x);
+    tests::random_access_readable_iterator_test(
+        hpx::util::make_transform_iterator(&y[0], polymorphic_mult_functor()),
+        N, x);
+}
 
-        tests::constant_lvalue_iterator_test(
-            hpx::util::make_transform_iterator((pair_t*) values, const_select_first()),
-            x[0]);
-
-        tests::non_const_lvalue_iterator_test(
-            hpx::util::make_transform_iterator((pair_t*) values, select_first()), x[0],
-            17);
-
-        tests::const_nonconst_iterator_test(
-            ++hpx::util::make_transform_iterator((pair_t*) values, select_first()),
-            hpx::util::make_transform_iterator((pair_t*) values, const_select_first()));
-    }
-
-    // Test transform_iterator with polymorphic object function
-    {
-        int x[N], y[N];
-        for (int k = 0; k < N; ++k)
-            x[k] = k;
-        std::copy(x, x + N, y);
-
-        for (int k2 = 0; k2 < N; ++k2)
-            x[k2] = x[k2] * 2;
-
-        tests::input_iterator_test(
-            hpx::util::make_transform_iterator(&y[0], polymorphic_mult_functor()),
-            x[0], x[1]);
-
-        tests::random_access_readable_iterator_test(
-            hpx::util::make_transform_iterator(&y[0], polymorphic_mult_functor()),
-            N, x);
-    }
-
-    return hpx::util::report_errors();
+return hpx::util::report_errors();
 }

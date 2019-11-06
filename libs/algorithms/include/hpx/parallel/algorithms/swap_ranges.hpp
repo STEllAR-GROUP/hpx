@@ -10,7 +10,7 @@
 #define HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>

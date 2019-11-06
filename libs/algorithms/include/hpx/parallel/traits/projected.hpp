@@ -11,7 +11,7 @@
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/functional/result_of.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/traits/vector_pack_load_store.hpp>
 #include <hpx/parallel/traits/vector_pack_type.hpp>
 #include <hpx/traits/is_execution_policy.hpp>

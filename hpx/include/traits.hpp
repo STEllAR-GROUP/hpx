@@ -18,8 +18,8 @@
 #include <hpx/functional/traits/is_bind_expression.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/functional/traits/is_placeholder.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/iterator_support/is_range.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/plugin/traits/plugin_config_data.hpp>
 #include <hpx/serialization/traits/brace_initializable_traits.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>

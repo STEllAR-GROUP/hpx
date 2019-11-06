@@ -10,6 +10,10 @@ set(tests
     iterator_adaptor
     iterator_facade
     range
+    stencil3_iterator
+    transform_iterator
+    transform_iterator2
+    zip_iterator
 )
 
 # Set the dependencies of each test

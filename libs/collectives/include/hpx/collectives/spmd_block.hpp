@@ -14,7 +14,7 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/include/plain_actions.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/parallel/execution.hpp>
 #include <hpx/runtime/get_locality_id.hpp>

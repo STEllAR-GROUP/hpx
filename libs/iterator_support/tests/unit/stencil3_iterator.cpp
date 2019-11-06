@@ -4,11 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/hpx_init.hpp>
 
-#include <hpx/util/transform_iterator.hpp>
+#include <hpx/iterator_support.hpp>
+#include <hpx/testing.hpp>
 
 #include <iterator>
 #include <numeric>
@@ -18,24 +18,20 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace test
-{
+namespace test {
     template <typename Iterator>
-    HPX_FORCEINLINE
-    Iterator previous(Iterator it)
+    HPX_FORCEINLINE Iterator previous(Iterator it)
     {
         return --it;
     }
 
     template <typename Iterator>
-    HPX_FORCEINLINE
-    Iterator next(Iterator it)
+    HPX_FORCEINLINE Iterator next(Iterator it)
     {
         return ++it;
     }
 
-    namespace detail
-    {
+    namespace detail {
         struct stencil_transformer
         {
             template <typename Iterator>
@@ -43,21 +39,20 @@ namespace test
             {
                 typedef typename std::iterator_traits<Iterator>::reference
                     element_type;
-                typedef hpx::util::tuple<
-                        element_type, element_type, element_type
-                    > type;
+                typedef hpx::util::tuple<element_type, element_type,
+                    element_type>
+                    type;
             };
 
             // it will dereference tuple(it-1, it, it+1)
             template <typename Iterator>
-            typename result<Iterator>::type
-            operator()(Iterator const& it) const
+            typename result<Iterator>::type operator()(Iterator const& it) const
             {
                 typedef typename result<Iterator>::type type;
                 return type(*test::previous(it), *it, *test::next(it));
             }
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator,
@@ -73,53 +68,48 @@ namespace test
 
         explicit stencil3_iterator(Iterator const& it)
           : base_type(it, Transformer())
-        {}
+        {
+        }
 
         stencil3_iterator(Iterator const& it, Transformer const& t)
           : base_type(it, t)
-        {}
+        {
+        }
     };
 
     template <typename Iterator, typename Transformer>
-    inline stencil3_iterator<Iterator, Transformer>
-    make_stencil3_iterator(Iterator const& it, Transformer const& t)
+    inline stencil3_iterator<Iterator, Transformer> make_stencil3_iterator(
+        Iterator const& it, Transformer const& t)
     {
         return stencil3_iterator<Iterator, Transformer>(it, t);
     }
 
     template <typename Iterator, typename Transformer>
-    inline std::pair<
-        stencil3_iterator<Iterator, Transformer>,
-        stencil3_iterator<Iterator, Transformer>
-    >
-    make_stencil3_range(Iterator const& begin, Iterator const& end,
-        Transformer const& t)
+    inline std::pair<stencil3_iterator<Iterator, Transformer>,
+        stencil3_iterator<Iterator, Transformer>>
+    make_stencil3_range(
+        Iterator const& begin, Iterator const& end, Transformer const& t)
     {
         return std::make_pair(
-            make_stencil3_iterator(begin, t),
-            make_stencil3_iterator(end, t));
+            make_stencil3_iterator(begin, t), make_stencil3_iterator(end, t));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
-    inline stencil3_iterator<Iterator>
-    make_stencil3_iterator(Iterator const& it)
+    inline stencil3_iterator<Iterator> make_stencil3_iterator(
+        Iterator const& it)
     {
         return stencil3_iterator<Iterator>(it);
     }
 
     template <typename Iterator>
-    inline std::pair<
-        stencil3_iterator<Iterator>,
-        stencil3_iterator<Iterator>
-    >
+    inline std::pair<stencil3_iterator<Iterator>, stencil3_iterator<Iterator>>
     make_stencil3_range(Iterator const& begin, Iterator const& end)
     {
         return std::make_pair(
-            make_stencil3_iterator(begin),
-            make_stencil3_iterator(end));
+            make_stencil3_iterator(begin), make_stencil3_iterator(end));
     }
-}
+}    // namespace test
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_stencil3_iterator()
@@ -127,33 +117,30 @@ void test_stencil3_iterator()
     std::vector<int> values(10);
     std::iota(std::begin(values), std::end(values), 0);
 
-    auto r = test::make_stencil3_range(values.begin()+1, values.end()-1);
+    auto r = test::make_stencil3_range(values.begin() + 1, values.end() - 1);
 
     typedef std::iterator_traits<decltype(r.first)>::reference reference;
 
     std::ostringstream str;
 
-    std::for_each(r.first, r.second,
-        [&str](reference val)
-        {
-            using hpx::util::get;
-            str << get<0>(val) << get<1>(val) << get<2>(val) << " ";
-        });
+    std::for_each(r.first, r.second, [&str](reference val) {
+        using hpx::util::get;
+        str << get<0>(val) << get<1>(val) << get<2>(val) << " ";
+    });
 
     HPX_TEST_EQ(str.str(), std::string("012 123 234 345 456 567 678 789 "));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace test
-{
+namespace test {
     template <typename F>
     struct custom_stencil_transformer
     {
         template <typename Iterator>
         struct result
         {
-            typedef typename std::iterator_traits<Iterator>::reference
-                element_type;
+            typedef
+                typename std::iterator_traits<Iterator>::reference element_type;
             typedef typename hpx::util::invoke_result<F, element_type>::type
                 value_type;
 
@@ -162,12 +149,12 @@ namespace test
 
         custom_stencil_transformer(F f)
           : f_(std::move(f))
-        {}
+        {
+        }
 
         // it will dereference tuple(it-1, it, it+1)
         template <typename Iterator>
-        typename result<Iterator>::type
-        operator()(Iterator const& it) const
+        typename result<Iterator>::type operator()(Iterator const& it) const
         {
             typedef typename result<Iterator>::type type;
             return type(f_(*test::previous(it)), *it, f_(*test::next(it)));
@@ -178,35 +165,34 @@ namespace test
 
     template <typename F>
     inline custom_stencil_transformer<typename hpx::util::decay<F>::type>
-    make_custom_stencil_transformer(F && f)
+    make_custom_stencil_transformer(F&& f)
     {
-        typedef custom_stencil_transformer<
-                typename hpx::util::decay<F>::type>
+        typedef custom_stencil_transformer<typename hpx::util::decay<F>::type>
             transformer_type;
         return transformer_type(std::forward<F>(f));
     }
-}
+}    // namespace test
 
 void test_stencil3_iterator_custom()
 {
     std::vector<int> values(10);
     std::iota(std::begin(values), std::end(values), 0);
 
-    auto t = test::make_custom_stencil_transformer([](int i) -> int { return 2*i; });
-    auto r = test::make_stencil3_range(values.begin()+1, values.end()-1, t);
+    auto t = test::make_custom_stencil_transformer(
+        [](int i) -> int { return 2 * i; });
+    auto r = test::make_stencil3_range(values.begin() + 1, values.end() - 1, t);
 
     typedef std::iterator_traits<decltype(r.first)>::reference reference;
 
     std::ostringstream str;
 
-    std::for_each(r.first, r.second,
-        [&str](reference val)
-        {
-            using hpx::util::get;
-            str << get<0>(val) << get<1>(val) << get<2>(val) << " ";
-        });
+    std::for_each(r.first, r.second, [&str](reference val) {
+        using hpx::util::get;
+        str << get<0>(val) << get<1>(val) << get<2>(val) << " ";
+    });
 
-    HPX_TEST_EQ(str.str(), std::string("014 226 438 6410 8512 10614 12716 14818 "));
+    HPX_TEST_EQ(
+        str.str(), std::string("014 226 438 6410 8512 10614 12716 14818 "));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
