@@ -642,19 +642,19 @@ Parallel algorithms
      * In header
      * Algorithm page at cppreference.com
    * * :cpp:func:`hpx::parallel::v1::is_partitioned`
-     * Returns ``true`` if each true element for a predicate precedes the false elements in a range
+     * Returns ``true`` if each true element for a predicate precedes the false elements in a range.
      * ``<hpx/include/parallel_is_partitioned.hpp>``
      * :cppreference-algorithm:`is_partitioned`
    * * :cpp:func:`hpx::parallel::v1::partition`
-     * Divides elements into two groups while don't preserve their relative order
+     * Divides elements into two groups while don't preserve their relative order.
      * ``<hpx/include/parallel_partition.hpp>``
      * :cppreference-algorithm:`partition`
    * * :cpp:func:`hpx::parallel::v1::partition_copy`
-     * Copies a range dividing the elements into two groups
+     * Copies a range dividing the elements into two groups.
      * ``<hpx/include/parallel_partition.hpp>``
      * :cppreference-algorithm:`partition_copy`
    * * :cpp:func:`hpx::parallel::v1::stable_partition`
-     * Divides elements into two groups while preserving their relative order
+     * Divides elements into two groups while preserving their relative order.
      * ``<hpx/include/parallel_partition.hpp>``
      * :cppreference-algorithm:`stable_partition`
 
@@ -665,19 +665,19 @@ Parallel algorithms
      * In header
      * Algorithm page at cppreference.com
    * * :cpp:func:`hpx::parallel::v1::is_sorted`
-     * Returns ``true`` if each element in a range is sorted
+     * Returns ``true`` if each element in a range is sorted.
      * ``<hpx/include/parallel_is_sorted.hpp>``
      * :cppreference-algorithm:`is_sorted`
    * * :cpp:func:`hpx::parallel::v1::is_sorted_until`
-     * Returns the first unsorted element
+     * Returns the first unsorted element.
      * ``<hpx/include/parallel_is_sorted.hpp>``
      * :cppreference-algorithm:`is_sorted_until`
    * * :cpp:func:`hpx::parallel::v1::sort`
-     * Sorts the elements in a range
+     * Sorts the elements in a range.
      * ``<hpx/include/parallel_sort.hpp>``
      * :cppreference-algorithm:`sort`
    * * :cpp:func:`hpx::parallel::v1::sort_by_key`
-     * Sorts one range of data using keys supplied in another range
+     * Sorts one range of data using keys supplied in another range.
      * ``<hpx/include/parallel_sort.hpp>``
      *
 
@@ -701,7 +701,7 @@ Parallel algorithms
        with a reduction to output only the final sum for each key. The key
        sequence ``{1,1,1,2,3,3,3,3,1}`` and value sequence
        ``{2,3,4,5,6,7,8,9,10}`` would be reduced to ``keys={1,2,3,1}``,
-       ``values={9,5,30,10}``
+       ``values={9,5,30,10}``.
      * ``<hpx/include/parallel_reduce.hpp>``
      *
    * * :cpp:func:`hpx::parallel::v1::transform_reduce`
@@ -795,9 +795,9 @@ Parallel algorithms
 Executor parameters and executor parameter traits
 -------------------------------------------------
 
-In |hpx| we introduce the notion of execution parameters and execution parameter
-traits. At this point, the only parameter which can be customized is the size of
-the chunks of work executed on a single |hpx|-thread (such as the number of loop
+|hpx| introduces the notion of execution parameters and execution parameter
+traits. At this point, the only parameter that can be customized is the size of
+the chunks of work executed on a single |hpx| thread (such as the number of loop
 iterations combined to run as a single task).
 
 An executor parameter object is responsible for exposing the calculation of the
@@ -809,7 +809,7 @@ are implemented. All functionalities of concrete executor parameter types are
 exposed and accessible through a corresponding
 :cpp:class:`hpx::parallel::executor_parameter_traits` type.
 
-With ``executor_parameter_traits`` clients access all types of executor
+With ``executor_parameter_traits``, clients access all types of executor
 parameters uniformly::
 
     std::size_t chunk_size =
@@ -817,53 +817,53 @@ parameters uniformly::
             my_executor, [](){ return 0; }, num_tasks);
 
 This call synchronously retrieves the size of a single chunk of loop iterations
-(or similar) to combine for execution on a single |hpx|-thread if the overall
+(or similar) to combine for execution on a single |hpx| thread if the overall
 number of tasks to schedule is given by ``num_tasks``. The lambda function
 exposes a means of test-probing the execution of a single iteration for
-performance measurement purposes (the execution parameter type might dynamically
+performance measurement purposes. The execution parameter type might dynamically
 determine the execution time of one or more tasks in order to calculate the
-chunk size, see :cpp:class:`hpx::parallel::execution::auto_chunk_size` for an
-example of such a executor parameter type).
+chunk size; see :cpp:class:`hpx::parallel::execution::auto_chunk_size` for an
+example of this executor parameter type.
 
-Other functions in the interface exist to discover whether a executor parameter
-type should be invoked once (i.e. returns a static chunk size, see
+Other functions in the interface exist to discover whether an executor parameter
+type should be invoked once (i.e., it returns a static chunk size; see
 :cpp:class:`hpx::parallel::execution::static_chunk_size`) or whether it should
-be invoked for each scheduled chunk of work (i.e. it returns a variable chunk
-size, for an example, see
+be invoked for each scheduled chunk of work (i.e., it returns a variable chunk
+size; for an example, see
 :cpp:class:`hpx::parallel::execution::guided_chunk_size`).
 
-Though this interface appears to require executor parameter type authors to
-implement all different basic operations, there is really none required. In
+Although this interface appears to require executor parameter type authors to
+implement all different basic operations, none are required. In
 practice, all operations have sensible defaults. However, some executor
 parameter types will naturally specialize all operations for maximum efficiency.
 
-In |hpx| we have implemented the following executor parameter types:
+|hpx|  implements the following executor parameter types:
 
 * :cpp:class:`hpx::parallel::execution::auto_chunk_size`: Loop iterations are
   divided into pieces and then assigned to threads. The number of loop
   iterations combined is determined based on measurements of how long the
   execution of 1% of the overall number of iterations takes. This executor
-  parameters type makes sure that as many loop iterations are combined as
+  parameter type makes sure that as many loop iterations are combined as
   necessary to run for the amount of time specified.
 * :cpp:class:`hpx::parallel::execution::static_chunk_size`: Loop iterations are
   divided into pieces of a given size and then assigned to threads. If the size
-  is not specified, the iterations are evenly (if possible) divided contiguously
+  is not specified, the iterations are, if possible, evenly divided contiguously
   among the threads. This executor parameters type is equivalent to OpenMP's
   STATIC scheduling directive.
 * :cpp:class:`hpx::parallel::execution::dynamic_chunk_size`: Loop iterations are
   divided into pieces of a given size and then dynamically scheduled among the
   cores; when a core finishes one chunk, it is dynamically assigned another. If
   the size is not specified, the default chunk size is 1. This executor
-  parameters type is equivalent to OpenMP's DYNAMIC scheduling directive.
+  parameter type is equivalent to OpenMP's DYNAMIC scheduling directive.
 * :cpp:class:`hpx::parallel::execution::guided_chunk_size`: Iterations are
   dynamically assigned to cores in blocks as cores request them until no blocks
-  remain to be assigned. Similar to ``dynamic_chunk_size`` except that the block
+  remain to be assigned. This is similar to ``dynamic_chunk_size`` except that the block
   size decreases each time a number of loop iterations is given to a thread. The
   size of the initial block is proportional to ``number_of_iterations /
   number_of_cores``. Subsequent blocks are proportional to
   ``number_of_iterations_remaining / number_of_cores``. The optional chunk size
   parameter defines the minimum block size. The default minimal chunk size is 1.
-  This executor parameters type is equivalent to OpenMP's GUIDED scheduling
+  This executor parameter type is equivalent to OpenMP's GUIDED scheduling
   directive.
 
 .. _using_task_block:
