@@ -13,7 +13,7 @@ Writing single-node |hpx| applications
 
 |hpx| is a C++ Standard Library for Concurrency and Parallelism. This means that
 it implements all of the corresponding facilities as defined by the C++
-Standard. Additionally, in |hpx| we implement functionalities proposed as part
+Standard. Additionally, |hpx| implements functionalities proposed as part
 of the ongoing C++ standardization process. This section focuses on the features
 available in |hpx| for parallel and concurrent computation on a single node,
 although many of the features presented here are also implemented to work in the
