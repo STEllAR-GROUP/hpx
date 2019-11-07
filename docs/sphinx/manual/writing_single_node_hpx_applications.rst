@@ -24,9 +24,9 @@ distributed case.
 Using :term:`LCO`\ s
 ====================
 
-:term:`Lightweight Control Object`\ s provide synchronization for HPX applications. Most
+:term:`Lightweight Control Object`\ s (LCOs) provide synchronization for |hpx| applications. Most
 of them are familiar from other frameworks, but a few of them work in slightly
-special different ways adapted to HPX.
+different ways adapted to |hpx|.
 
 #. ``future``
 
@@ -69,7 +69,7 @@ independent places in the program::
         done.get();             // wait for thread to be done
     }
 
-A channel component is created on one :term:`locality` and can be send to
+A channel component is created on one :term:`locality` and can be sent to
 another :term:`locality` using an action. This example also demonstrates how a
 channel can be used as a range of values::
 
@@ -157,7 +157,7 @@ and multicore components where today's C++ libraries are still lacking.
 
 The functionality of ``std::future`` offers a partial solution. It allows for
 the separation of the initiation of an operation and the act of waiting for its
-result; however the act of waiting is synchronous. In communication-intensive
+result; however, the act of waiting is synchronous. In communication-intensive
 code this act of waiting can be unpredictable, inefficient and simply
 frustrating. The example below illustrates a possible synchronous wait using
 futures::
@@ -183,7 +183,7 @@ asynchronous operations to ``hpx::future``, ``hpx::shared_future`` and
      * In asynchronous programming, it is very common for one asynchronous
        operation, on completion, to invoke a second operation and pass data to
        it. The current C++ standard does not allow one to register a
-       continuation to a future. With ``then`` instead of waiting for the result,
+       continuation to a future. With ``then``, instead of waiting for the result,
        a continuation is "attached" to the asynchronous operation, which is
        invoked when the result is ready. Continuations registered using then
        function will help to avoid blocking waits or wasting threads on polling,
@@ -192,8 +192,8 @@ asynchronous operations to ``hpx::future``, ``hpx::shared_future`` and
      * In some scenarios, you might want to create a future that returns another
        future, resulting in nested futures. Although it is possible to write
        code to unwrap the outer future and retrieve the nested future and its
-       result, such code is not easy to write because you must handle exceptions
-       and it may cause a blocking call. Unwrapping can allow us to mitigate
+       result, such code is not easy to write because users must handle exceptions
+       and it may cause a blocking call. Unwrapping can allow users to mitigate
        this problem by doing an asynchronous call to unwrap the outermost
        future.
    * * ``hpx::future::is_ready``
@@ -205,7 +205,7 @@ asynchronous operations to ``hpx::future``, ``hpx::shared_future`` and
    * * ``hpx::make_ready_future``
      * Some functions may know the value at the point of construction. In these
        cases the value is immediately available, but needs to be returned as a
-       future. By using ``hpx::make_ready_future`` a future can be created which
+       future. By using ``hpx::make_ready_future`` a future can be created that
        holds a pre-computed result in its shared state. In the current standard
        it is non-trivial to create a future directly from a value. First a
        promise must be created, then the promise is set, and lastly the future
@@ -218,7 +218,7 @@ language. Not including these functions is synonymous to Boolean algebra without
 AND/OR.
 
 In addition to the extensions proposed by |cpp11_n4107|_, |hpx| adds functions
-allowing to compose several futures in a more flexible way.
+allowing users to compose several futures in a more flexible way.
 
 .. list-table:: Facilities for composing ``hpx::future``\ s
 
@@ -263,7 +263,7 @@ allowing to compose several futures in a more flexible way.
 High level parallel facilities
 ==============================
 
-In preparation for the upcoming C++ Standards we currently see several proposals
+In preparation for the upcoming C++ Standards, there are currently several proposals
 targeting different facilities supporting parallel programming. |hpx| implements
 (and extends) some of those proposals. This is well aligned with our strategy to
 align the APIs exposed from |hpx| with current and future C++ Standards.
@@ -292,7 +292,7 @@ which is declared in the (inline) namespace ``hpx::parallel::v1``.
 
 .. note::
 
-   For compilers which do not support inline namespaces, all of the ``namespace
+   For compilers that do not support inline namespaces, all of the ``namespace
    v1`` is imported into the namespace ``hpx::parallel``. The effect is similar
    to what inline namespaces would do, namely all names defined in
    ``hpx::parallel::v1`` are accessible from the namespace ``hpx::parallel`` as
@@ -313,16 +313,16 @@ execution policy object of type |sequenced_execution_policy| or
 The applications of function objects in parallel algorithms invoked with an
 execution policy object of type |parallel_execution_policy| or
 |parallel_task_execution_policy| are permitted to execute in an unordered
-fashion in unspecified threads, and indeterminately sequenced within each
+fashion in unspecified threads, and are indeterminately sequenced within each
 thread.
 
 .. important::
 
-   It is the caller's responsibility to ensure correctness, for example that the
+   It is the caller's responsibility to ensure correctness, such as making sure that the
    invocation does not introduce data races or deadlocks.
 
 The applications of function objects in parallel algorithms invoked with an
-execution policy of type |parallel_unsequenced_execution_policy| is in |hpx|
+execution policy of type |parallel_unsequenced_execution_policy| is, in |hpx|,
 equivalent to the use of the execution policy |parallel_execution_policy|.
 
 Algorithms invoked with an execution policy object of type |execution_policy|
@@ -351,10 +351,10 @@ algorithm:
   be called.
 * If the execution policy object is of type |sequenced_execution_policy|,
   |sequenced_task_execution_policy|, |parallel_execution_policy|, or
-  |parallel_task_execution_policy| the execution of the algorithm terminates
+  |parallel_task_execution_policy|, the execution of the algorithm terminates
   with an |exception_list| exception. All uncaught exceptions thrown during the
   application of user-provided function objects shall be contained in the
-  |exception_list|
+  |exception_list|.
 
 For example, the number of invocations of the user-provided function object in
 for_each is unspecified. When |par_for_each| is executed sequentially, only one
@@ -463,7 +463,7 @@ Parallel algorithms
      * ``<hpx/include/parallel_search.hpp>``
      * :cppreference-algorithm:`search_n`
 
-.. list-table:: Modifying Parallel Algorithms (In Header: `<hpx/include/parallel_algorithm.hpp>`)
+.. list-table:: Modifying parallel algorithms (In Header: `<hpx/include/parallel_algorithm.hpp>`)
 
    * * Name
      * Description
