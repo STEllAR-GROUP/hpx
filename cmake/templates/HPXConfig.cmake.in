@@ -49,6 +49,15 @@ set(HPX_Fortran_COMPILER_VERSION "@CMAKE_Fortran_COMPILER_VERSION@" CACHE STRING
 # Setup the imported libraries (publicly linked) #
 
 # Allocator
+set(HPX_JEMALLOC_ROOT "@JEMALLOC_ROOT@")
+set(HPX_TCMALLOC_ROOT "@TCMALLOC_ROOT@")
+set(HPX_TBBMALLOC_ROOT "@TBBMALLOC_ROOT@")
+# Special handle for mimalloc cause we can't specify HPX_MIMALLOC_ROOT as a HINT
+# to find_package
+set(HPX_MIMALLOC_ROOT "@MIMALLOC_ROOT@")
+if (NOT MIMALLOC_ROOT AND NOT "$ENV{MIMALLOC_ROOT}")
+  set(MIMALLOC_ROOT ${HPX_MIMALLOC_ROOT})
+endif()
 include(HPX_SetupAllocator)
 
 # Boost
