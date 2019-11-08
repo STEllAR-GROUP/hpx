@@ -39,6 +39,7 @@ set(HPX_LIBS
   local_lcos
   logging
   memory
+  naming_base
   plugin
   preprocessor
   program_options

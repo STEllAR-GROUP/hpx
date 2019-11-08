@@ -9,7 +9,9 @@
 #define HPX_RUNTIME_NAMING_FWD_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/naming_base.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
+#include <hpx/naming_base.hpp>
 
 #include <cstdint>
 
@@ -28,12 +30,6 @@ namespace hpx
         struct HPX_EXPORT address;
 
         HPX_API_EXPORT resolver_client& get_agas_client();
-
-        using component_type = std::int32_t;
-        using address_type = std::uint64_t;
-
-        HPX_CONSTEXPR_OR_CONST std::uint32_t invalid_locality_id =
-            ~static_cast<std::uint32_t>(0);
 
         // tag used to mark serialization archive during check-pointing
         struct checkpointing_tag {};
