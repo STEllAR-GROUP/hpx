@@ -14,30 +14,30 @@ Writing distributed |hpx| applications
 
 This section focuses on the features of |hpx| needed to write distributed
 applications, namely the :term:`Active Global Address Space` (:term:`AGAS`),
-remotely executable functions (i.e. :term:`actions <action>`), and distributed
-objects (i.e. :term:`components <component>`).
+remotely executable functions (i.e., :term:`actions <action>`), and distributed
+objects (i.e., :term:`components <component>`).
 
 .. _global_names:
 
 Global names
 ============
 
-|hpx| implements an :term:`Active Global Address Space` (:term:`AGAS`) which is
-exposing a single uniform address space spanning all localities an application
-runs on. :term:`AGAS` is a fundamental component of the ParalleX execution
+|hpx| implements an :term:`Active Global Address Space` (:term:`AGAS`) which
+exposes a single uniform address space spanning all localities an application
+runs on. AGAS is a fundamental component of the ParalleX execution
 model. Conceptually, there is no rigid demarcation of local or global memory in
-:term:`AGAS`; all available memory is a part of the same address space.
-:term:`AGAS` enables named objects to be moved (migrated) across localities
-without having to change the object's name, i.e., no references to migrated
+AGAS; all available memory is a part of the same address space.
+AGAS enables named objects to be moved (migrated) across localities
+without having to change the object's name; i.e., no references to migrated
 objects have to be ever updated. This feature has significance for dynamic load
 balancing and in applications where the workflow is highly dynamic, allowing
 work to be migrated from heavily loaded nodes to less loaded nodes. In addition,
-immutability of names ensures that :term:`AGAS` does not have to keep extra
-indirections ("bread crumbs") when objects move, hence minimizing complexity of
+immutability of names ensures that AGAS does not have to keep extra
+indirections ("bread crumbs") when objects move, hence, minimizing complexity of
 code management for system developers as well as minimizing overheads in
 maintaining and managing aliases.
 
-The :term:`AGAS` implementation in |hpx| does not automatically expose every
+The AGAS implementation in |hpx| does not automatically expose every
 local address to the global address space. It is the responsibility of the
 programmer to explicitly define which of the objects have to be globally visible
 and which of the objects are purely local.
@@ -51,25 +51,25 @@ The only predefined global addresses are assigned to all localities. The
 following |hpx| API functions allow one to retrieve the global addresses of
 localities:
 
-* :cpp:func:`hpx::find_here`: retrieve the global address of the
+* :cpp:func:`hpx::find_here`: retrieves the global address of the
   :term:`locality` this function is called on.
-* :cpp:func:`hpx::find_all_localities()`: retrieve the global addresses of all
+* :cpp:func:`hpx::find_all_localities()`: retrieves the global addresses of all
   localities available to this application (including the :term:`locality` the
   function is being called on).
-* :cpp:func:`hpx::find_remote_localities()`: retrieve the global addresses of
+* :cpp:func:`hpx::find_remote_localities()`: retrieves the global addresses of
   all remote localities available to this application (not including the
-  :term:`locality` the function is being called on)
-* :cpp:func:`hpx::get_num_localities()`: retrieve the number of localities
+  :term:`locality` the function is being called on).
+* :cpp:func:`hpx::get_num_localities()`: retrieves the number of localities
   available to this application.
-* :cpp:func:`hpx::find_locality()`: retrieve the global address of any
+* :cpp:func:`hpx::find_locality()`: retrieves the global address of any
   :term:`locality` supporting the given component type.
-* :cpp:func:`hpx::get_colocation_id()`: retrieve the global address of the
+* :cpp:func:`hpx::get_colocation_id()`: retrieves the global address of the
   :term:`locality` currently hosting the object with the given global address.
 
 Additionally, the global addresses of localities can be used to create new
 instances of components using the following |hpx| API function:
 
-* :cpp:func:`hpx::components::new_()`: Create a new instance of the given
+* :cpp:func:`hpx::components::new_()`: Creates a new instance of the given
   ``Component`` type on the specified :term:`locality`.
 
 .. note::
@@ -77,7 +77,7 @@ instances of components using the following |hpx| API function:
    |hpx| does not expose any functionality to delete component instances. All
    global addresses (as represented using ``hpx::id_type``) are automatically
    garbage collected. When the last (global) reference to a particular component
-   instance goes out of scope the corresponding component instance is
+   instance goes out of scope, the corresponding component instance is
    automatically deleted.
 
 .. _applying_actions:
@@ -90,7 +90,7 @@ Applying actions
 Action type definition
 ----------------------
 
-Actions are special types we use to describe possibly remote operations. For
+Actions are special types used to describe possibly remote operations. For
 every global function and every member function which has to be invoked
 distantly, a special type must be defined. For any global function the special
 macro :c:macro:`HPX_PLAIN_ACTION` can be used to define the
@@ -158,8 +158,8 @@ The shown code defines an action type ``some_global_action`` inside the namespac
    to comprise a globally unique C++ identifier representing the action. This is
    used for serialization purposes.
 
-For member functions of objects which have been registered with :term:`AGAS`
-(e.g. 'components') a different registration macro
+For member functions of objects which have been registered with AGAS
+(e.g., 'components'), a different registration macro
 :c:macro:`HPX_DEFINE_COMPONENT_ACTION` has to be utilized. Any component needs
 to be declared in a header file and have some special support macros defined in
 a source file. Here is an example demonstrating this. The first snippet has to
@@ -187,7 +187,7 @@ go into the header file::
     //       C++ identifiers
     HPX_REGISTER_ACTION_DECLARATION(app::some_component::some_member_action, some_component_some_action);
 
-The next snippet belongs into a source file (e.g. the main application source
+The next snippet belongs in a source file (e.g., the main application source
 file) in the simplest case::
 
     typedef hpx::components::component<app::some_component> component_type;
@@ -200,12 +200,12 @@ file) in the simplest case::
     typedef some_component::some_member_action some_component_some_action;
     HPX_REGISTER_ACTION(some_component_some_action);
 
-Granted, these macro invocations are a bit more complex than for simple global
-functions, however we believe they are still manageable.
+While these macro invocations are a bit more complex than those for simple global
+functions, they should still be manageable.
 
 The most important macro invocation is the :c:macro:`HPX_DEFINE_COMPONENT_ACTION` in the header file
-as this defines the action type we need to invoke the member function. For a
-complete example of a simple component action see [hpx_link
+as this defines the action type needed to invoke the member function. For a
+complete example of a simple component action, see [hpx_link
 examples/quickstart/component_in_executable.cpp..component_in_executable.cpp]
 
 .. _action_invocation:
