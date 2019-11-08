@@ -10,7 +10,7 @@
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <cstddef>

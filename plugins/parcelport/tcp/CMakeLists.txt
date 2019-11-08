@@ -34,6 +34,7 @@ if(HPX_WITH_PARCELPORT_TCP)
       hpx_program_options
       hpx_serialization
       hpx_timing
+      hpx_threadmanager
       hpx_topology
       hpx_util
     INCLUDE_DIRS

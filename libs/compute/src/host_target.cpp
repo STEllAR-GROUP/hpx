@@ -7,10 +7,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/compute/host/target.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/topology/topology.hpp>
 

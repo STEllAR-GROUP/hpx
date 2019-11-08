@@ -6,9 +6,10 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/functional/bind.hpp>
+#include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/threadmanager.hpp>
 
 #include <cstddef>
 #include <cstdint>

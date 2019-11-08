@@ -280,10 +280,6 @@ namespace hpx { namespace threads {
         thread_id_type const& id, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    // Return the number of the NUMA node the current thread is running on
-    HPX_API_EXPORT std::size_t get_numa_node_number();
-
-    ///////////////////////////////////////////////////////////////////////////
     /// Returns whether the given thread can be interrupted at this point.
     ///
     /// \param id         [in] The thread id of the thread which should be

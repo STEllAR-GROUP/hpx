@@ -45,8 +45,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/migrate_component.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/new.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/naming/unmanaged.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/resource/partitioner.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/resource/partitioner_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/policies/scheduler_mode.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_helpers.hpp"

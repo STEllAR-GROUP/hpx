@@ -19,6 +19,7 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/threadmanager.hpp>
 
 #include <cstddef>
 #include <cstdint>
