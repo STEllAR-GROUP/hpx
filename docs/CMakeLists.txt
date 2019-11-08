@@ -63,7 +63,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal_async.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/unwrap.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/util/unwrapped.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
 
 foreach(doxygen_input ${doxygen_dependencies})
