@@ -82,6 +82,9 @@ include(HPX_SetupHwloc)
 # Papi
 set(HPX_PAPI_ROOT "@PAPI_ROOT@")
 include(HPX_SetupPapi)
+
+# CUDA
+include(HPX_SetupCUDA)
 ##################################################
 
 set(HPX_WITH_MALLOC_DEFAULT @HPX_WITH_MALLOC@)
@@ -103,27 +106,6 @@ hpx_setup_allocator()
 
 if(NOT DEFINED ${CMAKE_FIND_PACKAGE_NAME}_FOUND)
   set(${CMAKE_FIND_PACKAGE_NAME}_FOUND true)
-endif()
-
-# Set variables used by nvcc
-if(HPX_WITH_CUDA)
-  find_package(CUDA REQUIRED)
-  set(CUDA_SEPARABLE_COMPILATION ON)
-  set(CUDA_NVCC_FLAGS @CUDA_NVCC_FLAGS@)
-  # The following is a workaround to make sure that target_link_libraries in
-  # cuda_add_executable/library is called with a link keyword, not with a
-  # plain signature. From CMake 3.9 onwards this can be done officially with
-  # the CUDA_LINK_LIBRARIES_KEYWORD. For older versions we can emulate this by
-  # prepending a link keyword to CUDA_LIBRARIES.
-  #
-  # See
-  # https://gitlab.kitware.com/cmake/cmake/commit/9f41bfd7b9e6e8a7545f741f872949d2ae801978
-  # and https://gitlab.kitware.com/cmake/cmake/issues/16602 for more details.
-  if(CMAKE_VERSION VERSION_LESS "3.9")
-    set(CUDA_LIBRARIES PUBLIC ${CUDA_LIBRARIES})
-  else()
-    set(CUDA_LINK_LIBRARIES_KEYWORD PUBLIC)
-  endif()
 endif()
 
 # Set legacy variables for linking and include directories
