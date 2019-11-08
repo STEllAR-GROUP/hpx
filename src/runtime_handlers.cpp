@@ -12,9 +12,11 @@
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/runtime_handlers.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/debugging.hpp>
@@ -102,4 +104,17 @@ namespace hpx { namespace detail {
         return threads::get_self_ptr() != nullptr;
     }
 #endif
+
+    threads::thread_pool_base* get_default_pool()
+    {
+        hpx::runtime* rt = get_runtime_ptr();
+        if (rt == nullptr)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::detail::get_default_pool",
+                "The runtime system is not active");
+        }
+
+        return &rt->get_thread_manager().default_pool();
+    }
 }}    // namespace hpx::detail

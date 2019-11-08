@@ -100,7 +100,7 @@ namespace hpx { namespace parallel { namespace execution {
                 f, "parallel_executor_aggregated::post");
 
             detail::post_policy_dispatch<Policy>::call(
-                desc, Policy{}, std::forward<F>(f), std::forward<Ts>(ts)...);
+                Policy{}, desc, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
     private:
@@ -298,7 +298,7 @@ namespace hpx { namespace parallel { namespace execution {
                 f, "parallel_executor_aggregated::post");
 
             detail::post_policy_dispatch<hpx::launch>::call(
-                desc, policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
+                policy_, desc, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
     private:
@@ -355,7 +355,7 @@ namespace hpx { namespace parallel { namespace execution {
                 for (std::size_t i = 0; i != size; ++i, ++it)
                 {
                     detail::post_policy_dispatch<hpx::launch>::call(
-                        desc, policy_, [&, it]() -> void {
+                        policy_, desc, [&, it]() -> void {
                             // properly handle all exceptions thrown from 'f'
                             try
                             {
@@ -392,7 +392,7 @@ namespace hpx { namespace parallel { namespace execution {
                     while (size > chunk_size)
                     {
                         detail::post_policy_dispatch<hpx::launch>::call(
-                            desc, policy_, [&, chunk_size, num_tasks, it] {
+                            policy_, desc, [&, chunk_size, num_tasks, it] {
                                 spawn_hierarchical(l, chunk_size, num_tasks, f,
                                     it, e, mtx_e, ts...);
                             });

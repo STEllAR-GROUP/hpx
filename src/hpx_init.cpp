@@ -603,6 +603,8 @@ namespace hpx
 #if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
             set_error_handlers();
 #endif
+            hpx::threads::detail::set_get_default_pool(
+                &detail::get_default_pool);
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
             unsetenv("LANG");

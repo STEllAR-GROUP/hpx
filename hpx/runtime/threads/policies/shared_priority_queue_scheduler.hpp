@@ -1187,7 +1187,7 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t thread_num) override
         {
-            std::unique_lock<hpx::lcos::local::spinlock> lock(init_mutex);
+            std::unique_lock<std::mutex> lock(init_mutex);
             if (!initialized_)
             {
                 initialized_ = true;
@@ -1351,7 +1351,7 @@ namespace hpx { namespace threads { namespace policies {
 
         // used to make sure the scheduler is only initialized once on a thread
         bool initialized_;
-        hpx::lcos::local::spinlock init_mutex;
+        std::mutex init_mutex;
     };
 }}}
 #endif

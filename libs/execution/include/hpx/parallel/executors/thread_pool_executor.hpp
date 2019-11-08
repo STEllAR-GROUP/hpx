@@ -7,8 +7,8 @@
 
 /// \file parallel/executors/parallel_executor.hpp
 
-#if !defined(HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_MAY_13_2015_1057AM)
-#define HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_MAY_13_2015_1057AM
+#if !defined(HPX_THREAD_POOL_EXECUTOR_HPP)
+#define HPX_THREAD_POOL_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
@@ -39,52 +39,21 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { namespace execution {
-    namespace detail {
-        template <typename Policy>
-        struct get_default_policy
-        {
-            static HPX_CONSTEXPR Policy call()
-            {
-                return Policy{};
-            }
-        };
-
-        template <>
-        struct get_default_policy<hpx::launch>
-        {
-            static HPX_CONSTEXPR hpx::launch::async_policy call()
-            {
-                return hpx::launch::async_policy{};
-            }
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Shape, typename... Ts>
-        struct bulk_function_result;
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Shape, typename Future, typename... Ts>
-        struct bulk_then_execute_result;
-
-        template <typename F, typename Shape, typename Future, typename... Ts>
-        struct then_bulk_function_result;
-    }    // namespace detail
-
     ///////////////////////////////////////////////////////////////////////////
-    /// A \a parallel_executor creates groups of parallel execution agents
+    /// A \a thread_pool_executor creates groups of parallel execution agents
     /// which execute in threads implicitly created by the executor. This
     /// executor prefers continuing with the creating thread first before
     /// executing newly created threads.
     ///
     /// This executor conforms to the concepts of a TwoWayExecutor,
     /// and a BulkTwoWayExecutor
-    template <typename Policy>
-    struct parallel_policy_executor
+    struct thread_pool_executor
     {
         /// Associate the parallel_execution_tag executor tag type as a default
         /// with this executor.
@@ -95,28 +64,23 @@ namespace hpx { namespace parallel { namespace execution {
         typedef static_chunk_size executor_parameters_type;
 
         /// Create a new parallel executor
-        HPX_CONSTEXPR explicit parallel_policy_executor(
-            Policy l = detail::get_default_policy<Policy>::call(),
-            std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
-          : policy_(l)
-          , num_spread_(spread)
-          , num_tasks_(tasks)
+        explicit thread_pool_executor(threads::thread_pool_base* pool)
+          : pool_(pool)
         {
         }
 
         /// \cond NOINTERNAL
-        bool operator==(parallel_policy_executor const& rhs) const noexcept
+        bool operator==(thread_pool_executor const& rhs) const noexcept
         {
-            return policy_ == rhs.policy_ && num_spread_ == rhs.num_spread_ &&
-                num_tasks_ == rhs.num_tasks_;
+            return pool_ == rhs.pool_;
         }
 
-        bool operator!=(parallel_policy_executor const& rhs) const noexcept
+        bool operator!=(thread_pool_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        parallel_policy_executor const& context() const noexcept
+        thread_pool_executor const& context() const noexcept
         {
             return *this;
         }
@@ -130,8 +94,10 @@ namespace hpx { namespace parallel { namespace execution {
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
         async_execute(F&& f, Ts&&... ts) const
         {
-            return hpx::detail::async_launch_policy_dispatch<Policy>::call(
-                policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
+            return hpx::detail::async_launch_policy_dispatch<decltype(
+                hpx::launch::async)>::call(hpx::launch::async, pool_,
+                threads::thread_schedule_hint{}, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename Future, typename... Ts>
@@ -150,7 +116,7 @@ namespace hpx { namespace parallel { namespace execution {
             typename hpx::traits::detail::shared_state_ptr<result_type>::type
                 p = lcos::detail::make_continuation_alloc_nounwrap<result_type>(
                     hpx::util::internal_allocator<>{},
-                    std::forward<Future>(predecessor), policy_,
+                    std::forward<Future>(predecessor), hpx::launch::async,
                     std::move(func));
 
             return hpx::traits::future_access<hpx::future<result_type>>::create(
@@ -164,8 +130,10 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::util::thread_description desc(
                 f, "hpx::parallel::execution::parallel_executor::post");
 
-            detail::post_policy_dispatch<Policy>::call(
-                policy_, desc, std::forward<F>(f), std::forward<Ts>(ts)...);
+            detail::post_policy_dispatch<decltype(hpx::launch::async)>::call(
+                hpx::launch::async, desc, pool_,
+                threads::thread_schedule_hint{}, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         // BulkTwoWayExecutor interface
@@ -174,36 +142,48 @@ namespace hpx { namespace parallel { namespace execution {
             typename detail::bulk_function_result<F, S, Ts...>::type>>
         bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
         {
-            std::size_t num_tasks = num_tasks_;
-            if (num_tasks == std::size_t(-1))
-            {
-                auto thrd_data = threads::get_self_id_data();
-                auto pool = thrd_data ?
-                    thrd_data->get_scheduler_base()->get_parent_pool() :
-                    &hpx::threads::get_thread_manager().default_pool();
-                num_tasks =
-                    (std::min)(std::size_t(128), pool->get_os_thread_count());
-            }
+            std::size_t const os_thread_count = pool_->get_os_thread_count();
+            hpx::util::thread_description const desc(f,
+                "hpx::parallel::execution::thread_pool_executor::bulk_async_"
+                "execute");
 
             typedef std::vector<hpx::future<
                 typename detail::bulk_function_result<F, S, Ts...>::type>>
                 result_type;
 
             result_type results;
-            std::size_t size = hpx::util::size(shape);
+            std::size_t const size = hpx::util::size(shape);
             results.resize(size);
 
-            lcos::local::latch l(size);
-            if (hpx::detail::has_async_policy(policy_))
+            lcos::local::latch l(os_thread_count);
+            std::size_t part_begin = 0;
+            auto it = std::begin(shape);
+            for (std::size_t t = 0; t < os_thread_count; ++t)
             {
-                spawn_hierarchical(results, l, 0, size, num_tasks, f,
-                    hpx::util::begin(shape), ts...);
+                std::size_t const part_end = ((t + 1) * size) / os_thread_count;
+                threads::thread_schedule_hint hint{
+                    static_cast<std::int16_t>(t)};
+                detail::post_policy_dispatch<decltype(
+                    hpx::launch::async)>::call(hpx::launch::async, desc, pool_,
+                    hint,
+
+                    [&, this, hint, part_begin, part_end, f, it]() mutable {
+                        for (std::size_t part_i = part_begin; part_i < part_end;
+                             ++part_i)
+                        {
+                            results[part_i] =
+                                hpx::detail::async_launch_policy_dispatch<
+                                    decltype(hpx::launch::async)>::
+                                    call(hpx::launch::async, pool_, hint, f,
+                                        *it, ts...);
+                            ++it;
+                        }
+                        l.count_down(1);
+                    });
+                std::advance(it, part_end - part_begin);
+                part_begin = part_end;
             }
-            else
-            {
-                spawn_sequential(
-                    results, l, 0, size, f, hpx::util::begin(shape), ts...);
-            }
+
             l.wait();
 
             return results;
@@ -245,7 +225,7 @@ namespace hpx { namespace parallel { namespace execution {
             shared_state_type p =
                 lcos::detail::make_continuation_alloc<vector_result_type>(
                     hpx::util::internal_allocator<>{},
-                    std::forward<Future>(predecessor), policy_,
+                    std::forward<Future>(predecessor), hpx::launch::async,
                     [HPX_CAPTURE_MOVE(func)](future_type&& predecessor) mutable
                     -> vector_result_type {
                         // use unwrap directly (instead of lazily) to avoid
@@ -255,98 +235,32 @@ namespace hpx { namespace parallel { namespace execution {
 
             return hpx::traits::future_access<result_future_type>::create(
                 std::move(p));
-        }
-        /// \endcond
-
-    protected:
-        /// \cond NOINTERNAL
-        template <typename Result, typename F, typename Iter, typename... Ts>
-        void spawn_sequential(std::vector<hpx::future<Result>>& results,
-            lcos::local::latch& l, std::size_t base, std::size_t size,
-            F const& func, Iter it, Ts const&... ts) const
-        {
-            // spawn tasks sequentially
-            HPX_ASSERT(base + size <= results.size());
-
-            for (std::size_t i = 0; i != size; ++i, ++it)
-            {
-                results[base + i] = async_execute(func, *it, ts...);
-            }
-
-            l.count_down(size);
-        }
-
-        template <typename Result, typename F, typename Iter, typename... Ts>
-        void spawn_hierarchical(std::vector<hpx::future<Result>>& results,
-            lcos::local::latch& l, std::size_t base, std::size_t size,
-            std::size_t num_tasks, F const& func, Iter it,
-            Ts const&... ts) const
-        {
-            if (size > num_tasks)
-            {
-                // spawn hierarchical tasks
-                std::size_t chunk_size = (size + num_spread_) / num_spread_ - 1;
-                chunk_size = (std::max)(chunk_size, num_tasks);
-
-                while (size > chunk_size)
-                {
-                    post([&, base, chunk_size, num_tasks, it] {
-                        spawn_hierarchical(results, l, base, chunk_size,
-                            num_tasks, func, it, ts...);
-                    });
-
-                    base += chunk_size;
-                    it = hpx::parallel::v1::detail::next(it, chunk_size);
-                    size -= chunk_size;
-                }
-            }
-
-            // spawn remaining tasks sequentially
-            spawn_sequential(results, l, base, size, func, it, ts...);
+            return hpx::make_ready_future();
         }
         /// \endcond
 
     private:
-        /// \cond NOINTERNAL
-        friend class hpx::serialization::access;
-
-        template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
-        {
-            // clang-format off
-            ar & policy_ & num_spread_ & num_tasks_;
-            // clang-format on
-        }
-        /// \endcond
-
-    private:
-        /// \cond NOINTERNAL
-        Policy policy_;
-        std::size_t num_spread_;
-        std::size_t num_tasks_;
-        /// \endcond
+        threads::thread_pool_base* pool_;
     };
-
-    using parallel_executor = parallel_policy_executor<hpx::launch>;
 }}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
-    template <typename Policy>
-    struct is_one_way_executor<
-        parallel::execution::parallel_policy_executor<Policy>> : std::true_type
+    template <>
+    struct is_one_way_executor<parallel::execution::thread_pool_executor>
+      : std::true_type
     {
     };
 
-    template <typename Policy>
-    struct is_two_way_executor<
-        parallel::execution::parallel_policy_executor<Policy>> : std::true_type
+    template <>
+    struct is_two_way_executor<parallel::execution::thread_pool_executor>
+      : std::true_type
     {
     };
 
-    template <typename Policy>
-    struct is_bulk_two_way_executor<
-        parallel::execution::parallel_policy_executor<Policy>> : std::true_type
+    template <>
+    struct is_bulk_two_way_executor<parallel::execution::thread_pool_executor>
+      : std::true_type
     {
     };
     /// \endcond

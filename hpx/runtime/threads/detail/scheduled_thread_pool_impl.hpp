@@ -119,8 +119,8 @@ namespace hpx { namespace threads { namespace detail
             if (!sched_->Scheduler::has_reached_state(state_suspended))
             {
                 // still running
-                lcos::local::no_mutex mtx;
-                std::unique_lock<lcos::local::no_mutex> l(mtx);
+                std::mutex mtx;
+                std::unique_lock<std::mutex> l(mtx);
                 stop_locked(l);
             }
             threads_.clear();
