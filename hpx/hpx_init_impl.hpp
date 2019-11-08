@@ -76,7 +76,9 @@ namespace hpx
 #endif
         // set a handler for std::abort
         std::signal(SIGABRT, detail::on_abort);
+#if !defined (__APPLE__)
         std::at_quick_exit(detail::on_exit);
+#endif
         std::atexit(detail::on_exit);
 
         return detail::run_or_start(f, desc_cmdline, argc, argv,
