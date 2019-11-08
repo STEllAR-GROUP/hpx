@@ -11,7 +11,7 @@
 #include <hpx/logging.hpp>
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/format/destination/defaults.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/naming_base.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/console_logging.hpp>

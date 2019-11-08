@@ -8,7 +8,6 @@
 #define HPX_UTIL_WRAPPER_HEAP_BASE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 

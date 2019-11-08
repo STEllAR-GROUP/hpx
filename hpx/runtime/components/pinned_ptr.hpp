@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/naming_base.hpp>
 #include <hpx/runtime/get_lva.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/component_pin_support.hpp>
 
@@ -32,14 +32,14 @@ namespace hpx { namespace components
               : lva_(0)
             {}
 
-            explicit pinned_ptr_base(naming::address::address_type lva) noexcept
+            explicit pinned_ptr_base(naming::address_type lva) noexcept
               : lva_(lva)
             {}
 
             virtual ~pinned_ptr_base() {}
 
         protected:
-            naming::address::address_type lva_;
+            naming::address_type lva_;
         };
 
         template <typename Component>
@@ -51,7 +51,7 @@ namespace hpx { namespace components
         public:
             pinned_ptr() noexcept {}
 
-            explicit pinned_ptr(naming::address::address_type lva) noexcept
+            explicit pinned_ptr(naming::address_type lva) noexcept
               : pinned_ptr_base(lva)
             {
                 HPX_ASSERT(0 != this->lva_);
@@ -95,7 +95,7 @@ namespace hpx { namespace components
         template <typename Component, typename Enable = void>
         struct create_helper
         {
-            static pinned_ptr call(naming::address::address_type)
+            static pinned_ptr call(naming::address_type)
             {
                 return pinned_ptr{};
             }
@@ -108,14 +108,14 @@ namespace hpx { namespace components
                 traits::component_decorates_action<Component>::value
             >::type>
         {
-            static pinned_ptr call(naming::address::address_type lva)
+            static pinned_ptr call(naming::address_type lva)
             {
                 return pinned_ptr(lva, id<Component>{});
             }
         };
 
         template <typename Component>
-        pinned_ptr(naming::address::address_type lva, id<Component>)
+        pinned_ptr(naming::address_type lva, id<Component>)
           : data_(new detail::pinned_ptr<Component>(lva))
         {
         }
@@ -130,7 +130,7 @@ namespace hpx { namespace components
         pinned_ptr& operator= (pinned_ptr && rhs) = default;
 
         template <typename Component>
-        static pinned_ptr create(naming::address::address_type lva)
+        static pinned_ptr create(naming::address_type lva)
         {
             using component_type = typename std::remove_cv<Component>::type;
             return create_helper<component_type>::call(lva);

@@ -8,8 +8,8 @@
 #define HPX_TRAITS_ACTION_SELECT_DIRECT_EXECUTION_MAR_22_21018_0124PM
 
 #include <hpx/config.hpp>
+#include <hpx/naming_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 namespace hpx { namespace traits

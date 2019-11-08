@@ -9,7 +9,6 @@
 #define HPX_RUNTIME_THREADS_THREAD_INIT_DATA_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/threads_fwd.hpp>

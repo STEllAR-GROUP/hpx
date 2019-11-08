@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/naming_base.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
-#include <hpx/naming_base.hpp>
 
 #include <cstdint>
 

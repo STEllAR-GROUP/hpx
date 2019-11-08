@@ -19,8 +19,8 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/logging.hpp>
+#include <hpx/naming_base.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/logging.hpp>
