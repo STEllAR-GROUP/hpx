@@ -876,8 +876,8 @@ on |cpp11_n4088|_ are based on the ``task_block`` concept that is a part of the
 common subset of the |ppl|_ and the |tbb|_ libraries.
 
 These implementations adopt a simpler syntax than exposed by those libraries---
-one that is influenced by language-based concepts such as spawn and sync from
-|cilk_pp|_ and async and finish from |x10|_. It improves on existing practice in
+one that is influenced by language-based concepts, such as spawn and sync from
+|cilk_pp|_ and async and finish from |x10|_. They improve on existing practice in
 the following ways:
 
 * The exception handling model is simplified and more consistent with normal C++
@@ -916,13 +916,13 @@ containing invocations of threads spawned by the ``run`` member function of the
 work that is allowed to execute in parallel with respect to the caller. Any
 parallel tasks spawned by ``run`` within the task block are joined back to a
 single thread of execution at the end of the ``define_task_block``. ``run``
-takes a user-provided function object ``f`` and starts it asynchronously---i.e.
+takes a user-provided function object ``f`` and starts it asynchronously---i.e.,
 it may return before the execution of ``f`` completes. The |hpx| scheduler may
 choose to run ``f`` immediately or delay running ``f`` until compute resources
 become available.
 
 A ``task_block`` can be constructed only by ``define_task_block`` because it has
-no public constructors. Thus, ``run`` can be invoked (directly or indirectly)
+no public constructors. Thus, ``run`` can be invoked directly or indirectly
 only from a user-provided function passed to ``define_task_block``::
 
     void g();
@@ -952,9 +952,9 @@ Extensions for task blocks
 Using execution policies with task blocks
 .........................................
 
-In |hpx| we implemented some extensions for ``task_block`` beyond the actual
+|hpx| implements some extensions for ``task_block`` beyond the actual
 standards proposal |cpp11_n4088|_. The main addition is that a ``task_block``
-can be invoked with a execution policy as its first argument, very similar to
+can be invoked with an execution policy as its first argument, very similar to
 the parallel algorithms.
 
 An execution policy is an object that expresses the requirements on the
@@ -990,13 +990,13 @@ to :cpp:class:`hpx::parallel::execution::parallel_policy`.
 without an explicit execution policy. In this case the task block will run using
 the :cpp:class:`hpx::parallel::execution::parallel_policy`.
 
-|hpx| also adds the ability to access the execution policy which was used to
+|hpx| also adds the ability to access the execution policy that was used to
 create a given ``task_block``.
 
 Using executors to run tasks
 ............................
 
-Often, we want to be able to not only define an execution policy to use by
+Often, users want to be able to not only define an execution policy to use by
 default for all spawned tasks inside the task block, but also to
 customize the execution context for one of the tasks executed by
 ``task_block::run``. Adding an optionally passed executor instance to that
@@ -1027,6 +1027,6 @@ function enables this use case::
 
 |hpx| still supports calling :cpp:func:`hpx::parallel::v2::task_block::run`
 without an explicit executor object. In this case the task will be run using the
-executor associated with the execution policy which was used to call
+executor associated with the execution policy that was used to call
 :cpp:func:`hpx::parallel::v2::define_task_block`.
 
