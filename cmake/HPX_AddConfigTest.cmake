@@ -624,6 +624,13 @@ function(hpx_check_for_cxx11_override)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx11_std_quick_exit)
+  add_hpx_config_test(HPX_WITH_CXX11_STD_QUICK_EXIT
+    SOURCE cmake/tests/cxx11_std_quick_exit.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_cxx14_constexpr)
   add_hpx_config_test(HPX_WITH_CXX14_CONSTEXPR
     SOURCE cmake/tests/cxx14_constexpr.cpp
