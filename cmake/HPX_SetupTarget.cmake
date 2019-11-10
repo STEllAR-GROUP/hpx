@@ -198,7 +198,8 @@ function(hpx_setup_target target)
   endif()
 
   if(NOT target_NOLIBS)
-    if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${_type}" STREQUAL "EXECUTABLE"))
+    if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${_type}" STREQUAL "EXECUTABLE") AND
+       (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
       set(hpx_libs hpx_wrap)
     endif()
     set(hpx_libs ${hpx_libs} hpx)
