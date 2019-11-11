@@ -142,7 +142,8 @@ namespace hpx { namespace threads {
 #endif
             HPX_ASSERT(get_thread_id_data(id)->get_state().state() == active);
             HPX_ASSERT(state != active);
-            statex = self_.yield(threads::thread_result_type(state, nullptr));
+            statex = self_.yield(threads::thread_result_type(state,
+                threads::thread_id_type{nullptr}));
             HPX_ASSERT(get_thread_id_data(id)->get_state().state() == active);
         }
 
