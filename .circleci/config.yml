@@ -984,9 +984,26 @@ jobs:
               if [[ -z "$CIRCLE_PR_NUMBER" ]] && [[ "$CIRCLE_BRANCH" == "master" ]]; then
                   docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
                   docker push ${TARGET_IMAGE_NAME}
+              else
+                  echo "Not on the master branch. The docker image will not be pushed."
+              fi
+
+  # This is the final step once everything else passes. We need a full clone
+  # here again to be able to push the new tag.
+  push_stable_tag:
+    docker:
+      - image: stellargroup/build_env:ubuntu
+    steps:
+      - checkout:
+          path: /hpx/source
+      - <<: *add_github_to_known_hosts
+      - <<: *configure_local_git
+      - run:
+          name: Push stable tag
+          command: |
+              if [[ -z "$CIRCLE_PR_NUMBER" ]] && [[ "$CIRCLE_BRANCH" == "master" ]]; then
                   # Tag the commmit
                   cd /hpx/source
-                  git remote set-url origin git@github.com:STEllAR-GROUP/hpx.git
                   git tag -f stable
                   ##########################################################
                   # NOTE: Dependency on the Docker push is so that users who
@@ -998,7 +1015,7 @@ jobs:
                   # Push the new stable commit tag
                   git push origin stable
               else
-                  echo "Not on the master branch. the image will not be pushed and the commit will not be tagged."
+                  echo "Not on the master branch. The commit will not be tagged."
               fi
 
 workflows:
@@ -1121,4 +1138,8 @@ workflows:
             - tests.performance
             - tests.regressions
             - examples
+          <<: *gh_pages_filter
+      - push_stable_tag:
+          requires:
+            - install
           <<: *gh_pages_filter
