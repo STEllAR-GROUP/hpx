@@ -48,17 +48,6 @@ namespace hpx { namespace util
         std::vector<std::string>* unregistered_options = nullptr);
 
     ///////////////////////////////////////////////////////////////////////////
-    // retrieve the command line arguments for the current locality
-    HPX_API_EXPORT bool retrieve_commandline_arguments(
-        hpx::program_options::options_description const& app_options,
-        hpx::program_options::variables_map& vm);
-
-    ///////////////////////////////////////////////////////////////////////////
-    // retrieve the command line arguments for the current locality
-    HPX_API_EXPORT bool retrieve_commandline_arguments(
-        std::string const& appname, hpx::program_options::variables_map& vm);
-
-    ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT std::string reconstruct_command_line(
         hpx::program_options::variables_map const &vm);
 

@@ -6,10 +6,10 @@
 
 #include <hpx/datastructures/any.hpp>
 #include <hpx/filesystem.hpp>
-#include <hpx/runtime.hpp> // TODO
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
+#include <hpx/errors.hpp>
 
 #include <cctype>
 #include <cstddef>
@@ -746,45 +746,6 @@ namespace hpx { namespace util
         return parse_commandline(rtcfg, app_options,
             detail::extract_arg0(cmdline), args, vm, node, error_mode, mode,
             visible, unregistered_options);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // retrieve the command line arguments for the current locality
-    bool retrieve_commandline_arguments(
-        hpx::program_options::options_description const& app_options,
-        hpx::program_options::variables_map& vm)
-    {
-        // The command line for this application instance is available from
-        // this configuration section:
-        //
-        //     [hpx]
-        //     cmd_line=....
-        //
-        std::string cmdline;
-        std::size_t node = std::size_t(-1);
-
-        hpx::util::section& cfg = hpx::get_runtime().get_config();
-        if (cfg.has_entry("hpx.cmd_line"))
-            cmdline = cfg.get_entry("hpx.cmd_line");
-        if (cfg.has_entry("hpx.locality"))
-            node = hpx::util::from_string<std::size_t>
-                (cfg.get_entry("hpx.locality"));
-
-        return parse_commandline(cfg, app_options, cmdline, vm, node,
-            allow_unregistered);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // retrieve the command line arguments for the current locality
-    bool retrieve_commandline_arguments(
-        std::string const& appname, hpx::program_options::variables_map& vm)
-    {
-        using hpx::program_options::options_description;
-
-        options_description desc_commandline(
-            "Usage: " + appname +  " [options]");
-
-        return retrieve_commandline_arguments(desc_commandline, vm);
     }
 
     ///////////////////////////////////////////////////////////////////////////

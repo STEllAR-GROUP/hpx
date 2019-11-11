@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/program_options.hpp>
 #include <hpx/runtime/applier_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
@@ -355,6 +356,19 @@ namespace hpx
         notification_policy_type::on_startstop_type on_stop_func_;
         notification_policy_type::on_error_type on_error_func_;
     };
+
+    namespace util {
+        ///////////////////////////////////////////////////////////////////////////
+        // retrieve the command line arguments for the current locality
+        HPX_API_EXPORT bool retrieve_commandline_arguments(
+            hpx::program_options::options_description const& app_options,
+            hpx::program_options::variables_map& vm);
+
+        ///////////////////////////////////////////////////////////////////////////
+        // retrieve the command line arguments for the current locality
+        HPX_API_EXPORT bool retrieve_commandline_arguments(
+            std::string const& appname, hpx::program_options::variables_map& vm);
+    }    // namespace util
 }   // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
