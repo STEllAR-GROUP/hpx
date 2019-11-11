@@ -1034,22 +1034,6 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
-# HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY: turned off in V1.3.0
-hpx_option(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY BOOL
-    "Enable old overloads for inclusive_scan (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_INCLUSIVE_SCAN_COMPATIBILITY)
-endif()
-
-# HPX_WITH_UNWRAPPED_COMPATIBILITY: turned off in V1.3.0
-hpx_option(HPX_WITH_UNWRAPPED_COMPATIBILITY BOOL
-    "Enable the deprecated unwrapped function (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_UNWRAPPED_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_UNWRAPPED_COMPATIBILITY)
-endif()
-
 # HPX_WITH_ACTION_BASE_COMPATIBILITY: introduced in V1.4.0
 hpx_option(HPX_WITH_ACTION_BASE_COMPATIBILITY BOOL
     "Enable deprecated action bases (default: ON)"
