@@ -16,8 +16,7 @@
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     // Returns the major HPX version.
     HPX_EXPORT std::uint8_t major_version();
 
@@ -71,6 +70,6 @@ namespace hpx
 
     // Return the HPX configuration information
     HPX_EXPORT std::string configuration_string();
-}
+}    // namespace hpx
 
 #endif

@@ -11,12 +11,6 @@
 #include <hpx/config/version.hpp>
 #include <hpx/config/config_strings.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-// Intel MPI does not like to be included after stdio.h. As such, we include mpi.h
-// as soon as possible.
-#include <hpx/plugins/parcelport/mpi/mpi.hpp>
-#endif
-
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/format.hpp>
@@ -24,6 +18,12 @@
 
 #include <boost/config.hpp>
 #include <boost/version.hpp>
+
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+// Intel MPI does not like to be included after stdio.h. As such, we include mpi.h
+// as soon as possible.
+#include <mpi.h>
+#endif
 
 #include <hwloc.h>
 
@@ -166,7 +166,8 @@ namespace hpx
         strm << "  HPX_HAVE_MALLOC=" << HPX_HAVE_MALLOC << "\n";
 #endif
 
-        if (get_runtime_ptr() == nullptr)
+        const char* prefix = util::hpx_prefix();
+        if (prefix == nullptr)
         {
             strm << "  HPX_PREFIX (configured)=unknown\n";
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__MIC)
@@ -175,7 +176,7 @@ namespace hpx
         }
         else
         {
-            strm << "  HPX_PREFIX (configured)=" << util::hpx_prefix() << "\n";
+            strm << "  HPX_PREFIX (configured)=" << prefix << "\n";
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__MIC)
             strm << "  HPX_PREFIX=" << util::find_prefix() << "\n";
 #endif

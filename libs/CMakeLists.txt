@@ -61,6 +61,7 @@ set(HPX_LIBS
   topology
   type_support
   util
+  version
   CACHE INTERNAL "list of HPX modules" FORCE
 )
 

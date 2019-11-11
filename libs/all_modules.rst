@@ -64,3 +64,4 @@ All modules
    /libs/topology/docs/index.rst
    /libs/type_support/docs/index.rst
    /libs/util/docs/index.rst
+   /libs/version/docs/index.rst

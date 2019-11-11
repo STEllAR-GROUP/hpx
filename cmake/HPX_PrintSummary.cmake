@@ -62,12 +62,16 @@ function(create_configuration_summary message module_name)
     string(REPLACE ";" "" hpx_config_information ${hpx_config_information})
   endif()
 
-  if("${module_name}x" STREQUAL "hpxx")
+  if("${module_name}" STREQUAL "hpx")
     set(_base_dir_local "hpx/config")
     set(_base_dir "hpx/config")
     set(_template "config_defines_strings.hpp.in")
   else()
-    set(_base_dir_local "libs/${module_name}/include/hpx/${module_name}/config/")
+    # NOTE: We generate the config_strings.hpp files for each module into the
+    # config module directory. This ensures that modules like version can access
+    # the config strings of all modules, instead of making the version module
+    # depend on all other modules.
+    set(_base_dir_local "libs/config/include/hpx/${module_name}/config/")
     set(_base_dir "hpx/${module_name}/config/")
     set(_template "config_defines_strings_for_modules.hpp.in")
   endif()

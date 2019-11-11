@@ -54,5 +54,6 @@ add_hpx_module(runtime_configuration
     hpx_prefix
     hpx_serialization
     hpx_thread_support
+    hpx_version
   CMAKE_SUBDIRS examples tests
 )

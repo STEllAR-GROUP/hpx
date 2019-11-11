@@ -50,7 +50,6 @@ namespace hpx { namespace util {
 
     char const* hpx_prefix()
     {
-        HPX_ASSERT(nullptr != prefix_);
         return prefix_;
     }
 
