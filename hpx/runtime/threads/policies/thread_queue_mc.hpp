@@ -92,11 +92,19 @@ namespace hpx { namespace threads { namespace policies {
 
     public:
         // ----------------------------------------------------------------
-        // add new threads if there is some amount of work available
+        // Take thread init data from the new work queue and convert it into
+        // full thread_data items that are added to the pending queue.
+        //
+        // New work items are taken from the queue owned by 'addfrom' and
+        // added to the pending queue of this thread holder
+        //
+        // This is not thread safe, only the thread owning the holder should
+        // call this function
         std::size_t add_new(
             std::int64_t add_count, thread_queue_type* addfrom, bool stealing)
         {
-            if (new_tasks_count_.data_.load(std::memory_order_relaxed) == 0)
+            if (addfrom->new_tasks_count_.data_.load(
+                    std::memory_order_relaxed) == 0)
             {
                 return 0;
             }
@@ -232,8 +240,8 @@ namespace hpx { namespace threads { namespace policies {
         // ----------------------------------------------------------------
         /// Return the next thread to be executed, return false if none is
         /// available
-        bool get_next_thread(
-            threads::thread_data*& thrd, bool other_end) HPX_HOT
+        bool get_next_thread(threads::thread_data*& thrd, bool other_end,
+            bool check_new = false) HPX_HOT
         {
             std::int64_t work_items_count_count =
                 work_items_count_.data_.load(std::memory_order_relaxed);
@@ -248,6 +256,11 @@ namespace hpx { namespace threads { namespace policies {
                     debug::dec<4>(work_items_count_.data_),
                     debug::threadinfo<threads::thread_data*>(thrd));
                 return true;
+            }
+            if (check_new && add_new(32, this, false) > 0)
+            {
+                // use check_now false to prevent infinite recursion
+                return get_next_thread(thrd, other_end, false);
             }
             return false;
         }

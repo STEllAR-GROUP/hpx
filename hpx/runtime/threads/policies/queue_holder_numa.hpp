@@ -105,14 +105,18 @@ namespace hpx { namespace threads { namespace policies {
             for (std::uint16_t i = 0; i < num_queues_;
                  ++i, q = fast_mod((qidx + i), num_queues_))
             {
-                if (queues_[q]->get_next_thread_HP(thrd, (stealing || (i > 0))))
+                if (queues_[q]->get_next_thread_HP(
+                        thrd, (stealing || (i > 0)), i == 0))
                 {
-                    nq_deb.debug(debug::str<>("HP/BP get_next"), "D",
-                        debug::dec<2>(domain_), "Q", debug::dec<3>(q), "Qidx",
-                        debug::dec<3>(qidx),
-                        ((i == 0 && !stealing) ? "taken" : "stolen from"),
-                        typename ThreadQueue::queue_data_print(queues_[q]),
-                        debug::threadinfo<threads::thread_data*>(thrd));
+                    // clang-format off
+                    nq_deb.debug(debug::str<>("HP/BP get_next")
+                         , "D", debug::dec<2>(domain_)
+                         , "Q",  debug::dec<3>(q)
+                         , "Qidx",  debug::dec<3>(qidx)
+                         , ((i==0 && !stealing) ? "taken" : "stolen from")
+                         , typename ThreadQueue::queue_data_print(queues_[q])
+                         , debug::threadinfo<threads::thread_data*>(thrd));
+                    // clang-format on
                     return true;
                 }
                 // if stealing disabled, do not check other queues
@@ -151,7 +155,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        bool add_new_HP(ThreadQueue* origin, std::uint16_t qidx,
+        bool add_new_HP(ThreadQueue* receiver, std::uint16_t qidx,
             std::size_t& added, bool stealing, bool allow_stealing)
         {
             // loop over queues and take one task,
@@ -160,14 +164,18 @@ namespace hpx { namespace threads { namespace policies {
                  ++i, q = fast_mod((qidx + i), num_queues_))
             {
                 std::size_t added =
-                    origin->add_new_HP(8, queues_[q], (stealing || (i > 0)));
+                    receiver->add_new_HP(64, queues_[q], (stealing || (i > 0)));
                 if (added > 0)
                 {
-                    nq_deb.debug(debug::str<>("HP/BP add_new"), "added",
-                        debug::dec<>(added), "D", debug::dec<2>(domain_), "Q",
-                        debug::dec<3>(q), "Qidx", debug::dec<3>(qidx),
-                        ((i == 0 && !stealing) ? "taken" : "stolen from"),
-                        typename ThreadQueue::queue_data_print(queues_[q]));
+                    // clang-format off
+                    nq_deb.debug(debug::str<>("HP/BP add_new")
+                        , "added", debug::dec<>(added)
+                        , "D", debug::dec<2>(domain_)
+                        , "Q",  debug::dec<3>(q)
+                        , "Qidx",  debug::dec<3>(qidx)
+                        , ((i==0 && !stealing) ? "taken" : "stolen from")
+                        , typename ThreadQueue::queue_data_print(queues_[q]));
+                    // clang-format on
                     return true;
                 }
                 // if stealing disabled, do not check other queues
@@ -178,7 +186,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        bool add_new(ThreadQueue* origin, std::uint16_t qidx,
+        bool add_new(ThreadQueue* receiver, std::uint16_t qidx,
             std::size_t& added, bool stealing, bool allow_stealing)
         {
             // loop over queues and take one task,
@@ -187,14 +195,18 @@ namespace hpx { namespace threads { namespace policies {
                  ++i, q = fast_mod((qidx + i), num_queues_))
             {
                 std::size_t added =
-                    origin->add_new(8, queues_[q], (stealing || (i > 0)));
+                    receiver->add_new(64, queues_[q], (stealing || (i > 0)));
                 if (added > 0)
                 {
-                    nq_deb.debug(debug::str<>("add_new"), "added",
-                        debug::dec<>(added), "D", debug::dec<2>(domain_), "Q",
-                        debug::dec<3>(q), "Qidx", debug::dec<3>(qidx),
-                        ((i == 0 && !stealing) ? "taken" : "stolen from"),
-                        typename ThreadQueue::queue_data_print(queues_[q]));
+                    // clang-format off
+                    nq_deb.debug(debug::str<>("add_new")
+                         , "added", debug::dec<>(added)
+                         , "D", debug::dec<2>(domain_)
+                         , "Q",  debug::dec<3>(q)
+                         , "Qidx",  debug::dec<3>(qidx)
+                         , ((i==0 && !stealing) ? "taken" : "stolen from")
+                         , typename ThreadQueue::queue_data_print(queues_[q]));
+                    // clang-format on
                     return true;
                 }
                 // if stealing disabled, do not check other queues

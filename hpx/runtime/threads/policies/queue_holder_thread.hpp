@@ -347,12 +347,16 @@ namespace hpx { namespace threads { namespace policies {
         // ----------------------------------------------------------------
         bool cleanup_terminated(std::size_t thread_num, bool delete_all)
         {
-            if (thread_num != thread_num_)
-            {
-                tq_deb.error(debug::str<>("assertion fail"), "thread_num",
-                    thread_num, "thread_num_", thread_num_, "queue_index_",
-                    queue_index_, queue_data_print(this));
+            // clang-format off
+            if (thread_num!=thread_num_) {
+                tq_deb.error(debug::str<>("assertion fail")
+                             , "thread_num", thread_num
+                             , "thread_num_", thread_num_
+                             , "queue_index_", queue_index_
+                             , queue_data_print(this)
+                             );
             }
+            // clang-format on
             HPX_ASSERT(thread_num == thread_num_);
 
             if (terminated_items_count_.data_.load(std::memory_order_relaxed) ==
@@ -456,6 +460,13 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
+        // Not thread safe. This function must only be called by the
+        // thread that owns the holder object.
+        // Creates a thread_data object using information from
+        // thread_init_data .
+        // If a thread data object is available on one of the heaps
+        // it will use that, otherwise a new one is created.
+        // Heaps store data ordered/sorted by stack size
         void create_thread_object(threads::thread_id_type& tid,
             threads::thread_init_data& data, thread_state_enum state)
         {
@@ -498,6 +509,9 @@ namespace hpx { namespace threads { namespace policies {
                 tid = heap->front();
                 heap->pop_front();
                 get_thread_id_data(tid)->rebind(data, state);
+                tq_deb.debug(debug::str<>("create_thread_object"), "rebind",
+                    queue_data_print(this),
+                    debug::threadinfo<threads::thread_id_type*>(&tid));
             }
             else
             {
@@ -514,6 +528,9 @@ namespace hpx { namespace threads { namespace policies {
                         data, this, state);
                 }
                 tid = thread_id_type(p);
+                tq_deb.debug(debug::str<>("create_thread_object"), "new",
+                    queue_data_print(this),
+                    debug::threadinfo<threads::thread_id_type*>(&tid));
             }
         }
 
@@ -621,11 +638,11 @@ namespace hpx { namespace threads { namespace policies {
 
         // ----------------------------------------------------------------
         bool get_next_thread_HP(
-            threads::thread_data*& thrd, bool stealing) HPX_HOT
+            threads::thread_data*& thrd, bool stealing, bool check_new) HPX_HOT
         {
             // only take from BP queue if we are not stealing
             if (!stealing && bp_queue_ &&
-                bp_queue_->get_next_thread(thrd, stealing))
+                bp_queue_->get_next_thread(thrd, stealing, check_new))
             {
                 tq_deb.debug(debug::str<>("next_thread_BP"),
                     queue_data_print(this),
@@ -634,7 +651,8 @@ namespace hpx { namespace threads { namespace policies {
                 return true;
             }
 
-            if (hp_queue_ && hp_queue_->get_next_thread(thrd, stealing))
+            if (hp_queue_ &&
+                hp_queue_->get_next_thread(thrd, stealing, check_new))
             {
                 tq_deb.debug(debug::str<>("get_next_thread_HP"),
                     queue_data_print(this),

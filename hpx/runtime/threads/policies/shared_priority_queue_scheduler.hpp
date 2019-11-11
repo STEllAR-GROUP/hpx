@@ -334,7 +334,7 @@ namespace hpx { namespace threads { namespace policies {
                                 numa_holder_[0].thread_queue(0)->worker_next(
                                     num_workers_);
                         }
-                        else if (!round_robin_)
+                        else if (!round_robin_) /* thread parent */
                         {
                             if (spq_deb.is_enabled())
                             {
@@ -474,6 +474,7 @@ namespace hpx { namespace threads { namespace policies {
                             return result;
                         }
                     }
+                    // High priority tasks first
                     else if (steal_hp_first_)
                     {
                         std::uint16_t dom = domain;
@@ -498,7 +499,7 @@ namespace hpx { namespace threads { namespace policies {
                             if (!steal_numa || d == dm1)
                                 break;
                         }
-
+                        dom = domain;
                         for (std::uint16_t d = 0; d < num_domains_;
                              ++d,    // these are executed at the end of a loop
                              dom = fast_mod((domain + d), num_domains_),
@@ -521,7 +522,7 @@ namespace hpx { namespace threads { namespace policies {
                                 break;
                         }
                     }
-                    else /*(steal_after_local)*/
+                    else /*steal_after_local*/
                     {
                         // do this local core/queue
                         result = operation_HP(
@@ -563,8 +564,9 @@ namespace hpx { namespace threads { namespace policies {
                         else
                         {
                             // try other numa domains BP/HP
-                            std::uint16_t dom =
+                            std::uint16_t dstart =
                                 fast_mod((domain + 1), num_domains_);
+                            std::uint16_t dom = dstart;
                             for (
                                 std::uint16_t d = 1; d < num_domains_;
                                 ++d,    // these are executed at the end of a loop
@@ -584,6 +586,7 @@ namespace hpx { namespace threads { namespace policies {
                                 }
                             }
                             // try other numa domains NP/LP
+                            dom = dstart;
                             for (std::uint16_t d = 1; d < num_domains_; ++d,
                                                dom = fast_mod(
                                                    (domain + d), num_domains_))
@@ -647,7 +650,7 @@ namespace hpx { namespace threads { namespace policies {
                     // but send a null function for normal tasks
                     bool result = steal_by_function<threads::thread_data*>(
                         domain, q_index, numa_stealing_, core_stealing_,
-                        nullptr, thrd, "get_next_thread",
+                        nullptr, thrd, "SBF-get_next_thread",
                         get_next_thread_function_HP, get_next_thread_function);
 
                     if (result)
@@ -696,8 +699,8 @@ namespace hpx { namespace threads { namespace policies {
                                 q_index, added, stealing, allow_stealing);
                         };
 
-                    std::uint16_t domain = d_lookup_[thread_num];
-                    std::uint16_t q_index = q_lookup_[thread_num];
+                    std::uint16_t domain = d_lookup_[this_thread];
+                    std::uint16_t q_index = q_lookup_[this_thread];
                     //
                     thread_holder_type* receiver =
                         numa_holder_[domain].queues_[q_index];
@@ -763,7 +766,7 @@ namespace hpx { namespace threads { namespace policies {
                                 parent_pool_->get_pool_name(),
                                 debug::threadinfo<threads::thread_data*>(thrd));
                         }
-                        else if (!round_robin_)
+                        else if (!round_robin_) /*assign_parent*/
                         {
                             domain_num = d_lookup_[thread_num];
                             q_index = q_lookup_[thread_num];
