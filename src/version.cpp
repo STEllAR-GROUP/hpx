@@ -17,8 +17,8 @@
 #include <hpx/plugins/parcelport/mpi/mpi.hpp>
 #endif
 
+#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime_configuration/find_prefix.hpp> // TODO: Move to another module?
 #include <hpx/format.hpp>
 #include <hpx/version.hpp>
 

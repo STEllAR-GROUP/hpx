@@ -45,6 +45,7 @@ All modules
    /libs/memory/docs/index.rst
    /libs/naming_base/docs/index.rst
    /libs/plugin/docs/index.rst
+   /libs/prefix/docs/index.rst
    /libs/preprocessor/docs/index.rst
    /libs/program_options/docs/index.rst
    /libs/resiliency/docs/index.rst

@@ -42,6 +42,7 @@ set(HPX_LIBS
   memory
   naming_base
   plugin
+  prefix
   preprocessor
   program_options
   resiliency

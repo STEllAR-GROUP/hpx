@@ -11,9 +11,9 @@
 #include <hpx/filesystem.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/plugin.hpp>
+#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
-#include <hpx/runtime_configuration/find_prefix.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/init_ini_data.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>

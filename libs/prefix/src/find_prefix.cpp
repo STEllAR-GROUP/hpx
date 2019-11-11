@@ -12,7 +12,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/plugin.hpp>
-#include <hpx/runtime_configuration/find_prefix.hpp>
+#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #if defined(HPX_WINDOWS)
