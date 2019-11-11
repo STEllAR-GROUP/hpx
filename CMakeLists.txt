@@ -385,6 +385,7 @@ if(HPX_WITH_DATAPAR_VC)
 endif()
 
 if(HPX_WITH_DATAPAR_VC)
+  hpx_warn("Vc support is deprecated. This option will be removed in a future release. It will be replaced with SIMD support from the C++ standard library")
   include(HPX_SetupVc)
 endif()
 if(NOT HPX_WITH_DATAPAR_VC)
