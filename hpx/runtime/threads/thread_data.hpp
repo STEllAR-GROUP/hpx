@@ -603,7 +603,8 @@ namespace hpx { namespace threads {
         bool is_stackless_;
     };
 
-    HPX_CONSTEXPR thread_data* get_thread_id_data(thread_id_type const& tid)
+    HPX_CXX14_CONSTEXPR inline thread_data* get_thread_id_data(
+        thread_id_type const& tid)
     {
         return static_cast<thread_data*>(tid.get());
     }
