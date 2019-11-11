@@ -21,6 +21,7 @@ set(HPX_LIBS
   cache
   checkpoint
   collectives
+  command_line_handling
   compute
   compute_cuda
   concepts

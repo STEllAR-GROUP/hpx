@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/util/command_line_handling.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
 
 #include <hpx/assertion.hpp>
 #include <hpx/batch_environments.hpp>
@@ -24,7 +24,7 @@
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
-#include <hpx/util/parse_command_line.hpp>
+#include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/util/sed_transform.hpp>
 #include <hpx/version.hpp>
 

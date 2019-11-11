@@ -26,7 +26,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/util/parse_command_line.hpp>
+#include <hpx/command_line_handling/parse_command_line.hpp>
 
 #include <hpx/program_options.hpp>
 

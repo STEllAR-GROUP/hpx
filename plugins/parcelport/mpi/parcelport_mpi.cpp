@@ -16,7 +16,7 @@
 
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/plugins/parcelport_factory.hpp>
-#include <hpx/util/command_line_handling.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
 
 // parcelport
 #include <hpx/runtime.hpp>

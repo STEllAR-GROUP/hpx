@@ -17,7 +17,7 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/util/command_line_handling.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>

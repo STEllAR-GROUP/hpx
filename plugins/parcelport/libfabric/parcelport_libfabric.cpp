@@ -13,6 +13,7 @@
 // util
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/threading_base/thread_data.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 

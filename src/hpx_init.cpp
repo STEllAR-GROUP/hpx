@@ -39,7 +39,7 @@
 #include <hpx/timing.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/command_line_handling.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/init_logging.hpp>

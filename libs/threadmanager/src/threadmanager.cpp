@@ -33,8 +33,8 @@
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/from_string.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
 
 #include <cstddef>
 #include <cstdint>

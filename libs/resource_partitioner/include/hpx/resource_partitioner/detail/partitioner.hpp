@@ -18,7 +18,7 @@
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/command_line_handling.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
 
 #include <atomic>
 #include <cstddef>
