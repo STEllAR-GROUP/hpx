@@ -77,8 +77,10 @@ namespace hpx
 #endif
         // set a handler for std::abort, std::at_quick_exit, and std::atexit
         std::signal(SIGABRT, detail::on_abort);
-        std::at_quick_exit(detail::on_exit);
         std::atexit(detail::on_exit);
+#if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
+        std::at_quick_exit(detail::on_exit);
+#endif
 
         return 0 == detail::run_or_start(f, desc_cmdline, argc, argv,
             hpx_startup::user_main_config(cfg),
