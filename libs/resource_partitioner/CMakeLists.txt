@@ -56,6 +56,4 @@ add_hpx_module(resource_partitioner
 
 if (TARGET hpx::apex)
   target_link_libraries(hpx_resource_partitioner PRIVATE hpx::apex)
-  get_target_property(_apex_inc_dir hpx::apex INTERFACE_INCLUDE_DIRECTORIES)
-  target_include_directories(hpx_compute INTERFACE "${_apex_inc_dir}")
 endif()

@@ -45,3 +45,7 @@ add_hpx_module(threadmanager
     hpx_topology
   CMAKE_SUBDIRS examples tests
 )
+
+if (TARGET hpx::apex)
+  target_link_libraries(hpx_threadmanager PRIVATE hpx::apex)
+endif()

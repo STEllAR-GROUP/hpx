@@ -66,6 +66,4 @@ add_hpx_module(compute
 # module that link to apex, and we'd be able to remove this.
 if (TARGET hpx::apex)
   target_link_libraries(hpx_compute PRIVATE hpx::apex)
-  get_target_property(_apex_inc_dir hpx::apex INTERFACE_INCLUDE_DIRECTORIES)
-  target_include_directories(hpx_compute INTERFACE "${_apex_inc_dir}")
 endif()

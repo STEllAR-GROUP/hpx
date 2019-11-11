@@ -62,3 +62,7 @@ add_hpx_module(compute_cuda
     hpx_serialization
   CMAKE_SUBDIRS examples tests
 )
+
+if (TARGET hpx::apex)
+  target_link_libraries(hpx_compute_cuda PRIVATE hpx::apex)
+endif()
