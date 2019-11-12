@@ -7,8 +7,6 @@
 set(tests
     any_serialization
     bind_action
-    checkpoint
-    checkpoint_component
     config_entry
     pack_traversal
     pack_traversal_async
@@ -31,7 +29,6 @@ if(HWLOC_FOUND)
   set(parse_affinity_options_PARAMETERS THREADS_PER_LOCALITY 2)
 endif()
 
-set(checkpoint_component_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(serialize_buffer_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 
 foreach(test ${tests})

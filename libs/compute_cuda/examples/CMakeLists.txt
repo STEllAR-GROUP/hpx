@@ -78,7 +78,7 @@ foreach(example_program ${example_programs})
     INTERNAL_FLAGS
     SOURCES ${sources}
     ${${example_program}_FLAGS}
-    FOLDER "Examples/Compute/CUDA")
+    FOLDER "Examples/Modules/Compute/CUDA")
 
   add_hpx_example_target_dependencies("modules.compute_cuda" ${example_program})
 

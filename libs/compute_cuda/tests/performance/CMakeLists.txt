@@ -29,7 +29,7 @@ foreach(benchmark ${benchmarks})
     ${${benchmark}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Benchmarks/Modules/ComputeCuda")
+    FOLDER "Benchmarks/Modules/Compute/Cuda")
 
   add_hpx_performance_test("modules.compute_cuda" ${benchmark} ${${benchmark}_PARAMETERS})
 endforeach()
