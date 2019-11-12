@@ -11,12 +11,16 @@
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <cstdint>
+#include <memory>
+#include <string>
 
-namespace hpx { namespace util { 
+namespace hpx { namespace util {
 
 #ifdef HPX_HAVE_APEX
 
-    typedef uint64_t init_t(const char * thread_name, const uint64_t comm_rank, const uint64_t comm_size);
+    typedef uint64_t init_t(const char * thread_name,
+        const uint64_t comm_rank, const uint64_t comm_size);
 
     using enable_parent_task_handler_type = std::function<bool()>;
 
@@ -112,7 +116,7 @@ namespace hpx { namespace util {
     /* The actual API.  For all cases, check if the function pointer is
        null, and if not null call the registered function. */
     static inline uint64_t init(const char * thread_name,
-        const uint64_t comm_rank, const uint64_t comm_size) { 
+        const uint64_t comm_rank, const uint64_t comm_size) {
         return (init_function == nullptr) ? 0ULL :
             init_function(thread_name, comm_rank, comm_size);
     };

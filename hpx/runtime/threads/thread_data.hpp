@@ -39,6 +39,7 @@
 #include <stack>
 #include <string>
 #include <utility>
+#include <memory>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -531,11 +532,13 @@ namespace hpx { namespace threads {
             thread_init_data& init_data, thread_state_enum newstate) = 0;
 
 #if defined(HPX_HAVE_APEX)
-        std::shared_ptr<util::external_timer::task_wrapper> get_timer_data() const noexcept
+        std::shared_ptr<util::external_timer::task_wrapper>
+            get_timer_data() const noexcept
         {
             return timer_data_;
         }
-        void set_timer_data(std::shared_ptr<util::external_timer::task_wrapper> data) noexcept
+        void set_timer_data(
+            std::shared_ptr<util::external_timer::task_wrapper> data) noexcept
         {
             timer_data_ = data;
         }

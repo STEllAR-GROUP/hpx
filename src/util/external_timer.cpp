@@ -12,6 +12,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 
 namespace hpx { namespace util {
 
