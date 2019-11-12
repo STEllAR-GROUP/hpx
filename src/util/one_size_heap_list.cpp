@@ -157,7 +157,7 @@ namespace hpx { namespace util
     {
         if (nullptr == threads::get_self_ptr())
         {
-            hpx::applier::register_work_nullary(
+            hpx::threads::register_work_nullary(
                 util::bind_front(&one_size_heap_list::free, this, p, count),
                 "one_size_heap_list::free");
             return true;
