@@ -43,7 +43,6 @@ namespace hpx { namespace threads {
     class thread_data_stackless;
 
     /// \cond NOINTERNAL
-    class HPX_EXPORT threadmanager;
     struct HPX_EXPORT topology;
 
     class HPX_EXPORT executor;
@@ -129,12 +128,6 @@ namespace hpx { namespace threads {
     ///       code was compiled with HPX_HAVE_THREAD_TARGET_ADDRESS
     ///       being defined.
     HPX_API_EXPORT std::uint64_t get_self_component_id();
-
-    /// \cond NOINTERNAL
-    // The function get_thread_manager returns a reference to the
-    // current thread manager.
-    HPX_API_EXPORT threadmanager& get_thread_manager();
-    /// \endcond
 
     /// The function \a get_thread_count returns the number of currently
     /// known threads.

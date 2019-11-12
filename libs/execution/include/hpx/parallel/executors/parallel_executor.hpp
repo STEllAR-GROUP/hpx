@@ -31,7 +31,6 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
@@ -165,7 +164,7 @@ namespace hpx { namespace parallel { namespace execution {
                 f, "hpx::parallel::execution::parallel_executor::post");
 
             detail::post_policy_dispatch<Policy>::call(
-                desc, policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
+                policy_, desc, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         // BulkTwoWayExecutor interface
@@ -177,10 +176,7 @@ namespace hpx { namespace parallel { namespace execution {
             std::size_t num_tasks = num_tasks_;
             if (num_tasks == std::size_t(-1))
             {
-                auto thrd_data = threads::get_self_id_data();
-                auto pool = thrd_data ?
-                    thrd_data->get_scheduler_base()->get_parent_pool() :
-                    &hpx::threads::get_thread_manager().default_pool();
+                auto pool = threads::detail::get_self_or_default_pool();
                 num_tasks =
                     (std::min)(std::size_t(128), pool->get_os_thread_count());
             }

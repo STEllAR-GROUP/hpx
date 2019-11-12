@@ -66,7 +66,7 @@ std::uint64_t delay = 0;
 bool header = true;
 bool csv_header = false;
 std::string scaling("weak");
-std::string distribution("static-balanced");
+std::string distribution("static-balanced-stackbased");
 
 std::uint64_t suspend_step = 0;
 std::uint64_t no_suspend_step = 1;

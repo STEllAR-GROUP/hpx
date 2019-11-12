@@ -381,7 +381,7 @@ namespace hpx { namespace lcos { namespace detail
 
             parallel::execution::detail::post_policy_dispatch<
                     hpx::launch::async_policy
-                >::call(desc, hpx::launch::async,
+                >::call(hpx::launch::async, desc,
                     [HPX_CAPTURE_MOVE(this_),
                         HPX_CAPTURE_MOVE(f)
                     ]() mutable -> void {
@@ -427,7 +427,7 @@ namespace hpx { namespace lcos { namespace detail
 
             parallel::execution::detail::post_policy_dispatch<
                     hpx::launch::async_policy
-                >::call(desc, hpx::launch::async,
+                >::call(hpx::launch::async, desc,
                     [HPX_CAPTURE_MOVE(this_),
                         HPX_CAPTURE_MOVE(f)
                     ]() mutable -> void {

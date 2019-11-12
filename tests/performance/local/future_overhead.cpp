@@ -337,7 +337,7 @@ void measure_function_futures_register_work(std::uint64_t count, bool csv)
     high_resolution_timer walltime;
     for (std::uint64_t i = 0; i < count; ++i)
     {
-        hpx::applier::register_work_nullary([&l]() {
+        hpx::threads::register_work_nullary([&l]() {
             null_function();
             l.count_down(1);
         });
@@ -359,7 +359,7 @@ void measure_function_futures_create_thread(std::uint64_t count, bool csv)
         l.count_down(1);
     };
     auto const thread_func =
-        hpx::applier::detail::thread_function_nullary<decltype(func)>{func};
+        hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
     auto const desc = hpx::util::thread_description();
     auto const prio = hpx::threads::thread_priority_normal;
     auto const hint = hpx::threads::thread_schedule_hint();
@@ -394,7 +394,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
         l.count_down(1);
     };
     auto const thread_func =
-        hpx::applier::detail::thread_function_nullary<decltype(func)>{func};
+        hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
     auto const desc = hpx::util::thread_description();
     auto const prio = hpx::threads::thread_priority_normal;
     auto const stack_size =
@@ -422,7 +422,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
             }
         };
         auto const thread_spawn_func =
-            hpx::applier::detail::thread_function_nullary<decltype(spawn_func)>{
+            hpx::threads::detail::thread_function_nullary<decltype(spawn_func)>{
                 spawn_func};
 
         hpx::threads::thread_init_data init(

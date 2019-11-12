@@ -520,7 +520,9 @@ endforeach()
 
 # Add particular targets for the pkgconfig setup
 add_library(hpx_application INTERFACE)
-target_link_libraries(hpx_application INTERFACE hpx_wrap)
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+  target_link_libraries(hpx_application INTERFACE hpx_wrap)
+endif()
 target_compile_definitions(hpx_application INTERFACE HPX_APPLICATION_EXPORTS)
 add_library(hpx::application ALIAS hpx_application)
 

@@ -39,11 +39,13 @@ set(HPX_LIBS
   preprocessor
   program_options
   resiliency
+  resource_partitioner
   segmented_algorithms
   serialization
   statistics
   testing
   thread_support
+  threadmanager
   timing
   topology
   type_support

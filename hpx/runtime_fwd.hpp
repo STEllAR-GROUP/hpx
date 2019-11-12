@@ -265,6 +265,16 @@ namespace hpx
         char const* binary_filter_type, bool compress,
         serialization::binary_filter* next_filter = nullptr,
         error_code& ec = throws);
+
+    namespace threads {
+        class HPX_EXPORT threadmanager;
+
+        /// \cond NOINTERNAL
+        // The function get_thread_manager returns a reference to the
+        // current thread manager.
+        HPX_API_EXPORT threadmanager& get_thread_manager();
+        /// \endcond
+    }
 }
 
 #endif

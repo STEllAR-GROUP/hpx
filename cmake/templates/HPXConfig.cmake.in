@@ -49,6 +49,15 @@ set(HPX_Fortran_COMPILER_VERSION "@CMAKE_Fortran_COMPILER_VERSION@" CACHE STRING
 # Setup the imported libraries (publicly linked) #
 
 # Allocator
+set(HPX_JEMALLOC_ROOT "@JEMALLOC_ROOT@")
+set(HPX_TCMALLOC_ROOT "@TCMALLOC_ROOT@")
+set(HPX_TBBMALLOC_ROOT "@TBBMALLOC_ROOT@")
+# Special handle for mimalloc cause we can't specify HPX_MIMALLOC_ROOT as a HINT
+# to find_package
+set(HPX_MIMALLOC_ROOT "@MIMALLOC_ROOT@")
+if (NOT MIMALLOC_ROOT AND NOT "$ENV{MIMALLOC_ROOT}")
+  set(MIMALLOC_ROOT ${HPX_MIMALLOC_ROOT})
+endif()
 include(HPX_SetupAllocator)
 
 # Boost
@@ -73,6 +82,9 @@ include(HPX_SetupHwloc)
 # Papi
 set(HPX_PAPI_ROOT "@PAPI_ROOT@")
 include(HPX_SetupPapi)
+
+# CUDA
+include(HPX_SetupCUDA)
 ##################################################
 
 set(HPX_WITH_MALLOC_DEFAULT @HPX_WITH_MALLOC@)
@@ -96,31 +108,14 @@ if(NOT DEFINED ${CMAKE_FIND_PACKAGE_NAME}_FOUND)
   set(${CMAKE_FIND_PACKAGE_NAME}_FOUND true)
 endif()
 
-# Set variables used by nvcc
-if(HPX_WITH_CUDA)
-  find_package(CUDA REQUIRED)
-  set(CUDA_SEPARABLE_COMPILATION ON)
-  set(CUDA_NVCC_FLAGS @CUDA_NVCC_FLAGS@)
-  # The following is a workaround to make sure that target_link_libraries in
-  # cuda_add_executable/library is called with a link keyword, not with a
-  # plain signature. From CMake 3.9 onwards this can be done officially with
-  # the CUDA_LINK_LIBRARIES_KEYWORD. For older versions we can emulate this by
-  # prepending a link keyword to CUDA_LIBRARIES.
-  #
-  # See
-  # https://gitlab.kitware.com/cmake/cmake/commit/9f41bfd7b9e6e8a7545f741f872949d2ae801978
-  # and https://gitlab.kitware.com/cmake/cmake/issues/16602 for more details.
-  if(CMAKE_VERSION VERSION_LESS "3.9")
-    set(CUDA_LIBRARIES PUBLIC ${CUDA_LIBRARIES})
-  else()
-    set(CUDA_LINK_LIBRARIES_KEYWORD PUBLIC)
-  endif()
-endif()
-
 # Set legacy variables for linking and include directories
 set(HPX_LIBRARIES "hpx;hpx_init;")
 set(HPX_INCLUDE_DIRS "")
 set(HPX_LIBRARY_DIR "")
-set(HPX_LINK_LIBRARIES "hpx_wrap;")
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+  set(HPX_LINK_LIBRARIES "hpx_wrap;")
+else()
+  set(HPX_LINK_LIBRARIES "")
+endif()
 # The flags required by hpx_wrap are propagated from its interface options.
 set(HPX_LINKER_FLAGS "")

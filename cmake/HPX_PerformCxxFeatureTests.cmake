@@ -124,6 +124,9 @@ function(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_lock_guard(
     REQUIRED "HPX needs support for C++11 std::lock_guard")
 
+  hpx_check_for_cxx11_std_quick_exit(
+    DEFINITIONS HPX_HAVE_CXX11_STD_QUICK_EXIT)
+
   hpx_check_for_cxx11_std_random(
     DEFINITIONS HPX_HAVE_CXX11_STD_RANDOM)
 

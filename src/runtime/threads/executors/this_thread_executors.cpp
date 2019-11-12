@@ -149,10 +149,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
 
         // create a new thread
-        thread_init_data data(util::one_shot(util::bind(
-            &this_thread_executor::thread_function_nullary,
-            this, std::move(f))), desc);
-        data.stacksize = threads::get_stack_size(stacksize);
+        thread_init_data data(
+            util::one_shot(
+                util::bind(&this_thread_executor::thread_function_nullary, this,
+                    std::move(f))),
+            desc);
+        data.stacksize =
+            this_thread::get_pool()->get_scheduler()->get_stack_size(stacksize);
 
         // update statistics
         ++tasks_scheduled_;
@@ -188,10 +191,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         scheduler_.get_state(0).compare_exchange_strong(expected, state_starting);
 
         // create a new suspended thread
-        thread_init_data data(util::one_shot(util::bind(
-            &this_thread_executor::thread_function_nullary,
-            this, std::move(f))), desc);
-        data.stacksize = threads::get_stack_size(stacksize);
+        thread_init_data data(
+            util::one_shot(
+                util::bind(&this_thread_executor::thread_function_nullary, this,
+                    std::move(f))),
+            desc);
+        data.stacksize =
+            this_thread::get_pool()->get_scheduler()->get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread( //-V601

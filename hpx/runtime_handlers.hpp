@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
 
 #include <string>
 
@@ -24,4 +25,5 @@ namespace hpx { namespace detail {
     void registered_locks_error_handler();
     bool register_locks_predicate();
 #endif
+    threads::thread_pool_base* get_default_pool();
 }}    // namespace hpx::detail

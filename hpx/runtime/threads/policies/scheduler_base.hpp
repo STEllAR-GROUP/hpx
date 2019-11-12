@@ -11,9 +11,9 @@
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/format.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
@@ -240,6 +240,13 @@ namespace hpx { namespace threads { namespace policies {
 
             case thread_stacksize_huge:
                 return thread_queue_init_.huge_stacksize_;
+
+            case thread_stacksize_nostack:
+                return (std::numeric_limits<std::ptrdiff_t>::max)();
+
+            case thread_stacksize_current:
+                return get_self_stacksize();
+                break;
 
             default:
                 HPX_ASSERT_MSG(

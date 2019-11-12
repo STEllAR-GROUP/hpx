@@ -11,8 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/no_mutex.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/detail/network_background_callback.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>

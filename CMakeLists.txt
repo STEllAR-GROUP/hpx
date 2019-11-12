@@ -385,6 +385,7 @@ if(HPX_WITH_DATAPAR_VC)
 endif()
 
 if(HPX_WITH_DATAPAR_VC)
+  hpx_warn("Vc support is deprecated. This option will be removed in a future release. It will be replaced with SIMD support from the C++ standard library")
   include(HPX_SetupVc)
 endif()
 if(NOT HPX_WITH_DATAPAR_VC)
@@ -1034,28 +1035,20 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
-# HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY: turned off in V1.3.0
-hpx_option(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY BOOL
-    "Enable old overloads for inclusive_scan (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_INCLUSIVE_SCAN_COMPATIBILITY)
-endif()
-
-# HPX_WITH_UNWRAPPED_COMPATIBILITY: turned off in V1.3.0
-hpx_option(HPX_WITH_UNWRAPPED_COMPATIBILITY BOOL
-    "Enable the deprecated unwrapped function (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_UNWRAPPED_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_UNWRAPPED_COMPATIBILITY)
-endif()
-
 # HPX_WITH_ACTION_BASE_COMPATIBILITY: introduced in V1.4.0
 hpx_option(HPX_WITH_ACTION_BASE_COMPATIBILITY BOOL
     "Enable deprecated action bases (default: ON)"
     ON ADVANCED)
 if(HPX_WITH_ACTION_BASE_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_ACTION_BASE_COMPATIBILITY)
+endif()
+
+# HPX_WITH_REGISTER_THREAD_COMPATIBILITY: introduced in V1.4.0
+hpx_option(HPX_WITH_REGISTER_THREAD_COMPATIBILITY BOOL
+    "Enable deprecated register_thread/work functions in the hpx::applier namespace (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_REGISTER_THREAD_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_REGISTER_THREAD_COMPATIBILITY)
 endif()
 
 ################################################################################

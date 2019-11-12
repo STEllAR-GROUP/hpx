@@ -54,7 +54,9 @@ add_hpx_module(compute
     hpx_memory
     hpx_plugin
     hpx_program_options
+    hpx_resource_partitioner
     hpx_serialization
+    hpx_threadmanager
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

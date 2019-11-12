@@ -14,7 +14,7 @@
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
@@ -119,8 +119,8 @@ namespace hpx { namespace threads { namespace detail
             if (!sched_->Scheduler::has_reached_state(state_suspended))
             {
                 // still running
-                lcos::local::no_mutex mtx;
-                std::unique_lock<lcos::local::no_mutex> l(mtx);
+                std::mutex mtx;
+                std::unique_lock<std::mutex> l(mtx);
                 stop_locked(l);
             }
             threads_.clear();

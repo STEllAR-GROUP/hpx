@@ -242,8 +242,10 @@ namespace hpx { namespace threads {
 
     public:
         /// Return the id of the component this thread is running in
-        HPX_CXX14_CONSTEXPR naming::address_type get_component_id()
-            const noexcept
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+        HPX_CXX14_CONSTEXPR
+#endif
+        naming::address_type get_component_id() const noexcept
         {
             return 0;
         }
@@ -297,19 +299,28 @@ namespace hpx { namespace threads {
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
         /// Return the locality of the parent thread
-        HPX_CONSTEXPR std::uint32_t get_parent_locality_id() const noexcept
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+        HPX_CONSTEXPR
+#endif
+        std::uint32_t get_parent_locality_id() const noexcept
         {
             return naming::invalid_locality_id;
         }
 
         /// Return the thread id of the parent thread
-        HPX_CONSTEXPR thread_id_type get_parent_thread_id() const noexcept
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+        HPX_CONSTEXPR
+#endif
+        thread_id_type get_parent_thread_id() const noexcept
         {
             return threads::invalid_thread_id;
         }
 
         /// Return the phase of the parent thread
-        HPX_CONSTEXPR std::size_t get_parent_thread_phase() const noexcept
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+        HPX_CONSTEXPR
+#endif
+        std::size_t get_parent_thread_phase() const noexcept
         {
             return 0;
         }
@@ -347,7 +358,10 @@ namespace hpx { namespace threads {
 #ifndef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
-        HPX_CONSTEXPR char const* get_backtrace() const noexcept
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+        HPX_CONSTEXPR
+#endif
+        char const* get_backtrace() const noexcept
         {
             return nullptr;
         }
@@ -356,7 +370,10 @@ namespace hpx { namespace threads {
             return nullptr;
         }
 #else
-        HPX_CONSTEXPR util::backtrace const* get_backtrace() const noexcept
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+        HPX_CONSTEXPR
+#endif
+        util::backtrace const* get_backtrace() const noexcept
         {
             return nullptr;
         }
@@ -416,7 +433,10 @@ namespace hpx { namespace threads {
         }
 #endif
 
-        HPX_CXX14_CONSTEXPR thread_priority get_priority() const noexcept
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+        HPX_CXX14_CONSTEXPR
+#endif
+        thread_priority get_priority() const noexcept
         {
             return priority_;
         }

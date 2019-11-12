@@ -721,10 +721,12 @@ jobs:
               ninja -j2 -k 0 tests.unit.modules.preprocessor
               ninja -j2 -k 0 tests.unit.modules.program_options
               ninja -j2 -k 0 tests.unit.modules.resiliency
+              ninja -j2 -k 0 tests.unit.modules.resource_partitioner
               ninja -j2 -k 0 tests.unit.modules.serialization
               ninja -j2 -k 0 tests.unit.modules.statistics
               ninja -j2 -k 0 tests.unit.modules.testing
               ninja -j2 -k 0 tests.unit.modules.thread_support
+              ninja -j2 -k 0 tests.unit.modules.threadmanager
               ninja -j2 -k 0 tests.unit.modules.timing
               ninja -j2 -k 0 tests.unit.modules.topology
               ninja -j2 -k 0 tests.unit.modules.type_support
@@ -757,10 +759,12 @@ jobs:
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.program_options
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.resiliency
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.resource_partitioner
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.serialization
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.statistics
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.testing
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.threadmanager
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.timing
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.topology
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.type_support
@@ -980,9 +984,26 @@ jobs:
               if [[ -z "$CIRCLE_PR_NUMBER" ]] && [[ "$CIRCLE_BRANCH" == "master" ]]; then
                   docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
                   docker push ${TARGET_IMAGE_NAME}
+              else
+                  echo "Not on the master branch. The docker image will not be pushed."
+              fi
+
+  # This is the final step once everything else passes. We need a full clone
+  # here again to be able to push the new tag.
+  push_stable_tag:
+    docker:
+      - image: stellargroup/build_env:ubuntu
+    steps:
+      - checkout:
+          path: /hpx/source
+      - <<: *add_github_to_known_hosts
+      - <<: *configure_local_git
+      - run:
+          name: Push stable tag
+          command: |
+              if [[ -z "$CIRCLE_PR_NUMBER" ]] && [[ "$CIRCLE_BRANCH" == "master" ]]; then
                   # Tag the commmit
                   cd /hpx/source
-                  git remote set-url origin git@github.com:STEllAR-GROUP/hpx.git
                   git tag -f stable
                   ##########################################################
                   # NOTE: Dependency on the Docker push is so that users who
@@ -994,7 +1015,7 @@ jobs:
                   # Push the new stable commit tag
                   git push origin stable
               else
-                  echo "Not on the master branch. the image will not be pushed and the commit will not be tagged."
+                  echo "Not on the master branch. The commit will not be tagged."
               fi
 
 workflows:
@@ -1117,4 +1138,8 @@ workflows:
             - tests.performance
             - tests.regressions
             - examples
+          <<: *gh_pages_filter
+      - push_stable_tag:
+          requires:
+            - install
           <<: *gh_pages_filter
