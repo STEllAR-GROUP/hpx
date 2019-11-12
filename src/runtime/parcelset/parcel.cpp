@@ -458,7 +458,7 @@ namespace hpx { namespace parcelset
 
 #if defined(HPX_HAVE_APEX) && defined(HPX_HAVE_PARCEL_PROFILING)
         // tell APEX about the received parcel
-        util::external_timer::timer.recv(data_.parcel_id_.get_lsb(), size_,
+        util::external_timer::recv(data_.parcel_id_.get_lsb(), size_,
             naming::get_locality_id_from_gid(data_.source_id_),
             reinterpret_cast<std::uint64_t>(action_->get_parent_thread_id().get()));
 #endif

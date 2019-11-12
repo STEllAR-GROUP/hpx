@@ -427,7 +427,7 @@ namespace hpx { namespace parcelset
 
 #if defined(HPX_HAVE_APEX) && defined(HPX_HAVE_PARCEL_PROFILING)
             // tell APEX about the sent parcel
-            util::external_timer::timer.send(p.parcel_id().get_lsb(), p.size(),
+            util::external_timer::send(p.parcel_id().get_lsb(), p.size(),
                 p.destination_locality_id());
 #endif
         }

@@ -131,7 +131,7 @@ namespace hpx { namespace util
 
         if(!ec) {
 #ifdef HPX_HAVE_APEX
-            external_timer::timer.sample_value(name.c_str(), val);
+            external_timer::sample_value(name.c_str(), val);
 #elif HPX_HAVE_ITTNOTIFY != 0
             if (use_ittnotify_api)
             {
@@ -201,7 +201,7 @@ namespace hpx { namespace util
 
         if(!ec) {
 #ifdef HPX_HAVE_APEX
-            external_timer::timer.sample_value(name.c_str(), val);
+            external_timer::sample_value(name.c_str(), val);
 #elif HPX_HAVE_ITTNOTIFY != 0
             if (use_ittnotify_api)
             {

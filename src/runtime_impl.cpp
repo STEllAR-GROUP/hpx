@@ -406,7 +406,7 @@ namespace hpx
 
         // initialize instrumentation system
 #ifdef HPX_HAVE_APEX
-        util::external_timer::timer.init(nullptr, hpx::get_locality_id(),
+        util::external_timer::init(nullptr, hpx::get_locality_id(),
                 hpx::get_initial_num_localities());
 #endif
 
@@ -523,7 +523,7 @@ namespace hpx
 
 #if defined(HPX_HAVE_APEX)
         // not registering helper threads - for now
-        //util::external_timer::timer.register_thread(thread_name.c_str());
+        //util::external_timer::register_thread(thread_name.c_str());
 #endif
 
         // wait for termination
@@ -625,7 +625,7 @@ namespace hpx
 #endif
 //         deinit_tss();
 #ifdef HPX_HAVE_APEX
-        util::external_timer::timer.finalize();
+        util::external_timer::finalize();
 #endif
     }
 
@@ -924,7 +924,7 @@ namespace hpx
 
 #if defined(HPX_HAVE_APEX)
         if (std::strstr(name, "worker") != nullptr)
-            util::external_timer::timer.register_thread(name);
+            util::external_timer::register_thread(name);
 #endif
 
         // call thread-specific user-supplied on_start handler
