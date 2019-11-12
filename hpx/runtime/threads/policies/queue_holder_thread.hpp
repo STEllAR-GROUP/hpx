@@ -78,9 +78,12 @@ namespace hpx { namespace threads { namespace policies {
         QueueType * const np_queue_;
         QueueType * const lp_queue_;
 
-        const std::int16_t   owner_mask_;
-        const std::int16_t  queue_index_;
-        const std::int16_t domain_index_;
+        // these are the domain and local thread queue ids for the container
+        const std::uint16_t  domain_index_;
+        const std::uint16_t   queue_index_;
+        const std::uint16_t    thread_num_;
+        // a mask that hold a bit per queue to indicate ownership of the queue
+        const std::uint16_t    owner_mask_;
 
         // we must use OS mutexes here because we cannot suspend an HPX
         // thread whilst processing the Queues for that thread, this code
@@ -192,21 +195,24 @@ namespace hpx { namespace threads { namespace policies {
         queue_holder_thread(
                 QueueType *bp_queue, QueueType *hp_queue,
                 QueueType *np_queue, QueueType *lp_queue,
-                int owner, int id, int did,
+                std::uint16_t domain, std::uint16_t queue, std::uint16_t thread_num,
+                std::uint16_t owner,
                 const thread_queue_init_parameters &init)
             : bp_queue_(bp_queue)
             , hp_queue_(hp_queue)
             , np_queue_(np_queue)
             , lp_queue_(lp_queue)
+            , domain_index_(domain)
+            , queue_index_(queue)
+            , thread_num_(thread_num)
             , owner_mask_(owner)
-            , queue_index_(id)
-            , domain_index_(did)
             , min_delete_count_(init.min_delete_count_)
             , max_delete_count_(init.max_delete_count_)
             , max_terminated_threads_(init.max_terminated_threads_)
             , terminated_items_(max_thread_count)
         {
-            rollover_counters_.data_ = std::make_tuple(id, round_robin_rollover);
+            rollover_counters_.data_ =
+                    std::make_tuple(queue_index_, round_robin_rollover);
             tq_deb.debug(debug::str<>("construct")
                          , "D" , debug::dec<2>(domain_index_)
                          , "Q" , debug::dec<3>(queue_index_)
@@ -326,8 +332,18 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        bool cleanup_terminated(bool delete_all = false)
+        bool cleanup_terminated(std::size_t thread_num, bool delete_all)
         {
+            if (thread_num!=thread_num_) {
+                tq_deb.error(debug::str<>("assertion fail")
+                             , "thread_num", thread_num
+                             , "thread_num_", thread_num_
+                             , "queue_index_", queue_index_
+                             , queue_data_print(this)
+                             );
+            }
+            HPX_ASSERT(thread_num==thread_num_);
+
             if (terminated_items_count_.data_.load(std::memory_order_relaxed)==0)
                 return true;
 
@@ -372,8 +388,13 @@ namespace hpx { namespace threads { namespace policies {
 
         // ----------------------------------------------------------------
         void create_thread(thread_init_data& data, thread_id_type* tid,
-                           thread_state_enum state, bool run_now, error_code& ec)
+                           thread_state_enum state, bool run_now, std::uint16_t thread_num,
+                           error_code& ec)
         {
+            if (thread_num!=thread_num_) {
+                run_now = false;
+            }
+
             // create the thread using priority to select queue
             if (data.priority == thread_priority_normal)
             {
@@ -542,6 +563,11 @@ namespace hpx { namespace threads { namespace policies {
                 address << (void const *)td;
                 std::string prev = address.str();
 
+                tq_deb.error(debug::str<>("map add")
+                             , "Couldn't add new thread to the thread map"
+                             , queue_data_print(this)
+                             , debug::threadinfo<thread_id_type*>(&tid));
+
                 lk.unlock();
                 HPX_THROW_EXCEPTION(hpx::out_of_memory,
                     "queue_holder_thread::add_to_thread_map",
@@ -565,6 +591,7 @@ namespace hpx { namespace threads { namespace policies {
         {
             // this thread has to be in this map
             HPX_ASSERT(thread_map_.find(tid)  !=  thread_map_.end());
+
             HPX_ASSERT(thread_map_count_.data_ >= 0);
 
             bool deleted = thread_map_.erase(tid) != 0;
@@ -636,34 +663,36 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        std::size_t add_new_HP(std::int64_t add_count, thread_holder_type* addfrom,
-            /*std::unique_lock<mutex_type>& lk, */bool stealing)
+        std::size_t add_new_HP(std::int64_t add_count,
+                               thread_holder_type* addfrom,
+                               bool stealing)
         {
             std::size_t added = 0;
             if (owns_bp_queue()) {
-                added = bp_queue_->add_new(add_count, addfrom->bp_queue_, /*lk, */stealing);
+                added = bp_queue_->add_new(add_count, addfrom->bp_queue_, stealing);
                 if (added>0) return added;
             }
 
             if (owns_hp_queue()) {
-                added = hp_queue_->add_new(add_count, addfrom->hp_queue_, /*lk, */stealing);
+                added = hp_queue_->add_new(add_count, addfrom->hp_queue_, stealing);
                 if (added>0) return added;
             }
             return 0;
         }
 
         // ----------------------------------------------------------------
-        std::size_t add_new(std::int64_t add_count, thread_holder_type* addfrom,
-            /*std::unique_lock<mutex_type>& lk, */bool stealing)
+        std::size_t add_new(std::int64_t add_count,
+                            thread_holder_type* addfrom,
+                            bool stealing)
         {
             std::size_t added = 0;
             if (owns_np_queue()) {
-                added = np_queue_->add_new(add_count, addfrom->np_queue_, /*lk, */stealing);
+                added = np_queue_->add_new(add_count, addfrom->np_queue_, stealing);
                 if (added>0) return added;
             }
 
             if (owns_lp_queue()) {
-                added = lp_queue_->add_new(add_count, addfrom->lp_queue_, /*lk, */stealing);
+                added = lp_queue_->add_new(add_count, addfrom->lp_queue_, stealing);
                 if (added>0) return added;
             }
             //
@@ -798,9 +827,9 @@ namespace hpx { namespace threads { namespace policies {
 
         // ------------------------------------------------------------
         /// Destroy the passed thread as it has been terminated
-        void destroy_thread(threads::thread_data* thrd, bool xthread)
+        void destroy_thread(threads::thread_data* thrd, std::uint16_t thread_num, bool xthread)
         {
-            // the thread must be destroyed by the same queue holder that owns it
+            // the thread must be destroyed by the same queue holder that created it
             HPX_ASSERT(&thrd->get_queue<queue_holder_thread>() == this);
             //
             tq_deb.debug(debug::str<>("destroy"), "terminated_items push"
@@ -812,7 +841,7 @@ namespace hpx { namespace threads { namespace policies {
 
             if (!xthread && (count > max_terminated_threads_))
             {
-                cleanup_terminated(false);   // clean up all terminated threads
+                cleanup_terminated(thread_num, false);   // clean up all terminated threads
             }
         }
 
@@ -892,8 +921,8 @@ namespace hpx { namespace threads { namespace policies {
         {
             tq_deb.debug(debug::str<>("details")
                 , "owner_mask_", debug::bin<8>(owner_mask_)
-                , "queue_index_", debug::dec<3>(queue_index_)
-                , "domain_index_", debug::dec<2>(domain_index_)
+                , "D" , debug::dec<2>(domain_index_)
+                , "Q" , debug::dec<3>(queue_index_)
             );
             tq_deb.debug(debug::str<>("bp_queue")
                     , debug::hex<12,void*>(bp_queue_)

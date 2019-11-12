@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
@@ -91,22 +90,15 @@ namespace hpx { namespace threads { namespace policies
     public:
         // ----------------------------------------------------------------
         // add new threads if there is some amount of work available
-        std::size_t add_new(std::int64_t add_count, thread_queue_type* addfrom,
-            /*std::unique_lock<mutex_type>& lk, */bool stealing)
+        std::size_t add_new(std::int64_t add_count,
+                            thread_queue_type* addfrom,
+                            bool stealing)
         {
             if (new_tasks_count_.data_.load(std::memory_order_relaxed)==0)
             {
                 return 0;
             }
             //
-//            if (lk.owns_lock())
-//                return 0;
-
-//            lk.try_lock();
-//            if (!lk.owns_lock()) {
-//                tqmc_deb.debug(debug::str<>("add_new"), "try_lock failed");
-//                return 0;
-//            }
 
             std::size_t added = 0;
             task_description task;
@@ -212,15 +204,8 @@ namespace hpx { namespace threads { namespace policies
             if (run_now)
             {
                 threads::thread_id_type tid;
-                std::unique_lock<mutex_type> lk(holder_->thread_map_mtx_.data_);
-
-                // The mutex can not be locked while a new thread is getting
-                // created, as it might be that the current HPX thread gets
-                // suspended.
-                {
-                    holder_->create_thread_object(tid, data, initial_state);
-                    holder_->add_to_thread_map(tid);
-                }
+                holder_->create_thread_object(tid, data, initial_state);
+                holder_->add_to_thread_map(tid);
 
                 // push the new thread in the pending queue thread
                 if (initial_state == pending)

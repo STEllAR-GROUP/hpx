@@ -93,7 +93,7 @@ namespace hpx { namespace threads { namespace executors
             if (ec)
                 return;
 
-            HPX_ASSERT(invalid_thread_id != id || !run_now);
+            //HPX_ASSERT(invalid_thread_id != id || !run_now);
 
             if (&ec != &throws)
                 ec = make_success_code();
