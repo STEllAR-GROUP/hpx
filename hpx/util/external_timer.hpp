@@ -313,6 +313,6 @@ namespace hpx { namespace util {
         void stop(void) {}
         void yield(void) {}
     };
-#endif
     }    // namespace hpx::util::external_timer
+#endif
 }}    // namespace hpx::util
