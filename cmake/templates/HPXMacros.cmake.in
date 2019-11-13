@@ -85,19 +85,13 @@ function(hpx_check_boost_compatibility)
   endif()
 endfunction()
 
-function(hpx_setup_allocator)
-  if(HPX_DISABLE_CUSTOM_ALLOCATOR)
-    return()
+function(hpx_check_allocator_compatibility)
+  string(TOUPPER "${HPX_WITH_MALLOC}" HPX_MALLOC_UPPER)
+  string(TOUPPER "${HPX_WITH_MALLOC_DEFAULT}" HPX_MALLOC_DEFAULT_UPPER)
+  if(NOT (HPX_MALLOC_UPPER STREQUAL HPX_MALLOC_DEFAULT_UPPER))
+    hpx_error("HPX_WITH_MALLOC has been changed by this project. This project "
+      "has set HPX_WITH_MALLOC='${HPX_WITH_MALLOC}' and HPX was configured "
+      "with '${HPX_WITH_MALLOC_DEFAULT}'. HPX_WITH_MALLOC is only provided for "
+      "informational purposes to dependent projects and should not be changed.")
   endif()
-  if(HPX_WITH_MALLOC)
-    string(TOUPPER "${HPX_WITH_MALLOC}" HPX_MALLOC_UPPER)
-    string(TOUPPER "${HPX_WITH_MALLOC_DEFAULT}" HPX_MALLOC_DEFAULT_UPPER)
-    if(NOT (HPX_MALLOC_UPPER STREQUAL HPX_MALLOC_DEFAULT_UPPER))
-      hpx_error("The specified allocators do not match. This Project is configured with '${HPX_WITH_MALLOC}' and HPX was configured with '${HPX_WITH_MALLOC_DEFAULT}'.")
-    endif()
-  endif()
-  set(HPX_WITH_MALLOC ${HPX_WITH_MALLOC_DEFAULT} CACHE STRING
-    "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"
-    STRINGS "system;tcmalloc;jemalloc;mimalloc;tbbmalloc;custom")
-  include(HPX_SetupAllocator)
 endfunction()
