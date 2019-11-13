@@ -278,6 +278,9 @@ if (TARGET hpx::amplifier)
 endif()
 
 if (TARGET hpx::apex)
+  # APEX won't get explicitly pulled into libhpx.so any more.  HOWEVER,
+  # we do want to add the APEX link commands to all executables, so 
+  # we use the "INTERFACE" option for target_link_libraries.
   target_link_libraries(hpx INTERFACE "-Wl,--whole-archive" hpx::apex "-Wl,--no-whole-archive")
   # System has been removed when passing at set_property for cmake < 3.11 in
   # HPX_SetupApex.cmake so the property get is not SYSTEM_INTERFACE_INC_DIR
