@@ -80,6 +80,7 @@ namespace hpx { namespace util
                 nullptr)
         {
 #if defined(HPX_HAVE_APEX)
+            /* update the task wrapper in APEX to use the specified name */
             threads::set_self_timer_data(
                 external_timer::update_task(threads::get_self_timer_data(),
                 desc_));
@@ -95,9 +96,8 @@ namespace hpx { namespace util
                 nullptr)
         {
 #if defined(HPX_HAVE_APEX)
-            threads::set_self_timer_data(
-                external_timer::update_task(threads::get_self_timer_data(),
-                desc_));
+            /* no need to update the task description in APEX, because
+             * this same description was used when the task was created. */
 #endif
         }
 

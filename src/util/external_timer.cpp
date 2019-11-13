@@ -27,7 +27,7 @@ namespace hpx { namespace util {
 
     namespace external_timer {
 
-    std::shared_ptr<task_wrapper> new_task(thread_description const& description,
+    HPX_EXPORT std::shared_ptr<task_wrapper> new_task(thread_description const& description,
         std::uint32_t parent_locality_id,
         threads::thread_id_type const& parent_task)
     {
@@ -52,7 +52,7 @@ namespace hpx { namespace util {
     }
 
     /* register the function pointers */
-    void register_external_timer(registration_t &registration) {
+    HPX_EXPORT void register_external_timer(registration_t &registration) {
         switch (registration.type) {
             case init_flag: {
                 init_function = registration.record.init;
@@ -118,11 +118,11 @@ namespace hpx { namespace util {
     sample_value_t *sample_value_function{nullptr};
     send_t *send_function{nullptr};
     recv_t *recv_function{nullptr};
-    update_task_string_t *update_task_string_function{nullptr};
-    update_task_address_t *update_task_address_function{nullptr};
-    start_t *start_function{nullptr};
-    stop_t *stop_function{nullptr};
-    yield_t *yield_function{nullptr};
+    HPX_EXPORT update_task_string_t *update_task_string_function{nullptr};
+    HPX_EXPORT update_task_address_t *update_task_address_function{nullptr};
+    HPX_EXPORT start_t *start_function{nullptr};
+    HPX_EXPORT stop_t *stop_function{nullptr};
+    HPX_EXPORT yield_t *yield_function{nullptr};
 
     } // namespace hpx::util::external_timer
 

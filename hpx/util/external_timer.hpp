@@ -15,6 +15,24 @@
 #include <memory>
 #include <string>
 
+/* note carefully...some symbols are referenced by annotated_function.hpp
+ * which gets included by many things.  Therefore, we include a weak reference
+ * so that we don't get linker errors for shared object libraries that don't
+ * link with libhpx.so. */
+
+#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+#define HPX_UTIL_WEAK_PRE __declspec(selectany)
+#define HPX_UTIL_WEAK_POST
+#else // not WIN32
+#ifdef __clang__
+#define HPX_UTIL_WEAK_PRE
+#define HPX_UTIL_WEAK_POST __attribute__((weak_import))
+#else // not clang
+#define HPX_UTIL_WEAK_PRE __attribute__((weak))
+#define HPX_UTIL_WEAK_POST
+#endif
+#endif
+
 namespace hpx { namespace util {
 
 #ifdef HPX_HAVE_APEX
@@ -95,7 +113,9 @@ namespace hpx { namespace util {
         } record;
     } registration_t;
 
-    /* The actual function pointers */
+    /* The actual function pointers.  Some of them need to be exported,
+     * because through the miracle of chained headers they get referenced
+     * outside of the HPX library. */
     extern init_t *init_function;
     extern finalize_t *finalize_function;
     extern register_thread_t *register_thread_function;
@@ -104,14 +124,14 @@ namespace hpx { namespace util {
     extern sample_value_t *sample_value_function;
     extern send_t *send_function;
     extern recv_t *recv_function;
-    extern update_task_string_t *update_task_string_function;
-    extern update_task_address_t *update_task_address_function;
-    extern start_t *start_function;
-    extern stop_t *stop_function;
-    extern yield_t *yield_function;
+    HPX_EXPORT extern update_task_string_t *update_task_string_function ;
+    HPX_EXPORT extern update_task_address_t *update_task_address_function ;
+    HPX_EXPORT extern start_t *start_function ;
+    HPX_EXPORT extern stop_t *stop_function ;
+    HPX_EXPORT extern yield_t *yield_function ;
 
     /* The function registration interface */
-    void register_external_timer(registration_t &registration_record);
+    HPX_EXPORT void register_external_timer(registration_t &registration_record);
 
     /* The actual API.  For all cases, check if the function pointer is
        null, and if not null call the registered function. */
@@ -189,7 +209,7 @@ namespace hpx { namespace util {
         std::uint32_t parent_locality_id,
         threads::thread_id_type const& parent_task);
 
-    inline std::shared_ptr<task_wrapper> update_task(
+    HPX_EXPORT inline std::shared_ptr<task_wrapper> update_task(
         std::shared_ptr<task_wrapper> wrapper, thread_description const& description)
     {
         if (wrapper == nullptr)

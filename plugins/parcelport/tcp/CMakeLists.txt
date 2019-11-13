@@ -42,7 +42,4 @@ if(HPX_WITH_PARCELPORT_TCP)
     FOLDER
       "Core/Plugins/Parcelport/Tcp"
     )
-  if (TARGET hpx::apex)
-    set_property(TARGET parcelport_tcp PROPERTY LINK_LIBRARIES hpx::apex)
-  endif()
 endif()

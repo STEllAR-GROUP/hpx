@@ -82,11 +82,3 @@ add_hpx_module(collectives
     CMAKE_SUBDIRS examples tests
 )
 
-# Temporary : this module is currently depending on main headers which
-# themselves include apex. In the future, those main headers would be in a
-# module that link to apex, and we'd be able to remove this.
-if (TARGET hpx::apex)
-  target_link_libraries(hpx_collectives PRIVATE hpx::apex)
-  get_target_property(_apex_inc_dir hpx::apex INTERFACE_INCLUDE_DIRECTORIES)
-  target_include_directories(hpx_collectives INTERFACE "${_apex_inc_dir}")
-endif()

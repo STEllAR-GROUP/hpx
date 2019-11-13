@@ -278,7 +278,7 @@ if (TARGET hpx::amplifier)
 endif()
 
 if (TARGET hpx::apex)
-  target_link_libraries(hpx PRIVATE hpx::apex)
+  target_link_libraries(hpx INTERFACE "-Wl,--whole-archive" hpx::apex "-Wl,--no-whole-archive")
   # System has been removed when passing at set_property for cmake < 3.11 in
   # HPX_SetupApex.cmake so the property get is not SYSTEM_INTERFACE_INC_DIR
   # anymore, we can put it back once we require cmake >= 3.11
