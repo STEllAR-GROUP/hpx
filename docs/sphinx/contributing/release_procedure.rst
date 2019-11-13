@@ -7,7 +7,7 @@
 Release procedure for |hpx|
 ===========================
 
-Below is a step-wise procedure for making an |hpx| release. We aim to produce two
+Below is a step by step procedure for making an |hpx| release. We aim to produce two
 releases per year: one in March-April, and one in September-October.
 
 This is a living document and may not be totally current or accurate. It is an
