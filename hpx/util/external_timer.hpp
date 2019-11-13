@@ -37,21 +37,17 @@ namespace hpx { namespace util {
 
 #ifdef HPX_HAVE_APEX
 
-    typedef uint64_t init_t(const char * thread_name,
-        const uint64_t comm_rank, const uint64_t comm_size);
-
     using enable_parent_task_handler_type = std::function<bool()>;
 
     HPX_EXPORT void set_enable_parent_task_handler(
         enable_parent_task_handler_type f);
 
+    namespace external_timer {
+
     /* HPX provides a smart pointer to a data object that maintains
      * information about an hpx_thread.  Any library (i.e. APEX)
      * that wants to use this callback API needs to extend this class.
      */
-
-    namespace external_timer {
-
     struct task_wrapper {
         bool dummy;
     };
@@ -287,8 +283,15 @@ namespace hpx { namespace util {
         bool stopped;
         std::shared_ptr<task_wrapper> data_;
     };
+    }    // namespace hpx::util::external_timer
 
 #else
+    namespace external_timer {
+
+    struct task_wrapper {
+        bool dummy;
+    };
+
     inline std::shared_ptr<task_wrapper> new_task(
         thread_description const& description,
         std::uint32_t parent_locality_id,
