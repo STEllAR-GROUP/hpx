@@ -5,7 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 
-if(HPX_WITH_CUDA)
+if(HPX_WITH_CUDA AND NOT TARGET hpx::cuda)
 
   find_package(CUDA REQUIRED)
   set(HPX_WITH_COMPUTE ON)
@@ -61,7 +61,6 @@ if(HPX_WITH_CUDA)
     endif()
     target_link_libraries(hpx::cuda INTERFACE cudart)
   endif()
+
   target_link_libraries(hpx_base_libraries INTERFACE hpx::cuda)
-
 endif()
-

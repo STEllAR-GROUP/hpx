@@ -38,7 +38,7 @@ foreach(test ${tests})
     ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Unit/Compute/CUDA")
+    FOLDER "Tests/Unit/Modules/Compute/CUDA")
 
   add_hpx_unit_test("modules.compute_cuda" ${test} ${${test}_PARAMETERS})
 endforeach()

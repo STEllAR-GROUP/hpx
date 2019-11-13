@@ -58,7 +58,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_some.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_each.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/util/checkpoint.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/debugging.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal_async.hpp"
@@ -260,6 +259,8 @@ create_symbolic_link("${PROJECT_SOURCE_DIR}/examples"
                      "${CMAKE_CURRENT_BINARY_DIR}/examples")
 create_symbolic_link("${PROJECT_SOURCE_DIR}/tests"
                      "${CMAKE_CURRENT_BINARY_DIR}/tests")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/libs"
+                     "${CMAKE_CURRENT_BINARY_DIR}/libs")
 
 hpx_source_to_doxygen(hpx_autodoc
   DEPENDENCIES ${doxygen_dependencies})

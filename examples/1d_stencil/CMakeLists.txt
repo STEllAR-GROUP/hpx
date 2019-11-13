@@ -10,7 +10,6 @@ set(example_programs
     1d_stencil_2
     1d_stencil_3
     1d_stencil_4
-    1d_stencil_4_checkpoint
     1d_stencil_4_parallel
     1d_stencil_5
     1d_stencil_6
@@ -42,7 +41,6 @@ set(1d_stencil_1_PARAMETERS THREADS_PER_LOCALITY 4)
 set(1d_stencil_2_PARAMETERS THREADS_PER_LOCALITY 4)
 set(1d_stencil_3_PARAMETERS THREADS_PER_LOCALITY 4)
 set(1d_stencil_4_PARAMETERS THREADS_PER_LOCALITY 4)
-set(1d_stencil_4_checkpoint_PARAMETERS THREADS_PER_LOCALITY 4)
 set(1d_stencil_4_parallel_PARAMETERS THREADS_PER_LOCALITY 4)
 set(1d_stencil_5_PARAMETERS THREADS_PER_LOCALITY 4)
 set(1d_stencil_6_PARAMETERS THREADS_PER_LOCALITY 4)

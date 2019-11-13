@@ -332,9 +332,9 @@ foreach(_module ${HPX_LIBS})
     # add the full archive (some are not used directly in libhpx and need to be
     # forced into libhpx with this option)
     if(APPLE)
-        set(_module_target "-Wl,-all_load" "${_module_target}")
-    else(APPLE)
-        set(_module_target "-Wl,--whole-archive" "${_module_target}" "-Wl,--no-whole-archive")
+      set(_module_target "-Wl,-all_load" "${_module_target}")
+    else(APPLE) # not apple, regular linux
+      set(_module_target "-Wl,--whole-archive" "${_module_target}" "-Wl,--no-whole-archive")
     endif(APPLE)
   endif(UNIX)
 

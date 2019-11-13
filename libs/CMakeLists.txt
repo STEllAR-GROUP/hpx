@@ -16,6 +16,7 @@ set(HPX_LIBS
   assertion
   basic_execution
   cache
+  checkpoint
   collectives
   compute
   compute_cuda
@@ -104,6 +105,7 @@ foreach(lib ${HPX_LIBS})
 
   set(MODULE_FORCE_LINKING_INCLUDES
     "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\n")
+
   set(MODULE_FORCE_LINKING_CALLS
     "${MODULE_FORCE_LINKING_CALLS}\n        ${lib}::force_linking();")
 
@@ -114,9 +116,9 @@ foreach(lib ${HPX_LIBS})
 endforeach()
 
 configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/modules.cpp.in"
-  "${CMAKE_BINARY_DIR}/libs/modules.cpp"
-  @ONLY)
+    "${PROJECT_SOURCE_DIR}/cmake/templates/modules.cpp.in"
+    "${CMAKE_BINARY_DIR}/libs/modules.cpp"
+    @ONLY)
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
