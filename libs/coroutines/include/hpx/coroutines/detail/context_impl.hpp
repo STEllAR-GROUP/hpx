@@ -116,7 +116,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 }}}}    // namespace hpx::threads::coroutines::detail
 
 #elif (defined(__linux) || defined(linux) || defined(__linux__)) &&            \
-    !defined(__bgq__) && !defined(__powerpc__) && !defined(__s390x_)
+    !defined(__bgq__) && !defined(__powerpc__) && !defined(__s390x__)
 
 #include <hpx/coroutines/detail/context_linux_x86.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
@@ -125,7 +125,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 }}}}    // namespace hpx::threads::coroutines::detail
 
 #elif defined(_POSIX_VERSION) || defined(__bgq__) || defined(__powerpc__) ||   \
-    defined(__s390x_)
+    defined(__s390x__)
 
 #include <hpx/coroutines/detail/context_posix.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
