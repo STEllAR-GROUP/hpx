@@ -83,3 +83,7 @@ add_hpx_module(collectives
     CMAKE_SUBDIRS examples tests
 )
 
+# Temporary since the module still depends on some runtime files
+target_link_libraries(hpx_collectives PUBLIC
+  hpx_static_reinit
+  )

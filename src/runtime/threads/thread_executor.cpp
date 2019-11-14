@@ -11,7 +11,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/util/reinitializable_static.hpp>
+#include <hpx/static_reinit/reinitializable_static.hpp>
 
 #include <cstddef>
 #include <mutex>

@@ -38,7 +38,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/format.hpp>
-#include <hpx/util/reinitializable_static.hpp>
+#include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 

@@ -45,6 +45,7 @@ set(HPX_LIBS
   resource_partitioner
   segmented_algorithms
   serialization
+  static_reinit
   statistics
   testing
   thread_support
