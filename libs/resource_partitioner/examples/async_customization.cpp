@@ -28,8 +28,6 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/pack_traversal.hpp>
 //
-#include "shared_priority_queue_scheduler.hpp"
-//
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -474,7 +472,7 @@ int main(int argc, char** argv)
 
     // declare the high priority scheduler type we'll use
     using high_priority_sched =
-        hpx::threads::policies::example::shared_priority_queue_scheduler<>;
+        hpx::threads::policies::shared_priority_queue_scheduler<>;
     using hpx::threads::policies::scheduler_mode;
     // setup the default pool with our custom priority scheduler
     rp.create_thread_pool("custom",
