@@ -1171,6 +1171,20 @@ if(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
 endif()
 
 ################################################################################
+# Set configuration option to use Boost.Context or not. This depends on the
+# platform.
+set(__use_generic_coroutine_context OFF)
+if(APPLE)
+  set(__use_generic_coroutine_context ON)
+endif()
+if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+  set(__use_generic_coroutine_context ON)
+endif()
+hpx_option(HPX_WITH_GENERIC_CONTEXT_COROUTINES BOOL
+  "Use Boost.Context as the underlying coroutines context switch implementation."
+  ${__use_generic_coroutine_context} ADVANCED)
+
+################################################################################
 # check for miscellaneous things
 ################################################################################
 
@@ -1561,20 +1575,6 @@ endif()
 
 # store target architecture for later use
 set(HPX_WITH_TARGET_ARCHITECTURE ${__target_arch} CACHE INTERNAL "" FORCE)
-
-################################################################################
-# Set configuration option to use Boost.Context or not. This depends on the
-# platform.
-set(__use_generic_coroutine_context OFF)
-if(APPLE)
-  set(__use_generic_coroutine_context ON)
-endif()
-if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ")
-  set(__use_generic_coroutine_context ON)
-endif()
-hpx_option(HPX_WITH_GENERIC_CONTEXT_COROUTINES BOOL
-  "Use Boost.Context as the underlying coroutines context switch implementation."
-  ${__use_generic_coroutine_context} ADVANCED)
 
 # Compatibility with using Boost.ProgramOptions, introduced in V1.4.0
 hpx_option(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY

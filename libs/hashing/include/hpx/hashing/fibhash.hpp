@@ -16,7 +16,9 @@
 #include <cstdlib>
 
 namespace hpx { namespace util {
+
     namespace detail {
+
         template <std::size_t N>
         struct hash_helper;
 
@@ -29,18 +31,18 @@ namespace hpx { namespace util {
         template <std::size_t N>
         struct hash_helper
         {
-            HPX_STATIC_CONSTEXPR std::size_t log2 =
+            HPX_STATIC_CONSTEXPR std::uint64_t log2 =
                 hash_helper<(N >> 1)>::log2 + 1;
-            HPX_STATIC_CONSTEXPR std::size_t shift_amount = 64 - log2;
+            HPX_STATIC_CONSTEXPR std::uint64_t shift_amount = 64 - log2;
         };
 
-        HPX_STATIC_CONSTEXPR std::size_t golden_ratio = 11400714819323198485llu;
+        HPX_STATIC_CONSTEXPR std::uint64_t golden_ratio = 11400714819323198485llu;
     }    // namespace detail
 
     // This function calculates the hash based on a multiplicative Fibonacci
     // scheme
     template <std::size_t N>
-    HPX_CONSTEXPR std::size_t fibhash(std::size_t i)
+    HPX_CONSTEXPR std::size_t fibhash(std::uint64_t i)
     {
         using helper = detail::hash_helper<N>;
         static_assert(N != 0, "This algorithm only works with N != 0");
