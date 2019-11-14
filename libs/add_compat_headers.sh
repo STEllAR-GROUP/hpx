@@ -10,6 +10,8 @@
 # This file is globbing through the include_compatibility folder, so basic 
 # files should already be here
 
+# There is a possibility to specify the files manually
+
 script_sourced=0
 # Important to be at the beginning
 if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
@@ -22,11 +24,19 @@ function _exit() {
     fi
 }
 
+function extra_usage_message() {
+    echo
+    echo "- Can specify the --project_path if different from $HPX_ROOT"
+    echo "- Can also specify some target files if no globbing (without any extension) with:"
+    echo "--files \"<filename1> <filename2>\""
+    echo "Example with files: ./libs/add_compat_headers.sh -m module --files file -o hpx/util -p \$PWD"
+}
+
 if [[ $# -lt 1 ]]; then
     arg=${BASH_SOURCE[0]}
     echo "Usage : "$arg" -m <module_name> --old_path <include_path> --new_path <include_path>"
     echo "Example: "$arg" -m cache -o hpx/util/cache -n hpx/cache"
-    echo "Can specify the --project_path if different from $HPX_ROOT"
+    extra_usage_message
     _exit
     return
 fi
@@ -40,35 +50,44 @@ function parse_arguments() {
     do
         local key="$1"
         case $key in
+            -f|--files)
+                all_files=0
+                files=$2
+                echo "manually specified files => no globbing"
+                shift # pass option
+                shift # pass value
+                ;;
             -m|--module)
                 module=$2
                 echo "module : ${module}"
                 shift # pass option
-                shift # padd value
+                shift # pass value
                 ;;
             -n|--new_path)
+                new_path_set=true
                 new_path=$2
                 echo "new_path : ${new_path}"
                 shift # pass option
-                shift # padd value
+                shift # pass value
                 ;;
             -o|--old_path)
+                old_path_set=true
                 old_path=$2
                 echo "old_path : ${old_path}"
                 shift # pass option
-                shift # padd value
+                shift # pass value
                 ;;
             -p|--project_path)
                 project_path=$2
-                echo "project_path: ${project_path}"
                 shift # pass option
-                shift # padd value
+                shift # pass value
                 ;;
             --help|*)
-                echo $"Usage: $0 [-m, --module <value>] [-o, --old_path <value>] \
-                [-n, --new_path <value>] [-p, --project_path <value>]"
+                echo $"Usage: $0 [-m, --module <value>] [-o, --old_path <value>]"
+                echo "[-n, --new_path <value>] [-p, --project_path <value>]"
+                echo "[-f, --files \"<value1> <value2>\"]"
                 echo "Example: "$0" -m cache -o hpx/util/cache -n hpx/cache"
-                echo "Can specify the --project_path if different from $HPX_ROOT"
+                extra_usage_message
                 _exit
                 return
         esac
@@ -82,8 +101,8 @@ function parse_arguments() {
 # Default values which can be overwritten while parsing args
 project_path=$HPX_ROOT
 module=cache
-old_path=hpx/util/${module}
-new_path=hpx/${module}
+new_path_set=false
+old_path_set=false
 # Default is globbing compatibility files
 all_files=1
 files=
@@ -91,11 +110,23 @@ files=
 # Parsing arguments
 parse_arguments "$@"
 
+echo
+echo "project_path: ${project_path}"
 # Usual vars (depend on the parsing step)
 libs_path=$project_path/libs
 module_path=$libs_path/${module}
 module_caps=${module^^}
 
+# Error handling
+if [[ "$old_path_set" = "false" ]]; then
+    old_path=hpx/util/${module}
+fi
+if [[ "$new_path_set" = "false" ]]; then
+    new_path=hpx/${module}
+fi
+if [[ "$old_path_set" = "false" && $all_files -eq 0 ]]; then
+    echo "Attention only the basename of the files should be specified"
+fi
 # Project path not set (full specified path to be sure which source is used)
 if [[ -z $HPX_ROOT && -z $project_path ]]; then
     "HPX_ROOT env var doesn't exists and project_path option not specified !"
@@ -103,24 +134,27 @@ if [[ -z $HPX_ROOT && -z $project_path ]]; then
     return
 fi
 
-pushd $module_path/include_compatibility/${old_root}
+pushd $module_path/include_compatibility > /dev/null
 if [[ $? -eq 1 ]]; then
     echo "Please specify a correct project_path"
     _exit
     return
 fi
+echo "current path: $module_path/include_compatibility"
+
 # To enable **
 shopt -s globstar
 # Globbing step to get all the include_compatibility files, the files have to
 # already be there, we are just rewriting them
 if [[ all_files -eq 0 ]]; then
-    # To set the files manually, don't forget to put the subdirs (of old_root) if there is
-    files=(histogram rolling_max rolling_min)
+    files=($files)  # Make the string become an array
     files=(${files[@]/%/.hpp})
+    files=(${files[@]/#/$old_path/})
 else
     files=($(ls **/*.hpp))
 fi
 
+echo
 echo "Files overwritten :"
 # Create the corresponding compatibility headers
 for full_file in "${files[@]}"; do
@@ -155,4 +189,4 @@ EOL
 
 done
 
-popd
+popd > /dev/null

@@ -15,6 +15,8 @@
 # specified in the deprecation message in include_compatibility (so it is better
 # to execute add_compat_headers.sh after this script)
 
+# This file should be sourced for the sed to work
+
 # Arguments to modify :
 module=functional
 project_root=~/projects/hpx_module_functional
