@@ -273,7 +273,6 @@ namespace hpx { namespace util {
     namespace external_timer {
 
     struct task_wrapper {
-        bool dummy;
     };
 
     inline std::shared_ptr<task_wrapper> new_task(
