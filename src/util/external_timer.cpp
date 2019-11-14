@@ -27,7 +27,8 @@ namespace hpx { namespace util {
 
     namespace external_timer {
 
-    HPX_EXPORT std::shared_ptr<task_wrapper> new_task(thread_description const& description,
+    std::shared_ptr<task_wrapper> new_task(
+        thread_description const& description,
         std::uint32_t parent_locality_id,
         threads::thread_id_type const& parent_task)
     {
@@ -41,18 +42,20 @@ namespace hpx { namespace util {
 
         if (description.kind() == thread_description::data_type_description)
         {
-            return new_task(description.get_description(), UINTMAX_MAX, parent_wrapper);
+            return new_task(description.get_description(), UINTMAX_MAX,
+                parent_wrapper);
         }
         else
         {
             HPX_ASSERT(
                 description.kind() == thread_description::data_type_address);
-            return new_task(description.get_address(), UINTMAX_MAX, parent_wrapper);
+            return new_task(description.get_address(), UINTMAX_MAX,
+                parent_wrapper);
         }
     }
 
     /* register the function pointers */
-    HPX_EXPORT void register_external_timer(registration_t &registration) {
+    void register_external_timer(registration_t &registration) {
         switch (registration.type) {
             case init_flag: {
                 init_function = registration.record.init;
@@ -71,15 +74,18 @@ namespace hpx { namespace util {
                 break;
             }
             case new_task_address_flag: {
-                new_task_address_function = registration.record.new_task_address;
+                new_task_address_function =
+                    registration.record.new_task_address;
                 break;
             }
             case update_task_string_flag: {
-                update_task_string_function = registration.record.update_task_string;
+                update_task_string_function =
+                    registration.record.update_task_string;
                 break;
             }
             case update_task_address_flag: {
-                update_task_address_function = registration.record.update_task_address;
+                update_task_address_function =
+                    registration.record.update_task_address;
                 break;
             }
             case sample_value_flag: {
@@ -118,11 +124,11 @@ namespace hpx { namespace util {
     sample_value_t *sample_value_function{nullptr};
     send_t *send_function{nullptr};
     recv_t *recv_function{nullptr};
-    HPX_EXPORT update_task_string_t *update_task_string_function{nullptr};
-    HPX_EXPORT update_task_address_t *update_task_address_function{nullptr};
-    HPX_EXPORT start_t *start_function{nullptr};
-    HPX_EXPORT stop_t *stop_function{nullptr};
-    HPX_EXPORT yield_t *yield_function{nullptr};
+    update_task_string_t *update_task_string_function{nullptr};
+    update_task_address_t *update_task_address_function{nullptr};
+    start_t *start_function{nullptr};
+    stop_t *stop_function{nullptr};
+    yield_t *yield_function{nullptr};
 
     } // namespace hpx::util::external_timer
 

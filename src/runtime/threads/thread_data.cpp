@@ -21,6 +21,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads {
@@ -340,7 +341,8 @@ namespace hpx { namespace threads {
     }
 
 #if defined(HPX_HAVE_APEX)
-    task_wrapper get_self_timer_data()
+    std::shared_ptr<hpx::util::external_timer::task_wrapper>
+        get_self_timer_data()
     {
         thread_data* thrd_data = get_self_id_data();
         if (HPX_LIKELY(nullptr != thrd_data))
@@ -349,7 +351,8 @@ namespace hpx { namespace threads {
         }
         return nullptr;
     }
-    void set_self_timer_data(task_wrapper data)
+    void set_self_timer_data(
+        std::shared_ptr<hpx::util::external_timer::task_wrapper> data)
     {
         thread_data* thrd_data = get_self_id_data();
         if (HPX_LIKELY(nullptr != thrd_data))

@@ -279,7 +279,7 @@ endif()
 
 if (TARGET hpx::apex)
   # APEX won't get explicitly pulled into libhpx.so any more.  HOWEVER,
-  # we do want to add the APEX link commands to all executables, so 
+  # we do want to add the APEX link commands to all executables, so
   # we use the "INTERFACE" option for target_link_libraries.
   # Because libhpx_apex is a shared object library, we don't need to specify
   # the whole archive.

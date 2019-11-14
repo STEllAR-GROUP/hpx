@@ -24,10 +24,9 @@
 #include <utility>
 
 #if defined(HPX_HAVE_APEX)
-namespace hpx::util::external_timer {
+namespace hpx { namespace util { namespace external_timer {
     struct task_wrapper;
-}
-using task_wrapper = std::shared_ptr<hpx::util::external_timer::task_wrapper>;
+}}}
 #endif
 
 namespace hpx {
@@ -170,8 +169,10 @@ namespace hpx { namespace threads {
         thread_state_enum state = unknown);
 
 #if defined(HPX_HAVE_APEX)
-    HPX_API_EXPORT task_wrapper get_self_timer_data(void);
-    HPX_API_EXPORT void set_self_timer_data(task_wrapper data);
+    HPX_API_EXPORT std::shared_ptr<hpx::util::external_timer::task_wrapper>
+        get_self_timer_data(void);
+    HPX_API_EXPORT void set_self_timer_data(
+        std::shared_ptr<hpx::util::external_timer::task_wrapper> data);
 #endif
 }}    // namespace hpx::threads
 

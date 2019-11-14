@@ -72,7 +72,6 @@ foreach(example_program ${example_programs})
 
 endforeach()
 
-
 if(HPX_WITH_EXAMPLES_OPENMP)
   set_target_properties(1d_stencil_1_omp
     PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")

@@ -15,24 +15,6 @@
 #include <memory>
 #include <string>
 
-/* note carefully...some symbols are referenced by annotated_function.hpp
- * which gets included by many things.  Therefore, we include a weak reference
- * so that we don't get linker errors for shared object libraries that don't
- * link with libhpx.so. */
-
-#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
-#define HPX_UTIL_WEAK_PRE __declspec(selectany)
-#define HPX_UTIL_WEAK_POST
-#else // not WIN32
-#ifdef __clang__
-#define HPX_UTIL_WEAK_PRE
-#define HPX_UTIL_WEAK_POST __attribute__((weak_import))
-#else // not clang
-#define HPX_UTIL_WEAK_PRE __attribute__((weak))
-#define HPX_UTIL_WEAK_POST
-#endif
-#endif
-
 namespace hpx { namespace util {
 
 #ifdef HPX_HAVE_APEX
@@ -49,7 +31,6 @@ namespace hpx { namespace util {
      * that wants to use this callback API needs to extend this class.
      */
     struct task_wrapper {
-        bool dummy;
     };
 
     /* Enumeration of function type flags */
@@ -127,7 +108,8 @@ namespace hpx { namespace util {
     HPX_EXPORT extern yield_t *yield_function ;
 
     /* The function registration interface */
-    HPX_EXPORT void register_external_timer(registration_t &registration_record);
+    HPX_EXPORT void register_external_timer(
+        registration_t &registration_record);
 
     /* The actual API.  For all cases, check if the function pointer is
        null, and if not null call the registered function. */
@@ -206,7 +188,8 @@ namespace hpx { namespace util {
         threads::thread_id_type const& parent_task);
 
     HPX_EXPORT inline std::shared_ptr<task_wrapper> update_task(
-        std::shared_ptr<task_wrapper> wrapper, thread_description const& description)
+        std::shared_ptr<task_wrapper> wrapper,
+        thread_description const& description)
     {
         if (wrapper == nullptr)
         {
@@ -218,7 +201,8 @@ namespace hpx { namespace util {
             thread_description::data_type_description)
         {
             // Disambiguate the call by making a temporary string object
-            return update_task(wrapper, std::string(description.get_description()));
+            return update_task(wrapper,
+                std::string(description.get_description()));
         }
         else
         {
@@ -301,14 +285,15 @@ namespace hpx { namespace util {
     }
 
     inline std::shared_ptr<task_wrapper> update_task(
-        std::shared_ptr<task_wrapper> wrapper, thread_description const& description)
+        std::shared_ptr<task_wrapper> wrapper,
+        thread_description const& description)
     {
         return nullptr;
     }
 
     struct scoped_timer
     {
-        scoped_timer(std::shared_ptr<task_wrapper> data_ptr) {}
+        explicit scoped_timer(std::shared_ptr<task_wrapper> data_ptr) {}
         ~scoped_timer() {}
         void stop(void) {}
         void yield(void) {}
