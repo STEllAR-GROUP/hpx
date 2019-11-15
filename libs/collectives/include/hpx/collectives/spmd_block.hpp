@@ -20,7 +20,7 @@
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/util/first_argument.hpp>
+#include <hpx/functional/first_argument.hpp>
 
 #include <boost/range/irange.hpp>
 

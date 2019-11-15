@@ -14,7 +14,7 @@
 #include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
-#include <hpx/util/first_argument.hpp>
+#include <hpx/functional/first_argument.hpp>
 
 #include <boost/range/irange.hpp>
 

@@ -21,6 +21,7 @@ set(functional_headers
   hpx/functional/bind.hpp
   hpx/functional/bind_back.hpp
   hpx/functional/bind_front.hpp
+  hpx/functional/first_argument.hpp
   hpx/functional/function.hpp
   hpx/functional/function_ref.hpp
   hpx/functional/invoke.hpp
@@ -45,6 +46,7 @@ set(functional_compat_headers
   hpx/util/bind_back.hpp
   hpx/util/bind_front.hpp
   hpx/util/deferred_call.hpp
+  hpx/util/first_argument.hpp
   hpx/util/function.hpp
   hpx/util/function_ref.hpp
   hpx/util/invoke.hpp
