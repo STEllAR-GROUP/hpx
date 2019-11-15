@@ -6,14 +6,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime_configuration/config/defines.hpp>
-#include <hpx/runtime_configuration/find_prefix.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 
 #if defined(HPX_RUNTIME_CONFIGURATION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message("The header hpx/util/find_prefix.hpp is deprecated, \
-    please include hpx/runtime_configuration/find_prefix.hpp instead")
+#pragma message("The header hpx/util/runtime_configuration.hpp is deprecated, \
+    please include hpx/runtime_configuration/runtime_configuration.hpp instead")
 #else
-#warning "The header hpx/util/find_prefix.hpp is deprecated, \
-    please include hpx/runtime_configuration/find_prefix.hpp instead"
+#warning "The header hpx/util/runtime_configuration.hpp is deprecated, \
+    please include hpx/runtime_configuration/runtime_configuration.hpp instead"
 #endif
 #endif

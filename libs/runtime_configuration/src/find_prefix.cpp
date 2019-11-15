@@ -13,7 +13,7 @@
 #include <hpx/filesystem.hpp>
 #include <hpx/plugin.hpp>
 #include <hpx/type_support/unused.hpp>
-#include <hpx/util/find_prefix.hpp>
+#include <hpx/runtime_configuration/find_prefix.hpp>
 
 #if defined(HPX_WINDOWS)
 #  include <windows.h>

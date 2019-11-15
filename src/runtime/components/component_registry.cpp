@@ -12,9 +12,9 @@
 
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/util/find_prefix.hpp>
+#include <hpx/runtime_configuration/find_prefix.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>

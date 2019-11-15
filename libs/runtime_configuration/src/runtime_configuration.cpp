@@ -5,22 +5,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/util/runtime_configuration.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/util/find_prefix.hpp>
+#include <hpx/runtime_configuration/component_registry_base.hpp>
+#include <hpx/runtime_configuration/find_prefix.hpp>
+#include <hpx/runtime_configuration/init_ini_data.hpp>
+#include <hpx/runtime_configuration/plugin_registry_base.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/version.hpp>
-
-// TODO
-#include <hpx/util/init_ini_data.hpp>
-#include <hpx/util/init_logging.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
 
 #include <boost/predef/other/endian.h>
 #include <boost/spirit/include/qi_alternative.hpp>
@@ -70,6 +67,10 @@
 #include <limits>
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace parcelset {
+    std::vector<std::string> load_runtime_configuration();
+}}
+
 namespace hpx { namespace util
 {
     // pre-initialize entries with compile time based values
@@ -324,11 +325,137 @@ namespace hpx { namespace util
             "name = hpx",
             "path = $[hpx.location]/bin/" HPX_DLL_STRING,
             "enabled = 1"
+
+#if defined(HPX_HAVE_LOGGING)
+#define HPX_TIMEFORMAT "$hh:$mm.$ss.$mili"
+            // general logging
+            "[hpx.logging]",
+            "level = ${HPX_LOGLEVEL:0}",
+            "destination = ${HPX_LOGDESTINATION:console}",
+            "format = ${HPX_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%]|\\n}",
+
+            // general console logging
+            "[hpx.logging.console]",
+            "level = ${HPX_LOGLEVEL:$[hpx.logging.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_LOGDESTINATION:"
+                "file(hpx.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_LOGFORMAT:|}",
+
+            // logging related to timing
+            "[hpx.logging.timing]",
+            "level = ${HPX_TIMING_LOGLEVEL:-1}",
+            "destination = ${HPX_TIMING_LOGDESTINATION:console}",
+            "format = ${HPX_TIMING_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%] [TIM] |\\n}",
+
+            // console logging related to timing
+            "[hpx.logging.console.timing]",
+            "level = ${HPX_TIMING_LOGLEVEL:$[hpx.logging.timing.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:"
+                "file(hpx.timing.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:|}",
+
+            // logging related to AGAS
+            "[hpx.logging.agas]",
+            "level = ${HPX_AGAS_LOGLEVEL:-1}",
+            "destination = ${HPX_AGAS_LOGDESTINATION:"
+                "file(hpx.agas.$[system.pid].log)}",
+            "format = ${HPX_AGAS_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%][AGAS] |\\n}",
+
+            // console logging related to AGAS
+            "[hpx.logging.console.agas]",
+            "level = ${HPX_AGAS_LOGLEVEL:$[hpx.logging.agas.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:"
+                "file(hpx.agas.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}",
+
+            // logging related to the parcel transport
+            "[hpx.logging.parcel]",
+            "level = ${HPX_PARCEL_LOGLEVEL:-1}",
+            "destination = ${HPX_PARCEL_LOGDESTINATION:"
+                "file(hpx.parcel.$[system.pid].log)}",
+            "format = ${HPX_PARCEL_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%][  PT] |\\n}",
+
+            // console logging related to the parcel transport
+            "[hpx.logging.console.parcel]",
+            "level = ${HPX_PARCEL_LOGLEVEL:$[hpx.logging.parcel.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:"
+                "file(hpx.parcel.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_PARCEL_LOGFORMAT:|}",
+
+            // logging related to applications
+            "[hpx.logging.application]",
+            "level = ${HPX_APP_LOGLEVEL:-1}",
+            "destination = ${HPX_APP_LOGDESTINATION:console}",
+            "format = ${HPX_APP_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%] [APP] |\\n}",
+
+            // console logging related to applications
+            "[hpx.logging.console.application]",
+            "level = ${HPX_APP_LOGLEVEL:$[hpx.logging.application.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:"
+                "file(hpx.application.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}",
+
+            // logging of debug channel
+            "[hpx.logging.debuglog]",
+            "level = ${HPX_DEB_LOGLEVEL:-1}",
+            "destination = ${HPX_DEB_LOGDESTINATION:console}",
+            "format = ${HPX_DEB_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%] [DEB] |\\n}",
+
+            "[hpx.logging.console.debuglog]",
+            "level = ${HPX_DEB_LOGLEVEL:$[hpx.logging.debuglog.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:"
+                "file(hpx.debuglog.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_DEB_LOGFORMAT:|}"
+
+#undef HPX_TIMEFORMAT
+#endif
         };
 
 #if defined(HPX_HAVE_NETWORKING)
         std::vector<std::string> lines_pp =
-            hpx::parcelset::parcelhandler::load_runtime_configuration();
+            hpx::parcelset::load_runtime_configuration();
 
         lines.insert(lines.end(), lines_pp.begin(), lines_pp.end());
 #endif
@@ -574,12 +701,6 @@ namespace hpx { namespace util
     void runtime_configuration::reconfigure()
     {
         pre_initialize_ini();
-
-        std::vector<std::string> const& prefill =
-            util::detail::get_logging_data();
-        if (!prefill.empty())
-            this->parse("<static prefill defaults>", prefill, false, false);
-
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options

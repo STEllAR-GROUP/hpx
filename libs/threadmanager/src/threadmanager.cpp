@@ -24,6 +24,7 @@
 #include <hpx/runtime/threads/policies/maintain_queue_wait_times.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>
@@ -34,7 +35,6 @@
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/util/runtime_configuration.hpp>
 
 #include <cstddef>
 #include <cstdint>

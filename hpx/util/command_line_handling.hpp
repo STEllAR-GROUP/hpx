@@ -13,7 +13,7 @@
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/util/manage_config.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 
 #include <cstddef>
 #include <string>

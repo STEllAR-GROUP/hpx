@@ -16,7 +16,7 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/util/find_prefix.hpp>
+#include <hpx/runtime_configuration/find_prefix.hpp>
 #include <hpx/functional/function.hpp>
 
 #include <csignal>

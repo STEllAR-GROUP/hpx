@@ -13,8 +13,8 @@
 #include <hpx/runtime.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing.hpp>
-#include <hpx/util/find_prefix.hpp>
 #include <hpx/util/from_string.hpp>
+#include <hpx/runtime_configuration/find_prefix.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 
 #include <hpx/lcos/wait_all.hpp>

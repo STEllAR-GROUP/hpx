@@ -21,7 +21,7 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 
 #include <boost/asio/ip/tcp.hpp>
 

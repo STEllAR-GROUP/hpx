@@ -18,7 +18,7 @@
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/util/find_prefix.hpp>
+#include <hpx/runtime_configuration/find_prefix.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 
 #include <boost/algorithm/string/classification.hpp>

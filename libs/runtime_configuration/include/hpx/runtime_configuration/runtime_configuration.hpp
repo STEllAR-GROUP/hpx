@@ -9,15 +9,15 @@
 #define HPX_UTIL_RUNTIME_CONFIGURATION_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/plugin.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
+#include <hpx/runtime_configuration/plugin_registry_base.hpp>
+#include <hpx/runtime_configuration/static_factory_data.hpp>
 
 // TODO
-#include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
-#include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 
 #include <cstddef>

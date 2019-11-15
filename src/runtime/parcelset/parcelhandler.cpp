@@ -41,7 +41,10 @@
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/logging.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
@@ -1570,7 +1573,7 @@ namespace hpx { namespace parcelset
 #endif
     }
 
-    std::vector<std::string> parcelhandler::load_runtime_configuration()
+    std::vector<std::string> load_runtime_configuration()
     {
         // TODO: properly hide this in plugins ...
         std::vector<std::string> ini_defs;
@@ -1608,7 +1611,7 @@ namespace hpx { namespace parcelset
 #endif
             ;
 
-        for (plugins::parcelport_factory_base* f : get_parcelport_factories())
+        for (plugins::parcelport_factory_base* f : parcelhandler::get_parcelport_factories())
         {
             f->get_plugin_info(ini_defs);
         }

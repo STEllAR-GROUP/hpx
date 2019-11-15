@@ -493,18 +493,16 @@ namespace hpx { namespace parcelset
         /// cache whether networking has been enabled
         bool is_networking_enabled_;
 
-    private:
+    public:
         static std::vector<plugins::parcelport_factory_base *> &
             get_parcelport_factories();
 
-    public:
         static void add_parcelport_factory(plugins::parcelport_factory_base *);
 
         static void init(int *argc, char ***argv, util::command_line_handling &cfg);
-
-        /// load runtime configuration settings ...
-        static std::vector<std::string> load_runtime_configuration();
     };
+
+    std::vector<std::string> load_runtime_configuration();
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

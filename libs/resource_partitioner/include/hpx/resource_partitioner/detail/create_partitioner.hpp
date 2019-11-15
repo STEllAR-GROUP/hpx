@@ -12,7 +12,7 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/util/find_prefix.hpp>
+#include <hpx/runtime_configuration/find_prefix.hpp>
 
 #include <hpx/program_options.hpp>
 

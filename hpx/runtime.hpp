@@ -23,7 +23,7 @@
 #include <hpx/topology/topology.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 
 #include <atomic>
 #include <cstddef>

@@ -19,8 +19,8 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/static.hpp>
 #include <hpx/util/get_entry_as.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/util/init_logging.hpp>
-#include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/version.hpp>
 #include <boost/config.hpp>
@@ -941,7 +941,7 @@ namespace hpx { namespace util { namespace detail
 
 #else  // HPX_HAVE_LOGGING
 
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/init_logging.hpp>

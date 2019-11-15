@@ -21,7 +21,7 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/find_prefix.hpp>
+#include <hpx/runtime_configuration/find_prefix.hpp>
 #include <hpx/format.hpp>
 #include <hpx/version.hpp>
 
