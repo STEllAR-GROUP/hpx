@@ -198,7 +198,7 @@ follow the launch policy). An example of these features can be found below:
    :language: c++
    :lines: 27-38
 
-Now that we can create ``checkpoint`` s we now must be able to restore the
+Once users can create ``checkpoint`` s they must now be able to restore the
 objects they contain into memory. This is accomplished by the function
 ``restore_checkpoint``. This function takes a ``checkpoint`` and fills its data
 into the containers it is provided. It is important to remember that the
@@ -210,14 +210,14 @@ containers must be ordered in the same way they were placed into the
    :lines: 41-49
 
 The core utility of ``checkpoint`` is in its ability to make certain data
-persistent. Often this means that the data is needed to be stored in an object,
-such as a file, for later use. For these cases we have provided two solutions:
+persistent. Often, this means that the data needs to be stored in an object,
+such as a file, for later use. |hpx| has two solutions for these issues:
 stream operator overloads and access iterators.
 
-We have created the two stream overloads
-``operator<<`` and ``operator>>`` to stream data
-out of and into ``checkpoint``. You can see an
-example of the overloads in use below:
+|hpx| contains two stream overloads,
+``operator<<`` and ``operator>>``, to stream data
+out of and into ``checkpoint``. Here is an
+example of the overloads in use:
 
 .. literalinclude:: ../../tests/unit/util/checkpoint.cpp
    :language: c++
@@ -225,20 +225,20 @@ example of the overloads in use below:
 
 This is the primary way to move data into and out of a ``checkpoint``. It is
 important to note, however, that users should be cautious when using a stream
-operator to load data an another function to remove it (or vice versa). Both
+operator to load data and another function to remove it (or vice versa). Both
 ``operator<<`` and ``operator>>`` rely on a ``.write()`` and a ``.read()``
 function respectively. In order to know how much data to read from the
 ``std::istream``, the ``operator<<`` will write the size of the ``checkpoint``
 before writing the ``checkpoint`` data. Correspondingly, the ``operator>>`` will
 read the size of the stored data before reading the data into new instance of
 ``checkpoint``. As long as the user employs the ``operator<<`` and
-``operator>>`` to stream the data this detail can be ignored.
+``operator>>`` to stream, the data this detail can be ignored.
 
 .. important::
 
    Be careful when mixing ``operator<<`` and ``operator>>`` with other
-   facilities to read and write to a ``checkpoint``. ``operator<<`` writes and
-   extra variable and ``operator>>`` reads this variable back separately. Used
+   facilities to read and write to a ``checkpoint``. ``operator<<`` writes an
+   extra variable, and ``operator>>`` reads this variable back separately. Used
    together the user will not encounter any issues and can safely ignore this
    detail.
 
@@ -269,16 +269,16 @@ from ``hpx::cerr`` will be dispatched to ``std::cerr`` on the console
    ``hpx::endl`` and ``hpx::flush`` but those are just aliases for the
    corresponding standard manipulators.
 
-In order to use either ``hpx::cout`` or ``hpx::cerr`` application codes need to
+In order to use either ``hpx::cout`` or ``hpx::cerr``, application codes need to
 ``#include <hpx/include/iostreams.hpp>``. For an example, please see the
 simplest possible 'Hello world' program as included as an example with |hpx|:
 
 .. literalinclude:: ../../examples/quickstart/hello_world_1.cpp
    :language: c++
 
-Additionally those applications need to link with the iostreams component. When
-using cmake this can be achieved by using the ``COMPONENT_DEPENDENCIES``
-parameter, for instance:
+Additionally, those applications need to link with the iostreams component. When
+using CMake this can be achieved by using the ``COMPONENT_DEPENDENCIES``
+parameter; for instance:
 
 .. code-block:: cmake
 
@@ -294,4 +294,4 @@ parameter, for instance:
 
    The ``hpx::cout`` and ``hpx::cerr`` streams buffer all output locally until a
    ``std::endl`` or ``std::flush`` is encountered. That means that no output
-   will appear on the console as long as either of those is explicitly used.
+   will appear on the console as long as either of these is explicitly used.
