@@ -263,7 +263,7 @@
 
 /// By default we capture only 5 levels of stack back trace on suspension
 #if !defined(HPX_HAVE_THREAD_BACKTRACE_DEPTH)
-#  define HPX_HAVE_THREAD_BACKTRACE_DEPTH 5
+#  define HPX_HAVE_THREAD_BACKTRACE_DEPTH 20
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
