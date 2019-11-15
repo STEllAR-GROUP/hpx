@@ -18,11 +18,11 @@
 #include <boost/version.hpp>
 
 /// Evaluates to the major version of HPX
-#define HPX_VERSION_MAJOR        @HPX_VERSION_MAJOR@u
+#define HPX_VERSION_MAJOR        @HPX_VERSION_MAJOR@
 /// Evaluates to the minor version of HPX
-#define HPX_VERSION_MINOR        @HPX_VERSION_MINOR@u
+#define HPX_VERSION_MINOR        @HPX_VERSION_MINOR@
 /// Evaluates to the subminor version of HPX
-#define HPX_VERSION_SUBMINOR     @HPX_VERSION_SUBMINOR@u
+#define HPX_VERSION_SUBMINOR     @HPX_VERSION_SUBMINOR@
 
 /// Evaluates to the HPX version:
 /// ``HPX_VERSION_FULL & 0xFF0000 == HPX_VERSION_MAJOR``
