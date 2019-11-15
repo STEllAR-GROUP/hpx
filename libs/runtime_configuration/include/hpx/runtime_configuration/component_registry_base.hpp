@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/plugin.hpp>
-#include <hpx/runtime/components/static_factory_data.hpp>
+#include <hpx/runtime_configuration/static_factory_data.hpp>
 
 #include <string>
 #include <vector>

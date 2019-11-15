@@ -10,7 +10,7 @@
 #define HPX_PLUGIN_REGISTRY_MAR_24_2013_0235PM
 
 #include <hpx/config.hpp>
-#include <hpx/plugins/plugin_registry_base.hpp>
+#include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
 
 #include <hpx/plugin/traits/plugin_config_data.hpp>

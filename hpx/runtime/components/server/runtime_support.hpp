@@ -23,7 +23,7 @@
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/runtime/components/static_factory_data.hpp>
+#include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>

@@ -28,7 +28,7 @@
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/components/static_factory_data.hpp>
+#include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>

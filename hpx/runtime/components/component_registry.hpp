@@ -15,7 +15,7 @@
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
-#include <hpx/runtime/components/component_registry_base.hpp>
+#include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/traits/component_config_data.hpp>
