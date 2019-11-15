@@ -19,6 +19,9 @@
 #include <cstdint>
 #include <iostream>
 
+// our apex policy handle
+apex_policy_handle * periodic_policy_handle;
+
 ///////////////////////////////////////////////////////////////////////////////
 // forward declaration of the Fibonacci function
 std::uint64_t fibonacci(std::uint64_t n);
@@ -67,14 +70,21 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 
+    apex::deregister_policy(periodic_policy_handle);
+
     return hpx::finalize(); // Handles HPX shutdown
 }
 
 void register_policy(void) {
+    periodic_policy_handle =
     apex::register_periodic_policy(1000, [](apex_context const& context) {
         std::cout << "Periodic policy!" << std::endl;
         return APEX_NOERROR;
     });
+}
+
+void deregister_policy(void) {
+    apex::deregister_policy(periodic_policy_handle);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,6 +101,7 @@ int main(int argc, char* argv[])
         ;
 
     hpx::register_startup_function(register_policy);
+    hpx::register_shutdown_function(deregister_policy);
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);

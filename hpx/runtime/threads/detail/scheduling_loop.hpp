@@ -27,7 +27,7 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 #endif
 
 #include <atomic>
@@ -661,20 +661,20 @@ namespace hpx { namespace threads { namespace detail
 
                                 // the address of tmp_data is getting stored
                                 // by APEX during this call
-                                util::apex_wrapper apex_profiler(
-                                    thrd->get_apex_data());
+                                util::external_timer::scoped_timer profiler(
+                                    thrd->get_timer_data());
 
                                 thrd_stat = (*thrd)(context_storage);
 
                                 if (thrd_stat.get_previous() == terminated)
                                 {
-                                    apex_profiler.stop();
+                                    profiler.stop();
                                     // just in case, clean up the now dead pointer.
-                                    thrd->set_apex_data(nullptr);
+                                    thrd->set_timer_data(nullptr);
                                 }
                                 else
                                 {
-                                    apex_profiler.yield();
+                                    profiler.yield();
                                 }
 #else
                                 thrd_stat = (*thrd)(context_storage);

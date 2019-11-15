@@ -19,7 +19,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 #include <hpx/util/query_counters.hpp>
 
 #include <cstddef>
@@ -131,7 +131,7 @@ namespace hpx { namespace util
 
         if(!ec) {
 #ifdef HPX_HAVE_APEX
-            apex::sample_value(name.c_str(), val);
+            external_timer::sample_value(name.c_str(), val);
 #elif HPX_HAVE_ITTNOTIFY != 0
             if (use_ittnotify_api)
             {
@@ -201,7 +201,7 @@ namespace hpx { namespace util
 
         if(!ec) {
 #ifdef HPX_HAVE_APEX
-            apex::sample_value(name.c_str(), val);
+            external_timer::sample_value(name.c_str(), val);
 #elif HPX_HAVE_ITTNOTIFY != 0
             if (use_ittnotify_api)
             {

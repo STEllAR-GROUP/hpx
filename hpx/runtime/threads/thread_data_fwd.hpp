@@ -24,11 +24,9 @@
 #include <utility>
 
 #if defined(HPX_HAVE_APEX)
-// forward declare the APEX object
-namespace apex {
+namespace hpx { namespace util { namespace external_timer {
     struct task_wrapper;
-}
-using apex_task_wrapper = std::shared_ptr<apex::task_wrapper>;
+}}}
 #endif
 
 namespace hpx {
@@ -171,8 +169,10 @@ namespace hpx { namespace threads {
         thread_state_enum state = unknown);
 
 #if defined(HPX_HAVE_APEX)
-    HPX_API_EXPORT apex_task_wrapper get_self_apex_data(void);
-    HPX_API_EXPORT void set_self_apex_data(apex_task_wrapper data);
+    HPX_API_EXPORT std::shared_ptr<hpx::util::external_timer::task_wrapper>
+        get_self_timer_data(void);
+    HPX_API_EXPORT void set_self_timer_data(
+        std::shared_ptr<hpx::util::external_timer::task_wrapper> data);
 #endif
 }}    // namespace hpx::threads
 

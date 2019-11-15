@@ -18,7 +18,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/activate_counters.hpp>
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <cstddef>

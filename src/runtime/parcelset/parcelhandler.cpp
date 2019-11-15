@@ -30,7 +30,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
@@ -427,7 +427,7 @@ namespace hpx { namespace parcelset
 
 #if defined(HPX_HAVE_APEX) && defined(HPX_HAVE_PARCEL_PROFILING)
             // tell APEX about the sent parcel
-            apex::send(p.parcel_id().get_lsb(), p.size(),
+            util::external_timer::send(p.parcel_id().get_lsb(), p.size(),
                 p.destination_locality_id());
 #endif
         }

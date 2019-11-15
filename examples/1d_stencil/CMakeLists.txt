@@ -66,7 +66,7 @@ foreach(example_program ${example_programs})
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND
     NOT ("${example_program}" IN_LIST disabled_tests))
 
-    add_hpx_example_test("1d_stencil" ${example_program} ${${example_program}_PARAMETERS})
+  add_hpx_example_test("1d_stencil" ${example_program} ${${example_program}_PARAMETERS})
 
   endif()
 
