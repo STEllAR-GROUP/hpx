@@ -161,134 +161,134 @@ struct X
 
 int main()
 {
-    HPX_TEST( hpx::util::mem_fn(&X::dm_1) == hpx::util::mem_fn(&X::dm_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::dm_1) != hpx::util::mem_fn(&X::dm_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::dm_1), hpx::util::mem_fn(&X::dm_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::dm_1), hpx::util::mem_fn(&X::dm_2) );
 
     // 0
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf0_1) == hpx::util::mem_fn(&X::mf0_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf0_1) != hpx::util::mem_fn(&X::mf0_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf0_1), hpx::util::mem_fn(&X::mf0_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf0_1), hpx::util::mem_fn(&X::mf0_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf0_1) == hpx::util::mem_fn(&X::cmf0_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf0_1) != hpx::util::mem_fn(&X::cmf0_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf0_1), hpx::util::mem_fn(&X::cmf0_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf0_1), hpx::util::mem_fn(&X::cmf0_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf0v_1) == hpx::util::mem_fn(&X::mf0v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf0v_1) != hpx::util::mem_fn(&X::mf0v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf0v_1), hpx::util::mem_fn(&X::mf0v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf0v_1), hpx::util::mem_fn(&X::mf0v_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf0v_1) == hpx::util::mem_fn(&X::cmf0v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf0v_1) != hpx::util::mem_fn(&X::cmf0v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf0v_1), hpx::util::mem_fn(&X::cmf0v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf0v_1), hpx::util::mem_fn(&X::cmf0v_2) );
 
     // 1
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf1_1) == hpx::util::mem_fn(&X::mf1_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf1_1) != hpx::util::mem_fn(&X::mf1_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf1_1), hpx::util::mem_fn(&X::mf1_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf1_1), hpx::util::mem_fn(&X::mf1_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf1_1) == hpx::util::mem_fn(&X::cmf1_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf1_1) != hpx::util::mem_fn(&X::cmf1_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf1_1), hpx::util::mem_fn(&X::cmf1_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf1_1), hpx::util::mem_fn(&X::cmf1_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf1v_1) == hpx::util::mem_fn(&X::mf1v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf1v_1) != hpx::util::mem_fn(&X::mf1v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf1v_1), hpx::util::mem_fn(&X::mf1v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf1v_1), hpx::util::mem_fn(&X::mf1v_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf1v_1) == hpx::util::mem_fn(&X::cmf1v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf1v_1) != hpx::util::mem_fn(&X::cmf1v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf1v_1), hpx::util::mem_fn(&X::cmf1v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf1v_1), hpx::util::mem_fn(&X::cmf1v_2) );
 
     // 2
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf2_1) == hpx::util::mem_fn(&X::mf2_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf2_1) != hpx::util::mem_fn(&X::mf2_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf2_1), hpx::util::mem_fn(&X::mf2_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf2_1), hpx::util::mem_fn(&X::mf2_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf2_1) == hpx::util::mem_fn(&X::cmf2_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf2_1) != hpx::util::mem_fn(&X::cmf2_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf2_1), hpx::util::mem_fn(&X::cmf2_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf2_1), hpx::util::mem_fn(&X::cmf2_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf2v_1) == hpx::util::mem_fn(&X::mf2v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf2v_1) != hpx::util::mem_fn(&X::mf2v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf2v_1), hpx::util::mem_fn(&X::mf2v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf2v_1), hpx::util::mem_fn(&X::mf2v_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf2v_1) == hpx::util::mem_fn(&X::cmf2v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf2v_1) != hpx::util::mem_fn(&X::cmf2v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf2v_1), hpx::util::mem_fn(&X::cmf2v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf2v_1), hpx::util::mem_fn(&X::cmf2v_2) );
 
     // 3
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf3_1) == hpx::util::mem_fn(&X::mf3_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf3_1) != hpx::util::mem_fn(&X::mf3_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf3_1), hpx::util::mem_fn(&X::mf3_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf3_1), hpx::util::mem_fn(&X::mf3_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf3_1) == hpx::util::mem_fn(&X::cmf3_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf3_1) != hpx::util::mem_fn(&X::cmf3_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf3_1), hpx::util::mem_fn(&X::cmf3_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf3_1), hpx::util::mem_fn(&X::cmf3_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf3v_1) == hpx::util::mem_fn(&X::mf3v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf3v_1) != hpx::util::mem_fn(&X::mf3v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf3v_1), hpx::util::mem_fn(&X::mf3v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf3v_1), hpx::util::mem_fn(&X::mf3v_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf3v_1) == hpx::util::mem_fn(&X::cmf3v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf3v_1) != hpx::util::mem_fn(&X::cmf3v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf3v_1), hpx::util::mem_fn(&X::cmf3v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf3v_1), hpx::util::mem_fn(&X::cmf3v_2) );
 
     // 4
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf4_1) == hpx::util::mem_fn(&X::mf4_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf4_1) != hpx::util::mem_fn(&X::mf4_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf4_1), hpx::util::mem_fn(&X::mf4_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf4_1), hpx::util::mem_fn(&X::mf4_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf4_1) == hpx::util::mem_fn(&X::cmf4_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf4_1) != hpx::util::mem_fn(&X::cmf4_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf4_1), hpx::util::mem_fn(&X::cmf4_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf4_1), hpx::util::mem_fn(&X::cmf4_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf4v_1) == hpx::util::mem_fn(&X::mf4v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf4v_1) != hpx::util::mem_fn(&X::mf4v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf4v_1), hpx::util::mem_fn(&X::mf4v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf4v_1), hpx::util::mem_fn(&X::mf4v_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf4v_1) == hpx::util::mem_fn(&X::cmf4v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf4v_1) != hpx::util::mem_fn(&X::cmf4v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf4v_1), hpx::util::mem_fn(&X::cmf4v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf4v_1), hpx::util::mem_fn(&X::cmf4v_2) );
 
     // 5
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf5_1) == hpx::util::mem_fn(&X::mf5_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf5_1) != hpx::util::mem_fn(&X::mf5_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf5_1), hpx::util::mem_fn(&X::mf5_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf5_1), hpx::util::mem_fn(&X::mf5_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf5_1) == hpx::util::mem_fn(&X::cmf5_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf5_1) != hpx::util::mem_fn(&X::cmf5_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf5_1), hpx::util::mem_fn(&X::cmf5_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf5_1), hpx::util::mem_fn(&X::cmf5_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf5v_1) == hpx::util::mem_fn(&X::mf5v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf5v_1) != hpx::util::mem_fn(&X::mf5v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf5v_1), hpx::util::mem_fn(&X::mf5v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf5v_1), hpx::util::mem_fn(&X::mf5v_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf5v_1) == hpx::util::mem_fn(&X::cmf5v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf5v_1) != hpx::util::mem_fn(&X::cmf5v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf5v_1), hpx::util::mem_fn(&X::cmf5v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf5v_1), hpx::util::mem_fn(&X::cmf5v_2) );
 
     // 6
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf6_1) == hpx::util::mem_fn(&X::mf6_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf6_1) != hpx::util::mem_fn(&X::mf6_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf6_1), hpx::util::mem_fn(&X::mf6_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf6_1), hpx::util::mem_fn(&X::mf6_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf6_1) == hpx::util::mem_fn(&X::cmf6_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf6_1) != hpx::util::mem_fn(&X::cmf6_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf6_1), hpx::util::mem_fn(&X::cmf6_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf6_1), hpx::util::mem_fn(&X::cmf6_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf6v_1) == hpx::util::mem_fn(&X::mf6v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf6v_1) != hpx::util::mem_fn(&X::mf6v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf6v_1), hpx::util::mem_fn(&X::mf6v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf6v_1), hpx::util::mem_fn(&X::mf6v_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf6v_1) == hpx::util::mem_fn(&X::cmf6v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf6v_1) != hpx::util::mem_fn(&X::cmf6v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf6v_1), hpx::util::mem_fn(&X::cmf6v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf6v_1), hpx::util::mem_fn(&X::cmf6v_2) );
 
     // 7
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf7_1) == hpx::util::mem_fn(&X::mf7_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf7_1) != hpx::util::mem_fn(&X::mf7_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf7_1), hpx::util::mem_fn(&X::mf7_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf7_1), hpx::util::mem_fn(&X::mf7_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf7_1) == hpx::util::mem_fn(&X::cmf7_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf7_1) != hpx::util::mem_fn(&X::cmf7_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf7_1), hpx::util::mem_fn(&X::cmf7_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf7_1), hpx::util::mem_fn(&X::cmf7_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf7v_1) == hpx::util::mem_fn(&X::mf7v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf7v_1) != hpx::util::mem_fn(&X::mf7v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf7v_1), hpx::util::mem_fn(&X::mf7v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf7v_1), hpx::util::mem_fn(&X::mf7v_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf7v_1) == hpx::util::mem_fn(&X::cmf7v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf7v_1) != hpx::util::mem_fn(&X::cmf7v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf7v_1), hpx::util::mem_fn(&X::cmf7v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf7v_1), hpx::util::mem_fn(&X::cmf7v_2) );
 
     // 8
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf8_1) == hpx::util::mem_fn(&X::mf8_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf8_1) != hpx::util::mem_fn(&X::mf8_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf8_1), hpx::util::mem_fn(&X::mf8_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf8_1), hpx::util::mem_fn(&X::mf8_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf8_1) == hpx::util::mem_fn(&X::cmf8_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf8_1) != hpx::util::mem_fn(&X::cmf8_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf8_1), hpx::util::mem_fn(&X::cmf8_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf8_1), hpx::util::mem_fn(&X::cmf8_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::mf8v_1) == hpx::util::mem_fn(&X::mf8v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::mf8v_1) != hpx::util::mem_fn(&X::mf8v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::mf8v_1), hpx::util::mem_fn(&X::mf8v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::mf8v_1), hpx::util::mem_fn(&X::mf8v_2) );
 
-    HPX_TEST( hpx::util::mem_fn(&X::cmf8v_1) == hpx::util::mem_fn(&X::cmf8v_1) );
-    HPX_TEST( hpx::util::mem_fn(&X::cmf8v_1) != hpx::util::mem_fn(&X::cmf8v_2) );
+    HPX_TEST_EQ( hpx::util::mem_fn(&X::cmf8v_1), hpx::util::mem_fn(&X::cmf8v_1) );
+    HPX_TEST_NEQ( hpx::util::mem_fn(&X::cmf8v_1), hpx::util::mem_fn(&X::cmf8v_2) );
 
 
     return hpx::util::report_errors();

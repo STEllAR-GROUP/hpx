@@ -30,8 +30,8 @@ int hpx_main(int argc, char ** argv)
     std::int64_t val1 = total_cycles.get_value<std::int64_t>(hpx::launch::sync);
     std::int64_t val2 = cycles.get_value<std::int64_t>(hpx::launch::sync);
 
-    HPX_TEST(val1 != 0);
-    HPX_TEST(val2 != 0);
+    HPX_TEST_NEQ(val1, 0);
+    HPX_TEST_NEQ(val2, 0);
 #endif
 
     return hpx::finalize();

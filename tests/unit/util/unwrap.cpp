@@ -45,19 +45,19 @@ void test_unwrap(FutureProvider&& futurize)
     // Single values are unwrapped
     {
         int res = unwrap(futurize(0xDD));
-        HPX_TEST_EQ((res), (0xDD));
+        HPX_TEST_EQ(res, 0xDD);
     }
 
     // Futures with tuples may be unwrapped
     {
         tuple<int, int> res = unwrap(futurize(make_tuple(0xDD, 0xDF)));
-        HPX_TEST((res == make_tuple(0xDD, 0xDF)));
+        HPX_TEST(res == make_tuple(0xDD, 0xDF));
     }
 
     // The value of multiple futures is returned inside a tuple
     {
         tuple<int, int> res = unwrap(futurize(0xDD), futurize(0xDF));
-        HPX_TEST((res == make_tuple(0xDD, 0xDF)));
+        HPX_TEST(res == make_tuple(0xDD, 0xDF));
     }
 }
 
@@ -67,28 +67,28 @@ void test_unwrap_n(FutureProvider&& futurize)
     // Single values are unwrapped
     {
         int res = unwrap_n<2>(futurize(futurize(0xDD)));
-        HPX_TEST_EQ((res), (0xDD));
+        HPX_TEST_EQ(res, 0xDD);
     }
 
     // Futures with tuples may be unwrapped
     {
         tuple<int, int> res =
             unwrap_n<2>(futurize(futurize(make_tuple(0xDD, 0xDF))));
-        HPX_TEST((res == make_tuple(0xDD, 0xDF)));
+        HPX_TEST(res == make_tuple(0xDD, 0xDF));
     }
 
     // The value of multiple futures is returned inside a tuple
     {
         tuple<int, int> res =
             unwrap_n<2>(futurize(futurize(0xDD)), futurize(futurize(0xDF)));
-        HPX_TEST((res == make_tuple(0xDD, 0xDF)));
+        HPX_TEST(res == make_tuple(0xDD, 0xDF));
     }
 
     // Futures are not unwrapped beyond the given depth
     {
         FutureType<int> res =
             unwrap_n<3>(futurize(futurize(futurize(futurize(0xDD)))));
-        HPX_TEST_EQ((res.get()), (0xDD));
+        HPX_TEST(res.get() == 0xDD);
     }
 }
 
@@ -99,7 +99,7 @@ void test_unwrap_all(FutureProvider&& futurize)
     {
         int res =
             unwrap_all(futurize(futurize(futurize(futurize(futurize(0xDD))))));
-        HPX_TEST_EQ((res), (0xDD));
+        HPX_TEST_EQ(res, 0xDD);
     }
 
     // Futures with tuples may be unwrapped
@@ -107,14 +107,14 @@ void test_unwrap_all(FutureProvider&& futurize)
         tuple<int, int> res = unwrap_all(futurize(
             futurize(futurize(futurize(make_tuple(futurize(futurize(0xDD)),
                 futurize(futurize(futurize(0xDF)))))))));
-        HPX_TEST((res == make_tuple(0xDD, 0xDF)));
+        HPX_TEST(res == make_tuple(0xDD, 0xDF));
     }
 
     // The value of multiple futures is returned inside a tuple
     {
         tuple<int, int> res = unwrap_all(
             futurize(futurize(futurize(futurize(0xDD)))), futurize(0xDF));
-        HPX_TEST((res == make_tuple(0xDD, 0xDF)));
+        HPX_TEST(res == make_tuple(0xDD, 0xDF));
     }
 }
 
@@ -127,7 +127,7 @@ void test_unwrapping(FutureProvider&& futurize)
 
         int res = unwrapper(futurize(3));
 
-        HPX_TEST_EQ((res), (3));
+        HPX_TEST_EQ(res, 3);
     }
 
     /// Don't unpack single tuples which were passed to the functional unwrap
@@ -139,7 +139,7 @@ void test_unwrapping(FutureProvider&& futurize)
 
         int res = unwrapper(futurize(make_tuple(1, 2)));
 
-        HPX_TEST_EQ((res), (3));
+        HPX_TEST_EQ(res, 3);
     }
 
     // Multiple arguments are spread across the callable
@@ -148,7 +148,7 @@ void test_unwrapping(FutureProvider&& futurize)
 
         int res = unwrapper(futurize(1), futurize(2));
 
-        HPX_TEST_EQ((res), (3));
+        HPX_TEST_EQ(res, 3);
     }
 }
 
@@ -183,28 +183,28 @@ void test_unwrapping_n(FutureProvider&& futurize)
     {
         int res =
             unwrapping_n<2>(back_materializer{})(futurize(futurize(0xDD)));
-        HPX_TEST_EQ((res), (0xDD));
+        HPX_TEST_EQ(res, 0xDD);
     }
 
     // Futures with tuples may be unwrapped
     {
         tuple<int, int> res = unwrapping_n<2>(back_materializer{})(
             futurize(futurize(make_tuple(0xDD, 0xDF))));
-        HPX_TEST((res == make_tuple(0xDD, 0xDF)));
+        HPX_TEST(res == make_tuple(0xDD, 0xDF));
     }
 
     // The value of multiple futures is returned inside a tuple
     {
         tuple<int, int> res = unwrapping_n<2>(back_materializer{})(
             futurize(futurize(0xDD)), futurize(futurize(0xDF)));
-        HPX_TEST((res == make_tuple(0xDD, 0xDF)));
+        HPX_TEST(res == make_tuple(0xDD, 0xDF));
     }
 
     // Futures are not unwrapped beyond the given depth
     {
         FutureType<int> res = unwrapping_n<3>(back_materializer{})(
             futurize(futurize(futurize(futurize(0xDD)))));
-        HPX_TEST_EQ((res.get()), (0xDD));
+        HPX_TEST_EQ(res.get(), 0xDD);
     }
 }
 
@@ -215,7 +215,7 @@ void test_unwrapping_all(FutureProvider&& futurize)
     {
         int res = unwrapping_all(back_materializer{})(
             futurize(futurize(futurize(futurize(futurize(0xDD))))));
-        HPX_TEST_EQ((res), (0xDD));
+        HPX_TEST_EQ(res, 0xDD);
     }
 
     // Futures with tuples may be unwrapped
@@ -223,14 +223,14 @@ void test_unwrapping_all(FutureProvider&& futurize)
         tuple<int, int> res = unwrapping_all(
             back_materializer{})(futurize(futurize(futurize(futurize(make_tuple(
             futurize(futurize(0xDD)), futurize(futurize(futurize(0xDF)))))))));
-        HPX_TEST((res == make_tuple(0xDD, 0xDF)));
+        HPX_TEST(res == make_tuple(0xDD, 0xDF));
     }
 
     // The value of multiple futures is returned inside a tuple
     {
         tuple<int, int> res = unwrapping_all(back_materializer{})(
             futurize(futurize(futurize(futurize(0xDD)))), futurize(0xDF));
-        HPX_TEST((res == make_tuple(0xDD, 0xDF)));
+        HPX_TEST(res == make_tuple(0xDD, 0xDF));
     }
 }
 
@@ -255,7 +255,7 @@ void test_development_regressions(FutureProvider&& futurize)
         std::vector<FutureType<int>> f;
         std::vector<int> res = unwrap(f);
 
-        HPX_TEST((res.empty()));
+        HPX_TEST(res.empty());
     }
 
     // A single void future is mapped empty
@@ -283,7 +283,7 @@ void test_development_regressions(FutureProvider&& futurize)
             return a + b;
         });
 
-        HPX_TEST_EQ((callable(1, f, 2)), 3);
+        HPX_TEST_EQ(callable(1, f, 2), 3);
     }
 
     // Call callables with no arguments if the pack was mapped empty.
@@ -296,7 +296,7 @@ void test_development_regressions(FutureProvider&& futurize)
             return true;
         });
 
-        HPX_TEST((callable(f)));
+        HPX_TEST(callable(f));
     }
 
     // Map empty mappings back to void, if an empty mapping was propagated back.
@@ -327,7 +327,7 @@ void test_development_regressions(FutureProvider&& futurize)
 
         std::array<FutureType<int>, 2> in{{futurize(1), futurize(2)}};
 
-        HPX_TEST_EQ((unwrapper(in)), 3);
+        HPX_TEST_EQ(unwrapper(in), 3);
     }
 }
 

@@ -44,7 +44,7 @@ hpx::thread::id sync_bulk_test(int value, hpx::thread::id tid,
 void sync_bulk_test_void(
     int value, hpx::thread::id tid, int passed_through)    //-V813
 {
-    HPX_TEST(tid == hpx::this_thread::get_id());
+    HPX_TEST_EQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
@@ -74,7 +74,7 @@ hpx::thread::id then_bulk_test(int value, hpx::shared_future<void> f,
 
     f.get();    // propagate exceptions
 
-    HPX_TEST(tid == hpx::this_thread::get_id());
+    HPX_TEST_EQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 
     return hpx::this_thread::get_id();
@@ -87,7 +87,7 @@ void then_bulk_test_void(int value, hpx::shared_future<void> f,
 
     f.get();    // propagate exceptions
 
-    HPX_TEST(tid == hpx::this_thread::get_id());
+    HPX_TEST_EQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
@@ -138,14 +138,14 @@ void test_bulk_sync(Executor& exec)
             exec, hpx::util::bind(&sync_bulk_test, _1, tid, _2), v, 42);
     for (auto const& id : ids)
     {
-        HPX_TEST(id == hpx::this_thread::get_id());
+        HPX_TEST_EQ(id, hpx::this_thread::get_id());
     }
 
     ids = hpx::parallel::execution::bulk_sync_execute(
         exec, &sync_bulk_test, v, tid, 42);
     for (auto const& id : ids)
     {
-        HPX_TEST(id == hpx::this_thread::get_id());
+        HPX_TEST_EQ(id, hpx::this_thread::get_id());
     }
 
     hpx::parallel::execution::bulk_sync_execute(
@@ -199,7 +199,7 @@ void test_bulk_then(Executor& exec)
 
     for (auto const& tid : tids)
     {
-        HPX_TEST(tid == hpx::this_thread::get_id());
+        HPX_TEST_EQ(tid, hpx::this_thread::get_id());
     }
 
     hpx::parallel::execution::bulk_then_execute(

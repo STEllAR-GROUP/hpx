@@ -54,7 +54,7 @@ int hpx_main(int argc, char* argv[])
 
         auto values = c.get_counter_values_array(hpx::launch::sync, false);
 
-        HPX_TEST(values.count_ == static_cast<std::uint64_t>(i + 1));
+        HPX_TEST_EQ(values.count_, static_cast<std::uint64_t>(i + 1));
 
         std::vector<std::int64_t> expected(10);
         std::iota(expected.begin(), expected.end(), i);

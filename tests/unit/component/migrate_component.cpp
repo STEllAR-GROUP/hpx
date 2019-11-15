@@ -13,6 +13,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/testing.hpp>
 
+#include <cstdint>
 #include <chrono>
 #include <cstddef>
 #include <utility>
@@ -68,66 +69,66 @@ struct test_server
 
     hpx::id_type call() const
     {
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
         return hpx::find_here();
     }
 
     void busy_work() const
     {
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
         hpx::this_thread::sleep_for(std::chrono::seconds(1));
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
     }
 
     hpx::future<void> lazy_busy_work() const
     {
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
 
         auto f = hpx::make_ready_future_after(std::chrono::seconds(1));
 
         return f.then(
             [this](hpx::future<void> && f) -> void
             {
-                HPX_TEST(pin_count() != 0);
+                HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
                 f.get();
-                HPX_TEST(pin_count() != 0);
+                HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
             });
     }
 
     int get_data() const
     {
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
         return data_;
     }
 
     hpx::future<int> lazy_get_data() const
     {
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
 
         auto f = hpx::make_ready_future(data_);
 
         return f.then(
             [this](hpx::future<int> && f) -> int
             {
-                HPX_TEST(pin_count() != 0);
+                HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
                 auto result = f.get();
-                HPX_TEST(pin_count() != 0);
+                HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
                 return result;
             });
     }
 
     dummy_client lazy_get_client(hpx::id_type there) const
     {
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
 
         auto f = dummy_client(hpx::new_<dummy_server>(there));
 
         return f.then(
             [this](dummy_client && f) -> hpx::id_type
             {
-                HPX_TEST(pin_count() != 0);
+                HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
                 auto result = f.get();
-                HPX_TEST(pin_count() != 0);
+                HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
                 return result;
             });
     }

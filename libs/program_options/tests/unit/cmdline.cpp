@@ -16,6 +16,7 @@
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/value_semantic.hpp>
 
+#include <cstddef>
 #include <iostream>
 #include <sstream>
 #include <utility>
@@ -55,7 +56,7 @@ int translate_syntax_error_kind(invalid_command_line_syntax::kind_t k)
     b = table;
     e = table + sizeof(table) / sizeof(table[0]);
     i = std::find(b, e, k);
-    HPX_TEST(i != e);
+    HPX_TEST_NEQ(i, e);
     return int(std::distance(b, i)) + 3;
 }
 
@@ -434,9 +435,9 @@ void test_additional_parser()
 #if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
     (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
     // the long_names() API function was introduced in Boost V1.68
-    HPX_TEST(result.size() == 3);
+    HPX_TEST_EQ(result.size(), std::size_t(3));
 #else
-    HPX_TEST(result.size() == 2);
+    HPX_TEST_EQ(result.size(), std::size_t(2));
 #endif
     HPX_TEST_EQ(result[0].string_key, "response-file");
     HPX_TEST_EQ(result[0].value[0], "config");
@@ -494,7 +495,7 @@ void test_style_parser()
 
     vector<option> result = cmd.run();
 
-    HPX_TEST(result.size() == 2);
+    HPX_TEST_EQ(result.size(), std::size_t(2));
     HPX_TEST_EQ(result[0].string_key, "foo");
     HPX_TEST_EQ(result[0].value[0], "1");
     HPX_TEST_EQ(result[1].string_key, "bar");
@@ -518,7 +519,7 @@ void test_unregistered()
     cmd.allow_unregistered();
 
     vector<option> result = cmd.run();
-    HPX_TEST(result.size() == 5);
+    HPX_TEST_EQ(result.size(), std::size_t(5));
     // --foo=1
     HPX_TEST_EQ(result[0].string_key, "foo");
     HPX_TEST_EQ(result[0].unregistered, true);
@@ -530,7 +531,7 @@ void test_unregistered()
     // '1' is considered a positional option, not a value to
     // --bar
     HPX_TEST(result[2].string_key.empty());
-    HPX_TEST(result[2].position_key == 0);
+    HPX_TEST_EQ(result[2].position_key, 0);
     HPX_TEST_EQ(result[2].unregistered, false);
     HPX_TEST_EQ(result[2].value[0], "1");
     // -b
@@ -556,7 +557,7 @@ void test_unregistered()
 
     result = cmd2.run();
 
-    HPX_TEST(result.size() == 3);
+    HPX_TEST_EQ(result.size(), std::size_t(3));
     HPX_TEST_EQ(result[0].string_key, "help");
     HPX_TEST_EQ(result[0].unregistered, false);
     HPX_TEST(result[0].value.empty());

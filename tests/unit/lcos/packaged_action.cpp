@@ -65,7 +65,7 @@ int hpx_main(variables_map&)
 
         //test two successive 'get' from a promise
         hpx::lcos::shared_future<int> int_promise(async<int_action>(hpx::find_here()));
-        HPX_TEST(int_promise.get() == int_promise.get());
+        HPX_TEST_EQ(int_promise.get(), int_promise.get());
     }
 
     {
@@ -89,7 +89,7 @@ int hpx_main(variables_map&)
         //test two successive 'get' from a promise
         int_action do_int;
         hpx::lcos::shared_future<int> int_promise(async(do_int, hpx::find_here()));
-        HPX_TEST(int_promise.get() == int_promise.get());
+        HPX_TEST_EQ(int_promise.get(), int_promise.get());
     }
 
     hpx::finalize();       // Initiate shutdown of the runtime system.

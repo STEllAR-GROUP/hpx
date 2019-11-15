@@ -125,36 +125,36 @@ namespace n_constructors {
             HPX_TEST(px.get() == nullptr);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             X* p = new X;
-            HPX_TEST(p->use_count() == 0);
+            HPX_TEST_EQ(p->use_count(), 0);
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             hpx::intrusive_ptr<X> px(p);
-            HPX_TEST(px.get() == p);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px.get(), p);
+            HPX_TEST_EQ(px->use_count(), 1);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             X* p = new X;
-            HPX_TEST(p->use_count() == 0);
+            HPX_TEST_EQ(p->use_count(), 0);
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             intrusive_ptr_add_ref(p);
-            HPX_TEST(p->use_count() == 1);
+            HPX_TEST_EQ(p->use_count(), 1);
 
             hpx::intrusive_ptr<X> px(p, false);
-            HPX_TEST(px.get() == p);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px.get(), p);
+            HPX_TEST_EQ(px->use_count(), 1);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
     }
 
     void copy_constructor()
@@ -162,60 +162,60 @@ namespace n_constructors {
         {
             hpx::intrusive_ptr<X> px;
             hpx::intrusive_ptr<X> px2(px);
-            HPX_TEST(px2.get() == px.get());
+            HPX_TEST_EQ(px2.get(), px.get());
         }
 
         {
             hpx::intrusive_ptr<Y> py;
             hpx::intrusive_ptr<X> px(py);
-            HPX_TEST(px.get() == py.get());
+            HPX_TEST_EQ(px.get(), py.get());
         }
 
         {
             hpx::intrusive_ptr<X> px(nullptr);
             hpx::intrusive_ptr<X> px2(px);
-            HPX_TEST(px2.get() == px.get());
+            HPX_TEST_EQ(px2.get(), px.get());
         }
 
         {
             hpx::intrusive_ptr<Y> py(nullptr);
             hpx::intrusive_ptr<X> px(py);
-            HPX_TEST(px.get() == py.get());
+            HPX_TEST_EQ(px.get(), py.get());
         }
 
         {
             hpx::intrusive_ptr<X> px(nullptr, false);
             hpx::intrusive_ptr<X> px2(px);
-            HPX_TEST(px2.get() == px.get());
+            HPX_TEST_EQ(px2.get(), px.get());
         }
 
         {
             hpx::intrusive_ptr<Y> py(nullptr, false);
             hpx::intrusive_ptr<X> px(py);
-            HPX_TEST(px.get() == py.get());
+            HPX_TEST_EQ(px.get(), py.get());
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> px(new X);
             hpx::intrusive_ptr<X> px2(px);
-            HPX_TEST(px2.get() == px.get());
+            HPX_TEST_EQ(px2.get(), px.get());
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<Y> py(new Y);
             hpx::intrusive_ptr<X> px(py);
-            HPX_TEST(px.get() == py.get());
+            HPX_TEST_EQ(px.get(), py.get());
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
     }
 
     void test()
@@ -231,23 +231,23 @@ namespace n_destructor {
 
     void test()
     {
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> px(new X);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px->use_count(), 1);
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             {
                 hpx::intrusive_ptr<X> px2(px);
-                HPX_TEST(px->use_count() == 2);
+                HPX_TEST_EQ(px->use_count(), 2);
             }
 
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px->use_count(), 1);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
     }
 
 }    // namespace n_destructor
@@ -256,7 +256,7 @@ namespace n_assignment {
 
     void copy_assignment()
     {
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> p1;
@@ -270,7 +270,7 @@ namespace n_assignment {
 #pragma clang diagnostic pop
 #endif
 
-            HPX_TEST(p1 == p1);
+            HPX_TEST_EQ(p1, p1);
             HPX_TEST(p1 ? false : true);
             HPX_TEST(!p1);
             HPX_TEST(p1.get() == nullptr);
@@ -279,7 +279,7 @@ namespace n_assignment {
 
             p1 = p2;
 
-            HPX_TEST(p1 == p2);
+            HPX_TEST_EQ(p1, p2);
             HPX_TEST(p1 ? false : true);
             HPX_TEST(!p1);
             HPX_TEST(p1.get() == nullptr);
@@ -288,40 +288,40 @@ namespace n_assignment {
 
             p1 = p3;
 
-            HPX_TEST(p1 == p3);
+            HPX_TEST_EQ(p1, p3);
             HPX_TEST(p1 ? false : true);
             HPX_TEST(!p1);
             HPX_TEST(p1.get() == nullptr);
 
-            HPX_TEST(N::base::instances == 0);
+            HPX_TEST_EQ(N::base::instances, 0);
 
             hpx::intrusive_ptr<X> p4(new X);
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             p1 = p4;
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
-            HPX_TEST(p1 == p4);
+            HPX_TEST_EQ(p1, p4);
 
-            HPX_TEST(p1->use_count() == 2);
+            HPX_TEST_EQ(p1->use_count(), 2);
 
             p1 = p2;
 
-            HPX_TEST(p1 == p2);
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(p1, p2);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             p4 = p3;
 
-            HPX_TEST(p4 == p3);
-            HPX_TEST(N::base::instances == 0);
+            HPX_TEST_EQ(p4, p3);
+            HPX_TEST_EQ(N::base::instances, 0);
         }
     }
 
     void conversion_assignment()
     {
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> p1;
@@ -330,54 +330,54 @@ namespace n_assignment {
 
             p1 = p2;
 
-            HPX_TEST(p1 == p2);
+            HPX_TEST_EQ(p1, p2);
             HPX_TEST(p1 ? false : true);
             HPX_TEST(!p1);
             HPX_TEST(p1.get() == nullptr);
 
-            HPX_TEST(N::base::instances == 0);
+            HPX_TEST_EQ(N::base::instances, 0);
 
             hpx::intrusive_ptr<Y> p4(new Y);
 
-            HPX_TEST(N::base::instances == 1);
-            HPX_TEST(p4->use_count() == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
+            HPX_TEST_EQ(p4->use_count(), 1);
 
             hpx::intrusive_ptr<X> p5(p4);
-            HPX_TEST(p4->use_count() == 2);
+            HPX_TEST_EQ(p4->use_count(), 2);
 
             p1 = p4;
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
-            HPX_TEST(p1 == p4);
+            HPX_TEST_EQ(p1, p4);
 
-            HPX_TEST(p1->use_count() == 3);
-            HPX_TEST(p4->use_count() == 3);
+            HPX_TEST_EQ(p1->use_count(), 3);
+            HPX_TEST_EQ(p4->use_count(), 3);
 
             p1 = p2;
 
-            HPX_TEST(p1 == p2);
-            HPX_TEST(N::base::instances == 1);
-            HPX_TEST(p4->use_count() == 2);
+            HPX_TEST_EQ(p1, p2);
+            HPX_TEST_EQ(N::base::instances, 1);
+            HPX_TEST_EQ(p4->use_count(), 2);
 
             p4 = p2;
             p5 = p2;
 
-            HPX_TEST(p4 == p2);
-            HPX_TEST(N::base::instances == 0);
+            HPX_TEST_EQ(p4, p2);
+            HPX_TEST_EQ(N::base::instances, 0);
         }
     }
 
     void pointer_assignment()
     {
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> p1;
 
             p1 = p1.get();
 
-            HPX_TEST(p1 == p1);
+            HPX_TEST_EQ(p1, p1);
             HPX_TEST(p1 ? false : true);
             HPX_TEST(!p1);
             HPX_TEST(p1.get() == nullptr);
@@ -386,7 +386,7 @@ namespace n_assignment {
 
             p1 = p2.get();
 
-            HPX_TEST(p1 == p2);
+            HPX_TEST_EQ(p1, p2);
             HPX_TEST(p1 ? false : true);
             HPX_TEST(!p1);
             HPX_TEST(p1.get() == nullptr);
@@ -395,34 +395,34 @@ namespace n_assignment {
 
             p1 = p3.get();
 
-            HPX_TEST(p1 == p3);
+            HPX_TEST_EQ(p1, p3);
             HPX_TEST(p1 ? false : true);
             HPX_TEST(!p1);
             HPX_TEST(p1.get() == nullptr);
 
-            HPX_TEST(N::base::instances == 0);
+            HPX_TEST_EQ(N::base::instances, 0);
 
             hpx::intrusive_ptr<X> p4(new X);
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             p1 = p4.get();
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
-            HPX_TEST(p1 == p4);
+            HPX_TEST_EQ(p1, p4);
 
-            HPX_TEST(p1->use_count() == 2);
+            HPX_TEST_EQ(p1->use_count(), 2);
 
             p1 = p2.get();
 
-            HPX_TEST(p1 == p2);
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(p1, p2);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             p4 = p3.get();
 
-            HPX_TEST(p4 == p3);
-            HPX_TEST(N::base::instances == 0);
+            HPX_TEST_EQ(p4, p3);
+            HPX_TEST_EQ(N::base::instances, 0);
         }
 
         {
@@ -432,41 +432,41 @@ namespace n_assignment {
 
             p1 = p2.get();
 
-            HPX_TEST(p1 == p2);
+            HPX_TEST_EQ(p1, p2);
             HPX_TEST(p1 ? false : true);
             HPX_TEST(!p1);
             HPX_TEST(p1.get() == nullptr);
 
-            HPX_TEST(N::base::instances == 0);
+            HPX_TEST_EQ(N::base::instances, 0);
 
             hpx::intrusive_ptr<Y> p4(new Y);
 
-            HPX_TEST(N::base::instances == 1);
-            HPX_TEST(p4->use_count() == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
+            HPX_TEST_EQ(p4->use_count(), 1);
 
             hpx::intrusive_ptr<X> p5(p4);
-            HPX_TEST(p4->use_count() == 2);
+            HPX_TEST_EQ(p4->use_count(), 2);
 
             p1 = p4.get();
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
-            HPX_TEST(p1 == p4);
+            HPX_TEST_EQ(p1, p4);
 
-            HPX_TEST(p1->use_count() == 3);
-            HPX_TEST(p4->use_count() == 3);
+            HPX_TEST_EQ(p1->use_count(), 3);
+            HPX_TEST_EQ(p4->use_count(), 3);
 
             p1 = p2.get();
 
-            HPX_TEST(p1 == p2);
-            HPX_TEST(N::base::instances == 1);
-            HPX_TEST(p4->use_count() == 2);
+            HPX_TEST_EQ(p1, p2);
+            HPX_TEST_EQ(N::base::instances, 1);
+            HPX_TEST_EQ(p4->use_count(), 2);
 
             p4 = p2.get();
             p5 = p2.get();
 
-            HPX_TEST(p4 == p2);
-            HPX_TEST(N::base::instances == 0);
+            HPX_TEST_EQ(p4, p2);
+            HPX_TEST_EQ(N::base::instances, 0);
         }
     }
 
@@ -483,7 +483,7 @@ namespace n_reset {
 
     void test()
     {
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> px;
@@ -493,155 +493,155 @@ namespace n_reset {
             HPX_TEST(px.get() == nullptr);
 
             X* p = new X;
-            HPX_TEST(p->use_count() == 0);
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(p->use_count(), 0);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             px.reset(p);
-            HPX_TEST(px.get() == p);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px.get(), p);
+            HPX_TEST_EQ(px->use_count(), 1);
 
             px.reset();
             HPX_TEST(px.get() == nullptr);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> px(new X);
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             px.reset(nullptr);
             HPX_TEST(px.get() == nullptr);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> px(new X);
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             px.reset(nullptr, false);
             HPX_TEST(px.get() == nullptr);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> px(new X);
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             px.reset(nullptr, true);
             HPX_TEST(px.get() == nullptr);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             X* p = new X;
-            HPX_TEST(p->use_count() == 0);
+            HPX_TEST_EQ(p->use_count(), 0);
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             hpx::intrusive_ptr<X> px;
             HPX_TEST(px.get() == nullptr);
 
             px.reset(p, true);
-            HPX_TEST(px.get() == p);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px.get(), p);
+            HPX_TEST_EQ(px->use_count(), 1);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             X* p = new X;
-            HPX_TEST(p->use_count() == 0);
+            HPX_TEST_EQ(p->use_count(), 0);
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
 #if defined(BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP)
             using hpx::intrusive_ptr_add_ref;
 #endif
             intrusive_ptr_add_ref(p);
-            HPX_TEST(p->use_count() == 1);
+            HPX_TEST_EQ(p->use_count(), 1);
 
             hpx::intrusive_ptr<X> px;
             HPX_TEST(px.get() == nullptr);
 
             px.reset(p, false);
-            HPX_TEST(px.get() == p);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px.get(), p);
+            HPX_TEST_EQ(px->use_count(), 1);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> px(new X);
             HPX_TEST(px.get() != nullptr);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px->use_count(), 1);
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             X* p = new X;
-            HPX_TEST(p->use_count() == 0);
+            HPX_TEST_EQ(p->use_count(), 0);
 
-            HPX_TEST(N::base::instances == 2);
+            HPX_TEST_EQ(N::base::instances, 2);
 
             px.reset(p);
-            HPX_TEST(px.get() == p);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px.get(), p);
+            HPX_TEST_EQ(px->use_count(), 1);
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> px(new X);
             HPX_TEST(px.get() != nullptr);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px->use_count(), 1);
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             X* p = new X;
-            HPX_TEST(p->use_count() == 0);
+            HPX_TEST_EQ(p->use_count(), 0);
 
-            HPX_TEST(N::base::instances == 2);
+            HPX_TEST_EQ(N::base::instances, 2);
 
             px.reset(p, true);
-            HPX_TEST(px.get() == p);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px.get(), p);
+            HPX_TEST_EQ(px->use_count(), 1);
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> px(new X);
             HPX_TEST(px.get() != nullptr);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px->use_count(), 1);
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
 
             X* p = new X;
-            HPX_TEST(p->use_count() == 0);
+            HPX_TEST_EQ(p->use_count(), 0);
 
 #if defined(BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP)
             using hpx::intrusive_ptr_add_ref;
 #endif
             intrusive_ptr_add_ref(p);
-            HPX_TEST(p->use_count() == 1);
+            HPX_TEST_EQ(p->use_count(), 1);
 
-            HPX_TEST(N::base::instances == 2);
+            HPX_TEST_EQ(N::base::instances, 2);
 
             px.reset(p, false);
-            HPX_TEST(px.get() == p);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px.get(), p);
+            HPX_TEST_EQ(px->use_count(), 1);
 
-            HPX_TEST(N::base::instances == 1);
+            HPX_TEST_EQ(N::base::instances, 1);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
     }
 
 }    // namespace n_reset
@@ -659,7 +659,7 @@ namespace n_access {
             using boost::get_pointer;
 #endif
 
-            HPX_TEST(get_pointer(px) == px.get());
+            HPX_TEST_EQ(get_pointer(px), px.get());
         }
 
         {
@@ -671,21 +671,21 @@ namespace n_access {
             using boost::get_pointer;
 #endif
 
-            HPX_TEST(get_pointer(px) == px.get());
+            HPX_TEST_EQ(get_pointer(px), px.get());
         }
 
         {
             hpx::intrusive_ptr<X> px(new X);
             HPX_TEST(px ? true : false);
             HPX_TEST(!!px);
-            HPX_TEST(&*px == px.get());
-            HPX_TEST(px.operator->() == px.get());
+            HPX_TEST_EQ(&*px, px.get());
+            HPX_TEST_EQ(px.operator->(), px.get());
 
 #if defined(BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP)
             using boost::get_pointer;
 #endif
 
-            HPX_TEST(get_pointer(px) == px.get());
+            HPX_TEST_EQ(get_pointer(px), px.get());
         }
 
         {
@@ -697,17 +697,17 @@ namespace n_access {
 
         {
             X* p = new X;
-            HPX_TEST(p->use_count() == 0);
+            HPX_TEST_EQ(p->use_count(), 0);
 
             hpx::intrusive_ptr<X> px(p);
-            HPX_TEST(px.get() == p);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px.get(), p);
+            HPX_TEST_EQ(px->use_count(), 1);
 
             X* detached = px.detach();
             HPX_TEST(px.get() == nullptr);
 
-            HPX_TEST(detached == p);
-            HPX_TEST(detached->use_count() == 1);
+            HPX_TEST_EQ(detached, p);
+            HPX_TEST_EQ(detached->use_count(), 1);
 
             delete detached;
         }
@@ -743,20 +743,20 @@ namespace n_swap {
 
             px.swap(px2);
 
-            HPX_TEST(px.get() == p);
-            HPX_TEST(px->use_count() == 2);
+            HPX_TEST_EQ(px.get(), p);
+            HPX_TEST_EQ(px->use_count(), 2);
             HPX_TEST(px2.get() == nullptr);
-            HPX_TEST(px3.get() == p);
-            HPX_TEST(px3->use_count() == 2);
+            HPX_TEST_EQ(px3.get(), p);
+            HPX_TEST_EQ(px3->use_count(), 2);
 
             using std::swap;
             swap(px, px2);
 
             HPX_TEST(px.get() == nullptr);
-            HPX_TEST(px2.get() == p);
-            HPX_TEST(px2->use_count() == 2);
-            HPX_TEST(px3.get() == p);
-            HPX_TEST(px3->use_count() == 2);
+            HPX_TEST_EQ(px2.get(), p);
+            HPX_TEST_EQ(px2->use_count(), 2);
+            HPX_TEST_EQ(px3.get(), p);
+            HPX_TEST_EQ(px3->use_count(), 2);
         }
 
         {
@@ -768,22 +768,22 @@ namespace n_swap {
 
             px.swap(px2);
 
-            HPX_TEST(px.get() == p2);
-            HPX_TEST(px->use_count() == 2);
-            HPX_TEST(px2.get() == p1);
-            HPX_TEST(px2->use_count() == 1);
-            HPX_TEST(px3.get() == p2);
-            HPX_TEST(px3->use_count() == 2);
+            HPX_TEST_EQ(px.get(), p2);
+            HPX_TEST_EQ(px->use_count(), 2);
+            HPX_TEST_EQ(px2.get(), p1);
+            HPX_TEST_EQ(px2->use_count(), 1);
+            HPX_TEST_EQ(px3.get(), p2);
+            HPX_TEST_EQ(px3->use_count(), 2);
 
             using std::swap;
             swap(px, px2);
 
-            HPX_TEST(px.get() == p1);
-            HPX_TEST(px->use_count() == 1);
-            HPX_TEST(px2.get() == p2);
-            HPX_TEST(px2->use_count() == 2);
-            HPX_TEST(px3.get() == p2);
-            HPX_TEST(px3->use_count() == 2);
+            HPX_TEST_EQ(px.get(), p1);
+            HPX_TEST_EQ(px->use_count(), 1);
+            HPX_TEST_EQ(px2.get(), p2);
+            HPX_TEST_EQ(px2->use_count(), 2);
+            HPX_TEST_EQ(px3.get(), p2);
+            HPX_TEST_EQ(px3->use_count(), 2);
         }
     }
 
@@ -865,24 +865,24 @@ namespace n_static_cast {
             hpx::intrusive_ptr<X> px(new Y);
 
             hpx::intrusive_ptr<Y> py = hpx::static_pointer_cast<Y>(px);
-            HPX_TEST(px.get() == py.get());
-            HPX_TEST(px->use_count() == 2);
-            HPX_TEST(py->use_count() == 2);
+            HPX_TEST_EQ(px.get(), py.get());
+            HPX_TEST_EQ(px->use_count(), 2);
+            HPX_TEST_EQ(py->use_count(), 2);
 
             hpx::intrusive_ptr<X> px2(py);
-            HPX_TEST(px2.get() == px.get());
+            HPX_TEST_EQ(px2.get(), px.get());
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<Y> py =
                 hpx::static_pointer_cast<Y>(hpx::intrusive_ptr<X>(new Y));
             HPX_TEST(py.get() != nullptr);
-            HPX_TEST(py->use_count() == 1);
+            HPX_TEST_EQ(py->use_count(), 1);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
     }
 
 }    // namespace n_static_cast
@@ -904,27 +904,27 @@ namespace n_const_cast {
             HPX_TEST(px2.get() == nullptr);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X const> px(new X);
 
             hpx::intrusive_ptr<X> px2 = hpx::const_pointer_cast<X>(px);
-            HPX_TEST(px2.get() == px.get());
-            HPX_TEST(px2->use_count() == 2);
-            HPX_TEST(px->use_count() == 2);
+            HPX_TEST_EQ(px2.get(), px.get());
+            HPX_TEST_EQ(px2->use_count(), 2);
+            HPX_TEST_EQ(px->use_count(), 2);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> px =
                 hpx::const_pointer_cast<X>(hpx::intrusive_ptr<X const>(new X));
             HPX_TEST(px.get() != nullptr);
-            HPX_TEST(px->use_count() == 1);
+            HPX_TEST_EQ(px->use_count(), 1);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
     }
 
 }    // namespace n_const_cast
@@ -966,7 +966,7 @@ namespace n_dynamic_cast {
             HPX_TEST(py.get() == nullptr);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<Y> py =
@@ -974,18 +974,18 @@ namespace n_dynamic_cast {
             HPX_TEST(py.get() == nullptr);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> px(new Y);
 
             hpx::intrusive_ptr<Y> py = hpx::dynamic_pointer_cast<Y>(px);
-            HPX_TEST(py.get() == px.get());
-            HPX_TEST(py->use_count() == 2);
-            HPX_TEST(px->use_count() == 2);
+            HPX_TEST_EQ(py.get(), px.get());
+            HPX_TEST_EQ(py->use_count(), 2);
+            HPX_TEST_EQ(px->use_count(), 2);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
 
         {
             hpx::intrusive_ptr<X> px(new Y);
@@ -993,10 +993,10 @@ namespace n_dynamic_cast {
             hpx::intrusive_ptr<Y> py =
                 hpx::dynamic_pointer_cast<Y>(hpx::intrusive_ptr<X>(new Y));
             HPX_TEST(py.get() != nullptr);
-            HPX_TEST(py->use_count() == 1);
+            HPX_TEST_EQ(py->use_count(), 1);
         }
 
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
     }
 
 }    // namespace n_dynamic_cast

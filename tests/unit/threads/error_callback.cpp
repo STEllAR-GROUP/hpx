@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     }
 
     HPX_TEST(caught_exception);
-    HPX_TEST(count_error_handler == 1);
+    HPX_TEST_EQ(count_error_handler, std::size_t(1));
 
     return hpx::util::report_errors();
 }

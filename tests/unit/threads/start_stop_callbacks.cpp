@@ -68,29 +68,29 @@ int hpx_main(int argc, char* argv[])
     std::lock_guard<std::mutex> l(mtx);
 
     auto p = threads.equal_range("main-thread");
-    HPX_TEST(std::distance(p.first, p.second) == 1);
+    HPX_TEST_EQ(std::distance(p.first, p.second), 1);
 
     p = threads.equal_range("worker-thread");
-    HPX_TEST(std::size_t(std::distance(p.first, p.second)) ==
+    HPX_TEST_EQ(std::size_t(std::distance(p.first, p.second)),
         hpx::get_num_worker_threads());
 
     p = threads.equal_range("timer-thread");
     auto cfg = hpx::get_config_entry("hpx.threadpools.timer_pool_size", "0");
-    HPX_TEST(std::distance(p.first, p.second) == hpx::util::from_string<int>(cfg));
+    HPX_TEST_EQ(std::distance(p.first, p.second), hpx::util::from_string<int>(cfg));
 
 #if defined(HPX_HAVE_NETWORKING)
     if (hpx::is_networking_enabled())
     {
         p = threads.equal_range("parcel-thread");
         cfg = hpx::get_config_entry("hpx.threadpools.parcel_pool_size", "0");
-        HPX_TEST(
-            std::distance(p.first, p.second) == hpx::util::from_string<int>(cfg));
+        HPX_TEST_EQ(
+            std::distance(p.first, p.second), hpx::util::from_string<int>(cfg));
     }
 #endif
 
     p = threads.equal_range("io-thread");
     cfg = hpx::get_config_entry("hpx.threadpools.io_pool_size", "0");
-    HPX_TEST(std::distance(p.first, p.second) == hpx::util::from_string<int>(cfg));
+    HPX_TEST_EQ(std::distance(p.first, p.second), hpx::util::from_string<int>(cfg));
 
     return hpx::finalize();
 }

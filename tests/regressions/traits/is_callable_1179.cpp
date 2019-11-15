@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
     HPX_TEST_MSG((is_callable<const_mem_fun_ptr(p)>::value == true),
         "const-mem-fun-ptr");
 
-    HPX_TEST(invoke(&s::f, p()) == 42);
+    HPX_TEST_EQ(invoke(&s::f, p()), 42);
 
     return hpx::util::report_errors();
 }

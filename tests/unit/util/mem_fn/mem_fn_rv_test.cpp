@@ -103,7 +103,7 @@ int main()
     hpx::util::mem_fn(&X::f8)(make(), 1, 2, 3, 4, 5, 6, 7, 8);
     hpx::util::mem_fn(&X::g8)(make(), 1, 2, 3, 4, 5, 6, 7, 8);
 
-    HPX_TEST(hash == 2155);
+    HPX_TEST_EQ(hash, 2155u);
 
     return hpx::util::report_errors();
 }

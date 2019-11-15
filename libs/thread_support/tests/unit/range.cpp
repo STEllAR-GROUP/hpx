@@ -108,12 +108,12 @@ void adl_range()
 void vector_range()
 {
     std::vector<int> r(3);
-    HPX_TEST(hpx::util::begin(r) == r.begin());
-    HPX_TEST(hpx::util::end(r) == r.end());
+    HPX_TEST_EQ(hpx::util::begin(r), r.begin());
+    HPX_TEST_EQ(hpx::util::end(r), r.end());
 
     std::vector<int> cr(3);
-    HPX_TEST(hpx::util::begin(cr) == cr.begin());
-    HPX_TEST(hpx::util::end(cr) == cr.end());
+    HPX_TEST_EQ(hpx::util::begin(cr), cr.begin());
+    HPX_TEST_EQ(hpx::util::end(cr), cr.end());
     HPX_TEST_EQ(hpx::util::size(cr), 3u);
     HPX_TEST_EQ(hpx::util::empty(cr), false);
 }

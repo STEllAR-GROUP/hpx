@@ -32,7 +32,7 @@ void test_sync(bool sync)
     bool result = hpx::parallel::execution::sync_execute(exec, &test, 42) ==
         hpx::this_thread::get_id();
 
-    HPX_TEST(sync == result);
+    HPX_TEST_EQ(sync, result);
 }
 
 template <typename Policy>
@@ -45,7 +45,7 @@ void test_async(bool sync)
         hpx::parallel::execution::async_execute(exec, &test, 42).get() ==
         hpx::this_thread::get_id();
 
-    HPX_TEST(sync == result);
+    HPX_TEST_EQ(sync, result);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,19 +71,19 @@ void test_then(bool sync)
         hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() ==
         hpx::this_thread::get_id();
 
-    HPX_TEST(sync == result);
+    HPX_TEST_EQ(sync, result);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void bulk_test_s(int value, hpx::thread::id tid, int passed_through)    //-V813
 {
-    HPX_TEST(tid == hpx::this_thread::get_id());
+    HPX_TEST_EQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
 void bulk_test_a(int value, hpx::thread::id tid, int passed_through)    //-V813
 {
-    HPX_TEST(tid != hpx::this_thread::get_id());
+    HPX_TEST_NEQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
@@ -141,7 +141,7 @@ void bulk_test_f_s(int value, hpx::shared_future<void> f, hpx::thread::id tid,
 
     f.get();    // propagate exceptions
 
-    HPX_TEST(tid == hpx::this_thread::get_id());
+    HPX_TEST_EQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
@@ -152,7 +152,7 @@ void bulk_test_f_a(int value, hpx::shared_future<void> f, hpx::thread::id tid,
 
     f.get();    // propagate exceptions
 
-    HPX_TEST(tid != hpx::this_thread::get_id());
+    HPX_TEST_NEQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 

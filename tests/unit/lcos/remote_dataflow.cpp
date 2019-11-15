@@ -46,8 +46,8 @@ void plain_actions(hpx::id_type const& there)
         hpx::future<hpx::id_type> f1 = hpx::dataflow(id_f_action(), there);
         hpx::future<hpx::id_type> f2 = hpx::dataflow<id_f_action>(there);
 
-        HPX_TEST(there == f1.get());
-        HPX_TEST(there == f2.get());
+        HPX_TEST_EQ(there, f1.get());
+        HPX_TEST_EQ(there, f2.get());
     }
 
     hpx::launch policies[] =
@@ -79,8 +79,8 @@ void plain_actions(hpx::id_type const& there)
             hpx::future<hpx::id_type> f2 = hpx::dataflow<id_f_action>(
                 policies[i], there);
 
-            HPX_TEST(there == f1.get());
-            HPX_TEST(there == f2.get());
+            HPX_TEST_EQ(there, f1.get());
+            HPX_TEST_EQ(there, f2.get());
         }
     }
 
@@ -119,8 +119,8 @@ void plain_actions(hpx::id_type const& there)
         hpx::future<hpx::id_type> f2 = hpx::dataflow<id_f_action>(
             policy2, there);
 
-        HPX_TEST(there == f1.get());
-        HPX_TEST(there == f2.get());
+        HPX_TEST_EQ(there, f1.get());
+        HPX_TEST_EQ(there, f2.get());
     }
 }
 

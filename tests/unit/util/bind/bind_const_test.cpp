@@ -153,12 +153,12 @@ void function_test()
 {
     int const i = 1;
 
-    HPX_TEST( test( hpx::util::bind(f_0), i ) == 17041L );
-    HPX_TEST( test( hpx::util::bind(f_1, placeholders::_1), i ) == 1L );
-    HPX_TEST( test( hpx::util::bind(f_2, placeholders::_1, 2), i ) == 21L );
-    HPX_TEST( test( hpx::util::bind(f_3, placeholders::_1, 2, 3), i ) == 321L );
-    HPX_TEST( test( hpx::util::bind(f_4, placeholders::_1, 2, 3, 4), i ) == 4321L );
-    HPX_TEST( test( hpx::util::bind(f_5, placeholders::_1, 2, 3, 4, 5), i ) == 54321L );
+    HPX_TEST_EQ( test( hpx::util::bind(f_0), i ), 17041L );
+    HPX_TEST_EQ( test( hpx::util::bind(f_1, placeholders::_1), i ), 1L );
+    HPX_TEST_EQ( test( hpx::util::bind(f_2, placeholders::_1, 2), i ), 21L );
+    HPX_TEST_EQ( test( hpx::util::bind(f_3, placeholders::_1, 2, 3), i ), 321L );
+    HPX_TEST_EQ( test( hpx::util::bind(f_4, placeholders::_1, 2, 3, 4), i ), 4321L );
+    HPX_TEST_EQ( test( hpx::util::bind(f_5, placeholders::_1, 2, 3, 4, 5), i ), 54321L );
     HPX_TEST( test( hpx::util::bind(f_6, placeholders::_1, 2, 3, 4, 5,
         6), i ) == 654321L );
     HPX_TEST( test( hpx::util::bind(f_7, placeholders::_1, 2, 3, 4, 5,
@@ -168,11 +168,11 @@ void function_test()
     HPX_TEST( test( hpx::util::bind(f_9, placeholders::_1, 2, 3, 4, 5,
         6, 7, 8, 9), i ) == 987654321L );
 
-    HPX_TEST( testv( hpx::util::bind(fv_0), i ) == 17041L );
-    HPX_TEST( testv( hpx::util::bind(fv_1, placeholders::_1), i ) == 1L );
-    HPX_TEST( testv( hpx::util::bind(fv_2, placeholders::_1, 2), i ) == 21L );
-    HPX_TEST( testv( hpx::util::bind(fv_3, placeholders::_1, 2, 3), i ) == 321L );
-    HPX_TEST( testv( hpx::util::bind(fv_4, placeholders::_1, 2, 3, 4), i ) == 4321L );
+    HPX_TEST_EQ( testv( hpx::util::bind(fv_0), i ), 17041L );
+    HPX_TEST_EQ( testv( hpx::util::bind(fv_1, placeholders::_1), i ), 1L );
+    HPX_TEST_EQ( testv( hpx::util::bind(fv_2, placeholders::_1, 2), i ), 21L );
+    HPX_TEST_EQ( testv( hpx::util::bind(fv_3, placeholders::_1, 2, 3), i ), 321L );
+    HPX_TEST_EQ( testv( hpx::util::bind(fv_4, placeholders::_1, 2, 3, 4), i ), 4321L );
     HPX_TEST( testv( hpx::util::bind(fv_5, placeholders::_1, 2, 3, 4, 5),
         i ) == 54321L );
     HPX_TEST( testv( hpx::util::bind(fv_6, placeholders::_1, 2, 3, 4, 5,

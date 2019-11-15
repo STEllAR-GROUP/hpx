@@ -41,7 +41,7 @@ void test_when_each_from_list()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     auto callback_with_index =
@@ -52,7 +52,7 @@ void test_when_each_from_list()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     Container futures1;
@@ -100,7 +100,7 @@ void test_when_each_from_list_iterators()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     auto callback_with_index =
@@ -111,7 +111,7 @@ void test_when_each_from_list_iterators()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     Container futures1;
@@ -163,7 +163,7 @@ void test_when_each_n_from_list_iterators()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id < n);
+            HPX_TEST_LT(id, n);
         };
 
     auto callback_with_index_n =
@@ -174,7 +174,7 @@ void test_when_each_n_from_list_iterators()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id < n);
+            HPX_TEST_LT(id, n);
         };
 
     Container futures1;
@@ -229,7 +229,7 @@ void test_when_each_one_future()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     auto callback_with_index =
@@ -240,7 +240,7 @@ void test_when_each_one_future()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     hpx::future<unsigned> f = hpx::make_ready_future(static_cast<unsigned>(0));
@@ -272,7 +272,7 @@ void test_when_each_two_futures()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     auto callback_with_index =
@@ -283,7 +283,7 @@ void test_when_each_two_futures()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     hpx::future<unsigned> f1 = hpx::make_ready_future(static_cast<unsigned>(0));
@@ -322,7 +322,7 @@ void test_when_each_three_futures()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     auto callback_with_index =
@@ -333,7 +333,7 @@ void test_when_each_three_futures()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     hpx::future<unsigned> f1 = hpx::make_ready_future(static_cast<unsigned>(0));
@@ -376,7 +376,7 @@ void test_when_each_four_futures()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     auto callback_with_index =
@@ -387,7 +387,7 @@ void test_when_each_four_futures()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     hpx::future<unsigned> f1 = hpx::make_ready_future(static_cast<unsigned>(0));
@@ -434,7 +434,7 @@ void test_when_each_five_futures()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     auto callback_with_index =
@@ -445,7 +445,7 @@ void test_when_each_five_futures()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     hpx::future<unsigned> f1 = hpx::make_ready_future(static_cast<unsigned>(0));
@@ -496,7 +496,7 @@ void test_when_each_late_future()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     auto callback_with_index =
@@ -507,7 +507,7 @@ void test_when_each_late_future()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     hpx::lcos::local::futures_factory<unsigned()> pt0(make_unsigned_slowly<0>);
@@ -563,7 +563,7 @@ void test_when_each_deferred_futures()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     auto callback_with_index =
@@ -574,7 +574,7 @@ void test_when_each_deferred_futures()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id < count);
+            HPX_TEST_LT(id, count);
         };
 
     hpx::lcos::future<unsigned> f1 =

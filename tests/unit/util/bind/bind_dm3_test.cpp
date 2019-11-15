@@ -37,7 +37,7 @@ int main()
 
     int const & x = hpx::util::bind( &pair_type::first, placeholders::_1 )( pair );
 
-    HPX_TEST( &pair.first == &x );
+    HPX_TEST_EQ( &pair.first, &x );
 
     return hpx::util::report_errors();
 }

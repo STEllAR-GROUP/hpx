@@ -79,7 +79,7 @@ static void test_mixed_traversal()
 
         static_assert(std::is_same<decltype(res), decltype(expected)>::value,
             "Type mismatch!");
-        HPX_TEST((res == expected));
+        HPX_TEST(res == expected);
     }
 
     {
@@ -91,7 +91,7 @@ static void test_mixed_traversal()
     {
         // Also a regression test
         auto res = map_pack(all_map{}, std::vector<std::vector<int>>{{1, 2}});
-        HPX_TEST_EQ((res[0][0]), (0));
+        HPX_TEST_EQ(res[0][0], (0));
     }
 
     {
@@ -113,21 +113,21 @@ static void test_mixed_traversal()
 
         static_assert(std::is_same<decltype(res), decltype(expected)>::value,
             "Type mismatch!");
-        HPX_TEST((res == expected));
+        HPX_TEST(res == expected);
     }
 
     {
         int count = 0;
         traverse_pack(
             [&](int el) {
-                HPX_TEST_EQ((el), (count + 1));
+                HPX_TEST_EQ(el, (count + 1));
                 count = el;
             },
             1,
             hpx::util::make_tuple(
                 2, 3, std::vector<std::vector<int>>{{4, 5}, {6, 7}}));
 
-        HPX_TEST_EQ((count), (7));
+        HPX_TEST_EQ(count, 7);
     }
 
     return;
@@ -155,7 +155,7 @@ static void test_mixed_early_unwrapping()
 
         static_assert(std::is_same<decltype(res), decltype(expected)>::value,
             "Type mismatch!");
-        HPX_TEST((res == expected));
+        HPX_TEST(res == expected);
     }
 }
 
@@ -229,7 +229,7 @@ static void test_mixed_container_remap()
             std::vector<unsigned short> source = {1, 2, 3};
             std::vector<unsigned long> dest = map_pack(remapper, source);
 
-            HPX_TEST((dest == decltype(dest){0, 1, 2}));
+            HPX_TEST(dest == (decltype(dest){0, 1, 2}));
         }
 
         // Rebinds the allocator
@@ -245,7 +245,7 @@ static void test_mixed_container_remap()
                 std::vector<unsigned long, my_allocator<unsigned long>>
                     remapped = map_pack(remapper, source);
 
-                HPX_TEST_EQ((remapped.get_allocator().state_), (canary));
+                HPX_TEST(remapped.get_allocator().state_ == canary);
             }
 
             // Non empty
@@ -254,7 +254,7 @@ static void test_mixed_container_remap()
                 std::vector<unsigned long, my_allocator<unsigned long>>
                     remapped = map_pack(remapper, source);
 
-                HPX_TEST_EQ((remapped.get_allocator().state_), (canary));
+                HPX_TEST(remapped.get_allocator().state_ == canary);
             }
         }
     }
@@ -433,7 +433,7 @@ static void test_strategic_traverse()
             map_pack([](int i) { return i + 1; }, 0, 1, 2);
 
         auto expected = make_tuple(1, 2, 3);
-        HPX_TEST((res == expected));
+        HPX_TEST(res == expected);
     }
 
     // Remapping works across types
@@ -464,13 +464,13 @@ static void test_strategic_traverse()
                 std::move(p1), std::move(p2), std::move(p3));
 
         // We expect the ownership of p1 - p3 to be invalid
-        HPX_TEST((!bool(p1)));
-        HPX_TEST((!bool(p2)));
-        HPX_TEST((!bool(p3)));
+        HPX_TEST(!bool(p1));
+        HPX_TEST(!bool(p2));
+        HPX_TEST(!bool(p3));
 
-        HPX_TEST_EQ((*get<0>(res)), 2U);
-        HPX_TEST_EQ((*get<1>(res)), 3U);
-        HPX_TEST_EQ((*get<2>(res)), 4U);
+        HPX_TEST_EQ(*get<0>(res), 2U);
+        HPX_TEST_EQ(*get<1>(res), 3U);
+        HPX_TEST_EQ(*get<2>(res), 4U);
     }
 
     // Move only types contained in a pack which was passed as l-value
@@ -525,12 +525,12 @@ static void test_strategic_traverse()
                 },
                 ptr1, ptr2);
 
-        HPX_TEST_EQ((*get<0>(ref)), 6);
-        HPX_TEST_EQ((*get<1>(ref)), 7);
+        HPX_TEST_EQ(*get<0>(ref), 6);
+        HPX_TEST_EQ(*get<1>(ref), 7);
         *ptr1 = 1;
         *ptr2 = 2;
-        HPX_TEST_EQ((*get<0>(ref)), 1);
-        HPX_TEST_EQ((*get<1>(ref)), 2);
+        HPX_TEST_EQ(*get<0>(ref), 1);
+        HPX_TEST_EQ(*get<1>(ref), 2);
     }
 }
 
@@ -664,7 +664,7 @@ static void test_strategic_container_traverse()
                 container);
 
             HPX_TEST_EQ(res.size(), 1U);
-            HPX_TEST_EQ((*res[0]), 7);
+            HPX_TEST_EQ(*res[0], 7);
         }
     }
 }
@@ -712,7 +712,7 @@ static void test_strategic_tuple_like_traverse()
 
         static_assert(std::is_same<decltype(res), decltype(expected)>::value,
             "Type mismatch!");
-        HPX_TEST((res == expected));
+        HPX_TEST(res == expected);
     }
 
     // Fixed size homogeneous container
@@ -720,7 +720,7 @@ static void test_strategic_tuple_like_traverse()
         std::array<int, 3> values{{1, 2, 3}};
         std::array<float, 3> res = map_pack([](int) { return 1.f; }, values);
 
-        HPX_TEST((res == std::array<float, 3>{{1.f, 1.f, 1.f}}));
+        HPX_TEST(res == (std::array<float, 3>{{1.f, 1.f, 1.f}}));
     }
 
     // Make it possible to pass tuples containing move only objects
@@ -739,12 +739,12 @@ static void test_strategic_tuple_like_traverse()
                 },
                 value);
 
-        HPX_TEST_EQ((*get<0>(ref)), 6);
-        HPX_TEST_EQ((*get<1>(ref)), 7);
+        HPX_TEST_EQ(*get<0>(ref), 6);
+        HPX_TEST_EQ(*get<1>(ref), 7);
         (*get<0>(ref)) = 1;
         (*get<1>(ref)) = 2;
-        HPX_TEST_EQ((*get<0>(ref)), 1);
-        HPX_TEST_EQ((*get<1>(ref)), 2);
+        HPX_TEST_EQ(*get<0>(ref), 1);
+        HPX_TEST_EQ(*get<1>(ref), 2);
     }
 }
 
@@ -776,7 +776,7 @@ static void test_spread_traverse()
 
         auto expected = make_tuple(1, 1, 2, 2);
 
-        HPX_TEST((res == expected));
+        HPX_TEST(res == expected);
     }
 
     // 1:0 mappings
@@ -796,7 +796,7 @@ static void test_spread_container_traverse()
         std::vector<tuple<int, int>> expected;
         expected.push_back(make_tuple(1, 1));
 
-        HPX_TEST((res == expected));
+        HPX_TEST(res == expected);
     }
 
     // 1:0 mappings
@@ -816,7 +816,7 @@ static void test_spread_tuple_like_traverse()
         tuple<tuple<int, int, int, int>> expected =
             make_tuple(make_tuple(1, 1, 2, 2));
 
-        HPX_TEST((res == expected));
+        HPX_TEST(res == expected);
     }
 
     // 1:0 mappings
@@ -833,7 +833,7 @@ static void test_spread_tuple_like_traverse()
 
         std::array<int, 4> expected{{1, 1, 2, 2}};
 
-        HPX_TEST((res == expected));
+        HPX_TEST(res == expected);
     }
 
     // 1:0 mappings

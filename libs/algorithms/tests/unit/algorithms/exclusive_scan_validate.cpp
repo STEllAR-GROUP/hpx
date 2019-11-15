@@ -81,7 +81,7 @@ void test_exclusive_scan_validate(
         // counting from zero,
         int value = b[i];    //-V108
         int expected_value = INITIAL_VAL + check_n_triangle(i - 1);
-        if (!HPX_TEST(value == expected_value))
+        if (!HPX_TEST_EQ(value, expected_value))
             break;
     }
 
@@ -115,7 +115,7 @@ void test_exclusive_scan_validate(
         // counting from 1, use i+1
         int value = b[i];    //-V108
         int expected_value = INITIAL_VAL + check_n_triangle(i);
-        if (!HPX_TEST(value == expected_value))
+        if (!HPX_TEST_EQ(value, expected_value))
             break;
     }
 
@@ -149,7 +149,7 @@ void test_exclusive_scan_validate(
         // counting from zero,
         int value = b[i];    //-V108
         int expected_value = INITIAL_VAL + check_n_const(i, FILL_VALUE);
-        if (!HPX_TEST(value == expected_value))
+        if (!HPX_TEST_EQ(value, expected_value))
             break;
     }
 }

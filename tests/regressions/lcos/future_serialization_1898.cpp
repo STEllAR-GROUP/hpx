@@ -41,9 +41,9 @@ int main()
 {
     hpx::id_type loc = hpx::find_here();
     {
-        HPX_TEST(test_server::alive == 0);
+        HPX_TEST_EQ(test_server::alive, 0);
         hpx::id_type gid = hpx::new_<test_server>(loc).get();
-        HPX_TEST(test_server::alive == 1);
+        HPX_TEST_EQ(test_server::alive, 1);
 //         HPX_TEST(!hpx::naming::detail::gid_was_split(gid.get_gid()));
 
         auto remote_localities = hpx::find_remote_localities();
@@ -53,7 +53,7 @@ int main()
                 hpx::future<hpx::id_type> test_fid = hpx::make_ready_future(gid);
                 hpx::future<hpx::id_type> fid
                     = hpx::async(test_action(), loc, std::move(test_fid));
-                HPX_TEST(test_server::alive == 1);
+                HPX_TEST_EQ(test_server::alive, 1);
 
                 hpx::id_type new_gid = fid.get();
                 HPX_TEST_NEQ(
@@ -68,12 +68,12 @@ int main()
                 hpx::future<hpx::id_type> test_fid = pid.get_future();
                 hpx::future<hpx::id_type> fid
                     = hpx::async(test_action(), loc, std::move(test_fid));
-                HPX_TEST(test_server::alive == 1);
+                HPX_TEST_EQ(test_server::alive, 1);
 
                 hpx::this_thread::yield();
 
                 pid.set_value(gid);
-                HPX_TEST(test_server::alive == 1);
+                HPX_TEST_EQ(test_server::alive, 1);
 
                 hpx::id_type new_gid = fid.get();
                 HPX_TEST_NEQ(
@@ -83,9 +83,9 @@ int main()
             }
 
 
-            HPX_TEST(test_server::alive == 1);
+            HPX_TEST_EQ(test_server::alive, 1);
         }
-        HPX_TEST(test_server::alive == 1);
+        HPX_TEST_EQ(test_server::alive, 1);
     }
 
     return 0;

@@ -29,7 +29,7 @@ inline std::size_t idx(std::size_t i, int dir)
     if (i == size - 1 && dir == +1)
         return 0;
 
-    HPX_TEST((i + dir) < size);
+    HPX_TEST_LT((i + dir), size);
 
     return i + dir;
 }

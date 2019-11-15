@@ -51,7 +51,7 @@ void test(hpx::id_type dest, char* send_buffer, std::size_t size)
     {
         buffer_type b = f.get();
         HPX_TEST_EQ(b.size(), size);
-        HPX_TEST(0 == memcmp(b.data(), send_buffer, size));
+        HPX_TEST_EQ(0, memcmp(b.data(), send_buffer, size));
     }
 }
 
@@ -77,7 +77,7 @@ void test_stateful_allocator(hpx::id_type dest, char* send_buffer,
     {
         buffer_type b = f.get();
         HPX_TEST_EQ(b.size(), size);
-        HPX_TEST(0 == memcmp(b.data(), send_buffer, size));
+        HPX_TEST_EQ(0, memcmp(b.data(), send_buffer, size));
     }
 }
 

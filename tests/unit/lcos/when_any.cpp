@@ -666,7 +666,7 @@ void test_wait_for_either_of_five_futures_5()
 //         hpx::lcos::future<int>* const future =
 //               boost::wait_for_any(futures, futures+count);
 //
-//         HPX_TEST(future == (futures + i));
+//         HPX_TEST_EQ(future, (futures + i));
 //         for(unsigned j = 0; j < count; ++j)
 //         {
 //             if (j != i)

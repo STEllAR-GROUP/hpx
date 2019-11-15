@@ -171,14 +171,14 @@ int main()
     {
         int x = 0;
         iterator_with_proxy_reference i(x);
-        HPX_TEST(x == 0);
-        HPX_TEST(i.m_x == 0);
+        HPX_TEST_EQ(x, 0);
+        HPX_TEST_EQ(i.m_x, 0);
         ++(*i).m_x;
-        HPX_TEST(x == 1);
-        HPX_TEST(i.m_x == 1);
+        HPX_TEST_EQ(x, 1);
+        HPX_TEST_EQ(i.m_x, 1);
         ++i->m_x;
-        HPX_TEST(x == 2);
-        HPX_TEST(i.m_x == 2);
+        HPX_TEST_EQ(x, 2);
+        HPX_TEST_EQ(i.m_x, 2);
     }
 
     return hpx::util::report_errors();

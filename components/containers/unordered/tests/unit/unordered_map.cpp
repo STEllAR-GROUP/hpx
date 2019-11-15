@@ -73,7 +73,7 @@ void fill_unordered_map(hpx::unordered_map<Key, Value, Hash, KeyEqual>& m,
         std::string idx = std::to_string(i);
         m[idx] = val;
     }
-    HPX_TEST(m.size() == count);
+    HPX_TEST_EQ(m.size(), count);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

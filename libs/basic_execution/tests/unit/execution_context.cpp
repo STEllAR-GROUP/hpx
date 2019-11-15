@@ -165,11 +165,11 @@ void test_sleep()
     auto now = std::chrono::steady_clock::now();
     auto sleep_duration = std::chrono::milliseconds(100);
     hpx::basic_execution::this_thread::sleep_for(sleep_duration);
-    HPX_TEST(std::chrono::steady_clock::now() >= now + sleep_duration);
+    HPX_TEST(now + sleep_duration <= std::chrono::steady_clock::now());
 
     auto sleep_time = sleep_duration * 2 + std::chrono::steady_clock::now();
     hpx::basic_execution::this_thread::sleep_until(sleep_time);
-    HPX_TEST(std::chrono::steady_clock::now() >= now + sleep_duration * 2);
+    HPX_TEST(now + sleep_duration * 2 <= std::chrono::steady_clock::now());
 }
 
 int main()

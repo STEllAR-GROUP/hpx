@@ -68,7 +68,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t loop, std::size_t size,
     // align used buffers on page boundaries
     unsigned long align_size = getpagesize();
     (void) align_size;
-    HPX_TEST(align_size <= MAX_ALIGNMENT);
+    HPX_TEST_LTE(align_size, static_cast<unsigned long>(MAX_ALIGNMENT));
 
     std::unique_ptr<char[]> send_buffer(new char[size]);
     std::memset(send_buffer.get(), 'a', size);

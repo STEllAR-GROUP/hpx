@@ -30,7 +30,7 @@ int main()
 
         buffer << any1;
 
-        HPX_TEST_EQ(buffer.str(), "3040");
+        HPX_TEST(buffer.str() == "3040");
     }
 
     // non serializable version
@@ -40,11 +40,11 @@ int main()
             any_nonser any1_nonser(7), any2_nonser(7), any3_nonser(10),
                 any4_nonser(std::string("seven"));
 
-            HPX_TEST(any_cast<int>(any1_nonser) == 7);
-            HPX_TEST(any_cast<int>(any1_nonser) != 10);
-            HPX_TEST(any_cast<int>(any1_nonser) != 10.0f);
-            HPX_TEST(any_cast<int>(any1_nonser) == any_cast<int>(any1_nonser));
-            HPX_TEST(any_cast<int>(any1_nonser) == any_cast<int>(any2_nonser));
+            HPX_TEST_EQ(any_cast<int>(any1_nonser), 7);
+            HPX_TEST_NEQ(any_cast<int>(any1_nonser), 10);
+            HPX_TEST_NEQ(any_cast<int>(any1_nonser), 10.0f);
+            HPX_TEST_EQ(any_cast<int>(any1_nonser), any_cast<int>(any1_nonser));
+            HPX_TEST_EQ(any_cast<int>(any1_nonser), any_cast<int>(any2_nonser));
             HPX_TEST(any1_nonser.type() == any3_nonser.type());
             HPX_TEST(any1_nonser.type() != any4_nonser.type());
 
@@ -56,8 +56,8 @@ int main()
             any3_nonser = other_str;
             any4_nonser = 10.0f;
 
-            HPX_TEST(any_cast<std::string>(any1_nonser) == long_str);
-            HPX_TEST(any_cast<std::string>(any1_nonser) != other_str);
+            HPX_TEST_EQ(any_cast<std::string>(any1_nonser), long_str);
+            HPX_TEST_NEQ(any_cast<std::string>(any1_nonser), other_str);
             HPX_TEST(any1_nonser.type() == typeid(std::string));
             HPX_TEST(any_cast<std::string>(any1_nonser) ==
                 any_cast<std::string>(any1_nonser));

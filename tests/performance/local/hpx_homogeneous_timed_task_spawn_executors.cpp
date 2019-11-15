@@ -105,7 +105,7 @@ int hpx_main(
             // be bound to the remaining number of cores
             if ((i + 1) * num_cores_per_executor > num_os_threads)
             {
-                HPX_TEST(i == std::size_t(num_executors) - 1);
+                HPX_TEST_EQ(i, std::size_t(num_executors) - 1);
                 num_cores_per_executor = num_os_threads - i * num_cores_per_executor;
             }
             executors.push_back(local_priority_queue_executor(num_cores_per_executor));

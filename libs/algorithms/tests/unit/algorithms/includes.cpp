@@ -42,7 +42,7 @@ void test_includes1(ExPolicy policy, IteratorTag)
     std::size_t first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    HPX_TEST(start <= end);
+    HPX_TEST_LTE(start, end);
 
     base_iterator start_it = boost::next(std::begin(c1), start);
     base_iterator end_it = boost::next(std::begin(c1), end);
@@ -94,7 +94,7 @@ void test_includes1_async(ExPolicy p, IteratorTag)
     std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
     std::size_t end = start + dist(gen);
 
-    HPX_TEST(start <= end);
+    HPX_TEST_LTE(start, end);
 
     base_iterator start_it = boost::next(std::begin(c1), start);
     base_iterator end_it = boost::next(std::begin(c1), end);
@@ -173,7 +173,7 @@ void test_includes2(ExPolicy policy, IteratorTag)
     std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
     std::size_t end = start + dist(gen);
 
-    HPX_TEST(start <= end);
+    HPX_TEST_LTE(start, end);
 
     base_iterator start_it = boost::next(std::begin(c1), start);
     base_iterator end_it = boost::next(std::begin(c1), end);
@@ -226,7 +226,7 @@ void test_includes2_async(ExPolicy p, IteratorTag)
     std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
     std::size_t end = start + dist(gen);
 
-    HPX_TEST(start <= end);
+    HPX_TEST_LTE(start, end);
 
     base_iterator start_it = boost::next(std::begin(c1), start);
     base_iterator end_it = boost::next(std::begin(c1), end);
@@ -306,12 +306,12 @@ void test_includes_exception(ExPolicy policy, IteratorTag)
     std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
     std::size_t end = start + dist(gen);
 
-    HPX_TEST(start <= end);
+    HPX_TEST_LTE(start, end);
 
     if (start == end)
         ++end;
 
-    HPX_TEST(end <= c1.size());
+    HPX_TEST_LTE(end, c1.size());
 
     base_iterator start_it = boost::next(std::begin(c1), start);
     base_iterator end_it = boost::next(std::begin(c1), end);
@@ -355,12 +355,12 @@ void test_includes_exception_async(ExPolicy p, IteratorTag)
     std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
     std::size_t end = start + dist(gen);
 
-    HPX_TEST(start <= end);
+    HPX_TEST_LTE(start, end);
 
     if (start == end)
         ++end;
 
-    HPX_TEST(end <= c1.size());
+    HPX_TEST_LTE(end, c1.size());
 
     base_iterator start_it = boost::next(std::begin(c1), start);
     base_iterator end_it = boost::next(std::begin(c1), end);
@@ -436,12 +436,12 @@ void test_includes_bad_alloc(ExPolicy policy, IteratorTag)
     std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
     std::size_t end = start + dist(gen);
 
-    HPX_TEST(start <= end);
+    HPX_TEST_LTE(start, end);
 
     if (start == end)
         ++end;
 
-    HPX_TEST(end <= c1.size());
+    HPX_TEST_LTE(end, c1.size());
 
     base_iterator start_it = boost::next(std::begin(c1), start);
     base_iterator end_it = boost::next(std::begin(c1), end);
@@ -484,12 +484,12 @@ void test_includes_bad_alloc_async(ExPolicy p, IteratorTag)
     std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
     std::size_t end = start + dist(gen);
 
-    HPX_TEST(start <= end);
+    HPX_TEST_LTE(start, end);
 
     if (start == end)
         ++end;
 
-    HPX_TEST(end <= c1.size());
+    HPX_TEST_LTE(end, c1.size());
 
     base_iterator start_it = boost::next(std::begin(c1), start);
     base_iterator end_it = boost::next(std::begin(c1), end);

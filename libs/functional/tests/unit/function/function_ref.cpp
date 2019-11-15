@@ -119,7 +119,7 @@ static void test_zero_args()
     func_void_type v1 = five;
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation and self-assignment
     v1 = three;
@@ -135,7 +135,7 @@ static void test_zero_args()
 #endif
 
     v1();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment to a function
     v1 = five;
@@ -153,97 +153,97 @@ static void test_zero_args()
 #endif
 
     v1();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v1 = write_five;
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v1 = write_three;
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Invocation
     v1 = five;
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v1 = &write_three;
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Invocation
     func_void_type v2(v1);
     v2 = three;
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Invocation
     v2 = (five);
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v2 = (write_five);
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v2 = write_three;
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Swapping
     v1 = five;
     std::swap(v1, v2);
     v2();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
     v1();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
     std::swap(v1, v2);
 
     // Invocation
     v2 = five;
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v2 = &write_three;
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Invocation
     v1 = three;
     v2 = v1;
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assign to a function from a function with a function
     v2 = write_five;
     v1 = v2;
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Construct a function given another function containing a function
     func_void_type v3(v1);
@@ -251,37 +251,37 @@ static void test_zero_args()
     // Invocation of a function
     global_int = 0;
     v3();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v3 = three;
     global_int = 0;
     v3();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Invocation
     v3 = five;
     global_int = 0;
     v3();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v3 = &write_five;
     global_int = 0;
     v3();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v3 = &write_three;
     global_int = 0;
     v3();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Invocation
     v3 = five;
     global_int = 0;
     v3();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Construction of a function from a function containing a functor
     func_void_type v4(v3);
@@ -289,13 +289,13 @@ static void test_zero_args()
     // Invocation of a function
     global_int = 0;
     v4();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v4 = three;
     global_int = 0;
     v4();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment to a function
     v4 = five;
@@ -303,25 +303,25 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v4();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v4 = &write_five;
     global_int = 0;
     v4();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v4 = &write_three;
     global_int = 0;
     v4();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Invocation
     v4 = five;
     global_int = 0;
     v4();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Construction of a function from a functor
     func_void_type v5(five);
@@ -329,13 +329,13 @@ static void test_zero_args()
     // Invocation of a function
     global_int = 0;
     v5();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v5 = three;
     global_int = 0;
     v5();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment to a function
     v5 = five;
@@ -343,25 +343,25 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v5();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v5 = &write_five;
     global_int = 0;
     v5();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v5 = &write_three;
     global_int = 0;
     v5();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Invocation
     v5 = five;
     global_int = 0;
     v5();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Construction of a function from a function
     func_void_type v6(&write_five);
@@ -369,13 +369,13 @@ static void test_zero_args()
     // Invocation of a function
     global_int = 0;
     v6();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v6 = three;
     global_int = 0;
     v6();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment to a function
     v6 = five;
@@ -383,25 +383,25 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v6();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v6 = &write_five;
     global_int = 0;
     v6();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation
     v6 = &write_three;
     global_int = 0;
     v6();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Invocation
     v6 = five;
     global_int = 0;
     v6();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Const vs. non-const
     write_const_1_nonconst_2 one_or_two;
@@ -410,11 +410,11 @@ static void test_zero_args()
 
     global_int = 0;
     v7();
-    HPX_TEST(global_int == 2);
+    HPX_TEST_EQ(global_int, 2);
 
     global_int = 0;
     v8();
-    HPX_TEST(global_int == 2);
+    HPX_TEST_EQ(global_int, 2);
 
     // Test return values
     typedef hpx::util::function_ref<int()> func_int_type;
@@ -423,25 +423,25 @@ static void test_zero_args()
 
     func_int_type i0(gen_five);
 
-    HPX_TEST(i0() == 5);
+    HPX_TEST_EQ(i0(), 5);
     i0 = gen_three;
-    HPX_TEST(i0() == 3);
+    HPX_TEST_EQ(i0(), 3);
     i0 = &generate_five;
-    HPX_TEST(i0() == 5);
+    HPX_TEST_EQ(i0(), 5);
     i0 = &generate_three;
-    HPX_TEST(i0() == 3);
+    HPX_TEST_EQ(i0(), 3);
 
     // Test return values with compatible types
     typedef hpx::util::function_ref<long()> func_long_type;
     func_long_type i1(gen_five);
 
-    HPX_TEST(i1() == 5);
+    HPX_TEST_EQ(i1(), 5);
     i1 = gen_three;
-    HPX_TEST(i1() == 3);
+    HPX_TEST_EQ(i1(), 3);
     i1 = &generate_five;
-    HPX_TEST(i1() == 5);
+    HPX_TEST_EQ(i1(), 5);
     i1 = &generate_three;
-    HPX_TEST(i1() == 3);
+    HPX_TEST_EQ(i1(), 3);
 }
 
 static void test_one_arg()
@@ -449,30 +449,30 @@ static void test_one_arg()
     std::negate<int> neg;
 
     hpx::util::function_ref<int(int)> f1(neg);
-    HPX_TEST(f1(5) == -5);
+    HPX_TEST_EQ(f1(5), -5);
 
     hpx::util::function_ref<string(string)> id(&identity_str);
-    HPX_TEST(id("str") == "str");
+    HPX_TEST_EQ(id("str"), "str");
 
     hpx::util::function_ref<string(const char*)> id2(&identity_str);
-    HPX_TEST(id2("foo") == "foo");
+    HPX_TEST_EQ(id2("foo"), "foo");
 
     add_to_obj add_to(5);
     hpx::util::function_ref<int(int)> f2(add_to);
-    HPX_TEST(f2(3) == 8);
+    HPX_TEST_EQ(f2(3), 8);
 
     const hpx::util::function_ref<int(int)> cf2(add_to);
-    HPX_TEST(cf2(3) == 8);
+    HPX_TEST_EQ(cf2(3), 8);
 }
 
 static void test_two_args()
 {
     hpx::util::function_ref<string(const string&, const string&)> cat(
         &string_cat);
-    HPX_TEST(cat("str", "ing") == "string");
+    HPX_TEST_EQ(cat("str", "ing"), "string");
 
     hpx::util::function_ref<int(short, short)> sum(&sum_ints);
-    HPX_TEST(sum(2, 3) == 5);
+    HPX_TEST_EQ(sum(2, 3), 5);
 }
 
 struct add_with_throw_on_copy
@@ -501,7 +501,7 @@ static void test_ref()
     try
     {
         hpx::util::function_ref<int(int, int)> f(std::ref(atc));
-        HPX_TEST(f(1, 3) == 4);
+        HPX_TEST_EQ(f(1, 3), 4);
     }
     catch (std::runtime_error const& /*e*/)
     {
@@ -520,7 +520,7 @@ static void test_ptr_ref()
     global_int = 0;
     void_ptr = &write_three;
     v1();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation and assignment
     void_ptr = &write_five;
@@ -528,19 +528,19 @@ static void test_ptr_ref()
     global_int = 0;
     void_ptr = &write_three;
     v1();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Invocation of a function
     int (*int_ptr)() = &generate_five;
     func_int_type v2 = int_ptr;
     int_ptr = &generate_three;
-    HPX_TEST(v2() == 5);
+    HPX_TEST_EQ(v2(), 5);
 
     // Invocation and assignment
     int_ptr = &generate_five;
     v2 = int_ptr;
     int_ptr = &generate_three;
-    HPX_TEST(v2() == 5);
+    HPX_TEST_EQ(v2(), 5);
 }
 
 struct big_aggregating_structure
@@ -582,26 +582,26 @@ static void test_copy_semantics()
     f1_type f1 = obj;
     global_int = 0;
     f1();
-    HPX_TEST(global_int == 1);
+    HPX_TEST_EQ(global_int, 1);
 
     // Testing rvalue constructors
     f1_type f2(static_cast<f1_type&&>(f1));
-    HPX_TEST(global_int == 1);
+    HPX_TEST_EQ(global_int, 1);
     f2();
-    HPX_TEST(global_int == 2);
+    HPX_TEST_EQ(global_int, 2);
 
     f1_type f3(static_cast<f1_type&&>(f2));
-    HPX_TEST(global_int == 2);
+    HPX_TEST_EQ(global_int, 2);
     f3();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Testing, that no copies are made
     f1_type f4 = obj;
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
     f1_type f5 = obj;
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
     f4 = static_cast<f1_type&&>(f5);
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 }
 
 int main(int, char*[])

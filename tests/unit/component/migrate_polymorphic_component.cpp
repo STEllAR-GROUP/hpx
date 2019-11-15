@@ -13,6 +13,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/testing.hpp>
 
+#include <cstdint>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -37,22 +38,22 @@ struct test_server_base
 
     void busy_work() const
     {
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
         hpx::this_thread::sleep_for(std::chrono::seconds(1));
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
     }
     HPX_DEFINE_COMPONENT_ACTION(test_server_base, busy_work, busy_work_action);
 
     hpx::future<void> lazy_busy_work() const
     {
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
 
         auto f = hpx::make_ready_future_after(std::chrono::seconds(1));
 
         return f.then([this](hpx::future<void>&& f) -> void {
-            HPX_TEST(pin_count() != 0);
+            HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
             f.get();
-            HPX_TEST(pin_count() != 0);
+            HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
         });
     }
     HPX_DEFINE_COMPONENT_ACTION(
@@ -60,7 +61,7 @@ struct test_server_base
 
     int get_base_data() const
     {
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
         return base_data_;
     }
     HPX_DEFINE_COMPONENT_ACTION(
@@ -68,14 +69,14 @@ struct test_server_base
 
     hpx::future<int> lazy_get_base_data() const
     {
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
 
         auto f = hpx::make_ready_future(base_data_);
 
         return f.then([this](hpx::future<int>&& f) -> int {
-            HPX_TEST(pin_count() != 0);
+            HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
             auto result = f.get();
-            HPX_TEST(pin_count() != 0);
+            HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
             return result;
         });
     }
@@ -175,20 +176,20 @@ struct test_server
 
     int get_data() const override
     {
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
         return data_;
     }
 
     hpx::future<int> lazy_get_data() const override
     {
-        HPX_TEST(pin_count() != 0);
+        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
 
         auto f = hpx::make_ready_future(data_);
 
         return f.then([this](hpx::future<int>&& f) -> int {
-            HPX_TEST(pin_count() != 0);
+            HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
             auto result = f.get();
-            HPX_TEST(pin_count() != 0);
+            HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
             return result;
         });
     }

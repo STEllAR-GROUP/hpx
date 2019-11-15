@@ -66,13 +66,13 @@ int main(int, char*[])
     MaybeThrowOnCopy::throwOnCopy = false;
     f = MaybeThrowOnCopy(1);
     g = MaybeThrowOnCopy(2);
-    HPX_TEST(f() == 1);
-    HPX_TEST(g() == 2);
+    HPX_TEST_EQ(f(), 1);
+    HPX_TEST_EQ(g(), 2);
 
     MaybeThrowOnCopy::throwOnCopy = true;
     f.swap(g);
-    HPX_TEST(f() == 2);
-    HPX_TEST(g() == 1);
+    HPX_TEST_EQ(f(), 2);
+    HPX_TEST_EQ(g(), 1);
 
     return hpx::util::report_errors();
 }

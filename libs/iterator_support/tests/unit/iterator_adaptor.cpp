@@ -270,7 +270,7 @@ int main()
         int zero = 0;
         if (zero)    // don't do this, just make sure it compiles
         {
-            HPX_TEST((*i).x_ == i->foo());
+            HPX_TEST_EQ((*i).x_, i->foo());
         }
     }
 
@@ -282,7 +282,7 @@ int main()
         int zero = 0;
         if (zero)    // don't do this, just make sure it compiles
         {
-            HPX_TEST((*i).x_ == i->foo());
+            HPX_TEST_EQ((*i).x_, i->foo());
         }
     }
 

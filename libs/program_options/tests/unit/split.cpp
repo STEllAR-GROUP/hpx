@@ -14,6 +14,7 @@
 #include <hpx/program_options/value_semantic.hpp>
 #include <hpx/program_options/variables_map.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -22,7 +23,7 @@ using namespace std;
 
 void check_value(const string& option, const string& value)
 {
-    HPX_TEST(option == value);
+    HPX_TEST_EQ(option, value);
 }
 
 void split_whitespace(const options_description& description)
@@ -32,7 +33,7 @@ void split_whitespace(const options_description& description)
 
     vector<string> tokens = split_unix(cmdline, " \t\n\r");
 
-    HPX_TEST(tokens.size() == 7);
+    HPX_TEST_EQ(tokens.size(), std::size_t(7));
 
     check_value(tokens[0], "prg");
     check_value(tokens[1], "--input");
@@ -54,7 +55,7 @@ void split_equalsign(const options_description& description)
 
     vector<string> tokens = split_unix(cmdline, "= ");
 
-    HPX_TEST(tokens.size() == 7);
+    HPX_TEST_EQ(tokens.size(), std::size_t(7));
     check_value(tokens[0], "prg");
     check_value(tokens[1], "--input");
     check_value(tokens[2], "input.txt");
@@ -74,7 +75,7 @@ void split_semi(const options_description& description)
 
     vector<string> tokens = split_unix(cmdline, "; ");
 
-    HPX_TEST(tokens.size() == 7);
+    HPX_TEST_EQ(tokens.size(), std::size_t(7));
     check_value(tokens[0], "prg");
     check_value(tokens[1], "--input");
     check_value(tokens[2], "input.txt");
@@ -95,7 +96,7 @@ void split_quotes(const options_description& description)
 
     vector<string> tokens = split_unix(cmdline, " ");
 
-    HPX_TEST(tokens.size() == 7);
+    HPX_TEST_EQ(tokens.size(), std::size_t(7));
     check_value(tokens[0], "prg");
     check_value(tokens[1], "--input");
     check_value(tokens[2], "input.txt input.txt");
@@ -116,7 +117,7 @@ void split_escape(const options_description& description)
 
     vector<string> tokens = split_unix(cmdline, " ");
 
-    HPX_TEST(tokens.size() == 7);
+    HPX_TEST_EQ(tokens.size(), std::size_t(7));
     check_value(tokens[0], "prg");
     check_value(tokens[1], "--input");
     check_value(tokens[2], "\"input.txt\"");
@@ -137,7 +138,7 @@ void split_single_quote(const options_description& description)
 
     vector<string> tokens = split_unix(cmdline, " ", "'");
 
-    HPX_TEST(tokens.size() == 7);
+    HPX_TEST_EQ(tokens.size(), std::size_t(7));
     check_value(tokens[0], "prg");
     check_value(tokens[1], "--input");
     check_value(tokens[2], "input.txt input.txt");
@@ -158,7 +159,7 @@ void split_defaults(const options_description& description)
 
     vector<string> tokens = split_unix(cmdline);
 
-    HPX_TEST(tokens.size() == 7);
+    HPX_TEST_EQ(tokens.size(), std::size_t(7));
     check_value(tokens[0], "prg");
     check_value(tokens[1], "--input");
     check_value(tokens[2], "input file.txt");

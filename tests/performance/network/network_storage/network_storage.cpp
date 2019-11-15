@@ -246,13 +246,13 @@ public:
 
   pointer allocate(size_type n, void const* hint = nullptr)
   {
-    HPX_TEST(n == size_);
+    HPX_TEST_EQ(n, size_);
     return static_cast<T*>(pointer_);
   }
 
   void deallocate(pointer p, size_type n)
   {
-    HPX_TEST(p == pointer_ && n == size_);
+    HPX_TEST_EQ(p == pointer_ && n, size_);
   }
 
 private:

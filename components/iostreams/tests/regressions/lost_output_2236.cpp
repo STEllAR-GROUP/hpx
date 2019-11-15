@@ -299,12 +299,12 @@ namespace gc { namespace server {
         state();
         if (w < weight)
         {
-            HPX_TEST(strong_count > 0);
+            HPX_TEST_LT(std::size_t(0), strong_count);
             strong_count--;
         }
         else
         {
-            HPX_TEST(weak_count > 0);
+            HPX_TEST_LT(std::size_t(0), weak_count);
             weak_count--;
         }
         cd->phantom_count++;
@@ -367,12 +367,12 @@ namespace gc { namespace server {
     void collectable::recover_done()
     {
         cd->wc--;
-        HPX_TEST(cd->wc > 0);
+        HPX_TEST_LT(std::size_t(0), cd->wc);
         check_recover_done();
     }
     void collectable::done(hpx::id_type child)
     {
-        HPX_TEST(cd->wc > 0);
+        HPX_TEST_LT(std::size_t(0), cd->wc);
         cd->wc--;
         if (cd->wc == 0 && cd->cid == this->get_id())
         {
@@ -422,7 +422,7 @@ namespace gc { namespace server {
         }
         else
         {
-            HPX_TEST(weak_count > 0);
+            HPX_TEST_LT(std::size_t(0), weak_count);
             weak_count--;
             if (weak_count == 0 && strong_count == 0)
             {

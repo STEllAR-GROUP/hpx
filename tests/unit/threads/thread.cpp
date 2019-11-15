@@ -185,7 +185,7 @@ void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
     }
     catch (hpx::exception& e)
     {
-        HPX_TEST(e.get_error() == hpx::thread_not_interruptable);
+        HPX_TEST_EQ(e.get_error(), hpx::thread_not_interruptable);
         caught = true;
     }
 
@@ -316,12 +316,12 @@ void test_swap()
     hpx::thread::id id2 = t2.get_id();
 
     t1.swap(t2);
-    HPX_TEST(t1.get_id() == id2);
-    HPX_TEST(t2.get_id() == id1);
+    HPX_TEST_EQ(t1.get_id(), id2);
+    HPX_TEST_EQ(t2.get_id(), id1);
 
     swap(t1, t2);
-    HPX_TEST(t1.get_id() == id1);
-    HPX_TEST(t2.get_id() == id2);
+    HPX_TEST_EQ(t1.get_id(), id1);
+    HPX_TEST_EQ(t2.get_id(), id2);
 
     b2.wait();    // wait for the tests to be completed
 
@@ -345,7 +345,7 @@ void test_double_join()
     }
     catch (hpx::exception& e)
     {
-        HPX_TEST(e.get_error() == hpx::invalid_status);
+        HPX_TEST_EQ(e.get_error(), hpx::invalid_status);
         caught = true;
     }
 

@@ -106,7 +106,7 @@ void test_plain_argument(hpx::id_type const& id)
 
     for (hpx::future<hpx::id_type>& f : results)
     {
-        HPX_TEST(f.get() == id);
+        HPX_TEST_EQ(f.get(), id);
     }
 }
 
@@ -167,7 +167,7 @@ void test_future_argument(hpx::id_type const& id)
 
     for (hpx::future<hpx::id_type>& f : results)
     {
-        HPX_TEST(f.get() == id);
+        HPX_TEST_EQ(f.get(), id);
     }
 }
 
@@ -226,7 +226,7 @@ void test_mixed_arguments(hpx::id_type const& id)
 
     for (hpx::future<hpx::id_type>& f : results)
     {
-        HPX_TEST(f.get() == id);
+        HPX_TEST_EQ(f.get(), id);
     }
 }
 
@@ -261,7 +261,7 @@ void verify_counters()
         if (data_val != 0 && serialize_val != 0)
         {
             // compression should reduce the transmitted amount of data
-            HPX_TEST(data_val >= serialize_val);
+            HPX_TEST_LTE(serialize_val, data_val);
         }
 
         hpx::cout

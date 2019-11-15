@@ -69,7 +69,7 @@ namespace hpx { namespace parallel { namespace execution {
 
 void bulk_test(int value, hpx::thread::id tid, int passed_through)    //-V813
 {
-    HPX_TEST(tid != hpx::this_thread::get_id());
+    HPX_TEST_NEQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
@@ -200,8 +200,8 @@ void sum_test()
     hpx::future<int> f_void_par = hpx::parallel::execution::async_execute(
         exec, &void_parallel_sum, std::begin(vec), std::end(vec), num_parts);
 
-    HPX_TEST(f_par.get() == sum);
-    HPX_TEST(f_void_par.get() == sum);
+    HPX_TEST_EQ(f_par.get(), sum);
+    HPX_TEST_EQ(f_void_par.get(), sum);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

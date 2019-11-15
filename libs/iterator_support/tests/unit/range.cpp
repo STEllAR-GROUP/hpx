@@ -14,12 +14,12 @@
 void array_range()
 {
     int r[3] = {0, 1, 2};
-    HPX_TEST_EQ(hpx::util::begin(r), &r[0]);
-    HPX_TEST_EQ(hpx::util::end(r), &r[3]);
+    HPX_TEST(hpx::util::begin(r) == &r[0]);
+    HPX_TEST(hpx::util::end(r) == &r[3]);
 
     int const cr[3] = {0, 1, 2};
-    HPX_TEST_EQ(hpx::util::begin(cr), &cr[0]);
-    HPX_TEST_EQ(hpx::util::end(cr), &cr[3]);
+    HPX_TEST(hpx::util::begin(cr) == &cr[0]);
+    HPX_TEST(hpx::util::end(cr) == &cr[3]);
     HPX_TEST_EQ(hpx::util::size(cr), 3u);
     HPX_TEST_EQ(hpx::util::empty(cr), false);
 }
@@ -53,12 +53,12 @@ struct member
 void member_range()
 {
     member r = member();
-    HPX_TEST_EQ(hpx::util::begin(r), &r.x);
-    HPX_TEST_EQ(hpx::util::end(r), &r.x + 1);
+    HPX_TEST(hpx::util::begin(r) == &r.x);
+    HPX_TEST(hpx::util::end(r) == &r.x + 1);
 
     member const cr = member();
-    HPX_TEST_EQ(hpx::util::begin(cr), &cr.x);
-    HPX_TEST_EQ(hpx::util::end(cr), &cr.x + 1);
+    HPX_TEST(hpx::util::begin(cr) == &cr.x);
+    HPX_TEST(hpx::util::end(cr) == &cr.x + 1);
     HPX_TEST_EQ(hpx::util::size(cr), 1u);
     HPX_TEST_EQ(hpx::util::empty(cr), false);
 }
@@ -94,12 +94,12 @@ namespace adl {
 void adl_range()
 {
     adl::free r = adl::free();
-    HPX_TEST_EQ(hpx::util::begin(r), &r.x);
-    HPX_TEST_EQ(hpx::util::end(r), &r.x + 1);
+    HPX_TEST(hpx::util::begin(r) == &r.x);
+    HPX_TEST(hpx::util::end(r) == &r.x + 1);
 
     adl::free const cr = adl::free();
-    HPX_TEST_EQ(hpx::util::begin(cr), &cr.x);
-    HPX_TEST_EQ(hpx::util::end(cr), &cr.x + 1);
+    HPX_TEST(hpx::util::begin(cr) == &cr.x);
+    HPX_TEST(hpx::util::end(cr) == &cr.x + 1);
     HPX_TEST_EQ(hpx::util::size(cr), 1u);
     HPX_TEST_EQ(hpx::util::empty(cr), false);
 }

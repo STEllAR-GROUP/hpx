@@ -99,7 +99,7 @@ void test_is_heap(
             policy, iterator(std::begin(c)), iterator(std::end(c)));
         bool solution = std::is_heap(std::begin(c), std::end(c));
 
-        HPX_TEST(result == solution);
+        HPX_TEST_EQ(result, solution);
     }
     else
     {
@@ -135,7 +135,7 @@ void test_is_heap_with_pred(ExPolicy policy, IteratorTag, DataType, Pred pred,
             policy, iterator(std::begin(c)), iterator(std::end(c)), pred);
         bool solution = std::is_heap(std::begin(c), std::end(c), pred);
 
-        HPX_TEST(result == solution);
+        HPX_TEST_EQ(result, solution);
     }
     else
     {
@@ -171,7 +171,7 @@ void test_is_heap_async(
         bool result = f.get();
         bool solution = std::is_heap(std::begin(c), std::end(c));
 
-        HPX_TEST(result == solution);
+        HPX_TEST_EQ(result, solution);
     }
     else
     {

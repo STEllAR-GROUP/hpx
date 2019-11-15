@@ -64,7 +64,7 @@ public:
     std::uint64_t get_count() const
     {
         hpx::naming::gid_type const size = key_.second - key_.first;
-        HPX_TEST(size.get_msb() == 0);
+        HPX_TEST_EQ(size.get_msb(), std::uint64_t(0));
         return size.get_lsb();
     }
 

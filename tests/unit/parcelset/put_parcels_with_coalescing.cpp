@@ -98,7 +98,7 @@ void test_plain_argument(hpx::id_type const& id)
 
     for (hpx::future<hpx::id_type>& f : results)
     {
-        HPX_TEST(f.get() == id);
+        HPX_TEST_EQ(f.get(), id);
     }
 }
 
@@ -150,7 +150,7 @@ void test_future_argument(hpx::id_type const& id)
 
     for (hpx::future<hpx::id_type>& f : results)
     {
-        HPX_TEST(f.get() == id);
+        HPX_TEST_EQ(f.get(), id);
     }
 }
 
@@ -209,7 +209,7 @@ void test_mixed_arguments(hpx::id_type const& id)
 
     for (hpx::future<hpx::id_type>& f : results)
     {
-        HPX_TEST(f.get() == id);
+        HPX_TEST_EQ(f.get(), id);
     }
 }
 

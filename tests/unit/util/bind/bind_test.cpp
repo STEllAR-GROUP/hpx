@@ -211,7 +211,7 @@ void function_object_test()
 
     global_result = 0;
     hpx::util::bind(Y(), i, placeholders::_1, 9, 4)(k);
-    HPX_TEST( global_result == 4938 );
+    HPX_TEST_EQ( global_result, 4938 );
 
 #endif
 }
@@ -231,7 +231,7 @@ void function_object_test2()
 
     global_result = 0;
     hpx::util::bind(Y(), i, placeholders::_1, 9, 4)(k);
-    HPX_TEST( global_result == 4938 );
+    HPX_TEST_EQ( global_result, 4938 );
 }
 
 //
@@ -246,7 +246,7 @@ struct Z
 
 void adaptable_function_object_test()
 {
-    HPX_TEST( hpx::util::bind(Z(), 7, 4)() == 47 );
+    HPX_TEST_EQ( hpx::util::bind(Z(), 7, 4)(), 47 );
 }
 
 #endif
@@ -432,7 +432,7 @@ void member_function_test()
     hpx::util::bind(&X::g8, x, 1, 2, 3, 4, 5, 6, 7, 8)();
     hpx::util::bind(&X::g8, ref(x), 1, 2, 3, 4, 5, 6, 7, 8)();
 
-    HPX_TEST( x.hash == 23558 );
+    HPX_TEST_EQ( x.hash, static_cast<unsigned int>(23558) );
 }
 
 void member_function_void_test()
@@ -522,7 +522,7 @@ void member_function_void_test()
     hpx::util::bind(&V::g8, v, 1, 2, 3, 4, 5, 6, 7, 8)();
     hpx::util::bind(&V::g8, ref(v), 1, 2, 3, 4, 5, 6, 7, 8)();
 
-    HPX_TEST( v.hash == 23558 );
+    HPX_TEST_EQ( v.hash, static_cast<unsigned int>(23558) );
 }
 
 void nested_bind_test()

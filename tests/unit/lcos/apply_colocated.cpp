@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
         "HPX main exited with non-zero status");
 
     HPX_TEST_NEQ(std::uint32_t(-1), locality_id);
-    HPX_TEST(on_shutdown_executed || 0 != locality_id);
+    HPX_TEST_NEQ(on_shutdown_executed || 0, locality_id);
 
     return hpx::util::report_errors();
 }

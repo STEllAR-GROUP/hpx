@@ -47,22 +47,22 @@ int main()
 
     hpx::util::bind( &X::m, placeholders::_1 )( px ) = 42;
 
-    HPX_TEST( x.m == 42 );
+    HPX_TEST_EQ( x.m, 42 );
 
     hpx::util::bind( &X::m, std::ref(x) )() = 17041;
 
-    HPX_TEST( x.m == 17041 );
+    HPX_TEST_EQ( x.m, 17041 );
 
     X const * pcx = &x;
 
-    HPX_TEST( hpx::util::bind( &X::m, placeholders::_1 )( pcx ) == 17041L );
-    HPX_TEST( hpx::util::bind( &X::m, pcx )() == 17041L );
+    HPX_TEST_EQ( hpx::util::bind( &X::m, placeholders::_1 )( pcx ), 17041L );
+    HPX_TEST_EQ( hpx::util::bind( &X::m, pcx )(), 17041L );
 
     Y y = { "test" };
     std::string v( "test" );
 
-    HPX_TEST( hpx::util::bind( &Y::m, &y )() == v );
-    HPX_TEST( hpx::util::bind( &Y::m, &y )() == v );
+    HPX_TEST_EQ( hpx::util::bind( &Y::m, &y )(), v );
+    HPX_TEST_EQ( hpx::util::bind( &Y::m, &y )(), v );
 
     return hpx::util::report_errors();
 }
