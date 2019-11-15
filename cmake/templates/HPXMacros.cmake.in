@@ -101,3 +101,15 @@ function(hpx_setup_allocator)
     STRINGS "system;tcmalloc;jemalloc;mimalloc;tbbmalloc;custom")
   include(HPX_SetupAllocator)
 endfunction()
+
+# Check we are using the same build type as HPX
+function(hpx_check_cmake_build_type)
+  get_property(_GENERATOR_IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+  if (NOT _GENERATOR_IS_MULTI_CONFIG AND
+      NOT "${HPX_BUILD_TYPE}" STREQUAL "${CMAKE_BUILD_TYPE}" AND
+      ("${HPX_BUILD_TYPE}" STREQUAL "Debug" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
+    message(WARNING "CMAKE_BUILD_TYPE does not match ${HPX_BUILD_TYPE}: "
+      "this project uses '${CMAKE_BUILD_TYPE}', HPX uses '${HPX_BUILD_TYPE}'. "
+      "Please add -DCMAKE_BUILD_TYPE=${HPX_BUILD_TYPE} to your cmake command")
+  endif()
+endfunction()
