@@ -344,7 +344,6 @@ namespace hpx { namespace threads { namespace policies
         else {
             remove_scheduler_mode(mode);
         }
-        do_some_work(std::size_t(-1));
     }
 
     ///////////////////////////////////////////////////////////////////////////
