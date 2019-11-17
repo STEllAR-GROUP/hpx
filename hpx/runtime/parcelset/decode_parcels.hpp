@@ -213,7 +213,7 @@ namespace hpx { namespace parcelset
                         for (std::size_t i = 1; i != deferred_parcels.size(); ++i)
                         {
                             // schedule all but the first parcel on a new thread.
-                            hpx::applier::register_thread_nullary(
+                            hpx::threads::register_thread_nullary(
                                 util::deferred_call(
                                     [num_thread](parcel&& p)
                                     {
@@ -290,7 +290,7 @@ namespace hpx { namespace parcelset
     {
 //         if(hpx::is_running() && parcelport.async_serialization())
 //         {
-//             hpx::applier::register_thread_nullary(
+//             hpx::threads::register_thread_nullary(
 //                 util::deferred_call(
 //                     &decode_message<Parcelport, Buffer>,
 //                     std::ref(parcelport), std::move(buffer), 1, num_thread),
@@ -309,7 +309,7 @@ namespace hpx { namespace parcelset
     {
 //         if(hpx::is_running() && parcelport.async_serialization())
 //         {
-//             hpx::applier::register_thread_nullary(
+//             hpx::threads::register_thread_nullary(
 //                 util::deferred_call(
 //                     &decode_message<Parcelport, Buffer>,
 //                     std::ref(parcelport), std::move(buffer), 0, num_thread),

@@ -32,7 +32,7 @@ using std::chrono::milliseconds;
 using hpx::lcos::local::barrier;
 using hpx::lcos::local::mutex;
 
-using hpx::applier::register_thread;
+using hpx::threads::register_thread;
 
 using hpx::threads::get_thread_phase;
 using hpx::threads::get_self_id;
