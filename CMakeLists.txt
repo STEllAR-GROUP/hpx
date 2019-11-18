@@ -781,6 +781,7 @@ if(HPX_WITH_NETWORKING)
     "Enable the ibverbs based parcelport. This is currently an experimental feature"
     OFF CATEGORY "Parcelport" ADVANCED)
   if (NOT HPX_WITH_PARCELPORT_VERBS)
+    hpx_warn("The verbs parcelport is deprecated. Please use the MPI or libfabric parcelports instead.")
     hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS)
   endif()
 
