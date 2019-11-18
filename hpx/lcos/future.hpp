@@ -23,7 +23,6 @@
 #include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/timing/steady_clock.hpp>

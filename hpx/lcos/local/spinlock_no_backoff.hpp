@@ -14,7 +14,6 @@
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 
 #if defined(HPX_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock.hpp>

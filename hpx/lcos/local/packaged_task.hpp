@@ -8,14 +8,13 @@
 #define HPX_LCOS_LOCAL_PACKAGED_TASK_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/thread_description.hpp>
-#include <hpx/functional/unique_function.hpp>
 
 #include <exception>
 #include <memory>
