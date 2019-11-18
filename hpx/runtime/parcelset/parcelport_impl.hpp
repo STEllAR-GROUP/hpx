@@ -318,7 +318,7 @@ namespace hpx { namespace parcelset
             if (operations_in_flight_ != 0)
             {
                 error_code ec(lightweight);
-                hpx::applier::register_thread_nullary(
+                hpx::threads::register_thread_nullary(
                     util::deferred_call(
                         &parcelport_impl::remove_from_connection_cache,
                         this, loc),
@@ -338,7 +338,7 @@ namespace hpx { namespace parcelset
         {
             error_code ec(lightweight);
             threads::thread_id_type id =
-                hpx::applier::register_thread_nullary(
+                hpx::threads::register_thread_nullary(
                     util::deferred_call(
                         &parcelport_impl::remove_from_connection_cache_delayed,
                         this, loc),

@@ -28,7 +28,7 @@ using hpx::lcos::local::barrier;
 using hpx::threads::pending;
 using hpx::threads::thread_priority_normal;
 
-using hpx::applier::register_work;
+using hpx::threads::register_work;
 
 using hpx::init;
 using hpx::finalize;

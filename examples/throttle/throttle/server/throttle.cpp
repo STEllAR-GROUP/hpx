@@ -113,7 +113,7 @@ namespace throttle { namespace server
         std::string description("throttle controller for shepherd thread (" +
             std::to_string(shepherd) + ")");
 
-        hpx::applier::register_thread(
+        hpx::threads::register_thread(
             hpx::util::bind(&throttle::throttle_controller, this, shepherd),
             description.c_str(),
             hpx::threads::pending, true,
@@ -127,7 +127,7 @@ namespace throttle { namespace server
         std::string description("suspend shepherd thread (" +
             std::to_string(shepherd) + ")");
 
-        hpx::applier::register_thread(
+        hpx::threads::register_thread(
             hpx::util::bind(&throttle::suspend, this, shepherd),
             description.c_str(),
             hpx::threads::pending, true,
