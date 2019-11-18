@@ -41,8 +41,8 @@ set(HPX_PLATFORM "native")
 # Disable generic coroutines (and use posix version)
 set(HPX_WITH_GENERIC_CONTEXT_COROUTINES OFF CACHE BOOL "disable generic coroutines")
 
-# BGAS nodes support ibverbs
-set(HPX_WITH_PARCELPORT_IBVERBS ON CACHE BOOL "")
+# BGAS nodes support ibverbs, but it is deprecated
+set(HPX_WITH_PARCELPORT_VERBS OFF CACHE BOOL "")
 
 # Always disable the tcp parcelport as it is non-functional on the BGQ.
 set(HPX_WITH_PARCELPORT_TCP ON CACHE BOOL "")
