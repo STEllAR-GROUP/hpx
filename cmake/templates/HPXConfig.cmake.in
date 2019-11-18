@@ -103,7 +103,7 @@ enable_language(C)
 hpx_check_cmake_build_type()
 hpx_check_compiler_compatibility()
 hpx_check_boost_compatibility()
-hpx_setup_allocator()
+hpx_check_allocator_compatibility()
 
 if(NOT DEFINED ${CMAKE_FIND_PACKAGE_NAME}_FOUND)
   set(${CMAKE_FIND_PACKAGE_NAME}_FOUND true)
