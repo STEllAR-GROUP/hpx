@@ -30,12 +30,6 @@ set(subdirs
     transpose
    )
 
-if(HPX_WITH_QUEUE_COMPATIBILITY)
-  set(subdirs ${subdirs}
-      queue
-     )
-endif()
-
 if(HPX_WITH_EXAMPLES_HDF5)
   set(subdirs ${subdirs}
     interpolate1d

@@ -21,9 +21,6 @@
 #include <hpx/collectives/reduce.hpp>
 #include <hpx/collectives/gather.hpp>
 #include <hpx/lcos/channel.hpp>
-#if defined(HPX_HAVE_QUEUE_COMPATIBILITY)
-#include <hpx/lcos/queue.hpp>
-#endif
 
 #include <hpx/include/async.hpp>
 #include <hpx/include/dataflow.hpp>
