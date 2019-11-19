@@ -6,8 +6,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/include/apply.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/testing.hpp>
 
