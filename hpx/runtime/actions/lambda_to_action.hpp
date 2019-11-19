@@ -96,18 +96,13 @@ namespace hpx { namespace actions
         };
     }
 
-    template<typename F>
+    template <typename F>
     auto lambda_to_action(F&& f)
-    -> decltype( hpx::actions::detail::action_maker() += true
-        ? nullptr
-        : hpx::actions::detail::addr_add() +  f)
+        -> decltype(hpx::actions::detail::action_maker() +=
+            true ? nullptr : hpx::actions::detail::addr_add() + f)
     {
-        HPX_CONSTEXPR auto act =
-            hpx::actions::detail::action_maker() += true
-            ? nullptr
-            : hpx::actions::detail::addr_add() +  f;
-
-        return act;
+        return hpx::actions::detail::action_maker() +=
+            true ? nullptr : hpx::actions::detail::addr_add() + f;
     }
 }}
 
