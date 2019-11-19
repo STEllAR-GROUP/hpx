@@ -374,8 +374,8 @@ namespace hpx { namespace threads {
 
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
-                    thread_pool_init.affinity_data_,
-                    thread_queue_init, "core-local_queue_scheduler");
+                    thread_pool_init.affinity_data_, thread_queue_init,
+                    "core-local_queue_scheduler");
 
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
@@ -416,8 +416,7 @@ namespace hpx { namespace threads {
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
-                    thread_queue_init,
-                    "core-local_priority_queue_scheduler");
+                    thread_queue_init, "core-local_priority_queue_scheduler");
 
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
@@ -454,8 +453,7 @@ namespace hpx { namespace threads {
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
-                    thread_queue_init,
-                    "core-local_priority_queue_scheduler");
+                    thread_queue_init, "core-local_priority_queue_scheduler");
 
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
@@ -495,8 +493,8 @@ namespace hpx { namespace threads {
 
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
-                    thread_pool_init.affinity_data_,
-                    thread_queue_init, "core-static_queue_scheduler");
+                    thread_pool_init.affinity_data_, thread_queue_init,
+                    "core-static_queue_scheduler");
 
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
@@ -536,10 +534,8 @@ namespace hpx { namespace threads {
 
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
-                    thread_pool_init.affinity_data_,
-                    num_high_priority_queues,
-                    thread_queue_init,
-                    "core-static_priority_queue_scheduler");
+                    thread_pool_init.affinity_data_, num_high_priority_queues,
+                    thread_queue_init, "core-static_priority_queue_scheduler");
 
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
