@@ -283,8 +283,6 @@ namespace hpx { namespace threads { namespace policies {
             // safety check that task was created by this thread/scheduler
             HPX_ASSERT(data.scheduler_base == this);
 
-            bool assign_parent = get_scheduler_mode() & policies::assign_work_thread_parent;
-
             int local_num = local_thread_number();
 
             std::size_t thread_num  = local_num;
@@ -422,9 +420,6 @@ namespace hpx { namespace threads { namespace policies {
         {
             bool result;
             std::uint16_t dm1 = num_domains_-1;
-            // stealing policy
-            bool hp_first =
-                (get_scheduler_mode() & policies::steal_high_priority_first) != 0;
 
             // All stealing disabled
             if (!steal_core) {
@@ -507,7 +502,6 @@ namespace hpx { namespace threads { namespace policies {
                 }
                 else {
                     // try other numa domains BP/HP
-                    std::uint16_t dstart = fast_mod((domain+1), num_domains_);
                     std::uint16_t dom = fast_mod((domain+1), num_domains_);
                     for (std::uint16_t d=1; d<num_domains_;
                          ++d, // these are executed at the end of a loop
@@ -680,7 +674,6 @@ namespace hpx { namespace threads { namespace policies {
             std::unique_lock<pu_mutex_type> l;
 
             using threads::thread_schedule_hint_mode;
-            bool assign_parent = get_scheduler_mode() & policies::assign_work_thread_parent;
 
             switch (schedulehint.mode) {
             case thread_schedule_hint_mode::thread_schedule_hint_mode_none:
