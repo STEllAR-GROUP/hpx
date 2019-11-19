@@ -9,7 +9,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/local_lcos.hpp>
+#include <hpx/synchronization.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
