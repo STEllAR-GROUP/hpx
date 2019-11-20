@@ -32,3 +32,5 @@ provided:
 * :c:macro:`HPX_SANITY_LTE`
 * :c:macro:`HPX_SANITY_RANGE`
 * :c:macro:`HPX_SANITY_EQ_MSG`
+
+See the :ref:`API reference <libs_testing_api>` of the module for more details.

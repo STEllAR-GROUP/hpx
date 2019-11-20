@@ -16,7 +16,7 @@ can be used to exchange data between participating sites in a coordinated way.
 At this point the module exposes the following collective primitives:
 
 * :cpp:class:`hpx::collectives::all_reduce`: performs a reduction on data from
-  each participating site.
+  each participating site to each participating site.
 * :cpp:class:`hpx::collectives::all_to_all`: each participating site provides its
   element of the data to collect while all participating sites receive the data
   from every other site.
@@ -27,6 +27,10 @@ At this point the module exposes the following collective primitives:
   global identifiers.
 * :cpp:func:`hpx::lcos::gather`: gathers values from all participating sites.
 * :cpp:class:`hpx::lcos::latch`: distributed latch.
-* :cpp:func:`hpx::lcos::reduce`
+* :cpp:func:`hpx::lcos::reduce`: performs a reduction on data from each
+  participating site to a root site.
 * :cpp:class:`hpx::lcos::spmd_block`: performs the same operation on a local
   image while providing handles to the other images.
+
+See the :ref:`API reference <libs_collectives_api>` of the module for more
+details.

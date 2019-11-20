@@ -112,3 +112,6 @@ The following API functions are exposed:
   function" which returns the consensus formed by the voting logic. Any
   arguments for the executed task that are futures will cause the task
   invocation to be delayed until all of those futures have become ready.
+
+See the :ref:`API reference <libs_resiliency_api>` of the module for more
+details.

@@ -12,3 +12,5 @@ plugin
 ======
 
 This module provides base utilities for creating plugins.
+
+See the :ref:`API reference <libs_plugin_api>` of the module for more details.

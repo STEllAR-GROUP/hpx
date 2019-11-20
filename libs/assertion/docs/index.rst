@@ -23,3 +23,6 @@ needs to customize this, it needs to do so before calling
 :cpp:func:`hpx::hpx_init`, :cpp:func:`hpx::hpx_main` or using the C-main
 wrappers.
 
+
+See the :ref:`API reference <libs_assertion_api>` of the module for more
+details.

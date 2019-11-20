@@ -27,3 +27,6 @@ their arguments.
 * :cpp:func:`hpx::util::one_shot`
 * :cpp:func:`hpx::util::protect`
 * :cpp:class:`hpx::util::result_of`
+
+See the :ref:`API reference <libs_functional_api>` of the module for more
+details.

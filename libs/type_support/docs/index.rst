@@ -12,3 +12,6 @@ type_support
 ============
 
 This module provides helper facilities related to types.
+
+See the :ref:`API reference <libs_type_support_api>` of the module for more
+details.

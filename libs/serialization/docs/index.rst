@@ -13,3 +13,6 @@ serialization
 
 This module provides serialization primitives and support for many C++ standard
 library and Boost types.
+
+See the :ref:`API reference <libs_serialization_api>` of the module for more
+details.

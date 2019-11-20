@@ -13,3 +13,6 @@ algorithms
 
 The algorithms module exposes the full set of algorithms defined by the C++
 standard. There is also partial support for C++ ranges.
+
+See the :ref:`API reference <libs_algorithms_api>` of the module for more
+details.

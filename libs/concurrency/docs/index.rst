@@ -19,3 +19,6 @@ programming such as:
   :cpp:class:`hpx::util::cache_aligned_data`: wrappers for aligning and padding
   data to cache lines.
 * various lockfree queue data structures
+
+See the :ref:`API reference <libs_concurrency_api>` of the module for more
+details.

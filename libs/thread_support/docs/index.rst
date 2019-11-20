@@ -12,3 +12,6 @@ thread_support
 ==============
 
 This module provides miscellaneous utilities for threading and concurrency.
+
+See the :ref:`API reference <libs_thread_support_api>` of the module for more
+details.
