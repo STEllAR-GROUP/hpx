@@ -21,6 +21,9 @@
 module=functional
 project_root=~/projects/hpx_module_functional
 
+# Need to specify this to allow globbing
+shopt -s globstar
+
 # Retrieve the corresponding new header
 function find_matching() {
     for file in "${new_filenames[@]}"; do
