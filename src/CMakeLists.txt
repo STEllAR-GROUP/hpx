@@ -48,7 +48,7 @@ add_hpx_library_sources(hpx
   APPEND)
 
 add_hpx_library_sources(hpx_generated
-  GLOB GLOBS "${CMAKE_BINARY_DIR}/libs/modules.cpp"
+  GLOB GLOBS "${PROJECT_BINARY_DIR}/libs/modules.cpp"
   APPEND)
 
 # libhpx_wrap sources
@@ -154,7 +154,7 @@ add_hpx_source_group(
 
 add_hpx_source_group(
   NAME hpx_generated CLASS "Source Files"
-  ROOT "${CMAKE_BINARY_DIR}/libs"
+  ROOT "${PROJECT_BINARY_DIR}/libs"
   TARGETS ${hpx_generated_SOURCES})
 
 add_hpx_source_group(
@@ -248,7 +248,7 @@ target_link_libraries(hpx PUBLIC hpx::boost)
 # Set the basic search paths for the HPX headers
 target_include_directories(hpx PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
   $<INSTALL_INTERFACE:include>
   )
 
@@ -388,7 +388,7 @@ if(NOT HPX_WITH_STATIC_LINKING)
         ${hpx_init_SOURCES} ${hpx_init_HEADERS})
     endif()
   endif()
-  target_include_directories(hpx_init PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
+  target_include_directories(hpx_init PRIVATE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>)
   set_target_properties(hpx_init PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
   foreach(_module ${HPX_LIBS})
@@ -401,7 +401,7 @@ if(NOT HPX_WITH_STATIC_LINKING)
   # Set the basic search paths for the generated HPX headers
   target_include_directories(hpx_init
     PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+      $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
       $<INSTALL_INTERFACE:include>)
   target_link_libraries(hpx_init PRIVATE hpx::boost)
@@ -443,7 +443,7 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
     # Set the basic search paths for the generated HPX headers
     target_include_directories(hpx_wrap
       PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:include>)
     target_link_libraries(hpx_wrap PUBLIC hpx)
