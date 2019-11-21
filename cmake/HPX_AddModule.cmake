@@ -21,8 +21,6 @@ function(add_hpx_module name)
   include(HPX_Message)
   include(HPX_Option)
 
-  hpx_info("  ${name}")
-
   # Global headers should be always generated except if explicitly disabled
   if ("${${name}_GLOBAL_HEADER_GEN}" STREQUAL "")
       set(${name}_GLOBAL_HEADER_GEN ON)
@@ -262,5 +260,9 @@ function(add_hpx_module name)
   foreach(dir ${${name}_CMAKE_SUBDIRS})
     add_subdirectory(${dir})
   endforeach(dir)
+
+  include(HPX_PrintSummary)
+  create_configuration_summary(
+    "  Module configuration summary (${name}):" "${name}")
 
 endfunction(add_hpx_module)

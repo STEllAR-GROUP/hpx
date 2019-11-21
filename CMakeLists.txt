@@ -1984,12 +1984,7 @@ endif()
 ################################################################################
 # print overall configuration summary
 include(HPX_PrintSummary)
-create_configuration_summary("Configuration summary:" "hpx")
-
-foreach(_module ${HPX_LIBS})
-  create_configuration_summary(
-    "Module configuration summary (${_module}):" "${_module}")
-endforeach()
+create_configuration_summary("Configuration summary:\n--" "hpx")
 
 include(HPX_ExportTargets)
 # Modules can't link to this if not exported

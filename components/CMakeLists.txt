@@ -73,6 +73,7 @@ if(HPX_WITH_TESTS)
   endif()
 endif()
 
+hpx_info("")
 hpx_info("Configuring components:")
 
 add_hpx_pseudo_target(components)
