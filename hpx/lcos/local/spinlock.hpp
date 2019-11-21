@@ -17,7 +17,6 @@
 
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 
 #include <cstddef>
