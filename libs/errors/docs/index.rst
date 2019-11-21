@@ -11,3 +11,10 @@
 errors
 ======
 
+This module provides support for exceptions and error codes:
+
+* :cpp:class:`hpx::exception`
+* :cpp:class:`hpx::error_code`
+* :c:enum:`hpx::error`
+
+See the :ref:`API reference <libs_errors_api>` of the module for more details.

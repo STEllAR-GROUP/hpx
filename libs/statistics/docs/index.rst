@@ -11,4 +11,8 @@
 statistics
 ==========
 
-This module provide some statistics utilities like rolling min/max or histogram.
+This module provide some statistics utilities like rolling min/max and
+histogram.
+
+See the :ref:`API reference <libs_statistics_api>` of the module for more
+details.

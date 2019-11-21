@@ -12,3 +12,5 @@ timing
 ======
 
 This module provides the timing utilities (clocks and timers).
+
+See the :ref:`API reference <libs_timing_api>` of the module for more details.
