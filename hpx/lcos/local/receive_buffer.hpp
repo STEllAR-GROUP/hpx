@@ -11,9 +11,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/no_mutex.hpp>
+#include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/lcos/local/promise.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/errors.hpp>
 
 #include <cstddef>

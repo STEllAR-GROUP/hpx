@@ -8,7 +8,7 @@
 
 #ifndef Q_MOC_RUN
 #include <hpx/include/threads.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <cstddef>
 #include <functional>
 #endif

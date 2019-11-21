@@ -30,7 +30,7 @@
 #include <hpx/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/detail/yield_k.hpp>
+#include <hpx/synchronization/detail/yield_k.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <cstddef>

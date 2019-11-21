@@ -10,17 +10,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/dataflow.hpp>
-#include <hpx/lcos/local/barrier.hpp>
+
 #include <hpx/lcos/local/channel.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/lcos/local/counting_semaphore.hpp>
-#include <hpx/lcos/local/event.hpp>
-#include <hpx/lcos/local/latch.hpp>
-#include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/no_mutex.hpp>
-#include <hpx/lcos/local/recursive_mutex.hpp>
-#include <hpx/lcos/local/shared_mutex.hpp>
-#include <hpx/lcos/local/sliding_semaphore.hpp>
+
+#include <hpx/synchronization.hpp>
 
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/and_gate.hpp>

@@ -7,7 +7,7 @@
 // This must fail compiling
 
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/synchronization/mutex.hpp>
 
 #include <utility>
 

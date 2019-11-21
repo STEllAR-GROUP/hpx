@@ -7,7 +7,7 @@
 // This must fail compiling
 
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <utility>
 

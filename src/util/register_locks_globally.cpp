@@ -6,8 +6,8 @@
 
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/static.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 

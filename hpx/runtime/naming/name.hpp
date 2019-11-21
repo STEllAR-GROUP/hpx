@@ -22,7 +22,7 @@
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/util/detail/yield_k.hpp>
+#include <hpx/synchronization/detail/yield_k.hpp>
 
 #include <cstddef>
 #include <cstdint>

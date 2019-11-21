@@ -20,7 +20,7 @@
 #include <hpx/functional/one_shot.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/latch.hpp>
+#include <hpx/synchronization/latch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/executors/fused_bulk_execute.hpp>
 #include <hpx/parallel/executors/post_policy_dispatch.hpp>

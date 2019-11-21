@@ -10,8 +10,8 @@
 // config
 #include <hpx/config/defines.hpp>
 //
-#include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/mutex.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 //
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>

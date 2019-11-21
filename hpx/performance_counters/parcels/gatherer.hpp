@@ -10,8 +10,8 @@
 #define HPX_05A1C29B_DB73_463A_8C9D_B8EDC3B69F5E
 
 #include <hpx/assertion.hpp>
-#include <hpx/lcos/local/no_mutex.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/no_mutex.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 

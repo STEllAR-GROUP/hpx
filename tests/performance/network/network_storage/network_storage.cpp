@@ -9,7 +9,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
-#include <hpx/lcos/local/detail/sliding_semaphore.hpp>
+#include <hpx/synchronization/detail/sliding_semaphore.hpp>
 #include <hpx/testing.hpp>
 
 #include <boost/assert.hpp>

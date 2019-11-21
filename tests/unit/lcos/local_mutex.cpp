@@ -8,8 +8,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/synchronization/mutex.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/functional/bind.hpp>

@@ -11,7 +11,7 @@
 // config
 #include <hpx/config/defines.hpp>
 //
-#include <hpx/lcos/local/shared_mutex.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/lcos/future.hpp>
 //

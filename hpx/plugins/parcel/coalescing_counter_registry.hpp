@@ -13,7 +13,7 @@
 
 #include <hpx/functional/function.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/type_support/static.hpp>
 

@@ -9,7 +9,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/lcos/local/shared_mutex.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 
 #include <boost/thread/locks.hpp>
 

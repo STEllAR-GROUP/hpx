@@ -13,7 +13,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>

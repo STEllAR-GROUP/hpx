@@ -12,9 +12,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/synchronization/mutex.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/plugin.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>

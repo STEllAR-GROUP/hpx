@@ -7,7 +7,7 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_SENDER_CONNECTION_HPP
 #define HPX_PARCELSET_POLICIES_VERBS_SENDER_CONNECTION_HPP
 
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 //

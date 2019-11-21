@@ -12,7 +12,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>

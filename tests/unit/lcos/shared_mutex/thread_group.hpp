@@ -12,8 +12,8 @@
 #include <hpx/config.hpp>
 #include <hpx/errors/exception.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/lcos/local/shared_mutex.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
+#include <hpx/synchronization/mutex.hpp>
 
 #include <boost/thread/locks.hpp>
 

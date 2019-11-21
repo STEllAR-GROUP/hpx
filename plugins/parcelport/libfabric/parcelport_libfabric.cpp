@@ -11,7 +11,7 @@
 // config
 #include <hpx/config.hpp>
 // util
-#include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>

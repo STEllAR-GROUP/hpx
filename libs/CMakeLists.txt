@@ -47,6 +47,7 @@ set(HPX_LIBS
   serialization
   static_reinit
   statistics
+  synchronization
   testing
   thread_support
   threadmanager

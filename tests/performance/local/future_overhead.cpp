@@ -21,7 +21,7 @@
 #include <hpx/util/yield_while.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
-#include <hpx/lcos/local/sliding_semaphore.hpp>
+#include <hpx/synchronization/detail/sliding_semaphore.hpp>
 #include <hpx/runtime/threads/executors/limiting_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 

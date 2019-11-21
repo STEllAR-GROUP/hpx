@@ -20,7 +20,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 

@@ -139,6 +139,7 @@ add_hpx_module(algorithms
     hpx_iterator_support
     hpx_functional
     hpx_statistics
+    hpx_synchronization
     hpx_timing
     hpx_type_support
   CMAKE_SUBDIRS examples tests

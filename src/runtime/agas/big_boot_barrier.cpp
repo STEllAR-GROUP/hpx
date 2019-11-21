@@ -36,7 +36,7 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/util/detail/yield_k.hpp>
+#include <hpx/synchronization/detail/yield_k.hpp>
 #include <hpx/format.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/util/runtime_configuration.hpp>

@@ -10,9 +10,9 @@
 #define HPX_TEST_SHARED_MUTEX_LOCKING_THREAD_AUG_03_2015_0927PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/lcos/local/shared_mutex.hpp>
+#include <hpx/synchronization/mutex.hpp>
+#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 
 #include <boost/thread/locks.hpp>
 

@@ -78,6 +78,7 @@ add_hpx_module(execution
     hpx_functional
     hpx_iterator_support
     hpx_preprocessor
+    hpx_synchronization
     hpx_timing
     hpx_topology
     hpx_type_support

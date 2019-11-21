@@ -8,7 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>

@@ -8,8 +8,8 @@
 #define HPX_LCOS_LOCAL_SPMD_BLOCK_HPP
 
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/barrier.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/synchronization/barrier.hpp>
+#include <hpx/synchronization/mutex.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
