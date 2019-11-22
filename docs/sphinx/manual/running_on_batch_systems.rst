@@ -24,7 +24,7 @@ How to use |hpx| applications with PBS
 Most |hpx| applications are executed on parallel computers. These platforms
 typically provide integrated job management services that facilitate the
 allocation of computing resources for each parallel program. |hpx| includes
-out-of-the-box support for one of the most common job management systems, the
+support for one of the most common job management systems, the
 Portable Batch System (PBS).
 
 All PBS jobs require a script to specify the resource requirements and other
@@ -52,7 +52,7 @@ program, explained in the section :ref:`examples_hello_world`.
 .. caution::
 
    If the first application specific argument (inside ``$APP_OPTIONS``) is a
-   non-option (i.e., does not start with a ``-`` or a ``--``), then those have to
+   non-option (i.e., does not start with a ``-`` or a ``--``), then the argument has to
    be placed before the option :option:`--hpx:nodes`, which, in this case, should
    be the last option on the command line.
 
@@ -108,7 +108,7 @@ only the PBS options and shell variables as needed for a specific application.
 
 Another choice is for the |pbsdsh| command in your main job script to invoke
 your program via a shell, like ``sh`` or ``bash``, so that it gives an initialized
-environment for each instance. We create a small script ``runme.sh``, which is used
+environment for each instance. Users can create a small script ``runme.sh``, which is used
 to invoke the program:
 
 .. code-block:: bash
@@ -121,7 +121,7 @@ to invoke the program:
    # environment variables as usual.
    $@
 
-Now, we invoke this script using the |pbsdsh| tool:
+Now, the script is invoked using the |pbsdsh| tool:
 
 .. code-block:: bash
 
