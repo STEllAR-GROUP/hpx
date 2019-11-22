@@ -7,7 +7,7 @@
 import os
 import re
 
-compilation_database_dir = "@CMAKE_BINARY_DIR@"
+compilation_database_dir = "@PROJECT_BINARY_DIR@"
 
 def FlagsForFile(filename, **kwargs):
 
@@ -17,7 +17,7 @@ def FlagsForFile(filename, **kwargs):
         a = ''.join([l.rstrip('\n') for l in f.readlines() if 'command' in l])
 
     final_flags = list(set(re.findall('-(?:std|W|w)\S+|-(?:I|include|isystem)(?:\S+| \S+)', a)))
- 
+
     return {
         'flags': final_flags,
         'do_cache': True

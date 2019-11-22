@@ -47,7 +47,7 @@ function(add_hpx_test category name)
   endif()
 
   set(cmd "${PYTHON_EXECUTABLE}"
-          "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
+          "${PROJECT_BINARY_DIR}/bin/hpxrun.py"
           ${_exe}
           "-e" "${expected}"
           "-t" "${${name}_THREADS_PER_LOCALITY}")

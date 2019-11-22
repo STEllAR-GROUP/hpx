@@ -38,7 +38,7 @@ if (HPX_COMPUTE_CUDA_WITH_TESTS)
   if (HPX_WITH_TESTS_HEADERS)
     # TODO: Why is this needed?
     add_library(hpx_includes INTERFACE)
-    target_include_directories(hpx_includes INTERFACE ${CMAKE_SOURCE_DIR})
+    target_include_directories(hpx_includes INTERFACE ${PROJECT_SOURCE_DIR})
     add_hpx_header_tests(
       modules.compute_cuda
       HEADERS ${compute_cuda_headers}

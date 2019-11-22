@@ -101,7 +101,7 @@ endfunction()
 
 create_cmake_test(
   cmake_build_dir_test
-  "${CMAKE_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}")
+  "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}")
 
 create_cmake_test(
   cmake_install_dir_test
@@ -112,7 +112,7 @@ find_package(PkgConfig)
 if(PKGCONFIG_FOUND AND NOT MSVC)
   create_pkgconfig_test(
     pkgconfig_build_dir_test
-    "${CMAKE_BINARY_DIR}/lib/pkgconfig")
+    "${PROJECT_BINARY_DIR}/lib/pkgconfig")
 
   create_pkgconfig_test(
     pkgconfig_install_dir_test

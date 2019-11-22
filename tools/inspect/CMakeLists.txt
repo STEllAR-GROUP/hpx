@@ -18,7 +18,7 @@ if(NOT Boost_REGEX_FOUND)
 endif()
 
 # Set the basic search paths for the generated HPX headers
-target_include_directories(inspect PRIVATE ${CMAKE_BINARY_DIR})
+target_include_directories(inspect PRIVATE ${PROJECT_BINARY_DIR})
 target_link_libraries(inspect PRIVATE hpx::boost::regex hpx::boost hpx_config
   hpx_filesystem hpx_program_options)
 target_compile_definitions(inspect PRIVATE HPX_MODULE_STATIC_LINKING)
