@@ -148,7 +148,7 @@ of the neighboring partitions. These retrievals are asynchronous and the functio
 ``heat_part_data``, which, amongst other things, calls ``heat``, should not be
 called unless the data from the neighboring partitions have arrived. Therefore,
 it should come as no surprise that we synchronize this operation with another
-instance of dataflow (found in ``heat_part``). This dataflow passes futures
+instance of dataflow (found in ``heat_part``). This dataflow receives futures
 to the data in the current and surrounding partitions by calling ``get_data()``
 on each respective partition. When these futures are ready, dataflow passes them
 to the ``unwrapped`` function, which extracts the shared_array of doubles and
