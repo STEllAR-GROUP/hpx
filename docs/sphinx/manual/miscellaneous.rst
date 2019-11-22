@@ -271,7 +271,7 @@ from ``hpx::cerr`` will be dispatched to ``std::cerr`` on the console
 
 In order to use either ``hpx::cout`` or ``hpx::cerr``, application codes need to
 ``#include <hpx/include/iostreams.hpp>``. For an example, please see the
-simplest possible 'Hello world' program as included as an example with |hpx|:
+following 'Hello world' program:
 
 .. literalinclude:: ../../examples/quickstart/hello_world_1.cpp
    :language: c++
