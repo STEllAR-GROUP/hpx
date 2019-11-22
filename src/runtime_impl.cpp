@@ -415,6 +415,11 @@ namespace hpx
 
         lbt_ << "(1st stage) runtime_impl::start: booting locality " << here();
 
+        // Register this thread with the runtime system to allow calling
+        // certain HPX functionality from the main thread. Also calls
+        // registered startup callbacks.
+        init_tss("main-thread", 0, 0, "", "", false);
+
         // start runtime_support services
         runtime_support_->run();
         lbt_ << "(1st stage) runtime_impl::start: started "
@@ -468,10 +473,6 @@ namespace hpx
                     return get_state() < state_running;
                 }, "runtime_impl::start");
         }
-
-        // Register this thread with the runtime system to allow calling certain
-        // HPX functionality from the main thread.
-        init_tss("main-thread", 0, 0, "", "", false);
 
         return 0;   // return zero as we don't know the outcome of hpx_main yet
     }
