@@ -230,9 +230,9 @@ operator to load data and another function to remove it (or vice versa). Both
 function respectively. In order to know how much data to read from the
 ``std::istream``, the ``operator<<`` will write the size of the ``checkpoint``
 before writing the ``checkpoint`` data. Correspondingly, the ``operator>>`` will
-read the size of the stored data before reading the data into new instance of
+read the size of the stored data before reading the data into a new instance of
 ``checkpoint``. As long as the user employs the ``operator<<`` and
-``operator>>`` to stream, the data this detail can be ignored.
+``operator>>`` to stream the data, this detail can be ignored.
 
 .. important::
 
