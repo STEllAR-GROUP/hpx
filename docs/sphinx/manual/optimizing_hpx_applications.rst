@@ -2356,7 +2356,7 @@ system and application performance.
        events changes depending on the used architecture.
 
        For a full list of available PAPI events and their (short) description
-       use the ``--hpx:list-counters`` and ``--papi-event-info=all`` command
+       use the ``--hpx:list-counters`` and ``--hpx:papi-event-info=all`` command
        line options.
 
      * ``locality#*/total`` or
