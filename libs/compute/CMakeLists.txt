@@ -66,4 +66,5 @@ add_hpx_module(compute
 # Temporary since the module still depends on some runtime files
 target_link_libraries(hpx_compute PUBLIC
   hpx_static_reinit
+  hpx_local_lcos
   )

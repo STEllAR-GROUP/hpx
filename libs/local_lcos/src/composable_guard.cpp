@@ -10,7 +10,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 
-#include <hpx/lcos/local/composable_guard.hpp>
+#include <hpx/local_lcos/composable_guard.hpp>
 
 #include <algorithm>
 #include <cstddef>

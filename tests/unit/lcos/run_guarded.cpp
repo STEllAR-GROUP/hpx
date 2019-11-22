@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/local/composable_guard.hpp>
+#include <hpx/local_lcos/composable_guard.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/hpx_init.hpp>

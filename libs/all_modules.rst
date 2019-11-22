@@ -39,6 +39,7 @@ All modules
    /libs/hardware/docs/index.rst
    /libs/hashing/docs/index.rst
    /libs/iterator_support/docs/index.rst
+   /libs/local_lcos/docs/index.rst
    /libs/logging/docs/index.rst
    /libs/memory/docs/index.rst
    /libs/plugin/docs/index.rst

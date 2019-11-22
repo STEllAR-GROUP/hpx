@@ -14,7 +14,7 @@
 #include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>
-#include <hpx/lcos/local/promise.hpp>
+#include <hpx/local_lcos/promise.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>

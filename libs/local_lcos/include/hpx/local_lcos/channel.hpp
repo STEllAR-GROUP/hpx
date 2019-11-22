@@ -13,12 +13,12 @@
 #include <hpx/errors.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/synchronization/no_mutex.hpp>
-#include <hpx/lcos/local/packaged_task.hpp>
-#include <hpx/lcos/local/receive_buffer.hpp>
-#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/local_lcos/packaged_task.hpp>
+#include <hpx/local_lcos/receive_buffer.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/synchronization/no_mutex.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>

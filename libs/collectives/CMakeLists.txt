@@ -68,9 +68,9 @@ add_hpx_module(collectives
       hpx_hardware
       hpx_hashing
       hpx_iterator_support
+      hpx_local_lcos
       hpx_logging
       hpx_memory
-      hpx_plugin
       hpx_preprocessor
       hpx_program_options
       hpx_serialization

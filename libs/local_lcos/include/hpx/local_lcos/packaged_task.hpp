@@ -13,7 +13,7 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/promise.hpp>
+#include <hpx/local_lcos/promise.hpp>
 #include <hpx/util/annotated_function.hpp>
 
 #include <exception>

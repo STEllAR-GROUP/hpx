@@ -10,9 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/conditional_trigger.hpp>
+#include <hpx/local_lcos/conditional_trigger.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
-#include <hpx/lcos/local/promise.hpp>
+#include <hpx/local_lcos/promise.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>

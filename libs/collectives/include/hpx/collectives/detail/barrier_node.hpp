@@ -12,7 +12,7 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/synchronization/barrier.hpp>
-#include <hpx/lcos/local/promise.hpp>
+#include <hpx/local_lcos/promise.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

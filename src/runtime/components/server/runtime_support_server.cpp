@@ -39,7 +39,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 
 #include <hpx/collectives.hpp>
-#include <hpx/lcos/local/packaged_task.hpp>
+#include <hpx/local_lcos/packaged_task.hpp>
 
 #include <hpx/assertion.hpp>
 #include <hpx/util/command_line_handling.hpp>
