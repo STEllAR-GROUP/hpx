@@ -1089,7 +1089,7 @@ namespace hpx { namespace components { namespace server
                     &still_unregistered_options);
 
                 std::string still_unknown_commandline;
-                for (std::size_t i = 1; i != still_unregistered_options.size();
+                for (std::size_t i = 1; i < still_unregistered_options.size();
                      ++i)
                 {
                     if (i != 1)
