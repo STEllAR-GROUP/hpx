@@ -69,7 +69,7 @@ namespace hpx { namespace threads { namespace policies
     void scheduler_base::idle_callback(std::size_t num_thread)
     {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-        if (mode_.load(std::memory_order_relaxed) &
+        if (mode_.data_.load(std::memory_order_relaxed) &
                 policies::enable_idle_backoff)
         {
             // Put this thread to sleep for some time, additionally it gets
@@ -146,7 +146,7 @@ namespace hpx { namespace threads { namespace policies
         std::unique_lock<pu_mutex_type>& l, std::size_t num_thread,
         bool allow_fallback)
     {
-        if (mode_.load(std::memory_order_relaxed) &
+        if (mode_.data_.load(std::memory_order_relaxed) &
             threads::policies::enable_elasticity)
         {
             std::size_t states_size = states_.size();
@@ -311,7 +311,7 @@ namespace hpx { namespace threads { namespace policies
     void scheduler_base::set_scheduler_mode(scheduler_mode mode)
     {
         // distribute the same value across all cores
-        mode_.store(mode, std::memory_order_release);
+        mode_.data_.store(mode, std::memory_order_release);
         do_some_work(std::size_t(-1));
     }
 

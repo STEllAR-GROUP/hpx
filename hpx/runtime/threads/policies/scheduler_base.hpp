@@ -118,7 +118,7 @@ namespace hpx { namespace threads { namespace policies {
         // get/set scheduler mode
         scheduler_mode get_scheduler_mode() const
         {
-            return mode_.load(std::memory_order_relaxed);
+            return mode_.data_.load(std::memory_order_relaxed);
         }
 
         // set mode flags that control scheduler behaviour
@@ -276,10 +276,8 @@ namespace hpx { namespace threads { namespace policies {
         }
 
     protected:
-        // the scheduler mode is simply replicated across the cores to
-        // avoid false sharing, we ignore benign data races related to this
-        // variable
-        std::atomic<scheduler_mode> mode_;
+        // the scheduler mode, ptoected from false sharing
+        util::cache_line_data<std::atomic<scheduler_mode>> mode_;
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues
