@@ -13,3 +13,6 @@ execution
 
 This library implements executors and execution policies for use with parallel
 algorithms and other facilities related to managing the execution of tasks.
+
+See the :ref:`API reference <libs_execution_api>` of the module for more
+details.

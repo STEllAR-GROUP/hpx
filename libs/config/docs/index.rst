@@ -14,3 +14,5 @@ config
 The config module contains various configuration options, typically hidden
 behind macros that choose the correct implementation based on the compiler and
 other available options.
+
+See the :ref:`API reference <libs_config_api>` of the module for more details.

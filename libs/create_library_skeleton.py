@@ -62,6 +62,11 @@ index_rst = f'''..
 {lib_name}
 {header_str}
 
+TODO: High-level description of the library.
+
+See the :ref:`API reference <libs_{lib_name}_api>` of this module for more
+details.
+
 '''
 
 root_cmakelists_template = cmake_header + f'''

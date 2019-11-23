@@ -11,3 +11,7 @@
 debugging
 =========
 
+This module provides helpers for demangling symbol names.
+
+See the :ref:`API reference <libs_debugging_api>` of the module for more
+details.

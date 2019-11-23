@@ -13,3 +13,5 @@ hardware
 
 The hardware module abstracts away hardware specific details of timestamps and
 CPU features.
+
+See the :ref:`API reference <libs_hardware_api>` of the module for more details.

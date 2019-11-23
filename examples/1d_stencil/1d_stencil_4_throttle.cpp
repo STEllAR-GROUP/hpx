@@ -293,6 +293,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // We're done with the periodic policy now, so disable it.
     apex::deregister_policy(periodic_policy_handle);
+    apex::shutdown_throttling();
 
     // Print the final solution
     if (vm.count("results"))

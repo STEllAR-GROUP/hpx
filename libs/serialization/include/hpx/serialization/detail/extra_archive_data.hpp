@@ -38,7 +38,7 @@ namespace hpx { namespace serialization { namespace detail {
         inline T* get() noexcept;
 
         std::unique_ptr<extra_archive_data_member_base> ptr_;
-        void (*id_)();
+        void (*id_)() noexcept;
     };
 
     struct extra_archive_data_member_base

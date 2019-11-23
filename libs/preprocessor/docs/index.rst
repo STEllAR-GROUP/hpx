@@ -13,9 +13,11 @@ preprocessor
 
 This library contains useful preprocessor macros:
 
-* :c:func:`HPX_PP_CAT`
-* :c:func:`HPX_PP_EXPAND`
-* :c:func:`HPX_PP_NARGS`
-* :c:func:`HPX_PP_STRINGIZE`
-* :c:func:`HPX_PP_STRIP_PARENS`
+* :c:macro:`HPX_PP_CAT`
+* :c:macro:`HPX_PP_EXPAND`
+* :c:macro:`HPX_PP_NARGS`
+* :c:macro:`HPX_PP_STRINGIZE`
+* :c:macro:`HPX_PP_STRIP_PARENS`
 
+See the :ref:`API reference <libs_preprocessor_api>` of the module for more
+details.

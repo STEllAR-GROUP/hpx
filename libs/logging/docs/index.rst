@@ -12,3 +12,5 @@ logging
 =======
 
 This module provides useful macros for logging information.
+
+See the :ref:`API reference <libs_logging_api>` of the module for more details.

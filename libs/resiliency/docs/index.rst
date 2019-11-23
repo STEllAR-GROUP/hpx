@@ -8,10 +8,10 @@
 .. _libs_resiliency:
 
 ==========
-Resiliency
+resiliency
 ==========
 
-In HPX, a program failure is a manifestation of a failing task. This module
+In |hpx|, a program failure is a manifestation of a failing task. This module
 exposes several APIs that allow to manage failing tasks in a convenient way by
 either replaying a failed task or by replicating a specific task to begin with.
 
@@ -31,84 +31,87 @@ by repeating a task multiple times.
 
 The following API functions are exposed:
 
-- `hpx::resiliency::async_replay`: This version of task replay will catch user
-  defined exceptions and automatically reschedule the task N times before
-  throwing an `hpx::resiliency::abort_replay_exception` if no task is able to
-  complete execution without an exception.
+- :cpp:func:`hpx::resiliency::async_replay`: This version of task replay will
+  catch user defined exceptions and automatically reschedule the task N times
+  before throwing an :cpp:func:`hpx::resiliency::abort_replay_exception` if no
+  task is able to complete execution without an exception.
 
-- `hpx::resiliency::async_replay_validate`: This version of replay adds an
-  argument to async replay which receives a user provided validation function
-  to test the result of the task against. If the task's output is validated,
-  the result is returned. If the output fails the check or an exception is
-  thrown, the task is replayed until no errors are encountered or the number of
-  specified retries have been exceeded.
+- :cpp:func:`hpx::resiliency::async_replay_validate`: This version of replay
+  adds an argument to async replay which receives a user provided validation
+  function to test the result of the task against. If the task's output is
+  validated, the result is returned. If the output fails the check or an
+  exception is thrown, the task is replayed until no errors are encountered or
+  the number of specified retries have been exceeded.
 
-- `hpx::resiliency::async_replicate`: This is the most basic implementation of
-  the task replication. The API returns the first result that runs without
-  detecting any errors.
+- :cpp:func:`hpx::resiliency::async_replicate`: This is the most basic
+  implementation of the task replication. The API returns the first result that
+  runs without detecting any errors.
 
-- `hpx::resiliency::async_replicate_validate`: This API additionally takes a
-  validation function which evaluates the return values produced by the threads.
-  The first task to compute a valid result is returned.
+- :cpp:func:`hpx::resiliency::async_replicate_validate`: This API additionally
+  takes a validation function which evaluates the return values produced by the
+  threads. The first task to compute a valid result is returned.
 
-- `hpx::resiliency::async_replicate_vote`: This API adds a vote function to the
-  basic replicate function. Many hardware or software failures are silent errors
-  which do not interrupt program flow. In order to detect errors of this kind,
-  it is necessary to run the task several times and compare the values returned
-  by every version of the task. In order to determine which return value is
-  "correct", the API allow the user to provide a custom consensus function to
-  properly form a consensus. This voting function then returns the "correct""
-  answer.
+- :cpp:func:`hpx::resiliency::async_replicate_vote`: This API adds a vote
+  function to the basic replicate function. Many hardware or software failures
+  are silent errors which do not interrupt program flow. In order to detect
+  errors of this kind, it is necessary to run the task several times and compare
+  the values returned by every version of the task. In order to determine which
+  return value is "correct", the API allow the user to provide a custom
+  consensus function to properly form a consensus. This voting function then
+  returns the "correct"" answer.
 
-- `hpx::resiliency::async_replicate_vote_validate`: This combines the features
-  of the previously discussed replicate set. Replicate vote validate allows a
-  user to provide a validation function to filter results. Additionally, as
-  described in replicate vote, the user can provide a "voting function" which
-  returns the consensus formed by the voting logic.
+- :cpp:func:`hpx::resiliency::async_replicate_vote_validate`: This combines the
+  features of the previously discussed replicate set. Replicate vote validate
+  allows a user to provide a validation function to filter results.
+  Additionally, as described in replicate vote, the user can provide a "voting
+  function" which returns the consensus formed by the voting logic.
 
-- `hpx::resiliency::dataflow_replay`: This version of dataflow replay will catch
-  user defined exceptions and automatically reschedules the task N times before
-  throwing an `hpx::resiliency::abort_replay_exception` if no task is able to
-  complete execution without an exception. Any arguments for the executed task
-  that are futures will cause the task invocation to be delayed until all of
-  those futures have become ready.
+- :cpp:func:`hpx::resiliency::dataflow_replay`: This version of dataflow replay
+  will catch user defined exceptions and automatically reschedules the task N
+  times before throwing an :cpp:func:`hpx::resiliency::abort_replay_exception`
+  if no task is able to complete execution without an exception. Any arguments
+  for the executed task that are futures will cause the task invocation to be
+  delayed until all of those futures have become ready.
 
-- `hpx::resiliency::dataflow_replay_validate` : This version of replay adds an
-  argument to dataflow replay which receives a user provided validation function
-  to test the result of the task against. If the task's output is validated,
-  the result is returned. If the output fails the check or an exception is
-  thrown, the task is replayed until no errors are encountered or the number of
-  specified retries have been exceeded. Any arguments for the executed task
-  that are futures will cause the task invocation to be delayed until all of
-  those futures have become ready.
-
-- `hpx::resiliency::datafloe_replicate`: This is the most basic implementation of
-  the task replication. The API returns the first result that runs without
-  detecting any errors. Any arguments for the executed task that are futures will
-  cause the task invocation to be delayed until all of those futures have become
-  ready.
-
-- `hpx::resiliency::datafloe_replicate_validate`: This API additionally takes a
-  validation function which evaluates the return values produced by the threads.
-  The first task to compute a valid result is returned. Any arguments for the
+- :cpp:func:`hpx::resiliency::dataflow_replay_validate` : This version of replay
+  adds an argument to dataflow replay which receives a user provided validation
+  function to test the result of the task against. If the task's output is
+  validated, the result is returned. If the output fails the check or an
+  exception is thrown, the task is replayed until no errors are encountered or
+  the number of specified retries have been exceeded. Any arguments for the
   executed task that are futures will cause the task invocation to be delayed
   until all of those futures have become ready.
 
-- `hpx::resiliency::datafloe_replicate_vote`:  This API adds a vote function to
-  the basic replicate function. Many hardware or software failures are silent
-  errorswhich do not interrupt program flow. In order to detect errors of this
-  kind, it is necessary to run the task several times and compare the values
-  returned by every version of the task. In order to determine which return value
-  is "correct", the API allow the user to provide a custom consensus function to
-  properly form a consensus. This voting function then returns the "correct""
-  answer. Any arguments for the executed task that are futures will cause the
-  task invocation to be delayed until all of those futures have become ready.
+- :cpp:func:`hpx::resiliency::dataflow_replicate`: This is the most basic
+  implementation of the task replication. The API returns the first result that
+  runs without detecting any errors. Any arguments for the executed task that
+  are futures will cause the task invocation to be delayed until all of those
+  futures have become ready.
 
-- `hpx::resiliency::datafloe_replicate_vote_validate`:  This combines the features
-  of the previously discussed replicate set. Replicate vote validate allows a
-  user to provide a validation function to filter results. Additionally, as
-  described in replicate vote, the user can provide a "voting function" which
-  returns the consensus formed by the voting logic.  Any arguments for the
-  executed task that are futures will cause the task invocation to be delayed
-  until all of those futures have become ready.
+- :cpp:func:`hpx::resiliency::dataflow_replicate_validate`: This API
+  additionally takes a validation function which evaluates the return values
+  produced by the threads. The first task to compute a valid result is returned.
+  Any arguments for the executed task that are futures will cause the task
+  invocation to be delayed until all of those futures have become ready.
 
+- :cpp:func:`hpx::resiliency::dataflow_replicate_vote`: This API adds a vote
+  function to the basic replicate function. Many hardware or software failures
+  are silent errors which do not interrupt program flow. In order to detect
+  errors of this kind, it is necessary to run the task several times and compare
+  the values returned by every version of the task. In order to determine which
+  return value is "correct", the API allows the user to provide a custom
+  consensus function to properly form a consensus. This voting function then
+  returns the "correct" answer. Any arguments for the executed task that are
+  futures will cause the task invocation to be delayed until all of those
+  futures have become ready.
+
+- :cpp:func:`hpx::resiliency::dataflow_replicate_vote_validate`: This combines
+  the features of the previously discussed replicate set. Replicate vote
+  validate allows a user to provide a validation function to filter results.
+  Additionally, as described in replicate vote, the user can provide a "voting
+  function" which returns the consensus formed by the voting logic. Any
+  arguments for the executed task that are futures will cause the task
+  invocation to be delayed until all of those futures have become ready.
+
+See the :ref:`API reference <libs_resiliency_api>` of the module for more
+details.
