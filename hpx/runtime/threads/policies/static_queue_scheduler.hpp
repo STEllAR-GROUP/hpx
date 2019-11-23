@@ -29,8 +29,6 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-// JB set work stealing false in mode set
-
 // TODO: add branch prediction and function heat
 
 ///////////////////////////////////////////////////////////////////////////////
