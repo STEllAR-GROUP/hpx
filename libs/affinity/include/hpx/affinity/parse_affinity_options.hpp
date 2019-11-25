@@ -107,15 +107,12 @@ namespace hpx { namespace threads {
 
         HPX_API_EXPORT void parse_mappings(std::string const& spec,
             mappings_type& mappings, error_code& ec = throws);
-    }
+    }    // namespace detail
 
     HPX_API_EXPORT void parse_affinity_options(std::string const& spec,
-        std::vector<mask_type>& affinities,
-        std::size_t used_cores,
-        std::size_t max_cores,
-        std::size_t num_threads,
-        std::vector<std::size_t>& num_pus,
-        bool use_process_mask,
+        std::vector<mask_type>& affinities, std::size_t used_cores,
+        std::size_t max_cores, std::size_t num_threads,
+        std::vector<std::size_t>& num_pus, bool use_process_mask,
         error_code& ec = throws);
 
     // backwards compatibility helper
@@ -126,6 +123,6 @@ namespace hpx { namespace threads {
         parse_affinity_options(
             spec, affinities, 1, 1, affinities.size(), num_pus, false, ec);
     }
-}}
+}}    // namespace hpx::threads
 
 #endif    // HPX_RUNTIME_THREADS_POLICIES_PARSE_AFFINITY_OPTIONS_HPP

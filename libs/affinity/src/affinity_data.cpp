@@ -4,11 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/affinity/affinity_data.hpp>
+#include <hpx/affinity/parse_affinity_options.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
-#include <hpx/affinity/affinity_data.hpp>
-#include <hpx/affinity/parse_affinity_options.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
@@ -97,7 +97,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
                 threads::resize(affinity_masks_[i], num_system_pus);
 
             parse_affinity_options(affinity_description, affinity_masks_,
-                used_cores, max_cores, num_threads_, pu_nums_, use_process_mask);
+                used_cores, max_cores, num_threads_, pu_nums_,
+                use_process_mask);
 
             std::size_t num_initialized = count_initialized(affinity_masks_);
             if (num_initialized != num_threads_)
@@ -146,8 +147,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
         return (std::max)(num_unique_cores, max_cores);
     }
 
-    mask_cref_type affinity_data::get_pu_mask(threads::topology const& topo,
-        std::size_t global_thread_num) const
+    mask_cref_type affinity_data::get_pu_mask(
+        threads::topology const& topo, std::size_t global_thread_num) const
     {
         // --hpx:bind=none disables all affinity
         if (threads::test(no_affinity_, global_thread_num))
@@ -190,8 +191,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
         return topo.get_machine_affinity_mask();
     }
 
-    mask_type affinity_data::get_used_pus_mask(threads::topology const& topo,
-        std::size_t pu_num) const
+    mask_type affinity_data::get_used_pus_mask(
+        threads::topology const& topo, std::size_t pu_num) const
     {
         mask_type ret = mask_type();
         threads::resize(ret, hardware_concurrency());
@@ -277,8 +278,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
         }
     }
 
-    std::size_t affinity_data::get_pu_num(std::size_t num_thread,
-        std::size_t hardware_concurrency) const
+    std::size_t affinity_data::get_pu_num(
+        std::size_t num_thread, std::size_t hardware_concurrency) const
     {
         // The offset shouldn't be larger than the number of available
         // processing units.
@@ -306,4 +307,4 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
     }
 
     std::atomic<int> affinity_data::instance_number_counter_(-1);
-}}}}
+}}}}    // namespace hpx::threads::policies::detail

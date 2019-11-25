@@ -25,21 +25,19 @@
 //#define VERIFY_AFFINITY_MASKS
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace detail
-{
+namespace hpx { namespace threads { namespace detail {
     std::ostream& operator<<(std::ostream& os, spec_type const& data)
     {
         os << spec_type::type_name(data.type_);
         for (std::size_t i : data.index_bounds_)
         {
-            os  << "," << i;
+            os << "," << i;
         }
         return os;
     }
-}}}
+}}}    // namespace hpx::threads::detail
 
-namespace test
-{
+namespace test {
     using hpx::threads::detail::spec_type;
 
     struct data_good_thread
@@ -58,43 +56,44 @@ namespace test
         std::uint64_t masks[4];
     };
 
-//  Test cases implemented below:
-//
-//   thread:0-1=socket:0
-//   thread:0-1=socket:0-1
-//   thread:0-1=numanode:0
-//   thread:0-1=numanode:0-1
-//   thread:0-1=core:0
-//   thread:0-1=core:0-1
-//   thread:0-1=core:0.pu:0
-//   thread:0-1=core:0.pu:0-1
-//   thread:0-1=pu:0
-//   thread:0-1=pu:0-1
-//   thread:0-1=socket:0.core:0
-//   thread:0-1=socket:1.core:0-1
-//   thread:0-1=numanode:0.core:0
-//   thread:0-1=numanode:1.core:0-1
-//   thread:0-1=socket:1.core:1.pu:0
-//   thread:0-1=socket:1.core:1.pu:0-1
-//   thread:0-1=numanode:1.core:1.pu:0
-//   thread:0-1=numanode:1.core:1.pu:0-1
-//   thread:0-1=socket:1.core:0-1.pu:1
-//   thread:0-1=numanode:1.core:0-1.pu:1
-//   thread:0-1=socket:0-1.core:1.pu:1
-//   thread:0-1=numanode:0-1.core:1.pu:1
-//   thread:0-1=socket:0-1.pu:0
-//   thread:0-1=numanode:0-1.pu:0
-//   thread:0-1=socket:0.pu:0
-//   thread:0-1=socket:0.pu:0-1
-//   thread:0-1=numanode:0.pu:0
-//   thread:0-1=numanode:0.pu:0-1
-//   thread:0-1=socket:0.core:all.pu:0
+    //  Test cases implemented below:
+    //
+    //   thread:0-1=socket:0
+    //   thread:0-1=socket:0-1
+    //   thread:0-1=numanode:0
+    //   thread:0-1=numanode:0-1
+    //   thread:0-1=core:0
+    //   thread:0-1=core:0-1
+    //   thread:0-1=core:0.pu:0
+    //   thread:0-1=core:0.pu:0-1
+    //   thread:0-1=pu:0
+    //   thread:0-1=pu:0-1
+    //   thread:0-1=socket:0.core:0
+    //   thread:0-1=socket:1.core:0-1
+    //   thread:0-1=numanode:0.core:0
+    //   thread:0-1=numanode:1.core:0-1
+    //   thread:0-1=socket:1.core:1.pu:0
+    //   thread:0-1=socket:1.core:1.pu:0-1
+    //   thread:0-1=numanode:1.core:1.pu:0
+    //   thread:0-1=numanode:1.core:1.pu:0-1
+    //   thread:0-1=socket:1.core:0-1.pu:1
+    //   thread:0-1=numanode:1.core:0-1.pu:1
+    //   thread:0-1=socket:0-1.core:1.pu:1
+    //   thread:0-1=numanode:0-1.core:1.pu:1
+    //   thread:0-1=socket:0-1.pu:0
+    //   thread:0-1=numanode:0-1.pu:0
+    //   thread:0-1=socket:0.pu:0
+    //   thread:0-1=socket:0.pu:0-1
+    //   thread:0-1=numanode:0.pu:0
+    //   thread:0-1=numanode:0.pu:0-1
+    //   thread:0-1=socket:0.core:all.pu:0
 
 #if defined(__GNUC__) && __GNUC__ < 5
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #endif
 
+    // clang-format off
     data_good data[] =
     {
         {   "thread:0=socket:0;thread:1=socket:0", 2,
@@ -976,9 +975,10 @@ namespace test
 
         { "", 0,  {data_good_thread(), data_good_thread()}, {0,0} }
     };
+    // clang-format on
 
 #if defined(__GNUC__) && __GNUC__ < 5
-#  pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 #endif
 
     void good_testing(data_good const* t, char const* const options)
@@ -996,11 +996,13 @@ namespace test
             hpx::threads::detail::mappings_spec_type mappings_specs(
                 boost::get<hpx::threads::detail::mappings_spec_type>(mappings));
 
-            for (hpx::threads::detail::full_mapping_type const& m : mappings_specs)
+            for (hpx::threads::detail::full_mapping_type const& m :
+                mappings_specs)
             {
                 HPX_TEST_EQ(t->t[i].thread, m.first);
                 HPX_TEST_EQ(m.second.size(), 3u);
-                if (m.second.size() == 3u) {
+                if (m.second.size() == 3u)
+                {
                     HPX_TEST_EQ(t->t[i].socket, m.second[0]);
                     HPX_TEST_EQ(t->t[i].core, m.second[1]);
                     HPX_TEST_EQ(t->t[i].pu, m.second[2]);
@@ -1026,15 +1028,17 @@ namespace test
 #endif
     }
 
-    std::string replace_all(std::string str, char const* const what,
-        char const* const with)
+    std::string replace_all(
+        std::string str, char const* const what, char const* const with)
     {
         std::string::size_type p = str.find(what);
-        if (p != std::string::npos) {
+        if (p != std::string::npos)
+        {
             std::size_t len = strnlen(what, 64);
-            do {
+            do
+            {
                 str.replace(p, len, with);
-                p = str.find(what, p+len);
+                p = str.find(what, p + len);
             } while (p != std::string::npos);
         }
         return str;
@@ -1062,6 +1066,7 @@ namespace test
         }
     }
 
+    // clang-format off
     char const* const data_bad[] =
     {
         // wrong sequence
@@ -1089,6 +1094,7 @@ namespace test
         "pu:0",
         nullptr
     };
+    // clang-format on
 
     void bad()
     {
@@ -1101,7 +1107,7 @@ namespace test
             HPX_TEST(ec);
         }
     }
-}
+}    // namespace test
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
@@ -1118,12 +1124,9 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // We force this test to use 4 threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=4"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=4"};
 
     // Initialize and run HPX
     HPX_TEST(0 == hpx::init(argc, argv, cfg));
     return hpx::util::report_errors();
 }
-
