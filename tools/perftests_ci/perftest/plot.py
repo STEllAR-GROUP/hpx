@@ -38,8 +38,10 @@ class _OutputKey(typing.NamedTuple):
     @classmethod
     def outputs_by_key(cls, data):
         def split_output(o):
-            return cls(**{k: v
-                          for k, v in o.items() if k != 'series'}), o['series']
+            return cls(**{
+                k: v for k, v in o.items() \
+                    if k != 'series' and k != 'average' \
+            }), o['series']
 
         return dict(split_output(o) for o in data['outputs'])
 

@@ -1571,7 +1571,9 @@ The predefined command line options for any application using
 
    The queue scheduling policy to use. Options are ``local``,
    ``local-priority-fifo``, ``local-priority-lifo``, ``static``,
-   ``static-priority``, ``abp-priority-fifo`` and ``abp-priority-lifo``
+   ``static-priority``, ``abp-priority-fifo``,
+   ``local-workrequesting-fifo``, ``local-workrequesting-lifo``
+   and ``abp-priority-lifo``
    (default: ``local-priority-fifo``).
 
 .. option:: --hpx:high-priority-threads arg
