@@ -16,13 +16,13 @@
 |hpx| thread scheduling policies
 ================================
 
-The |hpx| runtime has five thread scheduling policies: local-priority,
-static-priority, local, static and abp-priority. These policies can be specified
-from the command line using the command line option :option:`--hpx:queuing`. In
-order to use a particular scheduling policy, the runtime system must be built
-with the appropriate scheduler flag turned on (e.g. ``cmake
--DHPX_THREAD_SCHEDULERS=local``, see :ref:`cmake_variables` for more
-information).
+The |hpx| runtime has six thread scheduling policies: local-priority,
+static-priority, local, static, local-workrequesting-fifo, and abp-priority. 
+These policies can be specified from the command line using the command line
+option :option:`--hpx:queuing`. In order to use a particular scheduling policy,
+the runtime system must be built with the appropriate scheduler flag turned on
+(e.g. ``cmake -DHPX_THREAD_SCHEDULERS=local``, see :ref:`cmake_variables` for
+more information).
 
 Priority local scheduling policy (default policy)
 -------------------------------------------------
@@ -51,9 +51,7 @@ policy and must be invoked using the command line option
 Static priority scheduling policy
 ---------------------------------
 
-* invoke using: :option:`--hpx:queuing`\ ``=static-priority`` (or ``-qs``)
-* flag to turn on for build: ``HPX_THREAD_SCHEDULERS=all`` or
-  ``HPX_THREAD_SCHEDULERS=static-priority``
+* invoke using: :option:`--hpx:queuing`\ ``static-priority`` (or ``-qs``)
 
 The static scheduling policy maintains one queue per OS thread from which each
 OS thread pulls its tasks (user threads). Threads are distributed in a round
@@ -102,7 +100,7 @@ domain first, only after that work is stolen from other NUMA domains.
 This scheduler can be used with two underlying queuing policies (FIFO:
 first-in-first-out, and LIFO: last-in-first-out). In order to use the LIFO
 policy use the command line option
-:option:`--hpx:queuing`\ ``=abp-priority-lifo``.
+:option:`--hpx:queuing`\ ``abp-priority-lifo``.
 
 ..
     Questions, concerns and notes:
@@ -150,6 +148,23 @@ policy use the command line option
     enum { max_thread_count = 1000 };
 
     I see both FIFO and double ended queues in ABP policies?
+
+Work requesting scheduling policies
+-----------------------------------
+
+* invoke using: :option:`--hpx:queuing`\ ``local-workrequesting-fifo``
+  or using :option:`--hpx:queuing`\ ``local-workrequesting-lifo``
+
+The work-requesting policies rely on a different mechanism of balancing work
+between cores (compared to the other policies listed above). Instead of actively
+trying to steal work from other cores, requesting work relies on a less
+disruptive mechanism. If a core runs out of work, instead of actively looking at
+the queues of neighboring cores, in this case a request is posted to another
+core. This core now (whenever it is not busy with other work) either responds to
+the original core by sending back work or passes the request on to the next
+possible core in the system. In general, this scheme avoids contention on the
+work queues as those are always accessed by their own cores only.
+
 
 The |hpx| resource partitioner
 ==============================
