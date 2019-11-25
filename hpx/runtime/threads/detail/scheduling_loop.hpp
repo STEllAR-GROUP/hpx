@@ -562,7 +562,7 @@ namespace hpx { namespace threads { namespace detail
         std::shared_ptr<bool> background_running = nullptr;
         thread_id_type background_thread;
 
-        if ((scheduler.SchedulingPolicy::get_scheduler_mode(num_thread) &
+        if ((scheduler.SchedulingPolicy::get_scheduler_mode() &
                 policies::do_background_work) &&
             num_thread < params.max_background_threads_ &&
             !params.background_.empty())
@@ -588,15 +588,15 @@ namespace hpx { namespace threads { namespace detail
 
             // extract the stealing mode once per loop iteration
             bool enable_stealing =
-                scheduler.SchedulingPolicy::get_scheduler_mode(num_thread) &
-                policies::enable_stealing;
+                scheduler.SchedulingPolicy::get_scheduler_mode() &
+                    policies::enable_stealing;
 
             // stealing staged threads is enabled if:
             // - fast idle mode is on: same as normal stealing
             // - fast idle mode off: only after normal stealing has failed for
             //                       a while
             bool enable_stealing_staged = enable_stealing;
-            if (!(scheduler.SchedulingPolicy::get_scheduler_mode(num_thread) &
+            if (!(scheduler.SchedulingPolicy::get_scheduler_mode() &
                     policies::fast_idle_mode))
             {
                 enable_stealing_staged = enable_stealing_staged &&
@@ -847,8 +847,8 @@ namespace hpx { namespace threads { namespace detail
 
                         if (can_exit)
                         {
-                            if (!(scheduler.SchedulingPolicy::get_scheduler_mode(
-                                            num_thread) & policies::delay_exit))
+                            if (!(scheduler.SchedulingPolicy::get_scheduler_mode()
+                                  & policies::delay_exit))
                             {
                                 // If this is an inner scheduler, try to exit immediately
 #if defined(HPX_HAVE_NETWORKING)
@@ -890,7 +890,7 @@ namespace hpx { namespace threads { namespace detail
                     }
                 }
                 else if (!may_exit && added == 0 &&
-                    (scheduler.SchedulingPolicy::get_scheduler_mode(num_thread) &
+                    (scheduler.SchedulingPolicy::get_scheduler_mode() &
                         policies::fast_idle_mode))
                 {
                     // speed up idle suspend if no work was stolen

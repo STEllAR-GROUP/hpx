@@ -104,17 +104,42 @@ namespace hpx { namespace threads { namespace policies {
         bool is_state(hpx::state s) const;
         std::pair<hpx::state, hpx::state> get_minmax_state() const;
 
-        // get/set scheduler mode
-        virtual scheduler_mode get_scheduler_mode(std::size_t num_thread) const
+        ///////////////////////////////////////////////////////////////////////
+        bool has_work_stealing() const
         {
-            return modes_[num_thread].data_.load(std::memory_order_relaxed);
+            return (get_scheduler_mode() & policies::enable_stealing);
         }
 
-        void set_scheduler_mode(scheduler_mode mode);
+        bool has_work_stealing_numa() const
+        {
+            return (get_scheduler_mode() & policies::enable_stealing_numa);
+        }
+
+        // get/set scheduler mode
+        scheduler_mode get_scheduler_mode() const
+        {
+            return mode_.data_.load(std::memory_order_relaxed);
+        }
+
+        // set mode flags that control scheduler behaviour
+        // This set function is virtual so that flags may be overriden
+        // by schedulers that do not support certain operations/modes.
+        // All other mode set functions should call this one to ensure
+        // that flags are always consistent
+        virtual void set_scheduler_mode(scheduler_mode mode);
+
+        // add a flag to the scheduler mode flags
         void add_scheduler_mode(scheduler_mode mode);
+
+        // remove flag from scheduler mode
+        void remove_scheduler_mode(scheduler_mode mode);
+
+        // add flag to scheduler mode
         void add_remove_scheduler_mode(
             scheduler_mode to_add_mode, scheduler_mode to_remove_mode);
-        void remove_scheduler_mode(scheduler_mode mode);
+
+        // conditionally add or remove depending on set true/false
+        void update_scheduler_mode(scheduler_mode mode, bool set);
 
         pu_mutex_type& get_pu_mutex(std::size_t num_thread)
         {
@@ -123,13 +148,6 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        virtual bool numa_sensitive() const
-        {
-            return false;
-        }
-
-        virtual bool has_thread_stealing(std::size_t num_thread) const;
-
         // domain management
         std::size_t domain_from_local_thread_index(std::size_t n);
 
@@ -258,10 +276,8 @@ namespace hpx { namespace threads { namespace policies {
         }
 
     protected:
-        // the scheduler mode is simply replicated across the cores to
-        // avoid false sharing, we ignore benign data races related to this
-        // variable
-        std::vector<util::cache_line_data<std::atomic<scheduler_mode>>> modes_;
+        // the scheduler mode, ptoected from false sharing
+        util::cache_line_data<std::atomic<scheduler_mode>> mode_;
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues

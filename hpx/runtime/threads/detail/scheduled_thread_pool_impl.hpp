@@ -96,8 +96,7 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     scheduled_thread_pool<Scheduler>::scheduled_thread_pool(
-        std::unique_ptr<Scheduler>
-            sched,
+        std::unique_ptr<Scheduler> sched,
         thread_pool_init_parameters const& init)
       : thread_pool_base(init)
       , sched_(std::move(sched))
