@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 #include <hpx/schedulers/background_scheduler.hpp>
 #include <hpx/schedulers/local_priority_queue_scheduler.hpp>
 #include <hpx/schedulers/local_queue_scheduler.hpp>
