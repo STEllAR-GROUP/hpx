@@ -93,7 +93,10 @@ namespace hpx { namespace compute { namespace detail {
         {
             std::lock_guard<mutex_type> l(mtx_);
             if (targets_.empty())
+            {
+                hpx::util::ignore_lock(&mtx_);
                 targets_ = Target::get_local_targets();
+            }
 
             std::size_t num_parts = (num_partitions_ == std::size_t(-1)) ?
                 targets_.size() :
