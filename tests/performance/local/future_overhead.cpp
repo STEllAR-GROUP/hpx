@@ -230,11 +230,12 @@ void measure_function_futures_thread_count(
     });
 
     // stop the clock
-    const double duration = walltime.elapsed();
+    double const duration = walltime.elapsed();
 
     if (sanity_check != 0)
     {
-        auto count = this_pool->get_thread_count_unknown(std::size_t(-1), false);
+        std::size_t count =
+            this_pool->get_thread_count_unknown(std::size_t(-1), false);
         throw std::runtime_error(
             "This test is faulty " + std::to_string(count));
     }
@@ -278,7 +279,8 @@ void measure_function_futures_limiting_executor(
         hpx::threads::executors::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
         hpx::parallel::for_loop(
-            hpx::parallel::execution::par.with(fixed), 0, count, [&](std::uint64_t) {
+            hpx::parallel::execution::par.with(fixed), 0, std::uint64_t(count), 
+            [&](std::uint64_t) {
                 hpx::apply(signal_exec, [&]() {
                     null_function();
                     sanity_check--;
@@ -452,8 +454,9 @@ void measure_function_futures_create_thread_hierarchical_placement(
             for (std::uint64_t i = count_start; i < count_end; ++i)
             {
                 hpx::threads::thread_init_data init(
-                    hpx::threads::thread_function_type(thread_func), desc, prio,
-                    hint, stack_size, sched);
+                    hpx::threads::thread_function_type(thread_func), desc,
+                    hpx::threads::thread_priority_normal, hint, stack_size,
+                    sched);
                 sched->create_thread(
                     init, nullptr, hpx::threads::pending, false, ec);
             }
@@ -463,8 +466,8 @@ void measure_function_futures_create_thread_hierarchical_placement(
                 spawn_func};
 
         hpx::threads::thread_init_data init(
-            hpx::threads::thread_function_type(thread_spawn_func), desc, prio,
-            hint, stack_size, sched);
+            hpx::threads::thread_function_type(thread_spawn_func), desc,
+            hpx::threads::thread_priority_normal, hint, stack_size, sched);
         sched->create_thread(init, nullptr, hpx::threads::pending, false, ec);
     }
     l.wait();

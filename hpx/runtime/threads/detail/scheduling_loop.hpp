@@ -819,9 +819,10 @@ namespace hpx { namespace threads { namespace detail
             {
                 --idle_loop_count;
 
+                next_thrd = nullptr;
                 if (scheduler.SchedulingPolicy::wait_or_add_new(
                         num_thread, running, idle_loop_count,
-                        enable_stealing_staged, added))
+                        enable_stealing_staged, added, &next_thrd))
                 {
                     // Clean up terminated threads before trying to exit
                     bool can_exit =
@@ -896,6 +897,12 @@ namespace hpx { namespace threads { namespace detail
                     // speed up idle suspend if no work was stolen
                     idle_loop_count -= params.max_idle_loop_count_ / 256;
                     added = std::size_t(-1);
+                }
+
+                // if stealing yielded a new task, run it first
+                if (next_thrd != nullptr)
+                {
+                    continue;
                 }
 
 #if defined(HPX_HAVE_NETWORKING)

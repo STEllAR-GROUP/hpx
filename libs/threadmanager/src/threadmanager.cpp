@@ -480,6 +480,40 @@ namespace hpx { namespace threads {
                 break;
             }
 
+            case resource::local_workstealing:
+            {
+#if defined(HPX_HAVE_LOCAL_WORKSTEALING_SCHEDULER)
+                // set parameters for scheduler and pool instantiation and
+                // perform compatibility checks
+                std::string affinity_desc;
+                std::size_t numa_sensitive =
+                    hpx::util::get_affinity_description(cfg_, affinity_desc);
+
+                // instantiate the scheduler
+                using local_sched_type =
+                    hpx::threads::policies::local_workstealing_scheduler<>;
+
+                local_sched_type::init_parameter_type init(
+                    thread_pool_init.num_threads_,
+                    thread_pool_init.affinity_data_, numa_sensitive,
+                    thread_queue_init, "core-local_workstealing_scheduler");
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(init));
+
+                // instantiate the pool
+                std::unique_ptr<thread_pool_base> pool(
+                    new hpx::threads::detail::scheduled_thread_pool<
+                        local_sched_type>(std::move(sched), thread_pool_init));
+                pools_.push_back(std::move(pool));
+#else
+                throw hpx::detail::command_line_error(
+                    "Command line option --hpx:queuing=local-workstealing "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=local-workstealing'.");
+#endif
+                break;
+            }
+
             case resource::static_:
             {
 #if defined(HPX_HAVE_STATIC_SCHEDULER)

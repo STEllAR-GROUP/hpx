@@ -532,20 +532,23 @@ namespace hpx { namespace threads { namespace policies {
 
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)
-        std::int64_t get_queue_length() const
+        std::int64_t get_queue_length(
+            std::memory_order order = std::memory_order_acquire) const
         {
-            return work_items_count_.data_ + new_tasks_count_.data_;
+            return work_items_count_.data_.load(order) +
+                new_tasks_count_.data_.load(order);
         }
 
         // This returns the current length of the pending queue
-        std::int64_t get_pending_queue_length() const
+        std::int64_t get_pending_queue_length(
+            std::memory_order order = std::memory_order_acquire) const
         {
-            return work_items_count_.data_;
+            return work_items_count_.data_.load(order);
         }
 
         // This returns the current length of the staged queue
         std::int64_t get_staged_queue_length(
-            std::memory_order order = std::memory_order_seq_cst) const
+            std::memory_order order = std::memory_order_acquire) const
         {
             return new_tasks_count_.data_.load(order);
         }
@@ -957,7 +960,8 @@ namespace hpx { namespace threads { namespace policies {
         /// manager to allow for maintenance tasks to be executed in the
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        inline bool wait_or_add_new(bool, std::size_t& added) HPX_HOT
+        inline bool wait_or_add_new(
+            bool, std::size_t& added, bool steal = false) HPX_HOT
         {
             if (0 == new_tasks_count_.data_.load(std::memory_order_relaxed))
             {
@@ -978,7 +982,7 @@ namespace hpx { namespace threads { namespace policies {
                 return false;    // avoid long wait on lock
 
             // stop running after all HPX threads have been terminated
-            return add_new_always(added, this, lk);
+            return !add_new_always(added, this, lk, steal);
         }
 
         inline bool wait_or_add_new(bool running, std::size_t& added,
@@ -1074,30 +1078,30 @@ namespace hpx { namespace threads { namespace policies {
         mutable mutex_type mtx_;    // mutex protecting the members
 
         thread_map_type thread_map_;    // mapping of thread id's to HPX-threads
-        std::atomic<std::int64_t>
-            thread_map_count_;    // overall count of work items
+
+        // overall count of work items
+        std::atomic<std::int64_t> thread_map_count_;
 
         work_items_type work_items_;    // list of active work items
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        std::atomic<std::int64_t>
-            work_items_wait_;    // overall wait time of work items
-        std::atomic<std::int64_t>
-            work_items_wait_count_;    // overall number of
-                                       // work items in queue
+        // overall wait time of work items
+        std::atomic<std::int64_t> work_items_wait_;
+        // overall number of work items in queue
+        std::atomic<std::int64_t> work_items_wait_count_;
 #endif
-        terminated_items_type
-            terminated_items_;    // list of terminated threads
-        std::atomic<std::int64_t>
-            terminated_items_count_;    // count of terminated items
+        // list of terminated threads
+        terminated_items_type terminated_items_;
+        // count of terminated items
+        std::atomic<std::int64_t> terminated_items_count_;
 
         task_items_type new_tasks_;    // list of new tasks to run
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        std::atomic<std::int64_t>
-            new_tasks_wait_;    // overall wait time of new tasks
-        std::atomic<std::int64_t>
-            new_tasks_wait_count_;    // overall number tasks waited
+        // overall wait time of new tasks
+        std::atomic<std::int64_t> new_tasks_wait_;
+        // overall number tasks waited
+        std::atomic<std::int64_t> new_tasks_wait_count_;
 #endif
 
         thread_heap_type thread_heap_small_;

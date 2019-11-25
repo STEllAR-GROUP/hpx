@@ -1012,7 +1012,7 @@ namespace hpx { namespace util
 #endif
 
         // handle setting related to schedulers
-        queuing_ = detail::handle_queuing(cfgmap, vm, "local-priority-fifo");
+        queuing_ = detail::handle_queuing(cfgmap, vm, "local-workstealing");
         ini_config.emplace_back("hpx.scheduler=" + queuing_);
 
         affinity_domain_ = detail::handle_affinity(cfgmap, vm, "pu");

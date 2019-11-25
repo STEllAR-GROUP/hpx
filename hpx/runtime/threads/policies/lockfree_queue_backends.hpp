@@ -63,6 +63,8 @@ namespace hpx { namespace threads { namespace policies {
         bool pop(reference val, bool steal = true)
         {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+            if (steal)
+                return queue_.pop_left(val);
             return queue_.pop_right(val);
 #else
             return queue_.pop(val);
@@ -168,6 +170,8 @@ namespace hpx { namespace threads { namespace policies {
 
         bool pop(reference val, bool steal = true)
         {
+            if (steal)
+                return queue_.pop_right(val);
             return queue_.pop_left(val);
         }
 

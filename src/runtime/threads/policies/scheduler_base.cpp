@@ -38,7 +38,8 @@
 namespace hpx { namespace threads { namespace policies
 {
     scheduler_base::scheduler_base(std::size_t num_threads,
-        char const* description, thread_queue_init_parameters thread_queue_init,
+        char const* description,
+        thread_queue_init_parameters const& thread_queue_init,
         scheduler_mode mode)
       : suspend_mtxs_(num_threads)
       , suspend_conds_(num_threads)

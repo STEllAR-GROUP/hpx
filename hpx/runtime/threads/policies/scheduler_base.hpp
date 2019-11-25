@@ -48,7 +48,7 @@ namespace hpx { namespace threads { namespace policies {
         typedef std::mutex pu_mutex_type;
 
         scheduler_base(std::size_t num_threads, char const* description = "",
-            thread_queue_init_parameters thread_queue_init = {},
+            thread_queue_init_parameters const& thread_queue_init = {},
             scheduler_mode mode = nothing_special);
 
         virtual ~scheduler_base() = default;
@@ -226,7 +226,7 @@ namespace hpx { namespace threads { namespace policies {
 
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, bool enable_stealing,
-            std::size_t& added) = 0;
+            std::size_t& added, thread_data** next_thrd = nullptr) = 0;
 
         virtual void on_start_thread(std::size_t num_thread) = 0;
         virtual void on_stop_thread(std::size_t num_thread) = 0;

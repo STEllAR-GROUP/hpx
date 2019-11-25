@@ -109,9 +109,8 @@ namespace hpx { namespace threads { namespace policies {
           , queues_(init.num_queues_)
           , curr_queue_(0)
           , affinity_data_(init.affinity_data_)
-          ,
 #ifndef HPX_NATIVE_MIC    // we know that the MIC has one NUMA domain only
-          steals_in_numa_domain_()
+          , steals_in_numa_domain_()
           , steals_outside_numa_domain_()
 #endif
           , numa_domain_masks_(
@@ -132,7 +131,7 @@ namespace hpx { namespace threads { namespace policies {
             }
         }
 
-        virtual ~local_queue_scheduler()
+        ~local_queue_scheduler()
         {
             for (std::size_t i = 0; i != queues_.size(); ++i)
                 delete queues_[i];
@@ -327,7 +326,7 @@ namespace hpx { namespace threads { namespace policies {
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        virtual bool get_next_thread(std::size_t num_thread, bool running,
+        bool get_next_thread(std::size_t num_thread, bool running,
             threads::thread_data*& thrd, bool /*enable_stealing*/) override
         {
             std::size_t queues_size = queues_.size();
@@ -686,9 +685,9 @@ namespace hpx { namespace threads { namespace policies {
         /// manager to allow for maintenance tasks to be executed in the
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        virtual bool wait_or_add_new(std::size_t num_thread, bool running,
+        bool wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, bool /*enable_stealing*/,
-            std::size_t& added) override
+            std::size_t& added, thread_data** next_thrd = nullptr) override
         {
             std::size_t queues_size = queues_.size();
             HPX_ASSERT(num_thread < queues_.size());

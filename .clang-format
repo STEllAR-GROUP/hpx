@@ -1,5 +1,5 @@
 # Copyright (c) 2016 Thomas Heller
-# Copyright (c) 2016-2018 Hartmut Kaiser
+# Copyright (c) 2016-2019 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -42,9 +42,11 @@ AlwaysBreakTemplateDeclarations: true
 BinPackArguments: true
 BinPackParameters: true
 BraceWrapping:
+#    AfterCaseLabel: true       # added in V10
     AfterClass: true
     AfterControlStatement: true
     AfterEnum: true
+#    AfterExternBlock: true     # added in V10
     AfterFunction: true
     AfterNamespace: false
     AfterStruct: true
@@ -52,6 +54,9 @@ BraceWrapping:
     BeforeCatch: true
     BeforeElse: true
     IndentBraces: false
+#    SplitEmptyFunction: true   # added in V10
+#    SplitEmptyNamespace: true  # added in V10
+#    SplitEmptyRecord: true     # added in V10
 BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Custom
 BreakBeforeInheritanceComma: true
@@ -102,7 +107,7 @@ PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 200
 PointerAlignment: Left
 ReflowComments: false
-SortIncludes:    true
+SortIncludes: true
 SpaceAfterCStyleCast: true
 SpaceAfterTemplateKeyword: true
 SpaceBeforeAssignmentOperators: true

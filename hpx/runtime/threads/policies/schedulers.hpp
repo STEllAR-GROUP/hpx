@@ -16,6 +16,9 @@
 #include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 #endif
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
+#if defined(HPX_HAVE_LOCAL_WORKSTEALING_SCHEDULER)
+#include <hpx/runtime/threads/policies/local_workstealing_scheduler.hpp>
+#endif
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
 #endif
