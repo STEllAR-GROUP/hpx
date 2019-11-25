@@ -158,7 +158,3 @@ add_hpx_module(serialization
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )
-
-if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
-  hpx_info("    Enabled serialization of Boost types")
-endif()

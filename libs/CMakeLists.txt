@@ -90,6 +90,7 @@ if(HPX_WITH_TESTS)
 endif()
 
 
+hpx_info("")
 hpx_info("Configuring modules:")
 
 # variables needed for modules.cpp

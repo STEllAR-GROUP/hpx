@@ -52,7 +52,3 @@ add_hpx_module(datastructures
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )
-
-if(HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE)
-  hpx_info("    Adapted hpx::util::tuple to be usable with std::tuple")
-endif()

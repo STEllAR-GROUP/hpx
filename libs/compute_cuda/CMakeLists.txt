@@ -62,3 +62,7 @@ add_hpx_module(compute_cuda
     hpx_serialization
   CMAKE_SUBDIRS examples tests
 )
+
+include(HPX_PrintSummary)
+create_configuration_summary(
+  "  Module configuration summary (compute_cuda):" "compute_cuda")

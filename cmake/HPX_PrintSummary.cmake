@@ -37,7 +37,7 @@ function(create_configuration_summary message module_name)
 
       if(${__pos} EQUAL 0)
         get_property(_value CACHE "${_variableName}" PROPERTY VALUE)
-        hpx_info("  ${_variableName}=${_value}")
+        hpx_info("    ${_variableName}=${_value}")
 
         string(REPLACE "_WITH_" "_HAVE_" __variableName ${_variableName})
         list(FIND DEFINITIONS_VARS ${__variableName} __pos)
@@ -73,12 +73,12 @@ function(create_configuration_summary message module_name)
   endif()
 
   configure_file(
-    "${PROJECT_SOURCE_DIR}/cmake/templates/${_template}"
-    "${CMAKE_BINARY_DIR}/${_base_dir_local}/config_strings.hpp"
+    "${HPX_SOURCE_DIR}/cmake/templates/${_template}"
+    "${HPX_BINARY_DIR}/${_base_dir_local}/config_strings.hpp"
     @ONLY)
   configure_file(
-    "${PROJECT_SOURCE_DIR}/cmake/templates/${_template}"
-    "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${_base_dir}/config_strings.hpp"
+    "${HPX_SOURCE_DIR}/cmake/templates/${_template}"
+    "${HPX_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${_base_dir}/config_strings.hpp"
     @ONLY)
 
 endfunction()

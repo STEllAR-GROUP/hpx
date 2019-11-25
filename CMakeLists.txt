@@ -56,6 +56,9 @@ set(HPX_VERSION "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINO
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
 set(HPX_SOVERSION ${HPX_VERSION_MAJOR})
 set(HPX_PACKAGE_NAME HPX)
+# To keep track of the hpx_root when other subprojects are declared
+set(HPX_SOURCE_DIR "${PROJECT_SOURCE_DIR}")
+set(HPX_BINARY_DIR "${PROJECT_BINARY_DIR}")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -1981,12 +1984,7 @@ endif()
 ################################################################################
 # print overall configuration summary
 include(HPX_PrintSummary)
-create_configuration_summary("Configuration summary:" "hpx")
-
-foreach(_module ${HPX_LIBS})
-  create_configuration_summary(
-    "Module configuration summary (${_module}):" "${_module}")
-endforeach()
+create_configuration_summary("Configuration summary:\n--" "hpx")
 
 include(HPX_ExportTargets)
 # Modules can't link to this if not exported
