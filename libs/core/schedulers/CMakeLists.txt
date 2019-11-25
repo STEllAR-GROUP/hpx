@@ -11,6 +11,7 @@ set(schedulers_headers
     hpx/schedulers/deadlock_detection.hpp
     hpx/schedulers/local_priority_queue_scheduler.hpp
     hpx/schedulers/local_queue_scheduler.hpp
+    hpx/schedulers/local_workrequesting_scheduler.hpp
     hpx/schedulers/lockfree_queue_backends.hpp
     hpx/schedulers/maintain_queue_wait_times.hpp
     hpx/schedulers/queue_helpers.hpp

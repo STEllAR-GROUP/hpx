@@ -425,6 +425,12 @@ namespace hpx { namespace threads {
         void create_scheduler_shared_priority(
             thread_pool_init_parameters const&,
             policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_local_workrequesting_fifo(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_local_workrequesting_lifo(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
 
         mutable mutex_type mtx_;    // mutex protecting the members
 

@@ -478,18 +478,24 @@ namespace hpx::local::detail {
                 "run on (default: 0), valid for "
                 "--hpx:queuing=local, --hpx:queuing=abp-priority, "
                 "--hpx:queuing=static, --hpx:queuing=static-priority, "
+                "--hpx:queuing=local-workrequesting-fifo, "
+                "--hpx:queuing=local-workrequesting-lifo, "
                 "and --hpx:queuing=local-priority only")
             ("hpx:pu-step", value<std::size_t>(),
                 "the step between used processing unit numbers for this "
                 "instance of HPX (default: 1), valid for "
                 "--hpx:queuing=local, --hpx:queuing=abp-priority, "
                 "--hpx:queuing=static, --hpx:queuing=static-priority "
+                "--hpx:queuing=local-workrequesting-fifo, "
+                "--hpx:queuing=local-workrequesting-lifo, "
                 "and --hpx:queuing=local-priority only")
             ("hpx:affinity", value<std::string>(),
                 "the affinity domain the OS threads will be confined to, "
                 "possible values: pu, core, numa, machine (default: pu), valid for "
                 "--hpx:queuing=local, --hpx:queuing=abp-priority, "
                 "--hpx:queuing=static, --hpx:queuing=static-priority "
+                "--hpx:queuing=local-workrequesting-fifo, "
+                "--hpx:queuing=local-workrequesting-lifo, "
                 " and --hpx:queuing=local-priority only")
             ("hpx:bind", value<std::vector<std::string> >()->composing(),
                 "the detailed affinity description for the OS threads, see "
@@ -514,13 +520,16 @@ namespace hpx::local::detail {
             ("hpx:queuing", value<std::string>(),
                 "the queue scheduling policy to use, options are "
                 "'local', 'local-priority-fifo','local-priority-lifo', "
-                "'abp-priority-fifo', 'abp-priority-lifo', 'static', and "
-                "'static-priority' (default: 'local-priority'; "
+                "'abp-priority-fifo', 'abp-priority-lifo', 'static', "
+                "'static-priority', 'local-workrequesting-fifo', and "
+                "'local-workrequesting-lifo' (default: 'local-priority'; "
                 "all option values can be abbreviated)")
             ("hpx:high-priority-threads", value<std::size_t>(),
                 "the number of operating system threads maintaining a high "
                 "priority queue (default: number of OS threads), valid for "
                 "--hpx:queuing=local-priority,--hpx:queuing=static-priority, "
+                "--hpx:queuing=local-workrequesting-fifo, "
+                "--hpx:queuing=local-workrequesting-lifo, "
                 " and --hpx:queuing=abp-priority only)")
             ("hpx:numa-sensitive", value<std::size_t>()->implicit_value(0),
                 "makes the local-priority scheduler NUMA sensitive ("

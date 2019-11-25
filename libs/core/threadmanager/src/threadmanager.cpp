@@ -502,6 +502,85 @@ namespace hpx { namespace threads {
         pools_.push_back(HPX_MOVE(pool));
     }
 
+    void threadmanager::create_scheduler_local_workrequesting_fifo(
+        thread_pool_init_parameters const& thread_pool_init,
+        policies::thread_queue_init_parameters const& thread_queue_init,
+        std::size_t numa_sensitive)
+    {
+        // set parameters for scheduler and pool instantiation and
+        // perform compatibility checks
+        std::size_t num_high_priority_queues =
+            hpx::util::get_entry_as<std::size_t>(rtcfg_,
+                "hpx.thread_queue.high_priority_queues",
+                thread_pool_init.num_threads_);
+        detail::check_num_high_priority_queues(
+            thread_pool_init.num_threads_, num_high_priority_queues);
+
+        // instantiate the scheduler
+        using local_sched_type =
+            hpx::threads::policies::local_workrequesting_scheduler<>;
+
+        local_sched_type::init_parameter_type init(
+            thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
+            num_high_priority_queues, thread_queue_init,
+            "core-local_workrequesting_scheduler");
+
+        std::unique_ptr<local_sched_type> sched(new local_sched_type(init));
+
+        // set the default scheduler flags
+        sched->set_scheduler_mode(thread_pool_init.mode_);
+
+        // conditionally set/unset this flag
+        sched->update_scheduler_mode(
+            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive);
+
+        // instantiate the pool
+        std::unique_ptr<thread_pool_base> pool = std::make_unique<
+            hpx::threads::detail::scheduled_thread_pool<local_sched_type>>(
+            HPX_MOVE(sched), thread_pool_init);
+        pools_.push_back(HPX_MOVE(pool));
+    }
+
+    void threadmanager::create_scheduler_local_workrequesting_lifo(
+        thread_pool_init_parameters const& thread_pool_init,
+        policies::thread_queue_init_parameters const& thread_queue_init,
+        std::size_t numa_sensitive)
+    {
+        // set parameters for scheduler and pool instantiation and
+        // perform compatibility checks
+        std::size_t num_high_priority_queues =
+            hpx::util::get_entry_as<std::size_t>(rtcfg_,
+                "hpx.thread_queue.high_priority_queues",
+                thread_pool_init.num_threads_);
+        detail::check_num_high_priority_queues(
+            thread_pool_init.num_threads_, num_high_priority_queues);
+
+        // instantiate the scheduler
+        using local_sched_type =
+            hpx::threads::policies::local_workrequesting_scheduler<std::mutex,
+                hpx::threads::policies::lockfree_lifo>;
+
+        local_sched_type::init_parameter_type init(
+            thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
+            num_high_priority_queues, thread_queue_init,
+            "core-local_workrequesting_scheduler");
+
+        std::unique_ptr<local_sched_type> sched(new local_sched_type(init));
+
+        // set the default scheduler flags
+        sched->set_scheduler_mode(thread_pool_init.mode_);
+
+        // conditionally set/unset this flag
+        sched->update_scheduler_mode(
+            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive);
+
+        // instantiate the pool
+        std::unique_ptr<thread_pool_base> pool = std::make_unique<
+            hpx::threads::detail::scheduled_thread_pool<local_sched_type>>(
+            HPX_MOVE(sched), thread_pool_init);
+        pools_.push_back(HPX_MOVE(pool));
+    }
+
     void threadmanager::create_pools()
     {
         auto& rp = hpx::resource::get_partitioner();
@@ -637,6 +716,16 @@ namespace hpx { namespace threads {
 
             case resource::scheduling_policy::static_priority:
                 create_scheduler_static_priority(
+                    thread_pool_init, thread_queue_init, numa_sensitive);
+                break;
+
+            case resource::scheduling_policy::local_workrequesting_fifo:
+                create_scheduler_local_workrequesting_fifo(
+                    thread_pool_init, thread_queue_init, numa_sensitive);
+                break;
+
+            case resource::scheduling_policy::local_workrequesting_lifo:
+                create_scheduler_local_workrequesting_lifo(
                     thread_pool_init, thread_queue_init, numa_sensitive);
                 break;
 
