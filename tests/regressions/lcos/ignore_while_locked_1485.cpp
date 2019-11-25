@@ -76,6 +76,7 @@ void test_condition_with_mutex()
 
     {
         std::lock_guard<hpx::lcos::local::spinlock> lock(data.mutex);
+        hpx::util::ignore_all_while_checking il;
         data.cond_var.notify_one();
     }
 
